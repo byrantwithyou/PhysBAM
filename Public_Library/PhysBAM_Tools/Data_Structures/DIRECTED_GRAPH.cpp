@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-namespace PhysBAM{
+using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -24,7 +24,8 @@ void DIRECTED_GRAPH_CORE::
 Reset()
 {
     for(int i=0;i<parents.m;i++){parents(i).Remove_All();children(i).Remove_All();}
-    level_of_node.Clean_Memory();nodes_in_level.Clean_Memory();
+    level_of_node.Clean_Memory();
+    nodes_in_level.Clean_Memory();
 }
 //#####################################################################
 // Function Initialize
@@ -32,7 +33,9 @@ Reset()
 void DIRECTED_GRAPH_CORE::
 Initialize(const int number_nodes)
 {
-    parents.Resize(number_nodes,false,false);children.Resize(number_nodes,false,false);Reset();
+    parents.Resize(number_nodes,false,false);
+    children.Resize(number_nodes,false,false);
+    Reset();
 }
 //#####################################################################
 // Function Resize
@@ -40,7 +43,8 @@ Initialize(const int number_nodes)
 void DIRECTED_GRAPH_CORE::
 Resize(const int number_nodes)
 {
-    parents.Resize(number_nodes);children.Resize(number_nodes);
+    parents.Resize(number_nodes);
+    children.Resize(number_nodes);
 }
 //#####################################################################
 // Function Add_Edge
@@ -57,7 +61,8 @@ Add_Edge(const int parent,const int child,bool ensure_distinct)
 void DIRECTED_GRAPH_CORE::
 Remove_Edge(const int parent,const int child)
 {
-    children(parent).Remove_Index_Lazy(children(parent).Find(child));parents(child).Remove_Index_Lazy(parents(child).Find(parent));
+    children(parent).Remove_Index_Lazy(children(parent).Find(child));
+    parents(child).Remove_Index_Lazy(parents(child).Find(parent));
 }
 //#####################################################################
 // Function Topological_Sort
@@ -65,8 +70,12 @@ Remove_Edge(const int parent,const int child)
 bool DIRECTED_GRAPH_CORE::
 Topological_Sort(ARRAY<int>& finish_time,ARRAY<int>& node_index) // returns false if cycles are found
 {
-    finish_time.Resize(parents.m);node_index.Resize(parents.m);
-    ARRAY<short,int> visit_tag(parents.m);int time=0;bool cycle_free=true;
+    finish_time.Resize(parents.m);
+    finish_time.Fill(-1);
+    node_index.Resize(parents.m);
+    ARRAY<short,int> visit_tag(parents.m);
+    int time=0;
+    bool cycle_free=true;
     for(int i=0;i<parents.m;i++) if(!visit_tag(i)) Visit(i,finish_time,node_index,visit_tag,time,cycle_free);
     return cycle_free;
 }
@@ -76,8 +85,10 @@ Topological_Sort(ARRAY<int>& finish_time,ARRAY<int>& node_index) // returns fals
 void DIRECTED_GRAPH_CORE::
 Topological_Sort_Assuming_Cycle_Free(ARRAY<int>& finish_time,ARRAY<int>& node_index)
 {
-    finish_time=CONSTANT_ARRAY<int>(parents.m,0);node_index.Resize(parents.m,false,false);
-    int time=0;for(int i=0;i<parents.m;i++)if(!finish_time(i)) Visit_Assuming_Cycle_Free(i,finish_time,node_index,time);
+    finish_time=CONSTANT_ARRAY<int>(parents.m,-1);
+    node_index.Resize(parents.m,false,false);
+    int time=0;
+    for(int i=0;i<parents.m;i++)if(finish_time(i)<0) Visit_Assuming_Cycle_Free(i,finish_time,node_index,time);
 }
 //#####################################################################
 // Function Strongly_Connected_Components
@@ -86,8 +97,14 @@ int DIRECTED_GRAPH_CORE::
 Strongly_Connected_Components(ARRAY<int>& component_id) // returns total number of components
 {
     component_id.Resize(parents.m);
-    component_id.Fill(-1);ARRAY<int> finish_time;ARRAY<int> node_index;Topological_Sort(finish_time,node_index);
-    int total_components=0;ARRAY<int> component;component.Preallocate(Value(parents.Size()));ARRAY<short,int> visit_tag(parents.m); // use parents.m for DIRECTED_GRAPH_CORE<int>
+    component_id.Fill(-1);
+    ARRAY<int> finish_time;
+    ARRAY<int> node_index;
+    Topological_Sort(finish_time,node_index);
+    int total_components=0;
+    ARRAY<int> component;
+    component.Preallocate(Value(parents.Size()));
+    ARRAY<short,int> visit_tag(parents.m); // use parents.m for DIRECTED_GRAPH_CORE<int>
     for(int time=parents.m-1;time>=0;time--) if(!visit_tag(node_index(time))){
         total_components++;component.Remove_All();Visit_Transpose(node_index(time),visit_tag,component);
         for(int j=0;j<component.m;j++) component_id(component(j))=total_components-1;}
@@ -100,13 +117,22 @@ void DIRECTED_GRAPH_CORE::
 Generate_Levels() // collapses all cycles into a single level
 {
     level_of_node.Resize(parents.m);
-    ARRAY<int> component_id;int number_components=Strongly_Connected_Components(component_id);
+    ARRAY<int> component_id;
+    int number_components=Strongly_Connected_Components(component_id);
     DIRECTED_GRAPH_CORE component_graph(number_components);
-    for(int i=0;i<parents.m;i++){int parent=component_id(i);for(int j=0;j<children(i).m;j++){
-        int child=component_id(children(i)(j));if(parent != child) component_graph.Add_Edge(parent,child,true);}}
-    ARRAY<int> finish_time,node_index;component_graph.Topological_Sort_Assuming_Cycle_Free(finish_time,node_index);
-    nodes_in_level.Resize(number_components);for(int i=0;i<number_components;i++) nodes_in_level(i).Remove_All();
-    for(int i=0;i<parents.m;i++){int level=number_components-1-finish_time(component_id(i));level_of_node(i)=level;nodes_in_level(level).Append(i);} // level 1 has the highest finish time
+    for(int i=0;i<parents.m;i++){
+        int parent=component_id(i);
+        for(int j=0;j<children(i).m;j++){
+            int child=component_id(children(i)(j));
+            if(parent != child) component_graph.Add_Edge(parent,child,true);}}
+    ARRAY<int> finish_time,node_index;
+    component_graph.Topological_Sort_Assuming_Cycle_Free(finish_time,node_index);
+    nodes_in_level.Resize(number_components);
+    for(int i=0;i<number_components;i++) nodes_in_level(i).Remove_All();
+    for(int i=0;i<parents.m;i++){
+        int level=number_components-1-finish_time(component_id(i));
+        level_of_node(i)=level;
+        nodes_in_level(level).Append(i);} // level 1 has the highest finish time
 }
 //#####################################################################
 // Function Maximal_Depth_On_Acyclic_Graph
@@ -117,7 +143,8 @@ Get_Depth_In_Graph(const DIRECTED_GRAPH_CORE& self,const int index,T_DEPTHS& dep
 {
     if(depths(index)) return depths(index);
     assert(int(recursion_depth)<self.parents.m); // detect cycles
-    int max_depth=0;for(int k=0;k<self.parents(index).m;k++) max_depth=max(max_depth,Get_Depth_In_Graph(self,self.parents(index)(k),depths PHYSBAM_DEBUG_ONLY(,recursion_depth+1)));
+    int max_depth=0;
+    for(int k=0;k<self.parents(index).m;k++) max_depth=max(max_depth,Get_Depth_In_Graph(self,self.parents(index)(k),depths PHYSBAM_DEBUG_ONLY(,recursion_depth+1)));
     return depths(index)=max_depth+1;
 }
 }
@@ -137,7 +164,10 @@ Visit(const int index,ARRAY<int>& finish_time,ARRAY<int>& node_index,ARRAY<short
     for(int i=0;i<children(index).m;i++){
         if(!visit_tag(children(index)(i))) Visit(children(index)(i),finish_time,node_index,visit_tag,time,cycle_free);
         else if(visit_tag(children(index)(i)) == 1) cycle_free=false;}
-    visit_tag(index)=2;finish_time(index)=time;node_index(time)=index;time++;
+    visit_tag(index)=2;
+    finish_time(index)=time;
+    node_index(time)=index;
+    time++;
 }
 //#####################################################################
 // Function Visit_Transpose
@@ -145,7 +175,8 @@ Visit(const int index,ARRAY<int>& finish_time,ARRAY<int>& node_index,ARRAY<short
 void DIRECTED_GRAPH_CORE::
 Visit_Transpose(const int index,ARRAY<short,int>& visit_tag,ARRAY<int>& component)
 {
-    visit_tag(index)=1;component.Append(index);
+    visit_tag(index)=1;
+    component.Append(index);
     for(int i=0;i<parents(index).m;i++) if(!visit_tag(parents(index)(i))) Visit_Transpose(parents(index)(i),visit_tag,component);
     visit_tag(index)=2;
 }
@@ -155,9 +186,12 @@ Visit_Transpose(const int index,ARRAY<short,int>& visit_tag,ARRAY<int>& componen
 void DIRECTED_GRAPH_CORE::
 Visit_Assuming_Cycle_Free(const int index,ARRAY<int>& finish_time,ARRAY<int>& node_index,int& time)
 {
-    for(int i=0;i<children(index).m;i++)if(!finish_time(children(index)(i)))
-        Visit_Assuming_Cycle_Free(children(index)(i),finish_time,node_index,time);
-    finish_time(index)=time;node_index(time)=index;time++;
+    for(int i=0;i<children(index).m;i++)
+        if(finish_time(children(index)(i))<0)
+            Visit_Assuming_Cycle_Free(children(index)(i),finish_time,node_index,time);
+    finish_time(index)=time;
+    node_index(time)=index;
+    time++;
 }
 //#####################################################################
-}
+

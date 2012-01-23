@@ -638,12 +638,12 @@ Print_Maximum_Velocities(const T time) const
         LOG::cout<<"maximum velocity = "<<max_magnitude_global;
         if(solid_body_collection.deformable_body_collection.mpi_solids) LOG::cout<<", local = "<<max_magnitude;
         LOG::cout<<" ("<<p<<")"<<std::endl;}
-    int max_linear_index=0,max_angular_index=0;T max_linear_magnitude_squared=-FLT_MAX,max_angular_magnitude_squared=-FLT_MAX;
+    int max_linear_index=-1,max_angular_index=0;T max_linear_magnitude_squared=-FLT_MAX,max_angular_magnitude_squared=-FLT_MAX;
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){const int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
         T linear_magnitude_squared=rigid_body_particles.twist(p).linear.Magnitude_Squared(),angular_magnitude_squared=rigid_body_particles.twist(p).angular.Magnitude_Squared();
         if(linear_magnitude_squared>max_linear_magnitude_squared){max_linear_magnitude_squared=linear_magnitude_squared;max_linear_index=p;}
         if(angular_magnitude_squared>max_angular_magnitude_squared){max_angular_magnitude_squared=angular_magnitude_squared;max_angular_index=p;}}
-    if(max_linear_index){
+    if(max_linear_index>=0){
         T max_linear_magnitude=sqrt(max_linear_magnitude_squared),max_angular_magnitude=sqrt(max_angular_magnitude_squared);
         T max_linear_magnitude_global=max_linear_magnitude,max_angular_magnitude_global=max_angular_magnitude;
         if(solid_body_collection.deformable_body_collection.mpi_solids){
