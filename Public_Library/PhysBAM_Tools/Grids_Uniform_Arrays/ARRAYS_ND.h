@@ -87,7 +87,7 @@ public:
     {delete[] array.Get_Array_Pointer();}
 
     void Clean_Memory()
-    {Resize(RANGE<TV_INT>(TV_INT::All_Ones_Vector(),TV_INT()),false,false);}
+    {Resize(RANGE<TV_INT>::Empty_Box(),false,false);}
 
     void Delete_Pointers_And_Clean_Memory() // only valid if T is a pointer type
     {for(int i=0;i<array.Size();i++) delete array(i);Clean_Memory();}
@@ -129,26 +129,26 @@ public:
 private:
     void Resize_Helper(const RANGE<VECTOR<int,3> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)
     {TV_INT m1=TV_INT::Componentwise_Max(domain.min_corner,box.min_corner),m2=TV_INT::Componentwise_Min(domain.max_corner,box.max_corner),i;
-    for(i.x=m1.x;i.x<=m2.x;i.x++) for(i.y=m1.y;i.y<=m2.y;i.y++) for(i.z=m1.z;i.z<=m2.z;i.z++){
+    for(i.x=m1.x;i.x<m2.x;i.x++) for(i.y=m1.y;i.y<m2.y;i.y++) for(i.z=m1.z;i.z<m2.z;i.z++){
         TV_INT diff_old(i-domain.min_corner),diff_new(i-box.min_corner);
-        array_new(((diff_new.x*counts_new.y+diff_new.y)*counts_new.z+diff_new.z)+1)=array(((diff_old.x*counts.y+diff_old.y)*counts.z+diff_old.z)+1);}}
+        array_new(((diff_new.x*counts_new.y+diff_new.y)*counts_new.z+diff_new.z))=array(((diff_old.x*counts.y+diff_old.y)*counts.z+diff_old.z));}}
 
     void Resize_Helper(const RANGE<VECTOR<int,2> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)
     {TV_INT m1=TV_INT::Componentwise_Max(domain.min_corner,box.min_corner),m2=TV_INT::Componentwise_Min(domain.max_corner,box.max_corner),i;
-    for(i.x=m1.x;i.x<=m2.x;i.x++) for(i.y=m1.y;i.y<=m2.y;i.y++){
+    for(i.x=m1.x;i.x<m2.x;i.x++) for(i.y=m1.y;i.y<m2.y;i.y++){
         TV_INT diff_old(i-domain.min_corner),diff_new(i-box.min_corner);
-        array_new((diff_new.x*counts_new.y+diff_new.y)+1)=array((diff_old.x*counts.y+diff_old.y)+1);}}
+        array_new((diff_new.x*counts_new.y+diff_new.y))=array((diff_old.x*counts.y+diff_old.y));}}
 
     void Resize_Helper(const RANGE<VECTOR<int,1> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)
     {TV_INT m1=TV_INT::Componentwise_Max(domain.min_corner,box.min_corner),m2=TV_INT::Componentwise_Min(domain.max_corner,box.max_corner),i;
-    for(i.x=m1.x;i.x<=m2.x;i.x++){
+    for(i.x=m1.x;i.x<m2.x;i.x++){
         TV_INT diff_old(i-domain.min_corner),diff_new(i-box.min_corner);
-        array_new(diff_new.x+1)=array(diff_old.x+1);}}
+        array_new(diff_new.x)=array(diff_old.x);}}
 public:
 
     void Resize(const RANGE<TV_INT>& box,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
     {if(box==domain) return;
-    TV_INT counts_new(box.Edge_Lengths()+1);
+    TV_INT counts_new(box.Edge_Lengths());
     assert(counts_new.Min()>=0);
     int size_new=counts_new.Product();
     ARRAY_VIEW<T> array_new(size_new,new T[size_new]);
@@ -162,7 +162,7 @@ public:
     {RANGE<TV_INT> box(m_start_new,m_end_new,n_start_new,n_end_new,mn_start_new,mn_end_new);Resize_In_Place(box);}
 
     void Resize_In_Place(const RANGE<TV_INT>& box)
-    {TV_INT counts_new(box.Edge_Lengths()+1);
+    {TV_INT counts_new(box.Edge_Lengths());
     if(array.Size()>=counts_new.Product()){domain=box;counts=counts_new;Calculate_Acceleration_Constants();}
     else Resize(box,false,false);}
 

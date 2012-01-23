@@ -364,10 +364,10 @@ public:
     {return domain.Clamp(location);}
 
     TV Clamp_Component(const TV& location,const int component) const
-    {TV loc(location);loc(component)=clamp(loc(component),domain.min_corner(component),domain.max_corner(component));return loc;}
+    {TV loc(location);loc(component)=clamp(loc(component),domain.min_corner(component),domain.max_corner(component)-1);return loc;}
 
     TV Clamp(const TV& location,int number_of_ghost_cells) const // clamps to the grid (with ghost cells)
-    {TV extra=(T)number_of_ghost_cells*dX;return clamp(location,domain.min_corner-extra,domain.max_corner+extra);}
+    {TV extra=(T)number_of_ghost_cells*dX;return clamp(location,domain.min_corner-extra,domain.max_corner+extra-1);}
 
     TV_INT Clamp_Min(const TV_INT& index) const
     {return clamp_min(index,TV_INT());}
@@ -376,25 +376,25 @@ public:
     {return clamp_max(index,counts-1);}
 
     void Clamp(TV_INT& index) const
-    {index=clamp(index,TV_INT(),counts);}
+    {index=clamp(index,TV_INT(),counts-1);}
     
     void Clamp(TV_INT& index,const int number_of_ghost_cells) const
     {index=clamp(index,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells-1);}
 
     TV_INT Clamped_Index(const TV& location) const
-    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts);}
+    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts-1);}
     
     TV_INT Clamped_Face_Index(const TV& location) const
-    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts+1);}
+    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts);}
 
     TV_INT Clamped_Index_End_Minus_One(const TV& location) const
-    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts-1);}
+    {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts-2);}
         
     TV_INT Clamped_Index_End_Minus_One(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells-1);}
 
     TV_INT Clamp_To_Cell(const TV& location) const
-    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX),TV_INT(),numbers_of_cells);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX),TV_INT(),numbers_of_cells-1);}
 
     TV_INT Clamp_To_Cell(const TV& location,const int number_of_ghost_cells) const
     {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells-1);}
@@ -406,7 +406,7 @@ public:
     {assert(Is_MAC_Grid());return Clamped_Index_End_Minus_One(X,number_of_ghost_cells)+1;}
 
     TV_INT Closest_Node(const TV& location) const
-    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T).5),TV_INT(),counts);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T).5),TV_INT(),counts-1);}
 
     const RANGE<TV>& Domain() const
     {return domain;}

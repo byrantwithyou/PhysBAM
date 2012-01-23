@@ -80,7 +80,7 @@ public:
     {TV_INT sizes_new;bool early_return=true;
     VECTOR<RANGE<TV_INT>,dimension> domains;
     domain_indices=domain;
-    for(int i=0;i<dimension;i++){domains(i)=domain;domains(i).max_corner(i)++;sizes_new(i)=(domains(i).Edge_Lengths()+1).Product();if(domains(i)!=data(i).Domain_Indices()) early_return=false;}
+    for(int i=0;i<dimension;i++){domains(i)=domain;domains(i).max_corner(i)++;sizes_new(i)=(domains(i).Edge_Lengths()).Product();if(domains(i)!=data(i).Domain_Indices()) early_return=false;}
     if(early_return) return;
     buffer_size=sizes_new.Sum();
     T* p=new T[buffer_size];

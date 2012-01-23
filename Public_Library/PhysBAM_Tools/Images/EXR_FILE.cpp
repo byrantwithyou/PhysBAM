@@ -47,7 +47,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
         Rgba* pixels=new Rgba[height*width];
         file.setFrameBuffer(pixels, 1, width);
         file.readPixels(data_window.min.y,data_window.max.y);
-        image.Resize(1,width,1,height);
+        image.Resize(0,width,0,height);
         int t=0;
         for(int j=image.counts.y-1;j>=0;j--) for(int i=0;i<image.counts.x;i++){image(i,j)=VECTOR<T,3>((T)pixels[t].r,(T)pixels[t].g,(T)pixels[t].b);t++;}
         delete[] pixels;}

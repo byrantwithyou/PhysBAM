@@ -10,7 +10,7 @@ template<class TV> UNIFORM_GRID_ITERATOR_CELL<TV>::
 UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
     :UNIFORM_GRID_ITERATOR<TV>(grid_input)
 {
-    assert(0<=side&&side<=6);assert(region_type!=GRID<TV>::BOUNDARY_REGION && region_type!=GRID<TV>::INTERIOR_REGION); // these types may not really make sense here
+    assert(-1<=side&&side<6);assert(region_type!=GRID<TV>::BOUNDARY_REGION && region_type!=GRID<TV>::INTERIOR_REGION); // these types may not really make sense here
     RANGE<TV_INT> domain(grid.Domain_Indices(number_of_ghost_cells));
     switch(region_type){
         case GRID<TV>::WHOLE_REGION: assert(side>=0);Add_Region(domain);break;

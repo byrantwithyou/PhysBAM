@@ -49,7 +49,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
     LOG::cout<<"reading "<<filename<<": "<<row_stride/3<<" x "<<cinfo.output_height<<std::endl;
 
-    image.Resize(1,cinfo.output_width,1,cinfo.output_height,false,false);
+    image.Resize(0,cinfo.output_width,0,cinfo.output_height,false,false);
     while(cinfo.output_scanline<cinfo.output_height){
         jpeg_read_scanlines(&cinfo,row_pointer,1);int index=0;
         for(int i=0;i<image.counts.x;i++){

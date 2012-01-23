@@ -30,7 +30,7 @@ public:
         Read_Binary<RW>(input,domain);
         T_ARRAY_VIEW array_new(domain,p_start);
         T_ARRAY_VIEW::Exchange_Arrays(array_new,object.data(i));
-        p_start+=(domain.Edge_Lengths()+1).Product();}}
+        p_start+=(domain.Edge_Lengths()).Product();}}
 
     static void Write(std::ostream& output,const ARRAY<T,FACE_INDEX<d> >& object)
     {Write_Binary<RW>(output,object.domain_indices);Write_Binary<RW>(output,object.buffer_size);Write_Binary_Array<RW>(output,object.base_pointer,object.buffer_size);for(int i=0;i<d;i++) Write_Binary<RW>(output,object.data(i).domain);}

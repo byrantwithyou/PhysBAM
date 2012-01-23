@@ -31,7 +31,7 @@ protected:
     {int read_length;Read_Binary<RW>(input,read_length,object.domain);
     if(read_length!=length2) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read length %d not equal to %d",read_length,length2));
     if(object.counts.Min()<0) throw READ_ERROR("Invalid negative array size");
-    object.counts=object.domain.Edge_Lengths()+1;
+    object.counts=object.domain.Edge_Lengths();
     int size=object.counts.Product();
     if(size!=object.array.Size()){delete[] object.array.Get_Array_Pointer();ARRAY_VIEW<T> new_array(size,new T[size]);object.array.Exchange(new_array);}
     Read_Binary_Array<RW>(input,object.array.Get_Array_Pointer(),object.array.Size());object.Calculate_Acceleration_Constants();}

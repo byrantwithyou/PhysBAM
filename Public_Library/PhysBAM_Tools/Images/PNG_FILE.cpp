@@ -61,7 +61,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     int width=png_get_image_width(png_ptr,info_ptr),height=png_get_image_height(png_ptr,info_ptr);
     int color_type=png_get_color_type(png_ptr,info_ptr);
     if(color_type!=PNG_COLOR_TYPE_RGB && color_type!=PNG_COLOR_TYPE_RGBA) PHYSBAM_FATAL_ERROR("PNG read only supports RGB and RGBA");
-    image.Resize(1,width,1,height);
+    image.Resize(0,width,0,height);
     VECTOR<unsigned char,3>** row_pointers=(VECTOR<unsigned char,3>**)png_get_rows(png_ptr,info_ptr);
     for(int i=0;i<width;i++)for(int j=0;j<height;j++)image(i,j)=IMAGE<T>::Byte_Color_To_Scalar_Color(row_pointers[height-j][i-1]);
         

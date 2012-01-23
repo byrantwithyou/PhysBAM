@@ -20,7 +20,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
 {
     std::istream* input(FILE_UTILITIES::Safe_Open_Input(filename,true));
     RGB_HEADER header;Read_Binary<T>(*input,header);
-    image.Resize(1,header.width,1,header.height);unsigned char byte;
+    image.Resize(0,header.width,0,header.height);unsigned char byte;
     if(!header.compression){
         VECTOR<unsigned char,3> color_byte;
         for(int j=0;j<image.counts.y;j++) for(int i=0;i<image.counts.x;i++){Read_Binary<T>(*input,byte);image(i,j).x=IMAGE<T>::Byte_Color_To_Scalar_Color(byte);}

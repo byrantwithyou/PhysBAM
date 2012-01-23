@@ -13,7 +13,7 @@ template<class TV> UNIFORM_GRID_ITERATOR_NODE<TV>::
 UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_cells,const T_REGION& region_type,const int side)
     :UNIFORM_GRID_ITERATOR<TV>(grid_input)
 {
-    assert(0<=side&&side<=2*TV::dimension);assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION);
+    assert(-1<=side&&side<2*TV::dimension);assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION);
     TV_INT counts=grid.Numbers_Of_Nodes(); // exact number of nodes (even if MAC)
     RANGE<TV_INT> domain(grid.Node_Indices(number_of_ghost_cells));
     switch(region_type){
