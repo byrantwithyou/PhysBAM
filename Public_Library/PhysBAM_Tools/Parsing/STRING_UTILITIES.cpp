@@ -73,8 +73,8 @@ return true;}
 std::string Join(const std::string& separator,const ARRAY<std::string>& tokens)
 {
     if(tokens.m==0) return "";
-    std::string str=tokens(1);
-    for(int i=2;i<=tokens.m;i++) str+=separator+tokens(i);
+    std::string str=tokens(0);
+    for(int i=1;i<tokens.m;i++) str+=separator+tokens(i);
     return str;
 }
 

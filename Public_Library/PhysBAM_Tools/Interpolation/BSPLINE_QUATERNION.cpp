@@ -39,7 +39,7 @@ template<class T> T BSPLINE_QUATERNION<T>::
 Quaternion_Basis_Function(const int i,const int k,const T t)
 {
     T sum=0;
-    for(int j=i;j<=control_points.m-k;j++) sum+=BSPLINE<T,ROTATION<TV> >::Basis_Function(j,k,t);
+    for(int j=i;j<control_points.m-k;j++) sum+=BSPLINE<T,ROTATION<TV> >::Basis_Function(j,k,t);
     return sum;
 }
 //#####################################################################
@@ -82,5 +82,5 @@ Create_Closed_Points()
 template<class T> void BSPLINE_QUATERNION<T>::
 Quaternion_Check()
 {
-    for(int i=2;i<=control_points.m;i++) control_points(i)=ROTATION<TV>::Switch_Hemisphere(control_points(i-1),control_points(i));
+    for(int i=1;i<control_points.m;i++) control_points(i)=ROTATION<TV>::Switch_Hemisphere(control_points(i-1),control_points(i));
 }

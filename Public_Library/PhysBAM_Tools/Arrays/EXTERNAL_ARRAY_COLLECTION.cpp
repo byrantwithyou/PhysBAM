@@ -41,7 +41,7 @@ ATTRIBUTE_INDEX EXTERNAL_ARRAY_COLLECTION::
 Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_COLLECTION_ELEMENT_BASE* array,bool owned_element)
 {
     ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);
-    if(index<=arrays.m && arrays(index)->id==attribute_id){
+    if(index<arrays.m && arrays(index)->id==attribute_id){
         PHYSBAM_ASSERT(array==arrays(index));
         return index;}
     array->id=attribute_id;

@@ -29,10 +29,10 @@ public:
     {m=m_input;pdf.Resize(m);cdf.Resize(m+1);}
 
     void Compute_Cumulative_Distribution_Function()
-    {cdf(1)=0;
-    for(int i=2;i<=cdf.m;i++)cdf(i)=cdf(i-1)+pdf(i-1); // compute unnormalized cdf
+    {cdf(0)=0;
+    for(int i=1;i<cdf.m;i++) cdf(i)=cdf(i-1)+pdf(i-1); // compute unnormalized cdf
     normalization_constant=cdf.Last(); // store pdf normalization constant
-    for(int i=0;i<cdf.m;i++)cdf(i)/=normalization_constant;} // normalize to 1
+    for(int i=0;i<cdf.m;i++) cdf(i)/=normalization_constant;} // normalize to 1
 
     PAIR<int,T> Sample(T xi) const // returns (item# , xi')
     {int lower_bound_cdf_index=cdf.Binary_Search(xi)-1;

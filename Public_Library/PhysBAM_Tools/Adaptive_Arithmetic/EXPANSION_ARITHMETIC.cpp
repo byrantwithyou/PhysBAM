@@ -51,29 +51,29 @@ Add_Expansions(const ARRAY<T>& e,const ARRAY<T>& f,ARRAY<T>& h)
 {
   INEXACT T Qnew,hh;
   T enow=e(0),fnow=f(0),Q;
-  int eindex=1,findex=1;
+  int eindex=0,findex=0;
 
   h.Remove_All();h.Preallocate(e.m+f.m);
-  if((fnow>enow)==(fnow>-enow)){Q=enow;if(++eindex<=e.m)enow=e(eindex-1);}
-  else{Q=fnow;if(++findex<=f.m)fnow=f(findex);}
-  if((eindex<=e.m)&&(findex<=f.m)){
-      if((fnow>enow)==(fnow>-enow)){Fast_Two_Sum(enow,Q,Qnew,hh);if(++eindex<=e.m)enow=e(eindex-1);}
-      else{Fast_Two_Sum(fnow,Q,Qnew,hh);if(++findex<=f.m)fnow=f(findex-1);}
+  if((fnow>enow)==(fnow>-enow)){Q=enow;if(++eindex<e.m)enow=e(eindex-1);}
+  else{Q=fnow;if(++findex<f.m)fnow=f(findex);}
+  if((eindex<e.m)&&(findex<f.m)){
+      if((fnow>enow)==(fnow>-enow)){Fast_Two_Sum(enow,Q,Qnew,hh);if(++eindex<e.m)enow=e(eindex-1);}
+      else{Fast_Two_Sum(fnow,Q,Qnew,hh);if(++findex<f.m)fnow=f(findex-1);}
       Q=Qnew;
       if(hh!=0) h.Append(const_cast<T&>(hh)); // NOTE: if(hh!=0) is not equivalent to if(hh) (bool)--(float)0=true
-      while((eindex<=e.m)&&(findex<=f.m)){
-          if((fnow>enow)==(fnow>-enow)){Two_Sum(Q,enow,Qnew,hh);if(++eindex<=e.m)enow=e(eindex-1);}
-          else{Two_Sum(Q,fnow,Qnew,hh);if(++findex<=f.m)fnow=f(findex-1);}
+      while((eindex<e.m)&&(findex<f.m)){
+          if((fnow>enow)==(fnow>-enow)){Two_Sum(Q,enow,Qnew,hh);if(++eindex<e.m)enow=e(eindex-1);}
+          else{Two_Sum(Q,fnow,Qnew,hh);if(++findex<f.m)fnow=f(findex-1);}
           Q=Qnew;
           if(hh!=0) h.Append(const_cast<T&>(hh));}}
-  while(eindex<=e.m){
+  while(eindex<e.m){
       Two_Sum(Q,enow,Qnew,hh);
-      if(++eindex<=e.m)enow=e(eindex-1);
+      if(++eindex<e.m)enow=e(eindex-1);
       Q=Qnew;
       if(hh!=0) h.Append(const_cast<T&>(hh));}
-  while(findex<=f.m){
+  while(findex<f.m){
       Two_Sum(Q,fnow,Qnew,hh);
-      if(++findex<=f.m)fnow=f(findex-1);
+      if(++findex<f.m)fnow=f(findex-1);
       Q=Qnew;
       if(hh!=0) h.Append(const_cast<T&>(hh));}
   if((Q!=0)||!h.m) h.Append(Q);
@@ -92,7 +92,7 @@ Scale_Expansion(const ARRAY<T>& e,const T b,ARRAY<T>& h)
   Split(b,bhi,blo);
   Two_Product_Presplit(e(0),b,bhi,blo,Q,hh);
   if(hh!=0) h.Append(hh);
-  for(eindex=2;eindex<=e.m;eindex++){
+  for(eindex=1;eindex<e.m;eindex++){
       enow=e(eindex);
       Two_Product_Presplit(enow,b,bhi,blo,product1,product0);
       Two_Sum(Q,product0,sum,hh);

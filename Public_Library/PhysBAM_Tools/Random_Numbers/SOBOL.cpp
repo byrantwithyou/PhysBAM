@@ -58,8 +58,8 @@ template<class TV> SOBOL<TV>::
 template<class TV> TV SOBOL<TV>::
 Get_Vector()
 {
-    int rightmost_zero_position=1+integer_log_exact(rightmost_bit((int)~n));
-    PHYSBAM_ASSERT(rightmost_zero_position<=v.m,"Ran out of bits (this means floating point precision has already been exhausted)");
+    int rightmost_zero_position=integer_log_exact(rightmost_bit((int)~n));
+    PHYSBAM_ASSERT(rightmost_zero_position<v.m,"Ran out of bits (this means floating point precision has already been exhausted)");
     const VECTOR<TI,d>& vc=v(rightmost_zero_position);
     for(int i=0;i<d;i++) x[i]^=vc[i];
     n++;
