@@ -1322,7 +1322,7 @@ Get_Image(ARRAY<VECTOR<T,d> ,VECTOR<int,2> > &image,const bool use_back_buffer)
     glGetIntegerv(GL_VIEWPORT,vp);
     PHYSBAM_ASSERT(window->Width()==vp[2] && window->Height()==vp[3]);
 
-    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > temporary_image(1,window->Height(),1,window->Width());image.Resize(1,window->Width(),1,window->Height()); // temporary is row major
+    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > temporary_image(0,window->Height(),0,window->Width());image.Resize(0,window->Width(),0,window->Height()); // temporary is row major
 #ifndef USE_OPENGLES
     glReadBuffer(use_back_buffer?GL_BACK:GL_FRONT);
 #endif

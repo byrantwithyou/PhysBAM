@@ -190,7 +190,7 @@ Update_Divergence()
             else got_all_psi=false;}
         else got_all_psi=false;
         if(!got_all_psi){psi_N.Clean_Memory();psi_D.Clean_Memory();}
-        divergence.Resize(1,grid.counts.x,1,grid.counts.y);
+        divergence.Resize(0,grid.counts.x,0,grid.counts.y);
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
             if(got_all_psi && (psi_D(i,j) || (psi_N.Component(1)(i,j) && psi_N.Component(1)(i+1,j) && psi_N.Component(2)(i,j) && psi_N.Component(2)(i,j+1)))) divergence(i,j)=0;
             else divergence(i,j)=grid.one_over_dX.x*(u(i+1,j)-u(i,j))+grid.one_over_dX.y*(v(i,j+1)-v(i,j));}

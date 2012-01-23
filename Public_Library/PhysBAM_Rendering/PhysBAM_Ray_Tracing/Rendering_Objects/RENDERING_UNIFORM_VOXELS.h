@@ -107,8 +107,8 @@ public:
 protected:
     void Prepare_For_Precomputation(RENDER_WORLD<T>& world) PHYSBAM_OVERRIDE
     {precomputed_light.Resize(world.Lights().m);precomputed_light_valid.Resize(world.Lights().m);
-    for(int i=0;i<precomputed_light.m;i++)precomputed_light(i)=new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >(1,coarse_grid.counts.x,1,coarse_grid.counts.y,1,coarse_grid.counts.z);
-    for(int i=0;i<precomputed_light.m;i++){precomputed_light_valid(i)=new ARRAY<bool,VECTOR<int,3> >(1,coarse_grid.counts.x,1,coarse_grid.counts.y,1,coarse_grid.counts.z);precomputed_light_valid(i)->Fill(false);}}
+    for(int i=0;i<precomputed_light.m;i++)precomputed_light(i)=new ARRAY<VECTOR<T,3> ,VECTOR<int,3> >(0,coarse_grid.counts.x,0,coarse_grid.counts.y,0,coarse_grid.counts.z);
+    for(int i=0;i<precomputed_light.m;i++){precomputed_light_valid(i)=new ARRAY<bool,VECTOR<int,3> >(0,coarse_grid.counts.x,0,coarse_grid.counts.y,0,coarse_grid.counts.z);precomputed_light_valid(i)->Fill(false);}}
 
 //#####################################################################
     void Postprocess_Light_Field() PHYSBAM_OVERRIDE;

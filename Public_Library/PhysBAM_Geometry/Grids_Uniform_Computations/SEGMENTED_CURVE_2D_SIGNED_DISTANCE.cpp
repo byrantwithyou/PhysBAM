@@ -21,7 +21,7 @@ template<class T> void Calculate(SEGMENTED_CURVE_2D<T>& curve,const GRID<VECTOR<
 {
     bool bounding_box_defined=curve.bounding_box!=0;if(!bounding_box_defined) curve.Update_Bounding_Box();
 
-    phi.Resize(1,grid.counts.x,1,grid.counts.y);
+    phi.Resize(0,grid.counts.x,0,grid.counts.y);
 
     T epsilon=(T)1e-8*grid.min_dX;
     int total_cells=grid.counts.x*grid.counts.y,cells_done=0,progress=-1;

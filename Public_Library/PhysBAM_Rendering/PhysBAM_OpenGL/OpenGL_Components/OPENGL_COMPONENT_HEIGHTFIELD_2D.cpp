@@ -29,7 +29,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV> &grid_input,
     } else {
         domain.min_corner.x = m_start_input; domain.max_corner.x = m_end_input; domain.min_corner.y = n_start_input; domain.max_corner.y = n_end_input;
     }
-    counts=domain.Edge_Lengths()+1;
+    counts=domain.Edge_Lengths();
     PHYSBAM_ASSERT(counts.Min()>0);
 
     opengl_triangulated_surface.Set_Two_Sided();

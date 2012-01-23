@@ -38,7 +38,7 @@ public:
         axial_primitive_centroids[axis].Resize(primitives,false);
         axial_primitive_bounding_boxes[axis].Resize(primitives,false);
         axial_intervals[axis].Resize(axis_clusters,false);}
-    cluster_grid_hash.Resize(1,axis_clusters_input,1,axis_clusters_input,1,axis_clusters_input,false);
+    cluster_grid_hash.Resize(0,axis_clusters_input,0,axis_clusters_input,0,axis_clusters_input,false);
     primitive_to_axial_clusters.Resize(primitives);
     // generate ranges
     cluster_ranges.Resize(axis_clusters,false,false);

@@ -66,9 +66,9 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     bool need_flood_fill=compute_signed_distance_function || compute_heaviside_function;
     ARRAY<bool,TV_INT> edge_is_blocked_x,edge_is_blocked_y,edge_is_blocked_z;
     if(need_flood_fill){
-        edge_is_blocked_x.Resize(2,grid.counts.x,1,grid.counts.y,1,grid.counts.z);
-        edge_is_blocked_y.Resize(1,grid.counts.x,2,grid.counts.y,1,grid.counts.z);
-        edge_is_blocked_z.Resize(1,grid.counts.x,1,grid.counts.y,2,grid.counts.z);}
+        edge_is_blocked_x.Resize(1,grid.counts.x,0,grid.counts.y,0,grid.counts.z);
+        edge_is_blocked_y.Resize(0,grid.counts.x,1,grid.counts.y,0,grid.counts.z);
+        edge_is_blocked_z.Resize(0,grid.counts.x,0,grid.counts.y,1,grid.counts.z);}
 
     bool store_closest_triangle_index=need_flood_fill && !only_boundary_region_is_outside;
     ARRAY<int,TV_INT> closest_triangle_index;

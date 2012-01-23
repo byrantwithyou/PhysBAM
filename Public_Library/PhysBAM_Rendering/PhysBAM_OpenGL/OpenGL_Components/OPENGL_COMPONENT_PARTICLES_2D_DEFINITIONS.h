@@ -392,7 +392,7 @@ Apply_Id_Selection()
             int idx = 0;
             for (int i = 0;i<particles_multiple(current_set)->array_collection->Size(); i++){
                 int dummy;
-                if(selected_ids(current_set).Find((*ids)(i),dummy)) opengl_points_multiple(current_set)->Select_Point(idx); 
+                if(selected_ids(current_set).Find((*ids)(i),dummy)>=0) opengl_points_multiple(current_set)->Select_Point(idx); 
                 idx++;}
         }
     }

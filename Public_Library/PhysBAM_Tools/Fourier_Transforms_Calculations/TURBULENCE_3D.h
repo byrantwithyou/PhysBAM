@@ -41,8 +41,8 @@ public:
     
     void Initialize_Grid(const GRID<TV>& grid_input)
     {grid=grid_input;
-    u_old.Resize(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z);v_old.Resize(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z);w_old.Resize(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z);
-    u_new.Resize(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z);v_new.Resize(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z);w_new.Resize(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z);}
+    u_old.Resize(0,grid.counts.x,0,grid.counts.y,0,grid.counts.z);v_old.Resize(0,grid.counts.x,0,grid.counts.y,0,grid.counts.z);w_old.Resize(0,grid.counts.x,0,grid.counts.y,0,grid.counts.z);
+    u_new.Resize(0,grid.counts.x,0,grid.counts.y,0,grid.counts.z);v_new.Resize(0,grid.counts.x,0,grid.counts.y,0,grid.counts.z);w_new.Resize(0,grid.counts.x,0,grid.counts.y,0,grid.counts.z);}
 
     void Generate_Initial_Turbulence(const T time_start_input=0,const T time_end_input=1)
     {time_start=time_start_input;time_end=time_end_input;
