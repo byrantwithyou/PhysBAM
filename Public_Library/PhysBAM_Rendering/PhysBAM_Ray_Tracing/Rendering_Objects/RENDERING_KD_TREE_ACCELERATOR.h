@@ -43,8 +43,8 @@ public:
     {for(int i=0;i<objects.m;i++)objects(i)->Get_Aggregate_World_Space_Bounding_Boxes(primitives);
     if(primitives.m>0){
         // construct total bounding box...
-        bounding_box.Reset_Bounds(primitives(1).bounding_box);
-        for(int i=2;i<=objects.m;i++)bounding_box.Enlarge_To_Include_Box(primitives(i).bounding_box);}}
+        bounding_box.Reset_Bounds(primitives(0).bounding_box);
+        for(int i=1;i<objects.m;i++)bounding_box.Enlarge_To_Include_Box(primitives(i).bounding_box);}}
 
     bool Inside(const TV& location,RENDERING_OBJECT<T>** intersected_object) const PHYSBAM_OVERRIDE
     {for(int i=0;i<objects.m;i++){
