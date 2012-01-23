@@ -45,6 +45,12 @@ public:
         g.Add_Edge(4,3);
         g.Add_Edge(5,4);
 
+        ARRAY<int> parents=g.Parents(4);
+        TEST(parents.Size()==1);
+        TEST(parents(0)==5);
+        ARRAY<int> children=g.Children(4);
+        TEST(children.Size()==3);
+
         g.Generate_Levels();
         TEST(g.Number_Of_Levels()==6);
         g.Add_Edge(2,5);
