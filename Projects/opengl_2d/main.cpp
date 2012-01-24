@@ -677,18 +677,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(pressure2_component,"Pressure2",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F7),pressure2_component->Toggle_Draw_CB());}
 
-    opengl_world.Set_Key_Binding_Category("Volume of Material");
-    filename=basedir+"/%d/negative_material";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* volume_of_material_component=new OPENGL_COMPONENT_SCALAR_FIELD_2D<T>(mac_grid,filename,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
-        volume_of_material_component->opengl_scalar_field.Set_Uniform_Contour_Values(-2,2,(T).1);
-        Add_Component(volume_of_material_component,"Volume of Material",'0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
-    filename=basedir+"/%d/vof_object";
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        std::string color_file=basedir+"/%d/vof_colors";
-        Add_Component(new OPENGL_COMPONENT_TRIANGULATED_AREA<T>(filename,*new std::string(color_file)),
-            "VOF Refinement",'Z',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
-
     // Draw grid here so it'll be above particles and pressure
     opengl_world.Set_Key_Binding_Category("Grid");
     if(has_valid_grid){

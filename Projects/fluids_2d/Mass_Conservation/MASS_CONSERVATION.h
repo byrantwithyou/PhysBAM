@@ -30,7 +30,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 namespace PhysBAM{
 
 template<class T_input,class RW=T_input>
@@ -131,9 +130,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_maccormack_for_level_set=false;
     fluids_parameters.use_maccormack_for_incompressible=false;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    fluids_parameters.mass_conservation=false;
-    fluids_parameters.mass_conservation_maximum_refinement_depth=2;
-    fluids_parameters.mass_conservation_minimum_refinement_depth=1;
 
     period=8;
     T final_time=period;
@@ -231,9 +227,6 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         T_GRID& grid=*fluids_parameters.grid;
         T_ARRAYS_SCALAR copy_phis=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi;
         T_ARRAYS_SCALAR copy_volumes;
-        if(fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection){
-            copy_volumes=fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material;
-            fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material.Fill((T)0);}
         fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi.Fill((T)1);
         TV position_offset;
         if(test_number==11){
@@ -241,9 +234,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
                 TV_INT cell_index=iterator.Cell_Index();
                 if(cell_index.y<grid.counts.x-50){
-                    fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi(cell_index)=copy_phis(cell_index+offset);
-                    if(fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection)
-                        fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material(cell_index)=copy_volumes(cell_index+offset);}}
+                    fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi(cell_index)=copy_phis(cell_index+offset);}}
             position_offset=TV((T)0,(T)-50);
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
@@ -258,9 +249,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
                 TV_INT cell_index=iterator.Cell_Index();
                 if(cell_index.y>50){
-                    fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi(cell_index)=copy_phis(cell_index+offset);
-                    if(fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection)
-                        fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material(cell_index)=copy_volumes(cell_index+offset);}}
+                    fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.phi(cell_index)=copy_phis(cell_index+offset);}}
             position_offset=TV((T)0,(T)50);
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
@@ -272,10 +261,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                     for(int k=0;k<block_particles.array_collection->Size();k++) block_particles.X(k)+=position_offset;}}}
         
         fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.negative_particles);
-        fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles);
-        if(fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection)
-            for(int p=0;p<fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->object.particles.array_collection->Size();p++) // NOTE: this messes up preimage simplices in cell!
-                fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->object.particles.X(p)+=position_offset;}
+        fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.positive_particles);}
 }
 //#####################################################################
 // Function Update_Fluid_Parameters
@@ -381,12 +367,10 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
         RANGE<TV> source_one_box((T).2,(T).3,(T).14,(T).16);ORIENTED_BOX<TV> oriented_one_box(source_one_box,ROTATION<TV>::From_Angle((T)pi/4),source_one_box.Minimum_Corner());
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());T source_phi=oriented_one_box.Signed_Distance(source_X);
-            if(source_phi<0 && fluids_parameters.mass_conservation) fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material(iterator.Cell_Index())=1;
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index()),source_phi);}
         RANGE<TV> source_two_box((T).4,(T).5,(T).14,(T).16);ORIENTED_BOX<TV> oriented_two_box(source_two_box,ROTATION<TV>::From_Angle((T)pi/3),source_two_box.Minimum_Corner());
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV source_X=world_to_source.Homogeneous_Times(iterator.Location());T source_phi=oriented_two_box.Signed_Distance(source_X);
-            if(source_phi<0 && fluids_parameters.mass_conservation) fluids_parameters.particle_levelset_evolution->particle_levelset.vof_advection->volume_of_material(iterator.Cell_Index())=1;
             fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index())=min(fluids_parameters.particle_levelset_evolution->phi(iterator.Cell_Index()),source_phi);}}
     return false;
 }

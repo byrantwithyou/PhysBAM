@@ -130,7 +130,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_maccormack_for_level_set=false;
     fluids_parameters.use_maccormack_for_incompressible=false;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    fluids_parameters.mass_conservation=false;
 
     period=8;
     T final_time=period;
@@ -202,8 +201,6 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     fluids_parameters.Use_No_Fluid_Coupling_Defaults();
     if(test_number==1 || test_number==2 || test_number==3 || test_number==4 || test_number==5 || test_number==6){
-        fluids_parameters.mass_conservation_minimum_refinement_depth=2;
-        fluids_parameters.mass_conservation_maximum_refinement_depth=3;
         fluids_parameters.particle_levelset_evolution->levelset_advection.Use_Local_WENO_For_Advection();
         fluids_parameters.particle_levelset_evolution->Set_Runge_Kutta_Order_Levelset(3);
         fluids_parameters.particle_levelset_evolution->Set_Runge_Kutta_Order_Particles(3);
