@@ -942,7 +942,7 @@ Check_For_Any_Interpenetration()
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index) && rigid_body_collection.Rigid_Body(rigid_body->particle_index).Is_Simulated()){
             int particle_body=0,levelset_body=0;
             spatial_partition->Get_Potential_Collisions(i,object_indices,false);
-            for(int t=0;t<object_indices.m;t++) if(object_indices(t)){
+            for(int t=0;t<object_indices.m;t++) if(object_indices(t)>=0){
                 int id=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(t));
                 if(id && Either_Body_Collides_With_The_Other(rigid_body->particle_index,id) &&
                     intersections.Intersection_Check(rigid_body->particle_index,id,particle_body,levelset_body)){

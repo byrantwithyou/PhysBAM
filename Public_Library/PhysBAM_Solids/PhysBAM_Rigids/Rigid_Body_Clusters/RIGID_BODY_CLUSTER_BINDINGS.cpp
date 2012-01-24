@@ -58,12 +58,18 @@ Update_Joint_Structures(const int parent)
             PAIR<int,int> pair=articulated_rigid_body.joint_mesh.undirected_graph.Edges(list(j));
             int oid=pair.x+(Value(pair.y)-Value(id));
             if(!hashtable.Contains(oid)){
-                BOUNDARY_JOINT boundary_joint;boundary_joint.joint_id=list(j);boundary_joint.boundary_body=id;boundary_joint.is_parent=(pair.x==id);
+                BOUNDARY_JOINT boundary_joint;
+                boundary_joint.joint_id=list(j);
+                boundary_joint.boundary_body=id;
+                boundary_joint.is_parent=(pair.x==id);
                 if(boundary_joint.is_parent) boundary_joint.original_frame=articulated_rigid_body.joint_mesh(list(j))->F_pj();
                 else boundary_joint.original_frame=articulated_rigid_body.joint_mesh(list(j))->F_cj();
                 cluster.boundary_joints.Append(boundary_joint);}
             else if(id<oid){
-                INTERNAL_JOINT internal_joint;internal_joint.joint=articulated_rigid_body.joint_mesh(list(j));internal_joint.parent=pair.x;internal_joint.child=pair.y;
+                INTERNAL_JOINT internal_joint;
+                internal_joint.joint=articulated_rigid_body.joint_mesh(list(j));
+                internal_joint.parent=pair.x;
+                internal_joint.child=pair.y;
                 cluster.internal_joints.Append(internal_joint);}}}
 }
 //#####################################################################
@@ -74,8 +80,8 @@ Append_Binding(const int particle,const PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> d
 {
     int size=binding_index(particle).m+1;
     binding_index(particle).Resize(size,true,true);
-    binding_index(particle)(size)=binding_index(particle)(1);
-    binding_index(particle)(1)=data;
+    binding_index(particle)(size)=binding_index(particle)(0);
+    binding_index(particle)(0)=data;
 }
 //#####################################################################
 // Function Bind_Particle
@@ -86,7 +92,8 @@ Add_Binding(const ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID>& child_particles)
     RIGID_BODY<TV>* parent_body=new RIGID_BODY<TV>(rigid_body_collection,true);
     int parent=parent_body->particle_index;
     CLUSTER& cluster=*reverse_bindings.Get_Or_Insert(parent,new CLUSTER());
-    cluster.parent=parent;cluster.stored_active=false;
+    cluster.parent=parent;
+    cluster.stored_active=false;
     binding_index.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
     bool has_static=false,has_kinematic=false;
     for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<child_particles.Size();i++){
@@ -132,7 +139,7 @@ Delete_Binding(const int parent_particle)
 template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Make_Active_Parent(const int parent_particle,ARRAY<PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> >& child_list)
 {
-    for(int i=0;i<child_list.m;i++) if(child_list(i).x==parent_particle){exchange(child_list(1),child_list(i));return;}
+    for(int i=0;i<child_list.m;i++) if(child_list(i).x==parent_particle){exchange(child_list(0),child_list(i));return;}
 }
 //#####################################################################
 // Function Set_Binding_Active
@@ -229,10 +236,10 @@ Restore_Bindings_State()
 template<class TV> FRAME<TV> RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Get_Child_To_Parent_Frame(int child_particle_index) const
 {    
-    assert(binding_index(child_particle_index)(1).y!=0);
+    assert(binding_index(child_particle_index)(0).y!=0);
     assert(Get_Parent_Index(child_particle_index)!=0);
     return reverse_bindings.Get(Get_Parent_Index(child_particle_index))->
-        child_to_parent(binding_index(child_particle_index)(1).y);
+        child_to_parent(binding_index(child_particle_index)(0).y);
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Positions
@@ -450,11 +457,15 @@ template<class TV> int RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Binding(const int child_particle,FRAME<TV>& frame) const
 {
     if(child_particle>binding_index.m || binding_index(child_particle).m==0) return -1;
-    int parent=binding_index(child_particle)(0).x;const RIGID_CLUSTER_CONSTITUENT_ID instance=binding_index(child_particle)(0).y;
-    if(!parent) return -1; if(!instance) return parent;
-    const CLUSTER& binding=*reverse_bindings.Get(parent);assert(binding.children(instance)==child_particle);
+    int parent=binding_index(child_particle)(0).x;
+    const RIGID_CLUSTER_CONSTITUENT_ID instance=binding_index(child_particle)(0).y;
+    if(parent<0) return -1;
+    if(!instance) return parent;
+    const CLUSTER& binding=*reverse_bindings.Get(parent);
+    assert(binding.children(instance)==child_particle);
     if(!binding.active) return -1;
-    frame=binding.child_to_parent(instance);return parent;
+    frame=binding.child_to_parent(instance);
+    return parent;
 }
 //#####################################################################
 // Function Clamp_Particle_To_Embedded_Position
@@ -463,7 +474,8 @@ template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particle_To_Embedded_Position(const int child) const
 {
     if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) return;
-    FRAME<TV> child_to_parent;int parent=Binding(child,child_to_parent);
+    FRAME<TV> child_to_parent;
+    int parent=Binding(child,child_to_parent);
     rigid_body_collection.Rigid_Body(child).Set_Frame(rigid_body_collection.Rigid_Body(parent).Frame()*child_to_parent);
 }
 //#####################################################################
@@ -473,7 +485,8 @@ template<class TV> void RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Clamp_Particle_To_Embedded_Velocity(const int child) const
 {
     if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) return;
-    FRAME<TV> child_to_parent;int parent=Binding(child,child_to_parent);
+    FRAME<TV> child_to_parent;
+    int parent=Binding(child,child_to_parent);
     rigid_body_collection.rigid_body_particle.twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particle.X(child));
     rigid_body_collection.rigid_body_particle.twist(child).angular=rigid_body_collection.rigid_body_particle.twist(parent).angular;
     rigid_body_collection.Rigid_Body(child).Update_Angular_Momentum();
