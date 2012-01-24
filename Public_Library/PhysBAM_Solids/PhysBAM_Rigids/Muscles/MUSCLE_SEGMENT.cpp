@@ -41,7 +41,7 @@ Update_Frame()
 {
     TV point_1_embedded_position=point_1->Embedded_Position();
     // TODO: use y direction for non-axisymmetric surfaces
-    ROTATION<TV> rotation=ROTATION<TV>::From_Rotated_Vector(TV::Axis_Vector(1),point_2->Embedded_Position()-point_1_embedded_position);
+    ROTATION<TV> rotation=ROTATION<TV>::From_Rotated_Vector(TV::Axis_Vector(0),point_2->Embedded_Position()-point_1_embedded_position);
     Set_Frame(FRAME<TV>(point_1_embedded_position,rotation));
 }
 //#####################################################################

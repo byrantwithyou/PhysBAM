@@ -96,7 +96,7 @@ public:
     {max_time_step=max_time_step_input;}
 
     void Set_Gravity(const T gravity_input=9.8)
-    {gravity=gravity_input;downward_direction=T_GRID::dimension>1?-TV::Axis_Vector(2):TV();}
+    {gravity=gravity_input;downward_direction=T_GRID::dimension>1?-TV::Axis_Vector(1):TV();}
 
     void Set_Gravity(const T gravity_input,const TV& downward_direction_input)
     {gravity=gravity_input;downward_direction=downward_direction_input;}

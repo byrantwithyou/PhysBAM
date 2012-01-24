@@ -25,7 +25,7 @@ template<class T_input> NORMAL_JOINT<VECTOR<T_input,1> >::
 template<class TV> void NORMAL_JOINT<TV>::
 Constrain_Prismatically(TV& translation) const
 {
-    translation(1)=clamp(translation(1),x_min,x_max);
+    translation(0)=clamp(translation(0),x_min,x_max);
 }
 //#####################################################################
 // Function Constrain_Relative_Linear_Velocity
@@ -73,7 +73,7 @@ template<class TV> void NORMAL_JOINT<TV>::
 Prismatic_Constraint_Matrix(const FRAME<TV>& parent_frame,MATRIX_MXN<T>& constrained_matrix,MATRIX_MXN<T>* unconstrained_matrix) const
 {
     TV_BOOL constrain;
-    constrain(1)=x_min>=x_max;
+    constrain(0)=x_min>=x_max;
     Constraint_Matrix_Helper(parent_frame.r*F_pj().r,constrained_matrix,unconstrained_matrix,constrain);
 }
 //#####################################################################

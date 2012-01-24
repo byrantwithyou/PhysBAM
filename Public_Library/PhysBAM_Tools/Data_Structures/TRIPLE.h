@@ -35,4 +35,5 @@ template<class T1,class T2,class T3>
 inline TRIPLE<T1,T2,T3> Tuple(const T1& x,const T2& y,const T3& z)
 {return TRIPLE<T1,T2,T3>(x,y,z);}
 }
+#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_TRIPLE.h>
 #endif

@@ -98,7 +98,7 @@ Adjust_Bounding_Boxes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,const T f
                     bool already_adjusted=false; // multiple rigid bodies can share a triangulated surface - don't adjust bounding box multiple times
                     for(COLLISION_GEOMETRY_ID j(0);j<i-1;j++) if(rigid_body_collection.rigid_geometry_collection.collision_body_list->Is_Active(j)){
                         int rigid_body_id_j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(j);
-                        if(rigid_body_id_j && rigid_body_collection.Is_Active(rigid_body_id_j) && rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object &&
+                        if(rigid_body_id_j>=0 && rigid_body_collection.Is_Active(rigid_body_id_j) && rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object &&
                             rigid_body->simplicial_object==rigid_body_collection.Rigid_Body(rigid_body_id_j).simplicial_object){
                             already_adjusted=true;break;}}
                     if(!already_adjusted){
@@ -342,7 +342,7 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
             transformed_point(1)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
@@ -375,7 +375,7 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
     TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     T separation=TV::Dot_Product(body1->X()-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
@@ -964,7 +964,7 @@ Find_All_Bounding_Box_Pairs(const T thickness)
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);if(rigid_body){
             spatial_partition->Get_Potential_Collisions(i,object_indices);
             for(int t=0;t<object_indices.m;t++){int j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(t));
-                if(j && Either_Body_Collides_With_The_Other(rigid_body->particle_index,j) && intersections.Bounding_Boxes_Intersect(rigid_body->particle_index,j,thickness))
+                if(j>=0 && Either_Body_Collides_With_The_Other(rigid_body->particle_index,j) && intersections.Bounding_Boxes_Intersect(rigid_body->particle_index,j,thickness))
                     pairs.Append(VECTOR<int,2>(j,rigid_body->particle_index));}}}}
     return pairs;
 }
@@ -987,7 +987,7 @@ Print_Interpenetration_Statistics()
             if(rigid_body) if(rigid_body_collection.Is_Active(rigid_body->particle_index) && rigid_body_collection.Rigid_Body(rigid_body->particle_index).Is_Simulated()){
             spatial_partition->Get_Potential_Collisions(i,object_indices);
             for(int t=0;t<object_indices.m;t++){int j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(t));
-                if(j && Either_Body_Collides_With_The_Other(rigid_body->particle_index,j) && intersections.Bounding_Boxes_Intersect(rigid_body->particle_index,j))
+                if(j>=0 && Either_Body_Collides_With_The_Other(rigid_body->particle_index,j) && intersections.Bounding_Boxes_Intersect(rigid_body->particle_index,j))
                     intersections.Append_All_Intersections(rigid_body->particle_index,j,particle_intersections);}}}}
     num_interpenetration_points=particle_intersections.m;
     for(int i=0;i<particle_intersections.m;i++){
