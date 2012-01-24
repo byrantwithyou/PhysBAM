@@ -117,7 +117,7 @@ public:
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(aggregate_id,initial_hit_point)[axis];return true;}
     ARRAY<COLLISION_GEOMETRY_ID> objects;objects_in_cell.Get_Objects_For_Cells(face_index,face_index-TV_INT::Axis_Vector(axis),collision_geometry_collection.bodies.m,objects);if(!objects.m) return false;
     int triangle_id;
-    if(collision_geometry_collection.Intersection_Between_Points(grid.Center((side==1)?face_index:(face_index-TV_INT::Axis_Vector(axis))),X,body_id,triangle_id,initial_hit_point,&objects)){
+    if(collision_geometry_collection.Intersection_Between_Points(grid.Center((side==0)?face_index:(face_index-TV_INT::Axis_Vector(axis))),X,body_id,triangle_id,initial_hit_point,&objects)){
         face_velocity=collision_geometry_collection(body_id).Pointwise_Object_Velocity(triangle_id,initial_hit_point)[axis];
         return true;}
     return false;}

@@ -459,7 +459,7 @@ Compute_Intermediate_Solid_Position_Data(const T dt)
 template<class TV> void SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
 Revert_Cells_Near_Interface(const int iteration_number)
 {
-    if(iteration_number==1){
+    if(iteration_number==0){
         for(CELL_ITERATOR iterator(euler.grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             near_interface(cell_index) = (cut_cells_n(cell_index)!=0 || cut_cells_n_p_half(cell_index)!=0 || cut_cells_np1(cell_index)!=0);}
         for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();

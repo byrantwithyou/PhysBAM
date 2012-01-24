@@ -33,10 +33,10 @@ template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,2> >& box, con
     POLYGON<VECTOR<T,2> > modified_polygon(polygon.X.Size());
     for(int i=0;i<polygon.X.Size();i++) modified_polygon.X(i) = polygon.X(i);
 
-    int offset=1;int side;
+    int offset=0;int side;
     T t_start,t_end;
     ARRAY<PAIR<int,int> > added_nodes;
-    for(int s=1;s<polygon.X.Size();++s){
+    for(int s=0;s<polygon.X.Size()-1;++s){
         RAY<VECTOR<T,2> > edge_ray(SEGMENT_2D<T>(polygon.X(s),polygon.X(s+1)));
         if(INTERSECTION::Get_Intersection_Range(edge_ray,box,t_start,t_end)){
             if(t_start != 0){modified_polygon.X.Insert(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_start),side),s+offset);added_nodes.Append(PAIR<int,int>(s+offset++,side));}
@@ -47,7 +47,7 @@ template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,2> >& box, con
         if(t_start != 0){modified_polygon.X.Append(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_start),side));added_nodes.Append(PAIR<int,int>(modified_polygon.X.Size(),side));offset++;}
         if(t_end != edge_ray.t_max){modified_polygon.X.Append(box_polygon.Find_Closest_Point_On_Polygon(edge_ray.Point(t_end),side));added_nodes.Append(PAIR<int,int>(modified_polygon.X.Size(),side));offset++;}}
 
-    if(offset==1) { // entirely outside, or entirely inside
+    if(offset==0) { // entirely outside, or entirely inside
         if(box.Inside(polygon.X(0),0)) return modified_polygon.Area();
         else if(modified_polygon.Inside_Polygon(box.min_corner)) return box.Robust_Size();
         else return (T)0;}

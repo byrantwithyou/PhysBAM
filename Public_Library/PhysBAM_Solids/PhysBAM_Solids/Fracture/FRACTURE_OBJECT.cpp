@@ -174,7 +174,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
             else continue;
             // add cuts
             count++;
-            if(cut==1){
+            if(cut==0){
                 int ref_t=corresponding_simplex_in_reference(t);
                 fracture_normal=eigenvector_coefficient*fracture_normal+fracture_bias_propagation_coefficient*propagation_direction(t);
                 if(fracture_bias_direction_coefficient && fracture_bias_direction(ref_t)!=VECTOR<T,d>()) fracture_normal+=fracture_bias_direction_coefficient*spatial_fracture_bias_direction(t);}

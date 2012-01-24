@@ -245,17 +245,17 @@ Update_Springs(const bool search_hierarchy)
             for(FRAGMENT_ID fragment(0);fragment<mpi_solids->force_boundaries_of_fragment.Size();fragment++)
                 mpi_solids->force_boundaries_of_fragment.Remove_All(); // TODO: NOT GENERAL ONLY FOR HAIR
             PHYSBAM_ASSERT(mpi_solids->fragments_of_partition(mpi_solids->Partition()).Size()==1);
-            FRAGMENT_ID my_fragment=mpi_solids->fragments_of_partition(mpi_solids->Partition())(1);
+            FRAGMENT_ID my_fragment=mpi_solids->fragments_of_partition(mpi_solids->Partition())(0);
             mpi_solids->force_boundaries_of_fragment.Resize(mpi_solids->partition_from_fragment.Size());
             ARRAY<PAIR<FRAGMENT_ID,ARRAY<int> > >& local_boundary_list=mpi_solids->force_boundaries_of_fragment(my_fragment);
             for(PARTITION_ID other_partition(0);other_partition<my_boundary.Size();other_partition++) if(other_partition!=mpi_solids->Partition()){
                 PHYSBAM_ASSERT(mpi_solids->fragments_of_partition(other_partition).Size()==1);
-                FRAGMENT_ID other_fragment=mpi_solids->fragments_of_partition(other_partition)(1);
+                FRAGMENT_ID other_fragment=mpi_solids->fragments_of_partition(other_partition)(0);
                 local_boundary_list.Append(PAIR<FRAGMENT_ID,ARRAY<int> >(other_fragment,my_boundary(other_partition)));
                 mpi_solids->force_boundaries_of_fragment(other_fragment).Append(PAIR<FRAGMENT_ID,ARRAY<int> >(my_fragment,my_ghost(other_partition)));
             }
             // TODO: This looks broken...
-            ARRAY<PAIR<SUPER_FRAGMENT_ID,SUPER_FRAGMENT_ID> > swap_pairs;ARRAY<SUPER_FRAGMENT_ID> rebuild;rebuild.Append(SUPER_FRAGMENT_ID(1));
+            ARRAY<PAIR<SUPER_FRAGMENT_ID,SUPER_FRAGMENT_ID> > swap_pairs;ARRAY<SUPER_FRAGMENT_ID> rebuild;rebuild.Append(SUPER_FRAGMENT_ID(0));
             LOG::Stop_Time();
 #endif            
         }

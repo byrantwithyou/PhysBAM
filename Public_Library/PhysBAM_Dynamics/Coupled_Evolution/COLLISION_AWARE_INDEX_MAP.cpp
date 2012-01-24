@@ -82,7 +82,7 @@ template<class TV> bool COLLISION_AWARE_INDEX_MAP<TV>::
 Register_Face_Index(const FACE_INDEX<d>& face_index)
 {
     int axis=face_index.axis;
-    if(boundary_condition_collection.periodic_boundary[axis] && face_index.index(axis)==1)
+    if(boundary_condition_collection.periodic_boundary[axis] && face_index.index(axis)==0)
         return false;
     assert(!face_indices(face_index));
     face_indices(face_index)=indexed_faces.Append(face_index);

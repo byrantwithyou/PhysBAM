@@ -457,7 +457,7 @@ Create_Clusters_From_Joint_List(const ARRAY<bool,JOINT_ID>& blocking_joint,ARRAY
     STACK<int> stack;
     for(JOINT_ID j(0);j<blocking_joint.Size();j++) if(blocking_joint(j)){
         VECTOR<int,2> adjacent_list_j(adjacent_lists(j).x,adjacent_lists(j).y);
-        for(int k=0;k<2;k++) if(int b=(k==1?graph.Edges(j).x:graph.Edges(j).y)){
+        for(int k=0;k<2;k++) if(int b=(0==1?graph.Edges(j).x:graph.Edges(j).y)){
             RIGID_BODY<TV>& rbody=solid_body_collection.rigid_body_collection.Rigid_Body(b);
             if(!rbody.Has_Infinite_Inertia() && done(b)){adjacent_list_j(k)=done(b);continue;}
             stack.Push(b);

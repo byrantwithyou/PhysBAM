@@ -92,12 +92,12 @@ public:
     return intersected;}
 
     TV Normal(const TV& location,const int aggregate) const PHYSBAM_OVERRIDE
-    {assert(aggregate >= 1 && aggregate <= 6);
-    if(aggregate == 1) return World_Space_Vector(xmin.Normal());
-    else if(aggregate == 2) return World_Space_Vector(xmax.Normal());
-    else if(aggregate == 3) return World_Space_Vector(ymin.Normal());
-    else if(aggregate == 4) return World_Space_Vector(ymax.Normal());
-    else if(aggregate == 5) return World_Space_Vector(zmin.Normal());
+    {assert(aggregate>=0 && aggregate<6);
+    if(aggregate == 0) return World_Space_Vector(xmin.Normal());
+    else if(aggregate == 1) return World_Space_Vector(xmax.Normal());
+    else if(aggregate == 2) return World_Space_Vector(ymin.Normal());
+    else if(aggregate == 3) return World_Space_Vector(ymax.Normal());
+    else if(aggregate == 4) return World_Space_Vector(zmin.Normal());
     else return World_Space_Vector(zmax.Normal());}
     
     bool Inside(const TV& location) const  PHYSBAM_OVERRIDE
@@ -152,14 +152,14 @@ public:
     surface->Update_Triangle_List();surface->Update_Vertex_Normals();return surface;}
     
     virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const
-    {assert(aggregate >= 1 && aggregate <= 6);
+    {assert(aggregate>=0 && aggregate<6);
     TV x1;TV texture_vector1,texture_vector2;
-    if(aggregate==1){x1=xmin.x1; texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
-    else if(aggregate==2){x1=xmax.x1;texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
-    else if(aggregate==3){x1=ymin.x1;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
-    else if(aggregate==4){x1=ymax.x1;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
-    else if(aggregate==5){x1=zmin.x1;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
-    else if(aggregate==6){x1=zmax.x1;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
+    if(aggregate==0){x1=xmin.x1; texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
+    else if(aggregate==1){x1=xmax.x1;texture_vector1=texture_vector_x_1;texture_vector2=texture_vector_x_2;}
+    else if(aggregate==2){x1=ymin.x1;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
+    else if(aggregate==3){x1=ymax.x1;texture_vector1=texture_vector_y_1;texture_vector2=texture_vector_y_2;}
+    else if(aggregate==4){x1=zmin.x1;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
+    else if(aggregate==5){x1=zmax.x1;texture_vector1=texture_vector_z_1;texture_vector2=texture_vector_z_2;}
     TV p=object_space_point-x1;s=TV::Dot_Product(p,texture_vector1);t=TV::Dot_Product(p,texture_vector2);}
     
 

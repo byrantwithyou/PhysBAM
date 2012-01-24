@@ -73,12 +73,12 @@ Display(const int in_color) const
         T_ARRAYS_BOOL *cell_mask=0;
         T_FACE_ARRAYS_BOOL *face_mask=0;
         T_ARRAYS_BOOL *node_mask=0;
-        if(draw_mask_type==1) cell_mask=active_cell_mask;
-        else if(draw_mask_type==2){cell_mask=ghost_cell_mask;ghost_cells=ghost_cells?4:0;}
-        else if(draw_mask_type==3) face_mask=active_face_mask;
-        else if(draw_mask_type==4){face_mask=ghost_face_mask;ghost_cells=ghost_cells?4:0;}
-        else if(draw_mask_type==5) node_mask=active_node_mask;
-        else if(draw_mask_type==6){node_mask=ghost_node_mask;ghost_cells=ghost_cells?4:0;}
+        if(draw_mask_type==0) cell_mask=active_cell_mask;
+        else if(draw_mask_type==1){cell_mask=ghost_cell_mask;ghost_cells=ghost_cells?4:0;}
+        else if(draw_mask_type==2) face_mask=active_face_mask;
+        else if(draw_mask_type==3){face_mask=ghost_face_mask;ghost_cells=ghost_cells?4:0;}
+        else if(draw_mask_type==4) node_mask=active_node_mask;
+        else if(draw_mask_type==5){node_mask=ghost_node_mask;ghost_cells=ghost_cells?4:0;}
 
         if(ghost_cells==4){min_corner=min_corner-grid.dX;max_corner=max_corner+grid.dX;}
         if(cell_mask){

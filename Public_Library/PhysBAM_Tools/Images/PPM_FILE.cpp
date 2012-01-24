@@ -30,7 +30,7 @@ Read(const std::string& filename,ARRAY<VECTOR<T,4> ,VECTOR<int,2> >& image)
 template<class T> template<int d> void PPM_FILE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {  
-    assert(image.domain.min_corner.x==1 && image.domain.min_corner.y==1);
+    assert(image.domain.min_corner.x==0 && image.domain.min_corner.y==0);
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(filename,true,false); // no compression
     *output<<"P6"<<std::endl;
     *output<<"# Generated using PPM_FILE::Write"<<std::endl;

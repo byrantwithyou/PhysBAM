@@ -34,7 +34,7 @@ public:
         int total_rows=domain.max_corner(axis)-domain.min_corner(axis)+1;
         if(thread_queue && total_rows>0){
             number_of_domains=number_of_domains_multiplier*thread_queue->Number_Of_Threads();
-            if(domain_type==1){
+            if(domain_type==0){
                 if(row_jump_override<=0){
                     number_of_domains=min(number_of_domains,total_rows); // have to have at least 1 row per domain
                     int row_jump=total_rows/number_of_domains;
@@ -50,7 +50,7 @@ public:
                         domains(i).max_corner(axis)=min(domains(i).max_corner(axis),domain.max_corner(axis));}
                     assert(previous_domain_max==domain.max_corner(axis));} // if this isn't true, something is wrong with the above logic
                 else PHYSBAM_FATAL_ERROR();} // not implemented yet
-            else if(domain_type==2){
+            else if(domain_type==1){
                 ARRAY<ARRAY<int> > boundaries;
                 split_per_dimension=Split_Range_Wrapper(split_per_dimension,domain,boundaries);
                 //TODO: sync split_per_dimension and update if diff

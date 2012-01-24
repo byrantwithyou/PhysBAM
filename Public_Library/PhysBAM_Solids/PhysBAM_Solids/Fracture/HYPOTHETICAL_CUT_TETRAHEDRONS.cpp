@@ -36,13 +36,13 @@ Initialize_Hypothetical_Cut(const VECTOR<T,3>& fracture_normal_input,const int c
     fracture_normal=fracture_normal_input;
     tetrahedron=tetrahedron_input;
     int i,j,k,l;embedded_object.simplicial_object.mesh.elements(tetrahedron).Get(i,j,k,l);
-    if(cut_index==1) Initialize_Triangle_Cut(i);   // i
-    else if(cut_index==2) Initialize_Triangle_Cut(j);  // j
-    else if(cut_index==3) Initialize_Triangle_Cut(k);  // k
-    else if(cut_index==4) Initialize_Triangle_Cut(l);  // l
-    else if(cut_index==5) Initialize_Quad_Cut(i,j); // ij-kl
-    else if(cut_index==6) Initialize_Quad_Cut(i,k); // ik-jl
-    else{assert(cut_index==7);Initialize_Quad_Cut(i,l);}// il-jk        
+    if(cut_index==0) Initialize_Triangle_Cut(i);   // i
+    else if(cut_index==1) Initialize_Triangle_Cut(j);  // j
+    else if(cut_index==2) Initialize_Triangle_Cut(k);  // k
+    else if(cut_index==3) Initialize_Triangle_Cut(l);  // l
+    else if(cut_index==4) Initialize_Quad_Cut(i,j); // ij-kl
+    else if(cut_index==5) Initialize_Quad_Cut(i,k); // ik-jl
+    else{assert(cut_index==6);Initialize_Quad_Cut(i,l);}// il-jk        
     Initialize_Quality_Metric_And_Quad_Diagonal_Indices();
 }
 //#####################################################################

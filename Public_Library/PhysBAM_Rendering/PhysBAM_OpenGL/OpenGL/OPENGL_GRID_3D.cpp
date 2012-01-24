@@ -78,11 +78,11 @@ Display(const int in_color) const
             int i, j, k;
             int i_start, i_end, j_start, j_end, k_start, k_end;
             VECTOR<T,3> axis_1, axis_2, axis_3;
-            if (slice->axis==1) { i_start=i_end=(slice->index-1)/scale+1; axis_1=y_vector; axis_2=z_vector; axis_3=x_vector; } 
+            if (slice->axis==0) { i_start=i_end=(slice->index-1)/scale+1; axis_1=y_vector; axis_2=z_vector; axis_3=x_vector; } 
             else { i_start=1-ghost_cells; i_end=grid.numbers_of_cells.x+ghost_cells; }
-            if (slice->axis==2) { j_start=j_end=(slice->index-1)/scale+1; axis_1=z_vector; axis_2=x_vector; axis_3=y_vector; } 
+            if (slice->axis==1) { j_start=j_end=(slice->index-1)/scale+1; axis_1=z_vector; axis_2=x_vector; axis_3=y_vector; } 
             else { j_start=1-ghost_cells; j_end=grid.numbers_of_cells.y+ghost_cells; }
-            if (slice->axis==3) { k_start=k_end=(slice->index-1)/scale+1; axis_1=x_vector; axis_2=y_vector; axis_3=z_vector; } 
+            if (slice->axis==2) { k_start=k_end=(slice->index-1)/scale+1; axis_1=x_vector; axis_2=y_vector; axis_3=z_vector; } 
             else { k_start=1-ghost_cells; k_end=grid.numbers_of_cells.z+ghost_cells; }
 
             VECTOR<T,3> pos_start=grid.Node(i_start,j_start,k_start);
@@ -116,9 +116,9 @@ Display(const int in_color) const
 #endif
         {
             VECTOR<int,3> node_start(1-ghost_cells,1-ghost_cells,1-ghost_cells),node_end(grid.numbers_of_cells+ghost_cells+1);
-            if (slice->axis==1) { node_start.x=(slice->index-1)/scale+1; node_end.x=node_start.x+1; }
-            else if (slice->axis==2) { node_start.y=(slice->index-1)/scale+1; node_end.y=node_start.y+1; }
-            else if (slice->axis==3) { node_start.z=(slice->index-1)/scale+1; node_end.z=node_start.z+1; }
+            if (slice->axis==0) { node_start.x=(slice->index-1)/scale+1; node_end.x=node_start.x+1; }
+            else if (slice->axis==1) { node_start.y=(slice->index-1)/scale+1; node_end.y=node_start.y+1; }
+            else if (slice->axis==2) { node_start.z=(slice->index-1)/scale+1; node_end.z=node_start.z+1; }
             Draw_Subgrid(node_start,node_end);
 
             // Outline boundary of real domain in wider line

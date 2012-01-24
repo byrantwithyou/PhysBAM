@@ -39,7 +39,7 @@ Compute(int axis,VECTOR<bool,d> periodic_boundary_input)
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next()){FACE_INDEX<d> index=it.Full_Index();
         bool& b=inside(index);
         b=!b;
-        if(b && !(periodic_boundary[index.axis] && index.index[index.axis]==1))
+        if(b && !(periodic_boundary[index.axis] && index.index[index.axis]==0))
             face_to_index(index)=index_to_face.Append(index);}
 
     for(int a=0;a<d;a++) if(periodic_boundary[a])

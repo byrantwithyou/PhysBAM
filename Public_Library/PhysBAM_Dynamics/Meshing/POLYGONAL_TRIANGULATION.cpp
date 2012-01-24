@@ -349,7 +349,7 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
     ARRAY< ARRAY<int> > polygon(polygon_input.m);
     for(int ell=0;ell<polygon.m;ell++) polygon(ell)=polygon_input(ell);
     int infinite_loop_detector=0;
-    for(int ell=polygon.m;polygon.m>1;ell=(ell+polygon.m-2)%polygon.m+1){
+    for(int ell=polygon.m-1;polygon.m>0;ell=(ell+polygon.m-1)%polygon.m){
         if(ell==1) continue;
         if(++infinite_loop_detector>polygon.m) PHYSBAM_FATAL_ERROR();
         // attempt to find a non-intersecting segment between loop ell and loop 1

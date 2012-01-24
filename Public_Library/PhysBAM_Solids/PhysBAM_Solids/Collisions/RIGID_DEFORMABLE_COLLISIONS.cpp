@@ -379,7 +379,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
         if(!kinematic_rigid_bodies_only && solids_parameters.rigid_body_collision_parameters.perform_collisions){
             // Calls skip_collision_check.Skip_Pair and if necessary skip_collision_check.Set_Last_Checked
             rigid_body_collisions.Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==solids_parameters.rigid_body_collision_parameters.collision_iterations-1,
-                i==1,solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness);
+                i==0,solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness);
             for(int j=0;j<pairs.m;j++){
                 rigid_body_collisions.added_bodies(0).Remove_All();rigid_body_collisions.added_bodies(1).Remove_All();
                 int id_1=pairs(j)(0),id_2=pairs(j)(1);
@@ -739,7 +739,7 @@ Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>
             precompute_boundary_list.Append(precompute_boundary);}}
 
     for(int i=0;i<solids_parameters.rigid_body_collision_parameters.contact_project_iterations;i++) for(int body=0;body<precompute_boundary_list.m;body++)
-        /*if(1 || i==1 || !precompute_boundary_list(body)->rigid_body.Has_Infinite_Inertia())*/{ // only process static/kinematic bodies once
+        /*if(1 || i==0 || !precompute_boundary_list(body)->rigid_body.Has_Infinite_Inertia())*/{ // only process static/kinematic bodies once
             PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_boundary_list(body);
             Apply_Rigid_Deformable_Contact_Projection(X,V,twist(precompute.rigid_body.particle_index),precompute);}
     precompute_boundary_list.Delete_Pointers_And_Clean_Memory();
@@ -753,10 +753,10 @@ Project_Contact_Pairs(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist)
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     // TODO: rigid/rigid
     const int iterations=solids_parameters.rigid_body_collision_parameters.contact_project_iterations;
-    for(int k=0;k<iterations;k++) for(int i=0;i<precompute_contact_projections.m;i++) if(k==1 || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
+    for(int k=0;k<iterations;k++) for(int i=0;i<precompute_contact_projections.m;i++) if(k==0 || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(i);
         Apply_Rigid_Deformable_Contact_Projection(deformable_body_collection.particles.X,V,twist(precompute.rigid_body.particle_index),precompute);}
-    for(int k=0;k<iterations;k++) for(int i=precompute_contact_projections.m-1;i>=0;i--) if(k==iterations || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
+    for(int k=0;k<iterations;k++) for(int i=precompute_contact_projections.m-1;i>=0;i--) if(k==iterations-1 || !precompute_contact_projections(i)->rigid_body.Has_Infinite_Inertia()){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(i);
         Apply_Rigid_Deformable_Contact_Projection(deformable_body_collection.particles.X,V,twist(precompute.rigid_body.particle_index),precompute);}
 }

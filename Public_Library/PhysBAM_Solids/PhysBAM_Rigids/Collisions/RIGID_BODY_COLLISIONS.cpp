@@ -424,7 +424,7 @@ Update_Levelset_Collision_Pair(const int id_1,const int id_2,const T dt,const T 
         const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(smallest_index);
         RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
         if(Update_Collision_Pair_Helper(body1,body2,dt,time,collision_location,collision_normal,collision_relative_velocity,mpi_one_ghost)) return false;}
-    return i>1; // if i==1, we didn't process any collisions
+    return i>0; // if i==0, we didn't process any collisions
 }
 //#####################################################################
 // Function Get_Contact_Pairs
@@ -1106,7 +1106,7 @@ Add_Elastic_Collisions(const T dt,const T time)
                 mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                 mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
 
-        need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations-1,i==1);
+        need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations-1,i==0);
         for(int j=0;j<pairs.m;j++){
             int id_1=pairs(j)(0),id_2=pairs(j)(1);
             if(Update_Collision_Pair(id_1,id_2,dt,time,(mpi_rigids && (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) || 

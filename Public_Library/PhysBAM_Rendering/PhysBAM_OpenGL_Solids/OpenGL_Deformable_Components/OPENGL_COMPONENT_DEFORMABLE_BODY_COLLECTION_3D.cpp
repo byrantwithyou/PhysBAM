@@ -200,7 +200,7 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
 
         // visualize point face interactions
-        if(interaction_pair_display_mode==1 || interaction_pair_display_mode==2){
+        if(interaction_pair_display_mode==0 || interaction_pair_display_mode==1){
             OpenGL_Begin(GL_LINES);
             for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
                 const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
@@ -221,7 +221,7 @@ Display(const int in_color) const
             OpenGL_End();}
 
         // visualize edge edge interactions
-        if(interaction_pair_display_mode==1 || interaction_pair_display_mode==3){
+        if(interaction_pair_display_mode==0 || interaction_pair_display_mode==2){
             OpenGL_Begin(GL_LINES);
             for(int k=0;k<edge_edge_interaction_pairs.Size();k++){
                 const EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_interaction_pairs(k);
@@ -243,10 +243,10 @@ Display(const int in_color) const
         OpenGL_Begin(GL_LINES);
         for(int k=0;k<force_data_list.Size();k++){
             const FORCE_DATA<TV>& force_data=force_data_list(k);
-            if(display_forces_mode==1 && force_data.name!="LINEAR_SPRINGS") continue;
-            else if(display_forces_mode==2 && force_data.name!="TRIANGLE_BENDING_SPRINGS") continue;
-            else if(display_forces_mode==3 && force_data.name!="LINEAR_ALTITUDE_SPRINGS_3D") continue;
-            else if(display_forces_mode==4 && force_data.name!="SCALED_SOLIDS_FORCES") continue;
+            if(display_forces_mode==0 && force_data.name!="LINEAR_SPRINGS") continue;
+            else if(display_forces_mode==1 && force_data.name!="TRIANGLE_BENDING_SPRINGS") continue;
+            else if(display_forces_mode==2 && force_data.name!="LINEAR_ALTITUDE_SPRINGS_3D") continue;
+            else if(display_forces_mode==3 && force_data.name!="SCALED_SOLIDS_FORCES") continue;
 
             OPENGL_COLOR force_color=color_map_forces->Lookup(force_data.state);force_color.Send_To_GL_Pipeline();
             OpenGL_Line(force_data.first_action_point,force_data.second_action_point);}

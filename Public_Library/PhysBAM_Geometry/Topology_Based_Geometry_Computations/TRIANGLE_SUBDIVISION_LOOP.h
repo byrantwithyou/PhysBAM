@@ -44,7 +44,7 @@ void Apply_Loop_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> base_v
             subdivided_values(index)=(T).5*(base_values(end1)+base_values(end2));
         else if(neighbors(end1).m==6 && neighbors(end2).m==6){ // if next to regular vertices (the most common situation)
             j=0;neighbors(end1).Find(end2,j);assert(j);
-            int common1=neighbors(end1)(j==1?neighbors(end1).m:j-1),common2=neighbors(end1)(j==neighbors(end1).m?1:j+1);
+            int common1=neighbors(end1)(j==0?neighbors(end1).m:j-1),common2=neighbors(end1)(j==neighbors(end1).m?1:j+1);
             subdivided_values(index)=(T).375*(base_values(end1)+base_values(end2))+(T).125*(base_values(common1)+base_values(common2));}
         else{
             if(neighbors(end1).m != 6){

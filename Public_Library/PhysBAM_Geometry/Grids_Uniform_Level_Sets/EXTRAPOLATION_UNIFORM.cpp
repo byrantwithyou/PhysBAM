@@ -114,7 +114,7 @@ Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_B
 {
     T2 value[T_GRID::dimension]={T2()}; // the value to use in the given direction
     T phix_dx[T_GRID::dimension]={0}; // the difference in phi value for the direction
-    int number_of_axis=0; // the number of axis that we want to use later
+    int number_of_axis=-1; // the number of axis that we want to use later
     int missing_axis=3; // used in number_of_axis==2 case only, so it gives you which axis is missing (==3 for 2d)
 
     // check each principal axis
@@ -133,8 +133,8 @@ Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_B
         number_of_axis++;}
        
     assert(number_of_axis);
-    if(number_of_axis==1) u(index)=value[0];
-    else if(T_GRID::dimension==2 || number_of_axis==2){
+    if(number_of_axis==0) u(index)=value[0];
+    else if(T_GRID::dimension==2 || number_of_axis==1){
         T a=phix_dx[0]*optimization_scale[missing_axis],b=phix_dx[1],denominator=a+b,fraction=(T).5;
         if(denominator > small_number) fraction=clamp(a/denominator,(T)0,(T)1);
         u(index)=fraction*value[0]+(1-fraction)*value[1];}
