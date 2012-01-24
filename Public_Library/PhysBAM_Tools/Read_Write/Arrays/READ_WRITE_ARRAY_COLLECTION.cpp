@@ -95,7 +95,7 @@ Write_Arrays(std::ostream& output,const ARRAY_COLLECTION& object)
 template<class RW> void Read_Write<ARRAY_COLLECTION,RW>::
 Print(std::ostream& output,const ARRAY_COLLECTION& object,const int p)
 {
-    if(p<1 || p>object.number) throw INDEX_ERROR("Index out of range");
+    if(p<0 || p>=object.number) throw INDEX_ERROR("Index out of range");
     for(ATTRIBUTE_INDEX i(0);i<object.arrays.m;i++){
         const ARRAY_COLLECTION_ELEMENT_BASE* entry=object.arrays(i);
         const READ_WRITE_ARRAY_COLLECTION_FUNCTIONS* read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(entry->Hashed_Id()));

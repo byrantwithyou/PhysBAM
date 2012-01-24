@@ -179,7 +179,7 @@ template<int d> int SIMPLEX_MESH<d>::
 Delete_Elements_With_Missing_Nodes()
 {
     int m_save=elements.m;
-    for(int t=elements.m-1;t>=0;t--)if(elements(t).Contains(0)) elements.Remove_Index_Lazy(t);
+    for(int t=elements.m-1;t>=0;t--)if(elements(t).Contains(-1)) elements.Remove_Index_Lazy(t);
     elements.Compact();Refresh_Auxiliary_Structures();
     return m_save-elements.m;
 }

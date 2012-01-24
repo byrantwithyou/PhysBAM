@@ -24,12 +24,12 @@ public:
 public:
 
     RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_rigid_body_particles_input,
-        const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(2-(TV::dimension==1)))
+        const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
         :BASE(rigid_body_collection_input,influenced_rigid_body_particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
     {}
 
     RIGID_GRAVITY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_rigid_body_particles_input,
-        const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(2-(TV::dimension==1)))
+        const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
         :BASE(rigid_body_collection_input,influence_all_rigid_body_particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
     {}
 
