@@ -78,10 +78,10 @@ private:
 
     RANGE<TV_INT> Voxel(const RANGE<TV>& box) const
     {if(Out_Of_Range(box.min_corner) || Out_Of_Range(box.max_corner)) throw FLOATING_POINT_ERROR(std::string("Floating Point Exception: Box is too big or voxel size is too small"));
-    return RANGE<TV_INT>(Voxel(box.min_corner),Voxel(box.max_corner));}
+    return RANGE<TV_INT>(Voxel(box.min_corner),Voxel(box.max_corner)+1);}
 
     int Number_Of_Voxels_Occupied(const ID index) const
-    {return (voxel_range(index).Edge_Lengths()+TV_INT::All_Ones_Vector()).Product();}
+    {return voxel_range(index).Edge_Lengths().Product();}
 
 public:
 //#####################################################################
