@@ -35,7 +35,7 @@ public:
     {TV_INT index;RANGE<TV_INT> u_domain=u.Domain_Indices();RANGE<TV> grid_domain=grid.Domain(); 
     TV_INT M_start=u_domain.Minimum_Corner(),M_end=u_domain.Maximum_Corner();TV min_X=grid_domain.Minimum_Corner();TV one_over_DX=grid.One_Over_DX(); 
     for(int axis=0;axis<T_GRID::dimension;axis++){ 
-        index[axis]=min(M_end[axis]-end_offset,M_start[axis]+start_offset+max(0,(int)((location[axis]-min_X[axis])*one_over_DX[axis]-M_start[axis]-start_offset+1-grid.MAC_offset)));} 
+        index[axis]=min(M_end[axis]-end_offset-1,M_start[axis]+start_offset+max(0,(int)((location[axis]-min_X[axis])*one_over_DX[axis]-M_start[axis]-start_offset-grid.MAC_offset)));} 
     return index;}
 
     static TV_INT Clamped_Index_End_Minus_One(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& location)
