@@ -53,7 +53,7 @@ Tridiagonalize(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& w,KRYL
             if(print_diagnostics) LOG::cout<<"lanczos iterations = "<<iterations<<std::endl;
 #endif
             return true;}
-        if(iterations=max_iterations-1) break;
+        if(iterations==max_iterations-1) break;
         q=w;
         w.Copy(1/beta,v);
         v.Copy(-beta,q);}
