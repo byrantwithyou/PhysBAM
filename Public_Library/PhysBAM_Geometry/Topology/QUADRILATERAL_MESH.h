@@ -42,7 +42,7 @@ public:
     void Initialize_Square_Mesh(const int m,const int n)
     {Clean_Memory();
     number_nodes=m*n;quadrilaterals.Resize((m-1)*(n-1));
-    int t=0;for(int j=0;j<n-1;j++) for(int i=0;i<m-1;i++){t++;quadrilaterals(t)(1)=i+m*(j-1);quadrilaterals(t)(2)=(i+1)+m*(j-1);quadrilaterals(t)(3)=i+m*j;quadrilaterals(t)(4)=(i+1)+m*j;}}
+    int t=0;for(int j=0;j<n-1;j++) for(int i=0;i<m-1;i++){t++;quadrilaterals(t)(0)=i+m*(j-1);quadrilaterals(t)(1)=(i+1)+m*(j-1);quadrilaterals(t)(2)=i+m*j;quadrilaterals(t)(3)=(i+1)+m*j;}}
 
 //#####################################################################
 };   

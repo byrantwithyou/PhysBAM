@@ -231,7 +231,7 @@ Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VEC
     vorticity_weights.Resize(grid);
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(iterator.Axis())++;
-        for(int i=0;i<TV::dimension;i++){if(domain_boundary(i)(1)) domain.min_corner(i)++;if(domain_boundary(i)(2)) domain.max_corner(i)--;}
+        for(int i=0;i<TV::dimension;i++){if(domain_boundary(i)(0)) domain.min_corner(i)++;if(domain_boundary(i)(1)) domain.max_corner(i)--;}
         vorticity_weights(index)=(conserve_kinetic_energy && lsv)?(-1*lsv->Phi(iterator.Location())):1;
         if(vorticity_weights(index)<energy_clamp) vorticity_weights(index)=0;if(projection.elliptic_solver->psi_N(index) || !domain.Lazy_Inside_Half_Open(index.index)) vorticity_weights(index)=0;}
     if(!conserve_kinetic_energy) return;
@@ -251,8 +251,8 @@ Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VEC
             T KE=0,potential=0;
             for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
                 if(lsv && lsv->phi(iterator.Cell_Index())>0) continue;
-                if(density) potential+=(*density)(iterator.Cell_Index())*(*density)(iterator.Cell_Index())*buoyancy_constant*(1-iterator.Location()(2));
-                else potential+=(T)(projection.density*grid.dX.Product()*iterator.Location()(2)*9.8);}
+                if(density) potential+=(*density)(iterator.Cell_Index())*(*density)(iterator.Cell_Index())*buoyancy_constant*(1-iterator.Location()(1));
+                else potential+=(T)(projection.density*grid.dX.Product()*iterator.Location()(1)*9.8);}
             for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();if(lsv && lsv->Phi(iterator.Location())>0) continue;
                 T mass=(T)(density?(((*density)(iterator.First_Cell_Index())+((*density)(iterator.Second_Cell_Index())))*.5):projection.density*grid.dX.Product());
                 KE+=(T)(0.5*mass*face_velocities(index)*face_velocities(index));

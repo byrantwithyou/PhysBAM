@@ -113,7 +113,7 @@ Initialize_Original_Embedding(const TETRAHEDRALIZED_VOLUME<T>& original_tetrahed
             polygon_mesh.elements.Append(ARRAY<ARRAY<int> >());ARRAY<ARRAY<int> >& new_polygon=polygon_mesh.elements.Last();
             bool face_reversed=Face_Reversed_In_Tetrahedron(embedding_tetrahedrons(tet),face_nodes,embedding_vertices);
             VECTOR<int,3> face_nodes_ordered=face_nodes;
-            if(face_reversed) exchange(face_nodes_ordered[1],face_nodes_ordered[2]);
+            if(face_reversed) exchange(face_nodes_ordered[0],face_nodes_ordered[1]);
             new_polygon.Append(ARRAY<int>(face_nodes_ordered));
             int cutting_polygon_index=current_cutting_polygons.Append(CUTTING_POLYGON(polygon_mesh.elements.m,index,face_reversed,polygon_type));
             cutting_polygons_per_cutting_simplex.Append(ARRAY<int>(VECTOR<int,1>(cutting_polygon_index)));

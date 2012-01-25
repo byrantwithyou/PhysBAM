@@ -156,7 +156,7 @@ Total_Length() const
 {
     T length=0;
     for(int t=0;t<mesh.elements.m;t++){
-        int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2);
+        int node1=mesh.elements(t)(0),node2=mesh.elements(t)(1);
         length+=(particles.X(node1)-particles.X(node2)).Magnitude();}
     return length;
 }

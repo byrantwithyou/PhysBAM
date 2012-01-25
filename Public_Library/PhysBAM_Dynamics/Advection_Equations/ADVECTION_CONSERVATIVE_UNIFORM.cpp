@@ -253,24 +253,24 @@ Face_Diffusion(const T_GRID& grid,ARRAY<T,FACE_INDEX<TV::dimension> >& sum_jc,T_
                 for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2) continue;//handled above
                     RANGE<TV_INT> domain=grid.Domain_Indices();
                     domain.max_corner(axis)+=1;domain.min_corner(axis2)+=1;
-                    if(solid_walls_hack_axis(axis)(1)) domain.min_corner(axis)+=1;
-                    if(solid_walls_hack_axis(axis)(2)) domain.max_corner(axis)-=1;
+                    if(solid_walls_hack_axis(axis)(0)) domain.min_corner(axis)+=1;
+                    if(solid_walls_hack_axis(axis)(1)) domain.max_corner(axis)-=1;
                     for(FACE_ITERATOR iterator(grid,domain,axis2);iterator.Valid();iterator.Next()) Face_Diffusion_Helper(iterator,axis,sum_jc,Z,inside);}
                 RANGE<TV_INT> domain=grid.Domain_Indices();
-                if((mpi_grid && mpi_boundary(axis)(1)) || solid_walls_hack_axis(axis)(1)) domain.min_corner(axis)+=1; 
-                if((mpi_grid && mpi_boundary(axis)(2)) || solid_walls_hack_axis(axis)(2)) domain.max_corner(axis)-=1; 
+                if((mpi_grid && mpi_boundary(axis)(0)) || solid_walls_hack_axis(axis)(0)) domain.min_corner(axis)+=1; 
+                if((mpi_grid && mpi_boundary(axis)(1)) || solid_walls_hack_axis(axis)(1)) domain.max_corner(axis)-=1; 
                 for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()) Face_Diffusion_Helper(iterator,axis,sum_jc,Z,inside);}
             else{
                 ARRAY<FACE_ITERATOR*> faces;ARRAY<CELL_ITERATOR*> cells;
                 for(int axis2=0;axis2<TV::dimension;axis2++){if(axis==axis2) continue;//handled above
                     RANGE<TV_INT> domain=grid.Domain_Indices();
                     domain.max_corner(axis)+=1;domain.min_corner(axis2)+=1;
-                    if(solid_walls_hack_axis(axis)(1)) domain.min_corner(axis)+=1;
-                    if(solid_walls_hack_axis(axis)(2)) domain.max_corner(axis)-=1;
+                    if(solid_walls_hack_axis(axis)(0)) domain.min_corner(axis)+=1;
+                    if(solid_walls_hack_axis(axis)(1)) domain.max_corner(axis)-=1;
                     for(FACE_ITERATOR iterator(grid,domain,axis2);iterator.Valid();iterator.Next()) faces.Append(new FACE_ITERATOR(iterator));}
                 RANGE<TV_INT> domain=grid.Domain_Indices();
-                if((mpi_grid && mpi_boundary(axis)(1)) || solid_walls_hack_axis(axis)(1)) domain.min_corner(axis)+=1; 
-                if((mpi_grid && mpi_boundary(axis)(2)) || solid_walls_hack_axis(axis)(2)) domain.max_corner(axis)-=1; 
+                if((mpi_grid && mpi_boundary(axis)(0)) || solid_walls_hack_axis(axis)(0)) domain.min_corner(axis)+=1; 
+                if((mpi_grid && mpi_boundary(axis)(1)) || solid_walls_hack_axis(axis)(1)) domain.max_corner(axis)-=1; 
                 for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()) cells.Append(new CELL_ITERATOR(iterator));
                 for(int i=faces.m-1;i>=0;i--){FACE_ITERATOR& iterator=*faces(i);Face_Diffusion_Helper(iterator,axis,sum_jc,Z,inside);}
                 for(int i=cells.m-1;i>=0;i--){CELL_ITERATOR& iterator=*cells(i);Face_Diffusion_Helper(iterator,axis,sum_jc,Z,inside);}
@@ -432,8 +432,8 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
             //else if(!Is_MPI_Boundary(grid.Domain_Indices(),local_weights(i).x)){
             //    total_mass_lost_per_cell(local_weights(i).x)+=local_weights(i).y*Z_ghost(cell);
             //    total_mass_lost+=local_weights(i).y*Z_ghost(cell);}}
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) total_potential_gained+=total_mass_gained_per_cell(iterator.Cell_Index())*total_mass_gained_per_cell(iterator.Cell_Index())*(1-iterator.Location()(2));
-    for(CELL_ITERATOR iterator(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) total_potential_lost+=total_mass_lost_per_cell(iterator.Cell_Index())*total_mass_lost_per_cell(iterator.Cell_Index())*(1-iterator.Location()(2));
+    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) total_potential_gained+=total_mass_gained_per_cell(iterator.Cell_Index())*total_mass_gained_per_cell(iterator.Cell_Index())*(1-iterator.Location()(1));
+    for(CELL_ITERATOR iterator(grid,number_of_ghost_cells,GRID<TV>::GHOST_REGION);iterator.Valid();iterator.Next()) total_potential_lost+=total_mass_lost_per_cell(iterator.Cell_Index())*total_mass_lost_per_cell(iterator.Cell_Index())*(1-iterator.Location()(1));
     LOG::Time("After distrib calc");
 
     //diffusion

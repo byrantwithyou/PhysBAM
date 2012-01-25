@@ -18,19 +18,18 @@ public:
 
     template<class T2,class T3,class T4>
     static void Up_Heap(const T2& phi,T3& close_k,ARRAY<T4>& heap,int index)
-    {for(;;){int parent=index/2;
-        if(parent >= 1 && abs(phi(heap(index))) < abs(phi(heap(parent)))){
+    {while(index>0){int parent=(index-1)/2;
+        if(abs(phi(heap(index))) < abs(phi(heap(parent)))){
             exchange(heap(index),heap(parent));
             close_k(heap(index))=index; // update child k
             close_k(heap(parent))=parent; // update parent k
-            index=parent;} // move up one
-        else return;}}
+            index=parent;}}} // move up one
 
     template<class T2,class T3,class T4>
     static void Down_Heap(const T2& phi,T3& close_k,ARRAY<T4>& heap,const int heap_length)
-    {int index=1;
-    for(;;){int left=2*index,right=2*index+1;
-        if(right > heap_length) break;
+    {int index=0;
+    for(;;){int left=2*index+1,right=2*index+2;
+        if(right >= heap_length) break;
         else if(abs(phi(heap(left))) <= abs(phi(heap(right)))){
             heap(index)=heap(left); // update i, j, ij
             close_k(heap(index))=index; // update k
@@ -40,8 +39,8 @@ public:
             close_k(heap(index))=index; // update k
             index=right;}} // move down one
     // fill the hole with the last element
-    if(index != heap_length){
-        heap(index)=heap(heap_length); // update i, j, ij
+    if(index != heap_length-1){
+        heap(index)=heap(heap_length-1); // update i, j, ij
         close_k(heap(index))=index; // update k
         Up_Heap(phi,close_k,heap,index);}}
 

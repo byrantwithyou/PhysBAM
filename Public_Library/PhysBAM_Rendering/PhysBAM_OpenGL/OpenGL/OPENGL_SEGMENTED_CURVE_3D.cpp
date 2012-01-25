@@ -20,7 +20,7 @@ template<class TV>
 TV Camera_Oriented_Normal(const TV& camera_direction,const VECTOR<TV,2>& Xs)
 {
     typedef typename TV::SCALAR T;
-    VECTOR<T,3> tangent=(Xs[1]-Xs[2]).Normalized();
+    VECTOR<T,3> tangent=(Xs[0]-Xs[1]).Normalized();
     TV normal=camera_direction.Projected_Orthogonal_To_Unit_Direction(tangent).Normalized();
     if(TV::Dot_Product(normal,camera_direction)<0) normal=-normal;
     return normal;
@@ -44,7 +44,7 @@ Display(const int in_color) const
     if(hide_unselected){
         for(int i=0;i<selected_edges.m;i++){edge=selected_edges(i);parent_curve->curve.mesh.elements(edge).Get(node1,node2);seen.Set(node1,true);seen.Set(node2,true);}
         for(int i=0;i<curve.mesh.elements.m;i++){const VECTOR<int,2> edge=curve.mesh.elements(i);
-            if(seen.Contains(edge[1])||seen.Contains(edge[2])){seen.Set(edge[1],true);seen.Set(edge[2],true);}}}
+            if(seen.Contains(edge[0])||seen.Contains(edge[1])){seen.Set(edge[0],true);seen.Set(edge[1],true);}}}
     
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
@@ -65,7 +65,7 @@ Display(const int in_color) const
         if(use_solid_color){
             vertices.Resize(0);
             for(int t=0;t<curve.mesh.elements.m;t++){
-                int i=curve.mesh.elements(t)(1),j=curve.mesh.elements(t)(2);
+                int i=curve.mesh.elements(t)(0),j=curve.mesh.elements(t)(1);
                 if(!hide_unselected || (seen.Contains(i) && seen.Contains(j))){
                     OpenGL_Vertex(curve.particles.X(i),vertices);OpenGL_Vertex(curve.particles.X(j),vertices);}}
             OpenGL_Draw_Arrays(GL_LINES,3,vertices);}
@@ -76,19 +76,19 @@ Display(const int in_color) const
                 for(int i=0;i<segment_nodes.m;i++){int p=segment_nodes(i);
                     const ARRAY<int>& incident=(*curve.mesh.incident_elements)(p);
                     for(int j=0;j<incident.m;j++){const VECTOR<int,2>& nodes=curve.mesh.elements(incident(j));
-                        if(!hide_unselected || (seen.Contains(nodes[1]) && seen.Contains(nodes[2]))){
-                            OpenGL_Normal(vertex_normals.Get(nodes[1]),normals);OpenGL_Vertex(curve.particles.X(nodes[1]),vertices);
-                            OpenGL_Normal(vertex_normals.Get(nodes[2]),normals);OpenGL_Vertex(curve.particles.X(nodes[2]),vertices);}}}
+                        if(!hide_unselected || (seen.Contains(nodes[0]) && seen.Contains(nodes[1]))){
+                            OpenGL_Normal(vertex_normals.Get(nodes[0]),normals);OpenGL_Vertex(curve.particles.X(nodes[0]),vertices);
+                            OpenGL_Normal(vertex_normals.Get(nodes[1]),normals);OpenGL_Vertex(curve.particles.X(nodes[1]),vertices);}}}
                 OpenGL_Draw_Arrays_With_Normals(GL_LINES,3,vertices,normals);}
             else{
                 vertices.Resize(0);normals.Resize(0);
                 VECTOR<T,3> camera_direction=TV(OPENGL_WORLD::Singleton()->Get_Camera_Position()-OPENGL_WORLD::Singleton()->Get_Target_Position()).Normalized();
                 for(int s=0;s<curve.mesh.elements.m;s++){
                     const VECTOR<int,2>& nodes=curve.mesh.elements(s);
-                    if(!hide_unselected || (seen.Contains(nodes[1]) && seen.Contains(nodes[2]))){
+                    if(!hide_unselected || (seen.Contains(nodes[0]) && seen.Contains(nodes[1]))){
                         VECTOR<TV,2> Xs(curve.particles.X.Subset(nodes));
                         for(int line_vertices=0;line_vertices<2;line_vertices++) OpenGL_Normal(Camera_Oriented_Normal(camera_direction,Xs),normals);
-                        OpenGL_Vertex(Xs[1],vertices);OpenGL_Vertex(Xs[2],vertices);}}
+                        OpenGL_Vertex(Xs[0],vertices);OpenGL_Vertex(Xs[1],vertices);}}
                 OpenGL_Draw_Arrays_With_Normals(GL_LINES,3,vertices,normals);}}
 
         if(current_selection){

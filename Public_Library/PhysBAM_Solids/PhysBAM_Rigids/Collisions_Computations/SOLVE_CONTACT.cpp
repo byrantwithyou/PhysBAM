@@ -80,7 +80,7 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
                 bool need_another_level_iteration=true;int level_iteration=0;
                 while(need_another_level_iteration && ++level_iteration<=rigid_body_collisions.contact_level_iterations){need_another_level_iteration=false;
                     if(parameters.use_epsilon_scaling_for_level) epsilon_scale=(T)iteration*level_iteration/(parameters.contact_iterations*rigid_body_collisions.contact_level_iterations);
-                    for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(1),id_2=pairs(i)(2);
+                    for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                         if(rigid_body_collisions.skip_collision_check.Skip_Pair(id_1,id_2)) continue;
                         if(rigid_body_collisions.prune_contact_using_velocity){
                             TRIPLE<int,int,int>& pair_scale=rigid_body_collisions.pairs_scale.Get(pairs(i).Sorted());
@@ -312,7 +312,7 @@ void Get_Contact_Points(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,RIGIDS_
     LOG::SCOPE scope_contacts("creating contacts");
     for(int i=0;i<pairs.m;i++)
     {
-        int id_1=pairs(i)(1),id_2=pairs(i)(2);
+        int id_1=pairs(i)(0),id_2=pairs(i)(1);
         ARRAY<TV> locations,normals;
         ARRAY<typename TV::SCALAR> distances;
         RIGID_BODY<TV>& body_1=rigid_body_collection.Rigid_Body(id_1);

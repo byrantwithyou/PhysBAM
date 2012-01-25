@@ -50,7 +50,7 @@ Display(const int in_color) const
     {
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         for(int t=0;t<curve.mesh.elements.m;t++){
-            int i=curve.mesh.elements(t)(1),j=curve.mesh.elements(t)(2);
+            int i=curve.mesh.elements(t)(0),j=curve.mesh.elements(t)(1);
             OpenGL_Line(curve.particles.X(i),curve.particles.X(j),vertices);}
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
 
@@ -105,8 +105,8 @@ template<class T> RANGE<VECTOR<float,3> > OPENGL_SEGMENTED_CURVE_2D<T>::
 Bounding_Box() const
 {
     float xmin,xmax,ymin,ymax;
-    xmin=xmax=curve.particles.X(1).x;
-    ymin=ymax=curve.particles.X(1).y;
+    xmin=xmax=curve.particles.X(0).x;
+    ymin=ymax=curve.particles.X(0).y;
     for(int i=0;i<curve.particles.array_collection->Size();i++){
         xmin=min(xmin,(float)curve.particles.X(i).x);xmax=max(xmax,(float)curve.particles.X(i).x);
         ymin=min(ymin,(float)curve.particles.X(i).y);ymax=max(ymax,(float)curve.particles.X(i).y);}

@@ -139,7 +139,7 @@ inline void OpenGL_Transform(const FRAME<VECTOR<T,3> >& frame)
 {OpenGL_Translate(frame.t);OpenGL_Rotate(frame.r.Normalized());}
 
 inline void OpenGL_Texture(const VECTOR<float,2>& texture,ARRAY<GLfloat>& textures)
-{textures.Append(texture[1]);textures.Append(texture[2]);}
+{textures.Append(texture[0]);textures.Append(texture[1]);}
 
 inline void OpenGL_Color(const GLfloat* color,ARRAY<GLfloat>& colors)
 {colors.Append(color[0]);colors.Append(color[1]);colors.Append(color[2]);colors.Append(color[3]);}

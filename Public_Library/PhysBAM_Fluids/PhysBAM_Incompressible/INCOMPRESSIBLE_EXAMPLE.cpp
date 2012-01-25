@@ -30,7 +30,7 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     incompressible.Set_Custom_Advection(advection_scalar);
     //incompressible.Add_Force(new INCOMPRESSIBILITY<GRID<TV> >(projection));
     //incompressible.Add_Force(new FLUID_GRAVITY<GRID<TV> >());
-    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
+    for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     Initialize_Geometry_Particle();
     Initialize_Read_Write_Structures();
 }

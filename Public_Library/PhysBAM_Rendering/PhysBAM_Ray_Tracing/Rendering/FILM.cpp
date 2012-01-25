@@ -641,7 +641,7 @@ Generate_Samples(const RANGE<VECTOR<int,2> >& pixel_range,const CAMERA<T>& camer
             sample.alpha=0;
             sample.film_position=max_length*TV2(best_candidate_samples[i][0],best_candidate_samples[i][1])+pixel_left;
             if(grid.domain.Lazy_Inside(sample.film_position)){
-                sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[1]+camera.vertical_vector*sample.film_position[2];
+                sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[0]+camera.vertical_vector*sample.film_position[1];
                 samples.Append(sample);}}}
 }
 template<class T> void FILM<T>::
@@ -656,7 +656,7 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
                 sample.alpha=0;
                 if(sampler==JITTERED) sample.film_position=subpixel_center+random.Get_Uniform_Vector(-(T).5*subpixel_grid.dX,(T).5*subpixel_grid.dX);
                 else sample.film_position=subpixel_center;
-                sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[1]+camera.vertical_vector*sample.film_position[2];
+                sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[0]+camera.vertical_vector*sample.film_position[1];
                 samples.Append(sample);}}}
     else{
         TV2 pixel_center=grid.X(pixel_index);
@@ -666,7 +666,7 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
             sample.alpha=0;
             if(sampler==JITTERED) sample.film_position=pixel_center+random.Get_Uniform_Vector(-(T).5*grid.dX,(T).5*grid.dX);
             else sample.film_position=pixel_center;
-            sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[1]+camera.vertical_vector*sample.film_position[2];
+            sample.world_position=camera.focal_point+camera.horizontal_vector*sample.film_position[0]+camera.vertical_vector*sample.film_position[1];
             samples.Append(sample);}}
 }
 template<class T> void FILM<T>::

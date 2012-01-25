@@ -284,7 +284,7 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         SEGMENTED_CURVE<TV>* segmented_curve=deformable_geometry->template Find_Structure<SEGMENTED_CURVE<TV>*>(display_relative_velocity_mode);
-        for(int j=0;j<segmented_curve->mesh.elements.m;j++){int p1=segmented_curve->mesh.elements(j)(1),p2=segmented_curve->mesh.elements(j)(2);
+        for(int j=0;j<segmented_curve->mesh.elements.m;j++){int p1=segmented_curve->mesh.elements(j)(0),p2=segmented_curve->mesh.elements(j)(1);
             TV relative_velocity=deformable_geometry->particles.V(p2)-deformable_geometry->particles.V(p1);
             TV edge_vector=deformable_geometry->particles.X(p2)-deformable_geometry->particles.X(p1);
             T edge_length=edge_vector.Magnitude();
@@ -318,7 +318,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Show_Only_First()
 {
     active_list.Fill(false);
-    active_list(1)=true;
+    active_list(0)=true;
 }
 //#####################################################################
 // Function Decrease_Cutaway_Fraction

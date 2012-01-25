@@ -64,7 +64,7 @@ template<class TV> void LINEAR_SPRINGS<TV>::
 Set_Restlength_From_Material_Coordinates(ARRAY_VIEW<TV> material_coordinates)
 {
     restlength.Resize(segment_mesh.elements.m,false);Invalidate_CFL();
-    for(int i=0;i<segment_mesh.elements.m;i++) restlength(i)=(material_coordinates(segment_mesh.elements(i)(1))-material_coordinates(segment_mesh.elements(i)(2))).Magnitude();
+    for(int i=0;i<segment_mesh.elements.m;i++) restlength(i)=(material_coordinates(segment_mesh.elements(i)(0))-material_coordinates(segment_mesh.elements(i)(1))).Magnitude();
     visual_restlength=restlength;
 }
 //#####################################################################
@@ -135,7 +135,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);Invalidate_CFL();
     for(int i=0;i<segment_mesh.elements.m;i++){
-        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
+        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(0))+particles.one_over_effective_mass(segment_mesh.elements(i)(1)));
         T ym;if(!youngs_modulus.m) ym=constant_youngs_modulus;else ym=youngs_modulus(i);
         damping(i)=overdamping_fraction*2*sqrt(ym*restlength(i)*harmonic_mass);}
 }
@@ -147,7 +147,7 @@ Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is criti
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);Invalidate_CFL();
     for(int i=0;i<segment_mesh.elements.m;i++){
-        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
+        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(0))+particles.one_over_effective_mass(segment_mesh.elements(i)(1)));
         T ym;if(!youngs_modulus.m) ym=constant_youngs_modulus;else ym=youngs_modulus(i);
         damping(i)=overdamping_fraction(i)*2*sqrt(ym*restlength(i)*harmonic_mass);}
 }
@@ -364,7 +364,7 @@ Print_Restlength_Statistics() const
     ARRAY<T> length(restlength);Sort(length);
     ARRAY<T> visual_length(visual_restlength);Sort(visual_length);
     if(length.m){
-        LOG::Stat("smallest restlength",length(1));LOG::Stat("smallest visual restlength",visual_length(1));
+        LOG::Stat("smallest restlength",length(0));LOG::Stat("smallest visual restlength",visual_length(0));
         LOG::Stat("one percent restlength",length((int)(.01*length.m)+1));LOG::Stat("one percent visual restlength",visual_length((int)(.01*length.m)+1));
         LOG::Stat("ten percent restlength",length((int)(.1*length.m)+1));LOG::Stat("ten percent visual restlength",visual_length((int)(.1*length.m)+1));
         LOG::Stat("median restlength",length((int)(.5*length.m)+1));LOG::Stat("median visual restlength",visual_length((int)(.5*length.m)+1));}
@@ -410,7 +410,7 @@ Maximum_Compression_Or_Expansion_Fraction(int* index) const
 template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Potential_Energy(const int s,const T time) const
 {
-    T current_length=(particles.X(segment_mesh.elements(s)(1))-particles.X(segment_mesh.elements(s)(2))).Magnitude();
+    T current_length=(particles.X(segment_mesh.elements(s)(0))-particles.X(segment_mesh.elements(s)(1))).Magnitude();
     T spring_youngs_modulus=youngs_modulus.m?youngs_modulus(s):constant_youngs_modulus;
     return (T).5*spring_youngs_modulus/restlength(s)*sqr(current_length-visual_restlength(s));
 }
@@ -473,8 +473,8 @@ Endpoint_Kinetic_Energy(int s) const
 template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Effective_Impulse_Factor(int s) const
 {
-    T one_over_denom=particles.one_over_mass(segment_mesh.elements(s)(1))*particles.one_over_mass(segment_mesh.elements(s)(2));
-    return (particles.mass(segment_mesh.elements(s)(1))+particles.mass(segment_mesh.elements(s)(1)))*one_over_denom;
+    T one_over_denom=particles.one_over_mass(segment_mesh.elements(s)(0))*particles.one_over_mass(segment_mesh.elements(s)(1));
+    return (particles.mass(segment_mesh.elements(s)(0))+particles.mass(segment_mesh.elements(s)(0)))*one_over_denom;
 }
 //#####################################################################
 // Function Create_Edge_Springs

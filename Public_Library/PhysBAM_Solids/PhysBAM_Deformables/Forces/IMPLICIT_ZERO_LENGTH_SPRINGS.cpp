@@ -61,7 +61,7 @@ Set_Overdamping_Fraction(const T overdamping_fraction) // 1 is critically damped
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);
     for(int i=0;i<segment_mesh.elements.m;i++){
-        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
+        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(0))+particles.one_over_effective_mass(segment_mesh.elements(i)(1)));
         T ym;if(!stiffness.m) ym=constant_stiffness;else ym=stiffness(i);
         damping(i)=overdamping_fraction*2*sqrt(ym*harmonic_mass);}
 }
@@ -73,7 +73,7 @@ Set_Overdamping_Fraction(ARRAY_VIEW<const T> overdamping_fraction) // 1 is criti
 {
     constant_damping=0;damping.Resize(segment_mesh.elements.m,false,false);
     for(int i=0;i<segment_mesh.elements.m;i++){
-        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(1))+particles.one_over_effective_mass(segment_mesh.elements(i)(2)));
+        T harmonic_mass=Pseudo_Inverse(particles.one_over_effective_mass(segment_mesh.elements(i)(0))+particles.one_over_effective_mass(segment_mesh.elements(i)(1)));
         T ym;if(!stiffness.m) ym=constant_stiffness;else ym=stiffness(i);
         damping(i)=overdamping_fraction(i)*2*sqrt(ym*harmonic_mass);}
 }
