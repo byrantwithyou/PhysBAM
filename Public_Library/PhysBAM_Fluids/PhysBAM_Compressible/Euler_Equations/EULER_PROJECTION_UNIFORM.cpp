@@ -323,7 +323,7 @@ Get_Ghost_Pressures(const T dt,const T time,const T_ARRAYS_BOOL& psi_D,const T_F
     // Restore dirichlet pressures at non-periodic dirichlet cells which are extrapolated by pressure_boundary
     if(!use_neumann_condition_for_outflow_boundaries){
         for(int axis=0;axis<T_GRID::dimension;axis++) if(!elliptic_solver->periodic_boundary[axis]){
-            for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+            for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
                 for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT cell_index=iterator.Cell_Index();
                     TV_INT boundary_face_index=side&1?iterator.Second_Face_Index(axis):iterator.First_Face_Index(axis);
@@ -425,7 +425,7 @@ Consistent_Boundary_Conditions() const
         LOG::cout<<"checking for consistent mpi boundaries"<<std::endl;
         T_ARRAYS_BOOL psi_D_ghost(elliptic_solver->psi_D);T_FACE_ARRAYS_SCALAR psi_N_ghost(euler->grid);
         euler->mpi_grid->Exchange_Boundary_Cell_Data(psi_D_ghost,1);
-        for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
             if(euler->mpi_grid->Neighbor(axis,axis_side)){TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
                 for(FACE_ITERATOR iterator(euler->grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index(),cell=face+exterior_cell_offset;int axis=iterator.Axis();

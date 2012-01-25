@@ -215,16 +215,16 @@ Find_Matrix_Indices(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_diverg
     for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> region(domain_indices);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.min_corner(axis)-1;
-        Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+1,region,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,dummy_box,cell_count);
+        Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,2*axis+0,region,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,dummy_box,cell_count);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.max_corner(axis)+1;
-        Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+2,region,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,dummy_box,cell_count);
+        Find_Matrix_Indices_In_Region(local_grid,valid_divergence_cells,2*axis+1,region,cell_index_to_matrix_index,face_ghost_cell_index,face_ghost_cell_index_map,face_lambdas,dummy_box,cell_count);
     }
     for(int axis=0;axis<TV::dimension;axis++){
         RANGE<TV_INT> region(domain_indices);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.min_corner(axis);
-        Find_Boundary_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+1,region,cell_index_to_matrix_index,face_ghost_cell_index,face_lambdas);
+        Find_Boundary_Indices_In_Region(local_grid,valid_divergence_cells,2*axis,region,cell_index_to_matrix_index,face_ghost_cell_index,face_lambdas);
         region.min_corner(axis)=region.max_corner(axis)=domain_indices.max_corner(axis);
-        Find_Boundary_Indices_In_Region(local_grid,valid_divergence_cells,2*(axis-1)+2,region,cell_index_to_matrix_index,face_ghost_cell_index,face_lambdas);
+        Find_Boundary_Indices_In_Region(local_grid,valid_divergence_cells,2*axis+1,region,cell_index_to_matrix_index,face_ghost_cell_index,face_lambdas);
     }
 }
 //#####################################################################

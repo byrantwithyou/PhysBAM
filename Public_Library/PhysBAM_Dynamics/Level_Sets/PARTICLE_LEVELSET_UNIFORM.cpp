@@ -903,16 +903,16 @@ Delete_Particles_Near_Outside_Grid(RANGE<TV_INT>& domain,int axis,int side)
     RANGE<TV> local_domain=levelset.grid.domain;TV domain_boundaries[2]={local_domain.Minimum_Corner(),local_domain.Maximum_Corner()};
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(negative_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side-1][axis],axis,*negative_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-3);
             if(!negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}
         if(positive_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side-1][axis],axis,*positive_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*positive_particles(block),2*side-3);
             if(!positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}
         if(use_removed_negative_particles)if(removed_negative_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side-1][axis],axis,*removed_negative_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_negative_particles(block),2*side-3);
             if(!removed_negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_negative_particles(block));}
         if(use_removed_positive_particles)if(removed_positive_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side-1][axis],axis,*removed_positive_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_positive_particles(block),2*side-3);
             if(!removed_positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_positive_particles(block));}}
 }
 //#####################################################################
