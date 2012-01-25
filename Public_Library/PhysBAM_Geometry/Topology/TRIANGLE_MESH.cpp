@@ -85,11 +85,11 @@ Initialize_Square_Mesh(const int m,const int n,const bool reverse_triangles) // 
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     if(reverse_triangles){
-        int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-            elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(t++).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}}
+        int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // clockwise node ordering
+            elements(t++).Set(i+m*j,i+1+m*j,i+m*(j+1));elements(t++).Set(i+1+m*j,i+1+m*(j+1),i+m*(j+1));}}
     else{
         int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-            elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(t++).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
+            elements(t++).Set(i+m*j,i+1+m*j,i+1+m*(j+1));elements(t++).Set(i+m*j,i+1+m*(j+1),i+m*(j+1));}}
 }
 //#####################################################################
 // Function Initialize_Equilateral_Mesh
