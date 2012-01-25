@@ -24,8 +24,8 @@ EXTRAPOLATION_UNIFORM(const T_GRID& grid,const T_ARRAYS_BASE& phi_input,T_ARRAYS
     Set_Small_Number();
     node_grid=grid.Is_MAC_Grid()?grid.Get_Regular_Grid_At_MAC_Positions():grid;
     TV DX2=node_grid.dX*node_grid.dX;
-    if(T_GRID::dimension>=2){optimization_scale[2]=DX2[2]/DX2[1]; // dy^2/dx^2
-        if(T_GRID::dimension==3){optimization_scale[0]=DX2[3]/DX2[2];optimization_scale[1]=DX2[3]/DX2[1];}} // dz^2/dy^2 and dz^2/dx^2 
+    if(T_GRID::dimension>=2){optimization_scale[2]=DX2[1]/DX2[0]; // dy^2/dx^2
+        if(T_GRID::dimension==3){optimization_scale[0]=DX2[2]/DX2[1];optimization_scale[1]=DX2[2]/DX2[0];}} // dz^2/dy^2 and dz^2/dx^2 
     RANGE<TV_INT> domain_indices=node_grid.Domain_Indices().Thickened(ghost_cells);dimension_start=domain_indices.Minimum_Corner();dimension_end=domain_indices.Maximum_Corner();
 }
 //#####################################################################
@@ -55,7 +55,7 @@ Extrapolate(const T time,const bool fill_ghost_cells)
     ARRAY<TV_INT> heap(close.array.Size());
     Initialize(phi_ghost,done,close,heap,heap_length);
 
-    while(heap_length && phi_ghost(heap(1)) <= band_width+isobaric_fix_width){
+    while(heap_length && phi_ghost(heap(0)) <= band_width+isobaric_fix_width){
         TV_INT index=Remove_Root_From_Heap(phi_ghost,heap,heap_length,close);
         done(index)=true;
         Update_Close_Point(u_ghost,phi_ghost,done,index);

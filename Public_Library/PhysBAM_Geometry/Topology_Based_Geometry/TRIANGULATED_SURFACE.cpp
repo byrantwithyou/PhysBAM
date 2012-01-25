@@ -32,7 +32,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_UPDATE_VERTEX_NORMALS.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
-// #include <temp/Get_Triangles_Near_Edges.h>
 using namespace PhysBAM;
 //#####################################################################
 // Register this class as read-write

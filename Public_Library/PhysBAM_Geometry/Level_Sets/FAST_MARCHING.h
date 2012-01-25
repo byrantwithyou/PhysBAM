@@ -23,7 +23,8 @@ public:
             exchange(heap(index),heap(parent));
             close_k(heap(index))=index; // update child k
             close_k(heap(parent))=parent; // update parent k
-            index=parent;}}} // move up one
+            index=parent;}
+        else break;}} // move up one
 
     template<class T2,class T3,class T4>
     static void Down_Heap(const T2& phi,T3& close_k,ARRAY<T4>& heap,const int heap_length)
