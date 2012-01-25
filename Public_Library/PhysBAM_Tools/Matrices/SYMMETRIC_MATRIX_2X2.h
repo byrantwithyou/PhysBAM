@@ -321,8 +321,8 @@ Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) 
     if(a>=0){eigenvalues.x11=a+m;eigenvalues.x22=eigenvalues.x11?k/eigenvalues.x11:0;}
     else{eigenvalues.x22=a-m;eigenvalues.x11=eigenvalues.x22?k/eigenvalues.x22:0;}
     exchange_sort(eigenvalues.x22,eigenvalues.x11); // if order is wrong, matrix is nearly scalar
-    eigenvectors.Column(1)=(b>=0?TV(m+b,c):TV(-c,b-m)).Normalized();
-    eigenvectors.Column(2)=eigenvectors.Column(1).Perpendicular();
+    eigenvectors.Column(0)=(b>=0?TV(m+b,c):TV(-c,b-m)).Normalized();
+    eigenvectors.Column(1)=eigenvectors.Column(0).Perpendicular();
 }
 //#####################################################################
 // Function Conjugate
