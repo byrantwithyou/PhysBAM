@@ -278,7 +278,7 @@ Initialize_Bodies()
         guide_object2=new DEFORMABLE_BODY_COLLECTION<TV>(solid_body_collection.example_forces_and_velocities,guide_list);
         guide_object1->Read(stream_type,guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
         guide_object2->Read(stream_type,guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
-        SEGMENTED_CURVE<TV>& guide_edges=guide_object1->deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(1);
+        SEGMENTED_CURVE<TV>& guide_edges=guide_object1->deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
         particles.array_collection->Add_Elements(guide_edges.particles.array_collection->Size());
         for(int i=0;i<guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
         for(int i=0;i<guide_edges.particles.array_collection->Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<PARTICLES<TV>&>(guide_edges.particles).V(i);}
@@ -335,7 +335,7 @@ Initialize_Bodies()
     int i=1;
     for(int t=0;t<volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume->mesh.elements(t);
-        if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
+        if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[2],nodes[3]);
         i++;}
     for(int t=0;t<volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume->mesh.elements(t);
@@ -343,7 +343,7 @@ Initialize_Bodies()
     volume->Update_Number_Nodes();
     for(int t=0;t<sim_guide_volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=sim_guide_volume->mesh.elements(t);
-        if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
+        if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[2],nodes[3]);
         i++;}
     for(int t=0;t<sim_guide_volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=sim_guide_volume->mesh.elements(t);
@@ -482,9 +482,9 @@ Initialize_Bodies()
     else{
         /*for(int i=0;i<edges.mesh.elements.m;i++) {
             const VECTOR<int,2> &nodes=edges.mesh.elements(i);
-            if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[1]))||implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[2]))){
-                deformable_body_collection.collisions.ignored_nodes.Append(nodes[1]);
-                deformable_body_collection.collisions.ignored_nodes.Append(nodes[2]);}}
+            if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[0]))||implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[1]))){
+                deformable_body_collection.collisions.ignored_nodes.Append(nodes[0]);
+                deformable_body_collection.collisions.ignored_nodes.Append(nodes[1]);}}
         Sort(deformable_body_collection.collisions.ignored_nodes);
         for(int i=deformable_body_collection.collisions.ignored_nodes.m;i>1;i--) if(deformable_body_collection.collisions.ignored_nodes(i)==deformable_body_collection.collisions.ignored_nodes(i-1)) deformable_body_collection.collisions.ignored_nodes.Remove_Index_Lazy(i);*/
         for(int i=0;i<particles.array_collection->Size();i++) 
@@ -572,7 +572,7 @@ Initialize_Bodies()
         // Restrict project_mesh to processors TODO: make this repartitionable
         for(int i=project_mesh.elements.m;i>=1;i--){
             const VECTOR<int,2>& nodes=project_mesh.elements(i);
-            if(partition_id_from_particle_index(nodes(1))!=solid_body_collection.deformable_body_collection.mpi_solids->Partition() && partition_id_from_particle_index(nodes(1))!=solid_body_collection.deformable_body_collection.mpi_solids->Partition())
+            if(partition_id_from_particle_index(nodes(0))!=solid_body_collection.deformable_body_collection.mpi_solids->Partition() && partition_id_from_particle_index(nodes(0))!=solid_body_collection.deformable_body_collection.mpi_solids->Partition())
                 project_mesh.elements.Remove_Index_Lazy(i);}
     }
     else{
@@ -590,7 +590,7 @@ Initialize_Bodies()
     project_restlengths.Resize(project_mesh.elements.m);
     for(int i=0;i<project_mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=project_mesh.elements(i);
-        project_restlengths(i)=(deformable_body_collection.particles.X(nodes[1])-deformable_body_collection.particles.X(nodes[2])).Magnitude();}
+        project_restlengths(i)=(deformable_body_collection.particles.X(nodes[0])-deformable_body_collection.particles.X(nodes[1])).Magnitude();}
 
     // compute binding velocities (needs to happen after MPI restriction)
     if(use_deforming_levelsets) Compute_Binding_Velocities();
@@ -761,8 +761,8 @@ Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
         T duration = (T)2.;
         T start_time = (T)1.;
         INTERPOLATION_CURVE<T,TV> curve, normal;
-        curve.Add_Control_Point(0,interp_points(1));
-        normal.Add_Control_Point(0,interp_normals(1));
+        curve.Add_Control_Point(0,interp_points(0));
+        normal.Add_Control_Point(0,interp_normals(0));
         for(int i=0;i<interp_points.m;i++) {
             curve.Add_Control_Point(start_time+duration*(T)i/interp_points.m,interp_points(i));
             normal.Add_Control_Point(start_time+duration*(T)i/interp_normals.m,interp_normals(i));}
@@ -797,8 +797,8 @@ Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
         FRAME<TV> rotation,transup,transhead;
         transup.t=TV(0,(T)(0.05*0.95),0);
         INTERPOLATION_CURVE<T,TV> curve, normal;
-        curve.Add_Control_Point(0,interp_points(1)+TV(0,0,(T)10.));
-        normal.Add_Control_Point(0,interp_normals(1));
+        curve.Add_Control_Point(0,interp_points(0)+TV(0,0,(T)10.));
+        normal.Add_Control_Point(0,interp_normals(0));
         for(int i=0;i<interp_points.m;i++) {
             curve.Add_Control_Point(start_time+duration*(T)i/interp_points.m,interp_points(i));
             normal.Add_Control_Point(start_time+duration*(T)i/interp_normals.m,interp_normals(i));}
@@ -936,8 +936,8 @@ Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,
     T factor = (T)0.5-sqr(attempt_ratio)/(T)2.;
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     const ARRAY<TV>& X=geometry.X_self_collision_free;
-    VECTOR<T,3> face_embedded=weights[1]*X(nodes[2])+weights[2]*X(nodes[3])+weights[3]*X(nodes[4]);
-    VECTOR<T,3> point=X(nodes[1]);
+    VECTOR<T,3> face_embedded=weights[0]*X(nodes[1])+weights[1]*X(nodes[2])+weights[2]*X(nodes[3]);
+    VECTOR<T,3> point=X(nodes[0]);
     if (implicit_rigid_body->implicit_object->Signed_Distance(face_embedded)<implicit_rigid_body->implicit_object->Signed_Distance(point))
     {one_over_mass2*=factor;one_over_mass3*=factor;one_over_mass4*=factor;}
     else one_over_mass1*=factor;
@@ -947,14 +947,14 @@ Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,VECTOR<T,4>& one_over_mass)
-{Point_Face_Mass(attempt_ratio,nodes,weights,one_over_mass[1],one_over_mass[2],one_over_mass[3],one_over_mass[4]);}
+{Point_Face_Mass(attempt_ratio,nodes,weights,one_over_mass[0],one_over_mass[1],one_over_mass[2],one_over_mass[3]);}
 //#####################################################################
 // Function Point_Face_Mass
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Point_Face_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,3>& weights,ARRAY_VIEW<T>& one_over_mass){
     saved=one_over_mass.Subset(nodes);
-    Point_Face_Mass(attempt_ratio,nodes,weights,one_over_mass(nodes[1]),one_over_mass(nodes[2]),one_over_mass(nodes[3]),one_over_mass(nodes[4]));
+    Point_Face_Mass(attempt_ratio,nodes,weights,one_over_mass(nodes[0]),one_over_mass(nodes[1]),one_over_mass(nodes[2]),one_over_mass(nodes[3]));
 }
 //#####################################################################
 // Function Point_Face_Mass_Revert
@@ -971,8 +971,8 @@ Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2
     //TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     //const ARRAY<TV>& X=geometry.X_self_collision_free;
     VECTOR<int,4> distances(distance_to_root.Subset(nodes));
-    T distance1=(1-weights[1])*(T)distances[1]+weights[1]*(T)distances[2];
-    T distance2=(1-weights[2])*(T)distances[3]+weights[2]*(T)distances[4];
+    T distance1=(1-weights[0])*(T)distances[0]+weights[0]*(T)distances[1];
+    T distance2=(1-weights[1])*(T)distances[2]+weights[1]*(T)distances[3];
     one_over_mass1*=distance1;one_over_mass2*=distance1;
     one_over_mass3*=distance2;one_over_mass4*=distance2;
 }
@@ -981,14 +981,14 @@ Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,VECTOR<T,4>& one_over_mass)
-{Edge_Edge_Mass(attempt_ratio,nodes,weights,one_over_mass[1],one_over_mass[2],one_over_mass[3],one_over_mass[4]);}
+{Edge_Edge_Mass(attempt_ratio,nodes,weights,one_over_mass[0],one_over_mass[1],one_over_mass[2],one_over_mass[3]);}
 //#####################################################################
 // Function Edge_Edge_Mass
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Edge_Edge_Mass(const T attempt_ratio,const VECTOR<int,4>& nodes,const VECTOR<T,2>& weights,ARRAY_VIEW<T>& one_over_mass){
     saved=one_over_mass.Subset(nodes);
-    Edge_Edge_Mass(attempt_ratio,nodes,weights,one_over_mass(nodes[1]),one_over_mass(nodes[2]),one_over_mass(nodes[3]),one_over_mass(nodes[4]));
+    Edge_Edge_Mass(attempt_ratio,nodes,weights,one_over_mass(nodes[0]),one_over_mass(nodes[1]),one_over_mass(nodes[2]),one_over_mass(nodes[3]));
 }
 //#####################################################################
 // Function Edge_Edge_Mass_Revert
@@ -1001,7 +1001,7 @@ Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass)
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass)
-{one_over_mass(nodes[1])=saved[1];one_over_mass(nodes[2])=saved[2];one_over_mass(nodes[3])=saved[3];one_over_mass(nodes[4])=saved[4];}
+{one_over_mass(nodes[0])=saved[0];one_over_mass(nodes[1])=saved[1];one_over_mass(nodes[2])=saved[2];one_over_mass(nodes[3])=saved[3];}
 //#####################################################################
 // Function Reorder_Pairs
 //#####################################################################

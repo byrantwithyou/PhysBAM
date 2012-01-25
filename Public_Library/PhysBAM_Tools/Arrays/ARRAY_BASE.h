@@ -402,16 +402,7 @@ public:
     {return Derived().Get_Array_Pointer()+Derived().Size();}
 
     ID Binary_Search(const T& value) const// lower_bound binary search
-    {const T_ARRAY& self=Derived();
-    ID first=1,last=self.Size()+1,length=last-first,half,middle;    
-    while(length>ID(0)){
-        half=length>>1;
-        middle=first+half;
-        if(self(middle)<value){
-            first=middle+1;
-            length-=half+1;}
-        else length=half;}
-    return first;}
+    {return ID(std::lower_bound(begin(),end(),value)-begin());}
 
 //#####################################################################
 };

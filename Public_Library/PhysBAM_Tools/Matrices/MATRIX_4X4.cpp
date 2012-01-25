@@ -30,11 +30,11 @@ Inverse() const
 {
     int pivot_row;
     T p1=abs(x[0]),p2=abs(x[1]),p3=abs(x[2]),p4=abs(x[3]);
-    if(p1>p2){if(p1>p3){if(p1>p4) pivot_row=1;else pivot_row=4;}else if(p3>p4) pivot_row=3;else pivot_row=4;}
-    else if(p2>p3){if(p2>p4) pivot_row=2;else pivot_row=4;}
-    else if(p3>p4) pivot_row=3;else pivot_row=4;
-    T a=x[pivot_row-1];assert(a!=0);
-    VECTOR<T,3> b(x[3+pivot_row],x[7+pivot_row],x[11+pivot_row]),c;MATRIX<T,3> d;
+    if(p1>p2){if(p1>p3){if(p1>p4) pivot_row=0;else pivot_row=3;}else if(p3>p4) pivot_row=2;else pivot_row=3;}
+    else if(p2>p3){if(p2>p4) pivot_row=1;else pivot_row=3;}
+    else if(p3>p4) pivot_row=2;else pivot_row=3;
+    T a=x[pivot_row];assert(a!=0);
+    VECTOR<T,3> b(x[4+pivot_row],x[8+pivot_row],x[12+pivot_row]),c;MATRIX<T,3> d;
     switch(pivot_row){
         case 0:c=VECTOR<T,3>(x[1],x[2],x[3]);d=MATRIX<T,3>(x[5],x[6],x[7],x[9],x[10],x[11],x[13],x[14],x[15]);break;
         case 1:c=VECTOR<T,3>(x[0],x[2],x[3]);d=MATRIX<T,3>(x[4],x[6],x[7],x[8],x[10],x[11],x[12],x[14],x[15]);break;

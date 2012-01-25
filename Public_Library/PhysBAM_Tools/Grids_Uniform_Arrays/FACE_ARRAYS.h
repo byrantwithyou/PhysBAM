@@ -127,10 +127,10 @@ public:
     {return ((unsigned)index.axis<(unsigned)dimension) && Component(index.axis).Valid_Index(index.index);}
 
     T_ARRAY_VIEW& Component(const int axis)
-    {assert((unsigned)axis<dimension);return *(&data.x+(axis-1));}
+    {assert((unsigned)axis<dimension);return *(&data.x+axis);}
 
     const T_ARRAY_VIEW& Component(const int axis) const
-    {assert((unsigned)axis<dimension);return *(&data.x+(axis-1));}
+    {assert((unsigned)axis<dimension);return *(&data.x+axis);}
 
     TV Cell_Centered_Average(const TV_INT& cell_index) const
     {TV average;for(int i=0;i<dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));return average;}

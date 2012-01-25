@@ -54,7 +54,7 @@ public:
     {return RANGE<TV_INT>(TV_INT(),TV_INT::Axis_Vector(axis));}
 
     bool Neighbor(const int axis,const int axis_side) const
-    {return side_neighbor_ranks(2*(axis-1)+axis_side)!=-1;}
+    {return side_neighbor_ranks(2*axis+axis_side)!=-1;}
     
     template<class T2> THREAD_PACKAGE Package_Cell_Data(ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const RANGE<TV_INT>& send_region) const
     {

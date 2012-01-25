@@ -678,7 +678,7 @@ Setup_Boundary_Condition_Collection()
 {
     VECTOR<VECTOR<bool,2>,TV::dimension> mpi_boundaries;mpi_boundaries.Fill(VECTOR<bool,2>(false,false));
     if(fluids_parameters.mpi_grid) for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
-        if(fluids_parameters.mpi_grid->side_neighbor_ranks(2*(axis-1)+axis_side)>=0) mpi_boundaries(axis)(axis_side)=true;
+        if(fluids_parameters.mpi_grid->side_neighbor_ranks(2*axis+axis_side)>=0) mpi_boundaries(axis)(axis_side)=true;
 
     if(Simulate_Incompressible_Fluids()){
         if(fluids_parameters.particle_levelset_evolution){

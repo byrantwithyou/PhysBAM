@@ -363,7 +363,7 @@ Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_A
     T_ARRAYS_BOOL& psi_D=elliptic_solver.psi_D;T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver.psi_N;
 
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*(axis-1)+axis_side;
+        int side=2*axis+axis_side;
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -509,7 +509,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 
     TV_INT shift;
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*(axis-1)+axis_side;TV_INT offset=(axis_side==0?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
+        int side=2*axis+axis_side;TV_INT offset=(axis_side==0?-1:1)*moving_grid_number_of_cells*TV_INT::Axis_Vector(axis);
         // loop over boundary region by looping over ghost region and shifting inwards
         for(CELL_ITERATOR iterator(*grid,moving_grid_number_of_cells,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next())
             if(particle_levelset_evolution->phi(iterator.Cell_Index()-offset)<=0){shift+=offset;break;}}

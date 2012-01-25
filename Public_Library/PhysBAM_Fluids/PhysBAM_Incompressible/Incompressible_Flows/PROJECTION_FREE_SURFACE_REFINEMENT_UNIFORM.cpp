@@ -59,7 +59,7 @@ Set_Coarse_Boundary_Conditions(T_FACE_ARRAYS_SCALAR& coarse_face_velocities)
     int ghost=max(3,coarse_scale);
     phi_boundary->Fill_Ghost_Cells(fine_grid,levelset.phi,phi_ghost,0,0,ghost);
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*(axis-1)+axis_side;
+        int side=2*axis+axis_side;
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
@@ -174,7 +174,7 @@ template<class T_GRID> void PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
 Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& levelset_velocities,const ARRAY<T,TV_INT>& levelset_phi,const T time)
 {
     Map_Fine_To_Levelset_For_Constraints(levelset_velocities);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
         TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);

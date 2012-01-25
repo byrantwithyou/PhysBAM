@@ -29,7 +29,7 @@ THREAD_QUEUE::THREAD_QUEUE(const int thread_count,const bool set_affinity)
 THREAD_QUEUE::~THREAD_QUEUE()
 {
     EXITER* exiter=new EXITER[threads.m];
-    for(int i=0;i<threads.m;i++) Queue(&exiter[i-1]);
+    for(int i=0;i<threads.m;i++) Queue(&exiter[i]);
     for(int i=0;i<threads.m;i++) pthread_join(threads(i),NULL);
     
     pthread_cond_destroy(&done_condition);

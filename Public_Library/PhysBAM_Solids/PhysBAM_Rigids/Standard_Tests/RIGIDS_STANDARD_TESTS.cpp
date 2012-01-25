@@ -180,7 +180,7 @@ Add_Analytic_Box(const VECTOR<T,2>& scaling_factor,int segments_per_side)
     SEGMENT_MESH& segment_mesh=simplicial_object.mesh;segment_mesh.number_nodes=4*segments_per_side;segment_mesh.elements.Preallocate(4*segments_per_side);
     int last_node=0;VECTOR<T,2> position=VECTOR<T,2>(box.min_corner.x,box.min_corner.y);
     for(int side=0;side<4;side++) for(int vertex=0;vertex<segments_per_side;vertex++){
-        int current_node=(side-1)*segments_per_side+vertex;particles.X(current_node)=position;
+        int current_node=side*segments_per_side+vertex;particles.X(current_node)=position;
         position((side+1)%2)+=(T)(side<3?1:-1)*(side%2?((box.max_corner.y-box.min_corner.y)/(T)segments_per_side):((box.max_corner.x-box.min_corner.x)/(T)segments_per_side));
         if(last_node) simplicial_object.mesh.elements.Append(VECTOR<int,2>(last_node,current_node));
         last_node=current_node;}
