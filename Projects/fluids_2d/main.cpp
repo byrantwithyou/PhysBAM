@@ -63,7 +63,6 @@ int main(int argc,char* argv[])
     else if(PARSE_ARGS::Find_And_Remove("-density",argc,argv)) example=new DENSITY_TARGETTING<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-glass",argc,argv)) example=new GLASS<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-smoke",argc,argv)) example=new STANDARD_TESTS_SMOKE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-mass_conservation",argc,argv)) example=new MASS_CONSERVATION<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-spinning_bar",argc,argv)) example=new SPINNING_BAR<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-refinement",argc,argv)) example=new REFINEMENT<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-flow_cylinder",argc,argv)) example=new FLOW_PAST_CIRCLE<T>(stream_type);
@@ -89,7 +88,6 @@ int main(int argc,char* argv[])
     //SOLID_FLUID_COUPLING_TEST<T> example(stream_type,example_number);
     //example=new ELASTIC_DRIP<T>(stream_type);
     //example=new FLUID_CONTROL<T>(stream_type);
-    bool conserve=PARSE_ARGS::Find_And_Remove("-conserve",argc,argv);
     example->want_mpi_world=true;
     example->Parse(argc,argv);
     
@@ -99,7 +97,6 @@ int main(int argc,char* argv[])
     else if(fluids_parameters.periodic!=VECTOR<bool,2>()){LOG::cerr<<"Periodic domains require MPI."<<std::endl;exit(1);}
 
     example->Adjust_Output_Directory_For_MPI(fluids_parameters.mpi_grid);
-    if(conserve){fluids_parameters.mass_conservation=true;example->output_directory+="_conserve";}
 
     SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
     driver.Execute_Main_Program();

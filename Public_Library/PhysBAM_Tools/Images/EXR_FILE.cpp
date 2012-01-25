@@ -26,7 +26,7 @@ using namespace Imf;
 template<class T> template<int d> void EXR_FILE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
 {
-    assert(image.domain.min_corner.x==1&&image.domain.min_corner.y==1&&image.length==1);
+    assert(image.domain.min_corner.x==0&&image.domain.min_corner.y==0&&image.length==1);
     Rgba* pixels=new Rgba[image.counts.Product()];
     int t=0;
     if(d==3) for(int i=0;i<image.counts.x;i++) for(int j=image.counts.y-1;j>=0;j--){pixels[t].r=(float)image(i,j)[0];pixels[t].g=(float)image(i,j)[1];pixels[t].b=(float)image(i,j)[2];pixels[t].a=(float)1;t++;}

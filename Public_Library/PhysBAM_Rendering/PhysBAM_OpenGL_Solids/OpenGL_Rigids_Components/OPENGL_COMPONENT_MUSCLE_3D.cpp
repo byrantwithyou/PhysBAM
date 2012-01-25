@@ -75,10 +75,10 @@ Display(const int in_color) const
             MUSCLE<TV>& muscle=*articulated_rigid_body->muscle_list->muscles(muscle_id);
             glLineWidth(OPENGL_PREFERENCES::highlighted_line_width);OPENGL_PREFERENCES::selection_highlight_color.Send_To_GL_Pipeline();
             OpenGL_Begin(GL_LINES);
-            if(!muscle.via_points.m){PHYSBAM_ASSERT(segment_id==1);OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
+            if(!muscle.via_points.m){PHYSBAM_ASSERT(segment_id==0);OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
             else{PHYSBAM_ASSERT(segment_id<=muscle.via_points.m+1);
-                if(segment_id==1){OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(1)->Embedded_Position());}
-                else if(segment_id==muscle.via_points.m+1){OpenGL_Line(muscle.via_points(muscle.via_points.m)->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
+                if(segment_id==0){OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(1)->Embedded_Position());}
+                else if(segment_id==muscle.via_points.m){OpenGL_Line(muscle.via_points(muscle.via_points.m)->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
                 else{OpenGL_Line(muscle.via_points(segment_id-1)->Embedded_Position(),muscle.via_points(segment_id)->Embedded_Position());}}
             OpenGL_End();glPopAttrib();}
         glPopAttrib();}

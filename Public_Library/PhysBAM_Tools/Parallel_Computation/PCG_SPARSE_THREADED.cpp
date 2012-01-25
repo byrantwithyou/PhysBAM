@@ -64,7 +64,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
             preconditioner_zero_tolerance,preconditioner_zero_replacement);}
 
     double rho=0,rho_old=0;
-    for(int iteration=1;;iteration++){
+    for(int iteration=0;;iteration++){
         if(incomplete_cholesky){
             // solve Mz=r
             C->Solve_Forward_Substitution(b_interior,temp_interior,true); // diagonal should be treated as the identity
@@ -76,7 +76,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 
         // update search direction
         rho_old=rho;rho=Global_Sum((T)VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior),tid);
-        T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
+        T beta=0;if(iteration==0) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
 #ifdef USE_PTHREADS
@@ -95,7 +95,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         // check for convergence
         if(show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
-        if(iteration==desired_iterations){if(show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
+        if(iteration==desired_iterations-1){if(show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
 #endif
     }
     delete C;
@@ -323,7 +323,7 @@ Solve_Part_Five(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,cons
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
     int interior_n=interior_indices.Size()+1;
     
-    T beta=0;if(iteration==1) p_interior(tid)=z_interior(tid);else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(tid)(i)=z_interior(tid)(i)+beta*p_interior(tid)(i);}
+    T beta=0;if(iteration==0) p_interior(tid)=z_interior(tid);else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(tid)(i)=z_interior(tid)(i)+beta*p_interior(tid)(i);}
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Solve_Part_Six(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,const SPARSE_MATRIX_FLAT_NXN<T>& A)
@@ -403,7 +403,7 @@ Threaded_Part_One(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,c
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_Two(VECTOR_ND<T>& z,T rho,T rho_old,int iteration,int start_index,int end_index)
 {
-    T beta=0;if(iteration==1){for(int i=start_index;i<=end_index;i++) p(i)=z(i);}else{beta=(T)(rho/rho_old);for(int i=start_index;i<=end_index;i++) p(i)=z(i)+beta*p(i);}
+    T beta=0;if(iteration==0){for(int i=start_index;i<=end_index;i++) p(i)=z(i);}else{beta=(T)(rho/rho_old);for(int i=start_index;i<=end_index;i++) p(i)=z(i)+beta*p(i);}
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_Three(SPARSE_MATRIX_FLAT_NXN<T>& A,int start_index,int end_index)

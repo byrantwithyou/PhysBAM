@@ -257,7 +257,7 @@ Advance_To_Target_Time(const T target_time)
         example.phi_boundary_water.Use_Extrapolation_Mode(true);
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> interpolation;
-        TV gravity_direction=-TV::Axis_Vector(2);
+        TV gravity_direction=-TV::Axis_Vector(1);
         LOG::Time("Update Particles");
         if(pls.use_removed_positive_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.fine_mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());

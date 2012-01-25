@@ -221,8 +221,8 @@ template<class T_GRID,class T_WATER_STANDARD_TESTS> typename T_GRID::VECTOR_T::S
 Initial_Phi(const int region,const TV& X) const
 {
     if(test_number<10){
-        if(region==1)return Initial_Phi(X);
-        else if(region==2)return -Initial_Phi(X);}
+        if(region==0) return Initial_Phi(X);
+        else if(region==1) return -Initial_Phi(X);}
     
     ARRAY<T> phis(50);
     // two drops test

@@ -200,7 +200,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
             pcg.preconditioner_zero_tolerance,pcg.preconditioner_zero_replacement);}
 
     double rho=0,rho_old=0;
-    for(int iteration=1;;iteration++){
+    for(int iteration=0;;iteration++){
         if(pcg.incomplete_cholesky){
             // solve Mz=r
             A.C->Solve_Forward_Substitution(b_local,temp,true); // diagonal should be treated as the identity
@@ -212,7 +212,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
 
         // update search direction
         rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z,b_local));
-        T beta=0;if(iteration==1) p_interior=z;else{beta=(T)(rho/rho_old);for(int i=0;i<global_n;i++) p_interior(i)=z(i)+beta*p_interior(i);} // when iteration=1, beta=0
+        T beta=0;if(iteration==0) p_interior=z;else{beta=(T)(rho/rho_old);for(int i=0;i<global_n;i++) p_interior(i)=z(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells_Far(p_global);
@@ -229,7 +229,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
         // check for convergence
         if(pcg.show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(pcg.show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
-        if(iteration==desired_iterations){if(pcg.show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
+        if(iteration==desired_iterations-1){if(pcg.show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
 #endif
     }
 

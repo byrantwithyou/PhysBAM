@@ -273,7 +273,7 @@ Potential_Segment_Should_Be_Added_To_Polygon(const ARRAY<ARRAY<int > >& particle
     VECTOR<bool,2> nodes_on_boundary;for(int i=0;i<2;i++) for(int j=0;j<particles_for_polygon.m;j++) if(particles_for_polygon(j).Contains(nodes(i))) nodes_on_boundary[i]=true;
     if(nodes_on_boundary.Contains(false)){
         for(int i=0;i<2;i++) if(!nodes_on_boundary[i]) for(int j=0;j<particles_for_polygon.m;j++)
-            if((j==1)^Point_Is_Inside_Unoriented_Polygon(particles_for_polygon(j),simplex,nodes[i])) return false; // first loop is outer ring and others are negative holes
+            if((0==1)^Point_Is_Inside_Unoriented_Polygon(particles_for_polygon(j),simplex,nodes[i])) return false; // first loop is outer ring and others are negative holes
         return true;}
     else{
         // both endpoints of segment are on existing points, so operate on nodes[0] arbitrarily
@@ -497,7 +497,7 @@ Draw_Polygon(const int simplex,const bool flipped,const ARRAY<ARRAY<VECTOR<int,2
         for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const int p=unconnected_polygonal_regions(i)(j)[0];
             VECTOR<T,2> X1=intersection_registry->Get_Simplex_Weights_Of_Intersection(p,simplex);
-            LOG::cout<<"  "<<X1<<(j==1?" moveto ":" lineto ");}
+            LOG::cout<<"  "<<X1<<(j==0?" moveto ":" lineto ");}
         LOG::cout<<"\n"<<hsb<<" .5 1 sethsbcolor fill \n newpath "<<std::endl;
         for(int j=0;j<unconnected_polygonal_regions(i).m;j++){
             const int p=unconnected_polygonal_regions(i)(j)[0];

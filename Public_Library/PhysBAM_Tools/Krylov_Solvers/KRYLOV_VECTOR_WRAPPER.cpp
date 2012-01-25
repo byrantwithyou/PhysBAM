@@ -82,10 +82,10 @@ inline int Raw_Size_Helper(const float& p){return 1;}
 inline int Raw_Size_Helper(const double& p){return 1;}
 template<class T,class T_VECTOR> inline int Raw_Size_Helper(const VECTOR_BASE<T,T_VECTOR>& p){if(!p.Size()) return 0;return p.Size()*Raw_Size_Helper(p(1));}
 template<class T,class T_ARRAY> inline int Raw_Size_Helper(const ARRAY_BASE<T,T_ARRAY>& p){if(!p.Size()) return 0;return p.Size()*Raw_Size_Helper(p(1));}
-inline float& Raw_Get_Helper(int i,float*,float& p){assert(i==1);return p;}
-inline double& Raw_Get_Helper(int i,double*,double& p){assert(i==1);return p;}
-template<class S,class T,class T_VECTOR> inline S& Raw_Get_Helper(int i,S* a,VECTOR_BASE<T,T_VECTOR>& p){int s=Raw_Size_Helper(p(1));return Raw_Get_Helper((i-1)%s+1,a,p((i-1)/s+1));}
-template<class S,class T,class T_ARRAY> inline S& Raw_Get_Helper(int i,S* a,ARRAY_BASE<T,T_ARRAY>& p){int s=Raw_Size_Helper(p(1));return Raw_Get_Helper((i-1)%s+1,a,p((i-1)/s+1));}
+inline float& Raw_Get_Helper(int i,float*,float& p){assert(i==0);return p;}
+inline double& Raw_Get_Helper(int i,double*,double& p){assert(i==0);return p;}
+template<class S,class T,class T_VECTOR> inline S& Raw_Get_Helper(int i,S* a,VECTOR_BASE<T,T_VECTOR>& p){int s=Raw_Size_Helper(p(1));return Raw_Get_Helper(i%s,a,p(i/s));}
+template<class S,class T,class T_ARRAY> inline S& Raw_Get_Helper(int i,S* a,ARRAY_BASE<T,T_ARRAY>& p){int s=Raw_Size_Helper(p(1));return Raw_Get_Helper(i%s,a,p(i/s));}
 }
 //#####################################################################
 // Function Raw_Size

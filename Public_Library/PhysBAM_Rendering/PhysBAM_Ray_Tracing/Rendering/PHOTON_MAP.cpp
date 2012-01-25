@@ -235,8 +235,8 @@ Print_Photon_List()
 template<class T> void PHOTON_MAP<T>::
 Print_Photon_Tree(const int depth,const int index)
 {
-    if(index>photons.m)return;
-    if(index==1)LOG::cout<<"PHOTON TREE"<<std::endl;
+    if(index>=photons.m)return;
+    if(index==0)LOG::cout<<"PHOTON TREE"<<std::endl;
     for(int i=0;i<depth;i++)LOG::cout<<" ";
     LOG::cout<<"Photon "<<photons(index).location<<" Split on "<<photons(index).kdtree_split_axis<<std::endl;
     Print_Photon_Tree(depth+5,index*2);

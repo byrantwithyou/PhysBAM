@@ -89,7 +89,7 @@ public:
     {}
 
     void Update_Position_Based_State(const T time,const bool is_position_update) PHYSBAM_OVERRIDE // Currently works only with a single fragment
-    {if(collision_body_list_id && typeid((*collision_body_list)(collision_body_list_id))==typeid(TETRAHEDRON_COLLISION_BODY<T>)){
+    {if(collision_body_list_id>=COLLISION_GEOMETRY_ID(0) && typeid((*collision_body_list)(collision_body_list_id))==typeid(TETRAHEDRON_COLLISION_BODY<T>)){
         TETRAHEDRON_COLLISION_BODY<T>& collision_body=(TETRAHEDRON_COLLISION_BODY<T>&)((*collision_body_list)(collision_body_list_id));
         collision_body.tetrahedralized_volume.hierarchy->Update_Boxes(collision_body.collision_thickness);
         collision_body.tetrahedralized_volume.triangulated_surface->hierarchy->Update_Boxes();

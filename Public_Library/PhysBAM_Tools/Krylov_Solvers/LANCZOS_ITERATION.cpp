@@ -36,9 +36,9 @@ Tridiagonalize(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& w,KRYL
     w*=1/sqrt(magnitude_squared);
 
     T convergence_norm=0;
-    for(int iterations=1;;iterations++){
+    for(int iterations=0;;iterations++){
         system.Multiply(w,q);
-        if(iterations==1) v=q;else v+=q;
+        if(iterations==0) v=q;else v+=q;
         system.Project(v);
         T alpha=(T)system.Inner_Product(w,v);
         v.Copy(-alpha,w,v);
@@ -53,7 +53,7 @@ Tridiagonalize(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& w,KRYL
             if(print_diagnostics) LOG::cout<<"lanczos iterations = "<<iterations<<std::endl;
 #endif
             return true;}
-        if(iterations==max_iterations) break;
+        if(iterations==max_iterations-1) break;
         q=w;
         w.Copy(1/beta,v);
         v.Copy(-beta,q);}

@@ -20,7 +20,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
     TV_INT periods=grid.Domain_Indices().Maximum_Corner();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*axis+axis_side-2;
+        int side=2*axis+axis_side;
         TV_INT period=(axis_side==0?1:-1)*periods[axis]*TV_INT::Axis_Vector(axis);
         for(NODE_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             u_ghost(node)=u_ghost(node+period);}}
@@ -41,7 +41,7 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS
         TV_INT periods=grid.Domain_Indices().Maximum_Corner();
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
         for(int face_axis=0;face_axis<T_GRID::dimension;face_axis++)for(int axis_side=0;axis_side<2;axis_side++){
-            int side=2*face_axis+axis_side-2;
+            int side=2*face_axis+axis_side;
             TV_INT period=(axis_side==0?1:-1)*periods[face_axis]*TV_INT::Axis_Vector(face_axis);
             for(NODE_ITERATOR iterator(face_grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
                 u_ghost_axis(node)=u_ghost_axis(node+period);}}}

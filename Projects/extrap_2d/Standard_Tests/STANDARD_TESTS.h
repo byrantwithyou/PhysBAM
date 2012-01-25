@@ -624,6 +624,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
 
             RANDOM_NUMBERS<T> rand;
+            rand.Set_Seed(12345);
             rand.Fill_Uniform(particles.X,-1,1);
             break;}
         case 18:{

@@ -44,11 +44,11 @@ Initialize_Vicinity_Triangles()
     for(int t=0;t<vicinity_triangles.m;t++){
         ARRAY<int>& vicinity_triangles_t=vicinity_triangles(t);vicinity_triangles_t.Resize(0);
         vicinity_triangles_t.Append(t);
-        candidates=adjacent_triangles(t);T r=Repulsion_Radius(t);int cycle=1;
+        candidates=adjacent_triangles(t);T r=Repulsion_Radius(t);int cycle=0;
         while(candidates.m){
             for(int i=0;i<candidates.m;i++){
                 int candidate=candidates(i);
-                if(cycle==1 || Acceptable_Vicinity_Triangle(t,r,candidate)){
+                if(cycle==0 || Acceptable_Vicinity_Triangle(t,r,candidate)){
                     vicinity_triangles_t.Append_Unique(candidate);
                     const ARRAY<int>& adjacent_to_candidate=adjacent_triangles(candidate);
                     for(int j=0;j<adjacent_to_candidate.m;j++)     

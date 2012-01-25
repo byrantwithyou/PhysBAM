@@ -14,7 +14,7 @@ template<class T1,class T2>
 class PAIR
 {
 public:
-    template<int i> struct GET:public IF<i==1,T1,T2>{};
+    template<int i> struct GET:public IF<i==0,T1,T2>{};
 
     T1 x;T2 y;
 

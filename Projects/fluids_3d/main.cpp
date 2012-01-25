@@ -80,7 +80,6 @@ int main(int argc,char* argv[])
     else if(PARSE_ARGS::Find_And_Remove("lighthouse",argc,argv)) example=new LIGHTHOUSE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("sheeting",argc,argv)) example=new SHEETING<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("spray",argc,argv)) example=new SPRAY_AND_FOAM<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("mass_conservation",argc,argv)) example=new MASS_CONSERVATION<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("dsd_fire_ball",argc,argv)) example=new DSD_FIRE_BALL_EXAMPLE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("dsd_no_navier",argc,argv)) example=new DSD_NO_NAVIER_STOKES<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("twophase",argc,argv)) example=new TWO_PHASE<T>(stream_type);

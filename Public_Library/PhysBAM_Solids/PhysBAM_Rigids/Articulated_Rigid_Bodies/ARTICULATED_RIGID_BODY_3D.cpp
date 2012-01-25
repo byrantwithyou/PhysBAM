@@ -94,14 +94,14 @@ Compute_Position_Based_State(const T dt,const T time)
             joint_muscle_control_matrix(i).Set_Submatrix(3,0,joint_angular_muscle_control_matrix(i));}}
 
     joint_offset_in_post_stabilization_matrix.Resize(joint_mesh.joints.m);
-    for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==1)?1:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
+    for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_post_stabilization_matrix(i)=(i==0)?0:joint_offset_in_post_stabilization_matrix(i-1)+joint_constrained_dimensions(i-1);
     int total_constrained_dimensions=joint_constrained_dimensions.Sum();
     global_post_stabilization_matrix_11=MATRIX_MXN<T>(total_constrained_dimensions,total_constrained_dimensions);
     LOG::cout<<"*** Total constrained dimensions "<<total_constrained_dimensions<<std::endl;
 
     if(use_muscle_actuators){
         joint_offset_in_muscle_control_matrix.Resize(joint_mesh.joints.m);
-        for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_muscle_control_matrix(i)=(i==1)?1:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
+        for(int i=0;i<joint_mesh.joints.m;i++) joint_offset_in_muscle_control_matrix(i)=(i==0)?0:joint_offset_in_muscle_control_matrix(i-1)+joint_muscle_control_dimensions(i-1);
         int total_muscle_control_dimensions=joint_muscle_control_dimensions.Sum();assert(total_muscle_control_dimensions);
         global_post_stabilization_matrix_12=MATRIX_MXN<T>(total_constrained_dimensions,muscle_list->muscles.m);
         global_post_stabilization_matrix_21=MATRIX_MXN<T>(total_muscle_control_dimensions,total_constrained_dimensions);
@@ -168,7 +168,7 @@ Compute_Position_Based_State(const T dt,const T time)
                         TV c21_along_direction=I_inverse*TV::Cross_Product(r_attach,direction);
                         TV c11_along_direction=TV::Cross_Product(c21_along_direction,r_joint)+direction/body.Mass();
                         VECTOR_ND<T> C_along_direction(6);C_along_direction.Set_Subvector(0,c11_along_direction);C_along_direction.Set_Subvector(3,c21_along_direction);
-                        if(t==1) C_along_direction=-C_along_direction; // child gets negative sign because the relative velocity measures parent vel - child vel
+                        if(t==0) C_along_direction=-C_along_direction; // child gets negative sign because the relative velocity measures parent vel - child vel
                         global_post_stabilization_matrix_12.Add_To_Submatrix(joint_offset_in_post_stabilization_matrix(i),muscle_index,
                             joint_constraint_matrix(i).Transpose_Times(C_along_direction));
                         global_post_stabilization_matrix_22.Add_To_Submatrix(joint_offset_in_muscle_control_matrix(i),muscle_index,

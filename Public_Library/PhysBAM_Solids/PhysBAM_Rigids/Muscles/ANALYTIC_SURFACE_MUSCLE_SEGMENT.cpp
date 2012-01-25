@@ -125,9 +125,9 @@ Update_Parameters()
 template<class T> T ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
 Get_Elongation_At_Local_Position(const TV& initial_local_position,const int segment_number) const
 {
-    if(segment_number<1||segment_number>(2*num_segments_over_2)) return 0;
+    if(segment_number<0||segment_number>=(2*num_segments_over_2)) return 0;
     T initial_segment_width=initial_curve_length/(2*num_segments_over_2),segment_width;
-    if(segment_number==1) segment_width=fractional_segment_endpoints(segment_number)*Curve_Length()/(2*(T)pi);
+    if(segment_number==0) segment_width=fractional_segment_endpoints(segment_number)*Curve_Length()/(2*(T)pi);
     else segment_width=(fractional_segment_endpoints(segment_number)-fractional_segment_endpoints(segment_number-1))*Curve_Length()/(2*(T)pi);
     return segment_width/initial_segment_width;
 }

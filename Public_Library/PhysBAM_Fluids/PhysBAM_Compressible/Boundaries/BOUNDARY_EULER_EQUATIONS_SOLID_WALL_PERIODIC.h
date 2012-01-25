@@ -123,7 +123,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DI
     T_ARRAYS_DIMENSION_BASE::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
 
-    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side-2;
+    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(!periodic[axis]) Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 int period=repeats_at_last_node[axis]?counts[axis]-1:counts[axis];

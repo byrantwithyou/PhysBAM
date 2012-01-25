@@ -47,13 +47,13 @@ public:
     virtual ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM();
 
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i)
-    {assert(i==1);return particle_levelset;}
+    {assert(i==0);return particle_levelset;}
 
     virtual T_FAST_LEVELSET& Levelset(const int i)
-    {assert(i==1);return particle_levelset.levelset;}
+    {assert(i==0);return particle_levelset.levelset;}
     
     virtual T_FAST_LEVELSET_ADVECTION& Levelset_Advection(const int i)
-    {assert(i==1);return levelset_advection;}
+    {assert(i==0);return levelset_advection;}
 
     virtual void Use_Semi_Lagrangian_Advection()
     {levelset_advection.Use_Local_Semi_Lagrangian_Advection();}
@@ -62,7 +62,7 @@ public:
     {levelset_advection.Use_Local_WENO_For_Advection();}
 
     virtual void Use_Hamilton_Jacobi_Eno_Advection(const int order)
-    {assert(order >= 1 && order <= 3);levelset_advection.Use_Local_ENO_For_Advection(order);}
+    {assert(order>=1 && order<=3);levelset_advection.Use_Local_ENO_For_Advection(order);}
 
     virtual  void Track_Mass(const bool track_mass_input=true)
     {track_mass=track_mass_input;if(track_mass){initial_mass=levelset_advection.Approximate_Negative_Material();LOG::cout << "negative volume = " << initial_mass << std::endl;}}

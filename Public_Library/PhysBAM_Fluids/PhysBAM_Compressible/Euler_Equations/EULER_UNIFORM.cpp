@@ -273,7 +273,7 @@ Advance_One_Time_Step_Explicit_Part(const T dt,const T time,const int rk_substep
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_default,euler_projection.elliptic_solver->psi_N,euler_projection.face_velocities,thinshell,
             open_boundaries,&eigensystems_pressureonly,&fluxes_pressure);}
     else{
-        if(timesplit && thinshell && rk_substep==1) conservation->Save_Fluxes();
+        if(timesplit && thinshell && rk_substep==0) conservation->Save_Fluxes();
         conservation->Update_Conservation_Law(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_default,euler_projection.elliptic_solver->psi_N,euler_projection.face_velocities,false,
             open_boundaries);}
 

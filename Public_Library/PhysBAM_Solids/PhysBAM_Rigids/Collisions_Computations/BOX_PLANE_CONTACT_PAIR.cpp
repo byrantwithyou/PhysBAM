@@ -60,7 +60,7 @@ bool Update_Box_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisi
             transformed_point(1)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}  
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
 

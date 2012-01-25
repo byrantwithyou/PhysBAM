@@ -93,10 +93,10 @@ Print_Altitude_Statistics()
     if(!Dm_inverse.m) return;
     ARRAY<T> altitude(Dm_inverse.m,false);for(int t=0;t<altitude.m;t++)altitude(t)=Rest_Altitude(t);Sort(altitude);
     LOG::cout<<"strain measure - total elements = "<<altitude.m<<std::endl;
-    LOG::cout<<"strain measure - smallest altitude = "<<altitude(1)<<std::endl;
-    LOG::cout<<"strain measure - one percent altitude = "<<altitude((int)(.01*altitude.m)+1)<<std::endl;
-    LOG::cout<<"strain measure - ten percent altitude = "<<altitude((int)(.1*altitude.m)+1)<<std::endl;
-    LOG::cout<<"strain measure - median altitude = "<<altitude((int)(.5*altitude.m)+1)<<std::endl;
+    LOG::cout<<"strain measure - smallest altitude = "<<altitude(0)<<std::endl;
+    LOG::cout<<"strain measure - one percent altitude = "<<altitude((int)(.01*altitude.m))<<std::endl;
+    LOG::cout<<"strain measure - ten percent altitude = "<<altitude((int)(.1*altitude.m))<<std::endl;
+    LOG::cout<<"strain measure - median altitude = "<<altitude((int)(.5*altitude.m))<<std::endl;
 }
 //#####################################################################
 #define INSTANTIATION_HELPER_T(T,m,d) \

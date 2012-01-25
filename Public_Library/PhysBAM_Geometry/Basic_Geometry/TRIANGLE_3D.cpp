@@ -91,15 +91,15 @@ Region(const VECTOR<T,3>& location,int& region_id,const T distance) const
     SEGMENT_3D<T> segment(x1,x2);T d1=segment.Distance_From_Point_To_Segment(location);
     segment.x1=x3;T d2=segment.Distance_From_Point_To_Segment(location);
     segment.x2=x1;T d3=segment.Distance_From_Point_To_Segment(location);
-    if(d1 > distance && d2 > distance && d3 > distance) return 3; // face is closest
+    if(d1 > distance && d2 > distance && d3 > distance) return 2; // face is closest
     else if(d1 <= distance){
-        if(d2 <= distance){region_id=2;return 1;} // vertex 2
-        else if(d3 <= distance){region_id=1;return 1;} // vertex 1
-        else{region_id=1;return 2;}} // edge 1
+        if(d2 <= distance){region_id=2;return 0;} // vertex 2
+        else if(d3 <= distance){region_id=1;return 0;} // vertex 1
+        else{region_id=1;return 1;}} // edge 1
     else if(d2 <= distance){
-        if(d3 <= distance){region_id=3;return 1;} // vertex 3
-        else{region_id=2;return 2;}} // edge 2
-    else{region_id=3;return 2;} // edge 3
+        if(d3 <= distance){region_id=3;return 0;} // vertex 3
+        else{region_id=2;return 1;}} // edge 2
+    else{region_id=3;return 1;} // edge 3
 }
 //#####################################################################
 // Function Closest_Point

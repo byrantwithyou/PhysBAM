@@ -79,7 +79,7 @@ Get_Previous_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
     int index=-1;
     for(int i=0;i<phoneme_labels.m;i++) if(phoneme_segment.phoneme_sample->name.compare(phoneme_labels(i))<0){index=i;break;}
     if(index<0) return;
-    index=(index==1?phoneme_labels.m:index-1);
+    index=(index==0?phoneme_labels.m-1:index-1);
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
     phoneme_segment.Set_Sample(*phoneme_segments(1)->phoneme_sample);
     phoneme_segment.phoneme_sample_name=phoneme_segments(1)->phoneme_sample_name;
@@ -108,7 +108,7 @@ Get_Previous_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
     int index=-1;
     for(int i=0;i<phoneme_segments.m;i++) if(!phoneme_segment.phoneme_sample_name.compare(phoneme_segments(i)->phoneme_sample_name)){index=i;break;}
     if(index<0) return;
-    index=(index==1?phoneme_segments.m:index-1);
+    index=(index==0?phoneme_segments.m-1:index-1);
     phoneme_segment.Set_Sample(*phoneme_segments(index)->phoneme_sample);
     phoneme_segment.phoneme_sample_name=phoneme_segments(index)->phoneme_sample_name;
 }

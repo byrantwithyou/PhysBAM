@@ -75,16 +75,16 @@ Normal(const TV& X) const
 template<class T> VECTOR<T,3> RING<T>::
 Normal(const TV& X,const int aggregate) const 
 {
-    assert(aggregate >= 1 && aggregate <= 4);
-    if(aggregate==1){ // outer cylinder
+    assert(aggregate>=0 && aggregate<4);
+    if(aggregate==0){ // outer cylinder
         TV normal=X-plane1.x1;
         normal-=TV::Dot_Product(normal,plane1.normal)*plane1.normal;
         return normal.Normalized();}
-    else if(aggregate==2){ // inner cylinder
+    else if(aggregate==1){ // inner cylinder
         TV normal=X-plane1.x1;
         normal-=TV::Dot_Product(normal,plane1.normal)*plane1.normal;
         return -normal.Normalized();}
-    else if(aggregate==3)
+    else if(aggregate==2)
         return plane1.Normal();
     else 
         return plane2.Normal();

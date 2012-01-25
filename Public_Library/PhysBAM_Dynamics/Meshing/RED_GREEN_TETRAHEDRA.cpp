@@ -306,10 +306,10 @@ Regularly_Refine_Tet(const int level,const int tet)
     Add_Tetrahedron(free_tet_indices,level+1,i,ij,ki,il,tet);Add_Tetrahedron(free_tet_indices,level+1,ij,j,jk,jl,tet);
     Add_Tetrahedron(free_tet_indices,level+1,ki,jk,k,kl,tet);Add_Tetrahedron(free_tet_indices,level+1,il,jl,kl,l,tet);
 
-    if(first_midpoint_index==1){
+    if(first_midpoint_index==0){
         Add_Tetrahedron(free_tet_indices,level+1,kl,ij,il,ki,tet);Add_Tetrahedron(free_tet_indices,level+1,kl,ij,jk,jl,tet);
         Add_Tetrahedron(free_tet_indices,level+1,kl,ij,ki,jk,tet);Add_Tetrahedron(free_tet_indices,level+1,kl,ij,jl,il,tet);}
-    else if(first_midpoint_index==2){
+    else if(first_midpoint_index==1){
         Add_Tetrahedron(free_tet_indices,level+1,jk,il,ij,jl,tet);Add_Tetrahedron(free_tet_indices,level+1,jk,il,ki,ij,tet);
         Add_Tetrahedron(free_tet_indices,level+1,jk,il,kl,ki,tet);Add_Tetrahedron(free_tet_indices,level+1,jk,il,jl,kl,tet);}
     else{

@@ -48,7 +48,7 @@ bool Update_Sphere_Plane_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_coll
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
     TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Rotation().Rotated_Axis(2);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     T separation=TV::Dot_Product(body1->X()-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;

@@ -196,7 +196,7 @@ Minimum_Area(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
     for(int t=0;t<mesh.elements.m;t++){
-        int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
+        int node1=mesh.elements(t)(0),node2=mesh.elements(t)(1),node3=mesh.elements(t)(2);
         T temp=TRIANGLE_2D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
     if(index) *index=k;
@@ -210,7 +210,7 @@ Minimum_Signed_Area(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
     for(int t=0;t<mesh.elements.m;t++){
-        int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
+        int node1=mesh.elements(t)(0),node2=mesh.elements(t)(1),node3=mesh.elements(t)(2);
         T temp=TRIANGLE_2D<T>::Signed_Area(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
     if(index) *index=k;
@@ -224,7 +224,7 @@ Total_Area() const
 {
     T area=0;
     for(int t=0;t<mesh.elements.m;t++){
-        int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
+        int node1=mesh.elements(t)(0),node2=mesh.elements(t)(1),node3=mesh.elements(t)(2);
         area+=TRIANGLE_2D<T>::Area(particles.X(node1),particles.X(node2),particles.X(node3));}
     return area;
 }
@@ -236,7 +236,7 @@ Minimum_Altitude(int* index) const
 {
     int k=0;T minimum=FLT_MAX;
     for(int t=0;t<mesh.elements.m;t++){
-        int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
+        int node1=mesh.elements(t)(0),node2=mesh.elements(t)(1),node3=mesh.elements(t)(2);
         T temp=TRIANGLE_2D<T>::Minimum_Altitude(particles.X(node1),particles.X(node2),particles.X(node3));
         if(temp < minimum){minimum=temp;k=t;}}
     if(index) *index=k;
@@ -274,7 +274,7 @@ Inverted_Triangles(ARRAY<int>& inverted_triangles) const
 {
     inverted_triangles.Resize(0);
     for(int t=0;t<mesh.elements.m;t++){
-        int node1=mesh.elements(t)(1),node2=mesh.elements(t)(2),node3=mesh.elements(t)(3);
+        int node1=mesh.elements(t)(0),node2=mesh.elements(t)(1),node3=mesh.elements(t)(2);
         if(TRIANGLE_2D<T>::Signed_Area(particles.X(node1),particles.X(node2),particles.X(node3)) < 0) inverted_triangles.Append(t);}
 }
 //#####################################################################

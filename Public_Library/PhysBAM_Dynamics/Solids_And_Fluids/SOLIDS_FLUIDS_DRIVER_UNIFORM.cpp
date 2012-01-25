@@ -1043,10 +1043,10 @@ Advect_Fluid(const T dt,const int substep)
             euler->conservation->adaptive_time_step=fluids_parameters.compressible_adaptive_time_step;
             euler->Advance_One_Time_Step_Explicit_Part(dt,rk_time,rk_substep,rungekutta_u.order);
             if((euler->conservation->min_dt<dt)&&(fluids_parameters.compressible_adaptive_time_step)){
-                if(rk_substep==1){restart_dt=euler->conservation->min_dt;reset_with_restart=true;return;}
-                else if((rk_substep==2)&&(rungekutta_u.order==2)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}
-                else if((rk_substep==2)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);*const_cast<T*>(&dt)=min_dt;rk_time-=dt/2;continue;}
-                else if((rk_substep==3)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}}
+                if(rk_substep==0){restart_dt=euler->conservation->min_dt;reset_with_restart=true;return;}
+                else if((rk_substep==1)&&(rungekutta_u.order==2)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}
+                else if((rk_substep==1)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);*const_cast<T*>(&dt)=min_dt;rk_time-=dt/2;continue;}
+                else if((rk_substep==2)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}}
             for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 assert(euler->U(cell_index)(1)>0);assert(EULER<T_GRID>::e(euler->U,cell_index)>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);
