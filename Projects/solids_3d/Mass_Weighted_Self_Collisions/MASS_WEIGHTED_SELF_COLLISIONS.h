@@ -34,9 +34,9 @@ public:
 
         bool operator()(const VECTOR<int,4>& pair1, const VECTOR<int,4>& pair2) {
             const ARRAY<TV>& X=geometry->X_self_collision_free;
-            T min1=X(pair1[1]).y;
-            T min2=X(pair2[1]).y;
-            for(int i=2;i<=4;i++) {
+            T min1=X(pair1[0]).y;
+            T min2=X(pair2[0]).y;
+            for(int i=1;i<4;i++) {
                 min1=min(min1,X(pair1[i]).y);
                 min2=min(min2,X(pair2[i]).y);
             }

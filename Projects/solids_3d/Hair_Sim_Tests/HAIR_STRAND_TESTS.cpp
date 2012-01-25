@@ -175,7 +175,7 @@ Initialize_Bodies()
     int i=1;
     for(int t=0;t<volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume->mesh.elements(t);
-        if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
+        if (TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[2],nodes[3]);
         i++;}
     for(int t=0;t<volume->mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume->mesh.elements(t);
@@ -264,7 +264,7 @@ Initialize_Bodies()
     project_restlengths.Resize(project_mesh.elements.m);
     for(int i=0;i<project_mesh.elements.m;i++){
         const VECTOR<int,2>& nodes=project_mesh.elements(i);
-        project_restlengths(i)=(deformable_body_collection.particles.X(nodes[1])-deformable_body_collection.particles.X(nodes[2])).Magnitude();}
+        project_restlengths(i)=(deformable_body_collection.particles.X(nodes[0])-deformable_body_collection.particles.X(nodes[1])).Magnitude();}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -290,7 +290,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
     T factor=2.;
     switch(test_number){
         case 1:
-            length=init_positions_end(1)[1]-init_positions_start(init_positions_start.m)[1];
+            length=init_positions_end(0)[0]-init_positions_start(init_positions_start.m)[0];
             interp_start.Add_Control_Point(0,FRAME<TV>());
             interp_start.Add_Control_Point(duration,FRAME<TV>());
             if(velocity_time<1.) for(int i=0;i<fixed_nodes_end.m;i++) V(fixed_nodes_end(i))=TV((T)-.3*length,0,0);
@@ -298,10 +298,10 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
             else{
                 for(int i=0;i<fixed_nodes_end.m;i++){
                     TV rotation_axis=TV((T)1.,0,0);
-                    V(fixed_nodes_end(i))=(T)pi*TV::Cross_Product(rotation_axis,particles.X(fixed_nodes_end(i))-TV(particles.X(fixed_nodes_end(i))(1),0,0));}}
+                    V(fixed_nodes_end(i))=(T)pi*TV::Cross_Product(rotation_axis,particles.X(fixed_nodes_end(i))-TV(particles.X(fixed_nodes_end(i))(0),0,0));}}
             break;
         case 2:
-            length=init_positions_end(1)[1]-init_positions_start(init_positions_start.m)[1];
+            length=init_positions_end(0)[0]-init_positions_start(init_positions_start.m)[0];
             frame.t=TV((T)-.5*length,0,0);
             interp_end.Add_Control_Point(0,FRAME<TV>());
             interp_end.Add_Control_Point((T)1.,FRAME<TV>());
@@ -316,12 +316,12 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
         case 3:
             interp_start.Add_Control_Point(0,FRAME<TV>());
             for(int i=0;i<duration*factor;i++){
-                frame.t=TV(0,(i%2==1)*(T)-1.*init_positions_start(1)[2],0);
+                frame.t=TV(0,(i%2==1)*(T)-1.*init_positions_start(0)[1],0);
                 interp_start.Add_Control_Point((T)i/factor,frame);
             }
             break;
         case 4:
-            length=init_positions_end(1)[2]-init_positions_start(init_positions_start.m)[2];
+            length=init_positions_end(0)[1]-init_positions_start(init_positions_start.m)[1];
             interp_start.Add_Control_Point(0,FRAME<TV>());
             interp_start.Add_Control_Point(duration,FRAME<TV>());
             if(velocity_time<(T)3.){
@@ -333,7 +333,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
             else if(!reset) {fixed_nodes_end.Remove_All();reset=true;}
             break;
         case 5:
-            length=init_positions_end(1)[1]-init_positions_start(init_positions_start.m)[1];
+            length=init_positions_end(0)[0]-init_positions_start(init_positions_start.m)[0];
             frame.t=TV(2*length,0,0);
             interp_start.Add_Control_Point(0,FRAME<TV>());
             interp_start.Add_Control_Point((T)3.,FRAME<TV>());
@@ -377,7 +377,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
     return;
     switch(test_number){
         case 1:
-            length=init_positions_end(1)[1]-init_positions_start(init_positions_start.m)[1];
+            length=init_positions_end(0)[0]-init_positions_start(init_positions_start.m)[0];
             interp_angle.Add_Control_Point(0,0);
             interp_angle.Add_Control_Point((T)1.,0);
             interp_angle.Add_Control_Point(duration,duration*(T)pi);
@@ -397,7 +397,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
             interp_start.Add_Control_Point(duration,FRAME<TV>());
             break;
         case 2:
-            length=init_positions_end(1)[1]-init_positions_start(init_positions_start.m)[1];
+            length=init_positions_end(0)[0]-init_positions_start(init_positions_start.m)[0];
             frame.t=TV((T)-.5*length,0,0);
             interp_end.Add_Control_Point(0,FRAME<TV>());
             interp_end.Add_Control_Point((T)1.,FRAME<TV>());

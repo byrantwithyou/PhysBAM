@@ -41,9 +41,9 @@ public:
 
         bool operator()(const VECTOR<int,4>& pair1, const VECTOR<int,4>& pair2){
             const ARRAY<TV>& X=geometry->X_self_collision_free;
-            T min1=head->implicit_object->Signed_Distance(X(pair1[1]));
-            T min2=head->implicit_object->Signed_Distance(X(pair2[1]));
-            for(int i=2;i<=4;i++) {
+            T min1=head->implicit_object->Signed_Distance(X(pair1[0]));
+            T min2=head->implicit_object->Signed_Distance(X(pair2[0]));
+            for(int i=1;i<4;i++) {
                 min1=min(min1,head->implicit_object->Signed_Distance(X(pair1[i])));
                 min2=min(min2,head->implicit_object->Signed_Distance(X(pair2[i])));
             }
