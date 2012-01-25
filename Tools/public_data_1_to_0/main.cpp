@@ -84,6 +84,7 @@ template<class T> void Convert_File(const std::string& ifilename,const std::stri
 //#################################################################
 template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std::string& ofilename)
 {
+    LOG::cout<<"TRI2D: "<<ifilename<<" -> "<<ofilename<<std::endl;
     try{
         TRIANGULATED_AREA<T>* area;
         FILE_UTILITIES::Create_From_File<T>(ifilename,area);
@@ -97,9 +98,13 @@ template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std
 //#################################################################
 template<class T> void Convert_Tri_File(const std::string& ifilename,const std::string& ofilename)
 {
+    LOG::cout<<"TRI: "<<ifilename<<" -> "<<ofilename<<std::endl;
     try{
         TRIANGULATED_SURFACE<T>* surface;
-        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);
+        for(int i=0; i<surface->mesh.elements.m;i++) surface->mesh.elements(i)-=VECTOR<int,3>(1,1,1);
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*surface);
+    }
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
