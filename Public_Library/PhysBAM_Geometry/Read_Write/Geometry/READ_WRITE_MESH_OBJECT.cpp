@@ -58,9 +58,9 @@ Read_Helper(std::istream& input,STRUCTURE<TV>& structure_object)
     object.particles.array_collection->Resize(size);
     Read_Binary_Array<RW>(input,object.particles.X.Get_Array_Pointer(),size);
     if(object.mesh.elements.m){
-        int min_index=object.mesh.elements.Flattened().Min(),max_index=object.mesh.elements.Flattened().Max();
-        if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
-        if(max_index>=object.particles.array_collection->Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read invalid vertex index %d (particles.array_collection->Size() = %d)",max_index,object.particles.array_collection->Size())); 
+        // int min_index=object.mesh.elements.Flattened().Min(),max_index=object.mesh.elements.Flattened().Max();
+        // if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
+        // if(max_index>=object.particles.array_collection->Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read invalid vertex index %d (particles.array_collection->Size() = %d)",max_index,object.particles.array_collection->Size())); 
         object.Update_Number_Nodes();}
 }
 //#####################################################################

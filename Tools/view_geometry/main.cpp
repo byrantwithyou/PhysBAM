@@ -173,10 +173,11 @@ template<class T> void Add_Box_File(const std::string& filename,OPENGL_WORLD& wo
 {
     typedef VECTOR<T,3> TV;
     try{
-        BOX<TV>* box=new BOX<TV>;
-        FILE_UTILITIES::Read_From_File<T>(filename,*box);
-        OPENGL_BOX_3D<T>* ob=new OPENGL_BOX_3D<T>(*box);
-        world.Add_Object(ob,true,true);}
+        // BOX<TV>* box=new BOX<TV>;
+        // FILE_UTILITIES::Read_From_File<T>(filename,*box);
+        // OPENGL_BOX_3D<T>* ob=new OPENGL_BOX_3D<T>(*box);
+        // world.Add_Object(ob,true,true);
+    }
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################

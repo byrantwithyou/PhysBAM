@@ -27,16 +27,13 @@
 #include <fstream>
 using namespace PhysBAM;
 using namespace FILE_UTILITIES;
-template<class T> void Add_File(const std::string& filename,int number);
-template<class T> void Add_Tri2D_File(const std::string& filename,int number);
-template<class T> void Add_Tri_File(const std::string& filename,int number);
-template<class T> void Add_Phi_File(const std::string& filename,int number);
-template<class T> void Add_Curve_File(const std::string& filename,int number);
-template<class T> void Add_Curve2D_File(const std::string& filename,int number);
-template<class T> void Add_Tet_File(const std::string& filename,int number);
-//#################################################################
-static bool triangulated_surface_highlight_boundary=false;
-static bool print_statistics=true;
+template<class T> void Convert_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Tri_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Phi_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Curve_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Curve2D_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Tet_File(const std::string& ifilename,const std::string& ofilename);
 //#################################################################
 // Function main
 //#################################################################
@@ -50,94 +47,99 @@ int main(int argc,char *argv[])
     for(int i=1;i<argc;i++){
         if(!strcmp(argv[i],"-float")) type_double=false;
         else if (!strcmp(argv[i],"-double")) type_double=true;
-        else if (!strcmp(argv[i],"-show_boundary")) triangulated_surface_highlight_boundary = true;
-        else if (!strcmp(argv[i],"-nostat")) print_statistics = false;
         else files.Append(argv[i]);}
 
-    for(int i=0;i<files.m;i++){
-        if(!type_double) Add_File<float>(files(i),i);
+    if(files.m!=2){LOG::cerr<<"Input and output file names expected."<<std::endl;exit(1);}
+
+    if(!type_double) Convert_File<float>(files(0),files(1));
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        else Add_File<double>(files(i),i);
+    else Convert_File<double>(files(0),files(1));
 #else
-        else{LOG::cerr<<"Double support not enabled."<<std::endl;exit(1);}
+    else{LOG::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
-        }
     return 0;
 }
 //#################################################################
-// Function Add_File
+// Function Convert_File
 //#################################################################
-template<class T> void Add_File(const std::string& filename,int number)
+template<class T> void Convert_File(const std::string& ifilename,const std::string& ofilename)
 {
-    FILE_TYPE type=Get_File_Type(filename);
-    switch(type){
-        case TRI_FILE: Add_Tri_File<T>(filename,number);break;
-        case TRI2D_FILE: Add_Tri2D_File<T>(filename,number);break;
-        case PHI_FILE: Add_Phi_File<T>(filename,number);break;
-        case CURVE_FILE: Add_Curve_File<T>(filename,number);break;
-        case CURVE2D_FILE: Add_Curve2D_File<T>(filename,number);break;
-        case TET_FILE: Add_Tet_File<T>(filename,number);break;
-        default: LOG::cerr<<"Unrecognized file "<<filename<<std::endl;}
+    FILE_TYPE itype=Get_File_Type(ifilename);
+    FILE_TYPE otype=Get_File_Type(ofilename);
+
+    if(itype!=otype){LOG::cerr<<"Input and output file types do not match."<<std::endl;exit(1);}
+
+    switch(itype){
+        case TRI_FILE: Convert_Tri_File<T>(ifilename,ofilename);break;
+        case TRI2D_FILE: Convert_Tri2D_File<T>(ifilename,ofilename);break;
+        case PHI_FILE: Convert_Phi_File<T>(ifilename,ofilename);break;
+        case CURVE_FILE: Convert_Curve_File<T>(ifilename,ofilename);break;
+        case CURVE2D_FILE: Convert_Curve2D_File<T>(ifilename,ofilename);break;
+        case TET_FILE: Convert_Tet_File<T>(ifilename,ofilename);break;
+        default: LOG::cerr<<"Unrecognized file type "<<ifilename<<std::endl;}
     LOG::cout<<std::flush;
 }
 //#################################################################
-// Function Add_Tri2D_File
+// Function Convert_Tri2D_File
 //#################################################################
-template<class T> void Add_Tri2D_File(const std::string& filename,int number)
+template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std::string& ofilename)
 {
     try{
         TRIANGULATED_AREA<T>* area;
-        FILE_UTILITIES::Create_From_File<T>(filename,area);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,area);
+        for(int i=0; i<area->mesh.elements.m;i++) area->mesh.elements(i)-=VECTOR<int,3>(1,1,1);
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*area);
+    }
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
-// Function Add_Tri_File
+// Function Convert_Tri_File
 //#################################################################
-template<class T> void Add_Tri_File(const std::string& filename,int number)
+template<class T> void Convert_Tri_File(const std::string& ifilename,const std::string& ofilename)
 {
     try{
         TRIANGULATED_SURFACE<T>* surface;
-        FILE_UTILITIES::Create_From_File<T>(filename,surface);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
-// Function Add_Phi_File
+// Function Convert_Phi_File
 //#################################################################
-template<class T> void Add_Phi_File(const std::string& filename,int number)
+template<class T> void Convert_Phi_File(const std::string& ifilename,const std::string& ofilename)
 {
     try{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* surface;
-        FILE_UTILITIES::Create_From_File<T>(filename,surface);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
-// Function Add_Curve_File
+// Function Convert_Curve_File
 //#################################################################
-template<class T> void Add_Curve_File(const std::string& filename,int number)
+template<class T> void Convert_Curve_File(const std::string& ifilename,const std::string& ofilename)
 {
     try{
         SEGMENTED_CURVE<VECTOR<T,3> >* curve;
-        FILE_UTILITIES::Create_From_File<T>(filename,curve);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,curve);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
-// Function Add_Curve2D_File
+// Function Convert_Curve2D_File
 //#################################################################
-template<class T> void Add_Curve2D_File(const std::string& filename,int number)
+template<class T> void Convert_Curve2D_File(const std::string& ifilename,const std::string& ofilename)
 {
     try{
         SEGMENTED_CURVE_2D<T>* curve;
-        FILE_UTILITIES::Create_From_File<T>(filename,curve);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,curve);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
-// Function Add_Tet_File
+// Function Convert_Tet_File
 //#################################################################
-template<class T> void Add_Tet_File(const std::string& filename,int number)
+template<class T> void Convert_Tet_File(const std::string& ifilename,const std::string& ofilename)
 {
     try{
         TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume;
-        FILE_UTILITIES::Create_From_File<T>(filename,tetrahedralized_volume);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,tetrahedralized_volume);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
