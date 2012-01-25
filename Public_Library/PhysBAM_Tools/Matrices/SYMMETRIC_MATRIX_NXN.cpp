@@ -54,10 +54,10 @@ template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
 Sqr() const
 {
     SYMMETRIC_MATRIX_NXN<T> result(n);
-    for(int j=0;j<n;j++) for(int i=j;i<=n;i++){
-        for(int k=1;k<j;k++) result(i,j)+=x[((2*n-k)*(k-1)>>1)+i-1]*x[((2*n-k)*(k-1)>>1)+j-1];
-        for(int k=j;k<=i;k++) result(i,j)+=x[((2*n-k)*(k-1)>>1)+i-1]*x[((2*n-j)*(j-1)>>1)+k-1];
-        for(int k=i+1;k<n;k++) result(i,j)+=x[((2*n-i)*(i-1)>>1)+k-1]*x[((2*n-j)*(j-1)>>1)+k-1];}
+    for(int j=0;j<n;j++) for(int i=j;i<n;i++){
+        for(int k=0;k<j;k++) result(i,j)+=x[((2*n-k-1)*k>>1)+i]*x[((2*n-k-1)*k>>1)+j];
+        for(int k=j;k<=i;k++) result(i,j)+=x[((2*n-k-1)*k>>1)+i]*x[((2*n-j-1)*j>>1)+k];
+        for(int k=i+1;k<n;k++) result(i,j)+=x[((2*n-i-1)*i>>1)+k]*x[((2*n-j-1)*j>>1)+k];}
     return result;
 }
 //#####################################################################
@@ -68,7 +68,7 @@ Givens_Conjugate(const int i,const int j,const T c,const T s)
 {
     if(i>j){Givens_Conjugate(j,i,c,-s);return;}
     assert(0<=i && i<j && j<n);
-    for(int k=1;k<i;k++){T u=(*this)(i,k),v=(*this)(j,k);(*this)(i,k)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
+    for(int k=0;k<i;k++){T u=(*this)(i,k),v=(*this)(j,k);(*this)(i,k)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
     for(int k=i+1;k<j;k++){T u=(*this)(k,i),v=(*this)(j,k);(*this)(k,i)=c*u-s*v;(*this)(j,k)=s*u+c*v;}
     for(int k=j+1;k<n;k++){T u=(*this)(k,i),v=(*this)(k,j);(*this)(k,i)=c*u-s*v;(*this)(k,j)=s*u+c*v;}
     T u=(*this)(i,i),v=(*this)(j,i),w=(*this)(j,j);

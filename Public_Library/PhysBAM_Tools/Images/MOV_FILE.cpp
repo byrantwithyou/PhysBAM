@@ -31,7 +31,7 @@ namespace{
     static void Big_Endian(T& x)
     {
         assert(sizeof(T)<=8);
-        if(sizeof(T)>1) {T old=x;for(unsigned int k=0;k<sizeof(T);k++) ((char*)&x)[k-1]=((char*)&old)[sizeof(T)-k];}
+        if(sizeof(T)>1) {T old=x;for(unsigned int k=0;k<sizeof(T);k++) ((char*)&x)[k]=((char*)&old)[sizeof(T)-k-1];}
     }
     //#####################################################################
     // Function Write

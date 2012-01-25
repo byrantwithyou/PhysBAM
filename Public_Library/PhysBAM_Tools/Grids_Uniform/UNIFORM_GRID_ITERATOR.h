@@ -47,7 +47,7 @@ public:
     if(index(TV::dimension-1)<region.max_corner(TV::dimension-1)-1) index(TV::dimension-1)++;else Next_Helper();}
 
     int Flat_Index()
-    {int result=index(0);for(int i=1;i<TV::dimension;i++){result=result*grid.counts(i)+index(i);}return result+1;}
+    {int result=index(0);for(int i=1;i<TV::dimension;i++){result=result*grid.counts(i)+index(i);}return result;}
 
 protected:
     void Next_Helper();

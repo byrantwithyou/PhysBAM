@@ -50,7 +50,7 @@ template<> struct IS_BINARY_IO_SAFE<double,double>:public IS_PRIMITIVE_BINARY_IO
 template<class T>
 inline void Swap_Endianity(T& x)
 {assert(sizeof(T)<=8);
-if(sizeof(T)>1) {T old=x;for(unsigned int k=0;k<sizeof(T);k++) ((char*)&x)[k-1]=((char*)&old)[sizeof(T)-k];}}
+if(sizeof(T)>1) {T old=x;for(unsigned int k=0;k<sizeof(T);k++) ((char*)&x)[k]=((char*)&old)[sizeof(T)-k-1];}}
 
 //#####################################################################
 // Read and Write for primitives

@@ -47,7 +47,7 @@ public:
     {
         DOMAIN_ITERATOR_THREADED_ALPHA<T_ARRAYS_T2,TV>(u.Domain_Indices(),&thread_queue).template Run<const T_ARRAYS_T2&,T_ARRAYS_T2&>(u_ghost,&T_ARRAYS_T2::Put_With_Range,u,u_ghost);
         ARRAY<RANGE<TV_INT> > regions;boundary.Find_Ghost_Regions(grid,regions,number_of_ghost_cells_input);
-        for(int side=0;side<T_GRID::number_of_faces_per_cell;side++){int axis=(side-1)/2;
+        for(int side=0;side<T_GRID::number_of_faces_per_cell;side++){int axis=side/2;
             DOMAIN_ITERATOR_THREADED_ALPHA<T_BOUNDARY_T2,TV>(regions(side),&thread_queue,axis%TV::dimension+1).template Run<const T_GRID&,T_ARRAYS_T2&,int>(boundary,&T_BOUNDARY_T2::Fill_Single_Ghost_Region_Threaded,grid,u_ghost,side);}
     }
 

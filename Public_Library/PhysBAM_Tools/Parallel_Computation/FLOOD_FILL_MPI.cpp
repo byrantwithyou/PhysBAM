@@ -299,7 +299,7 @@ Find_Global_Colors_Helper::Apply(const T_MPI_GRID& mpi_grid,const T_GRID& local_
     ARRAY<typename T_GRID::BOX_HORIZONTAL_INT> boundary_regions;
     mpi_grid.Find_Boundary_Regions(boundary_regions,CELL_ITERATOR::Sentinels(),false,RANGE<VECTOR<int,1> >(0,0),false,true,local_grid);
     for(int axis_side=0;axis_side<2;axis_side++){
-        int side=2*horizontal_axis-1+axis_side;
+        int side=2*horizontal_axis+axis_side;
         if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
             typename T_GRID::BOX_HORIZONTAL_INT face_region=boundary_regions(side);if(axis_side) face_region+=T_GRID::VECTOR_HORIZONTAL_INT::Axis_Vector(horizontal_axis);
             for(T_FACE face(local_grid,face_region);face;face++)if(!psi_N(face.Face())){int c1=face.cell1.Cell(),c2=face.cell2.Cell();

@@ -213,7 +213,7 @@ Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls)
 template<class T_GRID> bool MPI_GRID<T_GRID>::
 Neighbor(const int axis,const int axis_side) const
 {   
-    int side=2*(axis-1)+axis_side;
+    int side=2*axis+axis_side;
     return side_neighbor_ranks(side)!=MPI::PROC_NULL;
 }
 //#####################################################################
@@ -719,7 +719,7 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
-        int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
+        int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
@@ -775,7 +775,7 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<FACE_INDEX<TV::dimension>,FACE_INDEX<TV::dimension>,T> > > receive_per_proc(number_of_processes); 
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
-        int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
+        int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices();
         if(side==0) domain.max_corner(axis)=domain.min_corner(axis)+(ghost_cells-1);
         else domain.min_corner(axis)=domain.max_corner(axis)-(ghost_cells-1);
@@ -833,7 +833,7 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
-        int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
+        int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==0) ghost_domain.min_corner(axis)+=ghost_cells;
         else ghost_domain.max_corner(axis)-=ghost_cells;
@@ -881,7 +881,7 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > transfer_per_proc(number_of_processes); 
     ARRAY<ARRAY<TRIPLE<TV_INT,TV_INT,T> > > receive_per_proc(number_of_processes);
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
-        int other_rank=side_neighbor_ranks(2*(axis-1)+side);if(other_rank<0) continue;
+        int other_rank=side_neighbor_ranks(2*axis+side);if(other_rank<0) continue;
         RANGE<TV_INT> domain=local_grid.Domain_Indices(),ghost_domain=local_grid.Domain_Indices(ghost_cells);
         if(side==0) ghost_domain.min_corner(axis)+=ghost_cells;
         else ghost_domain.max_corner(axis)-=ghost_cells;

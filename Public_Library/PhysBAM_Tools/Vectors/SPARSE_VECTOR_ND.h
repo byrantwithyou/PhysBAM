@@ -7,6 +7,7 @@
 #ifndef __SPARSE_VECTOR_ND__
 #define __SPARSE_VECTOR_ND__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
@@ -16,80 +17,59 @@ class SPARSE_VECTOR_ND
 {
 public:
     int n;
-    int number_of_active_indices;
-    int* indices; // stores the locations of the entries
-    T* x; // stores the data
+    ARRAY<int> indices;
+    ARRAY<T> x;
 
      SPARSE_VECTOR_ND(const int n_input)
         :n(n_input)
     {
-        number_of_active_indices=0; // no elements originally
-        indices=new int[number_of_active_indices+1];
-        x=new T[number_of_active_indices+1];
     }
 
     SPARSE_VECTOR_ND(const SPARSE_VECTOR_ND& vector)
-        :n(vector.n)
+        :n(vector.n),indices(vector.indices),x(vector.x)
     {
-        number_of_active_indices=vector.number_of_active_indices;
-        indices=new int[number_of_active_indices+1];
-        x=new T[number_of_active_indices+1];
-        for(int i=0;i<number_of_active_indices;i++){indices[i]=vector.indices[i];x[i]=vector.x[i];}
     }
 
-    ~SPARSE_VECTOR_ND()
-    {delete[] x;delete[] indices;}
+    ~SPARSE_VECTOR_ND() {}
 
 private:
     void operator=(const SPARSE_VECTOR_ND&);
 public:
 
+    bool Element_Present_And_Location(const int i,int& location)
+    {assert((unsigned)i<(unsigned)n);
+    location=indices.Binary_Search(i);
+    return location<indices.m && indices(location)==i;}
+
     const T operator()(const int i) const
-    {assert((unsigned)i<n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i) return x[j];else if(indices[j]>i) break;
-    return T();}
+    {int k;if(Element_Present_And_Location(i,k)) return x(k);return T();}
+
+    int Get_Or_Add_Index(const int i)
+    {int k;if(!Element_Present_And_Location(i,k)){indices.Insert(i,k);x.Insert(T(),k);}return k;}
 
     void Set_Element(const int i,const T& element)
-    {assert((unsigned)i<(unsigned)n);
-    int j=0;for(;j<number_of_active_indices;j++) if(indices[j] == i){x[j]=element;return;}else if(indices[j]>i) break;
-    Insert_New_Element(i,j,element);}
-
-    void Insert_New_Element(const int index,const int array_position,const T element=T())
-    {number_of_active_indices++;
-    T* new_x=new T[number_of_active_indices+1];int* new_indices=new int[number_of_active_indices+1];
-    for(int i=1;i<array_position;i++){new_indices[i]=indices[i];new_x[i]=x[i];}
-    new_indices[array_position]=index;new_x[array_position]=element;
-    for(int i=array_position+1;i<=number_of_active_indices;i++){new_indices[i]=indices[i-1];new_x[i]=x[i-1];}
-    delete[] indices;delete[] x;indices=new_indices;x=new_x;}
+    {int k=Get_Or_Add_Index(i);x(k)=element;}
 
     void Add_Element(const int i,const T& element)
-    {assert((unsigned)i<(unsigned)n);
-    int j=0;for(;j<number_of_active_indices;j++) if(indices[j] == i){x[j]+=element;return;}else if(indices[j]>i) break;
-    Insert_New_Element(i,j,element);}
+    {int k=Get_Or_Add_Index(i);x(k)+=element;}
 
     bool Element_Present(const int i)
-    {assert((unsigned)i<(unsigned)n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i) return true;else if(indices[j]>i) return false;
-    return false;}
-
-    bool Element_Present_And_Location(const int i,int& location)
-    {assert((unsigned)i<(unsigned)n);for(int j=0;j<number_of_active_indices;j++) if(indices[j] == i){location=j;return true;}else if(indices[j]>i) return false;
-    return false;}
+    {int k;return Element_Present_And_Location(i,k);}
 
     void Clear()
-    {delete[] indices;delete[] x;number_of_active_indices=0;indices=new int[number_of_active_indices+1];x=new T[number_of_active_indices+1];}
+    {indices.Clean_Memory();x.Clean_Memory();}
 
     T Dot_Product(const VECTOR_ND<T>& vector)
-    {T sum=T();for(int i=0;i<number_of_active_indices;i++) sum+=x[i]*vector(indices[i]);return sum;}
+    {T sum=T();for(int i=0;i<indices.m;i++) sum+=x(i)*vector(indices(i));return sum;}
 
     void Negate()
-    {for(int i=0;i<number_of_active_indices;i++) x[i]=-x[i];}
+    {x=-x;}
 
     SPARSE_VECTOR_ND<T>& operator*=(const T a)
-    {for(int i=0;i<number_of_active_indices;i++)x[i]*=a;return *this;}
+    {x*=a;}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Write_Internal_Arrays(std::ostream& output_stream)
-    {for(int i=0;i<=number_of_active_indices;i++)output_stream<<indices[i]<<", "<<x[i]<<std::endl;}
-#endif
+    {for(int i=0;i<indices.m;i++) output_stream<<indices(i)<<", "<<x(i)<<std::endl;}
 //#####################################################################
 };
 }

@@ -81,7 +81,7 @@ public:
     {return grid.Center(Second_Cell_Index());}
 
     bool First_Boundary() const // returns true if currently on left, bottom, or front boundary
-    {assert(region_type==GRID<TV>::BOUNDARY_REGION);return (side<0 && current_region%2==0) || (side && (side-1)%2==0);}
+    {assert(region_type==GRID<TV>::BOUNDARY_REGION);return (side<0 && current_region%2==0) || (side>=0 && side%2==0);}
 
     TV_INT Face_Node_Index(const int node) const // 1-based
     {return grid.Face_Node_Index(axis,index,node);}
