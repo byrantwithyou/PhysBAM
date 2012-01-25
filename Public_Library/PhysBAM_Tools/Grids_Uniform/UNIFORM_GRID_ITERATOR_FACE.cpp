@@ -35,7 +35,7 @@ template<class TV> UNIFORM_GRID_ITERATOR_FACE<TV>::
 UNIFORM_GRID_ITERATOR_FACE(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input)
     :UNIFORM_GRID_ITERATOR<TV>(grid_input),axis(axis_input),single_axis(true)
 {
-    assert(axis);Add_Region(explicit_region_input);face_size=grid.Face_Size(axis);Reset();
+    assert(axis>=0);Add_Region(explicit_region_input);face_size=grid.Face_Size(axis);Reset();
 }
 //#####################################################################
 // Function Next_Helper

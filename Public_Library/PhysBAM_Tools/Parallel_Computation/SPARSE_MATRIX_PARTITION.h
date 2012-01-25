@@ -47,15 +47,15 @@ public:
     {interior_offset=previous_rows-interior_indices.min_corner+1;}
 
     int Translate_Index(const int j) const
-    {if(interior_indices.Lazy_Inside(j)) return Translate_Interior_Index(j);
-    for(int r=1;r<number_of_sides;r++) if(ghost_indices(r).Lazy_Inside(j)) return Translate_Ghost_Index(j,r);
+    {if(interior_indices.Lazy_Inside_Half_Open(j)) return Translate_Interior_Index(j);
+    for(int r=1;r<number_of_sides;r++) if(ghost_indices(r).Lazy_Inside_Half_Open(j)) return Translate_Ghost_Index(j,r);
     return Translate_Ghost_Index(j,number_of_sides);}
 
     int Translate_Interior_Index(const int j) const
-    {assert(interior_indices.Lazy_Inside(j));return j+interior_offset;}
+    {assert(interior_indices.Lazy_Inside_Half_Open(j));return j+interior_offset;}
 
     int Translate_Ghost_Index(const int j,const int region) const
-    {assert(ghost_indices(region).Lazy_Inside(j));
+    {assert(ghost_indices(region).Lazy_Inside_Half_Open(j));
     assert(ghost_indices(region).Size()+1==neighbors(region)->boundary_indices(((region-1)^1)+1).m);
     return neighbors(region)->boundary_indices(((region-1)^1)+1)(j-ghost_indices(region).min_corner+1)+neighbors(region)->interior_offset;}
 

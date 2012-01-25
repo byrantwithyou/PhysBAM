@@ -68,7 +68,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
             int reflection_times_two=2*cell_boundary+(axis_side==0?-1:1);
             for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 TV_INT boundary_cell=cell,boundary_face=cell;boundary_cell[axis]=cell_boundary;boundary_face[axis]=face_boundary;
-                if((*phi)(boundary_cell) <= 0 && domain_indices.Lazy_Inside(boundary_cell) && inward_sign*V->Component(axis)(boundary_face) > tolerance){
+                if((*phi)(boundary_cell) <= 0 && domain_indices.Lazy_Inside_Half_Open(boundary_cell) && inward_sign*V->Component(axis)(boundary_face) > tolerance){
                     TV_INT reflected_cell=cell;reflected_cell[axis]=reflection_times_two-cell[axis];
                     u_ghost(cell)=u_ghost(reflected_cell);}
                 else u_ghost(cell)=u_ghost(boundary_cell);}}}

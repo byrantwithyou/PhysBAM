@@ -36,7 +36,7 @@ template<class TV> UNIFORM_GRID_ITERATOR_EDGE<TV>::
 UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const RANGE<TV_INT>& explicit_region_input,const int axis_input)
     :UNIFORM_GRID_ITERATOR<TV>(grid_input),axis(axis_input),single_axis(true)
 {
-    assert(axis);
+    assert(axis>=0);
     Add_Region(explicit_region_input);
     Reset();
 }

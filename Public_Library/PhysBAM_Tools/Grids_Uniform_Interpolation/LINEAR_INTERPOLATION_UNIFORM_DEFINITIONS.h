@@ -36,11 +36,11 @@ template<class T>
 void Compute_Inverse_Map_Helper(const GRID<VECTOR<T,1> >& domain_grid,const ARRAY<T,VECTOR<int,1> >& function,const GRID<VECTOR<T,1> >& range_grid,ARRAY<T,VECTOR<int,1> >& inverse_function)
 {
     int domain_i=1;
-    T xmin=domain_grid.Axis_X(1,1),xmax=domain_grid.Axis_X(domain_grid.counts.x,1);
+    T xmin=domain_grid.Axis_X(0,0),xmax=domain_grid.Axis_X(domain_grid.counts.x,0);
     for(int i=0;i<range_grid.counts.x;i++){
-        T function_value=range_grid.Axis_X(i,1);
+        T function_value=range_grid.Axis_X(i,0);
         while(domain_i<domain_grid.counts.x-1 && function(domain_i+1)<function_value) domain_i++;
-        inverse_function(i)=clamp(domain_grid.Axis_X(domain_i,1)+domain_grid.dX.x*(function_value-function(domain_i))/(function(domain_i+1)-function(domain_i)),xmin,xmax);}
+        inverse_function(i)=clamp(domain_grid.Axis_X(domain_i,0)+domain_grid.dX.x*(function_value-function(domain_i))/(function(domain_i+1)-function(domain_i)),xmin,xmax);}
 }
 //#####################################################################
 // Function Compute_Inverse_Map_Helper
