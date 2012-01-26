@@ -14,7 +14,8 @@ Read(std::istream& input,SIMPLEX_MESH<d>& object)
         int min_index=object.elements.Flattened().Min(),max_index=object.elements.Flattened().Min();
         if(object.number_nodes<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative number_nodes = %d",object.number_nodes));
         if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
-        if(max_index>=object.number_nodes) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d (number_nodes = %d)",min_index,object.number_nodes));}
+        if(max_index>=object.number_nodes) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d (number_nodes = %d)",min_index,object.number_nodes));
+    }
 }
 template<class RW,class T_MESH> void Read_Write<T_MESH,RW,typename ENABLE_IF<IS_BASE_OF<SIMPLEX_MESH<T_MESH::dimension>,T_MESH>::value>::TYPE>::
 Write(std::ostream& output,const SIMPLEX_MESH<d>& object)

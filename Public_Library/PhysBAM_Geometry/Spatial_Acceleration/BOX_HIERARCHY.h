@@ -79,7 +79,7 @@ public:
     virtual ~BOX_HIERARCHY();
 
     bool Leaf(const int box) const
-    {return box<=leaves;}
+    {return box<leaves;}
 
     void Update_Box_Radii()
     {Update_Leaf_Box_Radii();Update_Nonleaf_Box_Radii();}
