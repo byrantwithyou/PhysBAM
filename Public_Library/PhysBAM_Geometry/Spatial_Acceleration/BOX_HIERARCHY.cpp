@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
@@ -36,7 +37,7 @@ template<class TV> BOX_HIERARCHY<TV>::
 template<class TV> void BOX_HIERARCHY<TV>::
 Clean_Memory()
 {
-    leaves=root=0;
+    leaves=root=-1;
     parents.Clean_Memory();children.Clean_Memory();box_hierarchy.Clean_Memory();traversal_stack.Clean_Memory();dual_traversal_stack.Clean_Memory();box_radius.Clean_Memory();
 }
 //#####################################################################
@@ -77,9 +78,9 @@ Initialize_Hierarchy_Using_KD_Tree()
 template<class TV> int BOX_HIERARCHY<TV>::
 Initialize_Hierarchy_Using_KD_Tree_Helper(KD_TREE_NODE<T>* node)
 {
-    if(!node->left&&!node->right)return node->node_index;
+    if(!node->left && !node->right) return node->node_index;
     int left_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->left);
-    if(!node->right)return left_child;
+    if(!node->right) return left_child;
     int right_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->right);
     children.Append(VECTOR<int,2>(left_child,right_child));parents.Append(0);
     return parents(left_child)=parents(right_child)=children.m+leaves-1;
@@ -90,8 +91,8 @@ Initialize_Hierarchy_Using_KD_Tree_Helper(KD_TREE_NODE<T>* node)
 template<class TV> void BOX_HIERARCHY<TV>::
 Update_Nonleaf_Boxes()
 {
-    for(int k=leaves;k<box_hierarchy.m;k++)
-        box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(children(k-leaves)(0)),box_hierarchy(children(k-leaves)(1)));
+    for(int k=leaves;k<box_hierarchy.m;k++){
+        box_hierarchy(k)=RANGE<TV>::Combine(box_hierarchy(children(k-leaves)(0)),box_hierarchy(children(k-leaves)(1)));}
 }
 //#####################################################################
 // Function Update_Modified_Nonleaf_Boxes
@@ -130,7 +131,7 @@ template<class TV> template<class T_THICKNESS> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const TV& point,ARRAY<int>& intersection_list,const T_THICKNESS thickness_over_two) const
 {
     if(!IS_SAME<T_THICKNESS,ZERO>::value && !thickness_over_two){Intersection_List(box,point,intersection_list,ZERO());return;}
-    if(box==0) return;
+    if(box<0) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
         if(box_hierarchy(current).Outside(point,thickness_over_two)) continue;
@@ -143,8 +144,9 @@ template<class TV> template<class T_THICKNESS> void BOX_HIERARCHY<TV>::
 Intersection_List(const int box,const RANGE<TV>& test_box,ARRAY<int>& intersection_list,const T_THICKNESS thickness_over_two) const
 {
     if(!IS_SAME<T_THICKNESS,ZERO>::value && !thickness_over_two){Intersection_List(box,test_box,intersection_list,ZERO());return;}
-    if(box==0) return;
+    if(box<0) return;
     traversal_stack.Remove_All();traversal_stack.Push(box);
+    
     while(!traversal_stack.Empty()){int current=traversal_stack.Pop();
         if(!test_box.Intersection(box_hierarchy(current),thickness_over_two)) continue;
         if(Leaf(current)) intersection_list.Append(current);else{int box1,box2;children(current-leaves).Get(box1,box2);traversal_stack.Push(box1);traversal_stack.Push(box2);}}
