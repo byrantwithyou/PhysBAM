@@ -41,7 +41,7 @@ public:
     }
 
     void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array) const PHYSBAM_OVERRIDE
-    {sample_array.Resize(1);sample_array(1)=RAY<VECTOR<T,3> >(SEGMENT_3D<T>(surface_position,position));}
+    {sample_array.Resize(1);sample_array(0)=RAY<VECTOR<T,3> >(SEGMENT_3D<T>(surface_position,position));}
 
     T Spotlight_Falloff(const VECTOR<T,3>& direction) const
     {T cos_theta=VECTOR<T,3>::Dot_Product(direction,spot_direction);

@@ -30,7 +30,7 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
     for(int light_index=0;light_index<lights.m;light_index++){
         PROGRESS_INDICATOR progress(location_list.m);LOG::cout<<"Light "<<light_index<<": ";
         ARRAY<RAY<VECTOR<T,3> > > sample_array;
-        lights(light_index)->Sample_Points(location_list(1),VECTOR<T,3>(1,0,0),sample_array);
+        lights(light_index)->Sample_Points(location_list(0),VECTOR<T,3>(1,0,0),sample_array);
         VECTOR<T,3> average_sample_point;for(int sample=0;sample<sample_array.m;sample++)average_sample_point+=sample_array(sample).Point(sample_array(sample).t_max);
         average_sample_point/=(T)sample_array.m;
         if(use_fast_precomputation){

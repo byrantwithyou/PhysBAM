@@ -57,13 +57,13 @@ Display(const int in_color) const
             if(mode==GL_SELECT){glPushName(i);glPushName(0);
                 if(!muscle.via_points.m){glLoadName(1);OpenGL_Begin(GL_LINES);OpenGL_Vertex(muscle.attachment_point_1->Embedded_Position());
                     OpenGL_Vertex(muscle.attachment_point_2->Embedded_Position());OpenGL_End();}
-                else{glLoadName(1);OpenGL_Begin(GL_LINES);OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(1)->Embedded_Position());OpenGL_End();
+                else{glLoadName(1);OpenGL_Begin(GL_LINES);OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(0)->Embedded_Position());OpenGL_End();
                 for(int t=1;t<muscle.via_points.m;t++){glLoadName(t+1);OpenGL_Begin(GL_LINES);OpenGL_Line(muscle.via_points(t)->Embedded_Position(),muscle.via_points(t+1)->Embedded_Position());OpenGL_End();}
                 glLoadName(muscle.via_points.m+1);OpenGL_Begin(GL_LINES);OpenGL_Line(muscle.via_points(muscle.via_points.m)->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());OpenGL_End();}
                 glPopName();glPopName();}
             else{OpenGL_Begin(GL_LINES);
                 if(!muscle.via_points.m){OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
-                else{OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(1)->Embedded_Position());
+                else{OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(0)->Embedded_Position());
                 for(int t=1;t<muscle.via_points.m;t++){OpenGL_Line(muscle.via_points(t)->Embedded_Position(),muscle.via_points(t+1)->Embedded_Position());}
                 OpenGL_Line(muscle.via_points(muscle.via_points.m)->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}OpenGL_End();}}
         glPopName();
@@ -77,7 +77,7 @@ Display(const int in_color) const
             OpenGL_Begin(GL_LINES);
             if(!muscle.via_points.m){PHYSBAM_ASSERT(segment_id==0);OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
             else{PHYSBAM_ASSERT(segment_id<=muscle.via_points.m+1);
-                if(segment_id==0){OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(1)->Embedded_Position());}
+                if(segment_id==0){OpenGL_Line(muscle.attachment_point_1->Embedded_Position(),muscle.via_points(0)->Embedded_Position());}
                 else if(segment_id==muscle.via_points.m){OpenGL_Line(muscle.via_points(muscle.via_points.m)->Embedded_Position(),muscle.attachment_point_2->Embedded_Position());}
                 else{OpenGL_Line(muscle.via_points(segment_id-1)->Embedded_Position(),muscle.via_points(segment_id)->Embedded_Position());}}
             OpenGL_End();glPopAttrib();}

@@ -124,7 +124,7 @@ Display(const int in_color) const
                 if(spring>0){
                     colors[spring-1].Send_To_GL_Pipeline();
                     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-                    if(spring<=4) OpenGL_Line(X(spring_nodes[0]),TRIANGLE_3D<T>(X.Subset(spring_nodes.Remove_Index(1))).Point_From_Barycentric_Coordinates(weights),vertices);
+                    if(spring<=4) OpenGL_Line(X(spring_nodes[0]),TRIANGLE_3D<T>(X.Subset(spring_nodes.Remove_Index(0))).Point_From_Barycentric_Coordinates(weights),vertices);
                     else if(spring<=7) OpenGL_Line((1-weights.x)*X(spring_nodes[0])+weights.x*X(spring_nodes[1]),(1-weights.y)*X(spring_nodes[2])+weights.y*X(spring_nodes[3]),vertices);
                     OpenGL_Draw_Arrays(GL_LINES,3,vertices);
                     glPopAttrib();}}}}

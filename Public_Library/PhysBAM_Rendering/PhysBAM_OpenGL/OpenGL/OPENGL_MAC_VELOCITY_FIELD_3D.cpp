@@ -59,7 +59,7 @@ Update()
     if(slice && ((slice->mode == OPENGL_SLICE::CELL_SLICE && ((slice->index-1)/scale+1 < domain_start[slice->axis] || (slice->index-1)/scale+1 > domain_end[slice->axis])) || (slice->mode == OPENGL_SLICE::NODE_SLICE)))
         return; // Currently we don't draw anything if the slice doesn't match where the velocity field lives
 
-    VECTOR<int,3> cell_start(face_velocities.Component(1).domain.min_corner),cell_end(face_velocities.Component(1).domain.max_corner-1);
+    VECTOR<int,3> cell_start(face_velocities.Component(0).domain.min_corner),cell_end(face_velocities.Component(0).domain.max_corner-1);
     int m=cell_end.x-cell_start.x+1,n=cell_end.y-cell_start.y+1,mn=cell_end.z-cell_start.z+1;
 
     if(slice && slice->mode==OPENGL_SLICE::CELL_SLICE)

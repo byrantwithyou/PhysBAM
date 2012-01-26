@@ -29,7 +29,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Levelset_Multiple_Color_Map();
     for(int j=0;j<opengl_levelsets.m;j++)
         opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(*(new LEVELSET_2D<GRID<TV> >(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
-    opengl_levelset=opengl_levelsets(1);
+    opengl_levelset=opengl_levelsets(0);
 
     is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
     Reinitialize();
@@ -84,12 +84,12 @@ template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selection) const
 {
     if(Is_Up_To_Date(frame)){
-        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_2D && opengl_levelsets(1)->levelset.grid.Is_MAC_Grid()){
+        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_2D && opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             VECTOR<int,2> index=((OPENGL_SELECTION_GRID_CELL_2D<T>*)current_selection)->index;
             for(int i=0;i<opengl_levelsets.m;i++) 
                 output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(index)
                              <<" curvature["<<i<<"]="<<opengl_levelsets(i)->levelset.Compute_Curvature(opengl_levelsets(i)->levelset.grid.Center(index))<<std::endl;}
-        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_2D && !opengl_levelsets(1)->levelset.grid.Is_MAC_Grid()){
+        if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_2D && !opengl_levelsets(0)->levelset.grid.Is_MAC_Grid()){
             VECTOR<int,2> index=((OPENGL_SELECTION_GRID_NODE_2D<T>*)current_selection)->index;
             for(int i=0;i<opengl_levelsets.m;i++) 
                 output_stream<<component_name<<": phi["<<i<<"]="<<opengl_levelsets(i)->levelset.phi(index)<<std::endl;}

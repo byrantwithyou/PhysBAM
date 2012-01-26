@@ -34,7 +34,7 @@ OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename_input, const std::stri
     else number_of_sets=1;
 
     particles_multiple.Resize(number_of_sets);opengl_points_multiple.Resize(number_of_sets);selected_ids.Resize(number_of_sets);
-    particles_multiple(1)=particles;opengl_points_multiple(1)=opengl_points;
+    particles_multiple(0)=particles;opengl_points_multiple(0)=opengl_points;
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Particle_Multiple_Color_Map();
     opengl_points->color=color_map->Lookup(1);
     for(int i=2;i<=number_of_sets;i++){
@@ -369,7 +369,7 @@ template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_2D<
 Select_Particles_By_Ids(const ARRAY<int> &ids)
 {
     // TODO: implement for multiple particle sets
-    for (int i = 1; i <= ids.m; i++) selected_ids(1).Append(ids(i));
+    for (int i = 1; i <= ids.m; i++) selected_ids(0).Append(ids(i));
     Apply_Id_Selection();
 }
 
@@ -403,7 +403,7 @@ Get_Particles_Id_Array(int set_number) const
 {
     if(!set_number) set_number=set;
     ARRAY_VIEW<int>* ids=particles_multiple(set_number)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
-    if(ids && ids->Size() && (*ids)(1)) return ids; // A hack to ignore ids if the first one equals zero
+    if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;
 }
 

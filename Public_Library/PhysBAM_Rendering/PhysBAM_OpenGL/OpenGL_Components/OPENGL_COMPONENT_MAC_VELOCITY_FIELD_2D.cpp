@@ -28,7 +28,7 @@ OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D(const GRID<TV> &grid,const std::string &v
 {
     ARRAY<GRID<TV>*> grid_array;
     grid_array.Resize(1);
-    grid_array(1)=new GRID<TV>(grid);
+    grid_array(0)=new GRID<TV>(grid);
     Initialize(grid_array);
 }
 
@@ -59,7 +59,7 @@ Initialize(const ARRAY<GRID<TV>*> &grid_array_input)
 
     opengl_adaptive_mac_velocity_fields.Resize(number_of_levels);
     for(int i=0;i<opengl_adaptive_mac_velocity_fields.m;i++) opengl_adaptive_mac_velocity_fields(i)=new OPENGL_MAC_VELOCITY_FIELD_2D<T>(*(new GRID<TV>(*grid_array_input(i))),*(new ARRAY<T,FACE_INDEX<2> >));
-    opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(1);
+    opengl_mac_velocity_field=opengl_adaptive_mac_velocity_fields(0);
     number_of_steps=2*opengl_mac_velocity_field->grid.counts.x;
     opengl_vorticity_magnitude=new OPENGL_SCALAR_FIELD_2D<T>(opengl_mac_velocity_field->grid,*(new ARRAY<T,VECTOR<int,2> >),OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1));
 
@@ -192,7 +192,7 @@ Update_Divergence()
         if(!got_all_psi){psi_N.Clean_Memory();psi_D.Clean_Memory();}
         divergence.Resize(0,grid.counts.x,0,grid.counts.y);
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-            if(got_all_psi && (psi_D(i,j) || (psi_N.Component(1)(i,j) && psi_N.Component(1)(i+1,j) && psi_N.Component(2)(i,j) && psi_N.Component(2)(i,j+1)))) divergence(i,j)=0;
+            if(got_all_psi && (psi_D(i,j) || (psi_N.Component(0)(i,j) && psi_N.Component(0)(i+1,j) && psi_N.Component(1)(i,j) && psi_N.Component(1)(i,j+1)))) divergence(i,j)=0;
             else divergence(i,j)=grid.one_over_dX.x*(u(i+1,j)-u(i,j))+grid.one_over_dX.y*(v(i,j+1)-v(i,j));}
         opengl_divergence_field->Update();}
     else divergence.Clean_Memory();
@@ -212,8 +212,8 @@ Update_Streamlines()
     if(use_seed_for_streamlines) random.Set_Seed(streamline_seed);
     T_LINEAR_INTERPOLATION_VECTOR linear_interpolation;
     T_FACE_ARRAYS_SCALAR mac_velocity_field(grid);
-    mac_velocity_field.Component(1)=opengl_mac_velocity_field->u;
-    mac_velocity_field.Component(2)=opengl_mac_velocity_field->v;
+    mac_velocity_field.Component(0)=opengl_mac_velocity_field->u;
+    mac_velocity_field.Component(1)=opengl_mac_velocity_field->v;
     FACE_LOOKUP_UNIFORM<GRID<TV> > V_lookup(mac_velocity_field);
 
     for(int i=0;i<number_of_streamlines;i++){

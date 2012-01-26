@@ -163,7 +163,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Show_Only_First()
 {
     active_list.Fill(false);
-    active_list(1)=true;
+    active_list(0)=true;
 }
 //#####################################################################
 // Function Use_Bounding_Box

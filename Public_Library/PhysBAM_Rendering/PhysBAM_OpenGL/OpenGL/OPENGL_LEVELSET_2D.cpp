@@ -36,8 +36,8 @@ template<class T> void OPENGL_LEVELSET_2D<T>::
 Set_Inside_And_Outside_Colors(const OPENGL_COLOR& inside_color_input,const OPENGL_COLOR& outside_color_input)
 {
     inside_color=inside_color_input;outside_color=outside_color_input;
-    this->color_maps(1);
-    this->color_maps(1)=OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_color,outside_color);
+    this->color_maps(0);
+    this->color_maps(0)=OPENGL_COLOR_RAMP<T>::Levelset_Color_Constant_Ramp(inside_color,outside_color);
 }
 //#####################################################################
 // Function Toggle_Normals

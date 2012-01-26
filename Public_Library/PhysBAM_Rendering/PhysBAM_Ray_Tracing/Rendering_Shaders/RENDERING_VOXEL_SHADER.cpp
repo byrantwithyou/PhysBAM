@@ -89,7 +89,7 @@ Attenuate_Color(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& object,co
                 TV accumulated_samples(0,0,0);
                 if(voxel_object->Use_Precomputed_Light_Data(sample_point,light_index)) {
                     ARRAY<RAY<TV> > sample_array;lights(light_index)->Sample_Points(sample_point,TV(1,0,0),sample_array);
-                    accumulated_samples=voxel_object->Precomputed_Light_Data(sample_point,light_index)*Phase(-sample_array(1).direction,-ray.ray.direction);}
+                    accumulated_samples=voxel_object->Precomputed_Light_Data(sample_point,light_index)*Phase(-sample_array(0).direction,-ray.ray.direction);}
                 else{
                     ARRAY<RAY<TV> > sample_array;
                     lights(light_index)->Sample_Points(sample_point,TV(1,0,0),sample_array);

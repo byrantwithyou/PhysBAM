@@ -141,13 +141,13 @@ Reinitialize(bool force)
             //Assume length is invariant and ui is a scale which must be 1 on input
             int id;
             if(rigid_filename=="cyllink"){
-                T radius=.18,height=body_motion.trajectories(i)(1).length*scale*.18;int resolution_radius=16,resolution_height=4;
+                T radius=.18,height=body_motion.trajectories(i)(0).length*scale*.18;int resolution_radius=16,resolution_height=4;
                 rigid_body=new RIGID_BODY<TV>(opengl_component_rigid_body_collection.rigid_body_collection,true);
                 CYLINDER<T> cylinder(TV(-height/2,0,0),TV(height/2,0,0),radius);
                 rigid_body->Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >(cylinder));
                 rigid_body->Add_Structure(*TESSELLATION::Generate_Triangles(cylinder,resolution_height,resolution_radius));
                 id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);}
-            else id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body(STREAM_TYPE(RW()),rigid_filename,scale*body_motion.trajectories(i)(1).length,true,true,false,true);
+            else id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body(STREAM_TYPE(RW()),rigid_filename,scale*body_motion.trajectories(i)(0).length,true,true,false,true);
             body_motion.ui_position(i).length=(T)1;
             opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.X(id)=TV();
             opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<TV>();

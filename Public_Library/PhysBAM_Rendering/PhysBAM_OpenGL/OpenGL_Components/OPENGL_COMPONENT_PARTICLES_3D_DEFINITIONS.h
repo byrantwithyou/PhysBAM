@@ -37,7 +37,7 @@ OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::stri
     else number_of_sets=1;
 
     particles_multiple.Resize(number_of_sets);opengl_points_multiple.Resize(number_of_sets);selected_ids.Resize(number_of_sets);
-    particles_multiple(1)=particles;opengl_points_multiple(1)=opengl_points;
+    particles_multiple(0)=particles;opengl_points_multiple(0)=opengl_points;
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Particle_Multiple_Color_Map();
     opengl_points->color=color_map->Lookup(1);
     for(int i=2;i<=number_of_sets;i++){
@@ -54,7 +54,7 @@ template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,T_P
 ~OPENGL_COMPONENT_PARTICLES_3D()
 {
     for(int i=0;i<number_of_sets;i++){delete particles_multiple(i);delete &opengl_points_multiple(i)->points;delete opengl_points_multiple(i);}
-    //delete &opengl_points->points; TODO: get rid of opengl_points altogether, but this is safe as opengl_points_multiple(1) is always an alias of this.
+    //delete &opengl_points->points; TODO: get rid of opengl_points altogether, but this is safe as opengl_points_multiple(0) is always an alias of this.
     delete &opengl_vector_field.vector_field;
 }
 //#####################################################################
@@ -417,7 +417,7 @@ Get_Particles_Id_Array(int set_number) const
 {
     if(!set_number) set_number=set;
     ARRAY_VIEW<int>* ids=particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
-    if(ids && ids->Size() && (*ids)(1)) return ids; // A hack to ignore ids if the first one equals zero
+    if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;
 }
 //#####################################################################

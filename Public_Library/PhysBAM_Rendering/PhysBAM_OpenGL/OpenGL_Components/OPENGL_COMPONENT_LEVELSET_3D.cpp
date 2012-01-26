@@ -46,7 +46,7 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
             opengl_levelset_multiviews(i)->Set_Slice_Color(color,OPENGL_COLOR::Transparent());
             opengl_levelset_multiviews(i)->Set_Surface_Material(color,color);
             opengl_levelset_multiviews(i)->Set_Two_Sided(false);}}
-    opengl_levelset_multiview=opengl_levelset_multiviews(1);
+    opengl_levelset_multiview=opengl_levelset_multiviews(0);
 
     if (triangulated_surface_filename.length()==0) triangulated_surface_filename="";
 
@@ -103,17 +103,17 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
 {
     if(Is_Up_To_Date(frame)){
         bool is_MAC=true;
-        if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(1)->Levelset() && !opengl_levelset_multiviews(1)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
+        if(opengl_levelset_multiviews.Size() && opengl_levelset_multiviews(0)->Levelset() && !opengl_levelset_multiviews(0)->Levelset()->grid.Is_MAC_Grid()) is_MAC=false;
         if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_CELL_3D && is_MAC){
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
-            opengl_levelset_multiviews(1)->Levelset()->grid.Clamp(index,ghost_cells);
+            opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
             for(int i=0;i<opengl_levelset_multiviews.m;i++){
                 const LEVELSET_3D<GRID<TV> >& levelset=*opengl_levelset_multiviews(i)->Levelset();
                 output_stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
                              <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}
         if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_3D && !is_MAC){
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
-            opengl_levelset_multiviews(1)->Levelset()->grid.Clamp(index,ghost_cells);
+            opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
             for(int i=0;i<opengl_levelset_multiviews.m;i++)  if(opengl_levelset_multiviews(i)->Levelset())
                 output_stream<<component_name<<": phi["<<i<<"]="<<(*opengl_levelset_multiviews(i)->Levelset()).phi(index)<<std::endl;}
         if(current_selection && current_selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){

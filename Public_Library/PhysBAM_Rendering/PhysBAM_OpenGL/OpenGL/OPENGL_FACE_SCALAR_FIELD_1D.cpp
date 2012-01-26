@@ -14,7 +14,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_1D<T,T2>::
 OPENGL_FACE_SCALAR_FIELD_1D(const GRID<TV> &grid_input,ARRAY<T2,FACE_INDEX<1> > &face_values_input,OPENGL_COLOR point_color_input,OPENGL_COLOR line_color_input)
-:grid(grid_input),face_values(face_values_input),x_face_values(face_values.Component(1)),point_color(point_color_input),line_color(line_color_input),scale(1)
+:grid(grid_input),face_values(face_values_input),x_face_values(face_values.Component(0)),point_color(point_color_input),line_color(line_color_input),scale(1)
 {
 }
 //#####################################################################

@@ -71,7 +71,7 @@ Locate_Photons_Helper(const int photon_index,const TV& location,T& max_distance_
             photons_found(number_of_photons_found)=&photon;distance_squared_of_photons_found(number_of_photons_found)=distance_squared_to_query_location;}  
         else{
             if(number_of_photons_found==photons_found.m){ARRAYS_COMPUTATIONS::Heapify(distance_squared_of_photons_found,photons_found);number_of_photons_found++;}
-            //photons_found(1)=&photon;distance_squared_of_photons_found(1)=distance_squared_to_query_location;
+            //photons_found(0)=&photon;distance_squared_of_photons_found(0)=distance_squared_to_query_location;
             // can't use heapify here, because we need to break at the position we place the new photon
             int current_index=1;
             int left,right,index_of_largest;
@@ -86,7 +86,7 @@ Locate_Photons_Helper(const int photon_index,const TV& location,T& max_distance_
                 current_index=index_of_largest;}
             distance_squared_of_photons_found(current_index)=distance_squared_to_query_location;
             photons_found(current_index)=&photon;
-            max_distance_squared=distance_squared_of_photons_found(1);}} // copy the new bounding distance
+            max_distance_squared=distance_squared_of_photons_found(0);}} // copy the new bounding distance
 }
 //#####################################################################
 // Function Irradiance_Estimate
@@ -235,8 +235,8 @@ Print_Photon_List()
 template<class T> void PHOTON_MAP<T>::
 Print_Photon_Tree(const int depth,const int index)
 {
-    if(index>=photons.m)return;
-    if(index==0)LOG::cout<<"PHOTON TREE"<<std::endl;
+    if(index>=photons.m) return;
+    if(index<0)LOG::cout<<"PHOTON TREE"<<std::endl;
     for(int i=0;i<depth;i++)LOG::cout<<" ";
     LOG::cout<<"Photon "<<photons(index).location<<" Split on "<<photons(index).kdtree_split_axis<<std::endl;
     Print_Photon_Tree(depth+5,index*2);
@@ -248,7 +248,7 @@ Print_Photon_Tree(const int depth,const int index)
 template<class T> void PHOTON_MAP<T>::
 Begin_Light_Emission(const int number_of_photons_for_light)
 {
-    if(light_emission_start_index!=-1)return;
+    if(light_emission_start_index!=-1) return;
     light_emission_photon_quota=number_of_photons_for_light;
     light_emission_start_index=photons_stored+1;
 }
@@ -258,7 +258,7 @@ Begin_Light_Emission(const int number_of_photons_for_light)
 template<class T> void PHOTON_MAP<T>::
 End_Light_Emission(const int number_of_photons_emitted)
 {
-    if(light_emission_start_index==-1||number_of_photons_emitted==0)return;
+    if(light_emission_start_index==-1||number_of_photons_emitted==0) return;
     T power_scale=T(1)/T(number_of_photons_emitted);
     for(int i=light_emission_start_index;i<=photons_stored;i++)photons(i).power*=power_scale;
     light_emission_start_index=-1;

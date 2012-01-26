@@ -89,7 +89,7 @@ public:
     {}
 
     void Sample_Points(const VECTOR<T,3>& surface_position,const VECTOR<T,3>& surface_normal,ARRAY<RAY<VECTOR<T,3> > >& sample_array)const PHYSBAM_OVERRIDE
-    {sample_array.Resize(1);sample_array(1)=RAY<VECTOR<T,3> >(surface_position,VECTOR<T,3>(1,0,0),true);} // just give dummy return to avoid division by zero
+    {sample_array.Resize(1);sample_array(0)=RAY<VECTOR<T,3> >(surface_position,VECTOR<T,3>(1,0,0),true);} // just give dummy return to avoid division by zero
 
     VECTOR<T,3> Sample_Point_In_Volume(const T xi_x,const T xi_y,const T xi_z,T& probability_of_location)const
     {PAIR<int,T> sample_x=x_cdf.Sample(xi_x);int i=sample_x.x;
