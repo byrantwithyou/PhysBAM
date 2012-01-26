@@ -120,13 +120,13 @@ Normalize() const
 #ifdef _DEBUG_EXACT_RATIONAL_
     // TODO: determine whether normalization is necessary.
     int max_exp=floating_point_exponent(denominator.expansion.Last());
-    int min_exp=floating_point_exponent(denominator.expansion(1));
+    int min_exp=floating_point_exponent(denominator.expansion(0));
     T scale=FLOATING_POINT_HELPER<T>::exp(-(max_exp+min_exp)/2);
     const_cast<EXACT_FLOAT<T>&>(numerator).expansion*=scale;
     const_cast<EXACT_FLOAT<T>&>(denominator).expansion*=scale;
 
     max_exp=max(FLOATING_POINT_HELPER<T>::log(numerator.expansion.Last()),FLOATING_POINT_HELPER<T>::log(denominator.expansion.Last()));
-    min_exp=min(FLOATING_POINT_HELPER<T>::log(numerator.expansion(1)),FLOATING_POINT_HELPER<T>::log(denominator.expansion(1)));
+    min_exp=min(FLOATING_POINT_HELPER<T>::log(numerator.expansion(0)),FLOATING_POINT_HELPER<T>::log(denominator.expansion(0)));
     if(max_exp>=std::numeric_limits<T>::max_exponent/4||min_exp<=std::numeric_limits<T>::min_exponent/4)
         LOG::cerr<<"*** DEBUG WARNING ***\n"<<"Large exponents encountered in EXACT_RATIONAL<T>::Normalize()\n"<<"    this = "<<this<<"\n"<<"    this.numerator.expansion = "<<numerator.expansion
             <<"    this.denominator.expansion = "<<denominator.expansion<<std::endl;
