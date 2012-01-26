@@ -1120,8 +1120,8 @@ Add_Elastic_Collisions(const T dt,const T time)
             need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;}
 
         // force it to the last iteration (so it picks up contact pairs one time at least)
-        if(!need_another_iteration && i<parameters.collision_iterations){
-            i=parameters.collision_iterations-1;
+        if(!need_another_iteration && i<parameters.collision_iterations-1){
+            i=parameters.collision_iterations-2;
             need_another_iteration=true;}
 
         if(mpi_rigids)

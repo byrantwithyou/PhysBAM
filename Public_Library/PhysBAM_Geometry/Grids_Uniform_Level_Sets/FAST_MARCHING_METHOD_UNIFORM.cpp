@@ -38,17 +38,18 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const 
 {
     /*int heap_length=0;
     T_ARRAYS_BOOL done(cell_grid.Domain_Indices(ghost_cells+1));
-    T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1)); // extra cell so that it is the same size as the done array for optimizations
+    T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
+    close_k.Fill(-1);
     ARRAY<TV_INT> heap(cell_grid.Domain_Indices().Thickened(ghost_cells).Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
     Initialize_Interface(phi_ghost,done,close_k,heap,heap_length,seed_indices,add_seed_indices_for_ghost_cells);
 
     while(heap_length != 0){
-        TV_INT index=heap(1); // smallest point is on top of heap
+        TV_INT index=heap(0); // smallest point is on top of heap
         if(stopping_distance && abs(phi_ghost(index)) > stopping_distance){ // exit early
             for(CELL_ITERATOR iterator(cell_grid);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
                 phi_ghost(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_ghost(iterator.Cell_Index()))*stopping_distance;}
             return;}
-        done(index)=true;close_k(index)=0; // add to done, remove from close
+        done(index)=true;close_k(index)=-1; // add to done, remove from close
         FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
 
         if(levelset.collision_body_list)
@@ -75,30 +76,31 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
     T_ARRAYS_SCALAR phi_new(domain);
     for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_new(cell)=phi_ghost(cell);}
     T_ARRAYS_BOOL done(domain.Thickened(1));
-    T_ARRAYS_INT close_k(domain.Thickened(1)); // extra cell so that it is the same size as the done array for optimizations
+    T_ARRAYS_INT close_k(domain.Thickened(1),false); // extra cell so that it is the same size as the done array for optimizations
+    close_k.Fill(-1);
     ARRAY<TV_INT> heap(domain.Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
     Initialize_Interface(domain,phi_new,done,close_k,heap,heap_length,seed_indices,add_seed_indices_for_ghost_cells);
 
     while(heap_length != 0){
-        TV_INT index=heap(1); // smallest point is on top of heap
+        TV_INT index=heap(0); // smallest point is on top of heap
         if(stopping_distance && abs(phi_new(index)) > stopping_distance){ // exit early
             for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
                 phi_new(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_new(iterator.Cell_Index()))*stopping_distance;}
             return;}
-        done(index)=true;close_k(index)=0; // add to done, remove from close
+        done(index)=true;close_k(index)=-1; // add to done, remove from close
         FAST_MARCHING<T>::Down_Heap(phi_new,close_k,heap,heap_length);heap_length--; // remove point from heap
 
         if(levelset.collision_body_list)
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != domain.max_corner[axis] && !done(index+axis_vector) && Neighbor_Visible(axis,index))
+                if(index[axis] != domain.max_corner[axis]-1 && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index+axis_vector);}
         else
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != domain.min_corner[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != domain.max_corner[axis] && !done(index+axis_vector))
+                if(index[axis] != domain.max_corner[axis]-1 && !done(index+axis_vector))
                     Update_Or_Add_Neighbor(phi_new,done,close_k,heap,heap_length,index+axis_vector);}}
 
     RANGE<TV_INT> interior_domain=domain.Thickened(-ghost_cells);
@@ -111,17 +113,18 @@ template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
 {
     int heap_length=0;
-    T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1)); // extra cell so that it is the same size as the done array for optimizations
+    T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
+    close_k.Fill(-1);
     ARRAY<TV_INT> heap(cell_grid.Domain_Indices().Thickened(ghost_cells).Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
     Initialize_Interface(phi_ghost,done,close_k,heap,heap_length,add_seed_indices_for_ghost_cells);
 
     while(heap_length != 0){
-        TV_INT index=heap(1); // smallest point is on top of heap
+        TV_INT index=heap(0); // smallest point is on top of heap
         if(stopping_distance && abs(phi_ghost(index)) > stopping_distance){ // exit early
             for(CELL_ITERATOR iterator(cell_grid);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
                 phi_ghost(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_ghost(iterator.Cell_Index()))*stopping_distance;}
             return;}
-        done(index)=true;close_k(index)=0; // add to done, remove from close
+        done(index)=true;close_k(index)=-1; // add to done, remove from close
         FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
 
         if(levelset.collision_body_list)
@@ -143,13 +146,14 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,const T stop
 template<class T_GRID> inline void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Update_Or_Add_Neighbor(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor)
 {
-    if(close_k(neighbor)){
+    if(close_k(neighbor)>=0){
         Update_Close_Point(phi_ghost,done,neighbor);
         FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,close_k(neighbor));}
-    else{close_k(neighbor)=1; // add to close 
+    else{
+        close_k(neighbor)=0; // add to close 
         Update_Close_Point(phi_ghost,done,neighbor);
-        heap_length++;heap(heap_length)=neighbor;
-        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length);}
+        heap(heap_length++)=neighbor;
+        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length-1);}
 }
 //#####################################################################
 // Function Initialize_Interface
@@ -194,10 +198,11 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
         for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
 
     // initialize close points
-    for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())){
+    for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){
+        if(close_k(iterator.Cell_Index())>=0){
         Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
-        heap_length++;heap(heap_length)=iterator.Cell_Index();
-        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length);}
+        heap(heap_length++)=iterator.Cell_Index();
+        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length-1);}}
 }
 //#####################################################################
 // Function Initialize_Interface
@@ -234,10 +239,10 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
         for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
 
     // initialize close points
-    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())){
+    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
         Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
-        heap_length++;heap(heap_length)=iterator.Cell_Index();
-        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length);}
+        heap(heap_length++)=iterator.Cell_Index();
+        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length-1);}
 }
 //#####################################################################
 // Function Initialize_Interface
@@ -350,10 +355,10 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
                     if(!done(neighbor_index))Add_To_Initial(done,close_k,neighbor_index);}}}}
 
    // initialize close points
-    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())){
+    for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(close_k(iterator.Cell_Index())>=0){
         Update_Close_Point(phi_ghost,done,iterator.Cell_Index());
-        heap_length++;heap(heap_length)=iterator.Cell_Index();
-        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length);}
+        heap(heap_length++)=iterator.Cell_Index();
+        FAST_MARCHING<T>::Up_Heap(phi_ghost,close_k,heap,heap_length-1);}
 }
 //#####################################################################
 // Function Update_Close_Point
@@ -388,16 +393,16 @@ Update_Close_Point(T_ARRAYS_SCALAR& phi_ghost,const T_ARRAYS_BOOL& done,const TV
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Add_To_Initial(T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,const TV_INT& index)
 {
-    done(index)=true;close_k(index)=0; // add to done, remove from close 
+    done(index)=true;close_k(index)=-1; // add to done, remove from close 
     // add neighbors to close if not done 
     if(levelset.collision_body_list){
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-            if(!done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector)) close_k(index-axis_vector)=1;
-            if(!done(index+axis_vector) && Neighbor_Visible(axis,index)) close_k(index+axis_vector)=1;}}
+            if(!done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector)) close_k(index-axis_vector)=0;
+            if(!done(index+axis_vector) && Neighbor_Visible(axis,index)) close_k(index+axis_vector)=0;}}
     else{
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-            if(!done(index-axis_vector)) close_k(index-axis_vector)=1;
-            if(!done(index+axis_vector)) close_k(index+axis_vector)=1;}}
+            if(!done(index-axis_vector)) close_k(index-axis_vector)=0;
+            if(!done(index+axis_vector)) close_k(index+axis_vector)=0;}}
 }
 //#####################################################################
 template class FAST_MARCHING_METHOD_UNIFORM<GRID<VECTOR<float,1> > >;

@@ -169,7 +169,7 @@ Initialize_Topologically_Sorted_Neighbor_Nodes()
         (*topologically_sorted_neighbor_nodes)(i).Exact_Resize(neighbors(i).m);
         ARRAY<bool> not_first(neighbors(i).m);for(int j=0;j<neighbors(i).m;j++) if(neighbor_links(i)(j)) not_first(neighbor_links(i)(j))=true;
         int node_index=0;while(node_index < neighbors(i).m && not_first(node_index)) node_index++; // now find the first node in the linked list
-        if(node_index => neighbors(i).m) node_index=-1; // if we have a cycle (i is in the interior), just use 0
+        if(node_index >= neighbors(i).m) node_index=-1; // if we have a cycle (i is in the interior), just use 0
         for(int j=0;j<neighbors(i).m;j++){(*topologically_sorted_neighbor_nodes)(i)(j)=neighbors(i)(node_index);node_index=neighbor_links(i)(node_index);}}
 }
 //#####################################################################
