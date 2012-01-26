@@ -96,7 +96,7 @@ Gather_Cell_Data(const T_ARRAYS& local_data,T_ARRAYS& global_data) const
             comm->Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
             ARRAY<char> buffer(status.Get_count(MPI::PACKED));//int position=0;
-            comm->Recv(&buffer(1),buffer.m,MPI::PACKED,source,tag);
+            comm->Recv(&buffer(0),buffer.m,MPI::PACKED,source,tag);
             T_GRID other_grid=Restrict_Grid(all_coordinates(p));
             T_GRID mac_other_grid=other_grid.Get_MAC_Grid();
             T_ARRAYS other_array(mac_other_grid.Domain_Indices(ghost_cells));
@@ -126,7 +126,7 @@ Scatter_Cell_Data(const T_ARRAYS& global_data,T_ARRAYS& local_data) const
         MPI::Status status;
         comm->Probe(0,tag,status);
         ARRAY<char> buffer(status.Get_count(MPI::PACKED));
-        comm->Recv(&buffer(1),buffer.m,MPI::PACKED,0,tag);
+        comm->Recv(&buffer(0),buffer.m,MPI::PACKED,0,tag);
         MPI_PACKAGE package=Package_Cell_Data(local_data,local_data.Domain_Indices());
         package.Unpack(buffer,*comm);
         package.Free();}

@@ -62,11 +62,11 @@ template<class T> int Pack_Size(const VECTOR_ND<T>& data,const MPI::Comm& comm)
 template<class T> void Pack(const VECTOR_ND<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Pack(data.n,buffer,position,comm);
-Datatype<T>().Pack(data.Get_Array_Pointer(),data.n,&buffer(1),buffer.Size(),position,comm);}
+Datatype<T>().Pack(data.Get_Array_Pointer(),data.n,&buffer(0),buffer.Size(),position,comm);}
 
 template<class T> void Unpack(VECTOR_ND<T>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int n;Unpack(n,buffer,position,comm);data.Resize(n);
-Datatype<T>().Unpack(&buffer(1),buffer.Size(),data.Get_Array_Pointer(),data.n,position,comm);}
+Datatype<T>().Unpack(&buffer(0),buffer.Size(),data.Get_Array_Pointer(),data.n,position,comm);}
 //#####################################################################
 // Pack/Unpack for SPARSE_MATRIX_FLAT_NXN
 //#####################################################################

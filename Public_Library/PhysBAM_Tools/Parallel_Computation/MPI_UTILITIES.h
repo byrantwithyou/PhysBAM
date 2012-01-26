@@ -88,12 +88,12 @@ template<class T,class ID> inline int Pack_Size(const ARRAY<T,ID>& data,const MP
 template<class T> inline void Pack(const ARRAY_VIEW<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Pack(data.Size(),buffer,position,comm);
-Datatype<T>().Pack(data.Get_Array_Pointer(),data.Size(),&buffer(1),buffer.Size(),position,comm);}
+Datatype<T>().Pack(data.Get_Array_Pointer(),data.Size(),&buffer(0),buffer.Size(),position,comm);}
 
 template<class T_ARRAY,class T_INDICES> inline void Pack(const INDIRECT_ARRAY<T_ARRAY,T_INDICES>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Pack(data.Size(),buffer,position,comm);MPI::Datatype type=Datatype<typename T_ARRAY::ELEMENT>();
-for(int i=0;i<data.Size();i++) type.Pack(&data(i),1,&buffer(1),buffer.Size(),position,comm);}
+for(int i=0;i<data.Size();i++) type.Pack(&data(i),1,&buffer(0),buffer.Size(),position,comm);}
 
 template<class T> inline void Pack(const ARRAY<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {Pack(ARRAY_VIEW<const T>(data),buffer,position,comm);}
@@ -103,20 +103,20 @@ template<class T,class ID> inline void Pack(const ARRAY<T,ID>& data,ARRAY_VIEW<c
 
 template<class T> inline void Unpack(ARRAY_VIEW<T> data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int m;Unpack(m,buffer,position,comm);PHYSBAM_ASSERT(m==data.Size());
-Datatype<T>().Unpack(&buffer(1),buffer.Size(),data.Get_Array_Pointer(),data.Size(),position,comm);}
+Datatype<T>().Unpack(&buffer(0),buffer.Size(),data.Get_Array_Pointer(),data.Size(),position,comm);}
 
 template<class T> inline void Unpack(ARRAY<T>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int m;Unpack(m,buffer,position,comm);data.Resize(m);
-Datatype<T>().Unpack(&buffer(1),buffer.Size(),data.Get_Array_Pointer(),data.Size(),position,comm);}
+Datatype<T>().Unpack(&buffer(0),buffer.Size(),data.Get_Array_Pointer(),data.Size(),position,comm);}
 
 template<class T,class ID> inline void Unpack(ARRAY<T,ID>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int m;Unpack(m,buffer,position,comm);data.Resize(ID(m));
-Datatype<T>().Unpack(&buffer(1),buffer.Size(),data.Get_Array_Pointer(),Value(data.Size()),position,comm);}
+Datatype<T>().Unpack(&buffer(0),buffer.Size(),data.Get_Array_Pointer(),Value(data.Size()),position,comm);}
 
 template<class T_ARRAY,class T_INDICES> inline void Unpack(INDIRECT_ARRAY<T_ARRAY,T_INDICES>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int m;Unpack(m,buffer,position,comm);PHYSBAM_ASSERT(m==data.Size());
 MPI::Datatype type=Datatype<typename T_ARRAY::ELEMENT>();
-for(int i=0;i<data.Size();i++) type.Unpack(&buffer(1),buffer.Size(),&data(i),1,position,comm);}
+for(int i=0;i<data.Size();i++) type.Unpack(&buffer(0),buffer.Size(),&data(i),1,position,comm);}
 //#####################################################################
 // Pack/Unpack for particles
 //#####################################################################
@@ -205,12 +205,12 @@ template<class T1,class T2,class T3,class T4,class T5,class T6> inline void Unpa
 // Function Wait_All
 //#####################################################################
 inline void Wait_All(ARRAY<MPI::Request>& requests)
-{if(requests.m) MPI::Request::Waitall(requests.m,&requests(1));requests.Clean_Memory();}
+{if(requests.m) MPI::Request::Waitall(requests.m,&requests(0));requests.Clean_Memory();}
 //#####################################################################
 // Function Wait_Any
 //#####################################################################
 inline bool Wait_Any(ARRAY<MPI::Request>& requests,MPI::Status& status)
-{if(!requests.m) return false;int index=MPI::Request::Waitany(requests.m,&requests(1),status);requests.Remove_Index_Lazy(index+1);return true;}
+{if(!requests.m) return false;int index=MPI::Request::Waitany(requests.m,&requests(0),status);requests.Remove_Index_Lazy(index+1);return true;}
 //#####################################################################
 // Function Free_Elements_And_Clean_Memory
 //#####################################################################

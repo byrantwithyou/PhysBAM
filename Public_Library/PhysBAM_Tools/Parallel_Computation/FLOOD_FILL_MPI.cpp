@@ -78,7 +78,7 @@ Synchronize_Colors()
 
     // send numbers of global colors to everyone
     ARRAY<int> global_color_counts(mpi_grid.number_of_processes);
-    mpi_grid.comm->Allgather(&global_color_count,1,MPI_UTILITIES::Datatype<int>(),&global_color_counts(1),1,MPI_UTILITIES::Datatype<int>());
+    mpi_grid.comm->Allgather(&global_color_count,1,MPI_UTILITIES::Datatype<int>(),&global_color_counts(0),1,MPI_UTILITIES::Datatype<int>());
     int total_global_colors=global_color_counts.Sum();
     int global_color_offset=global_color_counts.Prefix(mpi_grid.rank).Sum();
     LOG::cout<<"initial colors: "<<number_of_regions<<" total, "<<global_color_count<<" out of "<<total_global_colors<<" global"<<std::endl;
@@ -150,7 +150,7 @@ Synchronize_Colors()
         // synchronize color_touches_uncolorable, TODO: this could be merged with above communication
         ARRAY<bool> global_color_touches_uncolorable(color_ranks.m);
         ARRAY<bool>::Get(global_color_touches_uncolorable,*color_touches_uncolorable);
-        mpi_grid.comm->Allreduce(&global_color_touches_uncolorable(1),&(*color_touches_uncolorable)(1),color_ranks.m,MPI_UTILITIES::Datatype<bool>(),MPI::LOR);}
+        mpi_grid.comm->Allreduce(&global_color_touches_uncolorable(0),&(*color_touches_uncolorable)(0),color_ranks.m,MPI_UTILITIES::Datatype<bool>(),MPI::LOR);}
 
     // finish
     MPI_UTILITIES::Wait_All(send_requests);

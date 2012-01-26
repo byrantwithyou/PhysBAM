@@ -80,7 +80,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
         buffers.Append(pack);}
     else{
         while(buffers.m<=1) sleep(1);
-        barr=*(pthread_barrier_t**)(&buffers(1).buffer(0));}
+        barr=*(pthread_barrier_t**)(&buffers(0).buffer(0));}
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
     pthread_barrier_wait(barr);

@@ -24,20 +24,20 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         int buffer_size=MPI_UTILITIES::Pack_Size(partition,A,x,b,comm);
         ARRAY<char> buffer(buffer_size);int position=0;
         MPI_UTILITIES::Pack(partition,A,x,b,buffer,position,comm);
-        comm.Send(&buffer(1),position,MPI::PACKED,master,tag);
+        comm.Send(&buffer(0),position,MPI::PACKED,master,tag);
         // receive result
-        comm.Recv(&x(1),x.n,MPI_UTILITIES::Datatype<T>(),master,tag);}
+        comm.Recv(&x(0),x.n,MPI_UTILITIES::Datatype<T>(),master,tag);}
     else{
         // receive linear system pieces
-        ARRAY<SPARSE_MATRIX_PARTITION> partition_array(processors);partition_array(1)=partition; // TODO: very inefficient to copy everything into one array
-        ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(processors);A_array(1)=A;
-        ARRAY<VECTOR_ND<T> > x_array(processors),b_array(processors);x_array(1)=x;b_array(1)=b;
+        ARRAY<SPARSE_MATRIX_PARTITION> partition_array(processors);partition_array(0)=partition; // TODO: very inefficient to copy everything into one array
+        ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(processors);A_array(0)=A;
+        ARRAY<VECTOR_ND<T> > x_array(processors),b_array(processors);x_array(0)=x;b_array(0)=b;
         for(int p=2;p<=processors;p++){
             MPI::Status status;
             comm.Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
             ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-            comm.Recv(&buffer(1),buffer.m,MPI::PACKED,source,tag);
+            comm.Recv(&buffer(0),buffer.m,MPI::PACKED,source,tag);
             MPI_UTILITIES::Unpack(partition_array(source+1),A_array(source+1),x_array(source+1),b_array(source+1),buffer,position,comm);}
         // find total sizes and offsets
         int global_rows=0,global_entries=0;
@@ -51,7 +51,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         // find global offsets
         SPARSE_MATRIX_FLAT_NXN<T> global_A;
         global_A.n=global_rows;global_A.offsets.Resize(global_rows+1);
-        {int current_row=1,current_index=1;global_A.offsets(1)=1;
+        {int current_row=1,current_index=1;global_A.offsets(0)=1;
         for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++)
             global_A.offsets(current_row++)=current_index+=A_array(p).offsets(i+1)-A_array(p).offsets(i);
         assert(current_row==global_rows+1 && global_A.offsets(current_row)==global_entries+1);}
@@ -78,9 +78,9 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
                 for(int i=partition.ghost_indices(region).min_corner;i<=partition.ghost_indices(region).max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Ghost_Index(i,region));}}
         // send result pieces
         ARRAY<MPI::Request> requests;
-        for(int p=2;p<=processors;p++)requests.Append(comm.Isend(&x_array(p)(1),x_array(p).n,MPI_UTILITIES::Datatype<T>(),p-1,tag));
+        for(int p=2;p<=processors;p++)requests.Append(comm.Isend(&x_array(p)(0),x_array(p).n,MPI_UTILITIES::Datatype<T>(),p-1,tag));
         MPI_UTILITIES::Wait_All(requests);
-        x=x_array(1);}
+        x=x_array(0);}
 }
 //#####################################################################
 // Function Parallel_Solve
@@ -248,7 +248,7 @@ Initialize_Datatypes()
         if(partition.boundary_indices(s).m){
             const ARRAY<int>& displacements=partition.boundary_indices(s);
             ARRAY<int> block_lengths(displacements.m,false);block_lengths.Fill(1);
-            boundary_datatypes(s)=MPI_UTILITIES::Datatype<T>().Create_indexed(displacements.m,&block_lengths(1),&displacements(1)); // TODO: collapse consecutive elements into blocks
+            boundary_datatypes(s)=MPI_UTILITIES::Datatype<T>().Create_indexed(displacements.m,&block_lengths(0),&displacements(0)); // TODO: collapse consecutive elements into blocks
             boundary_datatypes(s).Commit();}
         int ghost_indices_length=partition.ghost_indices(s).Size()+1;
         if(ghost_indices_length){
@@ -265,12 +265,12 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     columns_to_receive.Resize(proc_column_index_boundaries.m);
     columns_to_send.Resize(proc_column_index_boundaries.m);
     VECTOR_ND<bool> column_needed(A.n);
-    int row_index=A.offsets(1);
+    int row_index=A.offsets(0);
     for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
         const int end=A.offsets(row+1);
         for(;row_index<end;row_index++){
             column_needed(A.A(row_index).j)=true;}}
-    int my_rank=comm.Get_rank();ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(1).y-proc_column_index_boundaries(1).x);
+    int my_rank=comm.Get_rank();ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(0).y-proc_column_index_boundaries(0).x);
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank!=my_rank){
             temp_indices.Remove_All();
@@ -287,14 +287,14 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
             int buffer_size=1+MPI_UTILITIES::Pack_Size(columns_to_receive(node_rank),comm);
             send_buffers(node_rank).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(columns_to_receive(node_rank),send_buffers(node_rank),position,comm);
-            requests.Append(comm.Isend(&(send_buffers(node_rank)(1)),position,MPI::PACKED,node_rank-1,tag));}}
+            requests.Append(comm.Isend(&(send_buffers(node_rank)(0)),position,MPI::PACKED,node_rank-1,tag));}}
     // Receive a list from each of the other procs, and store this list
     for(int node_rank=0;node_rank<columns_to_receive.m-1;node_rank++){
         MPI::Status status;
         comm.Probe(MPI::ANY_SOURCE,tag,status);
         int source=status.Get_source();
         ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-        requests.Append(comm.Irecv(&buffer(1),buffer.m,MPI::PACKED,source,tag));
+        requests.Append(comm.Irecv(&buffer(0),buffer.m,MPI::PACKED,source,tag));
         MPI_UTILITIES::Unpack(columns_to_send(source+1),buffer,position,comm);}
     MPI_UTILITIES::Wait_All(requests);
 }
@@ -308,12 +308,12 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
     columns_to_receive.Resize(proc_column_index_boundaries.m);
     columns_to_send.Resize(proc_column_index_boundaries.m);
     VECTOR_ND<bool> column_needed(A.n);
-    int row_index=A.offsets(1);
+    int row_index=A.offsets(0);
     for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
         const int end=A.offsets(row+1);
         for(;row_index<end;row_index++){
             column_needed(A.A(row_index).j)=true;}}
-    int my_rank=thread_grid->rank;ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(1).y-proc_column_index_boundaries(1).x);
+    int my_rank=thread_grid->rank;ARRAY<int> temp_indices;temp_indices.Preallocate(proc_column_index_boundaries(0).y-proc_column_index_boundaries(0).x);
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank!=my_rank){
             temp_indices.Remove_All();

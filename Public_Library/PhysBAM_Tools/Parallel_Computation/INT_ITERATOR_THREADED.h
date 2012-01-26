@@ -74,7 +74,7 @@ public:
 
     void Run(TYPE& my_class,void (TYPE::*func)(int))
     {
-        if(!thread_queue){(my_class.*func)(1);return;}
+        if(!thread_queue){(my_class.*func)(0);return;}
 #ifdef USE_PTHREADS
         for(int i=0;i<end_index;i++){
             INT_ITERATOR_TASK_0<TYPE>* task=new INT_ITERATOR_TASK_0<TYPE>(my_class,func,i);
