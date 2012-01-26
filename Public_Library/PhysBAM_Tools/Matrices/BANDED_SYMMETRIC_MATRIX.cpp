@@ -22,7 +22,7 @@ Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     STATIC_ASSERT(bandwidth==3); // TODO: implement for non-tridiagonal matrices
     assert(A.Size()==Size() && x.Size()==Size());
-    T x_previous=x(1);
+    T x_previous=x(0);
     result(0)=A(0)[1]*x_previous;
     for(int i=1;i<Size();i++){
         T x_i=x(i);
@@ -55,7 +55,7 @@ Power_Iterate_Shifted(VECTOR_ND<T>& x,const T shift,T& eigenvalue,const T tolera
 template<class T,int bandwidth> bool BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
 Eigenvalue_Range(VECTOR_ND<T>& x,INTERVAL<T>& eigenvalue_range,const T tolerance,const int max_iterations) const
 {
-    if(Size()==1){eigenvalue_range=INTERVAL<T>(A(1)(1));return true;}
+    if(Size()==1){eigenvalue_range=INTERVAL<T>(A(0)(0));return true;}
     T lambda_min,lambda_max;
     if(!Power_Iterate(x,lambda_max,tolerance,max_iterations)) return false;
     eigenvalue_range=INTERVAL<T>(lambda_max);

@@ -510,7 +510,7 @@ Reset(const int c)
     m=0;
     offsets.Remove_All();
     A.Remove_All();
-    offsets.Append(1);
+    offsets.Append(0);
 }
 //#####################################################################
 // Function Append_Entry_To_Current_Row

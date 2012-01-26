@@ -19,7 +19,7 @@ public:
     unsigned int current_operation;
 
     OPERATION_HASH(const ID m=ID())
-        :operations(m),current_operation(1)
+        :operations(m),current_operation(0)
     {}
 
     void Initialize(const ID m)

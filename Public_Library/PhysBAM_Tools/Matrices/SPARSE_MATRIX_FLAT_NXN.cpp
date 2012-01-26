@@ -30,9 +30,9 @@ SPARSE_MATRIX_FLAT_NXN(const ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& matrices)
     :n(0),C(0),thread_queue(0)
 {
     for(int i=0;i<matrices.m;i++) n+=matrices(i).n;
-    offsets.Resize(n+1,false,false);offsets(1)=1;
+    offsets.Resize(n+1,false,false);offsets(0)=1;
     ARRAY<int> matrix_row_offsets(matrices.m);ARRAY<int> matrix_element_offsets(matrices.m);
-    if(matrices.m){matrix_row_offsets(1)=0;matrix_element_offsets(1)=0;}
+    if(matrices.m){matrix_row_offsets(0)=0;matrix_element_offsets(0)=0;}
     for(int i=1;i<matrices.m;i++){matrix_row_offsets(i+1)=matrix_row_offsets(i)+matrices(i).n;matrix_element_offsets(i+1)=matrix_element_offsets(i)+matrices(i).A.m;}
     int index=1;
     for(int i=0;i<matrices.m;i++)for(int j=0;j<matrices(i).n;j++,index++) offsets(index+1)=offsets(index)+matrices(i).offsets(j+1)-matrices(i).offsets(j);
@@ -83,7 +83,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Set_Row_Lengths(const ARRAY<int>& lengths)
 {
     diagonal_index.Clean_Memory();delete C;C=0;n=lengths.m;
-    offsets.Resize(n+1,false,false);offsets(1)=1;
+    offsets.Resize(n+1,false,false);offsets(0)=1;
     for(int i=0;i<n;i++){assert(lengths(i));offsets(i+1)=offsets(i)+lengths(i);}
     A.Resize(offsets(n+1)-1);
 }
@@ -375,7 +375,7 @@ Reset()
     C=0;
     offsets.Remove_All();
     A.Remove_All();
-    offsets.Append(1);
+    offsets.Append(0);
     diagonal_index.Remove_All();
 }
 //#####################################################################
@@ -409,7 +409,7 @@ Sort_Entries()
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Conjugate_With_Diagonal_Matrix(VECTOR_ND<T>& x)
 {
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=0;i<n;i++){
         int end=offsets(i+1);
         for(;index<end;index++) A(index).a*=x(i)*x(A(index).j);}

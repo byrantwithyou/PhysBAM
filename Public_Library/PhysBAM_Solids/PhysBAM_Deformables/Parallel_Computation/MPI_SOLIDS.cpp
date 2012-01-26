@@ -548,7 +548,7 @@ Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inpu
 //#####################################################################
 template<class T_ARRAY,class T> void KD_Tree_Partition_Helper(const T_ARRAY& local_p_to_global_p,KD_TREE_NODE<T>& node,const int depth,const int target_depth,PARTITION_ID& partition,ARRAY<ARRAY<int>,PARTITION_ID>& particle_of_partition)
 {
-    if(node.split_axis==0) particle_of_partition(partition).Append(local_p_to_global_p(typename T_ARRAY::INDEX(node.node_index)));
+    if(node.split_axis==-1) particle_of_partition(partition).Append(local_p_to_global_p(typename T_ARRAY::INDEX(node.node_index)));
     else{
         if(depth==target_depth) partition++;
         KD_Tree_Partition_Helper(local_p_to_global_p,*node.left,depth+1,target_depth,partition,particle_of_partition);
