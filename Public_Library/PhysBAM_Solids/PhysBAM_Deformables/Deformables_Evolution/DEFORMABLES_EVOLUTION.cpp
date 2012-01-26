@@ -348,9 +348,9 @@ Print_Maximum_Velocities(const T time) const
 {
     LOG::cout<<"time = "<<time<<std::endl;
     PARTICLES<TV>& particles=deformable_body_collection.particles;
-    int max_index=0;T max_magnitude_squared=-FLT_MAX;const INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&>& V=particles.V.Subset(deformable_body_collection.dynamic_particles);
+    int max_index=-1;T max_magnitude_squared=-FLT_MAX;const INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&>& V=particles.V.Subset(deformable_body_collection.dynamic_particles);
     for(int i=0;i<V.Size();i++){T magnitude_squared=V(i).Magnitude_Squared();if(magnitude_squared>max_magnitude_squared){max_magnitude_squared=magnitude_squared;max_index=i;}}
-    if(max_index){
+    if(max_index>-1){
         int p=deformable_body_collection.dynamic_particles(max_index);T max_magnitude=sqrt(max_magnitude_squared),max_magnitude_global=max_magnitude;
         if(deformable_body_collection.mpi_solids) max_magnitude_global=deformable_body_collection.mpi_solids->Reduce_Max_Global(max_magnitude_global);
         LOG::cout<<"maximum velocity = "<<max_magnitude_global;
