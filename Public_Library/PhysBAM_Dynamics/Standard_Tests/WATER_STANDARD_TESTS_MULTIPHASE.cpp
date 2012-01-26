@@ -42,25 +42,25 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input=static_cast<FLUIDS_PARAMETERS_UNIFORM<T_GRID>&>(fluids_parameters);
 
     if(test_number<10){
-        fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(1)=1;
+        fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(0)=1;
         source_region.Resize(sources.m);source_region.Fill(1);
-        fluids_parameters_input.pseudo_dirichlet_regions(1)=true;
+        fluids_parameters_input.pseudo_dirichlet_regions(0)=true;
         fluids_parameters_input.second_order_cut_cell_method=false;}
     else if(test_number==11){
-        fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(1)=500;fluids_parameters_input.densities(2)=2000;
+        fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(0)=500;fluids_parameters_input.densities(1)=2000;
         fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T).1;
         fluids_parameters_input.surface_tensions(1,3)=fluids_parameters_input.surface_tensions(3,1)=(T).1;
         fluids_parameters_input.surface_tensions(2,3)=fluids_parameters_input.surface_tensions(3,2)=(T).1;}
     else if(test_number==12){
         fluids_parameters_input.dirichlet_regions(0)=true;use_open_wall=true;air_region=1;
-        fluids_parameters_input.densities(0)=1;fluids_parameters_input.densities(1)=800;fluids_parameters_input.densities(2)=1000;fluids_parameters_input.densities(3)=3000;}
+        fluids_parameters_input.densities(0)=1;fluids_parameters_input.densities(0)=800;fluids_parameters_input.densities(1)=1000;fluids_parameters_input.densities(3)=3000;}
     else if(test_number==13){
-        fluids_parameters_input.densities(0)=1400;fluids_parameters_input.densities(1)=500;fluids_parameters_input.densities(2)=1000;fluids_parameters_input.densities(3)=1;}
+        fluids_parameters_input.densities(0)=1400;fluids_parameters_input.densities(0)=500;fluids_parameters_input.densities(1)=1000;fluids_parameters_input.densities(3)=1;}
     else if(test_number==14){
-        fluids_parameters_input.densities(0)=(T)1.226;fluids_parameters_input.densities(1)=1000; 
+        fluids_parameters_input.densities(0)=(T)1.226;fluids_parameters_input.densities(0)=1000; 
         fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T).0728;
         fluids_parameters_input.viscosities(0)=(T).0000178;
-        fluids_parameters_input.viscosities(1)=(T).001137;
+        fluids_parameters_input.viscosities(0)=(T).001137;
         fluids_parameters_input.implicit_viscosity=false;
         fluids_parameters_input.incompressible_iterations=200;
         fluids_parameters_input.implicit_viscosity_iterations=200;}
@@ -72,11 +72,11 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
         //fluids_parameters_input.elastic_moduli(0)=20000;
         //fluids_parameters_input.plasticity_alphas(0)=0;
 
-        fluids_parameters_input.densities(1)=1000;
-        fluids_parameters_input.viscosities(1)=(T)60;
+        fluids_parameters_input.densities(0)=1000;
+        fluids_parameters_input.viscosities(0)=(T)60;
             
-        fluids_parameters_input.densities(2)=1000;
-        fluids_parameters_input.viscosities(2)=10;
+        fluids_parameters_input.densities(1)=1000;
+        fluids_parameters_input.viscosities(1)=10;
         // SOURCE SET IN DERIVED EXAMPLE
 
         fluids_parameters_input.densities(3)=1000;
@@ -122,9 +122,9 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
             fluids_parameters_input.implicit_viscosity=true;
             fluids_parameters_input.viscosities(0)=(T)200;           
         }
-        fluids_parameters_input.densities(1)=1000;
-        fluids_parameters_input.densities(2)=1;
-        fluids_parameters_input.dirichlet_regions(2)=true;
+        fluids_parameters_input.densities(0)=1000;
+        fluids_parameters_input.densities(1)=1;
+        fluids_parameters_input.dirichlet_regions(1)=true;
         fluids_parameters_input.reseeding_frame_rate=10;
         fluids_parameters_input.cfl/=2;
     }

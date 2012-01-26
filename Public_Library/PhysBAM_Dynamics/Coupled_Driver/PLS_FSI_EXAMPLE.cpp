@@ -221,8 +221,8 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Fluid_Scalars()
 {
-    T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(1);
-    T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(1);
+    T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
+    T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable)
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);
 }
@@ -232,8 +232,8 @@ Revalidate_Fluid_Scalars()
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Phi_After_Modify_Levelset()
 {
-    T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(1);
-    T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(1);
+    T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
+    T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable){
         levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_current=levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_next;
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);}
@@ -278,7 +278,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARR
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     T maximum_fluid_speed=face_velocities.Maxabs().Max(),maximum_particle_speed=0;
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(1);
+    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
     if(particle_levelset.use_removed_negative_particles) for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());
             if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}
@@ -286,7 +286,7 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARR
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_positive_particles(iterator.Cell_Index());
             if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}
     T max_particle_collision_distance=0;
-    max_particle_collision_distance=max(max_particle_collision_distance,fluids_parameters.particle_levelset_evolution->Particle_Levelset(1).max_collision_distance_factor*grid.dX.Max());
+    max_particle_collision_distance=max(max_particle_collision_distance,fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).max_collision_distance_factor*grid.dX.Max());
     fluids_parameters.collision_bodies_affecting_fluid->Compute_Occupied_Blocks(true,
         dt*max(maximum_fluid_speed,maximum_particle_speed)+2*max_particle_collision_distance+(T).5*fluids_parameters.p_grid.dX.Max(),10);
 }

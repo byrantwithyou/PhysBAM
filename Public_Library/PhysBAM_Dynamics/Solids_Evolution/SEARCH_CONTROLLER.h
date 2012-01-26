@@ -62,7 +62,7 @@ class ENVIRONMENTAL_STATE
         T threshold=(T)1e-5;
         if(incorporate_fluids) for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(abs(this->pressures(iterator.Cell_Index())-state.pressures(iterator.Cell_Index()))>threshold) return false;
         else if(abs(this->external_force_mag-state.external_force_mag)>1e-5||(this->external_force_dir-state.external_force_dir).Magnitude()>threshold) return false;
-        TV vector;vector.Fill(0);vector(1)=1;for(JOINT_ID i(0);i<this->angles.Size();i++){if(((this->angles(i).Inverse_Rotate(state.angles(i).Rotate(vector)))-vector).Magnitude()>threshold) return false;}
+        TV vector;vector.Fill(0);vector(0)=1;for(JOINT_ID i(0);i<this->angles.Size();i++){if(((this->angles(i).Inverse_Rotate(state.angles(i).Rotate(vector)))-vector).Magnitude()>threshold) return false;}
         return true;
     }
  

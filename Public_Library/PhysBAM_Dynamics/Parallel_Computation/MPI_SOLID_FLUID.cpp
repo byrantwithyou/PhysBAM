@@ -40,10 +40,10 @@ MPI_SOLID_FLUID()
     group=new MPI::Group(comm->Get_group());
     solid_ranks.Resize(number_of_solid_processes);
     for(int i=0;i<number_of_solid_processes;i++)solid_ranks(i)=i-1;
-    solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(1)));
+    solid_group=new MPI::Group(group->Incl(solid_ranks.n,&solid_ranks(0)));
     fluid_ranks.Resize(number_of_processes-number_of_solid_processes);
     for(int i=0;i<fluid_ranks.n;i++)fluid_ranks(i)=i+number_of_solid_processes-1;
-    fluid_group=new MPI::Group(group->Incl(fluid_ranks.n,&fluid_ranks(1)));
+    fluid_group=new MPI::Group(group->Incl(fluid_ranks.n,&fluid_ranks(0)));
 }
 //#####################################################################
 // Destructor
@@ -70,12 +70,12 @@ template<class T> void Exchange_Solid_Positions_And_Velocities_Helper(const MPI_
             int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,particles.V,rigid_body_particles.twist,*mpi.comm)+1;
             send_buffers(i).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(particles.X,rigid_body_particles.X,particles.V,rigid_body_particles.twist,send_buffers(i),position,*mpi.comm);
-            requests.Append(mpi.comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,mpi.fluid_ranks(i),tag));}
+            requests.Append(mpi.comm->Isend(&(send_buffers(i)(0)),position,MPI::PACKED,mpi.fluid_ranks(i),tag));}
         MPI_UTILITIES::Wait_All(requests);}
     else{
         int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,particles.V,rigid_body_particles.twist,*mpi.comm)+1;
         ARRAY<char> buffer(buffer_size);int position=0;
-        mpi.comm->Recv(&buffer(1),buffer_size,MPI::PACKED,mpi.solid_node,tag);
+        mpi.comm->Recv(&buffer(0),buffer_size,MPI::PACKED,mpi.solid_node,tag);
         MPI_UTILITIES::Unpack(particles.X,rigid_body_particles.X,particles.V,rigid_body_particles.twist,buffer,position,*mpi.comm);}
 }
 };
@@ -97,13 +97,13 @@ Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_co
             send_buffers(i).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,rigid_body_particles.angular_momentum,
                 send_buffers(i),position,*comm);
-            requests.Append(comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,fluid_ranks(i),tag));}
+            requests.Append(comm->Isend(&(send_buffers(i)(0)),position,MPI::PACKED,fluid_ranks(i),tag));}
         MPI_UTILITIES::Wait_All(requests);}
     else{
         int buffer_size=MPI_UTILITIES::Pack_Size(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,
             rigid_body_particles.angular_momentum,*comm)+1;
         ARRAY<char> buffer(buffer_size);int position=0;
-        comm->Recv(&buffer(1),buffer_size,MPI::PACKED,solid_node,tag);
+        comm->Recv(&buffer(0),buffer_size,MPI::PACKED,solid_node,tag);
         MPI_UTILITIES::Unpack(particles.X,rigid_body_particles.X,rigid_body_particles.rotation,particles.V,rigid_body_particles.twist,rigid_body_particles.angular_momentum,
             buffer,position,*comm);}
 }
@@ -199,13 +199,13 @@ Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int
             comm->Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
             ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-            comm->Recv(&buffer(1),buffer.m,MPI::PACKED,source,tag);
+            comm->Recv(&buffer(0),buffer.m,MPI::PACKED,source,tag);
             MPI_UTILITIES::Unpack((*results)(source),buffer,position,*comm);}}
     else{
         int buffer_size=MPI_UTILITIES::Pack_Size(*fluid_list,*comm)+1;
         ARRAY<char> buffer(buffer_size);int position=0;
         MPI_UTILITIES::Pack(*fluid_list,buffer,position,*comm);
-        comm->Send(&buffer(1),buffer_size,MPI::PACKED,solid_node,tag);}
+        comm->Send(&buffer(0),buffer_size,MPI::PACKED,solid_node,tag);}
 }
 //#####################################################################
 // Function Distribute_Lists_From_Solid_Node
@@ -220,13 +220,13 @@ Distribute_Lists_From_Solid_Node(GENERALIZED_VELOCITY<TV>& F) const
             int buffer_size=MPI_UTILITIES::Pack_Size(F.V,F.rigid_V,*comm)+1;
             send_buffers(i).Resize(buffer_size);int position=0;
             MPI_UTILITIES::Pack(F.V,F.rigid_V,send_buffers(i),position,*comm);
-            requests.Append(comm->Isend(&(send_buffers(i)(1)),position,MPI::PACKED,fluid_ranks(i),tag));}
+            requests.Append(comm->Isend(&(send_buffers(i)(0)),position,MPI::PACKED,fluid_ranks(i),tag));}
         MPI_UTILITIES::Wait_All(requests);}
     else{
         MPI::Status status;
         comm->Probe(MPI::ANY_SOURCE,tag,status);
         ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-        comm->Recv(&buffer(1),buffer.m,MPI::PACKED,solid_node,tag);
+        comm->Recv(&buffer(0),buffer.m,MPI::PACKED,solid_node,tag);
         MPI_UTILITIES::Unpack(F.V,F.rigid_V,buffer,position,*comm);}
 }
 //#####################################################################
@@ -245,14 +245,14 @@ Aggregate_Lists_To_Solid_Node(GENERALIZED_VELOCITY<TV>& F)
                 comm->Probe(MPI::ANY_SOURCE,F_tag,status);
                 int source=status.Get_source();
                 ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-                comm->Recv(&buffer(1),buffer.m,MPI::PACKED,source,F_tag);
+                comm->Recv(&buffer(0),buffer.m,MPI::PACKED,source,F_tag);
                 MPI_UTILITIES::Unpack(F_buffer,buffer,position,*comm);}
             { // Receive rigid_F_buffer
                 MPI::Status status;
                 comm->Probe(MPI::ANY_SOURCE,rigid_F_tag,status);
                 int source=status.Get_source();
                 ARRAY<char> buffer(status.Get_count(MPI::PACKED));int position=0;
-                comm->Recv(&buffer(1),buffer.m,MPI::PACKED,source,rigid_F_tag);
+                comm->Recv(&buffer(0),buffer.m,MPI::PACKED,source,rigid_F_tag);
                 MPI_UTILITIES::Unpack(rigid_F_buffer,buffer,position,*comm);}
             for(int j=0;j<F.V.array.m;j++) F.V.array(j)+=F_buffer(j);
             for(int j=0;j<F.rigid_V.array.m;j++) F.rigid_V.array(j)+=rigid_F_buffer(j);}}
@@ -261,12 +261,12 @@ Aggregate_Lists_To_Solid_Node(GENERALIZED_VELOCITY<TV>& F)
             int buffer_size=MPI_UTILITIES::Pack_Size(F.V.array,*comm)+1;
             ARRAY<char> buffer(buffer_size);int position=0;
             MPI_UTILITIES::Pack(F.V.array,buffer,position,*comm);
-            comm->Send(&buffer(1),buffer_size,MPI::PACKED,solid_node,F_tag);}
+            comm->Send(&buffer(0),buffer_size,MPI::PACKED,solid_node,F_tag);}
         { // Send rigid_F_buffer
             int buffer_size=MPI_UTILITIES::Pack_Size(F.rigid_V.array,*comm)+1;
             ARRAY<char> buffer(buffer_size);int position=0;
             MPI_UTILITIES::Pack(F.rigid_V.array,buffer,position,*comm);
-            comm->Send(&buffer(1),buffer_size,MPI::PACKED,solid_node,rigid_F_tag);}}
+            comm->Send(&buffer(0),buffer_size,MPI::PACKED,solid_node,rigid_F_tag);}}
 }
 //#####################################################################
 #else

@@ -62,7 +62,7 @@ template<class TV> void MATRIX_FLUID_GRADIENT_BASE<TV>::
 Collect_Maxabs_Velocity(const VECTOR_ND<T>& faces,VECTOR_ND<T>& cells) const
 {
     cells.Fill(0);
-    int index=gradient.offsets(1);
+    int index=gradient.offsets(0);
     for(int i=0;i<gradient.m;i++){
         int end=gradient.offsets(i+1);T y=faces(i);
         for(;index<end;index++) cells(gradient.A(index).j)=max(cells(gradient.A(index).j),abs(y*gradient.A(index).a));}

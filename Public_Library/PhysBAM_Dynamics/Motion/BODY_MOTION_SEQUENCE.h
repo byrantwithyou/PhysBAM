@@ -29,7 +29,7 @@ public:
     {}
 
     void Resize(int start_frame,int end_frame)
-    {if(end_frame==0) end_frame=this->trajectories(1).m;
+    {if(end_frame==0) end_frame=this->trajectories(0).m;
     for(int i=0;i<this->trajectories.m;i++) for(int j=start_frame;j<=end_frame;j++) this->trajectories(i)(j-start_frame+1)=this->trajectories(i)(j);}
 
     void Rescale(T scaling_factor)

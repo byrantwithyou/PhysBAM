@@ -106,7 +106,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     turbulence_grid=Default_Turbulence_Grid();
 
     domain_walls.Fill(VECTOR<bool,2>::Constant_Vector(true));
-    domain_walls(TV::m==1?0:1)(1)=false;
+    domain_walls(TV::m==1?0:1)(0)=false;
 }
 //#####################################################################
 // Destructor

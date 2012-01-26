@@ -31,7 +31,7 @@ ISend_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const ARRAY<PAIR<T_PART
     int position=0;
     MPI::Comm& comm=*mpi_grid.comm;
     buffer.Resize(MPI_UTILITIES::Pack_Size(destination_direction,comm)+MPI_UTILITIES::Pack_Size(particles.m,comm)
-        +(particles.m?particles.m*MPI_UTILITIES::Pack_Size(*particles(1).x,comm):0));
+        +(particles.m?particles.m*MPI_UTILITIES::Pack_Size(*particles(0).x,comm):0));
     MPI_UTILITIES::Pack(destination_direction,buffer,position,comm);
     MPI_UTILITIES::Pack(particles.m,buffer,position,comm);
     for(int i=0;i<particles.m;i++) MPI_UTILITIES::Pack(*particles(i).x,particles(i).y,buffer,position,comm);
@@ -58,7 +58,7 @@ Recv_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES& templ
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
     for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(*recv_particles,1,buffer,position,comm);
-        TV& X=recv_particles->X(1);X+=wrap_offset;
+        TV& X=recv_particles->X(0);X+=wrap_offset;
         if(!domain.Lazy_Inside(X)) continue;
         TV_INT final_b=mpi_grid.local_grid.Block_Index(X,1); // TODO: check whether this is a good block
         if(!particles(final_b)) particles(final_b)=particle_levelset.Allocate_Particles(template_particles);
@@ -86,7 +86,7 @@ Recv_Block_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES&
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
     for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(*recv_particles,1,buffer,position,comm);
-        TV& X=recv_particles->X(1);X+=wrap_offset;
+        TV& X=recv_particles->X(0);X+=wrap_offset;
         if(domain.Lazy_Inside(X)) continue;
         TV_INT final_b=mpi_grid.local_grid.Block_Index(X,1); // TODO: check whether this is a good block
         if(!particles(final_b)) particles(final_b)=particle_levelset.Allocate_Particles(template_particles);
@@ -114,7 +114,7 @@ Recv_Ghost_Particles(const MPI_UNIFORM_GRID<T_GRID>& mpi_grid,const T_PARTICLES&
     RANGE<TV> domain=mpi_grid.local_grid.Domain();
     for(int i=0;i<m;i++){
         MPI_UTILITIES::Unpack(*recv_particles,1,buffer,position,comm);
-        TV& X=recv_particles->X(1);X+=wrap_offset;
+        TV& X=recv_particles->X(0);X+=wrap_offset;
         if(domain.Lazy_Inside(X)) continue;
         TV_INT final_b=mpi_grid.local_grid.Block_Index(X,bandwidth-1); // TODO: check whether this is a good block
         if(!particles(final_b)) particles(final_b)=particle_levelset.Allocate_Particles(template_particles);

@@ -35,17 +35,17 @@ Gather_Phoneme_Statistics_Helper(PHONEME_CORPUS<T>* phoneme_corpus,ARRAY<PHONEME
             VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);
             if(!means(t+1).n)means(t+1).Resize(controls.n);
             means(t+1)+=controls;}}
-    VECTOR_ND<T> per_attribute_mean(means(1).n);
+    VECTOR_ND<T> per_attribute_mean(means(0).n);
     for(int t=0;t<frame_length;t++){
         means(t)/=(T)phonemes.m;
         for(int i=0;i<per_attribute_mean.n;i++) per_attribute_mean(i)+=abs(means(t)(i));}
     per_attribute_mean/=(T)frame_length;
-    errors->Resize(means(1).n);
+    errors->Resize(means(0).n);
     // get deviations
     for(int i=0;i<phonemes.m;i++)for(int t=0;t<frame_length;t++){VECTOR_ND<T> controls=phonemes(i)->Controls(t/(T)120);for(int j=0;j<(*errors).n;j++)(*errors)(j)+=pow(controls(j)-means(t+1)(j),2);}
-    LOG::cout<<"Stiffnesses for phoneme "<<phonemes(1)->phoneme_sample->name<<std::endl;
+    LOG::cout<<"Stiffnesses for phoneme "<<phonemes(0)->phoneme_sample->name<<std::endl;
     for(int i=0;i<(*errors).n;i++){(*errors)(i)=sqrt((*errors)(i)/phonemes.m)/abs(per_attribute_mean(i));LOG::cout<<i<<": "<<(*errors)(i)<<std::endl;}
-    phoneme_corpus->phoneme_stiffness.Set(phonemes(1)->phoneme_sample->name,errors);
+    phoneme_corpus->phoneme_stiffness.Set(phonemes(0)->phoneme_sample->name,errors);
 }
 //#####################################################################
 // Function Gather_Phoneme_Statistics
@@ -67,8 +67,8 @@ Get_Next_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
     if(index<0) return;
     index=(index%phoneme_labels.m)+1;
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
-    phoneme_segment.Set_Sample(*phoneme_segments(1)->phoneme_sample);
-    phoneme_segment.phoneme_sample_name=phoneme_segments(1)->phoneme_sample_name;
+    phoneme_segment.Set_Sample(*phoneme_segments(0)->phoneme_sample);
+    phoneme_segment.phoneme_sample_name=phoneme_segments(0)->phoneme_sample_name;
 }
 //#####################################################################
 // Function Get_Previous_Kind_Of_Phoneme
@@ -81,8 +81,8 @@ Get_Previous_Kind_Of_Phoneme(PHONEME_SEGMENT<T>& phoneme_segment)
     if(index<0) return;
     index=(index==0?phoneme_labels.m-1:index-1);
     ARRAY<PHONEME_SEGMENT<T>*>& phoneme_segments=*Get_Phonemes(phoneme_labels(index));
-    phoneme_segment.Set_Sample(*phoneme_segments(1)->phoneme_sample);
-    phoneme_segment.phoneme_sample_name=phoneme_segments(1)->phoneme_sample_name;
+    phoneme_segment.Set_Sample(*phoneme_segments(0)->phoneme_sample);
+    phoneme_segment.phoneme_sample_name=phoneme_segments(0)->phoneme_sample_name;
 }
 //#####################################################################
 // Function Get_Next_Phoneme
@@ -315,8 +315,8 @@ Produce_Phoneme_Arrangement(const ARRAY<std::string>& phonemes,const ARRAY<T>& s
     for(int i=0;i<phonemes.m;i++){phoneme_candidates.Append(*Get_Phonemes(phonemes(i)));if(!phoneme_candidates(i).m) return 0;indices(i)=1;}
     for(int i=0;i<phoneme_arrangement->list.m;i++){
         PHONEME_SEGMENT<T>& phoneme_segment=phoneme_arrangement->list(i);
-        phoneme_segment.Set_Sample(*phoneme_candidates(i)(1)->phoneme_sample);
-        phoneme_segment.phoneme_sample_name=phoneme_candidates(i)(1)->phoneme_sample_name;
+        phoneme_segment.Set_Sample(*phoneme_candidates(i)(0)->phoneme_sample);
+        phoneme_segment.phoneme_sample_name=phoneme_candidates(i)(0)->phoneme_sample_name;
 #if ALTERNATE_PHONEMES
         phoneme_segment.peak=starting_times(i)+lengths(i)/2;
 #endif

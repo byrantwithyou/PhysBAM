@@ -115,7 +115,7 @@ public:
     if(is_all_cutting_simplices){VECTOR<int,d2> converted_simplices;ARRAY<int> particles_on_cuts;
         for(int i=0;i<simplices.m;i++){
             converted_simplices(i)=cutting_simplices->simplices(simplices(i)).parent;assert((cutting_simplices->simplices(converted_simplices(i)).type==T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE));}
-        int embedding_simplex=cutting_simplices->simplices(simplices(1)).element_owner;const VECTOR<int,d_embed+1>& tet_nodes=current_embedding->mesh.elements(embedding_simplex);
+        int embedding_simplex=cutting_simplices->simplices(simplices(0)).element_owner;const VECTOR<int,d_embed+1>& tet_nodes=current_embedding->mesh.elements(embedding_simplex);
         intersection_registry->Intersection_List_For_Cuts(converted_simplices,tet_nodes,particles_on_cuts); // only keep particle if simplices contained in our tet
         particles.Append_Elements(particles_on_cuts);}}
 

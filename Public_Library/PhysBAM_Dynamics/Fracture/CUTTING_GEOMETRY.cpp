@@ -170,7 +170,7 @@ namespace{
         const ARRAY<VECTOR<int,2> >& cutting_segments=cutting.cutting.mesh.segment_mesh->elements;
 
         ARRAY<int> tet_intersection_list;
-        for(int cseg=0;cseg<cutting_segments.m;cseg++) if(cutting_edge_triangles(cseg).m==1 && cutting_edge_triangles(cseg)(1)>=cutting.first_new_cut_element){
+        for(int cseg=0;cseg<cutting_segments.m;cseg++) if(cutting_edge_triangles(cseg).m==1 && cutting_edge_triangles(cseg)(0)>=cutting.first_new_cut_element){
             // find intersections
             ARRAY<int> intersecting_tets;
             const VECTOR<int,2>& cut_nodes=cutting_segments(cseg);VECTOR<TV,2> cut_X(cutting.cutting.particles.X.Subset(cut_nodes));
@@ -181,7 +181,7 @@ namespace{
                 bool is_robust,intersects=robust_interactions.Intersection(embedding_tet_X,cut_X,&is_robust);if(!is_robust) PHYSBAM_FATAL_ERROR();
                 if(intersects) intersecting_tets.Append(embedding_tet);}
             // build simplices
-            const VECTOR<int,3>& real_bordering_triangle_nodes=cutting.cutting.mesh.elements(cutting_edge_triangles(cseg)(1));
+            const VECTOR<int,3>& real_bordering_triangle_nodes=cutting.cutting.mesh.elements(cutting_edge_triangles(cseg)(0));
             VECTOR<int,2> ordered_cut_nodes=T_CUTTING_MESH::Face_Reversed_In_Simplex(cut_nodes,real_bordering_triangle_nodes)?cut_nodes.Reversed():cut_nodes;
             VECTOR<int,3> fake_triangle_nodes=ordered_cut_nodes.Append(0);
             int parent=cutting.cutting_simplices->Add_Simplex(-fake_triangle_nodes,T_CUTTING_SIMPLEX::GLOBAL_CUT_FACE);
@@ -236,7 +236,7 @@ Initialize_Original_Embedding(const T_EMBEDDING_OBJECT& original_embedding)
             int cutting_polygon_index=current_cutting_polygons.Append(CUTTING_POLYGON(polygon_mesh.elements.m,simplex_index,face_reversed,polygon_type));
             cutting_polygons_per_cutting_simplex.Append(ARRAY<int>(VECTOR<int,1>(cutting_polygon_index)));
             if(!regions_per_embedding_simplex(embedding_simplex).m) regions_per_embedding_simplex(embedding_simplex).Append(ARRAY<int>());
-            regions_per_embedding_simplex(embedding_simplex)(1).Append(current_cutting_polygons.m);}}
+            regions_per_embedding_simplex(embedding_simplex)(0).Append(current_cutting_polygons.m);}}
     // intersection registry (vertices)
     const ARRAY<ARRAY<int> >& faces_on_vertices=*Face_Mesh(current_embedding->mesh).incident_elements;
     ARRAY<int> embedding_nodes;
@@ -371,7 +371,7 @@ Get_Polygon_Edges(const int polygon_element_index,ARRAY<VECTOR<int,2> >& polygon
     for(int i=0;i<polygon_particles.m;i++){
         const ARRAY<int>& component=polygon_particles(i);
         for(int j=1;j<component.m;j++) polygonal_segments.Append(VECTOR<int,2>(component(j),component(j+1)));
-        if(component.m) polygonal_segments.Append(VECTOR<int,2>(component.Last(),component(1)));}
+        if(component.m) polygonal_segments.Append(VECTOR<int,2>(component.Last(),component(0)));}
 }
 //#####################################################################
 template class CUTTING_GEOMETRY<VECTOR<float,2>,2>;

@@ -348,8 +348,8 @@ Set_Original_Attachment_Configuration(const FRAME<TV>& cranium_frame_input,const
 template<class T> void ATTACHMENT_FRAME_CONTROL_SET<T>::
 Project_Parameters_To_Allowable_Range(const bool active_controls_only)
 {
-    if(!active_controls_only || coefficient_active(1)) cranium_transform.Make_Rigid();
-    if(!active_controls_only || coefficient_active(13)){
+    if(!active_controls_only || coefficient_active(0)) cranium_transform.Make_Rigid();
+    if(!active_controls_only || coefficient_active(12)){
         jaw_transform.Make_Rigid();
         T left_sliding_parameter=TV::Dot_Product(jaw_front,jaw_transform.affine_transform*(jaw_midpoint-(T).5*jaw_axis_length*jaw_axis)+jaw_transform.translation-jaw_midpoint)/jaw_sliding_length;
         T right_sliding_parameter=TV::Dot_Product(jaw_front,jaw_transform.affine_transform*(jaw_midpoint+(T).5*jaw_axis_length*jaw_axis)+jaw_transform.translation-jaw_midpoint)/jaw_sliding_length;

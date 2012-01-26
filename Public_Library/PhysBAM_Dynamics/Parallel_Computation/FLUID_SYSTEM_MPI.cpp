@@ -117,7 +117,7 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
 {
     assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
-    int index=J_rigid.offsets(1);
+    int index=J_rigid.offsets(0);
     for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
@@ -147,7 +147,7 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const VECTOR
 {
     assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
-    int index=J_rigid.offsets(1);
+    int index=J_rigid.offsets(0);
     for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
@@ -167,7 +167,7 @@ Send_Generalized_Velocity_To_Solid(const INDIRECT_ARRAY<const ARRAY_VIEW<TV> > V
     int buffer_size=MPI_UTILITIES::Pack_Size(V_boundary,rigid_V_boundary,*mpi_solid_fluid->comm)+1;
     ARRAY<char> buffer_send(buffer_size);int position=0;
     MPI_UTILITIES::Pack(V_boundary,rigid_V_boundary,buffer_send,position,*mpi_solid_fluid->comm);
-    mpi_solid_fluid->comm->Send(&buffer_send(1),position,MPI::PACKED,mpi_solid_fluid->solid_node,tag_fluid_to_solid);
+    mpi_solid_fluid->comm->Send(&buffer_send(0),position,MPI::PACKED,mpi_solid_fluid->solid_node,tag_fluid_to_solid);
 }
 //#####################################################################
 // Function void Send_Generalized_Velocity_To_Solid
@@ -179,7 +179,7 @@ Get_Generalized_Velocity_From_Solid(INDIRECT_ARRAY<ARRAY_VIEW<TV> > V_boundary,I
     int tag_solid_to_fluid=mpi_solid_fluid->Get_Unique_Tag();
     int buffer_size=MPI_UTILITIES::Pack_Size(V_boundary,rigid_V_boundary,*mpi_solid_fluid->comm)+1;
     ARRAY<char> buffer(buffer_size);int position=0;
-    mpi_solid_fluid->comm->Recv(&buffer(1),buffer_size,MPI::PACKED,mpi_solid_fluid->solid_node,tag_solid_to_fluid);
+    mpi_solid_fluid->comm->Recv(&buffer(0),buffer_size,MPI::PACKED,mpi_solid_fluid->solid_node,tag_solid_to_fluid);
     MPI_UTILITIES::Unpack(V_boundary,rigid_V_boundary,buffer,position,*mpi_solid_fluid->comm);
 }
 #else

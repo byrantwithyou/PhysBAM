@@ -55,7 +55,7 @@ Compute_Preconditioner()
     delete poisson.C;
     poisson.C=new SPARSE_MATRIX_FLAT_NXN<T>;
     poisson.C->Reset();
-    int index=poisson.offsets(1);
+    int index=poisson.offsets(0);
     for(int i=0;i<poisson.n;i++){
         int end=poisson.offsets(i+1);
         if(index==end) continue;

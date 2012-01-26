@@ -657,11 +657,11 @@ Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const in
                     heap_size++;heap_particle_indices(heap_size)=index+particle_pool.number_particles_per_cell*(i-1);heap_phi_minus_radius(heap_size)=phi_minus_radius;
                     if(heap_size==number_particles_per_cell) ARRAYS_COMPUTATIONS::Heapify(heap_phi_minus_radius,heap_particle_indices);} // when heap is full, order values with largest on top
                 else{ // excess particles don't fit in the heap
-                    if(phi_minus_radius<heap_phi_minus_radius(1)){ // delete particle on top of heap & add new particle
+                    if(phi_minus_radius<heap_phi_minus_radius(0)){ // delete particle on top of heap & add new particle
                         int deletion_index;
-                        PARTICLE_LEVELSET_PARTICLES<TV>& deletion_particle_list=Get_Particle_Link(cell_particles,heap_particle_indices(1),deletion_index);
+                        PARTICLE_LEVELSET_PARTICLES<TV>& deletion_particle_list=Get_Particle_Link(cell_particles,heap_particle_indices(0),deletion_index);
                         Add_Particle_To_Deletion_List(deletion_list,deletion_particle_list,deletion_index); 
-                        heap_phi_minus_radius(1)=phi_minus_radius;heap_particle_indices(1)=index+particle_pool.number_particles_per_cell*(i-1);
+                        heap_phi_minus_radius(0)=phi_minus_radius;heap_particle_indices(0)=index+particle_pool.number_particles_per_cell*(i-1);
                         ARRAYS_COMPUTATIONS::Heapify(heap_phi_minus_radius,heap_particle_indices,1,heap_phi_minus_radius.m);}
                     else Add_Particle_To_Deletion_List(deletion_list,*local_cell_particles,index);}} // delete new particle, larger than top of heap
             local_cell_particles=local_cell_particles->next;}
