@@ -46,7 +46,7 @@ protected:
     {close(index)=true;heap_length++;heap(heap_length)=index;Up_Heap(phi,heap,heap_length);}
 
     static T_INDEX Remove_Root_From_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,T_ARRAYS_BOOL_BASE& close)
-    {T_INDEX index=heap(1);close(index)=false;Down_Heap(phi,heap,heap_length);heap_length--;return index;}
+    {T_INDEX index=heap(0);close(index)=false;Down_Heap(phi,heap,heap_length);heap_length--;return index;}
 
     static void Up_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int child)
     {int parent=child/2; // k=(2k)/2 and k=(2k+1)/2 from integer division

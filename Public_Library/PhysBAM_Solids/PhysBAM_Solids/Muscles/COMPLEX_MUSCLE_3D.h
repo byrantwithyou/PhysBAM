@@ -87,74 +87,74 @@ public:
     
     void Energy_Gradient(VECTOR_ND<T>& energy_gradient,const VECTOR_ND<T>& invariants,const int tetrahedron_index=0) const PHYSBAM_OVERRIDE
     {T G_1,G_2,K,dW3_dlambda;
-    T stretch=pow(invariants(3),-(T)one_sixth)*sqrt(invariants(4));
+    T stretch=pow(invariants(2),-(T)one_sixth)*sqrt(invariants(3));
     if(is_tendon(tetrahedron_index)){G_1=G_1_tendon;G_2=G_2_tendon;K=K_tendon;dW3_dlambda=Tendon_Tension(stretch);}
     else{G_1=G_1_muscle;G_2=G_2_muscle;K=K_muscle;dW3_dlambda=Muscle_Tension(stretch);}
     energy_gradient=VECTOR_ND<T>(5);
     // Along-fiber shear
-    energy_gradient(4)-=(T)2*G_1*invariants(5)/cube(invariants(4));
-    energy_gradient(5)+=G_1/sqr(invariants(4));
+    energy_gradient(3)-=(T)2*G_1*invariants(4)/cube(invariants(3));
+    energy_gradient(4)+=G_1/sqr(invariants(3));
     // Cross-fiber shear
-    T omega=(T).5*(invariants(1)*invariants(4)-invariants(5))/sqrt(invariants(3)*invariants(4));
+    T omega=(T).5*(invariants(0)*invariants(3)-invariants(4))/sqrt(invariants(2)*invariants(3));
     T dW2_domega=G_2*Sqr_Acosh_Robust_Derivative(omega);
-    T omega_1=(T).5*sqrt(invariants(4)/invariants(3));
-    T omega_3=(T)-.5*omega/invariants(3);
-    T omega_4=(T).25*(invariants(1)*invariants(4)+invariants(5))/sqrt(invariants(3)*cube(invariants(4)));
-    T omega_5=(T)-.5/sqrt(invariants(3)*invariants(4));
-    energy_gradient(1)+=dW2_domega*omega_1;energy_gradient(3)+=dW2_domega*omega_3;energy_gradient(4)+=dW2_domega*omega_4;energy_gradient(5)+=dW2_domega*omega_5;
+    T omega_1=(T).5*sqrt(invariants(3)/invariants(2));
+    T omega_3=(T)-.5*omega/invariants(2);
+    T omega_4=(T).25*(invariants(0)*invariants(3)+invariants(4))/sqrt(invariants(2)*cube(invariants(3)));
+    T omega_5=(T)-.5/sqrt(invariants(2)*invariants(3));
+    energy_gradient(0)+=dW2_domega*omega_1;energy_gradient(2)+=dW2_domega*omega_3;energy_gradient(3)+=dW2_domega*omega_4;energy_gradient(4)+=dW2_domega*omega_5;
     // Along-fiber stretch
-    T lambda_3=(T)-one_sixth*stretch/invariants(3);
-    T lambda_4=(T).5*stretch/invariants(4);
-    energy_gradient(3)+=dW3_dlambda*lambda_3;
-    energy_gradient(4)+=dW3_dlambda*lambda_4;
+    T lambda_3=(T)-one_sixth*stretch/invariants(2);
+    T lambda_4=(T).5*stretch/invariants(3);
+    energy_gradient(2)+=dW3_dlambda*lambda_3;
+    energy_gradient(3)+=dW3_dlambda*lambda_4;
     // Volumetric component
-    energy_gradient(3)+=(T).25*K*log(invariants(3))/invariants(3);}
+    energy_gradient(2)+=(T).25*K*log(invariants(2))/invariants(2);}
 
     void Energy_Hessian(VECTOR_ND<T>& energy_hessian,const VECTOR_ND<T>& invariants,const int tetrahedron_index=0) const PHYSBAM_OVERRIDE
     {T G_1,G_2,K,dW3_dlambda,ddW3_ddlambda;
-    T stretch=pow(invariants(3),-(T)one_sixth)*sqrt(invariants(4));
+    T stretch=pow(invariants(2),-(T)one_sixth)*sqrt(invariants(3));
     if(is_tendon(tetrahedron_index)){G_1=G_1_tendon;G_2=G_2_tendon;K=K_tendon;dW3_dlambda=Tendon_Tension(stretch);ddW3_ddlambda=Tendon_Tension_Derivative(stretch);}
     else{G_1=G_1_muscle;G_2=G_2_muscle;K=K_muscle;dW3_dlambda=Muscle_Tension(stretch);ddW3_ddlambda=Muscle_Tension_Derivative(stretch);}
     energy_hessian=VECTOR_ND<T>(15);
     // Along-fiber shear
-    energy_hessian(Hessian_Index(4,4))+=(T)6*G_1*invariants(5)/pow(invariants(3),4);
-    energy_hessian(Hessian_Index(5,4))-=(T)2*G_1/cube(invariants(4));
+    energy_hessian(Hessian_Index(3,3))+=(T)6*G_1*invariants(4)/pow(invariants(2),4);
+    energy_hessian(Hessian_Index(4,3))-=(T)2*G_1/cube(invariants(3));
     // Cross-fiber shear
-    T omega=(T).5*(invariants(1)*invariants(4)-invariants(5))/sqrt(invariants(3)*invariants(4));
+    T omega=(T).5*(invariants(0)*invariants(3)-invariants(4))/sqrt(invariants(2)*invariants(3));
     T dW2_domega=G_2*Sqr_Acosh_Robust_Derivative(omega);
     T ddW2_ddomega=G_2*Sqr_Acosh_Robust_Second_Derivative(omega);
-    T omega_1=(T).5*sqrt(invariants(4)/invariants(3));
-    T omega_3=(T)-.5*omega/invariants(3);
-    T omega_4=(T).25*invariants(1)/sqrt(invariants(3)*invariants(4));
-    T omega_5=(T)-.5/sqrt(invariants(3)*invariants(4));
-    T omega_31=(T)-.25*sqrt(invariants(4)/cube(invariants(3)));
-    T omega_41=(T).25/sqrt(invariants(3)*invariants(4));
-    T omega_33=(T).75*omega/sqr(invariants(3));
-    T omega_43=(T)-.125*(invariants(1)*invariants(4)+invariants(5))/sqrt(cube(invariants(3)*invariants(4)));
-    T omega_53=(T).25/sqrt(cube(invariants(3))*invariants(4));
-    T omega_44=(T)-.125*(invariants(1)*invariants(4)+(T)3*invariants(5))/sqrt(invariants(3)*pow(invariants(4),5));
-    T omega_54=(T).25/sqrt(invariants(3)*cube(invariants(4)));
-    energy_hessian(Hessian_Index(1,1))+=ddW2_ddomega*omega_1*omega_1;
-    energy_hessian(Hessian_Index(3,1))+=ddW2_ddomega*omega_3*omega_1+dW2_domega*omega_31;
-    energy_hessian(Hessian_Index(4,1))+=ddW2_ddomega*omega_4*omega_1+dW2_domega*omega_41;
-    energy_hessian(Hessian_Index(5,1))+=ddW2_ddomega*omega_5*omega_1;
-    energy_hessian(Hessian_Index(3,3))+=ddW2_ddomega*omega_3*omega_3+dW2_domega*omega_33;
-    energy_hessian(Hessian_Index(4,3))+=ddW2_ddomega*omega_4*omega_3+dW2_domega*omega_43;
-    energy_hessian(Hessian_Index(5,3))+=ddW2_ddomega*omega_5*omega_3+dW2_domega*omega_53;
-    energy_hessian(Hessian_Index(4,4))+=ddW2_ddomega*omega_4*omega_4+dW2_domega*omega_44;
-    energy_hessian(Hessian_Index(5,4))+=ddW2_ddomega*omega_5*omega_4+dW2_domega*omega_54;
-    energy_hessian(Hessian_Index(5,5))+=ddW2_ddomega*omega_5*omega_5;
+    T omega_1=(T).5*sqrt(invariants(3)/invariants(2));
+    T omega_3=(T)-.5*omega/invariants(2);
+    T omega_4=(T).25*invariants(0)/sqrt(invariants(2)*invariants(3));
+    T omega_5=(T)-.5/sqrt(invariants(2)*invariants(3));
+    T omega_31=(T)-.25*sqrt(invariants(3)/cube(invariants(2)));
+    T omega_41=(T).25/sqrt(invariants(2)*invariants(3));
+    T omega_33=(T).75*omega/sqr(invariants(2));
+    T omega_43=(T)-.125*(invariants(0)*invariants(3)+invariants(4))/sqrt(cube(invariants(2)*invariants(3)));
+    T omega_53=(T).25/sqrt(cube(invariants(2))*invariants(3));
+    T omega_44=(T)-.125*(invariants(0)*invariants(3)+(T)3*invariants(4))/sqrt(invariants(2)*pow(invariants(3),5));
+    T omega_54=(T).25/sqrt(invariants(2)*cube(invariants(3)));
+    energy_hessian(Hessian_Index(0,0))+=ddW2_ddomega*omega_1*omega_1;
+    energy_hessian(Hessian_Index(2,0))+=ddW2_ddomega*omega_3*omega_1+dW2_domega*omega_31;
+    energy_hessian(Hessian_Index(3,0))+=ddW2_ddomega*omega_4*omega_1+dW2_domega*omega_41;
+    energy_hessian(Hessian_Index(4,0))+=ddW2_ddomega*omega_5*omega_1;
+    energy_hessian(Hessian_Index(2,2))+=ddW2_ddomega*omega_3*omega_3+dW2_domega*omega_33;
+    energy_hessian(Hessian_Index(3,2))+=ddW2_ddomega*omega_4*omega_3+dW2_domega*omega_43;
+    energy_hessian(Hessian_Index(4,2))+=ddW2_ddomega*omega_5*omega_3+dW2_domega*omega_53;
+    energy_hessian(Hessian_Index(3,3))+=ddW2_ddomega*omega_4*omega_4+dW2_domega*omega_44;
+    energy_hessian(Hessian_Index(4,3))+=ddW2_ddomega*omega_5*omega_4+dW2_domega*omega_54;
+    energy_hessian(Hessian_Index(4,4))+=ddW2_ddomega*omega_5*omega_5;
     // Along-fiber stretch
-    T lambda_3=(T)-one_sixth*stretch/invariants(3);
-    T lambda_4=(T).5*stretch/invariants(4);
-    T lambda_33=((T)7/(T)36)*stretch*sqr(invariants(3));
-    T lambda_43=(T)-one_twelfth*stretch/(invariants(3)*invariants(4));
-    T lambda_44=(T)-.25*stretch/sqr(invariants(4));
-    energy_hessian(Hessian_Index(3,3))+=ddW3_ddlambda*lambda_3*lambda_3+dW3_dlambda*lambda_33;
-    energy_hessian(Hessian_Index(4,3))+=ddW3_ddlambda*lambda_4*lambda_3+dW3_dlambda*lambda_43;
-    energy_hessian(Hessian_Index(4,4))+=ddW3_ddlambda*lambda_4*lambda_4+dW3_dlambda*lambda_44;
+    T lambda_3=(T)-one_sixth*stretch/invariants(2);
+    T lambda_4=(T).5*stretch/invariants(3);
+    T lambda_33=((T)7/(T)36)*stretch*sqr(invariants(2));
+    T lambda_43=(T)-one_twelfth*stretch/(invariants(2)*invariants(3));
+    T lambda_44=(T)-.25*stretch/sqr(invariants(3));
+    energy_hessian(Hessian_Index(2,2))+=ddW3_ddlambda*lambda_3*lambda_3+dW3_dlambda*lambda_33;
+    energy_hessian(Hessian_Index(3,2))+=ddW3_ddlambda*lambda_4*lambda_3+dW3_dlambda*lambda_43;
+    energy_hessian(Hessian_Index(3,3))+=ddW3_ddlambda*lambda_4*lambda_4+dW3_dlambda*lambda_44;
     // Volumetric component
-    energy_hessian(Hessian_Index(3,3))+=(T).25*K*((T)1-log(invariants(3)))/sqr(invariants(3));}
+    energy_hessian(Hessian_Index(2,2))+=(T).25*K*((T)1-log(invariants(2)))/sqr(invariants(2));}
 
 //#####################################################################
 };

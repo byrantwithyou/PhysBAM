@@ -33,7 +33,7 @@ Earliest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,c
     T min_time=FLT_MAX;bool collision=false;T current_hit_time,current_hit_alpha,relative_speed;
     TV normal;
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
-        SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(1).x);
+        SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             SEGMENT_2D<T>::Robust_Point_Segment_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_hit_alpha,relative_speed);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time<min_time){
@@ -51,7 +51,7 @@ Latest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,con
     T max_time=-FLT_MAX;bool collision=false;T current_hit_time,current_hit_alpha,relative_speed;
     TV normal;
     for (int segment_number=1;segment_number<=rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
-        SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(1).x);
+        SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             SEGMENT_2D<T>::Robust_Point_Segment_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_hit_alpha,relative_speed);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time>max_time){
@@ -68,7 +68,7 @@ Any_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const 
     T current_hit_time,current_hit_alpha,relative_speed;
     TV normal;
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
-        SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(1).x);
+        SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             SEGMENT_2D<T>::Robust_Point_Segment_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_hit_alpha,relative_speed);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}
@@ -83,7 +83,7 @@ Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_bod
     if(!rigid_geometry.simplicial_object->segment_list) rigid_geometry.simplicial_object->Update_Segment_List();
     for(int t=0;t<rigid_geometry.simplicial_object->mesh.elements.m;t++){
         RANGE<TV> box=rigid_geometry.World_Space_Simplex_Bounding_Box(t);
-        if(with_body_motion) box.Enlarge_To_Include_Box(rigid_geometry.World_Space_Simplex_Bounding_Box(t,saved_states(1).x));
+        if(with_body_motion) box.Enlarge_To_Include_Box(rigid_geometry.World_Space_Simplex_Bounding_Box(t,saved_states(0).x));
         box.Change_Size(extra_thickness+body_thickness_factor*collision_thickness);
         bounding_boxes.Append(box);}
 }
@@ -99,7 +99,7 @@ Update_Intersection_Acceleration_Structures(const bool use_swept_triangle_hierar
 template<class T> SEGMENT_2D<T> RIGID_COLLISION_GEOMETRY<VECTOR<T,2> >::
 World_Space_Simplex(const int segment_id,const bool use_saved_state) const
 {
-    if(use_saved_state) return World_Space_Simplex(segment_id,saved_states(1).x);
+    if(use_saved_state) return World_Space_Simplex(segment_id,saved_states(0).x);
     return rigid_geometry.World_Space_Simplex(segment_id);
 }
 //##################################################################### 

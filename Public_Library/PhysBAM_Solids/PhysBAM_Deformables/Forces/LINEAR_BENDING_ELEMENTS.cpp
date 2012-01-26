@@ -150,7 +150,7 @@ Add_Force(const T scale,ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> F) const
     // offdiagonal
     const ARRAY<int>& offsets=stiffness_matrix_upper.offsets;
     const ARRAY<SPARSE_MATRIX_ENTRY<T> >& A=stiffness_matrix_upper.A;
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=1;i<offsets.Size();i++){
         int end=offsets(i+1);
         for(;index<end;index++){
@@ -189,7 +189,7 @@ Compute_Energy() const
     // offdiagonal
     const ARRAY<int>& offsets=stiffness_matrix_upper.offsets;
     const ARRAY<SPARSE_MATRIX_ENTRY<T> >& A=stiffness_matrix_upper.A;
-    int index=offsets(1);
+    int index=offsets(0);
     for(int i=1;i<offsets.Size();i++){
         int end=offsets(i+1);
         for(;index<end;index++){

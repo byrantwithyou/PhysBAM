@@ -162,7 +162,7 @@ Filled_Volume_Helper(const T_SIMPLICIAL_OBJECT& object, typename ENABLE_IF<(T_SI
     typedef typename T_SIMPLICIAL_OBJECT::SCALAR T;typedef typename T_SIMPLICIAL_OBJECT::VECTOR_T TV;//enum WORKAROUND{d=T_SIMPLICIAL_OBJECT::MESH::dimension};
     static const int d=T_SIMPLICIAL_OBJECT::MESH::dimension;
     if(d!=TV::m-1) PHYSBAM_FATAL_ERROR("only codimension 1 objects can be filled");
-    const TV base=object.particles.X(object.mesh.elements(1)[1]);
+    const TV base=object.particles.X(object.mesh.elements(0)[0]);
     T scaled_volume=0; // (d+1)!*volume
     for(int t=0;t<object.mesh.elements.m;t++){const VECTOR<int,d+1>& nodes=object.mesh.elements(t);
         MATRIX<T,TV::m,d+1> DX;for(int i=0;i<nodes.m;i++) DX.Column(i)=object.particles.X(nodes[i])-base;

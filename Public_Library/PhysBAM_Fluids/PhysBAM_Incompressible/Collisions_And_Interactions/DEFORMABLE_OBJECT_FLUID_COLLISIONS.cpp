@@ -79,7 +79,7 @@ template<class T> POINT_SIMPLEX_COLLISION_TYPE Simplex_Crossover_Helper(const VE
 template<class TV> POINT_SIMPLEX_COLLISION_TYPE DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,const int simplex) const 
 {
-    T_SIMPLEX initial_simplex=World_Space_Simplex(simplex),final_simplex=World_Space_Simplex(simplex,*saved_states(1).x);
+    T_SIMPLEX initial_simplex=World_Space_Simplex(simplex),final_simplex=World_Space_Simplex(simplex,*saved_states(0).x);
     return Simplex_Crossover_Helper(start_X,end_X,dt,hit_time,weights,collision_thickness,initial_simplex,final_simplex);
 }
 //##################################################################### 
@@ -88,7 +88,7 @@ Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEI
 template<class TV> typename DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::T_SIMPLEX DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 World_Space_Simplex(const int simplex_id,const bool use_saved_state) const
 {
-    if(use_saved_state){assert(saved_states(1).x);return World_Space_Simplex(simplex_id,*saved_states(1).x);}
+    if(use_saved_state){assert(saved_states(0).x);return World_Space_Simplex(simplex_id,*saved_states(0).x);}
     else return T_SIMPLEX(object.particles.X.Subset(object.mesh.elements(simplex_id)));
 }
 //##################################################################### 
@@ -105,7 +105,7 @@ World_Space_Simplex(const int simplex_id,const GEOMETRY_PARTICLES<TV>& state) co
 template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id) const
 {
-    if(!saved_states(1).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
+    if(!saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
     T min_time=FLT_MAX;T current_hit_time;T_WEIGHTS current_weights;
     if(object.hierarchy){
         ARRAY<int> triangles_to_check;
@@ -129,7 +129,7 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
 template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
 {   
-    if(!saved_states(1).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
+    if(!saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;
     T max_time=-FLT_MAX;T current_hit_time;T_WEIGHTS current_weights;
     if(object.hierarchy){
@@ -154,7 +154,7 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
 template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const
 {
-    if(!saved_states(1).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
+    if(!saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
     T hit_time;T_WEIGHTS weights;
     if(object.hierarchy){
         ARRAY<int> triangles_to_check;
@@ -176,11 +176,11 @@ Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const
 template<class TV> void DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const
 {
-    if(with_body_motion && !saved_states(1).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
+    if(with_body_motion && !saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
     for(int t=0;t<object.mesh.elements.m;t++){
         VECTOR<int,TV::dimension> nodes=object.mesh.elements(t);
         RANGE<TV> box=RANGE<TV>::Bounding_Box(object.particles.X.Subset(nodes));
-        if(with_body_motion) box.Enlarge_Nonempty_Box_To_Include_Points(saved_states(1).x->X.Subset(nodes));
+        if(with_body_motion) box.Enlarge_Nonempty_Box_To_Include_Points(saved_states(0).x->X.Subset(nodes));
         box.Change_Size(extra_thickness+body_thickness_factor*collision_thickness);
         bounding_boxes.Append(box);}
 }

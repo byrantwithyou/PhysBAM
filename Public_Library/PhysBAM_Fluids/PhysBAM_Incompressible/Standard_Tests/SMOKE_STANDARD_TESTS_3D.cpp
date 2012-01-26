@@ -35,7 +35,7 @@ Initialize(const int test_number_input,const int resolution)
     example.frame_rate=24;
     fluids_parameters.cfl=3;
     fluids_parameters.domain_walls=VECTOR<VECTOR<bool,2>,T_GRID::dimension>::Constant_Vector(VECTOR<bool,2>::Constant_Vector(false));
-    fluids_parameters.domain_walls(2)(1)=true;
+    fluids_parameters.domain_walls(1)(0)=true;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T).15;
     fluids_parameters.kolmogorov=(T)0;fluids_parameters.gravity=(T)0;
     rho=(T)1;fluids_parameters.rho_bottom=(T)1;fluids_parameters.rho_top=(T).65;

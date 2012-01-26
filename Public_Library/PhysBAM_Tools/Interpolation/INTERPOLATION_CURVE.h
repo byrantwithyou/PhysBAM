@@ -92,7 +92,7 @@ public:
 
     T2 Value(T t) const
     {int left_index=Locate_Interval(t);
-    if(left_index==0) return control_points.m>0?control_points(1).value:T2();
+    if(left_index==0) return control_points.m>0?control_points(0).value:T2();
     else if(left_index==control_points.m) return control_points(left_index).value;
     else if(control_points(left_index).type==CONSTANT) return control_points(left_index).value;
     else return HELPER<T2>::Value(control_points(left_index).t,control_points(left_index+1).t,control_points(left_index).value,control_points(left_index+1).value,t);}

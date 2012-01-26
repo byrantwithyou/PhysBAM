@@ -113,8 +113,8 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
 
     // Debug data
     if(indices_interface.m>0){
-        T Dcj_min=Dn.array(indices_interface(1)),Dcj_max=Dcj_min;
-        T Ddot_min=Dn_dot.array(indices_interface(1)),Ddot_max=Ddot_min;
+        T Dcj_min=Dn.array(indices_interface(0)),Dcj_max=Dcj_min;
+        T Ddot_min=Dn_dot.array(indices_interface(0)),Ddot_max=Ddot_min;
         for(int i=0;i<indices_interface.m;i++){TV_INT index=indices_interface(i);
             Dcj_min=min(Dn.array(index),Dcj_min);Dcj_max=max(Dn.array(index),Dcj_max);
             Ddot_min=min(Dn_dot.array(index),Ddot_min);Ddot_max=max(Dn_dot.array(index),Ddot_max);}

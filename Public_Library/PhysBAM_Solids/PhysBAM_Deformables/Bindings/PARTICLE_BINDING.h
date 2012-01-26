@@ -77,10 +77,10 @@ public:
     {mass_full(parent)+=particles.mass(particle_index);}
 
     ARRAY<int> Parents() const PHYSBAM_OVERRIDE
-    {ARRAY<int> parents_array(1);parents_array(1)=parent;return parents_array;}
+    {ARRAY<int> parents_array(1);parents_array(0)=parent;return parents_array;}
 
     ARRAY<T> Weights() const PHYSBAM_OVERRIDE
-    {ARRAY<T> weights_array(1);weights_array(1)=(T)1;return weights_array;}
+    {ARRAY<T> weights_array(1);weights_array(0)=(T)1;return weights_array;}
 
 private:
     void Read_Helper(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE

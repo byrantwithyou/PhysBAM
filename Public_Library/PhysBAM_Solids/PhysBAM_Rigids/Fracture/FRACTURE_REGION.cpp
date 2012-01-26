@@ -70,7 +70,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
         for(NODE_ITERATOR iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
             int color=colors(iterator.index);
             if(color>0) region_counts(color).Enlarge_To_Include_Point(iterator.index);}
-    else region_counts(1)=fragment_implicit_object->levelset.grid.Domain_Indices();
+    else region_counts(0)=fragment_implicit_object->levelset.grid.Domain_Indices();
     // for each color, construct the particles and fracture region correctly
     for(int color=0;color<num_colors;color++){
         LEVELSET_IMPLICIT_OBJECT<TV>* region_implicit_object;

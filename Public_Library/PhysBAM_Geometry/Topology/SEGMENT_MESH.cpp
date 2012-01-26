@@ -65,7 +65,7 @@ Initialize_Connected_Segments()
     UNION_FIND<> union_find(number_nodes);Add_Connectivity(union_find);
     ARRAY<int> buckets;
     for(int s=0;s<elements.m;s++){
-        int bucket=union_find.Find(elements(s)(1));
+        int bucket=union_find.Find(elements(s)(0));
         int index=buckets.Find(bucket);
         if(index<0){
             connected_segments->Append(ARRAY<VECTOR<int,2> >(-1,-1));
@@ -88,10 +88,10 @@ Initialize_Ordered_Loop_Nodes()
     for(int i=0;i<connected_segments->m;i++){
         for(int j=0;j<(*connected_segments)(i).m;j++)for(int k=0;k<2;k++)if((*neighbor_nodes)((*connected_segments)(i)(j)(k)).m!=2) goto not_closed;
         ordered_loop_nodes->Append(ARRAY<int>());
-        {int start_node=(*connected_segments)(i)(1)(1),curr_node=(*connected_segments)(i)(1)(2);
+        {int start_node=(*connected_segments)(i)(0)(0),curr_node=(*connected_segments)(i)(0)(1);
         ordered_loop_nodes->Last().Append(start_node);
         do{
-            int previous_node=ordered_loop_nodes->Last().Last(),neighbor1=(*neighbor_nodes)(curr_node)(1),neighbor2=(*neighbor_nodes)(curr_node)(2);
+            int previous_node=ordered_loop_nodes->Last().Last(),neighbor1=(*neighbor_nodes)(curr_node)(0),neighbor2=(*neighbor_nodes)(curr_node)(1);
             ordered_loop_nodes->Last().Append(curr_node);
             curr_node=previous_node==neighbor1?neighbor2:neighbor1;}
         while(curr_node!=start_node);}
@@ -130,7 +130,7 @@ Initialize_Boundary_Mesh()
         ARRAY<int>& current_incident_elements=(*incident_elements)(i);
         if(current_incident_elements.m==1){
             boundary_elements.Append(VECTOR<int,dimension>(i));
-            boundary_directions.Append(elements(current_incident_elements(1)).x!=i);}}
+            boundary_directions.Append(elements(current_incident_elements(0)).x!=i);}}
     boundary_elements.Compact();boundary_directions.Compact();
     boundary_mesh->number_nodes=number_nodes;
 

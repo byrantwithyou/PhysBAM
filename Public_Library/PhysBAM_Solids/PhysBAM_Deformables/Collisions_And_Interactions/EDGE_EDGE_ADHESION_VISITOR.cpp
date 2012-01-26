@@ -22,15 +22,15 @@ Find_Place_For_Spring(const int reference_segment_index,const int other_segment_
     if(adhesion.segments_with_springs(reference_segment_index).x.m>adhesion.max_connections){ // out of room or just ran out
         ARRAY<PAIR<T,int> >& heap=adhesion.segments_with_springs(reference_segment_index).x;
         if(adhesion.segments_with_springs(reference_segment_index).y==false){ARRAYS_COMPUTATIONS::Heapify(heap);adhesion.segments_with_springs(reference_segment_index).y=true;} // make into heap
-        if(heap(1).x<=distance) return false; // not allowed, biggest is smaller than our candidate
+        if(heap(0).x<=distance) return false; // not allowed, biggest is smaller than our candidate
         else{ // allowed, so kick out some existing pair
-            adhesion.springs->Delete(VECTOR<int,2>(reference_segment_index,heap(1).y).Sorted());
+            adhesion.springs->Delete(VECTOR<int,2>(reference_segment_index,heap(0).y).Sorted());
 
-            const VECTOR<int,2>& segment1_nodes=adhesion.curve.mesh.elements(reference_segment_index),&segment2_nodes=adhesion.curve.mesh.elements(heap(1).y);
+            const VECTOR<int,2>& segment1_nodes=adhesion.curve.mesh.elements(reference_segment_index),&segment2_nodes=adhesion.curve.mesh.elements(heap(0).y);
             adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]));
             adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment2_nodes[0],segment2_nodes[1],segment1_nodes[0],segment1_nodes[1]));
 
-            heap(1)=PAIR<T,int>(distance,other_segment_index);ARRAYS_COMPUTATIONS::Heapify(heap,1,heap.m);
+            heap(0)=PAIR<T,int>(distance,other_segment_index);ARRAYS_COMPUTATIONS::Heapify(heap,1,heap.m);
             return true;}}
     else{ // plenty of room
         adhesion.segments_with_springs(reference_segment_index).x.Append(PAIR<T,int>(distance,other_segment_index));

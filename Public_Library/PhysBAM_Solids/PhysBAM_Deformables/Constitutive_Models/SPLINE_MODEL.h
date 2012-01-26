@@ -43,7 +43,7 @@ public:
 
 private:
     static void Set(ARRAY<T>& parameter,const T value)
-    {parameter.Resize(1);parameter(1)=value;}
+    {parameter.Resize(1);parameter(0)=value;}
 
     static void Set(ARRAY<T>& parameter,ARRAY_VIEW<const T> value)
     {parameter=value;}
