@@ -2329,7 +2329,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         
         for(int t=0;t<fvm.Fe_hat.m;t++)
             if(fvm.Fe_hat(t).x11<3)
-                for (int i=1; i<=4; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
+                for (int i=0; i<4; i++) solid_body_collection.deformable_body_collection.collisions.check_collision(tet_volume.mesh.elements(t)(i))=true;
 
         if (time >=1 ) solid_body_collection.template Find_Force<GRAVITY<TV>&>().gravity=9.8;
     }
