@@ -17,7 +17,7 @@ UNIFORM_GRID_ITERATOR_FACE(const GRID<TV>& grid_input,const int number_of_ghost_
     assert(-1<=side&&side<2*TV::dimension&&(side<0||axis_input<0||side/2==axis_input));
     assert(region_type!=GRID<TV>::BOUNDARY_INTERIOR_REGION); // TODO: implement this case!
     if(region_type==GRID<TV>::BOUNDARY_REGION && side) axis_input=side/2;
-    if(axis_input){single_axis=true;Reset_Axis(axis_input);}else{single_axis=false;Reset_Axis(0);}
+    if(axis_input>=0){single_axis=true;Reset_Axis(axis_input);}else{single_axis=false;Reset_Axis(0);}
 }
 //#####################################################################
 // Constructor

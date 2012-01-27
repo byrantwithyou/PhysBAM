@@ -13,12 +13,12 @@ CLONE_ARRAY<CLONEABLE_BASE>::
 CLONE_ARRAY(const CLONEABLE_BASE& template_object,const int count)
     :sizeof_clone(template_object.Sizeof_Clone()),count(count),data(new char[sizeof_clone*count])
 {
-    int i=1;
+    int i=0;
     try{
-        for(;i<=count;i++)
+        for(;i<count;i++)
             template_object.Placement_Clone(&(*this)(i));}
     catch(...){
-        for(int j=1;j<i;j++)
+        for(int j=0;j<i;j++)
             (*this)(j).~CLONEABLE_BASE();
         throw;}
 }

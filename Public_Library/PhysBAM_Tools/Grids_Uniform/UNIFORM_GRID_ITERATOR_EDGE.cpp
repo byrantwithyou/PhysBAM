@@ -16,8 +16,8 @@ UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int number_of_ghost_
 {
     assert(side==0);
     assert(region_type==GRID<TV>::WHOLE_REGION);
-    if(axis_input){single_axis=true;Reset_Axis(axis_input);}
-    else{single_axis=false;Reset_Axis(0);}
+    if(axis_input>=0){single_axis=true;Reset_Axis(axis_input);}
+    else{single_axis=false;Reset_Axis(-1);}
 }
 //#####################################################################
 // Constructor

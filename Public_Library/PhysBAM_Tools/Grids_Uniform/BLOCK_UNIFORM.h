@@ -49,24 +49,24 @@ private:
 public:
     template<class T_FACE_LOOKUP>
     typename T_FACE_LOOKUP::ELEMENT Face_X_Value(const T_FACE_LOOKUP& face_value,const int block_face_index) const
-    {return face_value(1,Face_X(block_face_index));}
+    {return face_value(0,Face_X(block_face_index));}
 
     T& Face_X_Reference(T_FACE_ARRAYS_SCALAR& face_value,const int block_face_index) const
-    {return face_value(1,Face_X(block_face_index));}
+    {return face_value(0,Face_X(block_face_index));}
 
     template<class T_FACE_LOOKUP>
     typename T_FACE_LOOKUP::ELEMENT Face_Y_Value(const T_FACE_LOOKUP& face_value,const int block_face_index) const
-    {assert(T_GRID::dimension>=2);return face_value(2,Face_Y(block_face_index));}
+    {assert(T_GRID::dimension>=2);return face_value(1,Face_Y(block_face_index));}
 
     T& Face_Y_Reference(T_FACE_ARRAYS_SCALAR& face_value,const int block_face_index) const
-    {assert(T_GRID::dimension>=2);return face_value(2,Face_Y(block_face_index));}
+    {assert(T_GRID::dimension>=2);return face_value(1,Face_Y(block_face_index));}
 
     template<class T_FACE_LOOKUP>
     typename T_FACE_LOOKUP::ELEMENT Face_Z_Value(const T_FACE_LOOKUP& face_value,const int block_face_index) const
-    {assert(T_GRID::dimension==3);return face_value(3,Face_Z(block_face_index));}
+    {assert(T_GRID::dimension==3);return face_value(2,Face_Z(block_face_index));}
 
     T& Face_Z_Reference(T_FACE_ARRAYS_SCALAR& face_value,const int block_face_index) const
-    {assert(T_GRID::dimension==3);return face_value(3,Face_Z(block_face_index));}
+    {assert(T_GRID::dimension==3);return face_value(2,Face_Z(block_face_index));}
 
     FACE_INDEX<TV::dimension> Face_X_Index(const int block_face_index) const
     {return FACE_INDEX<TV::dimension>(1,Face_X(block_face_index));}

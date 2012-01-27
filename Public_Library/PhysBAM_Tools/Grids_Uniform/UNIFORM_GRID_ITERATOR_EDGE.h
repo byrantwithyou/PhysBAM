@@ -30,8 +30,8 @@ protected:
 
 public:
     // axis_input==0 means iterate through faces in all dimensions
-    UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int number_of_ghost_cells_input=0,const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=0,
-        int axis_input=0);
+    UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int number_of_ghost_cells_input=0,const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,
+        int axis_input=-1);
 
     UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int axis_input,const TV_INT& face_index);
 
