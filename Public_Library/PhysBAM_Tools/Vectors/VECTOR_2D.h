@@ -252,7 +252,7 @@ public:
     {return x==y;}
 
     int Dominant_Axis() const
-    {return (abs(x)>abs(y))?1:2;}
+    {return (abs(x)>abs(y))?0:1;}
 
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
     {return v1.x*v2.x+v1.y*v2.y;}

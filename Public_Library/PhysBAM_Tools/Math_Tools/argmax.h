@@ -11,11 +11,11 @@ namespace PhysBAM{
 
 template<class T>
 inline int argmax(const T a,const T b)
-{return a>=b?1:2;}
+{return a>=b?0:1;}
 
 template<class T>
 inline int argmax(const T a,const T b,const T c)
-{if(a>=c) return argmax(a,b);return b>=c?2:3;}
+{if(a>=c) return argmax(a,b);return b>=c?1:2;}
 
 }
 #endif

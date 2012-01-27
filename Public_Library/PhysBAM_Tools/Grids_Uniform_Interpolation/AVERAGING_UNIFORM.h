@@ -66,7 +66,7 @@ public:
     static VECTOR<T,2> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,2> >& grid,const typename GRID<VECTOR<T,2> >::FACE_ITERATOR& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
     {int axis=iterator.Axis();typename GRID<VECTOR<T,2> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
     VECTOR<T,2> value;value[axis]=u_face(axis,face);
-    int other_axis=3-axis;
+    int other_axis=1-axis;
     value[other_axis]=(T).25*(u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell1))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell1))+
                               u_face(other_axis,grid.First_Face_Index_In_Cell(other_axis,cell2))+u_face(other_axis,grid.Second_Face_Index_In_Cell(other_axis,cell2)));
     return value;}
