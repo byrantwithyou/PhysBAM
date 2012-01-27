@@ -170,8 +170,6 @@ Total_Volume() const
 {
     T volume=0;
     for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
-std::cout << mesh.elements.m << " " << i << " " << j << " " << k << " " << l << std::endl;
-std::cout << TETRAHEDRON<T>::Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l)) << std::endl;
         volume+=TETRAHEDRON<T>::Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));}
     return volume;
 }

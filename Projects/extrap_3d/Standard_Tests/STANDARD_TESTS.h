@@ -1941,17 +1941,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int j=0;j<n;j++)
                     for(int ij=0;ij<mn;ij++)
                     {
-                        particles.V(i+m*(j-1)+m*n*(ij-1)) = TV(0.32*cos(6*ij/(T)mn)+2.15,-0.28*cos(4*i/(T)m)+0.55,-0.31*sin(4*j/(T)n));
-                        particles.V(i+m*(j-1)+m*n*(ij-1)+m*n*mn) = TV(0.27*sin(6*j/(T)n)-2.17,0.32*cos(6*ij/(T)mn)+0.53,0.25*sin(4*i/(T)m));
+                        particles.V(i+m*j+m*n*ij) = TV(0.32*cos(6*ij/(T)mn)+2.15,-0.28*cos(4*i/(T)m)+0.55,-0.31*sin(4*j/(T)n));
+                        particles.V(i+m*j+m*n*ij+m*n*mn) = TV(0.27*sin(6*j/(T)n)-2.17,0.32*cos(6*ij/(T)mn)+0.53,0.25*sin(4*i/(T)m));
                     }
-            for (int i=1; i<=m*n*mn; i++)
+            for (int i=0; i<m*n*mn; i++)
             {
                 int index = i;
-                particles.V(index) += TV(particles.X(index).y-jello_centers(0).y,-(particles.X(index).x-jello_centers(1).x),0)*51;
-                particles.V(index) += TV(0,particles.X(index).z-jello_centers(0).z,-(particles.X(index).y-jello_centers(1).y))*(-13);
+                particles.V(index) += TV(particles.X(index).y-jello_centers(0).y,-(particles.X(index).x-jello_centers(0).x),0)*51;
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(0).z,-(particles.X(index).y-jello_centers(0).y))*(-13);
                 index+=m*n*mn;
-                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(2).x),0)*(-39);
-                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(2).y))*23;
+                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(1).x),0)*(-39);
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(1).y))*23;
             }
             break;}
         case 41:{
@@ -1959,7 +1959,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T poissons_ratio = .4;
             T damping = 0.001;
 
-            for (int k=1; k<=number_of_jellos; k++)
+            for (int k=0; k<number_of_jellos; k++)
             {
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(k);
                 Add_Constitutive_Model(tetrahedralized_volume,youngs_modulus,poissons_ratio,damping,0.4,50);
