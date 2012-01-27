@@ -50,7 +50,7 @@ Viscous_Update(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_
 
     // copy velocities into u so unchanged velocities can be copied out unconditionally...
     // TODO: make shared face copied in a more clever way to avoid this copy 
-    for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
         TV_INT p_face_index=iterator.Face_Index(),cell_index=p_face_index;
         u(cell_index)=velocity_component_ghost(p_face_index);}
 
@@ -61,7 +61,7 @@ Viscous_Update(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_
 
     // update face_velocities
     T_ARRAYS_BASE& velocity_component=face_velocities.Component(axis);
-    for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
         TV_INT index=iterator.Face_Index();
         velocity_component(index)=u(index);}
 }
@@ -149,18 +149,18 @@ Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
 
     // set neumann for the faces in the same axis that are on dirichlet primal cells
     const TV_INT axis_offset=TV_INT::Axis_Vector(axis);
-    for(FACE_ITERATOR iterator(face_grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next())if(p_psi_D(iterator.Face_Index()-axis_offset)) 
+    for(FACE_ITERATOR iterator(face_grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())if(p_psi_D(iterator.Face_Index()-axis_offset)) 
         psi_N(axis,iterator.Face_Index())=true;
 
     // set slip boundary conditions for tangential walls
     for(int other_axis=0;other_axis<T_GRID::dimension;other_axis++) if(other_axis!=axis){
-        for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,0,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
+        for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
             if(p_psi_N(other_axis,p_node_index-axis_offset)||p_psi_N(other_axis,p_node_index)) psi_N(other_axis,face_index)=true;}}
 
     // set slip boundary conditions for tangential walls
     if(p_psi_R.base_pointer)
         for(int other_axis=0;other_axis<T_GRID::dimension;other_axis++) if(other_axis!=axis){
-            for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,0,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
+            for(FACE_ITERATOR iterator(face_grid,0,T_GRID::BOUNDARY_REGION,-1,other_axis);iterator.Valid();iterator.Next()){TV_INT face_index=iterator.Face_Index(),p_node_index=face_index;
                 T a=p_psi_R(other_axis,p_node_index-axis_offset),b=p_psi_R(other_axis,p_node_index);
                 if(a || b) psi_R(other_axis,face_index)=(T).5*(a+b);}}
 }

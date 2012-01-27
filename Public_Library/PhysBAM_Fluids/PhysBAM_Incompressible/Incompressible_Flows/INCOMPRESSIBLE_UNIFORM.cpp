@@ -413,7 +413,7 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
         T_FACE_ARRAYS_BOOL fixed_faces=fixed_faces_input?*fixed_faces_input:T_FACE_ARRAYS_BOOL(grid,ghost_cells);
         for(int axis=0;axis<T_GRID::dimension;axis++){
             T_ARRAYS_BASE &phi_face=phi_faces.Component(axis),&face_velocity=face_velocities_ghost.Component(axis);T_ARRAYS_BOOL_BASE& fixed_face=fixed_faces.Component(axis);
-            for(FACE_ITERATOR iterator(grid,ghost_cells,T_GRID::INTERIOR_REGION,0,axis);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR iterator(grid,ghost_cells,T_GRID::INTERIOR_REGION,-1,axis);iterator.Valid();iterator.Next()){
                 TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
                 if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}}
         //mpi_grid->Exchange_Boundary_Face_Data(fixed_faces);
@@ -431,14 +431,14 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
             T_GRID face_grid=grid.Get_Face_Grid(axis);T_ARRAYS_SCALAR phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=face_velocities.Component(axis);
             T_ARRAYS_BOOL fixed_face;
             if(fixed_faces_input) fixed_face=fixed_faces_input->Component(axis); else fixed_face=T_ARRAYS_BOOL(face_grid.Domain_Indices());
-            for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){
+            for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
                 TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
                 if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
             LOG::cout<<"something..."<<std::endl;  // TODO(jontg): If this log statement doesn't appear, the code crashes in release mode...
             T_EXTRAPOLATION_SCALAR extrapolate(face_grid,phi_face,face_velocity,ghost_cells);extrapolate.Set_Band_Width(band_width);extrapolate.Set_Custom_Seed_Done(&fixed_face);
             if(face_neighbors_visible) extrapolate.Set_Collision_Aware_Extrapolation(face_neighbors_visible->Component(axis));
             extrapolate.Extrapolate();
-            if(damping) for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){TV_INT index=iterator.Face_Index();
+            if(damping) for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){TV_INT index=iterator.Face_Index();
                 if(!fixed_face(index) && phi_face(index)<delta) face_velocity(index)=(1-damping)*face_velocity(index)+damping*air_speed[axis];}}}
 
     // make extrapolated velocity divergence free

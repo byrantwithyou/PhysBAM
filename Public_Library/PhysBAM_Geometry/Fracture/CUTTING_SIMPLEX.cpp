@@ -49,10 +49,10 @@ CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,SIMPLEX_TYPE type,T abs_tol,int paren
     simplex_original_coordinates(simplex_original_coordinates)
 {
     assert(type==LOCAL_CUT_FACE);
-    for(int i=1;i<d;++i) assert(nodes[i]!=0);
+    for(int i=0;i<d-1;++i) assert(nodes[i]!=0);
     if(nodes[d]==0){
         this->simplex_original_coordinates[d].Fill(0);
-        for(int i=1;i<d;++i) this->simplex_original_coordinates[d]+=simplex_original_coordinates[i];
+        for(int i=0;i<d-1;++i) this->simplex_original_coordinates[d]+=simplex_original_coordinates[i];
         this->simplex_original_coordinates[d]/=(d-1);}
     // compute weights for each (real) node
     if(nodes[d]!=0){
@@ -61,12 +61,12 @@ CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,SIMPLEX_TYPE type,T abs_tol,int paren
         for(int i=0;i<d;i++) for(int j=0;j<d;j++) weights[i][j]=temp_weights[i][j];}
     else{
         VECTOR<VECTOR<T,d>,d-1> simplex2;
-        for(int i=1;i<d;++i) simplex2[i]=simplex_original_coordinates[i];
+        for(int i=0;i<d-1;++i) simplex2[i]=simplex_original_coordinates[i];
         VECTOR<VECTOR<T,d+1>,d-1> temp_weights;
         Barycentric_Coordinates<EXACT_FLOAT<T> >(element_original_coordinates,simplex2,temp_weights,abs_tol);
         // set the fake node's weights to be at the center of the real nodes
         weights[d].Fill(0);
-        for(int i=1;i<d;++i){
+        for(int i=0;i<d-1;++i){
             for(int j=0;j<d;j++) weights[i][j]=temp_weights[i][j];
             weights[d]+=weights[i];}
         weights[d]/=(T)(d-1);}

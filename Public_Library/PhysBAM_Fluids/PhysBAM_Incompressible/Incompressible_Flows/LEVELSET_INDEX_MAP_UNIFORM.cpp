@@ -36,7 +36,7 @@ Compute(int axis,VECTOR<bool,d> periodic_boundary_input)
     inside.Fill(false);
     callback->Mark_Outside(inside);
     periodic_boundary=periodic_boundary_input;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next()){FACE_INDEX<d> index=it.Full_Index();
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){FACE_INDEX<d> index=it.Full_Index();
         bool& b=inside(index);
         b=!b;
         if(b && !(periodic_boundary[index.axis] && index.index[index.axis]==0))

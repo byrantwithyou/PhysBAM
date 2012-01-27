@@ -20,12 +20,12 @@ Generate_Topology()
     topology.Preallocate(5000);
     vertices.Resize(0,m-1,0,n-1);
     TV_INT i;
-    for(i.x=1;i.x<m;i.x++)for(i.y=2;i.y<n;i.y++){ // generate one segment per x edge
+    for(i.x=0;i.x<m;i.x++)for(i.y=1;i.y<n;i.y++){ // generate one segment per x edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x+1,i.y);
         int index=vertices.Standard_Index(i),index_j=index-1;
         if(phi1<=contour_value&&phi2>contour_value) topology.Append(VECTOR<int,2>(index_j,index));
         if(phi1>contour_value&&phi2<=contour_value) topology.Append(VECTOR<int,2>(index,index_j));}
-    for(i.x=2;i.x<m;i.x++)for(i.y=1;i.y<n;i.y++){ // generate one segment per y edge
+    for(i.x=1;i.x<m;i.x++)for(i.y=0;i.y<n;i.y++){ // generate one segment per y edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x,i.y+1);
         int index=vertices.Standard_Index(i),index_i=index-vertices.counts.y;
         if(phi1<=contour_value&&phi2>contour_value) topology.Append(VECTOR<int,2>(index_i,index));
@@ -33,7 +33,7 @@ Generate_Topology()
     topology.Compact();
     for(int t=0;t<topology.m;t++){
         int i,j;topology(t).Get(i,j);
-        vertices.array(i)=vertices.array(j)=1;}
+        vertices.array(i)=vertices.array(j)=0;}
 }
 //#####################################################################
 // Function Generate_Vertices
@@ -47,7 +47,7 @@ Generate_Vertices()
     normals.Resize(count);
     levelset.Compute_Normals();
     int vertex=0;
-    for(int i=1;i<m;i++)for(int j=1;j<n;j++) if(vertices(i,j)){ // generate vertices where needed
+    for(int i=0;i<m;i++)for(int j=0;j<n;j++) if(vertices(i,j)){ // generate vertices where needed
         vertices(i,j)=++vertex;
         TV position=grid.Center(i,j);
         TV position_guess;
@@ -82,7 +82,7 @@ Ensure_Vertices_In_Correct_Cells()
 {
     int vertex=0;
     TV_INT i;
-    for(i.x=1;i.x<grid.counts.x;i.x++) for(i.y=1;i.y<grid.counts.y;i.y++) if(vertices(i)){
+    for(i.x=0;i.x<grid.counts.x;i.x++) for(i.y=0;i.y<grid.counts.y;i.y++) if(vertices(i)){
         ++vertex;TV_INT v=grid.Cell(geometry(vertex),0);
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset=(T).5*grid.dX;
@@ -115,11 +115,11 @@ Get_Triangulated_Area(const int sign)
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
     particles.array_collection->Preallocate(grid.counts.x*grid.counts.y*4);
     TRIANGLE_MESH& mesh=area->mesh;
-    int triangle_count=0;for(int i=2;i<grid.counts.x;i++) for(int j=2;j<grid.counts.y;j++) if(levelset.phi(i,j)*sign>=0) triangle_count+=4;
+    int triangle_count=0;for(int i=1;i<grid.counts.x;i++) for(int j=1;j<grid.counts.y;j++) if(levelset.phi(i,j)*sign>=0) triangle_count+=4;
     mesh.elements.Exact_Resize(triangle_count);
-    int current_triangle=1;
+    int current_triangle=0;
     GRID<TV> mac_grid=grid.Get_MAC_Grid();
-    for(int i=2;i<grid.counts.x;i++) for(int j=2;j<grid.counts.y;j++) if(levelset.phi(i,j)*sign>=0){
+    for(int i=1;i<grid.counts.x;i++) for(int j=1;j<grid.counts.y;j++) if(levelset.phi(i,j)*sign>=0){
         int v0=particles.array_collection->Add_Element(),v1=particles.array_collection->Add_Element(),v2=particles.array_collection->Add_Element(),v3=particles.array_collection->Add_Element(),v4=particles.array_collection->Add_Element();
         particles.X(v0)=grid.X(i,j);
         particles.X(v1)=vertices(i-1,j-1)?geometry(vertices(i-1,j-1)):mac_grid.X(i-1,j-1);

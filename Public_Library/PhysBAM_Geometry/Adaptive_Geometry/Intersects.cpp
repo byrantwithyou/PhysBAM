@@ -33,7 +33,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                 if(u==v1) continue;
                 const TV& y=all_vertices[u];
                 next_sign=Adaptive_Signed_Volume<T_EXACT,T>(x1,y).Sign();
-                int i=(u<=m?1:2);
+                int i=(u<=m?0:1);
                 if(sign[i]==0) sign[i]=next_sign;
                 could_be_a_separator=(next_sign!=0&&sign[i]==next_sign);}
             if(could_be_a_separator){
@@ -69,7 +69,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                     if(u==v1||u==v2) continue;
                     const TV& y=all_vertices[u];
                     next_sign=Adaptive_Signed_Volume<T_EXACT>(x1,x2,y).Sign();
-                    int i=(u<=m?1:2);
+                    int i=(u<=m?0:1);
                     if(sign[i]==0) sign[i]=next_sign;
                     could_be_a_separator=(next_sign!=0&&sign[i]==next_sign);}
                 if(could_be_a_separator){
@@ -108,7 +108,7 @@ namespace GEOMETRIC_PREDICATES_DETAIL{
                         if(u==v1||u==v2||u==v3) continue;
                         const TV& y=all_vertices[u];
                         next_sign=Adaptive_Signed_Volume<T_EXACT>(x1,x2,x3,y).Sign();
-                        int i=(u<=m?1:2);
+                        int i=(u<=m?0:1);
                         if(sign[i]==0) sign[i]=next_sign;
                         could_be_a_separator=(next_sign!=0&&sign[i]==next_sign);}
                     if(could_be_a_separator){
