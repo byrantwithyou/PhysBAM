@@ -24,7 +24,7 @@ public:
 };
 template<class TV>
 inline std::ostream& operator<<(std::ostream& output_stream,const ORIENTED_BOX<TV>& box)
-{output_stream<<"("<<box.corner<<")   (";for(int i=1;i<TV::dimension;i++) output_stream<<box.edges.Column(i)<<" : ";output_stream<<box.edges.Column(TV::dimension)<<")";return output_stream;}
+{output_stream<<"("<<box.corner<<")   (";for(int i=0;i<TV::dimension-1;i++) output_stream<<box.edges.Column(i)<<" : ";output_stream<<box.edges.Column(TV::dimension-1)<<")";return output_stream;}
 }
 #endif
 #endif

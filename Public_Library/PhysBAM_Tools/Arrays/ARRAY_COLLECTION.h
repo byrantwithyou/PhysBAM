@@ -56,7 +56,7 @@ public:
     {return deletion_list.m?deletion_list.Pop():Add_Element();}
 
     void Delete_Element(const int p)
-    {Copy_Element_Helper(number,p);Resize(number-1);}
+    {Copy_Element_Helper(number-1,p);Resize(number-1);}
 
     void Delete_All_Elements()
     {Resize(0);}

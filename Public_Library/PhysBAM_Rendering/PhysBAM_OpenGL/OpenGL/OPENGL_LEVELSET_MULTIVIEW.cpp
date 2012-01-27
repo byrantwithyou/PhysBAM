@@ -264,7 +264,7 @@ Update()
     else{
         Initialize_OpenGL_Scalar_Field();
         if(opengl_scalar_field){
-            opengl_scalar_field->current_color_map=(color_mode==COLOR_SOLID)?1:2;
+            opengl_scalar_field->current_color_map=(color_mode==COLOR_SOLID)?0:1;
             opengl_scalar_field->Set_Slice(slice);
             opengl_scalar_field->Set_Smooth_Slice_Texture(smooth_slice_texture);}
         if(display_overlay){

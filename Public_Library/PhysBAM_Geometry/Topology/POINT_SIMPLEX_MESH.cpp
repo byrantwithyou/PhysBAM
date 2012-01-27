@@ -31,7 +31,7 @@ Initialize_Segment_Mesh()
 
     ARRAY<VECTOR<int,2> > simplex_list;
     simplex_list.Resize(number_nodes-1);
-    for(int i=1;i<number_nodes;i++) simplex_list(i)=VECTOR<int,2>(elements(i)[1],elements(i+1)[1]);
+    for(int i=0;i<number_nodes-1;i++) simplex_list(i)=VECTOR<int,2>(elements(i)[0],elements(i+1)[0]);
     segment_mesh=new SEGMENT_MESH(number_nodes-1,simplex_list);
 }
 //#####################################################################

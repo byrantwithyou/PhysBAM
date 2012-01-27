@@ -55,12 +55,12 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
                 ind(d)+=s;
                 int& k=m.node_to_index(ind);
                 if(!k) k=m.index_to_node.Append(ind);}}}
-    m.max_solve_index(0)=m.index_to_node.m;
+    m.max_solve_index(0)=m.index_to_node.m-1;
 
     // Register additional cells inside for derivatives.
     for(int o=0,i=0;o<order*2;o++){
         int previous=m.index_to_node.m,mx=inside.m;
-        for(;i<=mx;i++){
+        for(;i<mx;i++){
             bool added=false;
             for(int k=0;k<TV::m*2;k++){
                 TV_INT ind=grid.Node_Neighbor(inside(i),k);
@@ -71,7 +71,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
                     normal.Append(phi.Normal(grid.X(inside(i))));
                     added=true;}}
             if(!added) inside.Append(TV_INT(inside(i)));}  // Use a copy to avoid but on resize
-        m.max_solve_index(o+1)=m.index_to_node.m;}
+        m.max_solve_index(o+1)=m.index_to_node.m-1;}
 
     // Register sentinal layer and precompute stencils.
     stencil.Resize(m.max_solve_index(order));
