@@ -79,7 +79,7 @@ Refresh_Auxiliary_Structures()
 //#####################################################################
 static inline int Lattice(const int i,const int j,const int k,const int m,const int n,const int p)
 {
-    return i+m*(j-1)+m*n*(k-1);
+    return i+m*j+m*n*k;
 }
 static inline int Half_Lattice(const int i,const int j,const int k,const int m,const int n,const int p)
 {
@@ -116,17 +116,17 @@ Initialize_Cube_Mesh(const int m,const int n,const int p) // 5 tetrahedrons per 
     Clean_Memory();number_nodes=m*n*p;elements.Exact_Resize(5*(m-1)*(n-1)*(p-1));int t=0;
     for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++)for(int k=0;k<p-1;k++){
         if((i+j+k)%2 == 0){
-            elements(t++).Set(i+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*(k-1),i+m*j+m*n*(k-1),i+m*(j-1)+m*n*k);
-            elements(t++).Set(i+1+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*k,i+1+m*j+m*n*k,i+m*(j-1)+m*n*k);
-            elements(t++).Set(i+m*j+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*j+m*n*k,i+1+m*(j-1)+m*n*(k-1));
-            elements(t++).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+m*(j-1)+m*n*k,i+m*j+m*n*(k-1));
-            elements(t++).Set(i+1+m*(j-1)+m*n*(k-1),i+m*(j-1)+m*n*k,i+1+m*j+m*n*k,i+m*j+m*n*(k-1));}
+            elements(t++).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+m*(j+1)+m*n*k,i+m*j+m*n*(k+1));
+            elements(t++).Set(i+1+m*j+m*n*k,i+1+m*j+m*n*(k+1),i+1+m*(j+1)+m*n*(k+1),i+m*j+m*n*(k+1));
+            elements(t++).Set(i+m*(j+1)+m*n*k,i+1+m*(j+1)+m*n*k,i+1+m*(j+1)+m*n*(k+1),i+1+m*j+m*n*k);
+            elements(t++).Set(i+m*(j+1)+m*n*(k+1),i+1+m*(j+1)+m*n*(k+1),i+m*j+m*n*(k+1),i+m*(j+1)+m*n*k);
+            elements(t++).Set(i+1+m*j+m*n*k,i+m*j+m*n*(k+1),i+1+m*(j+1)+m*n*(k+1),i+m*(j+1)+m*n*k);}
         else{
-            elements(t++).Set(i+m*(j-1)+m*n*(k-1),i+1+m*(j-1)+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*(j-1)+m*n*k);
-            elements(t++).Set(i+m*(j-1)+m*n*(k-1),i+m*j+m*n*(k-1),i+m*j+m*n*k,i+1+m*j+m*n*(k-1));
-            elements(t++).Set(i+m*j+m*n*k,i+1+m*(j-1)+m*n*k,i+m*(j-1)+m*n*k,i+m*(j-1)+m*n*(k-1));
-            elements(t++).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+1+m*(j-1)+m*n*k,i+1+m*j+m*n*(k-1));
-            elements(t++).Set(i+m*j+m*n*k,i+m*(j-1)+m*n*(k-1),i+1+m*j+m*n*(k-1),i+1+m*(j-1)+m*n*k);}}
+            elements(t++).Set(i+m*j+m*n*k,i+1+m*j+m*n*k,i+1+m*(j+1)+m*n*k,i+1+m*j+m*n*(k+1));
+            elements(t++).Set(i+m*j+m*n*k,i+m*(j+1)+m*n*k,i+m*(j+1)+m*n*(k+1),i+1+m*(j+1)+m*n*k);
+            elements(t++).Set(i+m*(j+1)+m*n*(k+1),i+1+m*j+m*n*(k+1),i+m*j+m*n*(k+1),i+m*j+m*n*k);
+            elements(t++).Set(i+m*(j+1)+m*n*(k+1),i+1+m*(j+1)+m*n*(k+1),i+1+m*j+m*n*(k+1),i+1+m*(j+1)+m*n*k);
+            elements(t++).Set(i+m*(j+1)+m*n*(k+1),i+m*j+m*n*k,i+1+m*(j+1)+m*n*k,i+1+m*j+m*n*(k+1));}}
 }
 //#####################################################################
 // Function Initialize_Prismatic_Cube_Mesh

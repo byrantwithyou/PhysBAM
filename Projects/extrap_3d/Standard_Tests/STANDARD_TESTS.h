@@ -326,8 +326,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid2=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.016,(T)0.016,(T)-0.016,(T)0.016,(T)-0.016,(T)0.016);
             mattress_grid3=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125);
             break;
-        case 37: case 39: case 40: case 38: case 44:
-            mattress_grid=GRID<TV>(40,40,40,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
+        case 37: case 39: case 40: case 38: case 44: case 8:
+            mattress_grid=GRID<TV>(2,2,2,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
         case 42: case 52:
             mattress_grid=GRID<TV>(20,20,20,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
@@ -647,6 +647,7 @@ void Get_Initial_Data()
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
+	std::cout << density << std::endl;
     switch(test_number){
         case 1: case 7:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
@@ -1146,8 +1147,8 @@ void Get_Initial_Data()
         {
             jello_centers.Append(TV(-0.266,0.022,0.013)); 
             jello_centers.Append(TV(0.266, 0.029,-0.013));
-            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7))));
-            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(2),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
+            RIGID_BODY_STATE<TV> initial_state1(FRAME<TV>(jello_centers(0),ROTATION<TV>(T(pi/0.13),TV(1.3,1.5,0.7))));
+            RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
             tests.Add_Ground();
@@ -1946,11 +1947,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for (int i=1; i<=m*n*mn; i++)
             {
                 int index = i;
-                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(1).x),0)*51;
-                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(1).y))*(-13);
+                particles.V(index) += TV(particles.X(index).y-jello_centers(0).y,-(particles.X(index).x-jello_centers(1).x),0)*51;
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(0).z,-(particles.X(index).y-jello_centers(1).y))*(-13);
                 index+=m*n*mn;
-                particles.V(index) += TV(particles.X(index).y-jello_centers(2).y,-(particles.X(index).x-jello_centers(2).x),0)*(-39);
-                particles.V(index) += TV(0,particles.X(index).z-jello_centers(2).z,-(particles.X(index).y-jello_centers(2).y))*23;
+                particles.V(index) += TV(particles.X(index).y-jello_centers(1).y,-(particles.X(index).x-jello_centers(2).x),0)*(-39);
+                particles.V(index) += TV(0,particles.X(index).z-jello_centers(1).z,-(particles.X(index).y-jello_centers(2).y))*23;
             }
             break;}
         case 41:{
