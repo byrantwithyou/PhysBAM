@@ -163,9 +163,9 @@ Delete_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
     PARTICLE_LEVELSET_PARTICLES<TV> *particles_link=&particles;
     while(particles_link->next){particles_link=particles_link->next;}
-    particles.array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size(),index);
-    particles_link->array_collection->Delete_Element(particles_link->array_collection->Size());
-    return(particles_link->array_collection->Size()==0);
+    particles.array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size()-1,index);
+    particles_link->array_collection->Delete_Element(particles_link->array_collection->Size()-1);
+    return particles_link->array_collection->Size()==0;
 }
 //#####################################################################
 // Function Delete_Particle
@@ -192,8 +192,8 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
         for(int i=deletion_list.m;i>0;i--) if(deletion_particles==deletion_list(i).x){deletion_list_local.Append(deletion_list(i).y);deletion_list.Remove_Index_Lazy(i);}
         Sort(deletion_list_local);
         for(int i=deletion_list_local.m;i>0;i--){int index=deletion_list_local(i);
-            deletion_particles->array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size(),index);
-            particles_link->array_collection->Delete_Element(particles_link->array_collection->Size());
+            deletion_particles->array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size()-1,index);
+            particles_link->array_collection->Delete_Element(particles_link->array_collection->Size()-1);
             if(particles_link->array_collection->Size()==0 && parent_particles){
                 particle_pool.Free_Particle(particles_link);parent_particles->next=0;particles_link=&particles;parent_particles=0;
                 while(particles_link->next){parent_particles=particles_link;particles_link=particles_link->next;}}}

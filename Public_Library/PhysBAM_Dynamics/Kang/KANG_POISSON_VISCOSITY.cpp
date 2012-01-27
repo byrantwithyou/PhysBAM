@@ -263,7 +263,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
 
     int num_dual_cells=0;
     ARRAY<int,TV_INT> dual_cell_index(dual_grid.Domain_Indices(3));
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         if(psi_N(it.Full_Index())) face_velocities(it.Full_Index())=psi_N_value(it.Full_Index());
         else if(!(psi_D(it.First_Cell_Index()) && psi_D(it.Second_Cell_Index())))
             dual_cell_index(it.index)=++num_dual_cells;}
@@ -283,7 +283,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     T rho_n=fluids_parameters.density,rho_p=fluids_parameters.outside_density;
     TV one_over_dX_2=sqr(dual_grid.one_over_dX);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         if(int index=dual_cell_index(it.index)){
             b.v(index)=face_velocities(it.Full_Index());
             r.v(index)=Face_Phi(it.Full_Index())<0?rho_n:rho_p;}}
@@ -368,7 +368,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors(u.v.Min(),u.v.Max(),false,true,false);
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next()){
         if(int index=dual_cell_index(it.index)){
             face_velocities(it.Full_Index())=u.v(index);
             /*Add_Debug_Particle(it.Location(),color_map(u.v(index)));*/}}

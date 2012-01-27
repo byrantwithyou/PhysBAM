@@ -33,7 +33,7 @@ public:
 
     // axis_input==0 means iterate through faces in all dimensions
     explicit UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input=0,bool use_outside_input=true,
-        const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=0,int axis_input=0);
+        const T_REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=-1,int axis_input=-1);
 
     ~UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED();
 

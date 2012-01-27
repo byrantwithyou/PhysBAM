@@ -364,7 +364,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
         ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);
         ARRAYS_ND_BASE<TV>& face_velocity=example.fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis);
         ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& fixed_face=valid_faces.Component(axis);
-        for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){
+        for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Face_Index();
             T phi1=phi_ghost(iterator.First_Cell_Index()),phi2=phi_ghost(iterator.Second_Cell_Index());
             phi_face(index)=(T).5*(phi1+phi2);
