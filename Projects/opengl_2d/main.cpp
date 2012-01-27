@@ -44,7 +44,6 @@
 #include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>
-#include <PhysBAM_Dynamics/Level_Sets/VOF_ADVECTION.h>
 #include <string.h>
 using namespace PhysBAM;
 using namespace std;
