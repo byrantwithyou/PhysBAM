@@ -41,7 +41,7 @@ public:
     RAY()
         :endpoint(TV()),semi_infinite(true),t_max(0),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
     {
-         direction=TV::Axis_Vector(TV::dimension);
+         direction=TV::Axis_Vector(TV::dimension-1);
     }
 
     RAY(const TV& endpoint_input,const TV& direction_input,const bool already_normalized=false)
