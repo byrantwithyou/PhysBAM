@@ -177,7 +177,7 @@ Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls)
 {   
     // fix walls
     for(int i=0;i<T_GRID::number_of_neighbors_per_node;i++)
-        if(side_neighbor_ranks(i)!=-1) domain_walls((i+1)/2)(i&1?0:1)=false;
+        if(side_neighbor_ranks(i)!=-1) domain_walls(i/2)(i&1?0:1)=false;
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"rank = "<<rank<<std::endl;
