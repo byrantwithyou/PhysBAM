@@ -872,14 +872,16 @@ Delete_Particles_Outside_Grid()
     RANGE<TV_INT> real_domain(levelset.grid.Domain_Indices());real_domain.max_corner+=TV_INT::All_Ones_Vector();
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices(3));domain.max_corner+=TV_INT::All_Ones_Vector();
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
+        RA(domain);
         RANGE<TV_INT> ghost_domain(domain);
-        if(side==0) ghost_domain.max_corner(axis)=real_domain.min_corner(axis)-1;
-        else ghost_domain.min_corner(axis)=real_domain.max_corner(axis)+1;
+        if(side==0) ghost_domain.max_corner(axis)=real_domain.min_corner(axis);
+        else ghost_domain.min_corner(axis)=real_domain.max_corner(axis);
+        RA(ghost_domain);
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(ghost_domain,thread_queue).Run(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_Outside_Grid);}
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> boundary_domain(real_domain);
-        if(side==0) boundary_domain.max_corner(axis)=real_domain.min_corner(axis);
-        else boundary_domain.min_corner(axis)=real_domain.max_corner(axis);
+        if(side==0) boundary_domain.max_corner(axis)=real_domain.min_corner(axis)+1;
+        else boundary_domain.min_corner(axis)=real_domain.max_corner(axis)-1;
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(boundary_domain,thread_queue).template Run<int,int>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Near_Outside_Grid,axis,side);}
     
     Consistency_Check(local_domain,positive_particles);

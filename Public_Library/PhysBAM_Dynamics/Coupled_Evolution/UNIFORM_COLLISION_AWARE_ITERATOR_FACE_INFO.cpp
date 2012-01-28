@@ -34,16 +34,16 @@ Register_Neighbors_As_Collision_Faces()
         if((*outside_fluid)(it.index)) continue;
         grid.Neighboring_Faces(faces,it.index);
         for(int i=0;i<TV::m;i++){simplices(i).Remove_All();merged(i).Remove_All();}
-        for(int i=0;i<faces.m;i++) if(int* a=old_faces.Get_Pointer(faces(i))) simplices((i+1)/2).Append_Unique_Elements(collision_face_info(*a).simplices);
+        for(int i=0;i<faces.m;i++) if(int* a=old_faces.Get_Pointer(faces(i))) simplices(i/2).Append_Unique_Elements(collision_face_info(*a).simplices);
         for(int i=0;i<TV::m;i++) if(simplices(i).m) for(int j=0;j<TV::m;j++) if(j!=i) merged(j).Append_Unique_Elements(simplices(i));
-        for(int i=0;i<faces.m;i++) if(merged((i+1)/2).m && !old_faces.Contains(faces(i))){
-            if(int* a=new_faces.Get_Pointer(faces(i))) collision_face_info(*a).simplices.Append_Unique_Elements(merged((i+1)/2));
+        for(int i=0;i<faces.m;i++) if(merged(i/2).m && !old_faces.Contains(faces(i))){
+            if(int* a=new_faces.Get_Pointer(faces(i))) collision_face_info(*a).simplices.Append_Unique_Elements(merged(i/2));
             else{
                 cfi.axis=faces(i).axis;
                 cfi.index=faces(i).index;
                 cfi.side=1;
                 collision_face_info.Append(cfi);
-                collision_face_info.Last().simplices=merged((i+1)/2);
+                collision_face_info.Last().simplices=merged(i/2);
                 new_faces.Set(faces(i),collision_face_info.m);}}}
 
     Sort(collision_face_info);
