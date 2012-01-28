@@ -108,7 +108,7 @@ Update_Articulation_Points()
     articulation_points.Exact_Resize(num_points);
     joint_frames.Exact_Resize(num_points);
     for(int i=0;i<num_points;i+=2){
-        int index=(i+1)/2;
+        int index=i/2;
         JOINT<TV>* joint=articulated_rigid_body->joint_mesh.joints(index);
         RIGID_BODY<TV>* parent=articulated_rigid_body->Parent(joint->id_number),*child=articulated_rigid_body->Child(joint->id_number);
         articulation_points(i)=parent->World_Space_Point(joint->F_pj().t);articulation_points(i+1)=child->World_Space_Point(joint->F_cj().t);

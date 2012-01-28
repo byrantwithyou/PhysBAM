@@ -24,7 +24,7 @@ UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int number_of_ghost_
 //#####################################################################
 template<class TV> UNIFORM_GRID_ITERATOR_EDGE<TV>::
 UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int axis_input,const TV_INT& face_index)
-    :UNIFORM_GRID_ITERATOR<TV>(grid_input,RANGE<TV_INT>(face_index))
+    :UNIFORM_GRID_ITERATOR<TV>(grid_input,RANGE<TV_INT>(face_index,face_index+1))
 {
     single_axis=true;
     axis=axis_input;

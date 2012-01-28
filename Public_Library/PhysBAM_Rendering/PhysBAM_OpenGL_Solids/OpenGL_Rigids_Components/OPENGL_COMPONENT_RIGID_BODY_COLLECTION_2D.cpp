@@ -260,7 +260,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
     if(selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_2D){
         PHYSBAM_ASSERT(articulated_rigid_body);
         OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T> *real_selection=(OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_2D<T>*)selection;
-        JOINT_ID joint_id((real_selection->joint_id+1)/2);
+        JOINT_ID joint_id(real_selection->joint_id/2);
         JOINT<TV>* joint=articulated_rigid_body->joint_mesh(joint_id);
         const RIGID_BODY<TV>* parent=articulated_rigid_body->Parent(joint_id),*child=articulated_rigid_body->Child(joint_id);
         FRAME<TV> current_frame=joint->Compute_Current_Joint_Frame(*parent,*child);

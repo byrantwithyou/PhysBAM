@@ -5,6 +5,8 @@
 // Class UNIFORM_GRID_ITERATOR
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
