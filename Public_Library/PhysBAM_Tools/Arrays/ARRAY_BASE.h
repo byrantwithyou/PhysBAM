@@ -24,6 +24,7 @@
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <iostream>
+#include <algorithm>
 namespace PhysBAM{
 
 template<class T,class T_ARRAY,class ID> class ARRAY_BASE;

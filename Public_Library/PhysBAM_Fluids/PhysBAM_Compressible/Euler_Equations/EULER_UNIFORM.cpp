@@ -410,7 +410,7 @@ CFL(const T time) const
         TV max_lambdas;TV max_grad_p_over_rho,max_grad_p;
 
         Fill_Ghost_Cells(last_dt,time,3);
-        T_ARRAYS_SCALAR p_approx(grid.Domain_Indices(0));
+        T_ARRAYS_SCALAR p_approx(grid.Domain_Indices(1));
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())
             p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
         T_FACE_ARRAYS_SCALAR p_approx_face(grid);

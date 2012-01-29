@@ -33,7 +33,7 @@ Find_Uncolored_Node(const GRAPH& graph,const ARRAY<int>& colors,ARRAY<int>& unco
 {
     while(uncolored_nodes.m>0){
         int i=uncolored_nodes.Last();
-        if(graph.valid_nodes(i)&&colors(i)==0){seed_node=i;return true;}
+        if(graph.valid_nodes(i)&&colors(i)==-1){seed_node=i;return true;}
         else uncolored_nodes.Remove_Index_Lazy(uncolored_nodes.m);}
     return false;
 }
@@ -43,7 +43,7 @@ Find_Uncolored_Node(const GRAPH& graph,const ARRAY<int>& colors,ARRAY<int>& unco
 void FLOOD_FILL_GRAPH::
 Flood_Fill_From_Seed_Node(const GRAPH& graph,ARRAY<int>& colors,const int fill_color,bool& touches_uncolorable_node,const int seed_node)
 {
-    assert(colors(seed_node)==0);touches_uncolorable_node=false;
+    assert(colors(seed_node)==-1);touches_uncolorable_node=false;
     flood_fill_stack.Remove_All();
     flood_fill_stack.Push(seed_node);
     while(!flood_fill_stack.Empty()){
