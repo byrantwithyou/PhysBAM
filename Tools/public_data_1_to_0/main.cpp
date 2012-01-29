@@ -88,7 +88,10 @@ template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std
     try{
         TRIANGULATED_AREA<T>* area;
         FILE_UTILITIES::Create_From_File<T>(ifilename,area);
-        for(int i=0; i<area->mesh.elements.m;i++) area->mesh.elements(i)-=VECTOR<int,3>(1,1,1);
+        for(int i=0; i<area->mesh.elements.m;i++){
+            area->mesh.elements(i)-=VECTOR<int,3>(1,1,1);
+            if (area->mesh.elements(i)(0)<0 || area->mesh.elements(i)(1)<0 || area->mesh.elements(i)(2)<0){
+                LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}}
         FILE_UTILITIES::Write_To_File<T>(ofilename,*area);
     }
     catch(FILESYSTEM_ERROR&){}
@@ -102,7 +105,10 @@ template<class T> void Convert_Tri_File(const std::string& ifilename,const std::
     try{
         TRIANGULATED_SURFACE<T>* surface;
         FILE_UTILITIES::Create_From_File<T>(ifilename,surface);
-        for(int i=0; i<surface->mesh.elements.m;i++) surface->mesh.elements(i)-=VECTOR<int,3>(1,1,1);
+        for(int i=0; i<surface->mesh.elements.m;i++){
+            surface->mesh.elements(i)-=VECTOR<int,3>(1,1,1);
+            if (surface->mesh.elements(i)(0)<0 || surface->mesh.elements(i)(1)<0 || surface->mesh.elements(i)(2)<0){
+                LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}}
         FILE_UTILITIES::Write_To_File<T>(ofilename,*surface);
     }
     catch(FILESYSTEM_ERROR&){}
@@ -112,9 +118,18 @@ template<class T> void Convert_Tri_File(const std::string& ifilename,const std::
 //#################################################################
 template<class T> void Convert_Phi_File(const std::string& ifilename,const std::string& ofilename)
 {
+    LOG::cout<<"PHI: "<<ifilename<<" -> "<<ofilename<<std::endl;
     try{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* surface;
-        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);}
+        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);
+        VECTOR<int,3>& min_corner = surface->levelset.phi.domain.min_corner;
+        min_corner.x--;
+        min_corner.y--;
+        min_corner.z--;
+        if (min_corner.x<0 || min_corner.y<0 || min_corner.z<0){
+            LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*surface);
+    }
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################

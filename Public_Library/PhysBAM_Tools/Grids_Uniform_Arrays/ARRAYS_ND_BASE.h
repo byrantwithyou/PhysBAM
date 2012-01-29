@@ -258,7 +258,7 @@ public:
     {assert(domain.Lazy_Inside_Half_Open(index));return base_pointer[Compute_Index(index)];}
 
     bool Valid_Index(const TV_INT& index) const
-    {return domain.Lazy_Inside_Half_Open(index);}
+    {LOG::cout<<index<<std::endl; return domain.Lazy_Inside_Half_Open(index);}
 
     bool Valid_Index(const int i,const int j,const int ij) const
     {STATIC_ASSERT(d==3);return domain.Lazy_Inside_Half_Open(TV_INT(i,j,ij));}
@@ -270,7 +270,7 @@ public:
     {STATIC_ASSERT(d==1);return domain.Lazy_Inside_Half_Open(TV_INT(i));}
 
     int Standard_Index(const TV_INT& index) const
-    {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner)+1;}
+    {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner);}
 
     TV_INT Clamp(const TV_INT& i) const
     {return domain.Clamp(i);}
