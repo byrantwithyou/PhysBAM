@@ -61,7 +61,7 @@ void FLOOD_FILL_2D::
 Flood_Fill_Node(ARRAYS_ND_BASE<TV_INT>& colors,const int fill_color,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,
     bool& touches_uncolorable_node,STACK<TV_INT >& flood_fill_stack,const TV_INT& node)
 {
-    if(colors(node)==-1){touches_uncolorable_node=true;return;}else if(colors(node)!=0)return;colors(node)=fill_color;
+    if(colors(node)==-2){touches_uncolorable_node=true;return;}else if(colors(node)!=-1)return;colors(node)=fill_color;
     if(node.x>colors.domain.min_corner.x&&!edge_is_blocked_x(node.x,node.y)&&colors(node.x-1,node.y)<=0) flood_fill_stack.Push(TV_INT(node.x-1,node.y));
     if(node.x<colors.domain.max_corner.x-1&&!edge_is_blocked_x(node.x+1,node.y)&&colors(node.x+1,node.y)<=0) flood_fill_stack.Push(TV_INT(node.x+1,node.y));
     if(node.y>colors.domain.min_corner.y&&!edge_is_blocked_y(node.x,node.y)&&colors(node.x,node.y-1)<=0) flood_fill_stack.Push(TV_INT(node.x,node.y-1));
