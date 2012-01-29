@@ -258,7 +258,7 @@ public:
     {assert(domain.Lazy_Inside_Half_Open(index));return base_pointer[Compute_Index(index)];}
 
     bool Valid_Index(const TV_INT& index) const
-    {LOG::cout<<index<<std::endl; return domain.Lazy_Inside_Half_Open(index);}
+    {return domain.Lazy_Inside_Half_Open(index);}
 
     bool Valid_Index(const int i,const int j,const int ij) const
     {STATIC_ASSERT(d==3);return domain.Lazy_Inside_Half_Open(TV_INT(i,j,ij));}
