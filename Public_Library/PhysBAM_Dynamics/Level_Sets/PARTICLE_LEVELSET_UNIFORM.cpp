@@ -754,7 +754,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
     RANDOM_NUMBERS<T> local_random;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         if(!number_of_particles_to_add(block_index)) continue;
-        VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis);h(TV::dimension) = time;
+        VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis)+1;h(TV::dimension) = time; // INDEXING: the +1 can go away when we are done.
         local_random.Set_Seed(Hash(h));
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
@@ -903,16 +903,16 @@ Delete_Particles_Near_Outside_Grid(RANGE<TV_INT>& domain,int axis,int side)
     RANGE<TV> local_domain=levelset.grid.domain;TV domain_boundaries[2]={local_domain.Minimum_Corner(),local_domain.Maximum_Corner()};
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(negative_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-1);
             if(!negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}
         if(positive_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*positive_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*positive_particles(block),2*side-1);
             if(!positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}
         if(use_removed_negative_particles)if(removed_negative_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_negative_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_negative_particles(block),2*side-1);
             if(!removed_negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_negative_particles(block));}
         if(use_removed_positive_particles)if(removed_positive_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_positive_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_positive_particles(block),2*side-1);
             if(!removed_positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_positive_particles(block));}}
 }
 //#####################################################################
