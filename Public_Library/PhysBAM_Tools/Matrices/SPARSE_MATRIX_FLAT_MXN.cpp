@@ -37,17 +37,17 @@ template<class T> SPARSE_MATRIX_FLAT_NXN<T>* SPARSE_MATRIX_FLAT_MXN<T>::
 Create_Submatrix(const INTERVAL<int>& rows)
 {
     assert(rows.Size()+1==m);
-    int entries=0;for(int index=offsets(0);index<offsets(m+1);index++)if(rows.Lazy_Inside(A(index).j)) entries++;
+    int entries=0;for(int index=offsets(0);index<offsets(m);index++)if(rows.Lazy_Inside_Half_Open(A(index).j)) entries++;
     SPARSE_MATRIX_FLAT_NXN<T>* submatrix=new SPARSE_MATRIX_FLAT_NXN<T>();
     submatrix->n=rows.Size()+1;
     submatrix->offsets.Resize(submatrix->n+1);
     submatrix->A.Resize(entries);
-    int next_index=1,shift=rows.min_corner-1;
+    int next_index=0,shift=rows.min_corner-1;
     for(int i=0;i<submatrix->n;i++){
         submatrix->offsets(i)=next_index;
-        for(int old_index=offsets(i);old_index<offsets(i+1);old_index++)if(rows.Lazy_Inside(A(old_index).j)){
+        for(int old_index=offsets(i);old_index<offsets(i+1);old_index++)if(rows.Lazy_Inside_Half_Open(A(old_index).j)){
             submatrix->A(next_index).j=A(old_index).j-shift;submatrix->A(next_index).a=A(old_index).a;next_index++;}}
-    submatrix->offsets(submatrix->n+1)=next_index;
+    submatrix->offsets(submatrix->n)=next_index;
     return submatrix;
 }
 //#####################################################################
@@ -56,9 +56,9 @@ Create_Submatrix(const INTERVAL<int>& rows)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
-    m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=1;
+    m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=0;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
-    A.Resize(offsets(m+1)-1);
+    A.Resize(offsets(m)-1);
 }
 //#####################################################################
 // Function Find_Index
@@ -67,7 +67,7 @@ template<class T> int SPARSE_MATRIX_FLAT_MXN<T>::
 Find_Index(const int i,const int j) const
 {
     assert(A.m);assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);
-    int index=offsets(i);while(A(index).j && A(index).j<j)index++;
+    int index=offsets(i);while(A(index).j>=0 && A(index).j<j)index++;
     assert(index<offsets(i+1));return index;
 }
 //#####################################################################
@@ -77,11 +77,11 @@ template<class T> int SPARSE_MATRIX_FLAT_MXN<T>::
 Find_Index_Exists(const int i,const int j) const
 {
     assert(A.m);assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);
-    int index=offsets(i);while(A(index).j && A(index).j<j)index++;
+    int index=offsets(i);while(A(index).j>=0 && A(index).j<j)index++;
     if(index<offsets(i+1) && A(index).j==j)
         return index;
     else
-        return 0;
+        return -1;
 }
 //#####################################################################
 // Function operator()
@@ -92,7 +92,7 @@ operator()(const int i,const int j)
     int index=Find_Index(i,j);
     if(A(index).j!=j){ // need to add entry
         if(A(index).j){ // shift entries over to make room
-            assert(!A(offsets(i+1)-1).j);
+            assert(A(offsets(i+1)-1).j>=0);
             for(int jj=offsets(i+1)-1;jj>index;jj--) A(jj)=A(jj-1);}
         A(index).j=j;A(index).a=0;}
     return A(index).a;
@@ -232,7 +232,7 @@ Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
         index=end;}
     compressed.Set_Row_Lengths(row_lengths);
     index=offsets(0);
-    int compressed_index=1;
+    int compressed_index=0;
     for(int i=0;i<m;i++){
         int end=offsets(i+1);
         while(index<end){if(!A(index).j) break;
@@ -526,7 +526,7 @@ Append_Entry_To_Current_Row(const int c,const T a)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Finish_Row()
 {
-    offsets.Append(A.m+1);
+    offsets.Append(A.m);
     m++;
 }
 //#####################################################################

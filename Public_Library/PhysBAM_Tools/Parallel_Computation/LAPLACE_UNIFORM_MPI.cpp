@@ -119,7 +119,7 @@ Find_Matrix_Indices_In_Region(const int region_index,const RANGE<TV_INT>& region
     else for(int color=0;color<filled_region_ranks.m;color++)partitions(color).interior_indices.min_corner=filled_region_cell_count(color)+1;
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT c=iterator.Cell_Index();
         int color=filled_region_colors(c);if(color<1 || (!filled_region_touches_dirichlet(color)&&!solve_neumann_regions)) continue;
-        int new_index=++filled_region_cell_count(color);cell_index_to_matrix_index(c)=new_index;
+        int new_index=filled_region_cell_count(color)++;cell_index_to_matrix_index(c)=new_index;
         matrix_index_to_cell_index_array(color)(new_index)=c;}
     if(region_index) for(int color=0;color<filled_region_ranks.m;color++)partitions(color).ghost_indices(region_index).max_corner=filled_region_cell_count(color);
     else for(int color=0;color<filled_region_ranks.m;color++)partitions(color).interior_indices.max_corner=filled_region_cell_count(color);

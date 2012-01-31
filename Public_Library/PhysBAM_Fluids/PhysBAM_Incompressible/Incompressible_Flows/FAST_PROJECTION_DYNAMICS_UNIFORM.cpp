@@ -46,7 +46,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     int count=0;
     for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int matrix_index;
-        count++;cell_index_to_matrix_index(cell_index)=matrix_index=count;
+        cell_index_to_matrix_index(cell_index)=matrix_index=count++;
         matrix_index_to_cell_index(matrix_index)=cell_index;}
     for(int i=0;i<row_counts.m;i++){
         int boundary=0;

@@ -105,7 +105,7 @@ Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,A
     for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         int color=filled_region_colors(cell_index);assert(color!=-1);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
-            int row_count=1;
+            int row_count=0;
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset;offset[axis]=1;
                 if(((filled_region_colors.Valid_Index(cell_index-offset) && filled_region_colors(cell_index-offset)==color) ||
                     (grid.Domain_Indices().Lazy_Outside(cell_index-offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index)) row_count++;
@@ -202,7 +202,7 @@ Compute_Matrix_Indices(const RANGE<TV_INT>& domain,ARRAY<int,VECTOR<int,1> >& fi
     for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
         int color=filled_region_colors(iterator.Cell_Index());
         if(color>=0&&(filled_region_touches_dirichlet(color)||solve_neumann_regions)){
-            cell_index_to_matrix_index(iterator.Cell_Index())=++filled_region_cell_count(color);
+            cell_index_to_matrix_index(iterator.Cell_Index())=filled_region_cell_count(color)++;
             matrix_index_to_cell_index_array(color)(filled_region_cell_count(color))=iterator.Cell_Index();}}
 }
 //#####################################################################

@@ -23,7 +23,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
     const ARRAY<INTERVAL<int> >& ghost_indices=all_ghost_indices(tid);
 
-    int local_n=A.n,interior_n=interior_indices.Size()+1;
+    int local_n=A.n,interior_n=interior_indices.Size();
     int global_n=Global_Sum_Int(interior_n);
     T global_tolerance=Global_Max(tolerance);
     pcg.maximum_iterations=40;

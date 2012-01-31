@@ -244,7 +244,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(!poisson->psi_D(cell_index) && valid_divergence_cells(cell_index)){
-            cell_index_to_matrix_index(cell_index)=++cell_count;
+            cell_index_to_matrix_index(cell_index)=cell_count++;
         }
     }
     divergence_indices.max_corner=cell_count;
@@ -252,7 +252,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(!poisson->psi_D(cell_index) && !valid_divergence_cells(cell_index)){
-            cell_index_to_matrix_index(cell_index)=++cell_count;
+            cell_index_to_matrix_index(cell_index)=cell_count++;
         }
     }
 
