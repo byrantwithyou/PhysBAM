@@ -8,7 +8,9 @@
 #define __max__
 
 namespace PhysBAM{
-
+#define QQ(x) LOG::cout<<#x<<" "<<(x)<<std::endl;
+#define ZZ(x) LOG::cout<<"Z "<<#x<<" "<<(x+1)<<std::endl;
+#define RA(x) LOG::cout<<"R "<<#x<<" ("<<((x).min_corner+1)<<" "<<(x).max_corner<<")"<<std::endl;
 template<class T>
 inline T max(const T a, const T b)
 {return (a>b)?a:b;}

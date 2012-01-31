@@ -37,7 +37,7 @@ UNIFORM_GRID_ITERATOR_CELL(const GRID<TV>& grid_input,const int number_of_ghost_
                     domain.min_corner(axis)=grid.numbers_of_cells(axis);
                     Add_Region(domain);
                     domain.max_corner(axis)=grid.numbers_of_cells(axis);
-                    domain.min_corner(axis)=1;}}
+                    domain.min_corner(axis)=0;}}
             else{int axis=side/2;if(side&1) domain.min_corner(axis)=grid.numbers_of_cells(axis);else domain.max_corner(axis)=0;Add_Region(domain);}
             break;}
     Reset();
