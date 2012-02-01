@@ -89,7 +89,7 @@ Initialize_Hierarchy(const bool update_boxes) // creates and updates the boxes a
     TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Hierarchy(*this,update_boxes);
 }
 //#####################################################################
-// Funcion Initialize_Octahedron_Mesh_And_Particles
+// Function Initialize_Octahedron_Mesh_And_Particles
 //#####################################################################
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid)
@@ -97,7 +97,7 @@ Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid)
     TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Octahedron_Mesh_And_Particles(*this,grid);
 }
 //#####################################################################
-// Funcion Initialize_Cube_Mesh_And_Particles
+// Function Initialize_Cube_Mesh_And_Particles
 //#####################################################################
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid)
