@@ -215,11 +215,7 @@ public:
     {return location.All_Greater_Equal(min_corner) && location.All_Less_Equal(max_corner);}
 
     bool Lazy_Inside_Half_Open(const TV& location) const
-    {
-        std::cout<<"location:  "<<location<<std::endl;
-        std::cout<<"min_corner:"<<min_corner<<std::endl;
-        std::cout<<"max_corner:"<<max_corner<<std::endl;
-        return location.All_Greater_Equal(min_corner) && location.All_Less(max_corner);}
+    {return location.All_Greater_Equal(min_corner) && location.All_Less(max_corner);}
     
     bool Inside(const TV& location,const T thickness_over_two) const
     {return Thickened(-thickness_over_two).Lazy_Inside(location);}

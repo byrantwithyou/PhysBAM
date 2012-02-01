@@ -20,26 +20,21 @@ Generate_Topology()
     vertices.Resize(0,m,0,n,0,mn);
     int z=vertices.counts.z,yz=vertices.counts.y*z;
     TV_INT i;
-    LOG::cout<<"***vertices: "<<vertices.counts<<std::endl;
-    LOG::cout<<"1---------------------------------"<<std::endl;
     for(i.x=0;i.x<m-1;i.x++)for(i.y=1;i.y<n;i.y++)for(i.z=1;i.z<mn;i.z++){ // generate one triangle pair per x edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x+1,i.y,i.z);
         int index=vertices.Standard_Index(i),index_j=index-z,index_ij=index-1,index_j_ij=index_j-1;
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_j_ij,index_ij,index,index_j));
         else if(phi1>0&&phi2<=0)topology.Append(VECTOR<int,4>(index_j,index,index_ij,index_j_ij));}
-    LOG::cout<<"2---------------------------------"<<std::endl;
     for(i.x=1;i.x<m;i.x++)for(i.y=0;i.y<n-1;i.y++)for(i.z=1;i.z<mn;i.z++){ // generate one triangle pair per y edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x,i.y+1,i.z);
         int index=vertices.Standard_Index(i),index_i=index-yz,index_ij=index-1,index_i_ij=index_i-1;
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_i_ij,index_i,index,index_ij));
         else if(phi1>0&&phi2<=0)topology.Append(VECTOR<int,4>(index_ij,index,index_i,index_i_ij));}
-    LOG::cout<<"3---------------------------------"<<std::endl;
     for(i.x=1;i.x<m;i.x++)for(i.y=1;i.y<n;i.y++)for(i.z=0;i.z<mn-1;i.z++){ // generate one triangle pair per z edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x,i.y,i.z+1);
         int index=vertices.Standard_Index(i),index_i=index-yz,index_j=index-z,index_i_j=index_i-z;
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_i_j,index_j,index,index_i));
         else if(phi1>0&&phi2<=0)topology.Append(VECTOR<int,4>(index_i,index,index_j,index_i_j));}
-    LOG::cout<<"4---------------------------------"<<std::endl;
     topology.Compact();
     for(int t=0;t<topology.m;t++){
         int i,j,k,l;topology(t).Get(i,j,k,l);
