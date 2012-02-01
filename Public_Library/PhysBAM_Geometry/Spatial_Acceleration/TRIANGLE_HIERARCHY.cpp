@@ -45,14 +45,21 @@ Initialize_Hierarchy_Using_KD_Tree()
 {
     KD_TREE<VECTOR<T,3> > kd_tree(false);
     ARRAY<VECTOR<T,3> > centroids(triangle_mesh.elements.m);
-    for(int t=0;t<triangle_mesh.elements.m;t++){int i,j,k;triangle_mesh.elements(t).Get(i,j,k);centroids(t)=TRIANGLE_3D<T>::Center(particles.X(i),particles.X(j),particles.X(k));}
+
+    for(int t=0;t<triangle_mesh.elements.m;t++){int i,j,k;triangle_mesh.elements(t).Get(i,j,k);centroids(t)=TRIANGLE_3D<T>::Center(particles.X(i),particles.X(j),particles.X(k));//std::cout << std::endl << i << "/ " << j << "/ " << k <<std::endl; 
+}
     if(triangles_per_group){
         triangles_in_group.Clean_Memory();
         kd_tree.Create_Left_Balanced_KD_Tree_With_Grouping(centroids,triangles_in_group,triangles_per_group);
-        leaves=triangles_in_group.m;parents.Resize(leaves);}
+        leaves=triangles_in_group.m;parents.Resize(leaves);
+	//std::cout << "group/"<<leaves<<std::endl;
+}
     else{
         kd_tree.Create_Left_Balanced_KD_Tree(centroids);
-        leaves=triangle_mesh.elements.m;parents.Resize(leaves);}
+        leaves=triangle_mesh.elements.m;parents.Resize(leaves);
+//std::cout << "NOgroup/"<<leaves<<std::endl;
+}
+//std::cout << "!!! " << kd_tree.root_node->node_index << std::endl;
     children.Remove_All();root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);
     assert(root==2*leaves-2);
     box_hierarchy.Resize(root+1);box_radius.Resize(root+1);
