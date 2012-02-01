@@ -89,7 +89,7 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARR
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
 Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const int side,const RANGE<TV_INT>& region) const
 {
-    int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis]+1;
+    int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis];
     NODE_ITERATOR iterator(grid,region);
     if(use_fixed_boundary) for(;iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
         u_ghost(node)=fixed_boundary_value;}
