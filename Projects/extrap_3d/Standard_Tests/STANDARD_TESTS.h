@@ -647,7 +647,6 @@ void Get_Initial_Data()
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
-	std::cout << density << std::endl;
     switch(test_number){
         case 1: case 7:{
             tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,density);
