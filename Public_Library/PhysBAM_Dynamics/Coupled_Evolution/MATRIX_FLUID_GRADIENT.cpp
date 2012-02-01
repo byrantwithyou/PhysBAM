@@ -63,7 +63,7 @@ template<class TV> void MATRIX_FLUID_GRADIENT<TV>::
 Add_Cell(int face_lookup,int axis,const TV_INT& cell_index,T weight)
 {
     int cell_lookup;
-    if(periodic_boundary(axis) && index_map.grid.Domain_Indices().Lazy_Outside(cell_index)){
+    if(periodic_boundary(axis) && index_map.grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index)){
         TV_INT periodic_offset_cell=cell_index;
         int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,index_map.grid.counts[axis]);
         periodic_offset_cell[axis]=axis_periodic_cell;

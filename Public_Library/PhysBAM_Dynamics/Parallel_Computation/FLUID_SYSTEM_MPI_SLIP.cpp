@@ -41,7 +41,7 @@ FLUID_SYSTEM_MPI_SLIP(const bool use_preconditioner_input,const SPARSE_MATRIX_FL
         C_s.Transpose(C_s_transpose);
         // want to zero out columns outside the local box
         for(int i=0;i<C_s_transpose.A.m;i++)
-            if(interior_regions.Lazy_Outside(C_s_transpose.A(i).j))
+            if(interior_regions.Lazy_Outside_Half_Open(C_s_transpose.A(i).j))
                 C_s_transpose.A(i).a=0;
         solid_velocities_size_vector.Resize(J.n);}
     if(use_preconditioner){

@@ -18,7 +18,7 @@ template<class T>
 struct SPARSE_MATRIX_ENTRY
 {
     int j;T a;
-    SPARSE_MATRIX_ENTRY():j(0),a(0){}
+    SPARSE_MATRIX_ENTRY():j(-1),a(0){}
     SPARSE_MATRIX_ENTRY(int index,T value):j(index),a(value){}
     bool operator<(const SPARSE_MATRIX_ENTRY& s) const {return j<s.j;}
 };

@@ -36,7 +36,7 @@ SPARSE_MATRIX_FLAT_NXN(const ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& matrices)
     for(int i=0;i<matrices.m;i++){matrix_row_offsets(i+1)=matrix_row_offsets(i)+matrices(i).n;matrix_element_offsets(i+1)=matrix_element_offsets(i)+matrices(i).A.m;}
     int index=0;
     for(int i=0;i<matrices.m;i++)for(int j=0;j<matrices(i).n;j++,index++) offsets(index+1)=offsets(index)+matrices(i).offsets(j+1)-matrices(i).offsets(j);
-    A.Resize(offsets(n)-1);
+    A.Resize(offsets(n));
     for(int i=0;i<matrices.m;i++)for(int j=0;j<matrices(i).A.m;j++){A(matrix_element_offsets(i)+j).j=matrices(i).A(j).j+matrix_row_offsets(i);A(matrix_element_offsets(i)+j).a=matrices(i).A(j).a;}
 }
 //#####################################################################
@@ -64,16 +64,15 @@ Create_Submatrix(const INTERVAL<int>& rows)
 {
     int entries=0;for(int index=offsets(rows.min_corner);index<offsets(rows.max_corner);index++)if(rows.Lazy_Inside_Half_Open(A(index).j)) entries++;
     SPARSE_MATRIX_FLAT_NXN<T>* submatrix=new SPARSE_MATRIX_FLAT_NXN<T>();
-    submatrix->n=rows.Size()+1;
+    submatrix->n=rows.Size();
     submatrix->offsets.Resize(submatrix->n+1);
     submatrix->A.Resize(entries);
-    int next_index=0,shift=rows.min_corner-1;
+    int next_index=0;
     for(int i=0;i<submatrix->n;i++){
         submatrix->offsets(i)=next_index;
-        for(int old_index=offsets(i+shift);old_index<offsets(i+shift+1);old_index++)if(rows.Lazy_Inside_Half_Open(A(old_index).j)){
-            submatrix->A(next_index).j=A(old_index).j-shift;submatrix->A(next_index).a=A(old_index).a;next_index++;}}
-    submatrix->offsets(submatrix->n+1)=next_index;
-    //LOG::cout<<"Offsets "<<submatrix->offsets<<std::endl;
+        for(int old_index=offsets(i+rows.min_corner);old_index<offsets(i+rows.min_corner+1);old_index++)if(rows.Lazy_Inside_Half_Open(A(old_index).j)){
+            submatrix->A(next_index).j=A(old_index).j-rows.min_corner;submatrix->A(next_index).a=A(old_index).a;next_index++;}}
+    submatrix->offsets(submatrix->n)=next_index;
     return submatrix;
 }
 //#####################################################################
@@ -85,7 +84,7 @@ Set_Row_Lengths(const ARRAY<int>& lengths)
     diagonal_index.Clean_Memory();delete C;C=0;n=lengths.m;
     offsets.Resize(n+1,false,false);offsets(0)=0;
     for(int i=0;i<n;i++){assert(lengths(i));offsets(i+1)=offsets(i)+lengths(i);}
-    A.Resize(offsets(n)-1);
+    A.Resize(offsets(n));
 }
 //#####################################################################
 // Function Find_Index
@@ -94,7 +93,7 @@ template<class T> int SPARSE_MATRIX_FLAT_NXN<T>::
 Find_Index(const int i,const int j) const
 {
     assert(A.m);assert((unsigned)i<(unsigned)n);assert((unsigned)j<(unsigned)n);
-    int index=offsets(i);while(A(index).j>=0 && A(index).j<j)index++;
+    int index=offsets(i);while(A(index).j>=0 && A(index).j<j) index++;
     assert(index<offsets(i+1));return index;
 }
 //#####################################################################
@@ -105,8 +104,8 @@ operator()(const int i,const int j)
 {
     int index=Find_Index(i,j);
     if(A(index).j!=j){ // need to add entry
-        if(A(index).j){ // shift entries over to make room
-            assert(A(offsets(i+1)-1).j>=0);
+        if(A(index).j>=0){ // shift entries over to make room
+            assert(A(offsets(i+1)-1).j<0);
             for(int jj=offsets(i+1)-1;jj>index;jj--)A(jj)=A(jj-1);}
         A(index).j=j;A(index).a=0;}
     return A(index).a;
@@ -137,7 +136,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     //TODO: Remove const casting
-    INT_ITERATOR_THREADED_ALPHA<SPARSE_MATRIX_FLAT_NXN<T> >(1,n,thread_queue).template Run<const VECTOR_ND<T>&,VECTOR_ND<T>&>(*const_cast<SPARSE_MATRIX_FLAT_NXN<T>*>(this),&SPARSE_MATRIX_FLAT_NXN<T>::Times_Threaded,x,result);
+    INT_ITERATOR_THREADED_ALPHA<SPARSE_MATRIX_FLAT_NXN<T> >(0,n,thread_queue).template Run<const VECTOR_ND<T>&,VECTOR_ND<T>&>(*const_cast<SPARSE_MATRIX_FLAT_NXN<T>*>(this),&SPARSE_MATRIX_FLAT_NXN<T>::Times_Threaded,x,result);
 }
 //#####################################################################
 // Function Multiply
@@ -155,7 +154,7 @@ template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Times(const int row_start,const int row_end,const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 {
     int index=offsets(row_start);
-    for(int i=row_start;i<=row_end;i++){
+    for(int i=row_start;i<row_end;i++){
         int end=offsets(i+1);T sum=0;
         for(;index<end;index++)sum+=A(index).a*x(A(index).j);
         result(i)=sum;}

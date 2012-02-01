@@ -39,6 +39,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     elliptic_solver->Set_Neumann_Outer_Boundaries();
     int number_of_elements=TV::dimension==2?scale*scale:scale*scale*scale;
     cell_index_to_matrix_index.Resize(mac_grid.Domain_Indices());
+    cell_index_to_matrix_index.Fill(-1);
     matrix_index_to_cell_index.Resize(number_of_elements);
     b.Resize(number_of_elements);
     ARRAY<int> row_counts;

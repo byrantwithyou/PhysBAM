@@ -235,11 +235,11 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count)
 {
     if(region_index)
-        partition.ghost_indices(region_index).min_corner=cell_count+1;
+        partition.ghost_indices(region_index).min_corner=cell_count;
     else
-        partition.interior_indices.min_corner=cell_count+1;
+        partition.interior_indices.min_corner=cell_count;
 
-    divergence_indices.min_corner=cell_count+1;
+    divergence_indices.min_corner=cell_count;
     int count_before=cell_count;
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();

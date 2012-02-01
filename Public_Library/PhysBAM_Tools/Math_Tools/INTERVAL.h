@@ -147,6 +147,9 @@ public:
     bool Lazy_Outside(const T& location) const
     {return !Lazy_Inside(location);}
 
+    bool Lazy_Outside_Half_Open(const T& location) const
+    {return !Lazy_Inside_Half_Open(location);}
+
     bool Outside(const T& location,const T thickness_over_two) const
     {return Thickened(thickness_over_two).Lazy_Outside(location);}
 

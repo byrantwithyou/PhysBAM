@@ -267,7 +267,9 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         // Set up fluids matrix (A_array) and RHS (b_array from modifying poisson->f for boundary conditions in psi_D)
         number_of_regions=poisson.number_of_regions;
-        matrix_index_to_cell_index_array.Resize(number_of_regions);cell_index_to_matrix_index.Resize(grid.Domain_Indices(1));
+        matrix_index_to_cell_index_array.Resize(number_of_regions);
+        cell_index_to_matrix_index.Resize(grid.Domain_Indices(1));
+        cell_index_to_matrix_index.Fill(-1);
         ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
         A_array.Resize(number_of_regions);b_array.Resize(number_of_regions);
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
