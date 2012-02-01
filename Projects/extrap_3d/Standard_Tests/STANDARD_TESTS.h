@@ -710,7 +710,7 @@ void Get_Initial_Data()
         case 8:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
             tests.Create_Mattress(mattress_grid,true,&initial_state);
-            tests.Add_Ground();
+            // tests.Add_Ground();
             break;}
         case 80:{
             RIGID_BODY_STATE<TV> initial_state(FRAME<TV>(TV(0,4,0)));
