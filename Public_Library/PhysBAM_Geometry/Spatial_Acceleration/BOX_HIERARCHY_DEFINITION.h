@@ -21,14 +21,10 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
     ARRAY_VIEW<const RANGE<TV> > self_box_hierarchy(box_hierarchy),other_box_hierarchy(other_hierarchy.box_hierarchy);
     ARRAY_VIEW<const VECTOR<int,2> > self_children(children),other_children(other_hierarchy.children);
 
-std::cout << self_box << " " << other_box << " " << leaves << " " << other_leaves << std::endl;
-
     while(!stack.Empty()){
         int self_hierarchy_box,other_hierarchy_box;stack.Pop().Get(self_hierarchy_box,other_hierarchy_box);
-std::cout << self_hierarchy_box << " " << other_hierarchy_box << " " << self_box << " " << other_box << " " << leaves << " " << other_leaves << std::endl;
         if(visitor.Cull(self_hierarchy_box,other_hierarchy_box)) continue;
         if(!self_box_hierarchy(self_hierarchy_box).Intersection(other_box_hierarchy(other_hierarchy_box),extra_thickness)) continue;
-std::cout << self_hierarchy_box << " " << other_hierarchy_box << " " << self_box << " " << other_box << " " << leaves << " " << other_leaves  << std::endl;
         if(self_hierarchy_box<self_leaves && other_hierarchy_box<other_leaves) visitor.Store(self_hierarchy_box,other_hierarchy_box);
         else if(self_hierarchy_box<self_leaves){int child_box1,child_box2;other_children(other_hierarchy_box-other_leaves).Get(child_box1,child_box2);
             stack.Push(VECTOR<int,2>(self_hierarchy_box,child_box1));stack.Push(VECTOR<int,2>(self_hierarchy_box,child_box2));}
