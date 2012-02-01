@@ -54,12 +54,14 @@ Solve(const T time,const bool solution_regions_already_computed)
         pcg_threaded->maximum_iterations=pcg.maximum_iterations;
         pcg_threaded->number_of_threads=thread_queue->Number_Of_Threads();pthread_barrier_init(&pcg_threaded->barr,0,pcg_threaded->number_of_threads);}
 #endif
-    ARRAY<ARRAY<TV_INT> > matrix_index_to_cell_index_array(number_of_regions);T_ARRAYS_INT cell_index_to_matrix_index(grid.Domain_Indices(1));
+    ARRAY<ARRAY<TV_INT> > matrix_index_to_cell_index_array(number_of_regions);
+    T_ARRAYS_INT cell_index_to_matrix_index(grid.Domain_Indices(1));
+    cell_index_to_matrix_index.Fill(-1);
     ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
     ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(number_of_regions);ARRAY<VECTOR_ND<T> > b_array(number_of_regions);
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(filled_region_colors(iterator.Cell_Index()))++;
     for(int color=0;color<number_of_regions;color++) if(filled_region_touches_dirichlet(color)||solve_neumann_regions){
-        matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color)+1);}
+        matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}
     filled_region_cell_count.Fill(0); // reusing this array in order to make the indirection arrays
     DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_UNIFORM<T_GRID>,TV> threaded_iterator(grid.Domain_Indices(1),thread_queue,1,1,2,1);
     ARRAY<int,TV_INT> domain_index(grid.Domain_Indices(1),false);
@@ -108,9 +110,9 @@ Find_A_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_INT& cell_index_to_matrix_index,A
             int row_count=1;
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset;offset[axis]=1;
                 if(((filled_region_colors.Valid_Index(cell_index-offset) && filled_region_colors(cell_index-offset)==color) ||
-                    (grid.Domain_Indices().Lazy_Outside(cell_index-offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index)) row_count++;
+                    (grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index-offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index)) row_count++;
                 if(((filled_region_colors.Valid_Index(cell_index+offset) && filled_region_colors(cell_index+offset)==color) ||
-                    (grid.Domain_Indices().Lazy_Outside(cell_index+offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index+offset)) row_count++;}
+                    (grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis])) && !psi_N.Component(axis)(cell_index+offset)) row_count++;}
             row_counts(color)(cell_index_to_matrix_index(cell_index))=row_count;}}
 }
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
@@ -129,7 +131,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                 if(filled_region_colors.Valid_Index(cell_index-offset)){
                     if(use_psi_R && (r=psi_R.Component(axis)(cell_index))) row_sum+=one_over_dx2[axis]*r;
                     else if(psi_N.Component(axis)(cell_index)) row_sum+=one_over_dx2[axis];
-                    else if(grid.Domain_Indices().Lazy_Outside(cell_index-offset) && periodic_boundary[axis]){
+                    else if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index-offset) && periodic_boundary[axis]){
                         TV_INT periodic_offset_cell=cell_index-offset;
                         int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
                         periodic_offset_cell[axis]=axis_periodic_cell;
@@ -140,7 +142,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                 if(filled_region_colors.Valid_Index(cell_index+offset)){               
                     if(use_psi_R && (r=psi_R.Component(axis)(cell_index+offset))) row_sum+=one_over_dx2[axis]*r;
                     else if(psi_N.Component(axis)(cell_index+offset)) row_sum+=one_over_dx2[axis];
-                    else if(grid.Domain_Indices().Lazy_Outside(cell_index+offset) && periodic_boundary[axis]){
+                    else if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis]){
                         TV_INT periodic_offset_cell=cell_index+offset;
                         int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
                         periodic_offset_cell[axis]=axis_periodic_cell;
@@ -202,8 +204,8 @@ Compute_Matrix_Indices(const RANGE<TV_INT>& domain,ARRAY<int,VECTOR<int,1> >& fi
     for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
         int color=filled_region_colors(iterator.Cell_Index());
         if(color>=0&&(filled_region_touches_dirichlet(color)||solve_neumann_regions)){
-            cell_index_to_matrix_index(iterator.Cell_Index())=++filled_region_cell_count(color);
-            matrix_index_to_cell_index_array(color)(filled_region_cell_count(color))=iterator.Cell_Index();}}
+            matrix_index_to_cell_index_array(color)(filled_region_cell_count(color))=iterator.Cell_Index();
+            cell_index_to_matrix_index(iterator.Cell_Index())=filled_region_cell_count(color)++;}}
 }
 //#####################################################################
 // Function Compute_Matrix_Indices_Threaded
@@ -214,7 +216,7 @@ Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTER
     for(int i=0;i<domains.m;i++){
         RANGE<TV_INT> interior_domain(domains(i));
         interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
-        for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color)+1;
+        for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color);
         Compute_Matrix_Indices(interior_domain,filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=axis*2+side;
@@ -226,7 +228,7 @@ Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTER
             RANGE<TV_INT> interior_domain(domains(i));
             interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
             interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
-            for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color)+1;
+            for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color);
             Compute_Matrix_Indices(RANGE<TV_INT>::Intersect(exterior_domain,interior_domain),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).max_corner=filled_region_cell_count(color);}}
 }

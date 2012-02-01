@@ -51,7 +51,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                         if(!psi_N.Component(axis)(cell_index)){
                             T element=divergence_face_weights.Component(axis)(cell_index)*beta_face.Component(axis)(cell_index)*one_over_dx2[axis];
                             diagonal-=element;
-                            if(grid.Domain_Indices().Lazy_Outside(cell_index-offset) && periodic_boundary[axis]){
+                            if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index-offset) && periodic_boundary[axis]){
                                 TV_INT periodic_offset_cell=cell_index-offset;
                                 int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
                                 periodic_offset_cell[axis]=axis_periodic_cell;
@@ -62,7 +62,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                         if(!psi_N.Component(axis)(cell_index+offset)){
                             T element=divergence_face_weights.Component(axis)(cell_index+offset)*beta_face.Component(axis)(cell_index+offset)*one_over_dx2[axis];
                             diagonal-=element;
-                            if(grid.Domain_Indices().Lazy_Outside(cell_index+offset) && periodic_boundary[axis]){
+                            if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis]){
                                 TV_INT periodic_offset_cell=cell_index+offset;
                                 int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
                                 periodic_offset_cell[axis]=axis_periodic_cell;
@@ -81,7 +81,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                     if(filled_region_colors.Valid_Index(cell_index-offset)){
                         if(!psi_N.Component(axis)(cell_index)){T element=beta_face.Component(axis)(cell_index)*one_over_dx2[axis];
                             diagonal-=element;
-                            if(grid.Domain_Indices().Lazy_Outside(cell_index-offset) && periodic_boundary[axis]){
+                            if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index-offset) && periodic_boundary[axis]){
                                 TV_INT periodic_offset_cell=cell_index-offset;
                                 int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
                                 periodic_offset_cell[axis]=axis_periodic_cell;
@@ -91,7 +91,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                     if(filled_region_colors.Valid_Index(cell_index+offset)){
                         if(!psi_N.Component(axis)(cell_index+offset)){T element=beta_face.Component(axis)(cell_index+offset)*one_over_dx2[axis];
                             diagonal-=element;
-                            if(grid.Domain_Indices().Lazy_Outside(cell_index+offset) && periodic_boundary[axis]){
+                            if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis]){
                                 TV_INT periodic_offset_cell=cell_index+offset;
                                 int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
                                 periodic_offset_cell[axis]=axis_periodic_cell;

@@ -596,7 +596,9 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
                 number_of_regions=poisson->number_of_regions;
 
                 ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
-                matrix_index_to_cell_index_array.Resize(number_of_regions);cell_index_to_matrix_index.Resize(fluids_parameters->grid->Domain_Indices(1));
+                matrix_index_to_cell_index_array.Resize(number_of_regions);
+                cell_index_to_matrix_index.Resize(fluids_parameters->grid->Domain_Indices(1));
+                cell_index_to_matrix_index.Fill(-1);
                 for(CELL_ITERATOR iterator(*fluids_parameters->grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson->filled_region_colors(iterator.Cell_Index()))++;
                 for(int color=0;color<number_of_regions;color++) if(poisson->filled_region_touches_dirichlet(color)||poisson->solve_neumann_regions){
                         matrix_index_to_cell_index_array(color).Resize(filled_region_cell_count(color));}

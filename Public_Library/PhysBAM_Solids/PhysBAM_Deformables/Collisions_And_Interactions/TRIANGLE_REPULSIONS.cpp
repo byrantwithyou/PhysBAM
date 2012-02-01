@@ -157,9 +157,9 @@ Compute_Interaction_Pairs(ARRAY_VIEW<const TV> X_other)
     LOG::SCOPE scope("computing repulsion pairs", "computing repulsion pairs");
     point_face_interaction_pairs.Remove_All();edge_edge_interaction_pairs.Remove_All();
     for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
-        for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
+        for(int i=0;i<2;i++){if(i==1 && pair[0]==pair[1]) break;
             if(compute_point_face_friction || compute_point_face_inelastic_collision_repulsion || compute_point_face_repulsion){
-                Get_Faces_Near_Points(*geometry.structure_geometries(pair[i]),*geometry.structure_geometries(pair[2-i]),X_other,true);}}
+                Get_Faces_Near_Points(*geometry.structure_geometries(pair[i]),*geometry.structure_geometries(pair[1-i]),X_other,true);}}
         if(compute_edge_edge_friction || compute_edge_edge_inelastic_collision_repulsion || compute_edge_edge_repulsion){
             Get_Edges_Near_Edges(*geometry.structure_geometries(pair[0]),*geometry.structure_geometries(pair[1]),X_other,true);}}
 

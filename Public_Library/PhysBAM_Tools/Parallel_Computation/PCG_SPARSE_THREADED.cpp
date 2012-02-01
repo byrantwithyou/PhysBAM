@@ -20,7 +20,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
     const ARRAY<INTERVAL<int> >& ghost_indices=all_ghost_indices(tid);
 
-    int global_n=A.n,interior_n=interior_indices.Size()+1;
+    int global_n=A.n,interior_n=interior_indices.Size();
     T global_tolerance=tolerance;
     int desired_iterations=global_n;if(enforce_compatibility) desired_iterations--;if(maximum_iterations) desired_iterations=min(desired_iterations,maximum_iterations);
 
@@ -271,7 +271,7 @@ Solve_Part_One(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const
     int tid=domain_index(interior_domain.min_corner);
     assert(tid==domain_index(interior_domain.max_corner));
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
-    int interior_n=interior_indices.Size()+1;
+    int interior_n=interior_indices.Size();
 
     z_interior(tid).Resize(interior_n);
     x_interior(tid).Set_Subvector_View(x,interior_indices);
@@ -321,7 +321,7 @@ Solve_Part_Five(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,cons
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
-    int interior_n=interior_indices.Size()+1;
+    int interior_n=interior_indices.Size();
     
     T beta=0;if(iteration==0) p_interior(tid)=z_interior(tid);else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(tid)(i)=z_interior(tid)(i)+beta*p_interior(tid)(i);}
 }
@@ -341,7 +341,7 @@ Solve_Part_Seven(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,con
     RANGE<TV_INT> interior_domain(domain);interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
     int tid=domain_index(interior_domain.min_corner);
     const INTERVAL<int>& interior_indices=all_interior_indices(tid);
-    int interior_n=interior_indices.Size()+1;
+    int interior_n=interior_indices.Size();
    
     for(int i=0;i<interior_n;i++){x_interior(tid)(i)+=alpha*p_interior(tid)(i);b_interior(tid)(i)-=alpha*temp_interior(tid)(i);}
 }

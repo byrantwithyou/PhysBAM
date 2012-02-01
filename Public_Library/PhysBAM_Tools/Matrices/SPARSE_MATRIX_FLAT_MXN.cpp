@@ -36,18 +36,18 @@ template<class T> SPARSE_MATRIX_FLAT_MXN<T>::
 template<class T> SPARSE_MATRIX_FLAT_NXN<T>* SPARSE_MATRIX_FLAT_MXN<T>::
 Create_Submatrix(const INTERVAL<int>& rows)
 {
-    assert(rows.Size()+1==m);
-    int entries=0;for(int index=offsets(0);index<offsets(m+1);index++)if(rows.Lazy_Inside(A(index).j)) entries++;
+    assert(rows.Size()==m);
+    int entries=0;for(int index=offsets(0);index<offsets(m);index++)if(rows.Lazy_Inside_Half_Open(A(index).j)) entries++;
     SPARSE_MATRIX_FLAT_NXN<T>* submatrix=new SPARSE_MATRIX_FLAT_NXN<T>();
-    submatrix->n=rows.Size()+1;
+    submatrix->n=rows.Size();
     submatrix->offsets.Resize(submatrix->n+1);
     submatrix->A.Resize(entries);
-    int next_index=1,shift=rows.min_corner-1;
+    int next_index=0;
     for(int i=0;i<submatrix->n;i++){
         submatrix->offsets(i)=next_index;
-        for(int old_index=offsets(i);old_index<offsets(i+1);old_index++)if(rows.Lazy_Inside(A(old_index).j)){
-            submatrix->A(next_index).j=A(old_index).j-shift;submatrix->A(next_index).a=A(old_index).a;next_index++;}}
-    submatrix->offsets(submatrix->n+1)=next_index;
+        for(int old_index=offsets(i);old_index<offsets(i+1);old_index++)if(rows.Lazy_Inside_Half_Open(A(old_index).j)){
+            submatrix->A(next_index).j=A(old_index).j-rows.min_corner;submatrix->A(next_index).a=A(old_index).a;next_index++;}}
+    submatrix->offsets(submatrix->n)=next_index;
     return submatrix;
 }
 //#####################################################################
@@ -56,9 +56,9 @@ Create_Submatrix(const INTERVAL<int>& rows)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
-    m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=1;
+    m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=0;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
-    A.Resize(offsets(m+1)-1);
+    A.Resize(offsets(m)-1);
 }
 //#####################################################################
 // Function Find_Index
@@ -67,7 +67,7 @@ template<class T> int SPARSE_MATRIX_FLAT_MXN<T>::
 Find_Index(const int i,const int j) const
 {
     assert(A.m);assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);
-    int index=offsets(i);while(A(index).j && A(index).j<j)index++;
+    int index=offsets(i);while(A(index).j>=0 && A(index).j<j)index++;
     assert(index<offsets(i+1));return index;
 }
 //#####################################################################
@@ -77,11 +77,11 @@ template<class T> int SPARSE_MATRIX_FLAT_MXN<T>::
 Find_Index_Exists(const int i,const int j) const
 {
     assert(A.m);assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);
-    int index=offsets(i);while(A(index).j && A(index).j<j)index++;
+    int index=offsets(i);while(A(index).j>=0 && A(index).j<j)index++;
     if(index<offsets(i+1) && A(index).j==j)
         return index;
     else
-        return 0;
+        return -1;
 }
 //#####################################################################
 // Function operator()
@@ -91,8 +91,8 @@ operator()(const int i,const int j)
 {
     int index=Find_Index(i,j);
     if(A(index).j!=j){ // need to add entry
-        if(A(index).j){ // shift entries over to make room
-            assert(!A(offsets(i+1)-1).j);
+        if(A(index).j>=0){ // shift entries over to make room
+            assert(A(offsets(i+1)-1).j>=0);
             for(int jj=offsets(i+1)-1;jj>index;jj--) A(jj)=A(jj-1);}
         A(index).j=j;A(index).a=0;}
     return A(index).a;
@@ -227,15 +227,15 @@ Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed)
     int index=offsets(0);
     for(int i=0;i<m;i++){
         int end=offsets(i+1);
-        while(index<end){if(!A(index).j) break;
+        while(index<end){if(A(index).j<0) break;
             index++;row_lengths(i)++;}
         index=end;}
     compressed.Set_Row_Lengths(row_lengths);
     index=offsets(0);
-    int compressed_index=1;
+    int compressed_index=0;
     for(int i=0;i<m;i++){
         int end=offsets(i+1);
-        while(index<end){if(!A(index).j) break;
+        while(index<end){if(A(index).j<0) break;
             compressed.A(compressed_index++)=A(index);index++;}
         index=end;}
 }
@@ -526,7 +526,7 @@ Append_Entry_To_Current_Row(const int c,const T a)
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Finish_Row()
 {
-    offsets.Append(A.m+1);
+    offsets.Append(A.m);
     m++;
 }
 //#####################################################################
@@ -615,24 +615,24 @@ Construct_Incomplete_LQ_Factorization(const int p_l,const int p_q,const T zero_t
 {
     ARRAY<SPARSE_MATRIX_ENTRY<T> > q_i,l_i;
     delete Q;delete L;Q=new SPARSE_MATRIX_FLAT_MXN<T>();L=new SPARSE_MATRIX_FLAT_MXN<T>();
-    (*Q).Reset(n);(*L).Reset(m);
+    Q->Reset(n);L->Reset(m);
     for(int i=0;i<m;i++){
         Get_Row(q_i,i);
-        (*Q).Fast_Sparse_Multiply(q_i,l_i);
+        Q->Fast_Sparse_Multiply(q_i,l_i);
         Keep_Largest_N(l_i,p_l);
         for(int j=0;j<l_i.m;j++)
-            Subtract_C_Times(q_i,l_i(j).a,(*Q).A.Array_View((*Q).offsets(l_i(j).j),(*Q).offsets(l_i(j).j+1)-(*Q).offsets(l_i(j).j)));
+            Subtract_C_Times(q_i,l_i(j).a,Q->A.Array_View(Q->offsets(l_i(j).j),Q->offsets(l_i(j).j+1)-Q->offsets(l_i(j).j)));
         Keep_Largest_N(q_i,p_q);
         T magnitude=Two_Norm(q_i);
         if(magnitude<zero_tolerance){PHYSBAM_FATAL_ERROR("Zero pivot in LQ factorization");magnitude=zero_replacement;}
         T one_over_magnitude=Inverse(magnitude);
         for(int j=0;j<q_i.m;j++)
-            (*Q).Append_Entry_To_Current_Row(q_i(j).j,q_i(j).a*one_over_magnitude);
-        (*Q).Finish_Row();
+            Q->Append_Entry_To_Current_Row(q_i(j).j,q_i(j).a*one_over_magnitude);
+        Q->Finish_Row();
         for(int j=0;j<l_i.m;j++)
-            (*L).Append_Entry_To_Current_Row(l_i(j).j,l_i(j).a);
-        (*L).Append_Entry_To_Current_Row(i,magnitude);
-        (*L).Finish_Row();
+            L->Append_Entry_To_Current_Row(l_i(j).j,l_i(j).a);
+        L->Append_Entry_To_Current_Row(i,magnitude);
+        L->Finish_Row();
     }
 }
 //#####################################################################

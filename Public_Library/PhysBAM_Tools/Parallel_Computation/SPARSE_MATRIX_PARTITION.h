@@ -37,18 +37,18 @@ public:
     neighbor_ranks.Resize(number_of_sides);neighbors.Resize(number_of_sides);}
 
     int Interior_Rows() const
-    {return interior_indices.Size()+1;}
+    {return interior_indices.Size();}
 
     template<class T>
     int Interior_Entries(const SPARSE_MATRIX_FLAT_NXN<T>& A) const
-    {return A.offsets(interior_indices.max_corner+1)-A.offsets(interior_indices.min_corner);}
+    {return A.offsets(interior_indices.max_corner)-A.offsets(interior_indices.min_corner);}
 
     void Set_Interior_Offset(const int previous_rows)
-    {interior_offset=previous_rows-interior_indices.min_corner+1;}
+    {interior_offset=previous_rows-interior_indices.min_corner;}
 
     int Translate_Index(const int j) const
     {if(interior_indices.Lazy_Inside_Half_Open(j)) return Translate_Interior_Index(j);
-    for(int r=1;r<number_of_sides;r++) if(ghost_indices(r).Lazy_Inside_Half_Open(j)) return Translate_Ghost_Index(j,r);
+    for(int r=0;r<number_of_sides-1;r++) if(ghost_indices(r).Lazy_Inside_Half_Open(j)) return Translate_Ghost_Index(j,r);
     return Translate_Ghost_Index(j,number_of_sides);}
 
     int Translate_Interior_Index(const int j) const
@@ -56,8 +56,8 @@ public:
 
     int Translate_Ghost_Index(const int j,const int region) const
     {assert(ghost_indices(region).Lazy_Inside_Half_Open(j));
-    assert(ghost_indices(region).Size()+1==neighbors(region)->boundary_indices(((region-1)^1)+1).m);
-    return neighbors(region)->boundary_indices(((region-1)^1)+1)(j-ghost_indices(region).min_corner+1)+neighbors(region)->interior_offset;}
+    assert(ghost_indices(region).Size()==neighbors(region)->boundary_indices(region^1).m);
+    return neighbors(region)->boundary_indices(region^1)(j-ghost_indices(region).min_corner+1)+neighbors(region)->interior_offset;}
 
 //#####################################################################
 };

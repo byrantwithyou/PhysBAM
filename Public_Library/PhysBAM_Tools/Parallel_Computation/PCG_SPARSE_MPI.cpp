@@ -90,7 +90,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
 {
     if(thread_grid){Parallel_Solve(A,x,b,thread_grid->global_column_index_boundaries,tolerance,recompute_preconditioner);return;}
     Initialize_Datatypes();
-    int local_n=A.n,interior_n=partition.interior_indices.Size()+1;
+    int local_n=A.n,interior_n=partition.interior_indices.Size();
     int global_n=Global_Sum(interior_n);
     T global_tolerance=Global_Max(tolerance);
     int desired_iterations=global_n;if(pcg.enforce_compatibility) desired_iterations--;if(pcg.maximum_iterations) desired_iterations=min(desired_iterations,pcg.maximum_iterations);

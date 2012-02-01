@@ -754,7 +754,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
     RANDOM_NUMBERS<T> local_random;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         if(!number_of_particles_to_add(block_index)) continue;
-        VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis);h(TV::dimension) = time;
+        VECTOR<T,TV::dimension+1> h;for(int axis=0;axis<TV::dimension;axis++) h(axis)=(T)block_index(axis)+1;h(TV::dimension) = time; // INDEXING: the +1 can go away when we are done.
         local_random.Set_Seed(Hash(h));
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
@@ -872,11 +872,9 @@ Delete_Particles_Outside_Grid()
     RANGE<TV_INT> real_domain(levelset.grid.Domain_Indices());real_domain.max_corner+=TV_INT::All_Ones_Vector();
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices(3));domain.max_corner+=TV_INT::All_Ones_Vector();
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
-            //RA(domain);
         RANGE<TV_INT> ghost_domain(domain);
         if(side==0) ghost_domain.max_corner(axis)=real_domain.min_corner(axis);
         else ghost_domain.min_corner(axis)=real_domain.max_corner(axis);
-        // RA(ghost_domain);
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV>(ghost_domain,thread_queue).Run(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Delete_Particles_Far_Outside_Grid);}
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){
         RANGE<TV_INT> boundary_domain(real_domain);
@@ -905,16 +903,16 @@ Delete_Particles_Near_Outside_Grid(RANGE<TV_INT>& domain,int axis,int side)
     RANGE<TV> local_domain=levelset.grid.domain;TV domain_boundaries[2]={local_domain.Minimum_Corner(),local_domain.Maximum_Corner()};
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(negative_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-1);
             if(!negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}
         if(positive_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*positive_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*positive_particles(block),2*side-1);
             if(!positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}
         if(use_removed_negative_particles)if(removed_negative_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_negative_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_negative_particles(block),2*side-1);
             if(!removed_negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_negative_particles(block));}
         if(use_removed_positive_particles)if(removed_positive_particles(block)){
-            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_positive_particles(block),2*side-3);
+            Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_positive_particles(block),2*side-1);
             if(!removed_positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_positive_particles(block));}}
 }
 //#####################################################################

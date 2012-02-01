@@ -83,17 +83,17 @@ Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL
 {
     assert(local_grid.Is_MAC_Grid());
     //interior mpi cells, interior thread cells
-    for(int color=0;color<filled_region_ranks.m;color++) partitions(color).interior_indices.min_corner=filled_region_cell_count(color)+1;
+    for(int color=0;color<filled_region_ranks.m;color++) partitions(color).interior_indices.min_corner=filled_region_cell_count(color);
     for(int i=0;i<domains.m;i++){
         RANGE<TV_INT> interior_domain(domains(i));
         interior_domain.max_corner-=TV_INT::All_Ones_Vector();interior_domain.min_corner+=TV_INT::All_Ones_Vector();
-        for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color)+1;
+        for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).min_corner=filled_region_cell_count(color);
         laplace->Compute_Matrix_Indices(interior_domain,filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
         for(int color=0;color<interior_indices.m;color++) interior_indices(color)(i).max_corner=filled_region_cell_count(color);}
     for(int color=0;color<filled_region_ranks.m;color++) partitions(color).interior_indices.max_corner=filled_region_cell_count(color);
     //boundary mpi cells
     for(int axis=0;axis<TV::dimension;axis++) for(int side=0;side<2;side++){int s=axis*2+side;
-        for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).min_corner=filled_region_cell_count(color)+1;
+        for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).min_corner=filled_region_cell_count(color);
         RANGE<TV_INT> exterior_domain(local_grid.Domain_Indices(1));
         for(int axis2=axis+1;axis2<TV::dimension;axis2++){exterior_domain.min_corner(axis2)++;exterior_domain.max_corner(axis2)--;}
         if(side==0) exterior_domain.max_corner(axis)=exterior_domain.min_corner(axis);
@@ -102,7 +102,7 @@ Find_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL
             RANGE<TV_INT> interior_domain(domains(i));
             interior_domain.max_corner-=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.max_corner(axis)==local_grid.Domain_Indices().max_corner(axis)) interior_domain.max_corner(axis)++;
             interior_domain.min_corner+=TV_INT::All_Ones_Vector();for(int axis=0;axis<TV_INT::dimension;axis++) if(interior_domain.min_corner(axis)==local_grid.Domain_Indices().min_corner(axis)) interior_domain.min_corner(axis)--;
-            for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color)+1;
+            for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).min_corner=filled_region_cell_count(color);
             laplace->Compute_Matrix_Indices(RANGE<TV_INT>::Intersect(exterior_domain,interior_domain),filled_region_cell_count,matrix_index_to_cell_index_array,cell_index_to_matrix_index);
             for(int color=0;color<interior_indices.m;color++) ghost_indices(color)(i)(s).max_corner=filled_region_cell_count(color);}
         for(int color=0;color<filled_region_ranks.m;color++) partitions(color).ghost_indices(s).max_corner=filled_region_cell_count(color);
@@ -115,11 +115,11 @@ template<class T_GRID> void LAPLACE_UNIFORM_MPI<T_GRID>::
 Find_Matrix_Indices_In_Region(const int region_index,const RANGE<TV_INT>& region,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,T_ARRAYS_INT& cell_index_to_matrix_index,
     ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array)
 {
-    if(region_index) for(int color=0;color<filled_region_ranks.m;color++)partitions(color).ghost_indices(region_index).min_corner=filled_region_cell_count(color)+1;
-    else for(int color=0;color<filled_region_ranks.m;color++)partitions(color).interior_indices.min_corner=filled_region_cell_count(color)+1;
+    if(region_index) for(int color=0;color<filled_region_ranks.m;color++)partitions(color).ghost_indices(region_index).min_corner=filled_region_cell_count(color);
+    else for(int color=0;color<filled_region_ranks.m;color++)partitions(color).interior_indices.min_corner=filled_region_cell_count(color);
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT c=iterator.Cell_Index();
         int color=filled_region_colors(c);if(color<1 || (!filled_region_touches_dirichlet(color)&&!solve_neumann_regions)) continue;
-        int new_index=++filled_region_cell_count(color);cell_index_to_matrix_index(c)=new_index;
+        int new_index=filled_region_cell_count(color)++;cell_index_to_matrix_index(c)=new_index;
         matrix_index_to_cell_index_array(color)(new_index)=c;}
     if(region_index) for(int color=0;color<filled_region_ranks.m;color++)partitions(color).ghost_indices(region_index).max_corner=filled_region_cell_count(color);
     else for(int color=0;color<filled_region_ranks.m;color++)partitions(color).interior_indices.max_corner=filled_region_cell_count(color);
