@@ -66,12 +66,9 @@ Initialize_Hierarchy_Using_KD_Tree()
 {
     KD_TREE<TV> kd_tree(false);
     ARRAY<TV> centroids(box_hierarchy.m);
-std::cout << std::endl;
     for(int l=0;l<box_hierarchy.m;l++)centroids(l)=box_hierarchy(l).Center();
-    for(int l=0;l<box_hierarchy.m;l++)std::cout << centroids(l);
     kd_tree.Create_Left_Balanced_KD_Tree(centroids);
     leaves=box_hierarchy.m;parents.Resize(leaves);children.Remove_All();
-std::cout << "!!! " << kd_tree.root_node << std::endl;
     root=Initialize_Hierarchy_Using_KD_Tree_Helper(kd_tree.root_node);assert(root==2*leaves-2);
     box_hierarchy.Resize(root+1);
 }
@@ -81,13 +78,10 @@ std::cout << "!!! " << kd_tree.root_node << std::endl;
 template<class TV> int BOX_HIERARCHY<TV>::
 Initialize_Hierarchy_Using_KD_Tree_Helper(KD_TREE_NODE<T>* node)
 {
-//	std::cout << std::endl << " ni " << node->node_index;
     if(!node->left && !node->right){return node->node_index;}
     int left_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->left);
-	//std::cout << " lc " << left_child;
     if(!node->right){return left_child;}
     int right_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->right);
-//	std::cout << " rc " << right_child << " ? " << (parents(left_child)=parents(right_child)=children.m+leaves-1);
     children.Append(VECTOR<int,2>(left_child,right_child));parents.Append(0);
     return parents(left_child)=parents(right_child)=children.m+leaves-1;
 }

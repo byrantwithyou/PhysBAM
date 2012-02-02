@@ -21,23 +21,19 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
     ARRAY_VIEW<const RANGE<TV> > self_box_hierarchy(box_hierarchy),other_box_hierarchy(other_hierarchy.box_hierarchy);
     ARRAY_VIEW<const VECTOR<int,2> > self_children(children),other_children(other_hierarchy.children);
 
-
-//std::cout << std::endl; for (int i=0; i<children.m; i++){std::cout << children(i)(0) << " " << children(i)(1)<< "  " << parents(i) << std::endl;} std::cout << std::endl;
-//std::cout << std::endl; for (int i=0; i<other_children.m; i++){std::cout << other_children(i)(0) << " " << other_children(i)(1)<< "  " << parents(i) << std::endl;} std::cout << std::endl;
-
     while(!stack.Empty()){
         int self_hierarchy_box,other_hierarchy_box;stack.Pop().Get(self_hierarchy_box,other_hierarchy_box);
         if(visitor.Cull(self_hierarchy_box,other_hierarchy_box)) continue;
         if(!self_box_hierarchy(self_hierarchy_box).Intersection(other_box_hierarchy(other_hierarchy_box),extra_thickness)) continue;
         if(self_hierarchy_box<self_leaves && other_hierarchy_box<other_leaves) visitor.Store(self_hierarchy_box,other_hierarchy_box);
         else if(self_hierarchy_box<self_leaves){int child_box1,child_box2;other_children(other_hierarchy_box-other_leaves).Get(child_box1,child_box2);
-            stack.Push(VECTOR<int,2>(self_hierarchy_box,child_box1));stack.Push(VECTOR<int,2>(self_hierarchy_box,child_box2));}//std::cout << child_box1 << " a " << child_box2 << std::endl;}
+            stack.Push(VECTOR<int,2>(self_hierarchy_box,child_box1));stack.Push(VECTOR<int,2>(self_hierarchy_box,child_box2));}
         else if(other_hierarchy_box<other_leaves){int child_box1,child_box2;self_children(self_hierarchy_box-self_leaves).Get(child_box1,child_box2);
-            stack.Push(VECTOR<int,2>(child_box1,other_hierarchy_box));stack.Push(VECTOR<int,2>(child_box2,other_hierarchy_box));}//std::cout << child_box1 << " b " << child_box2 << std::endl;}
+            stack.Push(VECTOR<int,2>(child_box1,other_hierarchy_box));stack.Push(VECTOR<int,2>(child_box2,other_hierarchy_box));}
         else {int self_child_box1,self_child_box2,other_child_box1,other_child_box2;
             self_children(self_hierarchy_box-self_leaves).Get(self_child_box1,self_child_box2);other_children(other_hierarchy_box-other_leaves).Get(other_child_box1,other_child_box2);
             stack.Push(VECTOR<int,2>(self_child_box1,other_child_box1));stack.Push(VECTOR<int,2>(self_child_box1,other_child_box2));
-            stack.Push(VECTOR<int,2>(self_child_box2,other_child_box1));stack.Push(VECTOR<int,2>(self_child_box2,other_child_box2));}}//std::cout << self_child_box1 << " c " << self_child_box2 << " " << other_child_box1 << " " << other_child_box2 << std::endl;}}
+            stack.Push(VECTOR<int,2>(self_child_box2,other_child_box1));stack.Push(VECTOR<int,2>(self_child_box2,other_child_box2));}}
     stack.Exchange(dual_traversal_stack); // release stack ownership
 }
 //#####################################################################

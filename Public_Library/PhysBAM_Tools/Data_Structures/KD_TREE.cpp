@@ -111,10 +111,9 @@ Balance_Sub_KD_Tree_Using_Internal_Nodes(KD_TREE_NODE<T>* cell,const int first_i
 //#####################################################################
 template<class TV> void KD_TREE<TV>::
 Balance_Sub_KD_Tree_Using_Leaf_Nodes(KD_TREE_NODE<T>* cell,const int first_index,const int last_index,ARRAY_VIEW<const TV> points,ARRAY_VIEW<int> permutation_array,RANGE<TV>& box)
-{	// std::cout << "firstandlast" << first_index << " " << last_index << std::endl;
+{
     if(last_index==first_index+1){cell->split_axis=-1;cell->node_index=permutation_array(first_index);return;}
     int partition_index=Choose_Partition_Index_Using_Leaf_Nodes(first_index,last_index);
-//std::cout << "index " << partition_index << std::endl;
     cell->split_axis=Choose_Partition_Axis(box.Edge_Lengths());
     Median_Split(partition_index,first_index,last_index,points,permutation_array,cell->split_axis);
     cell->split_value=points(permutation_array(partition_index))[cell->split_axis];
