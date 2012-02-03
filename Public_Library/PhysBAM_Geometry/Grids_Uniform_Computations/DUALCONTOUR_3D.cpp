@@ -17,20 +17,20 @@ Generate_Topology()
 {
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     topology.Preallocate(5000);
-    vertices.Resize(0,m,0,n,0,mn);
+    vertices.Resize(0,mn-1,0,n-1,0,mn-1);
     int z=vertices.counts.z,yz=vertices.counts.y*z;
     TV_INT i;
-    for(i.x=0;i.x<m-1;i.x++)for(i.y=1;i.y<n;i.y++)for(i.z=1;i.z<mn;i.z++){ // generate one triangle pair per x edge
+    for(i.x=0;i.x<m-1;i.x++)for(i.y=1;i.y<n-1;i.y++)for(i.z=1;i.z<mn-1;i.z++){ // generate one triangle pair per x edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x+1,i.y,i.z);
         int index=vertices.Standard_Index(i),index_j=index-z,index_ij=index-1,index_j_ij=index_j-1;
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_j_ij,index_ij,index,index_j));
         else if(phi1>0&&phi2<=0)topology.Append(VECTOR<int,4>(index_j,index,index_ij,index_j_ij));}
-    for(i.x=1;i.x<m;i.x++)for(i.y=0;i.y<n-1;i.y++)for(i.z=1;i.z<mn;i.z++){ // generate one triangle pair per y edge
+    for(i.x=1;i.x<m-1;i.x++)for(i.y=0;i.y<n-1;i.y++)for(i.z=1;i.z<mn-1;i.z++){ // generate one triangle pair per y edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x,i.y+1,i.z);
         int index=vertices.Standard_Index(i),index_i=index-yz,index_ij=index-1,index_i_ij=index_i-1;
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_i_ij,index_i,index,index_ij));
         else if(phi1>0&&phi2<=0)topology.Append(VECTOR<int,4>(index_ij,index,index_i,index_i_ij));}
-    for(i.x=1;i.x<m;i.x++)for(i.y=1;i.y<n;i.y++)for(i.z=0;i.z<mn-1;i.z++){ // generate one triangle pair per z edge
+    for(i.x=1;i.x<m-1;i.x++)for(i.y=1;i.y<n-1;i.y++)for(i.z=0;i.z<mn-1;i.z++){ // generate one triangle pair per z edge
         T phi1=levelset.phi(i),phi2=levelset.phi(i.x,i.y,i.z+1);
         int index=vertices.Standard_Index(i),index_i=index-yz,index_j=index-z,index_i_j=index_i-z;
         if(phi1<=0&&phi2>0)topology.Append(VECTOR<int,4>(index_i_j,index_j,index,index_i));
@@ -52,7 +52,7 @@ Generate_Vertices()
     normals.Resize(count);
     levelset.Compute_Normals();
     int vertex=-1;
-    for(int i=0;i<m;i++)for(int j=0;j<n;j++)for(int ij=0;ij<mn;ij++)if(vertices(i,j,ij)){ // generate vertices where needed
+    for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++)for(int ij=0;ij<mn-1;ij++)if(vertices(i,j,ij)){ // generate vertices where needed
         vertices(i,j,ij)=++vertex;
         TV position=grid.Center(i,j,ij);
         TV normal=levelset.Normal(position);
@@ -72,7 +72,7 @@ Ensure_Vertices_In_Correct_Cells()
 {
     int vertex=-1;
     TV_INT i;
-    for(i.x=0;i.x<grid.counts.x;i.x++)for(i.y=0;i.y<grid.counts.y;i.y++)for(i.z=0;i.z<grid.counts.z;i.z++) if(vertices(i)){
+    for(i.x=0;i.x<grid.counts.x-1;i.x++)for(i.y=0;i.y<grid.counts.y-1;i.y++)for(i.z=0;i.z<grid.counts.z-1;i.z++) if(vertices(i)){
         vertex++;TV_INT v=grid.Clamp_To_Cell(geometry(vertex));
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset((T).5*grid.dX);
