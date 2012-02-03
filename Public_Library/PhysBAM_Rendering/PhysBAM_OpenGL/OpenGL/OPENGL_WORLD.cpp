@@ -419,7 +419,7 @@ void OPENGL_WORLD::Render_World(bool selecting,bool swap_buffers)
     glLoadIdentity();
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT,ambient_light.rgba);
     glEnable(GL_LIGHTING);
-    for(int i=0;i<lights.m;i++) lights(i)->Send_To_GL_Pipeline(i-1);
+    for(int i=0;i<lights.m;i++) lights(i)->Send_To_GL_Pipeline(i);
 
     glTranslatef(0,0,-camera_distance);
     glMultMatrixf(arcball_matrix.x); // assumes MATRIX_4X4::x is a column-major array
