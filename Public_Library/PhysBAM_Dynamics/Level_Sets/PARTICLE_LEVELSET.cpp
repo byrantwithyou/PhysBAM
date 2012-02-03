@@ -189,9 +189,9 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
     deletion_particles=particles_link;
     while(deletion_list.m>0){
         ARRAY<int> deletion_list_local;
-        for(int i=deletion_list.m;i>0;i--) if(deletion_particles==deletion_list(i).x){deletion_list_local.Append(deletion_list(i).y);deletion_list.Remove_Index_Lazy(i);}
+        for(int i=deletion_list.m-1;i>=0;i--) if(deletion_particles==deletion_list(i).x){deletion_list_local.Append(deletion_list(i).y);deletion_list.Remove_Index_Lazy(i);}
         Sort(deletion_list_local);
-        for(int i=deletion_list_local.m;i>0;i--){int index=deletion_list_local(i);
+        for(int i=deletion_list_local.m-1;i>=0;i--){int index=deletion_list_local(i);
             deletion_particles->array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size()-1,index);
             particles_link->array_collection->Delete_Element(particles_link->array_collection->Size()-1);
             if(particles_link->array_collection->Size()==0 && parent_particles){
@@ -216,7 +216,7 @@ template<class T_GRID> PARTICLE_LEVELSET_PARTICLES<typename T_GRID::VECTOR_T>& P
 Get_Particle_Link(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int absolute_index,int& index_in_link)
 {
     PARTICLE_LEVELSET_PARTICLES<TV>* particles_link=&particles;index_in_link=absolute_index;
-    while(index_in_link>particle_pool.number_particles_per_cell){
+    while(index_in_link>=particle_pool.number_particles_per_cell){
         assert(particles_link->next);assert(particles_link->array_collection->Size()==particle_pool.number_particles_per_cell);
         particles_link=particles_link->next;index_in_link-=particle_pool.number_particles_per_cell;}
     assert(index_in_link<particles_link->array_collection->Size());

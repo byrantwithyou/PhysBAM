@@ -91,8 +91,8 @@ void Initialize_Cylinder_Mesh_And_Particles(TRIANGULATED_SURFACE<T>& ts,const in
     typedef VECTOR<T,3> TV;
     ts.particles.array_collection->Delete_All_Elements();T dtheta=(T)two_pi/n;T dlength=length/(m-1);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
-        int p=ts.particles.array_collection->Add_Element();T theta=(j-1)*dtheta;
-        ts.particles.X(p)=TV(dlength*(i-1),radius*sin(theta),radius*cos(theta));}
+        int p=ts.particles.array_collection->Add_Element();T theta=j*dtheta;
+        ts.particles.X(p)=TV(dlength*i,radius*sin(theta),radius*cos(theta));}
     if(create_caps){int p_1=ts.particles.array_collection->Add_Element();int p_2=ts.particles.array_collection->Add_Element();ts.particles.X(p_1)=TV(0,0,0);ts.particles.X(p_2)=TV(length,0,0);}
     ts.mesh.Initialize_Cylinder_Mesh(m,n,create_caps);
 }

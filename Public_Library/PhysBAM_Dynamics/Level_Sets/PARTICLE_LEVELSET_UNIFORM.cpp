@@ -619,7 +619,7 @@ Reseed_Particles(const T time,T_ARRAYS_BOOL* cell_centered_mask)
 template<class T_GRID> int PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const int sign)
 {
-    int number_deleted=0;ARRAY<int> heap_particle_indices(number_particles_per_cell);ARRAY<T> heap_phi_minus_radius(number_particles_per_cell);
+    int number_deleted=0;ARRAY<int> heap_particle_indices(number_particles_per_cell);heap_particle_indices.Fill(-1);ARRAY<T> heap_phi_minus_radius(number_particles_per_cell);
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> > deletion_list;
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(block_index);
@@ -651,18 +651,18 @@ Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const in
         if(total_particles>number_particles_per_cell){ // too many particles - delete particles with a heap sort
             number_deleted+=total_particles-number_particles_per_cell;int heap_size=0;
             local_cell_particles=&cell_particles;
-            for(int i=1;local_cell_particles;i++){for(int index=0;index<local_cell_particles->array_collection->Size();index++) if(!all_escaped(i)(index)){
+            for(int i=0;local_cell_particles;i++){for(int index=0;index<local_cell_particles->array_collection->Size();index++) if(!all_escaped(i)(index)){
                 T phi_minus_radius=sign*levelset.Phi(local_cell_particles->X(index))-local_cell_particles->radius(index);
                 if(heap_size<number_particles_per_cell){ // add particle to heap
-                    heap_size++;heap_particle_indices(heap_size)=index+particle_pool.number_particles_per_cell*(i-1);heap_phi_minus_radius(heap_size)=phi_minus_radius;
+                    heap_particle_indices(heap_size)=index+particle_pool.number_particles_per_cell*i;heap_phi_minus_radius(heap_size++)=phi_minus_radius;
                     if(heap_size==number_particles_per_cell) ARRAYS_COMPUTATIONS::Heapify(heap_phi_minus_radius,heap_particle_indices);} // when heap is full, order values with largest on top
                 else{ // excess particles don't fit in the heap
                     if(phi_minus_radius<heap_phi_minus_radius(0)){ // delete particle on top of heap & add new particle
                         int deletion_index;
                         PARTICLE_LEVELSET_PARTICLES<TV>& deletion_particle_list=Get_Particle_Link(cell_particles,heap_particle_indices(0),deletion_index);
                         Add_Particle_To_Deletion_List(deletion_list,deletion_particle_list,deletion_index); 
-                        heap_phi_minus_radius(0)=phi_minus_radius;heap_particle_indices(0)=index+particle_pool.number_particles_per_cell*(i-1);
-                        ARRAYS_COMPUTATIONS::Heapify(heap_phi_minus_radius,heap_particle_indices,1,heap_phi_minus_radius.m);}
+                        heap_phi_minus_radius(0)=phi_minus_radius;heap_particle_indices(0)=index+particle_pool.number_particles_per_cell*i;
+                        ARRAYS_COMPUTATIONS::Heapify(heap_phi_minus_radius,heap_particle_indices,0,heap_phi_minus_radius.m);}
                     else Add_Particle_To_Deletion_List(deletion_list,*local_cell_particles,index);}} // delete new particle, larger than top of heap
             local_cell_particles=local_cell_particles->next;}
             Delete_Particles_From_Deletion_List(deletion_list,cell_particles);
@@ -1243,7 +1243,7 @@ Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
 {
     const T_ARRAYS_BOOL_DIMENSION& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
     RANGE<TV_INT> ghost_domain(domain);if(ghost_domain.min_corner.x>0) ghost_domain.min_corner.x-=1;
-    char new_mask=1<<distance,old_mask=new_mask-1;
+    char new_mask=1<<(distance+1),old_mask=new_mask-1;
     for(CELL_ITERATOR iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && (near_interface(cell)|near_interface(neighbor))&old_mask){

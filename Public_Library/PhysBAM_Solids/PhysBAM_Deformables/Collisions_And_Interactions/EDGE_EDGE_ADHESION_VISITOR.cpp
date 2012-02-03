@@ -30,7 +30,7 @@ Find_Place_For_Spring(const int reference_segment_index,const int other_segment_
             adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]));
             adhesion.intersecting_edge_edge_pairs.Delete_If_Present(VECTOR<int,4>(segment2_nodes[0],segment2_nodes[1],segment1_nodes[0],segment1_nodes[1]));
 
-            heap(0)=PAIR<T,int>(distance,other_segment_index);ARRAYS_COMPUTATIONS::Heapify(heap,1,heap.m);
+            heap(0)=PAIR<T,int>(distance,other_segment_index);ARRAYS_COMPUTATIONS::Heapify(heap,0,heap.m);
             return true;}}
     else{ // plenty of room
         adhesion.segments_with_springs(reference_segment_index).x.Append(PAIR<T,int>(distance,other_segment_index));

@@ -286,7 +286,7 @@ Find_Triangle_Triangle_Intersections()
         for(int i=0;i<simplices.m;i++){
             assert(!cutting_simplices->Simplex_Is_Parent(simplices(i)));
             const VECTOR<TV,3>& triangle_weights=cutting_simplices->simplices(simplices(i)).weights;
-            int p=3*(i-1);
+            int p=3*i;
             for(int j=0;j<3;j++) triangulated_surface.particles.X(p+j)=triangle_weights(j);
             triangulated_surface.mesh.elements.Append(VECTOR<int,3>(p+1,p+2,p+3));}
         triangulated_surface.Update_Number_Nodes();

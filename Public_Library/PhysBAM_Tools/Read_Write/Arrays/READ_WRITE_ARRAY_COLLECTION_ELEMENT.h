@@ -45,7 +45,7 @@ public:
     {return 0;}
 
     static int Write_Size(typename IF<IS_POINTER<T>::value,UNUSABLE,const ARRAY_COLLECTION_ELEMENT_BASE&>::TYPE object)
-    {return sizeof(T)*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(object).array->Size()+sizeof(int);}
+    {return sizeof(T)*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(object).array->Size()+sizeof(int);} // INDEXING: Change the sizeof(T) to sizeof(RW).  This was a bug before.
 
     static void Print_Helper(std::ostream& output,const ARRAY_COLLECTION_ELEMENT<T>& object,const int p)
     {if(const char* name=Get_Attribute_Name(object.id)) output<<name;

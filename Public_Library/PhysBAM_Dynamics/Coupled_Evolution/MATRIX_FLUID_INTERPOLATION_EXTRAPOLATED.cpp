@@ -89,7 +89,7 @@ template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
-        T& constraint=constraints(COUPLING_CONSTRAINT_ID(d*(i-1)+a));
+        T& constraint=constraints(COUPLING_CONSTRAINT_ID(d*i+a));
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=0;j<4;j++) constraint+=faces(e(j).x)*e(j).y;}
 }
@@ -100,7 +100,7 @@ template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const
 {
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
-        T constraint=constraints(COUPLING_CONSTRAINT_ID(d*(i-1)+a));
+        T constraint=constraints(COUPLING_CONSTRAINT_ID(d*i+a));
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=0;j<4;j++) faces(e(j).x)+=constraint*e(j).y;}
 }
@@ -123,7 +123,7 @@ Print_Each_Matrix(int n) const
 
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
-        for(int j=0;j<4;j++) oo.Add_Sparse_Entry(d*(i-1)+a,e(j).x,e(j).y);}
+        for(int j=0;j<4;j++) oo.Add_Sparse_Entry(d*i+a,e(j).x,e(j).y);}
 
     oo.End_Sparse_Matrix();
 }
@@ -135,7 +135,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
-        for(int j=0;j<4;j++) data.Append(TRIPLE<int,int,T>(d*(i-1)+a,e(j).x,e(j).y));}
+        for(int j=0;j<4;j++) data.Append(TRIPLE<int,int,T>(d*i+a,e(j).x,e(j).y));}
 }
 //#####################################################################
 // Function Add_Diagonal
@@ -144,7 +144,7 @@ template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_FLUID_MASS<TV>& fluid_mass) const
 {
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
-        T& diag=diagonal(COUPLING_CONSTRAINT_ID(d*(i-1)+a));
+        T& diag=diagonal(COUPLING_CONSTRAINT_ID(d*i+a));
         const VECTOR<PAIR<int,T>,4>& e=stencils(i).s(a);
         for(int j=0;j<4;j++) diag+=fluid_mass.one_over_fluid_mass_at_faces(e(j).x)*sqr(e(j).y);}
 }
