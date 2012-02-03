@@ -38,7 +38,7 @@ Generate_Topology()
     topology.Compact();
     for(int t=0;t<topology.m;t++){
         int i,j,k,l;topology(t).Get(i,j,k,l);
-        vertices.array(i)=vertices.array(j)=vertices.array(k)=vertices.array(l)=0;}
+        vertices.array(i)=vertices.array(j)=vertices.array(k)=vertices.array(l)=1;}
 }
 //#####################################################################
 // Function Generate_Vertices
