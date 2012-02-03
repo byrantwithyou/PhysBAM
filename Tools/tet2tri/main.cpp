@@ -10,7 +10,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
 #include <cstring>
 #include <fstream>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 using namespace PhysBAM;
 using namespace std;
 

@@ -23,7 +23,7 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_3D.h>
-#include <PhysBAM_Dynamics/Poisson_Equations/LAPLACE_SIMPLICIAL_NODE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
 
 #define SIGMA 0.5
 
