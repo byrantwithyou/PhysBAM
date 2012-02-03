@@ -25,5 +25,3 @@ pls/pls
 refinement/refinement
 refinement_pls/refinement_pls
 scalable_rigids/scalable_rigids
-extrap_2d_ftest/extrap_2d_ftest
-multigrid_poisson_3d_optimized_kernels/multigrid_poisson_3d_optimized_kernels
