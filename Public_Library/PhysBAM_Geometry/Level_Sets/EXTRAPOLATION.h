@@ -43,30 +43,30 @@ public:
 
 protected:
     static void Add_To_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,T_ARRAYS_BOOL_BASE& close,const T_INDEX& index)
-    {close(index)=true;heap_length++;heap(heap_length)=index;Up_Heap(phi,heap,heap_length);}
+    {close(index)=true;heap(heap_length++)=index;Up_Heap(phi,heap,heap_length-1);}
 
     static T_INDEX Remove_Root_From_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,T_ARRAYS_BOOL_BASE& close)
     {T_INDEX index=heap(0);close(index)=false;Down_Heap(phi,heap,heap_length);heap_length--;return index;}
 
     static void Up_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int child)
-    {int parent=child/2; // k=(2k)/2 and k=(2k+1)/2 from integer division
-    while(parent >= 1 && phi(heap(child)) < phi(heap(parent))){
+    {int parent=(child-1)/2; // k=(2k)/2 and k=(2k+1)/2 from integer division
+    while(parent >= 0 && phi(heap(child)) < phi(heap(parent))){
         exchange(heap(child),heap(parent)); // exchange child & parent
-        child=parent;parent=child/2;}} // move up one
+        child=parent;parent=(child-1)/2;}} // move up one
 
     static void Down_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,const int heap_length)
-    {int parent=1,child_left=2,child_right=3; // initialize
-    while(heap_length >= child_right){
+    {int parent=0,child_left=1,child_right=2; // initialize
+    while(heap_length > child_right){
         if(phi(heap(child_left)) <= phi(heap(child_right))){
             heap(parent)=heap(child_left); // update index
             parent=child_left;}  // move down one
         else{
             heap(parent)=heap(child_right); // update index
             parent=child_right;} // move down one
-        child_left=2*parent;child_right=2*parent+1;} // find new children
+        child_left=2*parent+1;child_right=2*parent+2;} // find new children
     // fill the hole with the last element
-    if(parent != heap_length){
-        heap(parent)=heap(heap_length); // update index
+    if(parent != heap_length-1){
+        heap(parent)=heap(heap_length-1); // update index
         Up_Heap(phi,heap,parent);}}
 
     static T2 Solve_Close_Point(const bool no_x,const T2& value_x,const T phix_dx,const bool no_y,const T2& value_y,const T phiy_dy,const T dy_squared_over_dx_squared,const T tolerance)

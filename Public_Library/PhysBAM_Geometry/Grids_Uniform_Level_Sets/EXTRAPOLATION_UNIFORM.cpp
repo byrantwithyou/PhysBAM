@@ -53,6 +53,7 @@ Extrapolate(const T time,const bool fill_ghost_cells)
     T_ARRAYS_BOOL done(node_grid.Domain_Indices(ghost_cells+1)); // extra cell for Update_Close_Point
     T_ARRAYS_BOOL close(node_grid.Domain_Indices(ghost_cells));
     ARRAY<TV_INT> heap(close.array.Size());
+    heap.Fill(TV_INT()-1);
     Initialize(phi_ghost,done,close,heap,heap_length);
 
     while(heap_length && phi_ghost(heap(0)) <= band_width+isobaric_fix_width){
@@ -64,13 +65,13 @@ Extrapolate(const T time,const bool fill_ghost_cells)
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector) && Neighbor_Visible(axis,index))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index+axis_vector);}}
         else{
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index+axis_vector);}}}
 
     T_ARRAYS_T2_BASE::Get(u,u_ghost);
@@ -114,8 +115,8 @@ Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_B
 {
     T2 value[T_GRID::dimension]={T2()}; // the value to use in the given direction
     T phix_dx[T_GRID::dimension]={0}; // the difference in phi value for the direction
-    int number_of_axis=-1; // the number of axis that we want to use later
-    int missing_axis=3; // used in number_of_axis==2 case only, so it gives you which axis is missing (==3 for 2d)
+    int number_of_axis=0; // the number of axis that we want to use later
+    int missing_axis=2; // used in number_of_axis==2 case only, so it gives you which axis is missing (==2 for 2d)
 
     // check each principal axis
     for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis),low=index-axis_vector,high=index+axis_vector;
@@ -131,10 +132,10 @@ Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_B
             if(phi(low)<=phi(high)){value[number_of_axis]=u(low);phix_dx[number_of_axis]=phi(index)-phi(low);}
             else{value[number_of_axis]=u(high);phix_dx[number_of_axis]=phi(index)-phi(high);}}
         number_of_axis++;}
-       
+
     assert(number_of_axis);
-    if(number_of_axis==0) u(index)=value[0];
-    else if(T_GRID::dimension==2 || number_of_axis==1){
+    if(number_of_axis==1) u(index)=value[0];
+    else if(T_GRID::dimension==2 || number_of_axis==2){
         T a=phix_dx[0]*optimization_scale[missing_axis],b=phix_dx[1],denominator=a+b,fraction=(T).5;
         if(denominator > small_number) fraction=clamp(a/denominator,(T)0,(T)1);
         u(index)=fraction*value[0]+(1-fraction)*value[1];}
