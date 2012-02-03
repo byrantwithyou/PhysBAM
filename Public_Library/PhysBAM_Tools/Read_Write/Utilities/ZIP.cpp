@@ -325,7 +325,7 @@ protected:
     {PHYSBAM_FATAL_ERROR("Attempt to read write only ostream");return 0;}
 
     virtual int overflow(int c=EOF)
-    {if(c!=EOF){*pptr()=c;pbump(0);}
+    {if(c!=EOF){*pptr()=c;pbump(1);}
     if(process(false)==EOF) return EOF;
     return c;}
 
