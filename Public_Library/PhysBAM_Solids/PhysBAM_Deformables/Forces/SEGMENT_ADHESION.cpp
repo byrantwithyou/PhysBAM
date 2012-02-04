@@ -193,12 +193,12 @@ Update_Springs(const bool search_hierarchy)
                     const VECTOR<int,4>& nodes=i.Data().nodes;
                     PARTITION_ID partition1=mpi_solids->partition_id_from_particle_index(nodes[0]),partition2=mpi_solids->partition_id_from_particle_index(nodes[2]);
                     if(partition1==mpi_solids->Partition()){
-                        my_boundary(partition2).Append_Elements(nodes.template Slice<1,2>());
-                        my_ghost(partition2).Append_Elements(nodes.template Slice<3,4>());
+                        my_boundary(partition2).Append_Elements(nodes.template Slice<0,1>());
+                        my_ghost(partition2).Append_Elements(nodes.template Slice<2,3>());
                         output_pairs(partition2).Append(T_PAIR(segments,i.Data().weights));}
                     else{
-                        my_boundary(partition1).Append_Elements(nodes.template Slice<3,4>());
-                        my_ghost(partition1).Append_Elements(nodes.template Slice<1,2>());
+                        my_boundary(partition1).Append_Elements(nodes.template Slice<2,3>());
+                        my_ghost(partition1).Append_Elements(nodes.template Slice<0,1>());
                         output_pairs(partition1).Append(T_PAIR(segments,i.Data().weights));}}}
             // exchange boundary pairs
             mpi_solids->All_Scatter_Adhesion_Pairs(output_pairs,input_pairs);
@@ -233,11 +233,11 @@ Update_Springs(const bool search_hierarchy)
                     // add the dependencies
                     PARTITION_ID partition1=mpi_solids->partition_id_from_particle_index(state.nodes[0]),partition2=mpi_solids->partition_id_from_particle_index(state.nodes[2]);
                     if(partition1==mpi_solids->Partition()){
-                        my_boundary(partition2).Append_Elements(state.nodes.template Slice<1,2>());
-                        my_ghost(partition2).Append_Elements(state.nodes.template Slice<3,4>());}
+                        my_boundary(partition2).Append_Elements(state.nodes.template Slice<0,1>());
+                        my_ghost(partition2).Append_Elements(state.nodes.template Slice<2,3>());}
                     else{
-                        my_boundary(partition1).Append_Elements(state.nodes.template Slice<3,4>());
-                        my_ghost(partition1).Append_Elements(state.nodes.template Slice<1,2>());}
+                        my_boundary(partition1).Append_Elements(state.nodes.template Slice<2,3>());
+                        my_ghost(partition1).Append_Elements(state.nodes.template Slice<0,1>());}
                 }
             }
 #if 0

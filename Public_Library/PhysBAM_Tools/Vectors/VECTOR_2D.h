@@ -385,8 +385,8 @@ public:
     {return VECTOR(y,x);}
 
     template<int d1,int d2> VECTOR<T,d2-d1+1> Slice() const
-    {STATIC_ASSERT(((1<=d1) && (d2<=2)));
-    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1+1]=(*this)[i];return r;}
+    {STATIC_ASSERT(((0<=d1) && (d2<2)));
+    VECTOR<T,d2-d1+1> r;for(int i=d1;i<=d2;i++) r[i-d1]=(*this)[i];return r;}
 
     template<int n> void Split(VECTOR<T,n>& v1,VECTOR<T,2-n>& v2) const
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
