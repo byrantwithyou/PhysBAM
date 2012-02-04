@@ -38,7 +38,7 @@ Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body,ARRAY_VIEW<const TV> X_
         int p=nodes_to_check(pp),soft_binding=soft_bindings.Soft_Binding(p);
         T thickness=thickness_table?thickness_table->Get_Default(p,0):0;
         COLLISION_PARTICLE_STATE<TV>& collision=collision_particle_state(p);
-        if(soft_binding && soft_bindings.use_impulses_for_collisions(soft_binding)){
+        if(soft_binding>=0 && soft_bindings.use_impulses_for_collisions(soft_binding)){
             int parent=soft_bindings.bindings(soft_binding).y;
             BINDING<TV>* hard_binding=soft_bindings.Hard_Binding(p);
             if(hard_binding) hard_binding->Clamp_To_Embedded_Position(); // sync hard binding position, allow (position only) drift in soft binding

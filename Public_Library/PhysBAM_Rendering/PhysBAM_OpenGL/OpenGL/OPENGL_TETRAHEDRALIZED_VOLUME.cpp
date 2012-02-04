@@ -21,13 +21,13 @@ namespace{
 static VECTOR<int,4> Spring_Nodes(unsigned char pair_id,const VECTOR<int,4>& n)
 {
     switch(pair_id){
-        case 1: return VECTOR<int,4>(n[0],n[1],n[3],n[2]); // point face
-        case 2: return VECTOR<int,4>(n[1],n[0],n[2],n[3]); // point face
-        case 3: return VECTOR<int,4>(n[2],n[0],n[3],n[1]); // point face
-        case 4: return VECTOR<int,4>(n[3],n[0],n[1],n[2]); // point face
-        case 5: return VECTOR<int,4>(n[0],n[1],n[2],n[3]); // edge edge
-        case 6: return VECTOR<int,4>(n[1],n[2],n[0],n[3]); // edge edge
-        case 7: return VECTOR<int,4>(n[0],n[2],n[3],n[1]); // edge edge
+        case 0: return VECTOR<int,4>(n[0],n[1],n[3],n[2]); // point face
+        case 1: return VECTOR<int,4>(n[1],n[0],n[2],n[3]); // point face
+        case 2: return VECTOR<int,4>(n[2],n[0],n[3],n[1]); // point face
+        case 3: return VECTOR<int,4>(n[3],n[0],n[1],n[2]); // point face
+        case 4: return VECTOR<int,4>(n[0],n[1],n[2],n[3]); // edge edge
+        case 5: return VECTOR<int,4>(n[1],n[2],n[0],n[3]); // edge edge
+        case 6: return VECTOR<int,4>(n[0],n[2],n[3],n[1]); // edge edge
         default: PHYSBAM_FATAL_ERROR();}
 }
 }

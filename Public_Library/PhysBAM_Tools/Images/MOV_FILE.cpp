@@ -146,7 +146,7 @@ Add_Frame(ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
     int row_stride=cinfo.image_width*3; // JSAMPLEs per row in image_buffer
     JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
     while(cinfo.next_scanline < cinfo.image_height){
-        int index=0;for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,3> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline));row[index++]=pixel.x;row[index++]=pixel.y;row[index++]=pixel.z;} // copy row
+        int index=0;for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,3> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline-1));row[index++]=pixel.x;row[index++]=pixel.y;row[index++]=pixel.z;} // copy row
         jpeg_write_scanlines(&cinfo,row_pointer,1);}
     delete[] row;
     jpeg_finish_compress(&cinfo);

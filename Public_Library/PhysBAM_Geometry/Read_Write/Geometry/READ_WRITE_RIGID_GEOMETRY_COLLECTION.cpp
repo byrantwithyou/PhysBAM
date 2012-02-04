@@ -26,18 +26,20 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
     ARRAY<int> needs_init_default;
     if(needs_init) needs_init->Remove_All();
     if(needs_destroy) needs_destroy->Remove_All();
-    char version;int last_id=0;ARRAY<int> active_ids;int local_frame=frame;
+    char version;int next_id=0;ARRAY<int> active_ids;int local_frame=frame;
     std::string active_list_name=STRING_UTILITIES::string_sprintf("%s/common/rigid_body_active_ids_list",directory.c_str(),frame);
     std::string active_name=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(active_list_name)){
         if(!object.frame_list_active){object.frame_list_active=new ARRAY<int>;FILE_UTILITIES::Read_From_File(stream_type,active_list_name,*object.frame_list_active);}
         local_frame=(*object.frame_list_active)(object.frame_list_active->Binary_Search(frame));}
     if(object.last_read_active!=local_frame && FILE_UTILITIES::File_Exists(active_name)){
-        FILE_UTILITIES::Read_From_File(stream_type,active_name,version,last_id,active_ids);
+        FILE_UTILITIES::Read_From_File(stream_type,active_name,version,next_id,active_ids);
         object.last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
-        if(needs_destroy) for(int i=last_id;i<object.particles.array_collection->Size();i++) if(!object.particles.rigid_geometry(i)) needs_destroy->Append(i);
-        object.particles.Resize(last_id);}
-    else for(int id=0;id<object.particles.array_collection->Size();id++) if(object.Is_Active(id)){active_ids.Append(id);}
+        if(needs_destroy) for(int i=next_id;i<object.particles.array_collection->Size();i++) if(!object.particles.rigid_geometry(i)) needs_destroy->Append(i);
+        object.particles.Resize(next_id);}
+    else{
+        for(int id=0;id<object.particles.array_collection->Size();id++) if(object.Is_Active(id)) active_ids.Append(id);
+        next_id=object.particles.array_collection->Size();}
     if(object.particles.rigid_geometry.Subset(active_ids).Contains(0)){ // don't need to re-read these things if we will not be initializing any newly-active bodies
         std::string key_file_list=STRING_UTILITIES::string_sprintf("%s/common/rigid_body_key_list",directory.c_str());
         std::string key_file=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_key",directory.c_str(),frame);
@@ -59,7 +61,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
             LOG::cerr<<"Did not find rigid body names."<<std::endl;
             object.rigid_body_names.Clean_Memory();}}
 
-    ARRAY<bool> exists(last_id);exists.Subset(active_ids).Fill(true);
+    ARRAY<bool> exists(next_id);exists.Subset(active_ids).Fill(true);
     for(int i=0;i<exists.m;i++) if(!exists(i) && object.Is_Active(i)) object.Deactivate_Geometry(i);
     if(active_ids.m>0){
         for(int i=0;i<active_ids.m;i++){int p=active_ids(i);

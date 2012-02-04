@@ -82,7 +82,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     int row_stride=cinfo.image_width*3; // JSAMPLEs per row in image_buffer
     JSAMPLE* row=new unsigned char[row_stride];JSAMPROW row_pointer[]={row};
     while(cinfo.next_scanline < cinfo.image_height){
-        int index=0;for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline));row[index++]=pixel[0];row[index++]=pixel[1];row[index++]=pixel[2];} // copy row
+        int index=0;for(int i=0;i<image.counts.x;i++){VECTOR<unsigned char,d> pixel=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,image.counts.y-cinfo.next_scanline-1));row[index++]=pixel[0];row[index++]=pixel[1];row[index++]=pixel[2];} // copy row
         jpeg_write_scanlines(&cinfo,row_pointer,1);}
     delete[] row;
     jpeg_finish_compress(&cinfo);
