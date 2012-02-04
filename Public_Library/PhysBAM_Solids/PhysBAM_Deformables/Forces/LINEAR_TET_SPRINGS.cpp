@@ -324,7 +324,7 @@ Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,
         bool found=false;
         for(maximum_cross_squared_index=4;maximum_cross_squared_index<7;maximum_cross_squared_index++){
             spring_nodes=Spring_Nodes(maximum_cross_squared_index,element_nodes);
-            if(spring_nodes.Slice<1,2>()==edge1 || spring_nodes.Slice<3,4>()==edge1 || spring_nodes.Slice<1,2>().Reversed()==edge1 || spring_nodes.Slice<3,4>().Reversed()==edge1){
+            if(spring_nodes.Slice<0,1>()==edge1 || spring_nodes.Slice<2,3>()==edge1 || spring_nodes.Slice<0,1>().Reversed()==edge1 || spring_nodes.Slice<2,3>().Reversed()==edge1){
                 found=true;break;}}
         PHYSBAM_ASSERT(found);
         minimum_normal=(X(edge1[0])-X(edge2[1])).Orthogonal_Vector().Normalized();
