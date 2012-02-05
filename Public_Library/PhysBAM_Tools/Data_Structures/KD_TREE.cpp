@@ -64,8 +64,8 @@ Create_Left_Balanced_KD_Tree(ARRAY_VIEW<const TV> points_to_balance)
     pool.Delete_All();root_node=pool.New();
     ARRAY<int> permutation_array(IDENTITY_ARRAY<>(points_to_balance.Size()));
     RANGE<TV> box=RANGE<TV>::Bounding_Box(points_to_balance);
-    if(store_values_on_internal_nodes) Balance_Sub_KD_Tree_Using_Internal_Nodes(root_node,0,permutation_array.m,points_to_balance,permutation_array,box);
-    else Balance_Sub_KD_Tree_Using_Leaf_Nodes(root_node,0,permutation_array.m,points_to_balance,permutation_array,box);
+    if(store_values_on_internal_nodes){Balance_Sub_KD_Tree_Using_Internal_Nodes(root_node,0,permutation_array.m,points_to_balance,permutation_array,box);}
+    else{Balance_Sub_KD_Tree_Using_Leaf_Nodes(root_node,0,permutation_array.m,points_to_balance,permutation_array,box);}
 }
 //#####################################################################
 // Function Create_Left_Balanced_KD_Tree_With_Grouping
@@ -184,6 +184,7 @@ Median_Split(const int partition_index,const int first_index,const int last_inde
     int* middle=std::stable_partition(permutation_subset.begin(),permutation_subset.end(),partition_helper_less);
     std::stable_partition(middle,permutation_subset.end(),partition_helper_less_equal);
     assert(points(permutation_array(partition_index-1))[axis]<=split_value && split_value<=points(permutation_array(partition_index))[axis]);
+
 }
 //#####################################################################
 // Function Find_Points_Within_Radius

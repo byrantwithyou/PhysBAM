@@ -332,12 +332,15 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
         GAUSS_JACOBI_PF_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
         if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
+        LOG::cout << std::endl << i << " " << pf_target_impulses(i) << " " << pf_target_weights(i) << " " << pf_normals(i) << " " << pf_old_speeds(i);
+        LOG::cout << std::endl << dt << " " << POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes) << " " << collision_time << " "<< attempt_ratio <<" " << exit_early << " " << rigid;
         if(final_repulsion_only)
             collided=Point_Face_Final_Repulsion(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,
                 exit_early||rigid);
         else collided=Point_Face_Collision(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,exit_early||rigid);
         if(collided){
             collisions++;
+            LOG::cout << std::endl << "collided "<<i;
             modified_full.Subset(nodes).Fill(true);
             recently_modified_full.Subset(nodes).Fill(true);
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}

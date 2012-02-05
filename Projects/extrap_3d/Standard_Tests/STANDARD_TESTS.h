@@ -1940,8 +1940,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int j=0;j<n;j++)
                     for(int ij=0;ij<mn;ij++)
                     {
-                        particles.V(i+m*j+m*n*ij) = TV(0.32*cos(6*ij/(T)mn)+2.15,-0.28*cos(4*i/(T)m)+0.55,-0.31*sin(4*j/(T)n));
-                        particles.V(i+m*j+m*n*ij+m*n*mn) = TV(0.27*sin(6*j/(T)n)-2.17,0.32*cos(6*ij/(T)mn)+0.53,0.25*sin(4*i/(T)m));
+                        particles.V(i+m*j+m*n*ij) = TV(0.32*cos(6*(ij+1)/(T)mn)+2.15,-0.28*cos(4*(i+1)/(T)m)+0.55,-0.31*sin(4*(j+1)/(T)n));
+                        particles.V(i+m*j+m*n*ij+m*n*mn) = TV(0.27*sin(6*(j+1)/(T)n)-2.17,0.32*cos(6*(ij+1)/(T)mn)+0.53,0.25*sin(4*(i+1)/(T)m));
                     }
             for (int i=0; i<m*n*mn; i++)
             {
@@ -2411,18 +2411,13 @@ void Update_Time_Varying_Material_Properties(const T time)
         icm.Update_Lame_Constants(pow(10.0,end_young),pois,(T).01); 
         forces_are_removed=false;
     }
-    //if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame Hooray!" << std::endl;
-    //if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oo-rah!" << std::endl;
     if(time>critical3 && self_collision_flipped==false){
         self_collision_flipped=true;
-        //std::cout << "3rd critical time reached frame Frame" << std::endl;
         FINITE_VOLUME<TV,3>& fv = deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
         CONSTITUTIVE_MODEL<T,3>& icm = fv.constitutive_model;
         T young = pow(10.0,end_young-rebound_drop);
         icm.Update_Lame_Constants(young,pois,(T).01);
         solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;        
-       // solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(1));
-        if(solids_parameters.triangle_collision_parameters.perform_self_collision) std::cout << "rame oh,rad!" << std::endl;
     }
     }
 }

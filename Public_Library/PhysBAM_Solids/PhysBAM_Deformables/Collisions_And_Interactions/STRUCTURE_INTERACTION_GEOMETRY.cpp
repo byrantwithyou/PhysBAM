@@ -8,6 +8,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
@@ -54,15 +55,19 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
     if((segmented_curve=Segmented_Curve(&structure)))
         segmented_curve->mesh.elements.Flattened().Get_Unique(collision_particles.active_indices);
     else if((triangulated_surface=Triangulated_Surface(&structure))){
+
         triangulated_surface->mesh.elements.Flattened().Get_Unique(collision_particles.active_indices);
-        triangulated_surface->Update_Number_Nodes();
+Sort(collision_particles.active_indices);
+//for (int ii=0;ii<collision_particles.active_indices.Size();ii++) std::cout<<std::endl<<"activeindices:" <<collision_particles.active_indices(ii); 
+//std::cout << std::endl; for (int ii=0;ii<particle_hierarchy.X.Size();ii++) std::cout<<std::endl<<"X42:" <<particle_hierarchy.X(ii)[0]<<" " <<particle_hierarchy.X(ii)[1]<<" " <<particle_hierarchy.X(ii)[2];        
+triangulated_surface->Update_Number_Nodes();
         if(!triangulated_surface->mesh.segment_mesh) triangulated_surface->mesh.Initialize_Segment_Mesh();
         segmented_curve=new T_SEGMENTED_CURVE(*triangulated_surface->mesh.segment_mesh,full_particles); // TODO: This is broken; long term shallow copy of a temporary auxiliary structure
-        need_destroy_segmented_curve=true;}
+        need_destroy_segmented_curve=true;
+}
     else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(&structure))
         collision_particles.active_indices=free_particles->nodes;
     else PHYSBAM_FATAL_ERROR();
-
     if(segmented_curve && !segmented_curve->mesh.incident_elements) segmented_curve->mesh.Initialize_Incident_Elements();
     collision_particles.Update_Subset_Index_From_Element_Index();
     Build_Topological_Structure_Of_Hierarchies();

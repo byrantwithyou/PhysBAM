@@ -55,7 +55,8 @@ public:
     collision_particles.Clean_Memory();triangulated_surface=0;segmented_curve=0;point_simplices=0;particle_hierarchy.Clean_Memory();}
 
     void Build_Topological_Structure_Of_Hierarchies()
-    {if(triangulated_surface) triangulated_surface->Initialize_Hierarchy(false);
+{
+    if(triangulated_surface) triangulated_surface->Initialize_Hierarchy(false);
     if(segmented_curve) segmented_curve->Initialize_Hierarchy(false);
     ARRAY_VIEW<TV> tmp_view(collision_particles.point_cloud.X.Size(),collision_particles.point_cloud.X.Get_Array_Pointer());
     subset.array.Exchange(tmp_view);

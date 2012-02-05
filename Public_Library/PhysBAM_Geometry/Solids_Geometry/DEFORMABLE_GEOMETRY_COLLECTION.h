@@ -28,11 +28,11 @@ public:
     {return structures.Append(structure);}
 
     template<class T_STRUCTURE> T_STRUCTURE
-    Find_Structure(const int index=1)
+    Find_Structure(const int index=0)
     {return Find_Type<T_STRUCTURE>(structures,index);}
 
     template<class T_STRUCTURE> const T_STRUCTURE
-    Find_Structure(const int index=1) const
+    Find_Structure(const int index=0) const
     {return Find_Type<T_STRUCTURE>(structures,index);}
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
