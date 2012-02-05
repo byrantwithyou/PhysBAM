@@ -140,7 +140,7 @@ template<class T_GRID> typename T_GRID::SCALAR LEVELSET_3D<T_GRID>::
 Compute_Curvature(const TV& location) const
 {
     // TODO: optimize
-    ARRAY<T,TV_INT> phi_stencil(-1,1,-1,1,-1,1);
+    ARRAY<T,TV_INT> phi_stencil(-1,2,-1,2,-1,2);
     for(int i=-1;i<=1;i++) for(int j=-1;j<=1;j++) for(int k=-1;k<=1;k++){
         TV phi_location=grid.dX.x*TV((T)i,0,0)+grid.dX.y*TV(0,(T)j,0)+grid.dX.z*TV(0,0,(T)k)+location;
         phi_stencil(i,j,k)=Phi(phi_location);}
@@ -296,7 +296,7 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,T
     assert(tet_grid.domain.min_corner.x >= grid.domain.min_corner.x && tet_grid.domain.max_corner.x <= grid.domain.max_corner.x && tet_grid.domain.min_corner.y >= grid.domain.min_corner.y && tet_grid.domain.max_corner.y <= grid.domain.max_corner.y && tet_grid.domain.min_corner.z >= grid.domain.min_corner.z &&
                tet_grid.domain.max_corner.z <= grid.domain.max_corner.z);
     triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.array_collection->Clean_Memory();
-    ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(0,tet_grid.counts.x,1,tet_grid.counts.y,1,tet_grid.counts.z);
+    ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(0,tet_grid.counts.x,0,tet_grid.counts.y,0,tet_grid.counts.z);
     // create particles
     int i;for(i=0;i<tet_grid.counts.x;i++) for(int j=0;j<tet_grid.counts.y;j++) for(int k=0;k<tet_grid.counts.z;k++){
         edge(i,j,k)(0)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k));

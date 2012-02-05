@@ -70,18 +70,18 @@ bool Map_Intersection(RAY<VECTOR<T,3> >& ray,HELPER_T pointer) const
     if(abs(ray.direction.x) < parallel_tolerance){cross.x=FLT_MAX;dt.x=0;end.x=0;}
     else{
         T one_over_direction_x=1/ray.direction.x;
-        if(ray.direction.x > 0){cross.x=t_start+(grid.Axis_X(index.x+1,1)-point.x)*one_over_direction_x;dt.x=grid.dX.x*one_over_direction_x;step.x=1;end.x=grid.counts.x;}
-        else{cross.x=t_start+(grid.Axis_X(index.x,1)-point.x)*one_over_direction_x;dt.x=-grid.dX.x*one_over_direction_x;step.x=-1;end.x=0;}}
+        if(ray.direction.x > 0){cross.x=t_start+(grid.Axis_X(index.x+1,0)-point.x)*one_over_direction_x;dt.x=grid.dX.x*one_over_direction_x;step.x=1;end.x=grid.counts.x;}
+        else{cross.x=t_start+(grid.Axis_X(index.x,0)-point.x)*one_over_direction_x;dt.x=-grid.dX.x*one_over_direction_x;step.x=-1;end.x=0;}}
     if(abs(ray.direction.y) < parallel_tolerance){cross.y=FLT_MAX;dt.y=0;end.y=0;}
     else{
         T one_over_direction_y=1/ray.direction.y;
-        if(ray.direction.y > 0){cross.y=t_start+(grid.Axis_X(index.y+1,2)-point.y)*one_over_direction_y;dt.y=grid.dX.y*one_over_direction_y;step.y=1;end.y=grid.counts.y;}
-        else{cross.y=t_start+(grid.Axis_X(index.y,2)-point.y)*one_over_direction_y;dt.y=-grid.dX.y*one_over_direction_y;step.y=-1;end.y=0;}}
+        if(ray.direction.y > 0){cross.y=t_start+(grid.Axis_X(index.y+1,1)-point.y)*one_over_direction_y;dt.y=grid.dX.y*one_over_direction_y;step.y=1;end.y=grid.counts.y;}
+        else{cross.y=t_start+(grid.Axis_X(index.y,1)-point.y)*one_over_direction_y;dt.y=-grid.dX.y*one_over_direction_y;step.y=-1;end.y=0;}}
     if(abs(ray.direction.z) < parallel_tolerance){cross.z=FLT_MAX;dt.z=0;end.z=0;}
     else{
         T one_over_direction_z=1/ray.direction.z;
-        if(ray.direction.z > 0){cross.z=t_start+(grid.Axis_X(index.z+1,3)-point.z)*one_over_direction_z;dt.z=grid.dX.z*one_over_direction_z;step.z=1;end.z=grid.counts.z;}
-        else{cross.z=t_start+(grid.Axis_X(index.z,3)-point.z)*one_over_direction_z;dt.z=-grid.dX.z*one_over_direction_z;step.z=-1;end.z=0;}}
+        if(ray.direction.z > 0){cross.z=t_start+(grid.Axis_X(index.z+1,2)-point.z)*one_over_direction_z;dt.z=grid.dX.z*one_over_direction_z;step.z=1;end.z=grid.counts.z;}
+        else{cross.z=t_start+(grid.Axis_X(index.z,2)-point.z)*one_over_direction_z;dt.z=-grid.dX.z*one_over_direction_z;step.z=-1;end.z=0;}}
     bool intersection=false;
     for(;;){
         int compare_bits=((cross[0]<cross[1])<<2)+((cross[0]<cross[2])<<1)+((cross[1]<cross[2]));

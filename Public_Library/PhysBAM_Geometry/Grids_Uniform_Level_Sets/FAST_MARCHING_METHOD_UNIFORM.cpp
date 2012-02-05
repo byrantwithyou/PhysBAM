@@ -56,13 +56,13 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const 
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && Neighbor_Visible(axis,index))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}
         else
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}}*/
     DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue,1,ghost_cells,2,1).template Run<T_ARRAYS_SCALAR&,T,const ARRAY<TV_INT>*,bool>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Fast_Marching_Method_Threaded,phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
 }
@@ -131,13 +131,13 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,const T stop
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && Neighbor_Visible(axis,index))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && Neighbor_Visible(axis,index))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}
         else
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}}
 }
 //#####################################################################

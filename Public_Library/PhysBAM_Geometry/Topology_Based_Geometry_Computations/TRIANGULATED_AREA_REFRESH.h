@@ -54,7 +54,7 @@ void Initialize_Equilateral_Mesh_And_Particles(TRIANGULATED_AREA<T>& ta,const GR
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     ta.particles.array_collection->Delete_All_Elements();ta.mesh.Initialize_Equilateral_Mesh(m,n);ta.particles.array_collection->Add_Elements(m*n);
-    for(int j=0;j<n;j++) for(int i=0;i<m;i++) ta.particles.X(particle++)=VECTOR<T,2>((j%2)?grid.Axis_X_minus_half(i,1):grid.Axis_X(i,1),grid.Axis_X(j,2));
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) ta.particles.X(particle++)=VECTOR<T,2>((j%2)?grid.Axis_X_minus_half(i,0):grid.Axis_X(i,0),grid.Axis_X(j,1));
 }
 //#####################################################################
 // Function Initialize_Segmented_Curve

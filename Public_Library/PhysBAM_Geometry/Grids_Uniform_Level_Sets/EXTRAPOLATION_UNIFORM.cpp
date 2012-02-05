@@ -95,14 +95,14 @@ Initialize(const T_ARRAYS_BASE& phi,T_ARRAYS_BOOL_BASE& done,T_ARRAYS_BOOL_BASE&
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0 && Neighbor_Visible(axis,index-axis_vector))
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0 && Neighbor_Visible(axis,index))
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0 && Neighbor_Visible(axis,index))
                     Add_To_Heap(phi,heap,heap_length,close,index+axis_vector);}}}
     else{
         for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Node_Index())){TV_INT index=iterator.Node_Index();
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
                 if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && !close(index-axis_vector) && phi(index-axis_vector) > 0)
                     Add_To_Heap(phi,heap,heap_length,close,index-axis_vector);
-                if(index[axis] != dimension_end[axis] && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0)
+                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector) && phi(index+axis_vector) > 0)
                     Add_To_Heap(phi,heap,heap_length,close,index+axis_vector);}}}
 }
 //#####################################################################
