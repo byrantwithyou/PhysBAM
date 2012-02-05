@@ -464,7 +464,7 @@ public:
     {assert(!Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner-expansion,domain.max_corner+expansion),true);}
 
     GRID<VECTOR<T,TV::dimension-1> > Remove_Dimension(int dimension) const
-    {return GRID<VECTOR<T,TV::dimension-1> >(counts.Remove_Index(dimension),domain.Remove_Dimension(dimension),Is_MAC_Grid());}
+    {return GRID<VECTOR<T,TV::dimension-1> >(counts.Remove_Index(dimension-1),domain.Remove_Dimension(dimension-1),Is_MAC_Grid());}
 
     GRID<VECTOR<T,TV::dimension-1> > Get_Horizontal_Grid() const
     {return Remove_Dimension(1);}

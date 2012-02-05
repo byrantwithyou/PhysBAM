@@ -805,7 +805,7 @@ Evaluate_Force_For_Joint(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const 
 
     Set_PD_Targets();
     T_SPIN angles;
-    angles(dimension)=dx*dx_multiplier;
+    angles(dimension-1)=dx*dx_multiplier;
     ROTATION<TV> target_delta=ROTATION<TV>::From_Euler_Angles(angles);
     ROTATION<TV> target_angle=target_delta*joint.joint_function->Angle();
     T_SPIN new_euler_angles=target_angle.Euler_Angles();joint.Constrain_Angles(new_euler_angles);

@@ -21,9 +21,9 @@ UNIFORM_ARRAY_ITERATOR(const RANGE<TV_INT>& domain_input)
 template<int dimension> void UNIFORM_ARRAY_ITERATOR<dimension>::
 Next_Helper()
 {
-    index(dimension)=domain.min_corner(dimension);
+    index(dimension-1)=domain.min_corner(dimension-1);
     for(int i=dimension-2;i>=0;i--){
-        if(index(i)<domain.max_corner(i)){index(i)++;return;}
+        if(++index(i)<domain.max_corner(i)) return;
         index(i)=domain.min_corner(i);}
     valid=false;
 }

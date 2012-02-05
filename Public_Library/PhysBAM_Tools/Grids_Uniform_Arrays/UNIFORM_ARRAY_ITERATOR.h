@@ -33,7 +33,7 @@ public:
 
     void Next() PHYSBAM_ALWAYS_INLINE
     {if(dimension==0){valid=false;return;}
-    if(index(dimension)<domain.max_corner(dimension)) index(dimension)++;else Next_Helper();}
+    if(++index(dimension-1)>=domain.max_corner(dimension-1)) Next_Helper();}
     
     const TV_INT& Index()
     {return index;}
