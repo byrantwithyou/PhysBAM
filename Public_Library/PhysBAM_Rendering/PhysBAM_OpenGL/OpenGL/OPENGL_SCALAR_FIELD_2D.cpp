@@ -268,8 +268,8 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     opengl_textured_rect->width = domain.Edge_Lengths().x;
     opengl_textured_rect->height = domain.Edge_Lengths().y;
 
-    int tex_width = end_index.x-start_index.x+1;
-    int tex_height = end_index.y-start_index.y+1;
+    int tex_width = end_index.x-start_index.x;
+    int tex_height = end_index.y-start_index.y;
 
     if(!opengl_textured_rect->texture || opengl_textured_rect->texture->width != tex_width || opengl_textured_rect->texture->height != tex_height)
     {
