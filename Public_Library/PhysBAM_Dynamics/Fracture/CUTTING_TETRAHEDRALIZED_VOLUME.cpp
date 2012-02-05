@@ -1696,7 +1696,7 @@ Get_Face_Weights_From_Tet(const VECTOR<int,3>& face_vertices,const VECTOR<int,4>
 template<class T> VECTOR<T,2> CUTTING_TETRAHEDRALIZED_VOLUME<T>::
 Get_Weight_From_Segment_On_Face(T bary,const int node_1,const int node_2,VECTOR<int,3> triangle) const
 {
-    int permutation=1;for(;permutation<=6;permutation++) if(permute_three(triangle,permutation).Remove_Index(2)==VECTOR<int,2>(node_1,node_2)) break; // find correct permutationd
+    int permutation=0;for(;permutation<6;permutation++) if(permute_three(triangle,permutation).Remove_Index(2)==VECTOR<int,2>(node_1,node_2)) break; // find correct permutationd
     assert(permutation<=6);
     return permute_three_inverse(VECTOR<T,3>(bary,1-bary,0),permutation).Remove_Index(2);
 }

@@ -22,7 +22,7 @@ OPENGL_COMPONENT_DEBUG_PARTICLES_3D(const std::string &filename_input)
     :OPENGL_COMPONENT("Particles 3D"),particles(*new GEOMETRY_PARTICLES<TV>),opengl_particles(*new OPENGL_DEBUG_PARTICLES_3D<T>(particles)),
     filename(filename_input),frame_loaded(-1),set(1),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
 {
-    is_animation = FILE_UTILITIES::Is_Animated(filename);
+    is_animation=FILE_UTILITIES::Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame
 }
 //#####################################################################
@@ -96,7 +96,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
     else if(buffer_size==2) point_index=buffer[1];
     else return 0;
 
-    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *selection = new OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>(this);
+    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *selection=new OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>(this);
 
     // We have the OPENGL_PARTICLES_3D index but need to find the particle index
     selection->index=point_index;
@@ -110,10 +110,10 @@ template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T,RW>::
 Highlight_Selection(OPENGL_SELECTION *selection)
 {
     if(selection->type != OPENGL_SELECTION::DEBUG_PARTICLES_3D) return;
-    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>*)selection;
-    int particle_index = real_selection->index;
-    int point_index = 0;
-    for (int i = 1; i <= particle_index; i++)
+    OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>*)selection;
+    int particle_index=real_selection->index;
+    int point_index=0;
+    for(int i=0;i<particle_index;i++)
         point_index++;
     opengl_particles.Select_Point(point_index);
 }
@@ -132,16 +132,16 @@ template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T,RW>::
 Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) const
 {
     if(selection && selection->type == OPENGL_SELECTION::DEBUG_PARTICLES_3D && selection->object == this){
-        OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>*)selection;
+        OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_DEBUG_PARTICLES_3D<T>*)selection;
         
         if(!draw_multiple_particle_sets && 1!=set) return;
     
         output_stream<<"Selected particle in ["<<component_name<<"("<<1<<")] (total number = "<<particles.array_collection->Size()<<")"<<std::endl;
     
-        int current_index = -1;
+        int current_index=-1;
         if(real_selection->index<particles.array_collection->Size()){
             output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
-            current_index = real_selection->index;}
+            current_index=real_selection->index;}
 
         if(current_index > 0){
             // real_selection->index is index into particles array at time of selection.  Not very useful. current_index is more useful
@@ -175,7 +175,7 @@ Selection_Bounding_Box(OPENGL_SELECTION *selection) const
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T,RW>::
 Reinitialize(bool force)
 {
-    if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))) return;
+    if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded<0))) return;
     valid=true;
 
     std::string frame_filename;

@@ -114,7 +114,7 @@ Get_Simplex_Weights_For_Edge_Triangle_Intersection(const VECTOR<int,3>& simplice
     
     for(int i=0;i<3;i++) if(i!= triangle_array_index){
         const VECTOR<int,3>& triangle_nodes=cutting_simplices->simplices(simplices(i)).nodes;
-        int permutation=1;for(;permutation<=6;permutation++) if(permute_three(triangle_nodes,permutation).Remove_Index(2)==shared_edge) break;
+        int permutation=0;for(;permutation<6;permutation++) if(permute_three(triangle_nodes,permutation).Remove_Index(2)==shared_edge) break;
         assert(permutation<=6);
         all_weights(i)=permute_three(VECTOR<T,3>(segment_weight,1-segment_weight,0),permutation).Remove_Index(2);}
 }
