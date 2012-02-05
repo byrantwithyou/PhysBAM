@@ -40,7 +40,7 @@ void Write_Auxiliary_Files(const STREAM_TYPE stream_type,const std::string& outp
         pressure(domain_indices),entropy(domain_indices),enthalpy(domain_indices),speedofsound(domain_indices),
         machnumber(domain_indices),density_gradient(domain_indices),pressure_gradient(domain_indices);
     for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        if(grid.Domain_Indices().Lazy_Inside(cell) && !psi(cell)) continue;
+        if(grid.Domain_Indices().Lazy_Inside_Half_Open(cell) && !psi(cell)) continue;
         density(cell)=EULER<T_GRID>::Get_Density(U,cell);
         pressure(cell)=eos.p(density(cell),EULER<T_GRID>::e(U(cell)));
         energy(cell)=EULER<T_GRID>::Get_Total_Energy(U,cell);
