@@ -160,7 +160,7 @@ Display(const int in_color) const
             glPointSize(5);
             vertices.Resize(0);
             for(int i=x.domain.min_corner.x;i<x.domain.max_corner.x;i++){
-                T dx=(i==x.domain.min_corner.x)?x(i+1)-x(i):(i==x.domain.max_corner.x)?x(i)-x(i-1):(T).5*(x(i+1)-x(i-1));
+                T dx=(i==x.domain.min_corner.x)?x(i+1)-x(i):(i==x.domain.max_corner.x-1)?x(i)-x(i-1):(T).5*(x(i+1)-x(i-1));
                 if(sign(dx)>0) positive_point_color.Send_To_GL_Pipeline();
                 else negative_point_color.Send_To_GL_Pipeline();
                 OpenGL_Vertex(VECTOR<T,2>(x(i),u(i)),vertices);

@@ -24,13 +24,13 @@ OPENGL_COMPONENT_HEIGHTFIELD_1D(const GRID<TV> &grid_input,
     if(ground_filename_input.length()){ground=new ARRAY<T,TV_INT>;ground_filename=ground_filename_input;}
     else{ground=0;ground_filename="";}
     if(u_filename_input.length()){
-        u = new ARRAY<T,TV_INT>;
+        u=new ARRAY<T,TV_INT>;
         vector_field.Resize(grid.counts.x);
         vector_locations.Resize(grid.counts.x);
         u_filename=u_filename_input;}
     else{u=0;u_filename="";}
     is_animation=height_filename.find("%d")!=std::string::npos;
-    frame_loaded = -1;
+    frame_loaded=-1;
 
     Reinitialize();
 }
@@ -68,18 +68,18 @@ Display(const int in_color) const
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     OPENGL_COLOR water_color(0,0,1);
-    OPENGL_COLOR ground_color = OPENGL_COLOR::Gray(0.8);
+    OPENGL_COLOR ground_color=OPENGL_COLOR::Gray(0.8);
     OPENGL_COLOR displaced_water(1,0,0);
     OPENGL_COLOR points_color(0,1,1);
-    OPENGL_COLOR selected_point_color = OPENGL_COLOR::Yellow();
-    GLfloat point_size = 3.0;
+    OPENGL_COLOR selected_point_color=OPENGL_COLOR::Yellow();
+    GLfloat point_size=3.0;
 
     GLint mode=0;
 #ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE, &mode);
 #endif
 
-    if (valid && draw)
+    if(valid && draw)
     {
         glDisable(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
@@ -91,11 +91,11 @@ Display(const int in_color) const
             glPushAttrib(GL_POINT_BIT);
             glPointSize(point_size);
             points_color.Send_To_GL_Pipeline();
-            for (int i = 1; i <= grid.counts.x; i++)
+            for(int i=0;i<grid.counts.x;i++)
             {
                 glLoadName(i);
                 vertices.Resize(0);
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,1), scale*height(i)),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
             }
             glPopAttrib();
@@ -104,20 +104,20 @@ Display(const int in_color) const
         else
 #endif
         {
-            if (x)
+            if(x)
             {
                 displaced_water.Send_To_GL_Pipeline();
                 vertices.Resize(0);
-                if (displacement_scale == 1)
+                if(displacement_scale == 1)
                 {
-                    for (int i = 1; i <= x->counts.x; i++)
-                        OpenGL_Vertex(VECTOR<T,2>((*x)(i), scale*height(i)),vertices);        
+                    for(int i=0;i<x->counts.x;i++)
+                        OpenGL_Vertex(VECTOR<T,2>((*x)(i), scale*height(i)),vertices);       
                 }
                 else
                 {
-                    for (int i = 1; i <= x->counts.x; i++)
-                        OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,1) + displacement_scale*((*x)(i)-grid.Axis_X(i,1)), 
-                                scale*height(i)),vertices);        
+                    for(int i=0;i<x->counts.x;i++)
+                        OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0) + displacement_scale*((*x)(i)-grid.Axis_X(i,0)),
+                                scale*height(i)),vertices);       
                 }
                 OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
             }
@@ -125,33 +125,33 @@ Display(const int in_color) const
             // Water
             water_color.Send_To_GL_Pipeline();
             vertices.Resize(0);
-            for (int i = 1; i <= grid.counts.x; i++)
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,1), scale*height(i)),vertices);
+            for(int i=0;i<grid.counts.x;i++)
+                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
             OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
 
-            if (draw_points)
+            if(draw_points)
             {
                 glPushAttrib(GL_POINT_BIT);
                 glPointSize(point_size);
                 points_color.Send_To_GL_Pipeline();
                 vertices.Resize(0);
-                for (int i = 1; i <= grid.counts.x; i++)
-                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,1), scale*height(i)),vertices);
+                for(int i=0;i<grid.counts.x;i++)
+                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
                 OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 
 #ifndef USE_OPENGLES
                 for(int i=0;i<grid.counts.x;i++)
-                    OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,1),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
+                    OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,0),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
 #endif
 
                 if(selected_index){
                     selected_point_color.Send_To_GL_Pipeline();
                     int i=selected_index;
                     vertices.Resize(0);
-                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,1), scale*height(i)),vertices);
+                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i)),vertices);
                     OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
 #ifndef USE_OPENGLES
-                    OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,1),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
+                    OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,0),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
 #endif
                 }
 
@@ -160,18 +160,18 @@ Display(const int in_color) const
 
             // Ground
             ground_color.Send_To_GL_Pipeline();
-            if (ground)
+            if(ground)
             {
                 vertices.Resize(0);
-                for (int i = 1; i <= grid.counts.x; i++)
-                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,1), scale*(*ground)(i)),vertices);       
+                for(int i=0;i<grid.counts.x;i++)
+                    OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(i,0), scale*(*ground)(i)),vertices);      
                 OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
             }
             else
             {
                 vertices.Resize(0);
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(1,1), 0),vertices);
-                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(grid.counts.x,1), 0),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(0,0), 0),vertices);
+                OpenGL_Vertex(VECTOR<T,2>(grid.Axis_X(grid.counts.x-1,0), 0),vertices);
                 OpenGL_Draw_Arrays(GL_LINE_STRIP,2,vertices);
             }
         }
@@ -180,9 +180,9 @@ Display(const int in_color) const
         glEnable(GL_DEPTH_TEST);
 
 #ifndef USE_OPENGLES
-        if (mode != GL_SELECT && draw_velocities) opengl_vector_field.Display(in_color);
+        if(mode != GL_SELECT && draw_velocities) opengl_vector_field.Display(in_color);
 #else
-        if (draw_velocities) opengl_vector_field.Display(in_color);
+        if(draw_velocities) opengl_vector_field.Display(in_color);
 #endif
     }
 }
@@ -190,14 +190,14 @@ Display(const int in_color) const
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw)
+    if(valid && draw)
     {
         T min_height=min((T)0,height.Min());
         T max_height=max((T)0,height.Max());
 
-        T min_x = grid.domain.min_corner.x, max_x = grid.domain.max_corner.x;
-        if (x) { 
-            min_x=min(min_x,x->Min()); 
+        T min_x=grid.domain.min_corner.x, max_x=grid.domain.max_corner.x;
+        if(x) { 
+            min_x=min(min_x,x->Min());
             max_x=max(max_x,x->Max());
         }
 
@@ -211,10 +211,10 @@ Reinitialize(bool force)
 {
     if(draw){
         if(force || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0)){
-            bool success = true;
-            valid = false;
+            bool success=true;
+            valid=false;
 
-            if (success){
+            if(success){
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(height_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,height);
@@ -232,7 +232,7 @@ Reinitialize(bool force)
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(ground_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*ground);
-                    if (height.counts.x != ground->counts.x) success = false;
+                    if(height.counts.x != ground->counts.x) success=false;
                     else height += (*ground);}
                 else success=false;}
 
@@ -240,24 +240,24 @@ Reinitialize(bool force)
                 std::string filename=FILE_UTILITIES::Get_Frame_Filename(u_filename,frame);
                 if(FILE_UTILITIES::File_Exists(filename)){
                     FILE_UTILITIES::Read_From_File<RW>(filename,*u);
-                    if (height.counts.x != u->counts.x) success = false;
+                    if(height.counts.x != u->counts.x) success=false;
                     else for(int i=0;i<grid.counts.x;i++){
-                            vector_field(i) = VECTOR<T,2>((*u)(i),0);
-                            vector_locations(i) = VECTOR<T,2>(grid.Axis_X(i,1), scale*height(i));}}
+                            vector_field(i)=VECTOR<T,2>((*u)(i),0);
+                            vector_locations(i)=VECTOR<T,2>(grid.Axis_X(i,0), scale*height(i));}}
                 else success=false;}
 
             if(success){
-                frame_loaded = frame;
-                valid = true;}}}
+                frame_loaded=frame;
+                valid=true;}}}
 }
 
 template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
-    if (buffer_size == 1)
+    if(buffer_size == 1)
     {
-        OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *selection = new OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>(this);
-        selection->index = buffer[0];
+        OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *selection=new OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>(this);
+        selection->index=buffer[0];
         return selection;
     }
     else return 0;
@@ -266,36 +266,36 @@ Get_Selection(GLuint *buffer,int buffer_size)
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Highlight_Selection(OPENGL_SELECTION *selection)
 {
-    if (selection->type != OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_1D) return;
-    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *real_selection = (OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>*)selection;
-    selected_index = real_selection->index;
+    if(selection->type != OPENGL_SELECTION::COMPONENT_HEIGHTFIELD_1D) return;
+    OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T> *real_selection=(OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>*)selection;
+    selected_index=real_selection->index;
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Clear_Highlight()
 {
-    selected_index = 0;
+    selected_index=0;
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Set_Scale(T scale_input)
 {
-    scale = scale_input;
-    Reinitialize(true); // To recompute velocity vector positions correctly
+    scale=scale_input;
+    Reinitialize(true);// To recompute velocity vector positions correctly
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Increase_Scale()
 {
     scale *= 1.1;
-    Reinitialize(true); // To recompute velocity vector positions correctly
+    Reinitialize(true);// To recompute velocity vector positions correctly
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Decrease_Scale()
 {
     scale *= 1/1.1;
-    Reinitialize(true); // To recompute velcity vector positions correctly
+    Reinitialize(true);// To recompute velcity vector positions correctly
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
@@ -325,14 +325,14 @@ Decrease_Velocity_Scale()
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Toggle_Draw_Velocities()
 {
-    draw_velocities = !draw_velocities;
+    draw_velocities=!draw_velocities;
     Reinitialize(true);
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Toggle_Draw_Points()
 {
-    draw_points = !draw_points;
+    draw_points=!draw_points;
 }
 
 template<class T> RANGE<VECTOR<float,3> > OPENGL_SELECTION_COMPONENT_HEIGHTFIELD_1D<T>::

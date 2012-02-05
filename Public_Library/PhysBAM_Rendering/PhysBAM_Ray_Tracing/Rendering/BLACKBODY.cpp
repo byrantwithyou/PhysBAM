@@ -18,7 +18,7 @@ Calculate_Radiance_Spectrum(const T temperature,const GRID<VECTOR<T,1> >& grid,A
 {
     T constant_1=T(plancks_constant*sqr(speed_of_light)/2),constant_2=T(plancks_constant*speed_of_light/boltzmanns_constant);
     for(int i=0;i<grid.counts.x;i++){
-        T lambda=grid.Axis_X(i,1);
+        T lambda=grid.Axis_X(i,0);
         radiance_spectrum(i)=constant_1/(cube(lambda)*sqr(lambda)*(exp(constant_2/(lambda*temperature))-1));}
 }
 //#####################################################################

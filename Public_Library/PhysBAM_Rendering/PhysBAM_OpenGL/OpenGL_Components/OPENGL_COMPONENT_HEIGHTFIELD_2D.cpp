@@ -99,14 +99,14 @@ Display(const int in_color) const
             for (int i = domain.min_corner.x; i <= domain.max_corner.x-1; i++)
             {
                 ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-                v1=VECTOR<T,3>(grid.Axis_X(i+1,1), scale*(height(i+1,1)+vertical_offset), grid.Axis_X(1,2));
-                v2=VECTOR<T,3>(grid.Axis_X(i,1), scale*(height(i,1)+vertical_offset), grid.Axis_X(1,2));
+                v1=VECTOR<T,3>(grid.Axis_X(i+1,0), scale*(height(i+1,0)+vertical_offset), grid.Axis_X(1,1));
+                v2=VECTOR<T,3>(grid.Axis_X(i,0), scale*(height(i,0)+vertical_offset), grid.Axis_X(1,1));
                 OpenGL_Vertex(v1,vertices);
                 OpenGL_Vertex(v2,vertices);
                 for (int j = domain.min_corner.y+1; j <= domain.max_corner.y; j++)
                 {
-                    v3=VECTOR<T,3>(grid.Axis_X(i+1,1), scale*(height(i+1,j)+vertical_offset), grid.Axis_X(j,2));
-                    v4=VECTOR<T,3>(grid.Axis_X(i,1), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,2));
+                    v3=VECTOR<T,3>(grid.Axis_X(i+1,0), scale*(height(i+1,j)+vertical_offset), grid.Axis_X(j,1));
+                    v4=VECTOR<T,3>(grid.Axis_X(i,0), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,1));
 
                     OpenGL_Normal(PLANE<T>(v1,v2,v3).Normal(),normals);
                     OpenGL_Vertex(v3,vertices);
@@ -183,7 +183,7 @@ Reinitialize(bool force)
                         int idx = 1;
                         for(int i=domain.min_corner.x;i<domain.max_corner.x;i++)for(int j=domain.min_corner.y;j<domain.max_corner.y;j++){
                             vector_field(idx) = VECTOR<T,3>((*uv)(i,j).x,0,(*uv)(i,j).y);
-                            vector_locations(idx) = VECTOR<T,3>(grid.Axis_X(i,1), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,2));
+                            vector_locations(idx) = VECTOR<T,3>(grid.Axis_X(i,0), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,1));
                             idx++;}}}
                 else success=false;}
 
@@ -203,9 +203,9 @@ Update_Surface()
         for (int i = domain.min_corner.x; i <= domain.max_corner.x; i++) for (int j = domain.min_corner.y; j <= domain.max_corner.y; j++)
         {
             triangulated_surface.particles.X(To_Linear_Index(i,j)) = 
-                VECTOR<T,3>(grid.Axis_X(i,1) + displacement_scale*((*xz)(i,j).x-grid.Axis_X(i,1)), 
+                VECTOR<T,3>(grid.Axis_X(i,0) + displacement_scale*((*xz)(i,j).x-grid.Axis_X(i,0)), 
                              scale*(height(i,j)+vertical_offset), 
-                             grid.Axis_X(j,2) + displacement_scale*((*xz)(i,j).y-grid.Axis_X(j,2)));
+                             grid.Axis_X(j,1) + displacement_scale*((*xz)(i,j).y-grid.Axis_X(j,1)));
         }
     }
     else
@@ -222,7 +222,7 @@ Update_Surface()
         for (int i = domain.min_corner.x; i <= domain.max_corner.x; i++) for (int j = domain.min_corner.y; j <= domain.max_corner.y; j++)
         {
             triangulated_surface.particles.X(To_Linear_Index(i,j)) = 
-                VECTOR<T,3>(grid.Axis_X(i,1), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,2));
+                VECTOR<T,3>(grid.Axis_X(i,0), scale*(height(i,j)+vertical_offset), grid.Axis_X(j,1));
         }
 
         if(subdivide_surface) triangulated_surface.Loop_Subdivide();
