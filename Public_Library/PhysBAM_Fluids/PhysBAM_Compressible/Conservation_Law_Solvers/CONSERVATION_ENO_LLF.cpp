@@ -38,12 +38,12 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     int number_ghost_cells=3;
     int start_index_ghost=U.domain.min_corner.x,end_index_ghost=U.domain.max_corner.x;
     // divided differences    
-    ARRAY<TV_DIMENSION,VECTOR<int,2> > DU(start_index_ghost,end_index_ghost,1,eno_order),DF(start_index_ghost,end_index_ghost,1,eno_order);
+    ARRAY<TV_DIMENSION,VECTOR<int,2> > DU(start_index_ghost,end_index_ghost,0,eno_order),DF(start_index_ghost,end_index_ghost,0,eno_order);
     ARRAY<TV_DIMENSION,VECTOR<int,1> > F(start_index_ghost,end_index_ghost);
     if(use_face_velocity_for_fluxes) eigensystem.Flux_Divided_By_Velocity(m,U,F,U_flux);
     else eigensystem.Flux(m,U,F,U_flux);
-    for(int i=start_index_ghost;i<end_index_ghost;i++){DU(i,1)=U(i);DF(i,1)=F(i);}
-    for(int j=1;j<order;j++) for(int i=start_index_ghost;i<end_index_ghost+1-j;i++){
+    for(int i=start_index_ghost;i<end_index_ghost;i++){DU(i,0)=U(i);DF(i,0)=F(i);}
+    for(int j=1;j<order;j++) for(int i=start_index_ghost;i<end_index_ghost-j;i++){
         DU(i,j)=(DU(i+1,j-1)-DU(i,j-1))/(j*dx);DF(i,j)=(DF(i+1,j-1)-DF(i,j-1))/(j*dx);}
 
     int start_index=U.domain.min_corner.x+number_ghost_cells,end_index=U.domain.max_corner.x-number_ghost_cells;
@@ -61,7 +61,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
 
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux(U.domain.min_corner.x+2,U.domain.max_corner.x-3); // fluxes to the right of each point
     MATRIX<T,d,d> L,R;
-    ARRAY<TV_DIMENSION,VECTOR<int,2> > LDU(start_index_ghost,end_index_ghost,1,eno_order),LDF(start_index_ghost,end_index_ghost,1,eno_order);
+    ARRAY<TV_DIMENSION,VECTOR<int,2> > LDU(start_index_ghost,end_index_ghost,0,eno_order),LDF(start_index_ghost,end_index_ghost,0,eno_order);
     const bool all_eigenvalues_same=eigensystem.All_Eigenvalues_Same();
     for(int i=start_index-1;i<end_index;i++) if(psi_ghost(i) || psi_ghost(i+1)){ // compute flux
         // transfer the divided differences into the characteristic fields
@@ -84,22 +84,22 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
         TV_DIMENSION Lflux; // flux without multiplication by R^T
         if(eno_order == 1) for(int k=0;k<d;k++){
             T alpha=max_alpha[k];
-            T flux_left=LDF(i,1)(k)+alpha*LDU(i,1)(k);
-            T flux_right=LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k);
+            T flux_left=LDF(i,0)(k)+alpha*LDU(i,0)(k);
+            T flux_right=LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k);
             Lflux(k)=(T).5*(flux_left+flux_right);}
         else if(eno_order == 2) for(int k=0;k<d;k++){
             T alpha=max_alpha[k];
-            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i,1)(k)+alpha*LDU(i,1)(k),LDF(i-1,2)(k)+alpha*LDU(i-1,2)(k),
-                LDF(i,2)(k)+alpha*LDU(i,2)(k));
-            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k),-(LDF(i+1,2)(k)-alpha*LDU(i+1,2)(k)),
-                -(LDF(i,2)(k)-alpha*LDU(i,2)(k)));
+            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i,0)(k)+alpha*LDU(i,0)(k),LDF(i-1,1)(k)+alpha*LDU(i-1,1)(k),
+                LDF(i,1)(k)+alpha*LDU(i,1)(k));
+            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k),-(LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k)),
+                -(LDF(i,1)(k)-alpha*LDU(i,1)(k)));
             Lflux(k)=(T).5*(flux_left+flux_right);}
         else if(eno_order == 3) for(int k=0;k<d;k++){
             T alpha=max_alpha[k];
-            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i,1)(k)+alpha*LDU(i,1)(k),LDF(i-1,2)(k)+alpha*LDU(i-1,2)(k),
-                LDF(i,2)(k)+alpha*LDU(i,2)(k),LDF(i-2,3)(k)+alpha*LDU(i-2,3)(k),LDF(i-1,3)(k)+alpha*LDU(i-1,3)(k),LDF(i,3)(k)+alpha*LDU(i,3)(k));
-            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k),-(LDF(i+1,2)(k)-alpha*LDU(i+1,2)(k)),
-                -(LDF(i,2)(k)-alpha*LDU(i,2)(k)),LDF(i+1,3)(k)-alpha*LDU(i+1,3)(k),LDF(i,3)(k)-alpha*LDU(i,3)(k),LDF(i-1,3)(k)-alpha*LDU(i-1,3)(k));
+            T flux_left=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i,0)(k)+alpha*LDU(i,0)(k),LDF(i-1,1)(k)+alpha*LDU(i-1,1)(k),
+                LDF(i,1)(k)+alpha*LDU(i,1)(k),LDF(i-2,2)(k)+alpha*LDU(i-2,2)(k),LDF(i-1,2)(k)+alpha*LDU(i-1,2)(k),LDF(i,2)(k)+alpha*LDU(i,2)(k));
+            T flux_right=ADVECTION_SEPARABLE_UNIFORM<GRID<TV>,T>::ENO(dx,LDF(i+1,0)(k)-alpha*LDU(i+1,0)(k),-(LDF(i+1,1)(k)-alpha*LDU(i+1,1)(k)),
+                -(LDF(i,1)(k)-alpha*LDU(i,1)(k)),LDF(i+1,2)(k)-alpha*LDU(i+1,2)(k),LDF(i,2)(k)-alpha*LDU(i,2)(k),LDF(i-1,2)(k)-alpha*LDU(i-1,2)(k));
             Lflux(k)=(T).5*(flux_left+flux_right);}
 
         if(all_eigenvalues_same) flux(i)=Lflux;

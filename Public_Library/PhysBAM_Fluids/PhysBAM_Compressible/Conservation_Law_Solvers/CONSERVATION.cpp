@@ -252,7 +252,7 @@ Update_Conservation_Law_For_Specialized_Shallow_Water_Equations(GRID<TV>& grid,T
     if(save_fluxes!=solver.save_fluxes) PHYSBAM_FATAL_ERROR();
 
     int i,j;int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;
-    ARRAY<VECTOR<T,3> ,VECTOR<int,2> > rhs(0,m,1,n);
+    ARRAY<VECTOR<T,3> ,VECTOR<int,2> > rhs(0,m,0,n);
 
     if(save_fluxes) fluxes.Resize(grid);
 

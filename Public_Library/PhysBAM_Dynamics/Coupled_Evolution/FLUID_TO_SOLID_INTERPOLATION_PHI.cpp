@@ -96,7 +96,7 @@ Setup_Mesh()
     T min_length=index_map.grid.dX.Min()*(T).1;
     for(int i=1;;i++){
         const ARRAY<FACE_INDEX<TV::m> >& array=cut_faces.Get(cell);
-        if(array.m!=2 && !index_map.grid.Domain_Indices().Lazy_Inside(cell)) PHYSBAM_FATAL_ERROR("Level set extends outside of domain");
+        if(array.m!=2 && !index_map.grid.Domain_Indices().Lazy_Inside_Half_Open(cell)) PHYSBAM_FATAL_ERROR("Level set extends outside of domain");
         PHYSBAM_ASSERT(array.m==2);
         FACE_INDEX<TV::m> next_face=(array(0)==prev_face)?array(1):array(0);
         if(next_face==it.Key()) break;
