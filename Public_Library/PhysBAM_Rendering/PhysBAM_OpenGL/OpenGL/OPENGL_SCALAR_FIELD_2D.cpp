@@ -36,9 +36,9 @@ OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_inp
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 ~OPENGL_SCALAR_FIELD_2D()
 {
-    if (opengl_points) delete &opengl_points->points;
+    if(opengl_points) delete &opengl_points->points;
     delete opengl_points;
-    if (opengl_textured_rect) delete opengl_textured_rect->texture;
+    if(opengl_textured_rect) delete opengl_textured_rect->texture;
     delete opengl_textured_rect;
     color_maps.Delete_Pointers_And_Clean_Memory();
     contour_curves.Delete_Pointers_And_Clean_Memory();
@@ -48,7 +48,7 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Set_Uniform_Contour_Values(const T2 min_value,const T2 max_value,const T2 increment)
 {
     contour_values.Remove_All();
-    for(T2 value=min_value;value<=max_value;value+=increment) contour_values.Append(value);
+    for(T2 value=min_value;value<max_value;value+=increment) contour_values.Append(value);
     if(draw_mode==DRAW_CONTOURS) Update_Contour_Curves();
 }
 
@@ -138,14 +138,14 @@ Pre_Map_Value(const T2 value) const
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Display(const int in_color) const
 {
-    if (draw_mode==DRAW_TEXTURE) {
+    if(draw_mode==DRAW_TEXTURE) {
         PHYSBAM_ASSERT(opengl_textured_rect);
 #ifndef USE_OPENGLES
         opengl_textured_rect->Display(in_color);
 #else
         Display_2D();
 #endif
-    } else if (draw_mode==DRAW_POINTS) {
+    } else if(draw_mode==DRAW_POINTS) {
         PHYSBAM_ASSERT(opengl_points);
         opengl_points->Display(in_color);
     } else {
@@ -195,17 +195,17 @@ Set_Draw_Mode(DRAW_MODE draw_mode_input)
 {
     draw_mode = draw_mode_input;
 
-    if (draw_mode!=DRAW_TEXTURE && opengl_textured_rect) {
+    if(draw_mode!=DRAW_TEXTURE && opengl_textured_rect) {
         delete opengl_textured_rect->texture; delete opengl_textured_rect; opengl_textured_rect=0;
     }
-    if (draw_mode!=DRAW_POINTS && opengl_points) {
+    if(draw_mode!=DRAW_POINTS && opengl_points) {
         delete &opengl_points->points; delete opengl_points; opengl_points=0;
     }
 
-    if (draw_mode==DRAW_TEXTURE) {
-        if (!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT;
-    } else if (draw_mode==DRAW_POINTS) {
-        if (!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(*new ARRAY<VECTOR<T,2> >);
+    if(draw_mode==DRAW_TEXTURE) {
+        if(!opengl_textured_rect) opengl_textured_rect=new OPENGL_TEXTURED_RECT;
+    } else if(draw_mode==DRAW_POINTS) {
+        if(!opengl_points) opengl_points=new OPENGL_POINTS_2D<T>(*new ARRAY<VECTOR<T,2> >);
     }
 
     Update();
@@ -215,9 +215,9 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update()
 {
     VECTOR<int,2> start_index(values.domain.min_corner.x,values.domain.min_corner.y),end_index(values.domain.max_corner.x,values.domain.max_corner.y);
-    if(!draw_ghost_values){start_index=clamp_min(start_index,VECTOR<int,2>(1,1));end_index=clamp_max(end_index,grid.counts);}
-    if (draw_mode==DRAW_TEXTURE) Update_Texture(start_index,end_index);
-    else if (draw_mode==DRAW_POINTS) Update_Points(start_index,end_index);
+    if(!draw_ghost_values){start_index=clamp_min(start_index,VECTOR<int,2>());end_index=clamp_max(end_index,grid.counts);}
+    if(draw_mode==DRAW_TEXTURE) Update_Texture(start_index,end_index);
+    else if(draw_mode==DRAW_POINTS) Update_Points(start_index,end_index);
     else Update_Contour_Curves();
 }
 
@@ -250,9 +250,11 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 {
     PHYSBAM_ASSERT(opengl_textured_rect);
 
-    if ((end_index.x-start_index.x+1) == 0 || (end_index.y-start_index.y+1) == 0)
+    if(end_index.x==start_index.x || end_index.y==start_index.y)
     {
-        delete opengl_textured_rect->texture; opengl_textured_rect->texture = 0; return;
+        delete opengl_textured_rect->texture;
+        opengl_textured_rect->texture = 0;
+        return;
     }
 
     // Handle values arrays which are not (1,m)(1,n)
@@ -269,7 +271,7 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     int tex_width = end_index.x-start_index.x+1;
     int tex_height = end_index.y-start_index.y+1;
 
-    if (!opengl_textured_rect->texture || opengl_textured_rect->texture->width != tex_width || opengl_textured_rect->texture->height != tex_height)
+    if(!opengl_textured_rect->texture || opengl_textured_rect->texture->width != tex_width || opengl_textured_rect->texture->height != tex_height)
     {
         delete opengl_textured_rect->texture;
         opengl_textured_rect->texture = new OPENGL_TEXTURE();
@@ -278,14 +280,14 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 
     OPENGL_COLOR* bitmap = new OPENGL_COLOR[tex_width*tex_height];
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
-    for (int i = 1; i <= tex_width; i++)
-        for (int j = 1; j <= tex_height; j++)
+    for(int i = 0; i < tex_width; i++)
+        for(int j = 0; j < tex_height; j++)
         {
-            int idx = (j-1)*tex_width + i-1;
-            T2 value=Pre_Map_Value(values(start_index.x+i-1,start_index.y+j-1));
-            
+            int idx = j*tex_width + i;
+            T2 value=Pre_Map_Value(values(start_index.x+i,start_index.y+j));
+
             OPENGL_COLOR color_value=color_map->Lookup(value);
-            if(active_cells && !(*active_cells)(start_index.x+i-1,start_index.y+j-1)) color_value.rgba[3]=0;
+            if(active_cells && !(*active_cells)(start_index.x+i,start_index.y+j)) color_value.rgba[3]=0;
             bitmap[idx]=color_value;
         }
 
@@ -299,13 +301,13 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 {
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
-    int index=1;
+    int index=0;
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
-    for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=0;j<=end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
+    for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=0;j<end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
         opengl_points->points(index)=grid.X(i,j);
         opengl_points->Set_Point_Color(index,color_map->Lookup(Pre_Map_Value(values(i,j))));
         index++;}
-    opengl_points->points.Resize(index-1);
+    opengl_points->points.Resize(index);
 }
 
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
@@ -354,10 +356,10 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     OPENGL_COLOR_MAP<bool>* color_map=color_maps(current_color_map);
     opengl_points->color=color_map->Lookup(true);
     opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
-    int index=1;
-    for(int i=start_index.x;i<=end_index.x;i++) for(int j=start_index.y;j<=end_index.y;j++)
+    int index=0;
+    for(int i=start_index.x;i<end_index.x;i++) for(int j=start_index.y;j<end_index.y;j++)
         if(values(i,j)) opengl_points->points(index++)=grid.X(i,j);
-    opengl_points->points.Resize(index-1);
+    opengl_points->points.Resize(index);
 }
 
 template<> void OPENGL_SCALAR_FIELD_2D<double,bool>::
@@ -367,10 +369,10 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     OPENGL_COLOR_MAP<bool>* color_map=color_maps(current_color_map);
     opengl_points->color=color_map->Lookup(true);
     opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
-    int index=1;
-    for(int i=start_index.x;i<=end_index.x;i++) for(int j=start_index.y;j<=end_index.y;j++)
+    int index=0;
+    for(int i=start_index.x;i<end_index.x;i++) for(int j=start_index.y;j<end_index.y;j++)
         if(values(i,j)) opengl_points->points(index++)=grid.X(i,j);
-    opengl_points->points.Resize(index-1);
+    opengl_points->points.Resize(index);
 }
 
 template<> void OPENGL_SCALAR_FIELD_2D<float,bool>::

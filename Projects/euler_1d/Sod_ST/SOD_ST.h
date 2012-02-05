@@ -136,9 +136,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==12) fluids_parameters.grid->Initialize(resolution,(T)-1,(T)2);
     else fluids_parameters.grid->Initialize(resolution,(T)0,(T)1);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-    if(test_number==1 || test_number==2) fluids_parameters.domain_walls[1][2]=true;
-    if(test_number==10){fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;}
+    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+    if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=true;
+    if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
     //time
     initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
     if(test_number==9) last_frame=4000;
@@ -213,8 +213,8 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
-    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_left(1),state_right(1)),
-        T_FACE_VECTOR(state_left(3),state_right(3)),TV_FACE_VECTOR(TV(state_left(2)),TV(state_right(2))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));
+    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_left(0),state_right(0)),
+        T_FACE_VECTOR(state_left(2),state_right(2)),TV_FACE_VECTOR(TV(state_left(1)),TV(state_right(1))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));
 }
 //#####################################################################
 // Function Intialize_Euler_State
@@ -229,11 +229,11 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //1 == density, 2 == momentum, 3 == total energy
     for(int i=0;i<grid.counts.x;i++){
         T rho=0.,u=0.,p=0.;
-        if(grid.Axis_X(i,1) <= middle_state_start_point){rho=state_left(1);u=state_left(2);p=state_left(3);}
-        else if(grid.Axis_X(i,1) <= right_state_start_point){rho=state_middle(1);u=state_middle(2);p=state_middle(3);}
-        else{rho=state_right(1);u=state_right(2);p=state_right(3);}
+        if(grid.Axis_X(i,0) <= middle_state_start_point){rho=state_left(0);u=state_left(1);p=state_left(2);}
+        else if(grid.Axis_X(i,0) <= right_state_start_point){rho=state_middle(0);u=state_middle(1);p=state_middle(2);}
+        else{rho=state_right(0);u=state_right(1);p=state_right(2);}
 
-        U(i)(1) = rho; U(i)(2) = rho*u; U(i)(3) = rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
+        U(i)(0) = rho; U(i)(1) = rho*u; U(i)(2) = rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
 
     flux_face.Resize(grid.Domain_Indices(3));
     for(FACE_ITERATOR iter(grid,3);iter.Valid();iter.Next())
