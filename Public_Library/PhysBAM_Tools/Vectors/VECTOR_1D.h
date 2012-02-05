@@ -314,7 +314,7 @@ public:
     return false;}
 
     VECTOR<T,0> Remove_Index(const int index) const
-    {assert(1==index);return VECTOR<T,0>();}
+    {assert(0==index);return VECTOR<T,0>();}
 
     VECTOR<T,2> Insert(const T& element,const int index) const
     {VECTOR<T,2> r;r[index]=element;r[1-index]=x;return r;}

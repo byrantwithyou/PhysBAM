@@ -20,7 +20,7 @@ Initialize(const std::string& data_directory)
     Load_Data(data_directory+"/Muscle_Curves/active_cubic",active_force_grid,active_force);
     Load_Data(data_directory+"/Muscle_Curves/tendon_cubic",tendon_force_grid,tendon_force);
     velocity_grid.Initialize(1001,-2,2);velocity_curve.Resize(velocity_grid.Domain_Indices());
-    for(int v=0;v<1001;v++){T velocity=velocity_grid.Axis_X(v,1);velocity_curve(v)=(velocity<-1)?0:(T).54*atan((T)5.69*velocity+(T).51)+(T).745;}
+    for(int v=0;v<1001;v++){T velocity=velocity_grid.Axis_X(v,0);velocity_curve(v)=(velocity<-1)?0:(T).54*atan((T)5.69*velocity+(T).51)+(T).745;}
     tendon_length_grid.Initialize(1001,0,3.5);tendon_length.Resize(tendon_length_grid.Domain_Indices());
     LINEAR_INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,T>::Compute_Inverse_Map(tendon_force_grid,tendon_force,tendon_length_grid,tendon_length);
     Compute_Slopes(passive_force_grid,passive_force,passive_force_slope_grid,passive_force_slope);

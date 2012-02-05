@@ -36,8 +36,8 @@ void FLOOD_FILL_2D::
 Fill_Single_Cell_Regions(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,int& fill_color)
 {
     for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++) if(colors(i,j)==-1)
-        if((i==colors.domain.min_corner.x || edge_is_blocked_x(i,j)) && (i==colors.domain.max_corner.x || edge_is_blocked_x(i+1,j)) &&
-           (j==colors.domain.min_corner.y || edge_is_blocked_y(i,j)) && (j==colors.domain.max_corner.y || edge_is_blocked_y(i,j+1))) colors(i,j)=fill_color++;
+        if((i==colors.domain.min_corner.x || edge_is_blocked_x(i,j)) && (i==colors.domain.max_corner.x-1 || edge_is_blocked_x(i+1,j)) &&
+           (j==colors.domain.min_corner.y || edge_is_blocked_y(i,j)) && (j==colors.domain.max_corner.y-1 || edge_is_blocked_y(i,j+1))) colors(i,j)=fill_color++;
 }
 bool  FLOOD_FILL_2D::
 Find_Uncolored_Node(const ARRAYS_ND_BASE<TV_INT>& colors,TV_INT& node_index)
