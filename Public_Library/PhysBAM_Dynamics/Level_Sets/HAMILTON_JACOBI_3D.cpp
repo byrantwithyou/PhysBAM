@@ -28,14 +28,14 @@ Euler_Step(const T dt,const T time)
         if(!curvature_defined){delete curvature;curvature=0;}}
     
     // find phx_plus and phix_minus
-    ARRAY<T,VECTOR<int,3> > phix_minus(1,m,1,n,1,mn),phix_plus(1,m,1,n,1,mn),phiy_minus(1,m,1,n,1,mn),phiy_plus(1,m,1,n,1,mn),
-                      phiz_minus(1,m,1,n,1,mn),phiz_plus(1,m,1,n,1,mn);
+    ARRAY<T,VECTOR<int,3> > phix_minus(0,m,0,n,0,mn),phix_plus(0,m,0,n,0,mn),phiy_minus(0,m,0,n,0,mn),phiy_plus(0,m,0,n,0,mn),
+                      phiz_minus(0,m,0,n,0,mn),phiz_plus(0,m,0,n,0,mn);
     Calculate_Derivatives(phi_ghost,phix_minus,phix_plus,phiy_minus,phiy_plus,phiz_minus,phiz_plus);
 
     if(LF_viscosity){
-        T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
-                    phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
-                    phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
+        T phix_min=min(phix_minus(0,0,0),phix_plus(0,0,0)),phix_max=max(phix_minus(0,0,0),phix_plus(0,0,0)),
+                    phiy_min=min(phiy_minus(0,0,0),phiy_plus(0,0,0)),phiy_max=max(phiy_minus(0,0,0),phiy_plus(0,0,0)),
+                    phiz_min=min(phiz_minus(0,0,0),phiz_plus(0,0,0)),phiz_max=max(phiz_minus(0,0,0),phiz_plus(0,0,0));
         for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
@@ -49,9 +49,9 @@ Euler_Step(const T dt,const T time)
                                  -hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time)*phiy_difference
                                  -hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time)*phiz_difference);}}
     else if(LLF_viscosity){
-        T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
-                    phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
-                    phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
+        T phix_min=min(phix_minus(0,0,0),phix_plus(0,0,0)),phix_max=max(phix_minus(0,0,0),phix_plus(0,0,0)),
+                    phiy_min=min(phiy_minus(0,0,0),phiy_plus(0,0,0)),phiy_max=max(phiy_minus(0,0,0),phiy_plus(0,0,0)),
+                    phiz_min=min(phiz_minus(0,0,0),phiz_plus(0,0,0)),phiz_max=max(phiz_minus(0,0,0),phiz_plus(0,0,0));
         for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
@@ -132,15 +132,15 @@ CFL(const T time)
     ARRAY<T,VECTOR<int,3> > phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
         
     // find phx_plus and phix_minus
-    ARRAY<T,VECTOR<int,3> > phix_minus(1,m,1,n,1,mn),phix_plus(1,m,1,n,1,mn),phiy_minus(1,m,1,n,1,mn),phiy_plus(1,m,1,n,1,mn),
-                      phiz_minus(1,m,1,n,1,mn),phiz_plus(1,m,1,n,1,mn);
+    ARRAY<T,VECTOR<int,3> > phix_minus(0,m,0,n,0,mn),phix_plus(0,m,0,n,0,mn),phiy_minus(0,m,0,n,0,mn),phiy_plus(0,m,0,n,0,mn),
+                      phiz_minus(0,m,0,n,0,mn),phiz_plus(0,m,0,n,0,mn);
     Calculate_Derivatives(phi_ghost,phix_minus,phix_plus,phiy_minus,phiy_plus,phiz_minus,phiz_plus);
     
     T maxabs_H1=0,maxabs_H2=0,maxabs_H3=0;
     if(LF_viscosity){
-        T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
-                    phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
-                    phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
+        T phix_min=min(phix_minus(0,0,0),phix_plus(0,0,0)),phix_max=max(phix_minus(0,0,0),phix_plus(0,0,0)),
+                    phiy_min=min(phiy_minus(0,0,0),phiy_plus(0,0,0)),phiy_max=max(phiy_minus(0,0,0),phiy_plus(0,0,0)),
+                    phiz_min=min(phiz_minus(0,0,0),phiz_plus(0,0,0)),phiz_max=max(phiz_minus(0,0,0),phiz_plus(0,0,0));
         for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
@@ -153,16 +153,16 @@ CFL(const T time)
             maxabs_H2=max(maxabs_H2,hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time));
             maxabs_H3=max(maxabs_H3,hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_min,phiz_max,i,j,ij,time));}}   
     else if(LLF_viscosity){
-        T phix_min=min(phix_minus(1,1,1),phix_plus(1,1,1)),phix_max=max(phix_minus(1,1,1),phix_plus(1,1,1)),
-                    phiy_min=min(phiy_minus(1,1,1),phiy_plus(1,1,1)),phiy_max=max(phiy_minus(1,1,1),phiy_plus(1,1,1)),
-                    phiz_min=min(phiz_minus(1,1,1),phiz_plus(1,1,1)),phiz_max=max(phiz_minus(1,1,1),phiz_plus(1,1,1));
+        T phix_min=min(phix_minus(0,0,0),phix_plus(0,0,0)),phix_max=max(phix_minus(0,0,0),phix_plus(0,0,0)),
+                    phiy_min=min(phiy_minus(0,0,0),phiy_plus(0,0,0)),phiy_max=max(phiy_minus(0,0,0),phiy_plus(0,0,0)),
+                    phiz_min=min(phiz_minus(0,0,0),phiz_plus(0,0,0)),phiz_max=max(phiz_minus(0,0,0),phiz_plus(0,0,0));
         for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             phix_min=min(phix_min,phix_minus(i,j,ij),phix_plus(i,j,ij));phix_max=max(phix_max,phix_minus(i,j,ij),phix_plus(i,j,ij));
             phiy_min=min(phiy_min,phiy_minus(i,j,ij),phiy_plus(i,j,ij));phiy_max=max(phiy_max,phiy_minus(i,j,ij),phiy_plus(i,j,ij));
             phiz_min=min(phiz_min,phiz_minus(i,j,ij),phiz_plus(i,j,ij));phiz_max=max(phiz_max,phiz_minus(i,j,ij),phiz_plus(i,j,ij));}
-        maxabs_H1=hamiltonian.Maxabs_H1(phix_minus(1,1,1),phix_plus(1,1,1),phiy_min,phiy_max,phiz_min,phiz_max,1,1,1,time);
-        maxabs_H2=hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_minus(1,1,1),phiy_plus(1,1,1),phiz_min,phiz_max,1,1,1,time);
-        maxabs_H3=hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_minus(1,1,1),phiz_plus(1,1,1),1,1,1,time);
+        maxabs_H1=hamiltonian.Maxabs_H1(phix_minus(0,0,0),phix_plus(0,0,0),phiy_min,phiy_max,phiz_min,phiz_max,1,1,1,time);
+        maxabs_H2=hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_minus(0,0,0),phiy_plus(0,0,0),phiz_min,phiz_max,1,1,1,time);
+        maxabs_H3=hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_minus(0,0,0),phiz_plus(0,0,0),1,1,1,time);
         for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_min_local=min(phix_minus(i,j,ij),phix_plus(i,j,ij)),phix_max_local=max(phix_minus(i,j,ij),phix_plus(i,j,ij)),
                        phiy_min_local=min(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),phiy_max_local=max(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),
@@ -171,12 +171,12 @@ CFL(const T time)
             maxabs_H2=max(maxabs_H2,hamiltonian.Maxabs_H2(phix_min,phix_max,phiy_min_local,phiy_max_local,phiz_min,phiz_max,i,j,ij,time));
             maxabs_H3=max(maxabs_H3,hamiltonian.Maxabs_H3(phix_min,phix_max,phiy_min,phiy_max,phiz_min_local,phiz_max_local,i,j,ij,time));}} 
     else if(LLLF_viscosity){
-        maxabs_H1=hamiltonian.Maxabs_H1(phix_minus(1,1,1),phix_plus(1,1,1),phiy_minus(1,1,1),phiy_plus(1,1,1),phiz_minus(1,1,1),
-                                                                  phiz_plus(1,1,1),1,1,1,time);
-        maxabs_H2=hamiltonian.Maxabs_H2(phix_minus(1,1,1),phix_plus(1,1,1),phiy_minus(1,1,1),phiy_plus(1,1,1),phiz_minus(1,1,1),
-                                                                  phiz_plus(1,1,1),1,1,1,time);
-        maxabs_H3=hamiltonian.Maxabs_H3(phix_minus(1,1,1),phix_plus(1,1,1),phiy_minus(1,1,1),phiy_plus(1,1,1),phiz_minus(1,1,1),
-                                                                  phiz_plus(1,1,1),1,1,1,time);
+        maxabs_H1=hamiltonian.Maxabs_H1(phix_minus(0,0,0),phix_plus(0,0,0),phiy_minus(0,0,0),phiy_plus(0,0,0),phiz_minus(0,0,0),
+                                                                  phiz_plus(0,0,0),1,1,1,time);
+        maxabs_H2=hamiltonian.Maxabs_H2(phix_minus(0,0,0),phix_plus(0,0,0),phiy_minus(0,0,0),phiy_plus(0,0,0),phiz_minus(0,0,0),
+                                                                  phiz_plus(0,0,0),1,1,1,time);
+        maxabs_H3=hamiltonian.Maxabs_H3(phix_minus(0,0,0),phix_plus(0,0,0),phiy_minus(0,0,0),phiy_plus(0,0,0),phiz_minus(0,0,0),
+                                                                  phiz_plus(0,0,0),1,1,1,time);
         for(i=0;i<m;i++) for(j=0;j<n;j++) for(ij=0;ij<mn;ij++){
             T phix_min_local=min(phix_minus(i,j,ij),phix_plus(i,j,ij)),phix_max_local=max(phix_minus(i,j,ij),phix_plus(i,j,ij)),
                        phiy_min_local=min(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),phiy_max_local=max(phiy_minus(i,j,ij),phiy_plus(i,j,ij)),

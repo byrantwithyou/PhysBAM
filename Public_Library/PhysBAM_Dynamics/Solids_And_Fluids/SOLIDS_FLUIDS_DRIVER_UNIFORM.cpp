@@ -1048,7 +1048,7 @@ Advect_Fluid(const T dt,const int substep)
                 else if((rk_substep==1)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);*const_cast<T*>(&dt)=min_dt;rk_time-=dt/2;continue;}
                 else if((rk_substep==2)&&(rungekutta_u.order==3)){T min_dt=dt;Calculate_Maximum_Allowable_dt(dt,min_dt,rk_substep,rungekutta_u);restart_dt=min_dt;break;}}
             for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-                assert(euler->U(cell_index)(1)>0);assert(EULER<T_GRID>::e(euler->U,cell_index)>0);}
+                assert(euler->U(cell_index)(0)>0);assert(EULER<T_GRID>::e(euler->U,cell_index)>0);}
             if(euler->timesplit && euler->perform_rungekutta_for_implicit_part){assert(!euler->thinshell);
                 euler->Get_Dirichlet_Boundary_Conditions(dt,rk_time);
                 fluids_parameters.Get_Neumann_And_Dirichlet_Boundary_Conditions(euler->euler_projection.elliptic_solver,euler->euler_projection.face_velocities,dt,rk_time+dt);

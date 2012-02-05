@@ -137,7 +137,7 @@ public:
     {if(samples_used)*samples_used=0;
     MATRIX_MXN<T> normal_equations_matrix(list.m,list.m);VECTOR_ND<T> normal_equations_rhs(list.m);
     for(int sample=0;sample<sampling_grid.counts.x;sample++){
-        T time=sampling_grid.Axis_X(sample,1);ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
+        T time=sampling_grid.Axis_X(sample,0);ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
         if(segment_list.m==2){
             if(samples_used)(*samples_used)++;
             int i=segment_list(0),j=segment_list(1);

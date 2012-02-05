@@ -289,7 +289,7 @@ Initial_Phi(const TV& X) const
         if(phi<0) phi=X.y-(T).400235234;}
     else if(test_number==21) phi=X.y-(T).32424;
     else if(test_number==22){
-        T height=height_noise_random.Get_Uniform_Number(grid.Axis_X(20,2),grid.Axis_X(21,2));
+        T height=height_noise_random.Get_Uniform_Number(grid.Axis_X(20,1),grid.Axis_X(21,1));
         phi=X.y-height;}
     else if(test_number==23){
         static SPHERE<TV> sphere((TV((T).7,(T).7,(T).7)),(T).1);
