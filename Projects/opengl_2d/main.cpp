@@ -326,11 +326,11 @@ Initialize_Components_And_Key_Bindings()
             levelset_component->opengl_levelsets(j)->draw_curve=true;
             levelset_component->opengl_levelsets(j)->Update();}
         else{
-            levelset_component->opengl_levelsets(1)->Set_Inside_And_Outside_Colors(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red(.5));
-            levelset_component->opengl_levelsets(1)->draw_cells=true;
-            levelset_component->opengl_levelsets(1)->draw_area=false;
-            levelset_component->opengl_levelsets(1)->draw_curve=false;
-            levelset_component->opengl_levelsets(1)->Update();}
+            levelset_component->opengl_levelsets(0)->Set_Inside_And_Outside_Colors(OPENGL_COLOR::Blue(),OPENGL_COLOR::Red(.5));
+            levelset_component->opengl_levelsets(0)->draw_cells=true;
+            levelset_component->opengl_levelsets(0)->draw_area=false;
+            levelset_component->opengl_levelsets(0)->draw_curve=false;
+            levelset_component->opengl_levelsets(0)->Update();}
         opengl_world.Set_Key_Binding_Category("Level Set");
         Add_Component(levelset_component,"Level Set",'l',BASIC_VISUALIZATION::OWNED);
         opengl_world.Append_Bind_Key(';',levelset_component->Toggle_Draw_Mode_CB());
