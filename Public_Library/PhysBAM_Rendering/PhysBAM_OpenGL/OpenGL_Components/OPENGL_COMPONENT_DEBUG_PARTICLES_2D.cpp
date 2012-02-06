@@ -20,7 +20,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename_input)
     :OPENGL_COMPONENT("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(particles)),
-    filename(filename_input),frame_loaded(-1),set(1),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
+    filename(filename_input),frame_loaded(-1),set(0),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
 {
     is_animation=FILE_UTILITIES::Is_Animated(filename);
     // Don't need to call Reinitialize here because it will be called in first call to Set_Frame

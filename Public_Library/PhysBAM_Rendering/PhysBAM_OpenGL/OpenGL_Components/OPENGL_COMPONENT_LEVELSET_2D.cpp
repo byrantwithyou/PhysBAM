@@ -15,7 +15,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input)
     :OPENGL_COMPONENT("Levelset 2D"),opengl_levelset(0),levelset_filename(levelset_filename_input),filename_set(filename_set_input),
-    frame_loaded(-1),set(1),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
+    frame_loaded(-1),set(0),use_sets(true),set_loaded(-1),valid(false),draw_multiple_levelsets(false)
 {
     int number_of_sets=0;
     while(filename_set!=""){
@@ -159,7 +159,7 @@ Toggle_Draw_Sign()
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Next_Set()
 {
-    set=min(set+1,opengl_levelsets.m);
+    set=min(set+1,opengl_levelsets.m-1);
     LOG::cout<<"viewing levelset set "<<set<<std::endl;
     opengl_levelset=opengl_levelsets(set);
     Reinitialize();
@@ -167,7 +167,7 @@ Next_Set()
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_2D<T,RW>::
 Previous_Set()
 {
-    set=max(set-1,1);
+    set=max(set-1,0);
     LOG::cout<<"viewing levelset set "<<set<<std::endl;
     opengl_levelset=opengl_levelsets(set);
     Reinitialize();

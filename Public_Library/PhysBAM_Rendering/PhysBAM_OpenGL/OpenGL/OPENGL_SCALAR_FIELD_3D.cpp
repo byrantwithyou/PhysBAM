@@ -16,7 +16,7 @@ namespace PhysBAM{
 
 template<class T,class T2> OPENGL_SCALAR_FIELD_3D<T,T2>::
 OPENGL_SCALAR_FIELD_3D(const GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,3> > &values_input,OPENGL_COLOR_MAP<T2> *color_map_input,DRAW_MODE draw_mode_input)
-    :grid(grid_input),values(values_input),current_color_map(1),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false)
+    :grid(grid_input),values(values_input),current_color_map(0),opengl_textured_rect(0),opengl_points(0),smooth_slice_texture(false),scale_range(false)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -525,7 +525,7 @@ Update_Points()
 {
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->points.Resize(values.counts.Product());
-    int index=1;
+    int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++){
         opengl_points->points(index)=grid.X(i,j,k);
         opengl_points->Set_Point_Color(index,color_maps(current_color_map)->Lookup(values(i,j,k)));
@@ -541,10 +541,10 @@ Update_Points()
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->color=color_maps(current_color_map)->Lookup(true);
     opengl_points->points.Resize(values.counts.Product());
-    int index=1;
+    int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(i,j,k);
-    opengl_points->points.Resize(index-1);
+    opengl_points->points.Resize(index);
 }
 
 template<> void OPENGL_SCALAR_FIELD_3D<double,bool>::
@@ -553,10 +553,10 @@ Update_Points()
     PHYSBAM_ASSERT(opengl_points);
     opengl_points->color=color_maps(current_color_map)->Lookup(true);
     opengl_points->points.Resize(values.counts.Product());
-    int index=1;
+    int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
         if(values(i,j,k)) opengl_points->points(index++)=grid.X(i,j,k);
-    opengl_points->points.Resize(index-1);
+    opengl_points->points.Resize(index);
 }
 
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
@@ -582,7 +582,7 @@ Toggle_Smooth_Slice_Texture()
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Toggle_Color_Map()
 {
-    current_color_map=current_color_map%color_maps.m+1;
+    current_color_map=current_color_map%color_maps.m;
     Update();
 }
 
