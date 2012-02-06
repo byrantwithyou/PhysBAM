@@ -136,7 +136,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //T rho0=(T)1,p0=(T)1,epsilon=(T)1e-3;
     T A=p0/(pow(rho0,gamma));
     for(int i=0;i<grid.counts.x;i++){
-        T x=grid.Axis_X(i,1);
+        T x=grid.Axis_X(i,0);
         T rho,u,p;
         u=0;
         T p1=(T)60*cos((T)2*(T)pi*x/period)+(T)100*sin((T)4*(T)pi*x/period);

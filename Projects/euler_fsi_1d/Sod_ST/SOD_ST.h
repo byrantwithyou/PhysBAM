@@ -194,7 +194,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
     fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
     fluids_parameters.compressible_rungekutta_order=rk_order;
-    //fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_RF<T,T_GRID::dimension+2>;
+    //fluids_parameters.compressible_conservation_method=new CONSERVATION_ENO_RF<T,T_GRID::dimension+2>;
     fluids_parameters.compressible_timesplit=timesplit;
     fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
     solid_body_collection.deformable_body_collection.simulate=false;
@@ -277,11 +277,11 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     //set custom boundary
     if(transition_to_incompressible){
         TV_DIMENSION state_average=(state_left+state_right)*(T).5;
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_average(1),state_average(1)),
-            T_FACE_VECTOR(state_average(3),state_average(3)),TV_FACE_VECTOR(TV(state_average(2)),TV(state_average(2))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_average(0),state_average(0)),
+            T_FACE_VECTOR(state_average(2),state_average(2)),TV_FACE_VECTOR(TV(state_average(1)),TV(state_average(1))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
     else{
-        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_left(1),state_right(1)),
-            T_FACE_VECTOR(state_left(3),state_right(3)),TV_FACE_VECTOR(TV(state_left(2)),TV(state_right(2))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
+        fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_left(0),state_right(0)),
+            T_FACE_VECTOR(state_left(2),state_right(2)),TV_FACE_VECTOR(TV(state_left(1)),TV(state_right(1))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
 }
 //#####################################################################
 // Function Intialize_Bodies
@@ -327,7 +327,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(test_number==12) rect.X()=TV((T).7+grid.DX()/(T)2+scaling_factor/(T)2+epsilon);
         else if(test_number==14) {
             epsilon=grid.DX()*(T).1;
-            rect.X()=grid.X(TV_INT(1))+scaling_factor/(T)2+epsilon;
+            rect.X()=grid.X(TV_INT(0))+scaling_factor/(T)2+epsilon;
             rect.Twist().linear=TV(.2);}
         else rect.X()=grid.X(TV_INT((T).7*TV(grid.counts)))+grid.DX()/(T)2+scaling_factor/(T)2+epsilon;
         rect.Is_Kinematic()=false;
@@ -348,24 +348,24 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     //1 == density, 2 == momentum, 3 == total energy
     for(int i=0;i<grid.counts.x;i++){
         T rho=0.,u=0.,p=0.;
-        if(grid.Axis_X(i,1) <= middle_state_start_point){rho=state_left(1);u=state_left(2);p=state_left(3);}
-        else if(grid.Axis_X(i,1) <= right_state_start_point){rho=state_middle(1);u=state_middle(2);p=state_middle(3);}
-        else{rho=state_right(1);u=state_right(2);p=state_right(3);}
+        if(grid.Axis_X(i,0) <= middle_state_start_point){rho=state_left(0);u=state_left(1);p=state_left(2);}
+        else if(grid.Axis_X(i,0) <= right_state_start_point){rho=state_middle(0);u=state_middle(1);p=state_middle(2);}
+        else{rho=state_right(0);u=state_right(1);p=state_right(2);}
 
-        U(i)(1) = rho; U(i)(2) = rho*u; U(i)(3) = rho*(eos.e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
+        U(i)(0)=rho; U(i)(1)=rho*u; U(i)(2)=rho*(eos.e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
 
     if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
         VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
         T rho=(T).125,p=(T).1,u_vel=(T)0.;
-        solid_state(1)=rho;solid_state(2)=rho*u_vel;solid_state(3)=rho*(eos.e_From_p_And_rho(p,rho)+(sqr(u_vel))/(T)2.);}
+        solid_state(0)=rho;solid_state(1)=rho*u_vel;solid_state(2)=rho*(eos.e_From_p_And_rho(p,rho)+(sqr(u_vel))/(T)2.);}
 }
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
 {
-    if(test_number==16) V(2)=TV();
+    if(test_number==16) V(1)=TV();
 }
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
 {
-    if(test_number==16) V(2)=TV();
+    if(test_number==16) V(1)=TV();
 }
 //#####################################################################
 // Function Postprocess_Frame
@@ -376,8 +376,8 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         std::ostream* output=FILE_UTILITIES::Safe_Open_Output(output_directory+STRING_UTILITIES::string_sprintf("/U_%d.txt",frame),false,false);
         for(CELL_ITERATOR it(*fluids_parameters.grid);it.Valid();it.Next()){
             if(fluids_parameters.euler->euler_projection.elliptic_solver->psi_D(it.Cell_Index())) continue;
-            TV_DIMENSION U_cell = fluids_parameters.euler->U(it.Cell_Index());
-            (*output)<<U_cell(1)<<"\t"<<U_cell(2)<<"\t"<<U_cell(3)<<"\t"
+            TV_DIMENSION U_cell=fluids_parameters.euler->U(it.Cell_Index());
+            (*output)<<U_cell(0)<<"\t"<<U_cell(1)<<"\t"<<U_cell(2)<<"\t"
                 <<EULER<T_GRID>::Get_Velocity(U_cell)<<"\t"<<EULER<T_GRID>::e(U_cell)<<std::endl;}
         delete output;}
 }

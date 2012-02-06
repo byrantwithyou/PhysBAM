@@ -164,8 +164,8 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Advection() PHYSBAM_OVERRIDE
 {
     //set custom boundary
-    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_left(1),state_right(1)),
-        T_FACE_VECTOR(state_left(3),state_right(3)),TV_FACE_VECTOR(TV(state_left(2)),TV(state_right(2))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));
+    fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,T_FACE_VECTOR(state_left(0),state_right(0)),
+        T_FACE_VECTOR(state_left(2),state_right(2)),TV_FACE_VECTOR(TV(state_left(1)),TV(state_right(1))),(T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));
 }
 //#####################################################################
 // Function Intialize_Euler_State
@@ -181,16 +181,16 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     for(int i=0;i<grid.counts.x;i++){
         if(state_in_conserved_variabbles){
             T rho=0.,rhou=0.,E=0.;
-            if(grid.Axis_X(i,1) <= middle_state_start_point){rho=state_conserved_left(1);rhou=state_conserved_left(2);E=state_conserved_left(3);}
-            else if(grid.Axis_X(i,1) <= right_state_start_point){rho=state_conserved_middle(1);rhou=state_conserved_middle(2);E=state_conserved_middle(3);}
-            else{rho=state_conserved_right(1);rhou=state_conserved_right(2);E=state_conserved_right(3);}
-            U(i)(1)=rho;U(i)(2)=rhou;U(i)(3)=E;}
+            if(grid.Axis_X(i,0) <= middle_state_start_point){rho=state_conserved_left(0);rhou=state_conserved_left(1);E=state_conserved_left(2);}
+            else if(grid.Axis_X(i,0) <= right_state_start_point){rho=state_conserved_middle(0);rhou=state_conserved_middle(1);E=state_conserved_middle(2);}
+            else{rho=state_conserved_right(0);rhou=state_conserved_right(1);E=state_conserved_right(2);}
+            U(i)(0)=rho;U(i)(1)=rhou;U(i)(2)=E;}
         else{
             T rho=0.,u=0.,p=0.;
-            if(grid.Axis_X(i,1) <= middle_state_start_point){rho=state_left(1);u=state_left(2);p=state_left(3);}
-            else if(grid.Axis_X(i,1) <= right_state_start_point){rho=state_middle(1);u=state_middle(2);p=state_middle(3);}
-            else{rho=state_right(1);u=state_right(2);p=state_right(3);}
-            U(i)(1)=rho; U(i)(2)=rho*u; U(i)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}}
+            if(grid.Axis_X(i,0) <= middle_state_start_point){rho=state_left(0);u=state_left(1);p=state_left(2);}
+            else if(grid.Axis_X(i,0) <= right_state_start_point){rho=state_middle(0);u=state_middle(1);p=state_middle(2);}
+            else{rho=state_right(0);u=state_right(1);p=state_right(2);}
+            U(i)(0)=rho; U(i)(1)=rho*u; U(i)(2)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}}
 }
 //#####################################################################
 };

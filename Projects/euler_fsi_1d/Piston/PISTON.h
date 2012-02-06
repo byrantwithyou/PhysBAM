@@ -177,17 +177,17 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     if(test_number==1)
         for(int i=0;i<grid.counts.x;i++) {
             T rho=(T)0.,u=(T)0.,p=(T)0.;
-            if(grid.Axis_X(i,1)<0) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}
-            U(i)(1)=rho; U(i)(2)=rho*u; U(i)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
+            if(grid.Axis_X(i,0)<0) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}
+            U(i)(0)=rho; U(i)(1)=rho*u; U(i)(2)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u)/(T)2.);}
     else if(test_number==2 || test_number==3)
         for(int i=0;i<grid.counts.x;i++){
-            U(i)(1)=rho_initial;U(i)(2)=rho_initial*u_initial;U(i)(3)=rho_initial*(tmp_eos->e_From_T_And_rho(T_initial,rho_initial)+sqr(u_initial)/(T)2.);}
+            U(i)(0)=rho_initial;U(i)(1)=rho_initial*u_initial;U(i)(2)=rho_initial*(tmp_eos->e_From_T_And_rho(T_initial,rho_initial)+sqr(u_initial)/(T)2.);}
     else if(test_number==4){
         rho_initial=1;u_initial=3;p_initial=(T)1.;
         for(int i=0;i<grid.counts.x;i++){
             TV_INT piston_face_index=grid.Cell(TV(piston_initial_position),0);
             if(i >=piston_face_index[1]) {rho_initial=(T)1.;p_initial=(T)1.;u_initial=(T)3.0;} else {rho_initial=(T)1.;p_initial=1.;u_initial=-(T)3.0;}
-            U(i)(1)=rho_initial;U(i)(2)=rho_initial*u_initial;U(i)(3)=rho_initial*(tmp_eos->e_From_p_And_rho(p_initial,rho_initial)+sqr(u_initial)/(T)2.);}}
+            U(i)(0)=rho_initial;U(i)(1)=rho_initial*u_initial;U(i)(2)=rho_initial*(tmp_eos->e_From_p_And_rho(p_initial,rho_initial)+sqr(u_initial)/(T)2.);}}
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions
@@ -201,7 +201,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
 
    T piston_position=piston_initial_position+piston_speed*time;
    if(test_number==1){TV_INT face_index=euler.grid.Cell(TV(piston_position),0);
-       psi_N.Component(1)(face_index)=true;face_velocities.Component(1)(face_index)=piston_speed;}
+       psi_N.Component(0)(face_index)=true;face_velocities.Component(0)(face_index)=piston_speed;}
    else if(test_number==2) for(FACE_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){
        int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();TV location=iterator.Location();
        if(location.x<=piston_position){psi_N.Component(axis)(face_index)=true;face_velocities.Component(axis)(face_index)=piston_speed;}}
@@ -214,7 +214,7 @@ void Set_Dirichlet_Boundary_Conditions(const T time) PHYSBAM_OVERRIDE
                psi_N.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.First_Face_Index_In_Cell(axis,cell_index))=0;
                psi_N.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=true;face_velocities.Component(axis)(euler.grid.Second_Face_Index_In_Cell(axis,cell_index))=0;}}}
    if(test_number==3){TV_INT face_index=euler.grid.Cell(TV(piston_initial_position),0);
-       psi_N.Component(1)(face_index)=true;face_velocities.Component(1)(face_index)=piston_speed;}
+       psi_N.Component(0)(face_index)=true;face_velocities.Component(0)(face_index)=piston_speed;}
 
    boundary_set_time=time;
 }
@@ -235,10 +235,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     PARTICLES<TV>& particles=static_cast<PARTICLES<TV>&>(point_simplices.particles);
     particles.Store_Mass();
     mesh.number_nodes=2;mesh.elements.Exact_Resize(2);
-    mesh.elements(1).Set(1);mesh.elements(2).Set(2);
+    mesh.elements(0).Set(0);mesh.elements(1).Set(1);
     particles.array_collection->Add_Elements(mesh.number_nodes);
-    particles.X(1)=TV(piston_initial_position-(T)10);
-    particles.X(2)=TV(piston_initial_position);
+    particles.X(0)=TV(piston_initial_position-(T)10);
+    particles.X(1)=TV(piston_initial_position);
     point_simplices.Update_Point_Simplex_List();
     
     rigid_body->Add_Structure(point_simplices);
@@ -253,7 +253,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     EOS_GAMMA<T> *tmp_eos=dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);
     T rho=rho_initial,p=p_initial,u_vel=u_initial;
-    solid_state(1)=rho;solid_state(2)=rho*u_vel;solid_state(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u_vel)/(T)2.);
+    solid_state(0)=rho;solid_state(1)=rho*u_vel;solid_state(2)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+sqr(u_vel)/(T)2.);
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
