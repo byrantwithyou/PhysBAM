@@ -59,28 +59,28 @@ template<class T,class T2> void OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 Update()
 {
     opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product()+z_face_values.counts.Product());
-    int index=1;
+    int index=0;
     VECTOR<int,3> index_start,index_end;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 1, index_start, index_end);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++) {
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
         opengl_points.points(index)=grid.X_Face(i,j,k);
         opengl_points.Set_Point_Color(index,color_map->Lookup(x_face_values(i,j,k)));
         index++;
     }
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 2, index_start, index_end);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++) {
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
         opengl_points.points(index)=grid.Y_Face(i,j,k);
         opengl_points.Set_Point_Color(index,color_map->Lookup(y_face_values(i,j,k)));
         index++;
     }
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 3, index_start, index_end);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++) {
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++) {
         opengl_points.points(index)=grid.Z_Face(i,j,k);
         opengl_points.Set_Point_Color(index,color_map->Lookup(z_face_values(i,j,k)));
         index++;
     }
-    opengl_points.points.Resize(index-1);
+    opengl_points.points.Resize(index);
 }
 //#####################################################################
 // Update
@@ -91,18 +91,18 @@ Update()
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product()+z_face_values.counts.Product());
     opengl_points.color=color_map->Lookup(true);
-    int index=1;
+    int index=0;
     VECTOR<int,3> index_start,index_end;
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 1, index_start, index_end,scale);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++)
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.X_Face(i,j,k);
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 2, index_start, index_end,scale);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++)
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Y_Face(i,j,k);
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 3, index_start, index_end,scale);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++)
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Z_Face(i,j,k);
-    opengl_points.points.Resize(index-1);
+    opengl_points.points.Resize(index);
 }
 //#####################################################################
 // Update
@@ -113,18 +113,18 @@ Update()
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     opengl_points.points.Resize(x_face_values.counts.Product()+y_face_values.counts.Product()+z_face_values.counts.Product());
     opengl_points.color=color_map->Lookup(true);
-    int index=1;
+    int index=0;
     VECTOR<int,3> index_start,index_end;
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 1, index_start, index_end);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++)
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.X_Face(i,j,k);
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 2, index_start, index_end);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++)
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Y_Face(i,j,k);
     OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 3, index_start, index_end);
-    for(int i=index_start.x;i<=index_end.x;i++) for(int j=index_start.y;j<=index_end.y;j++) for(int k=index_start.z;k<=index_end.z;k++)
+    for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Z_Face(i,j,k);
-    opengl_points.points.Resize(index-1);
+    opengl_points.points.Resize(index);
 }
 //#####################################################################
 // Slice_Has_Changed
