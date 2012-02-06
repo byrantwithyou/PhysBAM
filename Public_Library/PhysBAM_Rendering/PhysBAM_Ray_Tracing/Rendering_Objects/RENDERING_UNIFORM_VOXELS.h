@@ -73,7 +73,7 @@ public:
     return value;}
 
     void Get_Node_Locations(ARRAY<VECTOR<T,3> >& locations) PHYSBAM_OVERRIDE
-    {locations.Resize(coarse_grid.counts.Product());map_from_accessor_index_to_my_index.Resize(locations.m);int index=1;
+    {locations.Resize(coarse_grid.counts.Product());map_from_accessor_index_to_my_index.Resize(locations.m);int index=0;
     for(int i=0;i<coarse_grid.counts.x;i++)for(int j=0;j<coarse_grid.counts.y;j++)for(int ij=0;ij<coarse_grid.counts.z;ij++){
         map_from_accessor_index_to_my_index(index)=VECTOR<int,3>(i,j,ij);
         locations(index)=coarse_grid.X(i,j,ij);index++;}}

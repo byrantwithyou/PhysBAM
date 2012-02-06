@@ -92,7 +92,7 @@ public:
         deformable_to_rigid_particles.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
 
         // get all the particles of the material surface
-        int index=1;
+        int index=0;
         for(int particle_id=0;particle_id<solid_body_collection.deformable_body_collection.dynamic_particles.m;particle_id++){
             int i=solid_body_collection.deformable_body_collection.dynamic_particles(particle_id);
             rigid_to_deformable_particles(index)=i;

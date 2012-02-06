@@ -84,7 +84,7 @@ public:
                 primitives.Append(RENDERING_OBJECT_ACCELERATION_PRIMITIVE<T>(world_space_bounding_box,this,aggregate_id));}}}}
 private:
     void Create_Aggregate_Ids()
-    {int index=1;
+    {int index=0;
     for(int i=particles_array.domain.min_corner.x;i<particles_array.domain.max_corner.x;i++) for(int j=particles_array.domain.min_corner.y;j<particles_array.domain.max_corner.y;j++) for(int ij=particles_array.domain.min_corner.z;ij<particles_array.domain.max_corner.z;ij++){
         POINT_CLOUD<TV>* particles=particles_array(i,j,ij);
         if(particles)
