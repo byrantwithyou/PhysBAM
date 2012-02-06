@@ -327,7 +327,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid3=GRID<TV>(jello_size,jello_size,jello_size,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125,(T)-0.0125,(T)0.0125);
             break;
         case 37: case 39: case 40: case 38: case 44:
-            mattress_grid=GRID<TV>(2,2,2,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
+            mattress_grid=GRID<TV>(10,10,10,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
         case 42: case 52:
             mattress_grid=GRID<TV>(20,20,20,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
