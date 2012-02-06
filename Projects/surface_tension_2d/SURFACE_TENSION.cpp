@@ -253,7 +253,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
     VECTOR<T,2> center=fluids_parameters.grid->domain.Center(),size=fluids_parameters.grid->domain.Edge_Lengths();
     int id;
 
-    if(fluids_parameters.domain_walls(1)(1)){
+    if(fluids_parameters.domain_walls(0)(0)){
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -263,7 +263,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(fluids_parameters.domain_walls(1)(2)){
+    if(fluids_parameters.domain_walls(0)(1)){
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -273,7 +273,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(fluids_parameters.domain_walls(2)(1)){
+    if(fluids_parameters.domain_walls(1)(0)){
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -282,7 +282,7 @@ Add_Rigid_Body_Walls(const T coefficient_of_restitution,const T coefficient_of_f
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
 
-    if(fluids_parameters.domain_walls(2)(2)){
+    if(fluids_parameters.domain_walls(1)(1)){
         id=rigid_body_collection.Add_Rigid_Body(this->stream_type,data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
@@ -301,10 +301,10 @@ template<class T> void SURFACE_TENSION<T>::
 Initialize_Advection()
 {
     PHYSBAM_ASSERT(!fluids_parameters.use_conservative_advection,"cannot do fluid coupling with conservative advection yet");
-    fluids_parameters.particle_levelset_evolution->Levelset_Advection(1).
+    fluids_parameters.particle_levelset_evolution->Levelset_Advection(0).
         Use_Semi_Lagrangian_Collidable_Advection(*fluids_parameters.collision_bodies_affecting_fluid,fluids_parameters.collidable_phi_replacement_value,
             fluids_parameters.incompressible->valid_mask);
-    fluids_parameters.particle_levelset_evolution->Levelset(1).Set_Collision_Body_List(*fluids_parameters.collision_bodies_affecting_fluid);
+    fluids_parameters.particle_levelset_evolution->Levelset(0).Set_Collision_Body_List(*fluids_parameters.collision_bodies_affecting_fluid);
     fluids_parameters.incompressible->Use_Semi_Lagrangian_Collidable_Advection(*fluids_parameters.collision_bodies_affecting_fluid);
     fluids_parameters.incompressible->collision_body_list=fluids_parameters.collision_bodies_affecting_fluid;
 
@@ -702,7 +702,7 @@ Test_Analytic_Velocity(T time)
     int cnt=0;
     ARRAY<T,FACE_INDEX<TV::m> > u2(fluid_collection.incompressible_fluid_collection.face_velocities);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
-        if(fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0){
+        if(fluids_parameters.particle_levelset_evolution->Levelset(0).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0){
             fluid_collection.incompressible_fluid_collection.face_velocities(it.Full_Index())=0;
             continue;}
         TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
@@ -736,7 +736,7 @@ Test_Analytic_Pressure(T time)
     int cnt=0;
     ARRAY<T,TV_INT>& p=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(*solids_evolution).pressure;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
-        if(fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0) continue;
+        if(fluids_parameters.particle_levelset_evolution->Levelset(0).Phi(it.Location())>fluids_parameters.grid->dX.Min()*0) continue;
         TV dX=it.Location()-TV((T)(.5*m),(T)(.5*m));
         T r=dX.Magnitude();
         T theta=atan2(dX.y,dX.x);
@@ -790,7 +790,7 @@ Adjust_Phi_With_Objects(const T time)
 template<class T> void SURFACE_TENSION<T>::
 Sync_Particle_To_Level_Set(int p)
 {
-    const T_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(1);
+    const T_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
     TV& X=front_tracked_structure->particles.X(p);
     X-=levelset.Extended_Phi(X)*levelset.Extended_Normal(X);
 }
@@ -821,7 +821,7 @@ Divide_Segment(int e)
     int ne=front_tracked_structure->mesh.elements.m+1;
     int p=particle_segments.Append(VECTOR<int,2>(e,ne));
     LOG::cout<<p<<"  "<<front_tracked_structure->particles.array_collection->Size()<<std::endl;
-    PHYSBAM_ASSERT(p<=front_tracked_structure->particles.array_collection->Size());
+    PHYSBAM_ASSERT(p<front_tracked_structure->particles.array_collection->Size());
     front_tracked_structure->mesh.elements(e).y=p;
     front_tracked_structure->mesh.elements.Append(VECTOR<int,2>(p,seg.y));
     particle_segments(seg.y).x=ne;
@@ -972,7 +972,7 @@ Rebuild_Surface()
     rebuild_curve->mesh.elements.Remove_All();
     HASHTABLE<TV_INT,ARRAY<int> > used_cells;
     int next=1;
-    const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
+    const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face=it.Full_Index();
         TV_INT cell1=face.First_Cell_Index(),cell2=face.Second_Cell_Index();
@@ -985,20 +985,20 @@ Rebuild_Surface()
         typename MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::ENTRY entry={face,phi1<=0?1:2,X};
         fluid_interpolation_entries.Append(entry);
 
-        PHYSBAM_ASSERT(next<=number_surface_particles+1);
+        PHYSBAM_ASSERT(next<number_surface_particles+1);
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
         particles.X(next)=X;
         solid_interpolation_entries.Append(next);
         used_cells.Get_Or_Insert(cell2).Append(next);
-        cell2(3-face.axis)++;
+        cell2(1-face.axis)++;
         used_cells.Get_Or_Insert(cell2).Append(next);
         next++;}
 
     for(typename HASHTABLE<TV_INT,ARRAY<int> >::ITERATOR it(used_cells);it.Valid();it.Next()){
         ARRAY<int>& array=it.Data();
         PHYSBAM_ASSERT(array.m==2);
-        rebuild_curve->mesh.elements.Append(VECTOR<int,2>(array(1),array(2)));
-        Add_Debug_Particle((rebuild_curve->particles.X(array(1))+rebuild_curve->particles.X(array(2)))/2,VECTOR<T,3>(1,0,0));}
+        rebuild_curve->mesh.elements.Append(VECTOR<int,2>(array(0),array(1)));
+        Add_Debug_Particle((rebuild_curve->particles.X(array(0))+rebuild_curve->particles.X(array(1)))/2,VECTOR<T,3>(1,0,0));}
     PHYSBAM_ASSERT(rebuild_curve->particles.X.Get_Array_Pointer()==particles.X.Get_Array_Pointer());
 }
 //#####################################################################
@@ -1017,8 +1017,8 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
                 copy_X=front_tracked_structure->particles.X.Prefix(front_tracked_structure->mesh.elements.Flattened().Max());
                 X.Fill(TV());
                 front_tracked_structure->mesh.elements.Remove_All();
-                X(1)=copy_X(1);
-                for(int i=1,j=1;j<=copy_X.m;j++){
+                X(0)=copy_X(0);
+                for(int i=0,j=0;j<copy_X.m;j++){
                     int j1=j%copy_X.m+1;
                     T full_length=(X(i)-copy_X(j1)).Magnitude();
                     if(full_length>(T)1.5*dx){
@@ -1040,7 +1040,7 @@ Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T curren
                         else front_tracked_structure->mesh.elements.Append(TV_INT(i,1));}}}
             fsi=new FLUID_TO_SOLID_INTERPOLATION_CUT<TV>(system.index_map,*front_tracked_structure,fluids_parameters.density);}
         else{
-            FLUID_TO_SOLID_INTERPOLATION_PHI<TV>* local_fsi=new FLUID_TO_SOLID_INTERPOLATION_PHI<TV>(system.index_map,fluids_parameters.particle_levelset_evolution->Levelset(1).phi,*front_tracked_structure,fluids_parameters.density);
+            FLUID_TO_SOLID_INTERPOLATION_PHI<TV>* local_fsi=new FLUID_TO_SOLID_INTERPOLATION_PHI<TV>(system.index_map,fluids_parameters.particle_levelset_evolution->Levelset(0).phi,*front_tracked_structure,fluids_parameters.density);
             local_fsi->cut_order=parse_args->Get_Integer_Value("-cut_order");
             local_fsi->Setup_Mesh();
             fsi=dynamic_cast<FLUID_TO_SOLID_INTERPOLATION_CUT<TV>*>(local_fsi);}
@@ -1088,7 +1088,7 @@ Update_Time_Varying_Material_Properties(const T time)
     if(!time) return;
     if(rebuild_curve) Rebuild_Surface();
     if((test_number==3 || test_number==5 || test_number==10 || test_number==7 || test_number==11 || test_number==12) && !use_phi){
-        ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
+        ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
         LEVELSET_MAKER_UNIFORM_2D<T>::Compute_Level_Set(*front_tracked_structure,*fluids_parameters.grid,3,phi);}
 }
 //#####################################################################
@@ -1153,7 +1153,7 @@ FSI_Analytic_Test()
     solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*m));
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);
 
-    T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particle.mass(3);
+    T solid_mass=solid_body_collection.rigid_body_collection.rigid_body_particle.mass(2);
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;
@@ -1171,7 +1171,7 @@ Postprocess_Frame(const int frame)
 {
     if(test_number==6){
         T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
-        if(solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(3).linear.y;
+        if(solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(2).linear.y;
         LOG::cout<<"middle-velocity "<<v<<"   error from analytic solution "<<(v/analytic_solution-1)<<std::endl;}
     if(test_number==10 || test_number==9){ 
         ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
@@ -1202,14 +1202,14 @@ Postprocess_Frame(const int frame)
 template<class T> void SURFACE_TENSION<T>::
 Postprocess_Substep(const T dt,const T time)
 {
-    if(test_number==6 && solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.X(3)=TV(.5,.5)*m;
+    if(test_number==6 && solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.X(2)=TV(.5,.5)*m;
     if(test_number==4 || test_number==5){
         // location test
         TV p((T)((.5+circle_radius)*m),(T)(.5*m));
-        T value=fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(p);
+        T value=fluids_parameters.particle_levelset_evolution->Levelset(0).Phi(p);
         for(int i=0;i<5;i++){
-            p(1)-=value;
-            value=fluids_parameters.particle_levelset_evolution->Levelset(1).Phi(p);}
+            p(0)-=value;
+            value=fluids_parameters.particle_levelset_evolution->Levelset(0).Phi(p);}
         LOG::cout<<"Interface Location: "<<p<<std::endl;
         LOG::cout<<"Analytic Interface Location: "<<TV(.5,.5)*m+circle_radius+circle_perturbation*cos(omega*time)*TV(1,0)<<std::endl;
 
