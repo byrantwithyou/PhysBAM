@@ -16,7 +16,7 @@ using namespace std;
 template<class T> OPENGL_MAC_VELOCITY_FIELD_2D<T>::
 OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid, ARRAY<T,FACE_INDEX<2> > &face_velocities_input,T_ARRAYS_BOOL *active_cells_input,T_FACE_ARRAYS_BOOL *active_faces_input)
     : OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >(vector_field,vector_locations),
-     grid(grid),face_velocities(face_velocities_input),u(face_velocities.Component(1)),v(face_velocities.Component(2)),active_cells(active_cells_input),active_faces(active_faces_input)
+     grid(grid),face_velocities(face_velocities_input),u(face_velocities.Component(0)),v(face_velocities.Component(1)),active_cells(active_cells_input),active_faces(active_faces_input)
 {
     PHYSBAM_ASSERT(grid.MAC_offset == 0.5);
     Set_Velocity_Mode(CELL_CENTERED);
@@ -49,24 +49,24 @@ Update()
 
     if(u.counts.x-1!=v.counts.x || u.counts.y!=v.counts.y-1) return;
 
-    int idx=1;
+    int idx=0;
     if(velocity_mode == FACE_CENTERED){
         vector_field.Resize(u.counts.x*u.counts.y + v.counts.x*v.counts.y);
         vector_locations.Resize(u.counts.x*u.counts.y + v.counts.x*v.counts.y);
-        for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x;i++) for(int j=u.domain.min_corner.y;j<u.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(1))(i,j)){
+        for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x;i++) for(int j=u.domain.min_corner.y;j<u.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(0))(i,j)){
             vector_field(idx)=VECTOR<T,2>(u(i,j),0);vector_locations(idx)=grid.X_Face(i,j);idx++;}
-        for(int i=v.domain.min_corner.x;i<v.domain.max_corner.x;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(2))(i,j)){
+        for(int i=v.domain.min_corner.x;i<v.domain.max_corner.x;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y;j++) if(!active_faces||(active_faces->Component(1))(i,j)){
             vector_field(idx)=VECTOR<T,2>(0,v(i,j));vector_locations(idx)=grid.Y_Face(i,j);idx++;}
-        vector_field.Resize(idx-1);
-        vector_locations.Resize(idx-1);}
+        vector_field.Resize(idx);
+        vector_locations.Resize(idx);}
     else{
         int number_of_cells=(u.counts.x-1)*(v.counts.y-1);
         vector_field.Resize(number_of_cells);
         vector_locations.Resize(number_of_cells);
         for(int i=u.domain.min_corner.x;i<u.domain.max_corner.x-1;i++) for(int j=v.domain.min_corner.y;j<v.domain.max_corner.y-1;j++) if(!active_cells||(*active_cells)(i,j)){
             vector_field(idx)=VECTOR<T,2>((T).5*(u(i,j)+u(i+1,j)),(T).5*(v(i,j)+v(i,j+1)));vector_locations(idx)=grid.Center(i,j);idx++;}
-        vector_field.Resize(idx-1);
-        vector_locations.Resize(idx-1);}
+        vector_field.Resize(idx);
+        vector_locations.Resize(idx);}
 }
 //#####################################################################
 // Print_Selection_Info

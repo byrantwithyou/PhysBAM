@@ -17,7 +17,7 @@ namespace PhysBAM{
 
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,DRAW_MODE draw_mode_input)
-    : grid(grid_input),values(values_input),active_cells(0),draw_ghost_values(true),current_color_map(1),opengl_textured_rect(0),opengl_points(0),scale_range(false)
+    : grid(grid_input),values(values_input),active_cells(0),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -26,7 +26,7 @@ OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_inp
 
 template<class T,class T2> OPENGL_SCALAR_FIELD_2D<T,T2>::
 OPENGL_SCALAR_FIELD_2D(GRID<TV> &grid_input,ARRAY<T2,VECTOR<int,2> > &values_input,OPENGL_COLOR_MAP<T2>* color_map_input,ARRAY<bool,VECTOR<int,2> >* active_cells_input,DRAW_MODE draw_mode_input)
-    : grid(grid_input),values(values_input),active_cells(active_cells_input),draw_ghost_values(true),current_color_map(1),opengl_textured_rect(0),opengl_points(0),scale_range(false)
+    : grid(grid_input),values(values_input),active_cells(active_cells_input),draw_ghost_values(true),current_color_map(0),opengl_textured_rect(0),opengl_points(0),scale_range(false)
 {
     PHYSBAM_ASSERT(color_map_input);
     Initialize_Color_Maps(color_map_input);
@@ -300,7 +300,7 @@ template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 {
     PHYSBAM_ASSERT(opengl_points);
-    opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
+    opengl_points->points.Resize((end_index.x-start_index.x)*(end_index.y-start_index.y));
     int index=0;
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
     for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=0;j<end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
@@ -355,7 +355,7 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     PHYSBAM_ASSERT(opengl_points);
     OPENGL_COLOR_MAP<bool>* color_map=color_maps(current_color_map);
     opengl_points->color=color_map->Lookup(true);
-    opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
+    opengl_points->points.Resize((end_index.x-start_index.x)*(end_index.y-start_index.y));
     int index=0;
     for(int i=start_index.x;i<end_index.x;i++) for(int j=start_index.y;j<end_index.y;j++)
         if(values(i,j)) opengl_points->points(index++)=grid.X(i,j);
@@ -368,7 +368,7 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     PHYSBAM_ASSERT(opengl_points);
     OPENGL_COLOR_MAP<bool>* color_map=color_maps(current_color_map);
     opengl_points->color=color_map->Lookup(true);
-    opengl_points->points.Resize((end_index.x-start_index.x+1)*(end_index.y-start_index.y+1));
+    opengl_points->points.Resize((end_index.x-start_index.x)*(end_index.y-start_index.y));
     int index=0;
     for(int i=start_index.x;i<end_index.x;i++) for(int j=start_index.y;j<end_index.y;j++)
         if(values(i,j)) opengl_points->points(index++)=grid.X(i,j);
@@ -407,7 +407,7 @@ Toggle_Draw_Ghost_Values()
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Toggle_Color_Map()
 {
-    current_color_map=current_color_map%color_maps.m+1;
+    current_color_map=current_color_map%color_maps.m;
     Update();
 }
 
