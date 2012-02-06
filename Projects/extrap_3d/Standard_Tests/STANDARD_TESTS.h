@@ -1150,7 +1150,7 @@ void Get_Initial_Data()
             RIGID_BODY_STATE<TV> initial_state2(FRAME<TV>(jello_centers(1),ROTATION<TV>(T(pi/0.076),TV(0.7,1,0.1))));
             tests.Create_Mattress(mattress_grid,true,&initial_state1);
             tests.Create_Mattress(mattress_grid,true,&initial_state2);
-            //tests.Add_Ground();
+            tests.Add_Ground();
             break;
         }
         case 41:
