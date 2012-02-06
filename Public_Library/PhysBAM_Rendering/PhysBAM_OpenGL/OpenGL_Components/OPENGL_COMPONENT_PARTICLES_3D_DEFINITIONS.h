@@ -22,7 +22,7 @@ template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,T_P
 OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input, bool particles_stored_per_cell_adaptive_input)
     :OPENGL_COMPONENT("Particles 3D"), particles(new T_PARTICLES),opengl_points(new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >))),
     opengl_vector_field(*(new ARRAY<VECTOR<T,3> >),opengl_points->points,OPENGL_COLOR::Cyan()),
-    filename(filename_input), filename_set(filename_set_input),frame_loaded(-1), set(1), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
+    filename(filename_input), filename_set(filename_set_input),frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
     draw_velocities(false),have_velocities(false),use_ids(use_ids_input),
     particles_stored_per_cell_uniform(particles_stored_per_cell_uniform_input),particles_stored_per_cell_adaptive(particles_stored_per_cell_adaptive_input),
     draw_multiple_particle_sets(false)
@@ -345,7 +345,7 @@ Command_Prompt()
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
 Next_Set()
 {
-    set=min(set+1,number_of_sets);
+    set=min(set+1,number_of_sets-1);
     LOG::cout<<"viewing particle set "<<set<<std::endl;
     particles=particles_multiple(set);opengl_points=opengl_points_multiple(set);
     Reinitialize();
@@ -356,7 +356,7 @@ Next_Set()
 template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
 Previous_Set()
 {
-    set=max(set-1,1);
+    set=max(set-1,0);
     LOG::cout<<"viewing particle set "<<set<<std::endl;
     particles=particles_multiple(set);opengl_points=opengl_points_multiple(set);
     Reinitialize();

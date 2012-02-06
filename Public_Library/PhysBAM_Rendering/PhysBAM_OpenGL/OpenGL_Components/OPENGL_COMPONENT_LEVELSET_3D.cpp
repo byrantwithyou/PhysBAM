@@ -25,7 +25,7 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
       filename_set(filename_set_input),filename_triangulated_surface_set(filename_triangulated_surface_set_input),
       write_generated_triangulated_surface(write_generated_triangulated_surface_input),
       frame_loaded(-1),check_triangulated_surface_file_time(check_triangulated_surface_file_time_input),
-      set(1),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3)
+      set(0),set_loaded(-1),use_sets(true),draw_multiple_levelsets(true),ghost_cells(3)
 {
     int number_of_sets=0;
     while(filename_set!=""){
@@ -203,7 +203,7 @@ template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Next_Set()
 {
     if(!use_sets) return;
-    set=min(set+1,opengl_levelset_multiviews.m);
+    set=min(set+1,opengl_levelset_multiviews.m-1);
     opengl_levelset_multiview=opengl_levelset_multiviews(set);
     Reinitialize();
 }
@@ -212,7 +212,7 @@ template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
 Previous_Set()
 {
     if(!use_sets) return;
-    set=max(set-1,1);
+    set=max(set-1,0);
     opengl_levelset_multiview=opengl_levelset_multiviews(set);
     Reinitialize();
 }
