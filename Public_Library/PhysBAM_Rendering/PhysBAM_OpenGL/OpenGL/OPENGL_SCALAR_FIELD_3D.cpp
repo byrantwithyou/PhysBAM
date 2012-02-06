@@ -437,20 +437,20 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int te
             T2 value=T2();
             TV location;
             switch (slice->axis){
-                case 1: location=TV(self->grid.X(slice->index,1,1).x,
+                case 0: location=TV(self->grid.X(slice->index,0,0).x,
                     self->grid.domain.min_corner.y+j*(self->grid.domain.max_corner.y-self->grid.domain.min_corner.y)/tex_height,
                     self->grid.domain.max_corner.z-i*(self->grid.domain.max_corner.z-self->grid.domain.min_corner.z)/tex_width);
                     break;
-                case 2: location=TV(self->grid.domain.min_corner.x+i*(self->grid.domain.max_corner.x-self->grid.domain.min_corner.x)/tex_width,
-                    self->grid.X(1,slice->index,1).y,
+                case 1: location=TV(self->grid.domain.min_corner.x+i*(self->grid.domain.max_corner.x-self->grid.domain.min_corner.x)/tex_width,
+                    self->grid.X(0,slice->index,0).y,
                     self->grid.domain.max_corner.z-j*(self->grid.domain.max_corner.z-self->grid.domain.min_corner.z)/tex_height);
                     break;
-                case 3: location=TV(self->grid.domain.min_corner.x+i*(self->grid.domain.max_corner.x-self->grid.domain.min_corner.x)/tex_width,
+                case 2: location=TV(self->grid.domain.min_corner.x+i*(self->grid.domain.max_corner.x-self->grid.domain.min_corner.x)/tex_width,
                     self->grid.domain.min_corner.y+j*(self->grid.domain.max_corner.y-self->grid.domain.min_corner.y)/tex_height,
-                    self->grid.X(1,1,slice->index).z);
+                    self->grid.X(0,0,slice->index).z);
                     break;}
             value=interpolation.Clamped_To_Array(self->grid,self->values,location);
-            int idx=(j-1)*tex_width+i-1;
+            int idx=j*tex_width+i;
             bitmap[idx]=color_map->Lookup(self->Pre_Map_Value(value));}
 
     self->opengl_textured_rect->texture->Update_Texture(bitmap);

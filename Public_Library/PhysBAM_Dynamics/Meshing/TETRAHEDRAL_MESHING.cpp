@@ -163,7 +163,7 @@ Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
         Update_Dependent_Nodes(nodes(i));}
     Compute_Boundary_Mesh_Normals();
     for(int i=0;i<nodes.m;i++){
-        int p=nodes(reverse?nodes.m+1-i:i);
+        int p=nodes(reverse?nodes.m-1-i:i);
         TV normal=boundary_mesh_normals(map_from_nodes_to_boundary_list(p));
         if(abs(normal.x)>abs(normal.z) || abs(normal.y)>abs(normal.z)) directions(0)=TV(normal.y,-normal.x,0);
         else directions(0)=TV(normal.z,0,-normal.x);
@@ -190,7 +190,7 @@ Optimize_Interior_Layer(const int layer,const bool reverse)
     directions(4)=TV(-(T).90174918437566,-(T).34565929710323,(T).25955357597988);
     directions(5)=TV((T).21863854196520,-(T).86642677947325,(T).44888954518784);
     directions(6)=TV(-(T).58820534751966,(T).35620151622547,-(T).72604059734147);
-    for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
+    for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m-1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
 }
 //#####################################################################
 // Function Search_For_Best_Position

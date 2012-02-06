@@ -133,8 +133,8 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(vote(i,j,k)>=3) phi(i,j,k)*=-1;
 
         if(keep_only_largest_inside_region){
-            ARRAY<int,TV_INT> colors(grid.Domain_Indices());ARRAY<bool,TV_INT> null_edge_is_blocked(grid.Domain_Indices(1));
-            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(phi(i,j,k)>0) colors(i,j,k)=-1; // make outside regions uncolorable
+            ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);ARRAY<bool,TV_INT> null_edge_is_blocked(grid.Domain_Indices(1));
+            for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(phi(i,j,k)>0) colors(i,j,k)=-2; // make outside regions uncolorable
             FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
             int number_of_colors=flood_fill.Flood_Fill(colors,null_edge_is_blocked,null_edge_is_blocked,null_edge_is_blocked);
             // TODO: put this back if you need it
@@ -150,7 +150,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     }
     else if(need_flood_fill){ // Need flood fill to determine sign (inside/outside)
         if(verbose) LOG::Time("Flood Fill");
-        ARRAY<int,TV_INT> colors(grid.Domain_Indices());FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
+        ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
         int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked_x,edge_is_blocked_y,edge_is_blocked_z);
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"(got "<<number_of_colors<<" colors)... "<<std::endl;

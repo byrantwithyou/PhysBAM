@@ -44,7 +44,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     else eigensystem.Flux(m,U,F,U_flux);
     for(int i=start_index_ghost;i<end_index_ghost;i++){DU(i,0)=U(i);DF(i,0)=F(i);}
     for(int j=1;j<order;j++) for(int i=start_index_ghost;i<end_index_ghost-j;i++){
-        DU(i,j)=(DU(i+1,j-1)-DU(i,j-1))/(j*dx);DF(i,j)=(DF(i+1,j-1)-DF(i,j-1))/(j*dx);}
+        DU(i,j)=(DU(i+1,j-1)-DU(i,j-1))/((j+1)*dx);DF(i,j)=(DF(i+1,j-1)-DF(i,j-1))/((j+1)*dx);}
 
     int start_index=U.domain.min_corner.x+number_ghost_cells,end_index=U.domain.max_corner.x-number_ghost_cells;
     ARRAY<bool,VECTOR<int,1> > psi_ghost(start_index-1,end_index+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost);
@@ -69,10 +69,10 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
         if(use_face_velocity_for_fluxes) velocity_multiplier=eigensystem.Get_Face_Velocity_Component(i,use_standard_average,U);
         if(!all_eigenvalues_same){
             eigensystem.Eigenvectors(U,i,L,R);
-            for(int j=0;j<order;j++) for(int ii=i+1-j;ii<i+1;ii++) if(ii >= start_index_ghost && ii < end_index_ghost+1-j){
+            for(int j=0;j<order;j++) for(int ii=i-j;ii<=i+1;ii++) if(ii >= start_index_ghost && ii < end_index_ghost-j){
                 LDU(ii,j)=L*DU(ii,j);LDF(ii,j)=L*velocity_multiplier*DF(ii,j);}}
         else{
-            for(int j=0;j<order;j++) for(int ii=i+1-j;ii<i+1;ii++) if(ii >= start_index_ghost && ii < end_index_ghost+1-j){
+            for(int j=0;j<order;j++) for(int ii=i-j;ii<=i+1;ii++) if(ii >= start_index_ghost && ii < end_index_ghost-j){
                 LDU(ii,j)=DU(ii,j);LDF(ii,j)=velocity_multiplier*DF(ii,j);}}
 
         // compute max_alpha for use_global_llf=false case
@@ -149,7 +149,7 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
         if(!eigensystem.All_Eigenvalues_Same()){
             eigensystem.Eigenvectors(U_extrapolated,i,L,R);
             // transfer the fluxes into the characteristic fields
-            for(int ii=i+1-eno_order;ii<i+eno_order;ii++){
+            for(int ii=i+1-eno_order;ii<=i+eno_order;ii++){
                 for(int k=0;k<d;k++){
                     DLU(k,ii)(0)=0;DLF(k,ii)(0)=0;
                     // TODO need to do something with psi-ghost here instead of ii<1 and ii>m
@@ -157,19 +157,19 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
                     else if(ii>m && outflow_boundaries(1) && lambda(k)>0) for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(m)(kk);DLF(k,ii)(0)+=L(k,kk)*F(m)(kk);}
                     else for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(ii)(kk);DLF(k,ii)(0)+=L(k,kk)*F(ii)(kk);}}}
             // compute the divided differences
-            for(int j=2;j<eno_order;j++) for(int k=0;k<d;k++) for(int ii=i+1-eno_order;ii<i+eno_order-j+1;ii++){
-                DLU(k,ii)(j)=(DLU(k,ii+1)(j-1)-DLU(k,ii)(j-1))/(j*dx);DLF(k,ii)(j)=(DLF(k,ii+1)(j-1)-DLF(k,ii)(j-1))/(j*dx);}
+            for(int j=2;j<eno_order;j++) for(int k=0;k<d;k++) for(int ii=i+1-eno_order;ii<=i+eno_order-j+1;ii++){
+                DLU(k,ii)(j)=(DLU(k,ii+1)(j-1)-DLU(k,ii)(j-1))/((j+1)*dx);DLF(k,ii)(j)=(DLF(k,ii+1)(j-1)-DLF(k,ii)(j-1))/((j+1)*dx);}
             Dstate_ptr=&DLU;Dflux_ptr=&DLF;}
         else{
-            for(int ii=i+1-eno_order;ii<i+eno_order;ii++){
+            for(int ii=i+1-eno_order;ii<=i+eno_order;ii++){
                 for(int k=0;k<d;k++){
                     DU(k,ii)(0)=0;DF(k,ii)(0)=0;
                     if(ii<1 && outflow_boundaries(0) && lambda(k)<0){DU(k,ii)(0)=U(0)(k);DF(k,ii)(0)=F(0)(k);}
                     else if(ii>m && outflow_boundaries(1) && lambda(k)>0){DU(k,ii)(0)=U(m)(k);DF(k,ii)(0)=F(m)(k);}
                     else{DU(k,ii)(0)=U(ii)(k);DF(k,ii)(0)=F(ii)(k);}}}
             // compute the divided differences
-            for(int j=2;j<eno_order;j++) for(int k=0;k<d;k++) for(int ii=i+1-eno_order;ii<i+eno_order-j+1;ii++){
-                DU(k,ii)(j)=(DU(k,ii+1)(j-1)-DU(k,ii)(j-1))/(j*dx);DF(k,ii)(j)=(DF(k,ii+1)(j-1)-DF(k,ii)(j-1))/(j*dx);}
+            for(int j=2;j<eno_order;j++) for(int k=0;k<d;k++) for(int ii=i+1-eno_order;ii<=i+eno_order-j+1;ii++){
+                DU(k,ii)(j)=(DU(k,ii+1)(j-1)-DU(k,ii)(j-1))/((j+1)*dx);DF(k,ii)(j)=(DF(k,ii+1)(j-1)-DF(k,ii)(j-1))/((j+1)*dx);}
             Dstate_ptr=&DU;Dflux_ptr=&DF;}
         ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > &Dstate=*Dstate_ptr,&Dflux=*Dflux_ptr;
         // find a flux in each characteristic field

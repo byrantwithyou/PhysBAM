@@ -225,12 +225,12 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
         GRID<VECTOR<T,1> > grid_1d=euler->grid.Get_1D_Grid(axis);
         p_1d.Resize(grid_1d.Domain_Indices(3));u.Resize(grid_1d.Domain_Indices(3));u_px.Resize(grid_1d.Domain_Indices(3));
         T_GRID_LOWER_DIM lower_dimension_grid=euler->grid.Remove_Dimension(axis);
-        ARRAY<int,VECTOR<int,1> > colors(0,grid_1d.counts.x);
+        ARRAY<int,VECTOR<int,1> > colors(0,grid_1d.counts.x);colors.Fill(-1);
         ARRAY<bool,VECTOR<int,1> > psi_N_axis(0,grid_1d.counts.x+1);
         VECTOR<int,2> region_boundary;
         for(CELL_ITERATOR_LOWER_DIM iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){TV_INT_LOWER_DIM cell_index=iterator.Cell_Index();
             for(int i=-3;i<grid_1d.counts.x+3;i++) u(i)=v_cell(cell_index.Insert(i,axis))[axis];
-            for(int i=0;i<grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?0:-1;
+            for(int i=0;i<grid_1d.counts.x;i++) colors(i)=euler->psi(cell_index.Insert(i,axis))?-1:-2;
             for(int i=0;i<grid_1d.counts.x+1;i++) psi_N_axis(i)=elliptic_solver->psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(colors,psi_N_axis);
             for(int color=0;color<number_of_regions;color++){

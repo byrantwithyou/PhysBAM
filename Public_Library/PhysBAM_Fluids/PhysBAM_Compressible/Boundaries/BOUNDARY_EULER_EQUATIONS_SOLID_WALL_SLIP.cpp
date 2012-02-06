@@ -145,7 +145,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,con
         int boundary=Boundary(side,region);
         int reflection_times_two;
         if(grid.Is_MAC_Grid())
-            reflection_times_two=2*boundary+(side&1?-1:1);
+            reflection_times_two=2*boundary+(side&1?1:3);
         else reflection_times_two=2*boundary;
         for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT reflected_node=cell;reflected_node[axis]=reflection_times_two-cell[axis];

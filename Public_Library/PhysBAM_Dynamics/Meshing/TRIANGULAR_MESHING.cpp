@@ -93,7 +93,7 @@ Optimize_Boundary_Layer(const T compression_fraction,const bool reverse)
         particles.X(nodes(i))-=compression_fraction*implicit_curve(particles.X(nodes(i)))*boundary_mesh_normals(map_from_nodes_to_boundary_list(nodes(i)));
     Compute_Boundary_Mesh_Normals();
     for(i=0;i<nodes.m;i++){
-        int j;if(reverse) j=nodes(nodes.m+1-i);else j=nodes(i);
+        int j;if(reverse) j=nodes(nodes.m-1-i);else j=nodes(i);
         VECTOR<T,2> normal=boundary_mesh_normals(map_from_nodes_to_boundary_list(j));
         directions(0)=VECTOR<T,2>(normal.y,-normal.x);
         directions(0).Normalize();
@@ -112,7 +112,7 @@ Optimize_Interior_Layer(const int layer,const bool reverse)
     directions(2)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T).58778525229247312916870595463907);
     directions(3)=VECTOR<T,2>((T)-.80901699437494742410229341718282,(T)-.58778525229247312916870595463907);
     directions(4)=VECTOR<T,2>((T).30901699437494742410229341718282,(T)-.95105651629515357211643933337938);
-    for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m+1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
+    for(int i=0;i<layers(layer)->m;i++){int j;if(reverse) j=(*layers(layer))(layers(layer)->m-1-i);else j=(*layers(layer))(i);Search_For_Best_Position(j,directions);}
 }
 //#####################################################################
 // Function Search_For_Best_Position -- Need to modify

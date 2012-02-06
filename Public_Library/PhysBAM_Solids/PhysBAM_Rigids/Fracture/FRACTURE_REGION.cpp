@@ -53,13 +53,13 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
     fragment_implicit_object->levelset.grid.Initialize(fragment_counts.Edge_Lengths()+TV_INT::All_Ones_Vector(),fragment_domain,implicit_object->levelset.grid.Is_MAC_Grid());
     fragment_implicit_object->levelset.phi.Resize(fragment_implicit_object->levelset.grid.Domain_Indices());
     fragment_implicit_object->Update_Box();fragment_implicit_object->Update_Minimum_Cell_Size();
-    ARRAY<int,VECTOR<int,3> > colors(fragment_implicit_object->levelset.grid.Domain_Indices());
+    ARRAY<int,VECTOR<int,3> > colors(fragment_implicit_object->levelset.grid.Domain_Indices());colors.Fill(-1);
     for(NODE_ITERATOR iterator(fragment_implicit_object->levelset.grid);iterator.Valid();iterator.Next()){
         TV_INT my_cell_index=iterator.index+fragment_counts.min_corner-TV_INT::All_Ones_Vector();
         T body_phi=body.implicit_object->levelset.phi.Valid_Index(my_cell_index+offset)?body.implicit_object->levelset.phi(my_cell_index+offset):1;
         fragment_implicit_object->levelset.phi(iterator.index)=max(implicit_object->levelset.phi(my_cell_index),body_phi/phi_scale);
-        if(fragment_implicit_object->levelset.phi(iterator.index)<=0) colors(iterator.index)=0;
-        else colors(iterator.index)=-1;}
+        if(fragment_implicit_object->levelset.phi(iterator.index)<=0) colors(iterator.index)=-1;
+        else colors(iterator.index)=-2;}
     // Separate regions
     FLOOD_FILL_3D flood_fill;ARRAY<bool,FACE_INDEX<3> > edge_is_blocked(fragment_implicit_object->levelset.grid);edge_is_blocked.Fill(false);
     int num_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);

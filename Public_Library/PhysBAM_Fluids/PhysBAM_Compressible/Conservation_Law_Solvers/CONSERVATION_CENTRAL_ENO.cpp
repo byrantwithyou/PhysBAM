@@ -35,7 +35,7 @@ Conservation_Solver_Helper(const int m,const T dx,const ARRAY<bool,VECTOR<int,1>
     ARRAY<VECTOR<T,eno_order> ,VECTOR<int,2> > DU(0,d,-3,m+3),DF(0,d,-3,m+3);
     ARRAY<TV_DIMENSION,VECTOR<int,1> > F(-3,m+3);eigensystem.Flux(m,U,F); 
     for(i=-3;i<m+3;i++) for(k=0;k<d;k++){DU(k,i)(0)=U(i)(k);DF(k,i)(0)=F(i)(k);}
-    for(j=2;j<eno_order;j++) for(k=0;k<d;k++) for(i=-3;i<m+4-j;i++){DU(k,i)(j)=(DU(k,i+1)(j-1)-DU(k,i)(j-1))/(j*dx);DF(k,i)(j)=(DF(k,i+1)(j-1)-DF(k,i)(j-1))/(j*dx);}
+    for(j=2;j<eno_order;j++) for(k=0;k<d;k++) for(i=-3;i<m+4-j;i++){DU(k,i)(j)=(DU(k,i+1)(j-1)-DU(k,i)(j-1))/((j+1)*dx);DF(k,i)(j)=(DF(k,i+1)(j-1)-DF(k,i)(j-1))/((j+1)*dx);}
 
     // calculate the fluxes 
     ARRAY<bool,VECTOR<int,1> > psi_ghost(0,m+1);ARRAY<bool,VECTOR<int,1> >::Put(psi,psi_ghost); // ghost points for the if statement below  

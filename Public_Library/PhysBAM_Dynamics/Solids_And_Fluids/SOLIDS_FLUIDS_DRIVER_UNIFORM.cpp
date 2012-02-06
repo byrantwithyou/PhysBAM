@@ -1281,7 +1281,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             TV_INT min_cell_index,max_cell_index,max_velocity_index;
             for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
                 if(euler->psi(cell_index)){
-                    T current_density=euler->U(cell_index)[1];
+                    T current_density=euler->U(cell_index)[0];
                     TV current_velocity=EULER<T_GRID>::Get_Velocity(euler->U,cell_index);
                     if(current_density<min_density){min_density=current_density;min_cell_index=cell_index;}
                     if(current_density>max_density){max_density=current_density;max_cell_index=cell_index;}

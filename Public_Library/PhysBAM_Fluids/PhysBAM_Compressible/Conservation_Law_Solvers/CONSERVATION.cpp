@@ -22,7 +22,7 @@ using namespace PhysBAM;
 template<class T_GRID,int d> CONSERVATION<T_GRID,d>::
 CONSERVATION()
     :save_fluxes(1),object_boundary_default(*new BOUNDARY_OBJECT_REFLECTION<T_GRID,TV_DIMENSION>),use_exact_neumann_face_location(false),
-    scale_outgoing_fluxes_to_clamp_variable(false),clamped_variable_index(1),clamped_value(0),clamp_rho(.5),clamp_e(.5),min_dt(0),adaptive_time_step(false)
+    scale_outgoing_fluxes_to_clamp_variable(false),clamped_variable_index(0),clamped_value(0),clamp_rho(.5),clamp_e(.5),min_dt(0),adaptive_time_step(false)
 {
     Set_Order();
     Use_Field_By_Field_Alpha();
@@ -108,7 +108,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
         if(U_ghost_clamped) U_flux_1d_axis.Resize(U_ghost_start,U_ghost_end);
         ARRAY<bool,VECTOR<int,1> > psi_axis(U_start,U_end),psi_N_axis(U_start,U_end+1);
         VECTOR<bool,2> outflow_boundaries_axis(outflow_boundaries(2*axis),outflow_boundaries(2*axis+1));
-        ARRAY<int,VECTOR<int,1> > filled_region_colors(U_start,U_end);
+        ARRAY<int,VECTOR<int,1> > filled_region_colors(U_start,U_end);filled_region_colors.Fill(-1);
         ARRAY<bool,VECTOR<int,1> > psi_axis_current_component(U_start,U_end);
         if(save_fluxes) flux_temp.Resize(U_start-1,U_end,true,false);
         T_GRID_LOWER_DIM lower_dimension_grid=grid.Remove_Dimension(axis);
@@ -119,7 +119,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
 
             for(int i=U_start;i<U_end;i++){
                 psi_axis(i)=psi(cell_index.Insert(i,axis));
-                filled_region_colors(i)=psi_axis(i)?0:-1;}
+                filled_region_colors(i)=psi_axis(i)?-1:-2;}
             for(int i=U_start;i<U_end+1;i++) psi_N_axis(i)=psi_N(axis,cell_index.Insert(i,axis));
             int number_of_regions=find_connected_components.Flood_Fill(filled_region_colors,psi_N_axis);
             for(int color=0;color<number_of_regions;color++){
