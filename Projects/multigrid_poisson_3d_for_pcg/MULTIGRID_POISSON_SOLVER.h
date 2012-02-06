@@ -40,7 +40,7 @@ public:
     {
         discretizations.Resize(levels);
         refinements.Resize(levels-1);
-        discretizations(1)=new MULTIGRID_POISSON<T,d>(n,h,number_of_threads);
+        discretizations(0)=new MULTIGRID_POISSON<T,d>(n,h,number_of_threads);
     }
 
     ~MULTIGRID_POISSON_SOLVER()
@@ -50,14 +50,14 @@ public:
     }
 
     void Initialize_Multigrid_Hierarchy()
-    {discretizations(1)->Initialize();
+    {discretizations(0)->Initialize();
     for(int level=1;level<levels;level++){
         discretizations(level+1)=MULTIGRID_POISSON_REFINEMENT<T,d>::Coarsened_Discretization(*discretizations(level));
         refinements(level)=new MULTIGRID_POISSON_REFINEMENT<T,d>(*discretizations(level),*discretizations(level+1));}}
 
     void Reinitialize_Multigrid_Hierarchy()
     { 
-	discretizations(1)->Reinitialize();
+	discretizations(0)->Reinitialize();
 	refinements.Delete_Pointers_And_Clean_Memory();
         refinements.Resize(levels-1);
 	   for(int level=1;level<levels;level++){
@@ -67,25 +67,25 @@ public:
     }
 
     T_CELL_TYPE& Cell_Type(const T_INDEX& index)
-    {return discretizations(1)->cell_type(index);}
+    {return discretizations(0)->cell_type(index);}
 
     T& U(const T_INDEX& index)
-    {return discretizations(1)->u(index);}
+    {return discretizations(0)->u(index);}
 
     T& B(const T_INDEX& index)
-    {return discretizations(1)->b(index);}
+    {return discretizations(0)->b(index);}
 
     const GRID<TV>& Grid()
-    {return discretizations(1)->grid;}
+    {return discretizations(0)->grid;}
 
     MULTIGRID_POISSON<T,d>& Discretization() const
     {
 	assert(discretizations.Size());
-	return *discretizations(1);}
+	return *discretizations(0);}
 
 
     MULTIGRID_POISSON_REFINEMENT<T,d>& Refinement() const
-    {return *refinements(1);}
+    {return *refinements(0);}
     
     T V_Cycle(const T nullspace_component)
     {

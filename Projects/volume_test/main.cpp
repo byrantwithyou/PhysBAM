@@ -109,19 +109,19 @@ void Derivative_Test()
     for(int i=0;i<6;i++) printf("a(%i)=TV(%g,%g,%g);\n",i,a(i).x,a(i).y,a(i).z);
 
     ORIGIN_AREAS::VOL_DATA<T,3,6> data0,data1;
-    ORIGIN_AREAS::Volume_From_Simplices(data0,TV(),&a(1));
-    ORIGIN_AREAS::Volume_From_Simplices(data1,TV(),&ada(1));
+    ORIGIN_AREAS::Volume_From_Simplices(data0,TV(),&a(0));
+    ORIGIN_AREAS::Volume_From_Simplices(data1,TV(),&ada(0));
 
     T dV=(data1.V-data0.V)/e;
     T G=0;
-    for(int i=0;i<6;i++) G+=TV::Dot_Product(da(i),data0.G[i-1]+data1.G[i-1])/2;
+    for(int i=0;i<6;i++) G+=TV::Dot_Product(da(i),data0.G[i]+data1.G[i])/2;
     G/=e;
     printf("GRAD %9.6f %9.6f (%.6f)\n", dV, G, fabs(dV-G));
 
     T H0=0,H1=0,H2=0;
     for(int i=0;i<6;i++){
         TV Hx;
-        for(int j=0;j<6;j++) Hx+=(data0.H[i][j]+data1.H[i][j])*da(j+1)/(2*e);
+        for(int j=0;j<6;j++) Hx+=(data0.H[i][j]+data1.H[i][j])*da(j)/(2*e);
         TV G=(data1.G[i]-data0.G[i])/e;
         H0+=G.Magnitude_Squared();
         H1+=Hx.Magnitude_Squared();

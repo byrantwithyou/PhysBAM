@@ -45,29 +45,29 @@ bool Test()
     typedef double T;
     typedef VECTOR<double,2> TV;
     VECTOR<TV,4> a;
+    rn.Fill_Uniform(a(0),0,1);
     rn.Fill_Uniform(a(1),0,1);
     rn.Fill_Uniform(a(2),0,1);
     rn.Fill_Uniform(a(3),0,1);
-    rn.Fill_Uniform(a(4),0,1);
 
     T e=1e-5;
     VECTOR<TV,4> da;
+    rn.Fill_Uniform(da(0),-e,e);
     rn.Fill_Uniform(da(1),-e,e);
     rn.Fill_Uniform(da(2),-e,e);
     rn.Fill_Uniform(da(3),-e,e);
-    rn.Fill_Uniform(da(4),-e,e);
 
     trap_cases.Remove_All();
 //    fprintf(stderr, "1 1 1 setrgbcolor newpath 0 0 moveto 1000 0 lineto 1000 1000 lineto 0 1000 lineto closepath fill\n");
     VECTOR<TV,4> G1;
     VECTOR<VECTOR<MATRIX<T,2>,4>,4> H1;
-    T A1 = Trapezoid_Intersection_Area(a(1),a(2),a(3),a(4),G1,H1);
+    T A1 = Trapezoid_Intersection_Area(a(0),a(1),a(2),a(3),G1,H1);
     ARRAY<int> tmp_cases=trap_cases;
 
     trap_cases.Remove_All();
     VECTOR<TV,4> G2;
     VECTOR<VECTOR<MATRIX<T,2>,4>,4> H2;
-    T A2 = Trapezoid_Intersection_Area(a(1)+da(1),a(2)+da(2),a(3)+da(3),a(4)+da(4),G2,H2);
+    T A2 = Trapezoid_Intersection_Area(a(0)+da(0),a(1)+da(1),a(2)+da(2),a(3)+da(3),G2,H2);
 
     VECTOR<T,8>& Va=(VECTOR<T,8>&)da;
     VECTOR<T,8>& V1=(VECTOR<T,8>&)G1;
@@ -97,33 +97,33 @@ bool Tri_Test()
     typedef double T;
     typedef VECTOR<double,2> TV;
     VECTOR<TV,6> a;
+    rn.Fill_Uniform(a(0),0,1);
     rn.Fill_Uniform(a(1),0,1);
     rn.Fill_Uniform(a(2),0,1);
     rn.Fill_Uniform(a(3),0,1);
     rn.Fill_Uniform(a(4),0,1);
     rn.Fill_Uniform(a(5),0,1);
-    rn.Fill_Uniform(a(6),0,1);
 
     T e=1e-5;
     VECTOR<TV,6> da;
+    rn.Fill_Uniform(da(0),-e,e);
     rn.Fill_Uniform(da(1),-e,e);
     rn.Fill_Uniform(da(2),-e,e);
     rn.Fill_Uniform(da(3),-e,e);
     rn.Fill_Uniform(da(4),-e,e);
     rn.Fill_Uniform(da(5),-e,e);
-    rn.Fill_Uniform(da(6),-e,e);
 
     trap_cases.Remove_All();
 //    fprintf(stderr, "1 1 1 setrgbcolor newpath 0 0 moveto 1000 0 lineto 1000 1000 lineto 0 1000 lineto closepath fill\n");
     VECTOR<TV,6> G1;
     VECTOR<VECTOR<MATRIX<T,2>,6>,6> H1;
-    T A1 = Triangle_Intersection_Area(TRIANGLE_2D<T>(a(1),a(2),a(3)),TRIANGLE_2D<T>(a(4),a(5),a(6)),G1,H1);
+    T A1 = Triangle_Intersection_Area(TRIANGLE_2D<T>(a(0),a(1),a(2)),TRIANGLE_2D<T>(a(3),a(4),a(5)),G1,H1);
     ARRAY<int> tmp_cases=trap_cases;
 
     trap_cases.Remove_All();
     VECTOR<TV,6> G2;
     VECTOR<VECTOR<MATRIX<T,2>,6>,6> H2;
-    T A2 = Triangle_Intersection_Area(TRIANGLE_2D<T>(a(1)+da(1),a(2)+da(2),a(3)+da(3)),TRIANGLE_2D<T>(a(4)+da(4),a(5)+da(5),a(6)+da(6)),G2,H2);
+    T A2 = Triangle_Intersection_Area(TRIANGLE_2D<T>(a(0)+da(0),a(1)+da(1),a(2)+da(2)),TRIANGLE_2D<T>(a(3)+da(3),a(4)+da(4),a(5)+da(5)),G2,H2);
 
     VECTOR<T,12>& Va=(VECTOR<T,12>&)da;
     VECTOR<T,12>& V1=(VECTOR<T,12>&)G1;
@@ -318,9 +318,9 @@ void Case_Test()
     MATRIX<T,8> M;
     for(int i=0;i<12;i++) for(int j=0;j<12;j++) M(ii[i],ii[j])=H1(i/2)(j/2)(i%2,j%2);
     VECTOR<T,8>& W=(VECTOR<T,8>&)data.G;
-    MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i+1,2*j+1,data.H[i][j]);
+    MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i,2*j,data.H[i][j]);
 
-    printf("ERRORS: (case %i)  %.4f (%.4f)  %.4f (%.4f)  %.4f (%.4f)\n", (trap_cases.m?trap_cases(1):0), fabs(data.V-A1), fabs(A1), (W-V).Magnitude(), V.Magnitude(),
+    printf("ERRORS: (case %i)  %.4f (%.4f)  %.4f (%.4f)  %.4f (%.4f)\n", (trap_cases.m?trap_cases(0):0), fabs(data.V-A1), fabs(A1), (W-V).Magnitude(), V.Magnitude(),
         (M-N).Frobenius_Norm(),M.Frobenius_Norm());
     LOG::cout<<"Areas:  "<<data.V<<"   "<<A1<<std::endl;
     LOG::cout<<"Gradients: "<<W<<"    "<<V<<std::endl;
@@ -333,8 +333,8 @@ void Volume_From_Simplices_Test_Gradient(
     PhysBAM::VECTOR<T,2> (&X)[4])
 {
     typedef PhysBAM::VECTOR<T,2> TV;
-    const T tol=static_cast<T>(1)/(1024*1024);
-    const T dx=static_cast<T>(1)/1024;
+    const T tol=(T)1/(1024*1024);
+    const T dx=(T)1/1024;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx0;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx1;
     for(int i=0;i!=4;++i){
@@ -360,8 +360,8 @@ void Volume_From_Simplices_Test_Hessian(
     PhysBAM::VECTOR<T,2> (&X)[4])
 {
     typedef PhysBAM::VECTOR<T,2> TV;
-    const T tol=static_cast<T>(1)/(1024*1024);
-    const T dx=static_cast<T>(1)/1024;
+    const T tol=(T)1/(1024*1024);
+    const T dx=(T)1/1024;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx00;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx01;
     PhysBAM::ORIGIN_AREAS::VOL_DATA<T,2,4> vol_data_dx10;

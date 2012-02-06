@@ -194,28 +194,28 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 4:
             last_frame=360;
             fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,15*resolution+1,-5,5,0,10,-(T)7.5,(T)7.5);
-            fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=false;
-            fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=true;
+            fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=false;
+            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=true;
             break;
         case 5:
             fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,10*resolution+1,-5,5,5,15,-5,5);
-            fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=false;
-            fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=true;
+            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=false;
+            fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=true;
             break;
         case 6:
         case 8:
             fluids_parameters.grid->Initialize(10*resolution+1,9*resolution+1,10*resolution+1,-5,5,2,11,-5,5);
-            fluids_parameters.domain_walls[2][2]=false;
-            fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][1]=true;
+            fluids_parameters.domain_walls[1][1]=false;
+            fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;
             fluids_parameters.incompressible_iterations=400;
             break;
         case 7:
             //fluids_parameters.grid->Initialize(10*resolution+1,15*resolution+1,10*resolution+1,-8,8,0,24,-8,8);
             fluids_parameters.grid->Initialize(10*resolution+1,30*resolution+1,10*resolution+1,-8,8,0,48,-8,8);
-            fluids_parameters.domain_walls[2][2]=false;
-            //fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][1]=true;
-            fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=false;
+            fluids_parameters.domain_walls[1][1]=false;
+            //fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=true;
+            fluids_parameters.domain_walls[1][0]=false;
             fluids_parameters.incompressible_iterations=400;
             solids_parameters.implicit_solve_parameters.lanczos_iterations=1000;
             solids_parameters.implicit_solve_parameters.cg_iterations=1000;
@@ -239,10 +239,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 7: break;
         default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
 
-    for(int i=1;i<=TV::dimension*2;i+=2){
-        if(i==1){rigid_body_walls(i)=fluids_parameters.domain_walls[1][1];rigid_body_walls(i+1)=fluids_parameters.domain_walls[1][2];}
-        if(i==3){rigid_body_walls(i)=fluids_parameters.domain_walls[2][1];rigid_body_walls(i+1)=fluids_parameters.domain_walls[2][2];}
-        if(i==5){rigid_body_walls(i)=fluids_parameters.domain_walls[3][2];rigid_body_walls(i+1)=fluids_parameters.domain_walls[3][1];}}
+    for(int i=0;i<TV::dimension*2;i+=2){
+        if(i==0){rigid_body_walls(i)=fluids_parameters.domain_walls[0][0];rigid_body_walls(i+1)=fluids_parameters.domain_walls[0][1];}
+        if(i==2){rigid_body_walls(i)=fluids_parameters.domain_walls[1][0];rigid_body_walls(i+1)=fluids_parameters.domain_walls[1][1];}
+        if(i==4){rigid_body_walls(i)=fluids_parameters.domain_walls[2][1];rigid_body_walls(i+1)=fluids_parameters.domain_walls[2][0];}}
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Set_Driver(SOLIDS_FLUIDS_DRIVER<TV>* driver_input)
@@ -698,17 +698,17 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
     soft_bindings.Set_Mass_From_Effective_Mass();
     ARRAY<int> walls_added;
-    for(int i=1;i<=TV::dimension*2;i+=2){
-        if(i==1){Swap(fluids_parameters.domain_walls[1][1],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[1][2],rigid_body_walls(i+1));}
-        if(i==3){Swap(fluids_parameters.domain_walls[2][1],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[2][2],rigid_body_walls(i+1));}
-        if(i==5){Swap(fluids_parameters.domain_walls[3][2],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[3][1],rigid_body_walls(i+1));}}
-    fluids_parameters.domain_walls[2][1]=false;
+    for(int i=0;i<TV::dimension*2;i+=2){
+        if(i==0){Swap(fluids_parameters.domain_walls[0][0],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[0][1],rigid_body_walls(i+1));}
+        if(i==2){Swap(fluids_parameters.domain_walls[1][0],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[1][1],rigid_body_walls(i+1));}
+        if(i==4){Swap(fluids_parameters.domain_walls[2][1],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[2][0],rigid_body_walls(i+1));}}
+    fluids_parameters.domain_walls[1][0]=false;
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this,(T).5,(T).5,&walls_added);
-    if(test_number!=5) fluids_parameters.domain_walls[2][1]=true;
-    for(int i=1;i<=TV::dimension*2;i+=2){
-        if(i==1){Swap(fluids_parameters.domain_walls[1][1],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[1][2],rigid_body_walls(i+1));}
-        if(i==3){Swap(fluids_parameters.domain_walls[2][1],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[2][2],rigid_body_walls(i+1));}
-        if(i==5){Swap(fluids_parameters.domain_walls[3][2],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[3][1],rigid_body_walls(i+1));}}
+    if(test_number!=5) fluids_parameters.domain_walls[1][0]=true;
+    for(int i=0;i<TV::dimension*2;i+=2){
+        if(i==0){Swap(fluids_parameters.domain_walls[0][0],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[0][1],rigid_body_walls(i+1));}
+        if(i==2){Swap(fluids_parameters.domain_walls[1][0],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[1][1],rigid_body_walls(i+1));}
+        if(i==4){Swap(fluids_parameters.domain_walls[2][1],rigid_body_walls(i));Swap(fluids_parameters.domain_walls[2][0],rigid_body_walls(i+1));}}
     LOG::cout<<"Walls added with ids: "<<walls_added<<std::endl;
 }
 //#####################################################################
@@ -836,7 +836,7 @@ void Driven_Bird()
 
         ANGLE_JOINT<TV> *driven_joint=new ANGLE_JOINT<TV>;
         ANGLE_JOINT<TV> *controlled_joint=new ANGLE_JOINT<TV>;
-        if(i==1) left_wing=driven_joint; else right_wing=driven_joint;
+        if(i==0) left_wing=driven_joint; else right_wing=driven_joint;
         { // Create the PD-controlled joint that drives the up-down motion
             ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>* arb_impulse_accumulator=new ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>(*driven_joint,arb);
             driven_joint->impulse_accumulator=arb_impulse_accumulator;
@@ -870,10 +870,10 @@ void Driven_Bird()
                 controlled_joint->global_post_stabilization=false;controlled_joint->joint_function->active=false;
                 for(int i=0;i<T_SPIN::dimension;i++){controlled_joint->control_dof(i)=true;}}
             if(test_number==6){
-                if(i==1) controlled_joint->Set_Angle_Constraints(true,(T)-pi/2,(T)pi*3/8);
+                if(i==0) controlled_joint->Set_Angle_Constraints(true,(T)-pi/2,(T)pi*3/8);
                 else controlled_joint->Set_Angle_Constraints(true,(T)-pi*3/8,(T)pi/2);}
             else{
-                if(i==1) controlled_joint->Set_Angle_Constraints(true,(T)-pi/2,(T)0);
+                if(i==0) controlled_joint->Set_Angle_Constraints(true,(T)-pi/2,(T)0);
                 else controlled_joint->Set_Angle_Constraints(true,(T)0,(T)pi/2);}}
     }
 }
@@ -927,7 +927,7 @@ void Octosquid()
             tail_link.Rotation()=ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),direction);
             FRAME<TV> J;
             RIGID_BODY<TV>* joint_cover=0;
-            if(j==1){
+            if(j==0){
                 tail_link.X()-=direction*(T).1;
                 FRAME<TV> parent_frame=prev_link->Frame();parent_frame.t.y-=(radius/2+(T).3);
                 J=FRAME<TV>((tail_link.X()*(T).4+parent_frame.t*(T).6),ROTATION<TV>::From_Rotated_Vector(TV(0,0,1),direction));}

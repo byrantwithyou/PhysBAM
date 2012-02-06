@@ -102,7 +102,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             volume->mesh.Initialize_Bending_Tetrahedrons(surface.mesh);
             for(int t=0;t<volume->mesh.elements.m;t++){
                 VECTOR<int,4>& nodes=volume->mesh.elements(t);
-                if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);}
+                if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[2],nodes[3]);}
             //deformable_body_collection.deformable_geometry.Add_Structure(volume);
             tests.Add_Ground();
         }break;
@@ -110,7 +110,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.6,0))),false,true,1000);
             for(int t=0;t<volume->mesh.elements.m;t++){
                 VECTOR<int,4>& nodes=volume->mesh.elements(t);
-                if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);}
+                if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[2],nodes[3]);}
             deformable_body_collection.deformable_geometry.Add_Structure(volume);
             tests.Add_Ground();
         }break;

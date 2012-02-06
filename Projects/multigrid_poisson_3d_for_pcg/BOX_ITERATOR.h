@@ -30,10 +30,10 @@ public:
     {index=box.min_corner;}
 
     bool Valid() const
-    {return index.x<=box.max_corner.x;}
+    {return index.x<box.max_corner.x;}
 
     void Next()
-    {for(int i=d;i>=1;i--) if(index(i)<box.max_corner(i) || i==1){index(i)++;return;} else index(i)=box.min_corner(i);}
+    {for(int i=d-1;i>=0;i--) if(index(i)<box.max_corner(i) || i==1){index(i)++;return;} else index(i)=box.min_corner(i);}
 
     const TV_INT& Index()
     {return index;}
@@ -59,10 +59,10 @@ public:
     {index=box.min_corner;}
 
     bool Valid() const
-    {return index.x<=box.max_corner.x;}
+    {return index.x<box.max_corner.x;}
 
     void Next()
-    {for(int i=d;i>=1;i--) if(index(i)+stride<=box.max_corner(i) || i==1){index(i)+=stride;return;} else index(i)=box.min_corner(i);}
+    {for(int i=d-1;i>=0;i--) if(index(i)+stride<box.max_corner(i) || i==1){index(i)+=stride;return;} else index(i)=box.min_corner(i);}
 
     const TV_INT& Index()
     {return index;}
@@ -84,16 +84,16 @@ public:
     BOUNDARY_ITERATOR(const RANGE<TV_INT>& box_input,int side=0)
 	:box(box_input),side(side)
     {
-	assert(side<=2*d);
+	assert(side<2*d);
 	TV_INT min_corner=box.min_corner+1;
 	TV_INT max_corner=box.max_corner-1;
 	for(int v=0;v<d;v++){
 	    min_corner(v)=box.min_corner(v);
 	    max_corner(v)=box.min_corner(v);
-	    regions[(v-1)*2]=RANGE<TV_INT>(min_corner,max_corner);
+	    regions[v*2]=RANGE<TV_INT>(min_corner,max_corner);
 	    min_corner(v)=box.max_corner(v);
 	    max_corner(v)=box.max_corner(v);
-	    regions[(v-1)*2+1]=RANGE<TV_INT>(min_corner,max_corner);
+	    regions[v*2+1]=RANGE<TV_INT>(min_corner,max_corner);
 	    min_corner(v)=box.min_corner(v);
 	}
 	if(side)
@@ -119,7 +119,7 @@ public:
     void Next()
     {
 	if(!valid) return;
-	for(int i=d;i>=1;i--){
+	for(int i=d-1;i>=0;i--){
 	    if(index(i)<regions[current_region].max_corner(i)){
 		index(i)++; return;
 	    }

@@ -80,13 +80,13 @@ void Get_Initial_Data()
         VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
         particles.mass.Subset(tri_parts).Fill((T)1./3);
         particles.mass.Subset(tet_parts).Fill((T)1./4);
-        particles.X(tri_parts[1])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
-        particles.X(tri_parts[2])=TV((T)0.104949,(T)0.717676,(T)0.022739);
-        particles.X(tri_parts[3])=TV((T)0.306855,(T)0.963611,(T)1.181754);
-        particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)-0.750000);
-        particles.X(tet_parts[2])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
-        particles.X(tet_parts[3])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
-        particles.X(tet_parts[4])=TV((T)0.000000,(T)1.000000,(T)0.000000);
+        particles.X(tri_parts[0])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
+        particles.X(tri_parts[1])=TV((T)0.104949,(T)0.717676,(T)0.022739);
+        particles.X(tri_parts[2])=TV((T)0.306855,(T)0.963611,(T)1.181754);
+        particles.X(tet_parts[0])=TV((T)-0.433013,(T)-0.018620,(T)-0.750000);
+        particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
+        particles.X(tet_parts[2])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
+        particles.X(tet_parts[3])=TV((T)0.000000,(T)1.000000,(T)0.000000);
         surface.mesh.elements.Append(tri_parts);//deformable_body_collection.deformable_geometry.Add_Structure(&surface);
         TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
         for(int i=0;i<tri_parts.m;i++){
@@ -101,10 +101,10 @@ void Get_Initial_Data()
                 soft_bindings.Add_Binding(VECTOR<int,2>(etri_parts[i],tri_parts[i]),false);}}
         if(target_position){
             int target_particle=particles.array_collection->Add_Element();
-            particles.X(target_particle)=particles.X(8);
+            particles.X(target_particle)=particles.X(7);
             particles.mass(target_particle)=1; // TODO: make this work for zero mass
-            curve.mesh.elements.Append(VECTOR<int,2>(8,9));
-            //if(!use_zero_length_springs) curve.mesh.elements.Append(VECTOR<int,2>(2,8));
+            curve.mesh.elements.Append(VECTOR<int,2>(6,7));
+            //if(!use_zero_length_springs) curve.mesh.elements.Append(VECTOR<int,2>(1,7));
             deformable_body_collection.deformable_geometry.Add_Structure(&curve);}
         deformable_body_collection.deformable_geometry.Add_Structure(&curve2);
         volume.mesh.elements.Append(tet_parts);deformable_body_collection.deformable_geometry.Add_Structure(&volume);
@@ -166,27 +166,27 @@ void Get_Initial_Data()
         VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
         particles.mass.Subset(tri_parts).Fill((T)1./3);
         particles.mass.Subset(tet_parts).Fill((T)1./4);
-        particles.X(tri_parts[1])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
-        particles.X(tri_parts[2])=TV((T)0.104949,(T)0.717676,(T)0.022739);
-        particles.X(tri_parts[3])=TV((T)0.306855,(T)0.963611,(T)1.181754);
-        particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)-0.750000);
-        particles.X(tet_parts[2])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
-        particles.X(tet_parts[3])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
-        particles.X(tet_parts[4])=TV((T)0.000000,(T)1.000000,(T)0.000000);
+        particles.X(tri_parts[0])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
+        particles.X(tri_parts[1])=TV((T)0.104949,(T)0.717676,(T)0.022739);
+        particles.X(tri_parts[2])=TV((T)0.306855,(T)0.963611,(T)1.181754);
+        particles.X(tet_parts[0])=TV((T)-0.433013,(T)-0.018620,(T)-0.750000);
+        particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
+        particles.X(tet_parts[2])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
+        particles.X(tet_parts[3])=TV((T)0.000000,(T)1.000000,(T)0.000000);
         particles.array_collection->Add_Element(); // fake soft particle
         particles.array_collection->Add_Element(); // fake constrained point
-        particles.X(8)=particles.X(9)=particles.X(4);
-        particles.mass(8)=particles.mass(9)=particles.mass(4);
+        particles.X(7)=particles.X(8)=particles.X(3);
+        particles.mass(7)=particles.mass(8)=particles.mass(3);
         if(test_3_use_bound){
             particles.array_collection->Add_Element(); // hard bound particle
-            particles.X(10)=particles.X(2);
-            particles.mass(10)=particles.mass(2);
-            curve.mesh.elements.Append(VECTOR<int,2>(10,8));
+            particles.X(9)=particles.X(1);
+            particles.mass(9)=particles.mass(1);
+            curve.mesh.elements.Append(VECTOR<int,2>(9,7));
             TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
-            solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,10,tet_parts,tet.First_Three_Barycentric_Coordinates(particles.X(10))));
+            solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,10,tet_parts,tet.First_Three_Barycentric_Coordinates(particles.X(9))));
         }
-        else curve.mesh.elements.Append(VECTOR<int,2>(4,8));
-        curve.mesh.elements.Append(VECTOR<int,2>(8,9));
+        else curve.mesh.elements.Append(VECTOR<int,2>(3,7));
+        curve.mesh.elements.Append(VECTOR<int,2>(7,8));
         deformable_body_collection.deformable_geometry.Add_Structure(&curve);
         surface.mesh.elements.Append(tri_parts);deformable_body_collection.deformable_geometry.Add_Structure(&surface);
         volume.mesh.elements.Append(tet_parts);deformable_body_collection.deformable_geometry.Add_Structure(&volume);
@@ -202,13 +202,13 @@ void Get_Initial_Data()
         VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
         particles.mass.Subset(tri_parts).Fill((T)1./3);
         particles.mass.Subset(tet_parts).Fill((T)1./4);
-        particles.X(tri_parts[1])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
-        particles.X(tri_parts[2])=TV((T)0.104949,(T)0.717676,(T)0.022739);
-        particles.X(tri_parts[3])=TV((T)0.306855,(T)0.963611,(T)1.181754);
-        particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)-0.750000);
-        particles.X(tet_parts[2])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
-        particles.X(tet_parts[3])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
-        particles.X(tet_parts[4])=TV((T)0.000000,(T)1.000000,(T)0.000000);
+        particles.X(tri_parts[0])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
+        particles.X(tri_parts[1])=TV((T)0.104949,(T)0.717676,(T)0.022739);
+        particles.X(tri_parts[2])=TV((T)0.306855,(T)0.963611,(T)1.181754);
+        particles.X(tet_parts[0])=TV((T)-0.433013,(T)-0.018620,(T)-0.750000);
+        particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
+        particles.X(tet_parts[2])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
+        particles.X(tet_parts[3])=TV((T)0.000000,(T)1.000000,(T)0.000000);
         surface.mesh.elements.Append(tri_parts);//deformable_body_collection.deformable_geometry.Add_Structure(&surface);
         TETRAHEDRON<T> tet(particles.X.Subset(tet_parts));
         for(int i=0;i<tri_parts.m;i++){
@@ -218,18 +218,18 @@ void Get_Initial_Data()
                 TV coordinates=tet.First_Three_Barycentric_Coordinates(point);
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,tri_parts(i),tet_parts,coordinates));
                 etri_parts[i]=particles.array_collection->Add_Element();assert(etri_parts[i]==8); // 8
-                particles.mass(8)=1;
+                particles.mass(7)=1;
                 LOG::cout<<"embedding particle "<<etri_parts[i]<<" to "<<tri_parts[i]<<std::endl;
                 particles.X(etri_parts[i])=particles.X(tri_parts[i]);
                 soft_bindings.Add_Binding(VECTOR<int,2>(etri_parts[i],tri_parts[i]),false);
             }}
         particles.array_collection->Add_Element();assert(particles.array_collection->Size()==9); // 9
-        particles.X(9)=particles.X(8);
-        particles.mass(9)=1; // TODO: make this work for zero mass
+        particles.X(8)=particles.X(7);
+        particles.mass(8)=1; // TODO: make this work for zero mass
         constrained_point=9;
-        curve.mesh.elements.Append(VECTOR<int,2>(8,9));
-        curve.mesh.elements.Append(VECTOR<int,2>(2,8));
-            //if(!use_zero_length_springs) curve.mesh.elements.Append(VECTOR<int,2>(2,8));
+        curve.mesh.elements.Append(VECTOR<int,2>(7,8));
+        curve.mesh.elements.Append(VECTOR<int,2>(1,7));
+            //if(!use_zero_length_springs) curve.mesh.elements.Append(VECTOR<int,2>(1,7));
         deformable_body_collection.deformable_geometry.Add_Structure(&curve);
         volume.mesh.elements.Append(tet_parts);deformable_body_collection.deformable_geometry.Add_Structure(&volume);
         e_surface.mesh.elements.Append(etri_parts);
@@ -286,7 +286,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             spring_force->Set_Overdamping_Fraction(3);
             solid_body_collection.Add_Force(spring_force);}
         soft_bindings.Initialize_Binding_Mesh();
-        soft_bindings.binding_mesh->elements.Append(VECTOR<int,2>(8,9));
+        soft_bindings.binding_mesh->elements.Append(VECTOR<int,2>(7,8));
         soft_bindings.use_impulses_for_collisions.Fill(false);
         if(use_zero_length_springs) solid_body_collection.Add_Force(Create_Edge_Binding_Springs(particles,*soft_bindings.binding_mesh,(T)1e2,(T)1));
         else{

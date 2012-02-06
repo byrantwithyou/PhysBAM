@@ -47,7 +47,7 @@ public:
 	// do boundary separately
 	for(BOUNDARY_ITERATOR<d> coarse_iterator(coarse_discretization.padded_domain);coarse_iterator.Valid();coarse_iterator.Next()){
 	    const T_INDEX& coarse_index=coarse_iterator.Index();
-	    T_INDEX min_fine_index=(coarse_index-1)*2;
+	    T_INDEX min_fine_index=coarse_index*2;
 	    T_INDEX max_fine_index=min_fine_index+1;
 	    min_fine_index=T_INDEX::Componentwise_Max(min_fine_index,fine_discretization.padded_domain.min_corner);
 	    max_fine_index=T_INDEX::Componentwise_Min(max_fine_index,fine_discretization.padded_domain.max_corner);
@@ -66,7 +66,7 @@ public:
 
 	for(BOX_ITERATOR<d> coarse_iterator(coarse_discretization.unpadded_domain);coarse_iterator.Valid();coarse_iterator.Next()){
 	    const T_INDEX& coarse_index=coarse_iterator.Index();
-	    const T_INDEX base_fine_index=(coarse_index-1)*2;
+	    const T_INDEX base_fine_index=coarse_index*2;
 	    coarse_discretization.cell_type(coarse_index)=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
 	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 		const T_INDEX& fine_index=fine_iterator.Index();

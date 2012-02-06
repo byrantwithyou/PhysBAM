@@ -525,8 +525,8 @@ void Cloth_Ball()
     body.X().z=(T).5;
     body.Is_Kinematic()=true;
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-    constrained_point.Append(1);
-    constrained_point.Append(1+m*(n-1));
+    constrained_point.Append(0);
+    constrained_point.Append(m*(n-1));
 }
 //#####################################################################
 // Function Constrained_Cloth
@@ -537,8 +537,8 @@ void Constrained_Cloth()
     cloth_triangles=2*number_side_panels*(int)(number_side_panels*aspect_ratio);
     tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-    constrained_point.Append(1);
-    constrained_point.Append(1+m*(n-1));
+    constrained_point.Append(0);
+    constrained_point.Append(m*(n-1));
     animated_particle=1311;
     TV initial_point((T)1.7,(T).5,(T).45);
     animation_curve.Add_Control_Point(0,initial_point);
@@ -634,11 +634,11 @@ void Constrained_Sphere()
 {
     last_frame=300;
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
-    constrained_point.Append(1407);
-    constrained_point.Append(2510);
-    constrained_point.Append(1417);
-    constrained_point.Append(4271);
-    constrained_point.Append(4266);
+    constrained_point.Append(1406);
+    constrained_point.Append(2509);
+    constrained_point.Append(1416);
+    constrained_point.Append(4270);
+    constrained_point.Append(4265);
     animated_particle=1901;
     animation_curve.Add_Control_Point(0,TV(0,2,0));
     animation_curve.Add_Control_Point(2,TV(0,2,0));
@@ -672,9 +672,9 @@ void Single_Hair()
     ARRAY<bool> segment_perturbed;
     for(int i=0;i<n_segments+2;i++) points.Append(TV(T(T(i-1)/T(n_segments)),0,0));
     segment_perturbed.Append(false);
-    for(int i=1;i<points.m;i++){
-        if(i>1 && TRIANGLE_3D<T>(points(i-1),points(i),points(i+1)).Area()<perturb_threshold) segment_perturbed.Append(true);
-        else if(i<points.m-1 && TRIANGLE_3D<T>(points(i),points(i+1),points(i+2)).Area()<perturb_threshold) segment_perturbed.Append(true);
+    for(int i=0;i<points.m-1;i++){
+        if(i>0 && TRIANGLE_3D<T>(points(i-1),points(i),points(i+1)).Area()<perturb_threshold) segment_perturbed.Append(true);
+        else if(i<points.m-2 && TRIANGLE_3D<T>(points(i),points(i+1),points(i+2)).Area()<perturb_threshold) segment_perturbed.Append(true);
         else segment_perturbed.Append(false);}
 
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
@@ -690,10 +690,10 @@ void Single_Hair()
 
     int i=2,e0,r0,e1,r1=0,r2=0,r3;
     int last_particle=particles.array_collection->Add_Element();
-    particles.X(last_particle)=points(1);
+    particles.X(last_particle)=points(0);
     ARRAY<ARRAY<int> > previous;
     previous.Append(ARRAY<int>());
-    TV perturb=(points(1)-points(2)).Orthogonal_Vector();
+    TV perturb=(points(0)-points(1)).Orthogonal_Vector();
 
     int perturb_amount=1;
     while(i<=points.m){
@@ -711,9 +711,9 @@ void Single_Hair()
             extra_edges.mesh.elements.Append(Vi2(e0,r0));
         
             if(previous(i-1).m==3){
-                r2=previous(i-1)(1);
-                e1=previous(i-1)(2);
-                r1=previous(i-1)(3);
+                r2=previous(i-1)(0);
+                e1=previous(i-1)(1);
+                r1=previous(i-1)(2);
                 torsion_edges.mesh.elements.Append(Vi2(r2,e0));
                 volume.mesh.elements.Append(Vi4(r2,e1,r1,e0));
                 torsion_edges.mesh.elements.Append(Vi2(e1,r0));
@@ -721,13 +721,13 @@ void Single_Hair()
                 triangles.mesh.elements.Append(Vi3(r1,e0,r0));
                 bending_edges.mesh.elements.Append(Vi2(e1,e0));}
             else if(previous(i-1).m==2){
-                r2=previous(i-1)(1);
-                r1=previous(i-1)(2);
+                r2=previous(i-1)(0);
+                r1=previous(i-1)(1);
                 torsion_edges.mesh.elements.Append(Vi2(e0,r2));
                 volume.mesh.elements.Append(Vi4(r2,r1,e0,r0));
                 bending_edges.mesh.elements.Append(Vi2(last_particle,r0));
                 if(i-2>=0 && previous(i-2).m==2){
-                    r3=previous(i-2)(1);
+                    r3=previous(i-2)(0);
                     torsion_edges.mesh.elements.Append(Vi2(r3,r0));
                     volume.mesh.elements.Append(Vi4(r3,r2,r1,r0));}
                 triangles.mesh.elements.Append(Vi3(r1,e0,r0));
@@ -747,22 +747,22 @@ void Single_Hair()
 
         triangles.mesh.elements.Append(Vi3(r2,r1,r0));
         if(previous(i-1).m==2){
-            r2=previous(i-1)(1);
-            r1=previous(i-1)(2);
+            r2=previous(i-1)(0);
+            r1=previous(i-1)(1);
             bending_edges.mesh.elements.Append(Vi2(r2,r0));
             if(i-2>=0){
                 if(previous(i-2).m==2){
-                    r3=previous(i-2)(1);
+                    r3=previous(i-2)(0);
                     torsion_edges.mesh.elements.Append(Vi2(r3,r0));
                     volume.mesh.elements.Append(Vi4(r3,r2,r1,r0));}
                 else if(previous(i-2).m==3){
-                    r3=previous(i-2)(1);
+                    r3=previous(i-2)(0);
                     torsion_edges.mesh.elements.Append(Vi2(r3,r0));
                     volume.mesh.elements.Append(Vi4(r3,r2,r1,r0));}}}
         else if(previous(i-1).m==3){
-            r2=previous(i-1)(1);
-            e1=previous(i-1)(2);
-            r1=previous(i-1)(3);
+            r2=previous(i-1)(0);
+            e1=previous(i-1)(1);
+            r1=previous(i-1)(2);
             bending_edges.mesh.elements.Append(Vi2(r2,r0));
             torsion_edges.mesh.elements.Append(Vi2(e1,r0));
             volume.mesh.elements.Append(Vi4(r2,e1,r1,r0));}
@@ -778,7 +778,7 @@ void Single_Hair()
     i=1;
     for(int t=0;t<volume.mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume.mesh.elements(t);
-        if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[3],nodes[4]);
+        if(TETRAHEDRON<T>(particles.X.Subset(nodes)).Signed_Volume()<0) exchange(nodes[2],nodes[3]);
         i++;}
     for(int t=0;t<volume.mesh.elements.m;t++){
         VECTOR<int,4>& nodes=volume.mesh.elements(t);
@@ -823,11 +823,11 @@ void Single_Hair()
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&triangles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&volume);
         
-    constrained_point.Append(1);
+    constrained_point.Append(0);
 
     if(test_number==6){
         animated_particle=100;
-        animation_curve.Add_Control_Point(0,TV(0,2,0));//particles.X(100)(1),particles.X(100)(2),particles.X(100)(3)));
+        animation_curve.Add_Control_Point(0,TV(0,2,0));//particles.X(100)(0),particles.X(100)(1),particles.X(100)(2)));
         animation_curve.Add_Control_Point(2,TV(0,2,0));
         animation_curve.Add_Control_Point((T)3.3,TV(0,-10,0));
         animation_curve.Add_Control_Point((T)3.6,TV(0,10,0));
@@ -863,9 +863,9 @@ void Write_Saved_Interpolation_Curve_To_File(const std::string& filename,ARRAY<I
         Write_Binary(output,curve(i).control_points.m); 
         for(int j=0;j<curve(i).control_points.m;j++){
             Write_Binary(output,curve(i).control_points(j).t); 
+            Write_Binary(output,curve(i).control_points(j).value(0));
             Write_Binary(output,curve(i).control_points(j).value(1));
-            Write_Binary(output,curve(i).control_points(j).value(2));
-            Write_Binary(output,curve(i).control_points(j).value(3));}}
+            Write_Binary(output,curve(i).control_points(j).value(2));}}
     delete output_raw;
 }
 //#####################################################################
@@ -883,9 +883,9 @@ void Read_Saved_Interpolation_Curve_From_File(const std::string& filename,ARRAY<
         for(int j=0;j<n;j++){
             T t;TV value;
             Read_Binary(input,t);
+            Read_Binary(input,value(0));
             Read_Binary(input,value(1));
             Read_Binary(input,value(2));
-            Read_Binary(input,value(3));
             curve(i).Add_Control_Point(t,value);}}
     delete input_raw;
 }
@@ -923,16 +923,16 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
     if(test_number==19){
         T time=(T)frame/frame_rate,h=5-(T)4.9*sqr(time),v=-(T)9.8*time;
-        LOG::cout<<"Position errors: "<<(particles.X(1)-TV(1,h,0))<<"   /   "<<(particles.X(2)-TV(2,h,0))<<"   /   "<<(particles.X(3)-TV(3,h,0))<<std::endl;
-        LOG::cout<<"Velocity errors: "<<(particles.V(1)-TV(0,v,0))<<"   /   "<<(particles.V(2)-TV(0,v,0))<<"   /   "<<(particles.V(3)-TV(0,v,0))<<std::endl;}
+        LOG::cout<<"Position errors: "<<(particles.X(0)-TV(1,h,0))<<"   /   "<<(particles.X(1)-TV(2,h,0))<<"   /   "<<(particles.X(2)-TV(3,h,0))<<std::endl;
+        LOG::cout<<"Velocity errors: "<<(particles.V(0)-TV(0,v,0))<<"   /   "<<(particles.V(1)-TV(0,v,0))<<"   /   "<<(particles.V(2)-TV(0,v,0))<<std::endl;}
     if(test_number==20){
         T time=(T)frame/frame_rate,e=1-exp(-2*time),x=2*e,v=4*exp(-2*time);
         if(parameter==2){
             T g=-(T)9.8;
             x+=-g/(T)28*e+g/(T)14*time;
             v+=g/(T)14*e;}
-        LOG::cout<<"Position errors: "<<(particles.X(1)-TV(1,x,0))<<"   /   "<<(particles.X(2)-TV(2,x,0))<<"   /   "<<(particles.X(3)-TV(3,x,0))<<std::endl;
-        LOG::cout<<"Velocity errors: "<<(particles.V(1)-TV(0,v,0))<<"   /   "<<(particles.V(2)-TV(0,v,0))<<"   /   "<<(particles.V(3)-TV(0,v,0))<<std::endl;}
+        LOG::cout<<"Position errors: "<<(particles.X(0)-TV(1,x,0))<<"   /   "<<(particles.X(1)-TV(2,x,0))<<"   /   "<<(particles.X(2)-TV(3,x,0))<<std::endl;
+        LOG::cout<<"Velocity errors: "<<(particles.V(0)-TV(0,v,0))<<"   /   "<<(particles.V(1)-TV(0,v,0))<<"   /   "<<(particles.V(2)-TV(0,v,0))<<std::endl;}
     if(test_number==21){
         T t=(T)frame/frame_rate;
         T x0=initial_displacement_analytic,k=stiffness_analytic,m=mass_analytic,l0=restlength_analytic,w=sqrt(k/(m*l0));
@@ -963,8 +963,8 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                 dx=a*e1+b*e2;
                 v=a*quadratic.root1*e1+b*quadratic.root2*e2;}
         }
-        LOG::cout<<"Position errors: "<<(particles.X(1)-TV(-dx-restlength_analytic,h,z))<<"   /   "<<(particles.X(2)-TV(0,h,z))<<"   /   "<<(particles.X(3)-TV(dx+restlength_analytic,h,z))<<std::endl;
-        LOG::cout<<"Velocity errors: "<<(particles.V(1)-TV(-v,vh,vz))<<"   /   "<<(particles.V(2)-TV(0,vh,vz))<<"   /   "<<(particles.V(3)-TV(v,vh,vz))<<std::endl;}
+        LOG::cout<<"Position errors: "<<(particles.X(0)-TV(-dx-restlength_analytic,h,z))<<"   /   "<<(particles.X(1)-TV(0,h,z))<<"   /   "<<(particles.X(2)-TV(dx+restlength_analytic,h,z))<<std::endl;
+        LOG::cout<<"Velocity errors: "<<(particles.V(0)-TV(-v,vh,vz))<<"   /   "<<(particles.V(1)-TV(0,vh,vz))<<"   /   "<<(particles.V(2)-TV(v,vh,vz))<<std::endl;}
     if(test_number==22){
         PHYSBAM_ASSERT(frame==1);
         T fx=-stiffness_analytic/restlength_analytic;
@@ -984,9 +984,9 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         else if(parameter==12) analytic_step=Analytic_Solution_Async_Velocity_Averaging_Nosquared_Implicit_Explicit(initial_displacement_analytic,initial_velocity_analytic,mass_analytic,(T)1/frame_rate,0,fv,fx);
         else if(parameter==13) analytic_step=Analytic_Solution_Async_Velocity_Averaging_Nosquared_Implicit_Mixed(initial_displacement_analytic,initial_velocity_analytic,mass_analytic,(T)1/frame_rate,0,fv,fx,0,fv,fx);
 
-        LOG::cout<<"actual:  x "<<particles.X(1).x<<"     v "<<particles.V(1).x<<std::endl;
+        LOG::cout<<"actual:  x "<<particles.X(0).x<<"     v "<<particles.V(0).x<<std::endl;
         LOG::cout<<"analytic:  x "<<analytic_step.x<<"     v "<<analytic_step.y<<std::endl;
-        LOG::cout<<"Errors:  x "<<(particles.X(1).x-analytic_step.x)<<"     v "<<(particles.V(1).x-analytic_step.y)<<std::endl;
+        LOG::cout<<"Errors:  x "<<(particles.X(0).x-analytic_step.x)<<"     v "<<(particles.V(0).x-analytic_step.y)<<std::endl;
     }
 }
 //#####################################################################
@@ -1132,11 +1132,11 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
             V(Particle_Index_From_Coordinates(i,j,m)).z=0;V(Particle_Index_From_Coordinates(i,j,m)).x=x.Value(velocity_time);}}
     else if(test_number==9){
             int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-            for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(1,j,m))=TV();
-            for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(m,j,m))=TV((T).1,0,0);}
+            for(int j=0;j<n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(1,j,m))=TV();
+            for(int j=0;j<n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(m,j,m))=TV((T).1,0,0);}
     else if((test_number==10 || test_number==11 || test_number==12 || test_number==13) && velocity_time>sim_switch_time)
             for(int i=0;i<num_controlled_particles;i++) V(i)=saved_V(i).Value(velocity_time-subtract_time);
-    if(test_number==22) V(2)=TV();
+    if(test_number==22) V(1)=TV();
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -1148,7 +1148,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
     if((test_number==10 || test_number==11 || test_number==12 || test_number==13) && time>sim_switch_time){
         for(int i=0;i<num_controlled_particles;i++) X(i)=saved_X(i).Value(time-subtract_time);}
     if(asynchronous_evolution) asynchronous_evolution->Set_External_Positions(X,time);
-    if(test_number==22) X(2)=TV(-restlength_analytic,0,0);
+    if(test_number==22) X(1)=TV(-restlength_analytic,0,0);
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -1180,23 +1180,23 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
             V(Particle_Index_From_Coordinates(i,j,m)).z=0;V(Particle_Index_From_Coordinates(i,j,m)).x=0;}}
     else if(test_number==9){
         int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(1,j,m))=TV();
-        for(int j=1;j<=n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(m,j,m))=TV();}
+        for(int j=0;j<n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(1,j,m))=TV();
+        for(int j=0;j<n;j+=test_9_skipped_particles_number) V(Particle_Index_From_Coordinates(m,j,m))=TV();}
     else if((test_number==10 || test_number==11 || test_number==12 || test_number==13) && velocity_time>sim_switch_time){
         for(int i=0;i<num_controlled_particles;i++) V(i)=TV();}
-    if(test_number==22) V(2)=TV();
+    if(test_number==22) V(1)=TV();
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(test_number==3 && id==int(2)){
+    if(test_number==3 && id==int(1)){
         if(time<2) frame.t=TV(0,0,(T).5);
         else if(time<(T)3.5) frame.t=TV((time-2),(T).5*(time-2),(T).5);
         else if(time<4) frame.t=TV((T)1.5,(T)((T).75-(T)1.5*(time-(T)3.5)),(T).5);
         else frame.t=TV((T)(1.5-1.5*(time-4)),0,(T).5);}
-    else if((test_number==7) && id==int(2)){
+    else if((test_number==7) && id==int(1)){
         frame.t=TV(0,(T).30,0);
         if(time>(T).75) frame.r=ROTATION<TV>::From_Rotation_Vector(time*TV(0,(T)-pi/4,0));}
 }
@@ -1205,12 +1205,12 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 //#####################################################################
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(test_number==3 && id==int(2)){
+    if(test_number==3 && id==int(1)){
         if(time<2) twist.linear=TV();
         else if(time<(T)3.5) twist.linear=TV(1,(T).5,0);
         else if(time<4) twist.linear=TV(0,(T)-1.5,0);
         else twist.linear=TV(-1.5,0,0);}
-    else if((test_number==7) && id==int(2)){if(time>(T).75){twist.angular=TV(0,(T)-pi/4,0);}}
+    else if((test_number==7) && id==int(1)){if(time>(T).75){twist.angular=TV(0,(T)-pi/4,0);}}
     else return false;
     return true;
 }
@@ -1329,16 +1329,16 @@ void Expand_One_Ring_Particles(const ARRAY<VECTOR<int,2> >& elements,const HASHT
     VECTOR<int,2> edge;
     for(int i=0;i<elements.m;i++){
         edge=elements(i);
-        const int *front_index_1=frontier_particles.Get_Pointer(edge(1));
-        const int *front_index_2=frontier_particles.Get_Pointer(edge(2));
+        const int *front_index_1=frontier_particles.Get_Pointer(edge(0));
+        const int *front_index_2=frontier_particles.Get_Pointer(edge(1));
         if(front_index_1 && !front_index_2){
-            const int *mapped_index_2=all_old_particles.Get_Pointer(edge(2));
+            const int *mapped_index_2=all_old_particles.Get_Pointer(edge(1));
             if(!mapped_index_2)
-                new_particles.Set(edge(2),edge(2));}
+                new_particles.Set(edge(1),edge(1));}
         else if(!front_index_1 && front_index_2){
-            const int *mapped_index_1=all_old_particles.Get_Pointer(edge(1));
+            const int *mapped_index_1=all_old_particles.Get_Pointer(edge(0));
             if(!mapped_index_1)
-                new_particles.Set(edge(1),edge(1));}}
+                new_particles.Set(edge(0),edge(0));}}
 }
 //#####################################################################
 // Function Expand_N_Rings
@@ -1396,10 +1396,10 @@ void Asynchronous_Sphere()
                     PARTICLES<TV>& particles=deformable_body_collection.particles;
                     T top=-FLT_MAX,bottom=FLT_MAX;
                     for(int i=0;i<flattened.Size();i++){int p=flattened(i);
-                        if(particles.X(p)(2)>top) top=particles.X(p)(2);
-                        if(particles.X(p)(2)<bottom) bottom=particles.X(p)(2);}
+                        if(particles.X(p)(1)>top) top=particles.X(p)(1);
+                        if(particles.X(p)(1)<bottom) bottom=particles.X(p)(1);}
                     for(int i=0;i<flattened.Size();i++){int p=flattened(i);
-                        if(particles.X(p)(2)<=(top-bottom)*coverage_percent+bottom)
+                        if(particles.X(p)(1)<=(top-bottom)*coverage_percent+bottom)
                             particle_map.Set(p,p);}
                     HASHTABLE<int,int> frontier_particle_map=particle_map;
                     Expand_N_Rings(number_of_rings-1,volume->mesh.segment_mesh->elements,particle_map,frontier_particle_map);}
@@ -1412,13 +1412,13 @@ void Asynchronous_Sphere()
             case 2: //left
                 for(int i=0;i<all_particles.Size();i++) center+=deformable_body_collection.particles.X(all_particles(i));
                 center/=(T)all_particles.m;
-                for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(1)<center(1))
+                for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(0)<center(0))
                     particle_map.Set(i,i);
                 break;
             case 3: //top
                 for(int i=0;i<all_particles.m;i++) center+=deformable_body_collection.particles.X(all_particles(i));
                 center/=(T)all_particles.m;
-                for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(2)<center(2))
+                for(int i=0;i<all_particles.m;i++) if(deformable_body_collection.particles.X(all_particles(i))(1)<center(1))
                     particle_map.Set(i,i);
                 break;
             default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized config type %d",type_of_asynchronous_configuration));}
@@ -1742,7 +1742,7 @@ void Spring_Test()
         else particles.X(p)=TV((i-2)*restlength_analytic,0,0);
         particles.mass(p)=mass_analytic;
         particles.V(p)=TV(0,0,orthogonal_velocity);}
-    int_lists[0].Append(0);int_lists[0].Append(1);int_lists[1].Append(2);
+    int_lists[0].Append(0);int_lists[0].Append(0);int_lists[1].Append(2);
 
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
 
@@ -1762,8 +1762,8 @@ void Spring_Test()
     asynchronous_evolution->Add_Coarsescale_Force(force,ARRAY<int>(segmented_curve->mesh.elements.Flattened()),empty_list,coarse_fully_implicit,true);
     //asynchronous_evolution->Add_Finescale_Force(force,ARRAY<int>(segmented_curve->mesh.elements.Flattened()),empty_list,fine_fully_implicit);
 
-    particles.X(1)-=TV(initial_displacement_analytic,0,0);
-    particles.X(3)+=TV(initial_displacement_analytic,0,0);
+    particles.X(0)-=TV(initial_displacement_analytic,0,0);
+    particles.X(2)+=TV(initial_displacement_analytic,0,0);
 
     if(parameter==2 || parameter==3){
         asynchronous_evolution->Add_Finescale_Force(new DEFORMABLE_GRAVITY<TV>(particles,&int_lists[0]),int_lists[0],empty_list,fine_fully_implicit);
@@ -1845,8 +1845,8 @@ void One_Spring_Test()
             force=Create_Edge_Springs(particles,segmented_curve->mesh,stiffness_analytic,damping_analytic);
             asynchronous_evolution->Add_Finescale_Force(force,ARRAY<int>(segmented_curve->mesh.elements.Flattened()),empty_list,false);}}
 
-    particles.X(1)=TV(initial_displacement_analytic,0,0);
-    particles.V(1)=TV(initial_velocity_analytic,0,0);
+    particles.X(0)=TV(initial_displacement_analytic,0,0);
+    particles.V(0)=TV(initial_velocity_analytic,0,0);
 }
 //#####################################################################
 // Function Analytic_Solution_BE
@@ -2229,18 +2229,18 @@ void Initialize_Sphere_Analytic_Test()
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     if(asynchronous_evolution->both_forces_particles_indices.m){
-        mixed_particle_index=asynchronous_evolution->both_forces_particles_indices(1);
+        mixed_particle_index=asynchronous_evolution->both_forces_particles_indices(0);
         initial_X_mixed_particle=particles.X(mixed_particle_index);}
     else mixed_particle_index=-1;
     ARRAY<int> implicit_particle_indices;
     asynchronous_evolution->finescale_forces_particles_map.Get_Complementary_Keys(IDENTITY_ARRAY<int>(particles.array_collection->Size()),implicit_particle_indices);
     if(implicit_particle_indices.m){
-        implicit_particle_index=implicit_particle_indices(1);
+        implicit_particle_index=implicit_particle_indices(0);
         initial_X_implicit_particle=particles.X(implicit_particle_index);}
     else implicit_particle_index=-1;
     ARRAY<int> finescale_particle_indices;asynchronous_evolution->finescale_forces_particles_map.Get_Keys(finescale_particle_indices);
     if(finescale_particle_indices.m){
-        finescale_particle_index=finescale_particle_indices(1);
+        finescale_particle_index=finescale_particle_indices(0);
         initial_X_finescale_particle=particles.X(finescale_particle_index);}
     else finescale_particle_index=-1;
     LOG::cout<<"finescale_particle_index="<<finescale_particle_index<<",mixed_particle_index="<<mixed_particle_index<<",implicit_particle_index="<<implicit_particle_index<<std::endl;
@@ -2371,7 +2371,7 @@ void Asynchronous_Projected_Sphere()
             curve_temp->Update_Number_Nodes();
             T shortest=FLT_MAX;
             for(int i=0;i<curve_temp->mesh.elements.m;i++){VECTOR<int,2> e=curve_temp->mesh.elements(i);
-                T length=(deformable_body_collection.particles.X(e(2))-deformable_body_collection.particles.X(e(1))).Magnitude();
+                T length=(deformable_body_collection.particles.X(e(1))-deformable_body_collection.particles.X(e(0))).Magnitude();
                 if(length<shortest) shortest=length;}
             T largest=0;int largest_index=-1;
             for(int i=0;i<volume->mesh.elements.m;i++){
@@ -2412,19 +2412,19 @@ void Asynchronous_Projected_Sphere()
                 PARTICLES<TV>& particles=deformable_body_collection.particles;
                 T top=-FLT_MAX,bottom=FLT_MAX;
                 for(int i=0;i<particles.array_collection->Size();i++){int p=i;
-                    if(particles.X(p)(2)>top) top=particles.X(p)(2);
-                    if(particles.X(p)(2)<bottom) bottom=particles.X(p)(2);}
+                    if(particles.X(p)(1)>top) top=particles.X(p)(1);
+                    if(particles.X(p)(1)<bottom) bottom=particles.X(p)(1);}
                 for(int i=0;i<particles.array_collection->Size();i++){int p=i;
-                    if(particles.X(p)(2)<=(top-bottom)*coverage_percent+bottom)
+                    if(particles.X(p)(1)<=(top-bottom)*coverage_percent+bottom)
                         particle_map.Set(p,p);}}
             else if(treat_left_async){
                 PARTICLES<TV>& particles=deformable_body_collection.particles;
                 T right=-FLT_MAX,left=FLT_MAX;
                 for(int i=0;i<particles.array_collection->Size();i++){int p=i;
-                    if(particles.X(p)(1)>right) right=particles.X(p)(1);
-                    if(particles.X(p)(1)<left) left=particles.X(p)(1);}
+                    if(particles.X(p)(0)>right) right=particles.X(p)(0);
+                    if(particles.X(p)(0)<left) left=particles.X(p)(0);}
                 for(int i=0;i<particles.array_collection->Size();i++){int p=i;
-                    if(particles.X(p)(1)<=(right-left)*coverage_percent+left)
+                    if(particles.X(p)(0)<=(right-left)*coverage_percent+left)
                         particle_map.Set(p,p);}}
             else{
                 TRIANGULATED_SURFACE<T>& surface=volume->Get_Boundary_Object();
