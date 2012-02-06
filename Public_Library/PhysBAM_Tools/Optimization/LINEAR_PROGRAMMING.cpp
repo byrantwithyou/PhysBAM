@@ -194,8 +194,8 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
             if(x_min(permute_B(i)).x) x_B(i)=max(x_B(i),x_min(permute_B(i)).y);
             if(x_max(permute_B(i)).x) x_B(i)=min(x_B(i),x_max(permute_B(i)).y);}}
 
-    VECTOR_ND<int> permute(B.n+N.n);permute.Set_Subvector(1,permute_B);permute.Set_Subvector(B.n+1,permute_N);
-    VECTOR_ND<T> x(B.n+N.n);x.Set_Subvector(1,x_B);x.Set_Subvector(B.n+1,x_N);
+    VECTOR_ND<int> permute(B.n+N.n);permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_N);
+    VECTOR_ND<T> x(B.n+N.n);x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_N);
     x_unpermuted=x.Unpermute(permute);
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
