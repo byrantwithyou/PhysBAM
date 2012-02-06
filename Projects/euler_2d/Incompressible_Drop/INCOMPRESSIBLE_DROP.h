@@ -136,8 +136,8 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     if(test_number==1){
         for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
-            if(iterator.Axis()==1) fluid_collection.incompressible_fluid_collection.face_velocities.Component(1)(iterator.Face_Index())=(T)100;
-            else fluid_collection.incompressible_fluid_collection.face_velocities.Component(2)(iterator.Face_Index())=(T)0;
+            if(iterator.Axis()==1) fluid_collection.incompressible_fluid_collection.face_velocities.Component(0)(iterator.Face_Index())=(T)100;
+            else fluid_collection.incompressible_fluid_collection.face_velocities.Component(1)(iterator.Face_Index())=(T)0;
         for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             fluids_parameters.incompressible->projection.p(iterator.Cell_Index())=(T)100000.;}
     else if(test_number==2){
@@ -175,13 +175,13 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             T rho=(T)1.226,u_vel=(T)0.,v_vel=(T)0.,p=(T)100000.;
-            U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
+            U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
     else if(test_number==2)
         for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
             VECTOR<int,2> cell_index=iterator.Cell_Index();
             T rho=(T)0.,u_vel=(T)0.,v_vel=(T)0.,p=(T)0.;
             if(iterator.Location().x<(T)-.4){rho=(T)2.124;p=(T)148407.3;} else{rho=(T)1.58317;p=(T)98066.5;}
-            U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
+            U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
 }
 //#####################################################################
 };

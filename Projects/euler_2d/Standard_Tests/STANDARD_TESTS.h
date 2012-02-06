@@ -221,14 +221,14 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
     if(test_number==1 || test_number==3 || test_number==4){
-        TV far_field_velocity_left=TV(state_left(2),state_left(3)),far_field_velocity_right=TV(state_right(2),state_right(3));
+        TV far_field_velocity_left=TV(state_left(1),state_left(2)),far_field_velocity_right=TV(state_right(1),state_right(2));
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_left(1),state_right(1),state_left(1),state_right(1)),T_FACE_VECTOR(state_left(4),state_right(4),state_left(4),state_right(4)),
+            T_FACE_VECTOR(state_left(0),state_right(0),state_left(0),state_right(0)),T_FACE_VECTOR(state_left(3),state_right(3),state_left(3),state_right(3)),
             TV_FACE_VECTOR(far_field_velocity_left,far_field_velocity_right,far_field_velocity_left,far_field_velocity_right),(T)1,valid_wall);}
     else if(test_number==2){
-        TV far_field_velocity_left=TV(state_left(2),state_left(3)),far_field_velocity_right=TV(state_right(2),state_right(3));
+        TV far_field_velocity_left=TV(state_left(1),state_left(2)),far_field_velocity_right=TV(state_right(1),state_right(2));
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_left(1),state_right(1),state_left(1),state_right(1)),T_FACE_VECTOR(state_left(4),state_right(4),state_left(4),state_right(4)),
+            T_FACE_VECTOR(state_left(0),state_right(0),state_left(0),state_right(0)),T_FACE_VECTOR(state_left(3),state_right(3),state_left(3),state_right(3)),
             TV_FACE_VECTOR(far_field_velocity_left,far_field_velocity_right,far_field_velocity_left,far_field_velocity_right),(T).5,valid_wall);}
 }
 //#####################################################################
@@ -244,15 +244,15 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,p;
         if(test_number==1 || test_number==3 || test_number==4){
-            if(grid.X(cell_index).x<=(T).08){rho=state_left(1);u_vel=state_left(2);v_vel=state_left(3);p=state_left(4);}
-            else{rho=state_right(1);u_vel=state_right(2);v_vel=state_right(3);p=state_right(4);}}
+            if(grid.X(cell_index).x<=(T).08){rho=state_left(0);u_vel=state_left(1);v_vel=state_left(2);p=state_left(3);}
+            else{rho=state_right(0);u_vel=state_right(1);v_vel=state_right(2);p=state_right(3);}}
         else if(test_number==2){
-            if(grid.X(cell_index).x<=(T).05){rho=state_left(1);u_vel=state_left(2);v_vel=state_left(3);p=state_left(4);}
-            else{rho=state_right(1);u_vel=state_right(2);v_vel=state_right(3);p=state_right(4);}}
+            if(grid.X(cell_index).x<=(T).05){rho=state_left(0);u_vel=state_left(1);v_vel=state_left(2);p=state_left(3);}
+            else{rho=state_right(0);u_vel=state_right(1);v_vel=state_right(2);p=state_right(3);}}
         else{rho=(T)1.4;u_vel=(T)0;v_vel=(T)0;p=(T)1;}
 
-        U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;
-        U(cell_index)(4)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));}
+        U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;
+        U(cell_index)(3)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));}
 }
 //#####################################################################
 // Function Intialize_Bodies
@@ -312,10 +312,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create(particles);
 
         particles.array_collection->Add_Elements(8);
-        particles.X(1)=TV((T)0     ,(T)-.05);particles.X(2)=TV((T).006 ,(T)-.025);
-        particles.X(3)=TV((T).0125 ,(T)0);   particles.X(4)=TV((T).006 ,(T).025);  
-        particles.X(5)=TV((T)0     ,(T).05); particles.X(6)=TV((T)-.006,(T).025);  
-        particles.X(7)=TV((T)-.0125,(T)0);   particles.X(8)=TV((T)-.006,(T)-.025);
+        particles.X(0)=TV((T)0     ,(T)-.05);particles.X(1)=TV((T).006 ,(T)-.025);
+        particles.X(2)=TV((T).0125 ,(T)0);   particles.X(3)=TV((T).006 ,(T).025);  
+        particles.X(4)=TV((T)0     ,(T).05); particles.X(5)=TV((T)-.006,(T).025);  
+        particles.X(6)=TV((T)-.0125,(T)0);   particles.X(7)=TV((T)-.006,(T)-.025);
 
         curve->mesh.number_nodes=particles.array_collection->Size();curve->mesh.elements.Preallocate(particles.array_collection->Size());
         for(int i=1;i<particles.array_collection->Size();++i) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
@@ -356,10 +356,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         std::ofstream gnuplot_surface_stream;
         gnuplot_surface_stream.open(gnuplot_file.c_str());
         boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
-        ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(1);
+        ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(0);
         for(int i=0;i<segmented_curve.m;i++){
-            LOG::cout<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;
-            gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;}
+            LOG::cout<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;
+            gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;}
         gnuplot_surface_stream.flush();
         gnuplot_surface_stream.close();}
 }
@@ -421,10 +421,10 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     gnuplot_surface_stream.open(gnuplot_file.c_str());
 
     boundary->mesh.Initialize_Ordered_Loop_Nodes();assert(boundary->mesh.ordered_loop_nodes->m==1);
-    ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(1);
+    ARRAY<int>& segmented_curve=(*boundary->mesh.ordered_loop_nodes)(0);
     for(int i=0;i<segmented_curve.m;i++){
-        LOG::cout<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;
-        gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(1)<<"\t"<<boundary->particles.X(segmented_curve(i))(2)<<std::endl;}
+        LOG::cout<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;
+        gnuplot_surface_stream<<boundary->particles.X(segmented_curve(i))(0)<<"\t"<<boundary->particles.X(segmented_curve(i))(1)<<std::endl;}
 
     gnuplot_surface_stream.flush();
     gnuplot_surface_stream.close();

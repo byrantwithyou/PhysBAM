@@ -514,8 +514,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(incompressible){
          // Set ambient density and temperature
          EOS<T>& eos=*fluids_parameters.compressible_eos;
-         T rho_outside=state_outside(1);
-         T p_outside=state_outside(5);
+         T rho_outside=state_outside(0);
+         T p_outside=state_outside(4);
          T e_outside=eos.e_From_p_And_rho(p_outside,rho_outside);
          T temperature_outside=eos.T(rho_outside,e_outside);
          fluids_parameters.ambient_density=rho_outside;
@@ -531,7 +531,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             smoke_source.radius=(T)1;
             smoke_source.Set_Endpoints(TV((T)0,grid.Domain().min_corner.y,0),TV((T)0,grid.Domain().min_corner.y+smoke_source.radius,0));
 
-            source_density_value=(T)state_outside(1)*.01;
+            source_density_value=(T)state_outside(0)*.01;
             source_temperature_value=(T)1000;
             source_velocity_value=TV(0,0,0);}}
     if(use_soot_sourcing){
@@ -542,7 +542,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             source_soot_value=(T)1;
             soot_source.radius=T(.05);
             VECTOR<T,3> endpoint1=VECTOR<T,3>::Constant_Vector(0.25),endpoint2=VECTOR<T,3>::Constant_Vector(0.25);
-            endpoint1(2)=T(0);endpoint2(2)=T(0.05);
+            endpoint1(1)=T(0);endpoint2(1)=T(0.05);
             soot_source.Set_Endpoints(endpoint1,endpoint2);}}
 
     // output directory
@@ -579,17 +579,17 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
-    TV far_field_velocity=TV(state_outside(2),state_outside(3),state_outside(4));
+    TV far_field_velocity=TV(state_outside(1),state_outside(2),state_outside(3));
     if(use_fixed_farfield_boundary){
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1)),
-            T_FACE_VECTOR(state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5)),
+            T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
+            T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,valid_wall,true,T_FACE_VECTOR(1,1,1,1,1,1),T_FACE_VECTOR_BOOL(true,true,true,true,true,true));}
     else{
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1)),
-            T_FACE_VECTOR(state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5)),
+            T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
+            T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,valid_wall);}
 }
@@ -619,11 +619,11 @@ void Initialize_Euler_State()
         TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,w_vel,p;
         if(Inside_Shock(grid.X(cell_index))){
-            rho=state_inside(1);u_vel=state_inside(2);v_vel=state_inside(3);w_vel=state_inside(4);p=state_inside(5);}
-        else{rho=state_outside(1);u_vel=state_outside(2);v_vel=state_outside(3);w_vel=state_outside(4);p=state_outside(5);}
+            rho=state_inside(0);u_vel=state_inside(1);v_vel=state_inside(2);w_vel=state_inside(3);p=state_inside(4);}
+        else{rho=state_outside(0);u_vel=state_outside(1);v_vel=state_outside(2);w_vel=state_outside(3);p=state_outside(4);}
 
-        U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*w_vel;
-        U(cell_index)(5)=rho*(eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel)+sqr(w_vel))/(T)2.);}
+        U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*w_vel;
+        U(cell_index)(4)=rho*(eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel)+sqr(w_vel))/(T)2.);}
 
     if(read_soot_from_file) Read_Soot_Velocities(); // read in velocities in soot domain
 }
@@ -649,7 +649,7 @@ void Read_Soot_Velocities()
             T velocity;
             for(int axis=0;axis<T_GRID::dimension;axis++){
                 velocity=soot_interpolation.Clamped_To_Array_Face_Component(axis,soot_grid,FACE_LOOKUP_UNIFORM<T_GRID>(soot_mac_velocities),location);
-                U(cell_index)(axis+1)=U(cell_index)(1)*velocity;}}}
+                U(cell_index)(axis+1)=U(cell_index)(0)*velocity;}}}
 }
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
@@ -666,13 +666,13 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
             TV_INT cell_index=iterator.Cell_Index();
             T rho,temperature,p,e;
             if(Inside_Shock(grid.X(cell_index))){
-                rho=state_inside(1);
-                p=state_inside(5);
+                rho=state_inside(0);
+                p=state_inside(4);
                 e=eos.e_From_p_And_rho(p,rho);
                 temperature=eos.T(rho,e);}
             else{
-                rho=state_outside(1);
-                p=state_outside(5);
+                rho=state_outside(0);
+                p=state_outside(4);
                 e=eos.e_From_p_And_rho(p,rho);
                 temperature=eos.T(rho,e);}
             fluids_parameters.density_container.density(cell_index)=rho;

@@ -79,8 +79,8 @@ bool Test()
     if((!aa != !bb) || fabs((aa-bb)/bb)>1e-5) if(tmp_cases==trap_cases){printf("ZG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
 
     MATRIX<T,8> M1,M2;
-    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
-    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M1(i,j)=H1(i/2)(j/2)(i%2,j%2);
+    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M2(i,j)=H2(i/2)(j/2)(i%2,j%2);
 
     VECTOR<T,8> dG1=(M1+M2)/(T)2*Va;
     VECTOR<T,8> dG2=V2-V1;
@@ -135,8 +135,8 @@ bool Tri_Test()
     if((fabs(aa)>1e-5 || fabs(bb)>1e-5) && fabs((aa-bb)/bb)>1e-5){printf("TG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
 
     MATRIX<T,12> M1,M2;
-    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M1(i,j)=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
-    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M2(i,j)=H2((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M1(i,j)=H1(i/2)(j/2)(i%2,j%2);
+    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M2(i,j)=H2(i/2)(j/2)(i%2,j%2);
 
     VECTOR<T,12> dG1=(M1+M2)/(T)2*Va/e;
     VECTOR<T,12> dG2=(V2-V1)/e;
@@ -316,7 +316,7 @@ void Case_Test()
     VECTOR<T,8> V;
     for(int i=0;i<12;i++) V(ii[i])=V12(i);
     MATRIX<T,8> M;
-    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M(ii[i],ii[j])=H1((i+1)/2)((j+1)/2)((i+1)%2+1,(j+1)%2+1);
+    for(int i=0;i<12;i++) for(int j=0;j<12;j++) M(ii[i],ii[j])=H1(i/2)(j/2)(i%2,j%2);
     VECTOR<T,8>& W=(VECTOR<T,8>&)data.G;
     MATRIX<T,8> N;for(int i=0;i<4;i++) for(int j=0;j<4;j++) N.Set_Submatrix(2*i+1,2*j+1,data.H[i][j]);
 

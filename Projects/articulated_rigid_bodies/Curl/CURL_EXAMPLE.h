@@ -432,7 +432,7 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
         joint=0;
     }
 
-    for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(i);
         if(rigid_body_collection.rigid_body_particle.kinematic(i)){FRAME<TV> frame;Set_Kinematic_Positions(frame,0,i);rigid_body.Set_Frame(frame);}}
 

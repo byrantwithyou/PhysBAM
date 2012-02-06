@@ -121,7 +121,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             STRING_UTILITIES::Parse_Integer_List(range,integer_list);
             id_list.Resize(integer_list.Size());
             for(int i=0;i<integer_list.m;i++) id_list(i)=int(integer_list(i));}
-        else if(type=="Rigid_Body_List") for(int i(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)) id_list.Append(i);
+        else if(type=="Rigid_Body_List") for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)) id_list.Append(i);
         else PHYSBAM_FATAL_ERROR("A Range is Required for a Rigid_Body_Instance.");
 
         if(type=="Rigid_Body_List" && parents.m){
@@ -242,7 +242,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 LOG::cout<<"object "<<i<<": free particles "<<free_particles_list;
                 int free_particle=free_particles->nodes(free_particles_list(1));
                 TV point=deformable_body_collection.particles.X(free_particle);
-                free_particles_object->transform.Add_To_Submatrix(1,4,point);
+                free_particles_object->transform.Add_To_Submatrix(0,3,point);
                 free_particles_object->inverse_transform=free_particles_object->transform.Inverse();}
             else{LOG::cout<<"Weird object "<<i<<std::endl;PHYSBAM_FATAL_ERROR();}
             if(!object) object=surface;

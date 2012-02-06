@@ -1192,11 +1192,11 @@ void Get_Initial_Data()
                 TETRAHEDRALIZED_VOLUME<T>* volume=TETRAHEDRALIZED_VOLUME<T>::Create();
                 RANGE<TV> grid_domain;
                 T thickness=(T).3;int x_edge=25;
-                for(int i(1);i<=particle_indices.m;i++) grid_domain.Enlarge_To_Include_Point(particles.X(particle_indices(i)));
+                for(int i=0;i<particle_indices.m;i++) grid_domain.Enlarge_To_Include_Point(particles.X(particle_indices(i)));
                 GRID<TV> new_grid((T).02,grid_domain.Thickened(2*thickness));
                 ARRAY<T,VECTOR<int,3> > new_phi(new_grid.Domain_Indices());new_phi.Fill(1e10);
                 for(CELL_ITERATOR iterator(new_grid);iterator.Valid();iterator.Next()){const VECTOR<int,3> &cell_index=iterator.Cell_Index();
-                    for(int i(1);i<=particle_indices.m;i++) new_phi(cell_index)=min(new_phi(cell_index),(iterator.Location()-deformable_body_collection.deformable_geometry.particles.X(particle_indices(i))).Magnitude()-thickness);}
+                    for(int i=0;i<particle_indices.m;i++) new_phi(cell_index)=min(new_phi(cell_index),(iterator.Location()-deformable_body_collection.deformable_geometry.particles.X(particle_indices(i))).Magnitude()-thickness);}
                 LEVELSET_IMPLICIT_OBJECT<TV> implicit(new_grid,new_phi);
                 TV edges=new_grid.Domain().Edge_Lengths();
                 TV edge_cells_float=TV((T)x_edge,(T)x_edge*edges.y/edges.x,(T)x_edge*edges.z/edges.x);

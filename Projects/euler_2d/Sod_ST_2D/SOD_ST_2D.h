@@ -157,7 +157,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
     EOS_GAMMA<T> *tmp_eos=dynamic_cast<EOS_GAMMA<T>*>(fluids_parameters.euler->eos);
     T rho=(T).125,p=(T).1,u_vel=(T)0.,v_vel=(T)0.;
-    solid_state(1)=rho;solid_state(2)=rho*u_vel;solid_state(3)=rho*v_vel;solid_state(4)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);
+    solid_state(0)=rho;solid_state(1)=rho*u_vel;solid_state(2)=rho*v_vel;solid_state(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);
 }
 //#####################################################################
 // Function Intialize_Euler_State
@@ -173,12 +173,12 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         TV_INT cell_index=iterator.Cell_Index();
         T rho=(T)0.,u_vel=(T)0.,v_vel=(T)0.,p=(T)0.;
         if(test_number==1 || test_number==3){
-            if(grid.X(cell_index)(1)<0){rho=(T)1.;p=(T)1.;}
+            if(grid.X(cell_index)(0)<0){rho=(T)1.;p=(T)1.;}
             else{rho=(T).125;p=(T).1;}}
         else if(test_number==2){
-            if(grid.X(cell_index)(2)<0){rho=(T)1.;p=(T)1.;}
+            if(grid.X(cell_index)(1)<0){rho=(T)1.;p=(T)1.;}
             else{rho=(T).125;p=(T).1;}}
-        U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
+        U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
 }
 //#####################################################################
 };

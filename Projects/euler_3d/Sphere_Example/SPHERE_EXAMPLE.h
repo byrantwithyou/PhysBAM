@@ -218,17 +218,17 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
 
-    TV far_field_velocity=TV(state_outside(2),state_outside(3),state_outside(4));
+    TV far_field_velocity=TV(state_outside(1),state_outside(2),state_outside(3));
     if(use_fixed_farfield_boundary){
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1)),
-            T_FACE_VECTOR(state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5)),
+            T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
+            T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,valid_wall,true,T_FACE_VECTOR(1,1,1,1,1,1),T_FACE_VECTOR_BOOL(true,true,true,true,true,true));}
     else{
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1),state_outside(1)),
-            T_FACE_VECTOR(state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5),state_outside(5)),
+            T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
+            T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,valid_wall);}
 }
@@ -247,11 +247,11 @@ void Initialize_Euler_State()
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,w_vel,p;
-        if(grid.X(cell_index).Magnitude()<shock_radius){rho=state_inside(1);u_vel=state_inside(2);v_vel=state_inside(3);w_vel=state_inside(4);p=state_inside(5);}
-        else{rho=state_outside(1);u_vel=state_outside(2);v_vel=state_outside(3);w_vel=state_outside(4);p=state_outside(5);}
+        if(grid.X(cell_index).Magnitude()<shock_radius){rho=state_inside(0);u_vel=state_inside(1);v_vel=state_inside(2);w_vel=state_inside(3);p=state_inside(4);}
+        else{rho=state_outside(0);u_vel=state_outside(1);v_vel=state_outside(2);w_vel=state_outside(3);p=state_outside(4);}
 
-        U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*w_vel;
-        U(cell_index)(5)=rho*(eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel)+sqr(w_vel))/(T)2.);}
+        U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*w_vel;
+        U(cell_index)(4)=rho*(eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel)+sqr(w_vel))/(T)2.);}
 }
 //#####################################################################
 // Function Intialize_Bodies

@@ -167,8 +167,8 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         T rho=(T)0.,u_vel=(T)0.,v_vel=(T)0.,w_vel=(T)0.,p=(T)0.;
         if(grid.X(cell_index).x<=-1.5){rho=(T)2.124;p=(T)1.5;}
         else{rho=(T)1.58317;p=(T).5;}
-        U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*w_vel;
-        U(cell_index)(5)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel)+sqr(w_vel))/(T)2.);}
+        U(cell_index)(0)=rho;U(cell_index)(0)=rho*u_vel;U(cell_index)(1)=rho*v_vel;U(cell_index)(2)=rho*w_vel;
+        U(cell_index)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel)+sqr(w_vel))/(T)2.);}
 }
 //#####################################################################
 };

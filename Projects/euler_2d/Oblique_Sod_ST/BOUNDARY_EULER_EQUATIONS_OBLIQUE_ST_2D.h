@@ -66,25 +66,25 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
     if (left_constant_extrapolation) for(j=0;j<n;j++) u_ghost(-2,j)=u_ghost(-1,j)=u_ghost(0,j)=u_ghost(1,j);
     else
         for(j=0;j<n;j++) for(i=-2;i<=0;i++){ // left
-            T rho=u_ghost(2-i,j)(1);
-            T u_velocity=-u_ghost(2-i,j)(2)/u_ghost(2-i,j)(1);
-            T v_velocity=u_ghost(2-i,j)(3)/u_ghost(2-i,j)(1);
-            T e=u_ghost(2-i,j)(4)/u_ghost(2-i,j)(1)-(sqr(-u_velocity)+sqr(v_velocity))/2;
-            u_ghost(i,j)(1)=rho;
-            u_ghost(i,j)(2)=rho*u_velocity;
-            u_ghost(i,j)(3)=rho*v_velocity;
-            u_ghost(i,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+            T rho=u_ghost(2-i,j)(0);
+            T u_velocity=-u_ghost(2-i,j)(1)/u_ghost(2-i,j)(0);
+            T v_velocity=u_ghost(2-i,j)(2)/u_ghost(2-i,j)(0);
+            T e=u_ghost(2-i,j)(3)/u_ghost(2-i,j)(0)-(sqr(-u_velocity)+sqr(v_velocity))/2;
+            u_ghost(i,j)(0)=rho;
+            u_ghost(i,j)(1)=rho*u_velocity;
+            u_ghost(i,j)(2)=rho*v_velocity;
+            u_ghost(i,j)(3)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
     if (right_constant_extrapolation) for(j=0;j<n;j++) u_ghost(m+3,j)=u_ghost(m+2,j)=u_ghost(m+1,j)=u_ghost(m,j);
     else
         for(j=0;j<n;j++) for(i=m+1;i<=m+3;i++){ // right
-            T rho=u_ghost(2*m-i,j)(1);
-            T u_velocity=-u_ghost(2*m-i,j)(2)/u_ghost(2*m-i,j)(1);
-            T v_velocity=u_ghost(2*m-i,j)(3)/u_ghost(2*m-i,j)(1);
-            T e=u_ghost(2*m-i,j)(4)/u_ghost(2*m-i,j)(1)-(sqr(-u_velocity)+sqr(v_velocity))/2;
-            u_ghost(i,j)(1)=rho;
-            u_ghost(i,j)(2)=rho*u_velocity;
-            u_ghost(i,j)(3)=rho*v_velocity;
-            u_ghost(i,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+            T rho=u_ghost(2*m-i,j)(0);
+            T u_velocity=-u_ghost(2*m-i,j)(1)/u_ghost(2*m-i,j)(0);
+            T v_velocity=u_ghost(2*m-i,j)(2)/u_ghost(2*m-i,j)(0);
+            T e=u_ghost(2*m-i,j)(3)/u_ghost(2*m-i,j)(0)-(sqr(-u_velocity)+sqr(v_velocity))/2;
+            u_ghost(i,j)(0)=rho;
+            u_ghost(i,j)(1)=rho*u_velocity;
+            u_ghost(i,j)(2)=rho*v_velocity;
+            u_ghost(i,j)(3)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     int shift_index = (shift != 0) ? (n-1)/shift : 0; //always n-1 grids pts separating two points . . . 
     for(i=0;i<m;i++) {
@@ -107,28 +107,28 @@ Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time)
     if (!left_constant_extrapolation) 
         for(j=0;j<n;j++){
             // left wall
-            T rho=u(1,j)(1);
-            T u_velocity=u(1,j)(2)/u(1,j)(1);
-            T v_velocity=u(1,j)(3)/u(1,j)(1);
-            T e=u(1,j)(4)/u(1,j)(1)-(sqr(u_velocity)+sqr(v_velocity))/2;
+            T rho=u(1,j)(0);
+            T u_velocity=u(1,j)(1)/u(1,j)(0);
+            T v_velocity=u(1,j)(2)/u(1,j)(0);
+            T e=u(1,j)(3)/u(1,j)(0)-(sqr(u_velocity)+sqr(v_velocity))/2;
             u_velocity=0; 
-            u(1,j)(1)=rho;
-            u(1,j)(2)=rho*u_velocity;
-            u(1,j)(3)=rho*v_velocity;
-            u(1,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+            u(1,j)(0)=rho;
+            u(1,j)(1)=rho*u_velocity;
+            u(1,j)(2)=rho*v_velocity;
+            u(1,j)(3)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     if (!right_constant_extrapolation)
         for(j=0;j<n;j++){
             // right wall
-            T rho=u(m,j)(1);
-            T u_velocity=u(m,j)(2)/u(m,j)(1);
-            T v_velocity=u(m,j)(3)/u(m,j)(1);
-            T e=u(m,j)(4)/u(m,j)(1)-(sqr(u_velocity)+sqr(v_velocity))/2;
+            T rho=u(m,j)(0);
+            T u_velocity=u(m,j)(1)/u(m,j)(0);
+            T v_velocity=u(m,j)(2)/u(m,j)(0);
+            T e=u(m,j)(3)/u(m,j)(0)-(sqr(u_velocity)+sqr(v_velocity))/2;
             u_velocity=0;
-            u(m,j)(1)=rho;
-            u(m,j)(2)=rho*u_velocity;
-            u(m,j)(3)=rho*v_velocity;
-            u(m,j)(4)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
+            u(m,j)(0)=rho;
+            u(m,j)(1)=rho*u_velocity;
+            u(m,j)(2)=rho*v_velocity;
+            u(m,j)(3)=rho*(e+(sqr(u_velocity)+sqr(v_velocity))/2);}
 
     int shift_index = (shift != 0) ? (n-1)/shift : 0; //assuming square grid . . . 
     for(i=0;i<m;i++) u(i,n) = u(clamp(i-shift_index,1,m),1);

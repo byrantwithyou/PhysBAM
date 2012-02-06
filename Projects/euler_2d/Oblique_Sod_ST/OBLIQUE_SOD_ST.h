@@ -122,7 +122,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         T rho=(T)0.,u_vel=(T)0.,v_vel=(T)0.,p=(T)0.;
         T curr_x_jump_pos=initial_x_jump_pos + recip_slope*(j-1)*grid.dX.y;
         if(grid.Axis_X(i,1) < curr_x_jump_pos) {rho=(T)1.;p=(T)1.;} else {rho=(T).125;p=(T).1;}
-        U(i,j)(1)=rho;U(i,j)(2)=rho*u_vel;U(i,j)(3)=rho*v_vel;U(i,j)(4)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
+        U(i,j)(0)=rho;U(i,j)(1)=rho*u_vel;U(i,j)(2)=rho*v_vel;U(i,j)(3)=rho*(tmp_eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))/(T)2.);}
 }
 //#####################################################################
 };

@@ -815,15 +815,15 @@ Post_Stabilization_Constraint_Matrix(const JOINT_ID joint_id)
     int d=TV::dimension,s=T_SPIN::dimension;
     MATRIX_MXN<T> R_D[2];
     TV location=joint.Location(*rigid_bodies[0],*rigid_bodies[1]);
-    for(int i=0;i<=1;i++){
+    for(int i=0;i<2;i++){
         R_D[i].Resize(d+s,p+a);
-        R_D[i].Set_Submatrix(1,1,prismatic_constraints);
-        R_D[i].Set_Submatrix(d+1,1,prismatic_constraints.Cross_Product_Matrix_Times(location-rigid_bodies[i]->X()));
-        R_D[i].Set_Submatrix(d+1,p+1,angular_constraints);}
+        R_D[i].Set_Submatrix(0,0,prismatic_constraints);
+        R_D[i].Set_Submatrix(d,0,prismatic_constraints.Cross_Product_Matrix_Times(location-rigid_bodies[i]->X()));
+        R_D[i].Set_Submatrix(d,p,angular_constraints);}
 
     // constraint matrix
     MATRIX_MXN<T> constraint(2*(d+s),p+a);
-    constraint.Set_Submatrix(1,1,R_D[0]);constraint.Set_Submatrix(d+s+1,1,-R_D[1]);
+    constraint.Set_Submatrix(0,0,R_D[0]);constraint.Set_Submatrix(d+s,0,-R_D[1]);
 
     return constraint;
 }
@@ -911,7 +911,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
     for(int i=0;i<6;i++){
         LOG::cout<<"-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@"<<std::endl;
         VECTOR<T,6> j_combined;j_combined(i)=impulse_magnitude;
-        TV j,j_tau;j_combined.Get_Subvector(1,j);j_combined.Get_Subvector(4,j_tau);
+        TV j,j_tau;j_combined.Get_Subvector(0,j);j_combined.Get_Subvector(3,j_tau);
         LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
         typename LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV>::T_CONSTRAINT_ERROR f_error_result=f_error.F(j_combined);
         MATRIX<T,6> jacobian=f_error.Jacobian(j_combined);
@@ -924,7 +924,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
         LOG::cout<<"Testing component "<<i<<std::endl;
         if(TV::Dot_Product(f_angular,f_angular_2)<0){
             LOG::cout<<"Flipping sign"<<std::endl;
-            f_error_2_result.Set_Subvector(4,-f_angular_2);for(int i=4;i<=6;i++) for(int j=0;j<6;j++) jacobian_2(i,j)=-jacobian_2(i,j);}
+            f_error_2_result.Set_Subvector(3,-f_angular_2);for(int i=4;i<=6;i++) for(int j=0;j<6;j++) jacobian_2(i,j)=-jacobian_2(i,j);}
         Test_System_Prestabilization_Print(f_error_result,f_error_2_result,jacobian,jacobian_2);}
 
     LOG::cout<<"################################################################################"<<std::endl;
@@ -945,7 +945,7 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
     LOG::cout<<"Difference:\n"<<(jacobian-jacobian_2)<<std::endl;}
 
     {LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
-    VECTOR<T,6> j_combined;j_combined.Set_Subvector(1,jn);j_combined.Set_Subvector(4,j_tau);
+    VECTOR<T,6> j_combined;j_combined.Set_Subvector(0,jn);j_combined.Set_Subvector(3,j_tau);
     MATRIX<T,6> jacobian(f_error.Jacobian(j_combined)),jacobian_2;
     for(int i=0;i<6;i++){VECTOR<T,6> j;j(i)=epsilon;jacobian_2.Set_Column(i,(f_error.F(j_combined+j)-f_error.F(j_combined-j))/(2*epsilon));}
     LOG::cout<<"Computed Combined Jacobian:\n"<<jacobian<<"Approximated Combined Jacobian:\n"<<jacobian_2;

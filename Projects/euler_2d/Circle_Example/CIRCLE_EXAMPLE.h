@@ -329,8 +329,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
      if(incompressible){
          // Set ambient density and temperature
          EOS_GAMMA<T> eos_temp;
-         T rho_outside=state_outside(1);
-         T p_outside=state_outside(4);
+         T rho_outside=state_outside(0);
+         T p_outside=state_outside(3);
          T e_outside=eos_temp.e_From_p_And_rho(p_outside,rho_outside);
          T temperature_outside=eos_temp.T(rho_outside,e_outside);
          fluids_parameters.ambient_density=rho_outside;
@@ -361,17 +361,17 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         return;}
     //set custom boundary
 
-    TV far_field_velocity=TV(state_outside(2),state_outside(3));
+    TV far_field_velocity=TV(state_outside(1),state_outside(2));
     if(use_fixed_farfield_boundary){
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_outside(1),state_outside(1),state_outside(1),state_outside(1)),
-            T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
+            T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
+            T_FACE_VECTOR(state_outside(3),state_outside(3),state_outside(3),state_outside(3)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls),true,T_FACE_VECTOR(1,1,1,1),T_FACE_VECTOR_BOOL(true,true,true,true));}
     else{
         fluids_parameters.compressible_boundary=new BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>(fluids_parameters.euler,
-            T_FACE_VECTOR(state_outside(1),state_outside(1),state_outside(1),state_outside(1)),
-            T_FACE_VECTOR(state_outside(4),state_outside(4),state_outside(4),state_outside(4)),
+            T_FACE_VECTOR(state_outside(0),state_outside(0),state_outside(0),state_outside(0)),
+            T_FACE_VECTOR(state_outside(3),state_outside(3),state_outside(3),state_outside(3)),
             TV_FACE_VECTOR(far_field_velocity,far_field_velocity,far_field_velocity,far_field_velocity),
             (T).5,VECTOR_UTILITIES::Complement(fluids_parameters.domain_walls));}
 }
@@ -392,15 +392,15 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(fluids_parameters.euler->grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho,u_vel,v_vel,p;
-        if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius){rho=state_inside(1);u_vel=state_inside(2);v_vel=state_inside(3);p=state_inside(4);}
-        else{rho=state_outside(1);u_vel=state_outside(2);v_vel=state_outside(3);p=state_outside(4);}
+        if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius){rho=state_inside(0);u_vel=state_inside(1);v_vel=state_inside(2);p=state_inside(3);}
+        else{rho=state_outside(0);u_vel=state_outside(1);v_vel=state_outside(2);p=state_outside(3);}
 
-        U(cell_index)(1)=rho;U(cell_index)(2)=rho*u_vel;U(cell_index)(3)=rho*v_vel;U(cell_index)(4)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));}
+        U(cell_index)(0)=rho;U(cell_index)(1)=rho*u_vel;U(cell_index)(2)=rho*v_vel;U(cell_index)(3)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));}
 
     // initialize solid_state
     VECTOR<T,T_GRID::dimension+2>& solid_state=fluids_parameters.euler_solid_fluid_coupling_utilities->solid_state;
-    T rho=state_outside(1),p=state_outside(4),u_vel=(T)0.,v_vel=(T)0.;
-    solid_state(1)=rho;solid_state(2)=rho*u_vel;solid_state(3)=rho*v_vel;solid_state(4)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));
+    T rho=state_outside(0),p=state_outside(3),u_vel=(T)0.,v_vel=(T)0.;
+    solid_state(0)=rho;solid_state(1)=rho*u_vel;solid_state(2)=rho*v_vel;solid_state(3)=rho*(fluids_parameters.euler->eos->e_From_p_And_rho(p,rho)+(sqr(u_vel)+sqr(v_vel))*((T).5));
 }
 //#####################################################################
 // Function Adjust_Density_And_Temperature_With_Sources
@@ -415,8 +415,8 @@ void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         T rho;
-        if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius) rho=state_inside(1); 
-        else rho=state_outside(1);
+        if((grid.X(cell_index)-shock_center).Magnitude()<shock_radius) rho=state_inside(0); 
+        else rho=state_outside(0);
         fluids_parameters.density_container.density(cell_index)=rho;}
 }
 //#####################################################################
@@ -568,7 +568,7 @@ void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE
 void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==7 && time>=(T)1 && time<=(T)1.01){
-        wrench(1).linear=(T)10*TV(-1,0);}
+        wrench(0).linear=(T)10*TV(-1,0);}
 }
 //#####################################################################
 // Function Preprocess_Frame
@@ -600,13 +600,13 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     LAPLACE_UNIFORM<T_GRID>* elliptic_solver=fluids_parameters.euler->euler_projection.elliptic_solver;
     BASE::Set_Dirichlet_Boundary_Conditions(time);
-    elliptic_solver->psi_N.Component(1)(TV_INT(1,1))=false;
+    elliptic_solver->psi_N.Component(0)(TV_INT(1,1))=false;
     elliptic_solver->psi_D(TV_INT(0,1))=true;
-    //elliptic_solver->u(TV_INT(0,1))=state_outside(4);
+    //elliptic_solver->u(TV_INT(0,1))=state_outside(3);
 
     //for(CELL_ITERATOR iterator(fluids_parameters.euler->grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
      //   TV_INT cell_index=iterator.Cell_Index();
-      //  elliptic_solver->u(cell_index)=state_outside(4);}
+      //  elliptic_solver->u(cell_index)=state_outside(3);}
 
 }*/
 //#####################################################################

@@ -1664,11 +1664,11 @@ void Gravity_Test()
         int p=particles.array_collection->Add_Element();
         particles.X(p)=TV((T)i,5,0);
         particles.mass(p)=7;
-        int_lists[i-1].Append(p);}
+        int_lists[i].Append(p);}
 
     SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(0,1));
     segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(2,3));
     segmented_curve->Update_Number_Nodes();
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
 
@@ -1695,11 +1695,11 @@ void Ether_Drag_Test()
         particles.X(p)=TV((T)i,0,0);
         particles.V(p)=TV(0,4,0);
         particles.mass(p)=7;
-        int_lists[i-1].Append(p);}
+        int_lists[i].Append(p);}
 
     SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(0,1));
     segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(2,3));
     segmented_curve->Update_Number_Nodes();
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
 
@@ -1742,20 +1742,20 @@ void Spring_Test()
         else particles.X(p)=TV((i-2)*restlength_analytic,0,0);
         particles.mass(p)=mass_analytic;
         particles.V(p)=TV(0,0,orthogonal_velocity);}
-    int_lists[0].Append(1);int_lists[0].Append(2);int_lists[1].Append(3);
+    int_lists[0].Append(0);int_lists[0].Append(1);int_lists[1].Append(2);
 
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
 
     DEFORMABLES_FORCES<TV>* force;
     segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(0,1));
     segmented_curve->Update_Number_Nodes();
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
     force=Create_Edge_Springs(particles,segmented_curve->mesh,stiffness_analytic,damping_analytic);
     asynchronous_evolution->Add_Finescale_Force(force,ARRAY<int>(segmented_curve->mesh.elements.Flattened()),empty_list,fine_fully_implicit);
 
     segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(2,3));
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
     segmented_curve->Update_Number_Nodes();
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
     force=Create_Edge_Springs(particles,segmented_curve->mesh,stiffness_analytic,damping_analytic);
@@ -1807,7 +1807,7 @@ void One_Spring_Test()
 
     DEFORMABLES_FORCES<TV>* force;
     segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(0,1));
     segmented_curve->Update_Number_Nodes();
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
     force=Create_Edge_Springs(particles,segmented_curve->mesh,stiffness_analytic,damping_analytic);

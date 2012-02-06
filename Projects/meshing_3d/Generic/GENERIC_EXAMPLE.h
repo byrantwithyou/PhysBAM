@@ -57,7 +57,7 @@ public:
         if((*field_volume.tetrahedron_list)(t).Inside(X,thickness)){
             const VECTOR<int,4>& nodes=field_volume.mesh.elements(t);
             TV w=(*field_volume.tetrahedron_list)(t).First_Three_Barycentric_Coordinates(X);
-            return w[1]*field(nodes[1])+w[2]*field(nodes[2])+w[3]*field(nodes[3])+(1-w.Sum())*field(nodes[4]);}}
+            return w[0]*field(nodes[0])+w[1]*field(nodes[1])+w[2]*field(nodes[2])+(1-w.Sum())*field(nodes[3]);}}
     // if that fails, project X onto the surface
     TRIANGULATED_SURFACE<T>& surface=*field_volume.triangulated_surface;
     PHYSBAM_ASSERT(surface.triangle_list);
@@ -65,7 +65,7 @@ public:
     if(distance>=max_depth) return default_value;
     const VECTOR<int,3>& nodes=surface.mesh.elements(t);
     TV w=(*surface.triangle_list)(t).Barycentric_Coordinates(surface_X);
-    return w[1]*field(nodes[1])+w[2]*field(nodes[2])+w[3]*field(nodes[3]);}
+    return w[0]*field(nodes[0])+w[1]*field(nodes[1])+w[2]*field(nodes[2]);}
 };
 
 template<class T>
@@ -111,7 +111,7 @@ public:
     if(distance>=max_depth) return default_value;
     const VECTOR<int,3>& nodes=surface.mesh.elements(t);
     TV w=(*surface.triangle_list)(t).Barycentric_Coordinates(surface_X);
-    return w[1]*field(nodes[1])+w[2]*field(nodes[2])+w[3]*field(nodes[3]);}
+    return w[0]*field(nodes[0])+w[1]*field(nodes[1])+w[2]*field(nodes[2]);}
 };
 
 template<class T> class GENERIC_EXAMPLE;
