@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
@@ -57,10 +56,8 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
     else if((triangulated_surface=Triangulated_Surface(&structure))){
 
         triangulated_surface->mesh.elements.Flattened().Get_Unique(collision_particles.active_indices);
-Sort(collision_particles.active_indices);
-//for (int ii=0;ii<collision_particles.active_indices.Size();ii++) std::cout<<std::endl<<"activeindices:" <<collision_particles.active_indices(ii); 
-//std::cout << std::endl; for (int ii=0;ii<particle_hierarchy.X.Size();ii++) std::cout<<std::endl<<"X42:" <<particle_hierarchy.X(ii)[0]<<" " <<particle_hierarchy.X(ii)[1]<<" " <<particle_hierarchy.X(ii)[2];        
-triangulated_surface->Update_Number_Nodes();
+//Sort(collision_particles.active_indices);
+	triangulated_surface->Update_Number_Nodes();
         if(!triangulated_surface->mesh.segment_mesh) triangulated_surface->mesh.Initialize_Segment_Mesh();
         segmented_curve=new T_SEGMENTED_CURVE(*triangulated_surface->mesh.segment_mesh,full_particles); // TODO: This is broken; long term shallow copy of a temporary auxiliary structure
         need_destroy_segmented_curve=true;

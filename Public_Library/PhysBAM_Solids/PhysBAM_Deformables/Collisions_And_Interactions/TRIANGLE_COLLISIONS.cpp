@@ -107,7 +107,7 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
     point_face_pairs_external.Remove_All();edge_edge_pairs_external.Remove_All();
     for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
         if(compute_point_face_collisions){
-            for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
+            for(int i=0;i<2;i++){if(i==1 && pair[0]==pair[1]) break;
                 STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
                 STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1-i]);
                 Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,detection_thickness);}}
@@ -286,7 +286,7 @@ Get_Moving_Faces_Near_Moving_Points(STRUCTURE_INTERACTION_GEOMETRY<TV>& structur
     int old_total=pairs_internal.m;
     TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV> visitor(pairs_internal,pairs_external,structure_1,structure_2,geometry,detection_thickness,mpi_solids);
     if(mpi_solids){
-        BOX_VISITOR_MPI<TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV> > mpi_visitor(visitor,structure_1.point_processor_masks,structure_2.Face_Processor_Masks());
+	 BOX_VISITOR_MPI<TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV> > mpi_visitor(visitor,structure_1.point_processor_masks,structure_2.Face_Processor_Masks());
         structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),mpi_visitor,detection_thickness);}
     else structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),visitor,detection_thickness);
 
@@ -332,15 +332,12 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
         GAUSS_JACOBI_PF_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
         if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
-        LOG::cout << std::endl << i << " " << pf_target_impulses(i) << " " << pf_target_weights(i) << " " << pf_normals(i) << " " << pf_old_speeds(i);
-        LOG::cout << std::endl << dt << " " << POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes) << " " << collision_time << " "<< attempt_ratio <<" " << exit_early << " " << rigid;
         if(final_repulsion_only)
             collided=Point_Face_Final_Repulsion(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,
                 exit_early||rigid);
         else collided=Point_Face_Collision(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,exit_early||rigid);
         if(collided){
             collisions++;
-            LOG::cout << std::endl << "collided "<<i;
             modified_full.Subset(nodes).Fill(true);
             recently_modified_full.Subset(nodes).Fill(true);
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
@@ -800,7 +797,7 @@ Stop_Nodes_Before_Self_Collision(const T dt)
         point_face_pairs_internal.Remove_All();edge_edge_pairs_internal.Remove_All();
         for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
             if(compute_point_face_collisions){
-                for(int i=0;i<2;i++){if(i==2 && pair[0]==pair[1]) break;
+                for(int i=0;i<2;i++){if(i==1 && pair[0]==pair[1]) break;
                     STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
                     STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1-i]);
                     Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,collision_thickness);}}

@@ -206,7 +206,7 @@ Initialize_Reference_Quantities(const int hash_multiple)
 {
     delete reference_bending_quadruples_hashtable;
     reference_bending_quadruples_hashtable=new HASHTABLE<VECTOR<int,2>,int>(hash_multiple*bending_quadruples.m);
-    for(int q=0;q<bending_quadruples.m;q++) reference_bending_quadruples_hashtable->Insert(VECTOR<int,2>(bending_quadruples(q)(2),bending_quadruples(q)(3)),q);
+    for(int q=0;q<bending_quadruples.m;q++) reference_bending_quadruples_hashtable->Insert(VECTOR<int,2>(bending_quadruples(q)(1),bending_quadruples(q)(2)),q);
     reference_sine_half_rest_angle=new ARRAY<T>(sine_half_rest_angle);
     reference_bending_stiffness=new ARRAY<T>(bending_stiffness);
     reference_damping=new ARRAY<T>(damping);
@@ -222,9 +222,9 @@ Copy_Back_Reference_Quantities(const ARRAY<int>& node_map_to_reference)
     damping.Resize(bending_quadruples.m,false,false);
     if(plastic_hardening) plastic_hardening->Resize(bending_quadruples.m,false,false);
     for(int q=0;q<bending_quadruples.m;q++){
-        int reference_j=node_map_to_reference(bending_quadruples(q)(2));
-        int reference_k=node_map_to_reference(bending_quadruples(q)(3));
-        int q_reference=0;reference_bending_quadruples_hashtable->Get(VECTOR<int,2>(reference_j,reference_k),q_reference);assert(q_reference);
+        int reference_j=node_map_to_reference(bending_quadruples(q)(1));
+        int reference_k=node_map_to_reference(bending_quadruples(q)(2));
+        int q_reference=0;reference_bending_quadruples_hashtable->Get(VECTOR<int,2>(reference_j,reference_k),q_reference);assert(q_reference);//Not sure if the zero-indexing is right here
         sine_half_rest_angle(q)=(*reference_sine_half_rest_angle)(q_reference);
         bending_stiffness(q)=(*reference_bending_stiffness)(q_reference);
         damping(q)=(*reference_damping)(q_reference);
@@ -247,7 +247,7 @@ template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Copy_Back_Save_Quantities(const ARRAY<int>& node_map_to_saved)
 {
     HASHTABLE<VECTOR<int,2>,int> save_bending_quadruples_hashtable(2*bending_quadruples_save->m);
-    for(int q=0;q<bending_quadruples_save->m;q++) save_bending_quadruples_hashtable.Insert(VECTOR<int,2>((*bending_quadruples_save)(q)(2),(*bending_quadruples_save)(q)(3)),q);
+    for(int q=0;q<bending_quadruples_save->m;q++) save_bending_quadruples_hashtable.Insert(VECTOR<int,2>((*bending_quadruples_save)(q)(1),(*bending_quadruples_save)(q)(2)),q);
     plastic_yield->Resize(bending_quadruples.m,false,false);
     sine_half_elastic_angle->Resize(bending_quadruples.m,false,false);
     for(int q=0;q<bending_quadruples.m;q++){

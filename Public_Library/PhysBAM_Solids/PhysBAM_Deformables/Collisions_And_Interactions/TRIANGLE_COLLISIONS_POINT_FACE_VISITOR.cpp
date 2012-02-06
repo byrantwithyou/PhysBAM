@@ -45,7 +45,7 @@ Store(const int point_index,const int face_index)
     RANGE<TV> box1=RANGE<TV>::Bounding_Box(X_self_collision_free(p)+dX_average,X(p));
     RANGE<TV> box2=RANGE<TV>::Bounding_Box(X_self_collision_free.Subset(face_nodes))+dX_average;box2.Enlarge_Nonempty_Box_To_Include_Points(X.Subset(face_nodes));
     if(!box1.Intersection(box2,collision_thickness)) return;
-    VECTOR<int,d+1> nodes=face_nodes.Insert(p,1);
+    VECTOR<int,d+1> nodes=face_nodes.Insert(p,0);
     if(intersecting_point_face_pairs.Size() && intersecting_point_face_pairs.Contains(nodes)) return;
     if (mpi_solids){
         VECTOR<PARTITION_ID,d+1> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));

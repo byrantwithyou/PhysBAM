@@ -37,7 +37,7 @@ Store(const int point_index,const int face_index)
 {
     const VECTOR<int,d>& face_nodes=faces(face_index);int p=particle_active_indices(point_index);
     if(face_nodes.Contains(p)) return;
-    POINT_FACE_REPULSION_PAIR<TV> pair;pair.nodes=face_nodes.Insert(p,1);
+    POINT_FACE_REPULSION_PAIR<TV> pair;pair.nodes=face_nodes.Insert(p,0);
     T total_repulsion_thickness=thickness_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     T_FACE face(X_other.Subset(face_nodes));
     if(!face.Point_Face_Interaction(X_other(pair.nodes[0]),total_repulsion_thickness,false,pair.distance)) pruned++;
