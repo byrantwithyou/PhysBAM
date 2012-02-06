@@ -47,7 +47,7 @@ template<class TV> typename TV::SCALAR KANG_POISSON_VISCOSITY<TV>::
 Pressure_Jump(const TV_INT& cell,T dt) const
 {
     typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET LEVELSET;
-    const LEVELSET& phi=fluids_parameters.particle_levelset_evolution->Levelset(1);
+    const LEVELSET& phi=fluids_parameters.particle_levelset_evolution->Levelset(0);
     T kappa=phi.Compute_Curvature(cell);
     T pj_st=dt*fluids_parameters.surface_tension*kappa;
     TV du_n;
@@ -118,7 +118,7 @@ struct GRAD_HELPER
 template<class TV> void KANG_POISSON_VISCOSITY<TV>::
 Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 {
-    const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
+    const ARRAY<T,TV_INT>& phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
     const GRID<TV>& grid=*fluids_parameters.grid;
 
     int num_cells=0;

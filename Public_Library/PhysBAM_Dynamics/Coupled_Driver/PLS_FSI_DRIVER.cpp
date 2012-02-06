@@ -148,7 +148,7 @@ Initialize()
             example.kang_poisson_viscosity->psi_D_value,example.kang_poisson_viscosity->psi_N_value);
 
     example.fluids_parameters.particle_levelset_evolution=new typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET_EVOLUTION(*example.fluids_parameters.grid,example.fluids_parameters.number_of_ghost_cells);
-    example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(1));
+    example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(0));
     example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
     example.fluids_parameters.phi_boundary=&example.fluids_parameters.phi_boundary_water; // override default
     example.fluids_parameters.phi_boundary_water.Set_Velocity_Pointer(example.fluid_collection.incompressible_fluid_collection.face_velocities);
@@ -193,10 +193,10 @@ Initialize()
 
     particle_levelset_evolution->particle_levelset.levelset.Set_Custom_Boundary(*example.fluids_parameters.phi_boundary);
     particle_levelset_evolution->Bias_Towards_Negative_Particles(example.fluids_parameters.bias_towards_negative_particles);
-    if(example.fluids_parameters.use_removed_positive_particles) particle_levelset_evolution->Particle_Levelset(1).Use_Removed_Positive_Particles();
-    if(example.fluids_parameters.use_removed_negative_particles) particle_levelset_evolution->Particle_Levelset(1).Use_Removed_Negative_Particles();
+    if(example.fluids_parameters.use_removed_positive_particles) particle_levelset_evolution->Particle_Levelset(0).Use_Removed_Positive_Particles();
+    if(example.fluids_parameters.use_removed_negative_particles) particle_levelset_evolution->Particle_Levelset(0).Use_Removed_Negative_Particles();
     if(example.fluids_parameters.store_particle_ids){
-        particle_levelset_evolution->Particle_Levelset(1).Store_Unique_Particle_Id();}
+        particle_levelset_evolution->Particle_Levelset(0).Store_Unique_Particle_Id();}
     particle_levelset_evolution->Use_Particle_Levelset(example.fluids_parameters.use_particle_levelset);
 
     // solid fluid coupling
@@ -244,7 +244,7 @@ Initialize()
         T extrapolation_bandwidth=(T)(extrapolation_ghost_cells-1);
         T_ARRAYS_SCALAR exchanged_phi_ghost(grid.Domain_Indices(extrapolation_ghost_cells));
         particle_levelset_evolution->particle_levelset.levelset.boundary->Fill_Ghost_Cells(grid,particle_levelset_evolution->phi,exchanged_phi_ghost,0,time,extrapolation_ghost_cells);
-//        Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
+//        Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
         if(!example.two_phase) 
             incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
                 example.fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
@@ -286,7 +286,7 @@ First_Order_Time_Step(int substep,T dt)
     INCOMPRESSIBLE_UNIFORM<T_GRID>* incompressible=fluids_parameters.incompressible;
     ARRAY<T,FACE_INDEX<TV::m> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
 
-    if(example.use_kang) old_phi=fluids_parameters.particle_levelset_evolution->Levelset(1).phi;
+    if(example.use_kang) old_phi=fluids_parameters.particle_levelset_evolution->Levelset(0).phi;
 
     example.solid_body_collection.Print_Energy(time,1);
     collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
@@ -332,7 +332,7 @@ First_Order_Time_Step(int substep,T dt)
     Write_Substep("euler step position",substep,1);
 
     LOG::Time("extrapolating velocity across interface");
-//    Extrapolate_Velocity_Across_Interface(example.face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
+//    Extrapolate_Velocity_Across_Interface(example.face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
     if(!example.two_phase) Extrapolate_Velocity_Across_Interface(time,dt);
         //incompressible->Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,
         //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
@@ -457,7 +457,7 @@ Advect_Fluid(const T dt,const int substep)
     LOG::Time("updating removed particle velocities");
     example.Modify_Removed_Particles_Before_Advection(dt,time);
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time);
-    PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=particle_levelset_evolution->Particle_Levelset(1);
+    PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=particle_levelset_evolution->Particle_Levelset(0);
     LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
     if(pls.use_removed_positive_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
@@ -485,7 +485,7 @@ Advect_Fluid(const T dt,const int substep)
         rk.Set_Time(time);
         rk.Start(dt);
         for(int i=0;i<rk.order;i++){
-//            Extrapolate_Velocity_Across_Interface(face_velocities,particle_levelset_evolution->Particle_Levelset(1).levelset,extrapolation_bandwidth);
+//            Extrapolate_Velocity_Across_Interface(face_velocities,particle_levelset_evolution->Particle_Levelset(0).levelset,extrapolation_bandwidth);
             if(!example.two_phase)
                 incompressible->Extrapolate_Velocity_Across_Interface(example.fluid_collection.incompressible_fluid_collection.face_velocities,exchanged_phi_ghost,
                     fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
@@ -541,14 +541,14 @@ Advect_Fluid(const T dt,const int substep)
     LOG::Time("deleting particles in local maxima");
     particle_levelset_evolution->particle_levelset.Delete_Particles_In_Local_Maximum_Phi_Cells(1);
     LOG::Time("deleting particles far from interface");
-    particle_levelset_evolution->Particle_Levelset(1).Delete_Particles_Far_From_Interface(); // uses visibility
+    particle_levelset_evolution->Particle_Levelset(0).Delete_Particles_Far_From_Interface(); // uses visibility
     Write_Substep("after delete particles far from interface",0,1);
 
     LOG::Time("re-incorporating removed particles");
     // TODO: if your particles fall entirely within the grid this shouldn't need ghost cells, but it may need them for MPI
-    particle_levelset_evolution->Particle_Levelset(1).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
-    if(particle_levelset_evolution->Particle_Levelset(1).use_removed_positive_particles || particle_levelset_evolution->Particle_Levelset(1).use_removed_negative_particles)
-        particle_levelset_evolution->Particle_Levelset(1).Reincorporate_Removed_Particles(1,fluids_parameters.removed_particle_mass_scaling,
+    particle_levelset_evolution->Particle_Levelset(0).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
+    if(particle_levelset_evolution->Particle_Levelset(0).use_removed_positive_particles || particle_levelset_evolution->Particle_Levelset(0).use_removed_negative_particles)
+        particle_levelset_evolution->Particle_Levelset(0).Reincorporate_Removed_Particles(1,fluids_parameters.removed_particle_mass_scaling,
             fluids_parameters.reincorporate_removed_particle_velocity?&example.fluid_collection.incompressible_fluid_collection.face_velocities:0,true);
 
     // update ghost phi values

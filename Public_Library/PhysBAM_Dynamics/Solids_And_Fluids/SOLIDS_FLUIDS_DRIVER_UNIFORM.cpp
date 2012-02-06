@@ -714,7 +714,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             incompressible->projection.Set_Up_For_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve,true);
             Write_Substep("before one-way coupled sph solve",substep,1);
             // TODO: check this dt
-            fluids_parameters.sph_evolution->Make_Incompressible(particle_levelset_evolution->Particle_Levelset(1).removed_negative_particles,example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
+            fluids_parameters.sph_evolution->Make_Incompressible(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles,example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
             Write_Substep("after one-way coupled sph solve",substep,1);
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve,true);}
 
@@ -753,7 +753,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);}
         else if(fluids_parameters.use_sph_for_removed_negative_particles && fluids_parameters.sph_evolution->use_two_way_coupling){
             incompressible->projection.Set_Up_For_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);
-            fluids_parameters.sph_evolution->Copy_Particle_Attributes_From_Array(particle_levelset_evolution->Particle_Levelset(1).removed_negative_particles);
+            fluids_parameters.sph_evolution->Copy_Particle_Attributes_From_Array(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles);
             fluids_parameters.sph_evolution->Set_Up_For_Projection(example.fluid_collection.incompressible_fluid_collection.face_velocities,time);
             Write_Substep("before two-way coupled sph solve",substep,1);
             // TODO: sph people check this
@@ -761,7 +761,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
                 fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);
             Write_Substep("after two-way coupled sph solve",substep,1);
             fluids_parameters.sph_evolution->Postprocess_Particles(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection);
-            fluids_parameters.sph_evolution->Copy_Particle_Attributes_To_Array(particle_levelset_evolution->Particle_Levelset(1).removed_negative_particles);
+            fluids_parameters.sph_evolution->Copy_Particle_Attributes_To_Array(particle_levelset_evolution->Particle_Levelset(0).removed_negative_particles);
             incompressible->projection.Restore_After_SPH(example.fluid_collection.incompressible_fluid_collection.face_velocities,fluids_parameters.sph_evolution->use_variable_density_solve);}
         else if(number_of_regions<2 || fluids_parameters.pseudo_dirichlet_regions.Number_True()==0)
             incompressible->Advance_One_Time_Step_Implicit_Part(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt_projection,time_projection,

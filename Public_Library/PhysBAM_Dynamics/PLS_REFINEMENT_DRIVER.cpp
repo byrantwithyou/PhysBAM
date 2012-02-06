@@ -88,12 +88,12 @@ Initialize()
     if(example.coarse_mpi_grid) example.coarse_mpi_grid->Initialize(example.non_mpi_boundary);
     example.incompressible.mpi_grid=example.fine_mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.coarse_mpi_grid;
-    example.particle_levelset_evolution.Particle_Levelset(1).mpi_grid=example.fine_mpi_grid;
+    example.particle_levelset_evolution.Particle_Levelset(0).mpi_grid=example.fine_mpi_grid;
     if(example.fine_mpi_grid){
         example.boundary=new BOUNDARY_MPI<GRID<TV> >(example.fine_mpi_grid,example.boundary_scalar);
         example.boundary_coarse=new BOUNDARY_MPI<GRID<TV> >(example.coarse_mpi_grid,example.boundary_scalar);
         example.phi_boundary=new BOUNDARY_MPI<GRID<TV> >(example.fine_mpi_grid,example.phi_boundary_water);
-        example.particle_levelset_evolution.Particle_Levelset(1).last_unique_particle_id=example.fine_mpi_grid->rank*30000000;}
+        example.particle_levelset_evolution.Particle_Levelset(0).last_unique_particle_id=example.fine_mpi_grid->rank*30000000;}
     else{
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
@@ -122,9 +122,9 @@ Initialize()
 
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Custom_Boundary(*example.phi_boundary);
     example.particle_levelset_evolution.Bias_Towards_Negative_Particles(false);
-    example.particle_levelset_evolution.Particle_Levelset(1).Use_Removed_Positive_Particles();
-    example.particle_levelset_evolution.Particle_Levelset(1).Use_Removed_Negative_Particles();
-    example.particle_levelset_evolution.Particle_Levelset(1).Store_Unique_Particle_Id();
+    example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Positive_Particles();
+    example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Negative_Particles();
+    example.particle_levelset_evolution.Particle_Levelset(0).Store_Unique_Particle_Id();
     example.particle_levelset_evolution.Use_Particle_Levelset(true);
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
@@ -215,7 +215,7 @@ Advance_To_Target_Time(const T target_time)
         kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time+dt);
  
         LOG::Time("Collision setup 1");
-        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& pls=example.particle_levelset_evolution.Particle_Levelset(1);
+        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& pls=example.particle_levelset_evolution.Particle_Levelset(0);
         if(example.use_collidable_advection){
             example.collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);
             example.collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
@@ -233,7 +233,7 @@ Advance_To_Target_Time(const T target_time)
             example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_particle_speed+2*max_particle_collision_distance+(T).5*example.fine_mac_grid.dX.Max(),10);}
         else{
             T maximum_fluid_speed=example.fine_face_velocities.Maxabs().Max();
-            T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(1).max_collision_distance_factor*example.fine_mac_grid.dX.Max();
+            T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(0).max_collision_distance_factor*example.fine_mac_grid.dX.Max();
             example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.fine_mac_grid.dX.Max(),10);}
 
         LOG::Time("Fill ghost");
@@ -250,7 +250,7 @@ Advance_To_Target_Time(const T target_time)
         example.phi_boundary_water.Use_Extrapolation_Mode(true);
         example.Extrapolate_Phi_Into_Objects(time+dt);
         LOG::Time("Step Particles");
-        example.particle_levelset_evolution.Particle_Levelset(1).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
+        example.particle_levelset_evolution.Particle_Levelset(0).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",0,1);
         
         LOG::Time("Fill ghost");
@@ -288,7 +288,7 @@ Advance_To_Target_Time(const T target_time)
             example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.fine_mac_grid.Minimum_Edge_Length(),5);  // static occupied blocks
             example.collision_bodies_affecting_fluid.Compute_Grid_Visibility(); // used in fast marching and extrapolation too... NOTE: this requires that objects_in_cell be current!
             if(example.particle_levelset_evolution.Levelset_Advection(1).nested_semi_lagrangian_collidable)  
-                example.particle_levelset_evolution.Levelset_Advection(1).nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(example.fine_mac_grid,(T)1e-5,example.particle_levelset_evolution.Levelset(1).phi);
+                example.particle_levelset_evolution.Levelset_Advection(1).nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(example.fine_mac_grid,(T)1e-5,example.particle_levelset_evolution.Levelset(0).phi);
             if(example.incompressible.nested_semi_lagrangian_collidable) 
                 example.incompressible.nested_semi_lagrangian_collidable->Average_To_Invalidated_Face(example.fine_mac_grid,example.fine_face_velocities);
         }
@@ -312,14 +312,14 @@ Advance_To_Target_Time(const T target_time)
         LOG::Time("deleting particles in local maxima");
         example.particle_levelset_evolution.particle_levelset.Delete_Particles_In_Local_Maximum_Phi_Cells(1);
         LOG::Time("deleting particles far from interface");
-        example.particle_levelset_evolution.Particle_Levelset(1).Delete_Particles_Far_From_Interface(); // uses visibility
+        example.particle_levelset_evolution.Particle_Levelset(0).Delete_Particles_Far_From_Interface(); // uses visibility
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after delete",0,1);
 
         LOG::Time("re-incorporating removed particles");
-        example.particle_levelset_evolution.Particle_Levelset(1).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
+        example.particle_levelset_evolution.Particle_Levelset(0).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
-        if(example.particle_levelset_evolution.Particle_Levelset(1).use_removed_positive_particles || example.particle_levelset_evolution.Particle_Levelset(1).use_removed_negative_particles)
-            example.particle_levelset_evolution.Particle_Levelset(1).Reincorporate_Removed_Particles(1,1,0,true);
+        if(example.particle_levelset_evolution.Particle_Levelset(0).use_removed_positive_particles || example.particle_levelset_evolution.Particle_Levelset(0).use_removed_negative_particles)
+            example.particle_levelset_evolution.Particle_Levelset(0).Reincorporate_Removed_Particles(1,1,0,true);
 
         LOG::Time("Fill ghost");
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time+dt);

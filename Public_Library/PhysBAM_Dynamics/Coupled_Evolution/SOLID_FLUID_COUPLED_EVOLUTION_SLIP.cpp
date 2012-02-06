@@ -330,7 +330,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
     coupled_system->use_full_ic=use_full_ic;
     coupled_system->Compute(solids_fluids_parameters.mpi_solid_fluid?1:0,dt,current_velocity_time,boundary_condition_collection.psi_N,disable_thinshell,Simulate_Compressible_Fluids(),
         fluids_face_velocities,fluids_parameters.viscosity,fluids_parameters.particle_levelset_evolution && fluids_parameters.second_order_cut_cell_method,
-        fluids_parameters.particle_levelset_evolution?&fluids_parameters.particle_levelset_evolution->Levelset(1):0);
+        fluids_parameters.particle_levelset_evolution?&fluids_parameters.particle_levelset_evolution->Levelset(0):0);
 
     coupled_system->Resize_Coupled_System_Vector(coupled_f);
     coupled_system->Resize_Coupled_System_Vector(coupled_r);
@@ -467,7 +467,7 @@ Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_
     T_ARRAYS_BOOL& psi_D=poisson->psi_D;
     // TODO: this will not work for multiphase, obviously
     assert(fluids_parameters.number_of_regions==1); // this should not be called for gas or multiphase
-    T_LEVELSET* levelset=&fluids_parameters.particle_levelset_evolution->Levelset(1);
+    T_LEVELSET* levelset=&fluids_parameters.particle_levelset_evolution->Levelset(0);
     for(FACE_ITERATOR iterator(poisson->grid);iterator.Valid();iterator.Next()){
         TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
@@ -682,10 +682,10 @@ Setup_Boundary_Condition_Collection()
 
     if(Simulate_Incompressible_Fluids()){
         if(fluids_parameters.particle_levelset_evolution){
-            boundary_condition_collection.Add_Boundary_Condition(new INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<TV>(fluids_parameters.particle_levelset_evolution->Levelset(1).phi));
+            boundary_condition_collection.Add_Boundary_Condition(new INCOMPRESSIBLE_BOUNDARY_CONDITION_FREE_SURFACE<TV>(fluids_parameters.particle_levelset_evolution->Levelset(0).phi));
             if(fluids_parameters.surface_tension && false)
                 boundary_condition_collection.Add_Boundary_Condition(
-                    new SURFACE_TENSION_BOUNDARY_CONDITION<TV>(fluids_parameters.particle_levelset_evolution->Levelset(1),fluids_parameters.surface_tension));}
+                    new SURFACE_TENSION_BOUNDARY_CONDITION<TV>(fluids_parameters.particle_levelset_evolution->Levelset(0),fluids_parameters.surface_tension));}
         boundary_condition_collection.Add_Boundary_Condition(new INCOMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>(fluids_parameters.domain_walls,mpi_boundaries));}
     if(Simulate_Compressible_Fluids()){
         boundary_condition_collection.Add_Boundary_Condition(new COMPRESSIBLE_BOUNDARY_CONDITION_WALLS<TV>(fluids_parameters.domain_walls,mpi_boundaries,fluids_parameters));}
