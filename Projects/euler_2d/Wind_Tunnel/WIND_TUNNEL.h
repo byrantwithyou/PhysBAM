@@ -131,7 +131,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
     fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,1,(T)1e-5);
+    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
     fluids_parameters.compressible_rungekutta_order=rk_order;
     rho_initial=(T)1.4;u_vel_initial=(T)3.;v_vel_initial=(T)0.;p_initial=(T)1.;
     if(test_number==6){rho_initial=(T)1.4;u_vel_initial=-(T)3.;v_vel_initial=(T)0.;p_initial=(T)1.;}

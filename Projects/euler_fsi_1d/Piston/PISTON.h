@@ -120,7 +120,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_rungekutta_order=rk_order;
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,1,(T)1e-5);
+    fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
     //fluids_parameters.compressible_conservation_method->Set_Callbacks(this);
     u_initial=0;rho_initial=1;T_initial=300;e_initial=fluids_parameters.compressible_eos->e_From_T_And_rho(T_initial,rho_initial);p_initial=fluids_parameters.compressible_eos->p(rho_initial,e_initial);
     LOG::cout<<"rho_initial="<<rho_initial<<", T_initial="<<T_initial<<", e_initial="<<e_initial<<", p_initial="<<p_initial<<std::endl;

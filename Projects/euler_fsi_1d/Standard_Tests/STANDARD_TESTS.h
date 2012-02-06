@@ -245,7 +245,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else fluids_parameters.compressible_conservation_method = new HYBRID_SL_ENO_CONSERVATION<T_GRID,T_GRID::dimension+2>(flux_face,new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false));
     fluids_parameters.compressible_conservation_method->Set_Order(eno_order);
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
-    //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,1,(T)1e-5);
+    //fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
     fluids_parameters.compressible_rungekutta_order=rk_order;
     //fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_RF<T,T_GRID::dimension+2>;
     fluids_parameters.compressible_timesplit=timesplit;
