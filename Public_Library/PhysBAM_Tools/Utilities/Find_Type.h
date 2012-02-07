@@ -18,7 +18,7 @@ template<class T> struct FIND_TYPE_HELPER<T*>
     {int found=0;
     for(typename T_ARRAY::INDEX i(0);i<array.Size();i++){
         T* element=dynamic_cast<T*>(array(i));
-        if(element){found++;if(found==index) return element;}}
+        if(element){if(found++==index) return element;}}
     return 0;}
 };
 
