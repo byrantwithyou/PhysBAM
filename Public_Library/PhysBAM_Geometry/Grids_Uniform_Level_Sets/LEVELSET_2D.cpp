@@ -105,7 +105,7 @@ Compute_Curvature(const ARRAY<T,VECTOR<int,2> >& phi_input,const VECTOR<int,2>& 
 template<class T_GRID> typename T_GRID::SCALAR LEVELSET_2D<T_GRID>::
 Compute_Curvature(const VECTOR<T,2>& location) const
 {
-    TV l2=(location-(T).5*grid.dX-grid.domain.min_corner)*grid.one_over_dX+1;
+    TV l2=(location-(T).5*grid.dX-grid.domain.min_corner)*grid.one_over_dX;
     TV_INT cell(floor(l2));
 
     TV w(l2-TV(cell));
