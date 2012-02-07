@@ -35,7 +35,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if(mode == GL_SELECT){
         glPushAttrib(GL_ENABLE_BIT|GL_POINT_BIT);glDisable(GL_CULL_FACE);
-        VECTOR<T,2> min_corner=grid.Node(1-ghost_cells,1-ghost_cells),X;int i,j;
+        VECTOR<T,2> min_corner=grid.Node(-ghost_cells,-ghost_cells),X;int i,j;
 
         // Draw grid cells for selection
         glPushName(1);
@@ -67,8 +67,8 @@ Display(const int in_color) const
     {
         // Draw masks
         T x,y;int i,j,i_mask=1,j_mask=1;
-        VECTOR<T,2> min_corner=grid.Node(1-ghost_cells,1-ghost_cells);
-        VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells.x+ghost_cells+1,grid.numbers_of_cells.y+ghost_cells+1);
+        VECTOR<T,2> min_corner=grid.Node(-ghost_cells,-ghost_cells);
+        VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells.x+ghost_cells,grid.numbers_of_cells.y+ghost_cells);
 
         T_ARRAYS_BOOL *cell_mask=0;
         T_FACE_ARRAYS_BOOL *face_mask=0;
