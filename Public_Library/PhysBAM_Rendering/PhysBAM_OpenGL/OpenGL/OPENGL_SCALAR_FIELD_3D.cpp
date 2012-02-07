@@ -582,7 +582,7 @@ Toggle_Smooth_Slice_Texture()
 template<class T,class T2> void OPENGL_SCALAR_FIELD_3D<T,T2>::
 Toggle_Color_Map()
 {
-    current_color_map=current_color_map%color_maps.m;
+    current_color_map=(current_color_map+1)%color_maps.m;
     Update();
 }
 

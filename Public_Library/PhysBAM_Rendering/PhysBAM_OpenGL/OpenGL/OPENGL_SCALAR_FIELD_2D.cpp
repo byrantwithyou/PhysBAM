@@ -259,7 +259,7 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 
     // Handle values arrays which are not (1,m)(1,n)
     VECTOR<T,2> half_dX=(T)0.5*grid.dX;
-    RANGE<VECTOR<T,2> > domain(grid.X(start_index)-half_dX,grid.X(end_index)+half_dX);
+    RANGE<VECTOR<T,2> > domain(grid.X(start_index)-half_dX,grid.X(end_index-VECTOR<int,2>::All_Ones_Vector())+half_dX);
 
     // Set underlying OPENGL_OBJECT's transformation
     opengl_textured_rect->frame->t=VECTOR<float,3>(Convert_2d_To_3d(domain.Center()));
@@ -280,10 +280,10 @@ Update_Texture(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
 
     OPENGL_COLOR* bitmap = new OPENGL_COLOR[tex_width*tex_height];
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
-    for(int i = 0; i < tex_width; i++)
-        for(int j = 0; j < tex_height; j++)
+    for(int i=0;i<tex_width;i++)
+        for(int j=0;j<tex_height;j++)
         {
-            int idx = j*tex_width + i;
+            int idx = j*tex_width+i;
             T2 value=Pre_Map_Value(values(start_index.x+i,start_index.y+j));
 
             OPENGL_COLOR color_value=color_map->Lookup(value);
@@ -407,7 +407,7 @@ Toggle_Draw_Ghost_Values()
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::
 Toggle_Color_Map()
 {
-    current_color_map=current_color_map%color_maps.m;
+    current_color_map=(current_color_map+1)%color_maps.m;
     Update();
 }
 
