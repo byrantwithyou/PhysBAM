@@ -123,9 +123,6 @@ template<class T> void Convert_Phi_File(const std::string& ifilename,const std::
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* surface;
         FILE_UTILITIES::Create_From_File<T>(ifilename,surface);
         VECTOR<int,3>& min_corner = surface->levelset.phi.domain.min_corner;
-        min_corner.x--;
-        min_corner.y--;
-        min_corner.z--;
         if (min_corner.x<0 || min_corner.y<0 || min_corner.z<0){
             LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}
         FILE_UTILITIES::Write_To_File<T>(ofilename,*surface);

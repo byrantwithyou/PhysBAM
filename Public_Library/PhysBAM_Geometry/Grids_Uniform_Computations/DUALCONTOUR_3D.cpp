@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2004, Geoffrey Irving, Andrew Selle.
+// Copyright 2004-2012, Alexey, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class DUALCONTOUR_3D

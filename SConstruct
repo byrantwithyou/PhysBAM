@@ -22,6 +22,7 @@ variables.AddVariables(('CXX','C++ compiler',default_cxx),
                        BoolVariable('shared_objects','Build shareable objects when without shared libraries',1),
                        BoolVariable('autodetect','Automatically detect existence of libraries',0),
                        BoolVariable('USE_RENDERING','Use Rendering',0),
+                       BoolVariable('compile_with_read_one_based_data','Compile with read one based data',0),
                        BoolVariable('compile_without_read_write_support','Do not compile read_write support into the library',0),
                        BoolVariable('compile_without_double_support','Do not compile double support into the library',0),
                        BoolVariable('compile_without_dyadic_support','Do not compile dyadic support into the library',0),
@@ -211,6 +212,7 @@ else: # assume g++...
     if env["warnings_are_errors"]: env.Append(CXXFLAGS=" -Werror")
 
 if env['TYPE']=='release' or env['TYPE']=='profile' or env['TYPE']=='optdebug': env.Append(CPPDEFINES=['NDEBUG'])
+if env['compile_with_read_one_based_data']: env.Append(CPPDEFINES=['COMPILE_WITH_READ_ONE_BASED_DATA'])
 if env['compile_without_read_write_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_READ_WRITE_SUPPORT'])
 else: env['USE_BOOSTIO']=1
 if env['compile_without_double_support']: env.Append(CPPDEFINES=['COMPILE_WITHOUT_DOUBLE_SUPPORT'])
