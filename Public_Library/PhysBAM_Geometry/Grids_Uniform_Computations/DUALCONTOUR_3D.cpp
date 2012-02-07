@@ -52,17 +52,21 @@ Generate_Vertices()
     normals.Resize(count);
     levelset.Compute_Normals();
     int vertex=-1;
-    for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++)for(int ij=0;ij<mn-1;ij++)if(vertices(i,j,ij)){ // generate vertices where needed
-        vertices(i,j,ij)=++vertex;
-        TV position=grid.Center(i,j,ij);
-        TV normal=levelset.Normal(position);
-        T phi=levelset.Phi(position);
-        int iterations=0;
-        while(abs(phi)>1e-5*grid.min_dX && (iterations++)<10){
-            position-=phi*normal;
-            phi=levelset.Phi(position);
-            normal=levelset.Normal(position);}
-        geometry(vertex)=position;normals(vertex)=normal;}
+    for(int i=0;i<m-1;i++)
+    for(int j=0;j<n-1;j++)
+    for(int ij=0;ij<mn-1;ij++)
+        if(vertices(i,j,ij)){ // generate vertices where needed
+            vertices(i,j,ij)=++vertex;
+            TV position=grid.Center(i,j,ij);
+            TV normal=levelset.Normal(position);
+            T phi=levelset.Phi(position);
+            int iterations=0;
+            while(abs(phi)>1e-5*grid.min_dX && (iterations++)<10){
+                position-=phi*normal;
+                phi=levelset.Phi(position);
+                normal=levelset.Normal(position);}
+            geometry(vertex)=position;normals(vertex)=normal;}
+        else vertices(i,j,ij)=-1;
 }
 //#####################################################################
 // Function Ensure_Vertices_In_Correct_Cells
@@ -72,11 +76,12 @@ Ensure_Vertices_In_Correct_Cells()
 {
     int vertex=-1;
     TV_INT i;
-    for(i.x=0;i.x<grid.counts.x-1;i.x++)for(i.y=0;i.y<grid.counts.y-1;i.y++)for(i.z=0;i.z<grid.counts.z-1;i.z++) if(vertices(i)){
+    for(i.x=0;i.x<grid.counts.x-1;i.x++)for(i.y=0;i.y<grid.counts.y-1;i.y++)for(i.z=0;i.z<grid.counts.z-1;i.z++)if(vertices(i)>=0){
         vertex++;TV_INT v=grid.Clamp_To_Cell(geometry(vertex));
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset((T).5*grid.dX);
-            geometry(vertex)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}}
+            geometry(vertex)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));
+        }}
 }
 //#####################################################################
 // Function Get_Triangulated_Surface
