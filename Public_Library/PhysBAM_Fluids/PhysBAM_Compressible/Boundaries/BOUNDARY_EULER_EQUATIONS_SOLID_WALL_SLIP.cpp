@@ -95,15 +95,15 @@ Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BAS
     // apply L
     euler->eigensystems_default[axis]->Eigenvectors(U_1d,node_index[axis],L,R);
     euler->eigensystems_default[axis]->Eigenvalues(U_1d,node_index[axis],lambda,lambda_left,lambda_right);
-    for(int k=0;k<d;k++){LU(k)=0;LU_far_field(k)=0;
-        for(int kk=0;kk<d;kk++){LU(k)+=L(k,kk)*u_ghost(node_index)(kk);LU_far_field(k)+=L(k,kk)*U_far_field(side)(kk);}}
+    LU=L*u_ghost(node_index);
+    LU_far_field=L*U_far_field(side);
 
     // attenuate
     int flip=side&1?1:-1;
     for(int k=0;k<d;k++) if(flip*lambda_left(k)>0) LU(k)=LU_far_field(k)+net_inflow_attenuation*(LU(k)-LU_far_field(k));
 
     // apply R
-    for(int k=0;k<d;k++){U(k)=0;for(int kk=0;kk<d;kk++) U(k)+=LU(kk)*R(kk,k);}
+    U=R.Transpose_Times(LU);
 }
 //#####################################################################
 // Function Attenuate_To_Far_Field_Values
