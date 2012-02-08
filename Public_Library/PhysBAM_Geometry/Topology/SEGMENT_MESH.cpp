@@ -110,7 +110,7 @@ Initialize_Straight_Mesh(const int number_of_points,bool loop)
     number_nodes=number_of_points;
     elements.Exact_Resize(number_of_points-!loop);
     for(int i=0;i<number_of_points-1;i++)elements(i).Set(i,i+1);
-    if(loop) elements(number_of_points-1).Set(number_of_points,1);
+    if(loop) elements(number_of_points-1).Set(number_of_points-1,0);
 }
 //#####################################################################
 // Function Initialize_Boundary_Mesh

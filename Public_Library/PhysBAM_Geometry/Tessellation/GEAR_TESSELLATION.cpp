@@ -80,7 +80,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SMOOTH_GEAR<V
     curve->particles.array_collection->Add_Elements(pts.m);
     curve->particles.X=pts;
     for(int i=0;i<pts.m-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
-    curve->mesh.elements.Append(VECTOR<int,2>(pts.m,1));
+    curve->mesh.elements.Append(VECTOR<int,2>(pts.m-1,0));
     curve->Update_Number_Nodes();
     return curve;
 }
