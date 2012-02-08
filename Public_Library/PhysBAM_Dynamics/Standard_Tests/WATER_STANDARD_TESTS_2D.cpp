@@ -135,7 +135,7 @@ Initialize(const int test_number_input,const int resolution)
     if(test_number==3){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(2);source_velocity.Resize(2);world_to_source.Resize(2);
-        sources(0)=sources(2)=RANGE<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
+        sources(0)=sources(1)=RANGE<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
         ARRAY<MATRIX<T,3> > source_to_world(2);
         MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
