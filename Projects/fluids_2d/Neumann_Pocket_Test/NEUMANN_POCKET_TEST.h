@@ -27,8 +27,8 @@ public:
         last_frame=3840;
         frame_rate=24;
         cfl=3;
-        domain_walls[1][1]=domain_walls[1][2]=domain_walls[2][2]=false;
-        domain_walls[2][1]=true;
+        domain_walls[0][0]=domain_walls[0][1]=domain_walls[1][1]=false;
+        domain_walls[1][0]=true;
         use_vorticity_confinement=true;confinement_parameter=(T).05;
         kolmogorov=(T)0;
         rho=1;rho_bottom=1;rho_top=(T).65;buoyancy_constant=0;gravity=1;

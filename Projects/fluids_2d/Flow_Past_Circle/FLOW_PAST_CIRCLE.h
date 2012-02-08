@@ -49,7 +49,7 @@ public:
         fluids_parameters.gravity=0;
         fluids_parameters.density=1;
         //fluids_parameters.cfl=1.75;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.use_vorticity_confinement=false;
         fluids_parameters.use_levelset_viscosity=true;
         write_output_files=true;fluids_parameters.write_debug_data=true;

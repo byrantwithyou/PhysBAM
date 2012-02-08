@@ -38,7 +38,7 @@ public:
         PARAMETER_LIST parameters;
         output_directory="Simple_Flame/output";
         fluids_parameters.use_reacting_flow=true;
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.grid->Initialize(100,200,T(-.5),T(1.5),0,4);
         last_frame=parameters.Get_Parameter("last_frame,l",int(512),"Last frame of animation",true);
         fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);

@@ -72,7 +72,7 @@ public:
         // Fluids parameters
         fluids_parameters.simulate=true;
         fluids_parameters.grid.Initialize(51,51,3,10,0,7);
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
         fluids_parameters.reseeding_frame_rate=10;
         fluids_parameters.bias_towards_negative_particles=true;fluids_parameters.number_particles_per_cell=16;
         fluids_parameters.use_removed_positive_particles=false;fluids_parameters.use_removed_negative_particles=true;

@@ -65,7 +65,7 @@ public:
         }
 
         fluids_parameters.gravity=0;fluids_parameters.cfl=0.9;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.kolmogorov=(T)0;
         fluids_parameters.implicit_viscosity=false;
         fluids_parameters.incompressible_iterations=100;
@@ -118,7 +118,7 @@ public:
             use_source=false;
             solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;}
         else if(example_number==6){
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;
             PHYSBAM_FATAL_ERROR("Preroll is gone; this example is likely broken.");
             use_source=true;source_domain=BOX_2D<T>(0,.5,1.2,1.8);source_velocity=VECTOR_2D<T>(10,0);}
         else if(example_number==100){

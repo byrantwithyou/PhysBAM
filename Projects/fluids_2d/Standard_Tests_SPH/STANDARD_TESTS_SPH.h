@@ -230,10 +230,10 @@ void Adjust_SPH_Particle_For_Domain_Boundaries(SPH_PARTICLES<TV>& particles,cons
         TV normal=rigid->Implicit_Geometry_Normal(new_X);
         new_X-=normal*phi;
         V=(new_X-particles.X(index))/dt;}
-    if(fluids_parameters.domain_walls[1][1]&&new_X.x<grid.domain.min_corner.x){V.x=0;new_X.x=grid.domain.min_corner.x;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[1][2]&&new_X.x>grid.domain.max_corner.x){V.x=0;new_X.x=grid.domain.max_corner.x;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[2][1]&&new_X.y<grid.domain.min_corner.y){V.y=00;new_X.y=grid.domain.min_corner.y;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[2][2]&&new_X.y>grid.domain.max_corner.y){V.y=0;new_X.y=grid.domain.max_corner.y;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[0][0]&&new_X.x<grid.domain.min_corner.x){V.x=0;new_X.x=grid.domain.min_corner.x;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[0][1]&&new_X.x>grid.domain.max_corner.x){V.x=0;new_X.x=grid.domain.max_corner.x;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[1][0]&&new_X.y<grid.domain.min_corner.y){V.y=00;new_X.y=grid.domain.min_corner.y;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[1][1]&&new_X.y>grid.domain.max_corner.y){V.y=0;new_X.y=grid.domain.max_corner.y;particles.X(index)=new_X-dt*V;}
         
 }
 //#####################################################################

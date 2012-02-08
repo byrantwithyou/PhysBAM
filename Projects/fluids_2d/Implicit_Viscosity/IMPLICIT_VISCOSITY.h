@@ -27,7 +27,7 @@ public:
         last_frame=1000;//(int)(10*frame_rate);
         m=100;
         n=100;
-        domain_walls[1][1]=true;domain_walls[1][2]=true;domain_walls[2][1]=true;domain_walls[2][2]=false;
+        domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;
         fluids_parameters.Initialize_Domain_Boundary_Conditions(); // sets up the proper wall states
         //viscosity=1e6*.001137;
         //viscosity=100;

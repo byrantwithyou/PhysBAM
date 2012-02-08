@@ -43,7 +43,7 @@ public:
         first_frame=0;last_frame=2000;
         frame_rate=24;
         restart=false;restart_frame=18;
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false; 
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false; 
         fluids_parameters.number_particles_per_cell=32;
         fluids_parameters.particle_half_bandwidth=1; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         fluids_parameters.reseeding_frame_rate=1;

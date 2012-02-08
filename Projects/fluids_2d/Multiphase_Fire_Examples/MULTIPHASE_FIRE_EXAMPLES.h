@@ -66,7 +66,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.write_particles=true;
     PARAMETER_LIST parameters;
     fluids_parameters.use_reacting_flow=true;
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
     fluids_parameters.grid->Initialize(10*resolution+1,10*resolution+1,0,1,0,1);
     output_directory=STRING_UTILITIES::string_sprintf("Multiphase_Fire_Examples/Example_%d__Resolution_%d_%d",test_number,(fluids_parameters.grid->counts.x-1),(fluids_parameters.grid->counts.x-1));
     fluids_parameters.number_particles_per_cell=16;

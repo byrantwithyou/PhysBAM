@@ -28,8 +28,8 @@ public:
         frame_rate=24;
         m=500;n=100;
         xmin=(T)-5;xmax=(T)5;ymin=(T)0;ymax=(T)2;
-        domain_walls[1][1]=false;domain_walls[1][2]=false;domain_walls[2][1]=true;domain_walls[2][2]=false;
-        slip_boundary=BOUNDARY_SOLID_WALL_SLIP<T,VECTOR_2D<T> >(!domain_walls[1][1],!domain_walls[1][2],!domain_walls[2][1],!domain_walls[2][2]);
+        domain_walls[0][0]=false;domain_walls[0][1]=false;domain_walls[1][0]=true;domain_walls[1][1]=false;
+        slip_boundary=BOUNDARY_SOLID_WALL_SLIP<T,VECTOR_2D<T> >(!domain_walls[0][0],!domain_walls[0][1],!domain_walls[1][0],!domain_walls[1][1]);
         use_vorticity_confinement=true;confinement_parameter=(T).05;
         komolgorov=(T)0;
         incompressible_enforce_compatibility=false;

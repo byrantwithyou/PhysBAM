@@ -78,8 +78,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
     restart=false;restart_frame=0;
     first_frame=0;last_frame=300;frame_rate=400;
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.domain_walls[2][2]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
     fluids_parameters.number_particles_per_cell=16;
     fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;
     fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;fluids_parameters.write_debug_data=true;
