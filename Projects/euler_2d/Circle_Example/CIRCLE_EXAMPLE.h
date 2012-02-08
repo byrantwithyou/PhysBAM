@@ -190,28 +190,28 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==10) fluids_parameters.grid->Initialize(2*cells+1,cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)-100,(T)0),VECTOR<T,2>((T)100,(T)100))*grid_size);
     else fluids_parameters.grid->Initialize(cells+1,cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)-1,(T)-1),VECTOR<T,2>((T)1,(T)1))*grid_size);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-    fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+    fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
     if (test_number==5||test_number==7){
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-        fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;}
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;}
     if (test_number==6){
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=true;
-        fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;}
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
     if (test_number==9){
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-        fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false;}
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;}
     if(test_number==10){
-        fluids_parameters.domain_walls[2][1]=true;}
+        fluids_parameters.domain_walls[1][0]=true;}
     if(bucket_walls){
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-        fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false;}
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;}
     else if(all_walls){
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-        fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;}
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;}
     else if(no_walls){
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-        fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;}
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+        fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
     //time
     initial_time=(T)0.;last_frame=1000;frame_rate=(T)32.;
     if(strong_shock) frame_rate=2e4;

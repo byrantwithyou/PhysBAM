@@ -144,15 +144,15 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==1 || test_number==3 || test_number==4){
         fluids_parameters.grid->Initialize(5*cells+1,cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).2)));
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-        fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
     
         initial_time=(T)0.;last_frame=350;frame_rate=(T)1000.;}
     else{
         fluids_parameters.grid->Initialize(4*cells+1,3*cells+1,RANGE<VECTOR<T,2> >(VECTOR<T,2>((T)0,(T)0), VECTOR<T,2>((T)1,(T).75)));
         *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=true;
-        fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+        fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
+        fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
         initial_time=(T)0.;last_frame=10;frame_rate=(T)10000.;}
 

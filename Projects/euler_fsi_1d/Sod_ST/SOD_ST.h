@@ -164,13 +164,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(test_number==12) fluids_parameters.grid->Initialize(resolution,(T)-1,(T)2);
     else fluids_parameters.grid->Initialize(resolution,(T)0,(T)1);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-    if(test_number==1 || test_number==2) fluids_parameters.domain_walls[1][2]=false;
-    if(test_number==10){fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;}
-    if(test_number==11 || test_number==12) fluids_parameters.domain_walls[1][2]=false;
-    if(test_number==13 || test_number==14){fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;}
-    if(all_walls){fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;}
-    else if(no_walls){fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;}
+    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+    if(test_number==1 || test_number==2) fluids_parameters.domain_walls[0][1]=false;
+    if(test_number==10){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+    if(test_number==11 || test_number==12) fluids_parameters.domain_walls[0][1]=false;
+    if(test_number==13 || test_number==14){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+    if(all_walls){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+    else if(no_walls){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;}
     //time
     initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
     if(test_number==9) last_frame=4000;

@@ -211,11 +211,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==9) fluids_parameters.grid->Initialize(cells+1,(T)-1,(T)1);
     else fluids_parameters.grid->Initialize(cells+1,(T)0,(T)1);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid();
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=false;
-    if(test_number==5){fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;}
-    if(test_number==7 || test_number==8 || test_number==9){fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;}
-    if(all_walls){fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;}
-    else if(no_walls){fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;}
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;
+    if(test_number==5){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+    if(test_number==7 || test_number==8 || test_number==9){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;}
+    if(all_walls){fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;}
+    else if(no_walls){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;}
     //time
     initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
     if(test_number==3){frame_rate=(T)2e5;last_frame=3000;}
@@ -329,7 +329,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     }
 
     if(flip_shock){
-        exchange(fluids_parameters.domain_walls[1][1],fluids_parameters.domain_walls[1][2]);
+        exchange(fluids_parameters.domain_walls[0][0],fluids_parameters.domain_walls[0][1]);
         middle_state_start_point=(T)3.-middle_state_start_point;
         exchange(state_left,state_right);}
 

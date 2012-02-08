@@ -78,7 +78,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //grid
     fluids_parameters.grid->Initialize(cells,(T)0.,(T)1.);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
     //time
     initial_time=(T)0.;last_frame=10;frame_rate=(T)263;
     fluids_parameters.cfl=cfl_number;

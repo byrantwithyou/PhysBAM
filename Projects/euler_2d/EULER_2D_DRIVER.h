@@ -57,7 +57,7 @@ void Initialize()
     int m=example.m,n=example.n;
     U.Resize(1,m,1,n);
 
-    euler.eigensystems[1]=new EULER_2D_EIGENSYSTEM_F<T>();euler.eigensystems[2]=new EULER_2D_EIGENSYSTEM_G<T>();
+    euler.eigensystems[0]=new EULER_2D_EIGENSYSTEM_F<T>();euler.eigensystems[1]=new EULER_2D_EIGENSYSTEM_G<T>();
 
     std::cout << "grid info: [" << example.xmin << ", " << example.xmax << "] X [" << example.ymin << ", " << example.ymax << "], (" << example.m << ", " << example.n << ")" << std::endl;
     

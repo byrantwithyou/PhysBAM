@@ -115,9 +115,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(test_number==4) fluids_parameters.grid->Initialize(3*cells,3*cells,0,3,0,3);
     else fluids_parameters.grid->Initialize(3*cells,cells,0,3,0,1);
     if(test_number!=1 && test_number!=7) *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
-    if(test_number==4){fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;}
-    if(test_number==7){fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;}
+    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
+    if(test_number==4){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
+    if(test_number==7){fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;}
     //time
     initial_time=(T)0.;last_frame=1000;frame_rate=(T)80.;
     if(test_number==1) last_frame=320;
@@ -158,7 +158,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
     VECTOR<VECTOR<bool,2>,T_GRID::dimension> valid_wall;
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++)
         valid_wall[axis][axis_side]=(fluids_parameters.mpi_grid?!fluids_parameters.mpi_grid->Neighbor(axis,axis_side):true) && !fluids_parameters.domain_walls[axis][axis_side];
-    valid_wall[3]=VECTOR<bool,2>::Constant_Vector(false);
+    valid_wall[2]=VECTOR<bool,2>::Constant_Vector(false);
 
     if(test_number==7){
         BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP<T_GRID>* boundary_euler=

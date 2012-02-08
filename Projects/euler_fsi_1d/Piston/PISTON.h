@@ -106,8 +106,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.grid->Initialize(20*resolution+1,-(T)5,(T)5);
     else fluids_parameters.grid->Initialize(20*resolution+1,(T)0,(T)1);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
-    fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=true;
-    if(test_number==4) fluids_parameters.domain_walls[1][2]=false;
+    fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=true;
+    if(test_number==4) fluids_parameters.domain_walls[0][1]=false;
     //time
     initial_time=(T)0.;last_frame=1500;frame_rate=(T)100.;
     fluids_parameters.cfl=cfl_number;;
@@ -186,7 +186,7 @@ void Initialize_Euler_State() PHYSBAM_OVERRIDE
         rho_initial=1;u_initial=3;p_initial=(T)1.;
         for(int i=0;i<grid.counts.x;i++){
             TV_INT piston_face_index=grid.Cell(TV(piston_initial_position),0);
-            if(i >=piston_face_index[1]) {rho_initial=(T)1.;p_initial=(T)1.;u_initial=(T)3.0;} else {rho_initial=(T)1.;p_initial=1.;u_initial=-(T)3.0;}
+            if(i >=piston_face_index[0]) {rho_initial=(T)1.;p_initial=(T)1.;u_initial=(T)3.0;} else {rho_initial=(T)1.;p_initial=1.;u_initial=-(T)3.0;}
             U(i)(0)=rho_initial;U(i)(1)=rho_initial*u_initial;U(i)(2)=rho_initial*(tmp_eos->e_From_p_And_rho(p_initial,rho_initial)+sqr(u_initial)/(T)2.);}}
 }
 //#####################################################################
