@@ -48,8 +48,8 @@ template<class T,class T2> T BSPLINE<T,T2>::
 Basis_Function(const int i,const int k,const T t)
 {
     T t_i=control_points_times(i),t_i_plus_1=control_points_times(i+1);
-    if(k==1){if(t_i<=t && t<t_i_plus_1) return 1;else return 0;}
-    T t_i_plus_k_minus_1=control_points_times(i+k-1),t_i_plus_k=control_points_times(i+k);
+    if(k==0){if(t_i<=t && t<t_i_plus_1) return 1;else return 0;}
+    T t_i_plus_k_minus_1=control_points_times(i+k),t_i_plus_k=control_points_times(i+k);
     T result=0;
     if(t_i_plus_k_minus_1!=t_i) result+=((t-t_i)/(t_i_plus_k_minus_1-t_i))*Basis_Function(i,k-1,t);
     if(t_i_plus_k!=t_i_plus_1) result+=((t_i_plus_k-t)/(t_i_plus_k-t_i_plus_1))*Basis_Function(i+1,k-1,t);
@@ -77,10 +77,10 @@ Clamp_End_Points()
 template<class T,class T2> void BSPLINE<T,T2>::
 Create_Closed_Points()
 {
-    control_points.Resize(control_points.m+2*(k-1));control_points_times.Resize(control_points_times.m+2*(k-1));
-    for(int i=0;i<2*(k-1);i++){
-        control_points(control_points.m-2*(k-1)+i)=control_points(i+1);
-        control_points_times(control_points_times.m-2*(k-1)+i)=(control_points_times(i+1)-control_points_times(i)+control_points_times(control_points_times.m-2*(k-1)+i-1));}
+    control_points.Resize(control_points.m+2*k);control_points_times.Resize(control_points_times.m+2*k);
+    for(int i=0;i<2*k;i++){
+        control_points(control_points.m-2*k+i)=control_points(i+1);
+        control_points_times(control_points_times.m-2*k+i)=(control_points_times(i+1)-control_points_times(i)+control_points_times(control_points_times.m-2*k+i));}
     closed=true;
 }
 //#####################################################################

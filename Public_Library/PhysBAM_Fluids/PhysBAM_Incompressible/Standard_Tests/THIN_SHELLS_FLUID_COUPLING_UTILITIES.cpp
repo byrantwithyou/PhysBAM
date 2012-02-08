@@ -36,8 +36,8 @@ Add_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_body_
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.Initialize_Straight_Mesh(number_of_vertices);
     for(int i=0;i<number_of_vertices;i++){
-        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==i);
-        particles.X(i)=start_position+((T)(i-1)/(number_of_vertices-1))*(end_position-start_position);
+        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==i+1);
+        particles.X(i)=start_position+((T)i/(number_of_vertices-1))*(end_position-start_position);
         particles.V(i)=VECTOR<T,2>(0,0);}
     return index;
 }
@@ -53,8 +53,8 @@ Add_Circle_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformabl
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.Initialize_Straight_Mesh(number_of_vertices,true);
     for(int i=0;i<number_of_vertices;i++){
-        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==i);
-        T angle=(i-1)*(T)2*(T)pi/number_of_vertices;
+        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==i+1);
+        T angle=i*(T)2*(T)pi/number_of_vertices;
         particles.X(i)=center+radius*VECTOR<T,2>(cos(angle+(T).5*(T)pi),sin(angle+(T).5*(T)pi));
         particles.V(i)=VECTOR<T,2>(0,0);}
     return index;

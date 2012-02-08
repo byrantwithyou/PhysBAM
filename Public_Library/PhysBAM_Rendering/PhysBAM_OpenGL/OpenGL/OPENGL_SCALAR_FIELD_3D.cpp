@@ -376,9 +376,9 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int 
         for(int j=0;j<tex_height;j++){
             bool value=bool();
             switch (slice->axis){
-                case 0: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
-                case 1: value=self->values(domain_start.x+i-1,slice->index,domain_start.z+tex_height-j);break;
-                case 2: value=self->values(domain_start.x+i-1,domain_start.y+j-1,slice->index);break;}
+                case 0: value=self->values(slice->index,domain_start.y+j,domain_start.z+tex_width-i);break;
+                case 1: value=self->values(domain_start.x+i,slice->index,domain_start.z+tex_height-j);break;
+                case 2: value=self->values(domain_start.x+i,domain_start.y+j,slice->index);break;}
             int idx=j*tex_width+i;
             bitmap[idx]=color_map->Lookup(self->Pre_Map_Value(value));}
 
@@ -403,9 +403,9 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int t
         for(int j=0;j<tex_height;j++){
             int value=int();
             switch (slice->axis){
-                case 0: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
-                case 1: value=self->values(domain_start.x+i-1,slice->index,domain_start.z+tex_height-j);break;
-                case 2: value=self->values(domain_start.x+i-1,domain_start.y+j-1,slice->index);break;}
+                case 0: value=self->values(slice->index,domain_start.y+j,domain_start.z+tex_width-i);break;
+                case 1: value=self->values(domain_start.x+i,slice->index,domain_start.z+tex_height-j);break;
+                case 2: value=self->values(domain_start.x+i,domain_start.y+j,slice->index);break;}
             int idx=j*tex_width+i;
             bitmap[idx]=color_map->Lookup(self->Pre_Map_Value(value));}
 

@@ -99,7 +99,7 @@ public:
         for(int i=0;i<body_motion.trajectories.m;i++){closest_points(i).Resize(number_particles);weights(i).Resize(number_particles);}
         surface.mesh.Initialize_Neighbor_Nodes();surface.mesh.Initialize_Adjacent_Elements();surface.mesh.Initialize_Neighbor_Elements();
         row_lengths.Remove_All();row_lengths.Resize(number_particles,false,false);
-        for(int i=0;i<number_particles;i++) row_lengths(i)=(*surface.mesh.neighbor_nodes)(start_particles+i-1).m+1;
+        for(int i=0;i<number_particles;i++) row_lengths(i)=(*surface.mesh.neighbor_nodes)(start_particles+i).m+1;
         surface_laplacian.Set_Row_Lengths(row_lengths);
         for(int i=0;i<number_particles;i++) row_lengths(i)=1;
         h.Set_Row_Lengths(row_lengths);
@@ -130,9 +130,9 @@ public:
                 LOG::cout<<")"<<std::endl;
                 LOG::cout<<"One_Ring is "<<one_ring<<std::endl;
                 PHYSBAM_FATAL_ERROR("Missed a particle");}
-            for(int i=0;i<number_particles;i++) if(row_lengths(i)>(*surface.mesh.neighbor_nodes)(start_particles+i-1).m+1){
+            for(int i=0;i<number_particles;i++) if(row_lengths(i)>(*surface.mesh.neighbor_nodes)(start_particles+i).m+1){
                 ARRAY<int> one_ring;
-                LOG::cout<<"Mismatch: set elements for row "<<i<<" was set "<<row_lengths(i)<<" times but should have "<<(*surface.mesh.neighbor_nodes)(start_particles+i-1).m+1<<" times."<<std::endl;
+                LOG::cout<<"Mismatch: set elements for row "<<i<<" was set "<<row_lengths(i)<<" times but should have "<<(*surface.mesh.neighbor_nodes)(start_particles+i).m+1<<" times."<<std::endl;
                 LOG::cout<<"Elements are: (";
                 for(int j=0;j<surface.mesh.elements.m;j++) {
                     int a,b,c;surface.mesh.elements(j).Get(a,b,c);
