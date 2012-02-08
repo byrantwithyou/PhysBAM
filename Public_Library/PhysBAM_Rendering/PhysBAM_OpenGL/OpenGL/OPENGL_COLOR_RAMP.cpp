@@ -16,15 +16,15 @@ template<class T> OPENGL_COLOR_RAMP<T>::
 template<class T> OPENGL_COLOR OPENGL_COLOR_RAMP<T>::
 Lookup(T x) const
 {
-    int left_index=0,right_index=0;
+    int left_index=-1,right_index=-1;
     for(int i=0;i<color_x.m;i++){
         if(x>color_x(i))left_index=i;
         else if(x<color_x(i)){right_index=i;break;}
         else return equal_colors(i);}
-    if(left_index&&right_index){T alpha=(x-color_x(left_index))/(color_x(right_index)-color_x(left_index));
+    if(left_index>=0 && right_index>=0){T alpha=(x-color_x(left_index))/(color_x(right_index)-color_x(left_index));
         return T(alpha)*less_colors(right_index)+T(1.0-alpha)*greater_colors(left_index);}
-    else if(left_index)return greater_colors(left_index);
-    else if(right_index)return less_colors(right_index);
+    else if(left_index>=0) return greater_colors(left_index);
+    else if(right_index>=0) return less_colors(right_index);
     return OPENGL_COLOR(1,0,0);
 }
 template<class T> void OPENGL_COLOR_RAMP<T>::
@@ -76,7 +76,8 @@ Two_Color_Ramp(T value_min,T value_max,const OPENGL_COLOR& color_min,const OPENG
 }
 template<class T> OPENGL_COLOR_RAMP<T>* OPENGL_COLOR_RAMP<T>::
 Levelset_Color_Constant_Ramp(const OPENGL_COLOR& negative_color,const OPENGL_COLOR& positive_color)
-    {OPENGL_COLOR_RAMP<T> *ramp=new OPENGL_COLOR_RAMP<T>;
+{
+    OPENGL_COLOR_RAMP<T> *ramp=new OPENGL_COLOR_RAMP<T>;
     ramp->Add_Color(0,negative_color,negative_color,positive_color);
     return ramp;
 }

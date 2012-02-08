@@ -1056,7 +1056,7 @@ Advect_Fluid(const T dt,const int substep)
             if(!euler->timesplit || euler->perform_rungekutta_for_implicit_part) example.Apply_Isobaric_Fix(dt,rk_time);
             euler->Remove_Added_Internal_Energy(dt,rk_time);
             rk_time=rungekutta_u.Main();
-            if(rk_substep!=rungekutta_u.order) euler->Clamp_Internal_Energy(dt,rk_time);
+            if(rk_substep!=rungekutta_u.order-1) euler->Clamp_Internal_Energy(dt,rk_time);
 
             if(euler->timesplit && euler->thinshell){
                 Write_Substep("before applying FSI update for near-interface cells",substep,1);
@@ -1286,7 +1286,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
                     if(current_density<min_density){min_density=current_density;min_cell_index=cell_index;}
                     if(current_density>max_density){max_density=current_density;max_cell_index=cell_index;}
                     if(current_velocity.Magnitude()>max_velocity.Magnitude()){max_velocity=current_velocity;max_velocity_index=cell_index;}}}
-            LOG::cout<<"time="<<time+dt<<", Density extremas: min at "<<min_cell_index<<"="<<min_density<<", max at "<<max_cell_index<<"="<<max_density<<std::endl;
+            LOG::cout<<"time="<<time+dt<<", Density extremas: min at "<<(min_cell_index+1)<<"="<<min_density<<", max at "<<(max_cell_index+1)<<"="<<max_density<<std::endl; // INDEXING : get rid of the +1
             LOG::cout<<"time="<<time+dt<<", Maximum velocity ="<<max_velocity.Magnitude()<<": "<<max_velocity<<std::endl;}}
     else
         LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;

@@ -117,8 +117,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
     int particle_index=0;
     int active_count=0;
     for(particle_index=0;particle_index<particles_multiple(particle_set)->array_collection->Size();particle_index++){
-        active_count++;
-        if(active_count==point_index) break;}
+        if(active_count++==point_index) break;}
     selection->index=particle_index;
     selection->particle_set=particle_set;
     selection->location=particles_multiple(particle_set)->X(particle_index);
