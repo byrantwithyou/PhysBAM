@@ -43,7 +43,7 @@ public:
     explicit MATRIX(const VECTOR<T,size>& column1)
     {
         STATIC_ASSERT(m==1 || n==1);
-        for(int i=0;i<column1.Size();i++) x[i]=column1(i+1);
+        for(int i=0;i<column1.Size();i++) x[i]=column1(i);
     }
 
     template<class T_MATRIX>

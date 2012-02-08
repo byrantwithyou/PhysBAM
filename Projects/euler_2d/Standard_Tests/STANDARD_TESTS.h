@@ -318,8 +318,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         particles.X(6)=TV((T)-.0125,(T)0);   particles.X(7)=TV((T)-.006,(T)-.025);
 
         curve->mesh.number_nodes=particles.array_collection->Size();curve->mesh.elements.Preallocate(particles.array_collection->Size());
-        for(int i=1;i<particles.array_collection->Size();++i) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
-        curve->mesh.elements.Append(VECTOR<int,2>(particles.array_collection->Size(),1));
+        for(int i=0;i<particles.array_collection->Size()-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
+        curve->mesh.elements.Append(VECTOR<int,2>(particles.array_collection->Size()-1,0));
         curve->Update_Segment_List();curve->Update_Bounding_Box();
         rigid_body.Add_Structure(*curve);
 
@@ -393,7 +393,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     TV position(0,0),velocity(0,0);
     if(test_number==1 || test_number==4){
         RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
-        int rigid_body_index=1;
+        int rigid_body_index=0;
         position=rigid_body_particles.X(rigid_body_index);
         velocity=rigid_body_particles.twist(rigid_body_index).linear;
         rotation=rigid_body_particles.twist(rigid_body_index).angular.x;}

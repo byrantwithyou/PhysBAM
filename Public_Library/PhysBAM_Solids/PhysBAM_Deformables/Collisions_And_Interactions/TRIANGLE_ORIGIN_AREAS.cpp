@@ -54,17 +54,17 @@ template<class T,class TV> void Intersect_Triangle_Point(PT_DATA<T>& data,const 
         data.G[k]=XYP[k]*oPn;
         XYP[k]/=nP;
         onU[k]=MATRIX<T,3>::Outer_Product(n,U[k]);
-        data.H[k][3][3]=P(k+1)*H33-nP*ABC/(nP*nP*nP)*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(k+1),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(k+1)));}
+        data.H[k][3][3]=P(k)*H33-nP*ABC/(nP*nP*nP)*(MATRIX<T,3>::Outer_Product(TV::Axis_Vector(k),n)+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(k)));}
     for(int k=0;k<3;k++){
         int r=(k+1)%3,s=(k+2)%3;
         MATRIX<T,3> Hkk=-XYP[k]*(onU[k]+onU[k].Transposed());
         MATRIX<T,3> Hrs=XYP[r]*onU[k].Transposed()+XYP[r]*onU[r].Transposed()-XYP[s]*onU[r];
         MATRIX<T,3> Hk3=ABC/(nP*nP*nP)*onU[k]-XYP[k]*onn;
         for(int i=0;i<3;i++){
-            data.H[i][k][k]=P(i+1)*Hkk;
-            data.H[i][r][s]=P(i+1)*Hrs;
+            data.H[i][k][k]=P(i)*Hkk;
+            data.H[i][r][s]=P(i)*Hrs;
             data.H[i][s][r]=data.H[i][r][s].Transposed();
-            data.H[i][k][3]=P(i+1)*Hk3+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i+1))*nP*XYP[k];
+            data.H[i][k][3]=P(i)*Hk3+MATRIX<T,3>::Outer_Product(n,TV::Axis_Vector(i))*nP*XYP[k];
             data.H[i][3][k]=data.H[i][k][3].Transposed();}}
 }
 
@@ -116,7 +116,7 @@ template<class T> void Combine_Data(VOL_DATA<T,3,6>& data,const VOL_DATA<T,3,3>&
         for(int j=0;j<pd[z].n;j++)
             for(int s=0;s<pd[z].n;s++)
                 for(int i=0;i<3;i++)
-                    data.H[pd[z].index[j]][pd[z].index[s]]+=V.G[z](i+1)*pd[z].H[i][j][s];
+                    data.H[pd[z].index[j]][pd[z].index[s]]+=V.G[z](i)*pd[z].H[i][j][s];
 
     for(int y=0;y<3;y++)
         for(int z=0;z<3;z++)
