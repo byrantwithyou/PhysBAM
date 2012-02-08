@@ -182,7 +182,7 @@ Get_Local_Positions_For_Particles(const int m,const int n,GEOMETRY_PARTICLES<TV>
     T length=Length(),dtheta=(T)two_pi/n;
     for(int i=0;i<m;i++){
         T x_fraction=(i-1)/(T)(m-1);T distance_from_axis=Get_Fractional_Curve_Value(x_fraction,false);
-        for(int j=0;j<n;j++) particles.X(j+(i-1)*n)=TV(x_fraction*length,distance_from_axis*sin((j-1)*dtheta),distance_from_axis*cos((j-1)*dtheta));}
+        for(int j=0;j<n;j++) particles.X(j+i*n)=TV(x_fraction*length,distance_from_axis*sin(j*dtheta),distance_from_axis*cos(j*dtheta));}
     particles.X(m*n+1)=TV(0,0,0);particles.X(m*n+2)=TV(length,0,0);
 }
 //#####################################################################

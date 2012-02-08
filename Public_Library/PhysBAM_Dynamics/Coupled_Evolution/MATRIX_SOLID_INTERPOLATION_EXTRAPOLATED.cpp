@@ -64,7 +64,7 @@ template<class TV> void MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<TV>::
 Times_Add(const GENERALIZED_VELOCITY<TV>& solids,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
     for(int i=0;i<entries.m;i++) for(int axis=0;axis<TV::m;axis++)
-        constraints(COUPLING_CONSTRAINT_ID((i-1)*TV::m+axis))+=solids.V.array(entries(i))(axis);
+        constraints(COUPLING_CONSTRAINT_ID(i*TV::m+axis))+=solids.V.array(entries(i))(axis);
 }
 //#####################################################################
 // Function Transpose_Times_Add
@@ -73,7 +73,7 @@ template<class TV> void MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<TV>::
 Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,GENERALIZED_VELOCITY<TV>& solids) const
 {
     for(int i=0;i<entries.m;i++) for(int axis=0;axis<TV::m;axis++)
-        solids.V.array(entries(i))(axis)+=constraints(COUPLING_CONSTRAINT_ID((i-1)*TV::m+axis));
+        solids.V.array(entries(i))(axis)+=constraints(COUPLING_CONSTRAINT_ID(i*TV::m+axis));
 }
 //#####################################################################
 // Function Print_Each_Matrix
@@ -88,7 +88,7 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
 
     for(int i=0;i<entries.m;i++)
         for(int axis=0;axis<TV::m;axis++)
-            oo.Add_Sparse_Entry((i-1)*TV::m+axis,(reverse_map_deformable(entries(i))-1)*TV::m+axis,1);
+            oo.Add_Sparse_Entry(i*TV::m+axis,(reverse_map_deformable(entries(i))-1)*TV::m+axis,1);
 
     oo.End_Sparse_Matrix();
 }
@@ -103,7 +103,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 
     for(int i=0;i<entries.m;i++)
         for(int axis=0;axis<TV::m;axis++)
-            data.Append(TRIPLE<int,int,T>((i-1)*TV::m+axis,(reverse_map_deformable(entries(i))-1)*TV::m+axis,1));
+            data.Append(TRIPLE<int,int,T>(i*TV::m+axis,(reverse_map_deformable(entries(i))-1)*TV::m+axis,1));
 }
 //#####################################################################
 // Function Add_Diagonal
@@ -112,7 +112,7 @@ template<class TV> void MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<TV>::
 Add_Diagonal(ARRAY<T,COUPLING_CONSTRAINT_ID>& diagonal,const GENERALIZED_MASS<TV>& solid_mass) const
 {
     for(int i=0;i<entries.m;i++) for(int axis=0;axis<TV::m;axis++)
-        diagonal(COUPLING_CONSTRAINT_ID((i-1)*TV::m+axis))+=solid_mass.one_over_mass.array(entries(i));
+        diagonal(COUPLING_CONSTRAINT_ID(i*TV::m+axis))+=solid_mass.one_over_mass.array(entries(i));
 }
 //#####################################################################
 template class MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<VECTOR<float,1> >;

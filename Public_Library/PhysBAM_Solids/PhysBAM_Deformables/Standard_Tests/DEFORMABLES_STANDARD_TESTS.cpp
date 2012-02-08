@@ -391,7 +391,7 @@ Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspe
     mesh.Initialize_Herring_Bone_Mesh(m,n);particles.array_collection->Add_Elements(mesh.number_nodes);
     T mass_node=aspect_ratio*sqr(side_length)/(m*n);particles.mass.Fill(mass_node); // TODO: make this consistent with the density attribute
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) particles.X(i+m*(j-1))=TV((i-1)*dx,(T).5,(j-1)*dy);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) particles.X(i+m*j)=TV(i*dx,(T).5,j*dy);
     if(initial_state) Set_Initial_Particle_Configuration(particles,*initial_state,true);
     if(clipping_function) (*clipping_function)(triangulated_surface);
     TRIANGULATED_SURFACE<T>& copy=Copy_And_Add_Structure(triangulated_surface,particle_indices);
