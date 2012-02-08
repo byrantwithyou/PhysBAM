@@ -29,6 +29,7 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_IMPLICIT_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LIGHT.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
@@ -47,6 +48,7 @@ template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,
 template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& world,int number);
+template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Curve_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Curve2D_File(const std::string& filename,OPENGL_WORLD& world,int number);
 template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD& world,int number);
@@ -158,6 +160,7 @@ template<class T> void Add_File(const std::string& filename,OPENGL_WORLD& world,
         case TRI_FILE: Add_Tri_File<T>(filename,world,number);break;
         case TRI2D_FILE: Add_Tri2D_File<T>(filename,world,number);break;
         case PHI_FILE: Add_Phi_File<T>(filename,world,number);break;
+        case PHI2D_FILE: Add_Phi2D_File<T>(filename,world,number);break;
         case CURVE_FILE: Add_Curve_File<T>(filename,world,number);break;
         case CURVE2D_FILE: Add_Curve2D_File<T>(filename,world,number);break;
         case TET_FILE: Add_Tet_File<T>(filename,world,number);break;
@@ -252,6 +255,26 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& wo
         opengl_surface->Generate_Triangulated_Surface(false,"");
         opengl_surface->Set_Surface_Material(OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.8),float(.7),float(1))),OPENGL_MATERIAL::Matte(OPENGL_COLOR(float(.8),float(.8),float(.1))));
         world.Add_Object(opengl_surface);}
+    catch(FILESYSTEM_ERROR&){}
+}
+//#################################################################
+// Function Add_Phi2D_File
+//#################################################################
+template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD& world,int number)
+{
+    try{
+        LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* surface;
+        FILE_UTILITIES::Create_From_File<T>(filename,surface);
+        ARRAY<T,VECTOR<int,2> >& phi=surface->levelset.phi;
+        LOG::cout<<filename<<" statistics:"<<std::endl;
+        LOG::cout<<"  grid = "<<surface->levelset.grid<<std::endl;
+        LOG::cout<<"  phi array bounds = "<<phi.domain.min_corner.x<<" "<<phi.domain.max_corner.x<<", "<<phi.domain.min_corner.y<<" "<<phi.domain.max_corner.y<<std::endl;
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)if(phi(i,phi.domain.min_corner.y)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.y"<<std::endl;goto check1_end;}check1_end:
+        for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)if(phi(i,phi.domain.max_corner.y-1)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.y"<<std::endl;goto check2_end;}check2_end:
+        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(phi.domain.min_corner.x,j)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.x"<<std::endl;goto check5_end;}check5_end:
+        for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(phi.domain.max_corner.x-1,j)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.x"<<std::endl;goto check6_end;}check6_end:
+        OPENGL_LEVELSET_2D<T>* opengl_area=new OPENGL_LEVELSET_2D<T>(surface->levelset);
+        world.Add_Object(opengl_area);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################

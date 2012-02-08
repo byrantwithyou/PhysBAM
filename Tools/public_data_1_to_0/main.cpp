@@ -31,6 +31,7 @@ template<class T> void Convert_File(const std::string& ifilename,const std::stri
 template<class T> void Convert_Tri_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Phi_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Phi2D_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Tet_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Curve_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Curve2D_File(const std::string& ifilename,const std::string& ofilename);
@@ -76,6 +77,7 @@ template<class T> void Convert_File(const std::string& ifilename,const std::stri
         case TRI_FILE: Convert_Tri_File<T>(ifilename,ofilename);break;
         case TRI2D_FILE: Convert_Tri2D_File<T>(ifilename,ofilename);break;
         case PHI_FILE: Convert_Phi_File<T>(ifilename,ofilename);break;
+        case PHI2D_FILE: Convert_Phi2D_File<T>(ifilename,ofilename);break;
         case TET_FILE: Convert_Tet_File<T>(ifilename,ofilename);break;
         case CURVE_FILE: Convert_Curve_File<T>(ifilename,ofilename);break;
         case CURVE2D_FILE: Convert_Curve2D_File<T>(ifilename,ofilename);break;
@@ -135,6 +137,22 @@ template<class T> void Convert_Phi_File(const std::string& ifilename,const std::
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
+// Function Convert_Phi2D_File
+//#################################################################
+template<class T> void Convert_Phi2D_File(const std::string& ifilename,const std::string& ofilename)
+{
+    LOG::cout<<"PHI2: "<<ifilename<<" -> "<<ofilename<<std::endl;
+    try{
+        LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* surface;
+        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);
+        VECTOR<int,2>& min_corner = surface->levelset.phi.domain.min_corner;
+        if (min_corner.Min()<0){
+            LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*surface);
+    }
+    catch(FILESYSTEM_ERROR&){}
+}
+//#################################################################
 // Function Convert_Tet_File
 //#################################################################
 template<class T> void Convert_Tet_File(const std::string& ifilename,const std::string& ofilename)
@@ -152,6 +170,9 @@ template<class T> void Convert_Tet_File(const std::string& ifilename,const std::
     }
     catch(FILESYSTEM_ERROR&){}
 }
+//#################################################################
+// Function Convert_Curve_File
+//#################################################################
 template<class T> void Convert_Curve_File(const std::string& ifilename,const std::string& ofilename)
 {
     LOG::cout<<"CUR: "<<ifilename<<" -> "<<ofilename<<std::endl;
@@ -167,6 +188,9 @@ template<class T> void Convert_Curve_File(const std::string& ifilename,const std
     }
     catch(FILESYSTEM_ERROR&){}
 }
+//#####################################################################
+// Function Convert_Curve2_File
+//#####################################################################
 template<class T> void Convert_Curve2D_File(const std::string& ifilename,const std::string& ofilename)
 {
     LOG::cout<<"CUR2: "<<ifilename<<" -> "<<ofilename<<std::endl;
