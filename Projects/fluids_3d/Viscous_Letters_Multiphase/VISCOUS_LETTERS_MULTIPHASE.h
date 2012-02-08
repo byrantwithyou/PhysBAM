@@ -31,8 +31,8 @@ public:
     {
         fluids_parameters.grid.Initialize(35*resolution+1,20*resolution+1,35*resolution+1,-.3,.3,-.22,-.22+(.6*20/35),-.3,.3);
         LOG::cout<<"\ngrid: dx,dy,dz "<<fluids_parameters.grid.dx<<", "<<fluids_parameters.grid.dy<<", "<<fluids_parameters.grid.dz<<std::endl;
-        fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=false;
+        fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;
         frame_rate=480;
         last_frame=int(T(20)*frame_rate);
         fluids_parameters.use_vorticity_confinement=false;

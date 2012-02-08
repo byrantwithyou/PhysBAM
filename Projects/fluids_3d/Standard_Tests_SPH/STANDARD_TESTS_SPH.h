@@ -145,12 +145,12 @@ void Adjust_SPH_Particle_For_Domain_Boundaries(SPH_PARTICLES<TV>& particles,cons
     GRID<TV> grid=*fluids_parameters.grid;
     if(tests.test_number==1 && time<4) grid.domain.min_corner.x=(T).7;
     TV new_X=particles.X(index)+dt*V;
-    if(fluids_parameters.domain_walls[1][1]&&new_X.x<grid.domain.min_corner.x){V.x=0;new_X.x=grid.domain.min_corner.x;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[1][2]&&new_X.x>grid.domain.max_corner.x){V.x=0;new_X.x=grid.domain.max_corner.x;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[2][1]&&new_X.y<grid.domain.min_corner.y){V.y=00;new_X.y=grid.domain.min_corner.y;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[2][2]&&new_X.y>grid.domain.max_corner.y){V.y=0;new_X.y=grid.domain.max_corner.y;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[3][1]&&new_X.z<grid.domain.min_corner.z){V.z=0;new_X.z=grid.domain.min_corner.z;particles.X(index)=new_X-dt*V;}
-    if(fluids_parameters.domain_walls[3][2]&&new_X.z>grid.domain.max_corner.z){V.z=0;new_X.z=grid.domain.max_corner.z;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[0][0]&&new_X.x<grid.domain.min_corner.x){V.x=0;new_X.x=grid.domain.min_corner.x;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[0][1]&&new_X.x>grid.domain.max_corner.x){V.x=0;new_X.x=grid.domain.max_corner.x;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[1][0]&&new_X.y<grid.domain.min_corner.y){V.y=00;new_X.y=grid.domain.min_corner.y;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[1][1]&&new_X.y>grid.domain.max_corner.y){V.y=0;new_X.y=grid.domain.max_corner.y;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[2][0]&&new_X.z<grid.domain.min_corner.z){V.z=0;new_X.z=grid.domain.min_corner.z;particles.X(index)=new_X-dt*V;}
+    if(fluids_parameters.domain_walls[2][1]&&new_X.z>grid.domain.max_corner.z){V.z=0;new_X.z=grid.domain.max_corner.z;particles.X(index)=new_X-dt*V;}
 }
 //#####################################################################
 };

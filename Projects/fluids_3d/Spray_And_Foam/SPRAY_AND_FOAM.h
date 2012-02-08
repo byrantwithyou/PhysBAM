@@ -105,12 +105,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.cfl=3.5;
     fluids_parameters.use_density=true;
     fluids_parameters.use_temperature=false;
-    fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;fluids_parameters.domain_walls[2][1]=true;
+    fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[1][0]=true;
     fluids_parameters.use_vorticity_confinement=true;fluids_parameters.confinement_parameter=(T)10;
     fluids_parameters.gravity=(T)0;
     write_output_files=true;fluids_parameters.write_debug_data=true;
-    fluids_parameters.fluid_boundary=new BOUNDARY_OPEN_WATER<T_GRID>((T).5,!fluids_parameters.domain_walls[1][1],!fluids_parameters.domain_walls[1][2],!fluids_parameters.domain_walls[2][1],
-        !fluids_parameters.domain_walls[2][2],!fluids_parameters.domain_walls[3][1],!fluids_parameters.domain_walls[3][2]);
+    fluids_parameters.fluid_boundary=new BOUNDARY_OPEN_WATER<T_GRID>((T).5,!fluids_parameters.domain_walls[0][0],!fluids_parameters.domain_walls[0][1],!fluids_parameters.domain_walls[1][0],
+        !fluids_parameters.domain_walls[1][1],!fluids_parameters.domain_walls[2][0],!fluids_parameters.domain_walls[2][1]);
     fluids_parameters.Initialize_Domain_Boundary_Conditions();
 
     fluids_parameters.kolmogorov=(T).1;

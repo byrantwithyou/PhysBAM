@@ -84,7 +84,7 @@ public:
         fluids_parameters.grid.Initialize(181,91,181,-3,3,0,3,-3,3);
         printf("USING RESIZED GRID!!!!\n");
 //        fluids_parameters.grid.Initialize(31,11,31,-3,3,0,2,-3,3);
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.reseeding_frame_rate=10;
         fluids_parameters.bias_towards_negative_particles=true;fluids_parameters.number_particles_per_cell=16;
         fluids_parameters.use_removed_positive_particles=false;fluids_parameters.use_removed_negative_particles=true;

@@ -81,7 +81,7 @@ public:
         fluids_parameters.reseeding_frame_rate=10;
         fluids_parameters.incompressible_iterations=20;
         fluids_parameters.cfl=0.9;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=true;fluids_parameters.domain_walls[2][2]=false;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[1][1]=false;
         fluids_parameters.bias_towards_negative_particles=true;
         fluids_parameters.use_removed_positive_particles=false;fluids_parameters.use_removed_negative_particles=true;
         fluids_parameters.viscosity=(T)0;fluids_parameters.implicit_viscosity=false;fluids_parameters.variable_viscosity=false;fluids_parameters.second_order_cut_cell_method=false;

@@ -70,8 +70,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.write_particles=true;
     PARAMETER_LIST parameters;
     fluids_parameters.use_reacting_flow=true;
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
+    fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
     last_frame=512;frame_rate=96;
     fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);
     fluids_parameters.density_container.Set_Ambient_Density(0);

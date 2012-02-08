@@ -67,8 +67,8 @@ public:
         else fluids_parameters.grid.Initialize(33,33,33,0,1,0,1,0,1);
 
         fluids_parameters.gravity=0;fluids_parameters.cfl=0.9;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;
-        fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;
+        fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.kolmogorov=(T)0;
         fluids_parameters.implicit_viscosity=false;
         fluids_parameters.incompressible_iterations=100;
@@ -115,8 +115,8 @@ public:
             use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>(0,.55,.5),VECTOR<T,3>(.1,.55,.5),.05);world_to_source=MATRIX<T,4>::Identity_Matrix();source_velocity=VECTOR<T,3>(20,0,0);
             solids_parameters.perform_self_collision=false;}
         else if(example_number==4){
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][1]=true;
-            fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;
             PHYSBAM_FATAL_ERROR("Preroll is gone; this example is likely broken.");
             use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>(0,1.5,2),VECTOR<T,3>(.5,1.5,2),.3);world_to_source=MATRIX<T,4>::Identity_Matrix();source_velocity=VECTOR<T,3>(10,0,0);
             solids_parameters.cfl=(T)5.9;
@@ -129,8 +129,8 @@ public:
             use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>((T).5,(T)-.25,(T).5),VECTOR<T,3>((T).5,(T).25,(T).5),(T).15);source_velocity=VECTOR<T,3>(0,1,0);}
         else if(example_number==102){
             PHYSBAM_FATAL_ERROR("Preroll is gone; this example is likely broken.");
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[2][1]=true;
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[1][1]=false;
             solids_parameters.cfl=(T)3;
             use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>((T).5,(T)-.25,(T).5),VECTOR<T,3>((T).5,(T).25,(T).5),(T).15);source_velocity=VECTOR<T,3>(0,1,0);}
         else if(example_number==103){
@@ -138,8 +138,8 @@ public:
             solids_parameters.cfl=(T)3;
             use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>((T)0,(T).5,(T).5),VECTOR<T,3>((T).2,(T).5,(T).5),(T).15);source_velocity=VECTOR<T,3>(1,0,0);}
         else if(example_number==104){
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][1]=true;
-            fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;
             fluids_parameters.buoyancy_constant=0.15;
             fluids_parameters.confinement_parameter=3; // based on epsilon=60 and h=.05 (in fire paper)
             fluids_parameters.confinement_parameter_fuel=.8; // based on epsilon=16
@@ -147,8 +147,8 @@ public:
             fluids_parameters.density=0.01;
             use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>((T)0,(T)2,(T)2),VECTOR<T,3>((T).25,(T)2,(T)2),(T).2);source_velocity=VECTOR<T,3>(30,0,0);}
         else if(example_number==105){
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][1]=true;
-            fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[1][0]=true;
+            fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;
             fluids_parameters.buoyancy_constant=0.15;
             fluids_parameters.confinement_parameter=3; // based on epsilon=60 and h=.05 (in fire paper)
             fluids_parameters.confinement_parameter_fuel=.8; // based on epsilon=16

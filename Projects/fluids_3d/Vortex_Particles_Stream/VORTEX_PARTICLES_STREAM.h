@@ -40,8 +40,8 @@ public:
         first_frame=0;
         last_frame=200;
         frame_rate=60;
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.number_particles_per_cell=16;
         fluids_parameters.use_vorticity_confinement=false;fluids_parameters.confinement_parameter=(T).3;
         fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;

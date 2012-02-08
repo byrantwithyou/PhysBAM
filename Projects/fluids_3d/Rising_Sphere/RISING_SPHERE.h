@@ -32,7 +32,7 @@ public:
         restart_frame=0;
         m=30;n=60;mn=30;//m=84;n=60;mn=84;//105,75,105
         xmin=(T)0;xmax=(T)1;ymin=(T)0;ymax=(T)2;zmin=(T)0;zmax=(T)1;
-        domain_walls[1][1]=true;domain_walls[1][2]=true;domain_walls[2][1]=true;domain_walls[2][2]=false;domain_walls[3][1]=true;domain_walls[3][2]=true;
+        domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;
         fluids_parameters.Initialize_Domain_Boundary_Conditions(); // sets up the proper wall states
         number_particles_per_cell=32;
         use_removed_positive_particles=false;use_removed_negative_particles=false;

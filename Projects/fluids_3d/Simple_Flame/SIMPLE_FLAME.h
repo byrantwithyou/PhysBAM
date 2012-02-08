@@ -35,7 +35,7 @@ public:
          fuel_inject_velocity(0,1.0,0),rigid_body_list(solids_parameters.rigid_body_parameters.list),use_object(false)
     {
         fluids_parameters.grid->Initialize(33,65,33,T(0),T(1),0,2,T(0),T(1));
-        fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         last_frame=int(T(20)*frame_rate);
         fluids_parameters.incompressible_iterations=200;
         fluids_parameters.gravity=0;
