@@ -86,20 +86,20 @@ public:
     typedef typename HELPER<T2>::DERIVATIVE DERIVATIVE;
 
     int Locate_Interval(const T t) const
-    {int lo=0,hi=control_points.m+1;
+    {int lo=-1,hi=control_points.m;
     while(hi-lo>1){int m=(lo+hi)/2;if(t<control_points(m).t) hi=m;else lo=m;}
     return lo;}
 
     T2 Value(T t) const
     {int left_index=Locate_Interval(t);
-    if(left_index==0) return control_points.m>0?control_points(0).value:T2();
-    else if(left_index==control_points.m) return control_points(left_index).value;
+    if(left_index==-1) return control_points.m>0?control_points(0).value:T2();
+    else if(left_index==control_points.m-1) return control_points(left_index).value;
     else if(control_points(left_index).type==CONSTANT) return control_points(left_index).value;
     else return HELPER<T2>::Value(control_points(left_index).t,control_points(left_index+1).t,control_points(left_index).value,control_points(left_index+1).value,t);}
 
     DERIVATIVE Derivative(T t) const
     {int left_index=Locate_Interval(t);
-    if(left_index==0 || left_index==control_points.m || control_points(left_index).type==CONSTANT) return DERIVATIVE();
+    if(left_index==-1 || left_index==control_points.m-1 || control_points(left_index).type==CONSTANT) return DERIVATIVE();
     return 1/(control_points(left_index+1).t-control_points(left_index).t)*HELPER<T2>::Difference(control_points(left_index).value,control_points(left_index+1).value);}
 
     void Add_Control_Point(T t,const T2& value,INTERPOLATION_TYPE type=LINEAR)
