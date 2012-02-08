@@ -62,7 +62,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     frame_rate=24;
     restart=false;restart_frame=18;
     output_directory=STRING_UTILITIES::string_sprintf("Spinning_Bar/output_%d",resolution);
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=false; 
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false; 
     fluids_parameters.number_particles_per_cell=32;
     fluids_parameters.particle_half_bandwidth=1; // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     fluids_parameters.reseeding_frame_rate=1;

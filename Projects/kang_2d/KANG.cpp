@@ -93,8 +93,8 @@ Parse_Options()
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
     solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
     solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-    fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+    fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
     fluids_parameters.use_slip=true;
     test_system=parse_args->Is_Value_Set("-test_system");
@@ -132,33 +132,33 @@ Parse_Options()
     switch(test_number){
         case 1:
             grid.Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
-            domain_walls[1][1]=false;domain_walls[1][2]=false;
-            domain_walls[2][1]=false;domain_walls[2][2]=false;
+            domain_walls[0][0]=false;domain_walls[0][1]=false;
+            domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 2:
             grid.Initialize(resolution+1,resolution+1,0*m,1*m,0*m,1*m);
-            domain_walls[1][1]=false;domain_walls[1][2]=false;
-            domain_walls[2][1]=false;domain_walls[2][2]=false;
+            domain_walls[0][0]=false;domain_walls[0][1]=false;
+            domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 3:
             grid.Initialize(resolution+1,resolution*2+1,0*m,(T)1*m,0*m,(T)2*m);
-            domain_walls[1][1]=true;domain_walls[1][2]=true;
-            domain_walls[2][1]=true;domain_walls[2][2]=true;
+            domain_walls[0][0]=true;domain_walls[0][1]=true;
+            domain_walls[1][0]=true;domain_walls[1][1]=true;
             break;
         case 4:
             grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
-            domain_walls[1][1]=false;domain_walls[1][2]=true;
-            domain_walls[2][1]=true;domain_walls[2][2]=true;
+            domain_walls[0][0]=false;domain_walls[0][1]=true;
+            domain_walls[1][0]=true;domain_walls[1][1]=true;
             break;
         case 5:
             grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
-            domain_walls[1][1]=true;domain_walls[1][2]=true;
-            domain_walls[2][1]=false;domain_walls[2][2]=false;
+            domain_walls[0][0]=true;domain_walls[0][1]=true;
+            domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 6:
             grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
-            domain_walls[1][1]=true;domain_walls[1][2]=true;
-            domain_walls[2][1]=false;domain_walls[2][2]=false;
+            domain_walls[0][0]=true;domain_walls[0][1]=true;
+            domain_walls[1][0]=false;domain_walls[1][1]=false;
             break;
         case 7:
             grid.Initialize(resolution+1,resolution+1,-m,m,-m,m);
@@ -174,8 +174,8 @@ Parse_Options()
             break;
         case 9:
             grid.Initialize(resolution+1,3*resolution/2+1,-(T)0.01*m,+(T)0.01*m,-(T)0.01*m,(T)0.02*m);
-            domain_walls[1][1]=true;domain_walls[1][2]=true;
-            domain_walls[2][1]=true;domain_walls[2][2]=true;
+            domain_walls[0][0]=true;domain_walls[0][1]=true;
+            domain_walls[1][0]=true;domain_walls[1][1]=true;
             break;
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}

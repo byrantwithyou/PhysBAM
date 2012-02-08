@@ -39,8 +39,8 @@ public:
         last_frame=512;
         frame_rate=24;
         fluids_parameters.cfl=3;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=false;
-        fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;
+        fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.kolmogorov=(T)0;
         rho=1;rho_bottom=1;rho_top=(T).65;buoyancy_constant=0;fluids_parameters.gravity=0;
         fluids_parameters.temperature_container.Set_Cooling_Constant(0);fluids_parameters.temperature_products=3000;

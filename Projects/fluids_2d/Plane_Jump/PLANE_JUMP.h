@@ -22,10 +22,10 @@ public:
     PLANE_JUMP()
         :SOLIDS_FLUIDS_EXAMPLE_2D<RW>(fluids_parameters.FIRE)
     {
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.phi_boundary->Set_Constant_Extrapolation(!fluids_parameters.domain_walls[1][1],!fluids_parameters.domain_walls[1][2],!fluids_parameters.domain_walls[2][2],!fluids_parameters.domain_walls[2][1],!fluids_parameters.domain_walls[3][1],!fluids_parameters.domain_walls[3][2]);
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.phi_boundary->Set_Constant_Extrapolation(!fluids_parameters.domain_walls[0][0],!fluids_parameters.domain_walls[0][1],!fluids_parameters.domain_walls[1][1],!fluids_parameters.domain_walls[1][0],!fluids_parameters.domain_walls[2][0],!fluids_parameters.domain_walls[2][1]);
         fluids_parameters.phi_boundary->Set_Fixed_Boundary(false);
-        fluids_parameters.fluid_boundary->Set_Constant_Extrapolation(!fluids_parameters.domain_walls[1][1],!fluids_parameters.domain_walls[1][2],!fluids_parameters.domain_walls[2][2],!fluids_parameters.domain_walls[2][1],!fluids_parameters.domain_walls[3][1],!fluids_parameters.domain_walls[3][2]);
+        fluids_parameters.fluid_boundary->Set_Constant_Extrapolation(!fluids_parameters.domain_walls[0][0],!fluids_parameters.domain_walls[0][1],!fluids_parameters.domain_walls[1][1],!fluids_parameters.domain_walls[1][0],!fluids_parameters.domain_walls[2][0],!fluids_parameters.domain_walls[2][1]);
         frame_rate=240;last_frame=int(T(200)*frame_rate);
         fluids_parameters.grid.Initialize(100,100,0,1,0,1);
         fluids_parameters.temperature_container.Set_Ambient_Temperature(T(283.15));fluids_parameters.temperature_container.Set_Cooling_Constant((T)4000);
