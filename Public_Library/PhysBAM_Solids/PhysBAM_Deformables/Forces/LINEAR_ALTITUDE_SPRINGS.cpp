@@ -101,8 +101,8 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Print_Restlength_Statistics() const
 {
     LOG::cout<<"Altitude Springs - Total Springs = "<<(d+1)*parameters.m<<std::endl;
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*s+k-(d+1))=parameters(s)(k).restlength;Sort(length);
-    ARRAY<T> visual_length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++)visual_length((d+1)*s+k-(d+1))=parameters(s)(k).visual_restlength;
+    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*s+k)=parameters(s)(k).restlength;Sort(length);
+    ARRAY<T> visual_length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++)visual_length((d+1)*s+k)=parameters(s)(k).visual_restlength;
     Sort(visual_length);
     int one_percent=(int)(.01*length.m)+1,ten_percent=(int)(.1*length.m)+1,median=(int)(.5*length.m)+1;
     LOG::cout<<"Altitude Springs - Smallest Restlength = "<<length(1)<<", Visual Restlength = "<<visual_length(1)<<std::endl;
