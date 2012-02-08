@@ -32,6 +32,8 @@ template<class T> void Convert_Tri_File(const std::string& ifilename,const std::
 template<class T> void Convert_Tri2D_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Phi_File(const std::string& ifilename,const std::string& ofilename);
 template<class T> void Convert_Tet_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Curve_File(const std::string& ifilename,const std::string& ofilename);
+template<class T> void Convert_Curve2D_File(const std::string& ifilename,const std::string& ofilename);
 //#################################################################
 // Function main
 //#################################################################
@@ -75,6 +77,8 @@ template<class T> void Convert_File(const std::string& ifilename,const std::stri
         case TRI2D_FILE: Convert_Tri2D_File<T>(ifilename,ofilename);break;
         case PHI_FILE: Convert_Phi_File<T>(ifilename,ofilename);break;
         case TET_FILE: Convert_Tet_File<T>(ifilename,ofilename);break;
+        case CURVE_FILE: Convert_Curve_File<T>(ifilename,ofilename);break;
+        case CURVE2D_FILE: Convert_Curve2D_File<T>(ifilename,ofilename);break;
         default: LOG::cerr<<"Unrecognized file type "<<ifilename<<std::endl;}
     LOG::cout<<std::flush;
 }
@@ -145,6 +149,36 @@ template<class T> void Convert_Tet_File(const std::string& ifilename,const std::
             if (element.Min()<0){
                 LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}}
         FILE_UTILITIES::Write_To_File<T>(ofilename,*tetrahedralized_volume);
+    }
+    catch(FILESYSTEM_ERROR&){}
+}
+template<class T> void Convert_Curve_File(const std::string& ifilename,const std::string& ofilename)
+{
+    LOG::cout<<"CUR: "<<ifilename<<" -> "<<ofilename<<std::endl;
+    try{
+        SEGMENTED_CURVE<VECTOR<T,3> >* curve;
+        FILE_UTILITIES::Create_From_File<T>(ifilename,curve);
+        for(int i=0; i<curve->mesh.elements.m;i++){
+            VECTOR<int,2>& element=curve->mesh.elements(i);
+            element-=1;
+            if (element.Min()<0){
+                LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}}
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*curve);
+    }
+    catch(FILESYSTEM_ERROR&){}
+}
+template<class T> void Convert_Curve2D_File(const std::string& ifilename,const std::string& ofilename)
+{
+    LOG::cout<<"CUR2: "<<ifilename<<" -> "<<ofilename<<std::endl;
+    try{
+        SEGMENTED_CURVE_2D<T>* curve;
+        FILE_UTILITIES::Create_From_File<T>(ifilename,curve);
+        for(int i=0; i<curve->mesh.elements.m;i++){
+            VECTOR<int,2>& element=curve->mesh.elements(i);
+            element-=1;
+            if (element.Min()<0){
+                LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}}
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*curve);
     }
     catch(FILESYSTEM_ERROR&){}
 }
