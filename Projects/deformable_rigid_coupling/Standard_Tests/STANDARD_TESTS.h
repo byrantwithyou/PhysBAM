@@ -1657,7 +1657,7 @@ void Sphere_Block(bool deformable_on_top)
     last_frame=120;
     solids_parameters.cfl=2;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;
-    const char* sphere="/Tetrahedralized_Volumes/sphere.tet";
+    const char* sphere="/Tetrahedralized_Volumes/sphere_coarse.tet";
 
     tests.Create_Tetrahedralized_Volume(data_directory+sphere,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)(deformable_on_top?6:3),0))),true,true,1000);
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("sphere",1,(T).5);
