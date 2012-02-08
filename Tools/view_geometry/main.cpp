@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_BOX.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_HEXAHEDRALIZED_VOLUME.h>
@@ -27,9 +28,9 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_IMPLICIT_SURFACE.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LIGHT.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
@@ -263,18 +264,21 @@ template<class T> void Add_Phi_File(const std::string& filename,OPENGL_WORLD& wo
 template<class T> void Add_Phi2D_File(const std::string& filename,OPENGL_WORLD& world,int number)
 {
     try{
-        LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* surface;
-        FILE_UTILITIES::Create_From_File<T>(filename,surface);
-        ARRAY<T,VECTOR<int,2> >& phi=surface->levelset.phi;
+        LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* area;
+        FILE_UTILITIES::Create_From_File<T>(filename,area);
+        ARRAY<T,VECTOR<int,2> >& phi=area->levelset.phi;
         LOG::cout<<filename<<" statistics:"<<std::endl;
-        LOG::cout<<"  grid = "<<surface->levelset.grid<<std::endl;
+        LOG::cout<<"  grid = "<<area->levelset.grid<<std::endl;
         LOG::cout<<"  phi array bounds = "<<phi.domain.min_corner.x<<" "<<phi.domain.max_corner.x<<", "<<phi.domain.min_corner.y<<" "<<phi.domain.max_corner.y<<std::endl;
         for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)if(phi(i,phi.domain.min_corner.y)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.y"<<std::endl;goto check1_end;}check1_end:
         for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x;i++)if(phi(i,phi.domain.max_corner.y-1)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.y"<<std::endl;goto check2_end;}check2_end:
         for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(phi.domain.min_corner.x,j)<=0){LOG::cout<<"  phi<=0 on domain.min_corner.x"<<std::endl;goto check5_end;}check5_end:
         for(int j=phi.domain.min_corner.y;j<phi.domain.max_corner.y;j++)if(phi(phi.domain.max_corner.x-1,j)<=0){LOG::cout<<"  phi<=0 on domain.max_corner.x"<<std::endl;goto check6_end;}check6_end:
-        OPENGL_LEVELSET_2D<T>* opengl_area=new OPENGL_LEVELSET_2D<T>(surface->levelset);
-        world.Add_Object(opengl_area);}
+        SEGMENTED_CURVE_2D<T>* curve=DUALCONTOUR_2D<T>::Create_Segmented_Curve_From_Levelset(area->levelset);
+        curve->Update_Bounding_Box();
+        LOG::cout<<"bounding box: "<<*curve->bounding_box<<std::endl;
+        OPENGL_SEGMENTED_CURVE_2D<T>* og_curve=new OPENGL_SEGMENTED_CURVE_2D<T>(*curve,OPENGL_COLOR::Yellow());
+        world.Add_Object(og_curve);}
     catch(FILESYSTEM_ERROR&){}
 }
 //#################################################################
