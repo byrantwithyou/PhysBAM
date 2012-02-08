@@ -372,13 +372,13 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
     T min_collision_distance=fluids_parameters.particle_levelset_evolution->particle_levelset.min_collision_distance_factor*max_collision_distance;
     TV min_corner=fluids_parameters.grid->domain.Minimum_Corner(),max_corner=fluids_parameters.grid->domain.Maximum_Corner();
     for(int axis=0;axis<TV::m;axis++){
-        if(fluids_parameters.domain_walls[axis][1] && X_new[axis]<min_corner[axis]+max_collision_distance){
+        if(fluids_parameters.domain_walls[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
             T collision_distance=X[axis]-min_corner[axis];
             if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
             collision_distance=max(min_collision_distance,collision_distance);
             X_new[axis]+=max((T)0,min_corner[axis]-X_new[axis]+collision_distance);
             V[axis]=max((T)0,V[axis]);X=X_new-dt*V;}
-        if(fluids_parameters.domain_walls[axis][2] && X_new[axis]>max_corner[axis]-max_collision_distance){
+        if(fluids_parameters.domain_walls[axis][1] && X_new[axis]>max_corner[axis]-max_collision_distance){
             T collision_distance=max_corner[axis]-X[axis];
             if(collision_distance>max_collision_distance) collision_distance=max_corner[axis]-X_new[axis];
             collision_distance=max(min_collision_distance,collision_distance);

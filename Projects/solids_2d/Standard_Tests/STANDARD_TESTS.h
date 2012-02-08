@@ -333,32 +333,32 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             ARRAY<VECTOR<int,3> > new_elements;new_elements.Preallocate(4*number_new_particles);
             triangulated_area.particles.array_collection->Preallocate(number_new_particles);triangulated_area.Initialize_Square_Mesh_And_Particles(mattress_grid);
             for(int t=1;t<=mesh.elements.m;t+=2){
-                VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[1]%mattress_grid.counts.x,j_minus_one=nodes1[1]/mattress_grid.counts.x;
+                VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[0]%mattress_grid.counts.x,j_minus_one=nodes1[0]/mattress_grid.counts.x;
                 if(i>refine.x+j_minus_one&&i<refine.y+j_minus_one){
                     VECTOR<int,3> nodes2=mesh.elements(t+1);
                     int center_node=triangulated_area.particles.array_collection->Add_Element();
                     triangulated_area.particles.X(center_node)=mattress_grid.Center(i,j_minus_one+1);
                     deleted_elements.Append(t);deleted_elements.Append(t+1);
+                    new_elements.Append(VECTOR<int,3>(nodes1[0],nodes1[1],center_node));
                     new_elements.Append(VECTOR<int,3>(nodes1[1],nodes1[2],center_node));
-                    new_elements.Append(VECTOR<int,3>(nodes1[2],nodes1[3],center_node));
-                    new_elements.Append(VECTOR<int,3>(nodes2[2],nodes2[3],center_node));
-                    new_elements.Append(VECTOR<int,3>(nodes2[3],nodes2[1],center_node));}}
+                    new_elements.Append(VECTOR<int,3>(nodes2[1],nodes2[2],center_node));
+                    new_elements.Append(VECTOR<int,3>(nodes2[2],nodes2[0],center_node));}}
             if(test_number==3||test_number==6){ // add the bound non-dynamical particles
                 for(int t=1;t<=mesh.elements.m;t+=2){
-                    VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[1]%mattress_grid.counts.x,j_minus_one=nodes1[1]/mattress_grid.counts.x;
+                    VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[0]%mattress_grid.counts.x,j_minus_one=nodes1[0]/mattress_grid.counts.x;
                     if(i==refine.x+j_minus_one||i==refine.y+j_minus_one){
                         int center_node=triangulated_area.particles.array_collection->Add_Element();
                         triangulated_area.particles.X(center_node)=mattress_grid.Center(i,j_minus_one+1);
-                        solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,center_node,VECTOR<int,2>(nodes1[1],nodes1[3]),TV((T).5,(T).5)));
+                        solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,center_node,VECTOR<int,2>(nodes1[0],nodes1[2]),TV((T).5,(T).5)));
                         if(i==refine.x+j_minus_one){
                             deleted_elements.Append(t);
-                            new_elements.Append(VECTOR<int,3>(nodes1[1],nodes1[2],center_node));
-                            new_elements.Append(VECTOR<int,3>(nodes1[2],nodes1[3],center_node));}
+                            new_elements.Append(VECTOR<int,3>(nodes1[0],nodes1[1],center_node));
+                            new_elements.Append(VECTOR<int,3>(nodes1[1],nodes1[2],center_node));}
                         else{
                             VECTOR<int,3> nodes2=mesh.elements(t+1);
                             deleted_elements.Append(t+1);
-                            new_elements.Append(VECTOR<int,3>(nodes2[2],nodes2[3],center_node));
-                            new_elements.Append(VECTOR<int,3>(nodes2[3],nodes2[1],center_node));}}}
+                            new_elements.Append(VECTOR<int,3>(nodes2[1],nodes2[2],center_node));
+                            new_elements.Append(VECTOR<int,3>(nodes2[2],nodes2[0],center_node));}}}
                 mesh.Delete_Elements(deleted_elements);mesh.elements.Append_Elements(new_elements);}
             else{mesh.Delete_Sorted_Elements(deleted_elements);mesh.elements.Append_Elements(new_elements);}
             triangulated_area.Check_Signed_Areas_And_Make_Consistent(true);

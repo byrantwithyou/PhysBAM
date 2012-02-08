@@ -106,8 +106,8 @@ Parse_Options()
     solids_parameters.implicit_solve_parameters.cg_restart_iterations=200;
     solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
     //solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-    fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+    fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+    fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
     fluids_parameters.use_slip=true;
 //    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
@@ -159,27 +159,27 @@ Parse_Options()
     switch(test_number){
         case 1:
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+            fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 2:
             fluids_parameters.grid->Initialize(5,5,10*m,11*m,10*m,11*m);
-            fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][2]=false;
-            fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;
+            fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
             break;
         case 3:
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,(T).04*m,0*m,(T).04*m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+            fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 4:
         case 5:
             fluids_parameters.grid->Initialize(resolution+1,resolution+1,0*m,1*m,0*m,1*m);
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;
-            fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[2][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;
+            fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
             break;
         case 6:
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=false;fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
             (*fluids_parameters.grid).Initialize(resolution+1,resolution+1,0,1,(T)0,m);
             if(!parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=100;
             solid_density=150;
@@ -341,10 +341,10 @@ Kang_Circle(bool use_surface)
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     fluids_parameters.gravity=(T)0*m/(s*s);
     fluids_parameters.density=(T)1000*kg/(m*m);
+    fluids_parameters.domain_walls[0][0]=true;
+    fluids_parameters.domain_walls[0][1]=true;
+    fluids_parameters.domain_walls[1][0]=true;
     fluids_parameters.domain_walls[1][1]=true;
-    fluids_parameters.domain_walls[1][2]=true;
-    fluids_parameters.domain_walls[2][1]=true;
-    fluids_parameters.domain_walls[2][2]=true;
     fluids_parameters.cfl=(T).9;
 //    solids_parameters.write_static_variables_every_frame=true;
     use_massless_structure=use_surface;
@@ -762,10 +762,10 @@ FSI_Analytic_Test()
 
     fluids_parameters.gravity=(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);
-    fluids_parameters.domain_walls[1][1]=true;
-    fluids_parameters.domain_walls[1][2]=true;
-    fluids_parameters.domain_walls[2][1]=false;
-    fluids_parameters.domain_walls[2][2]=false;
+    fluids_parameters.domain_walls[0][0]=true;
+    fluids_parameters.domain_walls[0][1]=true;
+    fluids_parameters.domain_walls[1][0]=false;
+    fluids_parameters.domain_walls[1][1]=false;
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     fluids_parameters.second_order_cut_cell_method=true;
     fluids_parameters.use_levelset_viscosity=true;

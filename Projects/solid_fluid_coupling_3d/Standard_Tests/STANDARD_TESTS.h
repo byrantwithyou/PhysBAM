@@ -180,7 +180,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             fluids_parameters.density=(T)1000;
             fluids_parameters.gravity=(T)9.8;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             source_velocity=TV((T)0,(T)1,(T)0);
             source_cylinder=CYLINDER<T>(TV((T).5,(T)0,(T).5),TV((T).5,(T).05,(T).5),(T).15);
             break;
@@ -189,7 +189,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)1000;
             velocity_multiplier=(T)4;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             break;
         case 3:
             last_frame=1000;
@@ -197,7 +197,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)10;
             velocity_multiplier=(T)5;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             break;
         case 4:
             last_frame=1000;
@@ -205,7 +205,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)1;
             velocity_multiplier=(T)15;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             balloon_initial_radius=(T).2;
             light_sphere_drop_time=(T).5;
             heavy_sphere_drop_time=(T)1.5;
@@ -220,7 +220,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)1;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             balloon_initial_radius=(T).2;
             light_sphere_drop_time=(T).5;
             heavy_sphere_drop_time=(T)2.5;

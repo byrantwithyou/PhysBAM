@@ -197,7 +197,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     if(parse_args->Is_Value_Set("-stop_time")){spout_stop_time=(T)parse_args->Get_Double_Value("-stop_time");output_directory+=STRING_UTILITIES::string_sprintf("_stopat%.02f",spout_stop_time);}
     if(parse_args->Is_Value_Set("-radius")){spout_radius=(T)parse_args->Get_Double_Value("-radius");output_directory+=STRING_UTILITIES::string_sprintf("_radius%.02f",spout_radius);}
 
-    fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=false;
+    fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=false;
     fluids_parameters.density=(T)1000;
     solids_parameters.implicit_solve_parameters.cg_iterations=400;
 
@@ -218,7 +218,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.density=(T)10;
             last_frame=100;
             fluids_parameters.reseeding_frame_rate=5;
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             /* 
                case 1: heavy ball into bowl
                case 2: light ball into bowl
@@ -268,7 +268,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T).1;
             solid_density=(T)3000;
             fluids_parameters.grid->Initialize(20*resolution+1,15*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)1.5,(T)-1,(T)1);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).6*(T)1.5;;
             break;
         case 7:
@@ -282,7 +282,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)8000;
             fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
         case 16:
@@ -299,7 +299,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)8000;
             fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
         case 8:
@@ -309,7 +309,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             fluids_parameters.reseeding_frame_rate=5;
             fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             light_sphere_initial_height=(T)1.2;
             heavy_sphere_initial_height=(T)2.9;  // height of the funnel
             initial_fluid_height=(T)0;balloon_initial_radius=(T).325;
@@ -326,7 +326,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.removed_particle_mass_scaling=60;
             fluids_parameters.density=(T)1000;
             if(!parse_args->Is_Value_Set("-iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=800;
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)3.5;
             fluids_parameters.grid->Initialize(32*resolution+1,36*resolution+1,24*resolution+1,(T)-8,(T)8,(T)0,(T)18,(T)-6,(T)6);
             PHYSBAM_ASSERT(fluids_parameters.grid->dX.x==fluids_parameters.grid->dX.y && fluids_parameters.grid->dX.y==fluids_parameters.grid->dX.z);
@@ -337,7 +337,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_iterations=400;
             fluids_parameters.grid->Initialize(40*resolution+1,15*resolution+1,10*resolution+1,(T)-2,(T)2,(T)0,(T)1.5,(T)-.5,(T).5);
             solid_density=(T)1; for(int i=1;i<sub_test;++i) solid_density*=(T)10;
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)1.2;
             light_sphere_initial_height=ball_initial_height;
             break;
@@ -348,7 +348,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             if(!parse_args->Is_Value_Set("-iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=50;
             fluids_parameters.reseeding_frame_rate=5;
             fluids_parameters.grid->Initialize(20*resolution+1,30*resolution+1,20*resolution+1,(T)-1.5,(T)1.5,(T)0,(T)4,(T)-1.5,(T)1.5);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)1.35;
             balloon_initial_radius=(T).325;
             heavy_sphere_drop_time=(T)2.5;
@@ -381,7 +381,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solid_density=(T)1200;
             frame_rate=48;
             fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
         case 17:
@@ -396,7 +396,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solid_density=(T)1900;
             frame_rate=48;
             fluids_parameters.grid->Initialize(20*resolution+1,25*resolution+1,20*resolution+1,(T)-1,(T)1,(T)0,(T)2.5,(T)-1,(T)1);
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T).45*(T)2.5;
             break;
         case 21:
@@ -421,7 +421,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=500;
 
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;
             initial_fluid_height=(T)1.5;
 
             fountain_source_boxes.Append(RANGE<TV>(TV((T)-2,(T)0,(T)-1),TV((T)-1.95,initial_fluid_height,(T)1)));
@@ -478,7 +478,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 12:THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this,(T).5,(T).4);break;
         default:THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);break;}
 
-    fluids_parameters.domain_walls[2][1]=true;
+    fluids_parameters.domain_walls[1][0]=true;
 
     // give mon hints
     LOG::cout<<"MONITOR begin_frame="<<this->first_frame<<std::endl;

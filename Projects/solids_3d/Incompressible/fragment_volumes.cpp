@@ -41,8 +41,8 @@ int main(int argc,char* argv[])
         // compute volumes
         ARRAY<T> volumes(volume.particles.array_collection->Size());
         for(int t=0;t<volume.mesh.elements.m;t++){VECTOR<int,4>& nodes=volume.mesh.elements(t);
-            int root=union_find.Find(nodes[1]);
-            volumes(root)+=TETRAHEDRON<T>::Signed_Volume(particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3]),particles.X(nodes[4]));}
+            int root=union_find.Find(nodes[0]);
+            volumes(root)+=TETRAHEDRON<T>::Signed_Volume(particles.X(nodes[0]),particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3]));}
         // print volumes
         RANGE<VECTOR<T,1> > fragment_volume_box=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);
         for(int p=0;p<particles.array_collection->Size();p++)if(union_find.Is_Root(p)){
