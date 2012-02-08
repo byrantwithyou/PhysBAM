@@ -83,13 +83,13 @@ public:
     {return smooth_normals;}
 
     void Cycle_Cutaway_Mode()
-    {cutaway_mode=(cutaway_mode+1)%8;if(cutaway_mode)Update_Cutaway_Plane();}
+    {cutaway_mode=(cutaway_mode+1)%8;if(cutaway_mode) Update_Cutaway_Plane();}
 
     void Decrease_Cutaway_Fraction()
-    {cutaway_fraction-=(T).05;if(cutaway_fraction<0)cutaway_fraction+=1;if(cutaway_mode)Update_Cutaway_Plane();}
+    {cutaway_fraction-=(T).05;if(cutaway_fraction<0)cutaway_fraction+=1;if(cutaway_mode) Update_Cutaway_Plane();}
 
     void Increase_Cutaway_Fraction()
-    {cutaway_fraction+=(T).05;if(cutaway_fraction>1)cutaway_fraction-=1;if(cutaway_mode)Update_Cutaway_Plane();}
+    {cutaway_fraction+=(T).05;if(cutaway_fraction>1)cutaway_fraction-=1;if(cutaway_mode) Update_Cutaway_Plane();}
 
     bool Toggle_Differentiate_Inverted()
     {use_inverted_material=!use_inverted_material;return use_inverted_material;}

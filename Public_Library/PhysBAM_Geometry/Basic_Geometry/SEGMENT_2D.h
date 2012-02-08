@@ -116,18 +116,10 @@ public:
     {return RANGE<TV>::Bounding_Box(x1,x2);}
 
     const TV& X(const int i) const
-    {assert((unsigned)i<2);
-    switch(i){
-        case 1: return x1;
-        case 2: return x2;}
-    PHYSBAM_FATAL_ERROR();}
+    {assert((unsigned)i<2);return i?x2:x1;}
 
     TV& X(const int i)
-    {assert((unsigned)i<2);
-    switch(i){
-        case 1: return x1;
-        case 2: return x2;}
-    PHYSBAM_FATAL_ERROR();}
+    {assert((unsigned)i<2);return i?x2:x1;}
 
 //#####################################################################
     bool Segment_Line_Intersection(const TV& point_on_line,const TV& normal_of_line,T &interpolation_fraction) const;

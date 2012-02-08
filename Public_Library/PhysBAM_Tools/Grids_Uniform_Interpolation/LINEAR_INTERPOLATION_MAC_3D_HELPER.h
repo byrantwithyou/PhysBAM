@@ -37,16 +37,16 @@ public:
     template<class T_FACE_LOOKUP>
     static T Interpolate_Face_Component(const int axis,const T_BLOCK& block,const T_FACE_LOOKUP& face_velocities,const TV& X)
     {switch(axis){
-      case 1:return Interpolate_Face_X_Transformed(block,face_velocities,Transformed(block,X));
-      case 2:return Interpolate_Face_Y_Transformed(block,face_velocities,Transformed(block,X));
-      default:assert(axis==3);return Interpolate_Face_Z_Transformed(block,face_velocities,Transformed(block,X));}}
+      case 0:return Interpolate_Face_X_Transformed(block,face_velocities,Transformed(block,X));
+      case 1:return Interpolate_Face_Y_Transformed(block,face_velocities,Transformed(block,X));
+      default:assert(axis==2);return Interpolate_Face_Z_Transformed(block,face_velocities,Transformed(block,X));}}
 
     template<class T_FACE_LOOKUP>
     static ARRAY<PAIR<FACE_INDEX<3>,T> > Interpolate_Face_Component_Weights(const int axis,const T_BLOCK& block,const T_FACE_LOOKUP& face_velocities,const TV& X)
     {switch(axis){
-      case 1:return Interpolate_Face_X_Transformed_Weights(block,face_velocities,Transformed(block,X));
-      case 2:return Interpolate_Face_Y_Transformed_Weights(block,face_velocities,Transformed(block,X));
-      default:assert(axis==3);return Interpolate_Face_Z_Transformed_Weights(block,face_velocities,Transformed(block,X));}}
+      case 0:return Interpolate_Face_X_Transformed_Weights(block,face_velocities,Transformed(block,X));
+      case 1:return Interpolate_Face_Y_Transformed_Weights(block,face_velocities,Transformed(block,X));
+      default:assert(axis==2);return Interpolate_Face_Z_Transformed_Weights(block,face_velocities,Transformed(block,X));}}
 
     template<class T_BLOCK_2,class T_FACE_LOOKUP>
     static TV Interpolate_Face_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& face_velocities,const TV& DX)
@@ -60,9 +60,9 @@ public:
     template<class T_FACE_LOOKUP>
     static VECTOR<T,2> Extrema_Face_Component(const int axis,const T_BLOCK& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const TV& X)
     {switch(axis){
-      case 1:return Extrema_Face_X_Transformed(block,u_min,u_max,Transformed(block,X));
-      case 2:return Extrema_Face_Y_Transformed(block,u_min,u_max,Transformed(block,X));
-      default:assert(axis==3);return Extrema_Face_Z_Transformed(block,u_min,u_max,Transformed(block,X));}}
+      case 0:return Extrema_Face_X_Transformed(block,u_min,u_max,Transformed(block,X));
+      case 1:return Extrema_Face_Y_Transformed(block,u_min,u_max,Transformed(block,X));
+      default:assert(axis==2);return Extrema_Face_Z_Transformed(block,u_min,u_max,Transformed(block,X));}}
 
     template<class T_BLOCK_2,class T_FACE_LOOKUP>
     static VECTOR<TV,2> Extrema_Face_Transformed(const T_BLOCK_2& block,const T_FACE_LOOKUP& u_min,const T_FACE_LOOKUP& u_max,const TV& DX)

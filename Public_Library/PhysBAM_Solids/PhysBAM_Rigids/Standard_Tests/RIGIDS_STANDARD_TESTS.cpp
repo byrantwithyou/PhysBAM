@@ -307,12 +307,12 @@ Make_Lathe_Chain(const FRAME<TV>& frame,const T scale,const T friction,const T c
         rigid_body.Set_Coefficient_Of_Restitution(cor);
         links[i]=&rigid_body;
         switch(i){
-            case 1:rigid_body.Set_Frame(frame*FRAME<TV>(TV(0,4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi,TV(1,0,0))));break;
-            case 2:rigid_body.Set_Frame(frame*FRAME<TV>(TV(2+2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-2*(T)pi/3,TV(1,0,0))));break;
-            case 3:rigid_body.Set_Frame(frame*FRAME<TV>(TV(2+2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/3,TV(1,0,0))));break;
-            case 4:rigid_body.Set_Frame(frame*FRAME<TV>(TV(0,-4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))));break;
-            case 5:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/3,TV(1,0,0))));break;
-            case 6:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(2*(T)pi/3,TV(1,0,0))));break;}}
+            case 0:rigid_body.Set_Frame(frame*FRAME<TV>(TV(0,4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi,TV(1,0,0))));break;
+            case 1:rigid_body.Set_Frame(frame*FRAME<TV>(TV(2+2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-2*(T)pi/3,TV(1,0,0))));break;
+            case 2:rigid_body.Set_Frame(frame*FRAME<TV>(TV(2+2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/3,TV(1,0,0))));break;
+            case 3:rigid_body.Set_Frame(frame*FRAME<TV>(TV(0,-4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))));break;
+            case 4:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/3,TV(1,0,0))));break;
+            case 5:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(2*(T)pi/3,TV(1,0,0))));break;}}
 
     links[6]=links[0];
     for(int i=0;i<6;i++){

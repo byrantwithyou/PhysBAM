@@ -119,9 +119,9 @@ Fill_Node_Indices(int i,int j,int k,int l,int isolated_node_number,int& node1,in
 {
     // node1 is the isolated vertex and nodes2,3,4 are the triangle
     switch(isolated_node_number){
-        case 1:node1=i;node2=j;node3=l;node4=k;break;
-        case 2:node1=j;node2=i;node3=k;node4=l;break;
-        case 3:node1=k,node2=i,node3=l,node4=j;break;
+        case 0:node1=i;node2=j;node3=l;node4=k;break;
+        case 1:node1=j;node2=i;node3=k;node4=l;break;
+        case 2:node1=k,node2=i,node3=l,node4=j;break;
         default:node1=l;node2=i;node3=j;node4=k;}
 }
 //#####################################################################

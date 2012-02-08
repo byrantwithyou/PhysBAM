@@ -60,7 +60,7 @@ public:
     return VECTOR<T,2>(one_minus_fraction*u1+fraction*u2,one_minus_fraction*v1+fraction*v2);}
 
     T Turbulent_Face_Velocity(const int axis,const VECTOR<T,2>& X,const T fraction) const
-    {assert((unsigned)axis<2);switch(axis){case 1:return Turbulent_U_Velocity(X,fraction);default:return Turbulent_V_Velocity(X,fraction);}}
+    {assert((unsigned)axis<2);switch(axis){case 0:return Turbulent_U_Velocity(X,fraction);default:return Turbulent_V_Velocity(X,fraction);}}
     
     T Turbulent_U_Velocity(const VECTOR<T,2>& X,const T fraction) const
     {VECTOR<T,2> X_new=wrap(X,grid.Xmin(),grid.Xmax());

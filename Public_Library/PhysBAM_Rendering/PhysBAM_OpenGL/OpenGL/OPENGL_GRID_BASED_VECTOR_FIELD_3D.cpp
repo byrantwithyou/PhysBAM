@@ -66,27 +66,26 @@ Update()
             vector_field(index)=V(i,j,ij);vector_locations(index++)=grid.X(i,j,ij);}}
     else{
         VECTOR<int,3> domain_start(V.domain.min_corner.x,V.domain.min_corner.y,V.domain.min_corner.z),domain_end(V.domain.max_corner.x,V.domain.max_corner.y,V.domain.max_corner.z);
-        if ((slice->mode == OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index < domain_start[slice->axis] || slice->index > domain_end[slice->axis])) ||
-            (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index < domain_start[slice->axis] || slice->index > domain_end[slice->axis]))) {
+        if ((slice->mode == OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
+            (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis]))) {
             // Currently we don't draw anything if the slice doesn't match where the vector field lives
             return;}
 
-        int m_start=1,m_end=grid.counts.x,n_start=1,n_end=grid.counts.y,mn_start=1,mn_end=grid.counts.z;
+        int m_start=0,m_end=grid.counts.x,n_start=0,n_end=grid.counts.y,mn_start=0,mn_end=grid.counts.z;
         switch(slice->axis){
-            case 1:m_start=m_end=slice->index;break;
-            case 2:n_start=n_end=slice->index;break;
-            case 3:mn_start=mn_end=slice->index;break;}
+            case 0:m_start=slice->index;m_end=m_start+1;break;
+            case 1:n_start=n_end=slice->index;m_end=m_start+1;break;
+            case 2:mn_start=mn_end=slice->index;m_end=m_start+1;break;}
 
-        int num_vectors=(m_end-m_start+1)*(n_end-n_start+1)*(mn_end-mn_start+1);
+        int num_vectors=(m_end-m_start)*(n_end-n_start)*(mn_end-mn_start);
         vector_field.Resize(num_vectors);
         vector_locations.Resize(num_vectors);
 
         int idx=0;
-        for(int i=m_start;i<=m_end;i++)for(int j=n_start;j<=n_end;j++)for(int k=mn_start;k<=mn_end;k++){
-            idx++;
+        for(int i=m_start;i<m_end;i++)for(int j=n_start;j<n_end;j++)for(int k=mn_start;k<mn_end;k++){
             VECTOR<int,3> grid_index(i,j,k);
             vector_field(idx)=V(grid_index);
-            vector_locations(idx)=grid.X(grid_index);}}
+            vector_locations(idx++)=grid.X(grid_index);}}
 }
 //#####################################################################
 // Print_Selection_Info

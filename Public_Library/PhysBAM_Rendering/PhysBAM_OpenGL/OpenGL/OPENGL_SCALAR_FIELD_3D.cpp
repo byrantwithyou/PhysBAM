@@ -200,7 +200,7 @@ Display_3D() const
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
-    else if(dominant_axis==2){
+    else if(dominant_axis==1){
         if(view_forward[1]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=grid.counts.y-1;j>=0;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
@@ -221,7 +221,7 @@ Display_3D() const
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}}
-    else if(dominant_axis==3){
+    else if(dominant_axis==2){
         if(view_forward[2]>0){
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=grid.counts.z-1;k>=0;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
@@ -275,7 +275,7 @@ Display_3D_Slice() const
             OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
-    else if(slice->axis==2){
+    else if(slice->axis==1){
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int j=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
@@ -286,7 +286,7 @@ Display_3D_Slice() const
             OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
             OpenGL_Draw_Arrays(GL_TRIANGLE_STRIP,3,vertices,colors);vertices.Resize(0);colors.Resize(0);}}
-    else if(slice->axis==3){
+    else if(slice->axis==2){
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
         int k=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
@@ -376,10 +376,10 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,bool>* self,int tex_width,int 
         for(int j=0;j<tex_height;j++){
             bool value=bool();
             switch (slice->axis){
-                case 1: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
-                case 2: value=self->values(domain_start.x+i-1,slice->index,domain_start.z+tex_height-j);break;
-                case 3: value=self->values(domain_start.x+i-1,domain_start.y+j-1,slice->index);break;}
-            int idx=(j-1)*tex_width+i-1;
+                case 0: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
+                case 1: value=self->values(domain_start.x+i-1,slice->index,domain_start.z+tex_height-j);break;
+                case 2: value=self->values(domain_start.x+i-1,domain_start.y+j-1,slice->index);break;}
+            int idx=j*tex_width+i;
             bitmap[idx]=color_map->Lookup(self->Pre_Map_Value(value));}
 
     self->opengl_textured_rect->texture->Update_Texture(bitmap);
@@ -403,10 +403,10 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,int>* self,int tex_width,int t
         for(int j=0;j<tex_height;j++){
             int value=int();
             switch (slice->axis){
-                case 1: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
-                case 2: value=self->values(domain_start.x+i-1,slice->index,domain_start.z+tex_height-j);break;
-                case 3: value=self->values(domain_start.x+i-1,domain_start.y+j-1,slice->index);break;}
-            int idx=(j-1)*tex_width+i-1;
+                case 0: value=self->values(slice->index,domain_start.y+j-1,domain_start.z+tex_width-i);break;
+                case 1: value=self->values(domain_start.x+i-1,slice->index,domain_start.z+tex_height-j);break;
+                case 2: value=self->values(domain_start.x+i-1,domain_start.y+j-1,slice->index);break;}
+            int idx=j*tex_width+i;
             bitmap[idx]=color_map->Lookup(self->Pre_Map_Value(value));}
 
     self->opengl_textured_rect->texture->Update_Texture(bitmap);
@@ -464,8 +464,8 @@ Update_Slice()
     PHYSBAM_ASSERT(this->slice);
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     VECTOR<int,3> domain_start(values.domain.min_corner.x,values.domain.min_corner.y,values.domain.min_corner.z),domain_end(values.domain.max_corner.x,values.domain.max_corner.y,values.domain.max_corner.z);
-    if((slice->mode==OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index<domain_start[slice->axis] || slice->index>domain_end[slice->axis])) ||
-        (slice->mode==OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index<domain_start[slice->axis] || slice->index>domain_end[slice->axis]))){
+    if((slice->mode==OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis])) ||
+        (slice->mode==OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index<domain_start[slice->axis] || slice->index>=domain_end[slice->axis]))){
         // Currently we don't draw anything ifthe slice doesn't match where the scalar field lives
         Delete_Textured_Rect();
         return;}
@@ -481,7 +481,7 @@ Update_Slice()
     // rectangle will face you ifyou're looking down the positive axis
     int tex_width=0,tex_height=0; // texture width and height
     switch (slice->axis){
-        case 1:
+        case 0:
             opengl_textured_rect->frame->t.x=grid.Axis_X(slice->index,slice->axis);
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(0.5*pi,VECTOR<float,3>(0,1,0));
             opengl_textured_rect->width=domain.Edge_Lengths().z;
@@ -490,7 +490,7 @@ Update_Slice()
             tex_height=values.counts.y;
             break;
 
-        case 2:
+        case 1:
             opengl_textured_rect->frame->t.y=grid.Axis_X(slice->index,slice->axis);
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >(-0.5*pi,VECTOR<float,3>(1,0,0));
             opengl_textured_rect->width=domain.Edge_Lengths().x;
@@ -499,7 +499,7 @@ Update_Slice()
             tex_height=values.counts.z;
             break;
 
-        case 3:
+        case 2:
             opengl_textured_rect->frame->t.z=grid.Axis_X(slice->index,slice->axis);
             opengl_textured_rect->frame->r=ROTATION<VECTOR<float,3> >();
             opengl_textured_rect->width=domain.Edge_Lengths().x;

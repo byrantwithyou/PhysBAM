@@ -475,10 +475,10 @@ Initialize_Boundary_Mesh_With_T_Junctions(TRIANGLE_MESH& boundary_mesh_with_t_ju
     for(int tet=0;tet<elements.m;tet++) for(int e=0;e<4;e++){
         int i,j,k,l;
         switch(e){ // get edge (i,j,k) with proper orientation
-          case 1: elements(tet).Get(i,k,j,l);break;
-          case 2: elements(tet).Get(i,j,l,k);break;
-          case 3: elements(tet).Get(i,l,k,j);break;
-          case 4:default: elements(tet).Get(l,i,j,k);}
+          case 0: elements(tet).Get(i,k,j,l);break;
+          case 1: elements(tet).Get(i,j,l,k);break;
+          case 2: elements(tet).Get(i,l,k,j);break;
+          case 3:default: elements(tet).Get(l,i,j,k);}
         if(Number_Of_Tetrahedrons_Across_Face(tet,i,j,k)==1) continue;
         Add_Triangle_Or_Subtriangles(boundary_mesh_with_t_junctions.elements,*triangle_mesh,extended_segment_mesh,segment_midpoints,VECTOR<int,3>(i,j,k));}
 

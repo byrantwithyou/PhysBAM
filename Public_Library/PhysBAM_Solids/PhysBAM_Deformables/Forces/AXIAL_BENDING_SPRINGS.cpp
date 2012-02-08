@@ -263,9 +263,9 @@ template<class T> T AXIAL_BENDING_SPRINGS<T>::
 Endpoint_Mass(int s,int b) const
 {
     switch(b){
-        case 1:
+        case 0:
             return particles.mass(spring_particles(s)(0))*optimization_weights(s)(0)+particles.mass(spring_particles(s)(1))*optimization_weights(s)(1);
-        case 2:
+        case 1:
             return particles.mass(spring_particles(s)(2))*optimization_weights(s)(2)+particles.mass(spring_particles(s)(3))*optimization_weights(s)(3);
         default:
             PHYSBAM_FATAL_ERROR("Invalid endpoint");}
@@ -285,10 +285,10 @@ template<class T> VECTOR<T,3> AXIAL_BENDING_SPRINGS<T>::
 Endpoint_Velocity(ARRAY_VIEW<const TV> velocity,int s,int b) const
 {
     switch(b){
-        case 1:{
+        case 0:{
             int node1=spring_particles(s)(0),node2=spring_particles(s)(1);
             return velocity(node1)*optimization_weights(s)(0)+velocity(node2)*optimization_weights(s)(1);}
-        case 2:{
+        case 1:{
             int node3=spring_particles(s)(2),node4=spring_particles(s)(3);
             return velocity(node3)*optimization_weights(s)(2)+velocity(node4)*optimization_weights(s)(3);}
         default:

@@ -18,7 +18,7 @@ Set_Stiffness_Based_On_Reduced_Mass(const T scaling_coefficient) // assumes mass
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         for(int s=0;s<3;s++){int node1,node2,node3;
-            switch(s){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+            switch(s){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             T one_over_triangle_mass=(T).25*(particles.one_over_effective_mass(node2)+particles.one_over_effective_mass(node3)),one_over_particle_mass=particles.one_over_effective_mass(node1),
                harmonic_mass=Pseudo_Inverse(one_over_particle_mass+one_over_triangle_mass);
             parameters(t)(s).youngs_modulus=scaling_coefficient*harmonic_mass/parameters(t)(s).restlength;}}
@@ -83,9 +83,9 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         int i,j,k;mesh.elements(t).Get(i,j,k);
         int hmin=0;T cross_length_max=-FLT_MAX;
         for(int h=0;h<3;h++){
-            switch(h){case 1:node2=j;node3=k;break;case 2:node2=k;node3=i;break;default:node2=i;node3=j;}
+            switch(h){case 0:node2=j;node3=k;break;case 1:node2=k;node3=i;break;default:node2=i;node3=j;}
             T cross_length=(X(node3)-X(node2)).Magnitude_Squared();if(cross_length>cross_length_max){hmin=h;cross_length_max=cross_length;}}
-        switch(hmin){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+        switch(hmin){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
         TV direction=SEGMENT_2D<T>::Normal(X(node3),X(node2));
         T rl=parameters(t)(hmin).restlength,current_length=TV::Dot_Product(X(node1)-X(node2),direction);
         SPRING_STATE& spring_state=spring_states(t);
@@ -112,7 +112,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 is the segment
             const SPRING_PARAMETER& parameter=parameters(t)(state.node);
-            switch(state.node){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+            switch(state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             T rl=parameter.restlength,vrl=parameter.visual_restlength;
             TV force=parameter.youngs_modulus*(state.current_length-vrl)/rl*state.direction;
             F(node1)-=force;F(node2)+=state.barycentric.x*force;F(node3)+=state.barycentric.y*force;}}
@@ -128,7 +128,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
         if(spring_state.node){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
-            switch(spring_state.node){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+            switch(spring_state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             TV force=(spring_state.coefficient*TV::Dot_Product(V(node1)-spring_state.barycentric.x*V(node2)-spring_state.barycentric.y*V(node3),spring_state.direction))*spring_state.direction;
             F(node1)-=force;F(node2)+=spring_state.barycentric.x*force;F(node3)+=spring_state.barycentric.y*force;}}
 }
@@ -157,7 +157,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
         if(spring_state.node){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
-            switch(spring_state.node){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+            switch(spring_state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             aggregate(aggregate_id++)+=spring_state.sqrt_coefficient*TV::Dot_Product(V(node1)-spring_state.barycentric.x*V(node2)-spring_state.barycentric.y*V(node3),spring_state.direction);}}
 }
 //#####################################################################
@@ -172,7 +172,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
         if(spring_state.node){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
-            switch(spring_state.node){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+            switch(spring_state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             TV force=spring_state.sqrt_coefficient*aggregate(aggregate_id++)*spring_state.direction;
             F(node1)+=force;F(node2)-=spring_state.barycentric.x*force;F(node3)-=spring_state.barycentric.y*force;}}
 }
@@ -188,10 +188,10 @@ CFL_Strain_Rate() const
         int i,j,k;elements(t).Get(i,j,k);
         int hmin=0;T cross_length_max=-FLT_MAX;
         for(int h=0;h<3;h++){
-            switch(h){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+            switch(h){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             T cross_length=(X(node3)-X(node2)).Magnitude_Squared();
             if(cross_length>cross_length_max){hmin=h;cross_length_max=cross_length;}}
-        switch(hmin){case 1:node1=i;node2=j;node3=k;break;case 2:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
+        switch(hmin){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
         direction=SEGMENT_2D<T>::Normal(X(node2),X(node3));
         T rl=parameters(t)(hmin).restlength;
         if(use_rest_state_for_strain_rate) dx=rl;else dx=TV::Dot_Product(direction,X(node1)-X(node2));

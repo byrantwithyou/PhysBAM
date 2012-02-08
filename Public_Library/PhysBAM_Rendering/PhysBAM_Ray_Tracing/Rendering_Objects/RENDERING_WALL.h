@@ -113,19 +113,19 @@ public:
     {TV location=Object_Space_Point(world_location);
     if(box.Lazy_Inside(location)){
         int side=0;T distance=FLT_MAX;
-        if(show_xmin && location.x-box.min_corner.x < distance){side=1;distance=location.x-box.min_corner.x;}
-        if(show_xmax && box.max_corner.x-location.x < distance){side=2;distance=box.max_corner.x-location.x;}
-        if(show_ymin && location.y-box.min_corner.y < distance){side=3;distance=location.y-box.min_corner.y;}
-        if(show_ymax && box.max_corner.y-location.y < distance){side=4;distance=box.max_corner.y-location.y;}
-        if(show_zmin && location.z-box.min_corner.z < distance){side=5;distance=location.z-box.min_corner.z;}
-        if(show_zmax && box.max_corner.z-location.z < distance){side=6;distance=box.max_corner.z-location.z;}
+        if(show_xmin && location.x-box.min_corner.x < distance){side=0;distance=location.x-box.min_corner.x;}
+        if(show_xmax && box.max_corner.x-location.x < distance){side=1;distance=box.max_corner.x-location.x;}
+        if(show_ymin && location.y-box.min_corner.y < distance){side=2;distance=location.y-box.min_corner.y;}
+        if(show_ymax && box.max_corner.y-location.y < distance){side=3;distance=box.max_corner.y-location.y;}
+        if(show_zmin && location.z-box.min_corner.z < distance){side=4;distance=location.z-box.min_corner.z;}
+        if(show_zmax && box.max_corner.z-location.z < distance){side=5;distance=box.max_corner.z-location.z;}
         switch(side){
-          case 1:return TV(box.min_corner.x,location.y,location.z);
-          case 2:return TV(box.max_corner.x,location.y,location.z);
-          case 3:return TV(location.x,box.min_corner.y,location.z);
-          case 4:return TV(location.x,box.max_corner.y,location.z);
-          case 5:return TV(location.x,location.y,box.min_corner.z);
-          case 6:return TV(location.x,location.y,box.max_corner.z);
+          case 0:return TV(box.min_corner.x,location.y,location.z);
+          case 1:return TV(box.max_corner.x,location.y,location.z);
+          case 2:return TV(location.x,box.min_corner.y,location.z);
+          case 3:return TV(location.x,box.max_corner.y,location.z);
+          case 4:return TV(location.x,location.y,box.min_corner.z);
+          case 5:return TV(location.x,location.y,box.max_corner.z);
           default: return TV(clamp(location.x,box.min_corner.x,box.max_corner.x),clamp(location.y,box.min_corner.y,box.max_corner.y),clamp(location.z,box.min_corner.z,box.max_corner.z));}}
     else return TV(clamp(location.x,box.min_corner.x,box.max_corner.x),clamp(location.y,box.min_corner.y,box.max_corner.y),clamp(location.z,box.min_corner.z,box.max_corner.z));}
     

@@ -110,18 +110,18 @@ template<class T> VECTOR<T,3> TETRAHEDRON<T>::
 Surface(const VECTOR<T,3>& location) const
 {      
     if(Inside(location)){
-        int triangle=1;T distance=VECTOR<T,3>::Dot_Product(triangle1.x1-location,triangle1.normal);
+        int triangle=0;T distance=VECTOR<T,3>::Dot_Product(triangle1.x1-location,triangle1.normal);
         T distance_temp=VECTOR<T,3>::Dot_Product(triangle2.x1-location,triangle2.normal);
-        if(distance_temp < distance){triangle=2;distance=distance_temp;}
+        if(distance_temp < distance){triangle=1;distance=distance_temp;}
         distance_temp=VECTOR<T,3>::Dot_Product(triangle3.x1-location,triangle3.normal);
-        if(distance_temp < distance){triangle=3;distance=distance_temp;}
+        if(distance_temp < distance){triangle=2;distance=distance_temp;}
         distance_temp=VECTOR<T,3>::Dot_Product(triangle4.x1-location,triangle4.normal);
-        if(distance_temp < distance){triangle=4;distance=distance_temp;}
+        if(distance_temp < distance){triangle=3;distance=distance_temp;}
         switch(triangle){
-            case 1:return location+distance*triangle1.normal;
-            case 2:return location+distance*triangle2.normal;
-            case 3:return location+distance*triangle3.normal;
-            case 4:return location+distance*triangle4.normal;
+            case 0:return location+distance*triangle1.normal;
+            case 1:return location+distance*triangle2.normal;
+            case 2:return location+distance*triangle3.normal;
+            case 3:return location+distance*triangle4.normal;
             default:return VECTOR<T,3>(0,0,0);}} // should never be called!
     else{
         VECTOR<T,3> surface_point(location);

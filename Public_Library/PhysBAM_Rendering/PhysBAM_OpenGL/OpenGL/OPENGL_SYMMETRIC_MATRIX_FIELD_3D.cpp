@@ -35,22 +35,22 @@ Update()
 {
     if(!field.counts.x || !field.counts.y || !field.counts.z){entries.Clean_Memory();return;}
 
-    int m_start=1,m_end=grid.counts.x,n_start=1,n_end=grid.counts.y,mn_start=1,mn_end=grid.counts.z;
+    int m_start=0,m_end=grid.counts.x,n_start=0,n_end=grid.counts.y,mn_start=0,mn_end=grid.counts.z;
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
     if(slice && slice->mode!=OPENGL_SLICE::NO_SLICE){
         VECTOR<int,3> domain_start(m_start,n_start,mn_start),domain_end(m_end,n_end,mn_end);
-        if((slice->mode == OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index < domain_start[slice->axis] || slice->index > domain_end[slice->axis])) ||
-           (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index < domain_start[slice->axis] || slice->index > domain_end[slice->axis]))) return;
+        if((slice->mode == OPENGL_SLICE::CELL_SLICE && (grid.MAC_offset==0 || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis])) ||
+           (slice->mode == OPENGL_SLICE::NODE_SLICE && (grid.MAC_offset==0.5 || slice->index < domain_start[slice->axis] || slice->index >= domain_end[slice->axis]))) return;
         switch(slice->axis){
-            case 1:m_start=m_end=slice->index;break;
-            case 2:n_start=n_end=slice->index;break;
-            case 3:mn_start=mn_end=slice->index;break;}}
+            case 0:m_start=slice->index;m_end=m_start+1;break;
+            case 1:n_start=slice->index;m_end=m_start+1;break;
+            case 2:mn_start=slice->index;m_end=m_start+1;break;}}
 
     int count=0;
-    for(int i=m_start;i<=m_end;i++)for(int j=m_start;j<=n_end;j++)for(int ij=mn_start;ij<=mn_end;ij++) if(field(i,j,ij).Frobenius_Norm_Squared())count++;
+    for(int i=m_start;i<m_end;i++)for(int j=m_start;j<n_end;j++)for(int ij=mn_start;ij<mn_end;ij++) if(field(i,j,ij).Frobenius_Norm_Squared())count++;
     entries.Resize(count);count=0;
     DIAGONAL_MATRIX<T,3> D;MATRIX<T,3> U;
-    for(int i=m_start;i<=m_end;i++)for(int j=m_start;j<=n_end;j++)for(int ij=mn_start;ij<=mn_end;ij++) if(field(i,j,ij).Frobenius_Norm_Squared()){
+    for(int i=m_start;i<m_end;i++)for(int j=m_start;j<n_end;j++)for(int ij=mn_start;ij<mn_end;ij++) if(field(i,j,ij).Frobenius_Norm_Squared()){
         field(i,j,ij).Solve_Eigenproblem(D,U);entries(count++)=TRIPLE<VECTOR<T,3>,MATRIX<T,3>,VECTOR<bool,3> >(grid.X(i,j,ij),U*D,VECTOR<bool,3>(D.x11>0,D.x22>0,D.x33>0));}
 }
 //#####################################################################

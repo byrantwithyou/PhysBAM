@@ -73,7 +73,7 @@ public:
 
     template<class T_FACE_LOOKUP_LOOKUP>
     static VECTOR<T,3> Average_Face_To_Face_Vector_Helper(const GRID<VECTOR<T,3> >& grid,const typename GRID<VECTOR<T,3> >::FACE_ITERATOR& iterator,const T_FACE_LOOKUP_LOOKUP& u_face)
-    {static const int axis_to_other_axis[3][2]={{2,3},{1,3},{1,2}};
+    {static const int axis_to_other_axis[3][2]={{1,2},{0,2},{0,1}};
     int axis=iterator.Axis();typename GRID<VECTOR<T,3> >::INDEX face=iterator.Face_Index(),cell1,cell2;iterator.Unordered_Cell_Indices_Touching_Face(cell1,cell2);
     VECTOR<T,3> value;value[axis]=u_face(axis,face);
     for(int i=0;i<T_GRID::dimension-1;i++){

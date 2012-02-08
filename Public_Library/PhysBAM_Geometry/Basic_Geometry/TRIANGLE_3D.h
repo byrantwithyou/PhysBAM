@@ -156,20 +156,10 @@ public:
     {return RANGE<TV>::Bounding_Box(x1,x2,x3);}
 
     const TV& X(const int i) const
-    {assert((unsigned)i<3);
-    switch(i){
-        case 1: return x1;
-        case 2: return x2;
-        case 3: return x3;}
-    PHYSBAM_FATAL_ERROR();}
+    {assert((unsigned)i<3);if(i==2) return x3;return i?x2:x1;}
 
     TV& X(const int i)
-    {assert((unsigned)i<3);
-    switch(i){
-        case 1: return x1;
-        case 2: return x2;
-        case 3: return x3;}
-    PHYSBAM_FATAL_ERROR();}
+    {assert((unsigned)i<3);if(i==2) return x3;return i?x2:x1;}
 
 //#####################################################################
     void Change_Size(const T delta);
