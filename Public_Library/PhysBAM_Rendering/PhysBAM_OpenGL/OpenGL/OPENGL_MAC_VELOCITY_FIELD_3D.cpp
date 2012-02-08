@@ -17,7 +17,7 @@ using namespace PhysBAM;
 template<class T> OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid)
     :OPENGL_VECTOR_FIELD_3D<T>(*(new ARRAY<TV>),*(new ARRAY<TV>),OPENGL_COLOR::Gray(0.8f),.25,false,false,true),scale(1),grid(grid),
-    face_velocities(*new ARRAY<T,FACE_INDEX<3> >),u(face_velocities.Component(1)),v(face_velocities.Component(2)),w(face_velocities.Component(3))
+    face_velocities(*new ARRAY<T,FACE_INDEX<3> >),u(face_velocities.Component(0)),v(face_velocities.Component(1)),w(face_velocities.Component(2))
 {
     max_vectors_3d = 10000;
     PHYSBAM_ASSERT(grid.MAC_offset == 0.5);

@@ -33,13 +33,13 @@ public:
 
     template<class T_FACE_LOOKUP_LOOKUP>
     static T_SPIN Vorticity(const GRID<VECTOR<T,2> >& grid,const T_FACE_LOOKUP_LOOKUP& lookup,const TV_INT& index)
-    {return VECTOR<T,1>(Cell_Centered_Face_Velocity_Difference(grid,2,1,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,1,2,lookup,index));}
+    {return VECTOR<T,1>(Cell_Centered_Face_Velocity_Difference(grid,1,0,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,0,1,lookup,index));}
     template<class T_FACE_LOOKUP_LOOKUP>
     static T_SPIN Vorticity(const GRID<VECTOR<T,3> >& grid,const T_FACE_LOOKUP_LOOKUP& lookup,const TV_INT& index)
     {return VECTOR<T,3>(
-        Cell_Centered_Face_Velocity_Difference(grid,3,2,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,2,3,lookup,index),
-        Cell_Centered_Face_Velocity_Difference(grid,1,3,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,3,1,lookup,index),
-        Cell_Centered_Face_Velocity_Difference(grid,2,1,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,1,2,lookup,index));}
+        Cell_Centered_Face_Velocity_Difference(grid,2,1,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,1,2,lookup,index),
+        Cell_Centered_Face_Velocity_Difference(grid,0,2,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,2,0,lookup,index),
+        Cell_Centered_Face_Velocity_Difference(grid,1,0,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,0,1,lookup,index));}
 
     template<class T_FACE_LOOKUP_2>
     static void Vorticity(const GRID<TV>& grid,const T_FACE_LOOKUP_2& face_velocities_lookup,T_ARRAYS_SPIN& vorticity,T_ARRAYS_SCALAR& vorticity_magnitude)

@@ -403,25 +403,25 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
         T_ARRAYS_SCALAR density_ghost(grid->Domain_Indices(number_of_ghost_cells),false),temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         density_container.boundary->Fill_Ghost_Cells_Cell(*grid,density_container.density,density_ghost,time,number_of_ghost_cells);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
-        for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,2);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T rho_atm=rho_bottom+(rho_top-rho_bottom)*(iterator.Location().y-grid->domain.min_corner.y)/(grid->domain.max_corner.y-grid->domain.min_corner.y);
             T face_density=(density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))/(T)2;
             T face_temperature=(temperature_ghost(iterator.First_Cell_Index())+temperature_ghost(iterator.Second_Cell_Index()))/(T)2;
             if(face_density>density_buoyancy_threshold){
                 T density_difference=face_density-rho_atm,temperature_difference=face_temperature-temperature_container.ambient_temperature;
                 if(density_difference>0 || temperature_difference>0)
-                    force.Component(2)(iterator.Face_Index())=temperature_buoyancy_constant*temperature_difference-density_buoyancy_constant*density_difference;}}}
+                    force.Component(1)(iterator.Face_Index())=temperature_buoyancy_constant*temperature_difference-density_buoyancy_constant*density_difference;}}}
     else if(use_reacting_flow){
         T_ARRAYS_SCALAR temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
         T_LEVELSET_MULTIPLE& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         ARRAY<T> one_over_densities(number_of_regions);for(int i=0;i<number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
-        for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,2);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T temperature;
             int region=levelset_multiple.Inside_Region_Face(iterator.Axis(),iterator.Face_Index());
             if(fuel_region(region)) temperature=temperature_fuel;
             else temperature=(T).5*(temperature_ghost(iterator.First_Cell_Index())+temperature_ghost(iterator.Second_Cell_Index()));
-            force.Component(2)(iterator.Face_Index())=one_over_densities(region)*temperature_buoyancy_constant*(temperature-temperature_container.ambient_temperature);}}
+            force.Component(1)(iterator.Face_Index())=one_over_densities(region)*temperature_buoyancy_constant*(temperature-temperature_container.ambient_temperature);}}
 }
 template<> void FLUIDS_PARAMETERS_UNIFORM<GRID<VECTOR<double,1> > >::
 Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
