@@ -34,7 +34,7 @@ public:
         m=80;n=80;mn=80;
         lagrangian_steps=(T)4.9;
         xmin=(T)-.5;xmax=(T).5;ymin=(T)-.4;ymax=(T).6;zmin=(T)-.5;zmax=(T).5;
-        domain_walls[1][1]=true;domain_walls[1][2]=true;domain_walls[2][1]=true;domain_walls[2][2]=false;domain_walls[3][1]=true;domain_walls[3][2]=true;
+        domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;
         fluids_parameters.Initialize_Domain_Boundary_Conditions(); // sets up the proper wall states
         bias_towards_negative_particles=true;number_particles_per_cell=16;particle_restitution=0;use_removed_positive_particles=false;use_removed_negative_particles=false;
         viscosity=0;//(T)(.001137*2e5);

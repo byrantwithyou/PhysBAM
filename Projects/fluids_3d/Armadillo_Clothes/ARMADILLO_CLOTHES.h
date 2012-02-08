@@ -81,8 +81,8 @@ public:
             fluids_parameters.vector_advection=&thin_shells_semi_lagrangian_velocity;
             fluids_parameters.vector_advection_fuel=&thin_shells_semi_lagrangian_velocity_fuel;}
         fluids_parameters.levelset_substeps=.95;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=false;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;
         use_source=true;source_type=CYLINDER_SOURCE;cylinder_source=CYLINDER<T>(VECTOR<T,3>((T).5,(T)-.25,(T).5),VECTOR<T,3>((T).5,(T).25,(T).5),(T).15);source_velocity=VECTOR<T,3>(0,1,0);
 
         int r=-10;
@@ -97,8 +97,8 @@ public:
 
         // Fluids parameters 
         fluids_parameters.gravity=0;fluids_parameters.cfl=0.9;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;
-        fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;
+        fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.kolmogorov=(T)0;
         fluids_parameters.implicit_viscosity=false;
         fluids_parameters.incompressible_iterations=100;

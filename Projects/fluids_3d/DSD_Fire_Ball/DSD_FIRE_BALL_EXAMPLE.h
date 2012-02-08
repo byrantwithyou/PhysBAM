@@ -39,7 +39,7 @@ public:
     {
         frame_rate=96;
         fluids_parameters.grid->Initialize(151,226,151,0,2,0,3,0,2);
-        fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         last_frame=int(T(20)*frame_rate);
         fluids_parameters.incompressible_iterations=200;
         fluids_parameters.gravity=0;

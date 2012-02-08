@@ -20,7 +20,7 @@ public:
         frame_rate=24;
         restart=false;restart_frame=100;
         grid.Initialize(50,50,50,0,1,0,1,0,1);
-        domain_walls[1][1]=true;domain_walls[1][2]=true;domain_walls[2][1]=true;domain_walls[2][2]=false;domain_walls[3][1]=true;domain_walls[3][2]=true;
+        domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;
         number_particles_per_cell=16;
         write_levelset=true;write_velocity=true;write_particles=true;write_removed_positive_particles=false;write_removed_negative_particles=false;
         write_debug_data=true;

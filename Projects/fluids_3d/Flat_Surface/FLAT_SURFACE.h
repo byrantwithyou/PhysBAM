@@ -36,8 +36,8 @@ public:
     {
         first_frame=0;last_frame=300;
         frame_rate=24;
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.write_levelset=true;fluids_parameters.write_velocity=true;fluids_parameters.write_particles=true;
         fluids_parameters.write_removed_positive_particles=false;fluids_parameters.write_removed_negative_particles=true;
         fluids_parameters.write_debug_data=true;
@@ -79,7 +79,7 @@ public:
             fluids_parameters.object_friction=1;
             //solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/sphere",(T).15,true,true,false);
             fluids_parameters.gravity_direction=VECTOR<T,3>(0,0,-1);
-            fluids_parameters.domain_walls[2][2]=true;
+            fluids_parameters.domain_walls[1][1]=true;
             use_cylinder=false;}
         else{std::cerr<<"Dying inexplicably.\n";exit(1);}
     }

@@ -33,7 +33,7 @@ public:
         first_frame=0;last_frame=250;
         frame_rate=24;
         restart=false;restart_frame=25;
-        domain_walls[1][1]=true;domain_walls[1][2]=true;domain_walls[2][1]=true;domain_walls[2][2]=false;domain_walls[3][1]=true;domain_walls[3][2]=true;
+        domain_walls[0][0]=true;domain_walls[0][1]=true;domain_walls[1][0]=true;domain_walls[1][1]=false;domain_walls[2][0]=true;domain_walls[2][1]=true;
         reseeding_frame_rate=15;
         bias_towards_negative_particles=true;number_particles_per_cell=16;use_removed_positive_particles=false;use_removed_negative_particles=true;
         initial_water_level=(T)0.777; // some number so the interface won't lie in the center of a cell

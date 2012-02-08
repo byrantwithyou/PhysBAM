@@ -75,13 +75,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     output_directory=STRING_UTILITIES::string_sprintf("Flow_Past_Eftychis/Test_%d",test_number);
 
     if(test_number==1){
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.confinement_parameter=(T).5;
     }
     else if(test_number==2){
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[3][1]=false;fluids_parameters.domain_walls[3][2]=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
         fluids_parameters.gravity=0;
         source_sphere.radius=(T).1;
         source_sphere.center=TV((T)-.24,(T).62,(T).25);
@@ -89,8 +89,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.confinement_parameter=(T).15;
     }
     else if(test_number==3){
-        fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=false;fluids_parameters.domain_walls[2][1]=true;
-        fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[3][1]=false;fluids_parameters.domain_walls[3][2]=true;
+        fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
+        fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[2][0]=false;fluids_parameters.domain_walls[2][1]=true;
         //fluids_parameters.gravity=0;
         source_sphere.radius=(T).1;
         source_sphere.center=TV((T)-.24,(T).62,(T).25);

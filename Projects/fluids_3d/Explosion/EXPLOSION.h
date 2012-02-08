@@ -51,7 +51,7 @@ public:
         restart=parameters.Get_Parameter_And_Set_If_Undefined("restart",(bool)false);
         frame_rate=60;
         fluids_parameters.cfl=.9;
-        fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][2]=false;fluids_parameters.domain_walls[2][1]=true;
+        fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][1]=false;fluids_parameters.domain_walls[1][0]=true;
         fluids_parameters.use_vorticity_confinement=parameters.Get_Parameter_And_Set_If_Undefined("use_vorticity_confinement",false);
         fluids_parameters.confinement_parameter=parameters.Get_Parameter_And_Set_If_Undefined("confinement_parameter",(T).25);
         fluids_parameters.kolmogorov=(T)0;
