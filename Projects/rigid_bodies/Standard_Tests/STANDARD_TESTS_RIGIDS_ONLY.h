@@ -130,8 +130,8 @@ public:
             typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER& cluster=*rigid_bindings.reverse_bindings.Get(iterator.Key());
             for(int i=data.connections.m;i>=1;i--){
                 const VECTOR<RIGID_CLUSTER_CONSTITUENT_ID,2>& edge=data.connections(i);
-                RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(edge[1])),&child_2=rigid_body_collection.Rigid_Body(cluster.children(edge[2]));
-                VECTOR<int,2> hash_index=VECTOR<int,2>(cluster.children(edge[1]),cluster.children(edge[2])).Sorted();
+                RIGID_BODY<TV> &child_1=rigid_body_collection.Rigid_Body(cluster.children(edge[0])),&child_2=rigid_body_collection.Rigid_Body(cluster.children(edge[1]));
+                VECTOR<int,2> hash_index=VECTOR<int,2>(cluster.children(edge[0]),cluster.children(edge[1])).Sorted();
                 T minX=min(child_1.X()(1),child_2.X()(2));
                 T& decay=cluster_fracture->decay_rate.Get_Or_Insert(hash_index,0);decay=time-minX;}}
     }

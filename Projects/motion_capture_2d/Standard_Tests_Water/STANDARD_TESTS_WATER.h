@@ -188,9 +188,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 5:
             last_frame=360;
             fluids_parameters.grid->Initialize(20*resolution+1,10*resolution+1,-11,9,0,10);
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=false;
-            fluids_parameters.domain_walls[2][2]=true;
-            fluids_parameters.domain_walls[2][1]=true;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=false;
+            fluids_parameters.domain_walls[1][1]=true;
+            fluids_parameters.domain_walls[1][0]=true;
             fluids_parameters.fluid_affects_solid=false;
             break;
         case 3:
@@ -201,8 +201,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             //fluids_parameters.grid->Initialize(20*resolution+1,120*resolution+1,-4,4,0,48);
             //fluids_parameters.grid->Initialize(20*resolution+1,30*resolution+1,-4,4,0,12);
             fluids_parameters.grid->Initialize(45*resolution+1,60*resolution+1,-9,9,0,24);
-            fluids_parameters.domain_walls[2][2]=false;
-            fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=fluids_parameters.domain_walls[2][1]=true;
+            fluids_parameters.domain_walls[1][1]=false;
+            fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=fluids_parameters.domain_walls[1][0]=true;
             fluids_parameters.incompressible_iterations=400;
             solids_parameters.implicit_solve_parameters.lanczos_iterations=1000;
             //solids_parameters.implicit_solve_parameters.cg_iterations=1000;
@@ -694,11 +694,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
     soft_bindings.Set_Mass_From_Effective_Mass();
 
-    fluids_parameters.domain_walls[2][1]=false;
+    fluids_parameters.domain_walls[1][0]=false;
     ARRAY<int> walls_added;
     THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this,(T).5,(T).5,&walls_added);
     LOG::cout<<"Walls added with ids: "<<walls_added<<std::endl;
-    fluids_parameters.domain_walls[2][1]=true;
+    fluids_parameters.domain_walls[1][0]=true;
 }
 //#####################################################################
 // Function Cylinder_And_Block

@@ -51,9 +51,9 @@ struct F_EXAMPLE
     using boost::math::pow;
 
 #define DEFINE_XYZ( D ) DEFINE_XYZ_ ## D ;
-#define DEFINE_XYZ_1 const T x = x_[1]
-#define DEFINE_XYZ_2 DEFINE_XYZ_1, y = x_[2]
-#define DEFINE_XYZ_3 DEFINE_XYZ_2, z = x_[3]
+#define DEFINE_XYZ_1 const T x = x_[0]
+#define DEFINE_XYZ_2 DEFINE_XYZ_1, y = x_[1]
+#define DEFINE_XYZ_3 DEFINE_XYZ_2, z = x_[2]
 
 #define DISABLE_UNUSED_XYZ_WARNING( D ) DISABLE_UNUSED_XYZ_WARNING_ ## D
 #define DISABLE_UNUSED_XYZ_WARNING_1 static_cast<void>(x);

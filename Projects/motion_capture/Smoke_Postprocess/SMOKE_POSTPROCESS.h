@@ -116,8 +116,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     *fluids_parameters.grid=smoke_tests.grid;
     fluids_parameters.fluid_affects_solid=false;fluids_parameters.solid_affects_fluid=true;
     fluids_parameters.incompressible_iterations=100;
-    fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=true;
-    fluids_parameters.domain_walls[3][1]=fluids_parameters.domain_walls[3][2]=false;
+    fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=true;
+    fluids_parameters.domain_walls[2][0]=fluids_parameters.domain_walls[2][1]=false;
     fluids_parameters.use_vorticity_confinement=true;
     fluids_parameters.confinement_parameter=.25;
     //fluids_parameters.gravity=.98;
@@ -136,7 +136,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)1;
             velocity_multiplier=(T)15;
-            //fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            //fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             source_velocity=TV((T)0,(T)0,(T)-5);
             //source_box=RANGE<TV>((T)-10,(T)10,(T)-10,(T)10,(T)42,(T)45);
             source_box=RANGE<TV>((T)-3,(T)3,(T)-2,(T)4,(T)42,(T)45);
@@ -150,8 +150,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)1;
             velocity_multiplier=(T)15;
-            fluids_parameters.domain_walls[2][2]=false;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[1][1]=false;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             smoke_tests.world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,(T)5,(T)0);
             source_box=RANGE<TV>((T)-1,(T)1,(T)0,(T)1,(T)-1,(T)1);
@@ -165,8 +165,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
             fluids_parameters.density=(T)1;
             velocity_multiplier=(T)15;
-            fluids_parameters.domain_walls[2][2]=false;
-            fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[1][2]=true;fluids_parameters.domain_walls[2][1]=true;fluids_parameters.domain_walls[3][1]=true;fluids_parameters.domain_walls[3][2]=true;
+            fluids_parameters.domain_walls[1][1]=false;
+            fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
             smoke_tests.world_to_source=MATRIX<T,4>::Identity_Matrix();
             source_velocity=TV((T)0,(T)5,(T)0);
             source_box=RANGE<TV>((T)-1,(T)1,(T)0,(T)1,(T)-1,(T)1);

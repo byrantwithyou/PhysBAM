@@ -118,8 +118,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_removed_positive_particles=true;
     fluids_parameters.reincorporate_removed_particle_velocity=false;
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
-    fluids_parameters.domain_walls[3][2]=fluids_parameters.domain_walls[3][1]=false;
-    fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][2]=true;
+    fluids_parameters.domain_walls[2][1]=fluids_parameters.domain_walls[2][0]=false;
+    fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=fluids_parameters.domain_walls[0][0]=fluids_parameters.domain_walls[0][1]=true;
 
     FILE_UTILITIES::Read_From_File(stream_type,input_directory+"/grid",*fluids_parameters.grid);
 

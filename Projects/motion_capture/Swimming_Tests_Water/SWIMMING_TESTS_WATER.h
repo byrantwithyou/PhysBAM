@@ -143,7 +143,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         
     if(parse_args->Is_Value_Set("-mtn")) FILE_UTILITIES::Read_From_File(stream_type,parse_args->Get_String_Value("-mtn"),body_motion);
         
-    fluids_parameters.domain_walls[2][2]=fluids_parameters.domain_walls[2][1]=false;
+    fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=false;
     fluids_parameters.density=(T)1000;
     solids_parameters.implicit_solve_parameters.cg_iterations=400;
 
@@ -155,7 +155,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.removed_particle_mass_scaling=60;
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_iterations=800;
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)5.5;
             scale=2;
             fluids_parameters.grid->Initialize(32*resolution+1,(int)(36*resolution/scale)+1,24*resolution+1,(T)-8*scale,(T)8*scale,(T)0,(T)18,(T)-6*scale,(T)6*scale);
@@ -166,7 +166,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.removed_particle_mass_scaling=60;
             fluids_parameters.density=(T)1000;
             solids_parameters.implicit_solve_parameters.cg_iterations=800;
-            fluids_parameters.domain_walls[2][2]=false;
+            fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)3.5;
             fluids_parameters.grid->Initialize(32*resolution+1,36*resolution+1,24*resolution+1,(T)-8,(T)8,(T)0,(T)18,(T)-6,(T)6);
             PHYSBAM_ASSERT(fluids_parameters.grid->dX.x==fluids_parameters.grid->dX.y && fluids_parameters.grid->dX.y==fluids_parameters.grid->dX.z);
@@ -180,7 +180,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 9:THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this,(T).5,(T).5,&rigid_bodies_to_collide_against);break;
         default:THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this);break;}
 
-    fluids_parameters.domain_walls[2][1]=true;
+    fluids_parameters.domain_walls[1][0]=true;
 
     // give mon hints
     LOG::cout<<"MONITOR begin_frame="<<this->first_frame<<std::endl;
