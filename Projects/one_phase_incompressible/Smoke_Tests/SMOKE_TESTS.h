@@ -69,12 +69,12 @@ public:
         else{
             source_box_3d.radius=T(source_radius);
             VECTOR<T,3> endpoint1=VECTOR<T,3>::Constant_Vector(0.25),endpoint2=VECTOR<T,3>::Constant_Vector(0.25);
-            endpoint1(2)=T(0);endpoint2(2)=T(0.05);
+            endpoint1(1)=T(0);endpoint2(1)=T(0.05);
             source_box_3d.Set_Endpoints(endpoint1,endpoint2);}
         TV_INT counts=TV_INT::All_Ones_Vector()*scale;
         RANGE<TV> range=RANGE<TV>(TV(),TV::Constant_Vector(0.5));
-        counts(2)*=2;
-        range.max_corner(2)*=2;
+        counts(1)*=2;
+        range.max_corner(1)*=2;
         mac_grid.Initialize(counts,range,true);
         upsampled_mac_grid.Initialize(counts*upsample,range,true);
         if(test_number>1){
@@ -105,7 +105,7 @@ public:
                 else model_file_name="../../Public_Data/Rigid_Bodies/sphere";
                 rigid_particle_id=rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,T(.07),true,true,true,true);
                 rigid_geometry_collection.particles.X(rigid_particle_id)=TV::Constant_Vector(T(.25));
-                rigid_geometry_collection.particles.X(rigid_particle_id)(2)=0.5;
+                rigid_geometry_collection.particles.X(rigid_particle_id)(1)=0.5;
                 rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=true;
                 break;
             case 3:
@@ -121,9 +121,9 @@ public:
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
     {
         if(test_number==3){
-            frame.t=TV::Constant_Vector(T(0.25));frame.t(2)=0.5;
-            if(time<4.0) frame.t(2)=sin(2*pi*time/4.)*0.2+0.5;
-            else frame.t(1)=sin(2*pi*time/4.)*0.1+0.25;}
+            frame.t=TV::Constant_Vector(T(0.25));frame.t(1)=0.5;
+            if(time<4.0) frame.t(1)=sin(2*pi*time/4.)*0.2+0.5;
+            else frame.t(0)=sin(2*pi*time/4.)*0.1+0.25;}
     }
 
     void Write_Output_Files(const int frame)
@@ -205,7 +205,7 @@ public:
         for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,0,GRID<TV>::WHOLE_REGION,0,2);iterator.Valid();iterator.Next()){ // y-direction forces only
             T face_density=min((density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))*T(.5),buoyancy_clamp);
             T density_difference=face_density;
-            if(density_difference>0) force.Component(2)(iterator.Face_Index())=density_buoyancy_constant*density_difference;}
+            if(density_difference>0) force.Component(1)(iterator.Face_Index())=density_buoyancy_constant*density_difference;}
     }
 
 //#####################################################################

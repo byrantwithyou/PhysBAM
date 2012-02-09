@@ -32,12 +32,12 @@ int main(int argc,char* argv[])
     particles.X(7)=TV(40,1,-1);particles.X(8)=TV(40,1,1);
 
     ARRAY<VECTOR<int,3>,int> triangle_list;
-    triangle_list.Append(VECTOR<int,3>(1,2,3));triangle_list.Append(VECTOR<int,3>(2,4,3));
-    triangle_list.Append(VECTOR<int,3>(5,7,6));triangle_list.Append(VECTOR<int,3>(6,7,8));
-    triangle_list.Append(VECTOR<int,3>(1,5,2));triangle_list.Append(VECTOR<int,3>(2,5,6));
-    triangle_list.Append(VECTOR<int,3>(3,4,7));triangle_list.Append(VECTOR<int,3>(4,8,7));
-    triangle_list.Append(VECTOR<int,3>(1,3,5));triangle_list.Append(VECTOR<int,3>(3,7,5));
-    triangle_list.Append(VECTOR<int,3>(2,6,4));triangle_list.Append(VECTOR<int,3>(4,6,8));
+    triangle_list.Append(VECTOR<int,3>(0,1,2));triangle_list.Append(VECTOR<int,3>(1,3,2));
+    triangle_list.Append(VECTOR<int,3>(4,6,5));triangle_list.Append(VECTOR<int,3>(5,6,7));
+    triangle_list.Append(VECTOR<int,3>(0,4,1));triangle_list.Append(VECTOR<int,3>(1,4,5));
+    triangle_list.Append(VECTOR<int,3>(2,3,6));triangle_list.Append(VECTOR<int,3>(3,7,6));
+    triangle_list.Append(VECTOR<int,3>(0,2,4));triangle_list.Append(VECTOR<int,3>(2,6,4));
+    triangle_list.Append(VECTOR<int,3>(1,5,3));triangle_list.Append(VECTOR<int,3>(3,5,7));
 
     TRIANGLE_MESH mesh(8,triangle_list);mesh.Initialize_Adjacent_Elements();
     TRIANGULATED_SURFACE<T> triangulated_surface(mesh,particles);triangulated_surface.Update_Triangle_List();
@@ -45,15 +45,15 @@ int main(int argc,char* argv[])
     PhysBAMInterface<T> interface(triangulated_surface);interface.Update(true);
 //#####################################################################
 
-    ARRAY<TV> nodes_for_rays;nodes_for_rays.Append(triangulated_surface.Get_Element(1).Center());
-    nodes_for_rays.Append(triangulated_surface.Get_Element(1).Center()+TV(0,10,0));
-    nodes_for_rays.Append(triangulated_surface.Get_Element(1).Center()+TV(0,-10,0));
+    ARRAY<TV> nodes_for_rays;nodes_for_rays.Append(triangulated_surface.Get_Element(0).Center());
+    nodes_for_rays.Append(triangulated_surface.Get_Element(0).Center()+TV(0,10,0));
+    nodes_for_rays.Append(triangulated_surface.Get_Element(0).Center()+TV(0,-10,0));
 
     ARRAY<PAIR<VECTOR<int,2>,IntersectionResult<T> > > rays_to_intersect(3);
-    rays_to_intersect(1).x=VECTOR<int,2>(1,2);
-    rays_to_intersect(2).x=VECTOR<int,2>(2,1);
-    rays_to_intersect(3).x=VECTOR<int,2>(1,3);
-    rays_to_intersect(3).x=VECTOR<int,2>(3,1);
+    rays_to_intersect(0).x=VECTOR<int,2>(0,1);
+    rays_to_intersect(1).x=VECTOR<int,2>(1,0);
+    rays_to_intersect(2).x=VECTOR<int,2>(0,2);
+    rays_to_intersect(2).x=VECTOR<int,2>(2,0);
 
     interface.Intersect(nodes_for_rays,rays_to_intersect,tolerance);
     for(int i=0;i<rays_to_intersect.Size();i++)

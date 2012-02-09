@@ -261,10 +261,10 @@ void Test_Triangle_Intersection()
     X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
     X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
     X.Append(rn.Get_Uniform_Vector(RANGE<TV>::Unit_Box()));
-    VECTOR<int,3> t1(1,2,3);
-    VECTOR<int,3> t2(3,2,4);
-    VECTOR<int,3> t3(3,4,5);
-    VECTOR<int,3> t4(4,5,6);
+    VECTOR<int,3> t1(0,1,2);
+    VECTOR<int,3> t2(2,1,3);
+    VECTOR<int,3> t3(2,3,4);
+    VECTOR<int,3> t4(3,4,5);
 
     Test_Triangle_Intersection(t1,t2,X);
     Test_Triangle_Intersection(t1,t3,X);

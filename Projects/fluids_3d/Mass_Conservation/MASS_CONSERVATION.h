@@ -208,7 +208,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         fluids_parameters.reseeding_frame_rate=200000;
         fluids_parameters.reinitialize_geometry_frame_rate=200000;
         fluids_parameters.particle_levelset_evolution->Use_Reinitialization();
-        fluids_parameters.particle_levelset_evolution->Particle_Levelset(1).reincorporate_removed_particles_everywhere=true;}
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).reincorporate_removed_particles_everywhere=true;}
     if(test_number==6){
         fluids_parameters.phi_boundary=new BOUNDARY_MAC_GRID_PERIODIC<GRID<TV>,T>();
         fluids_parameters.incompressible->Set_Custom_Boundary(*fluids_parameters.phi_boundary);
@@ -300,8 +300,8 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     if(test_number==1)
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
-            if(axis==1) face_velocities.Component(1)(face)=(T).5;
-            else face_velocities.Component(2)(face)=(T)0;}
+            if(axis==1) face_velocities.Component(0)(face)=(T).5;
+            else face_velocities.Component(1)(face)=(T)0;}
     else if(test_number==2)
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             face_velocities.Component(iterator.Axis())(iterator.Face_Index())=root_three_over_three;
@@ -310,7 +310,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
         static T_FACE_ARRAYS_SCALAR stored_velocities;
         if(!initialized){
             stored_velocities.Resize(grid);
-            stored_velocities.Component(3).Fill((T)0);
+            stored_velocities.Component(2).Fill((T)0);
             for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();TV location=iterator.Location();
                 if(axis==1) stored_velocities.Component(axis)(face_index)=pi_over_314*(zalesak_velocity_center.y-location.y);

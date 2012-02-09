@@ -176,8 +176,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 4:{
             Triangulated_Surface_Forces(false,true,false);
             T theta=pi/16;
-            deformable_body_collection.particles.X(3).x=deformable_body_collection.particles.X(3).z*sin(theta);
-            deformable_body_collection.particles.X(3).z=deformable_body_collection.particles.X(3).z*cos(theta);}
+            deformable_body_collection.particles.X(2).x=deformable_body_collection.particles.X(2).z*sin(theta);
+            deformable_body_collection.particles.X(2).z=deformable_body_collection.particles.X(2).z*cos(theta);}
             break;
         case 5:
             Triangulated_Surface_Forces(false,false,true);
@@ -225,10 +225,10 @@ void Triangle_Permutations()
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
     particles.array_collection->Add_Elements(6);
     particles.mass.Fill((T)1);
-    particles.X(1)=TV(0,0,0);particles.X(2)=TV(1,0,0);particles.X(3)=TV(0,0,1);
-    particles.X(4)=TV(0,0,0);particles.X(5)=TV(1,0,0);particles.X(6)=TV(0,0,1);
-    surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
-    surface.mesh.elements.Append(VECTOR<int,3>(4,5,6));
+    particles.X(0)=TV(0,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,0,1);
+    particles.X(3)=TV(0,0,0);particles.X(4)=TV(1,0,0);particles.X(5)=TV(0,0,1);
+    surface.mesh.elements.Append(VECTOR<int,3>(0,1,2));
+    surface.mesh.elements.Append(VECTOR<int,3>(3,4,5));
 }
 //#####################################################################
 // Function Single_Triangle
@@ -250,8 +250,8 @@ void Single_Triangle()
         case 0:theta=0;break;
         case 1:theta=pi/4;break;
         case 2:theta=-pi/4;break;}
-    particles.X(1)=TV(0,0,0);particles.X(2)=TV(cos(theta),0,-sin(theta));particles.X(3)=TV(sin(theta),0,cos(theta));
-    surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
+    particles.X(0)=TV(0,0,0);particles.X(1)=TV(cos(theta),0,-sin(theta));particles.X(2)=TV(sin(theta),0,cos(theta));
+    surface.mesh.elements.Append(VECTOR<int,3>(0,1,2));
 }
 //#####################################################################
 // Function Shear_Test
@@ -268,8 +268,8 @@ void Shear_Test()
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
     particles.array_collection->Add_Elements(3);
     particles.mass.Fill((T)1);
-    particles.X(1)=TV(0,0,0);particles.X(2)=TV(1,0,0);particles.X(3)=TV(0,0,1);
-    surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
+    particles.X(0)=TV(0,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,0,1);
+    surface.mesh.elements.Append(VECTOR<int,3>(0,1,2));
 }
 //#####################################################################
 // Function Bending_Test
@@ -287,9 +287,9 @@ void Bending_Test()
     particles.array_collection->Add_Elements(4);
     particles.mass.Fill((T)1);
     T theta=pi/32;
-    particles.X(1)=TV(0,0,0);particles.X(2)=TV(1,0,0);particles.X(3)=TV(0,0,1);particles.X(4)=TV(.5*(1+cos(theta)),sqrt(2)*.5*sin(theta),.5*(1+cos(theta)));
-    surface.mesh.elements.Append(VECTOR<int,3>(1,2,3));
-    surface.mesh.elements.Append(VECTOR<int,3>(4,3,2));
+    particles.X(0)=TV(0,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,0,1);particles.X(3)=TV(.5*(1+cos(theta)),sqrt(2)*.5*sin(theta),.5*(1+cos(theta)));
+    surface.mesh.elements.Append(VECTOR<int,3>(0,1,2));
+    surface.mesh.elements.Append(VECTOR<int,3>(3,2,1));
 }
 //#####################################################################
 // Function Cloth_Body_Test
@@ -410,11 +410,11 @@ void Triangulated_Surface_Forces(const bool use_edge,const bool use_bending,cons
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE 
 {
     if(test_number==6){
-        for(int i=4;i<=9;i++) for(int j=4;j<=9;j++){
-            int linear_index=(i-1)*12+j;
+        for(int i=3;i<9;i++) for(int j=3;j<9;j++){
+            int linear_index=i*12+j;
             V(linear_index)=TV();}}
     else if(test_number==8){
-        V(1)=TV();
+        V(0)=TV();
         V((number_side_panels+1)*number_side_panels+1)=TV();}
 }
 //#####################################################################

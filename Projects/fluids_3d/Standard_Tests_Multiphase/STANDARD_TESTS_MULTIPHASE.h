@@ -65,14 +65,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.Initialize_Number_Of_Regions(WATER_STANDARD_TESTS_MULTIPHASE_3D<GRID<TV> >::Number_Of_Regions(test_number));
     *fluids_parameters.grid=tests.grid;
 /*
-  fluids_parameters.viscosities(1)=(T)100;
+  fluids_parameters.viscosities(0)=(T)100;
   fluids_parameters.implicit_viscosity=true;
   fluids_parameters.incompressible_iterations=200;
   fluids_parameters.implicit_viscosity_iterations=200;
 
-  fluids_parameters.use_multiphase_strain(1)=true;
-  fluids_parameters.elastic_moduli(1)=10000;
-  fluids_parameters.plasticity_alphas(1)=1;
+  fluids_parameters.use_multiphase_strain(0)=true;
+  fluids_parameters.elastic_moduli(0)=10000;
+  fluids_parameters.plasticity_alphas(0)=1;
   fluids_parameters.cfl/=4;*/
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
@@ -148,12 +148,12 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
 {
 #if 0
     if(tests.test_number==16&&fabs(fluids_parameters.grid->domain.min_corner.y)<1e-5&&time<1.1333333333+1e-5){
-        ARRAY<T,VECTOR<int,3> >& u=fluids_parameters.incompressible_multiphase->projection.face_velocities.Component(1);
-        ARRAY<T,VECTOR<int,3> >& w=fluids_parameters.incompressible_multiphase->projection.face_velocities.Component(3);
-        ARRAY<bool,VECTOR<int,3> >& psi_N_u=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(1);
-        ARRAY<bool,VECTOR<int,3> >& psi_N_w=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(3);
+        ARRAY<T,VECTOR<int,3> >& u=fluids_parameters.incompressible_multiphase->projection.face_velocities.Component(0);
+        ARRAY<T,VECTOR<int,3> >& w=fluids_parameters.incompressible_multiphase->projection.face_velocities.Component(2);
+        ARRAY<bool,VECTOR<int,3> >& psi_N_u=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(0);
+        ARRAY<bool,VECTOR<int,3> >& psi_N_w=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(2);
         for(CELL_ITERATOR iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,3);iterator.Valid();iterator.Next()){
-            //if(fluids_parameters.particle_levelset_evolution->Levelset(1).phi(iterator.Cell_Index())<=0){
+            //if(fluids_parameters.particle_levelset_evolution->Levelset(0).phi(iterator.Cell_Index())<=0){
             VECTOR<int,3> cell=iterator.Cell_Index();
             if(tests.armadillo->phi(cell+VECTOR<int,3>(0,1,0))<=0){
                 if(u.Valid_Index(cell+VECTOR<int,3>(0,1,0)))u(cell+VECTOR<int,3>(0,1,0))=0;

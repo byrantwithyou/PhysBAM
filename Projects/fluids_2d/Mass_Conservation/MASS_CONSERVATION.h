@@ -215,7 +215,7 @@ void Initialize_Advection() PHYSBAM_OVERRIDE
         fluids_parameters.reseeding_frame_rate=200000;
         fluids_parameters.reinitialize_geometry_frame_rate=200000;
         fluids_parameters.particle_levelset_evolution->Use_Reinitialization();
-        fluids_parameters.particle_levelset_evolution->Particle_Levelset(1).reincorporate_removed_particles_everywhere=true;}
+        fluids_parameters.particle_levelset_evolution->Particle_Levelset(0).reincorporate_removed_particles_everywhere=true;}
     if(test_number==5 || test_number==6 || test_number==13) fluids_parameters.particle_levelset_evolution->Use_Frozen_Velocity(false);
 }
 //#####################################################################
@@ -412,13 +412,13 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     if(test_number == 1 || test_number==11)
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
-            if(axis==1) face_velocities.Component(1)(face)=(T)0;
-            else face_velocities.Component(2)(face)=(T).625;}
+            if(axis==1) face_velocities.Component(0)(face)=(T)0;
+            else face_velocities.Component(1)(face)=(T).625;}
     else if(test_number==12)
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face=iterator.Face_Index();
-            if(axis==1) face_velocities.Component(1)(face)=(T)0;
-            else face_velocities.Component(2)(face)=(T)-.625;}
+            if(axis==1) face_velocities.Component(0)(face)=(T)0;
+            else face_velocities.Component(1)(face)=(T)-.625;}
     else if(test_number==2)
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             face_velocities.Component(iterator.Axis())(iterator.Face_Index())=root_two_over_two;

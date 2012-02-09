@@ -97,10 +97,10 @@ public:
         short_kol=parse_args.Get_Integer_Value("-short_kol");
         
         TV_INT ratio=TV_INT::All_Ones_Vector();
-        if(parse_args.Get_Integer_Value("-x")!=1) ratio(1)*=parse_args.Get_Integer_Value("-x");
-        if(parse_args.Get_Integer_Value("-y")!=1) ratio(2)*=parse_args.Get_Integer_Value("-y");
-        if(parse_args.Get_Integer_Value("-z")!=1) ratio(3)*=parse_args.Get_Integer_Value("-z");
-        TV space;space(1)=T(1);for(int i=2;i<=TV::dimension;i++) space(i)=(T)ratio(i)/(T)ratio(1);
+        if(parse_args.Get_Integer_Value("-x")!=1) ratio(0)*=parse_args.Get_Integer_Value("-x");
+        if(parse_args.Get_Integer_Value("-y")!=1) ratio(1)*=parse_args.Get_Integer_Value("-y");
+        if(parse_args.Get_Integer_Value("-z")!=1) ratio(2)*=parse_args.Get_Integer_Value("-z");
+        TV space;space(0)=T(1);for(int i=2;i<=TV::dimension;i++) space(i)=(T)ratio(i)/(T)ratio(0);
         space*=0.5;
 
         T source_radius=parse_args.Get_Double_Value("-source_radius");
@@ -111,8 +111,8 @@ public:
             source_box_2d.max_corner.y=T(0.05);}
         else if(TV::dimension==3){
             source_box_3d.radius=source_radius;
-            VECTOR<T,3> endpoint1=VECTOR<T,3>::Constant_Vector(space(1)*0.5),endpoint2=VECTOR<T,3>::Constant_Vector(space(1)*0.5);
-            endpoint1(2)=T(0);endpoint2(2)=T(0.05);
+            VECTOR<T,3> endpoint1=VECTOR<T,3>::Constant_Vector(space(0)*0.5),endpoint2=VECTOR<T,3>::Constant_Vector(space(0)*0.5);
+            endpoint1(1)=T(0);endpoint2(1)=T(0.05);
             source_box_3d.Set_Endpoints(endpoint1,endpoint2);}
         else{PHYSBAM_NOT_IMPLEMENTED();}
 
@@ -269,7 +269,7 @@ public:
         for(typename GRID<TV>::FACE_ITERATOR iterator(fine_mac_grid,0,GRID<TV>::WHOLE_REGION,0,2);iterator.Valid();iterator.Next()){ // y-direction forces only
             T face_density=min((density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))*T(.5),buoyancy_clamp);
             T density_difference=face_density;
-            if(density_difference>0) force.Component(2)(iterator.Face_Index())=density_buoyancy_constant*density_difference;}
+            if(density_difference>0) force.Component(1)(iterator.Face_Index())=density_buoyancy_constant*density_difference;}
     }
 
     bool Map_Fine_To_Local_Boundaries_For_Cell(GRID<TV>& local_mac_grid,ARRAY<bool,FACE_INDEX<TV::dimension> >& local_psi_N,TV_INT cell_index)
@@ -519,7 +519,7 @@ public:
                 radius=0.07;
                 rigid_particle_id=rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,radius,true,true,true,true);
                 rigid_geometry_collection.particles.X(rigid_particle_id)=TV::Constant_Vector(0.25);
-                rigid_geometry_collection.particles.X(rigid_particle_id)(2)=0.5;
+                rigid_geometry_collection.particles.X(rigid_particle_id)(1)=0.5;
                 rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=true;
                 break;
             case 3:
@@ -536,9 +536,9 @@ public:
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id)
     {
         if(test_number==3){
-            frame.t=TV::Constant_Vector(0.25);frame.t(2)=0.5;
-            if(time<4.0) frame.t(2)=sin(2.*pi*time/4.)*0.2+0.5;
-            else frame.t(1)=sin(2*pi*time/4.)*0.1+0.25;}
+            frame.t=TV::Constant_Vector(0.25);frame.t(1)=0.5;
+            if(time<4.0) frame.t(1)=sin(2.*pi*time/4.)*0.2+0.5;
+            else frame.t(0)=sin(2*pi*time/4.)*0.1+0.25;}
     }
 
     //Analytic

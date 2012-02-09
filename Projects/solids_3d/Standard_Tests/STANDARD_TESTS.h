@@ -1115,7 +1115,7 @@ void Get_Initial_Data()
             {TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>());
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-            i=1;j=1;particles.mass(i+m*(j-1))=FLT_MAX;i=1;j=n;particles.mass(i+m*(j-1))=FLT_MAX;
+            i=0;j=0;particles.mass(i+m*j)=FLT_MAX;i=0;j=n-1;particles.mass(i+m*j)=FLT_MAX;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,true);}
             break;
         case 47:
@@ -1124,10 +1124,10 @@ void Get_Initial_Data()
             TRIANGULATED_SURFACE<T>& base_surface=*TRIANGULATED_SURFACE<T>::Create(*temp_particles);
             temp_particles->Store_Mass();
             TRIANGLE_MESH& mesh=base_surface.mesh;
-            mesh.elements.Append(VECTOR<int,3>(1,2,3));
-            mesh.elements.Append(VECTOR<int,3>(4,3,2));
-            //mesh.elements.Append(VECTOR<int,3>(2,4,5));
-            //mesh.elements.Append(VECTOR<int,3>(3,4,6));
+            mesh.elements.Append(VECTOR<int,3>(0,1,2));
+            mesh.elements.Append(VECTOR<int,3>(3,2,1));
+            //mesh.elements.Append(VECTOR<int,3>(1,3,4));
+            //mesh.elements.Append(VECTOR<int,3>(2,3,5));
             mesh.Set_Number_Nodes(4);
             base_surface.particles.array_collection->Add_Elements(4);
             base_surface.particles.X(0)=TV(-1,0,0);

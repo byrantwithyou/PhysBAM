@@ -263,9 +263,9 @@ Gimbal_Joint(const T shift)
     joint2->joint_description.Set_Joint_To_Child_Frame(FRAME<T>(VECTOR_3D<T>(-1,-1,-1),QUATERNION<T>(-pi/2,VECTOR_3D<T>(0,1,0))));
     joint3->joint_description.Set_Joint_To_Child_Frame(FRAME<T>(VECTOR_3D<T>(-1,-1,-1),QUATERNION<T>(-pi/2,VECTOR_3D<T>(1,0,0))));
 
-    arb.Add_Articulation(1,2,1);
-    arb.Add_Articulation(1,2,2);
-    arb.Add_Articulation(1,2,3);
+    arb.Add_Articulation(0,1,0);
+    arb.Add_Articulation(0,1,1);
+    arb.Add_Articulation(0,1,2);
 }
 
 namespace PhysBAM

@@ -466,7 +466,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         evolution->Output_Iterators(this->stream_type,output_directory.c_str(),frame);}
     if(test_number==40){
         T v=fluid_collection.incompressible_fluid_collection.face_velocities(FACE_INDEX<2>(2,fluids_parameters.grid->counts/2));
-        if(solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(3).linear.y;
+        if(solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) v=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(2).linear.y;
         LOG::cout<<"middle-velocity "<<v<<"   error from analytic solution "<<(v/analytic_solution-1)<<std::endl;}
     if(test_number==32){
         LOG::cout<<"solid-velocity "<<solid_body_collection.rigid_body_collection.rigid_body_particle.twist.Last().linear.y<<std::endl;}
@@ -516,10 +516,10 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
                 int count=0;
                 T estimate=0;
                 if(i>1){ // integrate v_y in the x direction
-                    estimate+=stream_function(i-1,j)+dX.x*face_velocities_copy.Component(2)(i-1,j);
+                    estimate+=stream_function(i-1,j)+dX.x*face_velocities_copy.Component(1)(i-1,j);
                     count++;}
                 if(j>1){ // integrate v_x in the y direction
-                    estimate+=stream_function(i,j-1)-dX.y*face_velocities_copy.Component(1)(i,j-1);
+                    estimate+=stream_function(i,j-1)-dX.y*face_velocities_copy.Component(0)(i,j-1);
                     count++;}
                 if(count)
                     stream_function(i,j)=estimate/count;
@@ -534,7 +534,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    if(test_number==40 && solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.X(3)=TV(.5,.5)*scale_length;
+    if(test_number==40 && solid_body_collection.rigid_body_collection.rigid_body_particle.X.m>=3) solid_body_collection.rigid_body_collection.rigid_body_particle.X(2)=TV(.5,.5)*scale_length;
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -590,13 +590,13 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Initialize_Velocities() PHYSBAM_OVERRIDE
 {
     if(test_number==35)
-        fluid_collection.incompressible_fluid_collection.face_velocities.Component(1).Fill(velocity_multiplier);
+        fluid_collection.incompressible_fluid_collection.face_velocities.Component(0).Fill(velocity_multiplier);
     
     if(test_number==31 || test_number==37)
-        fluid_collection.incompressible_fluid_collection.face_velocities.Component(2).Fill((T).2);
+        fluid_collection.incompressible_fluid_collection.face_velocities.Component(1).Fill((T).2);
 
     if(test_number==38)
-        fluid_collection.incompressible_fluid_collection.face_velocities.Component(1).Fill((T)1);
+        fluid_collection.incompressible_fluid_collection.face_velocities.Component(0).Fill((T)1);
 
     if(fluids_parameters.use_coupled_implicit_viscosity){
         fluid_collection.incompressible_fluid_collection.viscosity.Resize(fluids_parameters.grid->Domain_Indices(1));
@@ -668,7 +668,7 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
                 face_velocities(axis,face_index)=velocity_multiplier*cos(velocity_angle);
             else
                 face_velocities(axis,face_index)=-velocity_multiplier*cos(velocity_angle);
-            if(iterator.Location().y>(0.5-sin(velocity_angle)) || iterator.Location().y<(0.5-sin(velocity_angle)-fluids_parameters.grid->DX()(2)))
+            if(iterator.Location().y>(0.5-sin(velocity_angle)) || iterator.Location().y<(0.5-sin(velocity_angle)-fluids_parameters.grid->DX()(1)))
                 psi_N(axis,face_index)=true;}
         for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
@@ -680,7 +680,7 @@ void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_B
                 face_velocities(axis,face_index)=-velocity_multiplier*cos(velocity_angle);
             else
                 face_velocities(axis,face_index)=velocity_multiplier*cos(velocity_angle);
-            if(iterator.Location().y<(0.5+sin(velocity_angle)) || iterator.Location().y>(0.5+sin(velocity_angle)+fluids_parameters.grid->DX()(2)))
+            if(iterator.Location().y<(0.5+sin(velocity_angle)) || iterator.Location().y>(0.5+sin(velocity_angle)+fluids_parameters.grid->DX()(1)))
                 psi_N(axis,face_index)=true;}
         for(FACE_ITERATOR iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,4);iterator.Valid();iterator.Next()){
             int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
@@ -1431,7 +1431,7 @@ void Analytic_Test()
         solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity*scale_length));
         Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);}
 
-    T solid_mass=use_solid?solid_body_collection.rigid_body_collection.rigid_body_particle.mass(3):0;
+    T solid_mass=use_solid?solid_body_collection.rigid_body_collection.rigid_body_particle.mass(2):0;
     T rho=fluids_parameters.density;
     TV size=fluids_parameters.grid->domain.Edge_Lengths();
     size.x=(size.x-solid_width)/2;

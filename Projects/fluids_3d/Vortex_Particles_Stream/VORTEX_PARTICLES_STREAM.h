@@ -87,8 +87,8 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
     for(FACE_ITERATOR iterator(fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next()){
             psi_N.Component(iterator.Axis())(iterator.Face_Index()+VECTOR<int,3>(1,0,0))=true;
             fluids_parameters.incompressible->projection.face_velocities.Component(iterator.Axis())(iterator.Face_Index()+VECTOR<int,3>(1,0,0))=inflow;
-            psi_N.Component(2)(iterator.Face_Index())=true;
-            fluids_parameters.incompressible->projection.face_velocities.Component(2)(iterator.Face_Index())=0;}
+            psi_N.Component(1)(iterator.Face_Index())=true;
+            fluids_parameters.incompressible->projection.face_velocities.Component(1)(iterator.Face_Index())=0;}
     for(CELL_ITERATOR iterator(fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,1);iterator.Valid();iterator.Next()) 
         psi_D(iterator.Cell_Index())=false;
     for(CELL_ITERATOR iterator(fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
