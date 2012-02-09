@@ -74,10 +74,10 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated)
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Set_Overdamping_Fraction(int b,const T overdamping_fraction) // 1 is critically damped
 {
-    TV X1=Attachment_Location(b,1),X2=Attachment_Location(b,2);
+    TV X1=Attachment_Location(b,0),X2=Attachment_Location(b,1);
     TV direction=(X2-X1).Normalized();
-    RIGID_BODY<TV>& b1=Body(b,1);
-    RIGID_BODY<TV>& b2=Body(b,2);
+    RIGID_BODY<TV>& b1=Body(b,0);
+    RIGID_BODY<TV>& b2=Body(b,1);
 
     T harmonic_mass=TV::Dot_Product((b1.Impulse_Factor(X1)+b2.Impulse_Factor(X2))*direction,direction);
     Set_Damping(b,overdamping_fraction*2*sqrt(youngs_modulus(b)*restlength(b)/harmonic_mass));
@@ -92,14 +92,14 @@ Update_Position_Based_State(const T time)
     current_lengths.Resize(segment_mesh.elements.m);
     
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
-        TV X1=Attachment_Location(s,1),X2=Attachment_Location(s,2);
+        TV X1=Attachment_Location(s,0),X2=Attachment_Location(s,1);
         STATE& state=states(s);
         state.nodes=segment_mesh.elements(s);
         state.direction=X2-X1;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=damping(s)/restlength(s);
-        state.r(0)=X1-Body(s,1).X();
-        state.r(1)=X2-Body(s,2).X();}
+        state.r(0)=X1-Body(s,0).X();
+        state.r(1)=X2-Body(s,1).X();}
 }
 //#####################################################################
 // Function Add_Force
@@ -303,7 +303,7 @@ Endpoint_Velocity(int s,int b) const
 template<class TV> typename TV::SCALAR RIGID_LINEAR_SPRINGS<TV>::
 Spring_Length(int s) const
 {
-    return (Attachment_Location(s,1)-Attachment_Location(s,2)).Magnitude();
+    return (Attachment_Location(s,0)-Attachment_Location(s,1)).Magnitude();
 }
 //#####################################################################
 // Function Set_Stiffness
@@ -355,7 +355,7 @@ Effective_Impulse_Factor(int s,int b) const
 template<class TV> typename TV::SCALAR RIGID_LINEAR_SPRINGS<TV>::
 Effective_Impulse_Factor(int s) const
 {
-    return Effective_Impulse_Factor(s,1)+Effective_Impulse_Factor(s,2);
+    return Effective_Impulse_Factor(s,0)+Effective_Impulse_Factor(s,1);
 }
 template<class TV> const RIGID_BODY<TV>& RIGID_LINEAR_SPRINGS<TV>::
 Body(int s,int b) const
