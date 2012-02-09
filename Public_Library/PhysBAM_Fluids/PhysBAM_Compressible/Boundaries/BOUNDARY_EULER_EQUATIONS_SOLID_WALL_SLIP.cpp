@@ -173,7 +173,7 @@ Apply_Boundary_Condition_Single_Side(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE&
 {
     if(grid.Is_MAC_Grid()) return;
     int axis=side/2;
-    int axis_side=2-side%2;
+    int axis_side=1-side%2;
     if(!euler->mpi_grid||!euler->mpi_grid->Neighbor(axis,axis_side)){
         if(!Constant_Extrapolation(side)) for(CELL_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
             TV_INT boundary_node=iterator.Cell_Index();

@@ -8,7 +8,7 @@
 #define __max__
 
 namespace PhysBAM{
-#define QQ(x) LOG::cout<<#x<<" "<<(x)<<std::endl;
+#define QQ(x) LOG::cout<<#x<<" "<<(x)<<std::endl; // INDEXING: these macros should go away when we are done with them.
 #define ZZ(x) LOG::cout<<"Z "<<#x<<" "<<(x+1)<<std::endl;
 #define RA(x) LOG::cout<<"R "<<#x<<" ("<<((x).min_corner+1)<<" "<<(x).max_corner<<")"<<std::endl;
 template<class T>

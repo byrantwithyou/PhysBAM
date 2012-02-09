@@ -41,7 +41,7 @@ Register_Neighbors_As_Collision_Faces()
             else{
                 cfi.axis=faces(i).axis;
                 cfi.index=faces(i).index;
-                cfi.side=1;
+                cfi.side=0;
                 int id=collision_face_info.Append(cfi);
                 collision_face_info(id).simplices=merged(i/2);
                 new_faces.Set(faces(i),id);}}}
@@ -89,8 +89,8 @@ Initialize_Collision_Aware_Face_Iterator(const ARRAY<bool,TV_INT>& outside_fluid
             if(!ray_intersection &&
                 (simplex.Inside(grid.X(first_cell_index),collision_body_thickness_over_two) || simplex.Inside(grid.X(second_cell_index),collision_body_thickness_over_two) || INTERSECTION::Intersects(ray,simplex,collision_body_thickness_over_two))) ray_intersection=true;}
         if(ray_intersection){
-            if(!(*outside_fluid)(first_cell_index)) {cfi.side=1;collision_face_info.Append(cfi);}
-            if(!(*outside_fluid)(second_cell_index)){cfi.side=2;collision_face_info.Append(cfi);}}}
+            if(!(*outside_fluid)(first_cell_index)) {cfi.side=0;collision_face_info.Append(cfi);}
+            if(!(*outside_fluid)(second_cell_index)){cfi.side=1;collision_face_info.Append(cfi);}}}
     if(use_collision_face_neighbors) Register_Neighbors_As_Collision_Faces();
 }
 template class UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<VECTOR<float,1> >;

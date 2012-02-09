@@ -152,7 +152,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     // now go through each of the boundaries and do those
     for(int axis=0;axis<T_GRID::dimension;axis++)
         for(int axis_side=0;axis_side<2;axis_side++){
-            int side=2*axis-(2-axis_side);
+            int side=2*axis+axis_side;
             int neighbor_rank=side_neighbor_ranks(side);
             if(neighbor_rank>=0){
                 TV_INT axis_vector=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis);

@@ -99,7 +99,7 @@ Clamp_Weights_To_Grid(const RANGE<TV_INT>& inside_domain,ARRAY<PAIR<FACE_INDEX<T
     for(int i=0;i<weights.m;i++) if(!inside_domain.Lazy_Inside_Half_Open(weights(i).x.index)) for(int j=0;j<TV::dimension;j++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(j)=weights(i).x.index(j);
         if(!inside_domain.Lazy_Inside_Half_Open(index)){
-            int side=1;if(index(j)>inside_domain.max_corner(j)) side=2;else assert(index(j)<inside_domain.min_corner(j));
+            int side=0;if(index(j)>inside_domain.max_corner(j)) side=1;else assert(index(j)<inside_domain.min_corner(j));
             if(solid_walls_hack_axis(j)(side)) weights(i).y=0;}}
     T sum=0;for(int i=0;i<weights.m;i++) sum+=weights(i).y;
     if(sum>delta && sum!=1) for(int i=0;i<weights.m;i++) weights(i).y/=sum;
@@ -112,7 +112,7 @@ Clamp_X_To_Grid(const GRID<TV>& grid,TV& X)
     bool outside=false;RANGE<TV> range=grid.Domain();
     if(!range.Lazy_Inside(X)) for(int i=0;i<TV::dimension;i++){TV point=range.min_corner;point(i)=X(i);
         if(!range.Lazy_Inside(point)){
-            int side=1;if(point(i)>range.max_corner(i)) side=2;else assert(point(i)<range.min_corner(i));
+            int side=0;if(point(i)>range.max_corner(i)) side=1;else assert(point(i)<range.min_corner(i));
             if(solid_walls_hack_axis(i)(side)) outside=true;}}
     if(outside) X=grid.Clamp(X);
 }
@@ -123,7 +123,7 @@ Is_Outside(const RANGE<TV_INT>& inside_domain,const FACE_INDEX<TV::dimension>& f
     if(!inside_domain.Lazy_Inside_Half_Open(face.index)) for(int i=0;i<TV::dimension;i++){
         TV_INT index=TV_INT::All_Ones_Vector()*2;index(i)=face.index(i);
         if(!inside_domain.Lazy_Inside_Half_Open(index)){
-            int side=1;if(index(i)>inside_domain.max_corner(i)) side=2;else assert(index(i)<inside_domain.min_corner(i));
+            int side=0;if(index(i)>inside_domain.max_corner(i)) side=1;else assert(index(i)<inside_domain.min_corner(i));
             if(solid_walls_hack_axis(i)(side)) return true;}}
     return false;
 }
@@ -140,7 +140,7 @@ Is_MPI_Boundary(const RANGE<TV_INT>& inside_domain,const TV_INT& index)
     if(!inside_domain.Lazy_Inside_Half_Open(index)) for(int i=0;i<TV::dimension;i++){
         TV_INT tmp_index=TV_INT::All_Ones_Vector()*2;tmp_index(i)=index(i);
         if(!inside_domain.Lazy_Inside_Half_Open(tmp_index)){
-            int side=1;if(tmp_index(i)>inside_domain.max_corner(i)) side=2;else assert(tmp_index(i)<inside_domain.min_corner(i));
+            int side=0;if(tmp_index(i)>inside_domain.max_corner(i)) side=1;else assert(tmp_index(i)<inside_domain.min_corner(i));
             if(mpi_boundary(i)(side)) return true;}}
     return false;
 }
