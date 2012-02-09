@@ -792,7 +792,7 @@ void Get_Initial_Data()
             else if(test_number==18){
                 segmented_curve.mesh.elements.Append(VECTOR<int,2>(constrained_particle,suspended_particle));
                 suspended_particle=particles.array_collection->Add_Element();
-                binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,suspended_particle,tetrahedralized_volume.mesh.elements(1),
+                binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,suspended_particle,tetrahedralized_volume.mesh.elements(0),
                     (T).25*VECTOR<T,4>::All_Ones_Vector()));
                 particles.X(suspended_particle)=binding_list.bindings.Last()->Embedded_Position();}
             break;}
@@ -828,22 +828,22 @@ void Get_Initial_Data()
             TRIANGULATED_SURFACE<T>& triangulated_surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T)1.0,(T)0))));
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
             constrained_particles.Resize(2);int last_particle;
-            for(int fragment(0);fragment<=1;fragment++){last_particle=0;
+            for(int fragment(0);fragment<2;fragment++){last_particle=0;
                 for(T z=(T)-.25;z<=(T).25;z+=(T).02){
                     int new_particle=segmented_curve.particles.array_collection->Add_Element();
                     static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_particle)=
-                        static_cast<PARTICLES<TV>&>(triangulated_surface.particles).mass(1);
+                        static_cast<PARTICLES<TV>&>(triangulated_surface.particles).mass(0);
                     segmented_curve.particles.X(new_particle)=TV((T)(Value(fragment)*.2-.1),(T)1.25,z);
                     if(last_particle) segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_particle,last_particle));
-                    else constrained_particles(fragment+1)(1)=new_particle;
+                    else constrained_particles(fragment+1)(0)=new_particle;
                     last_particle=new_particle;}
-                constrained_particles(fragment+1)(2)=last_particle;}
+                constrained_particles(fragment+1)(1)=last_particle;}
             int last_particle_x,last_particle_z;last_particle_x=last_particle_z=0;
             for(T pos=(T)-.25;pos<=(T).25;pos+=(T).02){
                 int new_particle_x=segmented_curve.particles.array_collection->Add_Element();int new_particle_z=segmented_curve.particles.array_collection->Add_Element();
                 static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_particle_x)=
                     static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_particle_z)=
-                        static_cast<PARTICLES<TV>&>(triangulated_surface.particles).mass(1);
+                        static_cast<PARTICLES<TV>&>(triangulated_surface.particles).mass(0);
                 segmented_curve.particles.X(new_particle_x)=TV(pos,(T)1.5,(T)0);segmented_curve.particles.X(new_particle_z)=TV((T)0,(T)3.0,pos);
                 if(last_particle_x) segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_particle_x,last_particle_x));
                 if(last_particle_z) segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_particle_z,last_particle_z));
@@ -955,16 +955,16 @@ void Get_Initial_Data()
             deformable_body_collection.deformable_geometry.Add_Structure(sphere_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&sphere_particles));
             for(int i=0;i<cylinder_particles.m;i++) deformable_body_collection.particles.X(cylinder_particles(i))=cylinder_body.World_Space_Point(deformable_body_collection.particles.X(cylinder_particles(i)));
             for(int i=0;i<sphere_particles.m;i++) deformable_body_collection.particles.X(sphere_particles(i))=sphere_body.World_Space_Point(deformable_body_collection.particles.X(sphere_particles(i)));
+            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.deformable_geometry.structures(0)),density);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.deformable_geometry.structures(1)),density);
-            SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*((TRIANGULATED_SURFACE<T>*)deformable_body_collection.deformable_geometry.structures(2)),density);
             automatically_add_to_collision_structures=false;
             deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
             T protection_thickness=(T)atof(getenv("PROTECTION_THICKNESS"));
             LOG::cout<<"Protection thickness "<<protection_thickness<<std::endl;
             deformable_body_collection.collisions.use_protectors=true;deformable_body_collection.collisions.protection_thickness=protection_thickness;
             deformable_body_collection.collisions.protecting_bodies_of_nodes.Resize(deformable_body_collection.particles.array_collection->Size());
-            for(int i=0;i<cylinder_particles.m;i++){deformable_body_collection.collisions.protecting_bodies_of_nodes(cylinder_particles(i)).Append(COLLISION_GEOMETRY_ID(1));}
-            for(int i=0;i<sphere_particles.m;i++){deformable_body_collection.collisions.protecting_bodies_of_nodes(sphere_particles(i)).Append(COLLISION_GEOMETRY_ID(2));}
+            for(int i=0;i<cylinder_particles.m;i++){deformable_body_collection.collisions.protecting_bodies_of_nodes(cylinder_particles(i)).Append(COLLISION_GEOMETRY_ID(0));}
+            for(int i=0;i<sphere_particles.m;i++){deformable_body_collection.collisions.protecting_bodies_of_nodes(sphere_particles(i)).Append(COLLISION_GEOMETRY_ID(1));}
             break;}
         case 28:{
             // The 2nd point stops by frame 14 at position 0.18655 -.135535 0.5
@@ -984,9 +984,9 @@ void Get_Initial_Data()
                 particles.mass(particle)=(T)1;particles.V(particle)=ground.Rotation().Rotate(TV(init_speed,0,0));
             }
             particles.X(5)=ground.Rotation().Rotate(TV(-0,(T).2,(T)1.1));particles.mass(5)=(T)1;particles.V(5)=ground.Rotation().Rotate(TV(init_speed,0,0));
-            //particles.X(2)=ground.Rotation().Rotate(TV(0,(T).1,(T)1.1));particles.mass(2)=(T)1;particles.V(2)=ground.Rotation().Rotate(TV(1,0,0));
-            //particles.X(3)=ground.Rotation().Rotate(TV(0,(T).1,(T)0.9));particles.mass(3)=(T)1;particles.V(3)=ground.Rotation().Rotate(TV(1,0,0));
-            //particles.X(4)=ground.Rotation().Rotate(TV(-.1,(T).2,1));particles.mass(4)=(T)1;particles.V(4)=ground.Rotation().Rotate(TV(1,0,0));
+            //particles.X(1)=ground.Rotation().Rotate(TV(0,(T).1,(T)1.1));particles.mass(1)=(T)1;particles.V(1)=ground.Rotation().Rotate(TV(1,0,0));
+            //particles.X(2)=ground.Rotation().Rotate(TV(0,(T).1,(T)0.9));particles.mass(2)=(T)1;particles.V(2)=ground.Rotation().Rotate(TV(1,0,0));
+            //particles.X(3)=ground.Rotation().Rotate(TV(-.1,(T).2,1));particles.mass(3)=(T)1;particles.V(3)=ground.Rotation().Rotate(TV(1,0,0));
             TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             tetrahedralized_volume->mesh.elements.Append(VECTOR<int,4>(2,3,4,5));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*tetrahedralized_volume,density);
@@ -1130,19 +1130,19 @@ void Get_Initial_Data()
             //mesh.elements.Append(VECTOR<int,3>(3,4,6));
             mesh.Set_Number_Nodes(4);
             base_surface.particles.array_collection->Add_Elements(4);
-            base_surface.particles.X(1)=TV(-1,0,0);
-            base_surface.particles.X(2)=TV(0,0,1);
-            base_surface.particles.X(3)=TV(0,0,-1);
-            base_surface.particles.X(4)=TV(1,.5,0);
-            //base_surface.particles.X(5)=TV(1,0,2);
-            //base_surface.particles.X(6)=TV(1,0,-2);
+            base_surface.particles.X(0)=TV(-1,0,0);
+            base_surface.particles.X(1)=TV(0,0,1);
+            base_surface.particles.X(2)=TV(0,0,-1);
+            base_surface.particles.X(3)=TV(1,.5,0);
+            //base_surface.particles.X(4)=TV(1,0,2);
+            //base_surface.particles.X(5)=TV(1,0,-2);
             TRIANGULATED_SURFACE<T>& surface=tests.Copy_And_Add_Structure(base_surface);
             delete &base_surface.particles;*/
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
             i=1;j=1;particles.mass(i+m*(j-1))=FLT_MAX;i=1;j=n;particles.mass(i+m*(j-1))=FLT_MAX;
             //i=1;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
-            //particles.mass(1)=FLT_MAX;
+            //particles.mass(0)=FLT_MAX;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,true);}
             break;
         case 48:
@@ -1177,14 +1177,14 @@ void Get_Initial_Data()
             RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T)1,(T)0);
             body.Set_Mass(10000);
             body.X().x=num_volumes*2+5;body.X().y=height/2;body.Twist().linear.x=-50;
-            for (int n=1;n<=num_volumes;n++){
+            for(int n=0;n<num_volumes;n++){
                 //Create curve
                 SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
                 ARRAY<int> particle_indices;
                 int base_particle=0;
                 for(int j=0;j<num_particles;j++){
                     int p=particles.array_collection->Add_Element();particle_indices.Append(p);PHYSBAM_ASSERT(p);
-                    if(j==1){fixed_particles.Append(p);base_particle=p;}
+                    if(j==0){fixed_particles.Append(p);base_particle=p;}
                     if(particle_indices.m>1) segmented_curve.mesh.elements.Append(VECTOR<int,2>(p,particle_indices(particle_indices.m-1)));
                     particles.X(p)=TV((n-1)*2,(float)(j-1)/(float)(num_particles-1)*height,0);
                     deformable_body_rest_positions_array.Append(particles.X(p));}
@@ -1286,7 +1286,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(spring_force);}
         case 16:
         case 18:{
-            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(1);
+            SEGMENTED_CURVE<TV>& segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>();
             solid_body_collection.Add_Force(Create_Edge_Springs(deformable_body_collection.particles,segmented_curve.mesh,(T)2e4));}
         case 1:
         case 2:
@@ -1418,7 +1418,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 19:
         case 29:{
-            for(int i=1;i<=((parameter>=2)?1:2);i++){
+            for(int i=0;i<((parameter>=2)?1:2);i++){
                 TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(i);
                 solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
                 solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
@@ -1572,7 +1572,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 solid_body_collection.Add_Force(Create_Finite_Volume(*structure,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 46:{
-            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(1);
+            TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>(0);
             solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,triangulated_surface.mesh,0));
             solid_body_collection.Add_Force(Create_Edge_Springs(triangulated_surface,stiffness_multiplier*2/(1+sqrt((T)2)),
                     damping_multiplier*2));
@@ -1741,8 +1741,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();
         i=1;j=number_side_panels;V(i+m*(j-1))=TV();i=m;j=number_side_panels;V(i+m*(j-1))=TV();
-        V.Subset(constrained_particles(1)).Fill(TV());
-        V.Subset(constrained_particles(2)).Fill(TV());}
+        V.Subset(constrained_particles(0)).Fill(TV());
+        V.Subset(constrained_particles(1)).Fill(TV());}
     else if(test_number==22){
         FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
         V.Subset(free_particles.nodes).Fill(TV());}
@@ -1797,8 +1797,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
         i=1;j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();
         i=1;j=number_side_panels;V(i+m*(j-1))=TV();i=m;j=number_side_panels;V(i+m*(j-1))=TV();
-        V.Subset(constrained_particles(1)).Fill(TV());
-        V.Subset(constrained_particles(2)).Fill(TV());}
+        V.Subset(constrained_particles(0)).Fill(TV());
+        V.Subset(constrained_particles(1)).Fill(TV());}
     else if(test_number==22){
         FREE_PARTICLES<TV>& free_particles=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<FREE_PARTICLES<TV>&>();
         V.Subset(free_particles.nodes).Fill(TV());}
@@ -1836,9 +1836,9 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
         for(int i=0;i<X_save.Size();i++) X(fixed_particles(i))=X_save(i);
         return;}
     ARRAY<TV>& X_save=deformable_body_rest_positions;
-    for(int j=1,index=0;j<=mattress_grid.counts.y;j++) for(int k=0;k<mattress_grid.counts.x;k++){
+    for(int j=0,index=-1;j<mattress_grid.counts.y;j++) for(int k=0;k<mattress_grid.counts.x;k++){
         index++;
-        if(test_number==6 || test_number==7 || test_number==8){X(index)=X_save(index)-time*attachment_twist.linear;X(X.Size()+1-index)=X_save(X.Size()+1-index)+time*attachment_twist.linear;}
+        if(test_number==6 || test_number==7 || test_number==8){X(index)=X_save(index)-time*attachment_twist.linear;X(X.Size()+index)=X_save(X.Size()+index)+time*attachment_twist.linear;}
         else{
             ROTATION<TV> orientation,opposite_orientation;
             TV end1_center_of_mass(0,0,(T)1),end2_center_of_mass(0,0,(T)-1);
@@ -1847,7 +1847,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
                 orientation=ROTATION<TV>(time*magnitude,attachment_twist.angular);
                 opposite_orientation=ROTATION<TV>(-time*magnitude,attachment_twist.angular);}
             X(index)=end1_center_of_mass+orientation.Rotate(X_save(index)-end1_center_of_mass)+time*attachment_twist.linear;
-            X(X.Size()+1-index)=end2_center_of_mass+opposite_orientation.Rotate(X_save(X.Size()+1-index)-end2_center_of_mass)-time*attachment_twist.linear;}}
+            X(X.Size()+index)=end2_center_of_mass+opposite_orientation.Rotate(X_save(X.Size()+index)-end2_center_of_mass)-time*attachment_twist.linear;}}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Position_Nodes
@@ -1855,43 +1855,43 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     assert(test_number==6 || test_number==7 || test_number==8 || test_number==9);
-    for(int j=1,index=0;j<=mattress_grid.counts.y;j++) for(int k=0;k<mattress_grid.counts.x;k++){index++;
-        X(index)=TV();X(X.Size()+1-index)=TV();}
+    for(int j=0,index=0;j<mattress_grid.counts.y;j++) for(int k=0;k<mattress_grid.counts.x;k++){index++;
+        X(index)=TV();X(X.Size()+index)=TV();}
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(test_number==5 && id==int(2)){
+    if(test_number==5 && id==int(1)){
         if(time<2) twist.linear=TV();
         else if(time<(T)3.5) twist.linear=TV(1,(T).5,0);
         else if(time<4) twist.linear=TV(0,(T)-1.5,0);
         else twist.linear=TV(-1.5,0,0);}
-    else if(test_number==10 && id==int(1)){twist.linear=test_10_frame_velocity;}
-    else if(test_number==10 && id==int(2)){twist.linear=-TV((T).88,0,0)+test_10_frame_velocity;}
-    else if(test_number==11 && id==int(3)){if(time>=(T)1.6666667) twist.linear=TV((T).88,0,0);}
-    else if(test_number==12 && id==int(6)){if(time<(T)1.1) twist.linear=-TV(0,(T)1.0,0);else twist.linear=TV();}
-    else if((test_number==13 || test_number==19) && id==int(2)){if(time>(T).75){twist.angular=TV(0,(T)-pi/4,0);}
+    else if(test_number==10 && id==int(0)){twist.linear=test_10_frame_velocity;}
+    else if(test_number==10 && id==int(1)){twist.linear=-TV((T).88,0,0)+test_10_frame_velocity;}
+    else if(test_number==11 && id==int(2)){if(time>=(T)1.6666667) twist.linear=TV((T).88,0,0);}
+    else if(test_number==12 && id==int(5)){if(time<(T)1.1) twist.linear=-TV(0,(T)1.0,0);else twist.linear=TV();}
+    else if((test_number==13 || test_number==19) && id==int(1)){if(time>(T).75){twist.angular=TV(0,(T)-pi/4,0);}
         //if(time>(T)8.333333){twist.linear=TV((T).5,(T).5,0);}
     }
-    else if(test_number==27 && id==int(1)){
+    else if(test_number==27 && id==int(0)){
         INTERPOLATION_CURVE<T,TV> curve;
         curve.Add_Control_Point((T)0,TV(0,(T)1.5,0));
         curve.Add_Control_Point((T)1.2,TV(0,(T)1.5,(T)1.8));
         curve.Add_Control_Point((T)4,TV(0,(T)1.5,(T)1.8));
         curve.Add_Control_Point((T)5.2,TV(0,(T)0,-1));
         twist.linear=curve.Derivative(time);}
-    else if(test_number==30 && id==int(2)){
+    else if(test_number==30 && id==int(1)){
         //INTERPOLATION_CURVE<T,TV> curve;
         // if(time>test_30_friction_off) rigid_body_2.coefficient_of_friction=(T).3; // TODO: This no longer makes sense here
-        //RIGID_BODY<TV>& rigid_body_3=solid_body_collection.rigid_body_collection.Rigid_Body(3);
+        //RIGID_BODY<TV>& rigid_body_3=solid_body_collection.rigid_body_collection.Rigid_Body(2);
         //curve.Add_Control_Point((T)4.16,TV(-.5,(T)1.5,(T).7));
         //curve.Add_Control_Point((T)6,TV(-.5,(T)0,(T)-4));
         //twist.linear=curve.Derivative(time);
     }
-    else if(test_number==32 && id==int(1)){twist.angular=TV(0,(T)-pi/4,0);}
-    else if(test_number==46 && id==int(1)){twist=TWIST<TV>();}
+    else if(test_number==32 && id==int(0)){twist.angular=TV(0,(T)-pi/4,0);}
+    else if(test_number==46 && id==int(0)){twist=TWIST<TV>();}
     else return false;
     return true;
 }
@@ -1900,36 +1900,36 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(test_number==5 && id==int(2)){
+    if(test_number==5 && id==int(1)){
         if(time<2) frame.t=TV(0,0,(T).5);
         else if(time<(T)3.5) frame.t=TV((time-2),(T).5*(time-2),(T).5);
         else if(time<4) frame.t=TV((T)1.5,(T)((T).75-(T)1.5*(time-(T)3.5)),(T).5);
         else frame.t=TV((T)(1.5-1.5*(time-4)),0,(T).5);}
-    else if(test_number==10 && id==int(1)){frame.t=TV((T)0,-(T).25,(T).5)+time*test_10_frame_velocity;}
-    else if(test_number==10 && id==int(2)){frame.t=TV((T)2,-(T).25,(T).5)+time*(-TV((T).88,0,0)+test_10_frame_velocity);}
-    else if(test_number==11 && id==int(3)){if(time>=(T)1.6666667) frame.t=TV((T)1.2,(T).25,(T).5)+(time-(T)1.666667)*TV((T).88,0,0);}
-    else if(test_number==12 && id==int(6)){if(time<(T)1.1) frame.t=TV(0,(T)1.25,0)+time*-TV(0,(T)1.0,0);}
-    else if((test_number==13 || test_number==19) && id==int(2)){
+    else if(test_number==10 && id==int(0)){frame.t=TV((T)0,-(T).25,(T).5)+time*test_10_frame_velocity;}
+    else if(test_number==10 && id==int(1)){frame.t=TV((T)2,-(T).25,(T).5)+time*(-TV((T).88,0,0)+test_10_frame_velocity);}
+    else if(test_number==11 && id==int(2)){if(time>=(T)1.6666667) frame.t=TV((T)1.2,(T).25,(T).5)+(time-(T)1.666667)*TV((T).88,0,0);}
+    else if(test_number==12 && id==int(5)){if(time<(T)1.1) frame.t=TV(0,(T)1.25,0)+time*-TV(0,(T)1.0,0);}
+    else if((test_number==13 || test_number==19) && id==int(1)){
         frame.t=TV(0,(T).30,0);
         if(time>(T).75) frame.r=ROTATION<TV>::From_Rotation_Vector(time*TV(0,(T)-pi/4,0));
         //if(time>(T)8.333333){frame.t=TV(0,(T).25,0)+(time-(T)8.333333)*TV((T).5,(T).5,0);}
     }
-    else if(test_number==27 && id==int(1)){
+    else if(test_number==27 && id==int(0)){
         INTERPOLATION_CURVE<T,TV> curve;
         curve.Add_Control_Point((T)0,TV(0,(T)1.5,0));
         curve.Add_Control_Point((T)1.2,TV(0,(T)1.5,(T)1.8));
         curve.Add_Control_Point((T)4,TV(0,(T)1.5,(T)1.8));
         curve.Add_Control_Point((T)5.2,TV(0,(T)0,-1));
         frame.t=curve.Value(time);}
-    else if(test_number==30 && id==int(2)){
+    else if(test_number==30 && id==int(1)){
         //INTERPOLATION_CURVE<T,TV> curve;
         //if(time>test_30_friction_off) rigid_body_2.coefficient_of_friction=(T).3;
-        //RIGID_BODY<TV>& rigid_body_3=solid_body_collection.rigid_body_collection.Rigid_Body(3);
+        //RIGID_BODY<TV>& rigid_body_3=solid_body_collection.rigid_body_collection.Rigid_Body(2);
         //curve.Add_Control_Point((T)4.16,TV(-.5,(T)1.5,(T).7));
         //curve.Add_Control_Point((T)6,TV(-.5,(T)0,(T)-4));
         //frame.t=curve.Value(time);
     }
-    else if(test_number==32 && id==int(1)){frame.r=ROTATION<TV>::From_Rotation_Vector(time*TV(0,(T)-pi/4,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));}
+    else if(test_number==32 && id==int(0)){frame.r=ROTATION<TV>::From_Rotation_Vector(time*TV(0,(T)-pi/4,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));}
 }
 //#####################################################################
 // Function Bind_Redgreen_Segment_Midpoints
