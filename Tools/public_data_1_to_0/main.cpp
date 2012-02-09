@@ -143,12 +143,12 @@ template<class T> void Convert_Phi2D_File(const std::string& ifilename,const std
 {
     LOG::cout<<"PHI2: "<<ifilename<<" -> "<<ofilename<<std::endl;
     try{
-        LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* surface;
-        FILE_UTILITIES::Create_From_File<T>(ifilename,surface);
-        VECTOR<int,2>& min_corner = surface->levelset.phi.domain.min_corner;
+        LEVELSET_IMPLICIT_OBJECT<VECTOR<T,2> >* area;
+        FILE_UTILITIES::Create_From_File<T>(ifilename,area);
+        VECTOR<int,2>& min_corner = area->levelset.phi.domain.min_corner;
         if (min_corner.Min()<0){
             LOG::cerr<<"Negative vertex index"<<std::endl; PHYSBAM_FATAL_ERROR();}
-        FILE_UTILITIES::Write_To_File<T>(ofilename,*surface);
+        FILE_UTILITIES::Write_To_File<T>(ofilename,*area);
     }
     catch(FILESYSTEM_ERROR&){}
 }
