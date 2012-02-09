@@ -88,7 +88,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
             if(phi_t.Min()>0) eo.simplicial_object.mesh.elements.Remove_Index_Lazy(t);
         }
         ARRAY<int> condensation_mapping;eo.simplicial_object.Discard_Valence_Zero_Particles_And_Renumber(condensation_mapping);
-        ARRAY<T> phi_new(eo.particles.array_collection->Size());for(int k=0;k<phi.m;k++) if(condensation_mapping(k)) phi_new(condensation_mapping(k))=phi(k);
+        ARRAY<T> phi_new(eo.particles.array_collection->Size());for(int k=0;k<phi.m;k++) if(condensation_mapping(k)>=0) phi_new(condensation_mapping(k))=phi(k);
         phi.Exchange(phi_new);
     }
 

@@ -36,7 +36,7 @@ Add_Embedded_Particle_To_Embedded_Children(EMBEDDED_OBJECT<TV,d>& eo,const int e
 template<class TV,class T,int d> int
 Add_Embedded_Particle(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,2>& nodes,const T interpolation_fraction_input,const bool reinitialize_hash_table)
 {
-    assert(eo.simplicial_object.mesh.number_nodes==eo.particles.array_collection->Size() && eo.embedded_mesh.number_nodes==eo.particles.array_collection->Size() && !eo.Embedded_Particle_On_Segment(nodes));
+    assert(eo.simplicial_object.mesh.number_nodes==eo.particles.array_collection->Size() && eo.embedded_mesh.number_nodes==eo.particles.array_collection->Size() && eo.Embedded_Particle_On_Segment(nodes)<0);
     int new_embedded_particle=eo.embedded_particles.Add_Element();
     eo.simplicial_object.mesh.Add_Nodes(1);eo.embedded_mesh.Add_Nodes(1); // Need to update meshes and acceleration structures
     eo.interpolation_fraction.Append(eo.Clamp_Interpolation_Fraction(interpolation_fraction_input));
@@ -54,8 +54,9 @@ Add_Embedded_Particle(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,2>& nodes,const
 template<class TV,class T,int d> int
 Add_Embedded_Particle_If_Not_Already_There(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,2>& nodes,const T interpolation_fraction_input)
 {
-    if(int current_embedded_particle=eo.Embedded_Particle_On_Segment(nodes)) return current_embedded_particle;
-    else return eo.Add_Embedded_Particle(nodes,interpolation_fraction_input);
+    int current_embedded_particle=eo.Embedded_Particle_On_Segment(nodes);
+    if(current_embedded_particle>=0) return current_embedded_particle;
+    return eo.Add_Embedded_Particle(nodes,interpolation_fraction_input);
 }
 //#####################################################################
 // Function Add_Embedded_Subelement_To_Embedded_Subelements_In_Element
@@ -81,8 +82,9 @@ template<class TV,int d> int
 Add_Embedded_Subelement_If_Not_Already_There(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,d>& embedded_nodes)
 {
     VECTOR<int,d> global_particles(eo.embedded_particles.active_indices.Subset(embedded_nodes));
-    if(int t=eo.embedded_mesh.Simplex(global_particles)) return t;
-    else return eo.Add_Embedded_Subelement(embedded_nodes);
+    int t=eo.embedded_mesh.Simplex(global_particles);
+    if(t>=0) return t;
+    return eo.Add_Embedded_Subelement(embedded_nodes);
 }
 //#####################################################################
 // Function Add_Embedded_Subelement

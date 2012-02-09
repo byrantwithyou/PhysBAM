@@ -78,7 +78,7 @@ public:
 
     int Embedded_Particle_On_Segment(const VECTOR<int,2>& endpoints) const
     {endpoints_temp=endpoints; // compiler bug, gcc 4.0.1
-    int embedded_particle=0;parents_to_embedded_particles_hash_table->Get(endpoints.Sorted(),embedded_particle);
+    int embedded_particle=-1;parents_to_embedded_particles_hash_table->Get(endpoints.Sorted(),embedded_particle);
     return embedded_particle;}
 
     int Particle_Embedded_On_Segment(const int endpoint1,const int endpoint2) const

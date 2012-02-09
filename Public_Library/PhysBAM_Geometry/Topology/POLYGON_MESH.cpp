@@ -229,7 +229,7 @@ Split_Polygon_Edge(const int node1,const int node2,const int new_node)
     VECTOR<int,2> &first_edge=segment_mesh->elements(first_edge_index),&second_edge=segment_mesh->elements(second_edge_index);
     if(first_edge==VECTOR<int,2>(node1,node2)){first_edge=VECTOR<int,2>(node1,new_node);second_edge=VECTOR<int,2>(new_node,node2);}
     else{first_edge=VECTOR<int,2>(node2,new_node);second_edge=VECTOR<int,2>(new_node,node1);}
-    int index=(*segment_mesh->incident_elements)(second_edge.y).Find(first_edge_index);if(!index) PHYSBAM_FATAL_ERROR();
+    int index=(*segment_mesh->incident_elements)(second_edge.y).Find(first_edge_index);if(index<0) PHYSBAM_FATAL_ERROR();
     (*segment_mesh->incident_elements)(second_edge.y)(index)=second_edge_index;
     (*segment_mesh->incident_elements)(new_node).Append(first_edge_index);(*segment_mesh->incident_elements)(new_node).Append(second_edge_index);
     // update elements and edge_elements

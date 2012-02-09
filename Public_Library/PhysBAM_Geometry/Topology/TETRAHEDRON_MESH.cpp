@@ -467,10 +467,13 @@ Initialize_Boundary_Mesh_With_T_Junctions(TRIANGLE_MESH& boundary_mesh_with_t_ju
 
     SEGMENT_MESH extended_segment_mesh(*triangle_mesh->segment_mesh);
     ARRAY<int> segment_midpoints(extended_segment_mesh.elements.m);
-    for(int i=0;i<t_junctions.m;i++)
-        if(int s=triangle_mesh->segment_mesh->Simplex(t_junction_parents(i))) segment_midpoints(s)=t_junctions(i);
-        else{extended_segment_mesh.elements.Append(t_junction_parents(i));segment_midpoints.Append(t_junctions(i));
-            extended_segment_mesh.number_nodes=max(extended_segment_mesh.number_nodes,t_junctions(i),t_junction_parents(i)(0),t_junction_parents(i)(1));}
+    for(int i=0;i<t_junctions.m;i++){
+        int s=triangle_mesh->segment_mesh->Simplex(t_junction_parents(i));
+        if(s>=0) segment_midpoints(s)=t_junctions(i);
+        else{
+            extended_segment_mesh.elements.Append(t_junction_parents(i));
+            segment_midpoints.Append(t_junctions(i));
+            extended_segment_mesh.number_nodes=max(extended_segment_mesh.number_nodes,t_junctions(i),t_junction_parents(i)(0),t_junction_parents(i)(1));}}
     extended_segment_mesh.Initialize_Incident_Elements();
     for(int tet=0;tet<elements.m;tet++) for(int e=0;e<4;e++){
         int i,j,k,l;
