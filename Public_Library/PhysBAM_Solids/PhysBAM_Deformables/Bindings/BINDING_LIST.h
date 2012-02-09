@@ -35,7 +35,7 @@ public:
     virtual ~BINDING_LIST();
 
     int Binding_Index_From_Particle_Index(const int particle) const
-    {assert(particle<particles.array_collection->Size());return binding_index_from_particle_index.m<particle?0:binding_index_from_particle_index(particle);}
+    {assert(particle<particles.array_collection->Size());return binding_index_from_particle_index.m<=particle?0:binding_index_from_particle_index(particle);}
 
     TV Embedded_Position(const int particle_index) const
     {return bindings(binding_index_from_particle_index(particle_index))->Embedded_Position();}

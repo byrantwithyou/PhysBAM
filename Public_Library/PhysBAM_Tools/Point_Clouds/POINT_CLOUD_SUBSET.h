@@ -65,9 +65,9 @@ public:
 
     int Add_Element()
     {assert(subset_index_from_point_cloud_index.m==point_cloud.array_collection->Size());
-    active_indices.Append(point_cloud.array_collection->Add_Element());subset_index_from_point_cloud_index.Append(active_indices.m);
+    int id=active_indices.Append(point_cloud.array_collection->Add_Element());subset_index_from_point_cloud_index.Append(id);
     array_collection->number=active_indices.m;
-    return active_indices.m-1;}
+    return id;}
 
     void Add_Elements(const int new_point_cloud)
     {for(int p=0;p<new_point_cloud;p++) Add_Element();}

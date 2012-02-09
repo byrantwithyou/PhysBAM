@@ -311,7 +311,7 @@ Spring_Length(int s) const
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Set_Stiffness(int b,T stiffness)
 {
-    if(youngs_modulus.m<b) youngs_modulus.Resize(segment_mesh.elements.m);
+    if(youngs_modulus.m<=b) youngs_modulus.Resize(segment_mesh.elements.m);
     youngs_modulus(b)=stiffness;
     Invalidate_CFL();
 }
@@ -321,7 +321,7 @@ Set_Stiffness(int b,T stiffness)
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Set_Damping(int b,T damp)
 {
-    if(damping.m<b) damping.Resize(segment_mesh.elements.m);
+    if(damping.m<=b) damping.Resize(segment_mesh.elements.m);
     damping(b)=damp;
     Invalidate_CFL();
 }
@@ -331,8 +331,8 @@ Set_Damping(int b,T damp)
 template<class TV> void RIGID_LINEAR_SPRINGS<TV>::
 Set_Restlength(int b,T length,T visual)
 {
-    if(restlength.m<b) restlength.Resize(segment_mesh.elements.m);
-    if(visual_restlength.m<b) visual_restlength.Resize(segment_mesh.elements.m);
+    if(restlength.m<=b) restlength.Resize(segment_mesh.elements.m);
+    if(visual_restlength.m<=b) visual_restlength.Resize(segment_mesh.elements.m);
     restlength(b)=length>=0?length:Spring_Length(b);
     visual_restlength(b)=visual>=0?visual:restlength(b);
     Invalidate_CFL();
