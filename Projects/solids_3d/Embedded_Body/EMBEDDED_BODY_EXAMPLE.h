@@ -241,7 +241,8 @@ void Get_Initial_Data()
     attached_nodes.Resize(input_attached_nodes.m);
     for(int b=0;b<soft_bindings.bindings.m;b++){
         int particle_index,parent_index;soft_bindings.bindings(b).Get(particle_index,parent_index);
-        if(int attachment=binding_attachments(parent_index-number_of_original_particles)){
+        int attachment=binding_attachments(parent_index-number_of_original_particles);
+        if(attachment>=0){
             attached_nodes(attachment).Append(particle_index);
             soft_bindings.use_impulses_for_collisions(b)=false;}
         else free_particles.nodes.Append(particle_index);}
