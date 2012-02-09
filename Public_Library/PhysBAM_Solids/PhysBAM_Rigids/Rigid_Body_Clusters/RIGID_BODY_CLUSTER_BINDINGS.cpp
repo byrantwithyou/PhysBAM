@@ -80,7 +80,7 @@ Append_Binding(const int particle,const PAIR<int,RIGID_CLUSTER_CONSTITUENT_ID> d
 {
     int size=binding_index(particle).m+1;
     binding_index(particle).Resize(size,true,true);
-    binding_index(particle)(size)=binding_index(particle)(0);
+    binding_index(particle).Last()=binding_index(particle)(0);
     binding_index(particle)(0)=data;
 }
 //#####################################################################
