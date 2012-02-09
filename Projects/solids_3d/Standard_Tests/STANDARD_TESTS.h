@@ -983,12 +983,12 @@ void Get_Initial_Data()
                 particles.X(particle)=ground.Rotation().Rotate(TV((T).2*cos(theta),0,(T)1.1+(T).2*sin(theta)));
                 particles.mass(particle)=(T)1;particles.V(particle)=ground.Rotation().Rotate(TV(init_speed,0,0));
             }
-            particles.X(6)=ground.Rotation().Rotate(TV(-0,(T).2,(T)1.1));particles.mass(6)=(T)1;particles.V(6)=ground.Rotation().Rotate(TV(init_speed,0,0));
-            //particles.X(3)=ground.Rotation().Rotate(TV(0,(T).1,(T)1.1));particles.mass(3)=(T)1;particles.V(3)=ground.Rotation().Rotate(TV(1,0,0));
-            //particles.X(4)=ground.Rotation().Rotate(TV(0,(T).1,(T)0.9));particles.mass(4)=(T)1;particles.V(4)=ground.Rotation().Rotate(TV(1,0,0));
-            //particles.X(5)=ground.Rotation().Rotate(TV(-.1,(T).2,1));particles.mass(5)=(T)1;particles.V(5)=ground.Rotation().Rotate(TV(1,0,0));
+            particles.X(5)=ground.Rotation().Rotate(TV(-0,(T).2,(T)1.1));particles.mass(5)=(T)1;particles.V(5)=ground.Rotation().Rotate(TV(init_speed,0,0));
+            //particles.X(2)=ground.Rotation().Rotate(TV(0,(T).1,(T)1.1));particles.mass(2)=(T)1;particles.V(2)=ground.Rotation().Rotate(TV(1,0,0));
+            //particles.X(3)=ground.Rotation().Rotate(TV(0,(T).1,(T)0.9));particles.mass(3)=(T)1;particles.V(3)=ground.Rotation().Rotate(TV(1,0,0));
+            //particles.X(4)=ground.Rotation().Rotate(TV(-.1,(T).2,1));particles.mass(4)=(T)1;particles.V(4)=ground.Rotation().Rotate(TV(1,0,0));
             TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            tetrahedralized_volume->mesh.elements.Append(VECTOR<int,4>(3,4,5,6));
+            tetrahedralized_volume->mesh.elements.Append(VECTOR<int,4>(2,3,4,5));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*tetrahedralized_volume,density);
             deformable_body_collection.deformable_geometry.Add_Structure(tetrahedralized_volume); 
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1,2),ROTATION<TV>((T)pi/2,TV(0,0,1))),

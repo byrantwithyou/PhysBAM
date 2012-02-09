@@ -103,9 +103,9 @@ public:
     ~STANDARD_TESTS()
     {if(test_number==21){
         T angle=parameter*(T)pi/40;
-        T y=solid_body_collection.rigid_body_collection.rigid_body_particle.X(1).y,yanalytic=-(T)5./14*(T)9.8*sqr((T)last_frame/24)*sqr(sin(angle));
-        T ke=solid_body_collection.rigid_body_collection.Rigid_Body(1).Kinetic_Energy(),pe=y*solid_body_collection.rigid_body_collection.rigid_body_particle.mass(1)*(T)9.8;
-        T omega=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(1).angular.z,speed=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(1).linear.Magnitude();
+        T y=solid_body_collection.rigid_body_collection.rigid_body_particle.X(0).y,yanalytic=-(T)5./14*(T)9.8*sqr((T)last_frame/24)*sqr(sin(angle));
+        T ke=solid_body_collection.rigid_body_collection.Rigid_Body(0).Kinetic_Energy(),pe=y*solid_body_collection.rigid_body_collection.rigid_body_particle.mass(0)*(T)9.8;
+        T omega=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(0).angular.z,speed=solid_body_collection.rigid_body_collection.rigid_body_particle.twist(0).linear.Magnitude();
         LOG::cout<<"ERROR in y for angle "<<angle<<"  ("<<(angle*180/(T)pi)<<" degrees):  "<<(1-y/yanalytic)<<std::endl;
         LOG::cout<<"SLIPPAGE  "<<omega/speed<<std::endl;LOG::cout<<"PE = "<<pe<<"    KE = "<<ke<<std::endl;}}
 
@@ -180,9 +180,9 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
 {
     if(test_number==14){
-        if(id==1) twist.linear=curve_left.Derivative(time);
-        else if(id==int(2)) twist.linear=curve_right.Derivative(time);
-        else if(id==int(3)) twist.linear=curve_plank.Derivative(time);}
+        if(id==0) twist.linear=curve_left.Derivative(time);
+        else if(id==1) twist.linear=curve_right.Derivative(time);
+        else if(id==2) twist.linear=curve_plank.Derivative(time);}
     else if(test_number==30) twist.linear=curve.Derivative(time);
     else if(test_number==34)
         Build_Deforming_Sphere(deforming_sphere,deforming_sphere->X(),deforming_sphere->Rotation(),time,false,true);
@@ -195,7 +195,7 @@ bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBA
 void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==19){
-        bool &is_static=solid_body_collection.rigid_body_collection.Rigid_Body(5).is_static,new_is_static=time<=(T).5;
+        bool &is_static=solid_body_collection.rigid_body_collection.Rigid_Body(4).is_static,new_is_static=time<=(T).5;
         if(is_static!=new_is_static){is_static=new_is_static;solid_body_collection.rigid_body_collection.Update_Simulated_Particles();}} // Changing is_static requires an Update_Simulated_Particles
 }
 //#####################################################################
@@ -205,10 +205,10 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==31){
         if(parameter==4 && time>=(T).4999 && time<=(T).5001){
-            solid_body_collection.rigid_body_collection.rigid_geometry_collection.Reactivate_Geometry(2);
+            solid_body_collection.rigid_body_collection.rigid_geometry_collection.Reactivate_Geometry(1);
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();}
         if(parameter==3 && time>=(T).4999 && time<=(T).5001){
-            solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(1);
+            solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(0);
             solid_body_collection.rigid_body_collection.Update_Simulated_Particles();}}
 }
 //#####################################################################
@@ -216,7 +216,7 @@ void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE
 {
-    if(test_number==31 && parameter==6) particle_is_simulated(2)=false;
+    if(test_number==31 && parameter==6) particle_is_simulated(1)=false;
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -264,7 +264,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     
     // add forces
     if(test_number==16){
-        rigid_body_particles_with_ether_drag.Append(2);
+        rigid_body_particles_with_ether_drag.Append(1);
         solid_body_collection.Add_Force(new RIGID_ETHER_DRAG<GRID<TV> >(solid_body_collection.rigid_body_collection,&rigid_body_particles_with_ether_drag,(T).5,(T).5));}
     else if(test_number==17){
         for(int i=2;i<=3;i++){
@@ -1194,8 +1194,8 @@ void Sphere_Sanity_Tests()
     int n=3;
     if(parameter==2) n=0;
     for(int i=0;i<n;i++) tests.Add_Rigid_Body("sphere",1,1).X().x=(T)3*i;
-    if(parameter==3) solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(3);
-    if(parameter==4) solid_body_collection.rigid_body_collection.rigid_geometry_collection.Deactivate_Geometry(2);
+    if(parameter==3) solid_body_collection.rigid_body_collection.rigid_body_particle.Remove_Body(2);
+    if(parameter==4) solid_body_collection.rigid_body_collection.rigid_geometry_collection.Deactivate_Geometry(1);
 }
 //#####################################################################
 // Function Collision_Contact_Pairs_Test
