@@ -306,7 +306,7 @@ Restore_State(const int state_index)
 template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
 Average_States(const int state1,const int state2,const int result_state,const T interpolation_distance)
 {
-    if(saved_states.m<result_state) saved_states.Resize(result_state);
+    if(saved_states.m<=result_state) saved_states.Resize(result_state+1);
     saved_states(result_state).x.t=((T)1-interpolation_distance)*saved_states(state1).x.t+interpolation_distance*saved_states(state2).x.t;
     saved_states(result_state).x.r=ROTATION<TV>::Spherical_Linear_Interpolation(saved_states(state1).x.r,saved_states(state2).x.r,interpolation_distance);
     saved_states(result_state).y=((T)1-interpolation_distance)*saved_states(state1).y+interpolation_distance*saved_states(state2).y;

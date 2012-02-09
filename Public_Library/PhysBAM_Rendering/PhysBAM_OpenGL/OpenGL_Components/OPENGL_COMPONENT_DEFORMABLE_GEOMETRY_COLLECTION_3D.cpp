@@ -541,7 +541,7 @@ Toggle_Active_Value_Response()
         std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
         sstream>>index;
         if(index>=0) {
-            if(active_list.m<index) active_list.Resize(index+1,true,true,start_val);
+            if(active_list.m<=index) active_list.Resize(index+1,true,true,start_val);
             active_list(index)=!active_list(index);}}
 }
 //#####################################################################
