@@ -141,12 +141,12 @@ public:
     int face_count=0;
     if(show_xmin){face_count++;};if(show_xmax){face_count++;};if(show_ymin){face_count++;};if(show_ymax){face_count++;};if(show_zmin){face_count++;};if(show_zmax){face_count++;};
     int triangle_count=1;ARRAY<VECTOR<int,3> > triangles(2*face_count);
-    if(show_xmin){triangles(triangle_count).Set(1,4,8);triangle_count++;triangles(triangle_count).Set(8,5,1);triangle_count++;};
-    if(show_xmax){triangles(triangle_count).Set(2,6,7);triangle_count++;triangles(triangle_count).Set(7,3,2);triangle_count++;};
-    if(show_ymin){triangles(triangle_count).Set(5,1,2);triangle_count++;triangles(triangle_count).Set(2,6,5);triangle_count++;};
-    if(show_ymax){triangles(triangle_count).Set(8,7,3);triangle_count++;triangles(triangle_count).Set(3,4,8);triangle_count++;};
-    if(show_zmin){triangles(triangle_count).Set(5,8,7);triangle_count++;triangles(triangle_count).Set(7,6,5);triangle_count++;};
-    if(show_zmax){triangles(triangle_count).Set(1,2,3);triangle_count++;triangles(triangle_count).Set(3,4,1);triangle_count++;};
+    if(show_xmin){triangles(triangle_count).Set(0,3,7);triangle_count++;triangles(triangle_count).Set(7,4,0);triangle_count++;};
+    if(show_xmax){triangles(triangle_count).Set(1,5,6);triangle_count++;triangles(triangle_count).Set(6,2,1);triangle_count++;};
+    if(show_ymin){triangles(triangle_count).Set(4,0,1);triangle_count++;triangles(triangle_count).Set(1,5,4);triangle_count++;};
+    if(show_ymax){triangles(triangle_count).Set(7,6,2);triangle_count++;triangles(triangle_count).Set(2,3,7);triangle_count++;};
+    if(show_zmin){triangles(triangle_count).Set(4,7,6);triangle_count++;triangles(triangle_count).Set(6,5,4);triangle_count++;};
+    if(show_zmax){triangles(triangle_count).Set(0,1,2);triangle_count++;triangles(triangle_count).Set(2,3,0);triangle_count++;};
 
     surface->mesh.Initialize_Mesh(particles.array_collection->Size(),triangles);
     surface->Update_Triangle_List();surface->Update_Vertex_Normals();return surface;}

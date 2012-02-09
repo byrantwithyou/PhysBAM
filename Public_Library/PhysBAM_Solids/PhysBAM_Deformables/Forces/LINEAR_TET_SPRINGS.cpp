@@ -358,8 +358,8 @@ template<class T> VECTOR<int,2> LINEAR_TET_SPRINGS<T>::
 Edge_Indices(unsigned char pair_id)
 {
     switch(pair_id){
-        case 0: return VECTOR<int,2>(5,4);case 1: return VECTOR<int,2>(2,3);case 2: return VECTOR<int,2>(3,1);case 3: return VECTOR<int,2>(1,2);
-        case 4: return VECTOR<int,2>(1,6);case 5: return VECTOR<int,2>(4,3);case 6:return VECTOR<int,2>(2,5);
+        case 0: return VECTOR<int,2>(4,3);case 1: return VECTOR<int,2>(1,2);case 2: return VECTOR<int,2>(2,0);case 3: return VECTOR<int,2>(0,1);
+        case 4: return VECTOR<int,2>(0,5);case 5: return VECTOR<int,2>(3,2);case 6: return VECTOR<int,2>(1,4);
         default: PHYSBAM_FATAL_ERROR();}
 }
 template<class T> LINEAR_TET_SPRINGS<T>* PhysBAM::

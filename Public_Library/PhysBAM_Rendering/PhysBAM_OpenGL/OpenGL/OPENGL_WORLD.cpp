@@ -1066,14 +1066,14 @@ Get_View_Frame(TV &view_forward,TV &view_up,TV &view_right)
     // (because OpenGL has negative z pointing into screen)
     // Since matrix^-1 = matrix^T, this is simply the negative of
     // the third row of matrix.
-    view_forward=TV(-matrix(3,1),-matrix(3,2),-matrix(3,3));
+    view_forward=TV(-matrix(2,0),-matrix(2,1),-matrix(2,2));
 
     // We want to find the vector v such that matrix * v = (0,1,0)
-    view_up=TV(matrix(2,1),matrix(2,2),matrix(2,3));
+    view_up=TV(matrix(1,0),matrix(1,1),matrix(1,2));
 
     // We want to find the vector v such that matrix * v = (-1,0,0)
     // (negative to compensate for the glScalef(-1,1,1) to get the LHS
-    view_right=TV(-matrix(1,1),-matrix(1,2),-matrix(1,3));
+    view_right=TV(-matrix(0,0),-matrix(0,1),-matrix(0,2));
 }
 
 //#####################################################################

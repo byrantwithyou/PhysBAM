@@ -48,9 +48,9 @@ Initialize(const int test_number_input,const int resolution,const int restart_fr
         fluids_parameters_input.second_order_cut_cell_method=false;}
     else if(test_number==11){
         fluids_parameters_input.densities(0)=1000;fluids_parameters_input.densities(0)=500;fluids_parameters_input.densities(1)=2000;
-        fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T).1;
-        fluids_parameters_input.surface_tensions(1,3)=fluids_parameters_input.surface_tensions(3,1)=(T).1;
-        fluids_parameters_input.surface_tensions(2,3)=fluids_parameters_input.surface_tensions(3,2)=(T).1;}
+        fluids_parameters_input.surface_tensions(0,1)=fluids_parameters_input.surface_tensions(1,0)=(T).1;
+        fluids_parameters_input.surface_tensions(0,2)=fluids_parameters_input.surface_tensions(2,0)=(T).1;
+        fluids_parameters_input.surface_tensions(1,2)=fluids_parameters_input.surface_tensions(2,1)=(T).1;}
     else if(test_number==12){
         fluids_parameters_input.dirichlet_regions(0)=true;use_open_wall=true;air_region=1;
         fluids_parameters_input.densities(0)=1;fluids_parameters_input.densities(0)=800;fluids_parameters_input.densities(1)=1000;fluids_parameters_input.densities(3)=3000;}

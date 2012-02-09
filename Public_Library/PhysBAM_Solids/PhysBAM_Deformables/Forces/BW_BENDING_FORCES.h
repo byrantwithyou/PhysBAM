@@ -35,7 +35,7 @@ protected:
     };
 public:
     ARRAY<BENDING_STATE> bending_states;
-    ARRAY<VECTOR<int,4> > constraint_particles; // spring is shortest line between segment with particles (1,2) and segment with particles (3,4)
+    ARRAY<VECTOR<int,4> > constraint_particles; // spring is shortest line between segment with particles (0,1) and segment with particles (2,3)
     MATRIX<VECTOR<VECTOR<T,3>,3>,4> dq_a_i_j_t;
     MATRIX<VECTOR<VECTOR<T,3>,3>,4> dq_b_i_j_t;
     bool assume_constant_normal_length;

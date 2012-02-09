@@ -54,8 +54,8 @@ public:
     void Enforce_Definiteness()
     {S=S.Positive_Definite_Part();
     DIAGONAL_MATRIX<T,3> D_d,D_s;MATRIX<T,3> V_d,V_s;dSdC_d.Fast_Solve_Eigenproblem(D_d,V_d);dSdC_s.Fast_Solve_Eigenproblem(D_s,V_s);MATRIX<T,3> M(V_d.Transpose_Times(dSdC_ds*V_s));
-    D_d.x11=max(D_d.x11,abs(M(1,1))+abs(M(1,2))+abs(M(1,3)));D_d.x22=max(D_d.x22,abs(M(2,1))+abs(M(2,2))+abs(M(2,3)));D_d.x33=max(D_d.x33,abs(M(3,1))+abs(M(3,2))+abs(M(3,3)));
-    D_s.x11=max(D_s.x11,abs(M(1,1))+abs(M(2,1))+abs(M(3,1)));D_s.x22=max(D_s.x22,abs(M(1,2))+abs(M(2,2))+abs(M(3,2)));D_s.x33=max(D_s.x33,abs(M(1,3))+abs(M(2,3))+abs(M(3,3)));
+    D_d.x11=max(D_d.x10,abs(M(0,0))+abs(M(0,1))+abs(M(0,2)));D_d.x22=max(D_d.x22,abs(M(1,0))+abs(M(1,1))+abs(M(1,2)));D_d.x33=max(D_d.x33,abs(M(2,0))+abs(M(2,1))+abs(M(2,2)));
+    D_s.x11=max(D_s.x10,abs(M(0,0))+abs(M(1,0))+abs(M(2,0)));D_s.x22=max(D_s.x22,abs(M(0,1))+abs(M(1,1))+abs(M(2,1)));D_s.x33=max(D_s.x33,abs(M(0,2))+abs(M(1,2))+abs(M(2,2)));
     dSdC_d=SYMMETRIC_MATRIX<T,3>::Conjugate(V_d,D_d);dSdC_s=SYMMETRIC_MATRIX<T,3>::Conjugate(V_s,D_s);}
 };
 }

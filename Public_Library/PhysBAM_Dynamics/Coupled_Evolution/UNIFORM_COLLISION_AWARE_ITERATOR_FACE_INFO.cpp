@@ -42,9 +42,9 @@ Register_Neighbors_As_Collision_Faces()
                 cfi.axis=faces(i).axis;
                 cfi.index=faces(i).index;
                 cfi.side=1;
-                collision_face_info.Append(cfi);
-                collision_face_info.Last().simplices=merged(i/2);
-                new_faces.Set(faces(i),collision_face_info.m);}}}
+                int id=collision_face_info.Append(cfi);
+                collision_face_info(id).simplices=merged(i/2);
+                new_faces.Set(faces(i),id);}}}
 
     Sort(collision_face_info);
 }

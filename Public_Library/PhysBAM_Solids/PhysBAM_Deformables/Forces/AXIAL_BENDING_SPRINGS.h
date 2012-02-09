@@ -35,7 +35,7 @@ public:
     ARRAY<T> youngs_modulus; // units of force (i.e. force per unit strain)
     ARRAY<T> restlength,visual_restlength; // visual restlength corresponds to length between particles; restlength may be larger than this to avoid zero/small restlength
     ARRAY<T> damping; // units of force*time (i.e. force per unit strain rate)
-    ARRAY<VECTOR<int,4> > spring_particles; // spring is shortest line between segment with particles (1,2) and segment with particles (3,4)
+    ARRAY<VECTOR<int,4> > spring_particles; // spring is shortest line between segment with particles (0,1) and segment with particles (2,3)
     ARRAY<T> attached_edge_restlength; // total rest length of edges of attached triangles which are not the center edge
     ARRAY<T> attached_edge_length; // total length of edges of attached triangles which are not the center edge
 private:
