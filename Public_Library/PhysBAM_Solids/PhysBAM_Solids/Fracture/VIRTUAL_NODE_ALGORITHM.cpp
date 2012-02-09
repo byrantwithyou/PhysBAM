@@ -22,7 +22,8 @@ template<class TV,int d> void
 Add_Element_If_Necessary(EMBEDDED_OBJECT<TV,d>& embedded_object,const VECTOR<int,d+1>& nodes,const int center_node)
 {
     SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
-    if(int element=mesh.Simplex(nodes)){embedded_object.node_in_simplex_is_material(element)(center_node)=true;return;}
+    int element=mesh.Simplex(nodes);
+    if(element>=0){embedded_object.node_in_simplex_is_material(element)(center_node)=true;return;}
     mesh.elements.Append(nodes);
     for(int i=0;i<nodes.m;i++) (*mesh.incident_elements)(nodes[i]).Append(mesh.elements.m);
     embedded_object.embedded_subelements_in_parent_element_index->Append(0);

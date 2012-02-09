@@ -259,7 +259,8 @@ Add_Best_Embedded_Triangle_With_Quad(const TV& fracture_normal,const int tetrahe
 template<class T> T FRACTURE_TETRAHEDRALIZED_VOLUME<T>::
 Interpolation_Fraction_For_Best_Normal(const TV& fracture_normal,const int tetrahedron,const TV& ik,const TV& il,const int i,const int j)
 {
-    if(int surface_particle_ij=embedded_object.Embedded_Particle_On_Segment(i,j)){
+    int surface_particle_ij=embedded_object.Embedded_Particle_On_Segment(i,j);
+    if(surface_particle_ij>=0){
         if(embedded_object.parent_particles(surface_particle_ij)(1)==i) return embedded_object.interpolation_fraction(surface_particle_ij);
         else return (T)1-embedded_object.interpolation_fraction(surface_particle_ij);}
     TV &xi=embedded_object.simplicial_object.particles.X(i),&xj=embedded_object.simplicial_object.particles.X(j);
@@ -301,30 +302,32 @@ Add_Third_Cut(const int tetrahedron,const TV& fracture_normal,const VECTOR<T,4>*
                 || embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangles[1])
                 || embedded_object.Node_Separated_By_Embedded_Subelement(emb_triangle3)));
         Add_Best_Embedded_Triangle_With_Quad_And_Triangle(fracture_normal,tetrahedron,tetrahedron_phi);}
-    else if(int segments_intersected=Add_Best_Embedded_Triangle_Or_Quad_With_Two_Triangles(fracture_normal,tetrahedron,hypothetical_cut)){
-        if(segments_intersected==3){// we know we have three elements
-            assert(!(hypothetical_cut.Triangle_Cut_Already_In_Embedded_Tetrahedralized_Volume()));
-            int i,j,k,l;permute_four(nodes,embedded_object.orientation_index(tetrahedron)).Get(i,j,k,l);
-            if(Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,l))) 
-                embedded_object.Add_Embedded_Triangle(l,k,l,j,l,i);
-            else{
-                assert(Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,k)));
-                embedded_object.Add_Embedded_Triangle(k,l,k,i,k,j);}}
+    else{
+        int segments_intersected=Add_Best_Embedded_Triangle_Or_Quad_With_Two_Triangles(fracture_normal,tetrahedron,hypothetical_cut);
+        if(segments_intersected>=0){
+            if(segments_intersected==3){// we know we have three elements
+                assert(!(hypothetical_cut.Triangle_Cut_Already_In_Embedded_Tetrahedralized_Volume()));
+                int i,j,k,l;permute_four(nodes,embedded_object.orientation_index(tetrahedron)).Get(i,j,k,l);
+                if(Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,l))) 
+                    embedded_object.Add_Embedded_Triangle(l,k,l,j,l,i);
+                else{
+                    assert(Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,k)));
+                    embedded_object.Add_Embedded_Triangle(k,l,k,i,k,j);}}
             // the two elements mandated by the bdry code are already in the right place (either of the two third elements work)
-        else if(segments_intersected==4){ // we know we have two triangles and a quad (we just added the quad)
-            assert(!(hypothetical_cut.Quad_Cut_Already_In_Embedded_Tetrahedralized_Volume()));
-            int count=1,i,j,k,l;nodes.Get(i,j,k,l);
-            while(!Emb_Node_In_Triangle(embedded_object,embedded_object.Embedded_Particle_On_Segment(i,j),emb_triangle1)
-                || !Emb_Node_In_Triangle(embedded_object,embedded_object.Embedded_Particle_On_Segment(i,k),emb_triangle1)
-                || !Emb_Node_In_Triangle(embedded_object,embedded_object.Embedded_Particle_On_Segment(i,l),emb_triangle1)
-                || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,k))
-                || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(k,j))
-                || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(j,l))
-                || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(l,i))
-                || !Quad_Diagonal_Is_Correct(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,k),embedded_object.Embedded_Particle_On_Segment(j,l)))
-                permute_four(nodes,++count).Get(i,j,k,l);
-            embedded_object.orientation_index(tetrahedron)=count;
-            embedded_object.Add_Embedded_Triangle(i,k,k,j,j,l);embedded_object.Add_Embedded_Triangle(j,l,l,i,i,k);}}
+            else if(segments_intersected==4){ // we know we have two triangles and a quad (we just added the quad)
+                assert(!(hypothetical_cut.Quad_Cut_Already_In_Embedded_Tetrahedralized_Volume()));
+                int count=1,i,j,k,l;nodes.Get(i,j,k,l);
+                while(!Emb_Node_In_Triangle(embedded_object,embedded_object.Embedded_Particle_On_Segment(i,j),emb_triangle1)
+                    || !Emb_Node_In_Triangle(embedded_object,embedded_object.Embedded_Particle_On_Segment(i,k),emb_triangle1)
+                    || !Emb_Node_In_Triangle(embedded_object,embedded_object.Embedded_Particle_On_Segment(i,l),emb_triangle1)
+                    || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,k))
+                    || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(k,j))
+                    || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(j,l))
+                    || !Emb_Node_Added_By_This_Tet(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(l,i))
+                    || !Quad_Diagonal_Is_Correct(hypothetical_cut,embedded_object.Embedded_Particle_On_Segment(i,k),embedded_object.Embedded_Particle_On_Segment(j,l)))
+                    permute_four(nodes,++count).Get(i,j,k,l);
+                embedded_object.orientation_index(tetrahedron)=count;
+                embedded_object.Add_Embedded_Triangle(i,k,k,j,j,l);embedded_object.Add_Embedded_Triangle(j,l,l,i,i,k);}}}
 }
 //####################################################################
 // Function Add_Best_Embedded_Triangle_With_Quad_And_Triangle

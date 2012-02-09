@@ -47,7 +47,7 @@ public:
     {return bindings(binding_index_from_particle_index(particle_index))->Embedded_Velocity();}
 
     BINDING<TV>* Binding(const int particle_index) const
-    {if(binding_index_from_particle_index.m<=particle_index || !binding_index_from_particle_index(particle_index)) return 0;
+    {if(binding_index_from_particle_index.m<=particle_index || binding_index_from_particle_index(particle_index)<0) return 0;
     return bindings(binding_index_from_particle_index(particle_index));}
 
     TV V(const int particle_index) const

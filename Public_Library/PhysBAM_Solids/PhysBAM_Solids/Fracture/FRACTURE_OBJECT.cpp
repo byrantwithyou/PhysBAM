@@ -60,7 +60,8 @@ Rebuild_Embedded_Object(ARRAY<int>& map_to_old_particles,ARRAY<int>& map_to_old_
 template<class TV,int d> TV FRACTURE_OBJECT<TV,d>::
 Rest_Position_Of_Material_Surface_Particle(const int material_surface_particle)
 {
-    if(int embedded_material_surface_particle=embedded_object.embedded_particles.subset_index_from_point_cloud_index(material_surface_particle)){
+    int embedded_material_surface_particle=embedded_object.embedded_particles.subset_index_from_point_cloud_index(material_surface_particle);
+    if(embedded_material_surface_particle>=0){
         T lambda=embedded_object.interpolation_fraction(embedded_material_surface_particle);
         VECTOR<int,2> ref_parents(corresponding_node_in_reference.Subset(embedded_object.parent_particles(embedded_material_surface_particle)));
         return LINEAR_INTERPOLATION<T,TV>::Linear(reference_particles.X(ref_parents[0]),reference_particles.X(ref_parents[1]),lambda);}
