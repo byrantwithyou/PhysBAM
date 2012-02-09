@@ -36,7 +36,7 @@ Reinitialize(const int time_steps,const T time)
 
     int m=grid.counts.x;T dx=grid.dX.x;
     
-    ARRAY<T,VECTOR<int,1> > sign_phi(1,m); // smeared out sign function
+    ARRAY<T,VECTOR<int,1> > sign_phi(0,m); // smeared out sign function
     T epsilon=sqr(dx);
     for(int i=0;i<m;i++) sign_phi(i)=phi(i)/sqrt(sqr(phi(i))+epsilon);
 
@@ -64,9 +64,9 @@ Euler_Step_Of_Reinitialization(const ARRAY<T,VECTOR<int,1> >& sign_phi,const T d
     int i;int m=grid.counts.x;T dx=grid.dX.x; 
     int ghost_cells=3;
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,ghost_cells);
-    ARRAY<T,VECTOR<int,1> > rhs(1,m);
+    ARRAY<T,VECTOR<int,1> > rhs(0,m);
     
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),phix_minus(1,m),phix_plus(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+ghost_cells),phix_minus(0,m),phix_plus(0,m);
     for(i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i);
     if(reinitialization_spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus,phix_plus);
     else HJ_ENO(reinitialization_spatial_order,m,dx,phi_1d_x,phix_minus,phix_plus);

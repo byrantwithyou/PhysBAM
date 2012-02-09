@@ -79,7 +79,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,2> >& phi_ghost,ARRAY<T,VECTOR<int,2> >
     int ghost_cells=3;
     
     // x-direction
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),phix_minus_1d(0,m),phix_plus_1d(0,m); 
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+ghost_cells),phix_minus_1d(0,m),phix_plus_1d(0,m); 
     for(j=0;j<n;j++){
         for(i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i,j);
         if(spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus_1d,phix_plus_1d);
@@ -87,7 +87,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,2> >& phi_ghost,ARRAY<T,VECTOR<int,2> >
         for(i=0;i<m;i++){phix_minus(i,j)=phix_minus_1d(i);phix_plus(i,j)=phix_plus_1d(i);}}
 
     // y-direction
-    ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+ghost_cells),phiy_minus_1d(0,n),phiy_plus_1d(0,n); 
+    ARRAY<T,VECTOR<int,1> > phi_1d_y(-ghost_cells,n+ghost_cells),phiy_minus_1d(0,n),phiy_plus_1d(0,n); 
     for(i=0;i<m;i++){
         for(j=-ghost_cells;j<n+ghost_cells;j++) phi_1d_y(j)=phi_ghost(i,j);
         if(spatial_order == 5) HJ_WENO(n,dy,phi_1d_y,phiy_minus_1d,phiy_plus_1d);

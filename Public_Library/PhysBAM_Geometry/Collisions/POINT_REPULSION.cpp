@@ -82,8 +82,8 @@ template<class T> void POINT_REPULSION<T>::
 Move_Points()
 {
     VECTOR<T,3> position,normal,accumulated_force;int new_triangle;
-    ARRAY<VECTOR<T,3> ,VECTOR<int,1> > new_points(1,points.m);
-    ARRAY<int,VECTOR<int,1> > new_triangles(1,points.m);
+    ARRAY<VECTOR<T,3> ,VECTOR<int,1> > new_points(0,points.m);
+    ARRAY<int,VECTOR<int,1> > new_triangles(0,points.m);
     for(int i=0;i<points.m;i++){new_points(i)=points(i).position;new_triangles(i)=points(i).triangle;}
     for(int i=0;i<points.m;i++){
         POINT_REPULSION_DATA<T>& data=points(i);position=data.position;

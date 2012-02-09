@@ -41,7 +41,7 @@ template<class T> template<int d> void IMAGE<T>::
 Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image,const T gamma,const T dither_amplitude)
 {
     RANDOM_NUMBERS<T> random;random.Set_Seed(324032); // want uniform seed so noise perturbation pattern is temporally coherent
-    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > *corrected_image=0; // may need to shift image to be (1,1) based, or to gamma correct it
+    ARRAY<VECTOR<T,d> ,VECTOR<int,2> > *corrected_image=0; // may need to shift image to be (0,0) based, or to gamma correct it
     if(gamma!=1 || image.domain.min_corner.x!=1 || image.domain.min_corner.y!=1 || dither_amplitude>0){
         corrected_image=new ARRAY<VECTOR<T,d> ,VECTOR<int,2> >(0,image.counts.x,0,image.counts.y,false);
         ARRAY<VECTOR<T,d> ,VECTOR<int,2> >::Shifted_Get(*corrected_image,image,VECTOR<int,2>(image.domain.min_corner.x-1,image.domain.min_corner.y-1));

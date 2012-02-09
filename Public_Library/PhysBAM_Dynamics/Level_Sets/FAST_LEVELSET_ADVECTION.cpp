@@ -16,7 +16,7 @@ using namespace PhysBAM;
 //#####################################################################
 // Function Local_WENO_Advect
 //#####################################################################
-// phi is (-2,m+3), u, distance and u_phix are (1,m)
+// phi is (-2,m+3), u, distance and u_phix are [0,m)
 template<class T> static void
 Local_WENO_Advect(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,const ARRAY<T,VECTOR<int,1> >& u,const ARRAY<T,VECTOR<int,1> >& distance,ARRAY<T,VECTOR<int,1> >& u_phix,const T half_band_width)
 {
@@ -29,7 +29,7 @@ Local_WENO_Advect(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,cons
 //#####################################################################
 // Function Local_ENO_Advect
 //#####################################################################
-// order = 1, 2 or 3, phi is (-2,m_3), u, distance and u_phix are (1,m)
+// order = 1, 2 or 3, phi is (-2,m_3), u, distance and u_phix are [0,m)
 template<class T> static void
 Local_ENO_Advect(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,const ARRAY<T,VECTOR<int,1> >& u,const ARRAY<T,VECTOR<int,1> >& distance,ARRAY<T,VECTOR<int,1> >& u_phix,const T half_band_width)
 {
@@ -55,7 +55,7 @@ Local_ENO_Advect(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int
 //#####################################################################
 // Function Local_ENO_Reinitialize
 //#####################################################################
-// order = 1, 2 or 3, phi is (-2,m_3), phix_minus and phix_plus are (1,m)
+// order = 1, 2 or 3, phi is (-2,m_3), phix_minus and phix_plus are [0,m)
 template<class T> static void
 Local_ENO_Reinitialize(const int order,const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,const ARRAY<T,VECTOR<int,1> >& distance,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus,const T half_band_width)
 {
@@ -85,7 +85,7 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAY<VECTOR<T
 {
     int m=grid.counts.x;T dx=grid.dX.x;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),u_1d(1,m),distance_1d_x(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+ghost_cells),u_1d(0,m),distance_1d_x(0,m);
     for(int i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i);
     for(int i=0;i<m;i++){u_1d(i)=V(i).x;distance_1d_x(i)=phi(i);}
     if(spatial_order == 5) Local_WENO_Advect(m,dx,phi_1d_x,u_1d,distance_1d_x,rhs,half_band_width);
@@ -97,14 +97,14 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAY<VECTOR<T
 {
     int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),u_1d(1,m),distance_1d_x(1,m),u_phix_1d(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+ghost_cells),u_1d(0,m),distance_1d_x(0,m),u_phix_1d(0,m);
     for(int j=0;j<n;j++){
         for(int i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i,j);
         for(int i=0;i<m;i++){u_1d(i)=V(i,j).x;distance_1d_x(i)=phi(i,j);}
         if(spatial_order == 5) Local_WENO_Advect(m,dx,phi_1d_x,u_1d,distance_1d_x,u_phix_1d,half_band_width);
         else Local_ENO_Advect(spatial_order,m,dx,phi_1d_x,u_1d,distance_1d_x,u_phix_1d,half_band_width);
         for(int i=0;i<m;i++) rhs(i,j)=u_phix_1d(i);}
-    ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+ghost_cells),v_1d(1,n),distance_1d_y(1,n),v_phiy_1d(1,n);
+    ARRAY<T,VECTOR<int,1> > phi_1d_y(-ghost_cells,n+ghost_cells),v_1d(0,n),distance_1d_y(0,n),v_phiy_1d(0,n);
     for(int i=0;i<m;i++){
         for(int j=-ghost_cells;j<n+ghost_cells;j++) phi_1d_y(j)=phi_ghost(i,j);
         for(int j=0;j<n;j++){v_1d(j)=V(i,j).y;distance_1d_y(j)=phi(i,j);}
@@ -118,21 +118,21 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAY<VECTOR<T
 {
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;T dx=grid.dX.x,dy=grid.dX.y,dz=grid.dX.z;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells),u_1d(1,m),distance_1d_x(1,m),u_phix_1d(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+ghost_cells),u_1d(0,m),distance_1d_x(0,m),u_phix_1d(0,m);
     for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         for(int i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i,j,ij);
         for(int i=0;i<m;i++){u_1d(i)=V(i,j,ij).x;distance_1d_x(i)=phi(i,j,ij);}
         if(spatial_order == 5) Local_WENO_Advect(m,dx,phi_1d_x,u_1d,distance_1d_x,u_phix_1d,half_band_width);
         else Local_ENO_Advect(spatial_order,m,dx,phi_1d_x,u_1d,distance_1d_x,u_phix_1d,half_band_width);
         for(int i=0;i<m;i++) rhs(i,j,ij)=u_phix_1d(i);}
-    ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+ghost_cells),v_1d(1,n),distance_1d_y(1,n),v_phiy_1d(1,n);
+    ARRAY<T,VECTOR<int,1> > phi_1d_y(-ghost_cells,n+ghost_cells),v_1d(0,n),distance_1d_y(0,n),v_phiy_1d(0,n);
     for(int i=0;i<m;i++) for(int ij=0;ij<mn;ij++){
         for(int j=-ghost_cells;j<n+ghost_cells;j++) phi_1d_y(j)=phi_ghost(i,j,ij);
         for(int j=0;j<n;j++){v_1d(j)=V(i,j,ij).y;distance_1d_y(j)=phi(i,j,ij);}
         if(spatial_order == 5) Local_WENO_Advect(n,dy,phi_1d_y,v_1d,distance_1d_y,v_phiy_1d,half_band_width);
         else Local_ENO_Advect(spatial_order,n,dy,phi_1d_y,v_1d,distance_1d_y,v_phiy_1d,half_band_width);
         for(int j=0;j<n;j++) rhs(i,j,ij)+=v_phiy_1d(j);}
-    ARRAY<T,VECTOR<int,1> > phi_1d_z(1-ghost_cells,mn+ghost_cells),w_1d(1,mn),distance_1d_z(1,mn),w_phiz_1d(1,mn);
+    ARRAY<T,VECTOR<int,1> > phi_1d_z(-ghost_cells,mn+ghost_cells),w_1d(0,mn),distance_1d_z(0,mn),w_phiz_1d(0,mn);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         for(int ij=-ghost_cells;ij<mn+ghost_cells;ij++) phi_1d_z(ij)=phi_ghost(i,j,ij);
         for(int ij=0;ij<mn;ij++){w_1d(ij)=V(i,j,ij).z;distance_1d_z(ij)=phi(i,j,ij);}
@@ -143,7 +143,7 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAY<VECTOR<T
 //#####################################################################
 // Function Local_WENO_Reinitialize
 //#####################################################################
-// phi is (-2,m+3), distance and phix_minus and phix_plus are (1,m)
+// phi is (-2,m+3), distance and phix_minus and phix_plus are [0,m)
 template<class T> static void
 Local_WENO_Reinitialize(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& phi,const ARRAY<T,VECTOR<int,1> >& distance,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus,const T half_band_width)
 {
@@ -162,7 +162,7 @@ Euler_Step_Of_Reinitialization_High_Order_Helper(const GRID<VECTOR<T,1> >& grid,
 {
     int m=grid.counts.x;T dx=grid.dX.x;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+3),distance_1d_x(1,m),phix_minus(1,m),phix_plus(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+3),distance_1d_x(0,m),phix_minus(0,m),phix_plus(0,m);
     for(int i=-ghost_cells;i<m+3;i++) phi_1d_x(i)=phi_ghost(i);
     for(int i=0;i<m;i++) distance_1d_x(i)=signed_distance(i);
     if(spatial_order == 5) Local_WENO_Reinitialize(m,dx,phi_1d_x,distance_1d_x,phix_minus,phix_plus,half_band_width);
@@ -177,7 +177,7 @@ Euler_Step_Of_Reinitialization_High_Order_Helper(const GRID<VECTOR<T,2> >& grid,
 {
     int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+3),distance_1d_x(1,m),phix_minus(1,m),phix_plus(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+3),distance_1d_x(0,m),phix_minus(0,m),phix_plus(0,m);
     for(int j=0;j<n;j++){
         for(int i=-ghost_cells;i<m+3;i++) phi_1d_x(i)=phi_ghost(i,j);
         for(int i=0;i<m;i++) distance_1d_x(i)=signed_distance(i,j);
@@ -187,7 +187,7 @@ Euler_Step_Of_Reinitialization_High_Order_Helper(const GRID<VECTOR<T,2> >& grid,
             if(LEVELSET_UTILITIES<T>::Sign(phi(i,j)) < 0) rhs(i,j)=sqr(max(-phix_minus(i),phix_plus(i),(T)0));
             else rhs(i,j)=sqr(max(phix_minus(i),-phix_plus(i),(T)0));}}
 
-    ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+3),distance_1d_y(1,n),phiy_minus(1,n),phiy_plus(1,n);
+    ARRAY<T,VECTOR<int,1> > phi_1d_y(-ghost_cells,n+3),distance_1d_y(0,n),phiy_minus(0,n),phiy_plus(0,n);
     for(int i=0;i<m;i++){
         for(int j=-ghost_cells;j<n+3;j++) phi_1d_y(j)=phi_ghost(i,j);
         for(int j=0;j<n;j++) distance_1d_y(j)=signed_distance(i,j);
@@ -203,7 +203,7 @@ Euler_Step_Of_Reinitialization_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,
 {
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;T dx=grid.dX.x,dy=grid.dX.y,dz=grid.dX.z;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+3),distance_1d_x(1,m),phix_minus(1,m),phix_plus(1,m);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+3),distance_1d_x(0,m),phix_minus(0,m),phix_plus(0,m);
     for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){
         for(int i=-ghost_cells;i<m+3;i++) phi_1d_x(i)=phi_ghost(i,j,ij);
         for(int i=0;i<m;i++) distance_1d_x(i)=signed_distance(i,j,ij);
@@ -213,7 +213,7 @@ Euler_Step_Of_Reinitialization_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,
             if(LEVELSET_UTILITIES<T>::Sign(phi(i,j,ij)) < 0) rhs(i,j,ij)=sqr(max(-phix_minus(i),phix_plus(i),(T)0));
             else rhs(i,j,ij)=sqr(max(phix_minus(i),-phix_plus(i),(T)0));}}
 
-    ARRAY<T,VECTOR<int,1> > phi_1d_y(1-ghost_cells,n+3),distance_1d_y(1,n),phiy_minus(1,n),phiy_plus(1,n);
+    ARRAY<T,VECTOR<int,1> > phi_1d_y(-ghost_cells,n+3),distance_1d_y(0,n),phiy_minus(0,n),phiy_plus(0,n);
     for(int i=0;i<m;i++) for(int ij=0;ij<mn;ij++){
         for(int j=-ghost_cells;j<n+3;j++) phi_1d_y(j)=phi_ghost(i,j,ij);
         for(int j=0;j<n;j++) distance_1d_y(j)=signed_distance(i,j,ij);
@@ -223,7 +223,7 @@ Euler_Step_Of_Reinitialization_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,
             if(LEVELSET_UTILITIES<T>::Sign(phi(i,j,ij)) < 0) rhs(i,j,ij)+=sqr(max(-phiy_minus(j),phiy_plus(j),(T)0));
             else rhs(i,j,ij)+=sqr(max(phiy_minus(j),-phiy_plus(j),(T)0));}}
 
-    ARRAY<T,VECTOR<int,1> > phi_1d_z(1-ghost_cells,mn+3),distance_1d_z(1,mn),phiz_minus(1,mn),phiz_plus(1,mn);
+    ARRAY<T,VECTOR<int,1> > phi_1d_z(-ghost_cells,mn+3),distance_1d_z(0,mn),phiz_minus(0,mn),phiz_plus(0,mn);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
         for(int ij=-ghost_cells;ij<mn+3;ij++) phi_1d_z(ij)=phi_ghost(i,j,ij);
         for(int ij=0;ij<mn;ij++) distance_1d_z(ij)=signed_distance(i,j,ij);

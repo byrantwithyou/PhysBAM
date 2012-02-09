@@ -54,7 +54,7 @@ protected:
     FORCE_ELEMENTS force_elements;
     
     ARRAY<SPRING_STATE> spring_states;
-    ARRAY<VECTOR<T,6> > edge_restlength_squared; // (1,2),(1,3),(1,4),(2,3),(2,4),(3,4)
+    ARRAY<VECTOR<T,6> > edge_restlength_squared; // (0,1),(0,2),(0,3),(1,2),(1,3),(2,3)
     bool use_springs_compressed_beyond_threshold; // only use the springs compressed enough
     T spring_compression_fraction_threshold;
     T minimum_edge_compression_squared; // threshold for judging cross product robust

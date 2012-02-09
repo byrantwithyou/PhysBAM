@@ -115,7 +115,7 @@ Display(const int in_color) const
         else
 #endif
         {
-            VECTOR<int,3> node_start(1-ghost_cells,1-ghost_cells,1-ghost_cells),node_end(grid.numbers_of_cells+ghost_cells+1);
+            VECTOR<int,3> node_start(-ghost_cells,-ghost_cells,-ghost_cells),node_end(grid.numbers_of_cells+ghost_cells+1);
             if (slice->axis==0) { node_start.x=(slice->index-1)/scale+1; node_end.x=node_start.x+1; }
             else if (slice->axis==1) { node_start.y=(slice->index-1)/scale+1; node_end.y=node_start.y+1; }
             else if (slice->axis==2) { node_start.z=(slice->index-1)/scale+1; node_end.z=node_start.z+1; }

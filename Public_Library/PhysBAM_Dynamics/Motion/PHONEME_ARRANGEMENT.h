@@ -105,7 +105,7 @@ public:
           {face_control_parameters->Set(list(segment_list(0)).Controls(time));face_control_parameters->Scale(list(segment_list(0)).scaling);
           VECTOR_ND<T> controls;face_control_parameters->Get(controls);return controls;}
       case 2:
-          {ARRAY<VECTOR_ND<T> ,VECTOR<int,1> > blending_controls(1,2);
+          {ARRAY<VECTOR_ND<T> ,VECTOR<int,1> > blending_controls(0,2);
           for(int i=0;i<2;i++){
               blending_controls(i)=list(segment_list(i)).Controls(time);
               face_control_parameters->Set(blending_controls(i));

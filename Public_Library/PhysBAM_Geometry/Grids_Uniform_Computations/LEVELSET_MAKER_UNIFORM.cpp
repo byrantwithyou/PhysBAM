@@ -171,7 +171,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             ARRAY<bool,TV_INT> path(grid.Domain_Indices());
             for(int i=0;i<path_nodes.m;i++){path(path_nodes(i))=true;}
             FILE_UTILITIES::Write_To_File<T>("path.debug",path);}*/
-        ARRAY<bool,VECTOR<int,1> > color_is_inside(1,number_of_colors);
+        ARRAY<bool,VECTOR<int,1> > color_is_inside(0,number_of_colors);
         if(only_boundary_region_is_outside){
             ARRAY<bool> color_touches_boundary(number_of_colors);
             if(verbose) LOG::Time("Marking boundary region as outside");

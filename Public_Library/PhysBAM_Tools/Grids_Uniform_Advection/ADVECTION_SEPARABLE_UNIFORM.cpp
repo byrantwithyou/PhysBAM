@@ -22,7 +22,7 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<1>
     static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,1> >& grid,ARRAYS_ND_BASE<VECTOR<T2,1> >& Z,
         const ARRAYS_ND_BASE<VECTOR<T2,1> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<VECTOR<T,1>,1> >& V,const T dt,const T time)
     {
-        int i;int m=grid.counts.x;T dx=grid.dX.x;ARRAY<T2,VECTOR<int,1> > rhs(1,m);
+        int i;int m=grid.counts.x;T dx=grid.dX.x;ARRAY<T2,VECTOR<int,1> > rhs(0,m);
 
         ARRAY<T2,VECTOR<int,1> > Z_1d_x(-2,m+3);ARRAY<T,VECTOR<int,1> > u_1d(V.domain.min_corner.x,V.domain.max_corner.x);
         for(i=-3;i<m+3;i++) Z_1d_x(i)=Z_ghost(i);

@@ -45,7 +45,7 @@ Initialize_Optimization(const bool verbose)
     for(i=0;i<layers.m;i++) delete layers(i);layers.Resize(1);layers(0)=triangle_mesh.boundary_nodes;
     triangle_mesh.boundary_nodes=0; // we don't need it hanging off the mesh object any more
     if(verbose) LOG::cout<<"boundary layer has "<<layers(0)->m<<" nodes"<<std::endl;
-    ARRAY<bool,VECTOR<int,1> > marked(1,triangle_mesh.number_nodes);for(i=0;i<layers(0)->m;i++) marked((*layers(0))(i))=true;
+    ARRAY<bool,VECTOR<int,1> > marked(0,triangle_mesh.number_nodes);for(i=0;i<layers(0)->m;i++) marked((*layers(0))(i))=true;
     for(int l=2;;l++){
         layers.Append(new ARRAY<int>);
         for(int i=0;i<layers(l-1)->m;i++){

@@ -18,7 +18,7 @@ Euler_Step(const T dt,const T time)
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,ghost_cells);
         
     // find phx_plus and phix_minus
-    ARRAY<T,VECTOR<int,1> > phix_minus(1,m),phix_plus(1,m);
+    ARRAY<T,VECTOR<int,1> > phix_minus(0,m),phix_plus(0,m);
     Calculate_Derivatives(phi_ghost,phix_minus,phix_plus);
         
     if(LF_viscosity){
@@ -43,7 +43,7 @@ Calculate_Derivatives(ARRAY<T,VECTOR<int,1> >& phi_ghost,ARRAY<T,VECTOR<int,1> >
 {
     int m=grid.counts.x;T dx=grid.dX.x;
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_1d_x(1-ghost_cells,m+ghost_cells);
+    ARRAY<T,VECTOR<int,1> > phi_1d_x(-ghost_cells,m+ghost_cells);
     for(int i=-ghost_cells;i<m+ghost_cells;i++) phi_1d_x(i)=phi_ghost(i);
     if(spatial_order == 5) HJ_WENO(m,dx,phi_1d_x,phix_minus,phix_plus);
     else HJ_ENO(spatial_order,m,dx,phi_1d_x,phix_minus,phix_plus);
@@ -59,7 +59,7 @@ CFL(const T time)
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
         
     // find phx_plus and phix_minus
-    ARRAY<T,VECTOR<int,1> > phix_minus(1,m),phix_plus(1,m);
+    ARRAY<T,VECTOR<int,1> > phix_minus(0,m),phix_plus(0,m);
     Calculate_Derivatives(phi_ghost,phix_minus,phix_plus);
     
     T maxabs_H1;
