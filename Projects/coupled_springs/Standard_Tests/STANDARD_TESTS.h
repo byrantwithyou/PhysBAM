@@ -237,24 +237,24 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
-    if(test_number==2) X(2)=TV((time+(T)1.1),(time+(T)1.1),(time+(T)1.1));
-    if(test_number==8){X(1)=particle_curve.Value(time);X(grid_m)=TV(grid_m*2-2,0,0);}
+    if(test_number==2) X(1)=TV((time+(T)1.1),(time+(T)1.1),(time+(T)1.1));
+    if(test_number==8){X(0)=particle_curve.Value(time);X(grid_m-1)=TV(grid_m*2-2,0,0);}
 }
 //#####################################################################
 // Function Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    if(test_number==2) V(2)=TV((T)1,(T)1,(T)1);
-    if(test_number==8){V(1)=particle_curve.Derivative(velocity_time);V(grid_m)=TV();}
+    if(test_number==2) V(1)=TV((T)1,(T)1,(T)1);
+    if(test_number==8){V(0)=particle_curve.Derivative(velocity_time);V(grid_m-1)=TV();}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    if(test_number==2) V(2)=TV();
-    if(test_number==8){V(1)=TV();V(grid_m)=TV();}
+    if(test_number==2) V(1)=TV();
+    if(test_number==8){V(0)=TV();V(grid_m-1)=TV();}
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -358,7 +358,7 @@ void Hanging_Sphere()
     sphere.X()=TV();
 
     LOG::cout<<"we currently have particles.array_collection->Size()= "<<particles.array_collection->Size()<<std::endl;
-    particles.array_collection->Add_Elements(2);particles.mass(1)=particles.mass(2)=(T)1;
+    particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
     RIGID_BODY_BINDING<TV>* binding1=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,box.particle_index,TV(0,-1,0));
     RIGID_BODY_BINDING<TV>* binding2=new RIGID_BODY_BINDING<TV>(particles,2,rigid_body_collection,sphere.particle_index,TV(1,0,0));
     binding_list.Add_Binding(binding1);
@@ -368,7 +368,7 @@ void Hanging_Sphere()
     binding2->Clamp_To_Embedded_Position();
     binding2->Clamp_To_Embedded_Velocity();
     SEGMENTED_CURVE<TV>* segmented_curve=new SEGMENTED_CURVE<TV>(*new SEGMENT_MESH,particles);
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(0,1));
     segmented_curve->mesh.Set_Number_Nodes(2);
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
     tests.Add_Gravity();
@@ -383,14 +383,14 @@ void Dragging_Cube()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
 
     RIGID_BODY<TV>& box=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-    particles.array_collection->Add_Elements(2);particles.mass(1)=particles.mass(2)=(T)1;
-    particles.X(2)=TV((T)1.1,(T)1.1,(T)1.1);
+    particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
+    particles.X(1)=TV((T)1.1,(T)1.1,(T)1.1);
     RIGID_BODY_BINDING<TV>* binding=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,box.particle_index,TV(0,0,0));
     binding_list.Add_Binding(binding);
     binding->Clamp_To_Embedded_Position();
     binding->Clamp_To_Embedded_Velocity();
     SEGMENTED_CURVE<TV>* segmented_curve=new SEGMENTED_CURVE<TV>(*new SEGMENT_MESH,particles);
-    segmented_curve->mesh.elements.Append(VECTOR<int,2>(1,2));
+    segmented_curve->mesh.elements.Append(VECTOR<int,2>(0,1));
     segmented_curve->mesh.Set_Number_Nodes(2);
     deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);
     tests.Add_Gravity();
