@@ -48,8 +48,8 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tri,const int new_si
                     ARRAY<int> nodes_shared_on_pair;VECTOR<int,2> alternative_simplex=VECTOR<int,2>(old_simplices(i),old_simplices(j));
                     cutting_simplices->Shared_Nodes_On_Simplices(alternative_simplex,nodes_shared_on_pair);
                     if(nodes_shared_on_pair.m>1) continue; // intersection is not a point so skip
-                    if(int intersection_index=intersection_registry->Intersection(alternative_simplex))
-                        Register_Cut_Intersection(converted_simplices,all_weights,intersection_index);
+                    int intersection_index=intersection_registry->Intersection(alternative_simplex);
+                    if(intersection_index>=0) Register_Cut_Intersection(converted_simplices,all_weights,intersection_index);
                     goto NEXT_OLD_SIMPLEX;}
             Register_Cut_Intersection(converted_simplices,all_weights,0);goto NEXT_OLD_SIMPLEX;}
         // Case 2 - Normal Intersection

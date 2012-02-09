@@ -175,7 +175,7 @@ Apply_Velocity_Update(const VECTOR_T& V,ARRAY<T,FACE_INDEX<TV::dimension> >& flu
         index_map.Distribute(V.pressure,fluid_pressures);
         if(dt) fluid_pressures*=1/dt;
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(index_map.grid);it.Valid();it.Next())
-            if(!index_map.face_indices(it.Full_Index()))
+            if(index_map.face_indices(it.Full_Index())<0)
                 fluid_velocity(it.Full_Index())=0;}
 
     temporary_faces*=(T)0;

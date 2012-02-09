@@ -1112,7 +1112,7 @@ Determine_Duplicate_Tets_And_Duplicate_Particles()
         for(int j=0;j<regions_per_tet(otet).m;j++){
             HASHTABLE<int> particle_ids_checked;
             new_tets_per_current(otet).Append(++num_new_tets);
-            int dup_tet=num_new_tets;const ARRAY<int> cutting_polygons_in_this_region=regions_per_tet(otet)(j);
+            int dup_tet=num_new_tets-1;const ARRAY<int> cutting_polygons_in_this_region=regions_per_tet(otet)(j);
             // duplicate tet nodes
             VECTOR<int,4> duplicate_particles_for_nodes;
             for(int k=0;k<4;k++){int dup_particle_index=++num_new_particles;duplicate_particles_for_nodes(k)=dup_particle_index;

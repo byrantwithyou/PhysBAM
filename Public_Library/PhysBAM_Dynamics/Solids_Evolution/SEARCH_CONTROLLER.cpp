@@ -457,24 +457,26 @@ Create_Clusters_From_Joint_List(const ARRAY<bool,JOINT_ID>& blocking_joint,ARRAY
     STACK<int> stack;
     for(JOINT_ID j(0);j<blocking_joint.Size();j++) if(blocking_joint(j)){
         VECTOR<int,2> adjacent_list_j(adjacent_lists(j).x,adjacent_lists(j).y);
-        for(int k=0;k<2;k++) if(int b=(0==1?graph.Edges(j).x:graph.Edges(j).y)){
-            RIGID_BODY<TV>& rbody=solid_body_collection.rigid_body_collection.Rigid_Body(b);
-            if(!rbody.Has_Infinite_Inertia() && done(b)){adjacent_list_j(k)=done(b);continue;}
-            stack.Push(b);
-            adjacent_list_j(k)=done(b)=body_lists.Append(ARRAY<int>());
-            while(!stack.Empty()){
-                int id=stack.Pop();
-                RIGID_BODY<TV>& body=solid_body_collection.rigid_body_collection.Rigid_Body(id);
-                body_lists.Last().Append(body.particle_index);
-                if(body.Has_Infinite_Inertia()) continue;
-                for(int i=0;i<graph.Adjacent_Edges(id).m;i++){
-                    JOINT_ID jid=graph.Adjacent_Edges(id)(i);
-                    if(blocking_joint(jid)) continue;
-                    int oid=graph.Edges(jid).y+(Value(graph.Edges(jid).x)-Value(id));
-                    RIGID_BODY<TV>& obody=solid_body_collection.rigid_body_collection.Rigid_Body(oid);
-                    if((!obody.Has_Infinite_Inertia() && done(oid)) || done(oid)==body_lists.m) continue;
-                    done(oid)=body_lists.m;
-                    stack.Push(oid);}}}}
+        for(int k=0;k<2;k++){
+            int b=(0==1?graph.Edges(j).x:graph.Edges(j).y);
+            if(b>=0){
+                RIGID_BODY<TV>& rbody=solid_body_collection.rigid_body_collection.Rigid_Body(b);
+                if(!rbody.Has_Infinite_Inertia() && done(b)){adjacent_list_j(k)=done(b);continue;}
+                stack.Push(b);
+                adjacent_list_j(k)=done(b)=body_lists.Append(ARRAY<int>());
+                while(!stack.Empty()){
+                    int id=stack.Pop();
+                    RIGID_BODY<TV>& body=solid_body_collection.rigid_body_collection.Rigid_Body(id);
+                    body_lists.Last().Append(body.particle_index);
+                    if(body.Has_Infinite_Inertia()) continue;
+                    for(int i=0;i<graph.Adjacent_Edges(id).m;i++){
+                        JOINT_ID jid=graph.Adjacent_Edges(id)(i);
+                        if(blocking_joint(jid)) continue;
+                        int oid=graph.Edges(jid).y+(Value(graph.Edges(jid).x)-Value(id));
+                        RIGID_BODY<TV>& obody=solid_body_collection.rigid_body_collection.Rigid_Body(oid);
+                        if((!obody.Has_Infinite_Inertia() && done(oid)) || done(oid)==body_lists.m) continue;
+                        done(oid)=body_lists.m;
+                        stack.Push(oid);}}}}}
 }
 //#####################################################################
 // Function Create_All_Clusters

@@ -111,7 +111,7 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
         if(!index_map.two_phase){
             for(int i=0;i<index_map.indexed_faces.m;i++){
                 FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
-                if(!index_map.cell_indices(face.First_Cell_Index()) || !index_map.cell_indices(face.Second_Cell_Index())){
+                if(index_map.cell_indices(face.First_Cell_Index())<0 || index_map.cell_indices(face.Second_Cell_Index())<0){
                     unused_faces.Set(i);}}
             PHYSBAM_DEBUG_WRITE_SUBSTEP("unused faces",0,1);}
 

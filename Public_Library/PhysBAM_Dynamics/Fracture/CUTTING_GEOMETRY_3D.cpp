@@ -154,8 +154,8 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
                         ARRAY<int> nodes_shared_on_triplet;
                         cutting_simplices->Shared_Nodes_On_Simplices(VECTOR<int,3>(old_simplices(i),old_simplices(j),old_simplices(k)),nodes_shared_on_triplet);
                         if(nodes_shared_on_triplet.m>1) continue; // The intersection does not define a single point
-                        if(int intersection_index=intersection_registry->Intersection(VECTOR<int,3>(old_simplices(i),old_simplices(j),old_simplices(k))))
-                            Register_Cut_Intersection(converted_simplices,all_weights,intersection_index);
+                        int intersection_index=intersection_registry->Intersection(VECTOR<int,3>(old_simplices(i),old_simplices(j),old_simplices(k)));
+                        if(intersection_index>=0) Register_Cut_Intersection(converted_simplices,all_weights,intersection_index);
                         goto NEXT_OLD_SIMPLEX;}
             Register_Cut_Intersection(converted_simplices,all_weights,0);goto NEXT_OLD_SIMPLEX;}}
         // Case 2: new simplex shares an edge with (exactly) one of the old simplices
@@ -171,7 +171,8 @@ Intersect_Simplex_With_Old_Simplices_In_Embedding(const int tet,const int new_si
                             if(cutting_simplices->simplices(old_simplices(k)).nodes.Contains_All(shared_edge)){
                                 int old_simplex_index_1=converted?cutting_simplices->simplices(old_simplices(j)).parent:old_simplices(j);
                                 int old_simplex_index_2=converted?cutting_simplices->simplices(old_simplices(k)).parent:old_simplices(k);
-                                if(int particle=intersection_registry->Intersection(VECTOR<int,3>(converted_simplices(2-i),old_simplex_index_1,old_simplex_index_2))){
+                                int particle=intersection_registry->Intersection(VECTOR<int,3>(converted_simplices(2-i),old_simplex_index_1,old_simplex_index_2));
+                                if(particle>=0){
                                     VECTOR<VECTOR<T,2>,3> all_weights;
                                     Get_Simplex_Weights_For_Edge_Triangle_Intersection(VECTOR<int,3>(simplices(2),simplices(i),simplices(2-i)),3,shared_edge,all_weights);
                                     Register_Cut_Intersection(VECTOR<int,1>(converted_simplices(2)),VECTOR<VECTOR<T,2>,1>(all_weights(0)),particle);}
