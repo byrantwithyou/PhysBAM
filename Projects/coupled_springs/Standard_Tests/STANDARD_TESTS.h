@@ -512,9 +512,9 @@ void Spring_Cloth()
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    
 
     for(int i=0;i<grid_m;i++) for(int j=0;j<grid_n;j++){
-        particles.X((i-1)*grid_n+j)=TV(2*i-2,0,2*j-2);
-        if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,i*grid_n+j));
-        if(j<grid_n) segmented_curve->mesh.elements.Append(VECTOR<int,2>((i-1)*grid_n+j,(i-1)*grid_n+j+1));}
+        particles.X(i*grid_n+j)=TV(2*i,0,2*j);
+        if(i<grid_m-1) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i*grid_n+j,(i+1)*grid_n+j));
+        if(j<grid_n-1) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i*grid_n+j,i*grid_n+j+1));}
 
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     particles.mass.Fill((T)1);
