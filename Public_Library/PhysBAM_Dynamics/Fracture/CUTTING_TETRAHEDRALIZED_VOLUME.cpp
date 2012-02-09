@@ -1185,7 +1185,7 @@ Duplicate_And_Merge_Elements()
     // new structures
     union_vertices=UNION_FIND<>(num_new_particles);union_vertices.parents.Fill(0);
     PARTICLES<TV>& new_particles=dynamic_cast<PARTICLES<TV>&>(next_tetrahedralized_volume->particles);
-    new_particle_indices.Resize(num_new_particles,true,false);
+    new_particle_indices.Resize(num_new_particles,true,false,-1);
     // original embedding structures
     const ARRAY<VECTOR<int,4> >& current_embedding_tetrahedrons=current_tetrahedralized_volume->mesh.elements;
     const TRIANGLE_MESH& current_embedding_faces=*current_tetrahedralized_volume->mesh.triangle_mesh;

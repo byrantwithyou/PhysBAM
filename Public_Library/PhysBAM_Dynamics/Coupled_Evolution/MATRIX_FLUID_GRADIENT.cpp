@@ -65,13 +65,13 @@ Add_Cell(int face_lookup,int axis,const TV_INT& cell_index,T weight)
     int cell_lookup;
     if(periodic_boundary(axis) && index_map.grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index)){
         TV_INT periodic_offset_cell=cell_index;
-        int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,index_map.grid.counts[axis]);
+        int axis_periodic_cell=wrap(periodic_offset_cell[axis],index_map.grid.counts[axis]);
         periodic_offset_cell[axis]=axis_periodic_cell;
         cell_lookup=index_map.cell_indices(periodic_offset_cell);}
     else
         cell_lookup=index_map.cell_indices(cell_index);
 
-    if(cell_lookup) gradient.Append_Entry_To_Current_Row(cell_lookup,weight);
+    if(cell_lookup>=0) gradient.Append_Entry_To_Current_Row(cell_lookup,weight);
     else{
         typename BASE::GHOST_GRADIENT_ENTRY ge;
         ge.index=cell_index;
@@ -89,13 +89,13 @@ Add_Interface(int face_lookup,const FACE_INDEX<d>& face_index,T weight)
     int ci1=index_map.cell_indices(cell1),ci2=index_map.cell_indices(cell2);
     const ARRAY<bool,TV_INT>& psi_D=index_map.boundary_condition_collection.psi_D;
     if(index_map.two_phase){
-        if(!ci1 || !ci2) return;
+        if(ci1<0 || ci2<0) return;
         bool out1=psi_D(cell1),out2=psi_D(cell2);
         if(out1==out2) return;
         if(out2) weight=-weight;}
     else{
-        if(!ci1==!ci2) return;
-        if(!ci2) weight=-weight;}
+        if((ci1<0)==(ci2<0)) return;
+        if(ci2<0) weight=-weight;}
 
     typename BASE::INTERFACE_ENTRY ie={face_lookup,weight};
     interface_gradient.Append(ie);
@@ -110,10 +110,10 @@ Add_Interface(int face_lookup,const SIDED_FACE_INDEX<d>& face_index,T weight)
     int ci=index_map.cell_indices(cell);
     const ARRAY<bool,TV_INT>& psi_D=index_map.boundary_condition_collection.psi_D;
     if(index_map.two_phase){
-        if(!ci || psi_D(cell)) return;
+        if(ci<0 || psi_D(cell)) return;
         if(face_index.side==0) weight=-weight;}
     else{
-        if(ci) return;
+        if(ci>=0) return;
         if(face_index.side==0) weight=-weight;}
 
     typename BASE::INTERFACE_ENTRY ie={face_lookup,weight};

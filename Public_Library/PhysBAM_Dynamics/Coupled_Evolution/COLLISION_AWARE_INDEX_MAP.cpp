@@ -84,7 +84,7 @@ Register_Face_Index(const FACE_INDEX<d>& face_index)
     int axis=face_index.axis;
     if(boundary_condition_collection.periodic_boundary[axis] && face_index.index(axis)==0)
         return false;
-    assert(!face_indices(face_index));
+    assert(face_indices(face_index)<0);
     face_indices(face_index)=indexed_faces.Append(face_index);
     return true;
 }
@@ -197,8 +197,8 @@ Clear(const int ghost_cells)
         cell_indices(indexed_cells(i))=0;
     indexed_cells.Remove_All();
     real_cell_indices.Remove_All();
-    cell_indices.Resize(grid.Domain_Indices(ghost_cells+1),true,false);
-    face_indices.Resize(grid,ghost_cells+1,true,false);
+    cell_indices.Resize(grid.Domain_Indices(ghost_cells+1),true,false,-1);
+    face_indices.Resize(grid,ghost_cells+1,true,false,-1);
 }
 //#####################################################################
 // Function Print
