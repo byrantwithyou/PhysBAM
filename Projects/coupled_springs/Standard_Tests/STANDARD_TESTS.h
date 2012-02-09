@@ -290,14 +290,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     T stiffness=(T)2e6;
     T damping=(T).01;
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         if(test_number==12 || test_number==21) solid_body_collection.Add_Force(Create_Tet_Springs(*tetrahedralized_volume,(T)stiffness/(1+sqrt((T)2)),(T)3));
         else solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
 
 //     for(int i=1;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
 //         solid_body_collection.Add_Force(Create_Edge_Springs(*segmented_curve,(T)stiffness/(1+sqrt((T)2)),(T)3));}
 
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
         solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
         T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
@@ -359,8 +359,8 @@ void Hanging_Sphere()
 
     LOG::cout<<"we currently have particles.array_collection->Size()= "<<particles.array_collection->Size()<<std::endl;
     particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
-    RIGID_BODY_BINDING<TV>* binding1=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,box.particle_index,TV(0,-1,0));
-    RIGID_BODY_BINDING<TV>* binding2=new RIGID_BODY_BINDING<TV>(particles,2,rigid_body_collection,sphere.particle_index,TV(1,0,0));
+    RIGID_BODY_BINDING<TV>* binding1=new RIGID_BODY_BINDING<TV>(particles,0,rigid_body_collection,box.particle_index,TV(0,-1,0));
+    RIGID_BODY_BINDING<TV>* binding2=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,sphere.particle_index,TV(1,0,0));
     binding_list.Add_Binding(binding1);
     binding_list.Add_Binding(binding2);
     binding1->Clamp_To_Embedded_Position();
@@ -383,9 +383,10 @@ void Dragging_Cube()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
 
     RIGID_BODY<TV>& box=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-    particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
+    particles.array_collection->Add_Elements(2);
+    particles.mass(0)=particles.mass(1)=(T)1;
     particles.X(1)=TV((T)1.1,(T)1.1,(T)1.1);
-    RIGID_BODY_BINDING<TV>* binding=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,box.particle_index,TV(0,0,0));
+    RIGID_BODY_BINDING<TV>* binding=new RIGID_BODY_BINDING<TV>(particles,0,rigid_body_collection,box.particle_index,TV(0,0,0));
     binding_list.Add_Binding(binding);
     binding->Clamp_To_Embedded_Position();
     binding->Clamp_To_Embedded_Velocity();
@@ -420,7 +421,7 @@ void Rigid_Spring()
 //#####################################################################
 void Rigid_Spring_Cloth()
 {
-    ARRAY<int,VECTOR<int,2> > body_indices(1,grid_m,1,grid_n);
+    ARRAY<int,VECTOR<int,2> > body_indices(0,grid_m,0,grid_n);
     for(int i=0;i<grid_m;i++)for(int j=0;j<grid_n;j++){
         RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",1,(T)0);
         body.Set_Frame(FRAME<TV>(TV(2*i,0,2*j)));
@@ -429,13 +430,13 @@ void Rigid_Spring_Cloth()
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
     int spring_index=0;
     for(int i=0;i<grid_m;i++)for(int j=0;j<grid_n;j++){
-        if(i<grid_m){
+        if(i<grid_m-1){
             spring->Add_Spring(body_indices(i,j),body_indices(i+1,j),TV(),TV());
             spring_index++;
             spring->Set_Restlength(spring_index,5);
             spring->Set_Stiffness(spring_index,arg_ks);
             spring->Set_Overdamping_Fraction(spring_index,arg_kd);}
-        if(j<grid_n){
+        if(j<grid_n-1){
             spring->Add_Spring(body_indices(i,j),body_indices(i,j+1),TV(),TV());
             spring_index++;
             spring->Set_Restlength(spring_index,5);
@@ -543,7 +544,7 @@ void Particle_Impulse_Chain()
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    
 
     for(int i=0;i<grid_m;i++){
-        particles.X(i)=TV(2*i-2,0,0);
+        particles.X(i)=TV(2*i,0,0);
         if(i<grid_m-1) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));}
 
     particles.mass.Fill((T)1);
