@@ -2110,9 +2110,9 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_x=velocity_time<final_time?TV(attachment_velocity,0,0):TV();
         TV velocity_y=velocity_time<final_time?TV(0,attachment_velocity,0):TV();
         TV velocity_z=velocity_time<final_time?TV(0,0,attachment_velocity):TV();
-        for(int i=m/3+0;i<2*m/3;i++)for(int j=n/3;j2*n/3;j++){V(i+m*j)=-velocity_z;V(i+m*j+(mn-1)*m*n)=velocity_z;}
-        for(int i=m/3+0;i<2*m/3;i++)for(int ij=mn/3;ij2*mn/3;ij++){V(i+m*n*ij)=-velocity_y;V(i+m*(n-1)+m*n*ij)=velocity_y;}
-        for(int ij=mn/3;ij2*mn/3;ij++)for(int j=n/3;j2*n/3;j++){V(m*j+m*n*ij)=-velocity_x;V(m-1+m*j+m*n*ij)=velocity_x;}
+        for(int i=m/3+0;i<2*m/3;i++)for(int j=n/3;j<2*n/3;j++){V(i+m*j)=-velocity_z;V(i+m*j+(mn-1)*m*n)=velocity_z;}
+        for(int i=m/3+0;i<2*m/3;i++)for(int ij=mn/3;ij<2*mn/3;ij++){V(i+m*n*ij)=-velocity_y;V(i+m*(n-1)+m*n*ij)=velocity_y;}
+        for(int ij=mn/3;ij<2*mn/3;ij++)for(int j=n/3;j<2*n/3;j++){V(m*j+m*n*ij)=-velocity_x;V(m-1+m*j+m*n*ij)=velocity_x;}
     }
     if(test_number==25){
         int m=mattress_grid.counts.x;
