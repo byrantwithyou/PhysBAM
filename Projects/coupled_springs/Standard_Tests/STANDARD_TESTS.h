@@ -481,11 +481,11 @@ void Impulse_Chain()
         body.Set_Frame(FRAME<TV>(TV(2*i-2,0,0)));
         body_indices.Append(body.particle_index);}
 
-    solid_body_collection.rigid_body_collection.Rigid_Body(body_indices(1)).Is_Kinematic()=true;
+    solid_body_collection.rigid_body_collection.Rigid_Body(body_indices(0)).Is_Kinematic()=true;
     solid_body_collection.rigid_body_collection.Rigid_Body(body_indices.Last()).is_static=true;
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
-    for(int i=1;i<grid_m;i++){
+    for(int i=0;i<grid_m-1;i++){
         spring->Add_Spring(body_indices(i),body_indices(i+1),TV(),TV());
         spring->Set_Restlength(i,2);
         spring->Set_Stiffness(i,arg_ks);
@@ -544,11 +544,11 @@ void Particle_Impulse_Chain()
 
     for(int i=0;i<grid_m;i++){
         particles.X(i)=TV(2*i-2,0,0);
-        if(i<grid_m) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));}
+        if(i<grid_m-1) segmented_curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));}
 
     particles.mass.Fill((T)1);
-    particles.mass(1)=FLT_MAX;
-    particles.mass(grid_m)=FLT_MAX;
+    particles.mass(0)=FLT_MAX;
+    particles.mass(grid_m-1)=FLT_MAX;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     particles.Compute_Auxiliary_Attributes(soft_bindings);soft_bindings.Set_Mass_From_Effective_Mass();
 
