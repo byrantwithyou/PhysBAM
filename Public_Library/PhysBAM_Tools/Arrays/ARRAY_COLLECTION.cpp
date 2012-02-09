@@ -83,12 +83,12 @@ Delete_Elements_On_Deletion_List(const bool preserve_order)
     Sort(deletion_list);
     if(preserve_order){
         for(int k=0;k<deletion_list.m;k++){
-            int next=k<deletion_list.m?deletion_list(k+1):number+1;
-            for(int i=deletion_list(k)+1;i<next;i++) Copy_Element_Helper(i,i-k);}}
+            int next=k<deletion_list.m-1?deletion_list(k+1):number;
+            for(int i=deletion_list(k);i<next;i++) Copy_Element_Helper(i,i-k);}}
     else{
         int last=number;
         for(int k=deletion_list.m-1;k>=0;k--)
-            Copy_Element_Helper(last--,deletion_list(k));}
+            Copy_Element_Helper(--last,deletion_list(k));}
     Resize(number-deletion_list.m);
     deletion_list.Remove_All();
 }

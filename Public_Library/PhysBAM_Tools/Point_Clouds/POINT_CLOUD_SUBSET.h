@@ -74,7 +74,7 @@ public:
 
     int Add_Existing_Element_If_Not_Already_There(const int p)
     {assert(subset_index_from_point_cloud_index.m==point_cloud.number);
-    if(!subset_index_from_point_cloud_index(p)) subset_index_from_point_cloud_index(p)=active_indices.Append(p);
+    if(subset_index_from_point_cloud_index(p)<0) subset_index_from_point_cloud_index(p)=active_indices.Append(p);
     array_collection->number=active_indices.m;
     return subset_index_from_point_cloud_index(p);}
 

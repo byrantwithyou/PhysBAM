@@ -135,13 +135,13 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             if(debug_optimization) LOG::cout<<"gradient_B =\n"<<gradient_B<<"\ngradient_N =\n"<<gradient_N<<"\npi =\n"<<pi<<"\nsigma =\n"<<sigma<<std::endl;
 #endif
             
-            int index_to_release=0;T sigma_to_release=0;
+            int index_to_release=-1;T sigma_to_release=0;
             for(int i=0;i<N.n;i++) if((sigma(i)<0 && x_min(permute_N(i)).x && b_N(i)==x_min(permute_N(i)).y) ||
                                        (sigma(i)>0 && x_max(permute_N(i)).x && b_N(i)==x_max(permute_N(i)).y))
                 if(abs(sigma(i))>sigma_to_release){sigma_to_release=abs(sigma(i));index_to_release=i;}
             
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-            if(!index_to_release){if(debug_optimization)LOG::cout << "QP: Nothing to release!" << std::endl;break;} // TODO: how handle this case?
+            if(index_to_release<0){if(debug_optimization)LOG::cout << "QP: Nothing to release!" << std::endl;break;} // TODO: how handle this case?
 
             if(debug_optimization) LOG::cout << "Releasing index " << index_to_release << " (muscle " << permute_N(index_to_release) << ")" << std::endl;
 #endif

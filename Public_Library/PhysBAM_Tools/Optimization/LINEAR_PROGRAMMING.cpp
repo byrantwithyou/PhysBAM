@@ -90,14 +90,14 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
         if(verbose) LOG::cout<<"c_B =\n"<<c_B<<"pi =\n"<<pi<<"sigma =\n"<<sigma<<std::endl;
 #endif
 
-        int index_to_release=0;T sigma_to_release=0;
+        int index_to_release=-1;T sigma_to_release=0;
         for(int i=0;i<N.n;i++) if((sigma(i)<0 && x_min(permute_N(i)).x && x_N(i)==x_min(permute_N(i)).y) ||
                                    (sigma(i)>0 && x_max(permute_N(i)).x && x_N(i)==x_max(permute_N(i)).y))
             if(abs(sigma(i))>sigma_to_release){sigma_to_release=abs(sigma(i));index_to_release=i;}
       
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T sigma_tolerance=(T)1e-10;
-        if(sigma_to_release<sigma_tolerance || !index_to_release){
+        if(sigma_to_release<sigma_tolerance || index_to_release<0){
             LOG::cout << "No feasible point found for given constraints!" << std::endl;
             break;} // TODO: how handle this case?
 
