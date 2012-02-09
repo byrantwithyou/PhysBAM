@@ -199,7 +199,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
             output_stream<<"   Selected by index "<<real_selection->index<<std::endl;
             current_index=real_selection->index;}
         
-        if(current_index > 0){
+        if(current_index>=0){
             // real_selection->index is index into particles array at time of selection.  Not very useful.
             // current_index is more useful
             output_stream<<"   current index = "<<current_index<<std::endl;
