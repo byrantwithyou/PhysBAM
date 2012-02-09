@@ -190,7 +190,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) c
                 output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
                 current_index=real_selection->index;}}
 
-        if(current_index > 0){
+        if(current_index >= 0){
             // real_selection->index is index into particles array at time of selection.  Not very useful. current_index is more useful
             output_stream<<"current index = "<<current_index<<std::endl;
             Read_Write<T_PARTICLES,RW>::Print(output_stream,*particles_multiple(real_selection->particle_set),current_index);}}
