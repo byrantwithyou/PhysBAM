@@ -182,10 +182,10 @@ public:
     {
         if (dump_sv)
         {
-            FINITE_VOLUME<TV,2>& force_field = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
-            ARRAY<DIAGONAL_MATRIX<T,2> >& sv = force_field.Fe_hat;
+            FINITE_VOLUME<TV,2>& force_field=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
+            ARRAY<DIAGONAL_MATRIX<T,2> >& sv=force_field.Fe_hat;
             
-            for (int i=1; i<=sv.m; i++)
+            for (int i=0;i<sv.m;i++)
             {
                 svout << sv(i).x11 << " " << sv(i).x22 << std::endl;
             }
@@ -276,9 +276,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
     use_rc_ext=parse_args->Is_Value_Set("-use_rc_ext");
     use_rc2_ext=parse_args->Is_Value_Set("-use_rc2_ext");
-    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref"); //
-    use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");    
-    use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");    
+    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");//
+    use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
+    use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");
     use_corotated=parse_args->Is_Value_Set("-use_corotated");
     use_corotated_fixed=parse_args->Is_Value_Set("-use_corotated_fixed");
     use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
@@ -367,7 +367,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=2000;
             if(test_number==33) last_frame=1;
             if(test_number==31) last_frame=250;
-            break;            
+            break;
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -476,7 +476,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             kinematic_id2=box2.particle_index;
             rigid_body_collection.rigid_body_particle.kinematic(box1.particle_index)=true;
             rigid_body_collection.rigid_body_particle.kinematic(box2.particle_index)=true;
-            for (int ind=0; ind <=20; ind++){
+            for (int ind=0;ind<20;ind++){
                 curve.Add_Control_Point(ind+4,FRAME<TV>(TV(-5*sin(2.0*pi*ind/5.0),-5*cos(2.0*pi*ind/5.0))));
                 curve2.Add_Control_Point(ind+4,FRAME<TV>(TV(5*sin(2.0*pi*ind/5.0),5*cos(2.0*pi*ind/5.0))));
             }
@@ -528,24 +528,24 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
             if(parameter==1){
                 particles.array_collection->Add_Elements(3);
-                particles.X(1)=TV(-.5,0)*1.5;
-                particles.X(2)=TV(.5,0)*1.5;
-                particles.X(3)=TV(0,sqrt(3)/2)*1.5;
-                ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));}
+                particles.X(0)=TV(-.5,0)*1.5;
+                particles.X(1)=TV(.5,0)*1.5;
+                particles.X(2)=TV(0,sqrt(3)/2)*1.5;
+                ta->mesh.elements.Append(VECTOR<int,3>(0,1,2));}
             else{
                 particles.array_collection->Add_Elements(9);
-                particles.X(1)=TV(-.5,0);
-                particles.X(2)=TV(.5,0);
-                particles.X(3)=TV(0,sqrt(3)/2);
-                particles.X(4)=TV(-.5,0);
-                particles.X(5)=TV(.5,0);
-                particles.X(6)=TV(0,sqrt(3)/2);
-                particles.X(7)=TV(-.5,0);
-                particles.X(8)=TV(.5,0);
-                particles.X(9)=TV(0,sqrt(3)/2);
-                ta->mesh.elements.Append(VECTOR<int,3>(1,2,3));
-                ta->mesh.elements.Append(VECTOR<int,3>(4,5,6));
-                ta->mesh.elements.Append(VECTOR<int,3>(7,8,9));}
+                particles.X(0)=TV(-.5,0);
+                particles.X(1)=TV(.5,0);
+                particles.X(2)=TV(0,sqrt(3)/2);
+                particles.X(3)=TV(-.5,0);
+                particles.X(4)=TV(.5,0);
+                particles.X(5)=TV(0,sqrt(3)/2);
+                particles.X(6)=TV(-.5,0);
+                particles.X(7)=TV(.5,0);
+                particles.X(8)=TV(0,sqrt(3)/2);
+                ta->mesh.elements.Append(VECTOR<int,3>(0,1,2));
+                ta->mesh.elements.Append(VECTOR<int,3>(3,4,5));
+                ta->mesh.elements.Append(VECTOR<int,3>(6,7,8));}
             particles.mass.Fill(1);
             solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(ta);
             contrail_colors.Append(VECTOR<T,3>(1,0,0));
@@ -576,7 +576,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 27: case 270: case 30: case 31: case 32: case 33:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e2,poissons_ratio,(T).05);
-            if(test_number==32) particles.X(1).x=stretch;
+            if(test_number==32) particles.X(0).x=stretch;
             break;}
         case 100:{
             for(int i=1;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
@@ -607,16 +607,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 14:{
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             
-            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            TRIANGULATED_AREA<T>& triangulated_area1=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(0);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area1,new COROTATED_QUARTIC<T,2>((T)2e4,poissons_ratio,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area2 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
+            TRIANGULATED_AREA<T>& triangulated_area2=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area2,new NEO_HOOKEAN_COROTATED_BLEND<T,2>((T)2e4,poissons_ratio,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area3 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
+            TRIANGULATED_AREA<T>& triangulated_area3=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(2);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area3,new NEO_HOOKEAN_EXTRAPOLATED<T,2>((T)2e4,poissons_ratio,(T).01)));
 
-            TRIANGULATED_AREA<T>& triangulated_area4 = solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(4);
+            TRIANGULATED_AREA<T>& triangulated_area4=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(3);
             solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area4,new NEO_HOOKEAN<T,2>((T)2e4,poissons_ratio,(T).01)));
             break;}
         case 17:{
@@ -638,16 +638,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 20:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e5,poissons_ratio,(T).01);
             break;}
         case 21:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
             break;}
         case 28:{
-            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>(1);
+            TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e5,poissons_ratio,(T).01);
             break;}
         case 29: break;
@@ -680,7 +680,7 @@ void Place_Triangle(int tri,T s1,T s2,T a,T b,TV shift)
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ROTATION<TV> rot(ROTATION<TV>::From_Angle(a)),rot2(ROTATION<TV>::From_Angle(b+a));
     TV com(0,sqrt(3)/6);
-    for(int i=0;i<3;i++) particles.X(3*(tri-1)+i)=rot2.Rotate(TV(s1,s2)*rot.Inverse_Rotate(particles.X(3*(tri-1)+i)-com))+shift;
+    for(int i=0;i<3;i++) particles.X(3*tri+i)=rot2.Rotate(TV(s1,s2)*rot.Inverse_Rotate(particles.X(3*tri+i)-com))+shift;
 }
 //#####################################################################
 // Function Set_Kinematic_Positions
@@ -714,7 +714,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
-        for(int j=0;j<n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
+        for(int j=0;j<n;j++){V(m*j)=-velocity;V(m-1+m*j)=velocity;}}
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -724,8 +724,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
         TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
-        for(int j=n/3+1;j<=2*n/3+1;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
-        for(int i=m/3+1;i<=2*m/3+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
+        for(int j=n/3;j<2*n/3+1;j++){V(m*j)=velocity_lef;V(m-1+m*j)=velocity_rig;}
+        for(int i=m/3;i<2*m/3+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==25){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -735,10 +735,10 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_tl=velocity_time<final_time?TV(-velocity,velocity):TV();
         TV velocity_br=velocity_time<final_time?TV(velocity,-velocity):TV();
         TV velocity_bl=velocity_time<final_time?TV(-velocity,-velocity):TV();
-        V(1)=velocity_bl;
-        V(m)=velocity_br;
-        V(m*(n-1)+1)=velocity_tl;
-        V(m*n)=velocity_tr;}
+        V(0)=velocity_bl;
+        V(m-1)=velocity_br;
+        V(m*(n-1))=velocity_tl;
+        V(m*n-1)=velocity_tr;}
     if(test_number==26){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -748,8 +748,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         TV velocity_bot=velocity_time<final_time?TV((T)0,-velocity):TV();
         TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
-        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}
-        for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
+        for(int j=0;j<n;j++){V(m*j)=velocity_lef;V(m-1+m*j)=velocity_rig;}
+        for(int i=2*m/5;i<3*m/5+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -757,7 +757,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         T final_time=40;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(velocity,(T)0):TV();
-        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+        for(int j=0;j<n;j++){V(m*j)=velocity_lef;V(m-1+m*j)=velocity_rig;}}
     if(test_number==30){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
@@ -765,15 +765,15 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         T final_time=8000;
         TV velocity_rig=velocity_time<final_time?TV(velocity,(T)0):TV();
         TV velocity_lef=velocity_time<final_time?TV(-velocity,(T)0):TV();
-        for(int j=0;j<n;j++){V(1+m*(j-1))=velocity_lef;V(m+m*(j-1))=velocity_rig;}}
+        for(int j=0;j<n;j++){V(m*j)=velocity_lef;V(m-1+m*j)=velocity_rig;}}
     if(test_number==28){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
-        for(int j=0;j<n;j++){V(1+m*(j-1))=-velocity;V(m+m*(j-1))=velocity;}}
-    if(test_number==31){V(1)=TV(0,.2);V(2).y=0;V(3).y=0;}
-    if(test_number==32){V(1)=V(3)=TV(0,0);V(3).x=0;}
-    if(test_number==33){V(1)=V(2)=V(4)=V(6)=V(7)=TV();}
+        for(int j=0;j<n;j++){V(m*j)=-velocity;V(m-1+m*j)=velocity;}}
+    if(test_number==31){V(0)=TV(0,.2);V(1).y=0;V(2).y=0;}
+    if(test_number==32){V(0)=V(1)=TV(0,0);V(2).x=0;}
+    if(test_number==33){V(0)=V(1)=V(3)=V(5)=V(6)=TV();}
 }
 //#####################################################################
 // Function Zero_Out_Enslaved_Velocity_Nodes
@@ -783,44 +783,44 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     if(test_number==20){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=0;j<n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
+        for(int j=0;j<n;j++) V(m*j)=V(m-1+m*j)=TV();}
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=n/3+1;j<=2*n/3+1;j++){V(1+m*(j-1))=V(m+m*(j-1))=TV();}
-        for(int i=m/3+1;i<=2*m/3+1;i++){V(i)=V(m*(n-1)+i)=TV();}}
+        for(int j=n/3;j<2*n/3+1;j++){V(m*j)=V(m-1+m*j)=TV();}
+        for(int i=m/3;i<2*m/3+1;i++){V(i)=V(m*(n-1)+i)=TV();}}
     if(test_number==25){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        V(1)=TV();
-        V(m)=TV();
-        V(m*(n-1)+1)=TV();
-        V(m*n)=TV();}
+        V(0)=TV();
+        V(m-1)=TV();
+        V(m*(n-1))=TV();
+        V(m*n-1)=TV();}
     if(test_number==26){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}
-        for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=TV();V(m*(n-1)+i)=TV();}}
+        for(int j=0;j<n;j++){V(m*j)=TV();V(m-1+m*j)=TV();}
+        for(int i=2*m/5;i<3*m/5+1;i++){V(i)=TV();V(m*(n-1)+i)=TV();}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
-        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+        for(int j=0;j<n;j++){V(m*j)=TV();V(m-1+m*j)=TV();}}
     if(test_number==30){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
-        for(int j=0;j<n;j++){V(1+m*(j-1))=TV();V(m+m*(j-1))=TV();}}
+        for(int j=0;j<n;j++){V(m*j)=TV();V(m-1+m*j)=TV();}}
     if(test_number==28){
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
-        for(int j=0;j<n;j++) V(1+m*(j-1))=V(m+m*(j-1))=TV();}
-    if(test_number==31){V(1)=TV();V(2).y=0;V(3).y=0;}
-    if(test_number==32){V(1)=V(3)=TV();V(3).x=0;}
-    if(test_number==33){V(1)=V(2)=V(4)=V(6)=V(7)=TV();}
+        for(int j=0;j<n;j++) V(m*j)=V(m-1+m*j)=TV();}
+    if(test_number==31){V(0)=TV();V(1).y=0;V(2).y=0;}
+    if(test_number==32){V(0)=V(1)=TV();V(2).x=0;}
+    if(test_number==33){V(0)=V(1)=V(3)=V(5)=V(6)=TV();}
 }
 void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
     /*if(test_number==270){
         int m=mattress_grid.counts.x;
-        int n=mattress_grid.counts.y;        
+        int n=mattress_grid.counts.y;
     }*/
 }
 //#####################################################################
@@ -829,7 +829,7 @@ void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {
 void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE
 {
     int m=mattress_grid.counts.x;
-    for(int j=0;j<mattress_grid.counts.y;j++) X(1+m*(j-1))=X(m+m*(j-1))=TV(0,0);
+    for(int j=0;j<mattress_grid.counts.y;j++) X(m*j)=X(m-1+m*j)=TV(0,0);
 }
 //#####################################################################
 // Function Write_Output_Files
@@ -847,7 +847,7 @@ void Preprocess_Frame(const int frame)
     
     if (dump_sv)
     {
-        std::string output_file = STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
+        std::string output_file=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d/SV_%d",test_number,frame);
         svout.open(output_file.c_str());
     }
     if(test_number==33) Plot_Energy_Landscape();
@@ -863,7 +863,7 @@ void Preprocess_Frame(const int frame)
 //#####################################################################
 // Function Add_Constitutive_Model
 //#####################################################################
-void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping, T cutoff = 0.4, T efc = 20)
+void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,T poissons_ratio,T damping, T cutoff=0.4, T efc=20)
 {
     if(input_efc!=FLT_MAX) efc=input_efc;
     if(input_cutoff!=FLT_MAX) cutoff=input_cutoff;
@@ -890,7 +890,7 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
 
         nh->use_constant_ife=use_constant_ife;}
     //std::cout << "Lambda= " << icm->constant_lambda << std::cout;
-    //std::cout << "Mu    = " << icm->constant_mu << std::cout;
+    //std::cout << "Mu   =" << icm->constant_mu << std::cout;
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 
     if(plot_energy_density) Plot_Energy_Density(icm,stiffness);
@@ -978,7 +978,7 @@ void Test_Model(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
         TV df;
         random.Fill_Uniform(df,-e,e);
         f=f.Sorted().Reversed();
-        if(random.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
+        if(random.Get_Uniform_Integer(0,1)==1) f(1)=-f(1);
         LOG::cout<<f<<std::endl;
         icm.Test(DIAGONAL_MATRIX<T,2>(f),1);
         Test_Model_Helper<RC_EXTRAPOLATED<T,2> >(&icm,f,df,e);
@@ -1004,7 +1004,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             DIAGONAL_MATRIX<T,2> ev;
             MATRIX<T,2> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);
-            TV evec=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(1):eigenvectors.Column(2);
+            TV evec=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(0):eigenvectors.Column(1);
             if(evec.Sum()<0) evec=-evec;
             T val=TV::Dot_Product(evec,g);
             img(VECTOR<int,2>(i,j))=VECTOR<T,3>(val<0,val>=0,0);}
@@ -1052,7 +1052,7 @@ void Dump_Scatter_Plot(int frame)
     eps.bounding_box=RANGE<TV>(-sigma_range,sigma_range,-sigma_range,sigma_range);
     for(int i=0;i<contrail.m;i++){
         eps.Line_Color(contrail_colors(i));
-        for(int j=2;j<=contrail(i).m;j++)
+        for(int j=1;j<contrail(i).m;j++)
             eps.Draw_Line(contrail(i)(j-1),contrail(i)(j));}
     for(int i=0;i<contrail.m;i++){
         eps.Line_Color(contrail_colors(i));
@@ -1096,7 +1096,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
             DIAGONAL_MATRIX<T,2> ev;
             MATRIX<T,2> eigenvectors;
             H.Fast_Solve_Eigenproblem(ev,eigenvectors);
-            evec(VECTOR<int,2>(i,j))=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(1):eigenvectors.Column(2);
+            evec(VECTOR<int,2>(i,j))=fabs(ev.x11)>fabs(ev.x22)?eigenvectors.Column(0):eigenvectors.Column(1);
             grad(VECTOR<int,2>(i,j))=g;}
 
     for(int i=1;i<image_size;i++)
@@ -1227,7 +1227,7 @@ void Energy_Profile_Plot(int frame)
 
     if(this->write_first_frame && frame==this->first_frame) FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/first_frame",frame,"\n");
 
-    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm = solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
+    ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>().isotropic_model;
     if(!energy_mesh){
         energy_particles.Store_Velocity(true);
         TRIANGULATED_AREA<T> ta(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>);
