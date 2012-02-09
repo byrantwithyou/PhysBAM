@@ -409,9 +409,9 @@ void Rigid_Spring()
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
     spring->Add_Spring(body_a.particle_index,body_b.particle_index,at[parameter/10],at[parameter%10]);
-    spring->Set_Restlength(1,5);
-    spring->Set_Stiffness(1,arg_ks);
-    spring->Set_Overdamping_Fraction(1,arg_kd);
+    spring->Set_Restlength(0,5);
+    spring->Set_Stiffness(0,arg_ks);
+    spring->Set_Overdamping_Fraction(0,arg_kd);
     solid_body_collection.Add_Force(spring);
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
 }
@@ -459,13 +459,13 @@ void Single_Particle()
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
     spring->Add_Spring(body_a.particle_index,body_b.particle_index,TV(),TV());
+    spring->Set_Restlength(0,5);
+    spring->Set_Stiffness(0,arg_ks);
+    spring->Set_Overdamping_Fraction(0,arg_kd);
+    spring->Add_Spring(body_c.particle_index,body_b.particle_index,TV(),TV());
     spring->Set_Restlength(1,5);
     spring->Set_Stiffness(1,arg_ks);
     spring->Set_Overdamping_Fraction(1,arg_kd);
-    spring->Add_Spring(body_c.particle_index,body_b.particle_index,TV(),TV());
-    spring->Set_Restlength(2,5);
-    spring->Set_Stiffness(2,arg_ks);
-    spring->Set_Overdamping_Fraction(2,arg_kd);
 
     solid_body_collection.Add_Force(spring);
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
