@@ -44,7 +44,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                 int poly_index=cut_cells(index)->geometry.Append(POLYGON<TV>(RANGE<TV>(cell_volume.min_corner, l_to_r_ray.Point(l_to_r_ray.t_max))));
                 TV centroid=cut_cells(index)->geometry(poly_index).X.Average();
 
-                cut_cells(index)->visibility.Resize(poly_index);
+                cut_cells(index)->visibility.Resize(poly_index+1);
                 if(!Is_Occluded_Cell_Center<T,1>(centroid,grid.Center(index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index)){
                     cut_cells(index)->dominant_element=poly_index;
                     cut_cells(index)->visibility(poly_index).Append(index);}
@@ -61,7 +61,7 @@ void Compute_Cut_Geometries(const GRID<VECTOR<T,1> >& grid,const int num_ghost_c
                 int poly_index=cut_cells(index)->geometry.Append(POLYGON<TV>(RANGE<TV>(r_to_l_ray.Point(r_to_l_ray.t_max),cell_volume.max_corner)));
                 TV centroid=cut_cells(index)->geometry(poly_index).X.Average();
 
-                cut_cells(index)->visibility.Resize(poly_index);
+                cut_cells(index)->visibility.Resize(poly_index+1);
                 if(!Is_Occluded_Cell_Center<T,1>(centroid,grid.Center(index),collision_bodies_affecting_fluid.objects_in_cell,collision_bodies_affecting_fluid.collision_geometry_collection,index)){
                     cut_cells(index)->dominant_element=poly_index;
                     cut_cells(index)->visibility(poly_index).Append(index);}

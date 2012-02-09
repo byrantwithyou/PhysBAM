@@ -475,9 +475,9 @@ Add_Tetrahedron(ARRAY<int>& free_tet_indices,const int level,const int i,const i
     TETRAHEDRON_MESH& tet_mesh=*meshes(level);
     int index;
     if(free_tet_indices.m == 0){
-        tet_mesh.elements.Append(VECTOR<int,4>(i,j,k,l));
-        leaf_number(level)->Append(0);parent(level)->Append(parent_index);index=tet_mesh.elements.m;
-        tet_mesh.element_edges->Resize(index);children(level)->Resize(index);index_in_stack(level)->Resize(index);}
+        index=tet_mesh.elements.Append(VECTOR<int,4>(i,j,k,l));
+        leaf_number(level)->Append(0);parent(level)->Append(parent_index);
+        tet_mesh.element_edges->Resize(index+1);children(level)->Resize(index+1);index_in_stack(level)->Resize(index+1);}
     else{
         index=free_tet_indices.Pop();tet_mesh.elements(index).Set(i,j,k,l);
         (*parent(level))(index)=parent_index;for(int a=0;a<8;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}

@@ -49,7 +49,7 @@ template<class TV> int BINDING_LIST<TV>::
 Add_Binding(BINDING<TV>* binding)
 {
     int id=bindings.Append(binding);
-    if(binding_index_from_particle_index.m<=binding->particle_index) binding_index_from_particle_index.Resize(binding->particle_index);
+    if(binding_index_from_particle_index.m<=binding->particle_index) binding_index_from_particle_index.Resize(binding->particle_index+1);
     binding_index_from_particle_index(binding->particle_index)=id;
     return id;
 }
@@ -60,8 +60,8 @@ template<class TV> void BINDING_LIST<TV>::
 Update_Binding_Index_From_Particle_Index()
 {
     binding_index_from_particle_index.Clean_Memory();
-    int max_particle_index=-1;for(int b=0;b<bindings.m;b++) max_particle_index=max(max_particle_index,bindings(b)->particle_index);
-    binding_index_from_particle_index.Resize(max_particle_index);
+    int max_particle_index=0;for(int b=0;b<bindings.m;b++) max_particle_index=max(max_particle_index,bindings(b)->particle_index);
+    binding_index_from_particle_index.Resize(max_particle_index+1);
     for(int b=0;b<bindings.m;b++){assert(binding_index_from_particle_index(bindings(b)->particle_index)<0);binding_index_from_particle_index(bindings(b)->particle_index)=b;}
 }
 //#####################################################################

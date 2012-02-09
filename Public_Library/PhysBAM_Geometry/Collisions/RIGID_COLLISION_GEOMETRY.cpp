@@ -288,7 +288,7 @@ Number_Of_Simplices() const
 template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
 Save_State(const int state_index,const T time)
 {
-    if(saved_states.m<state_index) saved_states.Resize(state_index);
+    if(saved_states.m<=state_index) saved_states.Resize(state_index+1);
     saved_states(state_index).x=rigid_geometry.Frame();
     saved_states(state_index).y=time;
 }
@@ -325,7 +325,7 @@ Delete_State(const int state_index)
 template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
 Read_State(TYPED_ISTREAM& input,const int state_index)
 {
-    if(saved_states.m<state_index) saved_states.Resize(state_index);
+    if(saved_states.m<=state_index) saved_states.Resize(state_index+1);
     Read_Binary(input,saved_states(state_index));
 }
 //#####################################################################

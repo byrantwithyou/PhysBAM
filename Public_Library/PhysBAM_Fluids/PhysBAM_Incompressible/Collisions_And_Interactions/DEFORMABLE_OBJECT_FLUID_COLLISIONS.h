@@ -63,7 +63,7 @@ public:
     object.particles.V=state.x->V;}
 
     void Save_State(const int state_index,const T time=0) PHYSBAM_OVERRIDE
-    {if(saved_states.m<state_index) saved_states.Resize(state_index);delete saved_states(state_index).x;
+    {if(saved_states.m<=state_index) saved_states.Resize(state_index+1);delete saved_states(state_index).x;
     saved_states(state_index).x=new GEOMETRY_PARTICLES<TV>;saved_states(state_index).x->Store_Velocity();
     saved_states(state_index).x->array_collection->Add_Elements(object.particles.array_collection->Size());Save_State(saved_states(state_index),time);}
 
@@ -71,7 +71,7 @@ public:
     {assert(saved_states(state_index).x);Restore_State(saved_states(state_index));}
 
     void Average_States(const int state1,const int state2,const int result_state,const T interpolation_distance) PHYSBAM_OVERRIDE
-    {if(saved_states.m<result_state) saved_states.Resize(result_state);delete saved_states(result_state).x;
+    {if(saved_states.m<=result_state) saved_states.Resize(result_state+1);delete saved_states(result_state).x;
     saved_states(result_state).x=new GEOMETRY_PARTICLES<TV>;saved_states(result_state).x->Store_Velocity();
     saved_states(result_state).x->array_collection->Add_Elements(object.particles.array_collection->Size());
     saved_states(result_state).x->X=((T)1-interpolation_distance)*saved_states(state1).x->X+interpolation_distance*saved_states(state2).x->X;
@@ -81,7 +81,7 @@ public:
     {delete saved_states(state_index).x;saved_states(state_index).x=0;}
 
     void Read_State(TYPED_ISTREAM& input,const int state_index) PHYSBAM_OVERRIDE
-    {if(saved_states.m<state_index) saved_states.Resize(state_index);
+    {if(saved_states.m<=state_index) saved_states.Resize(state_index+1);
     Read_Binary(input,saved_states(state_index));}
 
     void Write_State(TYPED_OSTREAM& output,const int state_index) const PHYSBAM_OVERRIDE

@@ -287,9 +287,9 @@ Add_Triangle(ARRAY<int>& free_triangle_indices,const int level,const int i,const
     TRIANGLE_MESH& triangle_mesh=*meshes(level);
     int index;
     if(free_triangle_indices.m == 0){
-        triangle_mesh.elements.Append(VECTOR<int,3>(i,j,k));
-        leaf_number(level)->Append(0);parent(level)->Append(parent_index);index=triangle_mesh.elements.m;
-        element_edges(level).Resize(index);children(level)->Resize(index);index_in_stack(level)->Resize(index);}
+        index=triangle_mesh.elements.Append(VECTOR<int,3>(i,j,k));
+        leaf_number(level)->Append(0);parent(level)->Append(parent_index);
+        element_edges(level).Resize(index+1);children(level)->Resize(index+1);index_in_stack(level)->Resize(index+1);}
     else{
         index=free_triangle_indices.Pop();triangle_mesh.elements(index).Set(i,j,k);
         (*parent(level))(index)=parent_index;for(int a=0;a<4;a++) (*children(level))(index)(a)=0;(*index_in_stack(level))(index)=0;}
