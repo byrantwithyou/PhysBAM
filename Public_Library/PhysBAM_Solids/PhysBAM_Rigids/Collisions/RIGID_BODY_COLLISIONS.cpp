@@ -133,7 +133,7 @@ Get_Deepest_Intersection_Point(const int id_1,const int id_2,ARRAY<RIGID_BODY_PA
                 collision_location=location;collision_normal=normal;collision_relative_velocity=relative_velocity;}
             smallest_value=phi;smallest_index=i;}}
 
-    if(smallest_index && !ignore_separating){ // these quantities are already computed if we ignore_separating
+    if(smallest_index>=0 && !ignore_separating){ // these quantities are already computed if we ignore_separating
         const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(smallest_index);
         RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
         collision_location=body1.World_Space_Point(intersection.particle_location);collision_normal=body2.Implicit_Geometry_Normal(collision_location);collision_relative_velocity=TV();}

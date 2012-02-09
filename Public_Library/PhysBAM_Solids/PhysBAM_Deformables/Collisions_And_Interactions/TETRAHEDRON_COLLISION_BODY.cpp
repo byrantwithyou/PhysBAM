@@ -156,7 +156,7 @@ Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate,con
             int i,j,k,tri=intersection_list(t);triangle_mesh.elements(tri).Get(i,j,k);
             TRIANGLE_3D<T> triangle(particles.X(i),particles.X(j),particles.X(k));
             TV tri_weights,closest_point=triangle.Closest_Point(location,tri_weights),normal=location-closest_point;
-            if(location_particle_index && (location_particle_index==i || location_particle_index==j || location_particle_index==k || //TODO: fix for embedded
+            if(location_particle_index>=0 && (location_particle_index==i || location_particle_index==j || location_particle_index==k || //TODO: fix for embedded
                 TV::Dot_Product((*triangulated_surface.vertex_normals)(location_particle_index),triangle.normal)>=self_collision_normal_angle_tolerance)) continue;
             T distance_squared=normal.Magnitude_Squared();
             if(distance_squared<closest_distance_squared){closest_distance_squared=distance_squared;closest_normal=normal;closest_triangle=tri;closest_tri_weights=tri_weights;}}

@@ -191,7 +191,7 @@ Apply_Impulse(const int particle,RIGID_BODY<TV>& rigid_body,const TV& impulse)
     particles.V(particle)+=particle_delta_V;
     // apply impulse to parents if particle is soft bound
     const int soft_binding_index=soft_bindings.Soft_Binding(particle);
-    if(soft_binding_index && soft_bindings.use_impulses_for_collisions(soft_binding_index)){
+    if(soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index)){
         const int parent=soft_bindings.bindings(soft_binding_index).y;
         BINDING<TV>* hard_binding=soft_bindings.binding_list.Binding(parent);
         if(hard_binding) hard_binding->Apply_Velocity_Change_To_Parents_Based_On_Embedding(particle_delta_V,0);
@@ -213,7 +213,7 @@ Apply_Displacement_To_Particle(const int particle_index,const TV& particle_delta
     particles.X(particle_index)+=particle_delta_X;
 
     const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
-    if(soft_binding_index && soft_bindings.use_impulses_for_collisions(soft_binding_index)){
+    if(soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index)){
         const int parent=soft_bindings.bindings(soft_binding_index).y;BINDING<TV>* hard_binding=soft_bindings.binding_list.Binding(parent);
         if(hard_binding) hard_binding->Apply_Displacement_To_Parents_Based_On_Embedding(particle_delta_X,0);
         else particles.X(parent)=particles.X(particle_index);} // TODO: add delta instead of setting?
@@ -296,7 +296,7 @@ Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int part
     // sync soft bound particles before processing
     const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
     BINDING<TV>* hard_binding=0;int parent=0;
-    const bool impulse_based_binding=soft_binding_index && soft_bindings.use_impulses_for_collisions(soft_binding_index);
+    const bool impulse_based_binding=soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index);
     if(impulse_based_binding){
         parent=soft_bindings.bindings(soft_binding_index).y;hard_binding=soft_bindings.binding_list.Binding(parent);
         if(hard_binding){hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();}
@@ -484,7 +484,7 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
     // sync soft bound particles before processing
     const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
     BINDING<TV>* hard_binding=0;int parent=0;
-    const bool impulse_based_binding=soft_binding_index && soft_bindings.use_impulses_for_collisions(soft_binding_index);
+    const bool impulse_based_binding=soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index);
     if(impulse_based_binding){
         parent=soft_bindings.bindings(soft_binding_index).y;hard_binding=soft_bindings.binding_list.Binding(parent);
         // TODO: the first position clamp is probably not necessary if hard bindings were satisfied in X_save
@@ -904,7 +904,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
     for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);
         const int soft_binding_index=solid_body_collection.deformable_body_collection.soft_bindings.Soft_Binding(p);
         BINDING<TV>* hard_binding=0;int parent=0;
-        const bool impulse_based_binding=soft_binding_index && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
+        const bool impulse_based_binding=soft_binding_index>=0 && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
         bool discard=false;
         if(impulse_based_binding){
             parent=solid_body_collection.deformable_body_collection.soft_bindings.bindings(soft_binding_index).y;
@@ -922,7 +922,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
     for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);
         const int soft_binding_index=solid_body_collection.deformable_body_collection.soft_bindings.Soft_Binding(p);
         BINDING<TV>* hard_binding=0;int parent=0;
-        const bool impulse_based_binding=soft_binding_index && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
+        const bool impulse_based_binding=soft_binding_index>=0 && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
         if(impulse_based_binding){
             parent=solid_body_collection.deformable_body_collection.soft_bindings.bindings(soft_binding_index).y;
             hard_binding=solid_body_collection.deformable_body_collection.soft_bindings.binding_list.Binding(parent);
@@ -1094,7 +1094,7 @@ Push_Out_From_Particle(const int particle)
     // Sync soft binding
     const int soft_binding_index=solid_body_collection.deformable_body_collection.soft_bindings.Soft_Binding(particle);
     BINDING<TV>* hard_binding=0;int parent=0;
-    const bool impulse_based_binding=soft_binding_index && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
+    const bool impulse_based_binding=soft_binding_index>=0 && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
     if(impulse_based_binding){
         parent=solid_body_collection.deformable_body_collection.soft_bindings.bindings(soft_binding_index).y;
         hard_binding=solid_body_collection.deformable_body_collection.soft_bindings.binding_list.Binding(parent);
@@ -1167,7 +1167,7 @@ Pull_In_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int par
     // sync soft bound particles before processing
     const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
     BINDING<TV>* hard_binding=0;int parent=0;
-    const bool impulse_based_binding=soft_binding_index && soft_bindings.use_impulses_for_collisions(soft_binding_index);
+    const bool impulse_based_binding=soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index);
     if(impulse_based_binding){
         parent=soft_bindings.bindings(soft_binding_index).y;hard_binding=soft_bindings.binding_list.Binding(parent);
         if(hard_binding){hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();}

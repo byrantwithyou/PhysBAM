@@ -327,7 +327,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int side=0;side<2;side++){
             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
             int ghost_cell_index=face_ghost_cell_index(side,axis,face_index);
-            if(ghost_cell_index && region.Lazy_Inside_Half_Open(cell_index)){
+            if(ghost_cell_index>=0 && region.Lazy_Inside_Half_Open(cell_index)){
                 if(!face_ghost_cell_index_map(ghost_cell_index))
                     face_ghost_cell_index_map(ghost_cell_index)=++cell_count;}}}
 
@@ -337,7 +337,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int side=0;side<2;side++){
             TV_INT cell_index=face_index+(1-side)*TV_INT::Axis_Vector(axis);
             int ghost_cell_index=face_ghost_cell_index(side,axis,face_index);
-            if(ghost_cell_index && region.Lazy_Inside_Half_Open(cell_index))
+            if(ghost_cell_index>=0 && region.Lazy_Inside_Half_Open(cell_index))
             face_ghost_cell_index(side,axis,face_index)=face_ghost_cell_index_map(ghost_cell_index);}}*/
 
     //PHYSBAM_FATAL_ERROR("pretty sure don't want Lazy_Inside");
