@@ -33,10 +33,10 @@ public:
     {return clamp((int)((T)256*color_in),0,255);}
 
     template<int d> static void Flip_X(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
-    {for(int i=0;i<image.m/2;i++)for(int j=0;j<image.n;j++)exchange(image(i,j),image(image.m-i+1,j));}
+    {for(int i=0;i<image.m/2;i++)for(int j=0;j<image.n;j++)exchange(image(i,j),image(image.m-i,j));}
 
     template<int d> static void Flip_Y(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
-    {for(int j=0;j<image.n/2;j++)for(int i=0;i<image.m;i++)exchange(image(i,j),image(i,image.n-j+1));}
+    {for(int j=0;j<image.n/2;j++)for(int i=0;i<image.m;i++)exchange(image(i,j),image(i,image.n-j));}
 
     template<int d> static void Invert(ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& image)
     {for(int i=image.domain.min_corner.x;i<image.domain.max_corner.x;i++) for(int j=image.domain.min_corner.y;j<image.domain.max_corner.y;j++) image(i,j)=VECTOR<T,d>::All_Ones_Vector()-image(i,j);}

@@ -37,8 +37,8 @@ Read(const std::string& filename,ARRAY<VECTOR<T,3> ,VECTOR<int,2> >& image)
         while(current_byte<data.m) Read_Binary<T>(*input,data(current_byte++));
         // unpack runs
         for(int band=0;band<3;band++)for(int j=0;j<image.counts.y;j++){
-            int index=offset(j+image.counts.y*(band-1)),end_index=index+length(j+image.counts.y*(band-1));int column=1;
-            for(int i=1;index<end_index;i++){
+            int index=offset(j+image.counts.y*band),end_index=index+length(j+image.counts.y*band);int column=1;
+            for(int i=0;index<end_index;i++){
                 pixel=data(index++);count=pixel & 0x7f;if(count==0) break;
                 if(pixel & 0x80){for(int k=0;k<count;k++){Read_Binary<T>(*input,byte);image(column,j)[band]=IMAGE<T>::Byte_Color_To_Scalar_Color(data(index++));column++;}}
                 else{T float_pixel=IMAGE<T>::Byte_Color_To_Scalar_Color(data(index++));for(int k=0;k<count;k++){image(column,j)[band]=float_pixel;column++;}}}}}

@@ -95,7 +95,7 @@ Write(const std::string& filename,const ARRAY<VECTOR<T,d> ,VECTOR<int,2> >& imag
     VECTOR<unsigned char,d>* byte_data=new VECTOR<unsigned char,d>[image.counts.y*image.counts.x];
     VECTOR<unsigned char,d>** row_pointers=new VECTOR<unsigned char,d>*[image.counts.y];
     for(int j=0;j<image.counts.y;j++){
-        row_pointers[image.counts.y-j]=byte_data+image.counts.x*(image.counts.y-j);
+        row_pointers[image.counts.y-j-1]=byte_data+image.counts.x*(image.counts.y-j-1);
         for(int i=0;i<image.counts.x;i++) row_pointers[image.counts.y-j-1][i]=IMAGE<T>::Scalar_Color_To_Byte_Color(image(i,j));}
     png_set_rows(png_ptr,info_ptr,(png_byte**)row_pointers);
     png_write_png(png_ptr,info_ptr,PNG_TRANSFORM_IDENTITY,0);
