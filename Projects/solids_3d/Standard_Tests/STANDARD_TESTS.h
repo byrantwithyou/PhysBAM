@@ -1023,9 +1023,9 @@ void Get_Initial_Data()
             T s=0,t=0;T total_s=Test_32_Arc_Length((T)1),ds=total_s/(m-1);
             for(int i=0;i<m;i++){
                 VECTOR<T,2> position;
-                if(i>1){t=Test_32_Find_Parameter(s+ds,t);s+=ds;}
+                if(i>0){t=Test_32_Find_Parameter(s+ds,t);s+=ds;}
                 position=VECTOR<T,2>(2*t-1,(T).5*3*sqr(2*t-1)); // 3/2 x^2
-                for(int j=0;j<n;j++) particles.X(i+m*(j-1))=TV((T).25*position.x,(T).25*position.y,(j-1)*dy-side_length/2);}
+                for(int j=0;j<n;j++) particles.X(i+m*j)=TV((T).25*position.x,(T).25*position.y,j*dy-side_length/2);}
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("skinnycyllink",(T).5,(T).3);rigid_body.X()=TV(0,(T)0.075,0);rigid_body.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));}
             break;
         case 33:{
@@ -1140,7 +1140,7 @@ void Get_Initial_Data()
             delete &base_surface.particles;*/
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-            i=1;j=1;particles.mass(i+m*(j-1))=FLT_MAX;i=1;j=n;particles.mass(i+m*(j-1))=FLT_MAX;
+            i=0;j=0;particles.mass(i+m*j)=FLT_MAX;i=0;j=n-1;particles.mass(i+m*j)=FLT_MAX;
             //i=1;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
             //particles.mass(0)=FLT_MAX;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,true);}
@@ -1151,8 +1151,8 @@ void Get_Initial_Data()
             TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>());
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-            i=1;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
-            i=m;for(j=0;j<n;j++) particles.mass(i+m*(j-1))=FLT_MAX;
+            i=0;for(j=0;j<n;j++) particles.mass(i+m*j)=FLT_MAX;
+            i=m-1;for(j=0;j<n;j++) particles.mass(i+m*j)=FLT_MAX;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,true);}
             break;
         case 42: 
@@ -1186,7 +1186,7 @@ void Get_Initial_Data()
                     int p=particles.array_collection->Add_Element();particle_indices.Append(p);PHYSBAM_ASSERT(p);
                     if(j==0){fixed_particles.Append(p);base_particle=p;}
                     if(particle_indices.m>1) segmented_curve.mesh.elements.Append(VECTOR<int,2>(p,particle_indices(particle_indices.m-1)));
-                    particles.X(p)=TV((n-1)*2,(float)(j-1)/(float)(num_particles-1)*height,0);
+                    particles.X(p)=TV((n-1)*2,(float)j/(float)(num_particles-1)*height,0);
                     deformable_body_rest_positions_array.Append(particles.X(p));}
                 //Create tet volume
                 TETRAHEDRALIZED_VOLUME<T>* volume=TETRAHEDRALIZED_VOLUME<T>::Create();
@@ -1711,36 +1711,36 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 {
     if(test_number==5 || test_number==41){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=1;j=n;V(i+m*(j-1))=TV();}
+        i=0;j=0;V(i+m*j)=TV();i=0;j=n-1;V(i+m*j)=TV();}
     else if(test_number==47){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=1;j=n;V(i+m*(j-1))=TV();}
-        //i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
+        i=0;j=0;V(i+m*j)=TV();i=0;j=n-1;V(i+m*j)=TV();}
+        //i=0;for(j=0;j<n;j++) V(i+m*j)=TV();}
     else if(test_number==48){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();
-        i=m;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
+        i=0;for(j=0;j<n;j++) V(i+m*j)=TV();
+        i=m-1;for(j=0;j<n;j++) V(i+m*j)=TV();}
     else if(test_number==10){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;j=1;V(i+m*(j-1))=test_10_frame_velocity;i=1;j=n;V(i+m*(j-1))=test_10_frame_velocity;}
+        i=0;j=0;V(i+m*j)=test_10_frame_velocity;i=0;j=n-1;V(i+m*j)=test_10_frame_velocity;}
     else if(test_number==14){
         if(velocity_time<1){
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
-            i=1;j=1;V(i+m*(j-1))=TV((T).88,0,0);i=m/3;j=1;V(i+m*(j-1))=TV((T).30,0,0);
-            i=(2*m/3);j=1;V(i+m*(j-1))=TV(-(T).30,0,0);i=m;j=1;V(i+m*(j-1))=TV(-(T).88,0,0);}
+            i=0;j=0;V(i+m*j)=TV((T).88,0,0);i=m/3;j=0;V(i+m*j)=TV((T).30,0,0);
+            i=(2*m/3);j=0;V(i+m*j)=TV(-(T).30,0,0);i=m-1;j=0;V(i+m*j)=TV(-(T).88,0,0);}
         else if(velocity_time<2){
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
-            i=1;j=1;V(i+m*(j-1))=TV(-(T).88,0,0);i=m/3;j=1;V(i+m*(j-1))=TV(-(T).30,0,0);
-            i=(2*m/3);j=1;V(i+m*(j-1))=TV((T).30,0,0);i=m;j=1;V(i+m*(j-1))=TV((T).88,0,0);}
+            i=0;j=0;V(i+m*j)=TV(-(T).88,0,0);i=m/3;j=0;V(i+m*j)=TV(-(T).30,0,0);
+            i=(2*m/3);j=0;V(i+m*j)=TV((T).30,0,0);i=m-1;j=0;V(i+m*j)=TV((T).88,0,0);}
         else{
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
-            i=1;j=1;V(i+m*(j-1))=TV();i=m/3;j=1;V(i+m*(j-1))=TV();
-            i=(2*m/3);j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();}}
+            i=0;j=0;V(i+m*j)=TV();i=m/3;j=0;V(i+m*j)=TV();
+            i=(2*m/3);j=0;V(i+m*j)=TV();i=m-1;j=0;V(i+m*j)=TV();}}
     else if(test_number==16 || test_number==17 || test_number==18) V(constrained_particle)=TV();
     else if(test_number==21){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();
-        i=1;j=number_side_panels;V(i+m*(j-1))=TV();i=m;j=number_side_panels;V(i+m*(j-1))=TV();
+        i=0;j=0;V(i+m*j)=TV();i=m-1;j=0;V(i+m*j)=TV();
+        i=0;j=number_side_panels;V(i+m*j)=TV();i=m-1;j=number_side_panels;V(i+m*j)=TV();
         V.Subset(constrained_particles(0)).Fill(TV());
         V.Subset(constrained_particles(1)).Fill(TV());}
     else if(test_number==22){
@@ -1754,21 +1754,21 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
             x.Add_Control_Point((T)0,(T)5);
             x.Add_Control_Point((T)test_30_constrained_off,(T)0);
             int j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;j=(int)((T).8*n);
-            V((int)((T).33*m)+m*(j-1)).z=0;V((int)((T).33*m)+m*(j-1)).x=x.Value(velocity_time);V((int)((T).66*m)+m*(j-1)).z=0;V((int)((T).66*m)+m*(j-1)).x=-x.Value(velocity_time);
-            j=(int)(.6*n);V((int)(.25*m)+m*(j-1)).z=(T)1.5*x.Value(velocity_time);V((int)(.5*m)+m*(j-1)).z=-(T)1.5*x.Value(velocity_time);V((int)(.65*m)+m*(j-1)).z=(T)1.5*x.Value(velocity_time);
-            j=(int)(.5*n);V((int)(.33*m)+m*(j-1)).z=0;V((int)(.33*m)+m*(j-1)).x=x.Value(velocity_time);}}
+            V((int)((T).33*m)+m*j).z=0;V((int)((T).33*m)+m*j).x=x.Value(velocity_time);V((int)((T).66*m)+m*j).z=0;V((int)((T).66*m)+m*j).x=-x.Value(velocity_time);
+            j=(int)(.6*n);V((int)(.25*m)+m*j).z=(T)1.5*x.Value(velocity_time);V((int)(.5*m)+m*j).z=-(T)1.5*x.Value(velocity_time);V((int)(.65*m)+m*j).z=(T)1.5*x.Value(velocity_time);
+            j=(int)(.5*n);V((int)(.33*m)+m*j).z=0;V((int)(.33*m)+m*j).x=x.Value(velocity_time);}}
     else if(test_number==32){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         if(velocity_time<(T)3.0){
-            i=1;j=1;V(i+m*(j-1))*=TV(0,0,(T)1);i=1;j=n;V(i+m*(j-1))*=TV(0,0,(T)1);i=m;j=1;V(i+m*(j-1))*=TV(0,0,(T)1);i=m;j=n;V(i+m*(j-1))*=TV(0,0,(T)1);}
+            i=0;j=0;V(i+m*j)*=TV(0,0,(T)1);i=0;j=n-1;V(i+m*j)*=TV(0,0,(T)1);i=m-1;j=0;V(i+m*j)*=TV(0,0,(T)1);i=m-1;j=n-1;V(i+m*j)*=TV(0,0,(T)1);}
         else{
-            i=1;j=1;V(i+m*(j-1))*=TV();i=1;j=n;V(i+m*(j-1))*=TV();i=m;j=1;V(i+m*(j-1))*=TV();i=m;j=n;V(i+m*(j-1))*=TV();}}
+            i=0;j=0;V(i+m*j)*=TV();i=0;j=n-1;V(i+m*j)*=TV();i=m-1;j=0;V(i+m*j)*=TV();i=m-1;j=n-1;V(i+m*j)*=TV();}}
     else if(test_number==36){
-        int i=1;int m=(int)(aspect_ratio*number_side_panels)+1;//,n=number_side_panels+1;
-        for(int j=0;j<number_side_panels+1;j++) V(i+m*(j-1))*=TV(0,0,0);}
+        int i=0;int m=(int)(aspect_ratio*number_side_panels)+1;//,n=number_side_panels+1;
+        for(int j=0;j<number_side_panels+1;j++) V(i+m*j)*=TV(0,0,0);}
     else if(test_number==38){
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
-            int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;
+            int index=hair_layout_grid.counts.z*(j+i*hair_layout_grid.counts.y)+1;
             V(index)=TV();}}
     else if(test_number==44) for(int i=0;i<fixed_particles.m;i++) V(fixed_particles(i))=TV();
 }
@@ -1779,24 +1779,24 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 {
     if(test_number==5 || test_number==10 || test_number==41){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=1;j=n;V(i+m*(j-1))=TV();}
+        i=0;j=0;V(i+m*j)=TV();i=0;j=n-1;V(i+m*j)=TV();}
     if(test_number==47){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=1;j=n;V(i+m*(j-1))=TV();}
-    //i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
+        i=0;j=0;V(i+m*j)=TV();i=0;j=n-1;V(i+m*j)=TV();}
+    //i=0;for(j=0;j<n;j++) V(i+m*j)=TV();}
     if(test_number==48){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-        i=1;for(j=0;j<n;j++) V(i+m*(j-1))=TV();
-        i=m;for(j=0;j<n;j++) V(i+m*(j-1))=TV();}
+        i=0;for(j=0;j<n;j++) V(i+m*j)=TV();
+        i=m-1;for(j=0;j<n;j++) V(i+m*j)=TV();}
     if(test_number==14){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=(m/3);j=1;V(i+m*(j-1))=TV();
-        i=(2*m/3);j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();}
+        i=0;j=0;V(i+m*j)=TV();i=(m/3);j=0;V(i+m*j)=TV();
+        i=(2*m/3);j=0;V(i+m*j)=TV();i=m-1;j=0;V(i+m*j)=TV();}
     if(test_number==16 || test_number==17 || test_number==18) V(constrained_particle)=TV();
     if(test_number==21){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1;
-        i=1;j=1;V(i+m*(j-1))=TV();i=m;j=1;V(i+m*(j-1))=TV();
-        i=1;j=number_side_panels;V(i+m*(j-1))=TV();i=m;j=number_side_panels;V(i+m*(j-1))=TV();
+        i=0;j=0;V(i+m*j)=TV();i=m-1;j=0;V(i+m*j)=TV();
+        i=0;j=number_side_panels;V(i+m*j)=TV();i=m-1;j=number_side_panels;V(i+m*j)=TV();
         V.Subset(constrained_particles(0)).Fill(TV());
         V.Subset(constrained_particles(1)).Fill(TV());}
     else if(test_number==22){
@@ -1807,21 +1807,21 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     else if(test_number==30){
         if(velocity_time < test_30_constrained_off){
             int j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;j=(int)(.8*n);
-            V((int)(.33*m)+m*(j-1)).z=0;V((int)(.33*m)+m*(j-1)).x=(T)0;V((int)(.66*m)+m*(j-1)).z=0;V((int)(.66*m)+m*(j-1)).x=0;
-            j=(int)(.6*n);V((int)(.25*m)+m*(j-1)).z=0;V((int)(.5*m)+m*(j-1)).z=0;V((int)(.65*m)+m*(j-1)).z=0;
-            j=(int)(.5*n);V((int)(.33*m)+m*(j-1)).z=0;V((int)(.33*m)+m*(j-1)).x=(T)0;}}
+            V((int)(.33*m)+m*j).z=0;V((int)(.33*m)+m*j).x=(T)0;V((int)(.66*m)+m*j).z=0;V((int)(.66*m)+m*j).x=0;
+            j=(int)(.6*n);V((int)(.25*m)+m*j).z=0;V((int)(.5*m)+m*j).z=0;V((int)(.65*m)+m*j).z=0;
+            j=(int)(.5*n);V((int)(.33*m)+m*j).z=0;V((int)(.33*m)+m*j).x=(T)0;}}
     else if(test_number==32){
         int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         if(velocity_time<(T)3.0){
-            i=1;j=1;V(i+m*(j-1))*=TV(0,0,(T)1);i=1;j=n;V(i+m*(j-1))*=TV(0,0,(T)1);i=m;j=1;V(i+m*(j-1))*=TV(0,0,(T)1);i=m;j=n;V(i+m*(j-1))*=TV(0,0,(T)1);}
+            i=0;j=0;V(i+m*j)*=TV(0,0,(T)1);i=0;j=n-1;V(i+m*j)*=TV(0,0,(T)1);i=m-1;j=0;V(i+m*j)*=TV(0,0,(T)1);i=m-1;j=n-1;V(i+m*j)*=TV(0,0,(T)1);}
         else{
-            i=1;j=1;V(i+m*(j-1))*=TV();i=1;j=n;V(i+m*(j-1))*=TV();i=m;j=1;V(i+m*(j-1))*=TV();i=m;j=n;V(i+m*(j-1))*=TV();}}
+            i=0;j=0;V(i+m*j)*=TV();i=0;j=n-1;V(i+m*j)*=TV();i=m-1;j=0;V(i+m*j)*=TV();i=m-1;j=n-1;V(i+m*j)*=TV();}}
     else if(test_number==36){
-        int i=1;int m=(int)(aspect_ratio*number_side_panels)+1;//,n=number_side_panels+1;
-        for(int j=0;j<number_side_panels+1;j++) V(i+m*(j-1))*=TV(0,0,0);}
+        int i=0;int m=(int)(aspect_ratio*number_side_panels)+1;//,n=number_side_panels+1;
+        for(int j=0;j<number_side_panels+1;j++) V(i+m*j)*=TV(0,0,0);}
     else if(test_number==38){
         for(int i=0;i<hair_layout_grid.counts.x;i++) for(int j=0;j<hair_layout_grid.counts.y;j++){
-            int index=hair_layout_grid.counts.z*(j-1+(i-1)*hair_layout_grid.counts.y)+1;
+            int index=hair_layout_grid.counts.z*(j+i*hair_layout_grid.counts.y)+1;
             V(index)=TV();}}
     else if(test_number==44) for(int i=0;i<fixed_particles.m;i++) V(fixed_particles(i))=TV();
 }
