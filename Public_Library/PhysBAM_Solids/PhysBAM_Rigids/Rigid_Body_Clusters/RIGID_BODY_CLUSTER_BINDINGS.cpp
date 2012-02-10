@@ -236,8 +236,8 @@ Restore_Bindings_State()
 template<class TV> FRAME<TV> RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Get_Child_To_Parent_Frame(int child_particle_index) const
 {    
-    assert(binding_index(child_particle_index)(0).y!=0);
-    assert(Get_Parent_Index(child_particle_index)!=0);
+    assert(binding_index(child_particle_index)(0).y>=RIGID_CLUSTER_CONSTITUENT_ID());
+    assert(Get_Parent_Index(child_particle_index)>=0);
     return reverse_bindings.Get(Get_Parent_Index(child_particle_index))->
         child_to_parent(binding_index(child_particle_index)(0).y);
 }

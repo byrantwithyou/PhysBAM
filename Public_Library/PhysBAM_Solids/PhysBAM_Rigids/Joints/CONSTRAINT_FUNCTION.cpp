@@ -315,7 +315,7 @@ F_Helper(const T_IMPULSE& j_tau,const int i) const
 template<class T> MATRIX<T,3> ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Jacobian_Helper(const T_IMPULSE& j_tau_i,const T_IMPULSE& j_tau_1_m_i,const int i) const
 {
-    ROTATION<TV> f=F_Helper(j_tau_1_m_i,1-i);MATRIX<T,3,4> m;m.Set_Column(0,-f.Quaternion().v);m.Set_Submatrix(0,0,MATRIX<T,3>::Cross_Product_Matrix(f.Quaternion().v)+f.Quaternion().s);
+    ROTATION<TV> f=F_Helper(j_tau_1_m_i,1-i);MATRIX<T,3,4> m;m.Set_Column(0,-f.Quaternion().v);m.Set_Submatrix(0,1,MATRIX<T,3>::Cross_Product_Matrix(f.Quaternion().v)+f.Quaternion().s);
     return m*Jacobian_Old_Helper(j_tau_i,i);
 }
 //#####################################################################

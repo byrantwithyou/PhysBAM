@@ -303,7 +303,7 @@ Compute_Constraint_Correcting_Impulse(T_CONSTRAINT_FUNCTION& constraint_error_fu
 
     j/=constraint_error_function.dt;
 
-    if(iterations>max_iterations) LOG::cout<<"PRESTABILIZATION: DID NOT CONVERGE (got "<<sqrt(f_of_j_norm)<<" vs. tolerance "<<iterative_tolerance<<")"<<std::endl;
+    if(iterations>=max_iterations) LOG::cout<<"PRESTABILIZATION: DID NOT CONVERGE (got "<<sqrt(f_of_j_norm)<<" vs. tolerance "<<iterative_tolerance<<")"<<std::endl;
     else if(f_of_j_norm>iterative_tolerance_squared && verbose)
         LOG::cout<<"PRESTABILIZATION: GOT IMPULSE "<<j<<" with tolerance "<<sqrt(f_of_j_norm)<<" vs. tolerance "<<iterative_tolerance<<std::endl;
 }

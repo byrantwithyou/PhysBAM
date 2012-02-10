@@ -269,7 +269,7 @@ Velocity_Dependent_Forces_Size() const
 template<class TV> void LINEAR_SPRINGS<TV>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
-    int aggregate_id=1;
+    int aggregate_id=0;
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         aggregate(aggregate_id++)+=state.sqrt_coefficient*TV::Dot_Product(V(state.nodes[0])-V(state.nodes[1]),state.direction);}
@@ -280,7 +280,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
 template<class TV> void LINEAR_SPRINGS<TV>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
-    int aggregate_id=1;
+    int aggregate_id=0;
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         const STATE& state=states(s);
         TV force=state.sqrt_coefficient*aggregate(aggregate_id++)*state.direction;
@@ -394,7 +394,7 @@ Print_Deformation_Statistics() const
 template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Maximum_Compression_Or_Expansion_Fraction(int* index) const
 {
-    T max_compression=0;int max_index=1;
+    T max_compression=0;int max_index=0;
     for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=(particles.X(i)-particles.X(j)).Magnitude();

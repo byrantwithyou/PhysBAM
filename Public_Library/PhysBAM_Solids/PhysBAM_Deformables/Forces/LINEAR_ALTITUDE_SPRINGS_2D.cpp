@@ -151,7 +151,7 @@ Velocity_Dependent_Forces_Size() const
 template<class T> void LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> aggregate,const T time) const
 {
-    int aggregate_id=1;
+    int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.node){
@@ -166,7 +166,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
 template<class T> void LINEAR_ALTITUDE_SPRINGS_2D<T>::
 Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VIEW<TV> F,const T time) const
 {
-    int aggregate_id=1;
+    int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
         if(spring_state.node){
