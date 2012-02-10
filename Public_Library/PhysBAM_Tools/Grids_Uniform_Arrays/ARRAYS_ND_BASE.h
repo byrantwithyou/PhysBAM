@@ -246,8 +246,7 @@ public:
     {STATIC_ASSERT(d==2);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,2>(i,j)));return base_pointer[i*counts.y+j];}
 
     T& operator()(const int i)
-    {STATIC_ASSERT(d==1);LOG::cout <<std::endl << domain.min_corner << " ~ " << i << " ~ " << domain.max_corner<<std::endl;
-assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
+    {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
 
     const T& operator()(const int i) const
     {STATIC_ASSERT(d==1);assert(domain.Lazy_Inside_Half_Open(VECTOR<int,1>(i)));return base_pointer[i];}
