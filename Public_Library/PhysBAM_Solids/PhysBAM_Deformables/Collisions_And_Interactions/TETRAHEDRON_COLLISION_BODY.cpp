@@ -268,11 +268,11 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_
         int p,t;interaction_pair(k).Get(p,t);
         TV surface_weights;int surface_triangle=Get_Surface_Triangle(t,weights(k),surface_weights,true);
         if(surface_triangle){
-            interactions++;interaction_pair(k)(2)=surface_triangle;TV change;
+            interactions++;interaction_pair(k)(1)=surface_triangle;TV change;
             // TODO: make this function take max_relative_velocity
             Adjust_Point_Face_Collision_Position_And_Velocity(surface_triangle,X(p),V(p),soft_bindings,collision_particles.one_over_effective_mass(p),dt,surface_weights,change);
             position_change.Append(change);}
-        else interaction_pair(k)(2)=0;}
+        else interaction_pair(k)(1)=0;}
     int count=0;
     for(int pair=0;pair<interaction_pair.m;pair++){
         int p,t;interaction_pair(pair).Get(p,t);
