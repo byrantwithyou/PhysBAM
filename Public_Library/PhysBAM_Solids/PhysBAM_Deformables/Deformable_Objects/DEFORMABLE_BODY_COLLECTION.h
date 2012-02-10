@@ -77,11 +77,11 @@ public:
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
     template<class T_FORCE> T_FORCE
-    Find_Force(const int index=1)
+    Find_Force(const int index=0)
     {return Find_Type<T_FORCE>(deformables_forces,index);}
 
     template<class T_FORCE> const T_FORCE
-    Find_Force(const int index=1) const
+    Find_Force(const int index=0) const
     {return Find_Type<T_FORCE>(deformables_forces,index);}
 
 //#####################################################################

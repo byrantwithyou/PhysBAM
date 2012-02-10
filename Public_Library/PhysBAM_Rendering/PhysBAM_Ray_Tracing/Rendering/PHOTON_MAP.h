@@ -58,7 +58,7 @@ private:
     void Median_Split(const int required_partition_index,const int first_index,const int last_index,ARRAY<int>& permutation_array,const typename PHOTON<T>::PHOTON_KDTREE_SPLIT_AXIS axis);
     int Partition_Sub_Array(const int left_index,const int right_index,ARRAY<int>& permutation_array,const typename PHOTON<T>::PHOTON_KDTREE_SPLIT_AXIS axis);
     void Print_Photon_List();
-    void Print_Photon_Tree(const int depth=0,const int index=1);
+    void Print_Photon_Tree(const int depth=0,const int index=0);
 public:
     void Begin_Light_Emission(const int number_of_photons_for_light);
     void End_Light_Emission(const int number_of_photons_emitted);

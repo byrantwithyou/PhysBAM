@@ -65,11 +65,11 @@ public:
     {implicit_damping=implicit_damping_input;}
 
     template<class T_FORCE> T_FORCE
-    Find_Force(const int index=1)
+    Find_Force(const int index=0)
     {return Find_Type<T_FORCE>(solids_forces,index);}
 
     template<class T_FORCE> const T_FORCE
-    Find_Force(const int index=1) const
+    Find_Force(const int index=0) const
     {return Find_Type<T_FORCE>(solids_forces,index);}
 
 //#####################################################################

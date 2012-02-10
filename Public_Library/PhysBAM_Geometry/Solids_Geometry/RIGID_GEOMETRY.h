@@ -55,7 +55,7 @@ public:
     virtual ~RIGID_GEOMETRY();
 
     template<class T_STRUCTURE>
-    T_STRUCTURE Find_Structure(const int index=1) const
+    T_STRUCTURE Find_Structure(const int index=0) const
     {return Find_Type<T_STRUCTURE>(structures,index);}
 
     void Set_Name(const std::string& name_input)
