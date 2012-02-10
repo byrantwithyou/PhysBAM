@@ -382,7 +382,7 @@ public:
     template<class T_VECTOR>
     RIGHT_VECTOR Lower_Triangular_Solve(const VECTOR_BASE<T,T_VECTOR>& b) const
     {assert(Rows()==Columns() && Columns()==b.Size());RIGHT_VECTOR x(INITIAL_SIZE(b.Size()));
-    for(int i=0;i<Columns();i++){x(i)=b(i);for(int j=0;j<i-1;j++) x(i)-=(*this)(i,j)*x(j);x(i)/=(*this)(i,i);}
+    for(int i=0;i<Columns();i++){x(i)=b(i);for(int j=0;j<i;j++) x(i)-=(*this)(i,j)*x(j);x(i)/=(*this)(i,i);}
     return x;}
 
     template<class T_VECTOR>
