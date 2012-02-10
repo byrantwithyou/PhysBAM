@@ -118,7 +118,7 @@ Get_Deepest_Intersection_Point(const int id_1,const int id_2,ARRAY<RIGID_BODY_PA
     particle_intersections.Remove_All();
     intersections.Append_All_Intersections(id_1,id_2,particle_intersections,desired_separation_distance);
     if(!particle_intersections.m){skip_collision_check.Set_Last_Checked(id_1,id_2);return false;}
-    smallest_value=FLT_MAX;smallest_index=0;
+    smallest_value=FLT_MAX;smallest_index=-1;
     for(int i=0;i<particle_intersections.m;i++){
         const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(i);
         T phi=(*rigid_body_collection.Rigid_Body(intersection.levelset_body).implicit_object)(rigid_body_collection.Rigid_Body(intersection.particle_body).World_Space_Point(intersection.particle_location));
@@ -138,7 +138,7 @@ Get_Deepest_Intersection_Point(const int id_1,const int id_2,ARRAY<RIGID_BODY_PA
         RIGID_BODY<TV> &body1=rigid_body_collection.Rigid_Body(intersection.particle_body),&body2=rigid_body_collection.Rigid_Body(intersection.levelset_body);
         collision_location=body1.World_Space_Point(intersection.particle_location);collision_normal=body2.Implicit_Geometry_Normal(collision_location);collision_relative_velocity=TV();}
 
-    return smallest_index!=0;
+    return smallest_index>=0;
 }
 //#####################################################################
 // Function Update_Collision_Pair

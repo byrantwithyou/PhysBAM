@@ -46,7 +46,7 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
         if(!particle_intersections.m){rigid_body_collisions.skip_collision_check.Set_Last_Checked(id_1,id_2);continue;}
         // revert to the saved positions & save the proposed positions in rigid_frame_save - restore rigid_frame_save below
         collision_callbacks.Swap_States(id_1,id_2);
-        T smallest_value=FLT_MAX;int smallest_index=0;TV collision_location,collision_normal,collision_relative_velocity;
+        T smallest_value=FLT_MAX;int smallest_index=-1;TV collision_location,collision_normal,collision_relative_velocity;
         for(int i=0;i<particle_intersections.m;i++){
             const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(i);
             FRAME<TV> saved_transform=collision_callbacks.Saved_Particle_To_Levelset_Body_Transform(intersection.levelset_body,intersection.particle_body);
@@ -62,7 +62,7 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
                 if(TV::Dot_Product(relative_velocity,normal)<0){ // approaching in *old configuration*
                     //TODO: need to add pair to rigid_body_particle_intersections if separating?
                     smallest_value=phi;smallest_index=i;collision_location=location;collision_normal=normal;collision_relative_velocity=relative_velocity;}}}
-        if(smallest_index){
+        if(smallest_index>=0){
             if(parent_id_1!=id_1) collision_callbacks.Exchange_Frame(id_1);
             if(parent_id_2!=id_2) collision_callbacks.Exchange_Frame(id_2);
             const RIGID_BODY_PARTICLE_INTERSECTION<TV>& intersection=particle_intersections(smallest_index);
