@@ -68,7 +68,7 @@ Compute(const int ghost_cells)
         ROW& row=rows(rows.Append(ROW()));
 
         for(int s=0;s<simplices.m;s++){
-            if(!simplices(s).y) PHYSBAM_NOT_IMPLEMENTED();
+            if(simplices(s).y<0) PHYSBAM_NOT_IMPLEMENTED();
 
             COLLISION_GEOMETRY<TV>& body=*iterator_info.coupling_bodies(simplices(s).x);
             const T_SIMPLEX& simplex=body.World_Space_Simplex(simplices(s).y);
