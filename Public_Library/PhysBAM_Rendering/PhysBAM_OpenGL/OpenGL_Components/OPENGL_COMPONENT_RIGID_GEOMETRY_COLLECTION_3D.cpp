@@ -191,8 +191,8 @@ Reinitialize(const bool force,const bool read_geometry)
                 if(body.name=="ground" || (object_space_implicit_object && typeid(*object_space_implicit_object)==typeid(ANALYTIC_IMPLICIT_OBJECT<BOUNDED_HORIZONTAL_PLANE<TV> >)))
                     Set_Object_Material(id,OPENGL_COLOR::Ground_Tan((T)1));
                 else{
-                    if(one_sided) Set_Object_Material(id,front_color_map->Lookup(Value(id)-1));
-                    else Set_Object_Material(id,front_color_map->Lookup(Value(id)-1),back_color_map->Lookup(Value(id)-1));}}
+                    if(one_sided) Set_Object_Material(id,front_color_map->Lookup(Value(id)));
+                    else Set_Object_Material(id,front_color_map->Lookup(Value(id)),back_color_map->Lookup(Value(id)));}}
             else Destroy_Geometry(id);}
         for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
