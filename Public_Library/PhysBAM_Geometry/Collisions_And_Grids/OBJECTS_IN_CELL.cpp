@@ -29,7 +29,7 @@ template <class T_GRID,class ID> void OBJECTS_IN_CELL<T_GRID,ID>::
 Reset(const T_GRID& grid,const int number_of_ghost_cells)
 {
     object_in_cell.Resize(grid.Cell_Indices(number_of_ghost_cells),false,false);
-    object_in_cell.Fill(ID());
+    object_in_cell.Fill(ID(INT_MAX));
     object_list.Clean_Memory();
 }
 //#####################################################################
