@@ -443,7 +443,7 @@ Perform_Smart_Simplex_Intersection(const VECTOR<int,3>& simplices) // simplices=
                     if(shared_nodes.m>1) continue; // The intersection does not define a single point
                     assert(shared_nodes.m==1 && shared_nodes(0)==shared_node);
                     int intersection_index=intersection_registry->Intersection(triplet);
-                    if(intersection_index!=0){Add_Non_Tet_Node_Intersection_To_Registry(simplices,all_weights,intersection_index);return;}}}}
+                    if(intersection_index>=0){Add_Non_Tet_Node_Intersection_To_Registry(simplices,all_weights,intersection_index);return;}}}}
         Add_Non_Tet_Node_Intersection_To_Registry(simplices,all_weights);
         return;}
     // If any pair of simplices share precisely one node (not on the 3rd simplex), terminate early.
@@ -472,7 +472,7 @@ Perform_Smart_Simplex_Intersection(const VECTOR<int,3>& simplices) // simplices=
                     int old_simplex1=converted?cutting_simplices->simplices(local_simplex1).parent:local_simplex1;
                     int old_simplex2=converted?cutting_simplices->simplices(local_simplex2).parent:local_simplex2;
                     int intersection_index=intersection_registry->Intersection(VECTOR<int,3>(converted_simplices[2-i],old_simplex1,old_simplex2));
-                    if(intersection_index!=0){
+                    if(intersection_index>=0){
                         VECTOR<VECTOR<T,2>,3> all_weights;
                         Get_Simplex_Weights_For_Edge_Triangle_Intersection(simplices,3-i,shared_edge,all_weights);
                         Add_Non_Tet_Node_Intersection_To_Registry(VECTOR<int,1>(converted_simplices[2]),VECTOR<VECTOR<T,2>,1>(all_weights[2]),intersection_index);}
@@ -1828,7 +1828,7 @@ Local_Planar_Coordinates_For_Intersection(int intersection_index,int cutting_sim
     int s=simplices_on_intersection.Find(cutting_simplex_index);
     if(s!=0){planar_coordinates=simplex_weights_on_intersection(s);return;}
     int parent_simplex_index=cutting_simplices->simplices(cutting_simplex_index).parent;
-    assert(parent_simplex_index!=0);
+    assert(parent_simplex_index>=0);
     s=simplices_on_intersection.Find(parent_simplex_index);
     if(s!=0){planar_coordinates=simplex_weights_on_intersection(s);return;}
     PHYSBAM_FATAL_ERROR();

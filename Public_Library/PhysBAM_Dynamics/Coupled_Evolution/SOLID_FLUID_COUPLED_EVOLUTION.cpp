@@ -335,7 +335,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                         for(int i=0;i<weights.m;i++){
                             int rigid_body_id=weights(i).x;T weight=weights(i).y;
                             int rigid_body_index=rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id);
-                            if(rigid_body_index!=0){
+                            if(rigid_body_index>=0){
                                 TV R_chunk=iterator.Location()-rigid_body_updated_center_of_mass(rigid_body_index);
                                 B.rigid_V(rigid_body_index).linear+=weight*momentum_chunk;
                                 B.rigid_V(rigid_body_index).angular+=TV::Cross_Product(R_chunk,weight*momentum_chunk);}}}}}}

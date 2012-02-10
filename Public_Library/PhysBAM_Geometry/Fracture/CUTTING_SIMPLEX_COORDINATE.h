@@ -104,7 +104,7 @@ public:
 
     EXACT_RATIONAL<T> Exact(int node_index, int coordinate_index)
     {assert((unsigned)node_index<d);assert((unsigned)coordinate_index<d+1);
-    assert(cutting_simplex.nodes[node_index]!=0);
+    assert(cutting_simplex.nodes[node_index]>=0);
     if(adaptive_coordinates==0){
         adaptive_coordinates=new COORDINATES_COLLECTION_TYPE;
         Barycentric_Coordinates< EXACT_FLOAT<T> >(cutting_simplex.element_original_coordinates,cutting_simplex.simplex_original_coordinates,*adaptive_coordinates);}
