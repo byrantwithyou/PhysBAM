@@ -227,15 +227,15 @@ template<class T> void EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::
 Add_To_Material_Surface_Tetrahedron_Face(const int i,const int j,const int l,const bool is_clockwise)
 {
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),il=embedded_object.Particle_Embedded_On_Segment(i,l),jl=embedded_object.Particle_Embedded_On_Segment(j,l);
-    if(ij && il && jl){
+    if(ij>=0 && il>=0 && jl>=0){
         Add_To_Material_Surface_Triangle(i,ij,il,is_clockwise);Add_To_Material_Surface_Triangle(ij,j,jl,is_clockwise);
         Add_To_Material_Surface_Triangle(il,jl,l,is_clockwise);Add_To_Material_Surface_Triangle(il,ij,jl,is_clockwise);}   
-    else if(!ij && il && jl){Add_To_Material_Surface_Triangle(l,il,jl,is_clockwise);Add_To_Material_Surface_Planar_Quad(i,j,jl,il,is_clockwise);}
-    else if(ij && !il && jl){Add_To_Material_Surface_Triangle(j,jl,ij,is_clockwise);Add_To_Material_Surface_Planar_Quad(i,ij,jl,l,is_clockwise);}
-    else if(ij && il && !jl){Add_To_Material_Surface_Triangle(i,ij,il,is_clockwise);Add_To_Material_Surface_Planar_Quad(ij,j,l,il,is_clockwise);}
-    else if(ij && !il && !jl){Add_To_Material_Surface_Triangle(j,l,ij,is_clockwise);Add_To_Material_Surface_Triangle(ij,l,i,is_clockwise);}
-    else if(!ij && il && !jl){Add_To_Material_Surface_Triangle(i,j,il,is_clockwise);Add_To_Material_Surface_Triangle(il,j,l,is_clockwise);}
-    else if(!ij && !il && jl){Add_To_Material_Surface_Triangle(i,j,jl,is_clockwise);Add_To_Material_Surface_Triangle(jl,l,i,is_clockwise);}
+    else if(ij<0 && il>=0 && jl>=0){Add_To_Material_Surface_Triangle(l,il,jl,is_clockwise);Add_To_Material_Surface_Planar_Quad(i,j,jl,il,is_clockwise);}
+    else if(ij>=0 && il<0 && jl>=0){Add_To_Material_Surface_Triangle(j,jl,ij,is_clockwise);Add_To_Material_Surface_Planar_Quad(i,ij,jl,l,is_clockwise);}
+    else if(ij>=0 && il>=0 && jl<0){Add_To_Material_Surface_Triangle(i,ij,il,is_clockwise);Add_To_Material_Surface_Planar_Quad(ij,j,l,il,is_clockwise);}
+    else if(ij>=0 && il<0 && jl<0){Add_To_Material_Surface_Triangle(j,l,ij,is_clockwise);Add_To_Material_Surface_Triangle(ij,l,i,is_clockwise);}
+    else if(ij<0 && il>=0 && jl<0){Add_To_Material_Surface_Triangle(i,j,il,is_clockwise);Add_To_Material_Surface_Triangle(il,j,l,is_clockwise);}
+    else if(ij<0 && il<0 && jl>=0){Add_To_Material_Surface_Triangle(i,j,jl,is_clockwise);Add_To_Material_Surface_Triangle(jl,l,i,is_clockwise);}
     else Add_To_Material_Surface_Triangle(i,j,l,is_clockwise);
 }
 //#####################################################################
@@ -297,11 +297,11 @@ Add_To_Material_Surface_Subprism(const int i,const int j,const int k,const int l
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),il=embedded_object.Particle_Embedded_On_Segment(i,l),
         jk=embedded_object.Particle_Embedded_On_Segment(j,k),kl=embedded_object.Particle_Embedded_On_Segment(k,l),jl=embedded_object.Particle_Embedded_On_Segment(j,l);
     Add_To_Material_Surface_Triangle(il,ik,ij,is_clockwise);Add_To_Material_Surface_Tetrahedron_Face(j,k,l,is_clockwise);    
-    if(!jk)Add_To_Material_Surface_Planar_Quad(k,j,ij,ik,is_clockwise);
+    if(jk<0)Add_To_Material_Surface_Planar_Quad(k,j,ij,ik,is_clockwise);
     else{Add_To_Material_Surface_Triangle(j,ij,jk,is_clockwise);Add_To_Material_Surface_Triangle(ij,ik,jk,is_clockwise);Add_To_Material_Surface_Triangle(ik,k,jk,is_clockwise);}
-    if(!kl)Add_To_Material_Surface_Planar_Quad(l,k,ik,il,is_clockwise);
+    if(kl<0)Add_To_Material_Surface_Planar_Quad(l,k,ik,il,is_clockwise);
     else{Add_To_Material_Surface_Triangle(k,ik,kl,is_clockwise);Add_To_Material_Surface_Triangle(ik,il,kl,is_clockwise);Add_To_Material_Surface_Triangle(il,l,kl,is_clockwise);}
-    if(!jl)Add_To_Material_Surface_Planar_Quad(j,l,il,ij,is_clockwise);
+    if(jl<0)Add_To_Material_Surface_Planar_Quad(j,l,il,ij,is_clockwise);
     else{Add_To_Material_Surface_Triangle(l,il,jl,is_clockwise);Add_To_Material_Surface_Triangle(il,ij,jl,is_clockwise);Add_To_Material_Surface_Triangle(ij,j,jl,is_clockwise);}
 }
 //#####################################################################
@@ -326,9 +326,9 @@ Add_To_Material_Surface_Wrick(const int i,const int j,const int k,const int l,co
         jl=embedded_object.Particle_Embedded_On_Segment(j,l),il=embedded_object.Particle_Embedded_On_Segment(i,l),kl=embedded_object.Particle_Embedded_On_Segment(k,l);
     Add_To_Material_Surface_Triangle(l,il,jl,is_clockwise);Add_To_Material_Surface_Triangle(jl,il,ij,is_clockwise);
     Add_To_Material_Surface_Triangle(ik,k,jk,is_clockwise);Add_To_Material_Surface_Triangle(ik,jk,ij,is_clockwise);
-    if(!kl) Add_To_Material_Surface_Planar_Quad(il,l,k,ik,is_clockwise);
+    if(kl<0) Add_To_Material_Surface_Planar_Quad(il,l,k,ik,is_clockwise);
     else{Add_To_Material_Surface_Triangle(l,kl,il,is_clockwise);Add_To_Material_Surface_Triangle(kl,ik,il,is_clockwise);Add_To_Material_Surface_Triangle(kl,k,ik,is_clockwise);}
-    if(!kl) Add_To_Material_Surface_Planar_Quad(k,l,jl,jk,is_clockwise);
+    if(kl<0) Add_To_Material_Surface_Planar_Quad(k,l,jl,jk,is_clockwise);
     else{Add_To_Material_Surface_Triangle(l,jl,kl,is_clockwise);Add_To_Material_Surface_Triangle(jl,jk,kl,is_clockwise);Add_To_Material_Surface_Triangle(jk,k,kl,is_clockwise);}
     Add_To_Material_Surface_Triangle(ij,jk,jl,is_clockwise);Add_To_Material_Surface_Triangle(ij,il,ik,is_clockwise);
 }
@@ -358,9 +358,9 @@ Add_To_Material_Surface_Subwedge(const int i,const int j,const int k,const int l
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),il=embedded_object.Particle_Embedded_On_Segment(i,l),
         jk=embedded_object.Particle_Embedded_On_Segment(j,k),jl=embedded_object.Particle_Embedded_On_Segment(j,l);
     Add_To_Material_Surface_Quad_Cut(il,jl,jk,ik,is_clockwise);
-    if(!ij) Add_To_Material_Surface_Planar_Quad(ik,jk,j,i,is_clockwise);
+    if(ij<0) Add_To_Material_Surface_Planar_Quad(ik,jk,j,i,is_clockwise);
     else{Add_To_Material_Surface_Triangle(jk,j,ij,is_clockwise);Add_To_Material_Surface_Triangle(ij,ik,jk,is_clockwise);Add_To_Material_Surface_Triangle(ij,i,ik,is_clockwise);}    
-    if(!ij) Add_To_Material_Surface_Planar_Quad(jl,il,i,j,is_clockwise);
+    if(ij<0) Add_To_Material_Surface_Planar_Quad(jl,il,i,j,is_clockwise);
     else{Add_To_Material_Surface_Triangle(j,jl,ij,is_clockwise);Add_To_Material_Surface_Triangle(jl,il,ij,is_clockwise);Add_To_Material_Surface_Triangle(il,i,ij,is_clockwise);}    
     Add_To_Material_Surface_Triangle(i,il,ik,is_clockwise);
     Add_To_Material_Surface_Triangle(jk,jl,j,is_clockwise);

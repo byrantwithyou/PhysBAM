@@ -141,7 +141,7 @@ Fill_Spring_State(int t,int isolated_node_number,int node1,int node2,int node3,i
         state.current_length=-state.current_length;}
     T rl=parameters(t)(isolated_node_number).restlength;
     if(use_springs_compressed_beyond_threshold && state.current_length-rl>-spring_compression_fraction_threshold*rl)
-    {state.node=0;return false;}
+    {state.node=-1;return false;}
     else{
         state.coefficient=parameters(t)(isolated_node_number).damping/rl;
         if(use_plasticity) Compute_Plasticity(isolated_node_number,t,state.current_length);

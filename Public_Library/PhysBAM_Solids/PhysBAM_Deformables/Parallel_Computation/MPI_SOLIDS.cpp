@@ -644,7 +644,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
         for(PARTITION_ID i(0);i<mpi_solids.particles_of_partition.Size();i++){
             send_matrix(i).Resize(mpi_solids.particles_of_partition.Size());receive_matrix(i).Resize(mpi_solids.particles_of_partition.Size());}
         for(int p=0;p<particle_to_component.m;p++){int component=particle_to_component(p);
-            if(component){
+            if(component>=0){
                 PARTITION_ID source=mpi_solids.partition_id_from_particle_index(p),destination=component_processor(component);
                 if(source!=destination){send_matrix(source)(destination).Append(p);receive_matrix(destination)(source).Append(p);}}}
         // send pairs

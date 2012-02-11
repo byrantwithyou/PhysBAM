@@ -52,7 +52,7 @@ INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure)
         if(VECTOR<bool,d+1>(mesh.node_on_boundary->Subset(element)).Number_True()>=element.m-1) // using Number_True directly on the subset hits a compiler bug in gcc 4.1.1
             for(int i=0;i<element.m;i++){
                 int b=boundary_mesh.Simplex(element.Remove_Index(i));
-                if(b) boundary_to_element(b).Set(t,i);}}
+                if(b>=0) boundary_to_element(b).Set(t,i);}}
 
     node_regions.Resize(particles.array_collection->Size());
     for(int p=0;p<particles.array_collection->Size();p++){ARRAY<int>& incident=(*mesh.incident_elements)(p);

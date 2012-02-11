@@ -48,8 +48,8 @@ Perturb_Nodes_For_Collision_Freeness(const T perturb_amount)
             if(embedded_object.Node_In_Simplex_Is_Material(parent_1,triangle)) parent1_in_material=true;
             if(embedded_object.Node_In_Simplex_Is_Material(parent_2,triangle)) parent2_in_material=true;
             int other_node=embedded_object.simplicial_object.mesh.Other_Node(parent_1,parent_2,triangle);
-            if(embedded_object.Node_In_Simplex_Is_Material(other_node,triangle) && other_node == embedded_object.Diamond_Node(t)){
-                if(!other_node_in_material) other_node_in_material=other_node;else more_than_one_other_node_in_material=true;}}
+            if(embedded_object.Node_In_Simplex_Is_Material(other_node,triangle) && other_node==embedded_object.Diamond_Node(t)){
+                if(other_node_in_material<0) other_node_in_material=other_node;else more_than_one_other_node_in_material=true;}}
         if(parent1_in_material){
             if(!parent2_in_material){
                 TV perturb_direction=(particles.X(parent_1)-embedded_particles.X(node)).Normalized();
@@ -110,15 +110,15 @@ Add_To_Material_Surface_Mesh_Face_Triangle(const int triangle)
 {
     int i,j,k;embedded_object.simplicial_object.mesh.elements(triangle).Get(i,j,k);
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),jk=embedded_object.Particle_Embedded_On_Segment(j,k);
-    if(ij && ik && jk){
+    if(ij>=0 && ik>=0 && jk>=0){
         Add_To_Material_Surface_Mesh_Triangle(i,ij,ik);Add_To_Material_Surface_Mesh_Triangle(ij,j,jk);
         Add_To_Material_Surface_Mesh_Triangle(ik,jk,k);Add_To_Material_Surface_Mesh_Triangle(ik,ij,jk);}
-    else if(!ij && ik && jk){Add_To_Material_Surface_Mesh_Triangle(k,ik,jk);Add_To_Material_Surface_Mesh_Quad(i,j,jk,ik);}
-    else if(ij && !ik && jk){Add_To_Material_Surface_Mesh_Triangle(j,jk,ij);Add_To_Material_Surface_Mesh_Quad(i,ij,jk,k);}
-    else if(ij && ik && !jk){Add_To_Material_Surface_Mesh_Triangle(i,ij,ik);Add_To_Material_Surface_Mesh_Quad(ij,j,k,ik);}
-    else if(ij && !ik && !jk){Add_To_Material_Surface_Mesh_Triangle(j,k,ij);Add_To_Material_Surface_Mesh_Triangle(ij,k,i);}
-    else if(!ij && ik && !jk){Add_To_Material_Surface_Mesh_Triangle(i,j,ik);Add_To_Material_Surface_Mesh_Triangle(ik,j,k);}
-    else if(!ij && !ik && jk){Add_To_Material_Surface_Mesh_Triangle(i,j,jk);Add_To_Material_Surface_Mesh_Triangle(jk,k,i);}
+    else if(ij<0 && ik>=0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(k,ik,jk);Add_To_Material_Surface_Mesh_Quad(i,j,jk,ik);}
+    else if(ij>=0 && ik>=0<0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(j,jk,ij);Add_To_Material_Surface_Mesh_Quad(i,ij,jk,k);}
+    else if(ij>=0 && ik>=0 && jk>=0<0){Add_To_Material_Surface_Mesh_Triangle(i,ij,ik);Add_To_Material_Surface_Mesh_Quad(ij,j,k,ik);}
+    else if(ij>=0 && ik>=0<0 && jk>=0<0){Add_To_Material_Surface_Mesh_Triangle(j,k,ij);Add_To_Material_Surface_Mesh_Triangle(ij,k,i);}
+    else if(ij<0 && ik>=0 && jk>=0<0){Add_To_Material_Surface_Mesh_Triangle(i,j,ik);Add_To_Material_Surface_Mesh_Triangle(ik,j,k);}
+    else if(ij<0 && ik>=0<0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(i,j,jk);Add_To_Material_Surface_Mesh_Triangle(jk,k,i);}
     else Add_To_Material_Surface_Mesh_Triangle(i,j,k);
 }
 //#####################################################################
@@ -132,9 +132,9 @@ Add_To_Material_Surface_Mesh_Subquadrilateral_Containg_Diamond_Node(const int tr
     embedded_object.simplicial_object.mesh.elements(triangle).Get(i,j,k);
     assert(embedded_object.Number_Of_Embedded_Subelements_In_Element(triangle)==2);
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),jk=embedded_object.Particle_Embedded_On_Segment(j,k);
-    if(diamond_node == i) Add_To_Material_Surface_Mesh_Diamond_Quad(i,ij,jk,ik);
-    else if (diamond_node == j) Add_To_Material_Surface_Mesh_Diamond_Quad(j,jk,ik,ij);
-    else if (diamond_node == k) Add_To_Material_Surface_Mesh_Diamond_Quad(k,ik,ij,jk);
+    if(diamond_node==i) Add_To_Material_Surface_Mesh_Diamond_Quad(i,ij,jk,ik);
+    else if (diamond_node==j) Add_To_Material_Surface_Mesh_Diamond_Quad(j,jk,ik,ij);
+    else if (diamond_node==k) Add_To_Material_Surface_Mesh_Diamond_Quad(k,ik,ij,jk);
 }
 //#####################################################################
 // Function Add_To_Material_Surface_Mesh_Diamond_Quad
@@ -154,13 +154,13 @@ Add_To_Material_Surface_Mesh_Corner_Triangles(const int triangle)
     int i,j,k,diamond_node=embedded_object.Diamond_Node(triangle);embedded_object.simplicial_object.mesh.elements(triangle).Get(i,j,k);
     assert(embedded_object.Number_Of_Embedded_Subelements_In_Element(triangle)==2);
     int ij=embedded_object.Particle_Embedded_On_Segment(i,j),ik=embedded_object.Particle_Embedded_On_Segment(i,k),jk=embedded_object.Particle_Embedded_On_Segment(j,k);
-    if(diamond_node == i){
+    if(diamond_node==i){
         if(embedded_object.Node_In_Simplex_Is_Material(j,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ij,j,jk);
         if(embedded_object.Node_In_Simplex_Is_Material(k,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(jk,k,ik);}
-    else if (diamond_node == j){
+    else if (diamond_node==j){
         if(embedded_object.Node_In_Simplex_Is_Material(i,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ik,i,ij);
         if(embedded_object.Node_In_Simplex_Is_Material(k,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(jk,k,ik);} 
-    else if (diamond_node == k){
+    else if (diamond_node==k){
         if(embedded_object.Node_In_Simplex_Is_Material(i,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ik,i,ij);
         if(embedded_object.Node_In_Simplex_Is_Material(j,triangle))Add_To_Material_Surface_Mesh_Corner_Triangle(ij,j,jk);}
 }
@@ -185,13 +185,13 @@ Add_To_Material_Surface_Mesh_Isolated_Node_Subtriangle(const int triangle)
     assert(emb_segments[0] && !emb_segments[1]);
     int curve_particle1,curve_particle2;embedded_object.embedded_mesh.elements(emb_segments[0]).Get(curve_particle1,curve_particle2);
     int embedded_curve_particle1=embedded_object.embedded_particles.subset_index_from_point_cloud_index(curve_particle1);
-    if(isolated_node == i){
+    if(isolated_node==i){
         if(embedded_object.Is_Parent(j,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subtriangle(curve_particle1,curve_particle2,i);
         else Add_To_Material_Surface_Mesh_Subtriangle(curve_particle2,curve_particle1,i);}
-    else if(isolated_node == j){
+    else if(isolated_node==j){
         if(embedded_object.Is_Parent(k,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subtriangle(curve_particle1,curve_particle2,j);
         else Add_To_Material_Surface_Mesh_Subtriangle(curve_particle2,curve_particle1,j);}
-    else{assert(isolated_node == k);
+    else{assert(isolated_node==k);
         if(embedded_object.Is_Parent(i,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subtriangle(curve_particle1,curve_particle2,k);
         else Add_To_Material_Surface_Mesh_Subtriangle(curve_particle2,curve_particle1,k);}
 }
@@ -214,15 +214,15 @@ Add_To_Material_Surface_Mesh_Subquadrilateral_Opposite_Isolated_Node(const int t
     assert(emb_segments[0] && !emb_segments[1]);
     int curve_particle1,curve_particle2;embedded_object.embedded_mesh.elements(emb_segments[0]).Get(curve_particle1,curve_particle2);
     int embedded_curve_particle1=embedded_object.embedded_particles.subset_index_from_point_cloud_index(curve_particle1);
-    if(isolated_node == i){
+    if(isolated_node==i){
         if(!embedded_object.Node_In_Simplex_Is_Material(j,triangle)) return;
         if(embedded_object.Is_Parent(j,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subquadrilateral(curve_particle1,curve_particle2,j,k);
         else Add_To_Material_Surface_Mesh_Subquadrilateral(curve_particle2,curve_particle1,j,k);}
-    else if(isolated_node == j){
+    else if(isolated_node==j){
         if(!embedded_object.Node_In_Simplex_Is_Material(i,triangle)) return;
         if(embedded_object.Is_Parent(k,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subquadrilateral(curve_particle1,curve_particle2,k,i);
         else Add_To_Material_Surface_Mesh_Subquadrilateral(curve_particle2,curve_particle1,k,i);}
-    else{assert(isolated_node == k);
+    else{assert(isolated_node==k);
         if(!embedded_object.Node_In_Simplex_Is_Material(i,triangle)) return;
         if(embedded_object.Is_Parent(i,embedded_curve_particle1)) Add_To_Material_Surface_Mesh_Subquadrilateral(curve_particle1,curve_particle2,i,j);
         else Add_To_Material_Surface_Mesh_Subquadrilateral(curve_particle2,curve_particle1,i,j);}
