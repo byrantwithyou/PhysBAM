@@ -1240,9 +1240,13 @@ Process_Push_Out()
         // Push out from particles only if there are tetrahedron collision bodies; if only rigid bodies and particles, just process around rigid bodies
         if(tetrahedron_collision_bodies.m){
             Compute_Particle_Candidates_Helper(*this,tetrahedron_collision_bodies,rigid_collision_bodies);
-            for(typename HASHTABLE<int,ARRAY<TETRAHEDRON_COLLISION_BODY<T>*> >::ITERATOR iterator(particle_tetrahedron_candidates);iterator.Valid();iterator.Next())
-                if(Push_Out_From_Particle(iterator.Key()) && !kinematic_rigid_bodies_only){
+            ARRAY<int> keys;particle_tetrahedron_candidates.Get_Keys(keys);Sort(keys); // INDEXING: Replace this with the commented out version below.
+            for(int kk=0;kk<keys.m;kk++)
+                if(Push_Out_From_Particle(keys(kk)) && !kinematic_rigid_bodies_only){
                     need_another_iteration=true;rigid_body_collisions.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();}}}
+//            for(typename HASHTABLE<int,ARRAY<TETRAHEDRON_COLLISION_BODY<T>*> >::ITERATOR iterator(particle_tetrahedron_candidates);iterator.Valid();iterator.Next())
+//                if(Push_Out_From_Particle(iterator.Key()) && !kinematic_rigid_bodies_only){
+//                    need_another_iteration=true;rigid_body_collisions.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();}}}
 
     // Process static/kinematic rigid bodies
     if(kinematic_rigid_bodies_only && solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions)
