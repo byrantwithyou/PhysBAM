@@ -30,7 +30,7 @@ template<class T> struct FIND_TYPE_HELPER<T&>
     return *element;}
 };
 
-template<class T,class T_ARRAY> T Find_Type(T_ARRAY& array,const int index=1)
+template<class T,class T_ARRAY> T Find_Type(T_ARRAY& array,const int index=0)
 {
     return FIND_TYPE_HELPER<T>::Find_Type(array,index);
 }

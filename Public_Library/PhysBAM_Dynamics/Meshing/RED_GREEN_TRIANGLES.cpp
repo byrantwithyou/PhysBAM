@@ -383,8 +383,8 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         for(int i=0;i<level_triangle_list(level).m;i++) for(int j=0;j<3;j++){
             int edge=element_edges(level)(level_triangle_list(level)(i))(j);int node1,node2;segment_mesh.elements(edge).Get(node1,node2);
             if(!nodes_referenced(node1) || !nodes_referenced(node2)){
-                int index=0;(*segment_mesh.incident_elements)(node1).Find(edge,index);if(index) (*segment_mesh.incident_elements)(node1).Remove_Index_Lazy(index);
-                index=0;(*segment_mesh.incident_elements)(node2).Find(edge,index);if(index) (*segment_mesh.incident_elements)(node2).Remove_Index_Lazy(index);}}}
+                int index=0;(*segment_mesh.incident_elements)(node1).Find(edge,index);if(index>=0) (*segment_mesh.incident_elements)(node1).Remove_Index_Lazy(index);
+                index=0;(*segment_mesh.incident_elements)(node2).Find(edge,index);if(index>=0) (*segment_mesh.incident_elements)(node2).Remove_Index_Lazy(index);}}}
 
     Rebuild_Object();
     // TODO: if node has 0 parent move it down to level 1

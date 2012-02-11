@@ -294,7 +294,7 @@ public:
         for(int i=0;i<fine_contacts.m;i++)
         {
             int id=fine_to_coarse_contacts_map(i);
-            if(id)
+            if(id>=0)
             {
                 SOLVE_CONTACT::CONTACT<TV>& contact=contacts(id);
                 SOLVE_CONTACT::CONTACT<TV>& fine_contact=fine_contacts(i);
@@ -351,7 +351,7 @@ public:
         for(int i=0;i<fine_contacts.m;i++)
         {
             int id=fine_to_coarse_contacts_map(i);
-            if(id)
+            if(id>=0)
             {
                 SOLVE_CONTACT::CONTACT<TV>& fine_contact=fine_contacts(i);
                 //SOLVE_CONTACT::CONTACT<TV>& coarse_contact=contacts(id);
