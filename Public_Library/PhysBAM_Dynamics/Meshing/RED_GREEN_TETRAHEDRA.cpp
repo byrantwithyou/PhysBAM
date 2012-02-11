@@ -138,7 +138,7 @@ Resolve_Stack()
 {
     while(stack.m){
         int level,tet;stack.Pop().Get(level,tet);
-        if(level){PHYSBAM_ASSERT(tet);(*index_in_stack(level))(tet)=0;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
+        if(level>=0){PHYSBAM_ASSERT(tet);(*index_in_stack(level))(tet)=0;if(!Regularly_Refined(level,tet)) Refine_If_Necessary(level,tet);}}
 }
 //#####################################################################
 // Function Refine_If_Necessary
@@ -328,23 +328,23 @@ Get_Existing_Subindices(const int level,const int tet,ARRAY<int>& midpoints,ARRA
     for(int e=0;e<6;e++) midpoints(e)=segment_midpoints((*meshes(level)->element_edges)(tet)(e));
     int i,j,k,l;meshes(level)->elements(tet).Get(i,j,k,l);
     int ij=midpoints(0),jk=midpoints(1),ki=midpoints(2),il=midpoints(3),jl=midpoints(4),kl=midpoints(5);
-    if(ij){
+    if(ij>=0){
         subedges(0)=segment_mesh.Segment(i,ij);subedges(3)=segment_mesh.Segment(j,ij);
-        if(jk) subedges(12)=segment_mesh.Segment(ij,jk);if(ki) subedges(14)=segment_mesh.Segment(ki,ij);
-        if(il) subedges(17)=segment_mesh.Segment(il,ij);if(jl) subedges(15)=segment_mesh.Segment(ij,jl);}
-    if(jk){
+        if(jk>=0) subedges(12)=segment_mesh.Segment(ij,jk);if(ki) subedges(14)=segment_mesh.Segment(ki,ij);
+        if(il>=0) subedges(17)=segment_mesh.Segment(il,ij);if(jl) subedges(15)=segment_mesh.Segment(ij,jl);}
+    if(jk>=0){
         subedges(4)=segment_mesh.Segment(j,jk);subedges(6)=segment_mesh.Segment(k,jk);
-        if(ki) subedges(13)=segment_mesh.Segment(jk,ki);if(jl) subedges(23)=segment_mesh.Segment(jl,jk);if(kl) subedges(21)=segment_mesh.Segment(jk,kl);}
-    if(ki){
+        if(ki>=0) subedges(13)=segment_mesh.Segment(jk,ki);if(jl) subedges(23)=segment_mesh.Segment(jl,jk);if(kl) subedges(21)=segment_mesh.Segment(jk,kl);}
+    if(ki>=0){
         subedges(1)=segment_mesh.Segment(i,ki);subedges(7)=segment_mesh.Segment(k,ki);
-        if(il) subedges(20)=segment_mesh.Segment(il,ki);if(kl) subedges(18)=segment_mesh.Segment(ki,kl);}
-    if(il){
+        if(il>=0) subedges(20)=segment_mesh.Segment(il,ki);if(kl) subedges(18)=segment_mesh.Segment(ki,kl);}
+    if(il>=0){
         subedges(2)=segment_mesh.Segment(i,il);subedges(9)=segment_mesh.Segment(l,il);
-        if(jl) subedges(16)=segment_mesh.Segment(jl,il);if(kl) subedges(19)=segment_mesh.Segment(kl,il);}
-    if(jl){
+        if(jl>=0) subedges(16)=segment_mesh.Segment(jl,il);if(kl) subedges(19)=segment_mesh.Segment(kl,il);}
+    if(jl>=0){
         subedges(5)=segment_mesh.Segment(j,jl);subedges(10)=segment_mesh.Segment(l,jl);
-        if(kl) subedges(22)=segment_mesh.Segment(kl,jl);}
-    if(kl){subedges(8)=segment_mesh.Segment(k,kl);subedges(11)=segment_mesh.Segment(l,kl);}    
+        if(kl>=0) subedges(22)=segment_mesh.Segment(kl,jl);}
+    if(kl>=0){subedges(8)=segment_mesh.Segment(k,kl);subedges(11)=segment_mesh.Segment(l,kl);}    
 }
 //#####################################################################
 // Function Ensure_Level_Exists

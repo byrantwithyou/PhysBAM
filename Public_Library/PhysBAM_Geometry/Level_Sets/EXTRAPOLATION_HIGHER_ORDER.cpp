@@ -65,8 +65,8 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
             for(int k=0;k<TV::m*2;k++){
                 TV_INT ind=grid.Node_Neighbor(inside(i),k);
                 int& n=m.node_to_index(ind);
-                if(!n){n=-1;inside.Append(ind);}
-                else if(n>0 && n<=previous && !added){
+                if(n<0){n=-2;inside.Append(ind);}
+                else if(n>=0 && n<=previous && !added){
                     m.node_to_index(inside(i))=m.index_to_node.Append(inside(i));
                     normal.Append(phi.Normal(grid.X(inside(i))));
                     added=true;}}
@@ -87,7 +87,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
                 ind(d)+=s;}
             ind(d)-=4*s;
             int& n=m.node_to_index(ind);
-            if(!n) n=1;
+            if(n<0) n=0;
             st.nodes(0)=n;}}
 }
 //#####################################################################

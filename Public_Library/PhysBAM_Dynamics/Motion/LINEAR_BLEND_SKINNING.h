@@ -34,13 +34,13 @@ public:
 
     int Find_Closest_Bone_And_Distance_Squared(T distance_squared,TV location,int frame)
     {
-        int bone=0;
+        int bone=-1;
         for(int i=0;i<body_motion.trajectories.m;i++){
             TV bone_length=TV(body_motion.trajectories(i)(frame).length,0,0);
             TV bone_vector=body_motion.trajectories(i)(frame).targeted_transform*bone_length;
             TV distance_vector=location-body_motion.trajectories(i)(frame).targeted_transform*TV(0,0,0);
             T new_distance_squared=(distance_vector-TV::Dot_Product(distance_vector,bone_vector)).Magnitude_Squared();
-            if(bone==0||distance_squared>new_distance_squared){distance_squared=new_distance_squared;bone=i;}}
+            if(bone==-1||distance_squared>new_distance_squared){distance_squared=new_distance_squared;bone=i;}}
         return bone;
     }
 
@@ -68,16 +68,16 @@ public:
             h.Set_Element(k-start_particles+1,k-start_particles+1,constant/distance_squared);
             touched_particles(k-start_particles+1)=true;}
 
-        if(element==1) LOG::cout<<"vert ("<<i<<","<<j<<","<<k<<")"<<std::endl;
+        if(element==0) LOG::cout<<"vert ("<<i<<","<<j<<","<<k<<")"<<std::endl;
         for(int index=0;index<(*surface.mesh.adjacent_elements)(element).m;index++){
             int next_element=(*surface.mesh.adjacent_elements)(element)(index);
-            if(element==1||next_element==1) LOG::cout<<"Found element: "<<element<<" next element: "<<next_element<<std::endl;
+            if(element==0||next_element==0) LOG::cout<<"Found element: "<<element<<" next element: "<<next_element<<std::endl;
             if(touched_elements(next_element)) continue;
-            if(element==1||next_element==1) LOG::cout<<"Dealing with"<<std::endl;
+            if(element==0||next_element==0) LOG::cout<<"Dealing with"<<std::endl;
             int l,m,n,a,b,c,d;surface.mesh.elements(next_element).Get(l,m,n);
             if(i!=l&&i!=m&&i!=n){a=i;b=j;c=k;} else if(j!=l&&j!=m&&j!=n){a=j;b=i;c=k;} else{a=k;b=i;c=j;}
             if(l!=i&&l!=j&&l!=k) d=l; else if(m!=i&&m!=j&&m!=k) d=m; else d=n;
-            if(element==1||next_element==1) LOG::cout<<"vert ("<<i<<","<<j<<","<<k<<") ("<<l<<","<<m<<","<<n<<") ("<<a<<","<<b<<","<<c<<","<<d<<")"<<std::endl;
+            if(element==0||next_element==0) LOG::cout<<"vert ("<<i<<","<<j<<","<<k<<") ("<<l<<","<<m<<","<<n<<") ("<<a<<","<<b<<","<<c<<","<<d<<")"<<std::endl;
             TV u1=(surface.particles.X(b)-surface.particles.X(a)),v1=(surface.particles.X(c)-surface.particles.X(a));
             TV u2=(surface.particles.X(b)-surface.particles.X(d)),v2=(surface.particles.X(c)-surface.particles.X(d));
             T area=TRIANGLE_3D<T>::Area(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
@@ -85,7 +85,7 @@ public:
             T cot_theta1=TV::Dot_Product(u1,v1)/TV::Cross_Product(u1,v1).Magnitude(),cot_theta2=TV::Dot_Product(u2,v2)/TV::Cross_Product(u2,v2).Magnitude();
             areas(b-start_particles+1)+=area;areas(c-start_particles+1)+=area;
             if(sanity_check) row_lengths(b-start_particles+1)+=1;row_lengths(c-start_particles+1)+=1;
-            if(element==1||next_element==1) LOG::cout<<"Adding to "<<b<<" and "<<c<<std::endl;
+            if(element==0||next_element==0) LOG::cout<<"Adding to "<<b<<" and "<<c<<std::endl;
             surface_laplacian.Add_Element(b-start_particles+1,b-start_particles+1,cot_theta1+cot_theta2);
             surface_laplacian.Add_Element(c-start_particles+1,c-start_particles+1,cot_theta1+cot_theta2);
             surface_laplacian.Set_Symmetric_Elements(b-start_particles+1,c-start_particles+1,(T)3./area*(cot_theta1+cot_theta2));}

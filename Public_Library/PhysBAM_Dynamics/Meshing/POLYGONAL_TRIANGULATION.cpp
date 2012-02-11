@@ -202,7 +202,7 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
             VECTOR<int,2> first_segment=all_segments(globally_best_first_segment_index);
             VECTOR<int,2> second_segment=all_segments(globally_best_second_segment_index);
             int third_segment_index=all_segments.Find(VECTOR<int,2>(second_segment(1),first_segment(0)));
-            if(!third_segment_index){
+            if(third_segment_index<0){
                 int segment_index=all_segments.Append(VECTOR<int,2>(first_segment(0),second_segment(1)));segments_used.Append(false);
                 outgoing_segments(first_segment(0)).Append(segment_index);
                 incoming_segments(second_segment(1)).Append(segment_index);

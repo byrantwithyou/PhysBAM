@@ -225,7 +225,7 @@ template<class TV> int RED_GREEN_TRIANGLES<TV>::
 Add_Midpoint(const int segment,const int level,const int tri)
 {
     assert(segment_midpoints(segment)==0);
-    int node1,node2,new_node=0;segment_mesh.elements(segment).Get(node1,node2);
+    int node1,node2,new_node=-1;segment_mesh.elements(segment).Get(node1,node2);
     if(free_segment_midpoints && free_segment_midpoints->Get(VECTOR<int,2>(node1,node2).Sorted(),new_node))
         free_segment_midpoints->Delete(VECTOR<int,2>(node1,node2).Sorted());
     else new_node=object.particles.array_collection->Add_Element_From_Deletion_List();

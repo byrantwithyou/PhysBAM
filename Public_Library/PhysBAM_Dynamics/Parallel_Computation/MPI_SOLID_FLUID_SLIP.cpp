@@ -234,7 +234,7 @@ template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::
 Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_divergence_cells,const int region_index,const RANGE<TV_INT>& region,
     T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count)
 {
-    if(region_index)
+    if(region_index>=0)
         partition.ghost_indices(region_index).min_corner=cell_count;
     else
         partition.interior_indices.min_corner=cell_count;
@@ -264,7 +264,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     // TODO: set the region/axis properly.  Probably, expand by one cell, see if ghost cell is inside region
     typename FACE_ITERATOR::T_REGION region_type;
     int side=0;
-    if(region_index){
+    if(region_index>=0){
         region_type=GRID<TV>::BOUNDARY_REGION;
         side=region_index;
     }
@@ -277,23 +277,23 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             int first_ghost_cell_index=face_ghost_cell_index(1,axis,cell_index); // looking IN to this cell
-            if(first_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside_Half_Open(cell_index-axis_vector)*/){
-                //if(region_index)
+            if(first_ghost_cell_index>=0/* && expanded_domain_indices.Lazy_Inside_Half_Open(cell_index-axis_vector)*/){
+                //if(region_index>=0)
                     //    DEBUG_UTILITIES::Debug_Breakpoint();
 #ifdef BRICK
-                if(!region_index)
+                if(region_index<0)
                     LOG::cout<<"Found boundary ghost cell across face (1, "<<axis<<", "<<cell_index<<") with temp index "<<first_ghost_cell_index<<std::endl;
 #endif
-                if(!face_ghost_cell_index_map(first_ghost_cell_index))
+                if(face_ghost_cell_index_map(first_ghost_cell_index)<0)
                     face_ghost_cell_index_map(first_ghost_cell_index)=++cell_count;
             }
             int second_ghost_cell_index=face_ghost_cell_index(2,axis,cell_index+axis_vector);
-            if(second_ghost_cell_index/* && expanded_domain_indices.Lazy_Inside_Half_Open(cell_index+axis_vector)*/){
+            if(second_ghost_cell_index>=0/* && expanded_domain_indices.Lazy_Inside_Half_Open(cell_index+axis_vector)*/){
 #ifdef BRICK
-                if(!region_index)
+                if(region_index<0)
                     LOG::cout<<"Found boundary ghost cell across face (2, "<<axis<<", "<<cell_index+axis_vector<<") with temp index "<<second_ghost_cell_index<<std::endl;
 #endif
-                if(!face_ghost_cell_index_map(second_ghost_cell_index))
+                if(face_ghost_cell_index_map(second_ghost_cell_index)<0)
                     face_ghost_cell_index_map(second_ghost_cell_index)=++cell_count;}}}
 
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){
@@ -301,17 +301,17 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
         for(int axis=0;axis<TV::dimension;axis++){
             TV_INT axis_vector=TV_INT::Axis_Vector(axis);
             int first_ghost_cell_index=face_ghost_cell_index(1,axis,cell_index);
-            if(first_ghost_cell_index){
+            if(first_ghost_cell_index>=0){
 #ifdef BRICK
-                if(!region_index)
+                if(region_index<0)
                     LOG::cout<<"Found boundary ghost cell across face (1, "<<axis<<", "<<cell_index<<") with index "<<face_ghost_cell_index_map(first_ghost_cell_index)<<std::endl;
 #endif
                 face_ghost_cell_index(1,axis,cell_index)=face_ghost_cell_index_map(first_ghost_cell_index);
             }
             int second_ghost_cell_index=face_ghost_cell_index(2,axis,cell_index+axis_vector);
-            if(second_ghost_cell_index){
+            if(second_ghost_cell_index>=0){
 #ifdef BRICK
-                if(!region_index)
+                if(region_index<0)
                     LOG::cout<<"Found boundary ghost cell across face (2, "<<axis<<", "<<cell_index+axis_vector<<") with index"<<face_ghost_cell_index_map(second_ghost_cell_index)<<std::endl;
 #endif
                 face_ghost_cell_index(2,axis,cell_index+axis_vector)=face_ghost_cell_index_map(second_ghost_cell_index);}}}
@@ -363,7 +363,7 @@ Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& va
     LOG::cout<<cell_count-count_before<<" face lambdas in region "<<region_index<<std::endl;
 #endif
 
-    if(region_index)
+    if(region_index>=0)
         partition.ghost_indices(region_index).max_corner=cell_count;
     else
         partition.interior_indices.max_corner=cell_count;

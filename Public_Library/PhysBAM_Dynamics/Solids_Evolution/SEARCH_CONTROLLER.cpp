@@ -530,7 +530,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
         int parent_cluster=Parent(joint_id)->particle_index,child_cluster=Child(joint_id)->particle_index;
         if(adjacent_lists(joint_id).x>0 && body_lists(adjacent_lists(joint_id).x).Size()>1){
             int cluster_particle=done(adjacent_lists(joint_id).x);
-            if(!cluster_particle){
+            if(cluster_particle<0){
                 ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
                 for(int i=0;i<body_lists(adjacent_lists(joint_id).x).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).x)(i));
                 cluster_particle=rigid_bindings.Add_Binding(children);
@@ -540,7 +540,7 @@ Create_All_Clusters(RIGID_BODY_COLLISION_MANAGER_HASH* collision_manager)
             parent_cluster=rigid_body_cluster->particle_index;}
         if(adjacent_lists(joint_id).y>0 && body_lists(adjacent_lists(joint_id).y).Size()>1){
             int cluster_particle=done(adjacent_lists(joint_id).y);
-            if(!cluster_particle){
+            if(cluster_particle<0){
                 ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
                 for(int i=0;i<body_lists(adjacent_lists(joint_id).y).Size();i++) children.Append(body_lists(adjacent_lists(joint_id).y)(i));
                 cluster_particle=rigid_bindings.Add_Binding(children);
