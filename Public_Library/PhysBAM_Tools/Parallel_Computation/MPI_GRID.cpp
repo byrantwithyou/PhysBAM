@@ -757,10 +757,10 @@ Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FA
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
             if(ignore_boundary_faces && face_domain.Lazy_Inside_Half_Open(data.x.index)) continue;
-            int index=0;for(int j=0;j<weights_to(data.x).m;j++) if(weights_to(data.x)(j).x==data.y) index=j;
+            int index=-1;for(int j=0;j<weights_to(data.x).m;j++) if(weights_to(data.x)(j).x==data.y) index=j;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
-            if(index) weights_to(data.x)(index).y=data.z;
+            if(index>=0) weights_to(data.x)(index).y=data.z;
             else{
                 weights_to(data.x).Append(PAIR<FACE_INDEX<TV::dimension>,T>(data.y,data.z));
                 weights_from(data.y).Append(PAIR<FACE_INDEX<TV::dimension>,int>(data.x,weights_to(data.x).m));}}}
@@ -813,10 +813,10 @@ Sync_Common_Face_Weights_To(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE
             data.x.index-=local_to_global_offset;data.y.index-=local_to_global_offset;
             RANGE<TV_INT> face_domain=local_grid.Domain_Indices();face_domain.max_corner(data.x.axis)++;
             if(ignore_boundary_faces && face_domain.Lazy_Inside_Half_Open(data.x.index)) continue;
-            int index=0;for(int j=0;j<weights_to(data.y).m;j++) if(weights_to(data.y)(j).x==data.x) index=j;
+            int index=-1;for(int j=0;j<weights_to(data.y).m;j++) if(weights_to(data.y)(j).x==data.x) index=j;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
-            if(index) weights_to(data.y)(index).y=data.z;
+            if(index>=0) weights_to(data.y)(index).y=data.z;
             else{
                 weights_to(data.y).Append(PAIR<FACE_INDEX<TV::dimension>,T>(data.x,data.z));
                 weights_from(data.x).Append(PAIR<FACE_INDEX<TV::dimension>,int>(data.y,weights_to(data.y).m));}}}
@@ -864,10 +864,10 @@ Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,A
             TRIPLE<TV_INT,TV_INT,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x,data.y,data.z,recv_buffers(i),position,*comm);
             TV_INT target_cell=data.y-local_to_global_offset;
-            int index=0;for(int k=0;k<weights_to(data.x-local_to_global_offset).m;k++) if(weights_to(data.x-local_to_global_offset)(k).x==target_cell) index=k;
+            int index=-1;for(int k=0;k<weights_to(data.x-local_to_global_offset).m;k++) if(weights_to(data.x-local_to_global_offset)(k).x==target_cell) index=k;
             assert(data.z>-delta);
             if(data.z<0) data.z=0;
-            if(index) weights_to(data.x-local_to_global_offset)(index).y=data.z;
+            if(index>=0) weights_to(data.x-local_to_global_offset)(index).y=data.z;
             else{
                 weights_to(data.x-local_to_global_offset).Append(PAIR<TV_INT,T>(target_cell,data.z));
                 weights_from(target_cell).Append(PAIR<TV_INT,int>(data.x-local_to_global_offset,weights_to(data.x-local_to_global_offset).m));}}}
@@ -912,10 +912,10 @@ Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARR
             TRIPLE<TV_INT,TV_INT,T>& data=receive_per_proc(i)(j);
             MPI_UTILITIES::Unpack(data.x,data.y,data.z,recv_buffers(i),position,*comm);
             TV_INT target_cell=data.x-local_to_global_offset;
-            int index=0;for(int k=0;k<weights_to(data.y-local_to_global_offset).m;k++) if(weights_to(data.y-local_to_global_offset)(k).x==target_cell) index=k;
+            int index=-1;for(int k=0;k<weights_to(data.y-local_to_global_offset).m;k++) if(weights_to(data.y-local_to_global_offset)(k).x==target_cell) index=k;
             assert(data.z>-1e-5);
             if(data.z<0) data.z=0;
-            if(index) weights_to(data.y-local_to_global_offset)(index).y=data.z;
+            if(index>=0) weights_to(data.y-local_to_global_offset)(index).y=data.z;
             else{
                 weights_to(data.y-local_to_global_offset).Append(PAIR<TV_INT,T>(target_cell,data.z));
                 weights_from(target_cell).Append(PAIR<TV_INT,int>(data.y-local_to_global_offset,weights_to(data.y-local_to_global_offset).m));}}}
