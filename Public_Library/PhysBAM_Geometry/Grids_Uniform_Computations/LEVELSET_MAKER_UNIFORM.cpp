@@ -26,8 +26,8 @@ static void Process_Segment(const int m,const ARRAY<bool,VECTOR<int,3> >& edge_i
     TV_INT index=start_index,increment;increment[axis]=1;
     int segment_start=1;bool segment_starts_inside=false;
     for(index[axis]=0;index[axis]<m;index[axis]++){
-        if(index[axis]>1 && edge_is_blocked(index)){segment_start=index[axis];segment_starts_inside=is_inside(index);}
-        if(index[axis]==m || (index[axis]<m && edge_is_blocked(index+increment))){
+        if(index[axis]>0 && edge_is_blocked(index)){segment_start=index[axis];segment_starts_inside=is_inside(index);}
+        if(index[axis]==m-1 || (index[axis]<m-1 && edge_is_blocked(index+increment))){
             int segment_end=index[axis];bool segment_ends_inside=index[axis]<m?is_inside(index):false;
             int vote_increment=(int)segment_starts_inside+(int)segment_ends_inside;
             TV_INT t=start_index;
@@ -92,18 +92,18 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             TV grid_position=grid.X(i,j,k),weights,closest_point=triangle.Closest_Point(grid_position,weights);
             T distance_squared=(grid_position-closest_point).Magnitude_Squared();
             if(phi(i,j,k)==FLT_MAX || distance_squared<sqr(phi(i,j,k))){
-                if(store_initialized_indices && phi(i,j,k)==FLT_MAX)initialized_indices.Append(TV_INT(i,j,k));
+                if(store_initialized_indices && phi(i,j,k)==FLT_MAX) initialized_indices.Append(TV_INT(i,j,k));
                 phi(i,j,k)=sqrt(distance_squared);
                 if(store_closest_triangle_index) closest_triangle_index(i,j,k)=t;
                 if(compute_velocity){
                     int node1,node2,node3;triangulated_surface.mesh.elements(t).Get(node1,node2,node3);
                     (*velocity)(i,j,k)=weights.x*triangulated_surface.particles.V(node1)+weights.y*triangulated_surface.particles.V(node2)+weights.z*triangulated_surface.particles.V(node3);}}}
         if(need_flood_fill){
-            for(int i=min_index.x+1;i<=max_index.x;i++) for(int j=min_index.y;j<=max_index.y;j++) for(int k=min_index.z;k<=max_index.z;k++)
+            for(int i=min_index.x+1;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++)
                 if(!edge_is_blocked_x(i,j,k)) edge_is_blocked_x(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(i,j,k),grid.X(i-1,j,k)),enlarged_triangle,surface_thickness_over_two);
-            for(int i=min_index.x;i<=max_index.x;i++) for(int j=min_index.y+1;j<=max_index.y;j++) for(int k=min_index.z;k<=max_index.z;k++)
+            for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y+1;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++)
                 if(!edge_is_blocked_y(i,j,k)) edge_is_blocked_y(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(i,j,k),grid.X(i,j-1,k)),enlarged_triangle,surface_thickness_over_two);
-            for(int i=min_index.x;i<=max_index.x;i++) for(int j=min_index.y;j<=max_index.y;j++) for(int k=min_index.z+1;k<=max_index.z;k++)
+            for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z+1;k<max_index.z;k++)
                 if(!edge_is_blocked_z(i,j,k)) edge_is_blocked_z(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(i,j,k),grid.X(i,j,k-1)),enlarged_triangle,surface_thickness_over_two);}}
 
     if((compute_signed_distance_function || compute_unsigned_distance_function) && use_fmm && fmm_stopping_distance)
@@ -150,13 +150,16 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     }
     else if(need_flood_fill){ // Need flood fill to determine sign (inside/outside)
         if(verbose) LOG::Time("Flood Fill");
-        ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
+        ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);
+        FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
         int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked_x,edge_is_blocked_y,edge_is_blocked_z);
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"(got "<<number_of_colors<<" colors)... "<<std::endl;
 #endif
         if(number_of_colors==1 && !phi_offset){ // there is only one color. check if the whole domain is inside or outside then return
-            if(triangulated_surface.Inside(grid.X(1,1,1)))phi.Fill(-FLT_MAX);else phi.Fill(FLT_MAX);return false;}
+            if(triangulated_surface.Inside(grid.X(1,1,1))) phi.Fill(-FLT_MAX);
+            else phi.Fill(FLT_MAX);
+            return false;}
         // TODO: put this back if you need it
         /*if(write_debug_data){
             FILE_UTILITIES::Write_To_File<T>("colors.debug",colors);
@@ -181,8 +184,12 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         else{
             ARRAY<T> color_maximum_distance(number_of_colors,false);color_maximum_distance.Fill(-1);
             ARRAY<TV_INT> color_representatives(number_of_colors);
-            for(int i=0;i<grid.counts.x;i++)for(int j=0;j<grid.counts.y;j++)for(int k=0;k<grid.counts.z;k++)if(closest_triangle_index(i,j,k) && color_maximum_distance(colors(i,j,k))<phi(i,j,k)){
-                color_maximum_distance(colors(i,j,k))=phi(i,j,k);color_representatives(colors(i,j,k))=TV_INT(i,j,k);}
+            for(int i=0;i<grid.counts.x;i++)
+                for(int j=0;j<grid.counts.y;j++)
+                    for(int k=0;k<grid.counts.z;k++)
+                        if(closest_triangle_index(i,j,k)>=0 && color_maximum_distance(colors(i,j,k))<phi(i,j,k)){
+                            color_maximum_distance(colors(i,j,k))=phi(i,j,k);
+                            color_representatives(colors(i,j,k))=TV_INT(i,j,k);}
             for(int color=0;color<number_of_colors;color++){
                 if(color_maximum_distance(color)<0){LOG::cerr<<"Error: could not determine inside/outside for color "<<color<<std::endl;PHYSBAM_FATAL_ERROR();}
                 else color_is_inside(color)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(color_representatives(color)),
@@ -211,15 +218,15 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         RANGE<TV> clip(grid.X_plus_half(TV_INT()+positive_boundary_band),grid.X_plus_half(grid.counts-positive_boundary_band));
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
             for(int i=0;i<positive_boundary_band+1;i++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.x-grid.Axis_X(i,0));
-            for(int i=grid.counts.x-positive_boundary_band;i<=grid.counts.x;i++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(i,0)-clip.max_corner.x);}
+            for(int i=grid.counts.x-positive_boundary_band;i<grid.counts.x;i++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(i,0)-clip.max_corner.x);}
 
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
             for(int j=0;j<positive_boundary_band+1;j++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.y-grid.Axis_X(j,1));
-            for(int j=grid.counts.y-positive_boundary_band;j<=grid.counts.y;j++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(j,1)-clip.max_corner.y);}
+            for(int j=grid.counts.y-positive_boundary_band;j<grid.counts.y;j++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(j,1)-clip.max_corner.y);}
 
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
             for(int k=0;k<positive_boundary_band+1;k++) phi(i,j,k)=max(phi(i,j,k),clip.min_corner.z-grid.Axis_X(k,2));
-            for(int k=grid.counts.z-positive_boundary_band;k<=grid.counts.z;k++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(k,2)-clip.max_corner.z);}}
+            for(int k=grid.counts.z-positive_boundary_band;k<grid.counts.z;k++) phi(i,j,k)=max(phi(i,j,k),grid.Axis_X(k,2)-clip.max_corner.z);}}
 
     if(use_fmm && (compute_unsigned_distance_function || compute_signed_distance_function)){
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) 

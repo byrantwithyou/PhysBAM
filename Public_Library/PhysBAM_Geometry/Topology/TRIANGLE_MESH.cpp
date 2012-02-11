@@ -99,8 +99,8 @@ Initialize_Equilateral_Mesh(const int m,const int n)
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-        if(j%2){elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(t++).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
-        else{elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(t++).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
+        if(j%2){elements(t++).Set(i+m*j,i+1+m*j,i+m*(j+1));elements(t++).Set(i+1+m*j,i+1+m*(j+1),i+m*(j+1));}
+        else{elements(t++).Set(i+m*j,i+1+m*j,i+1+m*(j+1));elements(t++).Set(i+m*j,i+1+m*(j+1),i+m*(j+1));}}
 }
 //#####################################################################
 // Function Initialize_Torus_Mesh
@@ -110,9 +110,9 @@ Initialize_Torus_Mesh(const int m,const int n)
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*m*n);assert((n&1)==0);
     int t=0;for(int i=0;i<m;i++) for(int j=0;j<n;j++){ // counterclockwise node ordering
-        int i1=i==m?1:i+1,j1=j==n?1:j+1;
-        if(j&1){elements(t++).Set(i+m*(j-1),i1+m*(j-1),i+m*(j1-1));elements(t++).Set(i1+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}
-        else{elements(t++).Set(i+m*(j-1),i1+m*(j-1),i1+m*(j1-1));elements(t++).Set(i+m*(j-1),i1+m*(j1-1),i+m*(j1-1));}}
+        int i1=i==m-1?0:i+1,j1=j==n-1?0:j+1;
+        if(j&1){elements(t++).Set(i+m*j,i1+m*j,i+m*j1);elements(t++).Set(i1+m*j,i1+m*j1,i+m*j1);}
+        else{elements(t++).Set(i+m*j,i1+m*j,i1+m*j1);elements(t++).Set(i+m*j,i1+m*j1,i+m*j1);}}
 }
 //#####################################################################
 // Function Initialize_Circle_Mesh
@@ -122,8 +122,8 @@ Initialize_Circle_Mesh(const int num_radial,const int num_tangential) // constru
 {
     Clean_Memory();number_nodes=num_radial*num_tangential;elements.Exact_Resize(2*(num_radial-1)*num_tangential);
     int t=0,n=num_tangential;for(int i=0;i<num_radial-1;i++)for(int j=0;j<n;j++){ // counterclockwise node ordering
-        if(j&1){elements(t++).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j);elements(t++).Set((i+1)*n+j,i*n+(j%n)+1,(i+1)*n+(j%n)+1);}
-        else{elements(t++).Set(i*n+j,i*n+(j%n)+1,(i+1)*n+j%n+1);elements(t++).Set((i+1)*n+j,i*n+j,(i+1)*n+(j%n)+1);}}
+        if(j&1){elements(t++).Set(i*n+j,i*n+(j+1)%n,(i+1)*n+j);elements(t++).Set((i+1)*n+j,i*n+(j+1)%n,(i+1)*n+(j+1)%n);}
+        else{elements(t++).Set(i*n+j,i*n+(j+1)%n,(i+1)*n+(j+1)%n);elements(t++).Set((i+1)*n+j,i*n+j,(i+1)*n+(j+1)%n );}}
 }
 //#####################################################################
 // Function Initialize_Herring_Bone_Mesh
@@ -133,8 +133,8 @@ Initialize_Herring_Bone_Mesh(const int m,const int n) // construct a regular m-b
 {
     Clean_Memory();number_nodes=m*n;elements.Exact_Resize(2*(m-1)*(n-1));
     int t=0;for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++){ // counterclockwise node ordering
-        if(i%2){elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+m*j);elements(t++).Set(i+1+m*(j-1),i+1+m*j,i+m*j);}
-        else{elements(t++).Set(i+m*(j-1),i+1+m*(j-1),i+1+m*j);elements(t++).Set(i+m*(j-1),i+1+m*j,i+m*j);}}
+        if(i%2){elements(t++).Set(i+m*j,i+1+m*j,i+m*(j+1));elements(t++).Set(i+1+m*j,i+1+m*(j+1),i+m*(j+1));}
+        else{elements(t++).Set(i+m*j,i+1+m*j,i+1+m*(j+1));elements(t++).Set(i+m*j,i+1+m*(j+1),i+m*(j+1));}}
 }
 //#####################################################################
 // Function Initialize_Cylinder_Mesh
@@ -145,9 +145,9 @@ Initialize_Cylinder_Mesh(const int m,const int n,const bool create_caps)
     Clean_Memory();int t=0;
     if(create_caps){elements.Exact_Resize(2*m*n);number_nodes=m*n+2;}
     else{elements.Exact_Resize(2*(m-1)*n);number_nodes=m*n;}
-    for(int j=0;j<n;j++){int j_1=j==n?0:j;
-        for(int i=0;i<m-1;i++){elements(t++).Set(j+(i-1)*n,j+i*n,j_1+i*n);elements(t++).Set(j+(i-1)*n,j_1+i*n,j_1+(i-1)*n);}
-        if(create_caps){elements(t++).Set(m*n+1,j,j_1);elements(t++).Set(m*n+2,j_1+(m-1)*n,j+(m-1)*n);}}
+    for(int j=0;j<n;j++){int j_1=j==n-1?0:j+1;
+        for(int i=0;i<m-1;i++){elements(t++).Set(j+i*n,j+(i+1)*n,j_1+(i+1)*n);elements(t++).Set(j+i*n,j_1+(i+1)*n,j_1+i*n);}
+        if(create_caps){elements(t++).Set(m*n,j,j_1);elements(t++).Set(m*n+1,j_1+(m-1)*n,j+(m-1)*n);}}
 }
 //#####################################################################
 // Function Initialize_Topologically_Sorted_Neighbor_Nodes
