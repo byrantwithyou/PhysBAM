@@ -221,7 +221,7 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
         VECTOR<int,2> nodes=mesh.segment_mesh->elements(s);
         VECTOR<int,2> old_nodes(map_to_old_particles.Subset(nodes));
         int old_embedded_particle=old_embedded_object.Embedded_Particle_On_Segment(old_nodes);
-        if(!old_embedded_particle) continue;
+        if(old_embedded_particle<0) continue;
         if(old_embedded_object.parent_particles(old_embedded_particle)!=old_nodes) exchange(nodes[0],nodes[1]); // swap if necessary to preserve node order
         if(embedded_node_already_used(old_embedded_particle)){ // add a new particle and copy state from old particle
             int p=embedded_object.Add_Embedded_Particle(nodes,old_embedded_object.interpolation_fraction(old_embedded_particle),false);

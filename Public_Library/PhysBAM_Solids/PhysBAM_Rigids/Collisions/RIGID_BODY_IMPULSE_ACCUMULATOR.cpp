@@ -70,7 +70,7 @@ Add_Impulse(const TV& location,const TWIST<TV>& impulse)
         TV object_space_impulse=rigid_body.Object_Space_Vector(impulse.linear);
         ARRAY_VIEW<TV> X(simplicial_object->particles.X);
         int simplex=Inside_Helper(*simplicial_object,object_space_location,surface_roughness);
-        if(simplex){
+        if(simplex>=0){
             VECTOR<int,d+1>& nodes=simplicial_object->mesh.elements(simplex);
             //VECTOR<T,d+1> weights=T_SIMPLEX::Barycentric_Coordinates(object_space_location,X.Subset(nodes));
             VECTOR<T,d+1> weights;

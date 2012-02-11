@@ -468,7 +468,7 @@ Get_Contact_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& pairs)
         spatial_partition->Get_Potential_Collisions_Using_Current_Position(id,object_indices,false);
         for(int k=0;k<object_indices.m;k++){
             int j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(k));
-            if(!j) continue;
+            if(j<0) continue;
             if(Either_Body_Collides_With_The_Other(p,j) &&
                 intersections.Bounding_Boxes_Intersect(p,j,parameters.collision_bounding_box_thickness+parameters.use_projected_gauss_seidel?parameters.contact_proximity:0)){ // this should *not* be ids, but should remain indices
                 int particle_body,levelset_body;
@@ -504,7 +504,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
             for(int j=0;j<contact_stack(i).m;j++) if(rigid_body_collection.Rigid_Body(contact_stack(i)(j)).Has_Infinite_Inertia()) stack_static_bodies.Set(PAIR<int,int>(i,contact_stack(i)(j)));}
         for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
             int rigid_body_id=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(i);
-            if(rigid_body_id) if(rigid_body_collection.Is_Active(rigid_body_id) && rigid_body_collection.Rigid_Body(rigid_body_id).Has_Infinite_Inertia()) body_stack(rigid_body_id)=-2;}
+            if(rigid_body_id>=0) if(rigid_body_collection.Is_Active(rigid_body_id) && rigid_body_collection.Rigid_Body(rigid_body_id).Has_Infinite_Inertia()) body_stack(rigid_body_id)=-2;}
 
         for(int i=0;i<edge_pairs.m;i++){
             VECTOR<int,2> state(body_stack.Subset(edge_pairs(i)));

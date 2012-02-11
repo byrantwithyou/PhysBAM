@@ -497,7 +497,7 @@ Clamp_Particle_To_Embedded_Velocity(const int child) const
 template<class TV> bool RIGID_BODY_CLUSTER_BINDINGS<TV>::
 Valid_Cluster_Collision_Helper(const int rigid_particle_index,const int parent)
 {
-    if(!parent) return true;
+    if(parent<0) return true;
     bool active_cluster=reverse_bindings.Get(parent)->active,is_parent=parent==rigid_particle_index,is_child=parent>0 && parent!=rigid_particle_index;
     assert(!active_cluster || is_parent || is_child);
     assert(!is_parent || !is_child);
