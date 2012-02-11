@@ -400,7 +400,7 @@ Apply_Id_Selection()
 template<class T,class T_PARTICLES,class RW> ARRAY_VIEW<int>* OPENGL_COMPONENT_PARTICLES_2D<T,T_PARTICLES,RW>::
 Get_Particles_Id_Array(int set_number) const
 {
-    if(!set_number) set_number=set;
+    if(set_number<0) set_number=set;
     ARRAY_VIEW<int>* ids=particles_multiple(set_number)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
     if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;

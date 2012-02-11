@@ -144,7 +144,7 @@ Display(const int in_color) const
                     OpenGL_String(VECTOR<T,2>(grid.Axis_X(i,0),scale*height(i)),STRING_UTILITIES::string_sprintf("%d",i));
 #endif
 
-                if(selected_index){
+                if(selected_index>=0){
                     selected_point_color.Send_To_GL_Pipeline();
                     int i=selected_index;
                     vertices.Resize(0);

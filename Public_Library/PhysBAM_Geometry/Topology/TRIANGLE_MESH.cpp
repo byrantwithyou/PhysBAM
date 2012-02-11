@@ -186,7 +186,7 @@ Initialize_Topologically_Sorted_Incident_Elements()
         ARRAY<int>& neighbors=(*topologically_sorted_neighbor_nodes)(p);
         int m=neighbors.m;assert(m>=2);
         int last_triangle=Triangle(p,neighbors(0),neighbors(m-1));
-        if(last_triangle){(*topologically_sorted_incident_elements)(p).Exact_Resize(m);(*topologically_sorted_incident_elements)(p)(m-1)=last_triangle;}
+        if(last_triangle>=0){(*topologically_sorted_incident_elements)(p).Exact_Resize(m);(*topologically_sorted_incident_elements)(p)(m-1)=last_triangle;}
         else (*topologically_sorted_incident_elements)(p).Exact_Resize(m-1);
         for(int a=0;a<m-1;a++){int t=Triangle(p,neighbors(a),neighbors(a+1));assert(t);(*topologically_sorted_incident_elements)(p)(a)=t;}}
     if(!topologically_sorted_neighbor_nodes_defined){delete topologically_sorted_neighbor_nodes;topologically_sorted_neighbor_nodes=0;}

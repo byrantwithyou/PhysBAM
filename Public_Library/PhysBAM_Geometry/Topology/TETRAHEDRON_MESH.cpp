@@ -220,7 +220,7 @@ Initialize_Tetrahedron_Faces()
         int tri_i,tri_j,tri_k;triangle_mesh->elements(tri).Get(tri_i,tri_j,tri_k);
         for(int face=0;face<2;face++){
             int tet=(*triangle_tetrahedrons)(tri)(face),tet_i,tet_j,tet_k,tet_l,local_tet_index_for_face=1;
-            if(tet){
+            if(tet>=0){
                 elements(tet).Get(tet_i,tet_j,tet_k,tet_l);
                 if(tet_i==tri_i||tet_i==tri_j||tet_i==tri_k)
                     if(tet_j==tri_i||tet_j==tri_j||tet_j==tri_k)
@@ -437,13 +437,15 @@ static bool Add_Triangle_Or_Subtriangles(ARRAY<VECTOR<int,3> >& triangle_list,co
 {
     int i,j,k;nodes.Get(i,j,k);
     int ij=segment_mesh.Segment(i,j),jk=segment_mesh.Segment(j,k),ik=segment_mesh.Segment(i,k);
-    if(ij) ij=segment_midpoints(ij);if(jk) jk=segment_midpoints(jk);if(ik) ik=segment_midpoints(ik);
-    if(!ij && !jk && !ik){triangle_list.Append(VECTOR<int,3>(i,j,k));return triangle_mesh.Triangle(i,j,k)!=0;}
+    if(ij>=0) ij=segment_midpoints(ij);
+    if(jk>=0) jk=segment_midpoints(jk);
+    if(ik>=0) ik=segment_midpoints(ik);
+    if(ij<0 && jk<0 && ik<0){triangle_list.Append(VECTOR<int,3>(i,j,k));return triangle_mesh.Triangle(i,j,k)!=0;}
     ARRAY<VECTOR<int,3> > subtriangles;
-    if(ij && !jk && !ik){subtriangles.Append(VECTOR<int,3>(i,ij,k));subtriangles.Append(VECTOR<int,3>(ij,j,k));}
-    else if(!ij && jk && !ik){subtriangles.Append(VECTOR<int,3>(i,j,jk));subtriangles.Append(VECTOR<int,3>(i,jk,k));}
-    else if(!ij && !jk && ik){subtriangles.Append(VECTOR<int,3>(i,j,ik));subtriangles.Append(VECTOR<int,3>(ik,j,k));}
-    else if(ij && jk && ik){subtriangles.Append(VECTOR<int,3>(i,ij,ik));subtriangles.Append(VECTOR<int,3>(ij,j,jk));subtriangles.Append(VECTOR<int,3>(ik,jk,k));subtriangles.Append(VECTOR<int,3>(jk,ik,ij));}
+    if(ij>=0 && jk<0 && ik<0){subtriangles.Append(VECTOR<int,3>(i,ij,k));subtriangles.Append(VECTOR<int,3>(ij,j,k));}
+    else if(ij<0 && jk>=0 && ik<0){subtriangles.Append(VECTOR<int,3>(i,j,jk));subtriangles.Append(VECTOR<int,3>(i,jk,k));}
+    else if(ij<0 && jk<0 && ik>=0){subtriangles.Append(VECTOR<int,3>(i,j,ik));subtriangles.Append(VECTOR<int,3>(ik,j,k));}
+    else if(ij>=0 && jk>=0 && ik>=0){subtriangles.Append(VECTOR<int,3>(i,ij,ik));subtriangles.Append(VECTOR<int,3>(ij,j,jk));subtriangles.Append(VECTOR<int,3>(ik,jk,k));subtriangles.Append(VECTOR<int,3>(jk,ik,ij));}
     else PHYSBAM_FATAL_ERROR(); // cannot have only 2 midpoints
     ARRAY<VECTOR<int,3> > candidate_triangle_list;
     bool subtriangle_in_triangle_mesh=false;

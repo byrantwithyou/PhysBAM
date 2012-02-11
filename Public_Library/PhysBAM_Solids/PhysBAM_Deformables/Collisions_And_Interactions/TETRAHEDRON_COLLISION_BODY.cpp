@@ -54,9 +54,9 @@ Implicit_Geometry_Lazy_Inside(const TV& location,T contour_value) const
     assert(contour_value<=0);
     TV tet_weights,tri_weights;
     int tet_nearest_point=Get_Tetrahedron_Near_Point(location,tet_weights);
-    if(!tet_nearest_point) return false;
+    if(tet_nearest_point<0) return false;
     int surface_triangle=Get_Surface_Triangle(tet_nearest_point,tet_weights,tri_weights,true);
-    if(!surface_triangle) return false;else if(!contour_value) return true;
+    if(surface_triangle<0) return false;else if(!contour_value) return true;
     int i,j,k;triangulated_surface.mesh.elements(surface_triangle).Get(i,j,k);
     TV surface_point=particles.X(i)*tri_weights.x+particles.X(j)*tri_weights.y+particles.X(k)*tri_weights.z;
     return (location-surface_point).Magnitude()+contour_value>=0;
@@ -69,9 +69,9 @@ Implicit_Geometry_Lazy_Inside_And_Value(const TV& location,T& phi,T contour_valu
 {
     assert(contour_value==0);
     TV tet_weights;int tet_nearest_point=Get_Tetrahedron_Near_Point(location,tet_weights);
-    if(tet_nearest_point){
+    if(tet_nearest_point>=0){
         TV tri_weights;int triangle_nearest_point=Get_Surface_Triangle(tet_nearest_point,tet_weights,tri_weights,true);
-        if(triangle_nearest_point){
+        if(triangle_nearest_point>=0){
             int i,j,k;triangulated_surface.mesh.elements(triangle_nearest_point).Get(i,j,k);
             phi=-((tri_weights.x*particles.X(i)+tri_weights.y*particles.X(j)+tri_weights.z*particles.X(k)-location).Magnitude());
             return true;}}
@@ -86,9 +86,9 @@ Implicit_Geometry_Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T&
     assert(contour_value==0);
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.mesh;
     TV tet_weights;int tet_nearest_point=Get_Tetrahedron_Near_Point(location,tet_weights);
-    if(tet_nearest_point){
+    if(tet_nearest_point>=0){
         TV tri_weights;int triangle_nearest_point=Get_Surface_Triangle(tet_nearest_point,tet_weights,tri_weights,false,true);
-        if(triangle_nearest_point){
+        if(triangle_nearest_point>=0){
             int i,j,k;triangle_mesh.elements(triangle_nearest_point).Get(i,j,k);
             phi_value=(tri_weights.x*particles.X(i)+tri_weights.y*particles.X(j)+tri_weights.z*particles.X(k)-location).Magnitude();
             return true;}}
@@ -109,7 +109,7 @@ Implicit_Geometry_Normal(const TV& location,const int aggregate) const
 {
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.mesh;
     TV tet_weights;int tet_nearest_point=Get_Tetrahedron_Near_Point(location,tet_weights);
-    if(tet_nearest_point){
+    if(tet_nearest_point>=0){
         bool inside;TV tri_weights;int triangle_nearest_point=Get_Surface_Triangle(tet_nearest_point,tet_weights,tri_weights,false,false,&inside);
         assert(triangle_nearest_point); // with false/false it should always find one
         int i,j,k;triangle_mesh.elements(triangle_nearest_point).Get(i,j,k);
@@ -140,7 +140,7 @@ Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate,con
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.mesh;
     ARRAY<int> particles_to_ignore(1);particles_to_ignore(0)=location_particle_index;
     TV tet_weights;int tet_nearest_point=Get_Tetrahedron_Near_Point(location,tet_weights,particles_to_ignore);
-    if(tet_nearest_point){
+    if(tet_nearest_point>=0){
         bool inside;TV tri_weights;int triangle_nearest_point=Get_Surface_Triangle(tet_nearest_point,tet_weights,tri_weights,false,false,&inside);
         assert(triangle_nearest_point); // with false/false it should always find one
         int i,j,k;triangle_mesh.elements(triangle_nearest_point).Get(i,j,k);
@@ -263,11 +263,11 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_
         ARRAY<int> particles_to_ignore;
         particles_to_ignore.Append(p);particles_to_ignore.Append_Elements(soft_bindings.Parents(p));
         TV w;int t=Get_Tetrahedron_Near_Point(X(p),w,particles_to_ignore);
-        if(t){interaction_pair.Append(VECTOR<int,2>(p,t));weights.Append(w);}}
+        if(t>=0){interaction_pair.Append(VECTOR<int,2>(p,t));weights.Append(w);}}
     for(int k=0;k<interaction_pair.m;k++){
         int p,t;interaction_pair(k).Get(p,t);
         TV surface_weights;int surface_triangle=Get_Surface_Triangle(t,weights(k),surface_weights,true);
-        if(surface_triangle){
+        if(surface_triangle>=0){
             interactions++;interaction_pair(k)(1)=surface_triangle;TV change;
             // TODO: make this function take max_relative_velocity
             Adjust_Point_Face_Collision_Position_And_Velocity(surface_triangle,X(p),V(p),soft_bindings,collision_particles.one_over_effective_mass(p),dt,surface_weights,change);
@@ -276,7 +276,7 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_
     int count=0;
     for(int pair=0;pair<interaction_pair.m;pair++){
         int p,t;interaction_pair(pair).Get(p,t);
-        if(t) X(p)+=relaxation_factor*position_change(count++);}
+        if(t>=0) X(p)+=relaxation_factor*position_change(count++);}
     if(interactions) soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(particle_on_surface);
     return interactions;
 }
