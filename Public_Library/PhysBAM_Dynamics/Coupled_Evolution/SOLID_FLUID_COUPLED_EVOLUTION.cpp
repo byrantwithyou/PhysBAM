@@ -773,7 +773,7 @@ Compute_W(const T current_position_time)
                         if(fluids_parameters.fluid_affects_solid) only_kinematic=false;
                         for(int p=0;p<simplex_indices.m;p++){
                             int dynamic_particle_index=particles_to_dynamic_particles_map(simplex_indices(p)); // TODO: make this work for embedded particles
-                            if(dynamic_particle_index) deformable_face_weights.Append(PAIR<int,T>(dynamic_particle_index,total_weight(p)));}}}
+                            if(dynamic_particle_index>=0) deformable_face_weights.Append(PAIR<int,T>(dynamic_particle_index,total_weight(p)));}}}
                 else if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body)){
                     T total_weight=(T)0;
                     for(int i=0;i<clipped_simplices_thin_shell.m;i++) total_weight+=clipped_simplices_thin_shell(i).Size();

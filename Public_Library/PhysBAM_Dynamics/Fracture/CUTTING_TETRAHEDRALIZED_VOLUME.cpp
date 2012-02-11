@@ -874,9 +874,9 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
                             if(flipped) angle=-angle;}
                         else angle=50;
                         if(angle<min_angle){min_angle=angle;next_segment=i;}}}
-                if(!next_segment) break;
+                if(next_segment<0) break;
                 int next_unused_segment_index=unused_segments.Find(segments(next_segment));
-                if(!next_unused_segment_index) break;
+                if(next_unused_segment_index<0) break;
                 nodes=unused_segments(next_unused_segment_index);
                 unused_segments.Remove_Index_Lazy(next_unused_segment_index);
                 segment_loop.Append(nodes);}
@@ -889,10 +889,10 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
                 if(!unused_segments.Contains(unused_segments(j).Reversed())){
                     int count=0;for(int k=0;k<unused_segments.m;k++) if(unused_segments(k)[1]==unused_segments(j)[0]) count++;
                     if(count<=1){starting_index=j;break;}}}
-            if(!starting_index) for(int j=0;j<unused_segments.m;j++){
+            if(starting_index<0) for(int j=0;j<unused_segments.m;j++){
                 int count=0;for(int k=0;k<unused_segments.m;k++) if(unused_segments(k)[1]==unused_segments(j)[0]) count++;
                 if(count<=1){starting_index=j;break;}}
-            if(!starting_index) starting_index=1;
+            if(starting_index<0) starting_index=1;
             ARRAY<VECTOR<int,2> > segments_for_this_fragment;segments_for_this_fragment.Append(unused_segments(starting_index));
             unused_segments.Remove_Index(starting_index);
             const int node_to_end_at=segments_for_this_fragment(0)[0];
@@ -929,7 +929,7 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
                     else angle=99;
                     if(angle<min_value_found_reversed){min_value_found_reversed=angle;next_seg_in_whole_list_reversed=i;}}
                 // invalid if reversed is sharper than non-reversed
-                if(!next_seg_in_whole_list_correct){
+                if(next_seg_in_whole_list_correct<0){
                     if(survive_incomplete_regions) goto Next_Region;
                     else PHYSBAM_FATAL_ERROR();}
                 bool reversed_is_sharper=next_seg_in_whole_list_reversed && min_value_found_reversed<min_value_found_correct
@@ -939,7 +939,7 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
                     else PHYSBAM_FATAL_ERROR();}
                 int index_of_best_segment_in_unused_list=unused_segments.Find(segments(next_seg_in_whole_list_correct));
                 // add segment?
-                if(index_of_best_segment_in_unused_list){
+                if(index_of_best_segment_in_unused_list>=0){
                     segments_for_this_fragment.Append(unused_segments(index_of_best_segment_in_unused_list));
                     unused_segments.Remove_Index(index_of_best_segment_in_unused_list);}
                 else if(segments_for_this_fragment.Last()[1]==node_to_end_at) break;
@@ -963,13 +963,13 @@ Inside_Outside_Determination_For_Unconnected_Polygonal_Regions(const int simplex
     DIRECTED_GRAPH<int> in_out_graph(unconnected_polygonal_regions.m); // TODO: possibly rename graph to reflect correct direction
     bool something_is_contained=false;
     for(int i=0;i<unconnected_polygonal_regions.m;i++) for(int j=0;j<unconnected_polygonal_regions.m;j++) if(i!=j){
-        int particle=0;
+        int particle=-1;
         for(int a=0;a<unconnected_polygonal_regions(i).m;a++){
             int p=unconnected_polygonal_regions(i)(a)[0];bool ok=true;
             for(int k=0;k<unconnected_polygonal_regions(j).m;k++){
                 if(unconnected_polygonal_regions(j)(k).Contains(p)){ok=false;break;}}
             if(ok){particle=p;break;}}
-        if(particle){
+        if(particle>=0){
             ARRAY<int> particles_on_j_segments(unconnected_polygonal_regions(j).Project(0));
             if(Point_Is_Inside_Unoriented_Polygon(particles_on_j_segments,simplex,particle)){
                 if(verbose) PHYSBAM_DEBUG_PRINT("Adding j,i",particles_on_j_segments,simplex,particle,j,i);
@@ -1241,7 +1241,7 @@ Duplicate_And_Merge_Elements()
             // the current particle index is either the tet node or the intersection, or both
             int old_tet_node=cutting_particles.tet_node_indices(current_particle_id_for_this_new_particle);
             old_particle_per_new_collapsed_particle.Append(old_tet_node);
-            if(old_tet_node)
+            if(old_tet_node>=0)
                 new_collapsed_tet_particle_per_old_tet_particle(old_tet_node).Append(particle_index);}
         else old_particle_per_new_collapsed_particle.Append(0);
         // set mass/velocity of tet nodes

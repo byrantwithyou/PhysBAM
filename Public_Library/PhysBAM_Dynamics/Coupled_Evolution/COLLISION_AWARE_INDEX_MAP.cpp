@@ -105,7 +105,7 @@ template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
 Register_Cell_Index(const TV_INT& index,const int ghost_cells)
 {
     int& cell_index=cell_indices(index);
-    if(!cell_index){
+    if(cell_index<0){
         bool outside=!grid.Inside_Domain(index) || (!two_phase && (*iterator_info.outside_fluid)(index));
 
         if(outside){

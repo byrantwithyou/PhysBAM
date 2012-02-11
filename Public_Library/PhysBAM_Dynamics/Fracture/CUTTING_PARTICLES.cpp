@@ -68,8 +68,8 @@ Add_Tet_Node_And_Intersection_Id(const int tet_node_index,const int intersection
 int CUTTING_PARTICLES::
 Particle_Id_From_Tet_Node(const int tet_node) const
 {
-    int particle_id=0;
-    if(!tet_node_to_particle_id.Get(tet_node,particle_id)) PHYSBAM_FATAL_ERROR();
+    int particle_id=-1;
+    if(tet_node_to_particle_id.Get(tet_node,particle_id)<0) PHYSBAM_FATAL_ERROR();
     return particle_id;
 }
 //#####################################################################
