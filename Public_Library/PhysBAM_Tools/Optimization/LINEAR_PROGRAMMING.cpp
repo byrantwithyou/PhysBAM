@@ -113,12 +113,12 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
         if(verbose) LOG::cout<<"Got p_B\n"<<p_B<<"\nGot p_N\n"<<p_N<<std::endl;
 #endif
 
-        T alpha=FLT_MAX,limiting_value=0;int limiting_index=0;
-        // clamp based on other constraint for variable we are releasing (limiting_index=-1 used to indicate this case)
+        T alpha=FLT_MAX,limiting_value=0;int limiting_index=-1;
+        // clamp based on other constraint for variable we are releasing (limiting_index=-2 used to indicate this case)
         if(x_min(permute_N(index_to_release)).x && x_max(permute_N(index_to_release)).x){
             limiting_value=(p_N(index_to_release)>0)?x_max(permute_N(index_to_release)).y:x_min(permute_N(index_to_release)).y;
             alpha=p_N(index_to_release)*(limiting_value-x_N(index_to_release));
-            limiting_index=-1;}
+            limiting_index=-2;}
         // check if we hit any other constraint
         // NOTE: if p_B(i) is close to zero we don't clamp against that variable because if we did and ended up trying to swap
         // columns from N and B then the new B would not be full rank and trying to update it using LU would give us a zero on the diagonal
@@ -139,9 +139,9 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
                (p_B(i)<0 && x_max(permute_B(i)).x && x_B(i)>=x_max(permute_B(i)).y && (x_max(permute_B(i)).y-x_B(i))/p_B(i)<=alpha))
                 x_in_feasible_region(permute_B(i))=true;}
 
-        if(!limiting_index){
+        if(limiting_index==-1){
 #if 0
-            alpha=0;limiting_index=0; // see how far we need to go to satisfy as much as possible
+            alpha=0;limiting_index=-1; // see how far we need to go to satisfy as much as possible
             for(int i=0;i<B.n;i++)
                 if(p_B(i)>0 && x_min(permute_B(i)).x && (x_min(permute_B(i)).y-x_B(i))/p_B(i)>alpha){alpha=(x_min(permute_B(i)).y-x_B(i))/p_B(i);limiting_index=i;}
                 else if(p_B(i)<0 && x_max(permute_B(i)).x && (x_max(permute_B(i)).y-x_B(i))/p_B(i)>alpha){alpha=(x_max(permute_B(i)).y-x_B(i))/p_B(i);limiting_index=i;}
@@ -152,7 +152,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 #endif
             break;} // TODO: how handle this case?
 
-        if(limiting_index==-1){ // p_N(i) limits alpha, switch x_N to be opposite end's constraint
+        if(limiting_index==-2){ // p_N(i) limits alpha, switch x_N to be opposite end's constraint
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout << "Active constraint " << index_to_release << " (muscle " << permute_N(index_to_release) << ") switched to bound " << limiting_value << std::endl;
 #endif

@@ -36,7 +36,7 @@ public:
 
     PAIR<int,T> Sample(T xi) const // returns (item# , xi')
     {int lower_bound_cdf_index=cdf.Binary_Search(xi)-1;
-    if(!lower_bound_cdf_index){return PAIR<int,T>(0,0);}
+    if(lower_bound_cdf_index<0){return PAIR<int,T>(0,0);}
     T xi_prime=(xi-cdf(lower_bound_cdf_index))/(cdf(lower_bound_cdf_index+1)-cdf(lower_bound_cdf_index));
     return PAIR<int,T>(lower_bound_cdf_index,xi_prime);}
 

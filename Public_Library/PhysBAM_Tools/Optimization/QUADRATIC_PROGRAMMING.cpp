@@ -123,7 +123,7 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             // reconstruct (permuted) x vector (note that b_N==x_N)
             x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N);}
 
-        if(!limiting_index){assert(alpha==1); // check lagrange multipliers
+        if(limiting_index==-1){assert(alpha==1); // check lagrange multipliers
             VECTOR_ND<T> gradient(D.Transpose_Times(D)*x+epsilon_hat.Transpose_Times(epsilon_hat*x-f_hat));
 
             // decompose gradient
@@ -189,9 +189,9 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
 #endif
 
             // now choose the best column from S to stick in last column of B
-            int s_column=0;T largest_s_diagonal=0;
+            int s_column=-1;T largest_s_diagonal=0;
             for(int j=0;j<S.n;j++)if(abs(S(S.m,j))>largest_s_diagonal){s_column=j;largest_s_diagonal=abs(S(S.m,j));}
-            if(!s_column){
+            if(s_column<0){
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout<<"Bottom row of B,S is all zero!"<<std::endl;
 #endif

@@ -349,7 +349,7 @@ void PARAMETER_LIST::
 Insert_Parameter(const std::string& name,const PARAMETER_INFO& parameter_info,bool overwrite_existing_values)
 {
     int i=Find_Parameter(name);
-    if(!i) parameter_list.Append(PAIR<std::string,PARAMETER_INFO>(name,parameter_info));
+    if(i<0) parameter_list.Append(PAIR<std::string,PARAMETER_INFO>(name,parameter_info));
     else if(overwrite_existing_values) parameter_list(i).y=parameter_info;
 }
 //#####################################################################

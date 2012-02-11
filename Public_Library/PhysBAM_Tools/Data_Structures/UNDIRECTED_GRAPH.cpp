@@ -110,7 +110,7 @@ Generate_Next_Level_Of_Breadth_First_Directed_Graph(DIRECTED_GRAPH_CORE& directe
     for(int i=0;i<adjacent_edges(node).m;i++){int edge=adjacent_edges(node)(i);if(!marked_edges(edge)){
         int parent=edges(edge).x,child=edges(edge).y;
         int next_node=parent==node?child:parent;
-        if(next_node){
+        if(next_node>=0){
             directed_graph.Add_Edge(node,next_node);marked_edges(edge)=true;
             if(!marked_nodes(next_node)){marked_nodes(next_node)=true;queue.Enqueue(next_node);}}}}
     if(!queue.Empty()) Generate_Next_Level_Of_Breadth_First_Directed_Graph(directed_graph,marked_nodes,marked_edges,queue);
@@ -133,7 +133,7 @@ Generate_Next_Level_Of_Depth_First_Directed_Graph(DIRECTED_GRAPH_CORE& directed_
     for(int i=0;i<adjacent_edges(node).m;i++){int edge=adjacent_edges(node)(i);
         int parent=edges(edge).x,child=edges(edge).y;
         int next_node=parent==node?child:parent;
-        if(next_node){
+        if(next_node>=0){
             directed_graph.Add_Edge(node,next_node);
             if(!marked(next_node)){marked(next_node)=true;Generate_Next_Level_Of_Depth_First_Directed_Graph(directed_graph,marked,next_node);}}}
 }
