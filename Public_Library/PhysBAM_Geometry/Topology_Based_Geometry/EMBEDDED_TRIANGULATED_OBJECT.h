@@ -68,11 +68,11 @@ public:
     return Node_Separated_By_Embedded_Subelement(emb_segments[0]);}
     
     int Diamond_Node(const int triangle)
-    {if(Number_Of_Embedded_Subelements_In_Element(triangle)<2) return 0;
+    {if(Number_Of_Embedded_Subelements_In_Element(triangle)<2) return -1;
     int common_emb_node=Embedded_Node_Common_To_Both_Segments_In_Triangle(triangle);
     int i,j,k;simplicial_object.mesh.elements(triangle).Get(i,j,k);
-    if(!Is_Parent(i,common_emb_node))return i;
-    if(!Is_Parent(j,common_emb_node))return j;
+    if(!Is_Parent(i,common_emb_node)) return i;
+    if(!Is_Parent(j,common_emb_node)) return j;
     return k;}
 
     T Fraction_Of_Triangles_With_N_Cuts(const int n)

@@ -55,7 +55,7 @@ public:
 
     template<class T_ARRAY>
     int Union(const T_ARRAY& array)
-    {int root=-1;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++){root=Find(array(i));break;}if(root<0) return 0;
+    {int root=-1;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++){root=Find(array(i));break;}if(root<0) return -1;
     for(;i<array.Size();i++) Union(root,array(i));return Find(root);}
 
     template<int d>

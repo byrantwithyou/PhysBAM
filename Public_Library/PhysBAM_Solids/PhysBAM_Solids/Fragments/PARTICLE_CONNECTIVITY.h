@@ -42,11 +42,11 @@ public:
     {return union_find.Find(i);}
 
     int Union(const int i,const int j)
-    {if(Exclude_Particle(i) || Exclude_Particle(j)) return 0;return union_find.Union(i,j);}
+    {if(Exclude_Particle(i) || Exclude_Particle(j)) return -1;return union_find.Union(i,j);}
 
     template<class T_ARRAY>
     int Union(const T_ARRAY& array)
-    {int root=-1;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++) if(!Exclude_Particle(array(i))){root=Find(array(i));break;}if(root<0) return 0;
+    {int root=-1;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++) if(!Exclude_Particle(array(i))){root=Find(array(i));break;}if(root<0) return -1;
     for(;i<array.Size();i++) if(!Exclude_Particle(array(i))) union_find.Union(root,array(i));return union_find.Find(root);}
 
     void Merge(const PARTICLE_CONNECTIVITY<TV>& particle_connectivity)

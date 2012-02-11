@@ -339,8 +339,8 @@ Parse_Commandline_Arguments(int argc,char *argv[])
 int PARAMETER_LIST::
 Find_Parameter(const std::string& name) const
 {
-    for(int i=0;i<parameter_list.m;i++)if(parameter_list(i).x==name)return i;
-    return 0;
+    for(int i=0;i<parameter_list.m;i++)if(parameter_list(i).x==name) return i;
+    return -1;
 }
 //#####################################################################
 // Function Insert_Parameter

@@ -95,11 +95,11 @@ public:
     {return Is_Parent(parents[0],embedded_node) && Is_Parent(parents[1],embedded_node);}
 
     int Other_Parent(const int parent,const int embedded_node) const
-    {int index=Which_Parent(parent,embedded_node);if(index == 1) return parent_particles(embedded_node)(1);else if(index == 2) return parent_particles(embedded_node)(0);else return 0;}
+    {int index=Which_Parent(parent,embedded_node);if(index==1) return parent_particles(embedded_node)(1);else if(index==2) return parent_particles(embedded_node)(0);else return -1;}
 
     void Replace_Parent_Particle(const int embedded_particle,const int old_parent_particle,const int new_parent_particle)
-    {if(parent_particles(embedded_particle)(0) == old_parent_particle) parent_particles(embedded_particle)(0)=new_parent_particle;
-    else{assert(parent_particles(embedded_particle)(1) == old_parent_particle);parent_particles(embedded_particle)(1)=new_parent_particle;}}
+    {if(parent_particles(embedded_particle)(0)==old_parent_particle) parent_particles(embedded_particle)(0)=new_parent_particle;
+    else{assert(parent_particles(embedded_particle)(1)==old_parent_particle);parent_particles(embedded_particle)(1)=new_parent_particle;}}
 
     int Number_Of_Children(const int parent_node) const
     {if(!(*embedded_children_index)(parent_node)) return 0;else return (*embedded_children)((*embedded_children_index)(parent_node)).m;}

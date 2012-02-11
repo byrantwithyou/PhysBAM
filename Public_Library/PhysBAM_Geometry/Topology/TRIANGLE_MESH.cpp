@@ -360,7 +360,7 @@ Adjacent_Triangle(const int triangle,const int node1,const int node2) const
     assert(Node_In_Triangle(node1,triangle) && Node_In_Triangle(node2,triangle) && adjacent_elements);
     for(int a=0;a<(*adjacent_elements)(triangle).m;a++){
         int t=(*adjacent_elements)(triangle)(a);if(Node_In_Triangle(node1,t) && Node_In_Triangle(node2,t))return t;}
-    return 0;
+    return -1;
 }
 //#####################################################################
 // Function Triangles_On_Edge

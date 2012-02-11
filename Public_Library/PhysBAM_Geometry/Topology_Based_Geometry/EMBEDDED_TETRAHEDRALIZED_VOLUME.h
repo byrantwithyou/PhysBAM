@@ -29,7 +29,7 @@ public:
     int ppa1,ppa2,ppb1,ppb2,ppc1,ppc2;parent_particles(a).Get(ppa1,ppa2);parent_particles(b).Get(ppb1,ppb2);parent_particles(c).Get(ppc1,ppc2);
     if(Is_Parent(ppa1,b) && Is_Parent(ppa1,c))return ppa1;
     else if(Is_Parent(ppa2,b) && Is_Parent(ppa2,c))return ppa2;
-    else return 0;} 
+    else return -1;} 
 
     bool Nodes_Are_Separated_In_Simplex(const int node1,const int node2,const int tetrahedron) const
     {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(embedded_node<0)return false;

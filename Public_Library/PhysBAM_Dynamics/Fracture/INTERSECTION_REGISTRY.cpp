@@ -24,7 +24,7 @@ template<class T,int d> int INTERSECTION_REGISTRY<T,d>::
 Intersection(const VECTOR<int,d>& simplices)
 {
     ARRAY<int> intersection_list;
-    if(!Intersection_List(simplices,intersection_list)) return 0;
+    if(!Intersection_List(simplices,intersection_list)) return -1;
     if(intersection_list.m>1) PHYSBAM_FATAL_ERROR();
     return intersection_list(0);
 }

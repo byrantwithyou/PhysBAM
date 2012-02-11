@@ -90,7 +90,7 @@ Simplex(const VECTOR<int,d+1>& nodes) const
     // search short list for other nodes
     for(int k=0;k<(*incident_elements)(short_list).m;k++){int t=(*incident_elements)(short_list)(k);
         if(Nodes_In_Simplex(check,t)) return t;}
-    return 0;
+    return -1;
 }
 //#####################################################################
 // Function Initialize_Neighbor_Nodes

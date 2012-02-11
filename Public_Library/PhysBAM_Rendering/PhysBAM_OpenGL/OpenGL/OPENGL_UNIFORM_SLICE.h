@@ -45,7 +45,7 @@ public:
         VECTOR<int,3> grid_cells(grid.numbers_of_cells);
         if(mode==NODE_SLICE) return grid_cells[axis]+1;
         else if(mode==CELL_SLICE) return grid_cells[axis];
-        else return 0;
+        else return -1;
     }
 
     void Initialize(GRID<VECTOR<float,3> > grid_input)

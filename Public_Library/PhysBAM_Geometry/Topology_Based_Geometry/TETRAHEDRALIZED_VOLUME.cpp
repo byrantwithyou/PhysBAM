@@ -512,7 +512,7 @@ template<class T> int TETRAHEDRALIZED_VOLUME<T>::
 Inside(const TV& location,const T thickness_over_two) const
 {
     if(!hierarchy) PHYSBAM_FATAL_ERROR();
-    if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return 0;
+    if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return -1;
     ARRAY<int> tetrahedrons_to_check;hierarchy->Intersection_List(location,tetrahedrons_to_check,thickness_over_two);
     if(tetrahedron_list) for(int p=0;p<tetrahedrons_to_check.m;p++){
         int t=tetrahedrons_to_check(p);if(!(*tetrahedron_list)(t).Outside(location,thickness_over_two)) return t;}
@@ -520,7 +520,7 @@ Inside(const TV& location,const T thickness_over_two) const
         int t=tetrahedrons_to_check(p);int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         TETRAHEDRON<T> tetrahedron_to_check(particles.X(i),particles.X(j),particles.X(k),particles.X(l));
         if(!tetrahedron_to_check.Outside(location,thickness_over_two)) return t;}
-    return 0;
+    return -1;
 }
 //#####################################################################
 // Function Inside
@@ -543,7 +543,7 @@ Find(const TV& location,const T thickness_over_two,ARRAY<int>& scratch) const
     hierarchy->Intersection_List(location,scratch,thickness_over_two);
     for(int p=0;p<scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,0)) return t;}
     for(int p=0;p<scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,thickness_over_two)) return t;}
-    return 0;
+    return -1;
 }
 //#####################################################################
 // Function Discard_Tetrahedrons_Outside_Implicit_Surface

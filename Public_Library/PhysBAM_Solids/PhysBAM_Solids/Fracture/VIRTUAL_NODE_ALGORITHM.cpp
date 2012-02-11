@@ -40,7 +40,7 @@ Unmarked_Neighbor_Node(const SIMPLEX_MESH<d>& mesh,const int center_node,const A
     for(int n=0;n<(*mesh.neighbor_nodes)(center_node).m;n++){
         int node=(*mesh.neighbor_nodes)(center_node)(n);
         if(!marked(node)) return node;}
-    return 0;
+    return -1;
 }
 //#####################################################################
 //  Function Mark_Disconnected_Components_In_One_Ring
