@@ -87,8 +87,8 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         RANGE<TV> triangle_bounding_box=enlarged_triangle.Bounding_Box();
         triangle_bounding_box.Change_Size(surface_thickness_over_two);
         if(!grid_domain.Lazy_Intersection(triangle_bounding_box)) continue;
-        TV_INT min_index=grid.Clamped_Index(triangle_bounding_box.Minimum_Corner()),max_index=grid.Clamped_Index_End_Minus_One(triangle_bounding_box.Maximum_Corner())+TV_INT(1,1,1);
-        for(int i=min_index.x;i<=max_index.x;i++) for(int j=min_index.y;j<=max_index.y;j++) for(int k=min_index.z;k<=max_index.z;k++){
+        TV_INT min_index=grid.Clamped_Index(triangle_bounding_box.Minimum_Corner()),max_index=grid.Clamped_Index_End_Minus_One(triangle_bounding_box.Maximum_Corner())+2;
+        for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++){
             TV grid_position=grid.X(i,j,k),weights,closest_point=triangle.Closest_Point(grid_position,weights);
             T distance_squared=(grid_position-closest_point).Magnitude_Squared();
             if(phi(i,j,k)==FLT_MAX || distance_squared<sqr(phi(i,j,k))){

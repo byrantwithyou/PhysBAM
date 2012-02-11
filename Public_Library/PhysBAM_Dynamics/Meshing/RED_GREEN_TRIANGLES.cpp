@@ -71,7 +71,7 @@ Resolve_Stack()
 {
     while(stack.m){
         int level,tri;stack.Pop().Get(level,tri);
-        if(level){assert(tri);(*index_in_stack(level))(tri)=0;if(!Regularly_Refined(level,tri)) Refine_If_Necessary(level,tri);}}
+        if(level>=0){assert(tri);(*index_in_stack(level))(tri)=0;if(!Regularly_Refined(level,tri)) Refine_If_Necessary(level,tri);}}
 }
 //#####################################################################
 // Function Refine_If_Necessary
@@ -96,21 +96,21 @@ Refine_If_Necessary(const int level,const int tri)
     // figure out which green triangles and green interior segment need to be made, and make them
     int i,j,k;meshes(level)->elements(tri).Get(i,j,k);
     // make sure the subedges along triangles's edges exist, and that green bisectors exist
-    if(midpoints(0)){ // if edge ij is split
-        if(!subedges(0)) Add_Segment(free_edge_indices,i,midpoints(0));if(!subedges(2)) Add_Segment(free_edge_indices,j,midpoints(0));
-        if(!midpoints(1) && !midpoints(2) && !segment_mesh.Segment(midpoints(0),k)) Add_Segment(free_edge_indices,midpoints(0),k);}
-    if(midpoints(1)){ // if edge jk is split
-        if(!subedges(3)) Add_Segment(free_edge_indices,j,midpoints(1));if(!subedges(4)) Add_Segment(free_edge_indices,k,midpoints(1));
-        if(!midpoints(0) && !midpoints(2) && !segment_mesh.Segment(midpoints(1),i)) Add_Segment(free_edge_indices,midpoints(1),i);}
-    if(midpoints(2)){ // if edge ki is split
-        if(!subedges(1)) Add_Segment(free_edge_indices,i,midpoints(2));if(!subedges(5)) Add_Segment(free_edge_indices,k,midpoints(2));
-        if(!midpoints(0) && !midpoints(1) && !segment_mesh.Segment(midpoints(2),j)) Add_Segment(free_edge_indices,midpoints(2),j);}
+    if(midpoints(0)>=0){ // if edge ij is split
+        if(subedges(0)<0) Add_Segment(free_edge_indices,i,midpoints(0));if(subedges(2)<0) Add_Segment(free_edge_indices,j,midpoints(0));
+        if(midpoints(1)<0 && midpoints(2)<0 && segment_mesh.Segment(midpoints(0),k)<0) Add_Segment(free_edge_indices,midpoints(0),k);}
+    if(midpoints(1)>=0){ // if edge jk is split
+        if(subedges(3)<0) Add_Segment(free_edge_indices,j,midpoints(1));if(subedges(4)<0) Add_Segment(free_edge_indices,k,midpoints(1));
+        if(midpoints(0)<0 && midpoints(2)<0 && segment_mesh.Segment(midpoints(1),i)<0) Add_Segment(free_edge_indices,midpoints(1),i);}
+    if(midpoints(2)>=0){ // if edge ki is split
+        if(subedges(1)<0) Add_Segment(free_edge_indices,i,midpoints(2));if(subedges(5)<0) Add_Segment(free_edge_indices,k,midpoints(2));
+        if(midpoints(0)<0 && midpoints(1)<0 && segment_mesh.Segment(midpoints(2),j)<0) Add_Segment(free_edge_indices,midpoints(2),j);}
     // go ahead and create any missing edges along with the triangles
-    if(midpoints(0)){ // if edge ij is split
+    if(midpoints(0)>=0){ // if edge ij is split
         Add_Triangle(free_triangle_indices,level+1,i,midpoints(0),k,tri);Add_Triangle(free_triangle_indices,level+1,midpoints(0),j,k,tri);}
-    else if(midpoints(1)){ // if edge jk is split
+    else if(midpoints(1)>=0){ // if edge jk is split
         Add_Triangle(free_triangle_indices,level+1,i,j,midpoints(1),tri);Add_Triangle(free_triangle_indices,level+1,i,midpoints(1),k,tri);}
-    else if(midpoints(2)){ // if edge ki is split
+    else if(midpoints(2)>=0){ // if edge ki is split
         Add_Triangle(free_triangle_indices,level+1,j,k,midpoints(2),tri);Add_Triangle(free_triangle_indices,level+1,j,midpoints(2),i,tri);}
 }
 //#####################################################################
@@ -127,18 +127,18 @@ Regularly_Refine_Triangle(const int level,const int tri)
     free_triangle_indices.Preallocate(2);free_edge_indices.Preallocate(5);
     Delete_Children(level,tri,free_triangle_indices,free_edge_indices);
     ARRAY<int> midpoints(3),subedges(9);Get_Existing_Subindices(level,tri,midpoints,subedges);
-    for(int a=0;a<3;a++) if(!midpoints(a)) midpoints(a)=Add_Midpoint(element_edges(level)(tri)(a),level,tri);
+    for(int a=0;a<3;a++) if(midpoints(a)<0) midpoints(a)=Add_Midpoint(element_edges(level)(tri)(a),level,tri);
     int i,j,k;meshes(level)->elements(tri).Get(i,j,k);
     int ij=midpoints(0),jk=midpoints(1),ki=midpoints(2);
-    if(!subedges(0)) Add_Segment(free_edge_indices,i,ij);
-    if(!subedges(1)) Add_Segment(free_edge_indices,i,ki);
-    if(!subedges(2)) Add_Segment(free_edge_indices,j,ij);
-    if(!subedges(3)) Add_Segment(free_edge_indices,j,jk);
-    if(!subedges(4)) Add_Segment(free_edge_indices,k,jk);
-    if(!subedges(5)) Add_Segment(free_edge_indices,k,ki);
-    if(!subedges(6)) Add_Segment(free_edge_indices,ij,jk);
-    if(!subedges(7)) Add_Segment(free_edge_indices,jk,ki);
-    if(!subedges(8)) Add_Segment(free_edge_indices,ki,ij); // TODO: check that these are always added
+    if(subedges(0)<0) Add_Segment(free_edge_indices,i,ij);
+    if(subedges(1)<0) Add_Segment(free_edge_indices,i,ki);
+    if(subedges(2)<0) Add_Segment(free_edge_indices,j,ij);
+    if(subedges(3)<0) Add_Segment(free_edge_indices,j,jk);
+    if(subedges(4)<0) Add_Segment(free_edge_indices,k,jk);
+    if(subedges(5)<0) Add_Segment(free_edge_indices,k,ki);
+    if(subedges(6)<0) Add_Segment(free_edge_indices,ij,jk);
+    if(subedges(7)<0) Add_Segment(free_edge_indices,jk,ki);
+    if(subedges(8)<0) Add_Segment(free_edge_indices,ki,ij); // TODO: check that these are always added
     Add_Triangle(free_triangle_indices,level+1,i,ij,ki,tri);Add_Triangle(free_triangle_indices,level+1,ij,j,jk,tri);
     Add_Triangle(free_triangle_indices,level+1,ki,jk,k,tri);Add_Triangle(free_triangle_indices,level+1,ij,jk,ki,tri);
 }
@@ -154,9 +154,9 @@ Get_Existing_Subindices(const int level,const int tri,ARRAY<int>& midpoints,ARRA
     for(int e=0;e<3;e++) midpoints(e)=segment_midpoints(element_edges(level)(tri)(e));
     int i,j,k;meshes(level)->elements(tri).Get(i,j,k);
     int ij=midpoints(0),jk=midpoints(1),ki=midpoints(2);
-    if(ij){subedges(0)=segment_mesh.Segment(i,ij);subedges(2)=segment_mesh.Segment(j,ij);if(jk) subedges(6)=segment_mesh.Segment(ij,jk);if(ki) subedges(8)=segment_mesh.Segment(ki,ij);}
-    if(jk){subedges(3)=segment_mesh.Segment(j,jk);subedges(4)=segment_mesh.Segment(k,jk);if(ki) subedges(7)=segment_mesh.Segment(jk,ki);}
-    if(ki){subedges(1)=segment_mesh.Segment(i,ki);subedges(5)=segment_mesh.Segment(k,ki);}
+    if(ij>=0){subedges(0)=segment_mesh.Segment(i,ij);subedges(2)=segment_mesh.Segment(j,ij);if(jk>=0) subedges(6)=segment_mesh.Segment(ij,jk);if(ki>=0) subedges(8)=segment_mesh.Segment(ki,ij);}
+    if(jk>=0){subedges(3)=segment_mesh.Segment(j,jk);subedges(4)=segment_mesh.Segment(k,jk);if(ki>=0) subedges(7)=segment_mesh.Segment(jk,ki);}
+    if(ki>=0){subedges(1)=segment_mesh.Segment(i,ki);subedges(5)=segment_mesh.Segment(k,ki);}
 }
 //#####################################################################
 // Function Ensure_Level_Exists
@@ -164,9 +164,9 @@ Get_Existing_Subindices(const int level,const int tri,ARRAY<int>& midpoints,ARRA
 template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Ensure_Level_Exists(const int level)
 {
-    if(meshes.m >= level) return; // it already exists
+    if(meshes.m > level) return; // it already exists
     meshes.Append(new TRIANGLE_MESH);
-    element_edges.Resize(level);
+    element_edges.Resize(level+1);
     meshes(level)->number_nodes=object.particles.array_collection->Size();
     meshes(level)->incident_elements=new ARRAY<ARRAY<int> >(object.particles.array_collection->Size());
     parent.Append(new ARRAY<int>(0));children.Append(new ARRAY<VECTOR<int,4> >());
@@ -206,7 +206,7 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
     // then zero out occurances in the stack
     for(p=0;p<deleted_tri_indices.m;p++){
         int t=deleted_tri_indices(p);
-        if((*index_in_stack(level+1))(t)){
+        if((*index_in_stack(level+1))(t)>=0){
             stack((*index_in_stack(level+1))(t)).Set(0,0); // can't remove since it would screw up index_in_stack, mark as no longer relevent
             (*index_in_stack(level+1))(t)=0;}}
 }
@@ -216,7 +216,7 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
 template<class TV> void RED_GREEN_TRIANGLES<TV>::
 Add_Midpoints_If_Not_Already_There(const int level,const int tri)
 {
-    for(int i=0;i<3;i++){int s=element_edges(level)(tri)(i);if(!segment_midpoints(s)) Add_Midpoint(s,level,tri);}
+    for(int i=0;i<3;i++){int s=element_edges(level)(tri)(i);if(segment_midpoints(s)<0) Add_Midpoint(s,level,tri);}
 }
 //#####################################################################
 // Function Add_Midpoint
@@ -239,21 +239,21 @@ Add_Midpoint(const int segment,const int level,const int tri)
     // add edge neighbors of triangle to the stack if not already there
     int i;for(i=0;i<(*meshes(level)->incident_elements)(node1).m;i++){
         int s=(*meshes(level)->incident_elements)(node1)(i);
-        if(s != tri && !(*index_in_stack(level))(s)){
+        if(s != tri && (*index_in_stack(level))(s)<0){
             int a,b,c;meshes(level)->elements(s).Get(a,b,c);assert(a == node1 || b == node1 || c == node1);
             if(node2 == a || node2 == b || node2 == c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level,s));(*index_in_stack(level))(s)=stack.m;}}}
     // check previous level for triangles incident on the edge
     if(level > 0 && node1 < meshes(level-1)->number_nodes) for(i=0;i<(*meshes(level-1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level-1)->incident_elements)(node1)(i);
-        if(!(*index_in_stack(level-1))(s)){
+        if((*index_in_stack(level-1))(s)<0){
             int a,b,c;meshes(level-1)->elements(s).Get(a,b,c);
             if(node2 == a || node2 == b || node2 == c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level-1,s));(*index_in_stack(level-1))(s)=stack.m;}}}
     // check next level for triangles incident on the edge
     if(level < meshes.m && node1 < meshes(level+1)->number_nodes) for(i=0;i<(*meshes(level+1)->incident_elements)(node1).m;i++){
         int s=(*meshes(level+1)->incident_elements)(node1)(i);
-        if(!(*index_in_stack(level+1))(s)){
+        if((*index_in_stack(level+1))(s)<0){
             int a,b,c;meshes(level+1)->elements(s).Get(a,b,c);assert(a == node1 || b == node1 || c == node1);
             if(node2 == a || node2 == b || node2 == c){ // not incident on edge
                 stack.Append(VECTOR<int,2>(level+1,s));(*index_in_stack(level+1))(s)=stack.m;}}}
@@ -275,7 +275,7 @@ Add_Segment(ARRAY<int>& free_edge_indices,const int node1,const int node2)
     if(free_edge_indices.m == 0){ // no more empty spots
         segment_mesh.elements.Append(VECTOR<int,2>(node1,node2));index=segment_mesh.elements.m;segment_midpoints.Append(0);}
     else{
-        index=free_edge_indices.Pop();assert(!segment_midpoints(index));segment_mesh.elements(index).Set(node1,node2);}
+        index=free_edge_indices.Pop();assert(segment_midpoints(index)<0);segment_mesh.elements(index).Set(node1,node2);}
     (*segment_mesh.incident_elements)(node1).Append(index);(*segment_mesh.incident_elements)(node2).Append(index);
 }
 //#####################################################################
@@ -297,11 +297,11 @@ Add_Triangle(ARRAY<int>& free_triangle_indices,const int level,const int i,const
     int ij=segment_mesh.Segment(i,j),jk=segment_mesh.Segment(j,k),ki=segment_mesh.Segment(k,i);
     element_edges(level)(index).Set(ij,jk,ki);
     // check if this new tri has a T-junction
-    if(segment_midpoints(ij) || segment_midpoints(jk) || segment_midpoints(ki)){stack.Append(VECTOR<int,2>(level,index));(*index_in_stack(level))(index)=stack.m;}
+    if(segment_midpoints(ij)>=0 || segment_midpoints(jk)>=0 || segment_midpoints(ki)>=0){stack.Append(VECTOR<int,2>(level,index));(*index_in_stack(level))(index)=stack.m;}
     // add tri to incident_tris
     int a;for(a=0;a<3;a++) (*triangle_mesh.incident_elements)(triangle_mesh.elements(index)(a)).Append(index);
     // add tri to parent's list of children
-    for(a=0;a<4;a++) if(!(*children(level-1))(parent_index)(a)){(*children(level-1))(parent_index)(a)=index;break;}
+    for(a=0;a<4;a++) if((*children(level-1))(parent_index)(a)<0){(*children(level-1))(parent_index)(a)=index;break;}
 }
 //#####################################################################
 // Function Rebuild_Object
@@ -330,7 +330,7 @@ Unrefined_Parents(const int node,ARRAY<int>& parents,ARRAY<T>& weights) const
 {
     parents.Remove_All();parents.Append(node);weights.Remove_All();weights.Append((T)1);
     for(int i=0;i<parents.m;){
-        if(!(*segment_index_from_midpoint_index)(parents(i))){i++;continue;}
+        if((*segment_index_from_midpoint_index)(parents(i))<0){i++;continue;}
         T old_weight=weights(i);VECTOR<int,2> segment=segment_mesh.elements((*segment_index_from_midpoint_index)(parents(i)));
         parents.Remove_Index_Lazy(i);weights.Remove_Index_Lazy(i);
         for(int j=0;j<2;j++){
@@ -369,9 +369,9 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         HASHTABLE<int,int>& simplex_map=(*level_simplex_maps)(level);simplex_map.Remove_All();
         
         meshes(level)->Delete_Sorted_Elements(level_triangle_list(level),simplex_map);
-        if(level<parent.m) for(int i=0;i<(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
-        if(parent(level)) parent(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
-        if(level>1) for(int i=0;i<children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
+        if(level<parent.m-1) for(int i=0;i<(*parent(level+1)).m;i++) simplex_map.Get((*parent(level+1))(i),(*parent(level+1))(i));
+        if(parent(level)>=0) parent(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
+        if(level>0) for(int i=0;i<children(level-1)->m;i++){for(int j=0;j<4;j++) simplex_map.Get((*children(level-1))(i)(j),(*children(level-1))(i)(j));
             (*children(level-1))(i)=(*children(level-1))(i).Sorted().Reversed();}
         children(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
         for(int i=0;i<leaf_levels_and_indices.m;i++) if(leaf_levels_and_indices(i)(0)==level) simplex_map.Get(leaf_levels_and_indices(i)(1),leaf_levels_and_indices(i)(1));
@@ -382,9 +382,9 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         ARRAY<int> deleted_edge_indices;
         for(int i=0;i<level_triangle_list(level).m;i++) for(int j=0;j<3;j++){
             int edge=element_edges(level)(level_triangle_list(level)(i))(j);int node1,node2;segment_mesh.elements(edge).Get(node1,node2);
-            if(!nodes_referenced(node1) || !nodes_referenced(node2)){
-                int index=0;(*segment_mesh.incident_elements)(node1).Find(edge,index);if(index>=0) (*segment_mesh.incident_elements)(node1).Remove_Index_Lazy(index);
-                index=0;(*segment_mesh.incident_elements)(node2).Find(edge,index);if(index>=0) (*segment_mesh.incident_elements)(node2).Remove_Index_Lazy(index);}}}
+            if(nodes_referenced(node1)<0 || nodes_referenced(node2)<0){
+                int index=-1;(*segment_mesh.incident_elements)(node1).Find(edge,index);if(index>=0) (*segment_mesh.incident_elements)(node1).Remove_Index_Lazy(index);
+                index=-1;(*segment_mesh.incident_elements)(node2).Find(edge,index);if(index>=0) (*segment_mesh.incident_elements)(node2).Remove_Index_Lazy(index);}}}
 
     Rebuild_Object();
     // TODO: if node has 0 parent move it down to level 1

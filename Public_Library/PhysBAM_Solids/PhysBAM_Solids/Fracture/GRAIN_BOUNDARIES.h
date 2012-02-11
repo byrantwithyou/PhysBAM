@@ -82,7 +82,7 @@ public:
         if(!coin_flip_threshold)to_be_marked(nbr_node)=true;
         else if(random_numbers.Get_Uniform_Number((T)0,(T)1) > coin_flip_threshold)to_be_marked(nbr_node)=true;}
     int number_marked=0;
-    for(int n=0;n<mesh.number_nodes;n++) if(!node_regions(n) && to_be_marked(n)){node_regions(n)=node_region;number_marked++;}
+    for(int n=0;n<mesh.number_nodes;n++) if(node_regions(n)<0 && to_be_marked(n)){node_regions(n)=node_region;number_marked++;}
     return number_marked;}
 
     int Unmarked_Element()

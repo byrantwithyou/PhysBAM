@@ -148,8 +148,8 @@ Get_Point_Surface_Element_Pairs_Helper(const RIGID_DEFORMABLE_COLLISIONS<VECTOR<
     ARRAY<int> particles_to_ignore;particles_to_ignore.Append(particle_index);
     particles_to_ignore.Append_Elements(rigid_deformable_collisions.solid_body_collection.deformable_body_collection.soft_bindings.Parents(particle_index));
     for(int i=0;i<tetrahedron_candidates.m;i++){TETRAHEDRON_COLLISION_BODY<T>& collision_body=*tetrahedron_candidates(i);
-        TV w;int t=collision_body.Get_Tetrahedron_Near_Point(particles.X(particle_index),w,particles_to_ignore);if(!t) continue;
-        TV surface_weights;int surface_triangle=collision_body.Get_Surface_Triangle(t,w,surface_weights,true);if(!surface_triangle) continue;
+        TV w;int t=collision_body.Get_Tetrahedron_Near_Point(particles.X(particle_index),w,particles_to_ignore);if(t<0) continue;
+        TV surface_weights;int surface_triangle=collision_body.Get_Surface_Triangle(t,w,surface_weights,true);if(surface_triangle<0) continue;
         VECTOR<int,3> element(collision_body.triangulated_surface.mesh.elements(surface_triangle));elements.Append(element);weights.Append(surface_weights);
         TV distance=-particles.X(particle_index);for(int j=0;j<TV::dimension;j++) distance+=particles.X(element(j))*surface_weights(j);
         particle_distances.Append(distance);}
@@ -954,7 +954,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         for(int i=0;i<rigid_body_interactions.m;i++){
             RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
             int index=parent_other_rigid_body.Has_Infinite_Inertia()?1:0;
-            if(index){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
+            if(index>=0){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
             TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.X();
             K_inverse_sum[index]+=K_inverse(i);ms[index]+=K_inverse_s;mrs[index]+=TV::Cross_Product(radius,K_inverse_s);
             MATRIX<T,T_SPIN::dimension,TV::dimension> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);

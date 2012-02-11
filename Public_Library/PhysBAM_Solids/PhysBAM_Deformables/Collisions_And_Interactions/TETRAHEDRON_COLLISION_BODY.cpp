@@ -193,7 +193,7 @@ Get_Tetrahedron_Near_Point(const TV& point,TV& weights,const ARRAY<int>& particl
     if(closest && max_min_weight>max_min_barycentric_weight_tolerance){
         int i,j,k,l;tetrahedron_mesh.elements(closest).Get(i,j,k,l);
         if(TETRAHEDRON<T>(particles.X(i),particles.X(j),particles.X(k),particles.X(l)).Signed_Volume()>min_tet_volume_tolerance) return closest;}
-    return 0;
+    return -1;
 }
 //#####################################################################
 // Function Get_Surface_Triangle
@@ -217,7 +217,7 @@ Get_Surface_Triangle(const int tetrahedron_index,const TV& tetrahedron_weights,T
     if(inside || omit_outside_points || omit_inside_points){
         bool inside_temp=implicit_surface.Extended_Phi(location)<=implicit_surface.Extended_Phi(closest_projected_point);
         if(inside) *inside=inside_temp;
-        if((omit_outside_points && !inside_temp) || (omit_inside_points && inside_temp)) return 0;}
+        if((omit_outside_points && !inside_temp) || (omit_inside_points && inside_temp)) return -1;}
     return closest_triangle;
 }
 //#####################################################################

@@ -175,7 +175,7 @@ Reinitialize(bool force,bool read_geometry)
     valid=true;
     first_time=false;
 
-    for(number_of_segmented_curve=1;deformable_geometry->template Find_Structure<SEGMENTED_CURVE<TV>*>(number_of_segmented_curve);number_of_segmented_curve++);
+    for(number_of_segmented_curve=0;deformable_geometry->template Find_Structure<SEGMENTED_CURVE<TV>*>(number_of_segmented_curve);number_of_segmented_curve++);
 }
 //#####################################################################
 // Function Valid_Frame

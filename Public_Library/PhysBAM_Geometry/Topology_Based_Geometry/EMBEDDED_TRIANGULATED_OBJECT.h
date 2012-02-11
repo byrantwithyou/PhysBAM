@@ -34,11 +34,11 @@ public:
     if(Is_Parent(ppa1,b))return ppa1;else return ppa2;}
 
     bool Nodes_Are_Separated_In_Simplex(const int node1,const int node2,const int triangle) const
-    {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(!embedded_node) return false;
+    {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(embedded_node<0) return false;
     VECTOR<int,2> segments=Embedded_Subelements_In_Element(triangle);
     int global_embedded_node=embedded_particles.active_indices(embedded_node);
-    if(!segments[0]) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[0])) return true;
-    if(!segments[1]) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[1])) return true;
+    if(segments[0]<0) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[0])) return true;
+    if(segments[1]<0) return false;else if(embedded_mesh.Node_In_Segment(global_embedded_node,segments[1])) return true;
     return false;}
 
     bool Nodes_Are_Materially_Connected_In_Simplex(const int node1,const int node2,const int simplex) const

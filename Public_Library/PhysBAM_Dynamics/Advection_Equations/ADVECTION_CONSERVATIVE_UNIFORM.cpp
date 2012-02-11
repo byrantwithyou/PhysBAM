@@ -372,8 +372,8 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
         Clamp_Weights_To_Objects(grid,forward_weights);
         for(int i=0;i<forward_weights.m;i++){assert(forward_weights(i).y>-1e-5);if(forward_weights(i).y<0) forward_weights(i).y=0;}
         for(int i=0;i<forward_weights.m;i++){
-            int index=0;for(int j=0;j<weights_to(cell).m;j++) if(weights_to(cell)(j).x==forward_weights(i).x) index=j;
-            if(index) weights_to(cell)(index).y+=forward_weights(i).y*remaining;
+            int index=-1;for(int j=0;j<weights_to(cell).m;j++) if(weights_to(cell)(j).x==forward_weights(i).x) index=j;
+            if(index>=0) weights_to(cell)(index).y+=forward_weights(i).y*remaining;
             else{
                 weights_to(cell).Append(PAIR<TV_INT,T>(forward_weights(i).x,forward_weights(i).y*remaining));
                 weights_from(forward_weights(i).x).Append(PAIR<TV_INT,int>(cell,weights_to(cell).m));}}}
@@ -517,8 +517,8 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
             for(int i=0;i<backwards_weights.m;i++) backwards_weights(i).y*=0.5;
             for(int i=0;i<backwards_weights2.m;i++) backwards_weights2(i).y*=0.5;
             for(int i=0;i<backwards_weights2.m;i++){
-                int index=0;for(int j=0;j<backwards_weights.m;j++) if(backwards_weights(j).x==backwards_weights2(i).x) index=j;
-                if(index) backwards_weights(index).y+=backwards_weights2(i).y;
+                int index=-1;for(int j=0;j<backwards_weights.m;j++) if(backwards_weights(j).x==backwards_weights2(i).x) index=j;
+                if(index>=0) backwards_weights(index).y+=backwards_weights2(i).y;
                 else backwards_weights.Append(backwards_weights2(i));}
             for(int i=0;i<backwards_weights.m;i++) if(!inside1(backwards_weights(i).x)) backwards_weights(i).y=0;
             Clamp_Weights_To_Grid(inside_domain,backwards_weights); 
@@ -593,8 +593,8 @@ Update_Advection_Equation_Face_Lookup(T_GRID& grid,T_ARRAYS_SCALAR& phi1,T_ARRAY
         for(int i=0;i<forward_weights.m;i++){//assert(forward_weights(i).y>-delta);
             if(forward_weights(i).y<0) forward_weights(i).y=0;}
         for(int i=0;i<forward_weights.m;i++){if(forward_weights(i).y==0) continue;
-            int index=0;for(int j=0;j<weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
-            if(index) weights_to(face)(index).y+=forward_weights(i).y*remaining;
+            int index=-1;for(int j=0;j<weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
+            if(index>=0) weights_to(face)(index).y+=forward_weights(i).y*remaining;
             else{
                 weights_to(face).Append(PAIR<FACE_INDEX<TV::dimension>,T>(forward_weights(i).x,forward_weights(i).y*remaining));
                 weights_from(forward_weights(i).x).Append(PAIR<FACE_INDEX<TV::dimension>,int>(face,weights_to(face).m));}}}
@@ -723,8 +723,8 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
         Clamp_Weights_To_Grid(inside_domain,forward_weights);
         Clamp_Weights_To_Objects(grid,forward_weights);
         for(int i=0;i<forward_weights.m;i++){
-            int index=0;for(int j=0;j<weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
-            if(index) weights_to(face)(index).y+=forward_weights(i).y*remaining;
+            int index=-1;for(int j=0;j<weights_to(face).m;j++) if(weights_to(face)(j).x==forward_weights(i).x) index=j;
+            if(index>=0) weights_to(face)(index).y+=forward_weights(i).y*remaining;
             else{
                 if(forward_weights(i).y==0) continue;
                 weights_to(face).Append(PAIR<FACE_INDEX<TV::dimension>,T>(forward_weights(i).x,forward_weights(i).y*remaining));

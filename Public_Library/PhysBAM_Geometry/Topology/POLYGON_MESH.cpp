@@ -120,7 +120,7 @@ Initialize_Element_Oriented_Edges()
             ARRAY<int>& component=elements(e)(c);
             for(int p=0;p<component.m;p++){
                 VECTOR<int,2> oriented_segment(component(p),component(p%component.m+1));
-                int s=segment_mesh->Simplex(oriented_segment);if(!s) PHYSBAM_FATAL_ERROR();
+                int s=segment_mesh->Simplex(oriented_segment);if(s<0) PHYSBAM_FATAL_ERROR();
                 if(oriented_segment==segment_mesh->elements(s)) (*element_oriented_edges)(e)(c).Append(PAIR<int,bool>(s,true));
                 else (*element_oriented_edges)(e)(c).Append(PAIR<int,bool>(s,false));}}}
 }
@@ -136,7 +136,7 @@ Initialize_Edge_Elements()
     for(int e=0;e<elements.m;e++) for(int c=0;c<elements(e).m;c++){
         ARRAY<int>& component=elements(e)(c);
         for(int p=0;p<component.m;p++){
-            int s=segment_mesh->Segment(component(p),component(p%component.m+1));if(!s) PHYSBAM_FATAL_ERROR();
+            int s=segment_mesh->Segment(component(p),component(p%component.m+1));if(s<0) PHYSBAM_FATAL_ERROR();
             if(!hash.Is_Marked_Current(s)){(*edge_elements)(s).Append(e);hash.Mark(s);}}
         hash.Next_Operation();}
 }
@@ -148,7 +148,7 @@ Elements_On_Edge(const int node1,const int node2,ARRAY<int>* elements_on_edge) c
 {
     if(!segment_mesh || !edge_elements) PHYSBAM_FATAL_ERROR();
     int s=segment_mesh->Segment(node1,node2);
-    if(!s){if(elements_on_edge) elements_on_edge->Remove_All();return 0;}
+    if(s<0){if(elements_on_edge) elements_on_edge->Remove_All();return 0;}
     if(elements_on_edge) *elements_on_edge=(*edge_elements)(s);
     return (*edge_elements)(s).m;
 }
@@ -159,7 +159,7 @@ bool POLYGON_MESH::
 Oriented_Edge_In_Element(const int node1,const int node2,const int element) const
 {
     if(!segment_mesh || !element_oriented_edges) PHYSBAM_FATAL_ERROR();
-    int s=segment_mesh->Segment(node1,node2);if(!s) return false;
+    int s=segment_mesh->Segment(node1,node2);if(s<0) return false;
     PAIR<int,bool> oriented_edge(s,segment_mesh->elements(s)==VECTOR<int,2>(node1,node2));
     for(int c=0;c<(*element_oriented_edges)(element).m;c++)
         if((*element_oriented_edges)(element)(c).Contains(oriented_edge)) return true;
@@ -173,7 +173,7 @@ Elements_On_Oriented_Edge(const int node1,const int node2,ARRAY<int>* elements_o
 {
     if(!segment_mesh || !edge_elements || !element_oriented_edges) PHYSBAM_FATAL_ERROR();
     int s=segment_mesh->Segment(node1,node2);
-    if(!s){if(elements_on_oriented_edge) elements_on_oriented_edge->Remove_All();return 0;}
+    if(s<0){if(elements_on_oriented_edge) elements_on_oriented_edge->Remove_All();return 0;}
     ARRAY<int>& candidate_elements_on_edge=(*edge_elements)(s);
     int elements_found=0;if(elements_on_oriented_edge) elements_on_oriented_edge->Remove_All();
     for(int i=0;i<candidate_elements_on_edge.m;i++) if(Oriented_Edge_In_Element(node1,node2,candidate_elements_on_edge(i))){

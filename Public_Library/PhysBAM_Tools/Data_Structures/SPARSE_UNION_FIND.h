@@ -55,7 +55,7 @@ public:
 
     template<class T_ARRAY>
     int Union(const T_ARRAY& array)
-    {int root=0;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++){root=Find(array(i));break;}if(!root) return 0;
+    {int root=-1;typename T_ARRAY::ELEMENT i(0);for(;i<array.Size();i++){root=Find(array(i));break;}if(root<0) return 0;
     for(;i<array.Size();i++) Union(root,array(i));return Find(root);}
 
     template<int d>
@@ -89,7 +89,7 @@ private:
     {ID k,j=i;while(parents.Get(j,k)) j=k;return j;}
 
     void Path_Compress(const ID i,const ID root) const
-    {ID j=i;while(j && j!=root){ID &ref_parent=parents.Get_Or_Insert(j),parent=ref_parent;ref_parent=root;j=parent;}}
+    {ID j=i;while(j>=0 && j!=root){ID &ref_parent=parents.Get_Or_Insert(j),parent=ref_parent;ref_parent=root;j=parent;}}
 
 //#####################################################################
 };

@@ -66,7 +66,7 @@ Add_Embedded_Subelement_To_Embedded_Subelements_In_Element(EMBEDDED_OBJECT<TV,d>
 {
     int element=eo.Element_Containing_Subelement(subelement);
     int index=(*eo.embedded_subelements_in_parent_element_index)(element);
-    if(index){
+    if(index>=0){
         int embedded_subelement_number=++(*eo.number_of_embedded_subelements_in_parent_element)(index);
         (*eo.embedded_subelements_in_parent_element)(index)(embedded_subelement_number)=subelement;}
     else{

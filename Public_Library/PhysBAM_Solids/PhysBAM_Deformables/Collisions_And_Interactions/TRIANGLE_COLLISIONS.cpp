@@ -672,7 +672,7 @@ Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const 
     rigid_lists.Resize(rigid_lists.m+1);rigid_lists.Last()=nodes;
 
     // figure out which list it should be combined with
-    int add_list=rigid_lists.m;for(int i=0;i<nodes.m;i++){int j=list_index(rigid_lists.Last()(i));if(j) add_list=min(add_list,j);}
+    int add_list=rigid_lists.m;for(int i=0;i<nodes.m;i++){int j=list_index(rigid_lists.Last()(i));if(j>=0) add_list=min(add_list,j);}
 
     // set up a new list or combine with another
     if(add_list == rigid_lists.m) for(int i=0;i<nodes.m;i++) list_index(rigid_lists.Last()(i))=rigid_lists.m; // label as a new list

@@ -32,7 +32,7 @@ public:
     else return 0;} 
 
     bool Nodes_Are_Separated_In_Simplex(const int node1,const int node2,const int tetrahedron) const
-    {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(!embedded_node)return false;
+    {int embedded_node=Embedded_Particle_On_Segment(node1,node2);if(embedded_node<0)return false;
     VECTOR<int,4> triangles=Embedded_Subelements_In_Element(tetrahedron);
     int global_embedded_node=embedded_particles.active_indices(embedded_node);
     for(int i=0;i<4 && triangles[i];i++){

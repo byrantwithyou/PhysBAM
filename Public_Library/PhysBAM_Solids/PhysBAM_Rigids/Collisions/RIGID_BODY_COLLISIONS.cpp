@@ -738,7 +738,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
                 continue;
             RIGID_BODY<TV>& parent_other_rigid_body=rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
             int index=parent_other_rigid_body.Has_Infinite_Inertia()?1:0;
-            if(index){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
+            if(index>=0){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
             TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.X();
             K_inverse_sum[index]+=K_inverse(i);ms[index]+=K_inverse_s;mrs[index]+=TV::Cross_Product(radius,K_inverse_s);
             MATRIX<T,T_SPIN::dimension,TV::dimension> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);

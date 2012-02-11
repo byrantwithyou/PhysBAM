@@ -86,7 +86,7 @@ public:
     void Set_Phi(const int t,const VECTOR<T,d+1>& phi_element)
     {assert(fracture_phi_index.m==reference_mesh.elements.m);
     int ref_t=corresponding_simplex_in_reference(t);
-    int index=fracture_phi_index(ref_t);if(index) phi(index)=phi_element;else fracture_phi_index(ref_t)=phi.Append(phi_element);}
+    int index=fracture_phi_index(ref_t);if(index>=0) phi(index)=phi_element;else fracture_phi_index(ref_t)=phi.Append(phi_element);}
 
     VECTOR<T,d+1> Get_Phi(const int t) const
     {return phi(Fracture_Phi_Index(t));}

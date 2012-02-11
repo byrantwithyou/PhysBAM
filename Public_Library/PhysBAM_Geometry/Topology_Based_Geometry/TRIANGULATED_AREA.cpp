@@ -365,12 +365,12 @@ Triangle_In_Direction_Uninverted(const int node,const VECTOR<T,2>& direction) co
 template<class T> int TRIANGULATED_AREA<T>::
 Triangle_Walk_Uninverted(const int start_node,const VECTOR<T,2>& dX) const
 {
-    int t=Triangle_In_Direction_Uninverted(start_node,dX);if(!t)return 0;
+    int t=Triangle_In_Direction_Uninverted(start_node,dX);if(t<0)return 0;
     VECTOR<T,2> start=particles.X(start_node),goal=start+dX;
     int e1,e2;mesh.Other_Two_Nodes(start_node,t,e1,e2);
     if(VECTOR<T,2>::Cross_Product(particles.X(e2)-particles.X(e1),goal-particles.X(e1)).x>=0)return t;
     for(;;){
-        t=mesh.Adjacent_Triangle(t,e1,e2);if(!t)return 0;
+        t=mesh.Adjacent_Triangle(t,e1,e2);if(t<0)return 0;
         int e3=mesh.Other_Node(e1,e2,t);
         VECTOR<T,2> w=TRIANGLE_2D<T>::First_Two_Barycentric_Coordinates(goal,particles.X(e2),particles.X(e1),particles.X(e3));
         if(w.x>=0){if(w.y>=0)return t;else e1=e3;}

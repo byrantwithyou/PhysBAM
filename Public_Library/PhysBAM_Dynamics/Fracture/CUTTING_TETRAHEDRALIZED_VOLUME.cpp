@@ -1201,7 +1201,7 @@ Duplicate_And_Merge_Elements()
             for(int j=0;j<regions_per_tet(tet_index_1).m;j++) for(int k=0;k<regions_per_tet(tet_index_2).m;k++){bool join=false;
                 const ARRAY<int>& region_1=regions_per_tet(tet_index_1)(j);const ARRAY<int>& region_2=regions_per_tet(tet_index_2)(k);
                 for(int v=0;v<region_1.m;v++){int polygon_element_index_1=Cutting_Polygon_To_Element(region_1(v));
-                    int element_opposite=polygon_mesh.Opposite_Oriented_Element(polygon_element_index_1);if(!element_opposite) continue;
+                    int element_opposite=polygon_mesh.Opposite_Oriented_Element(polygon_element_index_1);if(element_opposite<0) continue;
                     for(int w=0;w<region_2.m;w++){int polygon_element_index_2=Cutting_Polygon_To_Element(region_2(w));
                         if(polygon_element_index_2==element_opposite){join=true;goto Know_Join;}}}Know_Join:;
                 if(join){int dup_tet_1=new_tets_per_current(tet_index_1)(j);int dup_tet_2=new_tets_per_current(tet_index_2)(k);
@@ -1246,7 +1246,7 @@ Duplicate_And_Merge_Elements()
         else old_particle_per_new_collapsed_particle.Append(0);
         // set mass/velocity of tet nodes
         if(cutting_particles.particle_ids_types(current_particle_id_for_this_new_particle)!=CUTTING_PARTICLES::INTERSECTION_ID){
-            int tet_node=cutting_particles.tet_node_indices(current_particle_id_for_this_new_particle);if(!tet_node) PHYSBAM_FATAL_ERROR();
+            int tet_node=cutting_particles.tet_node_indices(current_particle_id_for_this_new_particle);if(tet_node<0) PHYSBAM_FATAL_ERROR();
             previous_particle_index_per_new_particle_index(particle_index)=tet_node;
             new_particles.V(particle_index)=current_embedding_vertices.V(tet_node);
             new_particles.mass(particle_index)=current_embedding_vertices.mass(tet_node);}}
