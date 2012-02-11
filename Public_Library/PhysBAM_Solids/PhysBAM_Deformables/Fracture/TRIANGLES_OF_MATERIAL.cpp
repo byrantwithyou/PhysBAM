@@ -114,11 +114,11 @@ Add_To_Material_Surface_Mesh_Face_Triangle(const int triangle)
         Add_To_Material_Surface_Mesh_Triangle(i,ij,ik);Add_To_Material_Surface_Mesh_Triangle(ij,j,jk);
         Add_To_Material_Surface_Mesh_Triangle(ik,jk,k);Add_To_Material_Surface_Mesh_Triangle(ik,ij,jk);}
     else if(ij<0 && ik>=0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(k,ik,jk);Add_To_Material_Surface_Mesh_Quad(i,j,jk,ik);}
-    else if(ij>=0 && ik>=0<0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(j,jk,ij);Add_To_Material_Surface_Mesh_Quad(i,ij,jk,k);}
-    else if(ij>=0 && ik>=0 && jk>=0<0){Add_To_Material_Surface_Mesh_Triangle(i,ij,ik);Add_To_Material_Surface_Mesh_Quad(ij,j,k,ik);}
-    else if(ij>=0 && ik>=0<0 && jk>=0<0){Add_To_Material_Surface_Mesh_Triangle(j,k,ij);Add_To_Material_Surface_Mesh_Triangle(ij,k,i);}
-    else if(ij<0 && ik>=0 && jk>=0<0){Add_To_Material_Surface_Mesh_Triangle(i,j,ik);Add_To_Material_Surface_Mesh_Triangle(ik,j,k);}
-    else if(ij<0 && ik>=0<0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(i,j,jk);Add_To_Material_Surface_Mesh_Triangle(jk,k,i);}
+    else if(ij>=0 && ik<0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(j,jk,ij);Add_To_Material_Surface_Mesh_Quad(i,ij,jk,k);}
+    else if(ij>=0 && ik>=0 && jk<0){Add_To_Material_Surface_Mesh_Triangle(i,ij,ik);Add_To_Material_Surface_Mesh_Quad(ij,j,k,ik);}
+    else if(ij>=0 && ik<0 && jk<0){Add_To_Material_Surface_Mesh_Triangle(j,k,ij);Add_To_Material_Surface_Mesh_Triangle(ij,k,i);}
+    else if(ij<0 && ik>=0 && jk<0){Add_To_Material_Surface_Mesh_Triangle(i,j,ik);Add_To_Material_Surface_Mesh_Triangle(ik,j,k);}
+    else if(ij<0 && ik<0 && jk>=0){Add_To_Material_Surface_Mesh_Triangle(i,j,jk);Add_To_Material_Surface_Mesh_Triangle(jk,k,i);}
     else Add_To_Material_Surface_Mesh_Triangle(i,j,k);
 }
 //#####################################################################
