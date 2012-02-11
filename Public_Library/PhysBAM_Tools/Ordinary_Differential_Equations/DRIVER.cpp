@@ -17,7 +17,7 @@ template<class TV> void Write_Substep_Helper(void*writer,const std::string& titl
 //#####################################################################
 template<class TV> DRIVER<TV>::
 DRIVER(EXAMPLE<TV>& example)
-    :example(example),output_number(example.first_frame)
+    :time(0),example(example),current_frame(0),output_number(example.first_frame)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
