@@ -370,7 +370,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     T damping=(T).01;
     if(test_number==8) damping=(T).03;
     if(test_number==19) damping=(T).1;
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         if(test_number==12 || test_number==21) solid_body_collection.Add_Force(Create_Tet_Springs(*tetrahedralized_volume,(T)stiffness/(1+sqrt((T)2)),(T)3));
         else
             if(test_number==8 || test_number==14){
@@ -380,10 +380,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 solid_body_collection.Add_Force(fv);}
             else solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
 
-    for(int i=1;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
+    for(int i=0;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
         solid_body_collection.Add_Force(Create_Edge_Springs(*segmented_curve,(T)stiffness/(1+sqrt((T)2)),(T)3));}
     
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
         solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
         T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
@@ -499,9 +499,9 @@ void Push_Out_Test()
     int num_blocks=4;
     for(int i=0;i<num_blocks;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-        rigid_body.Set_Frame(FRAME<TV>(TV((T)1.8*i,(T)1.6*i,(T)0),ROTATION<TV>((T)pi/10*i,TV::Axis_Vector(1))));
+        rigid_body.Set_Frame(FRAME<TV>(TV((T)1.8*(i+1),(T)1.6*(i+1),(T)0),ROTATION<TV>((T)pi/10*(i+1),TV::Axis_Vector(0))));
         rigid_body.Set_Mass(1000);
-        if(i==3) rigid_body.is_static=true;
+        if(i==2) rigid_body.is_static=true;
         /*        rigid_body.Twist().linear=TV(-1,0,0);*/}
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
@@ -513,7 +513,7 @@ void Push_Out_Test()
     tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
 
 //    int n=10;
-//    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).X()=TV(1.8*i,1.*j,1.75*k);
+//    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).X()=TV(1.8*(i+1),1.*j,1.75*k);
 }
 //#####################################################################
 // Function Coupled_Stack
@@ -526,10 +526,10 @@ void Coupled_Stack()
     for(int i=0;i<6;i++){
         if(i%2==0){
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).4);
-            rigid_body.X()=TV(0,(T)(2*i-1),0);
+            rigid_body.X()=TV(0,(T)(2*i+1),0);
             rigid_body.Set_Mass(6000);}
         else{
-            tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),RANGE<TV>(TV(-(T)1,(T)(2*i-2),-(T)1),TV((T)1,(T)(2*i),(T)1))),1000);}}
+            tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),RANGE<TV>(TV(-(T)1,(T)(2*i),-(T)1),TV((T)1,(T)(2*i+2),(T)1))),1000);}}
  
     maximum_fall_speed=105;
 //    T v=maximum_fall_speed,g=solids_parameters.gravity,t=4;
@@ -577,7 +577,7 @@ public:
 
     void operator()(TRIANGULATED_SURFACE<T>& surface) const
     {
-        for(int i=surface.mesh.elements.m;i>=1;i--){const VECTOR<int,3>& elements(surface.mesh.elements(i));
+        for(int i=surface.mesh.elements.m-1;i>=0;i--){const VECTOR<int,3>& elements(surface.mesh.elements(i));
             for(int j=0;j<3;j++) if(Prune(surface.particles.X(elements(j)))){surface.mesh.elements.Remove_Index_Lazy(i);break;}}
         surface.Discard_Valence_Zero_Particles_And_Renumber();
         static_cast<PARTICLES<TV>&>(surface.particles).mass*=20;
@@ -840,7 +840,7 @@ void Floppy_Fish()
         joint_function->Set_k_p(joint_strengths[i-2]);joint_function->Set_Target_Angle(ROTATION<TV>());}
 
 //    // make the joints
-//    tests.PD_Curl(scale,center-(T).5*(extent-scale*plank_length)*TV::Axis_Vector(1),ROTATION<TV>(),25,number_of_joints,false);
+//    tests.PD_Curl(scale,center-(T).5*(extent-scale*plank_length)*TV::Axis_Vector(0),ROTATION<TV>(),25,number_of_joints,false);
 
     // add the fish
     RIGID_BODY_STATE<TV> fish_state(FRAME<TV>(TV(0,3,0),ROTATION<TV>((T)half_pi,TV(1,0,0))));
@@ -876,7 +876,7 @@ void Twisting_Chain(bool apply_twist)
     int n=3;
     RIGID_BODY<TV>* rigid_body=0;
     for(int i=0;i<3*n+1;i++){
-        FRAME<TV> frame(TV((T)1.3*i,6,0),ROTATION<TV>(i*(T)pi/2,TV(1,0,0)));
+        FRAME<TV> frame(TV((T)1.3*(i+1),6,0),ROTATION<TV>((i+1)*(T)pi/2,TV(1,0,0)));
         if(i%3==1){
             rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);
             rigid_body->Set_Frame(frame*FRAME<TV>(TV(),ROTATION<TV>((T)pi/2,TV(1,0,0))));
@@ -887,8 +887,8 @@ void Twisting_Chain(bool apply_twist)
         else tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_thin_24K.tet",RIGID_BODY_STATE<TV>(frame),true,true,1000,(T).5);}
     if(apply_twist){
         curve.Add_Control_Point(0,rigid_body->Frame());
-        for(int i=0;i<=23;i++) curve.Add_Control_Point((T)i+2,rigid_body->Frame()*FRAME<TV>(TV(),ROTATION<TV>((T)(.5*pi*i),TV(1,0,0))));
-        for(int i=0;i<=23;i++) curve.Add_Control_Point(-(T)i+49,rigid_body->Frame()*FRAME<TV>(TV(),ROTATION<TV>((T)(.5*pi*i),TV(1,0,0))));}
+        for(int i=0;i<=23;i++) curve.Add_Control_Point((T)i+2,rigid_body->Frame()*FRAME<TV>(TV(),ROTATION<TV>((T)(.5*pi*(i+1)),TV(1,0,0))));
+        for(int i=0;i<=23;i++) curve.Add_Control_Point(-(T)i+49,rigid_body->Frame()*FRAME<TV>(TV(),ROTATION<TV>((T)(.5*pi*(i+1)),TV(1,0,0))));}
 
     tests.Add_Ground((T).5,-2,1);
 }
@@ -1190,7 +1190,7 @@ void Sidewinding()
     T friction=(T).8;
 
     // make the joints
-    PD_Snake(scale,center-(T).5*(extent-scale*plank_length)*snake_rotation.Rotate(TV::Axis_Vector(1)),snake_rotation,2000,number_of_joints,0);
+    PD_Snake(scale,center-(T).5*(extent-scale*plank_length)*snake_rotation.Rotate(TV::Axis_Vector(0)),snake_rotation,2000,number_of_joints,0);
 
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/snake_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(center,snake_rotation)),false,false,1000,(T).5);
 
@@ -1212,7 +1212,7 @@ void Sidewinding()
 
     for(int i=0;i<count;i++) for(int j=0;j<6;j++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("plank",(T)1,friction);
-        rigid_body.X()=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-6-2*i));
+        rigid_body.X()=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-4-2*i));
         rigid_body.Rotation()=ROTATION<TV>((T)half_pi,TV(0,1,0));
         rigid_body.Set_Name("obstruction");
         rigid_body.is_static=true;
@@ -1291,7 +1291,7 @@ void Add_Maggot(const T scale,const RIGID_BODY_STATE<TV>& state,const std::strin
     joint_separation=(T)1.05*scale;
 
     // make the joints
-    PD_Snake(scale,state.frame.t-(T).5*(extent-scale*plank_length)*state.frame.r.Rotate(TV::Axis_Vector(1)),state.frame.r,2000*scale,number_of_joints,-(T).2,friction);
+    PD_Snake(scale,state.frame.t-(T).5*(extent-scale*plank_length)*state.frame.r.Rotate(TV::Axis_Vector(0)),state.frame.r,2000*scale,number_of_joints,-(T).2,friction);
 
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_"+resolution+"K.tet",state,false,false,1000,(T)1.2*scale);
 
@@ -1452,12 +1452,12 @@ void Initialize_Dynamic_Subsampling()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         tetrahedralized_volume->Update_Number_Nodes();
         if(!tetrahedralized_volume->triangulated_surface) tetrahedralized_volume->Initialize_Triangulated_Surface();
         surface_elements.Append_Elements(tetrahedralized_volume->triangulated_surface->mesh.elements);}
 
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         triangulated_surface->Update_Number_Nodes();
         surface_elements.Append_Elements(triangulated_surface->mesh.elements);}
 

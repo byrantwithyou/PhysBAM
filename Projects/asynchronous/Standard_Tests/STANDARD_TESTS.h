@@ -430,10 +430,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         stiffness*=stiffness_multiplier;
         
         // get volumes and curves
-        if(!primary_tetrahedralized_volumes.m) for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++)
+        if(!primary_tetrahedralized_volumes.m) for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++)
                 primary_tetrahedralized_volumes.Append(tetrahedralized_volume);
         ARRAY<TETRAHEDRALIZED_VOLUME<T>*>& tetrahedralized_volumes_for_forces=(test_number==15 || test_number==16)?complementary_boundary_tetrahedralized_volumes:primary_tetrahedralized_volumes;
-        if(!primary_segmented_curves.m) for(int i=1;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++)
+        if(!primary_segmented_curves.m) for(int i=0;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++)
                 primary_segmented_curves.Append(segmented_curve);
         if(!primary_segmented_curves.m) for(int i=0;i<tetrahedralized_volumes_for_forces.m;i++){
                 TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=tetrahedralized_volumes_for_forces(i);
@@ -454,7 +454,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T linear_stiffness=stiffness_multiplier*10/(1+sqrt((T)2)),linear_damping=damping_multiplier*15;
             T bending_stiffness=bending_stiffness_multiplier*2/(1+sqrt((T)2)),bending_damping=bending_damping_multiplier*8;
             T axial_stiffness=axial_stiffness_multiplier*2/(1+sqrt((T)2)),axial_damping=axial_damping_multiplier*8;
-            for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+            for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
                 solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));
                 solid_body_collection.Add_Force(Create_Bending_Springs(*triangulated_surface,bending_stiffness,bending_damping));
                 solid_body_collection.Add_Force(Create_Axial_Bending_Springs(*triangulated_surface,(T).01,axial_stiffness,axial_damping));

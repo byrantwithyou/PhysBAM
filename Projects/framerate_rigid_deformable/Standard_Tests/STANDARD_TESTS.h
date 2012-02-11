@@ -204,7 +204,7 @@ void Torus_Test()
 //#####################################################################
 void Tetrahedralized_Volume_Forces()
 {
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         if(tetrahedralized_volume->mesh.elements.m){
             T linear_stiffness=stiffness_multiplier*(T)7.5e3,linear_damping=damping_multiplier*(T).5;
             DEFORMABLES_FORCES<TV>* altitude_springs=Create_Altitude_Springs(*tetrahedralized_volume,(T)linear_stiffness/(1+sqrt((T)2)),(T)linear_damping);
@@ -290,7 +290,7 @@ void Hanging_Curtain()
 void Triangulated_Surface_Forces(const bool use_edge,const bool use_bending,const bool use_altitude,const T linear_stiffness,const T linear_damping,const T altitude_stiffness,
     const T altitude_damping)
 {
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         if(use_edge){
             solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));} // were *2 and *10
         if(use_bending){

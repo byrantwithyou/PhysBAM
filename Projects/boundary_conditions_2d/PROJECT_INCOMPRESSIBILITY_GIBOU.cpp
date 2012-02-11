@@ -171,7 +171,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
         index_to_face.Append(face);
         for(int i=0;i<2;i++){
             int& index=cell_to_index(face.Cell_Index(i));
-            if(!index) index=index_to_cell.Append(face.Cell_Index(i));
+            if(index<0) index=index_to_cell.Append(face.Cell_Index(i));
             system.gradient.Append_Entry_To_Current_Row(index,sign(i)*dxi);
             neg_div_t.Append_Entry_To_Current_Row(index,sign(i)*fraction*dxi);}
         system.gradient.Finish_Row();

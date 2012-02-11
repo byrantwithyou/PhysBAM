@@ -88,7 +88,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     // add bindings
     for(int p=noodle_particles_start;p<=particles.array_collection->Size();p++){
         gravity_particles.active_indices.Append(p);
-        int parent_tet=Get_Intersecting_Tetrahedron(particles,particles.X(p),dynamic_volume);if(!parent_tet) PHYSBAM_FATAL_ERROR();
+        int parent_tet=Get_Intersecting_Tetrahedron(particles,particles.X(p),dynamic_volume);if(parent_tet<0) PHYSBAM_FATAL_ERROR();
         VECTOR<int,4> parents=dynamic_volume.mesh.elements(parent_tet);
         VECTOR<T,3> weights=TETRAHEDRON<T>(particles.X.Subset(parents)).Barycentric_Coordinates(particles.X(p));
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<T,TV,4>(particles,p,parents,weights));}

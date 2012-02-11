@@ -209,7 +209,7 @@ void Setup_Spatially_Varying_Wind(const int frame)
             (face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x,cell_index.y+1,cell_index.z)))/(T)2,
             (face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x,cell_index.y,cell_index.z+1)))/(T)2);
     }
-    for(int i=1;WIND_DRAG_3D<T>* drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>*>(i);i++){
+    for(int i=0;WIND_DRAG_3D<T>* drag=solid_body_collection.template Find_Force<WIND_DRAG_3D<T>*>(i);i++){
         drag->Use_Spatially_Varying_Wind((T)0,grid,v_array);drag->Set_Wind_Pressure(p_array);}
 }
 void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE

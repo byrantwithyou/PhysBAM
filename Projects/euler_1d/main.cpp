@@ -48,6 +48,7 @@ int main(int argc,char* argv[])
     if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);
     example->Adjust_Output_Directory_For_MPI(example->fluids_parameters.mpi_grid);
     
+    LOG::cout<<std::setprecision(16)<<std::endl;
     SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
     driver.Execute_Main_Program();
     

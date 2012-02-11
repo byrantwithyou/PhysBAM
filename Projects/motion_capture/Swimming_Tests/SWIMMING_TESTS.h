@@ -342,7 +342,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(!use_finite_volume){stiffness=2e4;damping=(T)1;}
     if(use_implicit) solids_parameters.cfl*=10;
     
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         if(use_finite_volume){
             finite_volume=Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1);
             solid_body_collection.Add_Force(finite_volume);}
@@ -827,12 +827,12 @@ void Initialize_Dynamic_Subsampling()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
-    for(int i=1;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
+    for(int i=0;TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>*>(i);i++){
         tetrahedralized_volume->Update_Number_Nodes();
         if(!tetrahedralized_volume->triangulated_surface) tetrahedralized_volume->Initialize_Triangulated_Surface();
         surface_elements.Append_Elements(tetrahedralized_volume->triangulated_surface->mesh.elements);}
 
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         triangulated_surface->Update_Number_Nodes();
         surface_elements.Append_Elements(triangulated_surface->mesh.elements);}
 

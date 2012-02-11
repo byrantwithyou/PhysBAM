@@ -579,7 +579,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             if(test_number==32) particles.X(0).x=stretch;
             break;}
         case 100:{
-            for(int i=1;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
+            for(int i=0;TRIANGULATED_AREA<T>* triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>*>(i);i++)
                 Add_Constitutive_Model(*triangulated_area,(T)1e2,poissons_ratio,(T).05);
             if(parameter==1) Place_Triangle(1,3,.1,.2,1.2,TV(4.1,0));
             else if(parameter==2){
@@ -1019,7 +1019,7 @@ void Primary_Contour(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 void Init_Scatter_Plot()
 {
     int s=0;
-    for(int f=1;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
+    for(int f=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
         force->Update_Position_Based_State(0,true);
         s+=force->Fe_hat.m;}
 
@@ -1033,7 +1033,7 @@ void Init_Scatter_Plot()
 //#####################################################################
 void Update_Scatter_Plot()
 {
-    for(int f=1,k=1;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
+    for(int f=0,k=0;FINITE_VOLUME<TV,2>* force=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>*>(f);f++){
         for(int i=0;i<force->Fe_hat.m;i++){
             if(!use_contrails) contrail(k).Remove_All();
             contrail(k++).Append(force->Fe_hat(i).To_Vector());}}

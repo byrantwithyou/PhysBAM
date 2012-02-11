@@ -294,7 +294,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         if(test_number==12 || test_number==21) solid_body_collection.Add_Force(Create_Tet_Springs(*tetrahedralized_volume,(T)stiffness/(1+sqrt((T)2)),(T)3));
         else solid_body_collection.Add_Force(Create_Finite_Volume(*tetrahedralized_volume,new NEO_HOOKEAN<T,3>(stiffness,(T).45,damping,(T).25),true,(T).1));}
 
-//     for(int i=1;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
+//     for(int i=0;SEGMENTED_CURVE<TV>* segmented_curve=deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>*>(i);i++){
 //         solid_body_collection.Add_Force(Create_Edge_Springs(*segmented_curve,(T)stiffness/(1+sqrt((T)2)),(T)3));}
 
     for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){

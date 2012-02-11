@@ -126,7 +126,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
 void Initialize_Forces()
 {
     for(int object=0;object<melting_parameters.body_index.m;object++){
-        int index=melting_parameters.body_index(object);if(!index)return;
+        int index=melting_parameters.body_index(object);if(index<0)return;
         RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
         rigid_body.Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);}
 }

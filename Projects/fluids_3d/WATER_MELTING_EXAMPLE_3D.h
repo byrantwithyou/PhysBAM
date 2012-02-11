@@ -119,7 +119,7 @@ void Modify_Fluid_For_Melting(const T dt,const T time)
     // add new water particles from the melting of the object
     for(int object=0;object<melting_parameters.levelsets.m;object++){
         int index=melting_parameters.body_index(object);
-        if(!index)continue;
+        if(index<)continue;
         if(melting_parameters.body_type(object)==melting_parameters.DEFORMABLE){
             LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
             RED_GREEN_GRID_3D<T>& grid=levelset.grid;

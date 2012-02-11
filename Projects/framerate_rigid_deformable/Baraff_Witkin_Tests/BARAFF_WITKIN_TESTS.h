@@ -380,7 +380,7 @@ void Cloth_Draped_On_Ground()
 //#####################################################################
 void Triangulated_Surface_Forces(const bool use_stretch,const bool use_shear,const bool use_bend)
 {
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         if(use_stretch) solid_body_collection.Add_Force(Create_BW_Stretch_Force(solid_body_collection.deformable_body_collection.particles,triangulated_surface->mesh,(T)1e6,(T)1000));
         if(use_shear) solid_body_collection.Add_Force(Create_BW_Shear_Force(solid_body_collection.deformable_body_collection.particles,triangulated_surface->mesh,(T)100,(T)100));
         if(use_bend) solid_body_collection.Add_Force(Create_BW_Bending_Force(solid_body_collection.deformable_body_collection.particles,triangulated_surface->mesh,(T).01,(T)2e-6));}
@@ -394,7 +394,7 @@ void Triangulated_Surface_Forces(const bool use_stretch,const bool use_shear,con
 void Triangulated_Surface_Forces(const bool use_edge,const bool use_bending,const bool use_altitude,const T linear_stiffness,const T linear_damping,const T altitude_stiffness,
     const T altitude_damping)
 {
-    for(int i=1;TRIANGULATED_SURFACE<T>* triangulated_surface=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
+    for(int i=0;TRIANGULATED_SURFACE<T>* triangulated_surface=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>*>(i);i++){
         if(use_edge){
             solid_body_collection.Add_Force(Create_Edge_Springs(*triangulated_surface,linear_stiffness,linear_damping));} // were *2 and *10
         if(use_bending){

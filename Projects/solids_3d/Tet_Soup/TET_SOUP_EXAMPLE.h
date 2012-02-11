@@ -94,7 +94,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         ARRAY<int> intersection_list;ARRAY<TV> X(4);
         for(int p=0;p<4;p++){
             X(p)=translation+(rotation.Rotate(tet.X(p)))*scale;
-            int intersecting_tet=Get_Intersecting_Tetrahedron(particles,X(p),dynamic_volume);if(!intersecting_tet) break;
+            int intersecting_tet=Get_Intersecting_Tetrahedron(particles,X(p),dynamic_volume);if(intersecting_tet<0) break;
             intersection_list.Append(intersecting_tet);}
         if(intersection_list.m!=4){i--;continue;}
         int offset=particles.array_collection->Size();particles.array_collection->Add_Elements(4);

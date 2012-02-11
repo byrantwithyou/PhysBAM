@@ -1028,8 +1028,8 @@ void Replace_Bones_With_Fused_Bone(const std::string& merge_filename,RIGID_BODY<
         if(verbose) LOG::cout<<"BONE "<<bone_name<<" got frame "<<original_to_fused_world_transform(i)<<std::endl;
         bone_name=FILE_UTILITIES::Get_Basename(FILE_UTILITIES::Get_Short_Name(bone_name));
         int index=Get_Bone_Index(bone_name);
-        if(!index) continue;
-        if(index) replaced_bones(i)=bones(index);
+        if(index<0) continue;
+        if(index>=0) replaced_bones(i)=bones(index);
         if(i==1){assert(replaced_bones(i));subtract_frame=original_to_fused_world_transform(i);align_frame=replaced_bones(i)->Frame();}
         original_to_fused_world_transform(i)=align_frame*subtract_frame.Inverse()*original_to_fused_world_transform(i)*bones(index)->Frame().Inverse();}
     Replace_Bones_With_Fused_Bone(replaced_bones,original_to_fused_world_transform,new_bone);
@@ -1037,7 +1037,7 @@ void Replace_Bones_With_Fused_Bone(const std::string& merge_filename,RIGID_BODY<
     if(new_reflected_bone){
         for(int i=0;i<n;i++){int index=0;
             bones.Find(replaced_bones(i),index);
-            if(!index || !bones(Reflected_Bone(index))){LOG::cerr<<"could not replace fused reflected bone"<<std::endl;return;}
+            if(index<0 || !bones(Reflected_Bone(index))){LOG::cerr<<"could not replace fused reflected bone"<<std::endl;return;}
             replaced_bones(i)=bones(Reflected_Bone(index));
             MATRIX<T,4> reflection=transform.Matrix_4X4()*Reflection_Matrix(0,specific_side)*transform.Inverse().Matrix_4X4();
             MATRIX<T,4> reflected_transform=reflection.Inverse()*original_to_fused_world_transform(i).Matrix_4X4()*reflection;
@@ -1213,7 +1213,7 @@ static INTERPOLATION_CURVE<T,ROTATION<TV> >* Read_Frame_Track_From_Spline(ARRAY<
 #if 0
     T tmin=0;int index=0;
     for(int i=0;i<motion_splines.m;i++) if(motion_splines(i).x==jointname) index=i;
-    if(!index) return 0;
+    if(index<0) return 0;
     FRAME_TRACK_3D<T>* frame_track=new FRAME_TRACK_3D<T>(samples,tmin,track_speedup_factor);
     T time_increment=(1/(T)(samples-1))*motion_splines(index).y->Range();
     for(int i=0;i<samples-1;i++) frame_track->trajectory(i+1)=FRAME<TV>(motion_splines(index).y->Evaluate(motion_splines(index).y->Start_Time()+i*time_increment));

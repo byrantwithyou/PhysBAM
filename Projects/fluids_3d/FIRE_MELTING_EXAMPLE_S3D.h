@@ -74,7 +74,7 @@ void Melting_Substep(const T dt,const T time)
         ARRAY<T>& temperature=*melting_parameters.temperature(object);ARRAY<T> old_temperature(temperature);
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         for(int n=0;n<temperature.m;n++){
-            int p=levelset.node_to_particle_mapping(n);if(!p)continue;
+            int p=levelset.node_to_particle_mapping(n);if(p<0)continue;
             temperature(n)-=dt*cloth_temperature_time_constant*(temperature(n)-interpolation.Clamped_To_Array(grid,smoothed_temperature,particles.X(p)));}
         LOG::cout<<"maximum cloth temperature = "<<temperature.Max()<<std::endl;
         for(int n=0;n<reaction.m;n++){

@@ -382,7 +382,7 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
             LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
             RED_GREEN_GRID_3D<T>& grid=levelset.grid;
             int index=melting_parameters.body_index(object);
-            if(!index)continue;
+            if(index<0)continue;
             RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
             FRAME<T> frame=rigid_body.Frame()*melting_parameters.rigid_body_grid_frames(object).Inverse();
             // map data to the cell based indices
@@ -440,7 +440,7 @@ void Initialize_Forces()
     PHYSBAM_FATAL_ERROR("BASIC FORCES NO LONGER EXIST");
 #if 0
     for(int object=0;object<melting_parameters.body_index.m;object++){
-        int index=melting_parameters.body_index(object);if(!index)continue;
+        int index=melting_parameters.body_index(object);if(index<0)continue;
         RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list(index);
         std::cout<<rigid_body.position<<std::endl;
         rigid_body.Add_Basic_Forces(solids_parameters.gravity,solids_parameters.gravity_direction,solids_parameters.rigid_body_evolution_parameters.rigid_body_ether_viscosity,0);

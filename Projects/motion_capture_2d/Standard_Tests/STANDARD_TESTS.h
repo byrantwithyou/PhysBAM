@@ -184,7 +184,7 @@ void Setup_Spatially_Varying_Wind(const int frame)
         v_array(cell_index)=TV((face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x+1,cell_index.y)))/(T)2,
             (face_velocities(1,cell_index)+face_velocities(1,TV_INT(cell_index.x,cell_index.y+1)))/(T)2);
     }
-    for(int i=1;WIND_DRAG<TV>* drag=solid_body_collection.template Find_Force<WIND_DRAG<TV>*>(i);i++){
+    for(int i=0;WIND_DRAG<TV>* drag=solid_body_collection.template Find_Force<WIND_DRAG<TV>*>(i);i++){
         drag->Use_Spatially_Varying_Wind((T)0,grid,v_array);drag->Set_Wind_Pressure(p_array);}
 }
 //#####################################################################

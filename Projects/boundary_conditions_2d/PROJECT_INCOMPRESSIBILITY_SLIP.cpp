@@ -72,7 +72,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
         fractions.Append(fraction);
         for(int i=0;i<2;i++){
             int& index=cell_to_index(face.Cell_Index(i));
-            if(!index) index=index_to_cell.Append(face.Cell_Index(i));
+            if(index<0) index=index_to_cell.Append(face.Cell_Index(i));
             system.gradient.Append_Entry_To_Current_Row(index,sign(i)*fraction*dxi*cell_vol);}
         system.gradient.Finish_Row();}
     system.gradient.n=index_to_cell.m;
