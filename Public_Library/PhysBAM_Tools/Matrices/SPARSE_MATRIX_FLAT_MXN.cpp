@@ -92,7 +92,7 @@ operator()(const int i,const int j)
     int index=Find_Index(i,j);
     if(A(index).j!=j){ // need to add entry
         if(A(index).j>=0){ // shift entries over to make room
-            assert(A(offsets(i+1)-1).j>=0);
+            assert(A(offsets(i+1)-1).j<0);
             for(int jj=offsets(i+1)-1;jj>index;jj--) A(jj)=A(jj-1);}
         A(index).j=j;A(index).a=0;}
     return A(index).a;
