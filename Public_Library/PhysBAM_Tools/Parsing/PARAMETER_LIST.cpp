@@ -200,7 +200,7 @@ End_Parse(bool exit_on_error)
     if(!first_error_parameter.empty()){
         LOG::cout<<"ERROR: Problems parsing parameter '"<<first_error_parameter<<"'"<<std::endl;
         int i=Find_Parameter(first_error_parameter);
-        if(i) LOG::cout<<"       (Got value string '"<<parameter_list(i).y.value_string<<"')"<<std::endl;}
+        if(i>=0) LOG::cout<<"       (Got value string '"<<parameter_list(i).y.value_string<<"')"<<std::endl;}
     if(commandline_parameter_map.Size())
         LOG::cout<<"ERROR: Unrecognized commandline parameters:";
     LOG::cout<<commandline_parameter_map<<std::endl;
@@ -235,7 +235,7 @@ Rename(const std::string &old_name,const std::string &new_name)
 {
     PHYSBAM_ASSERT(Is_Defined(old_name) && !Is_Defined(new_name));
     int i=Find_Parameter(old_name);
-    if(i) parameter_list(i).x=new_name;
+    if(i>=0) parameter_list(i).x=new_name;
 }
 //#####################################################################
 // Function Write (stream)

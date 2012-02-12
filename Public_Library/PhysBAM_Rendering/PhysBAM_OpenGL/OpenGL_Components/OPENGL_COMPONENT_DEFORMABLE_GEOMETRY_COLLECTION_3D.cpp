@@ -273,7 +273,7 @@ Display(const int in_color) const
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();
 
-    if(selected_vertex) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_geometry->particles.X(selected_vertex),selected_vertex);
+    if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_geometry->particles.X(selected_vertex),selected_vertex);
 
     if(draw_velocity_vectors) velocity_field.Display(in_color);
 

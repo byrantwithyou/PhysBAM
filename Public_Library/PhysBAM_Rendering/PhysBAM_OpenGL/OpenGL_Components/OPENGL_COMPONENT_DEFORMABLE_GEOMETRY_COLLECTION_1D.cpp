@@ -144,7 +144,7 @@ Display(const int in_color) const
         if(point_simplices_1d_objects(i)) point_simplices_1d_objects(i)->Display(in_color);}
 #endif
 
-    if(selected_vertex) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_geometry_collection->particles.X(selected_vertex),selected_vertex);
+    if(selected_vertex>=0) OPENGL_SELECTION::Draw_Highlighted_Vertex(deformable_geometry_collection->particles.X(selected_vertex),selected_vertex);
 
     //if(draw_velocity_vectors) velocity_field.Display(in_color);
 }

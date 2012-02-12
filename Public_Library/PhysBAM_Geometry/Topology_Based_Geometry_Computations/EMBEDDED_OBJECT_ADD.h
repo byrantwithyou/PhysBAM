@@ -94,7 +94,7 @@ template<class TV,int d> int
 Add_Embedded_Subelement(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,d>& embedded_nodes)
 {
     VECTOR<int,d> global_particles(eo.embedded_particles.active_indices.Subset(embedded_nodes));
-    assert(!eo.embedded_mesh.Simplex(global_particles));
+    assert(eo.embedded_mesh.Simplex(global_particles)<0);
     int new_subelement=eo.embedded_mesh.elements.Append(global_particles);
     if(eo.embedded_mesh.incident_elements) // needs to be updated
         for(int i=0;i<global_particles.m;i++) (*eo.embedded_mesh.incident_elements)(global_particles[i]).Append(new_subelement);
