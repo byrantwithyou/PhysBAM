@@ -428,7 +428,7 @@ Print_Maximum_Velocities(const T time) const
 {
     LOG::cout<<"time = "<<time<<std::endl;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
-    int max_linear_index=-1,max_angular_index=0;T max_linear_magnitude_squared=-FLT_MAX,max_angular_magnitude_squared=-FLT_MAX;
+    int max_linear_index=-1,max_angular_index=-1;T max_linear_magnitude_squared=-FLT_MAX,max_angular_magnitude_squared=-FLT_MAX;
     for(int i=0;i<rigid_body_collection.dynamic_rigid_body_particles.m;i++){const int p=rigid_body_collection.dynamic_rigid_body_particles(i);
         T linear_magnitude_squared=rigid_body_particles.twist(p).linear.Magnitude_Squared(),angular_magnitude_squared=rigid_body_particles.twist(p).angular.Magnitude_Squared();
         if(linear_magnitude_squared>max_linear_magnitude_squared){max_linear_magnitude_squared=linear_magnitude_squared;max_linear_index=p;}

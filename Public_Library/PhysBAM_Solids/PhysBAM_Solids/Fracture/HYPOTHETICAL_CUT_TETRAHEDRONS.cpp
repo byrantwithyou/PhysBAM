@@ -173,7 +173,7 @@ template<class T> void HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Initialize_Initiation_Point_Cut(const PLANE<T>& plane,const int tetrahedron_input)
 {
     tetrahedron=tetrahedron_input;
-    fracture_normal=plane.normal;cut_index=0;
+    fracture_normal=plane.normal;cut_index=-1;
     int i,j,k,l;embedded_object.simplicial_object.mesh.elements(tetrahedron).Get(i,j,k,l);
     VECTOR<T,3> xi=embedded_object.particles.X(i),xj=embedded_object.particles.X(j),xk=embedded_object.particles.X(k),xl=embedded_object.particles.X(l);
     T interpolation_fraction_ij,interpolation_fraction_ik,interpolation_fraction_il,interpolation_fraction_jk,interpolation_fraction_jl,interpolation_fraction_kl;
@@ -378,7 +378,7 @@ Edges_Shared_With_Existing_Embedded_Surface()
 template<class T> bool HYPOTHETICAL_CUT_TETRAHEDRONS<T>::
 Would_Orphan_Half_Oct()
 {
-    if(cut_index < 5) return false;assert(cut_index<=7);
+    if(cut_index < 5) return false;assert(cut_index<7);
     assert(!embedded_object.Cut_By_Quad(tetrahedron));
     assert(embedded_object.Number_Of_Embedded_Cuts(tetrahedron)==2);
     VECTOR<int,4> emb_tris=embedded_object.Embedded_Subelements_In_Element(tetrahedron);

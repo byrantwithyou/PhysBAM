@@ -590,7 +590,7 @@ Process_Push_Out_Legacy()
                         particle_intersections.Remove_All();
                         intersections.Append_All_Intersections(id_1,id_2,particle_intersections,desired_separation_distance);
                         if(!particle_intersections.m){skip_collision_check.Set_Last_Checked(id_1,id_2);continue;}
-                        T smallest_value=FLT_MAX;int smallest_index=0;
+                        T smallest_value=FLT_MAX;int smallest_index=-1;
                         TV collision_location,collision_normal;T collision_push_distance=0;
                         RIGID_BODY<TV> *collision_body1=0,*collision_body2=0;
                         for(int i=0;i<particle_intersections.m;i++){

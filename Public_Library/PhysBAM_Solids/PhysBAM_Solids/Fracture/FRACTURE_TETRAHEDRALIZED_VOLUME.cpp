@@ -220,7 +220,7 @@ Add_Best_Embedded_Triangle_With_Quad(const TV& fracture_normal,const int tetrahe
 {
     int i,j,k,l;permute_four(embedded_object.simplicial_object.mesh.elements(tetrahedron),embedded_object.orientation_index(tetrahedron)).Get(i,j,k,l);
     int pi,pj,pk,pl;permute_four(VECTOR<int,4>(1,2,3,4),embedded_object.orientation_index(tetrahedron)).Get(pi,pj,pk,pl);
-    T best_matched=(T)-FLT_MAX,best_lambda=0;int best_matched_index=0;
+    T best_matched=(T)-FLT_MAX,best_lambda=0;int best_matched_index=-1;
     TV ik=embedded_object.Position_Of_Embedded_Particle(i,k),kj=embedded_object.Position_Of_Embedded_Particle(k,j),
         jl=embedded_object.Position_Of_Embedded_Particle(j,l),li=embedded_object.Position_Of_Embedded_Particle(l,i),
         &xi=embedded_object.simplicial_object.particles.X(i),&xj=embedded_object.simplicial_object.particles.X(j),

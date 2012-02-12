@@ -244,7 +244,7 @@ void Aggregate_And_Stagger_Convex_Regions(ARRAY<TV>& locations, ARRAY<TV>& norma
         if(candidates.m)
         {
             T min_distance=FLT_MAX;
-            int min_index=0;
+            int min_index=-1;
             for(int j=0;j<candidates.m;j++)
             {
                 if(candidates(j)!=i)
