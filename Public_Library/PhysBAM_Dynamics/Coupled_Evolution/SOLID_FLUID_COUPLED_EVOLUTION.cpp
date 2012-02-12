@@ -270,7 +270,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         matrix_index_to_cell_index_array.Resize(number_of_regions);
         cell_index_to_matrix_index.Resize(grid.Domain_Indices(1));
         cell_index_to_matrix_index.Fill(-1);
-        ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
+        ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
         A_array.Resize(number_of_regions);b_array.Resize(number_of_regions);
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_cell_count(poisson.filled_region_colors(iterator.Cell_Index()))++;
         for(int color=0;color<number_of_regions;color++) if(poisson.filled_region_touches_dirichlet(color)||poisson.solve_neumann_regions){
@@ -295,7 +295,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
         interior_regions.Resize(colors);
         for(int color=0;color<colors;color++) if(filled_region_cell_count(color)>0){
-            if(!poisson.laplace_mpi || color>poisson.laplace_mpi->partitions.m) interior_regions(color)=INTERVAL<int>(1,filled_region_cell_count(color));
+            if(!poisson.laplace_mpi || color>=poisson.laplace_mpi->partitions.m) interior_regions(color)=INTERVAL<int>(0,filled_region_cell_count(color));
             else interior_regions(color)=poisson.laplace_mpi->partitions(color).interior_indices;}}
 
     // Compute coupling matrices, modified solid masses. Fix angular part of rigid RHS(B) for modified com.

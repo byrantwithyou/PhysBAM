@@ -71,8 +71,8 @@ Synchronize_Colors()
     mpi_grid.Find_Boundary_Regions(boundary_regions,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Zero_Box(),false,RANGE<VECTOR<int,1> >(-1,0),false,true,local_grid);
     // figure out which colors are global
     int global_color_count=0;
-    ARRAY<int,VECTOR<int,1> > color_map(-1,number_of_regions);color_map(-1)=-1;color_map(0)=0;
-    {ARRAY<bool,VECTOR<int,1> > color_is_global(-1,number_of_regions);
+    ARRAY<int,VECTOR<int,1> > color_map(-2,number_of_regions);color_map(-2)=-1;color_map(-1)=0;
+    {ARRAY<bool,VECTOR<int,1> > color_is_global(-2,number_of_regions);
     Find_Global_Colors(color_is_global,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Centered_Box());
     for(int color=0;color<number_of_regions;color++)if(color_is_global(color)) color_map(color)=++global_color_count;}
 
@@ -166,8 +166,8 @@ Synchronize_Colors_Threaded()
     mpi_grid.threaded_grid->Find_Boundary_Regions(boundary_regions,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Zero_Box(),false,RANGE<VECTOR<int,1> >(-1,0),false,true,local_grid);
     // figure out which colors are global
     int global_color_count=0;
-    ARRAY<int,VECTOR<int,1> > color_map(-1,number_of_regions);color_map(-1)=-1;color_map(0)=0;
-    {ARRAY<bool,VECTOR<int,1> > color_is_global(-1,number_of_regions);
+    ARRAY<int,VECTOR<int,1> > color_map(-2,number_of_regions);color_map(-2)=-2;color_map(-1)=-1;
+    {ARRAY<bool,VECTOR<int,1> > color_is_global(-2,number_of_regions);
     Find_Global_Colors(color_is_global,RANGE<typename T_PARALLEL_GRID::VECTOR_INT>::Centered_Box());
     for(int color=0;color<number_of_regions;color++)if(color_is_global(color)) color_map(color)=++global_color_count;}
 
@@ -181,7 +181,7 @@ Synchronize_Colors_Threaded()
 
     ARRAY<T_ARRAYS_INT> colors_copy(boundary_regions.m);
     // send left (front) colors
-    for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
+    for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-2){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         Translate_Local_Colors_To_Global_Colors(color_map,colors_copy(side),boundary_regions(side),global_color_offset);
         THREAD_PACKAGE pack=mpi_grid.threaded_grid->Package_Cell_Data(colors_copy(side),boundary_regions(side));pack.recv_tid=mpi_grid.threaded_grid->side_neighbor_ranks(side);
@@ -191,7 +191,7 @@ Synchronize_Colors_Threaded()
     // receive right (back) colors and initialize union find
     UNION_FIND<> union_find(total_global_colors);
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
-    {for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
+    {for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-2){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
         int index=-1;for(int i=0;i<mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
         PHYSBAM_ASSERT(index>=0);int position=0;
@@ -313,7 +313,7 @@ template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
 Translate_Local_Colors_To_Global_Colors(const ARRAY<int,VECTOR<int,1> >& color_map,T_ARRAYS_INT& colors_copy,const RANGE<TV_INT>& region,const int global_color_offset) const
 {
     for(CELL_ITERATOR iterator(local_grid,region);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        int new_color=color_map(colors(cell_index));colors_copy(cell_index)=new_color>0?new_color+global_color_offset:-1;}
+        int new_color=color_map(colors(cell_index));colors_copy(cell_index)=new_color>0?new_color+global_color_offset:-2;}
 }
 //#####################################################################
 // Function Find_Color_Matches
@@ -332,7 +332,7 @@ template<class T_GRID> void FLOOD_FILL_MPI<T_GRID>::
 Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const RANGE<TV_INT>&)
 {
     for(CELL_ITERATOR iterator(local_grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        int color=colors(cell_index);assert(color); // colors should either be -1 or positive
+        int color=colors(cell_index);assert(color); // colors should either be -2 or nonnegative
         if(color_map(color)==0) color_map(color)=++number_of_regions;
         colors(cell_index)=color_map(color);}
 }
@@ -343,7 +343,7 @@ template<class T_GRID> template<class T_BOX_HORIZONTAL_INT> void FLOOD_FILL_MPI<
 Remap_Colors(ARRAY<int,VECTOR<int,1> >& color_map,const T_BOX_HORIZONTAL_INT&)
 {
     for(int c=0;c<colors.m;c++){
-        int color=colors(c);assert(color); // colors should either be -1 or positive
+        int color=colors(c);assert(color); // colors should either be -2 or nonnegative
         if(color_map(color)==0) color_map(color)=++number_of_regions;
         colors(c)=color_map(color);}
 }

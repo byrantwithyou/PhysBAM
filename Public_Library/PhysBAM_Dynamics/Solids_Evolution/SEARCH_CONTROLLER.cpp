@@ -597,7 +597,7 @@ Add_Fluid_Drag(const T dt,const T time,ARRAY<TV> &F,ARRAY<TWIST<TV> > &rigid_F)
                 POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson=dynamic_cast<POISSON_COLLIDABLE_UNIFORM<T_GRID>*>(fluids_parameters->incompressible->projection.elliptic_solver);
                 number_of_regions=poisson->number_of_regions;
 
-                ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-1,number_of_regions);
+                ARRAY<int,VECTOR<int,1> > filled_region_cell_count(-2,number_of_regions);
                 matrix_index_to_cell_index_array.Resize(number_of_regions);
                 cell_index_to_matrix_index.Resize(fluids_parameters->grid->Domain_Indices(1));
                 cell_index_to_matrix_index.Fill(-1);

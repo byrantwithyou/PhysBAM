@@ -42,7 +42,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
     if(use_weighted_divergence)
         for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
             int color=filled_region_colors(iterator.Cell_Index());
-            if(color!=-1 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
+            if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
                 int matrix_index=cell_index_to_matrix_index(cell_index);
                 SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));VECTOR_ND<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
                 T diagonal=0;
@@ -73,7 +73,7 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
     else
         for(CELL_ITERATOR iterator(grid,domain);iterator.Valid();iterator.Next()){
             int color=filled_region_colors(iterator.Cell_Index());
-            if(color!=-1 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
+            if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){const TV_INT& cell_index=iterator.Cell_Index();
                 int matrix_index=cell_index_to_matrix_index(cell_index);
                 SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));VECTOR_ND<T>& b=b_array(filled_region_colors(cell_index));b(matrix_index)=f(cell_index);
                 T diagonal=0;
