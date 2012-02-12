@@ -954,7 +954,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         for(int i=0;i<rigid_body_interactions.m;i++){
             RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
             int index=parent_other_rigid_body.Has_Infinite_Inertia()?1:0;
-            if(index>=0){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
+            if(index){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
             TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.X();
             K_inverse_sum[index]+=K_inverse(i);ms[index]+=K_inverse_s;mrs[index]+=TV::Cross_Product(radius,K_inverse_s);
             MATRIX<T,T_SPIN::dimension,TV::dimension> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);
@@ -985,7 +985,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         MATRIX<T,TV::dimension+T_SPIN::dimension> M[2];
         for(int i=0;i<2;i++) if(equation_type!=(i?0:3)){
             M[i].Set_Submatrix(0,0,K_inverse_sum[i]);
-                M[i].Set_Submatrix(TV::dimension,0,mr[i]);
+            M[i].Set_Submatrix(TV::dimension,0,mr[i]);
             M[i].Set_Submatrix(0,TV::dimension,mr[i].Transposed());
             M[i].Set_Submatrix(TV::dimension,TV::dimension,mrr[i]);}
 

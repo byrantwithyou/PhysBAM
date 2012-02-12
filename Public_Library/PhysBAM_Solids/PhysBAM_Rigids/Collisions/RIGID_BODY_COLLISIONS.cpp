@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/STACK.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
@@ -375,7 +376,7 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
     TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
+    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
     T separation=TV::Dot_Product(body1->X()-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
@@ -1301,13 +1302,23 @@ Clean_Up_Fractured_Items_From_Lists(ARRAY<VECTOR<int,2> >& pairs,const int curre
 //#####################################################################
 // Function Initialize_All_Contact_Projections
 //#####################################################################
+namespace{
+struct COMPARE
+{
+    template<class A,class B,class C> bool operator()(const TRIPLE<A,B,C>& a1,const TRIPLE<A,B,C>& a2) const
+    {if(a1.x!=a2.x) return a1.x<a2.x;if(a1.y!=a2.y) return a1.y<a2.y;return LEXICOGRAPHIC_COMPARE()(a1.z,a2.z);}
+};
+}
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Initialize_All_Contact_Projections(const bool enforce_rigid_rigid_contact_in_cg)
 {
     // rigid/rigid
     if(rigid_body_collection.dynamic_rigid_body_particles.m && enforce_rigid_rigid_contact_in_cg){
-        for(typename HASHTABLE<TRIPLE<int,int,TV> >::ITERATOR iterator(rigid_body_particle_intersections);iterator.Valid();iterator.Next()){
-            const TRIPLE<int,int,TV>& intersection=iterator.Key();
+        ARRAY<TRIPLE<int,int,TV> > keys;rigid_body_particle_intersections.Get_Keys(keys);Sort(keys,COMPARE()); // INDEXING replace this with the commented portion.
+        for(int i=0;i<keys.m;i++){
+            const TRIPLE<int,int,TV>& intersection=keys(i);
+//        for(typename HASHTABLE<TRIPLE<int,int,TV> >::ITERATOR iterator(rigid_body_particle_intersections);iterator.Valid();iterator.Next()){
+//            const TRIPLE<int,int,TV>& intersection=iterator.Key();
             const RIGID_BODY<TV> &particle_body=rigid_body_collection.Rigid_Body(intersection.x),
                 &levelset_body=rigid_body_collection.Rigid_Body(intersection.y);
             if(rigid_body_collection.Is_Active(particle_body.particle_index) && rigid_body_collection.Is_Active(levelset_body.particle_index)) Create_Contact_Joint(particle_body,levelset_body,intersection.z);}}
