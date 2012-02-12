@@ -274,7 +274,7 @@ Highlight_Selection(OPENGL_SELECTION *selection)
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::
 Clear_Highlight()
 {
-    selected_index=0;
+    selected_index=-1;
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_HEIGHTFIELD_1D<T,RW>::

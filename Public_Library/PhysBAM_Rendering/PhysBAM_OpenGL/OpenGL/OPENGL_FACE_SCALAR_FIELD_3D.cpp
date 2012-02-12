@@ -93,13 +93,13 @@ Update()
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 1, index_start, index_end,scale);
+    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 0, index_start, index_end,scale);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.X_Face(i,j,k);
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 2, index_start, index_end,scale);
+    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 1, index_start, index_end,scale);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Y_Face(i,j,k);
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 3, index_start, index_end,scale);
+    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 2, index_start, index_end,scale);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Z_Face(i,j,k);
     opengl_points.points.Resize(index);
@@ -115,13 +115,13 @@ Update()
     opengl_points.color=color_map->Lookup(true);
     int index=0;
     VECTOR<int,3> index_start,index_end;
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 1, index_start, index_end);
+    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, x_face_values, 0, index_start, index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(x_face_values(i,j,k)) opengl_points.points(index++)=grid.X_Face(i,j,k);
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 2, index_start, index_end);
+    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, y_face_values, 1, index_start, index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(y_face_values(i,j,k)) opengl_points.points(index++)=grid.Y_Face(i,j,k);
-    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 3, index_start, index_end);
+    OPENGL_UNIFORM_SLICE::Get_Face_Index_Range(slice, z_face_values, 2, index_start, index_end);
     for(int i=index_start.x;i<index_end.x;i++) for(int j=index_start.y;j<index_end.y;j++) for(int k=index_start.z;k<index_end.z;k++)
         if(z_face_values(i,j,k)) opengl_points.points(index++)=grid.Z_Face(i,j,k);
     opengl_points.points.Resize(index);
