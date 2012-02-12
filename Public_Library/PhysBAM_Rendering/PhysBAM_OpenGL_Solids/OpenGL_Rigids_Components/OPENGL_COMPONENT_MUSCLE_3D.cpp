@@ -41,6 +41,7 @@ template<class T> OPENGL_COMPONENT_MUSCLE_3D<T>::
 template<class T> void OPENGL_COMPONENT_MUSCLE_3D<T>::
 Display(const int in_color) const
 {
+    if(!articulated_rigid_body->muscle_list) return;
     GLint mode;
     glGetIntegerv(GL_RENDER_MODE,&mode);
 
@@ -202,6 +203,7 @@ Initialize(ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body_input,std::string 
     if(articulated_rigid_body) return;
     opengl_triangulated_surface.Delete_Pointers_And_Clean_Memory();surface_muscle_indices.Resize(0);
     articulated_rigid_body=articulated_rigid_body_input;
+    if(!articulated_rigid_body->muscle_list) return;
 
     std::string muscle_info_file=STRING_UTILITIES::string_sprintf("%s/%d/muscle_info",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(muscle_info_file)) Read_Muscle_Internal_Particles(muscle_info_file);
