@@ -419,9 +419,9 @@ void Get_Initial_Data()
             connections.Append(&tests.Add_Rigid_Body("subdivided_box",1,(T)0));
             connections.Last()->X()=TV(0,13.5,3);
             for(int i=0;i<2;i++){
-                T y=i==1?10.5:16.5;
+                T y=i==0?10.5:16.5;
                 for(int j=0;j<8;j++){
-                    T x=j<4?-3:j>5?3:0;T z=(j==3||j==5||j==8)?-3:(j==2||j==7)?0:3;
+                    T x=j<3?-3:j>4?3:0;T z=(j==2||j==4||j==7)?-3:(j==1||j==6)?0:3;
                     RIGID_BODY<TV>* box=&tests.Add_Rigid_Body("subdivided_box",1,(T)0);
                     box->X()=TV(x,y,z);
                     for(int k=0;k<connections.m;k++){
