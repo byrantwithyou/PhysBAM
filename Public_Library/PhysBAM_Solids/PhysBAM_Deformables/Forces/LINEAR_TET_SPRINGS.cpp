@@ -292,7 +292,7 @@ template<class T> int LINEAR_TET_SPRINGS<T>::
 Find_Shortest_Spring(const int tet,const VECTOR<int,4> element_nodes,VECTOR<int,4>& spring_nodes_output,T& minimum_signed_distance,TV& minimum_normal,TV& weights) const
 {
     ARRAY_VIEW<const TV> X(particles.X);
-    int maximum_cross_squared_index=0;T maximum_cross_squared=(T)-FLT_MAX;TV maximum_cross;
+    int maximum_cross_squared_index=-1;T maximum_cross_squared=(T)-FLT_MAX;TV maximum_cross;
     for(unsigned char h=0;h<4;h++){
         VECTOR<int,4> spring_nodes=Spring_Nodes(h,element_nodes);
         TV u_cross_v=TV::Cross_Product(X(spring_nodes[2])-X(spring_nodes[1]),X(spring_nodes[3])-X(spring_nodes[1]));

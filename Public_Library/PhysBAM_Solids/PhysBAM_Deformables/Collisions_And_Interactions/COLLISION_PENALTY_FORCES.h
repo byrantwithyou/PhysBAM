@@ -101,7 +101,7 @@ public:
         for(COLLISION_GEOMETRY_ID r(0);r<collision_body_list->bodies.m;r++) if(collision_body_list->Is_Active(r)){
             COLLISION_GEOMETRY<TV>& collision_body=*collision_body_list->bodies(r);
             if(!skip_collision_body(r) && (perform_self_collision || collision_body.collision_geometry_id!=collision_body_list_id)){
-                int collision_body_particle_index=0;if(collision_body_list_id==collision_body.collision_geometry_id) collision_body_particle_index=index;
+                int collision_body_particle_index=-1;if(collision_body_list_id==collision_body.collision_geometry_id) collision_body_particle_index=index;
                 T phi_value;int aggregate=-1;TV normal=collision_body.Implicit_Geometry_Extended_Normal(particles.X(index),phi_value,aggregate,collision_body_particle_index);
                 T scaled_stiffness=stiffness;if(collision_body_list_id==collision_body.collision_geometry_id) scaled_stiffness*=self_collision_reciprocity_factor;
                 if(phi_value<=0){

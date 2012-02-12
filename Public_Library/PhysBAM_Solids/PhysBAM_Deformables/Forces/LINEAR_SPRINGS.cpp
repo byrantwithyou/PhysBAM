@@ -394,7 +394,7 @@ Print_Deformation_Statistics() const
 template<class TV> typename TV::SCALAR LINEAR_SPRINGS<TV>::
 Maximum_Compression_Or_Expansion_Fraction(int* index) const
 {
-    T max_compression=0;int max_index=0;
+    T max_compression=0;int max_index=-1;
     for(int s=0;s<segment_mesh.elements.m;s++){
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=(particles.X(i)-particles.X(j)).Magnitude();
