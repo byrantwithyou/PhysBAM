@@ -88,7 +88,7 @@ public:
 
     // Now deal with the main parameter list as usual
     T value;int i=Find_Parameter(long_name);
-    if(i){
+    if(i>=0){
         // Initialize stored default value and short name
         parameter_list(i).y.default_value_string=default_value_string;
         parameter_list(i).y.short_name=short_name;

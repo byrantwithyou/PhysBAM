@@ -22,7 +22,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D<T,RW>::
 OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_1D(const std::string& prefix,const int start_frame,const bool initialize_geometry)
     :OPENGL_COMPONENT("Deformable Object List"),prefix(prefix),frame_loaded(-1),valid(false),use_active_list(false),display_mode(0),
-    incremented_active_object(0),smooth_shading(false),selected_vertex(0),
+    incremented_active_object(0),smooth_shading(false),selected_vertex(-1),
     own_deformable_geometry(0),deformable_geometry_collection(0),real_selection(0),
     color_map(OPENGL_INDEXED_COLOR_MAP::Basic_16_Color_Map())
 {
@@ -317,7 +317,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Highlight_Particle_Response()
 {
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
-        int index=0;std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);sstream>>index;
+        int index=-1;std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);sstream>>index;
         if(index>=0 && index<deformable_geometry_collection->particles.array_collection->Size()) selected_vertex=index;}
     Reinitialize(true);
 }
