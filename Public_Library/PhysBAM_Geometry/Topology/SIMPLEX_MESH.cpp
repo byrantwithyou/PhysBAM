@@ -241,7 +241,7 @@ template<int d> int SIMPLEX_MESH<d>::
 Minimum_Valence(int* index)
 {
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined) Initialize_Neighbor_Nodes();
-    int minimum=INT_MAX,minimum_index=0;
+    int minimum=INT_MAX,minimum_index=-1;
     for(int p=0;p<number_nodes;p++)if((*neighbor_nodes)(p).m && (*neighbor_nodes)(p).m < minimum){
         minimum=(*neighbor_nodes)(p).m;minimum_index=p;}
     if(index) *index=minimum_index;
@@ -255,7 +255,7 @@ template<int d> int SIMPLEX_MESH<d>::
 Maximum_Valence(int* index)
 {
     bool neighbor_nodes_defined=neighbor_nodes!=0;if(!neighbor_nodes_defined) Initialize_Neighbor_Nodes();
-    int maximum=0,maximum_index=0;
+    int maximum=0,maximum_index=-1;
     for(int p=0;p<number_nodes;p++)if((*neighbor_nodes)(p).m > maximum){
         maximum=(*neighbor_nodes)(p).m;maximum_index=p;}
     if(index) *index=maximum_index;

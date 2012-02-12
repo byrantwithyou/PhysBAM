@@ -94,7 +94,7 @@ private:
     bool Initialize_Next_Voxels_To_Process()
     {VECTOR<int,3> voxel;if(!Next_Voxel_To_Process(voxel,main_list)) return false;
     assert(main_list->m > 0);   // should at least have one particle in it
-    main_list_index=1;int index=0;
+    main_list_index=0;int index=0;
     for(int i=voxel.x-1;i<=voxel.x+1;i++) for(int j=voxel.y-1;j<=voxel.y+1;j++) for(int k=voxel.z-1;k<=voxel.z+1;k++){
         if(i==voxel.x&&j==voxel.y&&k==voxel.z) continue;
         ARRAY<int>* occupancy_list=0;

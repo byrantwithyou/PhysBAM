@@ -105,13 +105,13 @@ public:
     {assert((aggregate >= 1 && aggregate <= 2*GRID<TV>::dimension) || aggregate == -1);
     if(aggregate != -1) return box.Normal(aggregate);
     else{
-        int index=0;Phi_With_Index(location,index);return (*levelsets)(index)->Normal(location);}}
+        int index=-1;Phi_With_Index(location,index);return (*levelsets)(index)->Normal(location);}}
 
     TV Extended_Normal(const TV& location,const int aggregate=-1) const PHYSBAM_OVERRIDE
     {assert((aggregate >= 1 && aggregate <= 2*GRID<TV>::dimension) || aggregate == -1);
     if(aggregate != -1) return box.Normal(aggregate);
     else{
-        int index=0;Phi_With_Index(location,index);return (*levelsets)(index)->Extended_Normal(location);}}
+        int index=-1;Phi_With_Index(location,index);return (*levelsets)(index)->Extended_Normal(location);}}
 
     void Compute_Normals()  PHYSBAM_OVERRIDE
     {for(int i=0;i<levelsets->m;i++) (*levelsets)(i)->Compute_Normals();}
@@ -181,7 +181,7 @@ public:
     Update_Box();Update_Minimum_Cell_Size();}
 
     VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
-    {int index=0;Phi_With_Index(X,index);return (*levelsets)(index)->Principal_Curvatures(X);}
+    {int index=-1;Phi_With_Index(X,index);return (*levelsets)(index)->Principal_Curvatures(X);}
 
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
