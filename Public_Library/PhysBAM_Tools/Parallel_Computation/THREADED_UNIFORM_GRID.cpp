@@ -242,9 +242,9 @@ Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,cons
     // receive
     ARRAY<RANGE<TV_INT> > recv_regions;Find_Boundary_Regions(recv_regions,sentinels,false,RANGE<VECTOR<int,1> >(-bandwidth,-1),include_corners,true,local_grid);
     pthread_barrier_wait(barr);
-    for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=-1){int index=0;
+    for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=-1){int index=-1;
         for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
-        PHYSBAM_ASSERT(index);int position=0;
+        PHYSBAM_ASSERT(index>=0);int position=0;
         for(CELL_ITERATOR iterator(local_grid,recv_regions(n));iterator.Valid();iterator.Next()) data.Unpack(buffers(index).buffer,position,iterator.Cell_Index());}
     pthread_barrier_wait(barr);
     if(tid==1) buffers.m=0;
@@ -275,10 +275,10 @@ Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int
     ARRAY<ARRAY<RANGE<TV_INT> > > recv_regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(recv_regions(axis),Face_Sentinels(axis),true,ghost_band,true);
     pthread_barrier_wait(barr);
-    for(int n=0;n<recv_regions(0).m;n++)if(all_neighbor_ranks(n)!=-1){int index=0;
+    for(int n=0;n<recv_regions(0).m;n++)if(all_neighbor_ranks(n)!=-1){int index=-1;
         ARRAY<RANGE<TV_INT> > recv_regions_n(T_GRID::dimension);for(int axis=0;axis<T_GRID::dimension;axis++)recv_regions_n(axis)=recv_regions(axis)(n);
         for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==all_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
-        assert(index);int position=0;
+        assert(index>=0);int position=0;
         for(int axis=0;axis<T_GRID::dimension;axis++) for(FACE_ITERATOR iterator(local_grid,recv_regions_n(axis),axis);iterator.Valid();iterator.Next())
             data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());}
     pthread_barrier_wait(barr);
@@ -308,8 +308,8 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     // average received data with local data (TODO: find a cleaner general way to do this)
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
-        int index=0;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
-        assert(index);int position=0;
+        int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
+        assert(index>=0);int position=0;
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
             local_data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());
             data(iterator.Full_Index())=data(iterator.Full_Index())*0.5+local_data(iterator.Full_Index())*0.5;}}
@@ -340,8 +340,8 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     // average received data with local data (TODO: find a cleaner general way to do this)
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
-        int index=0;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
-        assert(index);int position=0;
+        int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
+        assert(index>=0);int position=0;
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()){
             local_data.data(axis).Unpack(buffers(index).buffer,position,iterator.Face_Index());
             assert(abs(data(iterator.Full_Index())-local_data(iterator.Full_Index()))<=tolerance);}}

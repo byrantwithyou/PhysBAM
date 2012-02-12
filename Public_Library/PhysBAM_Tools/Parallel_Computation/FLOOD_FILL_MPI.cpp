@@ -193,8 +193,8 @@ Synchronize_Colors_Threaded()
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
     {for(int side=0;side<T_PARALLEL_GRID::number_of_faces_per_cell;side+=2)if(mpi_grid.threaded_grid->side_neighbor_ranks(side)!=-1){
         Resize_Helper(colors_copy(side),local_grid,boundary_regions(side));
-        int index=0;for(int i=0;i<mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
-        PHYSBAM_ASSERT(index);int position=0;
+        int index=-1;for(int i=0;i<mpi_grid.threaded_grid->buffers.m;i++) if(mpi_grid.threaded_grid->buffers(i).send_tid==mpi_grid.threaded_grid->side_neighbor_ranks(side) && mpi_grid.threaded_grid->buffers(i).recv_tid==mpi_grid.threaded_grid->rank) index=i;
+        PHYSBAM_ASSERT(index>=0);int position=0;
         for(CELL_ITERATOR iterator(local_grid,boundary_regions(side));iterator.Valid();iterator.Next()) colors_copy(side).Unpack(mpi_grid.threaded_grid->buffers(index).buffer,position,iterator.Cell_Index());
         Find_Color_Matches(color_map,union_find,colors_copy(side),boundary_regions(side),global_color_offset);}}
     pthread_barrier_wait(mpi_grid.threaded_grid->barr);
