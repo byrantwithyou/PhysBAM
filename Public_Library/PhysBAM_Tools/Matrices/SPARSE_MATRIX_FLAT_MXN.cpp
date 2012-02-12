@@ -58,7 +58,7 @@ Set_Row_Lengths(ARRAY_VIEW<int> lengths)
 {
     m=lengths.m;offsets.Resize(m+1,false,false);offsets(0)=0;
     for(int i=0;i<m;i++){offsets(i+1)=offsets(i)+lengths(i);}
-    A.Resize(offsets(m)-1);
+    A.Resize(offsets(m));
 }
 //#####################################################################
 // Function Find_Index
