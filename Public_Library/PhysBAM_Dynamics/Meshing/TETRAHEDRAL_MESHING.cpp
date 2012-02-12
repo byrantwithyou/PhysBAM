@@ -397,7 +397,7 @@ Advance_Dynamics(const T time,const T stopping_time,const bool verbose)
         solids_evolution->Advance_One_Time_Step_Position(dt,new_time,true);
         solids_evolution->Advance_One_Time_Step_Velocity(dt,new_time,true);new_time+=dt;}
 
-    if(verbose){int index=0;
+    if(verbose){int index=-1;
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         LOG::cout<<" maxPhi="<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index)<<"("<<index<<")";
         index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(deformable_body_collection.particles.V);

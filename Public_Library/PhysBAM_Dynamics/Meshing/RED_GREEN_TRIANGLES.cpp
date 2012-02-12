@@ -196,12 +196,12 @@ Delete_Children(const int level,const int tri,ARRAY<int>& deleted_tri_indices,AR
             deleted_edge_indices.Append(children_edges(p));} // delete interior edges
     // now do the actual deletion
     for(p=0;p<deleted_tri_indices.m;p++) for(int q=0;q<3;q++){ // remove deleted triangles from incident_triangles
-        int node=meshes(level+1)->elements(deleted_tri_indices(p))(q),index=0;
-        (*meshes(level+1)->incident_elements)(node).Find(deleted_tri_indices(p),index);assert(index);
+        int node=meshes(level+1)->elements(deleted_tri_indices(p))(q),index=-1;
+        (*meshes(level+1)->incident_elements)(node).Find(deleted_tri_indices(p),index);assert(index>=0);
         (*meshes(level+1)->incident_elements)(node).Remove_Index_Lazy(index);}
     for(p=0;p<deleted_edge_indices.m;p++) for(int q=0;q<2;q++){ // remove deleted edges from incident_segments
-        int node=segment_mesh.elements(deleted_edge_indices(p))(q),index=0;
-        (*segment_mesh.incident_elements)(node).Find(deleted_edge_indices(p),index);assert(index);
+        int node=segment_mesh.elements(deleted_edge_indices(p))(q),index=-1;
+        (*segment_mesh.incident_elements)(node).Find(deleted_edge_indices(p),index);assert(index>=0);
         (*segment_mesh.incident_elements)(node).Remove_Index_Lazy(index);}
     // then zero out occurances in the stack
     for(p=0;p<deleted_tri_indices.m;p++){
@@ -361,7 +361,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         // remove triangles to be deleted from incident elements
         // TODO: is incident_elements special or not?
         for(int i=0;i<level_triangle_list(level).m;i++) for(int j=0;j<3;j++){int node=meshes(level)->elements(level_triangle_list(level)(i))(j);
-            int index=0;(*meshes(level)->incident_elements)(node).Find(level_triangle_list(level)(i),index);assert(index);
+            int index=-1;(*meshes(level)->incident_elements)(node).Find(level_triangle_list(level)(i),index);assert(index);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 
         Sort(level_triangle_list(level));

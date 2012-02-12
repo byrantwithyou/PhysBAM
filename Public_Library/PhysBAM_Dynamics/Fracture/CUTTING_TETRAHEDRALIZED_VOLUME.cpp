@@ -884,7 +884,7 @@ Two_Dimensional_Region_Finding_On_Cutting_Simplex(const int cutting_simplex,cons
             unconnected_polygonal_regions.Append(segment_loop);}}
     else{
         while(unused_segments.m){
-            int starting_index=0;
+            int starting_index=-1;
             for(int j=0;j<unused_segments.m;j++){
                 if(!unused_segments.Contains(unused_segments(j).Reversed())){
                     int count=0;for(int k=0;k<unused_segments.m;k++) if(unused_segments(k)[1]==unused_segments(j)[0]) count++;
