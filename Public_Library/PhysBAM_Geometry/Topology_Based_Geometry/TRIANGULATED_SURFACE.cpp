@@ -557,7 +557,7 @@ Create_Compact_Copy() const
     for(int i=0;i<mesh.elements.m;i++){const VECTOR<int,3>& element=mesh.elements(i);
         for(int j=0;j<3;j++){
             int& a=old_to_new.Get_Or_Insert(element(j));
-            if(!a) a=new_to_old.Append(element(j));
+            if(a<0) a=new_to_old.Append(element(j));
             triangle_mesh->elements(i)(j)=a;}}
 
     GEOMETRY_PARTICLES<TV>* deformable_geometry_particle=new GEOMETRY_PARTICLES<TV>;

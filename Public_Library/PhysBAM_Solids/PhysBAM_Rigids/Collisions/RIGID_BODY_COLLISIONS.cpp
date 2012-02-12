@@ -1012,7 +1012,7 @@ Get_Bounding_Box_Collision_Pairs_Of_Body(ARRAY<VECTOR<int,2> >& pairs,int id,con
 {
     spatial_partition->Get_Potential_Collisions(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id),object_indices,false);
     for(int t=0;t<object_indices.m;t++){int j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(t));
-        if(!j || !Either_Body_Collides_With_The_Other(id,j)) continue;
+        if(j<0 || !Either_Body_Collides_With_The_Other(id,j)) continue;
         if(!rigid_body_collection.Rigid_Body(j).Has_Infinite_Inertia()){
             if(mpi_rigids){
                 if(j<id && mpi_rigids->Is_Real_Body(j))

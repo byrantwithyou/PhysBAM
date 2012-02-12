@@ -54,7 +54,7 @@ Fill_Level(const GRID<TV>& grid,const T_LEVELSET& phi,int ghost,MAPPING& m,ARRAY
             for(int j=0;j<2;j++){
                 ind(d)+=s;
                 int& k=m.node_to_index(ind);
-                if(!k) k=m.index_to_node.Append(ind);}}}
+                if(k<0) k=m.index_to_node.Append(ind);}}}
     m.max_solve_index(0)=m.index_to_node.m-1;
 
     // Register additional cells inside for derivatives.
