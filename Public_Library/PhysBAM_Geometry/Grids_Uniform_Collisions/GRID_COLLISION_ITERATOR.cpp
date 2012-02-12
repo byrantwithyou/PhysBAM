@@ -143,7 +143,7 @@ Next_Helper()
 {
     while(1){
         cur++;
-        if(cur>faces.m){last=index.index(index.axis)-1;return;}
+        if(cur>=faces.m){last=index.index(index.axis)-1;return;}
         if(faces(cur).inside(1)) break;}
     index=faces(cur).face;
     while(1){
@@ -182,8 +182,8 @@ Next_Helper()
 {
     while(1){
         cur++;
-        if(cur>faces.m) return;
-        if(faces(cur).inside(2)) break;}
+        if(cur>=faces.m) return;
+        if(faces(cur).inside(1)) break;}
     index=faces(cur).face.index;
     while(1){
         cur++;

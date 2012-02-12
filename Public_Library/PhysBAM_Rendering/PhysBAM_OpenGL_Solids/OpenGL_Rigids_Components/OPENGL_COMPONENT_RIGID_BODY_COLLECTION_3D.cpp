@@ -276,9 +276,9 @@ Display(const int in_color) const
 
     RANGE<VECTOR<T,3> > axes_box(0,2,0,2,0,2);
     //RANGE<VECTOR<T,3> > axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
-    if(draw_joint_frames==0) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
-    else if(draw_joint_frames==1) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
-    else if(draw_joint_frames==2) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
+    else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
 
     if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size()){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
