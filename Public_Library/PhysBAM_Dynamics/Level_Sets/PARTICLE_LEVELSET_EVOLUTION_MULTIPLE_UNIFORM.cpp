@@ -59,7 +59,7 @@ CFL(const bool need_to_get_velocity,const bool analytic_test)
 {
     if(need_to_get_velocity) particle_levelset_multiple.levelset_multiple.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset_multiple.levelset_multiple,V,time);
     if(analytic_test){T max_time_step=particle_levelset_multiple.levelset_multiple.levelsets(0)->max_time_step;
-        for(int i=2;i<=particle_levelset_multiple.levelset_multiple.levelsets.m;i++) max_time_step=min(max_time_step,particle_levelset_multiple.levelset_multiple.levelsets(i)->max_time_step);
+        for(int i=1;i<particle_levelset_multiple.levelset_multiple.levelsets.m;i++) max_time_step=min(max_time_step,particle_levelset_multiple.levelset_multiple.levelsets(i)->max_time_step);
         return cfl_number/max(V.Maxabs().Max(),1/max_time_step);}
     return cfl_number*particle_levelset_multiple.levelset_multiple.CFL(V);
 }

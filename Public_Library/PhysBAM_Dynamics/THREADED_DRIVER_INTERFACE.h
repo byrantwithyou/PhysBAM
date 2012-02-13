@@ -27,7 +27,7 @@ public:
 
     virtual ~THREADED_DRIVER_INTERFACE()
     {
-        for(int i=2;i<=thread_queue.Number_Of_Threads();i++) delete drivers(i);
+        for(int i=1;i<thread_queue.Number_Of_Threads();i++) delete drivers(i);
     }
 
     void Execute_Main_Program()

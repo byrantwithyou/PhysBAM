@@ -539,7 +539,7 @@ Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inpu
     partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
     for(int p=0;p<X.Size();p++){
         VECTOR<int,TV::m> cell=grid.Clamp_To_Cell(X(p));
-        int cell_number=cell[0]-1;for(int i=2;i<=TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
+        int cell_number=cell[0]-1;for(int i=1;i<TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
         partition_id_from_particle_index(p)=Rank_To_Partition(cell_number);
         particles_of_partition(Rank_To_Partition(cell_number)).Append(p);}
 }

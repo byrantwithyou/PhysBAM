@@ -359,10 +359,10 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                     if(!body.active) continue;
                     if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(&body))
                         for(int simplex=0;simplex<deformable->object.mesh.elements.m;simplex++){
-                            RANGE<TV> simplex_bounding_box(particles.X(deformable->object.mesh.elements(simplex)(1)));
-                            for(int node=2;node<=deformable->object.mesh.dimension;node++) simplex_bounding_box.Enlarge_To_Include_Point(particles.X(deformable->object.mesh.elements(simplex)(node)));
+                            RANGE<TV> simplex_bounding_box(particles.X(deformable->object.mesh.elements(simplex)(0)));
+                            for(int node=0;node<deformable->object.mesh.dimension;node++) simplex_bounding_box.Enlarge_To_Include_Point(particles.X(deformable->object.mesh.elements(simplex)(node)));
                             if(grid_domain.Lazy_Intersection(simplex_bounding_box)){
-                                boundary_particles.Subset(deformable->object.mesh.elements(simplex)).Fill(1);}}} // TODO(jontg): Check this
+                                boundary_particles.Subset(deformable->object.mesh.elements(simplex)).Fill(0);}}} // TODO(jontg): Check this
             for(int i=0;i<boundary_particles.m;i++) if(boundary_particles(i)) coupled_deformable_particle_indices.Append(i);
             solids_fluids_parameters.mpi_solid_fluid->Exchange_Coupled_Deformable_Particle_List(&coupled_deformable_particle_indices,0);
             fluid_system_mpi=new FLUID_SYSTEM_MPI<TV>(J_deformable,J_rigid,A_array,interior_regions,

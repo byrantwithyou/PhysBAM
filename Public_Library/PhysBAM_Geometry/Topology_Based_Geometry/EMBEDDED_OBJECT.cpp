@@ -152,8 +152,8 @@ Add_Embedded_Particle(const VECTOR<int,2>& nodes,const T interpolation_fraction_
 //#####################################################################
 template<int d> static inline VECTOR<int,d+1> Compact_Parents(const VECTOR<VECTOR<int,2>,d>& parents)
 {
-    VECTOR<int,d+1> all_parents(parents[1]);int m=2;
-    for(int i=2;i<=d;i++)for(int j=0;j<2;j++)
+    VECTOR<int,d+1> all_parents(parents[0]);int m=2;
+    for(int i=1;i<d;i++)for(int j=0;j<2;j++)
         if(!all_parents.Contains(parents[i][j])) all_parents[++m]=parents[i][j];
     assert(m==d+1);
     return all_parents;

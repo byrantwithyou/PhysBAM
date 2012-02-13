@@ -43,7 +43,7 @@ public:
     }
 
     bool Element_Spanning_Regions(const int element)
-    {for(int i=2;i<=d+1;i++)if(node_region(mesh.elements(element)[1])!=node_region(mesh.elements(element)[i]))return true;return false;}
+    {for(int i=1;i<d+1;i++)if(node_region(mesh.elements(element)[0])!=node_region(mesh.elements(element)[i]))return true;return false;}
 
     int Regions_Intersecting_Element(const int element,VECTOR<int,d+1>& regions)
     {int number_of_regions=0;

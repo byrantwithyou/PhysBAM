@@ -121,16 +121,16 @@ Initialize()
 void Find_Neighbors(ARRAY<VECTOR<int,3> >& neighbor_cells,int number_of_cells,VECTOR<int,3>& local_index,int sub_scale)
 {
     assert(number_of_cells==8);
-    for(int i=2;i<=3;i++){
-        if(local_index(i-1)<=sub_scale/2){neighbor_cells(i)(i-1)--;neighbor_cells(4)(i-1)--;neighbor_cells(i+4)(i-1)--;neighbor_cells(8)(i-1)--;}
-        else{neighbor_cells(i)(i-1)++;neighbor_cells(4)(i-1)++;neighbor_cells(i+4)(i-1)++;neighbor_cells(8)(i-1)++;}}
-    if(local_index(3)<=sub_scale/2){neighbor_cells(5)(3)--;neighbor_cells(6)(3)--;neighbor_cells(7)(3)--;neighbor_cells(8)(3)--;}
-    else{neighbor_cells(5)(3)++;neighbor_cells(6)(3)++;neighbor_cells(7)(3)++;neighbor_cells(8)(3)++;}
+    for(int i=1;i<3;i++){
+        if(local_index(i-1)<=sub_scale/2){neighbor_cells(i)(i-1)--;neighbor_cells(3)(i-1)--;neighbor_cells(i+4)(i-1)--;neighbor_cells(7)(i-1)--;}
+        else{neighbor_cells(i)(i-1)++;neighbor_cells(3)(i-1)++;neighbor_cells(i+4)(i-1)++;neighbor_cells(7)(i-1)++;}}
+    if(local_index(2)<=sub_scale/2){neighbor_cells(4)(2)--;neighbor_cells(5)(2)--;neighbor_cells(6)(2)--;neighbor_cells(7)(2)--;}
+    else{neighbor_cells(4)(2)++;neighbor_cells(5)(2)++;neighbor_cells(6)(2)++;neighbor_cells(7)(2)++;}
 }
 void Find_Neighbors(ARRAY<VECTOR<int,2> >& neighbor_cells,int number_of_cells,VECTOR<int,2>& local_index,int sub_scale)
 {
     assert(number_of_cells==4);
-    for(int i=2;i<=3;i++){
+    for(int i=1;i<3;i++){
         if(local_index(i-1)<=sub_scale/2){neighbor_cells(i)(i-1)--;neighbor_cells(4)(i-1)--;}
         else{neighbor_cells(i)(i-1)++;neighbor_cells(4)(i-1)++;}}
 }

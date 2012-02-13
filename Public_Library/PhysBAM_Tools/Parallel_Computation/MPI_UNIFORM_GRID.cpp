@@ -91,7 +91,7 @@ Gather_Cell_Data(const T_ARRAYS& local_data,T_ARRAYS& global_data) const
     else{
         LOCAL_GRID<T_GRID> my_local_grid(mac_global_grid,mac_local_grid);
         my_local_grid.Put(local_data,my_region,global_data);
-        for(int p=2;p<=processes;p++){
+        for(int p=1;p<processes;p++){
             MPI::Status status;
             comm->Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
@@ -134,7 +134,7 @@ Scatter_Cell_Data(const T_ARRAYS& global_data,T_ARRAYS& local_data) const
         LOCAL_GRID<T_GRID> my_local_grid(mac_global_grid,mac_local_grid);
         my_local_grid.Get(global_data,local_data);
         ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;ARRAY<T_ARRAYS > other_arrays(processes);
-        for(int p=2;p<=processes;p++){
+        for(int p=1;p<processes;p++){
             T_GRID other_grid=Restrict_Grid(all_coordinates(p));T_GRID mac_other_grid=other_grid.Get_MAC_Grid();
             LOCAL_GRID<T_GRID> other_local_grid(mac_global_grid,mac_other_grid);
             other_arrays(p).Resize(mac_other_grid.Domain_Indices(ghost_cells),false,false);

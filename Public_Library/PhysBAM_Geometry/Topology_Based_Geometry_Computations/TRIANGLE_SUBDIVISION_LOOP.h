@@ -34,7 +34,7 @@ void Apply_Loop_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> base_v
             T alpha;switch(neighbors(i).m){
                 case 3:alpha=(T).4375;break;case 4:alpha=(T).5;break;case 5:alpha=(T).54546609462891;break;case 6:alpha=(T).625;break;
                 default:{T lambda=(T).375+(T).25*cos(T(2*pi)/neighbors(i).m);alpha=1-lambda*(4+lambda*(5*lambda-8))/(2*(1-lambda))+sqr(lambda);}}
-            VECTOR<T,3> neighbor_sum=base_values(neighbors(i)(0));for(int j=2;j<=neighbors(i).m;j++)neighbor_sum+=base_values(neighbors(i)(j));
+            VECTOR<T,3> neighbor_sum=base_values(neighbors(i)(0));for(int j=1;j<neighbors(i).m;j++)neighbor_sum+=base_values(neighbors(i)(j));
             subdivided_values(i)=alpha*base_values(i)+(1-alpha)/neighbors(i).m*neighbor_sum;}}
     // edge values
     for(int i=0;i<ts.triangle_mesh.segment_mesh->elements.m;i++){

@@ -406,15 +406,15 @@ Triangulate_Nonconvex_Nonsimple_Polygon(const VECTORT2_ARRAY& coordinates,const 
         assert(vnexts.m==n);
         // (insertion) sort the loops in counter-clockwise order
         const VECTOR<T,2>& x=coordinates(v);
-        for(int j=2;j<=n;++j){
+        for(int j=1;j<n;++j){
             PAIR<int,int> vnextj_pair=vnexts(j);
             const VECTOR<T,2>& xj=coordinates(vnextj_pair.x);
             int k;
             if(Orientation(coordinates(vnexts(0).x),x,xj)>=0){
-                for(k=2;k<j&&Orientation(coordinates(vnexts(k).x),x,xj)>0;++k);}
+                for(k=1;k<j && Orientation(coordinates(vnexts(k).x),x,xj)>0;++k);}
             else{
-                for(k=j-1;k>=2&&Orientation(coordinates(vnexts(k).x),x,xj)<0;--k);
-                if(k>1) ++k;}
+                for(k=j-1;k>=1&&Orientation(coordinates(vnexts(k).x),x,xj)<0;--k);
+                if(k>0) ++k;}
             for(int m=j;m>k;--m) vnexts(m)=vnexts(m-1);
             vnexts(k)=vnextj_pair;}
         // rearrange the loops in polygon1

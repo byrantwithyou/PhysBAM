@@ -32,7 +32,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         ARRAY<SPARSE_MATRIX_PARTITION> partition_array(processors);partition_array(0)=partition; // TODO: very inefficient to copy everything into one array
         ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(processors);A_array(0)=A;
         ARRAY<VECTOR_ND<T> > x_array(processors),b_array(processors);x_array(0)=x;b_array(0)=b;
-        for(int p=2;p<=processors;p++){
+        for(int p=1;p<processors;p++){
             MPI::Status status;
             comm.Probe(MPI::ANY_SOURCE,tag,status);
             int source=status.Get_source();
@@ -78,7 +78,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
                 for(int i=partition.ghost_indices(region).min_corner;i<=partition.ghost_indices(region).max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Ghost_Index(i,region));}}
         // send result pieces
         ARRAY<MPI::Request> requests;
-        for(int p=2;p<=processors;p++)requests.Append(comm.Isend(&x_array(p)(0),x_array(p).n,MPI_UTILITIES::Datatype<T>(),p-1,tag));
+        for(int p=1;p<processors;p++)requests.Append(comm.Isend(&x_array(p)(0),x_array(p).n,MPI_UTILITIES::Datatype<T>(),p-1,tag));
         MPI_UTILITIES::Wait_All(requests);
         x=x_array(0);}
 }

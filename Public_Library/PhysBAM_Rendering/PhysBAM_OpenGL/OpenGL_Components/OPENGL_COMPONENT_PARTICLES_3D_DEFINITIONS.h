@@ -40,7 +40,7 @@ OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::stri
     particles_multiple(0)=particles;opengl_points_multiple(0)=opengl_points;
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Particle_Multiple_Color_Map();
     opengl_points->color=color_map->Lookup(1);
-    for(int i=2;i<=number_of_sets;i++){
+    for(int i=1;i<number_of_sets;i++){
         particles_multiple(i)=new T_PARTICLES;
         opengl_points_multiple(i)=new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >),color_map->Lookup(i));}
         
