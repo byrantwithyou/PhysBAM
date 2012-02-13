@@ -23,8 +23,7 @@ public:
     ARRAY<T_RANK,ID> ranks; 
 
     explicit UNION_FIND(const ID entries=ID())
-        :parents(entries),ranks(entries)
-    {}
+    {Initialize(entries);}
 
     void Initialize(const ID entries)
     {parents=CONSTANT_ARRAY<ID,ID>(entries,ID(-1));ranks=CONSTANT_ARRAY<T_RANK,ID>(entries,0);}
@@ -36,7 +35,7 @@ public:
     {parents.Fill(ID(-1));ranks.Fill(0);}
 
     ID Add_Entry()
-    {parents.Append(ID());ranks.Append(0);return Size();}
+    {parents.Append(ID(-1));ranks.Append(0);return Size();}
 
     bool Is_Root(const ID i) const
     {return parents(i)==-1;}
