@@ -51,7 +51,7 @@ Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VE
     regions(1)=RANGE<VECTOR<int,1> >(region_boundaries.y+1,region_boundaries.y+ghost_cells);
     for(int side=0;side<2;side++) if(psi_N(side))
         for(int i=regions(side).Minimum_Corner()[0];i<regions(side).Maximum_Corner()[0];i++) if(i>=domain.x && i<domain.y){
-            int reflection_face=side&1?regions(side).Maximum_Corner()[0]+1:regions(side).Minimum_Corner()[0];
+            int reflection_face=side&1?regions(side).Minimum_Corner()[0]:regions(side).Maximum_Corner()[0]+1;
             if(use_exact_neumann_face_location){
                 T location=grid_1d.Center(i).x;
                 T boundary_face_location;callbacks->Get_Neumann_Face_Location(grid_1d,reflection_face,boundary_face_location);
@@ -59,8 +59,8 @@ Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VE
                 Get_State_At_Location(grid_1d,U_1d,reflected_location,region_boundaries,u_1d);}
             else{
                 int reflected_node=2*reflection_face-i-1;
-                int extreme_node=side&1?region_boundaries.y:region_boundaries.x;
-                bool is_outside_region=side&1?reflected_node>extreme_node:reflected_node<extreme_node;
+                int extreme_node=side&1?region_boundaries.x:region_boundaries.y;
+                bool is_outside_region=side&1?reflected_node<extreme_node:reflected_node>extreme_node;
                 if(is_outside_region) reflected_node=extreme_node;
                 u_1d=U_1d(reflected_node);}
             T neumann_face_velocity=face_velocities.Component(axis)(node_lower_dimension.Insert(reflection_face,axis));

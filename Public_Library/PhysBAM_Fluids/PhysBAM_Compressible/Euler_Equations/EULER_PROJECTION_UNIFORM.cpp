@@ -326,7 +326,7 @@ Get_Ghost_Pressures(const T dt,const T time,const T_ARRAYS_BOOL& psi_D,const T_F
             for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
                 for(CELL_ITERATOR iterator(euler->grid,1,T_GRID::GHOST_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT cell_index=iterator.Cell_Index();
-                    TV_INT boundary_face_index=side&1?iterator.Second_Face_Index(axis):iterator.First_Face_Index(axis);
+                    TV_INT boundary_face_index=side&1?iterator.First_Face_Index(axis):iterator.Second_Face_Index(axis);
                     if(psi_D(cell_index) && !psi_N.Component(axis)(boundary_face_index)){
                         p_ghost(cell_index)=p_dirichlet(cell_index);}}}}}
     if(euler->mpi_grid) euler->mpi_grid->Exchange_Boundary_Cell_Data(p_ghost,1,false);

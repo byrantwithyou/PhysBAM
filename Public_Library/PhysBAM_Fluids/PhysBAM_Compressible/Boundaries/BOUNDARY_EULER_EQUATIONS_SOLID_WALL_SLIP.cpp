@@ -53,7 +53,7 @@ Attenuate_To_Far_Field_Values_Using_Riemann_Invariants(const T_ARRAYS_DIMENSION_
     T iL=-u_velocity+2*c/(gamma-1);
     T iR=u_velocity+2*c/(gamma-1);
 
-    int flip=side&1?1:-1;
+    int flip=side&1?-1:1;
     if(flip*u_velocity > 0) S=S_far_field(side)+net_inflow_attenuation*(S-S_far_field(side));
     if(flip*(u_velocity-c) > 0) iL=iL_far_field(side)+net_inflow_attenuation*(iL-iL_far_field(side));
     if(flip*(u_velocity+c) > 0) iR=iR_far_field(side)+net_inflow_attenuation*(iR-iR_far_field(side));
@@ -173,7 +173,7 @@ Apply_Boundary_Condition_Single_Side(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE&
 {
     if(grid.Is_MAC_Grid()) return;
     int axis=side/2;
-    int axis_side=1-side%2;
+    int axis_side=side%2;
     if(!euler->mpi_grid||!euler->mpi_grid->Neighbor(axis,axis_side)){
         if(!Constant_Extrapolation(side)) for(CELL_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_INTERIOR_REGION,side);iterator.Valid();iterator.Next()){
             TV_INT boundary_node=iterator.Cell_Index();

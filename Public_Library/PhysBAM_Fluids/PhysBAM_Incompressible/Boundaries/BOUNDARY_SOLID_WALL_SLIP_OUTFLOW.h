@@ -45,7 +45,7 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& u,T_FACE_AR
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);
         for(int side=0;side<T_GRID::number_of_faces_per_cell;side++){
             if(Constant_Extrapolation(side)){
-                clamp_below=side&1;clamp_above=!clamp_below;
+                clamp_above=side&1;clamp_below=!clamp_above;
                 Fill_Single_Ghost_Region(face_grid,u_ghost_component,side,regions(side));}
             else Reflect_Single_Ghost_Region(face_axis,face_grid,u_ghost_component,side,regions(side));}}
 }
