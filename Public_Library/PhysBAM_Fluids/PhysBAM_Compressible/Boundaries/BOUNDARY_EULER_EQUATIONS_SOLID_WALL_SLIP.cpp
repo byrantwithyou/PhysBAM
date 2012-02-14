@@ -99,7 +99,7 @@ Attenuate_To_Far_Field_Values_Using_Characteristics(const T_ARRAYS_DIMENSION_BAS
     LU_far_field=L*U_far_field(side);
 
     // attenuate
-    int flip=side&1?1:-1;
+    int flip=side&1?-1:1;
     for(int k=0;k<d;k++) if(flip*lambda_left(k)>0) LU(k)=LU_far_field(k)+net_inflow_attenuation*(LU(k)-LU_far_field(k));
 
     // apply R
@@ -129,7 +129,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,con
         RANGE<TV_INT> region_new(region);
         if(!attenuate_dirichlet_cells){
             int already_filled_cells=total_number_of_ghost_cells-ghost_cells_to_fill;
-            side&1?region_new.max_corner(axis)-=already_filled_cells:region_new.min_corner(axis)+=already_filled_cells;}
+            side&1?region_new.min_corner(axis)+=already_filled_cells:region_new.max_corner(axis)-=already_filled_cells;}
         int boundary=Boundary(side,region_new);
         if(attenuate_dirichlet_cells){
             Fill_Single_Ghost_Region(grid,u_ghost,side,region_new); // extrapolate values first, so that eigenvectors calculated at boundary flux values are calculated correctly.
@@ -145,8 +145,8 @@ Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_DIMENSION_BASE& u_ghost,con
         int boundary=Boundary(side,region);
         int reflection_times_two;
         if(grid.Is_MAC_Grid())
-            reflection_times_two=2*boundary+(side&1?1:3);
-        else reflection_times_two=2*boundary;
+            reflection_times_two=2*boundary+(side&1?1:-1);
+        else reflection_times_two=2*boundary+2;
         for(CELL_ITERATOR iterator(grid,region);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             TV_INT reflected_node=cell;reflected_node[axis]=reflection_times_two-cell[axis];
             T rho=u_ghost(reflected_node)(0);
