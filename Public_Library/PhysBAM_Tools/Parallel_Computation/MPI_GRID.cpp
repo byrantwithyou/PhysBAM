@@ -671,7 +671,7 @@ Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     ARRAY<MPI::Request> requests;
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
-        if(n%2==1) requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),tag));
+        if(n%2==0) requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),tag));
         else requests.Append(packages(n).Irecv(*comm,side_neighbor_ranks(n),tag));}
     // wait
     MPI_UTILITIES::Wait_All(requests);

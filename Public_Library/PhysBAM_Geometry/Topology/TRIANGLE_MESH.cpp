@@ -259,7 +259,7 @@ Initialize_Boundary_Mesh()
         const VECTOR<int,dimension+1>& element=elements(e);
         for(int i=0;i<dimension+1;i++){
             VECTOR<int,dimension> face=element.Remove_Index(i);
-            if(i==1) exchange(face.x,face.y); // ensure cyclic order
+            if(i==0) exchange(face.x,face.y); // ensure cyclic order
             const ARRAY<int>& incident_elements_to_face1=(*incident_elements)(face[0]);
             bool another_element_on_face=false;
             for(int j=0;j<incident_elements_to_face1.m&&!another_element_on_face;++j)

@@ -29,7 +29,7 @@ Inside_Using_Ray_Test(const TRIANGULATED_SURFACE<T>& ts,RAY<VECTOR<T,3> >& ray,c
             if(ts.Signed_Solid_Angle_Of_Triangle_Web(point,ts.mesh.elements(ray.aggregate_id)(region_id)) > 0) inside=true;} 
         else if(region==1) { // edge
             int node1,node2,node3,neighbor=-1;ts.mesh.elements(ray.aggregate_id).Get(node1,node2,node3);
-            if(region_id==1) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node1,node2);
+            if(region_id==0) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node1,node2);
             else if(region_id==1) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node2,node3);
             else neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node3,node1);
             if(neighbor==-1){if(triangle.Lazy_Inside(ray.endpoint)) inside=true;}

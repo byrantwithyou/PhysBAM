@@ -136,7 +136,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
 
         // update search direction
         rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior));
-        T beta=0;if(iteration==1) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
+        T beta=0;if(iteration==0) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells(p);

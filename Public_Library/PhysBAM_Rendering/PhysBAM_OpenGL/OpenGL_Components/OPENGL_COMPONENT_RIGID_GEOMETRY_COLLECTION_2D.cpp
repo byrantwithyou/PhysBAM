@@ -144,8 +144,8 @@ Reinitialize(const bool force,const bool read_geometry)
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame)))
             FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
         for(int id=0;id<colors.m;id++){
-            if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Green());
-            if(colors(id)==2) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
+            if(colors(id)==0) Set_Object_Color(id,OPENGL_COLOR::Green());
+            if(colors(id)==1) Set_Object_Color(id,OPENGL_COLOR::Magenta());}
 
         frame_loaded=frame;
         valid=true;}

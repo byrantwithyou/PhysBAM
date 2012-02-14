@@ -131,8 +131,8 @@ template<class TV> void FRACTURE_TRIANGULATED_OBJECT<TV>::
 Add_Cut(const int triangle,const TV& fracture_normal)
 {
     int cut=embedded_object.Number_Of_Embedded_Cuts(triangle)+1;
-    if(cut==0) Add_First_Embedded_Segment(triangle,fracture_normal);
-    else if(cut==1) Add_Second_Embedded_Segment(triangle,fracture_normal);
+    if(cut==1) Add_First_Embedded_Segment(triangle,fracture_normal);
+    else if(cut==2) Add_Second_Embedded_Segment(triangle,fracture_normal);
     else PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
