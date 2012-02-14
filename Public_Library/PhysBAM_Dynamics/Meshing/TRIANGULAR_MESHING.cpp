@@ -137,7 +137,7 @@ Search_For_Best_Position(const int node,const ARRAY<VECTOR<T,2> >& directions,bo
         T localbest_quality=best_quality;VECTOR<T,2> localbest_x=best_x;
         for(int d=0;d<directions.m;d++){
             int this_direction;if(d%2) this_direction=last_direction+d/2;else this_direction=last_direction-d/2;
-            this_direction=(this_direction+directions.m-1)%directions.m+1;
+            this_direction=(this_direction+directions.m)%directions.m;
             particles.X(node)=best_x+alpha*directions(this_direction);
             T q=Quality_Of_Worst_Incident_Triangle(node);
             if(q>localbest_quality){localbest_quality=q;localbest_x=particles.X(node);last_direction=this_direction;break;}}

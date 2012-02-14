@@ -250,7 +250,7 @@ Initialize_Datatypes()
             ARRAY<int> block_lengths(displacements.m,false);block_lengths.Fill(1);
             boundary_datatypes(s)=MPI_UTILITIES::Datatype<T>().Create_indexed(displacements.m,&block_lengths(0),&displacements(0)); // TODO: collapse consecutive elements into blocks
             boundary_datatypes(s).Commit();}
-        int ghost_indices_length=partition.ghost_indices(s).Size()+1;
+        int ghost_indices_length=partition.ghost_indices(s).Size();
         if(ghost_indices_length){
             ghost_datatypes(s)=MPI_UTILITIES::Datatype<T>().Create_indexed(1,&ghost_indices_length,&partition.ghost_indices(s).min_corner);
             ghost_datatypes(s).Commit();}}

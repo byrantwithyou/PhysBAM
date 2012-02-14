@@ -22,7 +22,7 @@ int Polygon_Orientation(const T_ARRAY_TV2& polygon_coordinates)
     if(polygon_coordinates.Size()<3) return 0;
     ADAPTIVE_OBJECT<T_EXACT> signed_area_x2(ATOM_TYPE(0.0));
     for(int p=0;p<polygon_coordinates.Size();p++){
-        int q=p%polygon_coordinates.Size()+1;
+        int q=(p+1)%polygon_coordinates.Size();
         const TV2 &xp=polygon_coordinates(p),&xq=polygon_coordinates(q);
         signed_area_x2+=(ATOM_TYPE(xp[0])*ATOM_TYPE(xq[1])-ATOM_TYPE(xp[1])*ATOM_TYPE(xq[0]));}
     return signed_area_x2.Sign();

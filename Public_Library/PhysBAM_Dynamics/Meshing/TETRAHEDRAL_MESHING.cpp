@@ -222,7 +222,7 @@ Search_For_Best_Position(const int node,const ARRAY<TV>& directions,bool include
         T localbest_quality=best_quality;TV localbest_x=best_x;
         for(int d=0;d<directions.m;d++){
             int this_direction;if(d%2) this_direction=last_direction+d/2;else this_direction=last_direction-d/2;
-            this_direction=(this_direction+directions.m-1)%directions.m+1;
+            this_direction=(this_direction+directions.m)%directions.m;
             particles.X(node)=best_x+alpha*directions(this_direction);Update_Dependent_Nodes(node);
             T q=Quality_Of_Worst_Dependent_Tetrahedron(node);if(include_boundary_terms) q+=Quality_Of_Worst_Dependent_Boundary_Triangle(node);
             if(q>localbest_quality){localbest_quality=q;localbest_x=particles.X(node);last_direction=this_direction;break;}}

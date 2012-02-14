@@ -68,7 +68,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bres
         VECTOR_T x_i,result_i;
         x_i.Set_Subvector_View(x.v(i),interior_regions(i));
         result_i.Set_Subvector_View(result.v(i),interior_regions(i));
-        temp_array(i).Resize(interior_regions(i).Size()+1);
+        temp_array(i).Resize(interior_regions(i).Size());
         A.C->Solve_Forward_Substitution(x_i,temp_array(i),true); // diagonal should be treated as the identity
         A.C->Solve_Backward_Substitution(temp_array(i),result_i,false,true);} // diagonal is inverted to save on divides
 }

@@ -74,13 +74,13 @@ public:
     {return 2;}
 
     T& operator()(const int i,const int j)
-    {assert(i<3);assert(j<2);return x[i+3*j];}
+    {assert((unsigned)i<3);assert((unsigned)j<2);return x[i+3*j];}
 
     const T& operator()(const int i,const int j) const
-    {assert(i<3);assert(j<2);return x[i+3*j];}
+    {assert((unsigned)i<3);assert((unsigned)j<2);return x[i+3*j];}
 
     bool Valid_Index(const int i,const int j) const
-    {return i<3 && j<2;}
+    {return (unsigned)i<3 && (unsigned)j<2;}
 
     VECTOR<T,3>& Column(const int j)
     {assert((unsigned)j<2);return *(VECTOR<T,3>*)(x+3*j);}

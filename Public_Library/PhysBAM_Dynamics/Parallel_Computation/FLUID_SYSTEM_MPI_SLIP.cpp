@@ -109,7 +109,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) 
     R.Copy((T)1,V);
     VECTOR_T V_i;V_i.Set_Subvector_View(V.v,divergence_indices);
     VECTOR_T R_i;R_i.Set_Subvector_View(R.v,divergence_indices);
-    pressures_size_vector.Resize(divergence_indices.Size()+1);
+    pressures_size_vector.Resize(divergence_indices.Size());
     div_M_inverse_div_transpose_precondition.C->Solve_Forward_Substitution(V_i,pressures_size_vector,true);
     div_M_inverse_div_transpose_precondition.C->Solve_Backward_Substitution(pressures_size_vector,R_i,false,true);
 }

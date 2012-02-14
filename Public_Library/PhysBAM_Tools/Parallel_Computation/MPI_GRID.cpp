@@ -143,7 +143,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
         // fill in ghost process_ranks for periodic domains
         if(periodic!=TV_BOOL()) for(NODE_ITERATOR iterator(process_grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()){
             TV_INT node=iterator.Node_Index(),wrapped_node=node;
-            for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis]-1)%process_grid.Counts()[axis]+1;
+            for(int axis=0;axis<T_GRID::dimension;axis++) if(periodic[axis]) wrapped_node[axis]=(node[axis]+process_grid.Counts()[axis])%process_grid.Counts()[axis];
             process_ranks(node)=process_ranks(wrapped_node);}
         // allocate communicator
         *comm=group?MPI::COMM_WORLD.Create(*group):MPI::COMM_WORLD.Dup();
@@ -347,7 +347,7 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,2> > >& regions,const RANGE<VECTOR<
 {
     RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(1,local_grid.numbers_of_cells.x,1,local_grid.numbers_of_cells.y)+sentinels;
     if(include_corners && include_ghost_regions){
-        int band_size=band.Size()+1;
+        int band_size=band.Size();
         if(side_neighbor_ranks(0)<0) box.min_corner.x-=band_size;
         if(side_neighbor_ranks(1)<0) box.max_corner.x+=band_size;
         if(side_neighbor_ranks(2)<0) box.min_corner.y-=band_size;
@@ -382,7 +382,7 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<
 {
     RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(1,local_grid.numbers_of_cells.x,1,local_grid.numbers_of_cells.y,1,local_grid.numbers_of_cells.z)+sentinels;
     if(include_corners && include_ghost_regions){
-        int band_size=band.Size()+1;
+        int band_size=band.Size();
         if(side_neighbor_ranks(0)<0) box.min_corner.x-=band_size;
         if(side_neighbor_ranks(1)<0) box.max_corner.x+=band_size;
         if(side_neighbor_ranks(2)<0) box.min_corner.y-=band_size;

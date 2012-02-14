@@ -860,7 +860,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 
         // assume we've done everything in terms of dynamic particles
         for(int i=0;i<colors;i++){
-            J_deformable(i).n=interior_regions(i).Size()+1;
+            J_deformable(i).n=interior_regions(i).Size();
             J_deformable(i).Set_Row_Lengths(row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_deformableiAj=J_deformable(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();
             J_deformableiAj.Fill(0);
@@ -963,10 +963,10 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
                             row_counts(right_column_color)(base_row+TV::dimension+j)++;kinematic_row_counts(right_column_color)(base_row+axis)++;}}}}}
 
         for(int i=0;i<J_rigid_kinematic.m;i++){
-            J_rigid_kinematic(i).n=interior_regions(i).Size()+1;J_rigid_kinematic(i).Set_Row_Lengths(kinematic_row_counts(i));
+            J_rigid_kinematic(i).n=interior_regions(i).Size();J_rigid_kinematic(i).Set_Row_Lengths(kinematic_row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_rigidiAj=J_rigid_kinematic(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();J_rigidiAj.Fill(0);}
         for(int i=0;i<J_rigid.m;i++){
-            J_rigid(i).n=interior_regions(i).Size()+1;J_rigid(i).Set_Row_Lengths(row_counts(i));
+            J_rigid(i).n=interior_regions(i).Size();J_rigid(i).Set_Row_Lengths(row_counts(i));
             PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_VALUE> J_rigidiAa=J_rigid(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>();
             J_rigidiAa.Fill(0);}}
 

@@ -132,7 +132,7 @@ Reinitialize(bool force,bool read_geometry)
                 front_colors.Append(OPENGL_COLOR::Yellow());back_colors.Append(OPENGL_COLOR::Magenta());
                 front_colors.Append(OPENGL_COLOR::Green());back_colors.Append(OPENGL_COLOR::Cyan());
                 triangulated_surface_objects(i)=new OPENGL_TRIANGULATED_SURFACE<T>(*triangulated_surface,false,
-                    OPENGL_MATERIAL::Metal(front_colors((i-1)%front_colors.Size()+1)),OPENGL_MATERIAL::Metal(back_colors((i-1)%back_colors.Size()+1)));}
+                    OPENGL_MATERIAL::Metal(front_colors(i%front_colors.Size())),OPENGL_MATERIAL::Metal(back_colors(i%back_colors.Size())));}
             else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(structure)){
                 if(first_time && tetrahedralized_volume->mesh.elements.m)
                     LOG::cout<<"object "<<i<<": tetrahedralized_volume, range = "<<tetrahedralized_volume->mesh.elements.Flattened().Min()<<" "<<tetrahedralized_volume->mesh.elements.Flattened().Max()<<"\n";

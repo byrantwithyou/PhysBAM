@@ -53,7 +53,7 @@ template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Highlight_Current_Node() const
 {
-    int node=(current_node-1)%surface.particles.array_collection->Size()+1;
+    int node=current_node%surface.particles.array_collection->Size();
     OPENGL_SHAPES::Draw_Dot(surface.particles.X(node),OPENGL_COLOR(1,0,1),7);
     if(highlight_neighbors_of_current_node){
         if(!surface.mesh.neighbor_nodes) surface.mesh.Initialize_Neighbor_Nodes();
@@ -67,7 +67,7 @@ Highlight_Current_Node() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Print_Triangles_Incident_On_Current_Node()
 {
-    int node=(current_node-1)%surface.particles.array_collection->Size()+1;
+    int node=current_node%surface.particles.array_collection->Size();
     if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
     LOG::cout<<"number of incident triangles to node "<<node<<"="<<(*surface.mesh.incident_elements)(node).m<<std::endl;
     for(int t=0;t<(*surface.mesh.incident_elements)(node).m;t++){
@@ -81,7 +81,7 @@ Print_Triangles_Incident_On_Current_Node()
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Print_Neighbor_Nodes_Of_Current_Node()
 {
-    int node=(current_node-1)%surface.particles.array_collection->Size()+1;
+    int node=current_node%surface.particles.array_collection->Size();
     if(!surface.mesh.neighbor_nodes) surface.mesh.Initialize_Neighbor_Nodes();
     LOG::cout<<"number of neighbors of node "<<node<<"="<<(*surface.mesh.neighbor_nodes)(node).m<<std::endl;
     LOG::cout<<"neighbors of node "<<node<<"={";
@@ -94,7 +94,7 @@ Print_Neighbor_Nodes_Of_Current_Node()
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Triangles_Incident_On_Current_Node() const
 {
-    int node=(current_node-1)%surface.particles.array_collection->Size()+1;
+    int node=current_node%surface.particles.array_collection->Size();
     if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
     glDisable(GL_CULL_FACE);
 #ifndef USE_OPENGLES
