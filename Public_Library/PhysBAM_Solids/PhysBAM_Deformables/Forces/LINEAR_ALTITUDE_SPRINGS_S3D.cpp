@@ -98,7 +98,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     spring_states.Resize(mesh.elements.m);
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data(); // use shortest spring only
         int i,j,k;mesh.elements(t).Get(i,j,k);
-        int hmin=0;T cross_length_max=-FLT_MAX;
+        int hmin=-1;T cross_length_max=-FLT_MAX;
         if(is_position_update){
             for(int h=0;h<3;h++){
                 switch(h){case 0:node2=j;node3=k;break;case 1:node2=k;node3=i;break;default:node2=i;node3=j;}
@@ -110,7 +110,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         T rl=parameters(t)(hmin).restlength,current_length=TV::Dot_Product(X(node1)-X(node2),direction);
         SPRING_STATE& state=spring_states(t);
         total_elements++;
-        if(use_springs_compressed_beyond_threshold && current_length-rl>-spring_compression_fraction_threshold*rl) state.node=0;
+        if(use_springs_compressed_beyond_threshold && current_length-rl>-spring_compression_fraction_threshold*rl) state.node=-1;
         else{
             used_springs++;
             state.current_length=current_length;state.coefficient=parameters(t)(hmin).damping/rl;
@@ -129,7 +129,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& state=spring_states(t);
-        if(state.node){
+        if(state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 is the segment
             switch(state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
@@ -146,7 +146,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& state=spring_states(t);
-        if(state.node){
+        if(state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
             switch(state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
@@ -163,7 +163,7 @@ CFL_Strain_Rate() const
     ARRAY<VECTOR<int,3> >& elements=mesh.elements;ARRAY_VIEW<const TV> X(particles.X),V(particles.V);
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data(); // use shortest spring only
         int i,j,k;elements(t).Get(i,j,k);
-        int hmin=0;T cross_length_max=-FLT_MAX;
+        int hmin=-1;T cross_length_max=-FLT_MAX;
         for(int h=0;h<3;h++){
             switch(h){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
             T cross_length=(X(node3)-X(node2)).Magnitude_Squared();
@@ -188,7 +188,7 @@ template<class T> T LINEAR_ALTITUDE_SPRINGS_S3D<T>::
 Potential_Energy(const int t,const T time) const
 {
     const SPRING_STATE& state=spring_states(t);
-    if(state.node){
+    if(state.node>=0){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 is the segment
         switch(state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
