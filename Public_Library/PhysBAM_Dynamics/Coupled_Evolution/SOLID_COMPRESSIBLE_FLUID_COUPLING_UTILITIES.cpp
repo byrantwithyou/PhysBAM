@@ -274,12 +274,12 @@ Apply_Isobaric_Fix(const T dt,const T time)
                     encountered_neumann_face=true;reference_point=iterator.Cell_Neighbor(2*axis);}}
             if(encountered_neumann_face){
                 LOG::cout<<"ISOBARIC FIX: fixing cell "<<cell_index<<" with reference cell "<<reference_point<<std::endl;
-                T rho=euler.U(cell_index)(1);
+                T rho=euler.U(cell_index)(0);
                 TV velocity=EULER<T_GRID>::Get_Velocity(euler.U,cell_index);
                 T e=EULER<T_GRID>::e(euler.U,cell_index);
                 T p_cell=euler.eos->p(rho,e);
 
-                T rho_reference=euler.U_ghost(reference_point)(1);
+                T rho_reference=euler.U_ghost(reference_point)(0);
                 T e_reference=EULER<T_GRID>::e(euler.U_ghost,reference_point);
                 T p_reference=euler.eos->p(rho_reference,e_reference);
 
@@ -299,7 +299,7 @@ Extract_Time_N_Data_For_Explicit_Fluid_Forces()
     if(!fluid_affects_solid || euler.timesplit) return;
     T_ARRAYS_SCALAR p_approx(euler.grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(euler.grid,1);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        p_approx(cell_index)=euler.eos->p(euler.U_ghost(cell_index)(1),euler.e(euler.U_ghost,cell_index));}
+        p_approx(cell_index)=euler.eos->p(euler.U_ghost(cell_index)(0),euler.e(euler.U_ghost,cell_index));}
     euler.euler_projection.Compute_Face_Pressure_From_Cell_Pressures(euler.grid,euler.U_ghost,euler.psi,pressure_at_faces,p_approx);
 
     solid_fluid_face_time_n.Fill(false);
@@ -722,9 +722,9 @@ Compute_Post_Advected_Variables()
     for(CELL_ITERATOR iterator(euler.grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
         if(near_interface(cell_index)){
-            if(uncovered_cells(cell_index)){T one_over_c=euler.eos->one_over_c(euler.U(cell_index)(1),euler.e(euler.U(cell_index)));
-                LOG::cout<<"Computing 1/(rho c^2) for uncovered cell "<<cell_index<<" = "<<one_over_c*one_over_c/(euler.U(cell_index)(1))<<std::endl;
-                euler.euler_projection.one_over_rho_c_squared(cell_index) = one_over_c*one_over_c/(euler.U(cell_index)(1));}
+            if(uncovered_cells(cell_index)){T one_over_c=euler.eos->one_over_c(euler.U(cell_index)(0),euler.e(euler.U(cell_index)));
+                LOG::cout<<"Computing 1/(rho c^2) for uncovered cell "<<cell_index<<" = "<<one_over_c*one_over_c/(euler.U(cell_index)(0))<<std::endl;
+                euler.euler_projection.one_over_rho_c_squared(cell_index) = one_over_c*one_over_c/(euler.U(cell_index)(0));}
             // LOG::cout<<"Updated Cell "<<cell_index<<" from "<<U_n(cell_index)<<" to "<<euler.U(cell_index)<<"\t\t 1/(rho c^2) = "<<euler.euler_projection.one_over_rho_c_squared(cell_index)<<std::endl;
         }}
 }
