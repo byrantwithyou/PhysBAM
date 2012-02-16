@@ -332,14 +332,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(test_number==6 && id==1) frame=curve.Value(time);
+    if(test_number==6 && id==0) frame=curve.Value(time);
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities
 //#####################################################################
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(test_number==6 && id==1){twist=curve.Derivative(time);return false;}
+    if(test_number==6 && id==0){twist=curve.Derivative(time);return false;}
     return true;
 }
 //#####################################################################
@@ -479,7 +479,7 @@ void Impulse_Chain()
     ARRAY<int> body_indices;
     for(int i=0;i<grid_m;i++){
         RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).5,(T)0);
-        body.Set_Frame(FRAME<TV>(TV(2*i-2,0,0)));
+        body.Set_Frame(FRAME<TV>(TV(2*i,0,0)));
         body_indices.Append(body.particle_index);}
 
     solid_body_collection.rigid_body_collection.Rigid_Body(body_indices(0)).Is_Kinematic()=true;
