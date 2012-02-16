@@ -978,7 +978,7 @@ void Get_Initial_Data()
             T init_speed=(T)0; // used (T)1 for stopping case
             particles.mass(particle2)=1;particles.X(particle2)=TV(0,0,(T).5);particles.V(particle2)=ground.Rotation().Rotate(TV(init_speed,0,0));
             particles.array_collection->Add_Elements(4);
-            for(int i=0;i<3;i++){int particle=i+2;T theta=-2*(T)pi/3*i;
+            for(int i=0;i<3;i++){int particle=i+2;T theta=-2*(T)pi/3*(i+1);
                 //particles.X(particle)=ground.Rotation().Rotate(TV((T).2*cos(theta),0,1.1+.2*sin(theta)));
                 particles.X(particle)=ground.Rotation().Rotate(TV((T).2*cos(theta),0,(T)1.1+(T).2*sin(theta)));
                 particles.mass(particle)=(T)1;particles.V(particle)=ground.Rotation().Rotate(TV(init_speed,0,0));
@@ -1096,7 +1096,7 @@ void Get_Initial_Data()
             break;
         case 37:{
             for(int i=0;i<5;i++){
-                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.2*i,0))),true,true,1000);}
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.2*(i+1),0))),true,true,1000);}
             tests.Add_Ground();
             break;}
         case 38:
@@ -1247,7 +1247,7 @@ void Get_Initial_Data()
             break;}
         case 50:{
             for(int i=0;i<parameter;i++)
-                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.1*i,0))),true,true,density);
+                tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.1*(i+1),0))),true,true,density);
             tests.Add_Ground();
             break;}
         default:
