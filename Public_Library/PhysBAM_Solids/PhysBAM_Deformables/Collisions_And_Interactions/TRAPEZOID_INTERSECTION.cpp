@@ -28,11 +28,11 @@ Trapezoid_Intersection_Area_Case_1ou(const TV& a,const TV& b,const TV& c,const T
     H(0)(0)(1,0)=H(0)(0)(0,1)=(T).5*xbc_xba2;
     H(0)(0)(1,1)=0;
     H(1)(0)(0,0)=H(0)(1)(0,0)=-xbc_xba*xca_xba*yba_xba;
-    H(1)(0)(0,1)=H(0)(1)(1,0)=(T).5*(0-xca_xba2);
+    H(1)(0)(0,1)=H(0)(1)(1,0)=(T).5*(1-xca_xba2);
     H(1)(1)(0,0)=-xca_xba2*yba_xba;
     H(1)(0)(1,0)=H(0)(1)(0,1)=-(T).5*xbc_xba2;
     H(1)(0)(1,1)=H(0)(1)(1,1)=0;
-    H(1)(1)(1,0)=H(1)(1)(0,1)=(T).5*(0+xca_xba2);
+    H(1)(1)(1,0)=H(1)(1)(0,1)=(T).5*(1+xca_xba2);
     H(1)(1)(1,1)=0;
     H(2)(0)(0,0)=H(0)(2)(0,0)=xbc_xba*yba_xba;
     H(2)(0)(0,1)=H(0)(2)(1,0)=-xbc_xba;

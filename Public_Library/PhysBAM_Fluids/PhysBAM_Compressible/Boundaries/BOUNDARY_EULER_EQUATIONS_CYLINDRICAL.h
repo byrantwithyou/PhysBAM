@@ -44,10 +44,10 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
 
     // left
     for(i=-3;i<0;i++) for(j=0;j<n;j++){
-        T rho=u_ghost(0-i,j)(0);
-        T u_velocity=-u_ghost(0-i,j)(1)/u_ghost(0-i,j)(0);
-        T v_velocity=u_ghost(0-i,j)(2)/u_ghost(0-i,j)(0);
-        T e=u_ghost(0-i,j)(3)/u_ghost(0-i,j)(0)-(sqr(u_velocity)+sqr(v_velocity))/2;
+        T rho=u_ghost(-i,j)(0);
+        T u_velocity=-u_ghost(-i,j)(1)/u_ghost(-i,j)(0);
+        T v_velocity=u_ghost(-i,j)(2)/u_ghost(-i,j)(0);
+        T e=u_ghost(-i,j)(3)/u_ghost(-i,j)(0)-(sqr(u_velocity)+sqr(v_velocity))/2;
         u_ghost(i,j)(0)=rho;
         u_ghost(i,j)(1)=rho*u_velocity;
         u_ghost(i,j)(2)=rho*v_velocity;

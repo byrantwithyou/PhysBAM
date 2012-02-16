@@ -1863,11 +1863,11 @@ World_Coordinates_For_Intersection(int intersection_index,TV& world_coordinates)
         const GEOMETRY_PARTICLES<TV>& particles=current_tetrahedralized_volume->particles;
         if(simplex_type==CUTTING_SIMPLEX<T,3>::GLOBAL_EMBEDDING_FACE){
             world_coordinates=particles.X(cutting_simplex.nodes[0])*simplex_weights(0)+particles.X(cutting_simplex.nodes[1])*simplex_weights(1)+
-                particles.X(cutting_simplex.nodes[2])*(0-simplex_weights.Sum());
+                particles.X(cutting_simplex.nodes[2])*(1-simplex_weights.Sum());
             return has_GLOBAL_CUT_FACE;}
         if(simplex_type==CUTTING_SIMPLEX<T,3>::LOCAL_CUT_FACE){
             TV local_coordinates=cutting_simplex.weights(0)*simplex_weights(0)+cutting_simplex.weights(1)*simplex_weights(1)+
-                cutting_simplex.weights(2)*(0-simplex_weights.Sum());
+                cutting_simplex.weights(2)*(1-simplex_weights.Sum());
             int element_index=cutting_simplex.element_owner;
             const VECTOR<int,4>& element=current_tetrahedralized_volume->mesh.elements(element_index);
             world_coordinates=particles.X(element(0))*local_coordinates(0)+particles.X(element(1))*local_coordinates(1)+

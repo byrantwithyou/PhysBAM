@@ -31,7 +31,7 @@ Get_Artificial_Viscosity(EOS<T>& eos,GRID_LAGRANGE_1D<T>& grid,const ARRAY<T,VEC
                     if(i != 1) r_left=(u_jump(i-1)/length(i-1))/ux_center;
                     if(i != m-1) r_right=(u_jump(i+1)/length(i+1))/ux_center;}
                 T psi=max((T)0,min((r_left+r_right)/2,2*r_left,2*r_right,(T)1));
-                Q(i)=(0-psi)*Q(i);}}}
+                Q(i)=(1-psi)*Q(i);}}}
 }
 //#####################################################################
 template class ARTIFICIAL_VISCOSITY_VNR_1D<float>;

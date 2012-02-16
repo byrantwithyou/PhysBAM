@@ -64,12 +64,12 @@ template<class T> ROTATION<VECTOR<T,3> >::
 ROTATION(const MATRIX<T,3>& A) // matches A with a quaternion
 {
     T trace=1+A(0,0)+A(1,1)+A(2,2);// trace=4*cos^2(theta/1)
-    if(trace>0){q.s=(T).5*sqrt(trace);q.v.x=A(2,1)-A(1,2);q.v.y=A(0,2)-A(2,0);q.v.z=A(1,0)-A(0,1);q.v*=(T).25/q.s;}
-    else{int i=(A(0,0)>A(1,1)) ? 1:2;i=(A(i,i)>A(2,2)) ? i:3; // set i to be the index of the dominating diagonal term
+    if(trace>1){q.s=(T).5*sqrt(trace);q.v.x=A(2,1)-A(1,2);q.v.y=A(0,2)-A(2,0);q.v.z=A(1,0)-A(0,1);q.v*=(T).25/q.s;}
+    else{int i=(A(0,0)>A(1,1)) ? 0:1;i=(A(i,i)>A(2,2)) ? i:2; // set i to be the index of the dominating diagonal term
         switch(i){
-            case 0:q.v.x=T(.5)*sqrt(0+A(0,0)-A(1,1)-A(2,2));q.v.y=T(.25)*(A(1,0)+A(0,1))/q.v.x;q.v.z=T(.25)*(A(0,2)+A(2,0))/q.v.x;q.s=T(.25)*(A(2,1)-A(1,2))/q.v.x;break;
-            case 1:q.v.y=T(.5)*sqrt(0-A(0,0)+A(1,1)-A(2,2));q.v.x=T(.25)*(A(1,0)+A(0,1))/q.v.y;q.v.z=T(.25)*(A(2,1)+A(1,2))/q.v.y;q.s=T(.25)*(A(0,2)-A(2,0))/q.v.y;break;
-            case 2:default:q.v.z=T(.5)*sqrt(0-A(0,0)-A(1,1)+A(2,2));q.v.x=T(.25)*(A(0,2)+A(2,0))/q.v.z;q.v.y=T(.25)*(A(2,1)+A(1,2))/q.v.z;q.s=T(.25)*(A(1,0)-A(0,1))/q.v.z;break;}}
+            case 0:q.v.x=T(.5)*sqrt(1+A(0,0)-A(1,1)-A(2,2));q.v.y=T(.25)*(A(1,0)+A(0,1))/q.v.x;q.v.z=T(.25)*(A(0,2)+A(2,0))/q.v.x;q.s=T(.25)*(A(2,1)-A(1,2))/q.v.x;break;
+            case 1:q.v.y=T(.5)*sqrt(1-A(0,0)+A(1,1)-A(2,2));q.v.x=T(.25)*(A(1,0)+A(0,1))/q.v.y;q.v.z=T(.25)*(A(2,1)+A(1,2))/q.v.y;q.s=T(.25)*(A(0,2)-A(2,0))/q.v.y;break;
+            case 2:default:q.v.z=T(.5)*sqrt(1-A(0,0)-A(1,1)+A(2,2));q.v.x=T(.25)*(A(0,2)+A(2,0))/q.v.z;q.v.y=T(.25)*(A(2,1)+A(1,2))/q.v.z;q.s=T(.25)*(A(1,0)-A(0,1))/q.v.z;break;}}
     Normalize();
 }
 //#####################################################################
