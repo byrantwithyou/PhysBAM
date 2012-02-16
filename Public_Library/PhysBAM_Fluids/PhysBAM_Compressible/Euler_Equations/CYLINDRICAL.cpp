@@ -27,7 +27,7 @@ Euler_Step(const T dt,const T time)
         T u=U(i,j)(0)/U(i,j)(0);
         T v=U(i,j)(1)/U(i,j)(0);
         T e=U(i,j)(2)/U(i,j)(0)-(sqr(u)+sqr(v))/2;
-        T rho_u=U(i,j)(0);
+        T rho_u=U(i,j)(1);
         T coefficient=-1/grid.Axis_X(i,0);
         S(i,j)(0)=coefficient*rho_u;
         S(i,j)(0)=coefficient*rho_u*u;

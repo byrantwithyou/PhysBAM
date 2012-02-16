@@ -35,7 +35,7 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
     T_ARRAYS_SCALAR phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);T_ARRAYS_VECTOR velocity(phi_ghost.Domain_Indices());
 
     for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
-        TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(1);TV vel=EULER<T_GRID>::Get_Velocity(U_ghost,cell_index);
+        TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<T_GRID>::Get_Velocity(U_ghost,cell_index);
         T e=EULER<T_GRID>::e(U_ghost(cell_index));
         phi_ghost_negated(cell_index)*=-1;
         pressure(cell_index)=eos.p(density,e);
@@ -96,7 +96,7 @@ Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,cons
         if((first_cell_euler&&second_cell_incompressible) || (second_cell_euler&&first_cell_incompressible)){
             if(first_cell_euler) compressible_cell_index=first_cell_index; else compressible_cell_index=second_cell_index;
 
-            T rho_compressible=U(compressible_cell_index)(1),rho_incompressible=incompressible_density;
+            T rho_compressible=U(compressible_cell_index)(0),rho_incompressible=incompressible_density;
             compressible_face_velocities.Component(axis)(face_index)=(rho_incompressible*incompressible_face_velocities.Component(axis)(face_index)+
                 rho_compressible*EULER<T_GRID>::Get_Velocity_Component(U,compressible_cell_index,axis))/(rho_compressible+rho_incompressible);}
         else if(first_cell_incompressible && second_cell_incompressible) // TODO(jontg): Move this out.
@@ -124,14 +124,14 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_G
             T rho_first_cell,rho_second_cell;
             T u_star_first_cell,u_star_second_cell;
             if(first_cell_euler){
-                rho_first_cell=U(first_cell_index)(1);
+                rho_first_cell=U(first_cell_index)(0);
                 u_star_first_cell=EULER<T_GRID>::Get_Velocity_Component(U,first_cell_index,axis);
                 rho_second_cell=incompressible_density;
                 u_star_second_cell=incompressible_face_velocities.Component(axis)(face_index);}
             else{
                 rho_first_cell=incompressible_density;
                 u_star_first_cell=incompressible_face_velocities.Component(axis)(face_index);
-                rho_second_cell=U(second_cell_index)(1);
+                rho_second_cell=U(second_cell_index)(0);
                 u_star_second_cell=EULER<T_GRID>::Get_Velocity_Component(U,second_cell_index,axis);}
 
             T correction_term=(T).5*rho_first_cell*rho_second_cell*face_grid.dX[axis]*(u_star_second_cell-u_star_first_cell)/(rho_first_cell+rho_second_cell);

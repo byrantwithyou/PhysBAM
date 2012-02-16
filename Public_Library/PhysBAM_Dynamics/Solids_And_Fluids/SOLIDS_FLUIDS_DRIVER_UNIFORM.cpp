@@ -871,10 +871,10 @@ Calculate_Maximum_Allowable_dt(const T dt,T& min_dt,const int substep,RUNGEKUTTA
     EULER_UNIFORM<T_GRID>* euler=example.fluids_parameters.euler;
     ARRAY_VIEW<TV_DIMENSION,TV_INT> U_n(euler->grid.Domain_Indices(),reinterpret_cast<TV_DIMENSION*>(rungekutta_u.u_copy.Get_Array_Pointer()));
     for(CELL_ITERATOR iterator(euler->grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
-        T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(1);
+        T clamp_rho_cell=euler->conservation->clamp_rho*U_n(cell_index)(0);
         T clamp_e_cell=euler->conservation->clamp_e*EULER<T_GRID>::e(U_n,cell_index);
-        if((euler->U(cell_index)(1)<U_n(cell_index)(1))&&(abs(euler->U(cell_index)(1)-U_n(cell_index)(1))>1e-5))
-            min_dt=min(min_dt,((T)val*dt*(clamp_rho_cell-U_n(cell_index)(1)))/(euler->U(cell_index)(1)-U_n(cell_index)(1)));
+        if((euler->U(cell_index)(0)<U_n(cell_index)(0))&&(abs(euler->U(cell_index)(0)-U_n(cell_index)(0))>1e-5))
+            min_dt=min(min_dt,((T)val*dt*(clamp_rho_cell-U_n(cell_index)(0)))/(euler->U(cell_index)(0)-U_n(cell_index)(0)));
         assert(min_dt>0);
         if((EULER<T_GRID>::e(euler->U,cell_index)<EULER<T_GRID>::e(U_n,cell_index))&&(abs(EULER<T_GRID>::e(euler->U,cell_index)-EULER<T_GRID>::e(U_n,cell_index))>1e-5))
             min_dt=min(min_dt,((T)val*dt*(clamp_e_cell-EULER<T_GRID>::e(U_n,cell_index)))/(EULER<T_GRID>::e(euler->U,cell_index)-EULER<T_GRID>::e(U_n,cell_index)));
