@@ -54,18 +54,12 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             if(!object->volume_object){
                 object->object.Update_Bounding_Box();
                 object->object.Refresh_Auxiliary_Structures();
-                RANGE<TV>& box(*(object->object.bounding_box));
-                TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner(),1);
-                TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner(),1);
-                for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,RANGE<TV_INT>(min_index,max_index));iterator.Valid();iterator.Next())
+                for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(*object->object.bounding_box,1));iterator.Valid();iterator.Next())
                     if(object->Inside(iterator.Location(),collision_thickness_over_two)){
                         psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}
             else{
                 for(int i=0;i<object->volume_object->mesh.elements.m;i++){T_SIMPLEX simplex=object->volume_object->Get_Element(i);
-                    RANGE<TV> box(simplex.Bounding_Box());
-                    TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner(),1);
-                    TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner(),1);
-                    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,RANGE<TV_INT>(min_index,max_index));iterator.Valid();iterator.Next())
+                    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(simplex.Bounding_Box(),1));iterator.Valid();iterator.Next())
                         if(simplex.Inside(iterator.Location(),collision_thickness_over_two)){
                             psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}}}
         else if(RIGID_COLLISION_GEOMETRY_BASE<TV>* object=dynamic_cast<RIGID_COLLISION_GEOMETRY_BASE<TV>*>(&collision_geometry_collection(i))){
@@ -73,10 +67,7 @@ Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<
             if(!rigid_body.simplicial_object->mesh.incident_elements) rigid_body.simplicial_object->mesh.Initialize_Incident_Elements();
             if(!rigid_body.simplicial_object->mesh.adjacent_elements) rigid_body.simplicial_object->mesh.Initialize_Adjacent_Elements();
             object->Update_Bounding_Box();
-            RANGE<TV> box(object->Axis_Aligned_Bounding_Box());
-            TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner(),1);
-            TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner(),1);
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,RANGE<TV_INT>(min_index,max_index));iterator.Valid();iterator.Next()){
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,grid.Clamp_To_Cell(object->Axis_Aligned_Bounding_Box(),1));iterator.Valid();iterator.Next()){
                 if(collision_geometry_collection(i).Inside(iterator.Location(),collision_thickness_over_two)){
                     psi_D(iterator.Cell_Index())=true;p(iterator.Cell_Index())=p_inside_solid;}}}
         else PHYSBAM_FATAL_ERROR("Unrecognized collision body type");}

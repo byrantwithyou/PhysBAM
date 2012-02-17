@@ -576,7 +576,7 @@ Transfer_Momentum_And_Set_Boundary_Conditions(const T time,GENERALIZED_VELOCITY<
             T_THIN_SHELL_SIMPLEX velocity_line=velocity_lines(i);
             TV jet_velocity=jet_velocities(i);
             RANGE<TV> box=velocity_line.Bounding_Box();
-            RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box.min_corner,1),grid.Clamp_To_Cell(box.max_corner,1));
+            RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box,1));
             bounding_grid_cells.Change_Size(1);
             // wonder if this works
             TV total_length_by_dimension;
@@ -697,7 +697,7 @@ Compute_W(const T current_position_time)
             else PHYSBAM_FATAL_ERROR();
             for(int e=0;e<mesh->elements.m;e++){
                 const RANGE<TV>& box=body.World_Space_Simplex(e).Bounding_Box();
-                RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box.min_corner,1),grid.Clamp_To_Cell(box.max_corner,1));
+                RANGE<TV_INT> bounding_grid_cells(grid.Clamp_To_Cell(box,1));
                 for(CELL_ITERATOR iterator(grid,bounding_grid_cells);iterator.Valid();iterator.Next())
                     structure_simplex_list(iterator.Cell_Index()).Append(PAIR<COLLISION_GEOMETRY_ID,int>(i,e));}}
 
