@@ -270,7 +270,7 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
     PARTICLES<TV>& particles=soft_bindings.particles;
     ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
     ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(particles.array_collection->Size()));
-    for(int i=0;i<nodes.m;i++) if(!embedded_only || soft_bindings.binding_list.Binding_Index_From_Particle_Index(nodes(i))){
+    for(int i=0;i<nodes.m;i++) if(!embedded_only || soft_bindings.binding_list.Binding_Index_From_Particle_Index(nodes(i))>=0){
         int node=nodes(i),bound_node;
         if(persistent_soft_bindings && persistent_soft_bindings->Get(node,bound_node))
             persistent_soft_bindings->Delete(node);
