@@ -44,7 +44,7 @@ public:
     if(use_radius) radius(cell)=max(radius(cell),(location-grid.Center(cell)).Magnitude());}
 
     RANGE<VECTOR<int,d> > Range(const RANGE<TV>& box) const
-    {return RANGE<VECTOR<int,d> >(grid.Clamp_To_Cell(box.Minimum_Corner()),grid.Clamp_To_Cell(box.Maximum_Corner()));}
+    {return grid.Clamp_To_Cell(box);}
 
     void Intersection_List(const IMPLICIT_OBJECT<TV>& test_surface,const MATRIX<T,d>& rotation,const TV& translation,ARRAY<VECTOR<int,d> >& intersection_list,const T contour_value=0) const
     {PHYSBAM_ASSERT(use_radius);intersection_list.Remove_All();
