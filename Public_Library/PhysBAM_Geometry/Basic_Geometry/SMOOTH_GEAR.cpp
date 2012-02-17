@@ -221,7 +221,7 @@ Bounding_Box() const
 template<class T> T SMOOTH_GEAR<VECTOR<T,3> >::
 Signed_Distance(const TV& X) const
 {
-    T ds=g.Signed_Distance(X.Remove_Index(3));
+    T ds=g.Signed_Distance(X.Remove_Index(2));
     T dw=fabs(X.z)-w;
     if(dw<0) return std::max(ds,dw);
     if(ds<0) return dw;
@@ -234,8 +234,8 @@ template<class T> VECTOR<T,3> SMOOTH_GEAR<VECTOR<T,3> >::
 Surface(const TV& X) const
 {
     typename GEAR::HELPER h;
-    g.Compute_Helper(X.Remove_Index(3),h);
-    VECTOR<T,2> S2=g.Surface(X.Remove_Index(3),h);
+    g.Compute_Helper(X.Remove_Index(2),h);
+    VECTOR<T,2> S2=g.Surface(X.Remove_Index(2),h);
     T dw=fabs(X.z)-w,ds=h.sd;
     if(ds>dw && dw<0) return S2.Append(X.z);
     if(ds<0){
@@ -251,11 +251,11 @@ template<class T> VECTOR<T,3> SMOOTH_GEAR<VECTOR<T,3> >::
 Normal(const TV& X) const
 {
     typename GEAR::HELPER h;
-    g.Compute_Helper(X.Remove_Index(3),h);
+    g.Compute_Helper(X.Remove_Index(2),h);
     T dw=fabs(X.z)-w,ds=h.sd;
-    if(ds>dw && dw<0) return g.Normal(X.Remove_Index(3),h).Append(0);
+    if(ds>dw && dw<0) return g.Normal(X.Remove_Index(2),h).Append(0);
     if(ds<0) return TV(0,0,X.z>0?1:-1);
-    return (X-g.Surface(X.Remove_Index(3),h).Append(X.z>0?w:-w)).Normalized();
+    return (X-g.Surface(X.Remove_Index(2),h).Append(X.z>0?w:-w)).Normalized();
 }
 //#####################################################################
 // Function Normal
@@ -272,7 +272,7 @@ template<class T> VECTOR<T,2> SMOOTH_GEAR<VECTOR<T,3> >::
 Principal_Curvatures(const TV& X) const
 {
     typename GEAR::HELPER h;
-    g.Compute_Helper(X.Remove_Index(3),h);
+    g.Compute_Helper(X.Remove_Index(2),h);
     T dw=fabs(X.z)-w,ds=h.sd;
     if(ds>dw && dw<0) return h.ui?VECTOR<T,2>(0,1/g.s):VECTOR<T,2>(-1/g.s,0);
     return VECTOR<T,2>(0,0);

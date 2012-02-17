@@ -111,7 +111,7 @@ namespace{
     }
     template<class T,class T_ARRAY> VECTOR<T,2> Barycentric_Coordinates(const VECTOR<T,2>& X,const T_ARRAY& triangle_X)
     {
-        return TRIANGLE_2D<T>::Barycentric_Coordinates(X,triangle_X).Remove_Index(3);
+        return TRIANGLE_2D<T>::Barycentric_Coordinates(X,triangle_X).Remove_Index(2);
     }
 }
 //#####################################################################

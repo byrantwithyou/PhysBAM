@@ -59,7 +59,7 @@ public:
     // make the trunk not quite on the z-axis
     Pring+=trunk_wobble*NOISE<T>::Noise_Function3(TV(0,0,Pshad.z*trunk_wobble_frequency))*TV(1,1,0);
     // evaluate the radius
-    T r=Pring.Remove_Index(3).Magnitude()*ring_frequency;
+    T r=Pring.Remove_Index(2).Magnitude()*ring_frequency;
     // add some noise to the angle to simulate rings that are not quite round
     r+=angular_wobble*Smooth(r,(T)0,(T)5)*NOISE<T>::Noise_Function1(angular_wobble_frequency*Pring*TV(1,1,(T).1));
     r+=(T)0.5*NOISE<T>::Noise_Function1(TV(r,0,0));

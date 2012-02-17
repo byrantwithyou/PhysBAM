@@ -83,7 +83,7 @@ public:
     {Simplices_On_Subsimplex(nodes,tetrahedrons_on_face);}
 
     static bool Face_Reversed_In_Simplex(const VECTOR<int,3>& face_nodes,const VECTOR<int,4>& tet_nodes)
-    {for(int i=0;i<24;i++) if(permute_four(tet_nodes,i).Remove_Index(4)==face_nodes) return !permutation_of_four_is_even(i);
+    {for(int i=0;i<24;i++) if(permute_four(tet_nodes,i).Remove_Index(3)==face_nodes) return !permutation_of_four_is_even(i);
     PHYSBAM_FATAL_ERROR();}
 
 //#####################################################################
