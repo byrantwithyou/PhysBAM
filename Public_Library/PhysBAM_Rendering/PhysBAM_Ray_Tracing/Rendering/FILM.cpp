@@ -672,7 +672,7 @@ Generate_Stratified_Sample_Points(const VECTOR<int,2>& pixel_index,const CAMERA<
 template<class T> void FILM<T>::
 Add_Sample(const SAMPLE& sample)
 {
-    RANGE<VECTOR<int,2> > box(grid.Clamp_To_Cell(RANGE<TV>(sample.film_position).Thickened(effective_filter_width)));
+    RANGE<VECTOR<int,2> > box(grid.Clamp_To_Cell(RANGE<TV2>(sample.film_position).Thickened(effective_filter_width)));
     for(int i=box.min_corner.x;i<box.max_corner.x;i++) for(int j=box.min_corner.y;j<box.max_corner.y;j++){
         T weight=filter(sample.film_position-grid.X(i,j),effective_filter_width);
         colors(i,j)+=weight*sample.radiance;weights(i,j)+=weight;alphas(i,j)+=weight*sample.alpha;}
