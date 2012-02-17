@@ -478,7 +478,7 @@ Substitute_Soft_Bindings_For_Embedded_Nodes(T_EMBEDDED_MATERIAL_SURFACE& object,
 #if 0
     ARRAY<int> nodes;object.material_surface.mesh.elements.Flattened().Get_Unique(nodes);
     ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(object.material_surface.particles.array_collection->Size()));
-    for(int i=0;i<nodes.m;i++) if(binding_list.Binding_Index_From_Particle_Index(nodes(i))){
+    for(int i=0;i<nodes.m;i++) if(binding_list.Binding_Index_From_Particle_Index(nodes(i))>=0){
         int embedded_node=nodes(i),bound_node;
         if(persistent_soft_bindings && persistent_soft_bindings->Get(embedded_node,bound_node))
             persistent_soft_bindings->Delete(embedded_node);

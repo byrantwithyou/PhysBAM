@@ -233,7 +233,7 @@ Set_Divergence_And_Multiplier(const TV_INT cell,const T_ARRAYS_BOOL& cells_valid
     else{
         T target_density_factor=callbacks->Target_Density_Factor(grid.Center(cell),time);bool near_interface=false;
         if(!enforce_density_near_interface){
-            RANGE<TV_INT> neighbor_cells(grid.Clamp_To_Cell(grid.Center(cell)-radius_vector,1),grid.Clamp_To_Cell(grid.Center(cell)+radius_vector,1));
+            RANGE<TV_INT> neighbor_cells=grid.Clamp_To_Cell(RANGE<TV>(grid.Center(cell)).Thickened(radius_vector),1);
             for(CELL_ITERATOR iterator_neighbor(grid,neighbor_cells);iterator_neighbor.Valid();iterator_neighbor.Next()){
                 if(!cells_valid(iterator_neighbor.Cell_Index()) || cell_weight(iterator_neighbor.Cell_Index())<=ballistic_particles_per_cell){near_interface=true;break;}}}
         if(!near_interface){
@@ -409,8 +409,8 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
             one_over_total_removed_negative_particle_cell_weight(block).Resize(particles.array_collection->Size());
             for(int p=0;p<particles.array_collection->Size();p++){
                 PAIR<TV_INT,int> particle_record(block,p);
-                TV_INT lower=grid.Clamp_To_Cell(particles.X(p)-radius_vector),upper=grid.Clamp_To_Cell(particles.X(p)+radius_vector);
-                for(CELL_ITERATOR cell_iterator(grid,RANGE<TV_INT>(lower,upper));cell_iterator.Valid();cell_iterator.Next()){
+                RANGE<TV_INT> range=grid.Clamp_To_Cell(RANGE<TV>(particles.X(p)).Thickened(radius_vector));
+                for(CELL_ITERATOR cell_iterator(grid,range);cell_iterator.Valid();cell_iterator.Next()){
                     TV_INT cell=cell_iterator.Cell_Index();
                     TV X_minus_Xp=grid.Center(cell)-particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
                     T weight=1-distance_squared*one_over_radius_squared;

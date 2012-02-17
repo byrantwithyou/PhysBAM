@@ -399,7 +399,7 @@ public:
     TV_INT Clamp_To_Cell(const TV& location,const int number_of_ghost_cells) const
     {return clamp(TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,numbers_of_cells+number_of_ghost_cells-1);}
 
-    RANGE<TV_INT> Clamp_To_Cell(const RANGE<TV>& box,const int number_of_ghost_cells) const
+    RANGE<TV_INT> Clamp_To_Cell(const RANGE<TV>& box,const int number_of_ghost_cells=0) const
     {return RANGE<TV_INT>(Clamp_To_Cell(box.Minimum_Corner(),number_of_ghost_cells),Clamp_To_Cell(box.Maximum_Corner(),number_of_ghost_cells)+1);}
 
     TV_INT Block_Index(const TV& X,const int number_of_ghost_cells) const // index of node at center of block

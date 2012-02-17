@@ -193,6 +193,9 @@ public:
     RANGE<TV> Thickened(const T thickness_over_two) const
     {return RANGE<TV>(min_corner-thickness_over_two,max_corner+thickness_over_two);}
 
+    RANGE<TV> Thickened(const TV& thickness_over_two) const
+    {return RANGE<TV>(min_corner-thickness_over_two,max_corner+thickness_over_two);}
+
     static RANGE<TV> Combine(const RANGE<TV>& box1,const RANGE<TV>& box2)
     {return RANGE<TV>(TV::Componentwise_Min(box1.min_corner,box2.min_corner),TV::Componentwise_Max(box1.max_corner,box2.max_corner));}
 
@@ -210,6 +213,9 @@ public:
 
     void Scale_About_Center(const T x_factor,const T y_factor,const T z_factor)
     {STATIC_ASSERT(d==3);Scale_About_Center(TV(x_factor,y_factor,z_factor));}
+
+    RANGE<TV> Translated(const TV& shift) const
+    {RANGE<TV> r(min_corner+shift,max_corner+shift);return r;}
 
     bool Lazy_Inside(const TV& location) const
     {return location.All_Greater_Equal(min_corner) && location.All_Less_Equal(max_corner);}

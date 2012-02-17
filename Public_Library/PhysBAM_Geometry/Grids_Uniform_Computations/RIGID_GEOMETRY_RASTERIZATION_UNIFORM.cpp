@@ -57,9 +57,8 @@ template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& gri
 template<class TV,class T_GRID> void Rasterize_Box(const T_GRID& grid,OBJECTS_IN_CELL<T_GRID,COLLISION_GEOMETRY_ID>& objects_in_cell,const RANGE<TV>& box,const COLLISION_GEOMETRY_ID id)
 {
     typedef typename REBIND<TV,int>::TYPE TV_INT;
-    TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner(),3);
-    TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner(),3);
-    for(typename T_GRID::CELL_ITERATOR iterator(grid,RANGE<TV_INT>(min_index,max_index));iterator.Valid();iterator.Next()) objects_in_cell.Add_Object_To_Cell(iterator.Cell_Index(),id);
+    for(typename T_GRID::CELL_ITERATOR iterator(grid,grid.Clamp_To_Cell(box,3));iterator.Valid();iterator.Next())
+        objects_in_cell.Add_Object_To_Cell(iterator.Cell_Index(),id);
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T,d) \

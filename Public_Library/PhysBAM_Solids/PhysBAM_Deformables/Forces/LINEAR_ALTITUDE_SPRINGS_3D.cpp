@@ -199,7 +199,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node){
+            if(state.node>=0){
                 int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
                 int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
                 const SPRING_PARAMETER& parameter=parameters(t)(state.node);
@@ -221,7 +221,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node){
+            if(state.node>=0){
                 int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
                 int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
                 Fill_Node_Indices(i,j,k,l,state.node,node1,node2,node3,node4);
@@ -243,7 +243,7 @@ Velocity_Dependent_Forces_Size() const
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node) aggregate_id++;}}
+            if(state.node>=0) aggregate_id++;}}
     return aggregate_id;
 }
 //#####################################################################
@@ -260,7 +260,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node){
+            if(state.node>=0){
                 int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
                 int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
                 Fill_Node_Indices(i,j,k,l,state.node,node1,node2,node3,node4);
@@ -280,7 +280,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node){
+            if(state.node>=0){
                 int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
                 int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
                 Fill_Node_Indices(i,j,k,l,state.node,node1,node2,node3,node4);
@@ -300,7 +300,7 @@ Add_Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node){
+            if(state.node>=0){
                 int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
                 int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
                 const SPRING_PARAMETER& parameter=parameters(t)(state.node);
@@ -373,7 +373,7 @@ Add_Force_Data(ARRAY<FORCE_DATA<TV> >& force_data_list,const std::string& force_
             if(use_shortest_spring_only) state_ptr=&spring_states(t);
             else state_ptr=&spring_states_all_springs(t)[spring_index];
             const SPRING_STATE& state=*state_ptr;
-            if(state.node){
+            if(state.node>=0){
                 int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
                 int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
                 const SPRING_PARAMETER& parameter=parameters(t)(state.node);
@@ -391,7 +391,7 @@ template<class T> T LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Potential_Energy(const int t,const T time) const
 {
     const SPRING_STATE& state=spring_states(t);
-    if(state.node){
+    if(state.node>=0){
         int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
         int node1,node2,node3,node4; // node1 is the isolated vertex and nodes2,3,4 are the triangle
         const SPRING_PARAMETER& parameter=parameters(t)(state.node);

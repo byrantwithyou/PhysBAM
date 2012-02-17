@@ -40,7 +40,7 @@ public:
 
 private:
     RANGE<TV_INT> Grid_Influence_Bounds(const T_GRID& grid,const TV& X) const
-    {return RANGE<TV_INT>(grid.Clamp_To_Cell(X-radius_of_influence),grid.Clamp_To_Cell(X+radius_of_influence));}
+    {return RANGE<TV_INT>(grid.Clamp_To_Cell(RANGE<TV>(X).Thickened(radius_of_influence)));}
 public:
 
     template<class T_ARRAY_T2,class T_ARRAYS_T2> void Transfer_To_Grid(ARRAY_VIEW<const TV> domain,const T_ARRAY_T2& range,const T_GRID& grid,T_ARRAYS_T2& grid_data) const

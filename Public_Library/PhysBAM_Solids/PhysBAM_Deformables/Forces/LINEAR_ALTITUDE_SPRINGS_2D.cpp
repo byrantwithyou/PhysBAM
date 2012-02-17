@@ -108,7 +108,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& state=spring_states(t);
-        if(state.node){
+        if(state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 is the segment
             const SPRING_PARAMETER& parameter=parameters(t)(state.node);
@@ -125,7 +125,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T ti
 {
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
-        if(spring_state.node){
+        if(spring_state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
             switch(spring_state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
@@ -142,7 +142,7 @@ Velocity_Dependent_Forces_Size() const
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){
         int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
-        if(spring_state.node) aggregate_id++;}
+        if(spring_state.node>=0) aggregate_id++;}
     return aggregate_id;
 }
 //#####################################################################
@@ -154,7 +154,7 @@ Add_Velocity_Dependent_Forces_First_Half(ARRAY_VIEW<const TV> V,ARRAY_VIEW<T> ag
     int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
-        if(spring_state.node){
+        if(spring_state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
             switch(spring_state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
@@ -169,7 +169,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T> aggregate,ARRAY_VI
     int aggregate_id=0;
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         const SPRING_STATE& spring_state=spring_states(t);
-        if(spring_state.node){
+        if(spring_state.node>=0){
             int i,j,k;mesh.elements(t).Get(i,j,k);
             int node1,node2,node3; // node1 is the isolated vertex and nodes2,3 are the segment
             switch(spring_state.node){case 0:node1=i;node2=j;node3=k;break;case 1:node1=j;node2=k;node3=i;break;default:node1=k;node2=i;node3=j;}
