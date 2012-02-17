@@ -314,7 +314,7 @@ public:
     assert((unsigned)axis<3&&(unsigned)node<4);return face_index+corner_from_face_offset[axis][node];}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,2>& face_index,const int node)
-    {assert((unsigned)node<2);TV_INT index=face_index;index[1-axis]+=node-1;return index;}
+    {assert((unsigned)node<2);TV_INT index=face_index;index[1-axis]+=node;return index;}
 
     static TV_INT Face_Node_Index(const int axis,const VECTOR<int,1>& face_index,const int node)
     {assert(axis==0&&node==0);return face_index;}

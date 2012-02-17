@@ -53,10 +53,10 @@ public:
     {return swept_occupied_blocks(cell_index);} // this will check the occupied block that is left,bottom,front of the current cell.
 
     bool Occupied_Face_Center(FACE_ITERATOR& iterator) const
-    {return occupied_blocks(iterator.Face_Node_Index(1));}
+    {return occupied_blocks(iterator.Face_Node_Index(0));}
 
     bool Swept_Occupied_Face_Center(FACE_ITERATOR& iterator) const
-    {return swept_occupied_blocks(iterator.Face_Node_Index(1));}
+    {return swept_occupied_blocks(iterator.Face_Node_Index(0));}
 
     bool Inside_Any_Simplex_Of_Any_Body(const TV& location,COLLISION_GEOMETRY_ID& body_id,int& aggregate_id) const
     {ARRAY<COLLISION_GEOMETRY_ID> objects;TV_INT cell_index=grid.Clamp_To_Cell(location);objects_in_cell.Get_Objects_For_Cell(cell_index,objects);if(!objects.m) return false;
