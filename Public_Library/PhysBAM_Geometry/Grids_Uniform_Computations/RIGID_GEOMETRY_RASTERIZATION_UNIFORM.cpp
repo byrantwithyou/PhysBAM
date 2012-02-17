@@ -47,9 +47,8 @@ template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& gri
 {
     typedef typename REBIND<TV,int>::TYPE TV_INT;
     TV DX_over_two=(typename TV::SCALAR).5*grid.dX;
-    TV_INT min_index=grid.Clamp_To_Cell(box.Minimum_Corner()-DX_over_two,3);
-    TV_INT max_index=grid.Clamp_To_Cell(box.Maximum_Corner()+DX_over_two,3);
-    for(typename T_GRID::CELL_ITERATOR iterator(grid,RANGE<TV_INT>(min_index,max_index));iterator.Valid();iterator.Next()) occupied(iterator.Cell_Index()+TV_INT::All_Ones_Vector())=true;
+    for(typename T_GRID::CELL_ITERATOR iterator(grid,grid.Clamp_To_Cell(box.Translated(-DX_over_two),3));iterator.Valid();iterator.Next())
+        occupied(iterator.Cell_Index()+1)=true;
 }
 //#####################################################################
 // Function Rasterize_Box
