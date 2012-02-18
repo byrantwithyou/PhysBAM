@@ -106,7 +106,7 @@ Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_def
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
-            int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-(dynamic_particle_index-1)*TV::dimension;
+            int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-dynamic_particle_index*TV::dimension;
             pressure(J_deformable.A(index).j)+=J_deformable.A(index).a*V.V(dynamic_particle_index)(axis);}}
 }
 //#####################################################################
@@ -121,7 +121,7 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
     for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
-            int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-(rigid_particle_index-1)*rows_per_rigid_body;
+            int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-rigid_particle_index*rows_per_rigid_body;
             if(component<=TV::dimension) pressure(J_rigid.A(index).j)+=J_rigid.A(index).a*V.rigid_V(rigid_particle_index).linear(component);
             else pressure(J_rigid.A(index).j)+=J_rigid.A(index).a*V.rigid_V(rigid_particle_index).angular(component-TV::dimension);}}
 }
@@ -136,7 +136,7 @@ Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,co
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
         for(;index<end;index++){
-            int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-(dynamic_particle_index-1)*TV::dimension;
+            int dynamic_particle_index=(i-1)/TV::dimension+1;int axis=i-dynamic_particle_index*TV::dimension;
             V.V(dynamic_particle_index)(axis)+=pressure(J_deformable.A(index).j)*J_deformable.A(index).a;}}
 }
 //#####################################################################
@@ -151,7 +151,7 @@ Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const VECTOR
     for(int i=0;i<J_rigid.m;i++){
         const int end=J_rigid.offsets(i+1);
         for(;index<end;index++){
-            int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-(rigid_particle_index-1)*rows_per_rigid_body;
+            int rigid_particle_index=(i-1)/rows_per_rigid_body+1;int component=i-rigid_particle_index*rows_per_rigid_body;
             if(component<=TV::dimension) V.rigid_V(rigid_particle_index).linear(component)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);
             else V.rigid_V(rigid_particle_index).angular(component-TV::dimension)+=J_rigid.A(index).a*pressure(J_rigid.A(index).j);}}
 }

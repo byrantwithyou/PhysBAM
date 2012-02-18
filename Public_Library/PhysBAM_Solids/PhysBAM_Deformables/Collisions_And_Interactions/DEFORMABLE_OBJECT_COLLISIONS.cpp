@@ -144,7 +144,7 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
             for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
                 if(particle_states(node).enforce && (*bodies)(body_id)->Implicit_Geometry_Lazy_Inside(particles.X(node),(thickness_table?thickness_table->Get_Default(node,0):0)-(T)1e-5)){
                     collision_count(node)++;if(collision_count(node)>1){particle_states(node).enforce=false;particles.X(node)=X_save(node);particles.V(node)=V_old(node);}}}}
-    else for(COLLISION_GEOMETRY_ID body_id=bodies->m;body_id>=COLLISION_GEOMETRY_ID(1);body_id--)
+    else for(COLLISION_GEOMETRY_ID body_id=bodies->m-1;body_id>=COLLISION_GEOMETRY_ID(0);body_id--)
         interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(*(*bodies)(body_id),X_old,particles,soft_bindings,collision_body_candidate_nodes(body_id),
             check_collision,collision_tolerance,particle_states,particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);
 

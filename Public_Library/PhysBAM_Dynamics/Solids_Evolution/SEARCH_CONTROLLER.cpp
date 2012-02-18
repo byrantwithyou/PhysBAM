@@ -160,9 +160,9 @@ Restore_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_ang
 template<class T_GRID> static typename T_GRID::SCALAR Get_Time_For_Saved_State_Helper(const GRID_BASED_COLLISION_GEOMETRY<T_GRID>& collision_body_list,const int state){
     typename T_GRID::SCALAR old_state_time=0;
     typedef typename T_GRID::VECTOR_T TV;
-    if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_body_list.collision_geometry_collection.bodies(COLLISION_GEOMETRY_ID(1)))){
+    if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(collision_body_list.collision_geometry_collection.bodies(COLLISION_GEOMETRY_ID(0)))){
         old_state_time=rigid_body_collision_geometry->saved_states(state).y;}
-    else if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable_body=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(collision_body_list.collision_geometry_collection.bodies(COLLISION_GEOMETRY_ID(1)))){
+    else if(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable_body=dynamic_cast<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*>(collision_body_list.collision_geometry_collection.bodies(COLLISION_GEOMETRY_ID(0)))){
         old_state_time=deformable_body->saved_states(state).y;}
     else PHYSBAM_FATAL_ERROR();
     return old_state_time;

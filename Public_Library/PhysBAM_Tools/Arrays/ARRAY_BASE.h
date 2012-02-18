@@ -148,11 +148,11 @@ public:
 
     template<class ID2>
     ARRAY_VIEW<const T,ID2> Array_View(const ID first,const ID2 length) const
-    {const T_ARRAY& self=Derived();assert(Value(first)+Value(length)<=Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<const T,ID2>(length,self.Get_Array_Pointer()+Value(first));}
+    {const T_ARRAY& self=Derived();assert((unsigned)(Value(first)+Value(length))<=(unsigned)Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<const T,ID2>(length,self.Get_Array_Pointer()+Value(first));}
 
     template<class ID2>
     ARRAY_VIEW<T,ID2> Array_View(const ID first,const ID2 length)
-    {T_ARRAY& self=Derived();assert(Value(first)+Value(length)<=Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<T,ID2>(length,self.Get_Array_Pointer()+Value(first));}
+    {T_ARRAY& self=Derived();assert((unsigned)(Value(first)+Value(length))<=(unsigned)Value(self.Size()) && Value(length)>=0);return ARRAY_VIEW<T,ID2>(length,self.Get_Array_Pointer()+Value(first));}
 
     template<class T_ARRAY1>
     bool operator==(const T_ARRAY1& v) const

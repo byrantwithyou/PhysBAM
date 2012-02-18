@@ -53,8 +53,8 @@ public:
     {int n=solid_velocity.Raw_Size();for(int i=0;i<pressure.m;i++) n+=pressure(i).n;return n;}
 
     T& Raw_Get(int i) PHYSBAM_OVERRIDE
-    {int n=solid_velocity.Raw_Size();if(i<=n) return solid_velocity.Raw_Get(i);i-=n;
-    for(int j=0;j<pressure.m;j++){if(i<=pressure(j).n) return pressure(j)(i);i-=pressure(j).n;}
+    {int n=solid_velocity.Raw_Size();if(i<n) return solid_velocity.Raw_Get(i);i-=n;
+    for(int j=0;j<pressure.m;j++){if(i<pressure(j).n) return pressure(j)(i);i-=pressure(j).n;}
     PHYSBAM_FATAL_ERROR();}
 };
 }

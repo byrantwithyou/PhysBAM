@@ -996,7 +996,7 @@ Mark_Valid_Faces(ARRAY<bool,FACE_INDEX<TV::m> >& valid) const
             /*Add_Debug_Particle(index_map.grid.Axis_X_Face(index_map.indexed_faces(i)),VECTOR<typename TV::SCALAR,3>(0,1,0));*/}}
     Dump_Substep(temporary_faces,"after mark valid faces");
 }
-template<class TV> int SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::solve_id=0;
+template<class TV> int SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::solve_id=-1;
 //#####################################################################
 template class SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<VECTOR<float,1> >;
 template class SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<VECTOR<float,2> >;

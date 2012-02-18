@@ -130,12 +130,12 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& COUPLED_SYSTEM_VECTOR<TV>::
 Raw_Get(int i)
 {
-    if(i<=pressure.n) return pressure(i);
+    if(i<pressure.n) return pressure(i);
     i-=pressure.n;
     int l=Value(lambda.m);
-    if(i<=l) return lambda(COUPLING_CONSTRAINT_ID(i));
+    if(i<l) return lambda(COUPLING_CONSTRAINT_ID(i));
     int f=Value(force_coefficients.m);
-    if(i<=l+f) return force_coefficients(FORCE_AGGREGATE_ID(i-l));
+    if(i<l+f) return force_coefficients(FORCE_AGGREGATE_ID(i-l));
     return viscous_force_coefficients(VISCOUS_FORCE_ID(i-l-f));
 }
 //#####################################################################
