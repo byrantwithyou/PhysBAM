@@ -135,7 +135,7 @@ Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_MXN<T>& m)
     out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: "<<m.A.m<<"\n# rows: "<<m.n<<"\n# columns: "<<m.m<<"\n";
     for(int i=0;i<m.m;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
-        for(int j=s;j<e;j++) out<<m.A(j).j<<" "<<i<<" "<<m.A(j).a<<"\n";}
+        for(int j=s;j<e;j++) out<<(m.A(j).j+1)<<" "<<(i+1)<<" "<<m.A(j).a<<"\n";}
 }
 //#####################################################################
 // Function Write
@@ -156,7 +156,7 @@ Write_Transpose(const char* name,const SPARSE_MATRIX_FLAT_NXN<T>& m)
     out<<"# name: "<<name<<"\n# type: sparse matrix\n# nnz: "<<m.A.m<<"\n# rows: "<<m.n<<"\n# columns: "<<m.n<<"\n";
     for(int i=0;i<m.n;i++){
         int s=m.offsets(i),e=m.offsets(i+1);
-        for(int j=s;j<e;j++) out<<(m.A(j).j)<<" "<<i<<" "<<m.A(j).a<<std::endl;}
+        for(int j=s;j<e;j++) out<<(m.A(j).j+1)<<" "<<(i+1)<<" "<<m.A(j).a<<std::endl;}
 }
 //#####################################################################
 // Function Write_Transpose
@@ -215,7 +215,7 @@ End_Sparse_Matrix()
     if(internal.m){
         Sort(internal);
         for(int i=0;i<internal.m;i++)
-            out<<internal(i).r<<" "<<internal(i).c<<" "<<internal(i).x<<"\n";
+            out<<(internal(i).r+1)<<" "<<(internal(i).c+1)<<" "<<internal(i).x<<"\n";
         nnz=internal.m;
         internal.Remove_All();}
 
@@ -234,7 +234,7 @@ Append_Sparse_Column(const KRYLOV_VECTOR_BASE<T>& v)
     current_column++;
     for(int j=0;j<n;j++)
         if(T x=v.Raw_Get(j)){
-            out<<j<<" "<<current_column<<" "<<x<<std::endl;
+            out<<(j+1)<<" "<<current_column<<" "<<x<<std::endl;
             nnz++;}
 }
 //#####################################################################
@@ -246,7 +246,7 @@ Append_Sparse_Column(const ARRAY_BASE<T2,T_ARRAY>& v)
     current_column++;
     for(int j=0;j<v.Size();j++)
         if(T x=v(j)){
-            out<<j<<" "<<current_column<<" "<<x<<std::endl;
+            out<<(j+1)<<" "<<current_column<<" "<<x<<std::endl;
             nnz++;}
 }
 //#####################################################################

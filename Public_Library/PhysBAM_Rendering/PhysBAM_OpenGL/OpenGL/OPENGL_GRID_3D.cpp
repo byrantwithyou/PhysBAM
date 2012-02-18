@@ -39,20 +39,20 @@ Display(const int in_color) const
 
     int ghost_cells=draw_ghost_values?3:0;
 
-    if (!slice || slice->mode==OPENGL_SLICE::NO_SLICE)
+    if(!slice || slice->mode==OPENGL_SLICE::NO_SLICE)
     {
         VECTOR<int,3> node_start(0,0,0),node_end(grid.numbers_of_cells+1);
         if(!hide_non_selected_grid) Draw_Subgrid(node_start,node_end);
     }
-    else if (slice->mode==OPENGL_SLICE::NODE_SLICE)
+    else if(slice->mode==OPENGL_SLICE::NODE_SLICE)
     {
         VECTOR<int,3> node_start(0,0,0),node_end(grid.numbers_of_cells+1);
-        if (slice->axis==0) { node_start.x=node_end.x=(slice->index-1)/scale; }
-        else if (slice->axis==1) { node_start.y=node_end.y=(slice->index-1)/scale+1; }
-        else if (slice->axis==2) { node_start.z=node_end.z=(slice->index-1)/scale+1; }
+        if(slice->axis==0) { node_start.x=node_end.x=slice->index/scale; }
+        else if(slice->axis==1) { node_start.y=node_end.y=slice->index/scale+1; }
+        else if(slice->axis==2) { node_start.z=node_end.z=slice->index/scale+1; }
 
 #ifndef USE_OPENGLES
-        if (mode==GL_SELECT)
+        if(mode==GL_SELECT)
         {
             // Currently only support node selection in this mode
             glPushName(2);
@@ -63,10 +63,10 @@ Display(const int in_color) const
 #endif
             Draw_Subgrid(node_start,node_end);
     }
-    else if (slice->mode==OPENGL_SLICE::CELL_SLICE)
+    else if(slice->mode==OPENGL_SLICE::CELL_SLICE)
     {
 #ifndef USE_OPENGLES
-        if (mode==GL_SELECT)
+        if(mode==GL_SELECT)
         {
             // Currently only support cell selection in this mode
             glPushAttrib(GL_ENABLE_BIT);
@@ -78,11 +78,11 @@ Display(const int in_color) const
             int i, j, k;
             int i_start, i_end, j_start, j_end, k_start, k_end;
             VECTOR<T,3> axis_1, axis_2, axis_3;
-            if (slice->axis==0) { i_start=i_end=(slice->index-1)/scale+1; axis_1=y_vector; axis_2=z_vector; axis_3=x_vector; } 
+            if(slice->axis==0) { i_start=slice->index/scale;i_end=i_start+1; axis_1=y_vector; axis_2=z_vector; axis_3=x_vector; } 
             else { i_start=1-ghost_cells; i_end=grid.numbers_of_cells.x+ghost_cells; }
-            if (slice->axis==1) { j_start=j_end=(slice->index-1)/scale+1; axis_1=z_vector; axis_2=x_vector; axis_3=y_vector; } 
+            if(slice->axis==1) { j_start=slice->index/scale;j_end=j_start+1; axis_1=z_vector; axis_2=x_vector; axis_3=y_vector; } 
             else { j_start=1-ghost_cells; j_end=grid.numbers_of_cells.y+ghost_cells; }
-            if (slice->axis==2) { k_start=k_end=(slice->index-1)/scale+1; axis_1=x_vector; axis_2=y_vector; axis_3=z_vector; } 
+            if(slice->axis==2) { k_start=slice->index/scale;k_end=k_start+1; axis_1=x_vector; axis_2=y_vector; axis_3=z_vector; } 
             else { k_start=1-ghost_cells; k_end=grid.numbers_of_cells.z+ghost_cells; }
 
             VECTOR<T,3> pos_start=grid.Node(i_start,j_start,k_start);
@@ -116,17 +116,17 @@ Display(const int in_color) const
 #endif
         {
             VECTOR<int,3> node_start(-ghost_cells,-ghost_cells,-ghost_cells),node_end(grid.numbers_of_cells+ghost_cells+1);
-            if (slice->axis==0) { node_start.x=(slice->index-1)/scale+1; node_end.x=node_start.x+1; }
-            else if (slice->axis==1) { node_start.y=(slice->index-1)/scale+1; node_end.y=node_start.y+1; }
-            else if (slice->axis==2) { node_start.z=(slice->index-1)/scale+1; node_end.z=node_start.z+1; }
+            if(slice->axis==0) { node_start.x=slice->index/scale; node_end.x=node_start.x+1; }
+            else if(slice->axis==1) { node_start.y=slice->index/scale; node_end.y=node_start.y+1; }
+            else if(slice->axis==2) { node_start.z=slice->index/scale; node_end.z=node_start.z+1; }
             Draw_Subgrid(node_start,node_end);
 
             // Outline boundary of real domain in wider line
             if(ghost_cells>0){
                 VECTOR<T,3> x000,x111;
-                if(slice->axis==0){x000=VECTOR<T,3>(grid.domain.min_corner.x+grid.dX.x*((slice->index-1)/scale+1),grid.domain.min_corner.y,grid.domain.min_corner.z);x111=VECTOR<T,3>(grid.domain.min_corner.x+grid.dX.x*(slice->index-1)/scale,grid.domain.max_corner.y,grid.domain.max_corner.z);}
-                else if(slice->axis==1){x000=VECTOR<T,3>(grid.domain.min_corner.x,grid.domain.min_corner.y+grid.dX.y*((slice->index-1)/scale+1),grid.domain.min_corner.z);x111=VECTOR<T,3>(grid.domain.max_corner.x,grid.domain.min_corner.y+grid.dX.y*(slice->index-1)/scale,grid.domain.max_corner.z);}
-                else if(slice->axis==2){x000=VECTOR<T,3>(grid.domain.min_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.z+grid.dX.z*((slice->index-1)/scale+1));x111=VECTOR<T,3>(grid.domain.max_corner.x,grid.domain.max_corner.y,grid.domain.min_corner.z+grid.dX.z*(slice->index-1)/scale);}
+                if(slice->axis==0){x000=VECTOR<T,3>(grid.domain.min_corner.x+grid.dX.x*slice->index/scale,grid.domain.min_corner.y,grid.domain.min_corner.z);x111=VECTOR<T,3>(grid.domain.min_corner.x+grid.dX.x*slice->index/scale,grid.domain.max_corner.y,grid.domain.max_corner.z);}
+                else if(slice->axis==1){x000=VECTOR<T,3>(grid.domain.min_corner.x,grid.domain.min_corner.y+grid.dX.y*slice->index/scale,grid.domain.min_corner.z);x111=VECTOR<T,3>(grid.domain.max_corner.x,grid.domain.min_corner.y+grid.dX.y*slice->index/scale,grid.domain.max_corner.z);}
+                else if(slice->axis==2){x000=VECTOR<T,3>(grid.domain.min_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.z+grid.dX.z*slice->index/scale);x111=VECTOR<T,3>(grid.domain.max_corner.x,grid.domain.max_corner.y,grid.domain.min_corner.z+grid.dX.z*slice->index/scale);}
                 glPushAttrib(GL_LINE_BIT);glLineWidth(3*OPENGL_PREFERENCES::line_width);
                 VECTOR<T,3> x001(x000.x,x000.y,x111.z),x010(x000.x,x111.y,x000.z),x011(x000.x,x111.y,x111.z),
                     x100(x111.x,x000.y,x000.z),x101(x111.x,x000.y,x111.z),x110(x111.x,x111.y,x000.z);
@@ -151,27 +151,27 @@ Display(const int in_color) const
         }
     }
 
-    if (current_selection)
+    if(current_selection)
     {
-        if (current_selection->type==OPENGL_SELECTION::GRID_CELL_3D)
+        if(current_selection->type==OPENGL_SELECTION::GRID_CELL_3D)
         {
             OPENGL_SELECTION_GRID_CELL_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection;
             VECTOR<T,3> min_corner=grid.Node(real_selection->index),max_corner=min_corner+grid.dX;
             OPENGL_SELECTION::Draw_Highlighted_Box(min_corner,max_corner);
         }
-        else if (current_selection->type==OPENGL_SELECTION::GRID_NODE_3D)
+        else if(current_selection->type==OPENGL_SELECTION::GRID_NODE_3D)
         {
             OPENGL_SELECTION_GRID_NODE_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection;
             OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(real_selection->index));
         }
-        else if (current_selection->type==OPENGL_SELECTION::GRID_CELL_LIST_3D)
+        else if(current_selection->type==OPENGL_SELECTION::GRID_CELL_LIST_3D)
         {
             OPENGL_SELECTION_GRID_CELL_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_LIST_3D<T>*)current_selection;
             for(int i=0;i<real_selection->indicies.m;i++){
                 VECTOR<T,3> min_corner=grid.Node(real_selection->indicies(i)),max_corner=min_corner+grid.dX;
                 OPENGL_SELECTION::Draw_Highlighted_Box(min_corner,max_corner);}
         }
-        else if (current_selection->type==OPENGL_SELECTION::GRID_NODE_LIST_3D)
+        else if(current_selection->type==OPENGL_SELECTION::GRID_NODE_LIST_3D)
         {
             OPENGL_SELECTION_GRID_NODE_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_LIST_3D<T>*)current_selection;
             for(int i=0;i<real_selection->indicies.m;i++) OPENGL_SELECTION::Draw_Highlighted_Vertex(grid.Node(real_selection->indicies(i)));
@@ -269,19 +269,19 @@ template<class T> OPENGL_SELECTION *OPENGL_GRID_3D<T>::
 Get_Selection(GLuint *buffer,int buffer_size)
 {
     OPENGL_SELECTION *selection=0;
-    if (buffer_size==4)
+    if(buffer_size==4)
     {
         if(buffer[0]==1)
             selection=new OPENGL_SELECTION_GRID_CELL_3D<T>(this,VECTOR<int,3>(buffer[1],buffer[2],buffer[3]));
-        else if (buffer[0]==2)
+        else if(buffer[0]==2)
             selection=new OPENGL_SELECTION_GRID_NODE_3D<T>(this,VECTOR<int,3>(buffer[1],buffer[2],buffer[3]));
     } 
-    if (buffer_size%3==1)
+    if(buffer_size%3==1)
     {
         ARRAY<VECTOR<int,3> > indicies;
         for(int i=0;i<buffer_size/3;i++) indicies.Append(VECTOR<int,3>(buffer[3*i+1],buffer[3*i+2],buffer[3*i+3]));
-        if (buffer[0]==3) selection=new OPENGL_SELECTION_GRID_CELL_LIST_3D<T>(this,indicies);
-        if (buffer[0]==4) selection=new OPENGL_SELECTION_GRID_NODE_LIST_3D<T>(this,indicies);
+        if(buffer[0]==3) selection=new OPENGL_SELECTION_GRID_CELL_LIST_3D<T>(this,indicies);
+        if(buffer[0]==4) selection=new OPENGL_SELECTION_GRID_NODE_LIST_3D<T>(this,indicies);
     }
 
     return selection;
@@ -293,22 +293,22 @@ template<class T> void OPENGL_GRID_3D<T>::
 Highlight_Selection(OPENGL_SELECTION *selection)
 {
     delete current_selection; current_selection=0;
-    if (selection->type==OPENGL_SELECTION::GRID_CELL_3D)
+    if(selection->type==OPENGL_SELECTION::GRID_CELL_3D)
     {
         OPENGL_SELECTION_GRID_CELL_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_3D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_CELL_3D<T>(this,real_selection->index);
     }
-    else if (selection->type==OPENGL_SELECTION::GRID_NODE_3D)
+    else if(selection->type==OPENGL_SELECTION::GRID_NODE_3D)
     {
         OPENGL_SELECTION_GRID_NODE_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_3D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_NODE_3D<T>(this,real_selection->index);
     }
-    else if (selection->type==OPENGL_SELECTION::GRID_CELL_LIST_3D)
+    else if(selection->type==OPENGL_SELECTION::GRID_CELL_LIST_3D)
     {
         OPENGL_SELECTION_GRID_CELL_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_CELL_LIST_3D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_CELL_LIST_3D<T>(this,real_selection->indicies);
     }
-    else if (selection->type==OPENGL_SELECTION::GRID_NODE_LIST_3D)
+    else if(selection->type==OPENGL_SELECTION::GRID_NODE_LIST_3D)
     {
         OPENGL_SELECTION_GRID_NODE_LIST_3D<T> *real_selection=(OPENGL_SELECTION_GRID_NODE_LIST_3D<T>*)selection;
         current_selection=new OPENGL_SELECTION_GRID_NODE_LIST_3D<T>(this,real_selection->indicies);

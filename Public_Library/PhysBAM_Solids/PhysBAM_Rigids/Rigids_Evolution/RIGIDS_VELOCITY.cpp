@@ -123,7 +123,7 @@ template<class TV> typename TV::SCALAR& RIGIDS_VELOCITY<TV>::
 Raw_Get(int i)
 {
     int o=i%TWIST<TV>::dimension,n=i/TWIST<TV>::dimension;
-    if(o<=TV::dimension) return rigid_V(n).linear(o);
+    if(o<TV::dimension) return rigid_V(n).linear(o);
     return rigid_V(n).angular(o-TV::dimension);
 }
 //#####################################################################

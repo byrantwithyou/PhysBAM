@@ -45,7 +45,7 @@ public:
                         domains(i)=domain;
                         domains(i).min_corner(axis)=previous_domain_max+1;
                         previous_domain_max+=row_jump;
-                        if(i<=row_remainder)previous_domain_max+=1; // if this is one of the early domains and we have more remainders, add it to this one
+                        if(i<row_remainder)previous_domain_max+=1; // if this is one of the early domains and we have more remainders, add it to this one
                         domains(i).max_corner(axis)=previous_domain_max+overlap_rows;
                         domains(i).max_corner(axis)=min(domains(i).max_corner(axis),domain.max_corner(axis));}
                     assert(previous_domain_max==domain.max_corner(axis));} // if this isn't true, something is wrong with the above logic
@@ -143,7 +143,7 @@ public:
         boundaries.Resize(processes+1);boundaries(0)=-1;
         for(int p=0;p<processes;p++){
             boundaries(p+1)=boundaries(p)+range_over_processes;
-            if(p<=remainder)boundaries(p+1)+=1;}
+            if(p<remainder)boundaries(p+1)+=1;}
     }
 
     void Run(TYPE& my_class,void (TYPE::*func)(RANGE<TV_INT>&))

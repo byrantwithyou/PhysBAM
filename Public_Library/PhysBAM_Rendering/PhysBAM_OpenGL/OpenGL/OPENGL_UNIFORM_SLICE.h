@@ -112,16 +112,16 @@ public:
         if(!slice) return;
         else if(slice->mode==CELL_SLICE) {
             if(face==slice->axis) {
-                index_start[slice->axis]=max((slice->index-1)/scale+1,index_start[slice->axis]);
-                index_end[slice->axis]=min((slice->index-1)/scale+2,index_end[slice->axis]);
+                index_start[slice->axis]=max(slice->index/scale,index_start[slice->axis]);
+                index_end[slice->axis]=min(slice->index/scale+1,index_end[slice->axis]);
             } else {
-                index_start[slice->axis]=max((slice->index-1)/scale+1,index_start[slice->axis]);
-                index_end[slice->axis]=min((slice->index-1)/scale+1,index_end[slice->axis]);
+                index_start[slice->axis]=max(slice->index/scale,index_start[slice->axis]);
+                index_end[slice->axis]=min(slice->index/scale,index_end[slice->axis]);
             }
         } else if(slice->mode==NODE_SLICE) {
             if(face==slice->axis) {
-                index_start[slice->axis]=max((slice->index-1)/scale+1,index_start[slice->axis]);
-                index_end[slice->axis]=min((slice->index-1)/scale+1,index_end[slice->axis]);
+                index_start[slice->axis]=max(slice->index/scale,index_start[slice->axis]);
+                index_end[slice->axis]=min(slice->index/scale,index_end[slice->axis]);
             } else {
                 index_start=VECTOR<int,3>(1,1,1);
                 index_end=VECTOR<int,3>(0,0,0);

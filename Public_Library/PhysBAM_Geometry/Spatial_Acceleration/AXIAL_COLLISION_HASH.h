@@ -43,7 +43,7 @@ public:
     // generate ranges
     cluster_ranges.Resize(axis_clusters,false,false);
     int quotient=primitives/axis_clusters,remainder=primitives%axis_clusters;
-    for(int i=0;i<axis_clusters;i++) cluster_ranges(i)=VECTOR<int,2>((i-1)*quotient+min(i-1,remainder)+1,i*quotient+min(i,remainder));}
+    for(int i=0;i<axis_clusters;i++) cluster_ranges(i)=VECTOR<int,2>(i*quotient+min(i,remainder),i*quotient+min(i,remainder));}
 
     void Update_Grid_Hash()
     {ARRAY<int> primitive_indices(primitives,false);

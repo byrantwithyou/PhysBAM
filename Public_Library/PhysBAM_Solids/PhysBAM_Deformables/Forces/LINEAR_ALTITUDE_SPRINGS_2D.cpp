@@ -90,7 +90,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         T rl=parameters(t)(hmin).restlength,current_length=TV::Dot_Product(X(node1)-X(node2),direction);
         SPRING_STATE& spring_state=spring_states(t);
         total_elements++;
-        if(use_springs_compressed_beyond_threshold && current_length-rl>-spring_compression_fraction_threshold*rl) spring_state.node=0;
+        if(use_springs_compressed_beyond_threshold && current_length-rl>-spring_compression_fraction_threshold*rl) spring_state.node=-1;
         else{
             used_springs++;
             spring_state.current_length=current_length;spring_state.coefficient=parameters(t)(hmin).damping/rl;

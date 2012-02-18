@@ -56,7 +56,7 @@ Update()
     // Make sure the slice is good
     VECTOR<int,3> domain_start(1,1,1),domain_end(grid.counts);
     OPENGL_UNIFORM_SLICE* slice=(OPENGL_UNIFORM_SLICE*)this->slice;
-    if(slice && ((slice->mode == OPENGL_SLICE::CELL_SLICE && ((slice->index-1)/scale+1 < domain_start[slice->axis] || (slice->index-1)/scale+1 > domain_end[slice->axis])) || (slice->mode == OPENGL_SLICE::NODE_SLICE)))
+    if(slice && ((slice->mode == OPENGL_SLICE::CELL_SLICE && (slice->index/scale<domain_start[slice->axis] || slice->index/scale>=domain_end[slice->axis])) || (slice->mode == OPENGL_SLICE::NODE_SLICE)))
         return; // Currently we don't draw anything if the slice doesn't match where the velocity field lives
 
     VECTOR<int,3> cell_start(face_velocities.Component(0).domain.min_corner),cell_end(face_velocities.Component(0).domain.max_corner-1);
@@ -65,9 +65,9 @@ Update()
     if(slice && slice->mode==OPENGL_SLICE::CELL_SLICE)
         switch (slice->axis)
         {
-            case 1: cell_start.x=cell_end.x=(slice->index-1)/scale+1;m=1; break;
-            case 2: cell_start.y=cell_end.y=(slice->index-1)/scale+1;n=1; break;
-            case 3: cell_start.z=cell_end.z=(slice->index-1)/scale+1;mn=1; break;
+            case 0: cell_start.x=cell_end.x=slice->index/scale;m=1; break;
+            case 1: cell_start.y=cell_end.y=slice->index/scale;n=1; break;
+            case 2: cell_start.z=cell_end.z=slice->index/scale;mn=1; break;
         }
     
     if(velocity_mode == FACE_CENTERED){

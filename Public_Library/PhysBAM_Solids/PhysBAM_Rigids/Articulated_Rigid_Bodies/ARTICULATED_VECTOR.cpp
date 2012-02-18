@@ -57,7 +57,7 @@ template<class TV> typename TV::SCALAR& ARTICULATED_VECTOR<TV>::
 Raw_Get(int i)
 {
     int o=i%TWIST<TV>::dimension+1,n=i/TWIST<TV>::dimension+1;
-    if(o<=TV::dimension) return v(JOINT_ID(n)).linear(o);
+    if(o<TV::dimension) return v(JOINT_ID(n)).linear(o);
     return v(JOINT_ID(n)).angular(o-TV::dimension);
 }
 template class ARTICULATED_VECTOR<VECTOR<float,1> >;

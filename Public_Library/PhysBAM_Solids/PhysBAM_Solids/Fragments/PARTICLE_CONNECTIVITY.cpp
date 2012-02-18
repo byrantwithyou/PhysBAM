@@ -22,7 +22,7 @@ PARTICLE_CONNECTIVITY(const PARTICLES<TV>& particles,const RIGID_BODY_COLLECTION
 template<class TV> bool PARTICLE_CONNECTIVITY<TV>::
 Exclude_Particle(const int i) const
 {   // TODO(jontg): This is a terrible reason to add dependencies to the rats-nest of dependencies that is RIGID_BODIES
-    if(i<=particles_number) return false;
+    if(i<particles_number) return false;
     if(!rigid_body_collection.Is_Active(i-particles_number)) return true;
     return !rigid_body_collection.Rigid_Body(i-particles_number).Is_Simulated();
 }

@@ -44,7 +44,7 @@ private:
 public:
 
     template<class T2,class T_ARRAY,class ID> void Append_Sparse_Column(const ARRAY_BASE<T2,T_ARRAY,ID>& v)
-    {Append_Sparse_Column(v.Array_View(ID(1),Value(v.Size())));}
+    {Append_Sparse_Column(v.Array_View(ID(0),Value(v.Size())));}
 
     template<class T2,class ID> void Write(const char* name,ARRAY_VIEW<T2,ID> v)
     {Write(name,ARRAY_VIEW<T2>(Value(v.Size()),v.Get_Array_Pointer()),0);}
