@@ -169,7 +169,7 @@ Advance_Substep(const T dt,const T time)
     GENERALIZED_VELOCITY<TV> V(V_full,rigid_V_full,solid_body_collection),F(F_full,rigid_F_full,solid_body_collection),R(R_full,rigid_R_full,solid_body_collection),
         S(S_full,rigid_S_full,solid_body_collection),AR(AR_full,rigid_AR_full,solid_body_collection);
 
-    static int solve_id=0;solve_id++;
+    static int solve_id=-1;solve_id++;
     if(example.solids_parameters.implicit_solve_parameters.print_matrix){
         LOG::cout << "solve id " << solve_id << std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,S,R);

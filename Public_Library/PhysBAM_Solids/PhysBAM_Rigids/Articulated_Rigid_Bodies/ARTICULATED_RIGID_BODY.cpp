@@ -599,7 +599,7 @@ Resize_System_Vector(ARTICULATED_VECTOR<TV>& v) const
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool print_matrix)
 {
-    static int solve_id=0;
+    static int solve_id=-1;
     solve_id++;
     ARTICULATED_SYSTEM<TV> system(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this));
     system.Initialize();

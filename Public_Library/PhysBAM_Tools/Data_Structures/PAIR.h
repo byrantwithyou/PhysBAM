@@ -56,4 +56,5 @@ template<class T1,class T2>
 inline PAIR<T1,T2> Tuple(const T1& x,const T2& y)
 {return PAIR<T1,T2>(x,y);}
 }
+#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
 #endif

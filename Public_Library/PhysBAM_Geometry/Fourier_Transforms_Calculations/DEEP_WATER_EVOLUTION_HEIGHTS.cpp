@@ -16,7 +16,7 @@ Intersect_With_Geometry(const RIGID_GEOMETRY<TV_FULL>& rigid_geometry,const T co
     bool intersected=false;
     for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
         TV pos=!lambda?grid.X(node):Xh(node);
-        RAY<TV_FULL> ray(pos.Insert(-10000,2),TV_FULL::Axis_Vector(1));
+        RAY<TV_FULL> ray(pos.Insert(-10000,1),TV_FULL::Axis_Vector(1));
         ray.semi_infinite=true;
 
         if(rigid_geometry.Simplex_Intersection(ray,collision_thickness)){

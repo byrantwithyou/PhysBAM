@@ -35,7 +35,7 @@ Apply_Full_Viscosity(ARRAY<T,FACE_INDEX<d> >& u,bool fully_explicit,bool fully_i
     Resize_Vectors(fully_explicit);
     index_map.Gather(u,b.v);
 
-    static int solve_id=0;solve_id++;
+    static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"viscosity solve id "<<solve_id<<std::endl;
         if(fully_explicit){q.v.Resize(index_map.index_to_face.m);s.v.Resize(index_map.index_to_face.m);}
