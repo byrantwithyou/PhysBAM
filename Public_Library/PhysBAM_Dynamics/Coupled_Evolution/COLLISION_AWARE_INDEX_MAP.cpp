@@ -211,7 +211,7 @@ Print(int id) const
     OCTAVE_OUTPUT<T> oo(buff);
     oo.Write("last_coupling_cell",(T)last_coupling_cell);
     ARRAY<VECTOR<int,TV::m+1> > flat_faces;
-    for(int i=0;i<indexed_faces.m;i++) flat_faces.Append(indexed_faces(i).index.Insert(indexed_faces(i).axis,1));
+    for(int i=0;i<indexed_faces.m;i++) flat_faces.Append(indexed_faces(i).index.Insert(indexed_faces(i).axis,0));
     oo.Write("indexed_faces",flat_faces);
     oo.Write("indexed_cells",indexed_cells);
     oo.Write("real_cell_indices",real_cell_indices);

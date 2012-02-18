@@ -459,7 +459,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             PRESSURE_VELOCITY_VECTOR<TV> V_coupled(V,x_array.v),F_coupled(F,p_array.v),R_coupled(R,r_array.v),S_coupled(S,ap_array.v),B_coupled(B,b_array),ar_coupled(ar_V,ar_array.v),
                 z_coupled(z_V,z_array.v);
             LOG::Time(solver_name);
-            static int solve_id=0;
+            static int solve_id=-1;
             solve_id++;
             if(print_matrix_rhs_and_solution) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("bo-%i.txt",solve_id).c_str()).Write("bo",B_coupled);
             if(!solver->Solve(solid_fluid_system,V_coupled,B_coupled,F_coupled,S_coupled,ar_coupled,R_coupled,z_coupled,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations))

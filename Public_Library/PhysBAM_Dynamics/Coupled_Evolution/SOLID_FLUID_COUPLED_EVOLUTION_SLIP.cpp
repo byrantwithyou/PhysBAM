@@ -282,7 +282,7 @@ Setup_Fluids(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T curren
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve)
 {
-    static int solve_id=0;solve_id++;
+    static int solve_id=-1;solve_id++;
     PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection=fluids_parameters.euler->euler_projection;

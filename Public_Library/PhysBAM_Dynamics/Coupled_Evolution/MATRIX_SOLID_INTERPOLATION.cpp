@@ -164,12 +164,12 @@ Print_Each_Matrix(int n,GENERALIZED_VELOCITY<TV>& G) const
         const int axis=rows(i).axis;
 
         for(int j=0;j<deformable_weights.m;j++)
-            oo.Add_Sparse_Entry(Value(i),(reverse_map_deformable(deformable_weights(j).index)-1)*TV::dimension+axis,deformable_weights(j).weight);
+            oo.Add_Sparse_Entry(Value(i),reverse_map_deformable(deformable_weights(j).index)*TV::dimension+axis,deformable_weights(j).weight);
 
         for(int j=0;j<rigid_weights.m;j++){
             int index=reverse_map_rigid(rigid_weights(j).index);
             if(index>=0){ // Prune out static/kinematic
-                int base=G.V.Size()*TV::dimension+(index-1)*TWIST<TV>::dimension;
+                int base=G.V.Size()*TV::dimension+index*TWIST<TV>::dimension;
                 oo.Add_Sparse_Entry(Value(i),base+axis,rigid_weights(j).weight);
                 VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
                 for(int k=0;k<TV::SPIN::m;k++) oo.Add_Sparse_Entry(Value(i),base+TV::m+k,cpm(k));}}}
@@ -202,7 +202,7 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
     ARRAY<int> reverse_map_deformable(this->V_size);
     reverse_map_deformable.Subset(*this->V_indices)=IDENTITY_ARRAY<>(this->V_indices->m);
-    ARRAY<int> reverse_map_rigid(this->rigid_V_size);
+    ARRAY<int> reverse_map_rigid(this->rigid_V_size);reverse_map_rigid.Fill(-1);
     reverse_map_rigid.Subset(*this->rigid_V_indices)=IDENTITY_ARRAY<>(this->rigid_V_indices->m);
 
     for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++){
@@ -211,12 +211,12 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
         const int axis=rows(i).axis;
 
         for(int j=0;j<deformable_weights.m;j++)
-            data.Append(TRIPLE<int,int,T>(Value(i),(reverse_map_deformable(deformable_weights(j).index)-1)*TV::dimension+axis,deformable_weights(j).weight));
+            data.Append(TRIPLE<int,int,T>(Value(i),reverse_map_deformable(deformable_weights(j).index)*TV::dimension+axis,deformable_weights(j).weight));
 
         for(int j=0;j<rigid_weights.m;j++){
             int index=reverse_map_rigid(rigid_weights(j).index);
             if(index>=0){ // Prune out static/kinematic
-                int base=this->V_indices->m*TV::dimension+(index-1)*TWIST<TV>::dimension;
+                int base=this->V_indices->m*TV::dimension+index*TWIST<TV>::dimension;
                 data.Append(TRIPLE<int,int,T>(Value(i),base+axis,rigid_weights(j).weight));
                 VECTOR<T,TV::SPIN::m> cpm=MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(rigid_weights(j).radius).Column(axis)*rigid_weights(j).weight;
                 for(int k=0;k<TV::SPIN::m;k++) data.Append(TRIPLE<int,int,T>(Value(i),base+TV::m+k,cpm(k)));}}}

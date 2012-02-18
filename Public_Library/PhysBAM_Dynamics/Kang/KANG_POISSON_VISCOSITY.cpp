@@ -207,7 +207,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
     if(test_system) system.Test_System(r,k,z);
 
-    static int solve_id=0;solve_id++;
+    static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"pressure solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",matrix);
@@ -338,7 +338,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
     helper.Compact();
     helper.Set_Matrix(num_dual_cells,matrix);
 
-    static int solve_id=0;solve_id++;
+    static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"viscosity id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-rho-%i.txt",solve_id).c_str()).Write("rho",r.v);

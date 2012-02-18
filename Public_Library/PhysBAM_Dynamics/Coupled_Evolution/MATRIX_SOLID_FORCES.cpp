@@ -130,7 +130,7 @@ Add_Velocity_Dependent_Forces_Second_Half(ARRAY_VIEW<const T,FORCE_AGGREGATE_ID>
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) if(solid_body_collection.deformable_body_collection.deformables_forces(k)->use_velocity_dependent_forces){
         PHYSBAM_ASSERT(solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces);
         //ARRAY_VIEW<const T> single_force_aggregate=aggregate.Array_View(aggregate_size,single_aggregate_size);
-        ARRAY_VIEW<const T> single_force_aggregate(force_dof_counts(k),aggregate.Get_Array_Pointer()+Value(aggregate_size-1));
+        ARRAY_VIEW<const T> single_force_aggregate(force_dof_counts(k),aggregate.Get_Array_Pointer()+Value(aggregate_size));
         aggregate_size+=force_dof_counts(k);
         solid_body_collection.deformable_body_collection.deformables_forces(k)->Add_Velocity_Dependent_Forces_Second_Half(single_force_aggregate,F_full,time);}
 }
