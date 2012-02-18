@@ -306,7 +306,7 @@ Split_Grid(const GRID<VECTOR<T,3> >& global_grid,const VECTOR<int,3>& processes_
 template<class T_GRID> void MPI_GRID<T_GRID>::
 Split_Dimension(const int m,const int processes,ARRAY<int>& boundaries)
 {
-    int cells_over_processes=(m-1)/processes,cells_mod_processes=(m-1)%processes;
+    int cells_over_processes=m/processes,cells_mod_processes=m%processes;
     boundaries.Resize(processes+1);boundaries(0)=1;
     for(int p=0;p<processes;p++)boundaries(p+1)=boundaries(p)+cells_over_processes+(p<=cells_mod_processes);
 }
@@ -610,7 +610,7 @@ Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
     ARRAY<MPI::Request> requests;
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=n/2;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),Get_Send_Tag(side_neighbor_directions(n))));
         buffers(n).Resize(packages(n).Size()/sizeof(T));
@@ -639,7 +639,7 @@ Union_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS_BOOL& data) cons
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<bool>();
     // send and receive into temporary buffers
     ARRAY<MPI::Request> requests;
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=n/2;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),Get_Send_Tag(side_neighbor_directions(n))));
         buffers(n).Resize(packages(n).Size()/sizeof(bool));
@@ -669,7 +669,7 @@ Copy_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
     // send and receive into temporary buffers
     int tag=Get_Unique_Tag();
     ARRAY<MPI::Request> requests;
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=n/2;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         if(n%2==0) requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),tag));
         else requests.Append(packages(n).Irecv(*comm,side_neighbor_ranks(n),tag));}
@@ -689,7 +689,7 @@ Assert_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data,const T t
     MPI::Datatype T_type=MPI_UTILITIES::Datatype<T>();
     // send and receive into temporary buffers
     ARRAY<MPI::Request> requests;
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=MPI::PROC_NULL){int axis=n/2;
         packages(n)=mpi_grid.Package_Common_Face_Data(data,axis,regions(axis)(n));
         requests.Append(packages(n).Isend(*comm,side_neighbor_ranks(n),Get_Send_Tag(side_neighbor_directions(n))));
         buffers(n).Resize(packages(n).Size()/sizeof(T));

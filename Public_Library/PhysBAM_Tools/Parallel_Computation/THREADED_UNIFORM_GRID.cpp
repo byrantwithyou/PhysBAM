@@ -296,7 +296,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     // send and receive into temporary buffers
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
         int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=side_neighbor_ranks(n);
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
@@ -306,7 +306,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
     // wait
     pthread_barrier_wait(barr);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;
@@ -328,7 +328,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
     // send and receive into temporary buffers
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
         int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
         int position=0;THREAD_PACKAGE pack(size);pack.send_tid=rank;pack.recv_tid=side_neighbor_ranks(n);
         for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) data.data(axis).Pack(pack.buffer,position,iterator.Face_Index());
@@ -338,7 +338,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
     // wait
     pthread_barrier_wait(barr);
     // average received data with local data (TODO: find a cleaner general way to do this)
-    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=(n-1)/2+1;
+    for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
         ARRAY<T2,FACE_INDEX<TV::dimension> > local_data;local_data.Resize(data.Domain_Indices(),false,false);
         int index=-1;for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==side_neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
         assert(index>=0);int position=0;

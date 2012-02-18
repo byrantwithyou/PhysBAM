@@ -52,7 +52,7 @@ template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T
         area->mesh.elements.Append(E(c,p,c-1));
         for(int j=0;j<n-1;j++){
             area->mesh.elements.Append(E(p,c+j,c+j+1));
-            if(j%i!=(i-1)/2){
+            if(j%i!=i/2){
                 area->mesh.elements.Append(E(c+j+1,p+1,p));
                 p++;}}
         p=c;}

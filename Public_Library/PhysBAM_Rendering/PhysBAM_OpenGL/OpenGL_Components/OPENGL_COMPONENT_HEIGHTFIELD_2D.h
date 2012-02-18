@@ -76,7 +76,7 @@ private:
     {return (i-domain.min_corner.x) + (j-domain.min_corner.y)*counts.x + 1;}
 
     VECTOR<int,2> From_Linear_Index(int idx) const
-    {return VECTOR<int,2>((idx-1) % counts.x + domain.min_corner.x, ((idx-1)/counts.x)+domain.min_corner.y);}
+    {return VECTOR<int,2>(idx % counts.x + domain.min_corner.x, (idx/counts.x)+domain.min_corner.y);}
 
 public:
     TRIANGULATED_SURFACE<T>& triangulated_surface;

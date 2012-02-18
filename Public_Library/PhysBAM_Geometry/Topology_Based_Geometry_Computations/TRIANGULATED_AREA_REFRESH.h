@@ -33,7 +33,7 @@ void Initialize_Circle_Mesh_And_Particles(TRIANGULATED_AREA<T>& ta,const T outer
     int particle=0;ta.particles.array_collection->Delete_All_Elements();
     ta.mesh.Initialize_Circle_Mesh(num_radial,num_tangential);ta.particles.array_collection->Add_Elements(num_radial*num_tangential);
     for(int j=0;j<num_radial;j++) for(int i=0;i<num_tangential;i++){
-        T r=T(j-1)/T(num_tangential-1)*(outer_radius-inner_radius)+inner_radius,theta=T(i)/T(num_tangential)*(T)2*(T)pi; 
+        T r=T(j)/T(num_tangential-1)*(outer_radius-inner_radius)+inner_radius,theta=T(i)/T(num_tangential)*(T)2*(T)pi; 
         ta.particles.X(particle++)=VECTOR<T,2>(r*cos(theta),r*sin(theta));}
 }
 //#####################################################################

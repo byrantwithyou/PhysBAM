@@ -49,7 +49,7 @@ protected:
     {T_INDEX index=heap(0);close(index)=false;Down_Heap(phi,heap,heap_length);heap_length--;return index;}
 
     static void Up_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int child)
-    {int parent=(child-1)/2; // k=(2k)/2 and k=(2k+1)/2 from integer division
+    {int parent=(child-1)/2; // k=(2k+1)/2 and k=(2k+2)/2 from integer division
     while(parent >= 0 && phi(heap(child)) < phi(heap(parent))){
         exchange(heap(child),heap(parent)); // exchange child & parent
         child=parent;parent=(child-1)/2;}} // move up one
