@@ -318,17 +318,17 @@ int main(int argc,char* argv[])
 	}
 	
 	LOG::cout<<"M"<<std::endl;
+	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,0);iterator.Valid();iterator.Next())
+	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,1);iterator.Valid();iterator.Next())
 	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,2);iterator.Valid();iterator.Next())
-	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,3);iterator.Valid();iterator.Next())
 	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::NEUMANN_CELL_TYPE;
+	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,3);iterator.Valid();iterator.Next())
+	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,4);iterator.Valid();iterator.Next())
 	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,5);iterator.Valid();iterator.Next())
-	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
-	for(T_NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,6);iterator.Valid();iterator.Next())
 	    cell_type(iterator.Node_Index())=MULTIGRID_POISSON<T,d>::DIRICHLET_CELL_TYPE;
 
 	{LOG::SCOPE scope("ICPCG Initialize");

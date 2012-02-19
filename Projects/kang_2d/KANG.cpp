@@ -274,7 +274,7 @@ Preprocess_Frame(const int frame)
         T mu1=fluids_parameters.outside_viscosity;
         T v0=(mu1*uright+mu0*uleft)/(mu1+mu0);
         T dx=fluids_parameters.grid->dX(1);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::WHOLE_REGION,0,2);it.Valid();it.Next()){
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::WHOLE_REGION,-1,1);it.Valid();it.Next()){
             TV x=it.Location();
             if(x.x>0) u(it.Full_Index())=(uright-v0)/(1+dx/2)*x.x+v0;
             else u(it.Full_Index())=(-uleft+v0)/(1+dx/2)*x.x+v0;}}
@@ -746,11 +746,11 @@ Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX
                     psi_N_value(it.Full_Index())=0;}
             break;
         case 6:
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,1);it.Valid();it.Next()){
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,0);it.Valid();it.Next()){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                 psi_N(it.Full_Index())=true;
                 psi_N_value(it.Full_Index())=uleft;}
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,2);it.Valid();it.Next()){
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,1,GRID<TV>::GHOST_REGION,1);it.Valid();it.Next()){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                 psi_N(it.Full_Index())=true;
                 psi_N_value(it.Full_Index())=uright;}

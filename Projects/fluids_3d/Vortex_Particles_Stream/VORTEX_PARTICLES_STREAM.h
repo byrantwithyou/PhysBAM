@@ -84,14 +84,14 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
     T rho=1;
     T inflow_height=custom_phi_boundary.inflow_height;
 
-    for(FACE_ITERATOR iterator(fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next()){
+    for(FACE_ITERATOR iterator(fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()){
             psi_N.Component(iterator.Axis())(iterator.Face_Index()+VECTOR<int,3>(1,0,0))=true;
             fluids_parameters.incompressible->projection.face_velocities.Component(iterator.Axis())(iterator.Face_Index()+VECTOR<int,3>(1,0,0))=inflow;
             psi_N.Component(1)(iterator.Face_Index())=true;
             fluids_parameters.incompressible->projection.face_velocities.Component(1)(iterator.Face_Index())=0;}
-    for(CELL_ITERATOR iterator(fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,1);iterator.Valid();iterator.Next()) 
+    for(CELL_ITERATOR iterator(fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,0);iterator.Valid();iterator.Next()) 
         psi_D(iterator.Cell_Index())=false;
-    for(CELL_ITERATOR iterator(fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
+    for(CELL_ITERATOR iterator(fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,1);iterator.Valid();iterator.Next()){
         psi_D(iterator.Cell_Index())=true;fluids_parameters.incompressible->projection.p(iterator.Cell_Index())=inflow_height-iterator.Location().y*fluids_parameters.gravity*rho;}        
 }
 //#####################################################################

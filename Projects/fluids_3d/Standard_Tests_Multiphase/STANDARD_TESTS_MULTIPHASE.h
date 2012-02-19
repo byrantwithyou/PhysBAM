@@ -152,7 +152,7 @@ void Get_Source_Velocities(const T time) PHYSBAM_OVERRIDE
         ARRAY<T,VECTOR<int,3> >& w=fluids_parameters.incompressible_multiphase->projection.face_velocities.Component(2);
         ARRAY<bool,VECTOR<int,3> >& psi_N_u=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(0);
         ARRAY<bool,VECTOR<int,3> >& psi_N_w=fluids_parameters.incompressible_multiphase->projection.elliptic_solver->psi_N.Component(2);
-        for(CELL_ITERATOR iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,3);iterator.Valid();iterator.Next()){
+        for(CELL_ITERATOR iterator(*fluids_parameters.grid,1,GRID<TV>::GHOST_REGION,2);iterator.Valid();iterator.Next()){
             //if(fluids_parameters.particle_levelset_evolution->Levelset(0).phi(iterator.Cell_Index())<=0){
             VECTOR<int,3> cell=iterator.Cell_Index();
             if(tests.armadillo->phi(cell+VECTOR<int,3>(0,1,0))<=0){
