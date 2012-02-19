@@ -325,10 +325,10 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,F
 {
     return;
     if(test_number==2){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);it.Valid();it.Next()){
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);it.Valid();it.Next()){
             face_velocities(it.Full_Index())=velocity_multiplier;psi_N(it.Full_Index())=true;}}
     if(test_number==3 || test_number==4){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);it.Valid();it.Next()){
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);it.Valid();it.Next()){
             face_velocities(it.Full_Index())=Get_Source_Velocity(it.Full_Index());psi_N(it.Full_Index())=true;}}
 }
 //#####################################################################
@@ -337,7 +337,7 @@ void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,F
 void Get_Reflection_Conditions(ARRAY<T,FACE_INDEX<2> >& psi_R,const T time)
 {
     if(test_number==2 || test_number==3 || test_number==4){
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);it.Valid();it.Next())
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);it.Valid();it.Next())
             psi_R(it.Full_Index())=mass_multiplier;
         psi_R(FACE_INDEX<2>(2,TV_INT(fluids_parameters.grid->counts.x+1,1)))=mass_multiplier;}
 }

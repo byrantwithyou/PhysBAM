@@ -211,9 +211,9 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 //#####################################################################
 void Mark_Outside(ARRAY<bool,FACE_INDEX<TV::m> >& outside) PHYSBAM_OVERRIDE
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,1);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,0);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,2);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,3);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(*fluids_parameters.grid,0,GRID<TV>::BOUNDARY_REGION,4);iterator.Valid();iterator.Next()) outside(iterator.Full_Index())=true;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(circle.Lazy_Inside(iterator.Location())){
         VECTOR<FACE_INDEX<2>,4> faces;
         GRID<TV>::Neighboring_Faces(faces,iterator.index);

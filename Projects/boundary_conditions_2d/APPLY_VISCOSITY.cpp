@@ -32,7 +32,7 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
 
     ARRAY<int,FACE_INDEX<d> > index(u.Domain_Indices());
     ARRAY<FACE_INDEX<d> > faces;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,0,axis);it.Valid();it.Next())
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,0,GRID<TV>::WHOLE_REGION,-1,axis);it.Valid();it.Next())
         if(callback.Inside(grid.Axis_X_Face(it.Full_Index())))
             index(it.Full_Index())=faces.Append(it.Full_Index());
 

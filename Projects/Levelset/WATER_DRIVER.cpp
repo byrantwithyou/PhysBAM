@@ -132,7 +132,7 @@ Project(const T dt,const T time)
     for(int axis=0;axis<GRID<TV>::dimension;axis++){
         GRID<TV> face_grid=example.mac_grid.Get_Face_Grid(axis);ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);T_ARRAYS_BASE& face_velocity=example.face_velocities.Component(axis);
         ARRAY<bool,TV_INT> fixed_face(face_grid.Domain_Indices());
-        for(typename GRID<TV>::FACE_ITERATOR iterator(example.mac_grid,0,GRID<TV>::WHOLE_REGION,0,axis);iterator.Valid();iterator.Next()){
+        for(typename GRID<TV>::FACE_ITERATOR iterator(example.mac_grid,0,GRID<TV>::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
         LOG::cout<<"something..."<<std::endl;  // TODO(jontg): If this log statement doesn't appear, the code crashes in release mode...
