@@ -127,7 +127,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_DIMENSION_BASE& u,T_ARRAYS_DI
         if(!periodic[axis]) Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
         else for(CELL_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
                 int period=repeats_at_last_node[axis]?counts[axis]-1:counts[axis];
-                int axis_periodic_node=1+wrap(cell[axis]-1,period);
+                int axis_periodic_node=wrap(cell[axis],period);
                 TV_INT periodic_node=cell;periodic_node[axis]=axis_periodic_node;
                 u_ghost(cell)=u_ghost(periodic_node);}}
 }
