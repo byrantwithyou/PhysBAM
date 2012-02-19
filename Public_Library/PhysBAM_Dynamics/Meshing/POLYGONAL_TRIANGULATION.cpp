@@ -147,8 +147,8 @@ Triangulate_Nonconvex_Planar_Connected_Polygon(const ARRAY<VECTOR<T,2> >& positi
     // make triangles
     int count=0;
     while(count<all_segments.m){
-        int globally_best_first_segment_index=-1;
-        int globally_best_second_segment_index=-1;
+        int globally_best_first_segment_index=-2;
+        int globally_best_second_segment_index=-2;
         T best_angle=(T)0;
         bool found=false;
         for(int i=0;i<segments_used.m;i++)

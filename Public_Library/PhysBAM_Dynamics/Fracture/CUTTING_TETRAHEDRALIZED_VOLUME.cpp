@@ -1047,7 +1047,7 @@ Find_Material_Regions()
         int count=0;HASHTABLE<int> polygons_used; // bool does nothing
         while(count<polygons.m){regions_for_tet.Append(ARRAY<int>());ARRAY<int>& polygons_for_new_region=regions_for_tet.Last();
             // find starting polygon
-            bool found_starting_index=false;int starting_index=-1;
+            bool found_starting_index=false;int starting_index=-2;
             for(int i=0;i<polygons.m;i++) if(!polygons_used.Contains(polygons(i))){found_starting_index=true;starting_index=i;break;}
             PHYSBAM_ASSERT(found_starting_index);int cutting_polygon_index=polygons(starting_index);
             STACK<int> polygons_to_examine;polygons_to_examine.Push(cutting_polygon_index);
@@ -1258,14 +1258,14 @@ Duplicate_And_Merge_Elements()
         ARRAY<VECTOR<int,4> > tets_to_add;
         for(int i=new_tets_per_current(otet).m-1;i>=0;i--){int dtet_1=new_tets_per_current(otet)(i);
             // make mesh, merge duplicates
-            VECTOR<int,4> collapsed_dup_particles_1;for(int k=0;k<4;k++){int particle_index=-1;
+            VECTOR<int,4> collapsed_dup_particles_1;for(int k=0;k<4;k++){int particle_index=-2;
                 int particle_id=cutting_particles.Particle_Id_From_Tet_Node(original_node(k));
                 bool found=hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet_1,particle_id),particle_index);if(!found) PHYSBAM_FATAL_ERROR();
                 collapsed_dup_particles_1(k)=new_particle_indices(union_vertices.Find(particle_index));
                 assert(collapsed_dup_particles_1(k)>0 && collapsed_dup_particles_1(k)<new_particles.array_collection->Size());}
             bool create=true;
             for(int j=i-1;j>=0;j--){int dtet_2=new_tets_per_current(otet)(j);VECTOR<int,4> collapsed_dup_particles_2;
-                for(int k=0;k<4;k++){int particle_index=-1;int poind_id=cutting_particles.Particle_Id_From_Tet_Node(original_node(k));
+                for(int k=0;k<4;k++){int particle_index=-2;int poind_id=cutting_particles.Particle_Id_From_Tet_Node(original_node(k));
                     bool found=hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet_2,poind_id),particle_index);if(!found) PHYSBAM_FATAL_ERROR();
                     collapsed_dup_particles_2(k)=new_particle_indices(union_vertices.Find(particle_index));
                     assert(collapsed_dup_particles_2(k)>0 && collapsed_dup_particles_2(k)<new_particles.array_collection->Size());}
@@ -1274,7 +1274,7 @@ Duplicate_And_Merge_Elements()
                         const ARRAY<ARRAY<int> >& polygon_nodes=polygon_mesh.elements(polygon_element_index);
                         for(int q=0;q<polygon_nodes.m;q++) for(int r=0;r<polygon_nodes(q).m;r++){
                             int original_intersection=polygon_nodes(q)(r);int particle_id=cutting_particles.Particle_Id_From_Intersection(original_intersection);
-                            int particle_index=-1;
+                            int particle_index=-2;
                             if(!hash_all_new_uncollapsed_particles.Get(PAIR<int,int>(dtet_1,particle_id),particle_index)) continue;
                             hash_all_new_uncollapsed_particles.Delete(PAIR<int,int>(dtet_1,particle_id));
                             if(!hash_all_new_uncollapsed_particles.Contains(PAIR<int,int>(dtet_2,particle_id))) // TODO: check if we can use Set here

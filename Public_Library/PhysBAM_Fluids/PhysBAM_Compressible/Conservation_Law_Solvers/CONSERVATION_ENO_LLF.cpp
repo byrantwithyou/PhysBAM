@@ -153,8 +153,8 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
                 for(int k=0;k<d;k++){
                     DLU(k,ii)(0)=0;DLF(k,ii)(0)=0;
                     // TODO need to do something with psi-ghost here instead of ii<1 and ii>m
-                    if(ii<1 && outflow_boundaries(0) && lambda(k)<0) for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(0)(kk);DLF(k,ii)(0)+=L(k,kk)*F(0)(kk);}
-                    else if(ii>m && outflow_boundaries(1) && lambda(k)>0) for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(m)(kk);DLF(k,ii)(0)+=L(k,kk)*F(m)(kk);}
+                    if(ii<0 && outflow_boundaries(0) && lambda(k)<0) for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(0)(kk);DLF(k,ii)(0)+=L(k,kk)*F(0)(kk);}
+                    else if(ii>=m && outflow_boundaries(1) && lambda(k)>0) for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(m)(kk);DLF(k,ii)(0)+=L(k,kk)*F(m)(kk);}
                     else for(int kk=0;kk<d;kk++){DLU(k,ii)(0)+=L(k,kk)*U(ii)(kk);DLF(k,ii)(0)+=L(k,kk)*F(ii)(kk);}}}
             // compute the divided differences
             for(int j=2;j<eno_order;j++) for(int k=0;k<d;k++) for(int ii=i+1-eno_order;ii<=i+eno_order-j+1;ii++){
@@ -164,8 +164,8 @@ Conservation_Solver_Helper_Experimental(const int m,const T dx,const ARRAY<bool,
             for(int ii=i+1-eno_order;ii<=i+eno_order;ii++){
                 for(int k=0;k<d;k++){
                     DU(k,ii)(0)=0;DF(k,ii)(0)=0;
-                    if(ii<1 && outflow_boundaries(0) && lambda(k)<0){DU(k,ii)(0)=U(0)(k);DF(k,ii)(0)=F(0)(k);}
-                    else if(ii>m && outflow_boundaries(1) && lambda(k)>0){DU(k,ii)(0)=U(m)(k);DF(k,ii)(0)=F(m)(k);}
+                    if(ii<0 && outflow_boundaries(0) && lambda(k)<0){DU(k,ii)(0)=U(0)(k);DF(k,ii)(0)=F(0)(k);}
+                    else if(ii>=m && outflow_boundaries(1) && lambda(k)>0){DU(k,ii)(0)=U(m)(k);DF(k,ii)(0)=F(m)(k);}
                     else{DU(k,ii)(0)=U(ii)(k);DF(k,ii)(0)=F(ii)(k);}}}
             // compute the divided differences
             for(int j=2;j<eno_order;j++) for(int k=0;k<d;k++) for(int ii=i+1-eno_order;ii<=i+eno_order-j+1;ii++){

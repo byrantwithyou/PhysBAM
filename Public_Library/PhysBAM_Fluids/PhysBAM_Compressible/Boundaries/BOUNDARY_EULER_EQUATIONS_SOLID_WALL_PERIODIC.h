@@ -5,7 +5,7 @@
 // Class BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC
 //#####################################################################
 //
-// If an axis is set to be periodic then it is periodic with period m-1*grid.dx:U(m)=U(0), if repeats_at_last_node is true, otherwise its periodic with period m*grid.dx: U(m+1)=U(0).
+// If an axis is set to be periodic then it is periodic with period m-1*grid.dx:U(m-1)=U(0), if repeats_at_last_node is true, otherwise its periodic with period m*grid.dx: U(m)=U(0).
 //
 //#####################################################################
 #ifndef __BOUNDARY_EULER_EQUATIONS_SOLID_WALL_PERIODIC__
