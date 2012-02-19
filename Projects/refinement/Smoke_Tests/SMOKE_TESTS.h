@@ -266,7 +266,7 @@ public:
     void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::dimension> >& force,const ARRAY<T,TV_INT>& density_ghost,const T dt,const T time)
     {
         T density_buoyancy_constant=T(2)/buoyancy_clamp;
-        for(typename GRID<TV>::FACE_ITERATOR iterator(fine_mac_grid,0,GRID<TV>::WHOLE_REGION,0,2);iterator.Valid();iterator.Next()){ // y-direction forces only
+        for(typename GRID<TV>::FACE_ITERATOR iterator(fine_mac_grid,0,GRID<TV>::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T face_density=min((density_ghost(iterator.First_Cell_Index())+density_ghost(iterator.Second_Cell_Index()))*T(.5),buoyancy_clamp);
             T density_difference=face_density;
             if(density_difference>0) force.Component(1)(iterator.Face_Index())=density_buoyancy_constant*density_difference;}

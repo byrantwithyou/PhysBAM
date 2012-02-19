@@ -95,10 +95,10 @@ Get_Density_At_Face(const int axis,const TV_INT& face_index)
         GRID<TV>::Cells_Touching_Face(axis,face_index,first_cell_index,second_cell_index);
         // TODO: use U_ghost instead
         if(fluids_parameters.euler->U.Valid_Index(first_cell_index) && fluids_parameters.euler->U.Valid_Index(second_cell_index))
-            density=(fluids_parameters.euler->U(first_cell_index)(1)+fluids_parameters.euler->U(second_cell_index)(1))*(T).5;
+            density=(fluids_parameters.euler->U(first_cell_index)(0)+fluids_parameters.euler->U(second_cell_index)(0))*(T).5;
         else if(fluids_parameters.euler->U.Valid_Index(first_cell_index))
-            density=fluids_parameters.euler->U(first_cell_index)(1);
-        else density=fluids_parameters.euler->U(second_cell_index)(1);}
+            density=fluids_parameters.euler->U(first_cell_index)(0);
+        else density=fluids_parameters.euler->U(second_cell_index)(0);}
     else density=fluids_parameters.density;
     return density;
 }
@@ -844,14 +844,14 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
             if(!dual_cell_weights(axis,face_index)) continue;
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*dual_cell_weights(axis,face_index);
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
-            int left_column_index=-1,right_column_index=-1;
+            int left_column_index=-2,right_column_index=-2;
             int left_column_color=poisson->filled_region_colors(first_cell_index),right_column_color=poisson->filled_region_colors(second_cell_index);
-            if(left_column_color>0 && first_cell_index(axis)>=domain_indices.min_corner(axis))
+            if(left_column_color>=0 && first_cell_index(axis)>=domain_indices.min_corner(axis))
                 left_column_index=cell_index_to_matrix_index(first_cell_index);
-            if(right_column_color>0 && second_cell_index(axis)<=domain_indices.max_corner(axis))
+            if(right_column_color>=0 && second_cell_index(axis)<domain_indices.max_corner(axis))
                 right_column_index=cell_index_to_matrix_index(second_cell_index);
             for(int i=0;i<dual_cell_weight.m;i++){
-                int j_row=TV::dimension*(dual_cell_weight(i).x-1)+axis;
+                int j_row=TV::dimension*dual_cell_weight(i).x+axis;
                 if(left_column_index>=0) row_counts(left_column_color)(j_row)++;
                 if(right_column_index>=0) row_counts(right_column_color)(j_row)++;
                 if(!fluids_parameters.compressible){
@@ -862,16 +862,14 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
         for(int i=0;i<colors;i++){
             J_deformable(i).n=interior_regions(i).Size();
             J_deformable(i).Set_Row_Lengths(row_counts(i));
-            PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_deformableiAj=J_deformable(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();
-            J_deformableiAj.Fill(0);
-            PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_VALUE> J_deformableiAa=J_deformable(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>();
-            J_deformableiAa.Fill(0);}}
+            J_deformable(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>().Fill(-1);
+            J_deformable(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>().Fill(0);}}
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         ARRAY<T> serial_nodal_fluid_mass(nodal_fluid_mass.m*TV::m),global_nodal_fluid_mass(nodal_fluid_mass.m*TV::m);
-        for(int node=0;node<nodal_fluid_mass.m;node++) for(int axis=0;axis<TV::m;axis++) serial_nodal_fluid_mass((node-1)*TV::m+axis)=nodal_fluid_mass(node)(axis);
+        for(int node=0;node<nodal_fluid_mass.m;node++) for(int axis=0;axis<TV::m;axis++) serial_nodal_fluid_mass(node*TV::m+axis)=nodal_fluid_mass(node)(axis);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_nodal_fluid_mass,global_nodal_fluid_mass);
-        for(int node=0;node<nodal_fluid_mass.m;node++) for(int axis=0;axis<TV::m;axis++) nodal_fluid_mass(node)(axis)=global_nodal_fluid_mass((node-1)*TV::m+axis);}
+        for(int node=0;node<nodal_fluid_mass.m;node++) for(int axis=0;axis<TV::m;axis++) nodal_fluid_mass(node)(axis)=global_nodal_fluid_mass(node*TV::m+axis);}
 
     // populate the entries of J
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
@@ -884,14 +882,14 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*dual_cell_weights(axis,face_index);
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             T left_column_weight=(T)0,right_column_weight=(T)0;
-            int left_column_index=-1,right_column_index=-1;
+            int left_column_index=-2,right_column_index=-2;
             int left_column_color=poisson->filled_region_colors(first_cell_index),right_column_color=poisson->filled_region_colors(second_cell_index);
-            if(left_column_color>0 && first_cell_index(axis)>=domain_indices.min_corner(axis)){
+            if(left_column_color>=0 && first_cell_index(axis)>=domain_indices.min_corner(axis)){
                 left_column_weight=(T)-one_over_dx(axis);left_column_index=cell_index_to_matrix_index(first_cell_index);}
-            if(right_column_color>0 && second_cell_index(axis)<=domain_indices.max_corner(axis)){
+            if(right_column_color>=0 && second_cell_index(axis)<domain_indices.max_corner(axis)){
                 right_column_weight=(T)one_over_dx(axis);right_column_index=cell_index_to_matrix_index(second_cell_index);}
             for(int i=0;i<dual_cell_weight.m;i++){
-                int j_row=TV::dimension*(dual_cell_weight(i).x-1)+axis;T weight=dual_cell_weight(i).y;
+                int j_row=TV::dimension*dual_cell_weight(i).x+axis;T weight=dual_cell_weight(i).y;
                 if(left_column_index>=0) J_deformable(left_column_color).Add_Element(j_row,left_column_index,weight*left_column_weight);
                 if(right_column_index>=0) J_deformable(right_column_color).Add_Element(j_row,right_column_index,weight*right_column_weight);}}
         for(int i=0;i<colors;i++){SPARSE_MATRIX_FLAT_MXN<T> temp(J_deformable(i));temp.Compress(J_deformable(i));}}
@@ -927,11 +925,11 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             if(!rigid_body_dual_cell_weights(axis,face_index)) continue;
             FACE_WEIGHT_ELEMENTS& dual_cell_weight=*rigid_body_dual_cell_weights(axis,face_index);
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
-            int left_column_index=-1,right_column_index=-1;
+            int left_column_index=-2,right_column_index=-2;
             int left_column_color,right_column_color;
-            if((left_column_color=poisson->filled_region_colors(first_cell_index))>0 && first_cell_index(axis)>=domain_indices.min_corner(axis))
+            if((left_column_color=poisson->filled_region_colors(first_cell_index))>=0 && first_cell_index(axis)>=domain_indices.min_corner(axis))
                 left_column_index=cell_index_to_matrix_index(first_cell_index);
-            if((right_column_color=poisson->filled_region_colors(second_cell_index))>0 && second_cell_index(axis)<=domain_indices.max_corner(axis))
+            if((right_column_color=poisson->filled_region_colors(second_cell_index))>=0 && second_cell_index(axis)<domain_indices.max_corner(axis))
                 right_column_index=cell_index_to_matrix_index(second_cell_index);
             // each one goes into four rows in 3d (with nonzero weight)
             for(int i=0;i<dual_cell_weight.m;i++){
@@ -964,25 +962,24 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
 
         for(int i=0;i<J_rigid_kinematic.m;i++){
             J_rigid_kinematic(i).n=interior_regions(i).Size();J_rigid_kinematic(i).Set_Row_Lengths(kinematic_row_counts(i));
-            PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_INDEX> J_rigidiAj=J_rigid_kinematic(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>();J_rigidiAj.Fill(0);}
+            J_rigid_kinematic(i).A.template Project<int,&SPARSE_MATRIX_ENTRY<T>::j>().Fill(-1);}
         for(int i=0;i<J_rigid.m;i++){
             J_rigid(i).n=interior_regions(i).Size();J_rigid(i).Set_Row_Lengths(row_counts(i));
-            PROJECTED_ARRAY<ARRAY<SPARSE_MATRIX_ENTRY<T> >,T_PROJECTED_VALUE> J_rigidiAa=J_rigid(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>();
-            J_rigidiAa.Fill(0);}}
+            J_rigid(i).A.template Project<T,&SPARSE_MATRIX_ENTRY<T>::a>().Fill(0);}}
 
     if(!fluids_parameters.compressible && solids_fluids_parameters.mpi_solid_fluid){ // TODO see if we can change this to a single direction send
         ARRAY<T> serial_rigid_body_updated_center_of_mass(rigid_body_updated_center_of_mass.m*TV::m),global_rigid_body_updated_center_of_mass(rigid_body_updated_center_of_mass.m*TV::m);
         ARRAY<T> serial_rigid_body_fluid_mass(rigid_body_fluid_mass.m*TV::m),global_rigid_body_fluid_mass(rigid_body_fluid_mass.m*TV::m);
         for(int rigid_body=0;rigid_body<rigid_body_updated_center_of_mass.m;rigid_body++)
             for(int axis=0;axis<TV::m;axis++){
-                serial_rigid_body_updated_center_of_mass((rigid_body-1)*TV::m+axis)=rigid_body_updated_center_of_mass(rigid_body)(axis);
-                serial_rigid_body_fluid_mass((rigid_body-1)*TV::m+axis)=rigid_body_fluid_mass(rigid_body)(axis);}
+                serial_rigid_body_updated_center_of_mass(rigid_body*TV::m+axis)=rigid_body_updated_center_of_mass(rigid_body)(axis);
+                serial_rigid_body_fluid_mass(rigid_body*TV::m+axis)=rigid_body_fluid_mass(rigid_body)(axis);}
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_updated_center_of_mass,global_rigid_body_updated_center_of_mass);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_fluid_mass,global_rigid_body_fluid_mass);
         for(int rigid_body=0;rigid_body<rigid_body_updated_center_of_mass.m;rigid_body++)
             for(int axis=0;axis<TV::m;axis++){
-                rigid_body_updated_center_of_mass(rigid_body)(axis)=global_rigid_body_updated_center_of_mass((rigid_body-1)*TV::m+axis);
-                rigid_body_fluid_mass(rigid_body)(axis)=global_rigid_body_fluid_mass((rigid_body-1)*TV::m+axis);}}
+                rigid_body_updated_center_of_mass(rigid_body)(axis)=global_rigid_body_updated_center_of_mass(rigid_body*TV::m+axis);
+                rigid_body_fluid_mass(rigid_body)(axis)=global_rigid_body_fluid_mass(rigid_body*TV::m+axis);}}
 
     if(fluids_parameters.fluid_affects_solid){
         rigid_body_fluid_inertia.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);
@@ -1007,11 +1004,11 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             
             TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();
             T left_column_weight=(T)0,right_column_weight=(T)0;
-            int left_column_index=-1,right_column_index=-1;
+            int left_column_index=-2,right_column_index=-2;
             int left_column_color,right_column_color;
-            if((left_column_color=poisson->filled_region_colors(first_cell_index))>0 && first_cell_index(axis)>=domain_indices.min_corner(axis)){
+            if((left_column_color=poisson->filled_region_colors(first_cell_index))>=0 && first_cell_index(axis)>=domain_indices.min_corner(axis)){
                 left_column_weight=(T)-one_over_dx(axis);left_column_index=cell_index_to_matrix_index(first_cell_index);}
-            if((right_column_color=poisson->filled_region_colors(second_cell_index))>0 && second_cell_index(axis)<=domain_indices.max_corner(axis)){
+            if((right_column_color=poisson->filled_region_colors(second_cell_index))>=0 && second_cell_index(axis)<domain_indices.max_corner(axis)){
                 right_column_weight=(T)one_over_dx(axis);right_column_index=cell_index_to_matrix_index(second_cell_index);}
             // each one goes into four rows in 3d (with nonzero weight)
             for(int i=0;i<dual_cell_weight.m;i++){
@@ -1049,12 +1046,12 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
         for(int rigid_body=0;rigid_body<rigid_body_fluid_inertia.m;rigid_body++)
             for(int row=0;row<T_INERTIA_TENSOR::m;row++)
                 for(int col=0;col<T_INERTIA_TENSOR::n;col++)
-                    serial_rigid_body_fluid_inertia((rigid_body-1)*inertia_tensor_size+(row-1)*T_INERTIA_TENSOR::m+col)=rigid_body_fluid_inertia(rigid_body)(row,col);
+                    serial_rigid_body_fluid_inertia(rigid_body*inertia_tensor_size+row*T_INERTIA_TENSOR::m+col)=rigid_body_fluid_inertia(rigid_body)(row,col);
         solids_fluids_parameters.mpi_solid_fluid->Reduce_Add(serial_rigid_body_fluid_inertia,global_rigid_body_fluid_inertia);
         for(int rigid_body=0;rigid_body<rigid_body_fluid_inertia.m;rigid_body++)
             for(int row=0;row<T_INERTIA_TENSOR::m;row++)
                 for(int col=0;col<T_INERTIA_TENSOR::n;col++)
-                    rigid_body_fluid_inertia(rigid_body)(row,col)=global_rigid_body_fluid_inertia((rigid_body-1)*inertia_tensor_size+(row-1)*T_INERTIA_TENSOR::m+col);}
+                    rigid_body_fluid_inertia(rigid_body)(row,col)=global_rigid_body_fluid_inertia(rigid_body*inertia_tensor_size+row*T_INERTIA_TENSOR::m+col);}
     if(fluids_parameters.fluid_affects_solid){
         for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i));
