@@ -32,7 +32,7 @@ public:
     }
 
     void Resize_Photon_Map(const int new_maximum_photons)
-    {photons.Resize(new_maximum_photons);photons_stored=0;light_emission_start_index=-1;}
+    {photons.Resize(new_maximum_photons);photons_stored=0;light_emission_start_index=-2;}
     
     TV Photon_Position(const int index) const
     {return photons(index).location;}

@@ -190,7 +190,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
     if(selection && selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_3D && selection->object == this){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
         output_stream<<component_name<<": "<<std::endl;
-        int current_index=-1;
+        int current_index=-2;
         if(real_selection->has_id){
             output_stream<<"   Selected by id "<<real_selection->id<<std::endl;
             ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
@@ -240,7 +240,7 @@ Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const
     PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_3D && selection->object == this);
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
 
-    int current_index=-1;
+    int current_index=-2;
     if(real_selection->has_id){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
         if(ids) ids->Find(real_selection->id,current_index);}

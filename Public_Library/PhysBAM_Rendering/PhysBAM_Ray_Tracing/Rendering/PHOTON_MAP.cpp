@@ -261,7 +261,7 @@ End_Light_Emission(const int number_of_photons_emitted)
     if(light_emission_start_index==-1||number_of_photons_emitted==0) return;
     T power_scale=T(1)/T(number_of_photons_emitted);
     for(int i=light_emission_start_index;i<=photons_stored;i++)photons(i).power*=power_scale;
-    light_emission_start_index=-1;
+    light_emission_start_index=-2;
 }
 //#####################################################################
 // Function Light_Emission_Quota_Remains

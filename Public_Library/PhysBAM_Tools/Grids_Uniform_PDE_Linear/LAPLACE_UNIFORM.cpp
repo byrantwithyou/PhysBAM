@@ -133,18 +133,18 @@ Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array
                     else if(psi_N.Component(axis)(cell_index)) row_sum+=one_over_dx2[axis];
                     else if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index-offset) && periodic_boundary[axis]){
                         TV_INT periodic_offset_cell=cell_index-offset;
-                        int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
+                        int axis_periodic_cell=wrap(periodic_offset_cell[axis],grid_counts[axis]);
                         periodic_offset_cell[axis]=axis_periodic_cell;
                         A.Set_Element(matrix_index,cell_index_to_matrix_index(periodic_offset_cell),one_over_dx2[axis]);}
                     else if(psi_D(cell_index-offset)) b(matrix_index)-=one_over_dx2[axis]*u(cell_index-offset);
                     else{assert(filled_region_colors(cell_index-offset)==color);
                         A.Set_Element(matrix_index,cell_index_to_matrix_index(cell_index-offset),one_over_dx2[axis]);}}
-                if(filled_region_colors.Valid_Index(cell_index+offset)){               
+                if(filled_region_colors.Valid_Index(cell_index+offset)){
                     if(use_psi_R && (r=psi_R.Component(axis)(cell_index+offset))) row_sum+=one_over_dx2[axis]*r;
                     else if(psi_N.Component(axis)(cell_index+offset)) row_sum+=one_over_dx2[axis];
                     else if(grid.Domain_Indices().Lazy_Outside_Half_Open(cell_index+offset) && periodic_boundary[axis]){
                         TV_INT periodic_offset_cell=cell_index+offset;
-                        int axis_periodic_cell=1+wrap(periodic_offset_cell[axis]-1,grid_counts[axis]);
+                        int axis_periodic_cell=wrap(periodic_offset_cell[axis],grid_counts[axis]);
                         periodic_offset_cell[axis]=axis_periodic_cell;
                         A.Set_Element(matrix_index,cell_index_to_matrix_index(periodic_offset_cell),one_over_dx2[axis]);}
                     else if(psi_D(cell_index+offset)) b(matrix_index)-=one_over_dx2[axis]*u(cell_index+offset);

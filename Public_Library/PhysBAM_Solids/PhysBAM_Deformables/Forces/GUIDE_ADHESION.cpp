@@ -92,7 +92,7 @@ Update_Springs(const bool search_hierarchy)
             ARRAY<int> intersections;
             guide_curve.hierarchy->Intersection_List(box,intersections,2*thickness);
             SPRING_STATE state;
-            int min_index=-1;
+            int min_index=-2;
             VECTOR<T,2> weights;
             TV normal;
             T distance=0;
