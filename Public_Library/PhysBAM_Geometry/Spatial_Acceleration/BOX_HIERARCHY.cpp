@@ -82,7 +82,7 @@ Initialize_Hierarchy_Using_KD_Tree_Helper(KD_TREE_NODE<T>* node)
     int left_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->left);
     if(!node->right){return left_child;}
     int right_child=Initialize_Hierarchy_Using_KD_Tree_Helper(node->right);
-    children.Append(VECTOR<int,2>(left_child,right_child));parents.Append(0);
+    children.Append(VECTOR<int,2>(left_child,right_child));parents.Append(-1);
     return parents(left_child)=parents(right_child)=children.m+leaves-1;
 }
 //#####################################################################

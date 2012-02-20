@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_SUM.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
+#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/maxabs.h>
@@ -23,8 +24,8 @@
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
-#include <iostream>
 #include <algorithm>
+#include <iostream>
 namespace PhysBAM{
 
 template<class T,class T_ARRAY,class ID> class ARRAY_BASE;
@@ -288,7 +289,7 @@ public:
     {STATIC_ASSERT_SAME(T,bool);return Count_Matches(false);}
 
     void Get_Unique(ARRAY<T>& array) const
-    {const T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);hash.Set_All(self);hash.Get_Keys(array);}
+    {const T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);array.Remove_All();for(int i=0;i<self.Size();i++) if(hash.Set(self(i))) array.Append(self(i));}
 
     void Prune_Duplicates()
     {T_ARRAY& self=Derived();HASHTABLE<T> hash(Value(self.Size())*3/2);int j=0;for(int i=0;i<self.Size();i++) if(hash.Set(self(i))) self(j++)=self(i);self.Resize(j);}

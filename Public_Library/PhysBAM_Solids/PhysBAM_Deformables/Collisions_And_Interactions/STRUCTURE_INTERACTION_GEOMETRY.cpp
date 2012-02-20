@@ -56,12 +56,10 @@ Build_Collision_Geometry(STRUCTURE<TV>& structure)
     else if((triangulated_surface=Triangulated_Surface(&structure))){
 
         triangulated_surface->mesh.elements.Flattened().Get_Unique(collision_particles.active_indices);
-//Sort(collision_particles.active_indices);
 	triangulated_surface->Update_Number_Nodes();
         if(!triangulated_surface->mesh.segment_mesh) triangulated_surface->mesh.Initialize_Segment_Mesh();
         segmented_curve=new T_SEGMENTED_CURVE(*triangulated_surface->mesh.segment_mesh,full_particles); // TODO: This is broken; long term shallow copy of a temporary auxiliary structure
-        need_destroy_segmented_curve=true;
-}
+        need_destroy_segmented_curve=true;}
     else if(FREE_PARTICLES<TV>* free_particles=dynamic_cast<FREE_PARTICLES<TV>*>(&structure))
         collision_particles.active_indices=free_particles->nodes;
     else PHYSBAM_FATAL_ERROR();

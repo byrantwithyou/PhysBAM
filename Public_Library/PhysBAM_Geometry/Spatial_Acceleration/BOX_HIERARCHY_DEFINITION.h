@@ -23,7 +23,6 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
 
     while(!stack.Empty()){
         int self_hierarchy_box,other_hierarchy_box;stack.Pop().Get(self_hierarchy_box,other_hierarchy_box);
-//std::cout << self_hierarchy_box << " " << other_hierarchy_box << "/"<<self_leaves << " " << other_leaves << ".../";
         if(visitor.Cull(self_hierarchy_box,other_hierarchy_box)) continue;
         if(!self_box_hierarchy(self_hierarchy_box).Intersection(other_box_hierarchy(other_hierarchy_box),extra_thickness)) continue;
         if(self_hierarchy_box<self_leaves && other_hierarchy_box<other_leaves) visitor.Store(self_hierarchy_box,other_hierarchy_box);
