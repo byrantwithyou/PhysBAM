@@ -45,7 +45,7 @@ public:
 
     int Add_Binding(const VECTOR<int,2>& binding,const bool use_impulses_for_collisions_input)
     {int id=bindings.Append(binding);use_impulses_for_collisions.Append(use_impulses_for_collisions_input);
-    if(binding_index_from_particle_index.m<=binding.x) binding_index_from_particle_index.Resize(binding.x+1);
+    if(binding_index_from_particle_index.m<=binding.x) binding_index_from_particle_index.Resize(binding.x+1,true,true,-1);
     binding_index_from_particle_index(binding.x)=id;
     return id;}
 
@@ -63,7 +63,7 @@ public:
     {return Particle_Is_Bound(particle_index)?bindings(binding_index_from_particle_index(particle_index)).y:particle_index;}
 
     int Soft_Binding(const int particle_index) const
-    {return particle_index<binding_index_from_particle_index.m?binding_index_from_particle_index(particle_index)-1:-1;}
+    {return particle_index<binding_index_from_particle_index.m?binding_index_from_particle_index(particle_index):-1;}
 
     BINDING<TV>* Hard_Binding(const int particle_index) const
     {return Particle_Is_Bound(particle_index)?binding_list.Binding(Parent(particle_index)):0;}

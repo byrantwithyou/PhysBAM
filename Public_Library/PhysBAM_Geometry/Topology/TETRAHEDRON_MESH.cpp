@@ -83,7 +83,7 @@ static inline int Lattice(const int i,const int j,const int k,const int m,const 
 }
 static inline int Half_Lattice(const int i,const int j,const int k,const int m,const int n,const int p)
 {
-    return m*n*p+i+1+(m+1)*j+(m+1)*(n+1)*k;
+    return m*n*p+i+1+(m+1)*(j+1)+(m+1)*(n+1)*(k+1);
 }
 void TETRAHEDRON_MESH::
 Initialize_Octahedron_Mesh(const int m,const int n,const int p)

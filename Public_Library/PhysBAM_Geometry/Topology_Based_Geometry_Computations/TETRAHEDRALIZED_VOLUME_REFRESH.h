@@ -49,7 +49,7 @@ void Initialize_Octahedron_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,cons
     tv.mesh.Initialize_Octahedron_Mesh(m,n,mn);
     tv.particles.array_collection->Add_Elements(m*n*mn+(m+1)*(n+1)*(mn+1));
     for(k=0;k<mn;k++) for(j=0;j<n;j++) for(i=0;i<m;i++) tv.particles.X(particle++)=grid.X(i,j,k);
-    for(k=0;k<=mn;k++) for(j=0;j<=n;j++) for(i=0;i<=m;i++) tv.particles.X(particle++)=grid.X(i,j,k)+(T).5*grid.dX;
+    for(k=-1;k<mn;k++) for(j=-1;j<n;j++) for(i=-1;i<m;i++) tv.particles.X(particle++)=grid.X(i,j,k)+(T).5*grid.dX;
 }
 //#####################################################################
 // Funcion Initialize_Cube_Mesh_And_Particles

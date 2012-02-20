@@ -84,7 +84,7 @@ Delete_Elements_On_Deletion_List(const bool preserve_order)
     if(preserve_order){
         for(int k=0;k<deletion_list.m;k++){
             int next=k<deletion_list.m-1?deletion_list(k+1):number;
-            for(int i=deletion_list(k);i<next;i++) Copy_Element_Helper(i,i-k);}}
+            for(int i=deletion_list(k)+1;i<next;i++) Copy_Element_Helper(i,i-k-1);}}
     else{
         int last=number;
         for(int k=deletion_list.m-1;k>=0;k--)
