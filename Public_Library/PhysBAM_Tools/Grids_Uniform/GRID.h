@@ -349,7 +349,7 @@ public:
     {return TV_INT(floor((location-domain.min_corner)*one_over_dX-MAC_offset));} // note that "floor" is expensive
 
     void Cell(const TV& location,TV_INT& index,const int number_of_ghost_cells) const // returns the left, bottom and front
-    {index=TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells)-number_of_ghost_cells;}
+    {int number_of_ghost_cells_plus_one=number_of_ghost_cells+1;index=TV_INT((location-domain.min_corner)*one_over_dX+(T)number_of_ghost_cells_plus_one)-number_of_ghost_cells_plus_one;}
 
     TV_INT Cell(const TV& location,const int number_of_ghost_cells) const // returns the left, bottom and front
     {TV_INT index;Cell(location,index,number_of_ghost_cells);return index;}
