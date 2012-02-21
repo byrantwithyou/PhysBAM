@@ -80,7 +80,7 @@ public:
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Delete_Pointers_And_Clean_Memory();}
 
     int Number_Of_Ghost_Cells() const
-    {return 1-domain_indices.min_corner.x;}
+    {return -domain_indices.min_corner.x;}
 
     T& operator()(const int side,const int axis,const TV_INT& face)
     {return Component(side,axis)(face);}

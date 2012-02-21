@@ -24,7 +24,7 @@ void Smooth(T_ARRAYS_T2& d,const int steps,const typename GRID_ARRAYS_POLICY<T_G
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::SCALAR T;
 
     if(!steps) return;
-    int number_of_ghost_cells=1-d.domain.min_corner.x;
+    int number_of_ghost_cells=-d.domain.min_corner.x;
     RANGE<TV_INT> domain_indices=d.Domain_Indices();
     T_GRID grid(domain_indices.Thickened(-number_of_ghost_cells).Maximum_Corner(),RANGE<typename T_GRID::VECTOR_T>::Centered_Box());
     if(grid.Domain_Indices().Thickened(number_of_ghost_cells)!=d.Domain_Indices()) PHYSBAM_FATAL_ERROR();

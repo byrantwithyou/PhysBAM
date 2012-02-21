@@ -391,7 +391,7 @@ public:
     {return clamp(TV_INT(((location-domain.min_corner)*one_over_dX-MAC_offset)),TV_INT(),counts-2);}
         
     TV_INT Clamped_Index_End_Minus_One(const TV& location,const int number_of_ghost_cells) const
-    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells-1);}
+    {return clamp(TV_INT((location-domain.min_corner)*one_over_dX-MAC_offset+(T)number_of_ghost_cells)-number_of_ghost_cells,TV_INT()-number_of_ghost_cells,counts+number_of_ghost_cells-2);}
 
     TV_INT Clamp_To_Cell(const TV& location) const
     {return clamp(TV_INT((location-domain.min_corner)*one_over_dX),TV_INT(),numbers_of_cells-1);}

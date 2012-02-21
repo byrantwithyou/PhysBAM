@@ -109,7 +109,7 @@ public:
     {for(int i=0;i<buffer_size;i++) delete base_pointer[i];Clean_Memory();}
 
     int Number_Of_Ghost_Cells() const
-    {return 1-domain_indices.min_corner.x;}
+    {return -domain_indices.min_corner.x;}
 
     T& operator()(const int axis,const TV_INT& face)
     {return Component(axis)(face);}
