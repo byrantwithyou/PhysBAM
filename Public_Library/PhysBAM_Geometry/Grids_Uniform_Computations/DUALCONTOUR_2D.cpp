@@ -33,7 +33,7 @@ Generate_Topology()
     topology.Compact();
     for(int t=0;t<topology.m;t++){
         int i,j;topology(t).Get(i,j);
-        vertices.array(i)=vertices.array(j)=1;}
+        vertices.array(i)=vertices.array(j)=0;}
 }
 //#####################################################################
 // Function Generate_Vertices
@@ -42,13 +42,13 @@ template<class T> void DUALCONTOUR_2D<T>::
 Generate_Vertices()
 {
     int m=grid.counts.x,n=grid.counts.y;
-    int count=vertices.Sum();
+    int count=vertices.array.Count_Matches(0);
     geometry.Resize(count);
     normals.Resize(count);
     levelset.Compute_Normals();
     int vertex=0;
-    for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++) if(vertices(i,j)){ // generate vertices where needed
-        vertices(i,j)=++vertex;
+    for(int i=0;i<m-1;i++)for(int j=0;j<n-1;j++) if(vertices(i,j)>=0){ // generate vertices where needed
+        vertices(i,j)=vertex++;
         TV position=grid.Center(i,j);
         TV position_guess;
         TV normal=levelset.Normal(position);
@@ -72,7 +72,7 @@ Generate_Vertices()
                 position=position_guess;
                 phi=levelset.Phi(position);
                 normal=levelset.Normal(position);}}
-        geometry(vertex-1)=position;normals(vertex-1)=normal;}
+        geometry(vertices(i,j))=position;normals(vertices(i,j))=normal;}
 }
 //#####################################################################
 // Function Ensure_Vertices_In_Correct_Cells
@@ -82,11 +82,12 @@ Ensure_Vertices_In_Correct_Cells()
 {
     int vertex=0;
     TV_INT i;
-    for(i.x=0;i.x<grid.counts.x-1;i.x++) for(i.y=0;i.y<grid.counts.y-1;i.y++) if(vertices(i)){
-        ++vertex;TV_INT v=grid.Cell(geometry(vertex-1),0);
+    for(i.x=0;i.x<grid.counts.x-1;i.x++) for(i.y=0;i.y<grid.counts.y-1;i.y++) if(vertices(i)>=0){
+        TV_INT v=grid.Cell(geometry(vertex),0);
         if(i!=v){
             TV cell_center=grid.Center(i);TV offset=(T).5*grid.dX;
-            geometry(vertex-1)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex-1));}}
+            geometry(vertex)=RANGE<TV>(cell_center-offset,cell_center+offset).Surface(geometry(vertex));}
+        vertex++;}
 }
 //#####################################################################
 // Function Get_Segmented_Curve
@@ -100,7 +101,7 @@ Get_Segmented_Curve()
     curve->mesh.number_nodes=geometry.m;
     curve->mesh.elements.Exact_Resize(topology.m);
     for(int t=0;t<topology.m;t++){
-        int i,j;topology(t).Get(i,j);i=vertices.array(i)-1;j=vertices.array(j)-1;
+        int i,j;topology(t).Get(i,j);i=vertices.array(i);j=vertices.array(j);
         curve->mesh.elements(t).Set(i,j);}
     curve->Update_Segment_List();
     return curve;
@@ -122,10 +123,10 @@ Get_Triangulated_Area(const int sign)
     for(int i=1;i<grid.counts.x-1;i++) for(int j=1;j<grid.counts.y-1;j++) if(levelset.phi(i,j)*sign>=0){
         int v0=particles.array_collection->Add_Element(),v1=particles.array_collection->Add_Element(),v2=particles.array_collection->Add_Element(),v3=particles.array_collection->Add_Element(),v4=particles.array_collection->Add_Element();
         particles.X(v0)=grid.X(i,j);
-        particles.X(v1)=vertices(i-1,j-1)?geometry(vertices(i-1,j-1)-1):mac_grid.X(i-1,j-1);
-        particles.X(v2)=vertices(i,j-1)?geometry(vertices(i,j-1)-1):mac_grid.X(i,j-1);
-        particles.X(v3)=vertices(i,j)?geometry(vertices(i,j)-1):mac_grid.X(i,j);
-        particles.X(v4)=vertices(i-1,j)?geometry(vertices(i-1,j)-1):mac_grid.X(i-1,j);
+        particles.X(v1)=vertices(i-1,j-1)>=0?geometry(vertices(i-1,j-1)):mac_grid.X(i-1,j-1);
+        particles.X(v2)=vertices(i,j-1)>=0?geometry(vertices(i,j-1)):mac_grid.X(i,j-1);
+        particles.X(v3)=vertices(i,j)>=0?geometry(vertices(i,j)):mac_grid.X(i,j);
+        particles.X(v4)=vertices(i-1,j)>=0?geometry(vertices(i-1,j)):mac_grid.X(i-1,j);
         mesh.elements(current_triangle++).Set(v2,v1,v0);
         mesh.elements(current_triangle++).Set(v3,v2,v0);
         mesh.elements(current_triangle++).Set(v4,v3,v0);
