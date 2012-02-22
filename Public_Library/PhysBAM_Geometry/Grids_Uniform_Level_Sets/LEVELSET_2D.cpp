@@ -108,7 +108,7 @@ Compute_Curvature(const VECTOR<T,2>& location) const
     TV l2=(location-(T).5*grid.dX-grid.domain.min_corner)*grid.one_over_dX;
     TV_INT cell(floor(l2));
 
-    TV w(l2-TV(cell));
+    TV w((l2+1)-TV(cell+1)); // INDEXING: simplify this
     T k00=Compute_Curvature(phi,cell);
     cell.y++;
     T k01=Compute_Curvature(phi,cell);
