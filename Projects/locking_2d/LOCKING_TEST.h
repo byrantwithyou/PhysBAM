@@ -22,7 +22,8 @@ class LOCKING_TEST:public NONCOPYABLE
 private:
     
     bool affine_velicities; // otherwise bilinear
-    long n; // cells
+    int n; // cells
+    T mu; // viscosity
 
     MATRIX_MXN<T> A;
 
@@ -48,9 +49,7 @@ private:
                 NxPhi[ix][iy]=((ix>0)?(0.5):(-0.5));
                 NyPhi[ix][iy]=((iy>0)?(0.5):(-0.5));
             }
-        }
-        else
-        {
+        }else{
             for(int ix=0; ix<2; ix++) for(int iy=0; iy<2; iy++) 
             for(int jx=0; jx<2; jx++) for(int jy=0; jy<2; jy++)
             { 
@@ -68,7 +67,7 @@ private:
 
 public:
 
-    LOCKING_TEST():affine_velicities(false),n(2){}
+    LOCKING_TEST():affine_velicities(false),n(2),mu(3){}
     ~LOCKING_TEST(){};
 
     void Parse_Arguments(int argc,char *argv[])
@@ -76,9 +75,11 @@ public:
         PARSE_ARGS parse_args;
         parse_args.Add_Option_Argument("-affine","use affine velocities");
         parse_args.Add_Integer_Argument("-cells",2,"cells","number of grid cells");
+        parse_args.Add_Double_Argument("-viscosity",3,"viscosity");
         parse_args.Parse(argc,argv);
         affine_velicities=parse_args.Is_Value_Set("-affine");
         n=parse_args.Get_Integer_Value("-cells");
+        mu=parse_args.Get_Double_Value("-viscosity");
     }
 
     void Compute_System_Matrix()
@@ -90,14 +91,16 @@ public:
             for(int ix=0; ix<2; ix++) for(int iy=0; iy<2; iy++) 
             for(int jx=0; jx<2; jx++) for(int jy=0; jy<2; jy++)
             {
-                A(U_GRID(x+ix),U_GRID(y+iy))+=2*NxNx[ix][iy][jx][jy]+NyNy[ix][iy][jx][jy];
-                A(V_GRID(x+ix),V_GRID(y+iy))+=2*NyNy[ix][iy][jx][jy]+NxNx[ix][iy][jx][jy];
-                A(V_GRID(x+ix),U_GRID(y+iy))+=NxNy[ix][iy][jx][jy];
-                A(U_GRID(y+iy),V_GRID(x+ix))+=NxNy[ix][iy][jx][jy];
+                A(U_GRID(x+ix),U_GRID(y+iy))+=(2*NxNx[ix][iy][jx][jy]+NyNy[ix][iy][jx][jy])*mu;
+                A(V_GRID(x+ix),V_GRID(y+iy))+=(2*NyNy[ix][iy][jx][jy]+NxNx[ix][iy][jx][jy])*mu;
+                A(V_GRID(x+ix),U_GRID(y+iy))+=(NxNy[ix][iy][jx][jy])*mu;
+                A(U_GRID(y+iy),V_GRID(x+ix))+=(NxNy[ix][iy][jx][jy])*mu;
+            }
+            for(int ix=0; ix<2; ix++) for(int iy=0; iy<2; iy++)
+            {
+                
             }
         }
-
-            
     }
 };
 }
