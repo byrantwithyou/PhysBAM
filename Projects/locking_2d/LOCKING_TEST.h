@@ -30,7 +30,7 @@ private:
     
     void Generate_Element_Stiffness_Matrices()
     {
-        if(this->affine_velocities)
+        if(affine_velicities)
         {
             for(int ix=0; ix<2; ix++) for(int iy=0; iy<2; iy++) 
             for(int jx=0; jx<2; jx++) for(int jy=0; jy<2; jy++)
@@ -67,7 +67,7 @@ public:
     LOCKING_TEST():affine_velicities(false),cells(2){}
     ~LOCKING_TEST(){};
 
-    void Parse(int argc,char *argv[])
+    void Parse_Arguments(int argc,char *argv[])
     {
         PARSE_ARGS parse_args;
         parse_args.Add_Option_Argument("-affine","use affine velocities");

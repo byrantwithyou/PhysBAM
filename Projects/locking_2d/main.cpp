@@ -9,22 +9,14 @@
 
 using namespace PhysBAM;
 
-void Parse_Arguments(int argc,char *argv[]);
-
 //#################################################################
 // Function main
 //#################################################################
 int main(int argc,char *argv[])
 {
     LOCKING_TEST<double> test;
-    test.Parse(argc,argv);
-
-    // for(int i=1;i<argc;i++){
-        // if(!strcmp(argv[i],"-affine_velicities")) affine_velicities=true;
-        // else if (!strcmp(argv[i],"-bilinear_velocities")) affine_velicities=false;
-        // else {LOG::cerr<<"Invalid argument"<<std::endl;exit(1);}}
-
-
+    test.Parse_Arguments(argc,argv);
+    test.Compute_System_Matrix();
 
     return 0;
 }
