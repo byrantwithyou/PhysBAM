@@ -227,7 +227,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
     LOG::Time(solver_name);
     Diagnostics(dt,current_position_time,0,0,606,"Before solve");
-    static int solve_id=0;solve_id++;
+    static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,S,R);
