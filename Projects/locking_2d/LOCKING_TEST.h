@@ -107,7 +107,7 @@ public:
         }
     }
 
-    void Print_Matrix()
+    void Print_System_Matrix()
     {
         for(int x=0; x<3*N; x++)
         {

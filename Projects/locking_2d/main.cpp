@@ -17,6 +17,7 @@ int main(int argc,char *argv[])
     LOCKING_TEST<double> test;
     test.Parse_Arguments(argc,argv);
     test.Compute_System_Matrix();
+    test.Print_System_Matrix();
 
     return 0;
 }
