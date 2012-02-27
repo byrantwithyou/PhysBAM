@@ -10,9 +10,9 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 
-#define U_GRID(X) (X)%n
-#define V_GRID(X) (X)%n+n
-#define P_GRID(X) (X)%n+2*n
+#define U_GRID(X,Y) ((X)%n)*n+((Y)%n)
+#define V_GRID(X,Y) ((X)%n)*n+((Y)%n)+N
+#define P_GRID(X,Y) ((X)%n)*n+((Y)%n)+2*N
 
 namespace PhysBAM{
 
@@ -22,7 +22,8 @@ class LOCKING_TEST:public NONCOPYABLE
 private:
     
     bool affine_velicities; // otherwise bilinear
-    int n; // cells
+    int n; // cells per direction
+    int N; // cells
     T mu; // viscosity
 
     MATRIX_MXN<T> A;
@@ -67,7 +68,7 @@ private:
 
 public:
 
-    LOCKING_TEST():affine_velicities(false),n(2),mu(3){}
+    LOCKING_TEST():affine_velicities(false),n(2),N(n*n),mu(3){}
     ~LOCKING_TEST(){};
 
     void Parse_Arguments(int argc,char *argv[])
@@ -78,29 +79,42 @@ public:
         parse_args.Add_Double_Argument("-viscosity",3,"viscosity");
         parse_args.Parse(argc,argv);
         affine_velicities=parse_args.Is_Value_Set("-affine");
-        n=parse_args.Get_Integer_Value("-cells");
+        n=parse_args.Get_Integer_Value("-cells"); N=n*n;
         mu=parse_args.Get_Double_Value("-viscosity");
     }
 
     void Compute_System_Matrix()
     {
         Generate_Element_Stiffness_Matrices();
-        A.Resize(n*3,n*3);
+        A.Resize(N*3,N*3);
         for(int x=0; x<n; x++) for(int y=0; y<n; y++)
         {
             for(int ix=0; ix<2; ix++) for(int iy=0; iy<2; iy++) 
             for(int jx=0; jx<2; jx++) for(int jy=0; jy<2; jy++)
             {
-                A(U_GRID(x+ix),U_GRID(y+iy))+=(2*NxNx[ix][iy][jx][jy]+NyNy[ix][iy][jx][jy])*mu;
-                A(V_GRID(x+ix),V_GRID(y+iy))+=(2*NyNy[ix][iy][jx][jy]+NxNx[ix][iy][jx][jy])*mu;
-                A(V_GRID(x+ix),U_GRID(y+iy))+=(NxNy[ix][iy][jx][jy])*mu;
-                A(U_GRID(y+iy),V_GRID(x+ix))+=(NxNy[ix][iy][jx][jy])*mu;
+                A(U_GRID(x+ix,y+iy),U_GRID(x+jx,y+jy))+=(2*NxNx[ix][iy][jx][jy]+NyNy[ix][iy][jx][jy])*mu;
+                A(V_GRID(x+ix,y+iy),V_GRID(x+jx,y+jy))+=(2*NyNy[ix][iy][jx][jy]+NxNx[ix][iy][jx][jy])*mu;
+                A(V_GRID(x+ix,y+iy),U_GRID(x+jx,y+jy))+=(NxNy[ix][iy][jx][jy])*mu;
+                A(U_GRID(x+jx,y+jy),V_GRID(x+ix,y+iy))+=(NxNy[ix][iy][jx][jy])*mu;
             }
             for(int ix=0; ix<2; ix++) for(int iy=0; iy<2; iy++)
             {
-                
+                A(U_GRID(x+ix,y+iy),P_GRID(x,y))-=NxPhi[ix][iy];
+                A(V_GRID(x+ix,y+iy),P_GRID(x,y))-=NyPhi[ix][iy];
+                A(P_GRID(x,y),U_GRID(x+ix,y+iy))-=NxPhi[ix][iy];
+                A(P_GRID(x,y),V_GRID(x+ix,y+iy))-=NyPhi[ix][iy];
             }
         }
+    }
+
+    void Print_Matrix()
+    {
+        for(int x=0; x<3*N; x++)
+        {
+            for(int y=0; y<3*N; y++)
+                LOG::cout<<A(x,y)<<"\t";
+            LOG::cout<<std::endl;
+        }                            
     }
 };
 }
