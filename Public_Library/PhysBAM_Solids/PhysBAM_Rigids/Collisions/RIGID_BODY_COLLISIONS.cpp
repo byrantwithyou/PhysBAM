@@ -1314,11 +1314,8 @@ Initialize_All_Contact_Projections(const bool enforce_rigid_rigid_contact_in_cg)
 {
     // rigid/rigid
     if(rigid_body_collection.dynamic_rigid_body_particles.m && enforce_rigid_rigid_contact_in_cg){
-        ARRAY<TRIPLE<int,int,TV> > keys;rigid_body_particle_intersections.Get_Keys(keys);Sort(keys,COMPARE()); // INDEXING replace this with the commented portion.
-        for(int i=0;i<keys.m;i++){
-            const TRIPLE<int,int,TV>& intersection=keys(i);
-//        for(typename HASHTABLE<TRIPLE<int,int,TV> >::ITERATOR iterator(rigid_body_particle_intersections);iterator.Valid();iterator.Next()){
-//            const TRIPLE<int,int,TV>& intersection=iterator.Key();
+        for(typename HASHTABLE<TRIPLE<int,int,TV> >::ITERATOR iterator(rigid_body_particle_intersections);iterator.Valid();iterator.Next()){
+            const TRIPLE<int,int,TV>& intersection=iterator.Key();
             const RIGID_BODY<TV> &particle_body=rigid_body_collection.Rigid_Body(intersection.x),
                 &levelset_body=rigid_body_collection.Rigid_Body(intersection.y);
             if(rigid_body_collection.Is_Active(particle_body.particle_index) && rigid_body_collection.Is_Active(levelset_body.particle_index)) Create_Contact_Joint(particle_body,levelset_body,intersection.z);}}

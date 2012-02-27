@@ -108,9 +108,7 @@ Get_Particles_Intersecting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int
     if(!candidate_particles) return;
 
     T depth=0;
-    ARRAY<int> list;candidate_particles->Get_Keys(list);Sort(list); // INDEXING
-    for(int j=0;j<list.m;j++){int p=list(j);
-//    for(HASHTABLE<int>::ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
+    for(HASHTABLE<int>::ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
         if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(p)<0
           && rigid_body.Implicit_Geometry_Lazy_Inside_And_Value(deformable_body_collection.particles.X(p),depth,solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
             depth-=solids_parameters.rigid_body_collision_parameters.collision_body_thickness;
@@ -668,9 +666,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
             if(use_saved_pairs){
                 const HASHTABLE<int>* contact_particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index);
                 if(!contact_particles) continue;
-                ARRAY<int> list;contact_particles->Get_Keys(list);Sort(list); // INDEXING
-                for(int j=0;j<list.m;j++){int p=list(j);
-//                for(HASHTABLE<int>::ITERATOR i(*contact_particles);i.Valid();i.Next()){int p=i.Key();
+                for(HASHTABLE<int>::ITERATOR i(*contact_particles);i.Valid();i.Next()){int p=i.Key();
                     Update_Rigid_Deformable_Contact_Pair(rigid_body,p,dt,time,1,X_save,rigid_X_save,rigid_rotation_save,collision_body_thickness,true);}}
             else{
                 ARRAY<int> particles;
@@ -693,9 +689,7 @@ Get_Particles_Contacting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int>&
     if(!candidate_particles) return;
 
     // NOTE: use time n normals, but get intersections based on time n+1
-    ARRAY<int> list;candidate_particles->Get_Keys(list);Sort(list); // INDEXING
-    for(int j=0;j<list.m;j++){int p=list(j);
-//    for(HASHTABLE<int>::ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
+    for(HASHTABLE<int>::ITERATOR i(*candidate_particles);i.Valid();i.Next()){int p=i.Key();
         if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(p)<0 && (include_soft_bound || !soft_bindings.Particle_Is_Bound(p))
           && rigid_body.Implicit_Geometry_Lazy_Inside(deformable_body_collection.particles.X(p),solids_parameters.rigid_body_collision_parameters.collision_body_thickness)){
             particles.Append(p);
@@ -788,7 +782,6 @@ Initialize_All_Contact_Projections()
                 if(HASHTABLE<int>* particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index)) if(particles->Size()){
                     PRECOMPUTE_CONTACT_PROJECTION* precompute=new PRECOMPUTE_CONTACT_PROJECTION(rigid_body,true);
                     particles->Get_Keys(precompute->particles);
-                    Sort(precompute->particles); // INDEXING
                     soft_bindings.Remove_Soft_Bound_Particles(precompute->particles); // TODO: fix
                     if(!precompute->particles.m){delete precompute;continue;}
                     Initialize_Rigid_Deformable_Contact_Projection(*precompute,deformable_body_collection.particles.X);
@@ -800,9 +793,7 @@ Initialize_All_Contact_Projections()
                 RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(p);
                 PRECOMPUTE_CONTACT_PROJECTION* precompute=0;
                 if(HASHTABLE<int>* particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index)){
-                    ARRAY<int> list;particles->Get_Keys(list);Sort(list); // INDEXING
-                    for(int j=0;j<list.m;j++){int p=list(j);
-//                    for(HASHTABLE<int>::ITERATOR iter(*particles);iter.Valid();iter.Next()){
+                    for(HASHTABLE<int>::ITERATOR iter(*particles);iter.Valid();iter.Next()){
                         if(!soft_bindings.Particle_Is_Bound(/*iter.Key()*/p)){ // skip soft bound particles. TODO: fix.
                             if(!precompute) precompute=new PRECOMPUTE_CONTACT_PROJECTION(rigid_body,true);
                             precompute->particles.Append(/*iter.Key()*/p);}}}
@@ -1250,13 +1241,9 @@ Process_Push_Out()
         // Push out from particles only if there are tetrahedron collision bodies; if only rigid bodies and particles, just process around rigid bodies
         if(tetrahedron_collision_bodies.m){
             Compute_Particle_Candidates_Helper(*this,tetrahedron_collision_bodies,rigid_collision_bodies);
-            ARRAY<int> keys;particle_tetrahedron_candidates.Get_Keys(keys);Sort(keys); // INDEXING: Replace this with the commented out version below.
-            for(int kk=0;kk<keys.m;kk++)
-                if(Push_Out_From_Particle(keys(kk)) && !kinematic_rigid_bodies_only){
+            for(typename HASHTABLE<int,ARRAY<TETRAHEDRON_COLLISION_BODY<T>*> >::ITERATOR iterator(particle_tetrahedron_candidates);iterator.Valid();iterator.Next())
+                if(Push_Out_From_Particle(iterator.Key()) && !kinematic_rigid_bodies_only){
                     need_another_iteration=true;rigid_body_collisions.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();}}}
-//            for(typename HASHTABLE<int,ARRAY<TETRAHEDRON_COLLISION_BODY<T>*> >::ITERATOR iterator(particle_tetrahedron_candidates);iterator.Valid();iterator.Next())
-//                if(Push_Out_From_Particle(iterator.Key()) && !kinematic_rigid_bodies_only){
-//                    need_another_iteration=true;rigid_body_collisions.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();}}}
 
     // Process static/kinematic rigid bodies
     if(kinematic_rigid_bodies_only && solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions)
