@@ -94,6 +94,21 @@ public:
     bool Empty() const
     {return !min_corner.All_Less_Equal(max_corner);}
 
+    bool Empty_Half_Open() const
+    {return !min_corner.All_Less(max_corner);}
+
+    RANGE<TV> To_Half_Opened() const
+    {
+        STATIC_ASSERT((IS_SAME<typename TV::ELEMENT,int>::value));
+        return RANGE<TV>(min_corner,max_corner+1);
+    }
+
+    RANGE<TV> To_Closed() const
+    {
+        STATIC_ASSERT((IS_SAME<typename TV::ELEMENT,int>::value));
+        return RANGE<TV>(min_corner,max_corner-1);
+    }
+
     bool operator==(const RANGE<TV>& r) const
     {return min_corner==r.min_corner && max_corner==r.max_corner;}
 
@@ -262,6 +277,9 @@ public:
 
     bool Lazy_Intersection(const RANGE<TV>& box) const
     {return min_corner.All_Less_Equal(box.max_corner) && max_corner.All_Greater_Equal(box.min_corner);}
+
+    bool Lazy_Intersection_Half_Open(const RANGE<TV>& box) const
+    {return min_corner.All_Less(box.max_corner) && max_corner.All_Greater(box.min_corner);}
 
     bool Intersection(const RANGE<TV>& box,const T thickness_over_two) const
     {return Thickened(thickness_over_two).Lazy_Intersection(box);}
