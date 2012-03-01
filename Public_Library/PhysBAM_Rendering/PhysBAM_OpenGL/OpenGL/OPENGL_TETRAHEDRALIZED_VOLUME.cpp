@@ -600,7 +600,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<"Tetrahedron "<<index<<" ("<<nodes[0]<<", "<<nodes[1]<<", "<<nodes[2]<<", "<<nodes[3]<<")"<<std::endl;
         output_stream<<"Signed Volume = "<<TETRAHEDRON<T>(particles->X.Subset(nodes)).Signed_Volume()<<std::endl;
         output_stream<<std::endl;
-        output_stream<<"Vertex"<<nodes[0]<<std::endl;
+        output_stream<<"Vertex "<<nodes[0]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[0]))<<std::endl;}
         Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[0]);
         output_stream<<std::endl;
