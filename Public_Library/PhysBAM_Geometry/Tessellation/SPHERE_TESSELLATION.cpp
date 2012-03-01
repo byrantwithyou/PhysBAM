@@ -40,19 +40,19 @@ template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T
     TRIANGULATED_AREA<T>* area=TRIANGULATED_AREA<T>::Create();
     GEOMETRY_PARTICLES<TV>& particles=area->particles;particles.array_collection->Add_Elements(1+3*levels*(levels+1));
     particles.X(0)=TV(0,0);
-    for(int i=0,k=0;i<levels;i++)
-        for(int j=0;j<i*6;j++){
-            T a=(T)pi/3*(j-(T).5*(i-1))/i;
-            particles.X(k++)=(T)i*TV(cos(a),sin(a));}
-    for(int i=1;i<7;i++) area->mesh.elements.Append(E(1,i,i%6));
+    for(int i=0,k=1;i<levels;i++)
+        for(int j=0;j<i*6+6;j++){
+            T a=(T)pi/3*(j+1-(T).5*i)/(i+1);
+            particles.X(k++)=(T)(i+1)*TV(cos(a),sin(a));}
+    for(int i=1;i<7;i++) area->mesh.elements.Append(E(0,i,i%6+1));
     for(int i=1,p=1;i<levels;i++){
-        int n=i*6;
+        int n=i*6+6;
         int c=p+n-6;
         area->mesh.elements.Append(E(c-1,c+n-1,c));
         area->mesh.elements.Append(E(c,p,c-1));
         for(int j=0;j<n-1;j++){
             area->mesh.elements.Append(E(p,c+j,c+j+1));
-            if(j%i!=i/2){
+            if(j%(i+1)!=i/2){
                 area->mesh.elements.Append(E(c+j+1,p+1,p));
                 p++;}}
         p=c;}
@@ -68,7 +68,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SPHERE<VECTOR
     curve->particles.array_collection->Add_Elements(n);
     for(int i=0;i<n;i++) curve->particles.X(i)=VECTOR<T,2>((T)cos(i*two_pi/n),(T)sin(i*two_pi/n))*sphere.radius+sphere.center;
     for(int i=0;i<n-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
-    curve->mesh.elements.Append(VECTOR<int,2>(n,1));
+    curve->mesh.elements.Append(VECTOR<int,2>(n-1,0));
     curve->Update_Number_Nodes();
     return curve;
 }
