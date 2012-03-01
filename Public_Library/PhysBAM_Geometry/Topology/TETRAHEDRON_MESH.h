@@ -92,6 +92,7 @@ public:
     void Initialize_Octahedron_Mesh(const int m,const int n,const int p);
     void Initialize_Cube_Mesh(const int m,const int n,const int p); // 5 tetrahedrons per cube
     void Initialize_Prismatic_Cube_Mesh(const int m,const int n,const int p); // 6 tetrahedra per cube
+    void Initialize_Swept_Mesh(const TRIANGLE_MESH& tri_mesh,int layers);
 private:
     int Number_Of_Tetrahedrons_Across_Face(const int tetrahedron,const int node1,const int node2,const int node3) const;
 public:

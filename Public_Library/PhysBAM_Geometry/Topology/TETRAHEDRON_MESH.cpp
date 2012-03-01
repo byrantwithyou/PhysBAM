@@ -628,3 +628,18 @@ Set_Number_Nodes(const int number_nodes_input)
     if(node_on_boundary) node_on_boundary->Resize(number_nodes);
 }
 //#####################################################################
+// Function Initialize_Swept_Mesh
+//#####################################################################
+void TETRAHEDRON_MESH::
+Initialize_Swept_Mesh(const TRIANGLE_MESH& tri_mesh,int layers)
+{
+    for(int l=0,particle_offset=0;l<layers;l++){
+        for(int e=0;e<tri_mesh.elements.m;e++){
+            VECTOR<int,3> e0=tri_mesh.elements(e)+particle_offset,e1=e0+tri_mesh.number_nodes;
+            elements.Append(VECTOR<int,4>(e0.x,e0.y,e0.z,e1.x));
+            elements.Append(VECTOR<int,4>(e0.y,e0.z,e1.x,e1.y));
+            elements.Append(VECTOR<int,4>(e0.z,e1.x,e1.y,e1.z));}
+        particle_offset+=tri_mesh.number_nodes;}
+    Set_Number_Nodes(tri_mesh.number_nodes*(layers+1));
+}
+//#####################################################################
