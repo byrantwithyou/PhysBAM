@@ -70,10 +70,10 @@ Dice_Stencil()
     const int half_big_shift=1<<29;
     RANGE<TV_INT> cell_box=RANGE<TV_INT>::Centered_Box();
     for(int i=0;i<stencils.m;i++){
-        RANGE<TV_INT> offset_range=stencils(i).region.Translated(-center_offset);
-        RANGE<TV_INT> ra((big_shift+1-offset_range.max_corner)/2-half_big_shift,(big_shift+1-offset_range.min_corner)/2-half_big_shift);
+        RANGE<TV_INT> offset_range=stencils(i).region.Translated(center_offset);
+        RANGE<TV_INT> ra((big_shift+1-offset_range.max_corner)/2-half_big_shift,(big_shift+2-offset_range.min_corner)/2-half_big_shift);
         for(UNIFORM_ARRAY_ITERATOR<TV::m> it(ra);it.Valid();it.Next()){
-            RANGE<TV_INT> cut_range=RANGE<TV_INT>::Intersect(offset_range.Translated(it.index),cell_box);
+            RANGE<TV_INT> cut_range=RANGE<TV_INT>::Intersect(offset_range.Translated(2*it.index),cell_box);
             DICED e={it.index,cut_range};
             e.polynomial=stencils(i).polynomial;
             e.polynomial.Shift(TV(it.index)-TV(center_offset)/2);
