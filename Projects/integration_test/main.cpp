@@ -38,12 +38,12 @@ void Integration_Test(int argc,char* argv[])
     GRID<TV> grid(TV_INT()+3,RANGE<TV>(TV(),TV()+1),true);
 
     BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
-    p_stencil.Set_Constant_Stencil();
     p_stencil.Set_Center();
-    u_stencil.Set_Multilinear_Stencil();
+    p_stencil.Set_Constant_Stencil();
     u_stencil.Set_Face(0);
-    v_stencil.Set_Multilinear_Stencil();
+    u_stencil.Set_Multilinear_Stencil();
     v_stencil.Set_Face(1);
+    v_stencil.Set_Multilinear_Stencil();
     BASIS_STENCIL_UNIFORM<TV> udx_stencil(u_stencil),udy_stencil(u_stencil),vdx_stencil(v_stencil),vdy_stencil(v_stencil);
     udx_stencil.Differentiate(0);
     udy_stencil.Differentiate(1);
