@@ -53,6 +53,8 @@ struct BASIS_STENCIL_UNIFORM
     void Set_Constant_Stencil();
     void Set_Multilinear_Stencil();
     void Differentiate(int v);
+
+    void Print() const;
 };
 }
 #endif

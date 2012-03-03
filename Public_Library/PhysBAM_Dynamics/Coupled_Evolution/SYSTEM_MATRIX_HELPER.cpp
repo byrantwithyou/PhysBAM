@@ -67,7 +67,7 @@ Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M) const
     M.A.Remove_All();
     M.offsets.Resize(m+1);
     for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;
-    for(int i=1;i<M.offsets.m;i++) M.offsets(i+1)+=M.offsets(i);
+    for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);
     for(int i=0;i<data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
 }
 //#####################################################################
@@ -81,7 +81,7 @@ Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M) const
     M.A.Remove_All();
     M.offsets.Resize(n+1);
     for(int i=0;i<data.m;i++) M.offsets(data(i).x+1)++;
-    for(int i=1;i<M.offsets.m;i++) M.offsets(i+1)+=M.offsets(i);
+    for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);
     for(int i=0;i<data.m;i++) M.A.Append(SPARSE_MATRIX_ENTRY<T>(data(i).y,data(i).z));
 }
 //#####################################################################

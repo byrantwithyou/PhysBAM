@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -27,14 +28,13 @@ Add_Symmetric_Entry(const ENTRY& e, int mask) // 1=x, 2=y, 4=z
 {
     int m=stencils.m;
     stencils.Append(e);
-    for(int i=0;i<3;i++)
+    for(int i=0;i<TV::m;i++)
         if(mask&(1<<i))
             for(int j=m,n=stencils.m;j<n;j++)
             {
-                ENTRY f;
-                f.region.min_corner(i)=1-stencils(j).region.max_corner(i);
-                f.region.max_corner(i)=1-stencils(j).region.min_corner(i);
-                f.polynomial=stencils(j).polynomial;
+                ENTRY f=stencils(j);
+                f.region.min_corner(i)=-stencils(j).region.max_corner(i);
+                f.region.max_corner(i)=-stencils(j).region.min_corner(i);
                 f.polynomial.Negate_Variable(i);
                 stencils.Append(f);
             }
@@ -87,8 +87,7 @@ Set_Constant_Stencil()
 {
     ENTRY e;
     e.region=RANGE<TV_INT>::Centered_Box();
-    e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT()+1,TV::m%2==0?1:-1));
-    e.polynomial.Shift(TV()-1);
+    e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT(),1));
     stencils.Append(e);
     Dice_Stencil();
 }
@@ -99,8 +98,10 @@ template<class TV> void BASIS_STENCIL_UNIFORM<TV>::
 Set_Multilinear_Stencil()
 {
     ENTRY e;
+    e.region.min_corner=TV_INT();
     e.region.max_corner=TV_INT()+2;
-    e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT(),1));
+    e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT()+1,TV::m%2==0?1:-1));
+    e.polynomial.Shift(TV()-1);
     Add_Symmetric_Entry(e);
     Dice_Stencil();
 }
@@ -112,6 +113,20 @@ Differentiate(int v)
 {
     for(int i=0;i<stencils.m;i++)
         stencils(i).polynomial.Differentiate(v);
+}
+//#####################################################################
+// Function Print
+//#####################################################################
+template<class TV> void BASIS_STENCIL_UNIFORM<TV>::
+Print() const
+{
+    LOG::cout<<"Stencils: "<<center_offset<<std::endl;
+    for(int i=0;i<stencils.m;i++)
+        LOG::cout<<"  "<<stencils(i).region<<"  "<<stencils(i).polynomial<<std::endl;
+
+    LOG::cout<<"Diced:"<<std::endl;
+    for(int i=0;i<diced.m;i++)
+        LOG::cout<<"  "<<diced(i).index_offset<<"  "<<diced(i).range<<"  "<<diced(i).polynomial<<std::endl;
 }
 template class BASIS_STENCIL_UNIFORM<VECTOR<float,1> >;
 template class BASIS_STENCIL_UNIFORM<VECTOR<float,2> >;

@@ -36,18 +36,16 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& 
         for(int j=0;j<s1.diced.m;j++){
             RANGE<TV_INT> overlap=RANGE<TV_INT>::Intersect(s0.diced(i).range,s1.diced(j).range);
             if(!overlap.Empty_Half_Open()){
-                OVERLAP_POLYNOMIALS op = {s0.diced(i).index_offset, s1.diced(i).index_offset, overlap};
+                OVERLAP_POLYNOMIALS op = {s0.diced(i).index_offset, s1.diced(j).index_offset, overlap};
                 op.polynomial=s0.diced(i).polynomial;
-                op.polynomial*=s1.diced(i).polynomial;
+                op.polynomial*=s1.diced(j).polynomial;
                 overlap_polynomials.Append(op);}}
 
     ARRAY<MATRIX_ENTRY> open_entries; // stencil with no boundary conditions
-    for(int i=0;i<overlap_polynomials.m;i++)
-    {
+    for(int i=0;i<overlap_polynomials.m;i++){
         RANGE<TV> box=RANGE<TV>(overlap_polynomials(i).range.To_Closed())/2;
         MATRIX_ENTRY me = {overlap_polynomials(i).index_offset0, overlap_polynomials(i).index_offset1, overlap_polynomials(i).polynomial.Definite_Integral(box)};
-        open_entries.Append(me);
-    }
+        open_entries.Append(me);}
 
     helper.New_Block();
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){

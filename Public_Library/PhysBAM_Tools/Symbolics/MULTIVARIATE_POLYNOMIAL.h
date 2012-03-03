@@ -60,5 +60,8 @@ struct MULTIVARIATE_POLYNOMIAL
     void Exchange_Variables(int u,int v);
     T Definite_Integral(RANGE<TV>& domain) const;
 };
+
+template<class TV>
+std::ostream& operator<< (std::ostream& o, const MULTIVARIATE_POLYNOMIAL<TV>& p);
 }
 #endif

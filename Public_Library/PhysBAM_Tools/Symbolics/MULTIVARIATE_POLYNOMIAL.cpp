@@ -71,8 +71,8 @@ operator*= (const MULTIVARIATE_POLYNOMIAL& m)
 {
     ARRAY<MULTIVARIATE_MONOMIAL<TV> > array;
     for(int i=0;i<terms.m;i++)
-        for(int j=0;i<m.terms.m;j++)
-            array.Append(MULTIVARIATE_MONOMIAL<TV>(terms(i).power+m.terms(i).power,terms(i).coeff*m.terms(i).coeff));
+        for(int j=0;j<m.terms.m;j++)
+            array.Append(MULTIVARIATE_MONOMIAL<TV>(terms(i).power+m.terms(j).power,terms(i).coeff*m.terms(j).coeff));
     Simplify();
     return *this;
 }
@@ -191,11 +191,33 @@ Definite_Integral(RANGE<TV>& domain) const
         s+=t;}
     return s;
 }
+//#####################################################################
+// Function operator<<
+//#####################################################################
+template<class TV> std::ostream& PhysBAM::
+operator<< (std::ostream& o, const MULTIVARIATE_POLYNOMIAL<TV>& p)
+{
+    for(int i=0;i<p.terms.m;i++){
+        if(p.terms(i).coeff>=0 && i>0) o<<'+';
+        o<<p.terms(i).coeff;
+        for(int j=0;j<TV::m;j++)
+            if(p.terms(i).power(j)>0){
+                o<<'*'<<"abcdefghijklmnopqrstuvwxyz"[j];
+                if(p.terms(i).power(j)>1)
+                    o<<'^'<<p.terms(i).power(j);}}
+    return o;
+}
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<float,1> >;
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<float,2> >;
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<float,3> >;
+template std::ostream& PhysBAM::operator<< <VECTOR<float,1> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,1> > const&);
+template std::ostream& PhysBAM::operator<< <VECTOR<float,2> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,2> > const&);
+template std::ostream& PhysBAM::operator<< <VECTOR<float,3> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<float,3> > const&);
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<double,1> >;
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<double,2> >;
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<double,3> >;
+template std::ostream& PhysBAM::operator<< <VECTOR<double,1> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,1> > const&);
+template std::ostream& PhysBAM::operator<< <VECTOR<double,2> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,2> > const&);
+template std::ostream& PhysBAM::operator<< <VECTOR<double,3> >(std::ostream&,MULTIVARIATE_POLYNOMIAL<VECTOR<double,3> > const&);
 #endif
