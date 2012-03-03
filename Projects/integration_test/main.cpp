@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
@@ -17,6 +18,7 @@ using namespace PhysBAM;
 
 typedef double T;
 typedef VECTOR<T,2> TV;
+typedef VECTOR<int,2> TV_INT;
 typedef float RW;
 
 void Integration_Test(int argc,char* argv[])
@@ -27,12 +29,13 @@ void Integration_Test(int argc,char* argv[])
     parse_args.Add_Double_Argument("-s",1,"second scale");
     parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
     parse_args.Parse(argc,argv);
-    T mu=parse_args.Get_Double_Value("-viscosity");
     T m=parse_args.Get_Double_Value("-m");
     T s=parse_args.Get_Double_Value("-s");
     T kg=parse_args.Get_Double_Value("-kg");
+    T mu=parse_args.Get_Double_Value("-viscosity")*kg/s;
+    (void)m;
 
-    GRID<TV> grid(TV_INT(3,3,3),RANGE<TV>(TV(0,0,0),TV(1,1,1)),true);
+    GRID<TV> grid(TV_INT()+3,RANGE<TV>(TV(),TV()+1),true);
 
     BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
     p_stencil.Set_Constant_Stencil();
@@ -52,28 +55,44 @@ void Integration_Test(int argc,char* argv[])
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
         index_map_p(it.index)=k++;
     ARRAY<int,TV_INT> index_map_u(index_map_p),index_map_v(index_map_p);
-    index_map_u+=grid.counts.Product();
-    index_map_v+=2*grid.counts.Product();
+    index_map_v+=grid.counts.Product();
+    index_map_p+=2*grid.counts.Product();
 
     SYSTEM_MATRIX_HELPER<T> helper;
     BASIS_INTEGRATION_UNIFORM<TV> biu(grid);
     biu.boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
     biu.boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
 
+    LOG::cout<<"u ";u_stencil.Print();
+    LOG::cout<<"v ";v_stencil.Print();
+    LOG::cout<<"p ";p_stencil.Print();
+    LOG::cout<<"udx ";udx_stencil.Print();
+    LOG::cout<<"vdx ";vdx_stencil.Print();
+    LOG::cout<<"udy ";udy_stencil.Print();
+    LOG::cout<<"vdy ";vdy_stencil.Print();
+
+    LOG::cout<<"udx udx"<<std::endl;
     biu.Compute_Matrix(helper, udx_stencil, udx_stencil, index_map_u, index_map_u);
     helper.Scale(2*mu);
+    LOG::cout<<"udy udy"<<std::endl;
     biu.Compute_Matrix(helper, udy_stencil, udy_stencil, index_map_u, index_map_u);
     helper.Scale(mu);
+    LOG::cout<<"udy vdx"<<std::endl;
     biu.Compute_Matrix(helper, udy_stencil, vdx_stencil, index_map_u, index_map_v);
     helper.Scale(mu);
+    LOG::cout<<"vdx udy"<<std::endl;
     biu.Compute_Matrix(helper, vdx_stencil, udy_stencil, index_map_v, index_map_u);
     helper.Scale(mu);
+    LOG::cout<<"vdx vdx"<<std::endl;
     biu.Compute_Matrix(helper, vdx_stencil, vdx_stencil, index_map_v, index_map_v);
     helper.Scale(2*mu);
+    LOG::cout<<"vdy vdy"<<std::endl;
     biu.Compute_Matrix(helper, vdy_stencil, vdy_stencil, index_map_v, index_map_v);
     helper.Scale(mu);
+    LOG::cout<<"udx p"<<std::endl;
     biu.Compute_Matrix(helper, udx_stencil, p_stencil, index_map_u, index_map_p);
     helper.Scale(mu);
+    LOG::cout<<"vdy p"<<std::endl;
     biu.Compute_Matrix(helper, vdy_stencil, p_stencil, index_map_v, index_map_p);
     helper.Scale(mu);
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
