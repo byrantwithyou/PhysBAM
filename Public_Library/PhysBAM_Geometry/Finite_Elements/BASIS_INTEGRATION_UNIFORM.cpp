@@ -43,9 +43,10 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& 
 
     ARRAY<MATRIX_ENTRY> open_entries; // stencil with no boundary conditions
     for(int i=0;i<overlap_polynomials.m;i++){
-        RANGE<TV> box=RANGE<TV>(overlap_polynomials(i).range.To_Closed())/2;
+        RANGE<TV> box=RANGE<TV>(overlap_polynomials(i).range)/2;
         MATRIX_ENTRY me = {overlap_polynomials(i).index_offset0, overlap_polynomials(i).index_offset1, overlap_polynomials(i).polynomial.Definite_Integral(box)};
         open_entries.Append(me);}
+    open_entries.Coalesce();
 
     helper.New_Block();
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){

@@ -27,25 +27,23 @@ struct SYSTEM_MATRIX_HELPER:public NONCOPYABLE
 {
     ARRAY<TRIPLE<int,int,T> > data;
     int start;
+    bool compacted;
 
     SYSTEM_MATRIX_HELPER()
-        :start(0)
+        :start(0), compacted(false)
     {}
 
-    static bool Data_Compare(const TRIPLE<int,int,T>& a,const TRIPLE<int,int,T>& b)
-    {if(a.x!=b.x) return a.x<b.x;return a.y<b.y;}
-
     void New_Block()
-    {start=data.m+1;}
+    {start=data.m;compacted=false;}
 
     void Add_Matrix(const SYSTEM_MATRIX_BASE<T>& base,bool trans=false,int dr=0,int dc=0);
     void Add_Matrix(const SPARSE_MATRIX_FLAT_MXN<T>& M,bool trans=false,int dr=0,int dc=0);
     void Transpose();
     void Scale(T s);
     void Shift(int dr,int dc);
-    void Compact();
-    void Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M) const;
-    void Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M) const;
+    void Compact(int rows, T tol=0);
+    void Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M, T tol=0);
+    void Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M, T tol=0);
 
     static void Base_To_Matrix(int m,int n,const SYSTEM_MATRIX_BASE<T>& base,SPARSE_MATRIX_FLAT_MXN<T>& M,bool tranpose=false);
 };

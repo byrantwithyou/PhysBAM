@@ -836,7 +836,6 @@ Compute_Scatter_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& gather_matrix)
             matrix_helper.Add_Matrix(*solid_forces,false,offset_force,size_fluids);
             matrix_helper.Scale(sqrt(dt));}}
 
-    matrix_helper.Compact();
     matrix_helper.Set_Matrix(offset_viscous+size_viscous,size_fluids+size_solids,gather_matrix);
 
     if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("SC-%i.txt",solve_id).c_str()).Write("SC",gather_matrix);
@@ -871,7 +870,6 @@ Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass)
 
     {int mx=0,my=0;for(int i=0;i<matrix_helper.data.m;i++) mx=std::max(mx,matrix_helper.data(i).x),my=std::max(my,matrix_helper.data(i).y);LOG::cout<<"max: "<<mx<<"  "<<my<<"  vs "<<size_fluids+size_solids<<"  "<<size_fluids+size_solids<<std::endl;}
 
-    matrix_helper.Compact();
     matrix_helper.Set_Matrix(size_fluids+size_solids,size_fluids+size_solids,inverse_mass);
 }    
 //#####################################################################

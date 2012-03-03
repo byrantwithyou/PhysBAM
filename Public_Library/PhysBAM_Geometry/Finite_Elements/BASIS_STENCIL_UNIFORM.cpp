@@ -30,14 +30,12 @@ Add_Symmetric_Entry(const ENTRY& e, int mask) // 1=x, 2=y, 4=z
     stencils.Append(e);
     for(int i=0;i<TV::m;i++)
         if(mask&(1<<i))
-            for(int j=m,n=stencils.m;j<n;j++)
-            {
+            for(int j=m,n=stencils.m;j<n;j++){
                 ENTRY f=stencils(j);
                 f.region.min_corner(i)=-stencils(j).region.max_corner(i);
                 f.region.max_corner(i)=-stencils(j).region.min_corner(i);
                 f.polynomial.Negate_Variable(i);
-                stencils.Append(f);
-            }
+                stencils.Append(f);}
 }
 //#####################################################################
 // Function Exchange_Axes
@@ -66,6 +64,7 @@ Scale_Axes(TV scale)
 template<class TV> void BASIS_STENCIL_UNIFORM<TV>::
 Dice_Stencil()
 {
+    diced.Remove_All();
     const int big_shift=1<<30;
     const int half_big_shift=1<<29;
     RANGE<TV_INT> cell_box=RANGE<TV_INT>::Centered_Box();
@@ -76,7 +75,7 @@ Dice_Stencil()
             RANGE<TV_INT> cut_range=RANGE<TV_INT>::Intersect(offset_range.Translated(2*it.index),cell_box);
             DICED e={it.index,cut_range};
             e.polynomial=stencils(i).polynomial;
-            e.polynomial.Shift(TV(it.index)-TV(center_offset)/2);
+            e.polynomial.Shift(-TV(it.index)-TV(center_offset)/2);
             diced.Append(e);}}
 }
 //#####################################################################
@@ -89,7 +88,6 @@ Set_Constant_Stencil()
     e.region=RANGE<TV_INT>::Centered_Box();
     e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT(),1));
     stencils.Append(e);
-    Dice_Stencil();
 }
 //#####################################################################
 // Function Set_Multilinear_Stencil
@@ -103,7 +101,6 @@ Set_Multilinear_Stencil()
     e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT()+1,TV::m%2==0?1:-1));
     e.polynomial.Shift(TV()-1);
     Add_Symmetric_Entry(e);
-    Dice_Stencil();
 }
 //#####################################################################
 // Function Differentiate
@@ -111,8 +108,12 @@ Set_Multilinear_Stencil()
 template<class TV> void BASIS_STENCIL_UNIFORM<TV>::
 Differentiate(int v)
 {
-    for(int i=0;i<stencils.m;i++)
+    int k=0;
+    for(int i=0;i<stencils.m;i++){
         stencils(i).polynomial.Differentiate(v);
+        if(stencils(i).polynomial.terms.m)
+            stencils(k++)=stencils(i);}
+    stencils.Resize(k);
 }
 //#####################################################################
 // Function Print

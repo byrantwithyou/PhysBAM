@@ -73,6 +73,7 @@ operator*= (const MULTIVARIATE_POLYNOMIAL& m)
     for(int i=0;i<terms.m;i++)
         for(int j=0;j<m.terms.m;j++)
             array.Append(MULTIVARIATE_MONOMIAL<TV>(terms(i).power+m.terms(j).power,terms(i).coeff*m.terms(j).coeff));
+    array.Exchange(terms);
     Simplify();
     return *this;
 }
@@ -197,15 +198,20 @@ Definite_Integral(RANGE<TV>& domain) const
 template<class TV> std::ostream& PhysBAM::
 operator<< (std::ostream& o, const MULTIVARIATE_POLYNOMIAL<TV>& p)
 {
+    if(!p.terms.m) return o<<"(0)";
+    o<<"(";
     for(int i=0;i<p.terms.m;i++){
-        if(p.terms(i).coeff>=0 && i>0) o<<'+';
-        o<<p.terms(i).coeff;
+        typename TV::ELEMENT c=p.terms(i).coeff;
+        if(c<0){o<<(i>0?"-":"-");c=-c;}
+        else o<<(i>0?"+":"");
+        if(c!=1 || p.terms(i).power==VECTOR<int,TV::m>()) o<<c;
+
         for(int j=0;j<TV::m;j++)
             if(p.terms(i).power(j)>0){
-                o<<'*'<<"abcdefghijklmnopqrstuvwxyz"[j];
+                o<<"abcdefghijklmnopqrstuvwxyz"[j];
                 if(p.terms(i).power(j)>1)
                     o<<'^'<<p.terms(i).power(j);}}
-    return o;
+    return o<<")";
 }
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<float,1> >;
 template class MULTIVARIATE_POLYNOMIAL<VECTOR<float,2> >;

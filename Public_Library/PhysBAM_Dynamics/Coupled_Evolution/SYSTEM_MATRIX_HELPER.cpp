@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
+#include <map>
 using namespace PhysBAM;
 //#####################################################################
 // Function Add_Matrix
@@ -47,21 +48,27 @@ Shift(int dr,int dc)
 // Function Compact
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Compact()
+Compact(int rows, T tol)
 {
-    Sort(data,Data_Compare);
+    ARRAY<std::map<int,T> > maps(rows);
+    for(int i=0;i<data.m;i++)
+        maps(data(i).x)[data(i).y]+=data(i).z;
+
     int k=0;
-    for(int i=1;i<data.m;i++){
-        if(data(k).x==data(i).x && data(k).y==data(i).y) data(k).z+=data(i).z;
-        else data(++k)=data(i);}
-    data.Resize(k+1);
+    for(int i=0;i<maps.m;i++)
+        for(typename std::map<int,T>::iterator it=maps(i).begin();it!=maps(i).end();it++)
+            if(abs(it->second)>=tol)
+                data(k++)=TRIPLE<int,int,T>(i,it->first,it->second);
+    data.Resize(k);
+    compacted=true;
 }
 //#####################################################################
 // Function Set_Matrix
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M) const
+Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M, T tol)
 {
+    if(!compacted) Compact(m, tol);
     M.Reset(n);
     M.m=m;
     M.A.Remove_All();
@@ -74,8 +81,9 @@ Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M) const
 // Function Set_Matrix
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M) const
+Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M, T tol)
 {
+    if(!compacted) Compact(n, tol);
     M.Reset();
     M.n=n;
     M.A.Remove_All();
@@ -107,7 +115,6 @@ Base_To_Matrix(int m,int n,const SYSTEM_MATRIX_BASE<T>& base,SPARSE_MATRIX_FLAT_
     SYSTEM_MATRIX_HELPER<T> helper;
     helper.Add_Matrix(base);
     if(tranpose) helper.Transpose();
-    helper.Compact();
     helper.Set_Matrix(m,n,M);
 }
 template struct SYSTEM_MATRIX_HELPER<float>;

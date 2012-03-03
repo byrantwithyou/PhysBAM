@@ -32,6 +32,17 @@ public:
     {
         TV_INT index0, index1;
         T x;
+
+        bool operator< (const MATRIX_ENTRY& me) const
+        {
+            if(index0!=me.index0) return LEXICOGRAPHIC_COMPARE()(index0,me.index0);
+            return LEXICOGRAPHIC_COMPARE()(index1,me.index1);
+        }
+
+        void Merge(const MATRIX_ENTRY& me)
+        {
+            x+=me.x;
+        }
     };
 
     struct OVERLAP_POLYNOMIALS
