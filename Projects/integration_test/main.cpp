@@ -40,15 +40,22 @@ void Integration_Test(int argc,char* argv[])
     BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
     p_stencil.Set_Center();
     p_stencil.Set_Constant_Stencil();
+    p_stencil.Dice_Stencil();
     u_stencil.Set_Face(0);
     u_stencil.Set_Multilinear_Stencil();
+    u_stencil.Dice_Stencil();
     v_stencil.Set_Face(1);
     v_stencil.Set_Multilinear_Stencil();
+    v_stencil.Dice_Stencil();
     BASIS_STENCIL_UNIFORM<TV> udx_stencil(u_stencil),udy_stencil(u_stencil),vdx_stencil(v_stencil),vdy_stencil(v_stencil);
     udx_stencil.Differentiate(0);
+    udx_stencil.Dice_Stencil();
     udy_stencil.Differentiate(1);
+    udy_stencil.Dice_Stencil();
     vdx_stencil.Differentiate(0);
+    vdx_stencil.Dice_Stencil();
     vdy_stencil.Differentiate(1);
+    vdy_stencil.Dice_Stencil();
 
     ARRAY<int,TV_INT> index_map_p(grid.Domain_Indices());
     int k=0;
@@ -95,8 +102,14 @@ void Integration_Test(int argc,char* argv[])
     LOG::cout<<"vdy p"<<std::endl;
     biu.Compute_Matrix(helper, vdy_stencil, p_stencil, index_map_v, index_map_p);
     helper.Scale(mu);
+    LOG::cout<<"p udx"<<std::endl;
+    biu.Compute_Matrix(helper, p_stencil, udx_stencil, index_map_p, index_map_u);
+    helper.Scale(mu);
+    LOG::cout<<"p vdy"<<std::endl;
+    biu.Compute_Matrix(helper, p_stencil, vdy_stencil, index_map_p, index_map_v);
+    helper.Scale(mu);
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
-    helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix);
+    helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix, 1e-14);
 
     OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
 };
