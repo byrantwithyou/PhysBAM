@@ -21,6 +21,10 @@ typedef VECTOR<T,2> TV;
 typedef VECTOR<int,2> TV_INT;
 typedef float RW;
 
+// * Handle interface
+// * Handle other boundary conditions
+// * Handle 
+
 void Integration_Test(int argc,char* argv[])
 {
     PARSE_ARGS parse_args;
@@ -35,16 +39,21 @@ void Integration_Test(int argc,char* argv[])
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/s;
     (void)m;
 
-    GRID<TV> grid(TV_INT()+3,RANGE<TV>(TV(),TV()+1),true);
+    GRID<TV> grid(TV_INT()+6,RANGE<TV>(TV(),TV()+1),true);
 
     BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
     p_stencil.Set_Center();
+//    p_stencil.Set_Multilinear_Stencil();
     p_stencil.Set_Constant_Stencil();
     p_stencil.Dice_Stencil();
     u_stencil.Set_Face(0);
+//    u_stencil.Set_Node();
+    v_stencil.Set_Center();
     u_stencil.Set_Multilinear_Stencil();
     u_stencil.Dice_Stencil();
     v_stencil.Set_Face(1);
+//    v_stencil.Set_Node();
+    v_stencil.Set_Center();
     v_stencil.Set_Multilinear_Stencil();
     v_stencil.Dice_Stencil();
     BASIS_STENCIL_UNIFORM<TV> udx_stencil(u_stencil),udy_stencil(u_stencil),vdx_stencil(v_stencil),vdy_stencil(v_stencil);
@@ -98,16 +107,16 @@ void Integration_Test(int argc,char* argv[])
     helper.Scale(mu);
     LOG::cout<<"udx p"<<std::endl;
     biu.Compute_Matrix(helper, udx_stencil, p_stencil, index_map_u, index_map_p);
-    helper.Scale(mu);
+//    helper.Scale(mu);
     LOG::cout<<"vdy p"<<std::endl;
     biu.Compute_Matrix(helper, vdy_stencil, p_stencil, index_map_v, index_map_p);
-    helper.Scale(mu);
+//    helper.Scale(mu);
     LOG::cout<<"p udx"<<std::endl;
     biu.Compute_Matrix(helper, p_stencil, udx_stencil, index_map_p, index_map_u);
-    helper.Scale(mu);
+//    helper.Scale(mu);
     LOG::cout<<"p vdy"<<std::endl;
     biu.Compute_Matrix(helper, p_stencil, vdy_stencil, index_map_p, index_map_v);
-    helper.Scale(mu);
+//    helper.Scale(mu);
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix, 1e-14);
 
