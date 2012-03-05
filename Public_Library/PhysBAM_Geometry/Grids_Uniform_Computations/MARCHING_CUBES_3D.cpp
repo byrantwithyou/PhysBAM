@@ -66,8 +66,8 @@ Initialize_Case_Table(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table)
     static CASE c5 = {{TRI(9,8,16,0), TRI(9,16,18,0)}, {TRI(2,9,18,0), TRI(8,4,16,0), TRI(8,1,4,0), TRI(1,5,4,0)}};
     static CASE c6 = {{TRI(13,17,8,0), TRI(18,9,12,1)}, {TRI(17,5,8,0), TRI(5,4,8,0), TRI(8,4,0,0), TRI(18,6,9,1), TRI(9,6,3,1), TRI(3,6,7,1)}};
     static CASE c7 = {{TRI(16,18,9,0), TRI(17,16,13,0), TRI(16,9,13,0)}, {TRI(2,9,18,0), TRI(16,17,5,0), TRI(5,4,16,0)}};
-    static CASE c15 = {{TRI(16,18,19,0), TRI(19,18,17,0)}, {TRI(2,3,18,0), TRI(3,19,18,0), TRI(16,17,5,0), TRI(5,4,16,0)}};
-    static CASE c20 = {{TRI(1,2,3,0)}, {TRI(4,5,6,0)}};
+    static CASE c15 = {{TRI(16,18,19,0), TRI(19,17,16,0)}, {TRI(2,3,18,0), TRI(3,19,18,0), TRI(16,17,5,0), TRI(5,4,16,0)}};
+    static CASE c20 = {{TRI(10,14,16,0), TRI(18,9,12,1)}, {TRI(10,16,0,0), TRI(0,5,10,0), TRI(0,1,5,0), TRI(18,6,9,1), TRI(9,6,3,1), TRI(3,6,7,1)}};
     static CASE c21 = {{TRI(1,2,3,0)}, {TRI(4,5,6,0)}};
     static CASE c22 = {{TRI(1,2,3,0)}, {TRI(4,5,6,0)}};
     static CASE c23 = {{TRI(1,2,3,0)}, {TRI(4,5,6,0)}};
