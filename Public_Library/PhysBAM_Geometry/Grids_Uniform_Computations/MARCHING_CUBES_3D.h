@@ -23,7 +23,7 @@ class MARCHING_CUBES_3D
 {
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    enum WORKAROUND {max_elements=4,sheet_elements=8}; // Replace 8 with the correct value.
+    enum WORKAROUND {max_elements=5,sheet_elements=7}; // Replace 8 with the correct value.
 
     struct CASE
     {
