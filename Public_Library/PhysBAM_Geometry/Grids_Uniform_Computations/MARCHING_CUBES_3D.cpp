@@ -7,12 +7,9 @@
 using namespace PhysBAM;
 static int edge_lookup[8][8];
 static int vertex_lookup[12][2];
-static int flip_map[3][20];
-static int swap_map[3][20];
+static int permute_map[6][20];
 #define TRI(a,b,c,s) (((s)<<15) | ((c)<<10) | ((b)<<5) | (a))
-#define TRI_ORIENT(x) (x?((x&0xfc00) | ((x&0x03e0)>>5) | ((x&0x001f)<<5)):0)
 #define TRI_ORIENT_MAP(x,f) (x?((x&0x8000) | (f[(x>>10)&31]<<10) | (f[x&31]<<5) | f[(x>>5)&31]):0)
-#define TRI_MAP(x,f) (x?((x&0x8000) | (f[(x>>10)&31]<<10) | (f[(x>>5)&31]<<5) | f[x&31]):0)
 //#####################################################################
 // Function Case_Table
 //#####################################################################
@@ -27,29 +24,18 @@ Case_Table()
 //#####################################################################
 // Function flip
 //#####################################################################
-int flip(int c,int a)
-{
-    int r=0,m=1<<a;
-    for(int i=0;i<8;i++)
-        if(c&(1<<i))
-            r|=1<<(i^m);
-    return r;
-}
-//#####################################################################
-// Function swapa
-//#####################################################################
-int swapa(int c,int a)
+static int permute_case(int c,int* f)
 {
     int r=0;
     for(int i=0;i<8;i++)
         if(c&(1<<i))
-            r|=1<<(swap_map[a][i+12]-12);
+            r|=1<<(f[i+12]-12);
     return r;
 }
 //#####################################################################
 // Function has_ambig
 //#####################################################################
-int has_ambig(int n)
+static int has_ambig(int n)
 {
     if((n&0x0f)==0x09 || (n&0x0f)==0x06) return true;
     if((n&0xf0)==0x90 || (n&0xf0)==0x60) return true;
@@ -65,13 +51,14 @@ int has_ambig(int n)
 template<class T> void MARCHING_CUBES_3D<T>::
 Initialize_Neighbor_Cases(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table, int c)
 {
-    for(int a=0;a<3;a++){
-        int b=flip(c,a);
+    for(int p=0;p<6;p++){
+        int b=permute_case(c, permute_map[p]);
         if(!table(b).elements[0]){
-            printf("flip %i -> %i\n", c, b);
-            for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],flip_map[a]);
-            for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],flip_map[a]);
-            table(b).proj_dir=table(c).proj_dir;
+            printf("permute[%i] %i -> %i\n", p, c, b);
+            for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],permute_map[p]);
+            for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],permute_map[p]);
+            if(p>=3 && table(c).proj_dir!=p-3) table(b).proj_dir=6-table(c).proj_dir-p;
+            else table(b).proj_dir=table(c).proj_dir;
             table(b).enclose_inside=table(c).enclose_inside;
             Initialize_Neighbor_Cases(table, b);}}
 
@@ -82,18 +69,6 @@ Initialize_Neighbor_Cases(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table, int
             table(b)=table(c);
             table(b).enclose_inside=1-table(b).enclose_inside;
             Initialize_Neighbor_Cases(table, b);}}
-
-    for(int a=0;a<3;a++){
-        int b=swapa(c,a);
-        if(!table(b).elements[0]){
-            printf("swap %i -> %i\n", c, b);
-            for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],swap_map[a]);
-            for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],swap_map[a]);
-            if(table(c).proj_dir!=a) table(b).proj_dir=3-table(c).proj_dir-a;
-            else table(b).proj_dir=table(c).proj_dir;
-            table(b).enclose_inside=table(c).enclose_inside;
-            Initialize_Neighbor_Cases(table, b);}}
-
 }
 //#####################################################################
 // Function Initialize_Case_Table
@@ -109,22 +84,16 @@ Initialize_Case_Table(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table)
                 vertex_lookup[k][1]=v|mask;
                 edge_lookup[v][v|mask]=edge_lookup[v|mask][v]=k++;}}
 
-    for(int a=0;a<3;a++){
-        int mask=1<<a;
-        for(int v=0;v<8;v++)
-            flip_map[a][v+12]=(v^mask)+12;
-        for(int e=0;e<12;e++)
-            flip_map[a][e]=edge_lookup[vertex_lookup[e][0]^mask][vertex_lookup[e][1]^mask];}
+    for(int a=0;a<3;a++) for(int v=0;v<8;v++) permute_map[a][v+12]=(v^(1<<a))+12;
+    for(int v=0;v<8;v++) permute_map[3][v+12]=((v&1)|(v&2)*2|(v&4)/2)+12;
+    for(int v=0;v<8;v++) permute_map[4][v+12]=((v&1)*4|(v&2)|(v&4)/4)+12;
+    for(int v=0;v<8;v++) permute_map[5][v+12]=((v&1)*2|(v&2)/2|(v&4))+12;
 
-    for(int v=0;v<8;v++) swap_map[0][v+12]=((v&1)|(v&2)*2|(v&4)/2)+12;
-    for(int v=0;v<8;v++) swap_map[1][v+12]=((v&1)*4|(v&2)|(v&4)/4)+12;
-    for(int v=0;v<8;v++) swap_map[2][v+12]=((v&1)*2|(v&2)/2|(v&4))+12;
-
-    for(int a=0;a<3;a++)
+    for(int i=0;i<6;i++)
         for(int e=0;e<12;e++){
-            int v0=swap_map[a][vertex_lookup[e][0]+12]-12;
-            int v1=swap_map[a][vertex_lookup[e][1]+12]-12;
-            swap_map[a][e]=edge_lookup[v0][v1];}
+            int v0=permute_map[i][vertex_lookup[e][0]+12]-12;
+            int v1=permute_map[i][vertex_lookup[e][1]+12]-12;
+            permute_map[i][e]=edge_lookup[v0][v1];}
 
     table.Resize(256);
     static CASE c0 = {{}, {}, 0, 1};
