@@ -113,14 +113,19 @@ int main(int argc, char* argv[])
     fprintf(F, "\\documentclass{article}\n");
     fprintf(F, "\\usepackage[margin=0cm,papersize={%.3fcm,%.3fcm}]{geometry}\n", mx_pt.x*5+5*margin, mx_pt.y*5+5*margin);
     fprintf(F, "\\usepackage{pstricks}\n");
+    fprintf(F, "\\usepackage{color}\n");
+    fprintf(F, "\\definecolor{dkred}{rgb}{0.5,0,0}\n");
+    fprintf(F, "\\definecolor{dkgreen}{rgb}{0,0.5,0}\n");
+    fprintf(F, "\\definecolor{dkblue}{rgb}{0,0,0.5}\n");
+    fprintf(F, "\\definecolor{dkmagenta}{rgb}{0.5,0,0.5}\n");
     fprintf(F, "\\begin{document}\n");
     fprintf(F, "\\psset{unit=5cm}\n");
     fprintf(F, "\\noindent\\begin{pspicture}(%.3f,%.3f)(%.3f,%.3f)\n", -margin/2, -margin/2, mx_pt.x+margin/2, mx_pt.y+margin/2);
 
     for(int v=0;v<8;v++) corners[v]=TV(v&1,v/2&1,v/4&1);
 
-    for(int v=0;v<8;v++) points[v]=corners[v];
-    for(int a=0,k=8;a<3;a++){
+    for(int v=0;v<8;v++) points[v+12]=corners[v];
+    for(int a=0,k=0;a<3;a++){
         int mask=1<<a;
         for(int v=0;v<8;v++){
             if(!(v&mask))
@@ -144,12 +149,16 @@ int main(int argc, char* argv[])
 
     std::multimap<float, PAIR<int,const char*> > tris;
 
+    const char * mc_tri_col[4] = {"red", "green", "blue", "magenta"};
+    const char * ex_tri_col[4] = {"dkred", "dkgreen", "dkblue", "dkmagenta"};
     typedef std::pair<float, PAIR<int,const char*> > pr;
-    for(int i=0;i<MARCHING_CUBES_3D<T>::max_elements && cs.elements[i];i++)
-        tris.insert(pr(-((points[cs.elements[i]&31]+points[(cs.elements[i]>>5)&31]+points[(cs.elements[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.elements[i],cs.elements[i]&0x8000?"cyan":"red")));
+    for(int i=0,c=-1;i<MARCHING_CUBES_3D<T>::max_elements && cs.elements[i];i++){
+        if(cs.elements[i]&0x8000) c++;
+        tris.insert(pr(-((points[cs.elements[i]&31]+points[(cs.elements[i]>>5)&31]+points[(cs.elements[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.elements[i],mc_tri_col[c])));}
 
-    for(int i=0;i<MARCHING_CUBES_3D<T>::sheet_elements && cs.boundary[i];i++)
-        tris.insert(pr(-((points[cs.boundary[i]&31]+points[(cs.boundary[i]>>5)&31]+points[(cs.boundary[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.boundary[i],cs.boundary[i]&0x8000?"blue":"green")));
+    for(int i=0,c=-1;i<MARCHING_CUBES_3D<T>::sheet_elements && cs.boundary[i];i++){
+        if(cs.boundary[i]&0x8000) c++;
+        tris.insert(pr(-((points[cs.boundary[i]&31]+points[(cs.boundary[i]>>5)&31]+points[(cs.boundary[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.boundary[i],ex_tri_col[c])));}
 
     for(std::map<float, PAIR<int,const char*> >::iterator it=tris.begin(); it!=tris.end(); it++)
         tri(points[it->second.x&31], points[(it->second.x>>5)&31], points[(it->second.x>>10)&31], "black", it->second.y, tri_edge_width, .5, .1);
