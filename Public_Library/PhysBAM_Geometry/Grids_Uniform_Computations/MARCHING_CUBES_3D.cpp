@@ -71,8 +71,7 @@ Initialize_Neighbor_Cases(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table, int
             printf("flip %i -> %i\n", c, b);
             for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],flip_map[a]);
             for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],flip_map[a]);
-            printf("%x %x %x %x %x\n", table(b).boundary[0], table(b).boundary[1], table(b).boundary[2], table(b).boundary[3], table(b).boundary[4]);
-            if(table(c).proj_dir!=a) table(b).proj_dir=3-table(c).proj_dir-a;
+            table(b).proj_dir=table(c).proj_dir;
             table(b).enclose_inside=table(c).enclose_inside;
             Initialize_Neighbor_Cases(table, b);}}
 
@@ -91,6 +90,7 @@ Initialize_Neighbor_Cases(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table, int
             for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],swap_map[a]);
             for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],swap_map[a]);
             if(table(c).proj_dir!=a) table(b).proj_dir=3-table(c).proj_dir-a;
+            else table(b).proj_dir=table(c).proj_dir;
             table(b).enclose_inside=table(c).enclose_inside;
             Initialize_Neighbor_Cases(table, b);}}
 

@@ -114,10 +114,10 @@ int main(int argc, char* argv[])
     fprintf(F, "\\usepackage[margin=0cm,papersize={%.3fcm,%.3fcm}]{geometry}\n", mx_pt.x*5+5*margin, mx_pt.y*5+5*margin);
     fprintf(F, "\\usepackage{pstricks}\n");
     fprintf(F, "\\usepackage{color}\n");
-    fprintf(F, "\\definecolor{dkred}{rgb}{0.5,0,0}\n");
-    fprintf(F, "\\definecolor{dkgreen}{rgb}{0,0.5,0}\n");
-    fprintf(F, "\\definecolor{dkblue}{rgb}{0,0,0.5}\n");
-    fprintf(F, "\\definecolor{dkmagenta}{rgb}{0.5,0,0.5}\n");
+    fprintf(F, "\\definecolor{dkred}{rgb}{0.3,0,0}\n");
+    fprintf(F, "\\definecolor{dkgreen}{rgb}{0,0.3,0}\n");
+    fprintf(F, "\\definecolor{dkblue}{rgb}{0,0,0.3}\n");
+    fprintf(F, "\\definecolor{dkmagenta}{rgb}{0.3,0,0.3}\n");
     fprintf(F, "\\begin{document}\n");
     fprintf(F, "\\psset{unit=5cm}\n");
     fprintf(F, "\\noindent\\begin{pspicture}(%.3f,%.3f)(%.3f,%.3f)\n", -margin/2, -margin/2, mx_pt.x+margin/2, mx_pt.y+margin/2);
@@ -172,6 +172,28 @@ int main(int argc, char* argv[])
     for(int v=0;v<4;v++){
         sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", (case_number>=0 && case_number&(1<<v))?"red":"black");
         circ(corners[v],corner_radius,buff);}
+
+    if(case_number>=0){
+        TV p(1.2,-.1,0);
+        T dx=.2;
+        TV a(1,0,0),b(0,0,1);
+        if(cs.proj_dir==0) a=TV(0,1,0);
+        if(cs.proj_dir==2) b=TV(0,1,0);
+        TV q=p+(TV(1,1,1)-a-b)*dx;
+        fprintf(F, "\\pspolygon[linestyle=none,fillcolor=%s,fillstyle=solid,opacity=%.3f]", rgb[cs.proj_dir], .5);
+        pt(q);
+        pt(q+a*dx);
+        pt(q+a*dx+b*dx);
+        pt(q+b*dx);
+        fprintf(F, "\n");
+        sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", cs.enclose_inside?"red":"black");
+        circ(TV(1.3,0,.1),corner_radius/2,buff);
+        fprintf(F, "\\pspolygon[linestyle=none,fillcolor=%s,fillstyle=solid,opacity=%.3f]", rgb[cs.proj_dir], .5);
+        pt(p);
+        pt(p+a*dx);
+        pt(p+a*dx+b*dx);
+        pt(p+b*dx);
+        fprintf(F, "\n");}
 
     fprintf(F, "\\end{pspicture}\n");
     fprintf(F, "\\end{document}\n");
