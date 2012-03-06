@@ -30,7 +30,7 @@ public:
         unsigned short elements[max_elements];
         unsigned short boundary[sheet_elements];
         unsigned short proj_dir;
-        unsigned short inclose_inside;
+        unsigned short enclose_inside;
     };
 
     MARCHING_CUBES_3D() {}
@@ -38,6 +38,7 @@ public:
 
     static const ARRAY<CASE>& Case_Table();
     static void Initialize_Case_Table(ARRAY<CASE>& table);
+    static void Initialize_Neighbor_Cases(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table, int c);
 //#####################################################################
 };
 }

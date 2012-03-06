@@ -5,6 +5,14 @@
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_3D.h>
 using namespace PhysBAM;
+static int edge_lookup[8][8];
+static int vertex_lookup[12][2];
+static int flip_map[3][20];
+static int swap_map[3][20];
+#define TRI(a,b,c,s) (((s)<<15) | ((c)<<10) | ((b)<<5) | (a))
+#define TRI_ORIENT(x) (x?((x&0xfc00) | ((x&0x03e0)>>5) | ((x&0x001f)<<5)):0)
+#define TRI_ORIENT_MAP(x,f) (x?((x&0x8000) | (f[(x>>10)&31]<<10) | (f[x&31]<<5) | f[(x>>5)&31]):0)
+#define TRI_MAP(x,f) (x?((x&0x8000) | (f[(x>>10)&31]<<10) | (f[(x>>5)&31]<<5) | f[x&31]):0)
 //#####################################################################
 // Function Case_Table
 //#####################################################################
@@ -19,23 +27,23 @@ Case_Table()
 //#####################################################################
 // Function flip
 //#####################################################################
-int flip(int c,int m)
+int flip(int c,int a)
 {
-    int r=0;
+    int r=0,m=1<<a;
     for(int i=0;i<8;i++)
         if(c&(1<<i))
             r|=1<<(i^m);
     return r;
 }
 //#####################################################################
-// Function swapyz
+// Function swapa
 //#####################################################################
-int swapyz(int c)
+int swapa(int c,int a)
 {
     int r=0;
     for(int i=0;i<8;i++)
         if(c&(1<<i))
-            r|=1<<((i&1)|(i&2)*2|(i&4)/2);
+            r|=1<<(swap_map[a][i+12]-12);
     return r;
 }
 //#####################################################################
@@ -54,10 +62,69 @@ int has_ambig(int n)
 //#####################################################################
 // Function Initialize_Case_Table
 //#####################################################################
-#define TRI(a,b,c,s) (((s)<<15) | ((c)<<10) | ((b)<<5) | (a))
+template<class T> void MARCHING_CUBES_3D<T>::
+Initialize_Neighbor_Cases(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table, int c)
+{
+    for(int a=0;a<3;a++){
+        int b=flip(c,a);
+        if(!table(b).elements[0]){
+            printf("flip %i -> %i\n", c, b);
+            for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],flip_map[a]);
+            for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],flip_map[a]);
+            printf("%x %x %x %x %x\n", table(b).boundary[0], table(b).boundary[1], table(b).boundary[2], table(b).boundary[3], table(b).boundary[4]);
+            if(table(c).proj_dir!=a) table(b).proj_dir=3-table(c).proj_dir-a;
+            table(b).enclose_inside=table(c).enclose_inside;
+            Initialize_Neighbor_Cases(table, b);}}
+
+    if(!has_ambig(c)){
+        int b=255-c;
+        if(!table(b).elements[0]){
+            printf("inv %i -> %i\n", c, b);
+            table(b)=table(c);
+            table(b).enclose_inside=1-table(b).enclose_inside;
+            Initialize_Neighbor_Cases(table, b);}}
+
+    for(int a=0;a<3;a++){
+        int b=swapa(c,a);
+        if(!table(b).elements[0]){
+            printf("swap %i -> %i\n", c, b);
+            for(int i=0;i<max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],swap_map[a]);
+            for(int i=0;i<sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],swap_map[a]);
+            if(table(c).proj_dir!=a) table(b).proj_dir=3-table(c).proj_dir-a;
+            table(b).enclose_inside=table(c).enclose_inside;
+            Initialize_Neighbor_Cases(table, b);}}
+
+}
+//#####################################################################
+// Function Initialize_Case_Table
+//#####################################################################
 template<class T> void MARCHING_CUBES_3D<T>::
 Initialize_Case_Table(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table)
 {
+    for(int a=0,k=0;a<3;a++){
+        int mask=1<<a;
+        for(int v=0;v<8;v++)
+            if(!(v&mask)){
+                vertex_lookup[k][0]=v;
+                vertex_lookup[k][1]=v|mask;
+                edge_lookup[v][v|mask]=edge_lookup[v|mask][v]=k++;}}
+
+    for(int a=0;a<3;a++){
+        int mask=1<<a;
+        for(int v=0;v<8;v++)
+            flip_map[a][v+12]=(v^mask)+12;
+        for(int e=0;e<12;e++)
+            flip_map[a][e]=edge_lookup[vertex_lookup[e][0]^mask][vertex_lookup[e][1]^mask];}
+
+    for(int v=0;v<8;v++) swap_map[0][v+12]=((v&1)|(v&2)*2|(v&4)/2)+12;
+    for(int v=0;v<8;v++) swap_map[1][v+12]=((v&1)*4|(v&2)|(v&4)/4)+12;
+    for(int v=0;v<8;v++) swap_map[2][v+12]=((v&1)*2|(v&2)/2|(v&4))+12;
+
+    for(int a=0;a<3;a++)
+        for(int e=0;e<12;e++){
+            int v0=swap_map[a][vertex_lookup[e][0]+12]-12;
+            int v1=swap_map[a][vertex_lookup[e][1]+12]-12;
+            swap_map[a][e]=edge_lookup[v0][v1];}
 
     table.Resize(256);
     static CASE c0 = {{}, {}, 0, 1};
@@ -77,6 +144,7 @@ Initialize_Case_Table(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table)
     static CASE c105 = {{TRI(8,4,0,1), TRI(9,7,2,1), TRI(1,11,5,1), TRI(3,10,6,1)}, {TRI(8,12,4,1), TRI(9,17,7,1), TRI(5,11,15,1), TRI(6,10,18,1)}, 0, 1};
     static CASE c125 = {{TRI(11,5,3,1), TRI(3,5,0,0), TRI(3,0,9,0), TRI(3,9,7,0)}, {TRI(17,7,9,1), TRI(11,15,5,0), TRI(12,14,16,0), TRI(14,18,16,0)}, 0, 1};
     static CASE c151 = {{TRI(10,1,6,1), TRI(1,2,6,0), TRI(1,5,2,0), TRI(5,9,2,0), TRI(11,3,7,1)}, {TRI(10,6,14,1), TRI(6,16,14,0), TRI(16,12,14,0), TRI(11,7,19,1)}, 0, 1};
+    static CASE c255 = {{}, {}, 0, 0};
 
     table(0)=c0;
     table(1)=c1;
@@ -95,21 +163,28 @@ Initialize_Case_Table(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table)
     table(105)=c105;
     table(125)=c125;
     table(151)=c151;
+    table(255)=c255;
 
-    UNION_FIND<> uf(256);
-    int base[256];
-    for(int c=0;c<256;c++){
-        base[c]=c;
-        uf.Union(c,flip(c,1));
-        uf.Union(c,flip(c,2));
-        uf.Union(c,flip(c,4));
-        uf.Union(c,swapyz(c));
-        if(!has_ambig(c)) uf.Union(c,255-c);}
+    Initialize_Neighbor_Cases(table,1);
+    Initialize_Neighbor_Cases(table,3);
+    Initialize_Neighbor_Cases(table,6);
+    Initialize_Neighbor_Cases(table,22);
+    Initialize_Neighbor_Cases(table,23);
+    Initialize_Neighbor_Cases(table,24);
+    Initialize_Neighbor_Cases(table,25);
+    Initialize_Neighbor_Cases(table,27);
+    Initialize_Neighbor_Cases(table,60);
+    Initialize_Neighbor_Cases(table,61);
+    Initialize_Neighbor_Cases(table,69);
+    Initialize_Neighbor_Cases(table,85);
+    Initialize_Neighbor_Cases(table,101);
+    Initialize_Neighbor_Cases(table,105);
+    Initialize_Neighbor_Cases(table,125);
+    Initialize_Neighbor_Cases(table,151);
 
-    for(int c=0;c<256;c++){
-        int p=uf.Find(c);
-        if(base[p]>c) base[p]=c;
-        base[c]=base[p];}
+    for(int c=1;c<256;c++)
+        if(!table(c).elements[0])
+            printf("missing: %i\n", c);
 }
 template class MARCHING_CUBES_3D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
