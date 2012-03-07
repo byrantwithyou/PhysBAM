@@ -101,7 +101,7 @@ Initialize_Case_Table(ARRAY<typename MARCHING_CUBES_3D<T>::CASE>& table)
     static CASE c3 = {{TRI(4,9,8,1), TRI(9,4,5,0)}, {TRI(12,4,8,1), TRI(5,13,9,0)}, 0, 1};
     static CASE c6 = {{TRI(5,9,0,1), TRI(10,1,4,1)}, {TRI(5,13,9,1), TRI(4,14,10,1)}, 0, 1};
     static CASE c22 = {{TRI(5,9,0,1), TRI(2,6,8,1), TRI(10,1,4,1)}, {TRI(5,13,9,1), TRI(6,16,8,1), TRI(10,4,14,1)}, 0, 1};
-    static CASE c23 = {{TRI(10,1,6,1), TRI(1,2,6,0), TRI(1,5,2,0), TRI(5,9,2,0)}, {TRI(10,6,14,1), TRI(6,16,14,0), TRI(16,12,14,0)}, 0, 1};
+    static CASE c23 = {{TRI(10,1,6,1), TRI(1,2,6,0), TRI(1,5,2,0), TRI(5,9,2,0)}, {TRI(10,6,14,1), TRI(6,16,14,0), TRI(16,12,14,0), TRI(5,13,9,0)}, 0, 1};
     static CASE c24 = {{TRI(2,6,8,1), TRI(5,1,11,1)}, {TRI(6,16,8,1), TRI(5,11,15,1)}, 0, 1};
     static CASE c25 = {{TRI(2,6,4,1), TRI(2,4,0,0), TRI(5,1,11,1)}, {TRI(6,16,4,1), TRI(16,12,4,0), TRI(15,5,11,1)}, 0, 1};
     static CASE c27 = {{TRI(2,6,4,1), TRI(2,4,1,0), TRI(2,1,9,0), TRI(1,11,9,0)}, {TRI(6,12,4,1), TRI(6,16,12,0), TRI(11,13,9,0), TRI(11,15,13,0)}, 0, 1};
