@@ -12,6 +12,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_MAPPING.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 
 using namespace PhysBAM;
@@ -66,16 +67,10 @@ void Integration_Test(int argc,char* argv[])
     vdy_stencil.Differentiate(1);
     vdy_stencil.Dice_Stencil();
 
-    ARRAY<int,TV_INT> index_map_p(grid.Domain_Indices());
-    int k=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        index_map_p(it.index)=k++;
-    ARRAY<int,TV_INT> index_map_u(index_map_p),index_map_v(index_map_p);
-    index_map_v+=grid.counts.Product();
-    index_map_p+=2*grid.counts.Product();
+    CELL_MAPPING<TV> index_map_p(grid),index_map_u(grid),index_map_v(grid);
 
     SYSTEM_MATRIX_HELPER<T> helper;
-    BASIS_INTEGRATION_UNIFORM<TV> biu(grid);
+    BASIS_INTEGRATION_UNIFORM<TV> biu(grid,grid);
     biu.boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
     biu.boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
 

@@ -14,6 +14,7 @@ namespace PhysBAM{
 
 template<class TV> class GRID;
 template<class TV> class BASIS_STENCIL_UNIFORM;
+template<class TV> class CELL_MAPPING;
 template<class T> class SYSTEM_MATRIX_HELPER;
 
 template<class TV>
@@ -23,6 +24,7 @@ public:
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     const GRID<TV>& grid;
+    const GRID<TV>& phi_grid;
 
     enum BOUNDARY_CONDITION {undefined, periodic, dirichlet, neumann};
 
@@ -52,10 +54,10 @@ public:
         MULTIVARIATE_POLYNOMIAL<TV> polynomial;
     };
 
-    BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input);
+    BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input);
     ~BASIS_INTEGRATION_UNIFORM();
 
-    void Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& s0, const BASIS_STENCIL_UNIFORM<TV>& s1, const ARRAY<int,TV_INT>& index_map0, const ARRAY<int,TV_INT>& index_map1);
+    void Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& s0, const BASIS_STENCIL_UNIFORM<TV>& s1, CELL_MAPPING<TV>& cm0, CELL_MAPPING<TV>& cm1);
 };
 }
 #endif

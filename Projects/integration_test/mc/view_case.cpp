@@ -21,7 +21,7 @@ TV corners[8];
 
 FILE * F = 0;
 
-V2 to2d(TV p) {return latex_x*p.x+latex_y*p.y+latex_z*p.z;}
+V2 to2d(TV p) {return latex_x*p.x+latex_y*p.y+latex_z*(1-p.z);}
 
 void pt(V2 p) {fprintf(F, "(%.3f,%.3f)", p.x, p.y);}
 
@@ -49,7 +49,7 @@ void circ(TV a,T r,const char* opts) {circ(to2d(a), r, opts);}
 void norm(TV a,TV b,TV c,const char* linecolor, const char* color, T width, T opacity, T normal_length)
 {
     TV u=(a+b+c)/3;
-    TV v=u+normal_length*TV::Cross_Product(c-a,b-a).Normalized();
+    TV v=u+normal_length*TV::Cross_Product(b-a,c-a).Normalized();
     fprintf(F, "\\psline[linewidth=%.3f,linecolor=%s]{->}", width, color);
     pt(u);
     pt(v);
@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
     F = fopen(file.c_str(), "w");
     char buff[1000];
 
-    V2 mx_pt=to2d(TV(1,1,1));
+    V2 mx_pt=to2d(TV(1,1,0));
     T margin=.5;
     fprintf(F, "\\documentclass{article}\n");
     fprintf(F, "\\usepackage[margin=0cm,papersize={%.3fcm,%.3fcm}]{geometry}\n", mx_pt.x*5+5*margin, mx_pt.y*5+5*margin);
@@ -154,11 +154,11 @@ int main(int argc, char* argv[])
     typedef std::pair<float, PAIR<int,const char*> > pr;
     for(int i=0,c=-1;i<MARCHING_CUBES_3D_CASE::max_elements && cs.elements[i];i++){
         if(cs.elements[i]&0x8000) c++;
-        tris.insert(pr(-((points[cs.elements[i]&31]+points[(cs.elements[i]>>5)&31]+points[(cs.elements[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.elements[i],mc_tri_col[c])));}
+        tris.insert(pr(((points[cs.elements[i]&31]+points[(cs.elements[i]>>5)&31]+points[(cs.elements[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.elements[i],mc_tri_col[c])));}
 
     for(int i=0,c=-1;i<MARCHING_CUBES_3D_CASE::sheet_elements && cs.boundary[i];i++){
         if(cs.boundary[i]&0x8000) c++;
-        tris.insert(pr(-((points[cs.boundary[i]&31]+points[(cs.boundary[i]>>5)&31]+points[(cs.boundary[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.boundary[i],ex_tri_col[c])));}
+        tris.insert(pr(((points[cs.boundary[i]&31]+points[(cs.boundary[i]>>5)&31]+points[(cs.boundary[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.boundary[i],ex_tri_col[c])));}
 
     for(std::map<float, PAIR<int,const char*> >::iterator it=tris.begin(); it!=tris.end(); it++)
         tri(points[it->second.x&31], points[(it->second.x>>5)&31], points[(it->second.x>>10)&31], "black", it->second.y, tri_edge_width, .5, .1);
@@ -174,7 +174,7 @@ int main(int argc, char* argv[])
         circ(corners[v],corner_radius,buff);}
 
     if(case_number>=0){
-        TV p(1.2,-.1,0);
+        TV p(1.2,-.1,1);
         T dx=.2;
         TV a(1,0,0),b(0,0,1);
         if(cs.proj_dir==0) a=TV(0,1,0);
@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
         pt(q+b*dx);
         fprintf(F, "\n");
         sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", cs.enclose_inside?"red":"black");
-        circ(TV(1.3,0,.1),corner_radius/2,buff);
+        circ(TV(1.3,0,.9),corner_radius/2,buff);
         fprintf(F, "\\pspolygon[linestyle=none,fillcolor=%s,fillstyle=solid,opacity=%.3f]", rgb[cs.proj_dir], .5);
         pt(p);
         pt(p+a*dx);
