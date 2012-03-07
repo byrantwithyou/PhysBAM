@@ -185,6 +185,7 @@ public:
         T& collision_time,TV& normal,TV& weights,T& relative_speed,const bool exit_early) const;
     void Clip_To_Box(const RANGE<TV>& box,ARRAY<TRIANGLE_3D<T> >& clipped_simplices) const;
     static void Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles);
+    static void Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles,ARRAY<TRIANGLE_3D<T> >& positive_triangles); // TODO: Alexey
 //#####################################################################
 };
 
