@@ -2,8 +2,11 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_3D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
 static int edge_lookup[8][8];
 static int vertex_lookup[12][2];
@@ -18,7 +21,9 @@ Case_Table()
 {
     static ARRAY<MARCHING_CUBES_3D_CASE> table;
     static bool filled=false;
-    if(!filled) Initialize_Case_Table(table);
+    if(!filled){
+        Initialize_Case_Table(table);
+        filled=true;}
     return table;
 }
 //#####################################################################
@@ -149,10 +154,45 @@ Initialize_Case_Table(ARRAY<MARCHING_CUBES_3D_CASE>& table)
     Initialize_Neighbor_Cases(table,105);
     Initialize_Neighbor_Cases(table,125);
     Initialize_Neighbor_Cases(table,151);
+}
+//#####################################################################
+// Function Create_Surface
+//#####################################################################
+template<class T> void MARCHING_CUBES_3D<T>::
+Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi)
+{
+    VECTOR<TV_INT,8> bits=GRID<TV>::Binary_Counts(TV_INT());
 
-    for(int c=1;c<256;c++)
-        if(!table(c).elements[0])
-            printf("missing: %i\n", c);
+    VECTOR<T,8> phis;
+    TV pts[20];
+
+    const ARRAY<MARCHING_CUBES_3D_CASE>& table=Case_Table();
+
+    for(UNIFORM_ARRAY_ITERATOR<TV::m> it(phi.domain.To_Half_Opened());it.Valid();it.Next()){
+        int c=0;
+        for(int i=0;i<bits.m;i++){
+            TV_INT ind=it.index+bits(i);
+            pts[i+12]=grid.Node(ind);
+            phis(i)=phi(ind);
+            c|=(phis(i)<0)<<i;}
+        for(int i=0;i<12;i++){
+            int v0=vertex_lookup[i][0];
+            int v1=vertex_lookup[i][1];
+            if(((c>>v0)^(c>>v1))&1){
+                T t=phis(v0)/(phis(v0)-phis(v1));
+                pts[i]=pts[v0+12]+t*(pts[v1+12]-pts[v0+12]);}}
+
+        const MARCHING_CUBES_3D_CASE& cs=table(c);
+
+        for(int i=0;i<MARCHING_CUBES_3D_CASE::max_elements && cs.elements[i];i++){
+            int e0=cs.elements[i]&31,e1=(cs.elements[i]>>5)&31,e2=(cs.elements[i]>>10)&31;
+            pts[e0];
+            pts[e1];
+            pts[e2];
+            
+        }
+    }
+
 }
 template class MARCHING_CUBES_3D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

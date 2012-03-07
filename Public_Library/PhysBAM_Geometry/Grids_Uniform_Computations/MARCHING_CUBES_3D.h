@@ -11,12 +11,12 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
-template<class T> class TRIANGLE_3D;
+template<class T> class TRIANGULATED_SURFACE;
 
 /*
   scccccbbbbbaaaaa
-  aaaaa, bbbbb, ccccc = vertex index (0-7 cube vertices, 8-19 cube edges)
-  s = sheet index (0 or 1)
+  aaaaa, bbbbb, ccccc = vertex index (12-19 cube vertices, 0-11 cube edges)
+  s = start new sheet (0 or 1)
  */
 struct MARCHING_CUBES_3D_CASE
 {
@@ -39,6 +39,7 @@ public:
     static const ARRAY<MARCHING_CUBES_3D_CASE>& Case_Table();
     static void Initialize_Case_Table(ARRAY<MARCHING_CUBES_3D_CASE>& table);
     static void Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_3D_CASE>& table, int c);
+    static void Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
 //#####################################################################
 };
 }
