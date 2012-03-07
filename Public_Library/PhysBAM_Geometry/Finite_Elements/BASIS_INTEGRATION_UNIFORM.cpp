@@ -8,14 +8,15 @@
 #include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_MAPPING.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> BASIS_INTEGRATION_UNIFORM<TV>::
-BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input)
-    :grid(grid_input)
+BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input)
+    :grid(grid_input),phi_grid(phi_grid_input)
 {
 }
 //#####################################################################
@@ -29,7 +30,7 @@ template<class TV> BASIS_INTEGRATION_UNIFORM<TV>::
 // Function Compute_Matrix
 //#####################################################################
 template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
-Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& s0, const BASIS_STENCIL_UNIFORM<TV>& s1, const ARRAY<int,TV_INT>& index_map0, const ARRAY<int,TV_INT>& index_map1)
+Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& s0, const BASIS_STENCIL_UNIFORM<TV>& s1, CELL_MAPPING<TV>& cm0, CELL_MAPPING<TV>& cm1)
 {
     ARRAY<OVERLAP_POLYNOMIALS> overlap_polynomials;
     for(int i=0;i<s0.diced.m;i++)
@@ -55,15 +56,8 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& 
             me.index0+=it.index;
             me.index1+=it.index;
 
-            for(int j=0;j<TV::m;j++)
-                if(boundary_conditions.min_corner(j)==periodic){
-                    if(me.index0(j)<0) me.index0(j)+=grid.counts(j);
-                    if(me.index0(j)>=grid.counts(j)) me.index0(j)-=grid.counts(j);
-                    if(me.index1(j)<0) me.index1(j)+=grid.counts(j);
-                    if(me.index1(j)>=grid.counts(j)) me.index1(j)-=grid.counts(j);}
-
-            int i0=index_map0(me.index0);
-            int i1=index_map1(me.index1);
+            int i0=cm0.Get_Index(me.index0,0);
+            int i1=cm1.Get_Index(me.index1,0);
             assert(i0>=0 && i1>=0);
 
             helper.data.Append(TRIPLE<int,int,T>(i0,i1,me.x));}}
