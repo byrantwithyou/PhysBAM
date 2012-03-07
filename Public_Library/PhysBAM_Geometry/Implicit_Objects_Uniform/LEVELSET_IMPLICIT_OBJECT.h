@@ -81,4 +81,5 @@ public:
 //###########################################################################
 };
 }
+#include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Uniform/READ_WRITE_LEVELSET_IMPLICIT_OBJECT.h>
 #endif

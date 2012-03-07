@@ -3,4 +3,5 @@
 Import('env Automatic_Program')
 Automatic_Program(env,"integration_test",["main.cpp"])
 Automatic_Program(env,"mc/view_case",["mc/view_case.cpp"])
+Automatic_Program(env,"mc/view_levelset",["mc/view_levelset.cpp"])
 

@@ -12,6 +12,7 @@
 namespace PhysBAM{
 
 template<class T> class TRIANGULATED_SURFACE;
+template<class TV> class GRID;
 
 /*
   scccccbbbbbaaaaa

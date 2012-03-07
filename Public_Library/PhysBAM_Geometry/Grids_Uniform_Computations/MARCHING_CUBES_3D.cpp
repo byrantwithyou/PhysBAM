@@ -59,7 +59,6 @@ Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_3D_CASE>& table, int c)
     for(int p=0;p<6;p++){
         int b=permute_case(c, permute_map[p]);
         if(!table(b).elements[0]){
-            printf("permute[%i] %i -> %i\n", p, c, b);
             for(int i=0;i<MARCHING_CUBES_3D_CASE::max_elements;i++) table(b).elements[i]=TRI_ORIENT_MAP(table(c).elements[i],permute_map[p]);
             for(int i=0;i<MARCHING_CUBES_3D_CASE::sheet_elements;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],permute_map[p]);
             if(p>=3 && table(c).proj_dir!=p-3) table(b).proj_dir=6-table(c).proj_dir-p;
@@ -70,28 +69,27 @@ Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_3D_CASE>& table, int c)
     if(!has_ambig(c)){
         int b=255-c;
         if(!table(b).elements[0]){
-            printf("inv %i -> %i\n", c, b);
             table(b)=table(c);
             table(b).enclose_inside=1-table(b).enclose_inside;
             Initialize_Neighbor_Cases(table, b);}}
 }
 static MARCHING_CUBES_3D_CASE c0 = {{}, {}, 0, 1};
-static MARCHING_CUBES_3D_CASE c1 = {{TRI(0,8,4,1)}, {TRI(12,4,8,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c3 = {{TRI(4,9,8,1), TRI(9,4,5,0)}, {TRI(12,4,8,1), TRI(5,13,9,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c6 = {{TRI(5,9,0,1), TRI(10,1,4,1)}, {TRI(5,13,9,1), TRI(4,14,10,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c22 = {{TRI(5,9,0,1), TRI(2,6,8,1), TRI(10,1,4,1)}, {TRI(5,13,9,1), TRI(6,16,8,1), TRI(10,4,14,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c23 = {{TRI(10,1,6,1), TRI(1,2,6,0), TRI(1,5,2,0), TRI(5,9,2,0)}, {TRI(10,6,14,1), TRI(6,16,14,0), TRI(16,12,14,0), TRI(5,13,9,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c24 = {{TRI(2,6,8,1), TRI(5,1,11,1)}, {TRI(6,16,8,1), TRI(5,11,15,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c25 = {{TRI(2,6,4,1), TRI(2,4,0,0), TRI(5,1,11,1)}, {TRI(6,16,4,1), TRI(16,12,4,0), TRI(15,5,11,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c27 = {{TRI(2,6,4,1), TRI(2,4,1,0), TRI(2,1,9,0), TRI(1,11,9,0)}, {TRI(6,12,4,1), TRI(6,16,12,0), TRI(11,13,9,0), TRI(11,15,13,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c60 = {{TRI(7,6,8,1), TRI(7,8,9,0), TRI(4,10,5,1), TRI(5,10,11,0)}, {TRI(6,16,8,1), TRI(17,7,9,0), TRI(4,14,10,1), TRI(15,5,11,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c61 = {{TRI(7,6,9,1), TRI(6,0,9,0), TRI(6,5,0,0), TRI(6,11,5,0), TRI(6,10,11,0)}, {TRI(10,6,14,1), TRI(14,6,16,0), TRI(12,14,16,0), TRI(11,15,5,0), TRI(7,9,17,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c69 = {{TRI(1,6,3,1), TRI(1,8,6,0), TRI(1,0,8,0)}, {TRI(14,18,6,1), TRI(14,6,8,0), TRI(14,8,12,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c85 = {{TRI(1,0,2,1), TRI(1,2,3,0)}, {TRI(12,14,16,1), TRI(14,18,16,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c101 = {{TRI(1,6,3,1), TRI(1,8,6,0), TRI(1,0,8,0), TRI(7,2,9,1)}, {TRI(14,18,6,1), TRI(14,6,8,0), TRI(14,8,12,0), TRI(17,7,9,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c105 = {{TRI(8,4,0,1), TRI(9,7,2,1), TRI(1,11,5,1), TRI(3,10,6,1)}, {TRI(8,12,4,1), TRI(9,17,7,1), TRI(5,11,15,1), TRI(6,10,18,1)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c125 = {{TRI(11,5,3,1), TRI(3,5,0,0), TRI(3,0,9,0), TRI(3,9,7,0)}, {TRI(17,7,9,1), TRI(11,15,5,0), TRI(12,14,16,0), TRI(14,18,16,0)}, 0, 1};
-static MARCHING_CUBES_3D_CASE c151 = {{TRI(10,1,6,1), TRI(1,2,6,0), TRI(1,5,2,0), TRI(5,9,2,0), TRI(11,3,7,1)}, {TRI(10,6,14,1), TRI(6,16,14,0), TRI(16,12,14,0), TRI(5,13,9,0), TRI(11,7,19,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c1 = {{TRI(8,0,4,1)}, {TRI(4,12,8,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c3 = {{TRI(9,4,8,1), TRI(4,9,5,0)}, {TRI(4,12,8,1), TRI(13,5,9,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c6 = {{TRI(9,5,0,1), TRI(1,10,4,1)}, {TRI(13,5,9,1), TRI(14,4,10,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c22 = {{TRI(9,5,0,1), TRI(6,2,8,1), TRI(1,10,4,1)}, {TRI(13,5,9,1), TRI(16,6,8,1), TRI(4,10,14,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c23 = {{TRI(1,10,6,1), TRI(2,1,6,0), TRI(5,1,2,0), TRI(9,5,2,0)}, {TRI(6,10,14,1), TRI(16,6,14,0), TRI(12,16,14,0), TRI(13,5,9,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c24 = {{TRI(6,2,8,1), TRI(1,5,11,1)}, {TRI(16,6,8,1), TRI(11,5,15,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c25 = {{TRI(6,2,4,1), TRI(4,2,0,0), TRI(1,5,11,1)}, {TRI(16,6,4,1), TRI(12,16,4,0), TRI(5,15,11,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c27 = {{TRI(6,2,4,1), TRI(4,2,1,0), TRI(1,2,9,0), TRI(11,1,9,0)}, {TRI(12,6,4,1), TRI(16,6,12,0), TRI(13,11,9,0), TRI(15,11,13,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c60 = {{TRI(6,7,8,1), TRI(8,7,9,0), TRI(10,4,5,1), TRI(10,5,11,0)}, {TRI(16,6,8,1), TRI(7,17,9,0), TRI(14,4,10,1), TRI(5,15,11,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c61 = {{TRI(6,7,9,1), TRI(0,6,9,0), TRI(5,6,0,0), TRI(11,6,5,0), TRI(10,6,11,0)}, {TRI(6,10,14,1), TRI(6,14,16,0), TRI(14,12,16,0), TRI(15,11,5,0), TRI(9,7,17,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c69 = {{TRI(6,1,3,1), TRI(8,1,6,0), TRI(0,1,8,0)}, {TRI(18,14,6,1), TRI(6,14,8,0), TRI(8,14,12,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c85 = {{TRI(0,1,2,1), TRI(2,1,3,0)}, {TRI(14,12,16,1), TRI(18,14,16,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c101 = {{TRI(6,1,3,1), TRI(8,1,6,0), TRI(0,1,8,0), TRI(2,7,9,1)}, {TRI(18,14,6,1), TRI(6,14,8,0), TRI(8,14,12,0), TRI(7,17,9,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c105 = {{TRI(4,8,0,1), TRI(7,9,2,1), TRI(11,1,5,1), TRI(10,3,6,1)}, {TRI(12,8,4,1), TRI(17,9,7,1), TRI(11,5,15,1), TRI(10,6,18,1)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c125 = {{TRI(5,11,3,1), TRI(5,3,0,0), TRI(0,3,9,0), TRI(9,3,7,0)}, {TRI(7,17,9,1), TRI(15,11,5,0), TRI(14,12,16,0), TRI(18,14,16,0)}, 0, 1};
+static MARCHING_CUBES_3D_CASE c151 = {{TRI(1,10,6,1), TRI(2,1,6,0), TRI(5,1,2,0), TRI(9,5,2,0), TRI(3,11,7,1)}, {TRI(6,10,14,1), TRI(16,6,14,0), TRI(12,16,14,0), TRI(13,5,9,0), TRI(7,11,19,1)}, 0, 1};
 static MARCHING_CUBES_3D_CASE c255 = {{}, {}, 0, 0};
 //#####################################################################
 // Function Initialize_Case_Table
@@ -167,8 +165,10 @@ Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY
     TV pts[20];
 
     const ARRAY<MARCHING_CUBES_3D_CASE>& table=Case_Table();
+    
+    HASHTABLE<FACE_INDEX<TV::m>,int> ht;
 
-    for(UNIFORM_ARRAY_ITERATOR<TV::m> it(phi.domain.To_Half_Opened());it.Valid();it.Next()){
+    for(UNIFORM_ARRAY_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
         int c=0;
         for(int i=0;i<bits.m;i++){
             TV_INT ind=it.index+bits(i);
@@ -183,16 +183,23 @@ Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY
                 pts[i]=pts[v0+12]+t*(pts[v1+12]-pts[v0+12]);}}
 
         const MARCHING_CUBES_3D_CASE& cs=table(c);
+        printf("case %i\n", c);
 
         for(int i=0;i<MARCHING_CUBES_3D_CASE::max_elements && cs.elements[i];i++){
-            int e0=cs.elements[i]&31,e1=(cs.elements[i]>>5)&31,e2=(cs.elements[i]>>10)&31;
-            pts[e0];
-            pts[e1];
-            pts[e2];
-            
+            TV_INT face;
+            for(int j=0;j<3;j++){
+                int e=(cs.elements[i]>>5*j)&31;
+                FACE_INDEX<TV::m> fi(e/4,it.index+bits(vertex_lookup[e][0]));
+                if(!ht.Get(fi,face(j))){
+                    int index=surface.particles.array_collection->Add_Element();
+                    face(j)=index;
+                    ht.Set(fi,index);
+                    surface.particles.X(index)=pts[e];}}
+            if(!cs.enclose_inside) exchange(face.x,face.y);
+            surface.mesh.elements.Append(face);
         }
     }
-
+    surface.Update_Number_Nodes();
 }
 template class MARCHING_CUBES_3D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
