@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
@@ -160,20 +161,17 @@ template<class T> void MARCHING_CUBES_3D<T>::
 Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi)
 {
     VECTOR<TV_INT,8> bits=GRID<TV>::Binary_Counts(TV_INT());
-
     VECTOR<T,8> phis;
     TV pts[20];
-
     const ARRAY<MARCHING_CUBES_3D_CASE>& table=Case_Table();
-    
     HASHTABLE<FACE_INDEX<TV::m>,int> ht;
 
     for(UNIFORM_ARRAY_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
         int c=0;
         for(int i=0;i<bits.m;i++){
-            TV_INT ind=it.index+bits(i);
-            pts[i+12]=grid.Node(ind);
-            phis(i)=phi(ind);
+            TV_INT index=it.index+bits(i);
+            pts[i+12]=grid.Node(index);
+            phis(i)=phi(index);
             c|=(phis(i)<0)<<i;}
         for(int i=0;i<12;i++){
             int v0=vertex_lookup[i][0];
@@ -200,6 +198,53 @@ Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY
         }
     }
     surface.Update_Number_Nodes();
+}
+
+//#####################################################################
+// Function Get_Triangles_For_Cell
+//#####################################################################
+template<class T> void MARCHING_CUBES_3D<T>::
+Get_Triangles_For_Cell(ARRAY<TRIANGLE_3D<T> >& surface,ARRAY<TRIANGLE_3D<T> >& boundary,int& direction,bool& enclose_inside,const ARRAY<T,TV_INT>& phi,const TV_INT& cell)
+{
+    VECTOR<TV_INT,8> bits=GRID<TV>::Binary_Counts(TV_INT());
+    VECTOR<T,8> phis;
+    TV pts[20];
+    const ARRAY<MARCHING_CUBES_3D_CASE>& table=Case_Table();
+
+    int c=0;
+    for(int i=0;i<bits.m;i++){
+        pts[i+12].x=(T)bits(i).x;
+        pts[i+12].y=(T)bits(i).y;
+        pts[i+12].z=(T)bits(i).z;
+        phis(i)=phi(cell+bits(i));
+        c|=(phis(i)<0)<<i;}
+        
+    for(int i=0;i<12;i++){
+        int v0=vertex_lookup[i][0];
+        int v1=vertex_lookup[i][1];
+        if(((c>>v0)^(c>>v1))&1){
+            T t=phis(v0)/(phis(v0)-phis(v1));
+            pts[i]=pts[v0+12]+t*(pts[v1+12]-pts[v0+12]);}}
+
+    const MARCHING_CUBES_3D_CASE& cs=table(c);
+    printf("case %i\n", c);
+    
+    for(int i=0;i<MARCHING_CUBES_3D_CASE::max_elements && cs.elements[i];i++){
+        TRIANGLE_3D<T> face;
+        for(int j=0;j<3;j++){
+            int e=(cs.elements[i]>>5*j)&31;
+            face.X(j)=pts[e];}
+        if(!cs.enclose_inside) exchange(face.X(0),face.X(1));
+        surface.Append(face);}
+    for(int i=0;i<MARCHING_CUBES_3D_CASE::sheet_elements && cs.boundary[i];i++){
+        TRIANGLE_3D<T> face;
+        for(int j=0;j<3;j++){
+            int e=(cs.boundary[i]>>5*j)&31;
+            face.X(j)=pts[e];}
+        if(!cs.enclose_inside) exchange(face.X(0),face.X(1));
+        surface.Append(face);}
+    direction=cs.proj_dir;
+    enclose_inside=cs.enclose_inside;
 }
 template class MARCHING_CUBES_3D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

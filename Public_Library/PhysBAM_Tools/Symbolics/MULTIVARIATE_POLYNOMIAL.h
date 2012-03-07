@@ -59,7 +59,7 @@ struct MULTIVARIATE_POLYNOMIAL
     void Shift(const TV& shift);
     void Exchange_Variables(int u,int v);
     T Definite_Integral(RANGE<TV>& domain) const;
-    T Integrate_Triangle(const VECTOR<TV>& vertices) const;
+    T Integrate_Triangle(const VECTOR<TV,3>& vertices) const; // TODO: Alexey
 };
 
 template<class TV>

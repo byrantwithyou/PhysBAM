@@ -12,6 +12,7 @@
 namespace PhysBAM{
 
 template<class T> class TRIANGULATED_SURFACE;
+template<class T> class TRIANGLE_3D;
 template<class TV> class GRID;
 
 /*
@@ -41,8 +42,8 @@ public:
     static void Initialize_Case_Table(ARRAY<MARCHING_CUBES_3D_CASE>& table);
     static void Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_3D_CASE>& table, int c);
     static void Create_Surface(TRIANGULATED_SURFACE<T>& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
-    static void Get_Triangles_For_Cell(ARRAY<TRIANGLE_3D<T> >& surface,ARRAY<TRIANGLE_3D<T> >& boundary,int& direction,bool& encloses_inside,
-        const ARRAY<T,TV_INT>& phi,const TV_INT& cell); // TODO: Alexey
+    static void Get_Triangles_For_Cell(ARRAY<TRIANGLE_3D<T> >& surface,ARRAY<TRIANGLE_3D<T> >& boundary,int& direction,bool& enclose_inside,
+        const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
 //#####################################################################
 };
 }
