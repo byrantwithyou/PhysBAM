@@ -226,10 +226,10 @@ Definite_Integral(const RANGE<TV>& domain) const
     return s;
 }
 //#####################################################################
-// Function Integrate_Over_Triangle
+// Function Integrate_Over_Primitive
 //#####################################################################
 template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
-Integrate_Over_Triangle(const VECTOR<TV,TV::m>& vertices) const
+Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const
 {
     MULTIVARIATE_POLYNOMIAL<TV> copy=(*this);
 
@@ -276,6 +276,15 @@ Integrate_Over_Triangle(const VECTOR<TV,TV::m>& vertices) const
         integral+=factorial[power(0)]*factorial[power(1)]/factorial[power(0)+power(1)+2];}
 
     return integral*TV::Cross_Product(a,b).Magnitude();
+}
+//#####################################################################
+// Function Integrate_Over_Primitive
+//#####################################################################
+template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
+Integrate_Over_Primitive(const VECTOR<TV,2>& vertices) const
+{
+    PHYSBAM_FATAL_ERROR();
+    return 0;
 }
 //#####################################################################
 // Function operator<<

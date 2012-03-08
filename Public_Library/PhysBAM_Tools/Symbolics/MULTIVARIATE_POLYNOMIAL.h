@@ -61,7 +61,8 @@ struct MULTIVARIATE_POLYNOMIAL
     void Shear(int v,int w,T shift); // v -> v + shift * w
     void Exchange_Variables(int u,int v);
     T Definite_Integral(const RANGE<TV>& domain) const;
-    T Integrate_Over_Triangle(const VECTOR<TV,TV::m>& vertices) const;
+    T Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const; // triangle
+    T Integrate_Over_Primitive(const VECTOR<TV,2>& vertices) const; // interval
 };
 
 template<class TV>
