@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;
@@ -21,6 +22,7 @@ template<class TV>
 class BASIS_INTEGRATION_UNIFORM:public NONCOPYABLE
 {
 public:
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
     const GRID<TV>& grid;
@@ -29,6 +31,9 @@ public:
     enum BOUNDARY_CONDITION {undefined, periodic, dirichlet, neumann};
 
     RANGE<TV_INT> boundary_conditions;
+    const BASIS_STENCIL_UNIFORM<TV>& s0,s1;
+    CELL_MAPPING<TV>& cm0,&cm1;
+    const ARRAY<T,TV_INT>& phi;
 
     struct MATRIX_ENTRY
     {
@@ -46,6 +51,7 @@ public:
             x+=me.x;
         }
     };
+    ARRAY<MATRIX_ENTRY> open_entries; // stencil with no boundary conditions
 
     struct OVERLAP_POLYNOMIALS
     {
@@ -53,11 +59,19 @@ public:
         RANGE<TV_INT> range; // Subset of [-1,1)
         MULTIVARIATE_POLYNOMIAL<TV> polynomial;
     };
+    ARRAY<OVERLAP_POLYNOMIALS> overlap_polynomials;
 
-    BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input);
+    BASIS_INTEGRATION_UNIFORM(const RANGE<TV_INT> boundary_conditions_input,const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,
+        const BASIS_STENCIL_UNIFORM<TV>& s0_input,const BASIS_STENCIL_UNIFORM<TV>& s1_input,CELL_MAPPING<TV>& cm0_input,
+        CELL_MAPPING<TV>& cm1_input,const ARRAY<T,TV_INT>& phi_input);
     ~BASIS_INTEGRATION_UNIFORM();
 
-    void Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV>& s0, const BASIS_STENCIL_UNIFORM<TV>& s1, CELL_MAPPING<TV>& cm0, CELL_MAPPING<TV>& cm1);
+    void Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper);
+    void Add_Uncut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside);
+    void Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,const TV_INT& cell,int dir,bool inside,const TV_INT& sub_cell,const OVERLAP_POLYNOMIALS& op);
+    void Cut_Elements(ARRAY<ARRAY<T_FACE>,TV_INT>& cut_elements,const ARRAY<T_FACE>& elements,const RANGE<TV_INT>& range,const RANGE<TV>& domain,int dir);
+    void Compute_Overlap_Polynomials();
+    void Compute_Open_Entries();
 };
 }
 #endif

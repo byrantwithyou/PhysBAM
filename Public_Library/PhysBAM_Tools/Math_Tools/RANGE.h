@@ -16,9 +16,9 @@
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <cassert>
 #include <cfloat>
+#include <iostream>
 #include <limits>
 #include <string>
-#include <iostream>
 namespace PhysBAM{
 
 template<class TV> class RANGE;

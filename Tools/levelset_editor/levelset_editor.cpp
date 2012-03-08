@@ -14,6 +14,7 @@
 #include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MOUSE_HANDLER.h>
@@ -23,7 +24,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_BASIC.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
 
 #define SIGMA 0.5
 

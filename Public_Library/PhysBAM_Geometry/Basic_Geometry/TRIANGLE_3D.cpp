@@ -283,12 +283,11 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
         case 3: // in positive halfspace
             break;}
 }
-
 //#####################################################################
 // Function Cut_With_Hyperplane
 //#####################################################################
 template<class T> void TRIANGLE_3D<T>::
-Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles,ARRAY<TRIANGLE_3D<T> >& positive_triangles)
+Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles,ARRAY<TRIANGLE_3D<T> >& positive_triangles,T tol)
 {
     VECTOR<T,3> phi_nodes;
     VECTOR<VECTOR<T,3>,3> X_nodes;
@@ -308,18 +307,20 @@ Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
             for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
                 VECTOR<VECTOR<T,3>,2> interface_locations;int index=(i+1)%3;
+                VECTOR<T,2> theta;
                 VECTOR<int,2> other_locations;
                 for(int j=0;j<2;j++,index=(index+1)%3){
                     other_locations(j)=index;
-                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes(i),X_nodes(index),LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index)));}
+                    theta(j)=LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index));
+                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes(i),X_nodes(index),theta(j));}
                 if(positive_count==1){ // add 2 negative and 1 positive
-                    negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
-                    negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));
-                    positive_triangles.Append(TRIANGLE_3D<T>(X_nodes(i),interface_locations(0),interface_locations(1)));}
+                    if(1-theta(0)>tol) negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
+                    if(1-theta(1)>tol) negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));
+                    if(theta(0)>tol && theta(1)>tol) positive_triangles.Append(TRIANGLE_3D<T>(X_nodes(i),interface_locations(0),interface_locations(1)));}
                 else{ // add 2 positive and 1 negative
-                    positive_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
-                    positive_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));
-                    negative_triangles.Append(TRIANGLE_3D<T>(X_nodes(i),interface_locations(0),interface_locations(1)));}
+                    if(1-theta(0)>tol) positive_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
+                    if(1-theta(1)>tol) positive_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));
+                    if(theta(0)>tol && theta(1)>tol) negative_triangles.Append(TRIANGLE_3D<T>(X_nodes(i),interface_locations(0),interface_locations(1)));}
                 return;}
         case 3: // in positive halfspace
             positive_triangles.Append(triangle);break;

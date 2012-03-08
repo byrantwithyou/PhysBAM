@@ -11,13 +11,13 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_3D.h>
 using namespace PhysBAM;
 
 typedef float T;
@@ -44,12 +44,12 @@ int main(int argc, char* argv[])
         phi.Fill(1);
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,-1);it.Valid();it.Next())
             phi(it.index)=random.Get_Uniform_Number(-1,1);
-        MARCHING_CUBES_3D<T>::Create_Surface(ts,grid,phi);}
+        MARCHING_CUBES<TV>::Create_Surface(ts,grid,phi);}
     else{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* io;
         FILE_UTILITIES::Create_From_File<T>(input,io);
         ARRAY<T,TV_INT>& phi=io->levelset.phi;
-        MARCHING_CUBES_3D<T>::Create_Surface(ts,io->levelset.grid,phi);
+        MARCHING_CUBES<TV>::Create_Surface(ts,io->levelset.grid,phi);
         delete io;}
 
     ts.mesh.Initialize_Boundary_Mesh();

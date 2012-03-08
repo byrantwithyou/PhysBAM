@@ -284,6 +284,37 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,c
             break;}
 }
 //#####################################################################
+// Function Cut_With_Hyperplane
+//#####################################################################
+template<class T> void SEGMENT_2D<T>::
+Cut_With_Hyperplane(const SEGMENT_2D<T>& segment,const LINE_2D<T>& cutting_plane,ARRAY<SEGMENT_2D<T> >& negative_segments,ARRAY<SEGMENT_2D<T> >& positive_segments,T tol)
+{
+    VECTOR<T,2> phi_nodes;
+    VECTOR<VECTOR<T,2>,2> X_nodes;
+    X_nodes(0)=segment.x1;
+    X_nodes(1)=segment.x2;
+    for(int i=0;i<2;i++){phi_nodes[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
+    int positive_count=0;
+    for(int i=0;i<2;i++) if(phi_nodes[i]>0) positive_count++;
+    switch(positive_count){
+        case 0: // in negative halfspace
+            negative_segments.Append(segment);break;
+        case 1:{
+            // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
+            T theta=LEVELSET_UTILITIES<T>::Theta(phi_nodes[0],phi_nodes[1]);
+            TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,2> >::Linear(X_nodes[0],X_nodes[1],theta);
+            if(phi_nodes[0]>0){
+                if(1-theta>tol) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));
+                if(theta>tol) positive_segments.Append(SEGMENT_2D<T>(segment.x1,interface_location));}
+            else{
+                if(theta>tol) negative_segments.Append(SEGMENT_2D<T>(segment.x1,interface_location));
+                if(1-theta>tol) positive_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));}
+            break;}
+        case 2: // in positive halfspace
+            positive_segments.Append(segment);break;
+            break;}
+}
+//#####################################################################
 // Function Clip_To_Box_Helper
 //#####################################################################
 template<class T> bool
