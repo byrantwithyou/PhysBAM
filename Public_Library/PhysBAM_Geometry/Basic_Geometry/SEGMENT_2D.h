@@ -145,6 +145,7 @@ public:
         TV& interaction_normal,TV& weights,T& relative_speed,const bool allow_negative_weights,const bool exit_early) const;
     void Clip_To_Box(const RANGE<TV>& box,ARRAY<SEGMENT_2D<T> >& clipped_simplices) const;
     static void Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,const LINE_2D<T>& cutting_plane,ARRAY<SEGMENT_2D<T> >& negative_segments);
+    static void Cut_With_Hyperplane(const SEGMENT_2D<T>& segment,const LINE_2D<T>& cutting_plane,ARRAY<SEGMENT_2D<T> >& negative_segments,ARRAY<SEGMENT_2D<T> >& positive_segments,T tol=0);
     bool Clip_To_Box(const RANGE<TV>& box,T& a,T& b) const;
 //#####################################################################
 };

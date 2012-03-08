@@ -144,9 +144,31 @@ Shift_Variable(int v,T shift)
         for(int j=1;j<mx;j++)
             table[i][j]=table[i-1][j-1]*shift+table[i-1][j];}
     for(int i=terms.m-1;i>=0;i--){
-    for(int j=1;j<=terms(i).power(v);j++){
-        terms.Append(MULTIVARIATE_MONOMIAL<TV>(terms(i).power,terms(i).coeff*table[terms(i).power(v)][j]));
-        terms.Last().power(v)-=j;}}
+        for(int j=1;j<=terms(i).power(v);j++){
+            terms.Append(MULTIVARIATE_MONOMIAL<TV>(terms(i).power,terms(i).coeff*table[terms(i).power(v)][j]));
+            terms.Last().power(v)-=j;}}
+    Simplify();
+}
+//#####################################################################
+// Function Shift_Variable
+//#####################################################################
+template<class TV> void MULTIVARIATE_POLYNOMIAL<TV>::
+Shear(int v,int w,T shift) // v -> v + shift * w
+{
+    int mx=Max_Power()(v);
+    assert(mx<20);
+    T table[20][20];
+    table[0][0]=1;
+    for(int i=1;i<=mx;i++){
+        table[i][0]=1;
+        table[i][i]=table[i-1][i-1]*shift;
+        for(int j=1;j<mx;j++)
+            table[i][j]=table[i-1][j-1]*shift+table[i-1][j];}
+    for(int i=terms.m-1;i>=0;i--){
+        for(int j=1;j<=terms(i).power(v);j++){
+            terms.Append(MULTIVARIATE_MONOMIAL<TV>(terms(i).power,terms(i).coeff*table[terms(i).power(v)][j]));
+            terms.Last().power(v)-=j;
+            terms.Last().power(w)+=j;}}
     Simplify();
 }
 //#####################################################################
@@ -172,7 +194,7 @@ Exchange_Variables(int u,int v)
 // Function Definite_Integral
 //#####################################################################
 template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
-Definite_Integral(RANGE<TV>& domain) const
+Definite_Integral(const RANGE<TV>& domain) const
 {
     TV_INT max_power=Max_Power()+1;
     assert(max_power.Max()<20);

@@ -70,9 +70,9 @@ void Integration_Test(int argc,char* argv[])
     CELL_MAPPING<TV> index_map_p(grid),index_map_u(grid),index_map_v(grid);
 
     SYSTEM_MATRIX_HELPER<T> helper;
-    BASIS_INTEGRATION_UNIFORM<TV> biu(grid,grid);
-    biu.boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
-    biu.boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
+    RANGE<TV_INT> boundary_conditions;
+    boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
+    boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
 
     LOG::cout<<"u ";u_stencil.Print();
     LOG::cout<<"v ";v_stencil.Print();
@@ -82,38 +82,40 @@ void Integration_Test(int argc,char* argv[])
     LOG::cout<<"udy ";udy_stencil.Print();
     LOG::cout<<"vdy ";vdy_stencil.Print();
 
+    ARRAY<T,TV_INT> phi;
+
     LOG::cout<<"udx udx"<<std::endl;
-    biu.Compute_Matrix(helper, udx_stencil, udx_stencil, index_map_u, index_map_u);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,udx_stencil,udx_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
     helper.Scale(2*mu);
     LOG::cout<<"udy udy"<<std::endl;
-    biu.Compute_Matrix(helper, udy_stencil, udy_stencil, index_map_u, index_map_u);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,udy_stencil,udy_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
     helper.Scale(mu);
     LOG::cout<<"udy vdx"<<std::endl;
-    biu.Compute_Matrix(helper, udy_stencil, vdx_stencil, index_map_u, index_map_v);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,udy_stencil,vdx_stencil,index_map_u,index_map_v,phi).Compute_Matrix(helper);
     helper.Scale(mu);
     LOG::cout<<"vdx udy"<<std::endl;
-    biu.Compute_Matrix(helper, vdx_stencil, udy_stencil, index_map_v, index_map_u);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,vdx_stencil,udy_stencil,index_map_v,index_map_u,phi).Compute_Matrix(helper);
     helper.Scale(mu);
     LOG::cout<<"vdx vdx"<<std::endl;
-    biu.Compute_Matrix(helper, vdx_stencil, vdx_stencil, index_map_v, index_map_v);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,vdx_stencil,vdx_stencil,index_map_v,index_map_v,phi).Compute_Matrix(helper);
     helper.Scale(2*mu);
     LOG::cout<<"vdy vdy"<<std::endl;
-    biu.Compute_Matrix(helper, vdy_stencil, vdy_stencil, index_map_v, index_map_v);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,vdy_stencil,vdy_stencil,index_map_v,index_map_v,phi).Compute_Matrix(helper);
     helper.Scale(mu);
     LOG::cout<<"udx p"<<std::endl;
-    biu.Compute_Matrix(helper, udx_stencil, p_stencil, index_map_u, index_map_p);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,udx_stencil,p_stencil,index_map_u,index_map_p,phi).Compute_Matrix(helper);
 //    helper.Scale(mu);
     LOG::cout<<"vdy p"<<std::endl;
-    biu.Compute_Matrix(helper, vdy_stencil, p_stencil, index_map_v, index_map_p);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,vdy_stencil,p_stencil,index_map_v,index_map_p,phi).Compute_Matrix(helper);
 //    helper.Scale(mu);
     LOG::cout<<"p udx"<<std::endl;
-    biu.Compute_Matrix(helper, p_stencil, udx_stencil, index_map_p, index_map_u);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,p_stencil,udx_stencil,index_map_p,index_map_u,phi).Compute_Matrix(helper);
 //    helper.Scale(mu);
     LOG::cout<<"p vdy"<<std::endl;
-    biu.Compute_Matrix(helper, p_stencil, vdy_stencil, index_map_p, index_map_v);
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,p_stencil,vdy_stencil,index_map_p,index_map_v,phi).Compute_Matrix(helper);
 //    helper.Scale(mu);
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
-    helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix, 1e-14);
+    helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix,1e-14);
 
     OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
 };

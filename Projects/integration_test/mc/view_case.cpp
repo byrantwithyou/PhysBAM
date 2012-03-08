@@ -102,8 +102,8 @@ int main(int argc, char* argv[])
     T tri_edge_width=parse_args.Get_Double_Value("-tri_edge_width");
     std::string file=parse_args.Get_String_Value("-o");
 
-    const ARRAY<MARCHING_CUBES_3D_CASE>& table=MARCHING_CUBES_3D<T>::Case_Table();
-    const MARCHING_CUBES_3D_CASE& cs = table(case_number>=0?case_number:0);
+    const ARRAY<MARCHING_CUBES_CASE<3> >& table=MARCHING_CUBES<TV>::Case_Table();
+    const MARCHING_CUBES_CASE<3>& cs = table(case_number>=0?case_number:0);
 
     F = fopen(file.c_str(), "w");
     char buff[1000];
@@ -152,11 +152,11 @@ int main(int argc, char* argv[])
     const char * mc_tri_col[4] = {"red", "green", "blue", "magenta"};
     const char * ex_tri_col[4] = {"dkred", "dkgreen", "dkblue", "dkmagenta"};
     typedef std::pair<float, PAIR<int,const char*> > pr;
-    for(int i=0,c=-1;i<MARCHING_CUBES_3D_CASE::max_elements && cs.elements[i];i++){
-        if(cs.elements[i]&0x8000) c++;
-        tris.insert(pr(((points[cs.elements[i]&31]+points[(cs.elements[i]>>5)&31]+points[(cs.elements[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.elements[i],mc_tri_col[c])));}
+    for(int i=0,c=-1;i<MARCHING_CUBES_CASE<3>::max_surface && cs.surface[i];i++){
+        if(cs.surface[i]&0x8000) c++;
+        tris.insert(pr(((points[cs.surface[i]&31]+points[(cs.surface[i]>>5)&31]+points[(cs.surface[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.surface[i],mc_tri_col[c])));}
 
-    for(int i=0,c=-1;i<MARCHING_CUBES_3D_CASE::sheet_elements && cs.boundary[i];i++){
+    for(int i=0,c=-1;i<MARCHING_CUBES_CASE<3>::max_boundary && cs.boundary[i];i++){
         if(cs.boundary[i]&0x8000) c++;
         tris.insert(pr(((points[cs.boundary[i]&31]+points[(cs.boundary[i]>>5)&31]+points[(cs.boundary[i]>>10)&31])/3).z,PAIR<int,const char*>(cs.boundary[i],ex_tri_col[c])));}
 

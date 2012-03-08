@@ -57,9 +57,10 @@ struct MULTIVARIATE_POLYNOMIAL
     void Scale_Variables(const TV& scale);
     void Shift_Variable(int v,T shift);
     void Shift(const TV& shift);
+    void Shear(int v,int w,T shift); // v -> v + shift * w
     void Exchange_Variables(int u,int v);
-    T Definite_Integral(RANGE<TV>& domain) const;
-    T Integrate_Triangle(const VECTOR<TV,3>& vertices) const; // TODO: Alexey
+    T Definite_Integral(const RANGE<TV>& domain) const;
+    T Integrate_Triangle(const VECTOR<TV,TV::m>& vertices) const; // TODO: Alexey
 };
 
 template<class TV>

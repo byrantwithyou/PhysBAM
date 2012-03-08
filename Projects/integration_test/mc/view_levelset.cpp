@@ -44,12 +44,12 @@ int main(int argc, char* argv[])
         phi.Fill(1);
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,-1);it.Valid();it.Next())
             phi(it.index)=random.Get_Uniform_Number(-1,1);
-        MARCHING_CUBES_3D<T>::Create_Surface(ts,grid,phi);}
+        MARCHING_CUBES<TV>::Create_Surface(ts,grid,phi);}
     else{
         LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* io;
         FILE_UTILITIES::Create_From_File<T>(input,io);
         ARRAY<T,TV_INT>& phi=io->levelset.phi;
-        MARCHING_CUBES_3D<T>::Create_Surface(ts,io->levelset.grid,phi);
+        MARCHING_CUBES<TV>::Create_Surface(ts,io->levelset.grid,phi);
         delete io;}
 
     ts.mesh.Initialize_Boundary_Mesh();
