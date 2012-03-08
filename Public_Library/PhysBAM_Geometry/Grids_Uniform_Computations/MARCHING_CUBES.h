@@ -2,10 +2,10 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class MARCHING_CUBES_3D
+// Class MARCHING_CUBES
 //#####################################################################
-#ifndef __MARCHING_CUBES_3D__
-#define __MARCHING_CUBES_3D__
+#ifndef __MARCHING_CUBES__
+#define __MARCHING_CUBES__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
