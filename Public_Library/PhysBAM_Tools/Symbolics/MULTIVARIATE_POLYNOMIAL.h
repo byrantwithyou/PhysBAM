@@ -23,16 +23,9 @@ struct MULTIVARIATE_MONOMIAL
     MULTIVARIATE_MONOMIAL(): coeff(0) {}
     MULTIVARIATE_MONOMIAL(const TV_INT& p, T c): power(p), coeff(c) {}
 
-    bool operator< (const MULTIVARIATE_MONOMIAL& m) const
-    {
-        return LEXICOGRAPHIC_COMPARE()(m.power,power); // Leading monomial first
-    }
-
-    void Merge(MULTIVARIATE_MONOMIAL& m)
-    {
-        assert(power==m.power);
-        coeff+=m.coeff;
-    }
+    bool operator< (const MULTIVARIATE_MONOMIAL& m) const {return LEXICOGRAPHIC_COMPARE()(m.power,power);} // Leading monomial first
+    void Merge(MULTIVARIATE_MONOMIAL& m) {assert(power==m.power); coeff+=m.coeff;}
+    int Power_Sum() const {int sum=0; for(int v=0;v<TV::m;v++) sum+=power(v); return sum;}
 };
 
 template<class TV>

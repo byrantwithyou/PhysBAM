@@ -46,10 +46,7 @@ template<class TV> int MULTIVARIATE_POLYNOMIAL<TV>::
 Max_Power_Sum() const
 {
     int mps=0;
-    for(int i=0;i<terms.m;i++){
-        int sum=0;
-        for(int v=0;v<TV::m;v++) sum+=terms(i).power(v);
-        mps=max(mps,sum);}
+    for(int i=0;i<terms.m;i++) mps=max(mps,terms(i).Power_Sum());
     return mps;
 }
 //#####################################################################
@@ -240,8 +237,7 @@ Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const
     TV_INT mp=copy.Max_Power();
     assert(mp.Max()<20);
     T table[TV::m][20][20];
-    for(int v=0;v<TV::m;v++)
-    {
+    for(int v=0;v<TV::m;v++){
         table[v][0][0]=1;
         for(int i=1;i<=mp(v);i++){
             table[v][i][0]=table[v][i-1][0]*a(v);
@@ -273,7 +269,7 @@ Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const
     T integral=0;
     for(int i=0;i<barycentric.terms.m;i++){
         TV_INT2 power=barycentric.terms(i).power;
-        integral+=factorial[power(0)]*factorial[power(1)]/factorial[power(0)+power(1)+2];}
+        integral+=barycentric.terms(i).coeff*factorial[power(0)]*factorial[power(1)]/factorial[power(0)+power(1)+2];}
 
     return integral*TV::Cross_Product(a,b).Magnitude();
 }
@@ -283,8 +279,35 @@ Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const
 template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
 Integrate_Over_Primitive(const VECTOR<TV,2>& vertices) const
 {
-    PHYSBAM_FATAL_ERROR();
-    return 0;
+    MULTIVARIATE_POLYNOMIAL<TV> copy=(*this);
+
+    copy.Shift(vertices(0));
+    TV a=vertices(1)-vertices(0);
+
+    TV_INT mp=copy.Max_Power();
+    assert(mp.Max()<20);
+    T table[TV::m][20];
+    for(int v=0;v<TV::m;v++){
+        table[v][0]=1;
+        for(int i=1;i<=mp(v);i++) table[v][i]=table[v][i-1]*a(v);}
+    
+    typedef VECTOR<T,1> TV1;
+    typedef VECTOR<int,1> TV_INT1;
+
+    MULTIVARIATE_POLYNOMIAL<TV1> barycentric;
+    for(int i=0;i<copy.terms.m;i++){
+        TV_INT power=copy.terms(i).power;
+        int scale=1;
+        for(int v=0;v<TV::m;v++) scale*=table[v][power(v)];
+        barycentric.terms.Append(MULTIVARIATE_MONOMIAL<TV1>(TV_INT1(copy.terms(i).Power_Sum()),copy.terms(i).coeff*scale));}
+    barycentric.Simplify();
+    
+    T integral=0;
+    for(int i=0;i<barycentric.terms.m;i++){
+        TV_INT1 power=barycentric.terms(i).power;
+        integral+=barycentric.terms(i).coeff/(power(0)+1);}
+
+    return integral*a.Magnitude();
 }
 //#####################################################################
 // Function operator<<
