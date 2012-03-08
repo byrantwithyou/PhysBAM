@@ -11,15 +11,13 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> MULTIVARIATE_POLYNOMIAL<TV>::
 MULTIVARIATE_POLYNOMIAL()
-{
-}
+{}
 //#####################################################################
 // Destructor
 //#####################################################################
 template<class TV> MULTIVARIATE_POLYNOMIAL<TV>::
 ~MULTIVARIATE_POLYNOMIAL()
-{
-}
+{}
 //#####################################################################
 // Function Simplify
 //#####################################################################
@@ -191,6 +189,14 @@ Definite_Integral(RANGE<TV>& domain) const
             t*=powers[1][j][p1(j)]-powers[0][j][p1(j)];
         s+=t;}
     return s;
+}
+//#####################################################################
+// Function Integrate_Over_Triangle
+//#####################################################################
+template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
+Integrate_Over_Triangle(const VECTOR<TV,3>& vertices) const
+{
+    
 }
 //#####################################################################
 // Function operator<<
