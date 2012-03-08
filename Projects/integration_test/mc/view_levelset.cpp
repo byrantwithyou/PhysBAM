@@ -17,7 +17,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_3D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 using namespace PhysBAM;
 
 typedef float T;

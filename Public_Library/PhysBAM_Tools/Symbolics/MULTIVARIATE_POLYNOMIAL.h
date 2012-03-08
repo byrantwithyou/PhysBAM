@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2012.
+// Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Class MULTIVARIATE_POLYNOMIAL
@@ -48,6 +48,7 @@ struct MULTIVARIATE_POLYNOMIAL
 
     void Simplify();
     TV_INT Max_Power() const;
+    int Max_Power_Sum() const;
     MULTIVARIATE_POLYNOMIAL& operator+= (const MULTIVARIATE_POLYNOMIAL& m);
     MULTIVARIATE_POLYNOMIAL& operator-= (const MULTIVARIATE_POLYNOMIAL& m);
     MULTIVARIATE_POLYNOMIAL& operator*= (const MULTIVARIATE_POLYNOMIAL& m);

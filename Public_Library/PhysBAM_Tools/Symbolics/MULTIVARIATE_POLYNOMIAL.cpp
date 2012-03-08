@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2012.
+// Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
@@ -38,6 +38,19 @@ Max_Power() const
     TV_INT mp;
     for(int i=0;i<terms.m;i++) mp=mp.Componentwise_Max(mp,terms(i).power);
     return mp;
+}
+//#####################################################################
+// Function Max_Power_Sum
+//#####################################################################
+template<class TV> int MULTIVARIATE_POLYNOMIAL<TV>::
+Max_Power_Sum() const
+{
+    int mps=0;
+    for(int i=0;i<terms.m;i++){
+        int sum=0;
+        for(int v=0;v<TV::m;v++) sum+=terms(i).power(v);
+        mps=max(mps,sum);}
+    return mps;
 }
 //#####################################################################
 // Operator +=
@@ -216,9 +229,53 @@ Definite_Integral(const RANGE<TV>& domain) const
 // Function Integrate_Over_Triangle
 //#####################################################################
 template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
-Integrate_Over_Triangle(const VECTOR<TV,3>& vertices) const
+Integrate_Over_Triangle(const VECTOR<TV,TV::m>& vertices) const
 {
+    MULTIVARIATE_POLYNOMIAL<TV> copy=(*this);
+
+    copy.Shift(vertices(0));
+    TV a=vertices(1)-vertices(0);
+    TV b=vertices(1)-vertices(0);
     
+    TV_INT mp=copy.Max_Power();
+    assert(mp.Max()<20);
+    T table[TV::m][20][20];
+    for(int v=0;v<TV::m;v++)
+    {
+        table[v][0][0]=1;
+        for(int i=1;i<=mp(v);i++){
+            table[v][i][0]=table[v][i-1][0]*a(v);
+            table[v][i][i]=table[v][i-1][i-1]*b(v);
+            for(int j=1;j<mp(v);j++)
+                table[v][i][j]=table[v][i-1][j-1]*b(v)+table[v][i-1][j]*a(v);}}
+    
+    typedef VECTOR<T,2> TV2;
+    typedef VECTOR<int,2> TV_INT2;
+
+    MULTIVARIATE_POLYNOMIAL<TV2> barycentric;
+    for(int i=0;i<copy.terms.m;i++){
+        MULTIVARIATE_POLYNOMIAL<TV2> monomial;
+        monomial.terms.Append(MULTIVARIATE_MONOMIAL<TV2>(TV_INT2(0,0),copy.terms(i).coeff));
+        for(int v=0;v<TV::m;v++){
+            MULTIVARIATE_POLYNOMIAL<TV2> variable;
+            int n=copy.terms(i).power(v);
+            for(int j=0;j<=n;j++){
+                variable.terms.Append(MULTIVARIATE_MONOMIAL<TV2>(TV_INT2(j,n-j),table[v][n][j]));}
+            monomial*=variable;}
+        barycentric+=monomial;}
+    
+    int max_factorial=barycentric.Max_Power_Sum()+2;
+    assert(max_factorial<20);
+    T factorial[20];
+    factorial[0]=(T)1;
+    for(int i=1;i<=max_factorial;i++) factorial[i]=factorial[i-1]*i;        
+
+    T integral=0;
+    for(int i=0;i<barycentric.terms.m;i++){
+        TV_INT2 power=barycentric.terms(i).power;
+        integral+=factorial[power(0)]*factorial[power(1)]/factorial[power(0)+power(1)+2];}
+
+    return integral*TV::Cross_Product(a,b).Magnitude();
 }
 //#####################################################################
 // Function operator<<

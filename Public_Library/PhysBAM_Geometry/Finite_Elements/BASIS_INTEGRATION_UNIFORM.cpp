@@ -158,7 +158,7 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
 
     T integral=0;
     for(int i=0;i<projected_elements.m;i++)
-        integral+=op.polynomial.Integrate_Triangle(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)))*projected_elements(i).Normal()(dir);
+        integral+=op.polynomial.Integrate_Over_Triangle(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)))*projected_elements(i).Normal()(dir);
 
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,inside),integral));
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,!inside),-integral));
