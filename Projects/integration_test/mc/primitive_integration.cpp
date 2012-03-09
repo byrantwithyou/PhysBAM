@@ -12,6 +12,8 @@ using namespace PhysBAM;
 typedef double T;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<int,3> TV_INT;
+typedef VECTOR<T,2> TV2;
+typedef VECTOR<int,2> TV_INT2;
 
 int main(int argc, char* argv[])
 {
@@ -67,7 +69,7 @@ int main(int argc, char* argv[])
         for(int ix=0;ix<5;ix++)
         for(int iy=0;iy<5;iy++)
         for(int iz=0;iz<5;iz++)
-            if(ix+iy+iz<=5) F.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT(ix,iy,iz),1));
+            if(ix+iy+iz<=5) F.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT(ix,iy,iz),random.Get_Uniform_Number(-1,1)));
 
         TV min_corner(random.Get_Uniform_Number(-1,1),random.Get_Uniform_Number(-1,1),random.Get_Uniform_Number(-1,1));
         TV max_corner(random.Get_Uniform_Number(0,1),random.Get_Uniform_Number(0,1),random.Get_Uniform_Number(0,1));
@@ -105,6 +107,39 @@ int main(int argc, char* argv[])
             F.Integrate_Over_Primitive(triangle2)-
             F.Integrate_Over_Primitive(triangle3)-
             F.Integrate_Over_Primitive(triangle4)<<std::endl;
+    }
+
+    LOG::cout<<"### POLYNOMIAL OVER A BOX 2D"<<std::endl;
+    {
+        RANDOM_NUMBERS<T> random;
+        MULTIVARIATE_POLYNOMIAL<TV2> F;
+        
+        for(int ix=0;ix<5;ix++)
+        for(int iy=0;iy<5;iy++)
+            if(ix+iy<=5) F.terms.Append(MULTIVARIATE_MONOMIAL<TV2>(TV_INT2(ix,iy),random.Get_Uniform_Number(-1,1)));
+
+        TV2 min_corner(random.Get_Uniform_Number(-1,1),random.Get_Uniform_Number(-1,1));
+        TV2 max_corner(random.Get_Uniform_Number(0,1),random.Get_Uniform_Number(0,1));
+        max_corner+=min_corner;
+        RANGE<TV2> range(min_corner,max_corner);
+
+        LOG::cout<<"range "<<range<<std::endl;
+        LOG::cout<<"poly "<<F<<std::endl;
+        LOG::cout<<"integral   "<<F.Definite_Integral(range)<<std::endl;
+        F.Integrate(1);
+
+        VECTOR<TV2,2> interval1;
+        VECTOR<TV2,2> interval2;
+        
+        interval1(0)=TV2(min_corner(0),max_corner(1));
+        interval1(1)=TV2(max_corner(0),max_corner(1));
+
+        interval2(0)=TV2(min_corner(0),min_corner(1));
+        interval2(1)=TV2(max_corner(0),min_corner(1));
+
+        LOG::cout<<"divergence "<<
+            F.Integrate_Over_Primitive(interval1)-
+            F.Integrate_Over_Primitive(interval2)<<std::endl;
     }
     
     return 0;
