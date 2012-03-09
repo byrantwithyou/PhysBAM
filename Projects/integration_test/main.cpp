@@ -2,14 +2,15 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MAPPING.h>
@@ -40,21 +41,21 @@ void Integration_Test(int argc,char* argv[])
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/s;
     (void)m;
 
-    GRID<TV> grid(TV_INT()+6,RANGE<TV>(TV(),TV()+1),true);
+    GRID<TV> grid(TV_INT()+8,RANGE<TV>(TV(),TV()+1),true);
+    GRID<TV> coarse_grid(grid.counts/2,grid.domain,true);
+    ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
+    SPHERE<TV> sphere(TV()+(T).5,(T).5);
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
+        phi(it.index)=sphere.Signed_Distance(coarse_grid.Node(it.index));
 
     BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
     p_stencil.Set_Center();
-//    p_stencil.Set_Multilinear_Stencil();
     p_stencil.Set_Constant_Stencil();
     p_stencil.Dice_Stencil();
     u_stencil.Set_Face(0);
-//    u_stencil.Set_Node();
-    v_stencil.Set_Center();
     u_stencil.Set_Multilinear_Stencil();
     u_stencil.Dice_Stencil();
     v_stencil.Set_Face(1);
-//    v_stencil.Set_Node();
-    v_stencil.Set_Center();
     v_stencil.Set_Multilinear_Stencil();
     v_stencil.Dice_Stencil();
     BASIS_STENCIL_UNIFORM<TV> udx_stencil(u_stencil),udy_stencil(u_stencil),vdx_stencil(v_stencil),vdy_stencil(v_stencil);
@@ -68,6 +69,9 @@ void Integration_Test(int argc,char* argv[])
     vdy_stencil.Dice_Stencil();
 
     CELL_MAPPING<TV> index_map_p(grid),index_map_u(grid),index_map_v(grid);
+    index_map_p.periodic.Fill(true);
+    index_map_u.periodic.Fill(true);
+    index_map_v.periodic.Fill(true);
 
     SYSTEM_MATRIX_HELPER<T> helper;
     RANGE<TV_INT> boundary_conditions;
@@ -81,8 +85,6 @@ void Integration_Test(int argc,char* argv[])
     LOG::cout<<"vdx ";vdx_stencil.Print();
     LOG::cout<<"udy ";udy_stencil.Print();
     LOG::cout<<"vdy ";vdy_stencil.Print();
-
-    ARRAY<T,TV_INT> phi;
 
     LOG::cout<<"udx udx"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,udx_stencil,udx_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
@@ -104,16 +106,12 @@ void Integration_Test(int argc,char* argv[])
     helper.Scale(mu);
     LOG::cout<<"udx p"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,udx_stencil,p_stencil,index_map_u,index_map_p,phi).Compute_Matrix(helper);
-//    helper.Scale(mu);
     LOG::cout<<"vdy p"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,vdy_stencil,p_stencil,index_map_v,index_map_p,phi).Compute_Matrix(helper);
-//    helper.Scale(mu);
     LOG::cout<<"p udx"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,p_stencil,udx_stencil,index_map_p,index_map_u,phi).Compute_Matrix(helper);
-//    helper.Scale(mu);
     LOG::cout<<"p vdy"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,grid,p_stencil,vdy_stencil,index_map_p,index_map_v,phi).Compute_Matrix(helper);
-//    helper.Scale(mu);
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix,1e-14);
 
