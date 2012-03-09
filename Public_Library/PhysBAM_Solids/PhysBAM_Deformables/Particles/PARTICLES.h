@@ -10,8 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/CENTER.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/EULER_STEP.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 
@@ -47,14 +45,11 @@ public:
     {return mass.Size()?mass.Max():0;}
 
     void Euler_Step_Position(const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(X,V,dt);}
+    {X+=dt*V;}
 
     template<class T_INDICES>
     void Euler_Step_Position(const T_INDICES& indices,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,X,V,dt);}
-
-    TV Center_Of_Mass()
-    {return POINT_CLOUDS_COMPUTATIONS::Weighted_Center(X,mass);}
+    {X.Subset(indices)+=dt*V.Subset(indices);}
 
 //#####################################################################
     TV Center_Of_Mass() const;

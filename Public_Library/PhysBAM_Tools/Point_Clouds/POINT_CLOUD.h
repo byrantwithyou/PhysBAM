@@ -10,15 +10,12 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/RANGE_COMPUTATIONS.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_FORWARD.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/CENTER.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/EULER_STEP.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <memory>
 namespace PhysBAM{
@@ -33,15 +30,13 @@ public:
 
     ARRAY_COLLECTION* array_collection;
     ARRAY_VIEW<TV> X;
-    ARRAY_VIEW<int> id; //TODO: Replace dynamic one with this
-    bool store_id;
 
     POINT_CLOUD(ARRAY_COLLECTION* array_collection_input)
-        :array_collection(array_collection_input),X(0,0),id(0,0),store_id(false)
+        :array_collection(array_collection_input),X(0,0)
     {Initialize_Array_Collection();}
 
     POINT_CLOUD()
-        :array_collection(new ARRAY_COLLECTION()),X(0,0),id(0,0),store_id(false)
+        :array_collection(new ARRAY_COLLECTION()),X(0,0)
     {Initialize_Array_Collection();}
 
     virtual ~POINT_CLOUD()
@@ -50,21 +45,18 @@ public:
     void Initialize_Array_Collection()
     {array_collection->Add_Array(ATTRIBUTE_ID_X,&X);}
 
-    void Store_Id(bool store=true)
-    {store_id=store;if(store) array_collection->Add_Array(ATTRIBUTE_ID_ID,&id);else array_collection->Remove_Array(ATTRIBUTE_ID_ID);}
-
     template<class T_INDICES>
     void Euler_Step(const T_INDICES& indices,const ARRAY<TV>& V,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,X.array,V,dt);}
+    {X.Subset(indices)+=dt*V.Subset(indices);}
 
     TV Weighted_Center(ARRAY<T> weights)
-    {return POINT_CLOUDS_COMPUTATIONS::Weighted_Center(X,weights);}
+    {typename TV::SCALAR total=weights.Sum();return total?X.Weighted_Sum(weights)/total:TV();}
 
     RANGE<TV> Compute_Bounding_Box()
-    {return ARRAYS_COMPUTATIONS::Compute_Range(X.array);}
+    {return RANGE<TV>::Bounding_Box(X.array);}
 
     TV Centroid()
-    {return X.array.Average();};
+    {return X.Average();};
 
     void Clone_Helper(const POINT_CLOUD<TV>& particles)
     {array_collection->Initialize(*particles.array_collection);}

@@ -38,8 +38,8 @@ template<class TV> PARTICLES<TV>::
 template<class TV> TV PARTICLES<TV>::
 Center_Of_Mass() const
 {
-    if(this->store_mass) return POINT_CLOUDS_COMPUTATIONS::Weighted_Center(this->X,this->mass);
-    return this->array_collection->Size()?this->X.Sum()/(T)this->array_collection->Size():TV(); // default to treating mass as one
+    if(this->store_mass) return Weighted_Center(mass);
+    return X.Average(); // default to treating mass as one
 }
 //#####################################################################
 // Function Compute_Auxiliary_Attributes

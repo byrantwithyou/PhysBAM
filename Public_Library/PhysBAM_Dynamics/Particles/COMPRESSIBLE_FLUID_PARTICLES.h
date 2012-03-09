@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/EULER_STEP.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -33,19 +32,19 @@ public:
 
     template<class T_INDICES>
     void Euler_Step_Grad_Phi(const T_INDICES& indices,const ARRAY<TV>& X,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,X,grad_phi.array,dt);}
+    {X.Subset(indices)+=dt*grad_phi.Subset(indices);}
 
     template<class T_INDICES>
     void Euler_Step_Grad_Phi(const T_INDICES& indices,const ARRAY<TV>& F,const ARRAY<T>& mass,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,grad_phi.array,F,mass,dt);}
+    {grad_phi.array.Subset(indices)+=dt/mass.Subset(indices)*F.Subset(indices);}
 
     template<class T_INDICES>
     void Euler_Step_Velocity(const T_INDICES& indices,const ARRAY<TV>& X,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,X,V.array,dt);}
+    {X.Subset(indices)+=dt*V.Subset(indices);}
 
     template<class T_INDICES>
     void Euler_Step_Velocity(const T_INDICES& indices,const ARRAY<TV>& F,const ARRAY<T>& mass,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,V.array,F,mass,dt);}
+    {V.Subset(indices)+=dt/mass.Subset(indices)*F.Subset(indices);}
 };
 }
 #endif

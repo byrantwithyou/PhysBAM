@@ -126,7 +126,7 @@ public:
     {Static_Assert_Not_Small();T result=0;for(int i=0;i<Size();i++) result+=(*this)(i);return result;}
 
     T Average() const
-    {Static_Assert_Not_Small();return Sum()/Size();}
+    {Static_Assert_Not_Small();return Size()?Sum()/Size():T();}
 
     T Product() const
     {Static_Assert_Not_Small();T result=1;for(int i=0;i<Size();i++) result*=(*this)(i);return result;}

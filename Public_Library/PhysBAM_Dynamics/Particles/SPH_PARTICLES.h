@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/EULER_STEP.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -28,11 +27,11 @@ public:
 
     template<class T_INDICES>
     void Euler_Step(const T_INDICES& indices,const ARRAY<TV>& X,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,X,V.array,dt);}
+    {X.Subset(indices)+=dt*V.Subset(indices);}
 
     template<class T_INDICES>
     void Euler_Step(const T_INDICES& indices,const ARRAY<TV>& F,const ARRAY<T>& mass,const T dt)
-    {POINT_CLOUDS_COMPUTATIONS::Euler_Step(indices,V.array,F,mass,dt);}
+    {V.Subset(indices)+=dt/mass.Subset(indices)*F.Subset(indices);}
 };
 }
 #endif
