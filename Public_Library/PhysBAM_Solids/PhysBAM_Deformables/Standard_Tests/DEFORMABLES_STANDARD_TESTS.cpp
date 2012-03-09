@@ -402,7 +402,7 @@ Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspe
 // Function Embed_Particles_In_Tetrahedralized_Volume
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,DEFORMABLE_PARTICLES<VECTOR<T,3> > >& particles_to_embed,
+Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const PARTICLES_SUBSET<VECTOR<T,3>,DEFORMABLE_PARTICLES<VECTOR<T,3> > >& particles_to_embed,
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two)
 {
     bool tetrahedron_list_initialized=tetrahedralized_volume.tetrahedron_list!=0;if(!tetrahedron_list_initialized) tetrahedralized_volume.Update_Tetrahedron_List();

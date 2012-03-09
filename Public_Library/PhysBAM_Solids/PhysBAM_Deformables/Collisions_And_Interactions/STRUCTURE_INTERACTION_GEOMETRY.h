@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/choice.h>
 #include <PhysBAM_Tools/Parallel_Computation/PARTITION_ID.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_SUBSET.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_SUBSET.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
@@ -29,7 +29,7 @@ class STRUCTURE_INTERACTION_GEOMETRY
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,1>::OBJECT T_SEGMENTED_CURVE;
 public:
     GEOMETRY_PARTICLES<TV>& full_particles;
-    POINT_CLOUD_SUBSET<TV,GEOMETRY_PARTICLES<TV> > collision_particles;
+    PARTICLES_SUBSET<TV,GEOMETRY_PARTICLES<TV> > collision_particles;
     TRIANGULATED_SURFACE<T>* triangulated_surface;
     T_SEGMENTED_CURVE* segmented_curve;
     POINT_SIMPLICES_1D<T>* point_simplices;

@@ -17,7 +17,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Shaders/VOLUMETRIC_SHADER.h>

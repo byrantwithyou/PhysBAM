@@ -1,6 +1,6 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
@@ -13,10 +13,10 @@ using namespace PhysBAM;
 template<class TV>
 void Read_Particles(const STREAM_TYPE& stream_type,const std::string& file)
 {
-    POINT_CLOUD<TV> particles;
+    PARTICLES<TV> particles;
     FILE_UTILITIES::Read_From_File(stream_type,file,particles);
     for(int i=0;i<particles.array_collection->Size();i++)
-        Read_Write<POINT_CLOUD<TV>,typename TV::SCALAR>::Print(std::cout,particles,i);
+        Read_Write<PARTICLES<TV>,typename TV::SCALAR>::Print(std::cout,particles,i);
 }
 
 int main(int argc,char *argv[])

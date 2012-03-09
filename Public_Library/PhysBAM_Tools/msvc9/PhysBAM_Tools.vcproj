@@ -2022,15 +2022,15 @@
 			Name="Point_Clouds"
 			>
 			<File
-				RelativePath="..\Point_Clouds\POINT_CLOUD.h"
+				RelativePath="..\Point_Clouds\PARTICLES.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Point_Clouds\POINT_CLOUD_FORWARD.h"
+				RelativePath="..\Point_Clouds\PARTICLES_FORWARD.h"
 				>
 			</File>
 			<File
-				RelativePath="..\Point_Clouds\POINT_CLOUD_SUBSET.h"
+				RelativePath="..\Point_Clouds\PARTICLES_SUBSET.h"
 				>
 			</File>
 			<File
@@ -2461,11 +2461,11 @@
 				Name="Point_Clouds"
 				>
 				<File
-					RelativePath="..\Read_Write\Point_Clouds\READ_WRITE_POINT_CLOUD.h"
+					RelativePath="..\Read_Write\Point_Clouds\READ_WRITE_PARTICLES.h"
 					>
 				</File>
 				<File
-					RelativePath="..\Read_Write\Point_Clouds\READ_WRITE_POINT_CLOUD_SUBSET.h"
+					RelativePath="..\Read_Write\Point_Clouds\READ_WRITE_PARTICLES_SUBSET.h"
 					>
 				</File>
 			</Filter>

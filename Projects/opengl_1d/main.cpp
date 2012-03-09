@@ -20,7 +20,7 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SCALAR_FIELD_1D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODIES_1D.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <fstream>
 #include <sstream>
 #include <string.h>

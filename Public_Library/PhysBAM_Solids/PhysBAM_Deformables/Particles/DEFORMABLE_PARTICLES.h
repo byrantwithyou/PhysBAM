@@ -4,12 +4,12 @@
 //#####################################################################
 // Class DEFORMABLE_PARTICLES
 //#####################################################################
-#ifndef __PARTICLES__
-#define __PARTICLES__
+#ifndef __DEFORMABLE_PARTICLES__
+#define __DEFORMABLE_PARTICLES__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 

@@ -6,7 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_FORWARD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>

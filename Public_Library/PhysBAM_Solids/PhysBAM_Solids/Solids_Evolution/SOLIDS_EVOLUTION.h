@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_FORWARD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigids_Evolution/RIGIDS_KINEMATIC_EVOLUTION.h>

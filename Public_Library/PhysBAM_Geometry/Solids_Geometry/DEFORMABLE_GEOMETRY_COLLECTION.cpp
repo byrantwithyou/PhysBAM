@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_HASHTABLE.h>
 #include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE.h>
 #endif

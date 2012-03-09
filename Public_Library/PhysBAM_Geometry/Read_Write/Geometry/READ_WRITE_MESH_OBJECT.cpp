@@ -6,7 +6,7 @@
 //#####################################################################
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Topology/READ_WRITE_HEXAHEDRON_MESH.h>

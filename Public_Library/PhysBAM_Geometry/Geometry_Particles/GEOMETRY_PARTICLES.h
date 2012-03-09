@@ -8,15 +8,15 @@
 #define __GEOMETRY_PARTICLES__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class TV>
-class GEOMETRY_PARTICLES:public CLONEABLE<GEOMETRY_PARTICLES<TV>,POINT_CLOUD<TV> >
+class GEOMETRY_PARTICLES:public CLONEABLE<GEOMETRY_PARTICLES<TV>,PARTICLES<TV> >
 {
     typedef typename TV::SCALAR T;
-    typedef CLONEABLE<GEOMETRY_PARTICLES<TV>,POINT_CLOUD<TV> > BASE;
+    typedef CLONEABLE<GEOMETRY_PARTICLES<TV>,PARTICLES<TV> > BASE;
 public:
     using BASE::array_collection;
 

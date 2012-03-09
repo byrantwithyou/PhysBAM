@@ -5,7 +5,7 @@
 // Class READ_WRITE_EMBEDDED_OBJECT
 //#####################################################################
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD_SUBSET.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES_SUBSET.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_EMBEDDED_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>

@@ -21,7 +21,7 @@ template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class TV> class EXAMPLE;
 template<class T> class EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE;
 template<class TV> class BINDING_LIST;
-template<class TV,class T_PARTICLES> class POINT_CLOUD_SUBSET;
+template<class TV,class T_PARTICLES> class PARTICLES_SUBSET;
 template<class TV,int d> class EMBEDDED_MATERIAL_SURFACE;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV> class GRID;
@@ -96,7 +96,7 @@ public:
     void PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_GEOMETRY_STATE<TV>* initial_state,
         TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices);
-    void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,
+    void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const PARTICLES_SUBSET<VECTOR<T,3>,
         DEFORMABLE_PARTICLES<VECTOR<T,3> > >& particles_to_embed,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
     void Mark_Hard_Bindings_With_Free_Particles();
     void Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,

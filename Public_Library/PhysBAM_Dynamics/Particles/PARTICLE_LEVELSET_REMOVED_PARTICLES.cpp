@@ -4,17 +4,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 namespace PhysBAM{
-//#####################################################################
-// Constructor
-//#####################################################################
-/*template<class TV> PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>::
-PARTICLE_LEVELSET_REMOVED_PARTICLES(ARRAY_COLLECTION& array_collection_input)
-    :BASE(array_collection_input),V(0,0)
-{
-    array_collection->Add_Array(ATTRIBUTE_ID_V,&V);
-    }*/
 //#####################################################################
 // Constructor
 //#####################################################################

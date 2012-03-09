@@ -7,7 +7,7 @@
 #ifndef __INCOMPRESSIBLE_FORWARD__
 #define __INCOMPRESSIBLE_FORWARD__
 
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_FORWARD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class T_GRID> class INCOMPRESSIBLE_UNIFORM;

@@ -20,7 +20,7 @@
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_SYMMETRIC_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
@@ -55,7 +55,7 @@
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 #include <stdexcept>
 using namespace PhysBAM;

@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Dynamics/Particles/COMPRESSIBLE_FLUID_PARTICLES.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor

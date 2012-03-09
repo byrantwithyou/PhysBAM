@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/RIGID_GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{

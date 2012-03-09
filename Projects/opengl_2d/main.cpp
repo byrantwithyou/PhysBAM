@@ -40,7 +40,7 @@
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/SPH_PARTICLES.h>
 #include <fstream>
 #include <sstream>

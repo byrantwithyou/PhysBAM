@@ -26,7 +26,7 @@ public:
     using BASE::particles;using BASE::material_surface_mesh;using BASE::material_surface;
 
     T_EMBEDDED_OBJECT& embedded_object;
-    POINT_CLOUD_SUBSET<TV,GEOMETRY_PARTICLES<TV> >& embedded_particles;
+    PARTICLES_SUBSET<TV,GEOMETRY_PARTICLES<TV> >& embedded_particles;
     ARRAY<VECTOR<int,2> >& parent_particles;
     ARRAY<T>& interpolation_fraction;
     ARRAY<bool> previously_perturbed;

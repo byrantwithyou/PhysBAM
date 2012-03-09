@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>

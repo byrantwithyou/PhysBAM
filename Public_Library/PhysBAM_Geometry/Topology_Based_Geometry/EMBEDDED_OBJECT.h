@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_SUBSET.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_SUBSET.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
@@ -39,7 +39,7 @@ public:
     enum WORKAROUND2 {max_subelements_per_element=2*d-2};
 
     GEOMETRY_PARTICLES<TV>& particles; // reference to the particles array containing all particles (including embedded)
-    POINT_CLOUD_SUBSET<TV,GEOMETRY_PARTICLES<TV> > embedded_particles;
+    PARTICLES_SUBSET<TV,GEOMETRY_PARTICLES<TV> > embedded_particles;
     ARRAY<VECTOR<int,2> > parent_particles; // has length embedded_particles.active_indices.m, indexes into particles
     ARRAY<T> interpolation_fraction; // has length embedded_particles.active_indices.m
     T interpolation_fraction_threshold;

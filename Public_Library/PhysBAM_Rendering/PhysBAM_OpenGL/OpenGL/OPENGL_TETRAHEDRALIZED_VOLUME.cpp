@@ -5,7 +5,7 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>

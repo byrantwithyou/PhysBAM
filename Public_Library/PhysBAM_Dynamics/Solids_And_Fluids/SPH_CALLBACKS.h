@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;

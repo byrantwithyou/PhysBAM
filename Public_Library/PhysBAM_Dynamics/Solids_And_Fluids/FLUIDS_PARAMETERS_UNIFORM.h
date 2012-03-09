@@ -16,7 +16,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 namespace PhysBAM{
 
@@ -157,7 +157,7 @@ public:
     void Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& single_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid);
     void Distribute_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& single_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid);
     template<class T_ARRAYS_PARTICLES> int Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const;
-    template<class T_ARRAYS_PARTICLES> void Write_Particles(const STREAM_TYPE stream_type,const POINT_CLOUD<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,
+    template<class T_ARRAYS_PARTICLES> void Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,
         const std::string& output_directory,const std::string& prefix,const int frame) const;
     template<class T_PARTICLES,class T_ARRAYS_PARTICLES> void Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particles,T_ARRAYS_PARTICLES& particles,
         const std::string& output_directory,const std::string& prefix,const int frame);

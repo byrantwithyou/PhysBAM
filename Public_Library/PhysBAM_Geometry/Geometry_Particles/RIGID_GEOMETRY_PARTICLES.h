@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 
@@ -22,10 +22,10 @@ template<class TV> class COLLISION_GEOMETRY_COLLECTION;
 template<class TV,class ID> class STRUCTURE_LIST;
 
 template<class TV>
-class RIGID_GEOMETRY_PARTICLES:public CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,POINT_CLOUD<TV> >
+class RIGID_GEOMETRY_PARTICLES:public CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,PARTICLES<TV> >
 {
     typedef typename TV::SCALAR T;
-    typedef CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,POINT_CLOUD<TV> > BASE;
+    typedef CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,PARTICLES<TV> > BASE;
 public:
     using BASE::array_collection;
 

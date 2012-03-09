@@ -27,7 +27,7 @@
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_SYMMETRIC_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/Find_Type.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
@@ -622,7 +622,7 @@ Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const
 // Function Write_Particles
 //#####################################################################
 template<class T_GRID> template<class T_ARRAYS_PARTICLES> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Write_Particles(const STREAM_TYPE stream_type,const POINT_CLOUD<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
+Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_particles,const T_ARRAYS_PARTICLES& particles,const std::string& output_directory,const std::string& prefix,
     const int frame) const
 {
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,prefix.c_str()),particles);
@@ -631,7 +631,7 @@ Write_Particles(const STREAM_TYPE stream_type,const POINT_CLOUD<TV>& template_pa
 
     // write out one T_PARTICLES that contains all the particles
     if(write_flattened_particles){
-        POINT_CLOUD<TV>* all_particles=template_particles.Clone();
+        PARTICLES<TV>* all_particles=template_particles.Clone();
         all_particles->array_collection->Initialize(particles.array);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s_all",output_directory.c_str(),frame,prefix.c_str()),*all_particles);}
 }

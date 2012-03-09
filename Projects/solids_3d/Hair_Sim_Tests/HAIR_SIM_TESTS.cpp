@@ -14,7 +14,7 @@
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>

@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parallel_Computation/LOCAL_GRID.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>

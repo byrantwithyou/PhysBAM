@@ -5,7 +5,7 @@
 #ifndef __GEOMETRY_PARTICLES_FORWARD__
 #define __GEOMETRY_PARTICLES_FORWARD__
 
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD_FORWARD.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 namespace PhysBAM{
 template<class TV> class GEOMETRY_PARTICLES;
 const ATTRIBUTE_ID ATTRIBUTE_ID_V(2);

@@ -35,7 +35,7 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_ROTATION.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>

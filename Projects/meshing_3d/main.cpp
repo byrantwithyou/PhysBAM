@@ -6,7 +6,7 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include "Generic/GENERIC_EXAMPLE.h"
 #include "MESHING_DRIVER.h"
 //#include "Sphere/SPHERE_EXAMPLE.h"
