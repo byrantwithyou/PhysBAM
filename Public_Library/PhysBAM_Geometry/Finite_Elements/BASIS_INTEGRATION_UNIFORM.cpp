@@ -179,8 +179,12 @@ Cut_Elements(ARRAY<ARRAY<T_FACE>,TV_INT>& cut_elements,const ARRAY<T_FACE>& elem
             typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE plane(TV::Axis_Vector(a),pt);
             for(int i=0;i<elements.m;i++)
                 T_FACE::Cut_With_Hyperplane(elements(i),plane,t1,t0,1e-14);
-            Cut_Elements(cut_elements,t0,RANGE<TV_INT>(range.min_corner,range.min_corner+size),RANGE<TV>(domain.min_corner,pt),dir);
-            Cut_Elements(cut_elements,t1,RANGE<TV_INT>(range.min_corner+size,range.max_corner),RANGE<TV>(pt,domain.max_corner),dir);
+            RANGE<TV> domain0(domain),domain1(domain);
+            RANGE<TV_INT> range0(range),range1(range);
+            domain0.max_corner(a)=domain1.min_corner(a)=pt(a);
+            range0.max_corner(a)=range1.min_corner(a)=range.min_corner(a)+new_size(a);
+            Cut_Elements(cut_elements,t0,range0,domain0,dir);
+            Cut_Elements(cut_elements,t1,range1,domain1,dir);
             return;}
     TV_INT cell=range.min_corner;
     cell(dir)=0;

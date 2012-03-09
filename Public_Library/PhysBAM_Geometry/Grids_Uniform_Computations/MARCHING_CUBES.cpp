@@ -32,17 +32,6 @@ Case_Table()
     return table;
 }
 //#####################################################################
-// Function flip
-//#####################################################################
-static int permute_case(int c,int* f)
-{
-    int r=0;
-    for(int i=0;i<8;i++)
-        if(c&(1<<i))
-            r|=1<<(f[i+12]-12);
-    return r;
-}
-//#####################################################################
 // Function has_ambig
 //#####################################################################
 static int has_ambig(int n)
@@ -61,8 +50,11 @@ static int has_ambig(int n)
 template<class TV> void MARCHING_CUBES<TV>::
 Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_CASE<TV::m> >& table, int c)
 {
-    for(int p=0;p<2;p++){
-        int b=permute_case(c, MARCHING_CUBES_CASE<TV::m>::permute_map[p]);
+    for(int p=0;p<4*TV::m-6;p++){
+        int b=0;
+        for(int i=0;i<num_corners;i++)
+            if(c&(1<<i))
+                b|=1<<(MARCHING_CUBES_CASE<TV::m>::permute_map[p][i+num_edges]-num_edges);
         if(!table(b).surface[0]){
             for(int i=0;i<MARCHING_CUBES_CASE<TV::m>::max_surface;i++) table(b).surface[i]=TRI_ORIENT_MAP(table(c).surface[i],MARCHING_CUBES_CASE<TV::m>::permute_map[p]);
             for(int i=0;i<MARCHING_CUBES_CASE<TV::m>::max_boundary;i++) table(b).boundary[i]=TRI_ORIENT_MAP(table(c).boundary[i],MARCHING_CUBES_CASE<TV::m>::permute_map[p]);

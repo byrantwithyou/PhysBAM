@@ -187,7 +187,7 @@ int main(int argc, char* argv[])
         pt(q+b*dx);
         fprintf(F, "\n");
         sprintf(buff, "fillstyle=solid,fillcolor=%s,linestyle=none", cs.enclose_inside?"red":"black");
-        circ(TV(1.3,0,.9),corner_radius/2,buff);
+        circ(TV(1.3,0,1.1),corner_radius/2,buff);
         fprintf(F, "\\pspolygon[linestyle=none,fillcolor=%s,fillstyle=solid,opacity=%.3f]", rgb[cs.proj_dir], .5);
         pt(p);
         pt(p+a*dx);
