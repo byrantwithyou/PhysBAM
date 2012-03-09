@@ -60,7 +60,7 @@ public:
 //#####################################################################
     static T Thin_Shell_Volume(const T_SIMPLICIAL_OBJECT& object);
     void Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor) const;
-    void Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor,POINT_CLOUD<TV>& point_cloud) const;
+    void Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor,GEOMETRY_PARTICLES<TV>& point_cloud) const;
 private:
     template<bool thin_shell> void Compute_Properties(MASS_PROPERTIES<TV,d>&,NORMAL_IMPLEMENTATION);
     template<bool thin_shell> void Compute_Properties(MASS_PROPERTIES<TV,d>&,DUMMY_IMPLEMENTATION);

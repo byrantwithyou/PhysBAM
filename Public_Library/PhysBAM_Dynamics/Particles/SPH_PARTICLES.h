@@ -10,17 +10,16 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV>
-class SPH_PARTICLES:public CLONEABLE<SPH_PARTICLES<TV>,POINT_CLOUD<TV> >
+class SPH_PARTICLES:public CLONEABLE<SPH_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> >
 {
-    typedef CLONEABLE<SPH_PARTICLES<TV>,POINT_CLOUD<TV> > BASE;
+    typedef CLONEABLE<SPH_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
     typedef typename TV::SCALAR T;
 public:
-    using BASE::array_collection;
-
-    ARRAY_VIEW<TV> V;
+    using BASE::array_collection;using BASE::X;using BASE::V;
 
     SPH_PARTICLES();
     virtual ~SPH_PARTICLES();

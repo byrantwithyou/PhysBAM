@@ -18,7 +18,7 @@ class PARTICLE_LEVELSET_REMOVED_PARTICLES:public CLONEABLE<PARTICLE_LEVELSET_REM
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>,PARTICLE_LEVELSET_PARTICLES<TV> > BASE;
 public:
-    using BASE::X;using BASE::array_collection;
+    using BASE::array_collection;using BASE::X;
 
     ARRAY_VIEW<TV> V;
     PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* next; //This should always be 0

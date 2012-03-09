@@ -27,23 +27,24 @@ class RIGID_GEOMETRY_PARTICLES:public CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,POI
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,POINT_CLOUD<TV> > BASE;
 public:
-    using BASE::array_collection;using BASE::X;
+    using BASE::array_collection;
 
+    ARRAY_VIEW<TV> X;
     ARRAY_VIEW<RIGID_GEOMETRY<TV>*> rigid_geometry;
     ARRAY_VIEW<ROTATION<TV> > rotation;
     ARRAY_VIEW<TWIST<TV> > twist;
     ARRAY_VIEW<VECTOR<int,3> > structure_ids;
 
     RIGID_GEOMETRY_PARTICLES(ARRAY_COLLECTION* array_collection_input)
-        :rigid_geometry(0,0),rotation(0,0),twist(0,0),structure_ids(0,0)
+        :X(0,0),rigid_geometry(0,0),rotation(0,0),twist(0,0),structure_ids(0,0)
     {delete array_collection;array_collection=array_collection_input;Initialize_Array_Collection();}
 
     RIGID_GEOMETRY_PARTICLES()
-        :rigid_geometry(0,0),rotation(0,0),twist(0,0),structure_ids(0,0)
+        :X(0,0),rigid_geometry(0,0),rotation(0,0),twist(0,0),structure_ids(0,0)
     {Initialize_Array_Collection();}
 
     void Initialize_Array_Collection()
-    {POINT_CLOUD<TV>::Initialize_Array_Collection();
+    {array_collection->Add_Array(ATTRIBUTE_ID_X,&X);
     array_collection->Add_Array(ATTRIBUTE_ID_RIGID_GEOMETRY,&rigid_geometry);array_collection->Add_Array(ATTRIBUTE_ID_ROTATION,&rotation);
     array_collection->Add_Array(ATTRIBUTE_ID_TWIST,&twist);array_collection->Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);}
     

@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
-#include <PhysBAM_Tools/Point_Clouds_Computations/DELETE_POINTS.h>
 #include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_POINT_CLOUD.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
@@ -316,6 +315,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
     int particle_to_add=spray_particles.array_collection->Size()+1;
     LOG::cout<<"spawning "<<number_of_particles_to_add<<" new particles"<<"of "<<new_removed_particles.array_collection->Size()*particle_number_amplification<<std::endl;
     spray_particles.array_collection->Add_Elements(number_of_particles_to_add);
+    ARRAY_VIEW<int>& id=*spray_particles.array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
     for(int i=0;i<new_removed_particles.array_collection->Size();i++)if(new_removed_particles_spawn_time(i)<=time+dt&&new_removed_particles_spawn_time(i)>time  && !kill_particle_box.Lazy_Inside(new_removed_particles.X(i))){
         for(int k=0;k<new_removed_particles_amplification_factor(i);k++){
             int index=particle_to_add++;
@@ -323,7 +323,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
             spray_particles.V(index)=TV(new_removed_particles.V(i).x*random.Get_Uniform_Number((T).8,(T)1.2),new_removed_particles.V(i).y*random.Get_Uniform_Number((T).8,(T)1.2),new_removed_particles.V(i).z*random.Get_Uniform_Number((T).8,(T)1.2));
             spray_particles.radius(index)=random.Get_Uniform_Number((T).05,(T).9);
             spray_particles.age(index)=0;
-            spray_particles.id(index)=unique_id++;}}
+            id(index)=unique_id++;}}
     LOG::cout<<"added "<<number_of_particles_to_add<<" out of "<<new_removed_particles.array_collection->Size()<<" new spray particles this frame"<<std::endl;
 
     LEVELSET_3D<GRID<TV> > interpolated_water_levelset(*fluids_parameters.grid,interpolated_water_phi);
@@ -372,7 +372,7 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
             spray_particles.V(index)=TV(last_frame_removed_particles.V(i).x*random.Get_Uniform_Number((T).8,(T)1.2),last_frame_removed_particles.V(i).y*random.Get_Uniform_Number((T).8,(T)1.2),last_frame_removed_particles.V(i).z*random.Get_Uniform_Number((T).8,(T)1.2));
             spray_particles.radius(index)=random.Get_Uniform_Number((T).05,(T).9);
             spray_particles.age(index)=0;
-            spray_particles.id(index)=unique_id++;}}
+            id(index)=unique_id++;}}
     LOG::cout<<"added "<<number_of_particles_to_add<<" new spray particles"<<std::endl;
 
     LOG::Time("converting spray particles to foam");
@@ -429,8 +429,6 @@ void Update_Fluid_Parameters(const T dt,const T time) PHYSBAM_OVERRIDE
 
     // remove bad particles
     LOG::Time("removing particles outside domain");
-    POINT_CLOUD_COMPUTATIONS::Delete_Points_Outside_Range(spray_particles,fluids_parameters.grid->Domain());
-    POINT_CLOUD_COMPUTATIONS::Delete_Points_Outside_Range(foam_particles,fluids_parameters.grid->Domain());
 
     LOG::Time("removing a small amount of density");
     for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
@@ -551,16 +549,17 @@ void Find_Removed_Particles_That_Will_Appear_This_Frame(int particle_type,const 
                 delete particles_array(i,j,ij);}}
 
         HASHTABLE<int,int> hashtable(last_frame_removed_particles.array_collection->Size());
+        ARRAY_VIEW<int>& id=*last_frame_removed_particles.array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
         for(int i=0;i<last_frame_removed_particles.array_collection->Size();i++){
-            hashtable.Insert(last_frame_removed_particles.id(i),i);}
+            hashtable.Insert(id(i),i);}
 
         // read in this frames particles
         if(particle_type==1) FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/removed_positive_particles.%d",input_water_directory.c_str(),(frame+1)),particles_array);
         else FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/removed_negative_particles.%d",input_water_directory.c_str(),(frame+1)),particles_array);
         for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++)for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++)for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++){
             if(particles_array(i,j,ij)){
-                for(int k=1;k<=particles_array(i,j,ij)->array_collection->Size();k++){
-                    int id=particles_array(i,j,ij)->id(k);
+                for(int k=0;k<particles_array(i,j,ij)->array_collection->Size();k++){
+                    int id=(*particles_array(i,j,ij)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID))(k);
                     if(!hashtable.Contains(id))
                       new_removed_particles.array_collection->Append(*particles_array(i,j,ij)->array_collection,k);}
                       delete particles_array(i,j,ij);}}
@@ -599,9 +598,9 @@ void Find_Removed_Particles_That_Will_Appear_This_Frame(int particle_type,const 
         else FILE_UTILITIES::Read_From_File<T>(STRING_UTILITIES::string_sprintf("%s/removed_negative_particles.%d",input_water_directory.c_str(),(frame+1)),particles_array);
         for(int i=particles_array.domain.min_corner.x;i<=particles_array.domain.max_corner.x;i++)for(int j=particles_array.domain.min_corner.y;j<=particles_array.domain.max_corner.y;j++)for(int ij=particles_array.domain.min_corner.z;ij<=particles_array.domain.max_corner.z;ij++){
             if(particles_array(i,j,ij)){
-                for(int k=1;k<=particles_array(i,j,ij)->array_collection->Size();k++){
+                for(int k=0;k<particles_array(i,j,ij)->array_collection->Size();k++){
                     last_frame_removed_particles.array_collection->Append(*particles_array(i,j,ij)->array_collection,k);
-                    int id=particles_array(i,j,ij)->id(k);
+                    int id=(*particles_array(i,j,ij)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID))(k);
                     int entry_number;
                     if(hashtable.Get(id,entry_number)){
                         new_removed_particles_spawn_time.Append(removed_particle_times(entry_number).y);

@@ -9,17 +9,6 @@ namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-/*template<class TV> PARTICLE_LEVELSET_PARTICLES<TV>::
-PARTICLE_LEVELSET_PARTICLES(ARRAY_COLLECTION& array_collection_input)
-    :POINT_CLOUD<TV>(array_collection_input),quantized_collision_distance(0,0),age(0,0),radius(0,0),next(0)
-{
-    array_collection->Add_Array(ATTRIBUTE_ID_QUANTIZED_COLLISION_DISTANCE,&quantized_collision_distance);
-    array_collection->Add_Array(ATTRIBUTE_ID_AGE,&age);
-    array_collection->Add_Array(ATTRIBUTE_ID_RADIUS,&radius);
-    }*/
-//#####################################################################
-// Constructor
-//#####################################################################
 template<class TV> PARTICLE_LEVELSET_PARTICLES<TV>::
 PARTICLE_LEVELSET_PARTICLES()
     :quantized_collision_distance(0,0),age(0,0),radius(0,0),next(0)

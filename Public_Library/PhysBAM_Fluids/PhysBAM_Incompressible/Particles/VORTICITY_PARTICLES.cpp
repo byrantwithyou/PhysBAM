@@ -11,16 +11,6 @@ namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-/*template<class TV> VORTICITY_PARTICLES<TV>::
-VORTICITY_PARTICLES(ARRAY_COLLECTION* array_collection_input)
-    :POINT_CLOUD<TV>(array_collection_input),vorticity(0,0),radius(0,0)
-{
-    array_collection->Add_Array(ATTRIBUTE_ID_VORTICITY,&vorticity);
-    array_collection->Add_Array(ATTRIBUTE_ID_RADIUS,&radius);
-    }*/
-//#####################################################################
-// Constructor
-//#####################################################################
 template<class TV> VORTICITY_PARTICLES<TV>::
 VORTICITY_PARTICLES()
     :vorticity(0,0),radius(0,0)

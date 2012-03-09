@@ -11,9 +11,8 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> SPH_PARTICLES<TV>::
 SPH_PARTICLES()
-    :V(0,0)
 {
-    array_collection->Add_Array(ATTRIBUTE_ID_V,&V);
+    this->Store_Velocity();
 }
 //#####################################################################
 // Constructor

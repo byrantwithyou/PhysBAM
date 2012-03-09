@@ -9,16 +9,16 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV>
-class PARTICLE_LEVELSET_PARTICLES:public CLONEABLE<PARTICLE_LEVELSET_PARTICLES<TV>,POINT_CLOUD<TV> >
+class PARTICLE_LEVELSET_PARTICLES:public CLONEABLE<PARTICLE_LEVELSET_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> >
 {
     typedef typename TV::SCALAR T;
-    typedef CLONEABLE<PARTICLE_LEVELSET_PARTICLES<TV>,POINT_CLOUD<TV> > BASE;
+    typedef CLONEABLE<PARTICLE_LEVELSET_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;
+    using BASE::array_collection;using BASE::X;
 
     ARRAY_VIEW<unsigned short> quantized_collision_distance;
     ARRAY_VIEW<T> age;

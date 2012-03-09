@@ -310,8 +310,9 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time) PHYSBAM_OVERRIDE
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
                 while(removed_negative_particles(block)->array_collection->Size()<.5*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){
                     TV X=random.Get_Uniform_Vector(block_bounding_box);
+                    ARRAY_VIEW<int>& id_attr=*removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
                     int id=removed_negative_particles(block)->array_collection->Add_Element();
-                    removed_negative_particles(block)->id(id)=particle_id++;
+                    id_attr(id)=particle_id++;
                     removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->V(id)=sph_sources_velocity(s);
                     removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}}}
 }

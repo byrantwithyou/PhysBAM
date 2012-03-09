@@ -146,7 +146,7 @@ Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inerti
 // Function Transform_To_Object_Frame
 //#####################################################################
 template<class TV,int d> void MASS_PROPERTIES<TV,d>::
-Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor,POINT_CLOUD<TV>& point_cloud) const
+Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inertia_tensor,GEOMETRY_PARTICLES<TV>& point_cloud) const
 {
     Transform_To_Object_Frame(frame,object_space_inertia_tensor);
     if(frame.r==ROTATION<TV>()) point_cloud.X-=frame.t;

@@ -9,16 +9,16 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV>
-class VORTICITY_PARTICLES:public CLONEABLE<VORTICITY_PARTICLES<TV>,POINT_CLOUD<TV> >
+class VORTICITY_PARTICLES:public CLONEABLE<VORTICITY_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> >
 {
     typedef typename TV::SCALAR T;
-    typedef CLONEABLE<VORTICITY_PARTICLES<TV>,POINT_CLOUD<TV> > BASE;
+    typedef CLONEABLE<VORTICITY_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;
+    using BASE::array_collection;using BASE::X;
 
     ARRAY_VIEW<typename TV::SPIN> vorticity;
     ARRAY_VIEW<T> radius;

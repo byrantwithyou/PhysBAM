@@ -9,9 +9,9 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Point_Clouds/POINT_CLOUD.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SELECTION.h>
@@ -33,7 +33,7 @@ public:
     OPENGL_POINTS_2D(T_ARRAY& points_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White(),float point_size = 5);
     virtual ~OPENGL_POINTS_2D();
 
-    void Set_Points_From_Particles(const POINT_CLOUD<TV>& particles,bool keep_colors=true,const bool use_ids=true)
+    void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true,const bool use_ids=true)
     {points=particles.X;
     const ARRAY_VIEW<int>* id=use_ids?particles.array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
     Store_Point_Ids(id!=0);

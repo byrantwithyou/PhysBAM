@@ -584,7 +584,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         T scale(parameters.Get_Parameter("Scale",T(1.0)));
         std::string particle_levelset(parameters.Get_Parameter("Levelset",std::string("unknown")));
         if(particle_levelset=="unknown"){LOG::cerr<<"Error: must specify levelset for particle"<<std::endl;exit(1);}
-        ARRAY<POINT_CLOUD<TV>*,VECTOR<int,3> > particles_array;
+        ARRAY<GEOMETRY_PARTICLES<TV>*,VECTOR<int,3> > particles_array;
         std::string raw_filename(parameters.Get_Parameter("Filename",std::string("unknown")));
         FILE_UTILITIES::Read_From_File<RW>(Animated_Filename(raw_filename,frame),particles_array);
         RENDERING_OBJECT<T>* particle_levelset_object;

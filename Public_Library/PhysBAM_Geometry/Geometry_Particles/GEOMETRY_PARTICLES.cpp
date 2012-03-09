@@ -10,7 +10,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> GEOMETRY_PARTICLES<TV>::
 GEOMETRY_PARTICLES(ARRAY_COLLECTION* array_collection_input)
-    :V(0,0),store_velocity(false)
+    :X(0,0),V(0,0),store_velocity(false)
 {
     delete array_collection;array_collection=array_collection_input;
     Initialize_Array_Collection();
@@ -20,7 +20,7 @@ GEOMETRY_PARTICLES(ARRAY_COLLECTION* array_collection_input)
 //#####################################################################
 template<class TV> GEOMETRY_PARTICLES<TV>::
 GEOMETRY_PARTICLES()
-    :V(0,0),store_velocity(false)
+    :X(0,0),V(0,0),store_velocity(false)
 {}
 //#####################################################################
 // Destructor 
@@ -34,7 +34,7 @@ template<class TV> GEOMETRY_PARTICLES<TV>::
 template<class TV> void GEOMETRY_PARTICLES<TV>::
 Initialize_Array_Collection()
 {
-    POINT_CLOUD<TV>::Initialize_Array_Collection();
+    array_collection->Add_Array(ATTRIBUTE_ID_X,&X);
 }
 //#####################################################################
 template class GEOMETRY_PARTICLES<VECTOR<float,1> >;

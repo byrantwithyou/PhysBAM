@@ -38,7 +38,9 @@ template<class TV> PARTICLES<TV>::
 template<class TV> TV PARTICLES<TV>::
 Center_Of_Mass() const
 {
-    if(this->store_mass) return Weighted_Center(mass);
+    if(this->store_mass){
+        T total=mass.Sum();
+        return total?X.Weighted_Sum(mass)/total:TV();}
     return X.Average(); // default to treating mass as one
 }
 //#####################################################################

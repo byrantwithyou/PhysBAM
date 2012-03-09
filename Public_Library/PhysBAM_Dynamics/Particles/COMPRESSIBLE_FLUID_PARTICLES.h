@@ -20,6 +20,7 @@ class COMPRESSIBLE_FLUID_PARTICLES:public CLONEABLE<COMPRESSIBLE_FLUID_PARTICLES
 public:
     using BASE::array_collection;
 
+    ARRAY_VIEW<TV> X;
     ARRAY_VIEW<T> rho;
     ARRAY_VIEW<T> E;
     ARRAY_VIEW<T> phi;
