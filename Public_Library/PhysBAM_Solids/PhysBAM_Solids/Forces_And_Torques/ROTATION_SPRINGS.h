@@ -29,7 +29,7 @@ protected:
     MPI_SOLIDS<TV>* mpi_solids;
 public:
     SEGMENT_MESH& mesh;
-    ARRAY<VECTOR<ROTATION<TV>,2> > object_to_joint_rotations;
+    ARRAY<VECTOR<FRAME<TV>,2> > object_to_joint_frames;
     ARRAY<T_SPIN> angle_limits;
     ARRAY<T_SPIN_MATRIX> stiffness; // torque / strain (past angle limits)
     ARRAY<T> damping; // torque / angular velocity

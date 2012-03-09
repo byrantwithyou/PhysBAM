@@ -136,7 +136,7 @@ Add_Ground(const T friction,const T height,const T coefficient_of_restitution,co
 {
     PHYSBAM_ASSERT(scale>0);
     RIGID_BODY<TV>& ground=Add_Rigid_Body("ground",scale,friction);
-    ground.X().y=height;
+    ground.Frame().t.y=height;
     ground.is_static=true;
     ground.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(ground.particle_index)->add_to_spatial_partition=false;
     ground.Set_Coefficient_Of_Restitution(coefficient_of_restitution);
@@ -307,12 +307,12 @@ Make_Lathe_Chain(const FRAME<TV>& frame,const T scale,const T friction,const T c
         rigid_body.Set_Coefficient_Of_Restitution(cor);
         links[i]=&rigid_body;
         switch(i){
-            case 0:rigid_body.Set_Frame(frame*FRAME<TV>(TV(0,4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi,TV(1,0,0))));break;
-            case 1:rigid_body.Set_Frame(frame*FRAME<TV>(TV(2+2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-2*(T)pi/3,TV(1,0,0))));break;
-            case 2:rigid_body.Set_Frame(frame*FRAME<TV>(TV(2+2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/3,TV(1,0,0))));break;
-            case 3:rigid_body.Set_Frame(frame*FRAME<TV>(TV(0,-4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))));break;
-            case 4:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/3,TV(1,0,0))));break;
-            case 5:rigid_body.Set_Frame(frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(2*(T)pi/3,TV(1,0,0))));break;}}
+            case 0:rigid_body.Frame()=frame*FRAME<TV>(TV(0,4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi,TV(1,0,0)));break;
+            case 1:rigid_body.Frame()=frame*FRAME<TV>(TV(2+2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-2*(T)pi/3,TV(1,0,0)));break;
+            case 2:rigid_body.Frame()=frame*FRAME<TV>(TV(2+2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/3,TV(1,0,0)));break;
+            case 3:rigid_body.Frame()=frame*FRAME<TV>(TV(0,-4*sin((T)pi/3),0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0)));break;
+            case 4:rigid_body.Frame()=frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),-4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/3,TV(1,0,0)));break;
+            case 5:rigid_body.Frame()=frame*FRAME<TV>(TV(-2-2*cos((T)pi/3),4*sin((T)pi/3)*(T).5,0)*scale,ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(2*(T)pi/3,TV(1,0,0)));break;}}
 
     links[6]=links[0];
     for(int i=0;i<6;i++){

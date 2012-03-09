@@ -272,7 +272,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
-void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE
+void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE
 {}
 //#####################################################################
 // Function Set_External_Velocities

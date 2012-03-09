@@ -17,7 +17,7 @@ template<class TV> RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>::
 // Function Set_External_Positions
 //#####################################################################
 template<class TV> void RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>::
-Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time)
+Set_External_Positions(ARRAY_VIEW<FRAME<TV> > rotation,const T time)
 {
     PHYSBAM_WARN_IF_NOT_OVERRIDDEN();
 }

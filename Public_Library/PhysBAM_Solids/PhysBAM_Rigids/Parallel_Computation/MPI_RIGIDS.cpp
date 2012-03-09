@@ -349,7 +349,7 @@ Exchange_All_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TWI
 // Function Exchange_All_Pushes
 //#####################################################################
 template<class TV> void MPI_RIGIDS<TV>::
-Exchange_All_Pushes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TV>& mpi_rigid_X_save,ARRAY<ROTATION<TV> >& mpi_rigid_rotation_save,RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions)
+Exchange_All_Pushes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TV>& mpi_rigid_frame_save,RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions)
 {
     ARRAY<bool> need_to_reevolve(rigid_body_collection.rigid_body_particle.array_collection->Size());
     Prune_And_Exchange_Impulses(rigid_body_collection,need_to_reevolve);
@@ -359,12 +359,11 @@ Exchange_All_Pushes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TV>& 
             int p=rigid_body_collection.rigid_body_particle.id(i);
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
             // Restore positions and rotations
-            rigid_body_collection.rigid_body_particle.X(p)=mpi_rigid_X_save(p);
-            rigid_body_collection.rigid_body_particle.rotation(p)=mpi_rigid_rotation_save(p);
+            rigid_body_collection.rigid_body_particle.frame(p)=mpi_rigid_frame_save(p);
             // Update positions and rotations
             RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1> *impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,TV::dimension-1>*>(rigid_body.impulse_accumulator);
-            rigid_body.X()+=impulse_accumulator->accumulated_impulse.linear;
-            rigid_body.Rotation()=ROTATION<TV>::From_Rotation_Vector(impulse_accumulator->accumulated_impulse.angular)*rigid_body.Rotation();rigid_body.Rotation().Normalize();
+            rigid_body.Frame().t+=impulse_accumulator->accumulated_impulse.linear;
+            rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(impulse_accumulator->accumulated_impulse.angular)*rigid_body.Frame().r;rigid_body.Frame().r.Normalize();
             rigid_body.Update_Angular_Velocity();
             rigid_body.Update_Bounding_Box();
             rigid_body_collisions.skip_collision_check.Set_Last_Moved(p);}}
@@ -497,7 +496,7 @@ template<class TV> void MPI_RIGIDS<TV>::Synchronize_Dt(T& dt) const {PHYSBAM_NOT
 template<class TV> void MPI_RIGIDS<TV>::Clear_Impulse_Accumulators(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input) {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_RIGIDS<TV>::Exchange_All_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TWIST<TV> >& mpi_rigid_velocity_save,
     ARRAY<T_SPIN>& mpi_rigid_angular_momentum_save,RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,const bool euler_step_with_new_velocity,const T dt,const T time) {PHYSBAM_NOT_IMPLEMENTED();}
-template<class TV> void MPI_RIGIDS<TV>::Exchange_All_Pushes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<TV>& mpi_rigid_X_save,ARRAY<ROTATION<TV> >& mpi_rigid_rotation_save,
+template<class TV> void MPI_RIGIDS<TV>::Exchange_All_Pushes(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<FRAME<TV> >& mpi_rigid_frame_save,
     RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions) {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> void MPI_RIGIDS<TV>::Prune_And_Exchange_Impulses(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<bool>& need_to_reevolve) {PHYSBAM_NOT_IMPLEMENTED();}
 template<class TV> template<class T_DATA> T_DATA MPI_RIGIDS<TV>::Reduce_Min(const T_DATA local_value) const {PHYSBAM_NOT_IMPLEMENTED();}

@@ -312,7 +312,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(solids) for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){  // Update angular momentum for modified center of mass
             // TODO(kwatra): do we need to this for compressible case, as there is no mass lumping there?
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i));
-            B.rigid_V(i).angular+=TV::Cross_Product((rigid_body_updated_center_of_mass(i)-rigid_body.X()),B.rigid_V(i).linear);}}
+            B.rigid_V(i).angular+=TV::Cross_Product((rigid_body_updated_center_of_mass(i)-rigid_body.Frame().t),B.rigid_V(i).linear);}}
 
     // Add fluids component to solids RHS(B)
     if(fluids){
@@ -404,7 +404,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 B.rigid_V(i).angular=solid_system_mpi->modified_world_space_rigid_inertia_tensor_inverse(i)*B.rigid_V(i).angular;}
             V.V=B.V;V.rigid_V=B.rigid_V;
             V.V*=(T)-1;V.rigid_V*=(T)-1;
-            solid_system->Set_Global_Boundary_Conditions(V,X_save,rigid_X_save,rigid_rotation_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
+            solid_system->Set_Global_Boundary_Conditions(V,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
                 solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
             solids_fluids_parameters.mpi_solid_fluid->Parallel_Solve_Solid_Part(*solid_system_mpi,V,B,F,S,ar,R,z,zaq,1,solids_parameters.implicit_solve_parameters.cg_iterations,solids_parameters.implicit_solve_parameters.cg_tolerance);}
         LOG::Stop_Time();}
@@ -425,7 +425,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         V.V=B.V;V.rigid_V=B.rigid_V;
         V.V*=(T)-1;V.rigid_V*=(T)-1;
         if(solids)
-            solid_system->Set_Global_Boundary_Conditions(V,X_save,rigid_X_save,rigid_rotation_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
+            solid_system->Set_Global_Boundary_Conditions(V,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
                 solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
 
         if(fluids){
@@ -502,7 +502,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(solids && Simulate_Fluids()){
         for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i));
-            V.rigid_V(i).linear-=TV::Cross_Product(V.rigid_V(i).angular,rigid_body_updated_center_of_mass(i)-rigid_body.X());}}
+            V.rigid_V(i).linear-=TV::Cross_Product(V.rigid_V(i).angular,rigid_body_updated_center_of_mass(i)-rigid_body.Frame().t);}}
 
     if(solids && velocity_update && solids_parameters.use_post_cg_constraints){ // save final force for friction calculation
         solid_system->Force(V,F);
@@ -986,9 +986,9 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
         // get updated center of mass for each rigid body, compute modified inertia tensor<
         for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){
             RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i));
-            if(fluids_parameters.compressible) rigid_body_updated_center_of_mass(i)=rigid_body.X();
+            if(fluids_parameters.compressible) rigid_body_updated_center_of_mass(i)=rigid_body.Frame().t;
             else rigid_body_updated_center_of_mass(i)=(rigid_body_fluid_mass(i)+rigid_body.Mass()).Solve_Linear_System(
-                    rigid_body_updated_center_of_mass(i)+rigid_body.X()*rigid_body.Mass());}
+                    rigid_body_updated_center_of_mass(i)+rigid_body.Frame().t*rigid_body.Mass());}
         rigid_body_fluid_inertia.Fill(T_INERTIA_TENSOR());}
 
     // populate the entries of J_rigid
@@ -1014,7 +1014,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
             for(int i=0;i<dual_cell_weight.m;i++){
                 int rigid_body_id=dual_cell_weight(i).x;T weight=dual_cell_weight(i).y;
                 RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(rigid_body_id);
-                TV center_of_mass=((!fluids_parameters.fluid_affects_solid || rigid_body.Has_Infinite_Inertia()) ? rigid_body.X() : rigid_body_updated_center_of_mass(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id)));
+                TV center_of_mass=((!fluids_parameters.fluid_affects_solid || rigid_body.Has_Infinite_Inertia())?rigid_body.Frame().t:rigid_body_updated_center_of_mass(rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_id)));
                 TV R=iterator.Location()-center_of_mass; // vector from center of mass to dual cell
                 // get inertia contribution, fluid mass contribution
                 // inertia

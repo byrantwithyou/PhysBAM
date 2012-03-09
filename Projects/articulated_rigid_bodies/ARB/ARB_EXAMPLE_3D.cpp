@@ -68,7 +68,7 @@ Coney_Island()
     //joint2->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(2,1,1)));
     
     box2=&tests.Add_Rigid_Body("subdivided_box",1,(T).3);
-    box2->X()=TV(0,(T)4.5,0);
+    box2->Frame().t=TV(0,(T)4.5,0);
     box2->Angular_Momentum()=TV(4,10,0);//make 0,0,10 with .5 prismatic if you want the stacked example
     // make (10,-3,15) to replicate hinge edge intersection problem with rotation around z
     box2->Set_Coefficient_Of_Restitution((T).5);
@@ -94,7 +94,7 @@ Five_Phallic_Falling()
 
     for(int i=0;i<5;i++){
         rigid_body[i]=&tests.Add_Rigid_Body("subdivided_box",1,(T).3);
-        rigid_body[i]->X()=TV(x[i],y[i],0);
+        rigid_body[i]->Frame().t=TV(x[i],y[i],0);
         rigid_body[i]->Twist().linear=TV(-5,-14,0);
         rigid_body[i]->Set_Coefficient_Of_Restitution((T)0.5);
         rigid_body[i]->Set_Name(STRING_UTILITIES::string_sprintf("square%d",(i+1)));
@@ -114,7 +114,7 @@ template<class T> void ARB_EXAMPLE_3D<T>::
 Two_Twins_Tumbling()
 {
     RIGID_BODY<TV> *box1=&tests.Add_Rigid_Body("subdivided_box",1,(T).3);
-    box1->X()=TV(0,2,0);
+    box1->Frame().t=TV(0,2,0);
     //box1->Twist().linear=TV(-5,-4,0);
     //box1->Angular_Momentum()=TV(15,0,10);
     box1->Set_Coefficient_Of_Restitution((T)0.5);
@@ -122,7 +122,7 @@ Two_Twins_Tumbling()
     box1->Set_Name("square1");
     
     RIGID_BODY<TV> *box2=&tests.Add_Rigid_Body("subdivided_box",1,(T).3);
-    box2->X()=TV(2,2,0);
+    box2->Frame().t=TV(2,2,0);
     box2->Twist().linear=TV(0,0,0);
     box2->Angular_Momentum()=TV(10,-3,20);//make 0,0,10 with .5 prismatic if you want the stacked example
     // make (10,-3,15) to replicate hinge edge intersection problem with rotation around z
@@ -157,14 +157,14 @@ One_Wonder_Wobbling()
     RIGID_BODY<TV> *plank=0,*box=0;
 
     plank=&tests.Add_Rigid_Body("plank",1,(T).3);
-    plank->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+    plank->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     plank->Set_Coefficient_Of_Restitution((T)0.5);
     plank->Set_Name("static");
     plank->is_static=true;
     
     box=&tests.Add_Rigid_Body("subdivided_box",1,(T).3);
-    box->X()=TV(1,6,-(T)1.5);
-    box->Rotation()=QUATERNION<T>((T)pi/2,TV(0,0,1));
+    box->Frame().t=TV(1,6,-(T)1.5);
+    box->Frame().r=QUATERNION<T>((T)pi/2,TV(0,0,1));
     box->Twist().linear=TV(-10,0,0);
     box->Set_Coefficient_Of_Restitution((T)0.5);
     box->Set_Name("square2");
@@ -190,8 +190,8 @@ Diez_Draping_Diddlehoppers()
 
     //green one
     rigid_body=&tests.Add_Rigid_Body("plank",1,(T).3);
-    rigid_body->X()=TV(0,3-8*shift,-2-9*shift+(T).25);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,3-8*shift,-2-9*shift+(T).25);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body->Set_Name("static");
     rigid_body->is_static=true;
@@ -200,8 +200,8 @@ Diez_Draping_Diddlehoppers()
 
     //purple one
     rigid_body=&tests.Add_Rigid_Body("plank",1,(T).3);
-    rigid_body->X()=TV(0,3-8*shift,2+9*shift-(T).25);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,3-8*shift,2+9*shift-(T).25);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body->Set_Name("static");
     rigid_body->is_static=true;
@@ -211,8 +211,8 @@ Diez_Draping_Diddlehoppers()
     // rope
     // 3
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-7*shift,-2-7*shift);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-7*shift,-2-7*shift);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[0]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -222,8 +222,8 @@ Diez_Draping_Diddlehoppers()
     
     // 4
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-5*shift,-2-5*shift);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-5*shift,-2-5*shift);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[1]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -233,8 +233,8 @@ Diez_Draping_Diddlehoppers()
 
     // 5
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-3*shift,-2-3*shift);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-3*shift,-2-3*shift);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[2]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -244,8 +244,8 @@ Diez_Draping_Diddlehoppers()
 
     // 6
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-shift,-2-shift);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-shift,-2-shift);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[3]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -255,8 +255,8 @@ Diez_Draping_Diddlehoppers()
     
     // 7
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8,-1);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8,-1);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[4]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -266,8 +266,8 @@ Diez_Draping_Diddlehoppers()
 
     // 8
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8,1);
-    rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8,1);
+    rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[5]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -278,8 +278,8 @@ Diez_Draping_Diddlehoppers()
 
     // 9
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-shift,2+shift);
-    rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-shift,2+shift);
+    rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[6]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -289,8 +289,8 @@ Diez_Draping_Diddlehoppers()
 
     // 10
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-3*shift,2+3*shift);
-    rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-3*shift,2+3*shift);
+    rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[7]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -300,8 +300,8 @@ Diez_Draping_Diddlehoppers()
 
     // 11
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-5*shift,2+5*shift);
-    rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-5*shift,2+5*shift);
+    rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[8]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -311,8 +311,8 @@ Diez_Draping_Diddlehoppers()
 
     // 12
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,8-7*shift,2+7*shift);
-    rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    rigid_body->Frame().t=TV(0,8-7*shift,2+7*shift);
+    rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     //rigid_body->Set_Mass(10);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint[9]->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,0)));
@@ -380,108 +380,108 @@ Twelve_Twirps_Twiddling()
 
     // 1
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,4,0);
+    rigid_body->Frame().t=TV(0,4,0);
     rigid_body->Twist().linear=TV(-10,0,0);
-    //rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1)));
     joint2->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,-1,1)));
     
     // 2
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(2,4,0);
+    rigid_body->Frame().t=TV(2,4,0);
     rigid_body->Twist().linear=TV(-10,0,0);
-    //rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint2->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1)));
     joint3->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,-1,1)));
 
     // 3
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(4,2,0);
+    rigid_body->Frame().t=TV(4,2,0);
     rigid_body->Twist().linear=TV(0,10,0);
-    //rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint3->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,1,1)));
     joint4->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,-1,1)));
 
     // 4
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(4,0,0);
+    rigid_body->Frame().t=TV(4,0,0);
     rigid_body->Twist().linear=TV(0,10,0);
-    //rigid_body->Rotation()=QUATERNION<T>((T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>((T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint4->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,1,1)));
     joint5->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,-1,1)));
     
     // 5
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(4,-2,0);
+    rigid_body->Frame().t=TV(4,-2,0);
     rigid_body->Twist().linear=TV(0,10,0);
-//    rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+//    rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint5->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,1,1)));
     joint6->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,-1,1)));
 
     // 6
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(2,-4,0);
+    rigid_body->Frame().t=TV(2,-4,0);
     rigid_body->Twist().linear=TV(10,0,0);
-    //rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint6->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,1,1)));
     joint7->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,1,1)));
 
     // 7
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(0,-4,0);
+    rigid_body->Frame().t=TV(0,-4,0);
     rigid_body->Twist().linear=TV(10,0,0);
-    //rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint7->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,1,1)));
     joint8->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,1,1)));
 
     // 8
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(-2,-4,0);
+    rigid_body->Frame().t=TV(-2,-4,0);
     rigid_body->Twist().linear=TV(10,0,0);
-    //rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint8->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,1,1)));
     joint9->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,1,1)));
 
     // 9
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(-4,-2,0);
+    rigid_body->Frame().t=TV(-4,-2,0);
     rigid_body->Twist().linear=TV(0,-10,0);
-    //rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint9->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,1)));
     joint10->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
 
     // 10
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(-4,0,0);
+    rigid_body->Frame().t=TV(-4,0,0);
     rigid_body->Twist().linear=TV(0,-10,0);
-    //rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint10->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,1)));
     joint11->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
 
     // 11
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(-4,2,0);
+    rigid_body->Frame().t=TV(-4,2,0);
     rigid_body->Twist().linear=TV(0,-10,0);
-    //rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint11->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,1)));
     joint12->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
 
     // 12
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",scale_factor,(T).3);
-    rigid_body->X()=TV(-2,4,0);
+    rigid_body->Frame().t=TV(-2,4,0);
     rigid_body->Twist().linear=TV(-10,0,20);
-    //rigid_body->Rotation()=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
+    //rigid_body->Frame().r=QUATERNION<T>(3*(T)pi/4,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     joint12->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1)));
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,-1,1)));

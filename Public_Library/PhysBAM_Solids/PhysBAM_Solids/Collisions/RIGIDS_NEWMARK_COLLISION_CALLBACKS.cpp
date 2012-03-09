@@ -55,8 +55,7 @@ template<class TV> void RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
 Restore_Position(const int p)
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=evolution.solid_body_collection.rigid_body_collection;
-    rigid_body_collection.rigid_body_particle.X(p)=evolution.rigid_X_save(p);
-    rigid_body_collection.rigid_body_particle.rotation(p)=evolution.rigid_rotation_save(p);
+    rigid_body_collection.rigid_body_particle.frame(p)=evolution.rigid_frame_save(p);
     rigid_body_collection.Rigid_Body(p).Update_Angular_Velocity();
     rigid_body_collection.Rigid_Body(p).Update_Bounding_Box();
 }
@@ -67,8 +66,7 @@ template<class TV> void RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
 Save_Position(const int p)
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=evolution.solid_body_collection.rigid_body_collection;
-    evolution.rigid_X_save(p)=rigid_body_collection.rigid_body_particle.X(p);
-    evolution.rigid_rotation_save(p)=rigid_body_collection.rigid_body_particle.rotation(p);
+    evolution.rigid_frame_save(p)=rigid_body_collection.rigid_body_particle.frame(p);
 }
 //#####################################################################
 // Function Restore_Velocity
@@ -126,10 +124,8 @@ Swap_State(const int id)
     RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(id);
     int parent_id=rigid_body_cluster_bindings.Get_Parent(body).particle_index;
     RIGID_BODY<TV>& parent_body=rigid_body_collection.Rigid_Body(parent_id);
-    exchange(rigid_body_collection.rigid_body_particle.X(id),evolution.rigid_X_save(body.particle_index));
-    exchange(rigid_body_collection.rigid_body_particle.rotation(id),evolution.rigid_rotation_save(body.particle_index));
-    if(parent_id!=id) exchange(rigid_body_collection.rigid_body_particle.X(parent_id),evolution.rigid_X_save(parent_id));
-    if(parent_id!=id) exchange(rigid_body_collection.rigid_body_particle.rotation(parent_id),evolution.rigid_rotation_save(parent_id));
+    exchange(rigid_body_collection.rigid_body_particle.frame(id),evolution.rigid_frame_save(body.particle_index));
+    if(parent_id!=id) exchange(rigid_body_collection.rigid_body_particle.frame(parent_id),evolution.rigid_frame_save(parent_id));
     parent_body.Update_Angular_Velocity();
 }
 //#####################################################################
@@ -138,8 +134,7 @@ Swap_State(const int id)
 template<class TV> FRAME<TV> RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
 Saved_Particle_To_Levelset_Body_Transform(const int levelset_body,const int particle_body)
 {
-    return FRAME<TV>(evolution.rigid_X_save(levelset_body),evolution.rigid_rotation_save(levelset_body)).Inverse_Times(
-        FRAME<TV>(evolution.rigid_X_save(particle_body),evolution.rigid_rotation_save(particle_body)));
+    return evolution.rigid_frame_save(levelset_body).Inverse_Times(evolution.rigid_frame_save(particle_body));
 }
 //#####################################################################
 // Function Exchange_Frame
@@ -147,9 +142,7 @@ Saved_Particle_To_Levelset_Body_Transform(const int levelset_body,const int part
 template<class TV> void RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
 Exchange_Frame(const int id)
 {
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=evolution.solid_body_collection.rigid_body_collection;
-    exchange(rigid_body_collection.rigid_body_particle.X(id),evolution.rigid_X_save(id));
-    exchange(rigid_body_collection.rigid_body_particle.rotation(id),evolution.rigid_rotation_save(id));
+    exchange(evolution.solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id),evolution.rigid_frame_save(id));
 }
 //#####################################################################
 // Function Compute_Collision_Impulse
@@ -158,7 +151,7 @@ template<class TV> TWIST<TV> RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
 Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const TV& relative_velocity,const T coefficient_of_restitution,
     const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy)
 {
-    return RIGID_BODY<TV>::Compute_Collision_Impulse(body1,body2,evolution.rigid_rotation_save(body1.particle_index),evolution.rigid_rotation_save(body2.particle_index),location,
+    return RIGID_BODY<TV>::Compute_Collision_Impulse(body1,body2,evolution.rigid_frame_save(body1.particle_index).r,evolution.rigid_frame_save(body2.particle_index).r,location,
         normal,relative_velocity,coefficient_of_restitution,coefficient_of_friction,clamp_friction_magnitude,rolling_friction,clamp_energy);
 }
 //#####################################################################
@@ -180,7 +173,7 @@ Begin_Fracture(const int body_id)
     Restore_Position(body_id);Restore_Velocity(body_id);
     old_stored_difference.angular=evolution.rigid_angular_momentum_difference(body_id);
     old_stored_difference.linear=evolution.rigid_velocity_difference(body_id);
-    old_position=rigid_body_collection.Rigid_Body(body_id).X();
+    old_position=rigid_body_collection.Rigid_Body(body_id).Frame().t;
 }
 //#####################################################################
 // Function End_Fracture
@@ -190,8 +183,7 @@ End_Fracture(const int body_id,ARRAY<int>& added_bodies)
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=evolution.solid_body_collection.rigid_body_collection;
     int new_size=rigid_body_collection.rigid_body_particle.array_collection->Size();
-    evolution.rigid_X_save.Resize(new_size);
-    evolution.rigid_rotation_save.Resize(new_size);
+    evolution.rigid_frame_save.Resize(new_size);
     evolution.rigid_velocity_save.Resize(new_size);
     evolution.rigid_angular_momentum_save.Resize(new_size);
     evolution.rigid_velocity_difference.Resize(new_size);
@@ -202,7 +194,7 @@ End_Fracture(const int body_id,ARRAY<int>& added_bodies)
         Save_Velocity(added_bodies(j));
         evolution.rigid_angular_momentum_difference(body_id)=old_stored_difference.angular;
         evolution.rigid_velocity_difference(body_id)=
-            old_stored_difference.linear+TV::Cross_Product(old_stored_difference.angular,rigid_body_collection.rigid_body_particle.X(body_id)-old_position);}
+            old_stored_difference.linear+TV::Cross_Product(old_stored_difference.angular,rigid_body_collection.rigid_body_particle.frame(body_id).t-old_position);}
 }
 //#####################################################################
 // Function Begin_Asymmetric_Collisions

@@ -55,7 +55,7 @@ public:
     void Bind_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body);
     template<class T_ARRAY> void Bind_Unbound_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& particle_array);
     template<class T_ARRAY> void Bind_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& particle_array);
-    void PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);
+    void PD_Curl(const T scale,const FRAME<TV>& frame,const T k_p,const int number_of_joints,const bool parent_static=true,const T friction=.5);
     RIGID_BODY<TV>* Create_Rigid_Body_From_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,
         const T density,const T cell_size,const int subdivision_loops=0,const bool perform_manifold_check=false,const bool (*create_levelset_test)(TETRAHEDRALIZED_VOLUME<T>&)=0,
         const bool use_implicit_surface_maker=true,const int levels_of_octree=0);

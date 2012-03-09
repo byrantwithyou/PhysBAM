@@ -773,7 +773,7 @@ void Set_Rigid_Body_Parameters(int rigid_body_index,const std::string& name,cons
     rigid_body_collection.Rigid_Body(rigid_body_index).name=name;
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Restitution((T)1);
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Friction((T)mu);
-    rigid_body_collection.rigid_body_particle.X(rigid_body_index)=position;
+    rigid_body_collection.rigid_body_particle.frame(rigid_body_index).t=position;
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Mass(mass);
     rigid_body_collection.rigid_body_particle.kinematic(rigid_body_index)=false;
     rigid_body_collection.Rigid_Body(rigid_body_index).simplicial_object->mesh.Initialize_Adjacent_Elements();
@@ -830,10 +830,10 @@ void Add_Destructive_Wall()
         implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
     rigid_body->Add_Structure(implicit_object);
     if(test_number==11){
-        rigid_body->X()=TV(.8,.2,0);
-        rigid_body->Rotation()=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));}
+        rigid_body->Frame().t=TV(.8,.2,0);
+        rigid_body->Frame().r=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));}
     else if(test_number==12)
-        rigid_body->X()=TV(0,.1,0);
+        rigid_body->Frame().t=TV(0,.1,0);
     rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
     rigid_body->fracture_threshold=(T).005;
 }
@@ -860,7 +860,7 @@ void Add_Room()
             implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
         rigid_body->Add_Structure(implicit_object);
         ROTATION<TV> rotation((T)i*(T)pi/2,TV(0,1,0));
-        rigid_body->Rotation()=ROTATION<TV>((T)i*(T)pi/2,TV(0,(T)1,0))*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
+        rigid_body->Frame().r=ROTATION<TV>((T)i*(T)pi/2,TV(0,(T)1,0))*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
         rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
         if((i==3) && fracture_walls){
             rigid_body->fracture_threshold=(T)18;
@@ -895,7 +895,7 @@ void Add_Enclosed_Room()
             implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
         rigid_body->Add_Structure(implicit_object);
         ROTATION<TV> rotation((T)i*(T)pi/2,TV(0,1,0));
-        rigid_body->Rotation()=rotation*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
+        rigid_body->Frame().r=rotation*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
         rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
         if(fracture_walls){
             rigid_body->fracture_threshold=(T)0;
@@ -920,7 +920,7 @@ void Add_Enclosed_Room()
             implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
         rigid_body->Add_Structure(implicit_object);
         ROTATION<TV> rotation((T)pi/2,TV(1,0,0));
-        rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
+        rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
         rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
         if(fracture_walls){
             rigid_body->fracture_threshold=(T)0;
@@ -970,7 +970,7 @@ void Bunny()
         FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/Rigid_Bodies/cannon.phi.gz",*levelset);
         rigid_body->Add_Structure(*surface);
         rigid_body->Add_Structure(*levelset);
-        rigid_body->Rotation()=ROTATION<TV>((T)pi,TV(0,(T)1,0))*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/5,TV(0,(T)1,0));
+        rigid_body->Frame().r=ROTATION<TV>((T)pi,TV(0,(T)1,0))*ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/5,TV(0,(T)1,0));
         rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
         Set_Rigid_Body_Parameters(rigid_body->particle_index,"Tube",TV(38,0,0),(T)1e10,(T)1);
         cannon_id=rigid_body->particle_index;
@@ -984,7 +984,7 @@ void Bunny()
         RIGID_BODY<TV>& rigid_body=solid_tests.Add_Rigid_Body("sphere",(T)1.45,(T).5,true,false);
         ammo_id=rigid_body.particle_index;
         rigid_body.simplicial_object->mesh.Initialize_Adjacent_Elements();
-        rigid_body.X()=TV((T)35,0,0);
+        rigid_body.Frame().t=TV((T)35,0,0);
         rigid_body.Set_Mass((T)1e3);
         collision_manager=new RIGID_BODY_COLLISION_MANAGER_HASH;
         collision_manager->hash.Insert(PAIR<int,int>(cannon_id,ammo_id));
@@ -994,8 +994,8 @@ void Bunny()
         if(fracture_walls){fp=6;FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fp),fracture_pattern);}
         RIGID_BODY<TV>& rigid_body=solid_tests.Add_Rigid_Body("bunny",6,(T).5,true,false);(void)rigid_body;
         rigid_body.simplicial_object->mesh.Initialize_Adjacent_Elements();
-        rigid_body.X()=TV(0,(T)-1,0);
-        rigid_body.Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0))*rigid_body.Rotation();
+        rigid_body.Frame().t=TV(0,(T)-1,0);
+        rigid_body.Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*rigid_body.Frame().r;
         rigid_body.fracture_threshold=(T)1e0;
     }
     { // The pedistal.
@@ -1019,7 +1019,7 @@ void Add_Wall_High_Resolution(const T x_delta,const T unit_mass)
 
     RIGID_BODY<TV>& wall=solid_tests.Add_Rigid_Body(wallfile,scale,mu);
     Set_Rigid_Body_Parameters(wall.particle_index,"wall",TV(x_pos,y_pos,z_pos),mass,mu);
-    wall.Rotation()=ROTATION<TV>((T)pi/2,TV(0,0,1));
+    wall.Frame().r=ROTATION<TV>((T)pi/2,TV(0,0,1));
 }
 //#####################################################################
 // Function Add_Stack_Of_Squares

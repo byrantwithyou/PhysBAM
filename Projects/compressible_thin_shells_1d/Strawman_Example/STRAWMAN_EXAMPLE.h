@@ -207,7 +207,7 @@ void Write_Output_Files(const T& time,const std::string& frame_title)
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/rho_fixed",rho_fixed);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/center_velocities",velocity);
 
-    rigid_geometry_collection.particles.X(1).x=solid_position(time);
+    rigid_geometry_collection.particles.frame(1).t.x=solid_position(time);
     Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,RW>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
 
     ARRAY<T,TV_INT> rho_analytic(grid.Domain_Indices(3));

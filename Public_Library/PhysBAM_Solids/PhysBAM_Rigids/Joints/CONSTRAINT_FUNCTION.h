@@ -169,8 +169,7 @@ public:
 
     const RIGID_BODY<TV>* rigid_body[2];
     const T dt,epsilon_scale;
-    TV p[2]; // time n position
-    ROTATION<TV> q[2]; // time n orientation
+    FRAME<TV> p[2]; // time n
     T_SPIN dt_angular_velocity[2],c,r[2];
     TV& location;
     T one_over_m;

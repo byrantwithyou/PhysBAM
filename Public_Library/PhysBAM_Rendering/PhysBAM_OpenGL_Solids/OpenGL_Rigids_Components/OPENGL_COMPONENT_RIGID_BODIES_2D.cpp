@@ -243,7 +243,7 @@ Update_Object_Labels()
         if(draw_object(i)){
             if(draw_velocity_vectors || draw_node_velocity_vectors){idx++;
                 if(draw_velocity_vectors){
-                    positions(idx)=rigid_body_collection.rigid_body_particle.X(i);
+                    positions(idx)=rigid_body_collection.rigid_body_particle.frame(i).t;
                     velocity_vectors(idx)=rigid_body_collection.rigid_body_particle.twist(i).linear;}
                 if(draw_node_velocity_vectors){
                     //only valid for squares . . .
@@ -263,7 +263,7 @@ Update_Object_Labels()
             if(opengl_segmented_curve(i)){
                 if(output_positions){
                     rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();
-                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.X(i).x,rigid_body_collection.rigid_body_particle.X(i).y,rigid_body_collection.rigid_body_particle.twist(i).angular.x));}
+                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.frame(i).t.x,rigid_body_collection.rigid_body_particle.frame(i).t.y,rigid_body_collection.rigid_body_particle.twist(i).angular.x));}
                 else opengl_segmented_curve(i)->Set_Name(rigid_body_collection.Rigid_Body(i).name);}}}
 }
 //#####################################################################
@@ -381,11 +381,11 @@ Display(const int in_color) const
                 OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
                 OpenGL_Begin(GL_LINES);
                 for(int i=0;i<forces_and_torques.Size();i++)
-                    OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particle.X(i),rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x);
+                    OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x);
                 OpenGL_End();
                 for(int i=0;i<forces_and_torques.Size();i++){
                     std::string label=STRING_UTILITIES::string_sprintf("F=%.3f %.3f, T=%.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).y);
-                    OpenGL_String(rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x,label);}}
+                    OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x,label);}}
 
             for(int i=0;i<extra_components.Size();i++)
                 for(int j=0;j<extra_components(i).m;j++)
@@ -395,7 +395,7 @@ Display(const int in_color) const
                 glColor3f(1,1,1);
                 for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
                     if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length())
-                        OpenGL_String(rigid_body_collection.rigid_body_particle.X(i),rigid_body_collection.Rigid_Body(i).name);}}
+                        OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.Rigid_Body(i).name);}}
         glPopAttrib();}
 }
 //#####################################################################
@@ -509,8 +509,8 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         if(!body->name.empty()){output_stream<<"Name = "<<body->name<<std::endl;}
         output_stream<<"Mass = "<<body->Mass()<<std::endl;
         output_stream<<"Moment of inertia = "<<body->Inertia_Tensor()<<std::endl;
-        output_stream<<"Position = "<<body->X()<<std::endl;
-        output_stream<<"Orientation = "<<body->Rotation()<<" (angle "<<body->Rotation().Angle()<<")"<<std::endl;
+        output_stream<<"Position = "<<body->Frame().t<<std::endl;
+        output_stream<<"Orientation = "<<body->Frame().r<<" (angle "<<body->Frame().r.Angle()<<")"<<std::endl;
         output_stream<<"Velocity = "<<body->Twist().linear<<std::endl;
         output_stream<<"Angular velocity = "<<body->Twist().angular<<std::endl;
         output_stream<<std::endl;

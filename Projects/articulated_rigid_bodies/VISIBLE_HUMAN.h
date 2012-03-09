@@ -398,7 +398,7 @@ void Make_Bones(const ARRAY<bool>& bone_filter=ARRAY<bool>())
             if(verbose) LOG::cout<<"Reading rigid body (but not adding to rigid body list) "<<filename<<std::endl;
             FRAME<TV> frame;
             rigid_body=new RIGID_BODY<TV>(rigid_body_collection);FILE_UTILITIES::Read_From_File(stream_type,filename+".rgd",rigid_body->Mass(),frame);
-            rigid_body->Set_Frame(frame);}
+            rigid_body->Frame()=frame;}
         rigid_body->Set_Coefficient_Of_Restitution((T).5);
         rigid_body->Set_Coefficient_Of_Friction((T).5);
         bone_names(i)=bone_files[i-1];
@@ -407,7 +407,7 @@ void Make_Bones(const ARRAY<bool>& bone_filter=ARRAY<bool>())
         rigid_body->Set_Name(bone_files[i-1]);
         // get anatomical frame w.r.t. rigid body frame instead of world frame
         anatomical_frame_in_rigid_body_frame(i)=rigid_body->Frame().Inverse()*anatomical_frame_in_rigid_body_frame(i);
-        rigid_body->Set_Frame(transform*rigid_body->Frame());
+        rigid_body->Frame()=transform*rigid_body->Frame();
         bones(i)=rigid_body;}
 }
 //#####################################################################
@@ -576,8 +576,8 @@ bool Add_Joint_Safe(const int local_parent_index,const int local_child_index,con
 ROTATION<TV> Get_Joint_Orientation_In_Parent_Anatomical_Frame(const int parent_index,const int child_index,const T rot1_deg,const T rot2_deg,const T rot3_deg,
     const ROTATION<TV>& joint_orientation_in_child_frame)
 {
-    ROTATION<TV> anatomical_to_world_frame_parent=bones(parent_index)->Rotation()*anatomical_frame_in_rigid_body_frame(parent_index).r;
-    ROTATION<TV> anatomical_to_world_frame_child=bones(child_index)->Rotation()*anatomical_frame_in_rigid_body_frame(child_index).r;
+    ROTATION<TV> anatomical_to_world_frame_parent=bones(parent_index)->Frame().r*anatomical_frame_in_rigid_body_frame(parent_index).r;
+    ROTATION<TV> anatomical_to_world_frame_child=bones(child_index)->Frame().r*anatomical_frame_in_rigid_body_frame(child_index).r;
     ROTATION<TV> rotation=ROTATION<TV>(rot1_deg*(T)(pi/180),TV(1,0,0))*ROTATION<TV>(rot2_deg*(T)(pi/180),TV(0,1,0))*ROTATION<TV>(rot3_deg*(T)(pi/180),TV(0,0,1));
     return anatomical_to_world_frame_parent.Inverse()*anatomical_to_world_frame_child*joint_orientation_in_child_frame*rotation.Inverse();
 }

@@ -276,9 +276,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     switch(test_number){
         case 1:{
             last_frame=(int)(8*frame_rate);
-            body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->X().z=4;
+            body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->Frame().t.z=4;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
-            body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->X().z=-4;
+            body=&tests.Add_Rigid_Body("box",(T)2,(T)0);body->Frame().t.z=-4;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)4));
@@ -305,9 +305,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 2:{
             last_frame=(int)(8*frame_rate);
-            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->X().z=11;
+            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
-            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->X().z=-11;
+            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=-11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)11));
@@ -321,9 +321,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 3:{
             last_frame=(int)(8*frame_rate);
-            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->X().z=11;
+            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
-            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->X().z=-11;
+            body=&tests.Add_Rigid_Body("box",(T)10,(T)0);body->Frame().t.z=-11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             int N=32;
@@ -337,9 +337,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 4:{
             last_frame=(int)(2*frame_rate);
-            body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->X().z=11;
+            body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->Frame().t.z=11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
-            body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->X().z=-11;
+            body=&tests.Add_Rigid_Body("box",(T)1,(T)0);body->Frame().t.z=-11;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)3));
@@ -361,9 +361,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 6:{
             last_frame=(int)(8*frame_rate);
-            body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->X().z=5;
+            body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->Frame().t.z=5;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
-            body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->X().z=-5;
+            body=&tests.Add_Rigid_Body("box",(T)3,(T)0);body->Frame().t.z=-5;
             rigid_body_collection.rigid_body_particle.kinematic(body->particle_index)=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             curve.Add_Control_Point((T)0,TV(0,0,(T)5));
@@ -389,19 +389,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             cylinder_start=TV(0,2,0);
             cylinder_velocity=TV(0,-5,0);
             RIGID_BODY<TV>&gear1=tests.Add_Rigid_Body("gear",(T).375,roller_friction);
-            gear1.X()=TV(-(T).4,(T)1.5,(T)-.75);
-            gear1.Rotation()=roller_orientation;
+            gear1.Frame().t=TV(-(T).4,(T)1.5,(T)-.75);
+            gear1.Frame().r=roller_orientation;
             gear1.Twist().angular=-roller_speed*TV(0,0,1);
 
             RIGID_BODY<TV>&gear2=tests.Add_Rigid_Body("gear",(T).375,roller_friction);
-            gear2.X()=TV((T).4,(T)1.5,(T)-.75);
-            gear2.Rotation()=roller_orientation;
+            gear2.Frame().t=TV((T).4,(T)1.5,(T)-.75);
+            gear2.Frame().r=roller_orientation;
             gear2.Twist().angular=roller_speed*TV(0,0,1);
 
             RIGID_BODY<TV>&cylinder=tests.Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).375/2,0);
-            cylinder.X()=cylinder_start;
+            cylinder.Frame().t=cylinder_start;
             cylinder.Twist().linear=cylinder_velocity;
-            cylinder.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
+            cylinder.Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));
 
             TETRAHEDRALIZED_VOLUME<T>& buddha=tests.Create_Tetrahedralized_Volume(buddha_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             buddha.Update_Bounding_Box();
@@ -421,7 +421,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             last_frame=(int)(5*frame_rate);
             solids_parameters.cfl=(T)10.0;
             RIGID_BODY<TV>& box=tests.Add_Rigid_Body("cutout_box",(T)0.708855526,0);
-            box.Rotation()=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
+            box.Frame().r=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
 
             TETRAHEDRALIZED_VOLUME<T>& buddha=tests.Create_Tetrahedralized_Volume(buddha_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             buddha.Update_Bounding_Box();
@@ -435,7 +435,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 9:{
             last_frame=(int)(2*frame_rate);
             RIGID_BODY<TV>& box=tests.Add_Rigid_Body("cutout_box",(T)1.611991954,0);
-            box.Rotation()=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
+            box.Frame().r=ROTATION<TV>(-(T)pi/2,TV(1,0,0));
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)1.2,0))),true,false,1000);
 
             use_gravity=true;
@@ -469,14 +469,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 12:{
             last_frame=(int)(8*frame_rate);
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)1.5,1,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-.5,0,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-2.5,-1,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-4.5,-2,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-6.5,-3,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-8.5,-4,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-10.5,-5,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-12.5,-6,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)1.5,1,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-.5,0,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-2.5,-1,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-4.5,-2,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-6.5,-3,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-8.5,-4,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-10.5,-5,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-12.5,-6,0);body->is_static=true;
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,3,0))),true,false,1000);
 
             use_gravity=true;
@@ -512,19 +512,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             cylinder_start=TV(0,2,0);
             cylinder_velocity=TV(0,-5,0);
             RIGID_BODY<TV>&gear1=tests.Add_Rigid_Body("gear",(T).375,roller_friction);
-            gear1.X()=TV(-(T).4,(T)1.5,(T)-.75);
-            gear1.Rotation()=roller_orientation;
+            gear1.Frame().t=TV(-(T).4,(T)1.5,(T)-.75);
+            gear1.Frame().r=roller_orientation;
             gear1.Twist().angular=-roller_speed*TV(0,0,1);
 
             RIGID_BODY<TV>&gear2=tests.Add_Rigid_Body("gear",(T).375,roller_friction);
-            gear2.X()=TV((T).4,(T)1.5,(T)-.75);
-            gear2.Rotation()=roller_orientation;
+            gear2.Frame().t=TV((T).4,(T)1.5,(T)-.75);
+            gear2.Frame().r=roller_orientation;
             gear2.Twist().angular=roller_speed*TV(0,0,1);
 
             RIGID_BODY<TV>&cylinder=tests.Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).375/2,0);
-            cylinder.X()=cylinder_start;
+            cylinder.Frame().t=cylinder_start;
             cylinder.Twist().linear=cylinder_velocity;
-            cylinder.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
+            cylinder.Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));
             
             tests.Create_Tetrahedralized_Volume(armadillo_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0),initial_orientation)),true,false,1000,armadillo_scale);
             tests.Add_Ground((T)1);
@@ -544,19 +544,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             cylinder_start=TV(0,2,0);
             cylinder_velocity=TV(0,-5,0);
             RIGID_BODY<TV>&gear1=tests.Add_Rigid_Body("gear",(T).375,roller_friction);
-            gear1.X()=TV(-(T).4,(T)1.5,(T)-.75);
-            gear1.Rotation()=roller_orientation;
+            gear1.Frame().t=TV(-(T).4,(T)1.5,(T)-.75);
+            gear1.Frame().r=roller_orientation;
             gear1.Twist().angular=-roller_speed*TV(0,0,1);
 
             RIGID_BODY<TV>&gear2=tests.Add_Rigid_Body("gear",(T).375,roller_friction);
-            gear2.X()=TV((T).4,(T)1.5,(T)-.75);
-            gear2.Rotation()=roller_orientation;
+            gear2.Frame().t=TV((T).4,(T)1.5,(T)-.75);
+            gear2.Frame().r=roller_orientation;
             gear2.Twist().angular=roller_speed*TV(0,0,1);
 
             RIGID_BODY<TV>&cylinder=tests.Add_Rigid_Body("Rings_Test/cylinder_revolve",(T).375/2,0);
-            cylinder.X()=cylinder_start;
+            cylinder.Frame().t=cylinder_start;
             cylinder.Twist().linear=cylinder_velocity;
-            cylinder.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
+            cylinder.Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));
             
             tests.Create_Tetrahedralized_Volume(sphere_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.3,0),initial_orientation)),true,false,1000,(T).3);
             tests.Add_Ground((T)1);
@@ -566,14 +566,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 16:{
             last_frame=(int)(8*frame_rate);
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)1.5,1,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-.5,0,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-2.5,-1,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-4.5,-2,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-6.5,-3,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-8.5,-4,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-10.5,-5,0);body->is_static=true;
-            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->X()=TV((T)-12.5,-6,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)1.5,1,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-.5,0,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-2.5,-1,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-4.5,-2,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-6.5,-3,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-8.5,-4,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-10.5,-5,0);body->is_static=true;
+            body=&tests.Add_Rigid_Body("plank",(T)1,(T)0);body->Frame().t=TV((T)-12.5,-6,0);body->is_static=true;
             tests.Create_Tetrahedralized_Volume(armadillo_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).33,(T)3,0),initial_orientation)),true,false,1000,armadillo_scale*4);
             tests.Add_Ground(0,(T)-7);
 
@@ -604,9 +604,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // rigid bodies
             if(test_number==18){
                 for(int i=0;i<16;i++){T a=i*(T)pi/8;
-                    body=&tests.Add_Rigid_Body("skinnyhexlink",(T)2,(T)0);body->X()=TV((T)cos(a)*6+(T)1.5,(T)2,(T)sin(a)*6+(T)1.5);body->is_static=true;}
+                    body=&tests.Add_Rigid_Body("skinnyhexlink",(T)2,(T)0);body->Frame().t=TV((T)cos(a)*6+(T)1.5,(T)2,(T)sin(a)*6+(T)1.5);body->is_static=true;}
                 for(int i=0;i<32;i++){T a=i*(T)pi/16;
-                    body=&tests.Add_Rigid_Body("skinnyhexlink",(T)2,(T)0);body->X()=TV((T)cos(a)*12+(T)1.5,(T)2,(T)sin(a)*12+(T)1.5);body->is_static=true;}}
+                    body=&tests.Add_Rigid_Body("skinnyhexlink",(T)2,(T)0);body->Frame().t=TV((T)cos(a)*12+(T)1.5,(T)2,(T)sin(a)*12+(T)1.5);body->is_static=true;}}
             tests.Add_Ground((T).1);
 
             use_gravity=true;

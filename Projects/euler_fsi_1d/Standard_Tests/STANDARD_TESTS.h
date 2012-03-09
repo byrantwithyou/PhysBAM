@@ -119,7 +119,7 @@ public:
     bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,ARRAY<T>& rigid_simplex_forces,
         TV& orientation,const T time) PHYSBAM_OVERRIDE {return false;}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
@@ -427,10 +427,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         rect.Set_Name("bullet");
         LOG::cout<<"Setting solid mass to "<<solid_mass<<std::endl;
         rect.Set_Mass(solid_mass);
-        if(test_number==5) rect.X()=TV(1.5);
-        // else if(test_number==6) rect.X()=TV(.9);
-        // else rect.X()=TV(.8);
-        rect.X()=grid.X(grid.Cell(TV(1.3),0))+solid_position_delta*grid.DX();
+        if(test_number==5) rect.Frame().t=TV(1.5);
+        // else if(test_number==6) rect.Frame().t=TV(.9);
+        // else rect.Frame().t=TV(.8);
+        rect.Frame().t=grid.X(grid.Cell(TV(1.3),0))+solid_position_delta*grid.DX();
         rect.Is_Kinematic()=false;
 
         Add_Volumetric_Body_To_Fluid_Simulation(rect,true,true);}
@@ -486,7 +486,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==2 || test_number==10 || test_number==5){
         RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
         int rigid_body_index=1;
-        position=rigid_body_particles.X(rigid_body_index).x;
+        position=rigid_body_particles.frame(rigid_body_index).t.x;
         velocity=rigid_body_particles.twist(rigid_body_index).linear.x;}
     else if(test_number==3 || test_number==4){
         DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;

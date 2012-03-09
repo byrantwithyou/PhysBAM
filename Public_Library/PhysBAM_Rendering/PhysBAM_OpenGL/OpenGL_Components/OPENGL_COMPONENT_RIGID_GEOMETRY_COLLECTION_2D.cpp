@@ -239,7 +239,7 @@ Update_Object_Labels()
         if(draw_object(i)){
             if(draw_velocity_vectors || draw_node_velocity_vectors){idx++;
                 if(draw_velocity_vectors){
-                    positions(idx)=rigid_geometry_collection->particles.X(i);
+                    positions(idx)=rigid_geometry_collection->particles.frame(i).t;
                     velocity_vectors(idx)=rigid_geometry_collection->particles.twist(i).linear;}
                 if(draw_node_velocity_vectors){
                     //only valid for squares . . .
@@ -258,7 +258,7 @@ Update_Object_Labels()
                     node_velocity_vectors((idx-1)*4+4)=rigid_geometry->Pointwise_Object_Velocity(rigid_geometry->World_Space_Vector(VECTOR<T,2>(-1,-1)));}}
             if(opengl_segmented_curve(i)){
                 if(output_positions){
-                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.X(i).x,rigid_geometry_collection->particles.X(i).y,rigid_geometry_collection->particles.twist(i).angular.x));}
+                    opengl_segmented_curve(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f> [w=%.3f]",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.frame(i).t.x,rigid_geometry_collection->particles.frame(i).t.y,rigid_geometry_collection->particles.twist(i).angular.x));}
                 else opengl_segmented_curve(i)->Set_Name(rigid_geometry_collection->Rigid_Geometry(i).name);}}}
 }
 //#####################################################################
@@ -349,7 +349,7 @@ Display(const int in_color) const
                 glColor3f(1,1,1);
                 for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++)
                     if(draw_object(i) && rigid_geometry_collection->Rigid_Geometry(i).name.length())
-                        OpenGL_String(rigid_geometry_collection->particles.X(i),rigid_geometry_collection->Rigid_Geometry(i).name);}
+                        OpenGL_String(rigid_geometry_collection->particles.frame(i).t,rigid_geometry_collection->Rigid_Geometry(i).name);}
 #endif
         }
         glPopAttrib();}

@@ -161,7 +161,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -499,7 +499,7 @@ void Push_Out_Test()
     int num_blocks=4;
     for(int i=0;i<num_blocks;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-        rigid_body.Set_Frame(FRAME<TV>(TV((T)1.8*(i+1),(T)1.6*(i+1),(T)0),ROTATION<TV>((T)pi/10*(i+1),TV::Axis_Vector(0))));
+        rigid_body.Frame()=FRAME<TV>(TV((T)1.8*(i+1),(T)1.6*(i+1),(T)0),ROTATION<TV>((T)pi/10*(i+1),TV::Axis_Vector(0)));
         rigid_body.Set_Mass(1000);
         if(i==2) rigid_body.is_static=true;
         /*        rigid_body.Twist().linear=TV(-1,0,0);*/}
@@ -513,7 +513,7 @@ void Push_Out_Test()
     tests.Initialize_Tetrahedron_Collisions(1,tetrahedralized_volume2,solids_parameters.triangle_collision_parameters);
 
 //    int n=10;
-//    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).X()=TV(1.8*(i+1),1.*j,1.75*k);
+//    for(int i=0;i<n;i++) for(int j=0;j<n;j++) for(int k=0;k<n;k++) tests.Add_Rigid_Body("subdivided_box",1,(T)0).Frame().t=TV(1.8*(i+1),1.*j,1.75*k);
 }
 //#####################################################################
 // Function Coupled_Stack
@@ -526,7 +526,7 @@ void Coupled_Stack()
     for(int i=0;i<6;i++){
         if(i%2==0){
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).4);
-            rigid_body.X()=TV(0,(T)(2*i+1),0);
+            rigid_body.Frame().t=TV(0,(T)(2*i+1),0);
             rigid_body.Set_Mass(6000);}
         else{
             tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(7,7,7),RANGE<TV>(TV(-(T)1,(T)(2*i),-(T)1),TV((T)1,(T)(2*i+2),(T)1))),1000);}}
@@ -534,7 +534,7 @@ void Coupled_Stack()
     maximum_fall_speed=105;
 //    T v=maximum_fall_speed,g=solids_parameters.gravity,t=4;
     RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",(T)1,(T).2);
-    sphere.X()=TV(0,1,82);
+    sphere.Frame().t=TV(0,1,82);
     sphere.Twist().linear=TV(0,0,-25);
     sphere.Update_Bounding_Box();
     sphere.Set_Mass(6000);
@@ -614,8 +614,8 @@ void Trampoline()
     RIGID_BODY<TV>& torus=tests.Add_Analytic_Torus((T).3,(T)7,12,48);
     torus.Is_Kinematic()=true;
     kinematic_id=torus.particle_index;
-    torus.X()=torus_min;
-    torus.Rotation()=torus_rotation;
+    torus.Frame().t=torus_min;
+    torus.Frame().r=torus_rotation;
 
     TORUS<T> torus_geometry(static_cast<ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >&>(*torus.implicit_object->object_space_implicit_object).analytic);
     TRAMPOLINE_CLIPPING clipping(torus.World_Space_Vector(torus_geometry.axis),torus_geometry.inner_radius+torus_geometry.outer_radius);
@@ -630,7 +630,7 @@ void Trampoline()
      for(int i=0;i<3;i++){
          RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",(T).6,(T).2);
          rigid_body.Update_Bounding_Box();
-         rigid_body.Set_Frame(Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,false));
+         rigid_body.Frame()=Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,false);
          rigid_body.Set_Mass(1);}
      for(int i=0;i<3;i++){
          RANGE<TV> box(-TV((T)3,(T)3,(T)1),TV((T)3,(T)3,(T)1));
@@ -660,17 +660,17 @@ void Sliding_Test()
     LOG::cout<<"Using angle "<<ground_angle_deg<<" deg ("<<ground_angle_rad<<") (critical coeff="<<tan(ground_angle_rad)<<std::endl;
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,box_size,mu);
-    rigid_body->X()=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad)+(T).2,0);
-    rigid_body->Rotation()=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
-    rigid_body->Twist().linear=rigid_body->Rotation().Rotate(TV(-initial_speed_down_ramp1,0,0));
+    rigid_body->Frame().t=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad)+(T).2,0);
+    rigid_body->Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
+    rigid_body->Twist().linear=rigid_body->Frame().r.Rotate(TV(-initial_speed_down_ramp1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("box 1 mu=%.2f",mu));
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,box_size,mu);
-    rigid_body->X()=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad),8*box_size);
-    rigid_body->Rotation()=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
+    rigid_body->Frame().t=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad),8*box_size);
+    rigid_body->Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Twist().linear=rigid_body->Rotation().Rotate(TV(-initial_speed_down_ramp2,0,0));
+    rigid_body->Twist().linear=rigid_body->Frame().r.Rotate(TV(-initial_speed_down_ramp2,0,0));
     rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("box 2 mu=%.2f",mu));
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
@@ -680,14 +680,14 @@ void Sliding_Test()
     free_particles.nodes.Append(particle_rest);free_particles.nodes.Append(particle_fall);
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T).1,0);
-    rigid_body->X()=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad)+(T).2,0);
+    rigid_body->Frame().t=TV(-box_size*sin(ground_angle_rad),box_size*cos(ground_angle_rad)+(T).2,0);
     rigid_body->Set_Name("analytic solution");
     rigid_body->Is_Kinematic()=true;
     kinematic_id=rigid_body->particle_index;
 
     RIGID_BODY<TV>& ground=tests.Add_Ground(mu,0,0);
     ground.Set_Coefficient_Of_Rolling_Friction(1);
-    ground.Rotation()=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
+    ground.Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
 }
 //#####################################################################
 // Function Point_Joint_Coupled_Drop
@@ -697,13 +697,13 @@ void Point_Joint_Coupled_Drop(bool make_body_static)
     last_frame=120;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body1.X()=TV(0,2,0);
+    rigid_body1.Frame().t=TV(0,2,0);
     rigid_body1.Set_Mass(1000);
     rigid_body1.Set_Name("parent");
     if(make_body_static) rigid_body1.is_static=true;
 
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body2.X()=TV(0,4,2);
+    rigid_body2.Frame().t=TV(0,4,2);
     rigid_body2.Set_Mass(1000);
     rigid_body2.Set_Name("child");
 
@@ -726,12 +726,12 @@ void Torsion_Spring()
 
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=3;
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body1.X()=TV(0,2,0);
+    rigid_body1.Frame().t=TV(0,2,0);
     rigid_body1.Set_Mass(30);
     rigid_body1.Set_Name("parent");
 
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body2.X()=TV((T)2.1,2,0);
+    rigid_body2.Frame().t=TV((T)2.1,2,0);
     rigid_body2.Set_Name("child");
     rigid_body2.Set_Mass(30);
     rigid_body2.is_static=true;
@@ -741,20 +741,20 @@ void Torsion_Spring()
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.05,0,0),ROTATION<TV>()));
 
     RIGID_BODY<TV>& rigid_body3=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body3.X()=TV(-8,2,0);
+    rigid_body3.Frame().t=TV(-8,2,0);
     rigid_body3.Set_Mass(30);
     rigid_body3.Set_Name("kinematic");
     rigid_body3.Is_Kinematic()=true;
     kinematic_id=rigid_body3.particle_index;
-    curve.Add_Control_Point((T)0,FRAME<TV>(rigid_body3.X(),ROTATION<TV>()));
-    curve.Add_Control_Point((T)1,FRAME<TV>(rigid_body3.X(),ROTATION<TV>()));
-    curve.Add_Control_Point((T)2,FRAME<TV>(rigid_body3.X(),ROTATION<TV>((T)(.5*pi),TV(1,0,0))));
-    curve.Add_Control_Point((T)3,FRAME<TV>(rigid_body3.X(),ROTATION<TV>((T)(pi),TV(1,0,0))));
-    curve.Add_Control_Point((T)4,FRAME<TV>(rigid_body3.X(),ROTATION<TV>((T)(1.5*pi),TV(1,0,0))));
-    curve.Add_Control_Point((T)5,FRAME<TV>(rigid_body3.X(),ROTATION<TV>((T)(2*pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)0,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>()));
+    curve.Add_Control_Point((T)1,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>()));
+    curve.Add_Control_Point((T)2,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(.5*pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)3,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)4,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(1.5*pi),TV(1,0,0))));
+    curve.Add_Control_Point((T)5,FRAME<TV>(rigid_body3.Frame().t,ROTATION<TV>((T)(2*pi),TV(1,0,0))));
 
     RIGID_BODY<TV>& rigid_body4=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-    rigid_body4.X()=TV((T)1.05,(T)4.05,0);
+    rigid_body4.Frame().t=TV((T)1.05,(T)4.05,0);
     rigid_body4.Set_Name("drop");
     rigid_body4.Set_Mass(30);
 
@@ -814,19 +814,19 @@ void Floppy_Fish()
     ARRAY<RIGID_BODY<TV>*> bones;
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T)1,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV(-(T)2,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV(-(T)2,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T)1,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV(-(T).75,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV(-(T).75,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T)1,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV((T).5,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV((T).5,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T).7,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV((T)1.7,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV((T)1.7,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T).5,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV((T)2.5,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV((T)2.5,(T)3,0));
 
     T density=1000;
     for(int i=0;i<bones.m;i++){
@@ -879,7 +879,7 @@ void Twisting_Chain(bool apply_twist)
         FRAME<TV> frame(TV((T)1.3*(i+1),6,0),ROTATION<TV>((i+1)*(T)pi/2,TV(1,0,0)));
         if(i%3==1){
             rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);
-            rigid_body->Set_Frame(frame*FRAME<TV>(TV(),ROTATION<TV>((T)pi/2,TV(1,0,0))));
+            rigid_body->Frame()=frame*FRAME<TV>(TV(),ROTATION<TV>((T)pi/2,TV(1,0,0)));
             rigid_body->Set_Mass(30);
             if(i==1 || (i==3*n+1 && !apply_twist)) rigid_body->is_static=true;
             else if(i==3*n+1 && apply_twist){rigid_body->Is_Kinematic()=true;kinematic_id=rigid_body->particle_index;}}
@@ -905,7 +905,7 @@ void Brush_And_Wheel()
 //  solids_parameters.cfl=(T)5;
 
     RIGID_BODY<TV>& cylinder=tests.Add_Analytic_Cylinder(1,2,48,4);
-    cylinder.X()=TV(0,1,0);
+    cylinder.Frame().t=TV(0,1,0);
     cylinder.Twist().angular=TV(0,0,1);
     cylinder.Update_Angular_Momentum();
     JOINT<TV>* joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(cylinder.particle_index,int(3),joint);
@@ -913,7 +913,7 @@ void Brush_And_Wheel()
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(0,3,0),ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
 
     RIGID_BODY<TV>& box=tests.Add_Analytic_Box(TV(2,2,2));
-    box.X()=TV((T)4.5,(T)3.6,0);
+    box.Frame().t=TV((T)4.5,(T)3.6,0);
     box.Is_Kinematic()=true;
     curve.Add_Control_Point(0,FRAME<TV>(TV((T)4.5,(T)3.6,0)));
     curve.Add_Control_Point((T).5,FRAME<TV>(TV((T)4.5,(T)3.6,0)));
@@ -984,14 +984,14 @@ void Ring_Drop()
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
             rigid_body.is_static=true;
-            rigid_body.X()=position;}
+            rigid_body.Frame().t=position;}
 
     // Rigid spheres
     for(int i=0;i<num_objects;i++){
         T scale=(T)1.75;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",scale,mu);
         rigid_body.Update_Bounding_Box();
-        rigid_body.Set_Frame(Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,true));
+        rigid_body.Frame()=Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,true);
         rigid_body.Set_Mass(ring_mass);
         T d=max((T)0,bounding_boxes.Last().Center().y-world.min_corner.y),clamp_time=d<h?0:base_t+(d-h)/maximum_fall_speed;
         if(clamp_time>0) rigid_body_clamp_time.Append(PAIR<RIGID_BODY<TV>*,T>(&rigid_body,clamp_time));}
@@ -1002,7 +1002,7 @@ void Ring_Drop()
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/ring_revolve",scale,mu);
 
         rigid_body.Update_Bounding_Box();
-        rigid_body.Set_Frame(Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,true));
+        rigid_body.Frame()=Find_Placement(random,rigid_body.axis_aligned_bounding_box,bounding_boxes,world,true);
         rigid_body.Set_Mass(ring_mass);
         T d=max((T)0,bounding_boxes.Last().Center().y-world.min_corner.y),clamp_time=d<h?0:base_t+(d-h)/maximum_fall_speed;
         if(clamp_time>0) rigid_body_clamp_time.Append(PAIR<RIGID_BODY<TV>*,T>(&rigid_body,clamp_time));}
@@ -1091,7 +1091,7 @@ void Cubes_Friction()
     TWIST<TV> twist(frame.r.Rotate(TV(-initial_speed_down_ramp,0,0)),TV());
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,box_size,mu);
-    rigid_body->Set_Frame(frame);
+    rigid_body->Frame()=frame;
     rigid_body->Twist()=twist;
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("box");
@@ -1108,14 +1108,14 @@ void Cubes_Friction()
 
     frame.t.z+=(T).2;
     rigid_body=&tests.Add_Rigid_Body("sphere",(T).1,0);
-    rigid_body->X()=frame.t;
+    rigid_body->Frame().t=frame.t;
     rigid_body->Set_Name("analytic solution");
     rigid_body->Is_Kinematic()=true;
     kinematic_id=rigid_body->particle_index;
 
     RIGID_BODY<TV>& ground=tests.Add_Ground(mu,0,0);
     ground.Set_Coefficient_Of_Rolling_Friction(1);
-    ground.Rotation()=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
+    ground.Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
 }
 //#####################################################################
 // Function PD_Curl
@@ -1129,8 +1129,8 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
 
     // Create first body
     parent_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
-    parent_body->X()=shift;
-    parent_body->Rotation()=orient*initial_orientation;
+    parent_body->Frame().t=shift;
+    parent_body->Frame().r=orient*initial_orientation;
     parent_body->Set_Name("parent");
     parent_body->Set_Mass(50);
 
@@ -1139,8 +1139,8 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
     for(int i=0;i<number_of_joints;i++){
         cheight+=scale*((T)1.25+space_adjustment);
         child_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
-        child_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-        child_body->Rotation()=orient*initial_orientation;
+        child_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
+        child_body->Frame().r=orient*initial_orientation;
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
         child_body->Set_Mass(50);
@@ -1198,12 +1198,12 @@ void Sidewinding()
     for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
-//     rigid_body.X()=TV((T)0,(T).3,-10);
+//     rigid_body.Frame().t=TV((T)0,(T).3,-10);
 //     rigid_body.Set_Name("obstruction");
 //     rigid_body.Set_Mass(30);}
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
-//     rigid_body.X()=TV((T)-2,(T).3,-10);
+//     rigid_body.Frame().t=TV((T)-2,(T).3,-10);
 //     rigid_body.Set_Name("obstruction");
 //     rigid_body.Set_Mass(30);}
 
@@ -1212,8 +1212,8 @@ void Sidewinding()
 
     for(int i=0;i<count;i++) for(int j=0;j<6;j++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("plank",(T)1,friction);
-        rigid_body.X()=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-4-2*i));
-        rigid_body.Rotation()=ROTATION<TV>((T)half_pi,TV(0,1,0));
+        rigid_body.Frame().t=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-4-2*i));
+        rigid_body.Frame().r=ROTATION<TV>((T)half_pi,TV(0,1,0));
         rigid_body.Set_Name("obstruction");
         rigid_body.is_static=true;
         rigid_body.Set_Mass(30);}
@@ -1238,14 +1238,14 @@ void Row_Of_Spheres()
     solids_parameters.cfl=(T)1;
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T)1,(T).2);
-    rigid_body->X()=TV(-30,0,0);
+    rigid_body->Frame().t=TV(-30,0,0);
     rigid_body->Twist().linear=TV(50,0,0);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Mass(1000);
     rigid_body->Set_Name("in");
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T)1,(T).2);
-    rigid_body->X()=TV(0,0,0);
+    rigid_body->Frame().t=TV(0,0,0);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Mass(1000);
     rigid_body->Set_Name("r 1");
@@ -1256,7 +1256,7 @@ void Row_Of_Spheres()
     solid_body_collection.Add_Force(fvm);
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T)1,(T).2);
-    rigid_body->X()=TV(4,0,0);
+    rigid_body->Frame().t=TV(4,0,0);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Mass(1000);
     rigid_body->Set_Name("r 3");
@@ -1267,7 +1267,7 @@ void Row_Of_Spheres()
     solid_body_collection.Add_Force(fvm);
 
     rigid_body=&tests.Add_Rigid_Body("sphere",(T)1,(T).2);
-    rigid_body->X()=TV(8,0,0);
+    rigid_body->Frame().t=TV(8,0,0);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Mass(1000);
     rigid_body->Set_Name("out");
@@ -1299,7 +1299,7 @@ void Add_Maggot(const T scale,const RIGID_BODY_STATE<TV>& state,const std::strin
     for(int p=rigid_body_collection.rigid_body_particle.array_collection->Size()-number_of_joints;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
         rigid_body.Twist().angular=state.twist.angular;
-        rigid_body.Twist().linear=state.Pointwise_Object_Velocity(rigid_body.X());
+        rigid_body.Twist().linear=state.Pointwise_Object_Velocity(rigid_body.Frame().t);
         tests.Bind_Particles_In_Rigid_Body(rigid_body);}
 }
 //#####################################################################
@@ -1369,8 +1369,8 @@ void Bowl_Of_Maggots(bool use_blocks)
     start_time=(T)0;
 
     RIGID_BODY<TV>& bowl=tests.Add_Rigid_Body("bowl",(T)5,(T).2);
-    bowl.X()=TV(0,(T)0.1,0);
-    bowl.Rotation()=ROTATION<TV>(-(T)half_pi,TV(1,0,0));
+    bowl.Frame().t=TV(0,(T)0.1,0);
+    bowl.Frame().r=ROTATION<TV>(-(T)half_pi,TV(1,0,0));
     bowl.Set_Name("bowl");
     bowl.is_static=true;
 
@@ -1391,7 +1391,7 @@ void Bowl_Of_Maggots(bool use_blocks)
         if(use_blocks){
             RIGID_BODY<TV>& block=tests.Add_Rigid_Body("torus",torus_scale,(T).2);
             FRAME<TV> frame=Find_Placement(random_numbers,torus_box*torus_scale,bounding_boxes,world,true);
-            block.Set_Frame(frame);
+            block.Frame()=frame;
             block.Set_Name("block");
             block.Set_Mass(ring_mass);}}
     (void)block_scale;
@@ -1431,8 +1431,8 @@ void Trapped_Maggot()
 
     RIGID_BODY<TV>& block=tests.Add_Rigid_Body("torus",5,(T).6);
     block.Set_Coefficient_Of_Restitution(0);
-    block.X()=TV((T)5,(T)1.75,0);
-    block.Rotation()=ROTATION<TV>(-(T)pi*(T).025,TV(0,0,1));
+    block.Frame().t=TV((T)5,(T)1.75,0);
+    block.Frame().r=ROTATION<TV>(-(T)pi*(T).025,TV(0,0,1));
     block.Set_Name("heavy object");
     block.Set_Mass(1000);
 
@@ -1611,8 +1611,8 @@ void Push_Out_Test2()
     last_frame=360;
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-    rigid_body1.X()=TV((T).5,10,0);
-    rigid_body2.X()=TV((T)-.5,11,0);
+    rigid_body1.Frame().t=TV((T).5,10,0);
+    rigid_body2.Frame().t=TV((T)-.5,11,0);
 }
 //#####################################################################
 // Function Sphere_Fall
@@ -1662,7 +1662,7 @@ void Sphere_Block(bool deformable_on_top)
     tests.Create_Tetrahedralized_Volume(data_directory+sphere,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)(deformable_on_top?6:3),0))),true,true,1000);
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("sphere",1,(T).5);
     rigid_body->Set_Mass(200);
-    rigid_body->X()=TV(0,(T)(deformable_on_top?3:6),0);
+    rigid_body->Frame().t=TV(0,(T)(deformable_on_top?3:6),0);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body->Set_Name("box");
     tests.Add_Ground();
@@ -1682,8 +1682,8 @@ void Two_Way_Tori()
     tests.Initialize_Tetrahedron_Collisions(1,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
     RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("torus",1,(T).5);
     rigid_body->Set_Mass(1000);
-    rigid_body->X()=TV(0,(T)2,0);
-    rigid_body->Rotation()=ROTATION<TV>((T)half_pi,TV(0,0,1));
+    rigid_body->Frame().t=TV(0,(T)2,0);
+    rigid_body->Frame().r=ROTATION<TV>((T)half_pi,TV(0,0,1));
     tests.Add_Ground();
     if(use_forces_for_drift){
         soft_bindings.use_impulses_for_collisions.Fill(false);

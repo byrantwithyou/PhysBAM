@@ -208,7 +208,7 @@ public:
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
@@ -715,10 +715,10 @@ void Get_Initial_Data()
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
             tests.Add_Ground();
             RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).25,(T)0);
-            body.X().z=(T).5;
+            body.Frame().t.z=(T).5;
             if(test_number==5) rigid_body_collection.rigid_body_particle.kinematic(body.particle_index)=true;
             if(test_number==45){
-                body.is_static=true;body.X()=TV(.75,.2,.5);
+                body.is_static=true;body.Frame().t=TV(.75,.2,.5);
                 deformable_body_collection.collisions.thickness_table=new HASHTABLE<int,T>();
                 for(int i=0;i<particles.array_collection->Size();i++) deformable_body_collection.collisions.thickness_table->Insert(i,.1);}
             break;}
@@ -732,32 +732,32 @@ void Get_Initial_Data()
             break;
         case 10:
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-            tests.Add_Rigid_Body("sphere",(T).25,(T)0).X()=TV((T)0,-(T).25,(T).5);
-            tests.Add_Rigid_Body("sphere",(T).25,(T)0).X()=TV((T)2,-(T).25,(T).5);
+            tests.Add_Rigid_Body("sphere",(T).25,(T)0).Frame().t=TV((T)0,-(T).25,(T).5);
+            tests.Add_Rigid_Body("sphere",(T).25,(T)0).Frame().t=TV((T)2,-(T).25,(T).5);
             break;
         case 11:{
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-            RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body1.X()=TV((T).5,-(T).25,(T).5);rigid_body1.Rotation()=ROTATION<TV>((T)(pi/2),TV(0,0,1));
-            RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body2.X()=TV((T)1.3,-(T).25,(T).5);rigid_body2.Rotation()=ROTATION<TV>((T)(pi/2),TV(0,0,1));
-            tests.Add_Rigid_Body("sphere",(T).25,(T).5).X()=TV((T)1.2,(T).25,(T).5);
+            RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body1.Frame().t=TV((T).5,-(T).25,(T).5);rigid_body1.Frame().r=ROTATION<TV>((T)(pi/2),TV(0,0,1));
+            RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("hexlink",(T).25,(T).5);rigid_body2.Frame().t=TV((T)1.3,-(T).25,(T).5);rigid_body2.Frame().r=ROTATION<TV>((T)(pi/2),TV(0,0,1));
+            tests.Add_Rigid_Body("sphere",(T).25,(T).5).Frame().t=TV((T)1.2,(T).25,(T).5);
             break;}
         case 12:
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).7,0))));
             tests.Add_Ground();
-            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).X()=TV((T).45,(T).3,(T).3);
-            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).X()=TV((T).45,(T).3,-(T).3);
-            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).X()=TV(-(T).45,(T).3,(T).3);
-            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).X()=TV(-(T).45,(T).3,-(T).3);
-            tests.Add_Rigid_Body("sphere",(T).15,(T).5).X()=TV(0,(T)1.25,0);
+            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).Frame().t=TV((T).45,(T).3,(T).3);
+            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).Frame().t=TV((T).45,(T).3,-(T).3);
+            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).Frame().t=TV(-(T).45,(T).3,(T).3);
+            tests.Add_Rigid_Body("skinnyhexlink",(T).3,(T)0).Frame().t=TV(-(T).45,(T).3,-(T).3);
+            tests.Add_Rigid_Body("sphere",(T).15,(T).5).Frame().t=TV(0,(T)1.25,0);
             break;
         case 13:
             {tests.Create_Cloth_Panel(number_side_panels,(T)1.9*side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).56,0))));
             tests.Add_Ground((T).1);
             RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).25,(T)1);
-            sphere_body.X()=TV(0,(T).30,0);
+            sphere_body.Frame().t=TV(0,(T).30,0);
             rigid_body_collection.rigid_body_particle.kinematic(sphere_body.particle_index)=true;
             RIGID_BODY<TV>& body=tests.Add_Rigid_Body("cut_pyramid",(T).1,(T).1);
-            body.X()=TV((T)-.65,(T).05,(T).65);body.Rotation()=ROTATION<TV>((T)-pi/2,TV(1,0,0))*body.Rotation();
+            body.Frame().t=TV((T)-.65,(T).05,(T).65);body.Frame().r=ROTATION<TV>((T)-pi/2,TV(1,0,0))*body.Frame().r;
             body.is_static=true;}
             break;
         case 14:
@@ -802,7 +802,7 @@ void Get_Initial_Data()
             tests.Add_Ground();
             if(parameter==0 || parameter==2){
                 RIGID_BODY<TV>& temp_sphere=tests.Add_Rigid_Body("sphere",(T).25,(T).5);
-                temp_sphere.X()=TV(0,(T).25,0);
+                temp_sphere.Frame().t=TV(0,(T).25,0);
                 temp_sphere.is_static=true;}
             break;}
         case 20:{
@@ -870,7 +870,7 @@ void Get_Initial_Data()
                 frame2((TV((T)0,(T).3,0)),(ROTATION<TV>::From_Euler_Angles((T)0,(T)0,(T)0)));
             VECTOR<FRAME<TV>,2> frames(frame1,frame2); // gcc 3.3.2 needs frame1/frame2 pulled out
             for(int frame_index=0;frame_index<frames.m;frame_index++){
-                RIGID_BODY<TV>& body=tests.Add_Rigid_Body("Thin_Shells/boat_hires",1,(T).3,false);body.X()=frames(frame_index).t;body.Rotation()=frames(frame_index).r;
+                RIGID_BODY<TV>& body=tests.Add_Rigid_Body("Thin_Shells/boat_hires",1,(T).3,false);body.Frame().t=frames(frame_index).t;body.Frame().r=frames(frame_index).r;
                 ARRAY<int> particle_indices;
                 //TRIANGULATED_SURFACE<T>& surface=*static_cast<TRIANGULATED_SURFACE<T>*>(body.simplicial_object->Append_Particles_And_Create_Copy(particles,&particle_indices));
                 TRIANGULATED_SURFACE<T>& old_surface=*body.simplicial_object;TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);
@@ -948,8 +948,8 @@ void Get_Initial_Data()
             rigid_sphere.is_static=true;
             break;}
         case 27:{
-            RIGID_BODY<TV>& cylinder_body=tests.Add_Rigid_Body("cylinder",(T).95,(T)0);cylinder_body.X()=TV(0,(T)1.5,0);
-            RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)4,(T)0);sphere_body.X()=TV(0,(T)1.75,(T)5.5);
+            RIGID_BODY<TV>& cylinder_body=tests.Add_Rigid_Body("cylinder",(T).95,(T)0);cylinder_body.Frame().t=TV(0,(T)1.5,0);
+            RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)4,(T)0);sphere_body.Frame().t=TV(0,(T)1.75,(T)5.5);
             ARRAY<int> sphere_particles,cylinder_particles;
             deformable_body_collection.deformable_geometry.Add_Structure(cylinder_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&cylinder_particles));
             deformable_body_collection.deformable_geometry.Add_Structure(sphere_body.simplicial_object->Append_Particles_And_Create_Copy(deformable_body_collection.particles,&sphere_particles));
@@ -969,30 +969,30 @@ void Get_Initial_Data()
         case 28:{
             // The 2nd point stops by frame 14 at position 0.18655 -.135535 0.5
             // The tet's 6th point (front most) stops by frame 40 at position 0.378322 -0.274866 1
-            RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T).4);ground.Rotation()=ROTATION<TV>((T)(-pi/5),TV(0,0,1));ground.is_static=true;
+            RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T).4);ground.Frame().r=ROTATION<TV>((T)(-pi/5),TV(0,0,1));ground.is_static=true;
             ground.Set_Coefficient_Of_Friction((T).6); // used .9 for stopping case
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
             int particle1=particles.array_collection->Add_Element();free_particles.nodes.Append(particle1);
-            particles.mass(particle1)=1;particles.X(particle1)=TV(0,(T).1,0);particles.V(particle1)=ground.Rotation().Rotate(TV(0,0,0));
+            particles.mass(particle1)=1;particles.X(particle1)=TV(0,(T).1,0);particles.V(particle1)=ground.Frame().r.Rotate(TV(0,0,0));
             int particle2=particles.array_collection->Add_Element();free_particles.nodes.Append(particle2);
             T init_speed=(T)0; // used (T)1 for stopping case
-            particles.mass(particle2)=1;particles.X(particle2)=TV(0,0,(T).5);particles.V(particle2)=ground.Rotation().Rotate(TV(init_speed,0,0));
+            particles.mass(particle2)=1;particles.X(particle2)=TV(0,0,(T).5);particles.V(particle2)=ground.Frame().r.Rotate(TV(init_speed,0,0));
             particles.array_collection->Add_Elements(4);
             for(int i=0;i<3;i++){int particle=i+2;T theta=-2*(T)pi/3*(i+1);
-                //particles.X(particle)=ground.Rotation().Rotate(TV((T).2*cos(theta),0,1.1+.2*sin(theta)));
-                particles.X(particle)=ground.Rotation().Rotate(TV((T).2*cos(theta),0,(T)1.1+(T).2*sin(theta)));
-                particles.mass(particle)=(T)1;particles.V(particle)=ground.Rotation().Rotate(TV(init_speed,0,0));
+                //particles.X(particle)=ground.Frame().r.Rotate(TV((T).2*cos(theta),0,1.1+.2*sin(theta)));
+                particles.X(particle)=ground.Frame().r.Rotate(TV((T).2*cos(theta),0,(T)1.1+(T).2*sin(theta)));
+                particles.mass(particle)=(T)1;particles.V(particle)=ground.Frame().r.Rotate(TV(init_speed,0,0));
             }
-            particles.X(5)=ground.Rotation().Rotate(TV(-0,(T).2,(T)1.1));particles.mass(5)=(T)1;particles.V(5)=ground.Rotation().Rotate(TV(init_speed,0,0));
-            //particles.X(1)=ground.Rotation().Rotate(TV(0,(T).1,(T)1.1));particles.mass(1)=(T)1;particles.V(1)=ground.Rotation().Rotate(TV(1,0,0));
-            //particles.X(2)=ground.Rotation().Rotate(TV(0,(T).1,(T)0.9));particles.mass(2)=(T)1;particles.V(2)=ground.Rotation().Rotate(TV(1,0,0));
-            //particles.X(3)=ground.Rotation().Rotate(TV(-.1,(T).2,1));particles.mass(3)=(T)1;particles.V(3)=ground.Rotation().Rotate(TV(1,0,0));
+            particles.X(5)=ground.Frame().r.Rotate(TV(-0,(T).2,(T)1.1));particles.mass(5)=(T)1;particles.V(5)=ground.Frame().r.Rotate(TV(init_speed,0,0));
+            //particles.X(1)=ground.Frame().r.Rotate(TV(0,(T).1,(T)1.1));particles.mass(1)=(T)1;particles.V(1)=ground.Frame().r.Rotate(TV(1,0,0));
+            //particles.X(2)=ground.Frame().r.Rotate(TV(0,(T).1,(T)0.9));particles.mass(2)=(T)1;particles.V(2)=ground.Frame().r.Rotate(TV(1,0,0));
+            //particles.X(3)=ground.Frame().r.Rotate(TV(-.1,(T).2,1));particles.mass(3)=(T)1;particles.V(3)=ground.Frame().r.Rotate(TV(1,0,0));
             TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
             tetrahedralized_volume->mesh.elements.Append(VECTOR<int,4>(2,3,4,5));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*tetrahedralized_volume,density);
             deformable_body_collection.deformable_geometry.Add_Structure(tetrahedralized_volume); 
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1,2),ROTATION<TV>((T)pi/2,TV(0,0,1))),
-                    TWIST<TV>(ground.Rotation().Rotate(TV(1,0,0)),typename TV::SPIN())));}
+                    TWIST<TV>(ground.Frame().r.Rotate(TV(1,0,0)),typename TV::SPIN())));}
             break;
         case 29:
             {RIGID_BODY_STATE<TV> state1((FRAME<TV>((TV(0,(T).5,0))))),state2((FRAME<TV>((TV(0,1,0)))));
@@ -1003,8 +1003,8 @@ void Get_Initial_Data()
         case 30:{
             tests.Create_Cloth_Panel(number_side_panels,(T)4,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4,(T)-.25))));
             tests.Add_Ground((T)0.2,(T).1);
-            RIGID_BODY<TV>& body=tests.Add_Rigid_Body("wardrobe",(T).25,(T)10);body.X()=TV(0,(T)1.5,(T).9-(T)0.194);body.Rotation()=ROTATION<TV>((T)-pi/2,TV(1,0,0));
-            //RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).2,(T)10000);sphere_body.X()=TV(-.5,(T)1.5,(T).7);}
+            RIGID_BODY<TV>& body=tests.Add_Rigid_Body("wardrobe",(T).25,(T)10);body.Frame().t=TV(0,(T)1.5,(T).9-(T)0.194);body.Frame().r=ROTATION<TV>((T)-pi/2,TV(1,0,0));
+            //RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).2,(T)10000);sphere_body.Frame().t=TV(-.5,(T)1.5,(T).7);}
             }
             break;
         case 31:{
@@ -1013,8 +1013,8 @@ void Get_Initial_Data()
             //tests.Create_Cloth_Panel(number_side_panels,(T)1,(T)1,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-.25,(T)2.75,0),ROTATION<TV>(6*(T)pi/6,TV(0,1,0)))));
             //tests.Create_Cloth_Panel(number_side_panels,(T)1,(T)1,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T).25,(T)2.0,0),ROTATION<TV>(3*(T)pi/3,TV(0,1,0)))));
             tests.Add_Ground((T)0.2);}
-            //RIGID_BODY<TV>& sphere_body_left=tests.Add_Rigid_Body("sphere",(T).2,(T).05);sphere_body_left.X()=TV(-.75,(T)1.5,0);
-            //RIGID_BODY<TV>& sphere_body_right=tests.Add_Rigid_Body("sphere",(T).2,(T).05);sphere_body_right.X()=TV((T).75,(T)1.5,0);}
+            //RIGID_BODY<TV>& sphere_body_left=tests.Add_Rigid_Body("sphere",(T).2,(T).05);sphere_body_left.Frame().t=TV(-.75,(T)1.5,0);
+            //RIGID_BODY<TV>& sphere_body_right=tests.Add_Rigid_Body("sphere",(T).2,(T).05);sphere_body_right.Frame().t=TV((T).75,(T)1.5,0);}
             break;
         case 32:{
             side_length=(T).3;
@@ -1026,7 +1026,7 @@ void Get_Initial_Data()
                 if(i>0){t=Test_32_Find_Parameter(s+ds,t);s+=ds;}
                 position=VECTOR<T,2>(2*t-1,(T).5*3*sqr(2*t-1)); // 3/2 x^2
                 for(int j=0;j<n;j++) particles.X(i+m*j)=TV((T).25*position.x,(T).25*position.y,j*dy-side_length/2);}
-            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("skinnycyllink",(T).5,(T).3);rigid_body.X()=TV(0,(T)0.075,0);rigid_body.Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));}
+            RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("skinnycyllink",(T).5,(T).3);rigid_body.Frame().t=TV(0,(T)0.075,0);rigid_body.Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));}
             break;
         case 33:{
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
@@ -1109,7 +1109,7 @@ void Get_Initial_Data()
                     segmented_curve.mesh.elements.Append(VECTOR<int,2>(count,count+1));count++;}
                 particles.X(count)=hair_layout_grid.X(i,j,hair_layout_grid.counts.z);count++;}
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,density);
-            RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T)0.15);sphere_body.X()=TV(0,(T)-1.2,0);
+            RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T)0.15);sphere_body.Frame().t=TV(0,(T)-1.2,0);
             break;}
         case 41:
             {TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>());
@@ -1147,7 +1147,7 @@ void Get_Initial_Data()
             break;
         case 48:
             {RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).125,(T)0);
-            body.X().y=(T).5;
+            body.Frame().t.y=(T).5;
             TRIANGULATED_SURFACE<T>& surface=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>());
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(surface,density);
             int i,j;int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
@@ -1176,7 +1176,7 @@ void Get_Initial_Data()
             int num_volumes=3,num_particles=10;T height=5;
             RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T)1,(T)0);
             body.Set_Mass(10000);
-            body.X().x=num_volumes*2+5;body.X().y=height/2;body.Twist().linear.x=-50;
+            body.Frame().t.x=num_volumes*2+5;body.Frame().t.y=height/2;body.Twist().linear.x=-50;
             for(int n=0;n<num_volumes;n++){
                 //Create curve
                 SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
@@ -1238,7 +1238,7 @@ void Get_Initial_Data()
         case 46:{
             tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).7,0))));
             RIGID_BODY<TV>& tmp_sphere=tests.Add_Rigid_Body("sphere",(T).25,(T).5);
-            tmp_sphere.X()=TV(0,(T).25,0);
+            tmp_sphere.Frame().t=TV(0,(T).25,0);
             tmp_sphere.is_static=true;
             break;}
         case 49:{

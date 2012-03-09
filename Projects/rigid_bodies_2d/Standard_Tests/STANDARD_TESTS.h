@@ -79,7 +79,7 @@ public:
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
@@ -177,13 +177,13 @@ void Kinematic()
     const char* boxfile="square";
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,boxsize1,stack_mu);
-    rigid_body->X()=TV(0,2*baseboxsize+boxsize1);
+    rigid_body->Frame().t=TV(0,2*baseboxsize+boxsize1);
     rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
     rigid_body->Set_Mass(smallboxmass);
     rigid_body->Set_Name("stack box 1a");
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,boxsize2,stack_mu);
-    rigid_body->X()=TV(0,2*baseboxsize+2*boxsize1+boxsize2);
+    rigid_body->Frame().t=TV(0,2*baseboxsize+2*boxsize1+boxsize2);
     rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
     rigid_body->Set_Mass(smallboxmass);
     rigid_body->Set_Name("stack box 1b");
@@ -202,7 +202,7 @@ void Kinematic()
     curve.Add_Control_Point((T)6,FRAME<TV>(t1,r0));
     curve.Add_Control_Point((T)8,FRAME<TV>(t1,r1));
 
-    rigid_body->Set_Frame(curve.Value(0));
+    rigid_body->Frame()=curve.Value(0);
     rigid_body->Twist()=curve.Derivative(0);
 
     tests.Add_Ground((T).3,0,1);
@@ -223,12 +223,12 @@ void Test_Example()
         rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T)0.5);
 
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("circle",(T)1,(T).1);
-    rigid_body1->Rotation()=ROTATION<TV>::From_Angle((T)pi/5);
+    rigid_body1->Frame().r=ROTATION<TV>::From_Angle((T)pi/5);
     rigid_body1->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body1->Set_Name("circle");
 
     RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("circle",(T)2,(T).1);
-    rigid_body2->X()=TV(0,120);
+    rigid_body2->Frame().t=TV(0,120);
     rigid_body2->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body2->Set_Name("circle");
 
@@ -252,19 +252,19 @@ void Pyramid_Of_Boxes()
         current_x = first_x;
         for (int j =  1; j <= i ; j++) {
             RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)2, (T).1);
-            rigid_body->X()=TV((T)current_x, (height+1-i)*5+80);
+            rigid_body->Frame().t=TV((T)current_x, (height+1-i)*5+80);
             rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
             current_x += 5;}
         first_x -= 2.5;}
 
     for(int i=0;i<2;i++){
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
-        rigid_body1->X()=TV(first_x-10,i*20);
+        rigid_body1->Frame().t=TV(first_x-10,i*20);
         rigid_body1->is_static = true;
         rigid_body1->Set_Name("left_square");
 
         RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
-        rigid_body2->X()=TV(current_x+7.5,i*20);
+        rigid_body2->Frame().t=TV(current_x+7.5,i*20);
         rigid_body2->is_static = true;
         rigid_body2->Set_Name("right_square");}
 
@@ -281,17 +281,17 @@ void Stacked_Boxes() {
     for (int i = 1; i <= height; i++) {
         for (int j =  1; j < 20 ; j++) {
             RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)2, (T).1);
-            rigid_body->X()=TV(5*j - 50, 5*i+10);
+            rigid_body->Frame().t=TV(5*j - 50, 5*i+10);
             rigid_body->Set_Coefficient_Of_Restitution((T)0.5);}}
 
     for (int i = 0; i < height/4; i++) {
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
-        rigid_body1->X()=TV(-58,i*20);
+        rigid_body1->Frame().t=TV(-58,i*20);
         rigid_body1->is_static = true;
         rigid_body1->Set_Name("left_square");
     
         RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
-        rigid_body2->X()=TV(58,i*20);
+        rigid_body2->Frame().t=TV(58,i*20);
         rigid_body2->is_static = true;
         rigid_body2->Set_Name("right_square");}
 
@@ -304,11 +304,11 @@ void Stacked_Boxes() {
 //#####################################################################
 void Partition_Test() {
     RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body->X() = TV(0,0);
+    rigid_body->Frame().t = TV(0,0);
     rigid_body->Twist().linear = TV(1,0);
 
     RIGID_BODY<TV>* rigid_body2 = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body2->X() = TV(10,3);
+    rigid_body2->Frame().t = TV(10,3);
     rigid_body2->Twist().linear = TV(-1,0);
 
     last_frame = 200;
@@ -331,22 +331,22 @@ void Cluster()
     tests.Add_Ground((T).1,(T)-4);
 
     RIGID_BODY<TV>* rigid_body_1=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
-    rigid_body_1->X()=TV(0,2);
+    rigid_body_1->Frame().t=TV(0,2);
     rigid_body_1->Set_Coefficient_Of_Restitution((T).5);
     rigid_body_1->Set_Name("box1");
 
     RIGID_BODY<TV>* rigid_body_2=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
-    rigid_body_2->X()=TV(2,3);
+    rigid_body_2->Frame().t=TV(2,3);
     rigid_body_2->Set_Coefficient_Of_Restitution((T).5);
     rigid_body_2->Set_Name("box2");
 
     RIGID_BODY<TV>* rigid_body_3=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
-    rigid_body_3->X()=TV(4,3);
+    rigid_body_3->Frame().t=TV(4,3);
     rigid_body_3->Set_Coefficient_Of_Restitution((T).5);
     rigid_body_3->Set_Name("box3");
 
     RIGID_BODY<TV>* rigid_body_4=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
-    rigid_body_4->X()=TV(4,5);
+    rigid_body_4->Frame().t=TV(4,5);
     rigid_body_4->Set_Coefficient_Of_Restitution((T).5);
     rigid_body_4->Set_Name("box4");
 
@@ -363,7 +363,7 @@ void Cluster()
     // make duplicate object non-clustered
     RIGID_BODY<TV>* rigid_body_cluster_test=new RIGID_BODY<TV>(rigid_body_collection,true);
     rigid_body_cluster_test->Set_Name("clustertest");
-    rigid_body_cluster_test->Set_Frame(FRAME<TV>(TV((T)15,0))*rigid_body_cluster->Frame());
+    rigid_body_cluster_test->Frame()=FRAME<TV>(TV((T)15,0))*rigid_body_cluster->Frame();
     SEGMENTED_CURVE_2D<T>* segmented_curve=SEGMENTED_CURVE_2D<T>::Create();
     segmented_curve->mesh.elements=rigid_body_cluster->simplicial_object->mesh.elements;
     segmented_curve->particles.array_collection->Add_Elements(rigid_body_cluster->simplicial_object->particles.array_collection->Size());
@@ -408,7 +408,7 @@ void Contact_Test_1() {
     for (int i=0;i<width;i++) {
         for (int j=0;j<height;j++) {
             RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-            rigid_body->X() = TV(i*4,j*2);}}
+            rigid_body->Frame().t = TV(i*4,j*2);}}
 
     tests.Add_Ground(1, -1);
     rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection, true));
@@ -423,7 +423,7 @@ void Contact_Test_2() {
     for (int i=0;i<height;i++) {
         for (int j=0;j<width;j++) {
             RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-            rigid_body->X() = TV((T)j*2+i*0.5,i*2);}
+            rigid_body->Frame().t = TV((T)j*2+i*0.5,i*2);}
         width--;}
 
     tests.Add_Ground(1, -1);
@@ -434,15 +434,15 @@ void Contact_Test_2() {
 //#####################################################################
 void Simple_Collision_Test() {
     RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body->X() = TV(0,0);
+    rigid_body->Frame().t = TV(0,0);
     rigid_body->Twist().linear = TV(2,0);
 
     RIGID_BODY<TV>* rigid_body2 = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body2->X() = TV(10,3);
+    rigid_body2->Frame().t = TV(10,3);
     rigid_body2->Twist().linear = TV(-1,0);
 
     RIGID_BODY<TV>* rigid_body3 = &tests.Add_Rigid_Body("square", (T)1, (T).1);
-    rigid_body3->X() = TV(10,0);
+    rigid_body3->Frame().t = TV(10,0);
     rigid_body3->Twist().linear = TV(-1,0);
 
     last_frame = 200;
@@ -454,8 +454,8 @@ void Collision_Test() {
     for (int i=0;i<height;i++) {
         RIGID_BODY<TV>* left_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
         RIGID_BODY<TV>* right_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-        left_body->X() = TV(0,i*3);
-        right_body->X() = TV((width+1)*3,i*3);
+        left_body->Frame().t = TV(0,i*3);
+        right_body->Frame().t = TV((width+1)*3,i*3);
         left_body->Set_Coefficient_Of_Restitution((T)1.0);
         right_body->Set_Coefficient_Of_Restitution((T)1.0);
         left_body->is_static=true;
@@ -463,7 +463,7 @@ void Collision_Test() {
 
         for (int j=1;j<=width;j++) {
             RIGID_BODY<TV>* rigid_body = &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-            rigid_body->X() = TV(j*3,i*3);
+            rigid_body->Frame().t = TV(j*3,i*3);
             rigid_body->Twist().linear = TV(4*(.5-j%2),0);
             rigid_body->Set_Coefficient_Of_Restitution((T)1.0);}}
 
@@ -475,7 +475,7 @@ void Collision_Test() {
 void Pushout_Test() {
     for (int i=0;i<num_bodies;i++) {
         RIGID_BODY<TV>* rigid_body =  &tests.Add_Rigid_Body("square_refined",(T)1,(T).1);
-        rigid_body->X() = TV((T)1.75*i,(T)1.75*i);}
+        rigid_body->Frame().t = TV((T)1.75*i,(T)1.75*i);}
 }
 //#####################################################################
 // Function Postprocess_Frame

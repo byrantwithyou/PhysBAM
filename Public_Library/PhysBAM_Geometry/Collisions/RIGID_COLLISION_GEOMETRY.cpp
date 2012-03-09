@@ -298,7 +298,7 @@ Save_State(const int state_index,const T time)
 template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
 Restore_State(const int state_index)
 {
-    rigid_geometry.Set_Frame(saved_states(state_index).x);
+    rigid_geometry.Frame()=saved_states(state_index).x;
 }
 //#####################################################################
 // Function Average_States

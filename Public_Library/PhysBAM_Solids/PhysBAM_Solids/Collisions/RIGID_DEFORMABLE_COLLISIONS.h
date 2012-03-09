@@ -64,16 +64,16 @@ public:
     virtual ~RIGID_DEFORMABLE_COLLISIONS();
 
 //#####################################################################
-    void Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,
-        ARRAY<TV>& rigid_velocity_difference,ARRAY<TV>& rigid_X_save,ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN> &rigid_angular_momentum_save,ARRAY<TV>& X_save,
+    void Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,
+        ARRAY<TV>& rigid_velocity_difference,ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN> &rigid_angular_momentum_save,ARRAY<TV>& X_save,
         ARRAY<TV>& V_save);
     void Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body,const bool use_saved_pairs,const bool use_existing_contact,
-        ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<TV>& rigid_velocity_difference,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& X_save,
+        ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<TV>& rigid_velocity_difference,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& X_save,
         const T collision_body_thickness);
     TV Pull_In_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const TV& original_relative_velocity,const bool check_succeeded_only,const bool apply_impulse);
     void Process_Push_Out();
     void Initialize_All_Contact_Projections();
-    void Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,ARRAY_VIEW<const ROTATION<TV> >& rigid_rotation_save,
+    void Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& rigid_frame_save,
         ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,ARRAY<TV>& V_save);
     void Project_Contact_Pairs(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist);
     void Process_Precomputed_Contact_With_Kinematic_Rigid_Bodies();
@@ -82,10 +82,9 @@ public:
         const T coefficient_of_friction,const bool clamp_friction_magnitude,TV& impulse,bool allow_pull=false,bool apply_impulse=true);
 private:
     void Get_Rigid_And_Tetrahedron_Collision_Bodies();
-    bool Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,ARRAY<TV>& X_save,ARRAY<TV>& V_save,ARRAY<TV>& rigid_X_save,
-        ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& rigid_velocity_difference);
-    bool Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int p,const T dt,const T time,const T epsilon_scale,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,
-        ARRAY<ROTATION<TV> >& rigid_rotation_save,const T collision_body_thickness,const bool process_contact_unconditionally=false);
+    bool Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,ARRAY<TV>& X_save,ARRAY<TV>& V_save,ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& rigid_velocity_difference);
+    bool Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int p,const T dt,const T time,const T epsilon_scale,ARRAY<TV>& X_save,
+        ARRAY<FRAME<TV> >& rigid_frame_save,const T collision_body_thickness,const bool process_contact_unconditionally=false);
     bool Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> >& particle_intersections,const T move_fraction);
     void Get_Particles_Contacting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int>& particles,const bool include_soft_bound);
     bool Push_Out_From_Particle(const int particle);
@@ -96,7 +95,7 @@ private:
         ARRAY<TV>& body_distances);
     void Apply_Impulse(const int particle,RIGID_BODY<TV>& rigid_body,const TV& impulse);
     void Apply_Displacement_To_Particle(const int particle_index,const TV& particle_delta_X);
-    bool Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T dt,const T time,ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,
+    bool Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_save,
         ARRAY<TV>& X_save);
     bool Apply_Rigid_Deformable_Contact_Projection(ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> V,TWIST<TV>& twist,PRECOMPUTE_CONTACT_PROJECTION& precompute);
     // precompute.particles is the input list of particles to collide against

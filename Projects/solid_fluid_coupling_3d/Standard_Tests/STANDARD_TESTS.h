@@ -259,7 +259,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
-void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE
+void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE
 {}
 //#####################################################################
 // Function Set_External_Positions
@@ -367,7 +367,7 @@ void Balloon()
     T height=light_sphere_initial_height-balloon_initial_radius;//seperation_distance+a;//+(T).08;
     T dist=sqrt(sqr(balloon_initial_radius)-sqr(a));
     //RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("sphere",cut_sphere_radius,0);
-    //rigid_body.Set_Frame(FRAME<TV>(TV((T)0,light_sphere_initial_height-seperation_distance,(T)0)));
+    //rigid_body.Frame()=FRAME<TV>(TV((T)0,light_sphere_initial_height-seperation_distance,(T)0));
 
     ARRAY<int> deletion_list; // List of deleted triangles
     ARRAY<bool> is_constrained;
@@ -418,7 +418,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     if(test_number==1){
         RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
-        rigid_body.Set_Frame(FRAME<TV>(TV((T).5,(T).6,(T).5)));
+        rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).6,(T).5));
         rigid_body.Set_Coefficient_Of_Restitution((T)0);
         rigid_body.Set_Name("circle");
         rigid_body_id=rigid_body.particle_index;
@@ -443,19 +443,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         // set up the ceiling
         RIGID_BODY<TV>& ceiling_one=solids_tests.Add_Rigid_Body("ground",(T).005,(T)0);
         ceiling_one.is_static=true;
-        ceiling_one.X()=TV((T)0,(T)1.5,(T).55);
+        ceiling_one.Frame().t=TV((T)0,(T)1.5,(T).55);
         rigid_bodies_to_simulate.Append(ceiling_one.particle_index);
         RIGID_BODY<TV>& ceiling_two=solids_tests.Add_Rigid_Body("ground",(T).005,(T)0);
         ceiling_two.is_static=true;
-        ceiling_two.X()=TV((T)0,(T)1.5,(T)-.55);
+        ceiling_two.Frame().t=TV((T)0,(T)1.5,(T)-.55);
         rigid_bodies_to_simulate.Append(ceiling_two.particle_index);
         RIGID_BODY<TV>& ceiling_three=solids_tests.Add_Rigid_Body("ground",(T).005,(T)0);
         ceiling_three.is_static=true;
-        ceiling_three.X()=TV((T).55,(T)1.5,(T)0);
+        ceiling_three.Frame().t=TV((T).55,(T)1.5,(T)0);
         rigid_bodies_to_simulate.Append(ceiling_three.particle_index);
         RIGID_BODY<TV>& ceiling_four=solids_tests.Add_Rigid_Body("ground",(T).005,(T)0);
         ceiling_four.is_static=true;
-        ceiling_four.X()=TV((T)-.55,(T)1.5,(T)0);
+        ceiling_four.Frame().t=TV((T)-.55,(T)1.5,(T)0);
         rigid_bodies_to_simulate.Append(ceiling_four.particle_index);
     }
 

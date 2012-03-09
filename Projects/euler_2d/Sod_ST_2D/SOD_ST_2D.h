@@ -149,7 +149,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     RANGE<TV> domain=fluids_parameters.grid->Domain();TV grid_size=domain.Edge_Lengths();
     TV epsilon=grid_size*(T).1;
     RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(TV(grid_size.x/(T)4,grid_size.y)+epsilon);
-    rect.X()=domain.Minimum_Corner()+TV((T).8*grid_size.x,(T).5*grid_size.y);
+    rect.Frame().t=domain.Minimum_Corner()+TV((T).8*grid_size.x,(T).5*grid_size.y);
     rect.Is_Kinematic()=false;
 
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);

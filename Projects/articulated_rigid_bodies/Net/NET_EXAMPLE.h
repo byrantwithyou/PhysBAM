@@ -109,14 +109,14 @@ void Add_Fused_Hands_And_Feet(const bool add_left=false)
     rigid_body=&tests.Add_Rigid_Body("New_Visible_Human_Bones/fused_hand_right",1,(T)1);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("fused_hand_right");
-    rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+    rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
     right_hand=rigid_body;
     man_bones.Append(rigid_body);
 
     rigid_body=&tests.Add_Rigid_Body("New_Visible_Human_Bones/fused_foot_right",1,(T)1);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("fused_foot_right");
-    rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+    rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
     right_foot=rigid_body;
     man_bones.Append(rigid_body);
 
@@ -124,14 +124,14 @@ void Add_Fused_Hands_And_Feet(const bool add_left=false)
         rigid_body=&tests.Add_Rigid_Body("New_Visible_Human_Bones/fused_hand_left",1,(T)1);
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Name("fused_hand_left");
-        rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+        rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
         left_hand=rigid_body;
         man_bones.Append(rigid_body);
 
         rigid_body=&tests.Add_Rigid_Body("New_Visible_Human_Bones/fused_foot_left",1,(T)1);
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Name("fused_foot_left");
-        rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+        rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
         left_foot=rigid_body;
         man_bones.Append(rigid_body);}
 
@@ -195,34 +195,34 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         for(int col=0;col<num_cols;col++){
             if(use_cylinders) rigid_body=&tests.Add_Rigid_Body("skinnycyllink_sub",scale_factor,(T).5);
             else rigid_body=&tests.Add_Rigid_Body("superskinnyhexlink",scale_factor,(T).5);
-            rigid_body->X()=scale_factor*TV(x_shift+1+2*col,y_shift,z_shift+2*row);
-            rigid_body->Rotation()=QUATERNION<T>(-(T)pi/2,TV(0,0,1));
+            rigid_body->Frame().t=scale_factor*TV(x_shift+1+2*col,y_shift,z_shift+2*row);
+            rigid_body->Frame().r=QUATERNION<T>(-(T)pi/2,TV(0,0,1));
             rigid_body->Set_Coefficient_Of_Restitution(0);
             rigid_body->Set_Name("net");}
         for(int col=0;col<num_cols+1;col++){
             rigid_body=&tests.Add_Rigid_Body("sphere",scale_factor,(T).5);
-            rigid_body->X()=scale_factor*TV(x_shift+2*col,y_shift,z_shift+2*row);
+            rigid_body->Frame().t=scale_factor*TV(x_shift+2*col,y_shift,z_shift+2*row);
             rigid_body->Set_Coefficient_Of_Restitution(0);
             rigid_body->Set_Name("net_joint");} // name is important (see update rigid body params)
         for(int col=0;col<num_cols+1;col++){
             if(use_cylinders) rigid_body=&tests.Add_Rigid_Body("skinnycyllink_sub",scale_factor,(T).5);
             else rigid_body=&tests.Add_Rigid_Body("superskinnyhexlink",scale_factor,(T).5);
-            rigid_body->X()=scale_factor*TV(x_shift+2*col,y_shift,z_shift+1+2*row);
-            rigid_body->Rotation()=QUATERNION<T>((T)pi/2,TV(1,0,0));
+            rigid_body->Frame().t=scale_factor*TV(x_shift+2*col,y_shift,z_shift+1+2*row);
+            rigid_body->Frame().r=QUATERNION<T>((T)pi/2,TV(1,0,0));
             rigid_body->Set_Coefficient_Of_Restitution(0);
             rigid_body->Set_Name("net");}
         if(row==num_rows-1){
             for(int col=0;col<num_cols+1;col++){
                 rigid_body=&tests.Add_Rigid_Body("sphere",(T).1*scale_factor,(T).5);
-                rigid_body->X()=scale_factor*TV(x_shift+2*col,y_shift,z_shift+2+2*row);
+                rigid_body->Frame().t=scale_factor*TV(x_shift+2*col,y_shift,z_shift+2+2*row);
                 rigid_body->Set_Coefficient_Of_Restitution(0);
                 rigid_body->Set_Name("net_joint");}}} // name is important (see update rigid body params)
 
     for(int col=0;col<num_cols;col++){
         if(use_cylinders) rigid_body=&tests.Add_Rigid_Body("skinnycyllink_sub",scale_factor,(T).5);
         else rigid_body=&tests.Add_Rigid_Body("superskinnyhexlink",scale_factor,(T).5);
-        rigid_body->X()=scale_factor*TV(x_shift+1+2*col,y_shift,z_shift+2*num_rows);
-        rigid_body->Rotation()=QUATERNION<T>(-(T)pi/2,TV(0,0,1));
+        rigid_body->Frame().t=scale_factor*TV(x_shift+1+2*col,y_shift,z_shift+2*num_rows);
+        rigid_body->Frame().r=QUATERNION<T>(-(T)pi/2,TV(0,0,1));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Name("net");}
 
@@ -356,7 +356,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     handle[1]=rigid_bodies(2*num_cols+1);
     handle[2]=rigid_bodies(num_cols*num_rows+2*(num_cols+1)*num_rows+1);
     handle[3]=rigid_bodies(num_cols*num_rows+2*(num_cols+1)*num_rows+num_cols+1);
-    for(int i=0;i<4;i++) pos[i]=handle[i]->X();
+    for(int i=0;i<4;i++) pos[i]=handle[i]->Frame().t;
     TV center=(T).25*(pos[0]+pos[1]+pos[2]+pos[3]),top(center.x,center.y,center.z);
     T corners_start_time=parameter_list.Get_Parameter("corners_start_time",(T)1);
     T corners_stop_time=parameter_list.Get_Parameter("corners_stop_time",(T)1);
@@ -375,25 +375,25 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         T box_mass=parameter_list.Get_Parameter("box_mass",(T)1);
         TV box_offset=parameter_list.Get_Parameter("box_offset",TV());
 
-        TV center=(T).25*(handle[0]->X()+handle[1]->X()+handle[2]->X()+handle[3]->X())+box_offset;
+        TV center=(T).25*(handle[0]->Frame().t+handle[1]->Frame().t+handle[2]->Frame().t+handle[3]->Frame().t)+box_offset;
 
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",box_scale,(T).5);
-        rigid_body->X()=center+(T)2.2*box_scale*TV::Axis_Vector(1);
+        rigid_body->Frame().t=center+(T)2.2*box_scale*TV::Axis_Vector(1);
         rigid_body->Set_Mass(box_mass);
         rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
 
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",box_scale,(T).5);
-        rigid_body->X()=center-(T)2.2*box_scale*TV::Axis_Vector(1);
+        rigid_body->Frame().t=center-(T)2.2*box_scale*TV::Axis_Vector(1);
         rigid_body->Set_Mass(box_mass*5);
         rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
 
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",box_scale,(T).5);
-        rigid_body->X()=center+(T)2.2*box_scale*TV::Axis_Vector(3);
+        rigid_body->Frame().t=center+(T)2.2*box_scale*TV::Axis_Vector(3);
         rigid_body->Set_Mass(box_mass*10);
         rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
 
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",box_scale,(T).5);
-        rigid_body->X()=center-(T)2.2*box_scale*TV::Axis_Vector(3);
+        rigid_body->Frame().t=center-(T)2.2*box_scale*TV::Axis_Vector(3);
         rigid_body->Set_Mass(box_mass*5);
         rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
 
@@ -593,7 +593,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     PHYSBAM_FATAL_ERROR("this should be done in kinematic rigid body callbacks");
     if(move_corners && static_corners){
         LOG::cout<<"moving corners in update rigid body parameters...time="<<time<<"\n";
-        for(int i=0;i<4;i++) handle[i]->X()=corner_position_curves[i].Value(time);}
+        for(int i=0;i<4;i++) handle[i]->Frame().t=corner_position_curves[i].Value(time);}
 
     // Zero out some angular velocities for improved stability
     if(zero_angular_velocity_of_net_joints){
@@ -601,7 +601,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             if(rigid_bodies(i)->name=="net_joint"){
                 rigid_bodies(i)->Twist().angular=rigid_bodies(i)->Angular_Momentum()=TV();}
             else if(rigid_bodies(i)->name=="net"){
-                rigid_bodies(i)->Twist().angular.Project_Orthogonal_To_Unit_Direction(rigid_bodies(i)->Rotation().Rotated_Y_Axis());
+                rigid_bodies(i)->Twist().angular.Project_Orthogonal_To_Unit_Direction(rigid_bodies(i)->Frame().r.Rotated_Y_Axis());
                 rigid_bodies(i)->Update_Angular_Momentum();}}
 
     if(clamp_thorax_speed && da_man && da_man->bones(VISIBLE_HUMAN<T>::BONE_THORAX)){
@@ -690,7 +690,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 
     if(parameter_list.Get_Parameter("reset_motion_curve_after_restart",false)){
         //handles
-        for(int i=0;i<4;i++) pos[i]=handle[i]->X();
+        for(int i=0;i<4;i++) pos[i]=handle[i]->Frame().t;
         TV center=(T).25*(pos[0]+pos[1]+pos[2]+pos[3]),top(center.x,center.y,center.z);
         T corners_start_time=parameter_list.Get_Parameter("corners_start_time",(T)1);
         T corners_stop_time=parameter_list.Get_Parameter("corners_stop_time",(T)1);

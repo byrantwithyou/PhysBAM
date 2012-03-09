@@ -203,7 +203,7 @@ void Create_SCA_Stamp()
     base.Update_Bounding_Box();sca.Update_Bounding_Box();
     letters_to_base_frame=FRAME<TV>(TV(0,-.625,0))*FRAME<TV>(TV(),ROTATION<TV>::From_Euler_Angles((T)pi/2,-(T)pi/2,0))*
         FRAME<TV>(base.Axis_Aligned_Bounding_Box().Center()-sca.Axis_Aligned_Bounding_Box().Center());
-    sca.X()=letters_to_base_frame.t;sca.Rotation()=letters_to_base_frame.r;
+    sca.Frame().t=letters_to_base_frame.t;sca.Frame().r=letters_to_base_frame.r;
 }
 //#####################################################################
 // Function Create_Rigid_Stamp

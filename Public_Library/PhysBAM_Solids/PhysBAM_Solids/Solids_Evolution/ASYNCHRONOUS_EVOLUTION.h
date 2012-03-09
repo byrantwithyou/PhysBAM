@@ -51,8 +51,7 @@ public:
     ARRAY<int> coarsescale_particle_indices,coarsescale_rigid_body_particle_indices,both_forces_particles_indices,both_forces_rigid_body_particles_indices,coarsescale_particles_pool;
 
     ARRAY<TV> X_n,V_n,X_np1,V_np1,V_last_finescale,V_save,X_last_finescale;
-    ARRAY<TV> rigid_X_n,rigid_X_np1,rigid_X_last_finescale;
-    ARRAY<ROTATION<TV> > rigid_rotation_n,rigid_rotation_np1,rigid_rotation_last_finescale;
+    ARRAY<FRAME<TV> > rigid_frame_n,rigid_frame_np1,rigid_frame_last_finescale;
     ARRAY<TWIST<TV> > twist_n,twist_np1,twist_last_finescale,twist_difference,rigid_V_save;
     ARRAY<T_SPIN> angular_momentum_n,angular_momentum_np1,angular_momentum_last_finescale,angular_momentum_difference;
     T time_n,time_np1,dt_epsilon;

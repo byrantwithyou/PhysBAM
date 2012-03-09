@@ -44,7 +44,7 @@ Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const in
 // Function Set_External_Positions
 //#####################################################################
 template<class TV> void RIGIDS_KINEMATIC_EVOLUTION<TV>::
-Set_External_Positions(TV& X,ROTATION<TV>& rotation,const T time,const int id)
+Set_External_Positions(FRAME<TV>& frame,const T time,const int id)
 {
     RIGID_BODY<TV>* rigid_body=&rigid_body_collection.Rigid_Body(id);
     assert(rigid_body_collection.rigid_body_particle.kinematic(id));
@@ -54,7 +54,7 @@ Set_External_Positions(TV& X,ROTATION<TV>& rotation,const T time,const int id)
         typename RIGID_BODY_CLUSTER_BINDINGS<TV>::CLUSTER* cluster=rigid_body_collection.rigid_body_cluster_bindings.reverse_bindings.Get(index);
         rigid_body=&rigid_body_collection.Rigid_Body(cluster->infinite_body);
         new_id=rigid_body->particle_index;}
-    BASE::Set_External_Positions(X,rotation,time,new_id);
+    BASE::Set_External_Positions(frame,time,new_id);
 }
 //#####################################################################
 template class RIGIDS_KINEMATIC_EVOLUTION<VECTOR<float,1> >;

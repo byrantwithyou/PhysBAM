@@ -117,7 +117,7 @@ public:
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     //void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     //void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     //void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -454,7 +454,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
             LOG::cout<<"Switching, so filling dF_array_multipliers with PAIR(0,1)"<<std::endl;
             controller->dF_array_multipliers.Fill(PAIR<T,T>((T)0,(T)1));}}
     if(test_number==6 && controller && !controller->hypothetical_step){
-        controller->drag_direction=octosquid_body->Rotation().Rotate(TV(0,-1));
+        controller->drag_direction=octosquid_body->Frame().r.Rotate(TV(0,-1));
         bool old_min=controller->minimize;
         if(((int)time)%4==1||((int)time)%4==2) LOG::cout<<"M1: Max with time"<<time<<std::endl;
         else LOG::cout<<"M1: Min with time"<<time<<std::endl;
@@ -708,7 +708,7 @@ void Cylinder_And_Block()
     T friction=(T)0;
     RIGID_BODY<TV>& kinematic_body=tests.Add_Rigid_Body("square_refined",(T).95,friction);
     kinematic_body.is_static=true;
-    kinematic_body.X()=TV(0,(T)1);
+    kinematic_body.Frame().t=TV(0,(T)1);
     kinematic_body.Update_Bounding_Box();
 
     T width=0;
@@ -717,8 +717,8 @@ void Cylinder_And_Block()
         case 2: width=(T).25; break;
         default: width=(T)2;}
     RIGID_BODY<TV>& dynamic_body=tests.Add_Analytic_Box(TV(width,(T)4));
-    dynamic_body.Rotation()=ROTATION<TV>::From_Angle((T)pi*initial_angle/180);
-    dynamic_body.X()=TV(0,(T)1)+(T)3*dynamic_body.Rotation().Rotate(TV(0,(T)1));
+    dynamic_body.Frame().r=ROTATION<TV>::From_Angle((T)pi*initial_angle/180);
+    dynamic_body.Frame().t=TV(0,(T)1)+(T)3*dynamic_body.Frame().r.Rotate(TV(0,(T)1));
     dynamic_body.Update_Bounding_Box();
 
     static const T volume=width*(T)4;
@@ -757,7 +757,7 @@ void Driven_Bird()
     RIGID_BODY<TV>& kinematic_body=tests.Add_Rigid_Body("circle",(T).45,friction);
     if(true){kinematic_body.Is_Kinematic()=1;}
     else{kinematic_body.Set_Mass((T)40*(T).45*(T).45*fluids_parameters.density);}
-    kinematic_body.X()=TV(0,(T)7);
+    kinematic_body.Frame().t=TV(0,(T)7);
     kinematic_body.Update_Bounding_Box();
     Add_Volumetric_Body_To_Fluid_Simulation(kinematic_body);
     controller->not_affected_by_fluid.Set(kinematic_body.particle_index);
@@ -773,9 +773,9 @@ void Driven_Bird()
         RIGID_BODY<TV>& driven_wing=tests.Add_Analytic_Box(TV((T).25,(T).75));
         RIGID_BODY<TV>& controlled_wing=tests.Add_Analytic_Box(TV((T).25,(T)1));
         RIGID_BODY<TV>& joint_cover=tests.Add_Rigid_Body("circle",(T).1767767,friction); // sqrt(2)*.25/2
-        driven_wing.Set_Frame(kinematic_body.Frame()*object_center_to_wing_center);driven_wing.Update_Bounding_Box();
-        controlled_wing.Set_Frame(FRAME<TV>(joint_rotation.Rotate(TV(0,(T)1)),ROTATION<TV>())*driven_wing.Frame());controlled_wing.Update_Bounding_Box();
-        joint_cover.Set_Frame(kinematic_body.Frame()*object_center_to_wing_center*FRAME<TV>(TV(0,(T).4375),ROTATION<TV>()));joint_cover.Update_Bounding_Box();
+        driven_wing.Frame()=kinematic_body.Frame()*object_center_to_wing_center;driven_wing.Update_Bounding_Box();
+        controlled_wing.Frame()=FRAME<TV>(joint_rotation.Rotate(TV(0,(T)1)),ROTATION<TV>())*driven_wing.Frame();controlled_wing.Update_Bounding_Box();
+        joint_cover.Frame()=kinematic_body.Frame()*object_center_to_wing_center*FRAME<TV>(TV(0,(T).4375),ROTATION<TV>());joint_cover.Update_Bounding_Box();
 
         static const T volume=(T).25*(T).75;
         driven_wing.Set_Mass(4*fluids_parameters.density*volume);
@@ -862,7 +862,7 @@ void Controlled_Fish()
     RIGID_BODY<TV>& kinematic_body=tests.Add_Rigid_Body("circle",(T)radius,friction);
     if(true){kinematic_body.Is_Kinematic()=1;}
     else{kinematic_body.Set_Mass((T)40*(T)radius*(T)radius*fluids_parameters.density);}
-    kinematic_body.X()=TV((T)0,(T)5);
+    kinematic_body.Frame().t=TV((T)0,(T)5);
     kinematic_body.Update_Bounding_Box();
     Add_Volumetric_Body_To_Fluid_Simulation(kinematic_body);
     controller->not_affected_by_fluid.Set(kinematic_body.particle_index);
@@ -877,14 +877,14 @@ void Controlled_Fish()
     RIGID_BODY<TV>* prev_link=&kinematic_body;
     for(int i=0;i<4;i++){
         RIGID_BODY<TV>& tail_link=tests.Add_Analytic_Box(TV(length,(T).15));
-        tail_link.Set_Frame(kinematic_body.Frame());tail_link.X()+=TV(offset+length,0);offset+=length+(T).1767767;
+        tail_link.Frame()=kinematic_body.Frame();tail_link.Frame().t+=TV(offset+length,0);offset+=length+(T).1767767;
         FRAME<TV> J;
         RIGID_BODY<TV>* joint_cover=0;
         if(i==1) J=kinematic_body.Frame();
         else{
-            J=FRAME<TV>((tail_link.X()*.5+prev_link->X()*.5),ROTATION<TV>());
+            J=FRAME<TV>((tail_link.Frame().t*.5+prev_link->Frame().t*.5),ROTATION<TV>());
             joint_cover=&tests.Add_Rigid_Body("circle",(T).1767767,friction); // sqrt(2)*.25/2
-            joint_cover->X()=J.t;}
+            joint_cover->Frame().t=J.t;}
 
         static const T volume=(T).15*length;
         tail_link.Set_Mass(4*fluids_parameters.density*volume);
@@ -952,8 +952,8 @@ void Three_Link_Fish()
 
     RIGID_BODY<TV> &central_body=tests.Add_Analytic_Box(TV((T).08,(T).8)),
         &head=tests.Add_Analytic_Box(TV((T).08,(T).8)), &tail=tests.Add_Analytic_Box(TV((T).08,(T).8));
-    central_body.X()=TV(0,(T)7);head.X()=TV((T)0,(T)8);
-    tail.Set_Frame(FRAME<TV>(TV(0,(T)6.5)+initial_tail_rotation.Rotate(TV(0,(T)-.5)),initial_tail_rotation));
+    central_body.Frame().t=TV(0,(T)7);head.Frame().t=TV((T)0,(T)8);
+    tail.Frame()=FRAME<TV>(TV(0,(T)6.5)+initial_tail_rotation.Rotate(TV(0,(T)-.5)),initial_tail_rotation);
     const T mass=(T)100*(T).08*(T).8*fluids_parameters.density;
     LOG::cout<<"Setting mass = "<<mass<<std::endl;
     central_body.Set_Mass(mass);head.Set_Mass(mass);tail.Set_Mass(mass);
@@ -1021,7 +1021,7 @@ void Octosquid()
     RIGID_BODY<TV>& kinematic_body=tests.Add_Rigid_Body("circle",radius,friction);
     if(use_kinematic_motion){kinematic_body.Is_Kinematic()=1;}
     else{kinematic_body.Set_Mass((T)40*radius*radius*fluids_parameters.density);}
-    kinematic_body.X()=TV(0,(T)8);
+    kinematic_body.Frame().t=TV(0,(T)8);
     kinematic_body.Update_Bounding_Box();
     octosquid_body=&kinematic_body;
     if(!use_deformable){Add_Volumetric_Body_To_Fluid_Simulation(kinematic_body);controller->not_affected_by_fluid.Set(kinematic_body.particle_index);}
@@ -1041,19 +1041,19 @@ void Octosquid()
         TV direction=ROTATION<TV>::From_Angle(i==1?-(T)pi:0).Rotate(TV(1,0));
         for(int j=0;j<num_segments_per_leg;j++){
             RIGID_BODY<TV>& tail_link=tests.Add_Analytic_Box(TV(length,width));
-            tail_link.Set_Frame(kinematic_body.Frame());tail_link.X().y-=radius/2;tail_link.X()+=(offset+length)*direction;offset+=length+.1767767;
-            tail_link.Rotation()=ROTATION<TV>::From_Rotated_Vector(TV(1,0),direction); // TODO: hmm
+            tail_link.Frame()=kinematic_body.Frame();tail_link.Frame().t.y-=radius/2;tail_link.Frame().t+=(offset+length)*direction;offset+=length+.1767767;
+            tail_link.Frame().r=ROTATION<TV>::From_Rotated_Vector(TV(1,0),direction); // TODO: hmm
             FRAME<TV> J;
             RIGID_BODY<TV>* joint_cover=0;
             if(j==1){
-                tail_link.X()-=direction*.1;
+                tail_link.Frame().t-=direction*.1;
                 FRAME<TV> parent_frame=prev_link->Frame();parent_frame.t.y-=radius/2;
-                J=FRAME<TV>((tail_link.X()*.6+parent_frame.t*.4),ROTATION<TV>());}
+                J=FRAME<TV>((tail_link.Frame().t*.6+parent_frame.t*.4),ROTATION<TV>());}
             else{
-                J=FRAME<TV>((tail_link.X()*.5+prev_link->X()*.5),ROTATION<TV>());
+                J=FRAME<TV>((tail_link.Frame().t*.5+prev_link->Frame().t*.5),ROTATION<TV>());
                 if(!use_deformable){
                     joint_cover=&tests.Add_Rigid_Body("circle",(T).1767767,friction); // sqrt(2)*.25/2
-                    joint_cover->X()=J.t;}}
+                    joint_cover->Frame().t=J.t;}}
 
             static const T volume=(T).15*length;
             tail_link.Set_Mass((T).4*fluids_parameters.density*volume);
@@ -1136,8 +1136,8 @@ void Joints_From_List(int joint_type)
         bone_hierarchy(id).Append(id+1);
         arb.joint_mesh.Add_Articulation(id,id+1,joint);
         joint->Set_Joint_To_Parent_Frame(FRAME<TV>());
-        joint->Set_Joint_To_Child_Frame(FRAME<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.rotation(id+1).Inverse_Rotate(solid_body_collection.rigid_body_collection.rigid_body_particle.X(id)-solid_body_collection.rigid_body_collection.rigid_body_particle.X(id+1)),
-                                                  solid_body_collection.rigid_body_collection.rigid_body_particle.rotation(id+1).Inverse()));
+        joint->Set_Joint_To_Child_Frame(FRAME<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id+1).r.Inverse_Rotate(solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id).t-solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id+1).t),
+                                                  solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id+1).r.Inverse()));
         JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
         joint->global_post_stabilization=false;joint->joint_function->active=false;
         joint_function->Set_k_p(1000);joint_function->Set_Target_Angle(ROTATION<TV>());

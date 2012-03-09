@@ -42,10 +42,10 @@ bool Update_Box_Box_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collision
     ORIENTED_BOX<TV> box1_transformed(box1,body1.Frame());
     ORIENTED_BOX<TV> box2_transformed(box2,body2.Frame());
 
-    TV collision_normal=body1.X()-body2.X();collision_normal.Normalize();
+    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
     if(!box1_transformed.Intersection(box2_transformed)){rigid_body_collisions.skip_collision_check.Set_Last_Checked(id_1,id_2);return false;}
     if(TV::Dot_Product(collision_normal,body1.Twist().linear-body2.Twist().linear)>=0) return false;
-    TV collision_location=(body1.X()-body2.X())*.5+body1.X();
+    TV collision_location=(body1.Frame().t-body2.Frame().t)*.5+body1.Frame().t;
     TV collision_relative_velocity=body1.Pointwise_Object_Velocity(collision_location)-body2.Pointwise_Object_Velocity(collision_location);
     collision_callbacks.Swap_States(id_1,id_2);
     SOLVE_CONTACT::Update_Contact_Pair_Helper<TV>(rigid_body_collisions,collision_callbacks,id_1,id_2,dt,time,epsilon_scale,collision_location,collision_normal,collision_relative_velocity,

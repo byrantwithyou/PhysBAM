@@ -87,8 +87,7 @@ public:
     MPI_RIGIDS<TV>* mpi_rigids;
     ARRAY<TWIST<TV> > mpi_rigid_velocity_save;
     ARRAY<T_SPIN> mpi_rigid_angular_momentum_save;
-    ARRAY<TV> mpi_rigid_X_save;
-    ARRAY<ROTATION<TV> > mpi_rigid_rotation_save;
+    ARRAY<FRAME<TV> > mpi_rigid_frame_save;
 
     RIGID_BODY_COLLISIONS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIGID_BODY_COLLISION_PARAMETERS<TV>& parameters_input,
         RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks_input,RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>& rigids_example_forces_and_velocities_input);

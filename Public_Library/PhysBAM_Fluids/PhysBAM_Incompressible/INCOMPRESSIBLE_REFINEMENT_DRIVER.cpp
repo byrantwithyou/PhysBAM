@@ -58,7 +58,7 @@ Initialize()
     // initialize collision objects
     example.Initialize_Bodies();
     kinematic_evolution.Get_Current_Kinematic_Keyframes(1/example.frame_rate,time);
-    kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);
+    kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
     kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
 
     // setup domain boundaries and mpi
@@ -146,13 +146,13 @@ Advance_To_Target_Time(const T target_time)
         else if(time+2*dt>=target_time){dt=(T)(.5*(target_time-time));}
 
         // kinematic_update
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);
+        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
         kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
         for(int i=0;i<example.rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
             RIGID_GEOMETRY<TV>& rigid_geometry=example.rigid_geometry_collection.Rigid_Geometry(i);            
-            rigid_geometry.X()+=dt*rigid_geometry.Twist().linear;
-            rigid_geometry.Rotation()=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Rotation();rigid_geometry.Rotation().Normalize();}
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time+dt);
+            rigid_geometry.Frame().t+=dt*rigid_geometry.Twist().linear;
+            rigid_geometry.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Frame().r;rigid_geometry.Frame().r.Normalize();}
+        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time+dt);
 
         LOG::Time("Scalar Advance");
         // scalar update

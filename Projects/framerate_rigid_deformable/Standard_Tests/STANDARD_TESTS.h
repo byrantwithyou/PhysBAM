@@ -235,7 +235,7 @@ void Curtain_And_Ball()
     tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
     tests.Add_Ground();
     RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).25,(T)0);
-    body.X().z=(T).5;
+    body.Frame().t.z=(T).5;
     body.Is_Kinematic()=true;
 }
 //#####################################################################

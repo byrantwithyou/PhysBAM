@@ -130,7 +130,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -494,7 +494,7 @@ void Floppy_Human()
             rigid_base_transform.t/=body_motion.trajectories(1)(1).length;}
         FRAME<TV> rigid_base_transform_i=rigid_base_transform;
         rigid_base_transform_i.t*=length;
-        rigid_body.Set_Frame(body_motion.trajectories(i)(1).targeted_transform*rigid_base_transform_i);}
+        rigid_body.Frame()=body_motion.trajectories(i)(1).targeted_transform*rigid_base_transform_i;}
     
     Create_Joints_From_Hierarchy(body_motion.name_to_track_index.Get("Root"));
 
@@ -564,7 +564,7 @@ void Static_Human()
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/body.tet",human_state,false,false,1000,(T)1);
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",(T).2,(T).1);    
-    rigid_body.X()=TV((T)1,(T).2,0);
+    rigid_body.Frame().t=TV((T)1,(T).2,0);
     rigid_body.Twist().linear=TV(-2.5,0,0);
     rigid_body.Update_Bounding_Box();
     T volume=(T)(4./3.*pi*.1*.1*.1);
@@ -606,19 +606,19 @@ void Floppy_Fish()
     ARRAY<RIGID_BODY<TV>*> bones;
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T)1,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV(-(T)2,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV(-(T)2,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T)1,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV(-(T).75,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV(-(T).75,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T)1,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV((T).5,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV((T).5,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T).7,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV((T)1.7,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV((T)1.7,(T)3,0));
 
     bones.Append(&tests.Add_Rigid_Body("miniplank25wide2",(T).5,friction));
-    bones.Last()->Set_Frame(FRAME<TV>(TV((T)2.5,(T)3,0)));
+    bones.Last()->Frame()=FRAME<TV>(TV((T)2.5,(T)3,0));
 
     T density=1000;
     for(int i=0;i<bones.m;i++){
@@ -665,8 +665,8 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
 
     // Create first body
     parent_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
-    parent_body->X()=shift;
-    parent_body->Rotation()=orient*initial_orientation;
+    parent_body->Frame().t=shift;
+    parent_body->Frame().r=orient*initial_orientation;
     parent_body->Set_Name("parent");
     parent_body->Set_Mass(50);
 
@@ -675,8 +675,8 @@ void PD_Snake(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p
     for(int i=0;i<number_of_joints;i++){
         cheight+=scale*((T)1.25+space_adjustment);
         child_body=&tests.Add_Rigid_Body("cyllink",scale*(T).2,friction);
-        child_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-        child_body->Rotation()=orient*initial_orientation;
+        child_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
+        child_body->Frame().r=orient*initial_orientation;
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
         child_body->Set_Mass(50);
@@ -733,12 +733,12 @@ void Sidewinding()
     for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
-//     rigid_body.X()=TV((T)0,(T).3,-10);
+//     rigid_body.Frame().t=TV((T)0,(T).3,-10);
 //     rigid_body.Set_Name("obstruction");
 //     rigid_body.Set_Mass(30);}
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
-//     rigid_body.X()=TV((T)-2,(T).3,-10);
+//     rigid_body.Frame().t=TV((T)-2,(T).3,-10);
 //     rigid_body.Set_Name("obstruction");
 //     rigid_body.Set_Mass(30);}
 
@@ -747,8 +747,8 @@ void Sidewinding()
 
     for(int i=0;i<count;i++) for(int j=0;j<6;j++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("plank",(T)1,friction);
-        rigid_body.X()=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-6-2*i));
-        rigid_body.Rotation()=ROTATION<TV>((T)half_pi,TV(0,1,0));
+        rigid_body.Frame().t=TV((T)(-(T)35+10*j),(T).2*steps[i-1]-(T).1,(T)(-6-2*i));
+        rigid_body.Frame().r=ROTATION<TV>((T)half_pi,TV(0,1,0));
         rigid_body.Set_Name("obstruction");
         rigid_body.is_static=true;
         rigid_body.Set_Mass(30);}
@@ -785,7 +785,7 @@ void Add_Maggot(const T scale,const RIGID_BODY_STATE<TV>& state,const std::strin
     for(int p=rigid_body_collection.rigid_body_particle.array_collection->Size()-number_of_joints;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
         rigid_body.Twist().angular=state.twist.angular;
-        rigid_body.Twist().linear=state.Pointwise_Object_Velocity(rigid_body.X());
+        rigid_body.Twist().linear=state.Pointwise_Object_Velocity(rigid_body.Frame().t);
         tests.Bind_Particles_In_Rigid_Body(rigid_body);}
 }
 //#####################################################################

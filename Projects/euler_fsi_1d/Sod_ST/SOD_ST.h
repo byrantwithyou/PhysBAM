@@ -101,7 +101,7 @@ public:
     bool Get_Solid_Source_Velocities(ARRAY<int>& deformable_simplices,ARRAY<T>& deformable_simplex_forces,ARRAY<PAIR<int,int> >& rigid_simplices,ARRAY<T>& rigid_simplex_forces,
         TV& orientation,const T time) PHYSBAM_OVERRIDE {return false;}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
@@ -324,12 +324,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         LOG::cout<<"Setting solid mass to "<<solid_mass<<std::endl;
         rect.Set_Mass(solid_mass);
         TV epsilon=TV(.000);
-        if(test_number==12) rect.X()=TV((T).7+grid.DX()/(T)2+scaling_factor/(T)2+epsilon);
+        if(test_number==12) rect.Frame().t=TV((T).7+grid.DX()/(T)2+scaling_factor/(T)2+epsilon);
         else if(test_number==14) {
             epsilon=grid.DX()*(T).1;
-            rect.X()=grid.X(TV_INT(0))+scaling_factor/(T)2+epsilon;
+            rect.Frame().t=grid.X(TV_INT(0))+scaling_factor/(T)2+epsilon;
             rect.Twist().linear=TV(.2);}
-        else rect.X()=grid.X(TV_INT((T).7*TV(grid.counts)))+grid.DX()/(T)2+scaling_factor/(T)2+epsilon;
+        else rect.Frame().t=grid.X(TV_INT((T).7*TV(grid.counts)))+grid.DX()/(T)2+scaling_factor/(T)2+epsilon;
         rect.Is_Kinematic()=false;
 
         fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);}

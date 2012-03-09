@@ -452,7 +452,7 @@ Create_New_Rigid_Bodies_From_Fracture(ARRAY<int>& map_to_old_particles)
             PHYSBAM_FATAL_ERROR("TODO: fix adding of forces");
             new_rigid_body->parent_rigid_body_id=rigid_body.particle_index;
             new_rigid_body->Set_Coefficient_Of_Friction(rigid_body.coefficient_of_friction);
-            new_rigid_body->Twist().linear=rigid_body.Pointwise_Object_Velocity(new_rigid_body->X());
+            new_rigid_body->Twist().linear=rigid_body.Pointwise_Object_Velocity(new_rigid_body->Frame().t);
             new_rigid_body->Twist().angular=rigid_body.Twist().angular;new_rigid_body->Update_Angular_Momentum();
             LOG::cout<<"+++++++++++++++ NEW RIGID BODY VELOCITY: "<<new_rigid_body->Twist().linear<<", angular: "<<new_rigid_body->Twist().angular<<std::endl;
             RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>* impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*new_rigid_body);

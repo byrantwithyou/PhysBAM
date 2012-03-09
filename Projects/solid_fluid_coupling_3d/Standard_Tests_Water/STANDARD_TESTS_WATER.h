@@ -552,7 +552,7 @@ void Floppy_Fish()
         T bone_scale=scale*bone_scales[i];
         RIGID_BODY<TV>& bone=solids_tests.Add_Rigid_Body("miniplank25wide2",bone_scale,friction);
         bones.Append(&bone);
-        bone.Set_Frame(FRAME<TV>(bone_positions[i]));
+        bone.Frame()=FRAME<TV>(bone_positions[i]);
         bone.Set_Mass(bone_density*bone_unscaled_volume*std::pow(bone_scale,TV::dimension));}
 
     T joint_strengths[4]={(T)500,(T)500,(T)200,(T)100};
@@ -757,8 +757,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T diameter=right_corner.x-left_corner.x;
             // Set up the thing we're dropping our object into
             RIGID_BODY<TV>& bowl=solids_tests.Add_Rigid_Body("bowl",diameter*(T).55,(T)0);
-            bowl.X()=TV((T)0,(T).05,(T)0);
-            bowl.Rotation()=ROTATION<TV>(-(T)pi/2,TV::Axis_Vector(1));
+            bowl.Frame().t=TV((T)0,(T).05,(T)0);
+            bowl.Frame().r=ROTATION<TV>(-(T)pi/2,TV::Axis_Vector(1));
             bowl.is_static=true;
             bowl.Set_Mass((T)1e10);
             bowl.Set_Coefficient_Of_Restitution((T)0);bowl.Set_Coefficient_Of_Friction((T)1);
@@ -767,7 +767,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             
             // Set up the thing we're dropping
             RIGID_BODY<TV>& dropped_object=solids_tests.Add_Rigid_Body("sphere",(T).8*(T).5*diameter,(T)0);
-            dropped_object.X()=TV((T)0,(T)2,(T)0);
+            dropped_object.Frame().t=TV((T)0,(T)2,(T)0);
             dropped_object.Set_Name("falling body");
             dropped_object.Set_Mass(sub_test==1?(T)1e10:(T)1e-10);
             dropped_object.Set_Coefficient_Of_Restitution((T)0);dropped_object.Set_Coefficient_Of_Friction((T)1);
@@ -791,14 +791,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int i=0;i<num_spheres;i++){
                 RIGID_BODY<TV>& rigid_body_sphere=solids_tests.Add_Rigid_Body("sphere",scale,(T)0,true,false);
                 rigid_body_sphere.Update_Bounding_Box();
-                rigid_body_sphere.Set_Frame(Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true));
+                rigid_body_sphere.Frame()=Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true);
                 rigid_body_sphere.Set_Mass(sphere_mass);///random.Get_Uniform_Number((T).1,(T)2));
                 rigid_bodies_to_simulate.Append(rigid_body_sphere.particle_index);}
 
             for(int i=0;i<num_blocks;i++){
                 RIGID_BODY<TV>& rigid_body_block=solids_tests.Add_Rigid_Body("subdivided_box",scale,(T)0);
                 rigid_body_block.Update_Bounding_Box();
-                rigid_body_block.Set_Frame(Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true));
+                rigid_body_block.Frame()=Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true);
                 rigid_body_block.Set_Mass(block_mass);///random.Get_Uniform_Number((T).1,(T)2));
                 rigid_bodies_to_simulate.Append(rigid_body_block.particle_index);}
             break;}
@@ -807,7 +807,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,rigid_directory+"/box",(T).4,true,true,false,false);
             //RIGID_BODY<TV>& rigid_body_square=solid_body_collection.rigid_body_collection.Rigid_Body(id);
             RIGID_BODY<TV>& rigid_body_square=solids_tests.Add_Rigid_Body("box",(T).4,(T)0);
-            rigid_body_square.Set_Frame(FRAME<TV>(TV((T).4,(T)1.4,(T).4)));
+            rigid_body_square.Frame()=FRAME<TV>(TV((T).4,(T)1.4,(T).4));
             rigid_body_square.Set_Coefficient_Of_Restitution((T)0);
             rigid_body_square.Set_Name("box");
             T volume=cube((T).4);
@@ -823,7 +823,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,(T)10,true);
             // rigid body
             RIGID_BODY<TV>& torus=solids_tests.Add_Rigid_Body("torus",(T).25,(T)0);
-            torus.Set_Frame(FRAME<TV>(TV((T)0,(T)1.5,(T)0)));
+            torus.Frame()=FRAME<TV>(TV((T)0,(T)1.5,(T)0));
             torus.Set_Name("torus");
             T volume=cube((T).15);
             torus.Set_Mass(volume*solid_density);
@@ -835,7 +835,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,(T)10,true);
             // rigid body
             RIGID_BODY<TV>& torus=solids_tests.Add_Rigid_Body("torus",(T).25,(T).2);
-            torus.Set_Frame(FRAME<TV>(TV((T)0,(T)2.15,(T)0)));
+            torus.Frame()=FRAME<TV>(TV((T)0,(T)2.15,(T)0));
             torus.Set_Name("torus");
             T volume=torus.Volume();
             torus.Set_Mass(volume*solid_density);
@@ -852,7 +852,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& pipe=solids_tests.Add_Rigid_Body("funnel_revolve",(T).3,(T)0);
             pipe.Set_Name("funnel");
             pipe.is_static=true;pipe.thin_shell=true;
-            pipe.Set_Frame(FRAME<TV>(TV((T)0,(T)heavy_sphere_initial_height,(T)0)));
+            pipe.Frame()=FRAME<TV>(TV((T)0,(T)heavy_sphere_initial_height,(T)0));
             rigid_bodies_to_simulate.Append(pipe.particle_index);
             break;}
         case 9: Floppy_Fish();break;
@@ -860,28 +860,28 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T fluid_mass=(T)four_thirds_pi*cube((T).4)*fluids_parameters.density;
             // really light cork
             RIGID_BODY<TV>& light_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
-            light_cork.Set_Frame(FRAME<TV>(TV((T)-1.5,light_sphere_initial_height,(T)0)));
+            light_cork.Frame()=FRAME<TV>(TV((T)-1.5,light_sphere_initial_height,(T)0));
             light_cork.Set_Name("light_cork");light_cork.Set_Mass((T).1*fluid_mass);
             light_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(light_cork.particle_index);
 
             // lightish cork
             RIGID_BODY<TV>& lightish_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
-            lightish_cork.Set_Frame(FRAME<TV>(TV((T)-.5,light_sphere_initial_height,(T)0)));
+            lightish_cork.Frame()=FRAME<TV>(TV((T)-.5,light_sphere_initial_height,(T)0));
             lightish_cork.Set_Name("lightish_cork");lightish_cork.Set_Mass((T).5*fluid_mass);
             lightish_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(lightish_cork.particle_index);
 
             // barely light cork
             RIGID_BODY<TV>& barely_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
-            barely_cork.Set_Frame(FRAME<TV>(TV((T).5,light_sphere_initial_height,(T)0)));
+            barely_cork.Frame()=FRAME<TV>(TV((T).5,light_sphere_initial_height,(T)0));
             barely_cork.Set_Name("heavy_cork");barely_cork.Set_Mass((T).9*fluid_mass);
             barely_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(barely_cork.particle_index);
 
             // heavy cork
             RIGID_BODY<TV>& heavy_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
-            heavy_cork.Set_Frame(FRAME<TV>(TV((T)1.5,light_sphere_initial_height,(T)0)));
+            heavy_cork.Frame()=FRAME<TV>(TV((T)1.5,light_sphere_initial_height,(T)0));
             heavy_cork.Set_Name("cork");heavy_cork.Set_Mass((T)10*fluid_mass);
             heavy_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(heavy_cork.particle_index);
@@ -891,7 +891,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             for(int i=0;i<6;++i) for(int j=0;j<4;++j) {
                 RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
                 TV position=TV((T).125+(T)i*(T).25,light_sphere_initial_height,(T).125+(T)j*(T).25);
-                sphere.Set_Frame(FRAME<TV>(position));
+                sphere.Frame()=FRAME<TV>(position);
                 sphere.Set_Name(STRING_UTILITIES::string_sprintf("cork_%i_%i",i,j));
                 sphere.Set_Coefficient_Of_Restitution((T)1);
                 switch(j) {
@@ -909,7 +909,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             T fraction=(T).2;
             T volume=(T)four_thirds_pi*cube((T).05);
             RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
-            sphere.Set_Frame(FRAME<TV>(TV((T)1.25,(T).55,(T).5)));
+            sphere.Frame()=FRAME<TV>(TV((T)1.25,(T).55,(T).5));
             sphere.Twist().linear=TV((T)-6,(T)-7.23333333333,(T)0);
             sphere.Set_Mass(sub_test==1?(T)1e10:fraction*volume*fluids_parameters.density);
             sphere.Set_Coefficient_Of_Restitution((T)1);
@@ -931,23 +931,23 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.y+(T).04,grid.domain.min_corner.z,grid.domain.max_corner.z);
 
             // slide all the rigid body walls down
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.rigid_body_particle.X(i).y-=(T).75;
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.rigid_body_particle.frame(i).t.y-=(T).75;
 
             RANDOM_NUMBERS<T> random;
 
             for(int i=0;i<num_spheres;i++){
                 RIGID_BODY<TV>& rigid_body_sphere=solids_tests.Add_Rigid_Body("sphere",scale,(T).15,true,false);
                 rigid_body_sphere.Update_Bounding_Box();
-                rigid_body_sphere.Set_Frame(Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true));
-                rigid_body_sphere.X().y=scale*(T)5;
+                rigid_body_sphere.Frame()=Find_Placement(random,rigid_body_sphere.axis_aligned_bounding_box,bounding_boxes,world,true);
+                rigid_body_sphere.Frame().t.y=scale*(T)5;
                 rigid_body_sphere.Set_Mass(sphere_mass);///random.Get_Uniform_Number((T).1,(T)2));
                 rigid_bodies_to_simulate.Append(rigid_body_sphere.particle_index);}
 
             for(int i=0;i<num_blocks;i++){
                 RIGID_BODY<TV>& rigid_body_block=solids_tests.Add_Rigid_Body("subdivided_box",scale,(T).15);
                 rigid_body_block.Update_Bounding_Box();
-                rigid_body_block.Set_Frame(Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true));
-                rigid_body_block.X().y=scale*(T)5;
+                rigid_body_block.Frame()=Find_Placement(random,rigid_body_block.axis_aligned_bounding_box,bounding_boxes,world,true);
+                rigid_body_block.Frame().t.y=scale*(T)5;
                 rigid_body_block.Set_Mass(block_mass);///random.Get_Uniform_Number((T).1,(T)2));
                 rigid_bodies_to_simulate.Append(rigid_body_block.particle_index);}
             break;}
@@ -957,7 +957,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,(T)10,true);
             // Set up the thing we're dropping
             RIGID_BODY<TV>& dropped_object=solids_tests.Add_Rigid_Body("sphere_66k",(T).125,(T)0,true,true);
-            dropped_object.X()=TV((T)0,(T)1.5,(T)0);
+            dropped_object.Frame().t=TV((T)0,(T)1.5,(T)0);
             dropped_object.Set_Name("falling body");
             T volume=(T)four_thirds_pi*cube((T).25);
             dropped_object.Set_Mass(volume*solid_density);
@@ -1102,22 +1102,22 @@ void Boat()
     // boat
     RIGID_BODY<TV>& boat=solids_tests.Add_Rigid_Body("Thin_Shells/canoe_high",(T).25,(T)1,false);
     boat_index=boat.particle_index;
-    boat.Update_Bounding_Box();T dy=boat.X().y-boat.Axis_Aligned_Bounding_Box().min_corner.y;
-    boat.X()=TV((T)0,initial_fluid_height+(T)1.05*dy,(T)0);
+    boat.Update_Bounding_Box();T dy=boat.Frame().t.y-boat.Axis_Aligned_Bounding_Box().min_corner.y;
+    boat.Frame().t=TV((T)0,initial_fluid_height+(T)1.05*dy,(T)0);
     boat.thin_shell=true;
     boat.Set_Mass(boat_mass);
 
     // light sphere
     RIGID_BODY<TV>& light_sphere=solids_tests.Add_Rigid_Body("sphere",(T).06,(T).4);
     light_sphere_index=light_sphere.particle_index;
-    light_sphere.Set_Frame(FRAME<TV>(TV((T)0,light_sphere_initial_height,-(T).1)));
+    light_sphere.Frame()=FRAME<TV>(TV((T)0,light_sphere_initial_height,-(T).1));
     T light_sphere_density=(T)50;
     light_sphere.Set_Mass(light_sphere.Volume()*light_sphere_density);
 
     // heavy sphere
     RIGID_BODY<TV>& heavy_sphere=solids_tests.Add_Rigid_Body("sphere",(T).06,(T).4);
     heavy_sphere_index=heavy_sphere.particle_index;
-    heavy_sphere.Set_Frame(FRAME<TV>(TV((T)0,heavy_sphere_initial_height,(T).15)));
+    heavy_sphere.Frame()=FRAME<TV>(TV((T)0,heavy_sphere_initial_height,(T).15));
     heavy_sphere.Set_Mass(heavy_sphere.Volume()*(T)10000);
 
     rigid_bodies_to_simulate.Append(boat.particle_index);
@@ -1180,17 +1180,17 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Set_External_Positions
 //#####################################################################
-void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE
+void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==21)
         for(int i=0;i<constrained_nodes.m;i++)
-            if(time<constrained_nodes(i).y) X(constrained_nodes(i).x)=constrained_nodes(i).z;
+            if(time<constrained_nodes(i).y) frame(constrained_nodes(i).x).t=constrained_nodes(i).z;
     if(test_number==6){
-        if(time<light_sphere_drop_time) X(light_sphere_index).y=light_sphere_initial_height;
-        if(time<heavy_sphere_drop_time) X(heavy_sphere_index).y=heavy_sphere_initial_height;}
+        if(time<light_sphere_drop_time) frame(light_sphere_index).t.y=light_sphere_initial_height;
+        if(time<heavy_sphere_drop_time) frame(heavy_sphere_index).t.y=heavy_sphere_initial_height;}
     if(test_number==4){
         // slide all the rigid body walls down
-        for(int i=0;i<4;i++) X(i).y=(T).75;
+        for(int i=0;i<4;i++) frame(i).t.y=(T).75;
     }
 }
 //#####################################################################

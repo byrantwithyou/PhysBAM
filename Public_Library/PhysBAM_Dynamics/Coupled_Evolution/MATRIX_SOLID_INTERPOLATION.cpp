@@ -88,7 +88,7 @@ Compute(const int ghost_cells)
                     row.deformable_weights.Append(DEFORMABLE_WEIGHT(element(i),cosine*simplex_weight(i)));}
             else if(RIGID_COLLISION_GEOMETRY<TV>* rigid_body_wrapper=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body)){
                 for(int i=0;i<clipped_simplices.m;i++) area+=clipped_simplices(i).Size();
-                row.rigid_weights.Append(RIGID_WEIGHT(rigid_body_wrapper->rigid_geometry.particle_index,cosine*area,iterator.Location()-dynamic_cast<RIGID_BODY<TV>&>(rigid_body_wrapper->rigid_geometry).X()));}
+                row.rigid_weights.Append(RIGID_WEIGHT(rigid_body_wrapper->rigid_geometry.particle_index,cosine*area,iterator.Location()-dynamic_cast<RIGID_BODY<TV>&>(rigid_body_wrapper->rigid_geometry).Frame().t));}
             else PHYSBAM_FATAL_ERROR("OMGWTFBBQ");
 
             accumulated_normal+=normal*area;

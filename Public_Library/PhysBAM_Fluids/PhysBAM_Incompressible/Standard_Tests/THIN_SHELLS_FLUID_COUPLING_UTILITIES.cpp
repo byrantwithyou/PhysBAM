@@ -152,7 +152,8 @@ Add_Deformable_Object_From_File(const STREAM_TYPE stream_type,DEFORMABLE_BODY_CO
 template<class T,class T_EXAMPLE> static void
 Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
 {
-    RIGID_BODY_COLLECTION<VECTOR<T,2> >& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    typedef VECTOR<T,2> TV;
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
     VECTOR<T,2> center=fluid_grid.domain.Center(),size=fluid_grid.domain.Edge_Lengths();
     int id;
 
@@ -160,8 +161,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(fluid_grid.domain.min_corner.x,center.y);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Angle(-(T)pi/2);
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(fluid_grid.domain.min_corner.x,center.y),ROTATION<TV>::From_Angle(-(T)pi/2));
         rigid_body_collection.Rigid_Body(id).Set_Name("left wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -170,8 +170,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.y*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(fluid_grid.domain.max_corner.x,center.y);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Angle((T)pi/2);
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(fluid_grid.domain.max_corner.x,center.y),ROTATION<TV>::From_Angle((T)pi/2));
         rigid_body_collection.Rigid_Body(id).Set_Name("right wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -180,7 +179,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(center.x,fluid_grid.domain.min_corner.y);
+        rigid_body_collection.rigid_body_particle.frame(id).t=TV(center.x,fluid_grid.domain.min_corner.y);
         rigid_body_collection.Rigid_Body(id).Set_Name("bottom wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -189,8 +188,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies_2D/ground",size.x*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,2>(center.x,fluid_grid.domain.max_corner.y);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Angle((T)pi);
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(center.x,fluid_grid.domain.max_corner.y),ROTATION<TV>::From_Angle((T)pi));
         rigid_body_collection.Rigid_Body(id).Set_Name("top wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -201,16 +199,16 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,2> >& fluid_grid,con
 template<class T,class T_EXAMPLE> static void
 Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,const T coefficient_of_restitution,const T coefficient_of_friction,ARRAY<int>* walls_added)
 {
-    RIGID_BODY_COLLECTION<VECTOR<T,3> >& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
-    VECTOR<T,3> center=fluid_grid.domain.Center(),size=fluid_grid.domain.Edge_Lengths();
+    typedef VECTOR<T,3> TV;
+    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=example.solid_body_collection.rigid_body_collection;
+    TV center=fluid_grid.domain.Center(),size=fluid_grid.domain.Edge_Lengths();
     int id;
 
     if(example.fluids_parameters.domain_walls(0)(0)){
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.y,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,3>(fluid_grid.domain.min_corner.x,center.y,center.z);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,3> >(-(T).5*(T)pi,VECTOR<T,3>(0,0,1));
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(fluid_grid.domain.min_corner.x,center.y,center.z),ROTATION<TV>(-(T).5*(T)pi,TV(0,0,1)));
         rigid_body_collection.Rigid_Body(id).Set_Name("left wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -219,8 +217,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.y,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,3>(fluid_grid.domain.max_corner.x,center.y,center.z);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(0,0,1));
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(fluid_grid.domain.max_corner.x,center.y,center.z),ROTATION<TV>((T).5*(T)pi,TV(0,0,1)));
         rigid_body_collection.Rigid_Body(id).Set_Name("right wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -229,7 +226,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,3>(center.x,fluid_grid.domain.min_corner.y,center.z);
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(center.x,fluid_grid.domain.min_corner.y,center.z));
         rigid_body_collection.Rigid_Body(id).Set_Name("bottom wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -238,8 +235,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.z)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,3>(center.x,fluid_grid.domain.max_corner.y,center.z);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,3> >((T)pi,VECTOR<T,3>(1,0,0));
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(center.x,fluid_grid.domain.max_corner.y,center.z),ROTATION<TV>((T)pi,TV(1,0,0)));
         rigid_body_collection.Rigid_Body(id).Set_Name("top wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -248,8 +244,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.y)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,3>(center.x,center.y,fluid_grid.domain.min_corner.z);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(1,0,0));
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(center.x,center.y,fluid_grid.domain.min_corner.z),ROTATION<TV>((T).5*(T)pi,TV(1,0,0)));
         rigid_body_collection.Rigid_Body(id).Set_Name("front wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}
@@ -258,8 +253,7 @@ Add_Rigid_Body_Walls(T_EXAMPLE& example,const GRID<VECTOR<T,3> >& fluid_grid,con
         id=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/ground",max(size.x,size.y)*(T).00501);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Restitution(coefficient_of_restitution);
         rigid_body_collection.Rigid_Body(id).Set_Coefficient_Of_Friction(coefficient_of_friction);
-        rigid_body_collection.rigid_body_particle.X(id)=VECTOR<T,3>(center.x,center.y,fluid_grid.domain.max_corner.z);
-        rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,3> >((T)-.5*(T)pi,VECTOR<T,3>(1,0,0));
+        rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>(TV(center.x,center.y,fluid_grid.domain.max_corner.z),ROTATION<TV>((T)-.5*(T)pi,TV(1,0,0)));
         rigid_body_collection.Rigid_Body(id).Set_Name("back wall");
         rigid_body_collection.Rigid_Body(id).is_static=true;
         if(walls_added) walls_added->Append(id);}

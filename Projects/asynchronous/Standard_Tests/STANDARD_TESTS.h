@@ -223,7 +223,7 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -522,7 +522,7 @@ void Cloth_Ball()
     tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
     tests.Add_Ground();
     RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).25,(T)0);
-    body.X().z=(T).5;
+    body.Frame().t.z=(T).5;
     body.Is_Kinematic()=true;
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
     constrained_point.Append(0);
@@ -572,10 +572,10 @@ void Cloth_And_Spinning_Sphere()
     tests.Create_Cloth_Panel(number_side_panels,(T)1.9*side_length,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).56,0))));
     tests.Add_Ground((T).1);
     RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).25,(T)1);
-    sphere_body.X()=TV(0,(T).30,0);
+    sphere_body.Frame().t=TV(0,(T).30,0);
     sphere_body.Is_Kinematic()=true;
     RIGID_BODY<TV>& body=tests.Add_Rigid_Body("cut_pyramid",(T).1,(T).1);
-    body.X()=TV((T)-.65,(T).05,(T).65);body.Rotation()=ROTATION<TV>((T)-pi/2,TV(1,0,0))*body.Rotation();
+    body.Frame().t=TV((T)-.65,(T).05,(T).65);body.Frame().r=ROTATION<TV>((T)-pi/2,TV(1,0,0))*body.Frame().r;
     body.is_static=true;
 }
 //#####################################################################
@@ -596,7 +596,7 @@ void Wardrobe_Cloth()
     tests.Create_Cloth_Panel(number_side_panels,(T)4,aspect_ratio,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4,(T)-.25))));
     tests.Add_Ground((T)0.2,(T).1);
     RIGID_BODY<TV>& body=tests.Add_Rigid_Body("wardrobe",(T).25,(T)10);
-    body.X()=TV(0,(T)1.5,(T).9-(T)0.194);body.Rotation()=ROTATION<TV>((T)-pi/2,TV(1,0,0));
+    body.Frame().t=TV(0,(T)1.5,(T).9-(T)0.194);body.Frame().r=ROTATION<TV>((T)-pi/2,TV(1,0,0));
     body.is_static=true;
 }
 //#####################################################################
@@ -1076,7 +1076,7 @@ void Activate_Secondary_Simulation()
 
     //if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
 
-    ground->X().y=-999;
+    ground->Frame().t.y=-999;
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties
@@ -1364,7 +1364,7 @@ void Asynchronous_Sphere()
     fully_implicit=false;
     solids_parameters.triangle_collision_parameters.perform_self_collision=(number_of_spheres>=2);
     ground=&tests.Add_Ground();
-    //ground->X().y=-999;
+    //ground->Frame().t.y=-999;
 
     if(test_number==15 || test_number==16) asynchronous_evolution=new ASYNCHRONOUS_EVOLUTION<TV>(solid_body_collection,solids_evolution,solids_parameters.cfl,true,projection_rigidity);
 

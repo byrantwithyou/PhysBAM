@@ -140,7 +140,7 @@ Update_Object_Labels()
             if(opengl_point_simplices(i)){
                 if(output_positions){
                     rigid_body_collection.Rigid_Body(i).Update_Angular_Velocity();
-                    opengl_point_simplices(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f>",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.X(i).x));}
+                    opengl_point_simplices(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f>",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.frame(i).t.x));}
                 else opengl_point_simplices(i)->Set_Name(rigid_body_collection.Rigid_Body(i).name);}}}
 }
 //#####################################################################
@@ -187,7 +187,7 @@ Display(const int in_color) const
             glColor3f(1,1,1);
             for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
                 if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length()){
-                    OpenGL_String(rigid_body_collection.rigid_body_particle.X(i),STRING_UTILITIES::string_sprintf("%s %f",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.twist(i).linear.x));}}}
+                    OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t,STRING_UTILITIES::string_sprintf("%s %f",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.twist(i).linear.x));}}}
         glPopAttrib();}
 }
 //#####################################################################

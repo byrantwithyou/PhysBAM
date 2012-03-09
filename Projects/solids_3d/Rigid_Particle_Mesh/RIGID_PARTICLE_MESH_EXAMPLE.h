@@ -58,8 +58,7 @@ void Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filena
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filename,(T).15,0,with_phi);
-    rigid_body.X()=frame.t;
-    rigid_body.Rotation()=frame.r;
+    rigid_body.Frame()=frame;
     rigid_body.Set_Coefficient_Of_Restitution(0);
     rigid_body.Set_Name(rigid_body_name);
     int gravity_particle=particles.array_collection->Add_Element();

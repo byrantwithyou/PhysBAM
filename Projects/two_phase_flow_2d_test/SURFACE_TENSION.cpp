@@ -1146,7 +1146,7 @@ FSI_Analytic_Test()
         rigid_body_collection.Rigid_Body(b).is_static=true;}
 
     RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Box(m*TV(solid_width,(T)1.2),5);
-    rigid_body.Set_Frame(FRAME<TV>(m*TV((T).5,.5)));
+    rigid_body.Frame()=FRAME<TV>(m*TV((T).5,.5));
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
     rigid_body.Set_Mass(solid_density*solid_width);
 

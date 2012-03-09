@@ -278,7 +278,7 @@ void Make_Mace(const int length,const T& scale_factor=(T)1,const TV & shift,cons
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body->Set_Name("holding");
     if(!parameter_list.Get_Parameter("use_man",true)) rigid_body->is_static=true;
-    rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+    rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
     hand=rigid_body;
     original_hand_frame=rigid_body->Frame();
 
@@ -287,7 +287,7 @@ void Make_Mace(const int length,const T& scale_factor=(T)1,const TV & shift,cons
     for(int i=0;i<length;i++){
         rigid_body=&tests.Add_Rigid_Body(data_directory+"/Rigid_Bodies/cyllink",(T).25*scale_factor,0);
         rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
-        rigid_body->Set_Frame(FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,-(T).5+i,0)));
+        rigid_body->Frame()=FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,-(T).5+i,0));
         rigid_body->Set_Name("cyllink");
         rigid_body->Set_Mass(1);}
 
@@ -296,7 +296,7 @@ void Make_Mace(const int length,const T& scale_factor=(T)1,const TV & shift,cons
     rigid_body->Set_Name("mace");
 //    rigid_body->Set_Mass(parameter_list.Get_Parameter("mace_mass",(T)1)*rigid_body->mass); 
     rigid_body->Set_Mass(parameter_list.Get_Parameter("mace_mass",(T)1));
-    rigid_body->Set_Frame(FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,1+length,0)));
+    rigid_body->Frame()=FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,1+length,0));
     mace=rigid_body;
 
     mace_joints=length+1;
@@ -321,7 +321,7 @@ void Make_Mace(const int length,const T& scale_factor=(T)1,const TV & shift,cons
     rigid_body=solids_parameters.rigid_body_parameters.list.rigid_bodies(id);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
     rigid_body->Set_Name("body1");
-    rigid_body->Set_Frame(FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,0,-12)));
+    rigid_body->Frame()=FRAME<TV>(shift,orient)*FRAME<TV>(scale_factor*TV(0,0,-12));
     rigid_body->Set_Mass(rigid_body->mass*(T).1);
     rigid_body->is_static=true;
 
@@ -486,11 +486,11 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
     da_man->Turn_Off_Collisions(arb,collision_manager);
     if(hand && !parameter_list.Get_Parameter("use_man",true)){
         //rotate it statically to see if it works
-        hand->Rotation()=QUATERNION<T>(time*parameter_list.Get_Parameter("rotation_increment",(T).1),TV(0,1,0))*original_hand_frame.r;
+        hand->Frame().r=QUATERNION<T>(time*parameter_list.Get_Parameter("rotation_increment",(T).1),TV(0,1,0))*original_hand_frame.r;
         hand->Twist().angular=TV(0,parameter_list.Get_Parameter("rotation_increment",(T).1),0);
         hand->Update_Angular_Momentum();
         
-        //           hand->X()=TV(time*parameter_list.Get_Parameter("rotation_increment",(T).1),0,0)+original_hand_frame.t;
+        //           hand->Frame().t=TV(time*parameter_list.Get_Parameter("rotation_increment",(T).1),0,0)+original_hand_frame.t;
         //    hand->velocity=TV(parameter_list.Get_Parameter("rotation_increment",(T).1),0,0);
     }
 }

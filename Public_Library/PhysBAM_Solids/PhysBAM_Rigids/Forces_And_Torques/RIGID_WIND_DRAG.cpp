@@ -83,7 +83,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
                 TV wind_velocity=use_constant_wind?constant_wind:optimization(t).wind_velocity;
                 TV relative_velocity=wind_velocity-rigid_body->Pointwise_Object_Velocity(optimization(t).center);
                 TV simplex_force=Add_Velocity_Independent_Forces_Helper(relative_velocity,t);
-                wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->X(),simplex_force);}}
+                wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->Frame().t,simplex_force);}}
 }
 //#####################################################################
 // Function Add_Velocity_Dependent_Forces
@@ -101,7 +101,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
             TV simplex_force=wind_viscosity*(negative_V-TV::Dot_Product(negative_V,optimization(t).inward_normal)*optimization(t).inward_normal);
             // total force
             simplex_force*=optimization(t).area_over_m; // one third of the triangle force is distriduted to each node
-            wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->X(),simplex_force);}}
+            wrench.linear+=simplex_force;wrench.angular+=TV::Cross_Product(optimization(t).center-rigid_body->Frame().t,simplex_force);}}
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T) \

@@ -252,7 +252,7 @@ Apply_Rigid_Deformable_Collision_Impulse(RIGID_BODY<TV>& rigid_body,const int pa
     if(!coefficient_of_friction || (allow_pull && relative_normal_velocity>=0)){ // frictionless case
         T nT_impulse1_n=particles.one_over_mass(particle),nT_impulse2_n=0;
         if(!rigid_body.Has_Infinite_Inertia()){
-            T_SPIN r2xn=TV::Cross_Product(location-rigid_body.X(),normal);
+            T_SPIN r2xn=TV::Cross_Product(location-rigid_body.Frame().t,normal);
             nT_impulse2_n=1/rigid_body.Mass()+Dot_Product(r2xn,rigid_body.World_Space_Inertia_Tensor_Inverse()*r2xn);}
         impulse=-(1+coefficient_of_restitution)*relative_normal_velocity/(nT_impulse1_n+nT_impulse2_n)*normal;}
     else{ // friction case
@@ -283,8 +283,8 @@ Apply_Rigid_Deformable_Collision_Impulse(RIGID_BODY<TV>& rigid_body,const int pa
 // Function Update_Rigid_Deformable_Collision_Pair
 //#####################################################################
 template<class TV> bool RIGID_DEFORMABLE_COLLISIONS<TV>::
-Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,ARRAY<TV>& X_save,ARRAY<TV>& V_save,ARRAY<TV>& rigid_X_save,
-    ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& rigid_velocity_difference)
+Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,ARRAY<TV>& X_save,ARRAY<TV>& V_save,
+    ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& rigid_velocity_difference)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -344,8 +344,8 @@ Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int part
 // Function Add_Elastic_Collisions
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
-Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,
-    ARRAY<TV>& rigid_velocity_difference,ARRAY<TV>& rigid_X_save,ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN> &rigid_angular_momentum_save,ARRAY<TV>& X_save,ARRAY<TV>& V_save)
+Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,
+    ARRAY<TV>& rigid_velocity_difference,ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN> &rigid_angular_momentum_save,ARRAY<TV>& X_save,ARRAY<TV>& V_save)
 {
     rigid_body_collisions.rigid_body_particle_intersections.Remove_All();
     particles_collided_with_rigid_body.Remove_All();
@@ -398,7 +398,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
                 RIGID_BODY<TV>& rigid_body=dynamic_cast<RIGID_BODY<TV>&>(dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>&>(*rigid_collision_bodies(collision_body_id)).rigid_geometry);
                 for(int j=0;j<deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id).m;j++){
                     int k=deformable_body_collection.collisions.collision_body_candidate_nodes(collision_body_id)(j);
-                    if(Update_Rigid_Deformable_Collision_Pair(rigid_body,k,dt,time,X_save,V_save,rigid_X_save,rigid_rotation_save,rigid_angular_momentum_difference,
+                    if(Update_Rigid_Deformable_Collision_Pair(rigid_body,k,dt,time,X_save,V_save,rigid_frame_save,rigid_angular_momentum_difference,
                             rigid_velocity_difference) && !rigid_body.Has_Infinite_Inertia()){
                         need_another_iteration=true;
                         if(solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects)
@@ -420,7 +420,7 @@ Add_Elastic_Collisions(const T dt,const T time,ARRAY<ROTATION<TV> >& rigid_rotat
 // Function Process_Deformable_Contact_With_Kinematic_Rigid_Body
 //#####################################################################
 template<class TV> bool RIGID_DEFORMABLE_COLLISIONS<TV>::
-Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T dt,const T time,ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<TV>& X_save)
+Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<TV>& X_save)
 {
     PHYSBAM_ASSERT(rigid_body.Has_Infinite_Inertia());
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
@@ -431,8 +431,7 @@ Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,
 
     PRECOMPUTE_CONTACT_PROJECTION precompute(rigid_body,false);
     ARRAY_VIEW<TV> V(deformable_body_collection.particles.V);
-    exchange(rigid_X_save(rigid_body.particle_index),rigid_body.X());
-    exchange(rigid_rotation_save(rigid_body.particle_index),rigid_body.Rotation());
+    exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
     rigid_body.Update_Angular_Velocity();
     // NOTE: positions and normals are now at time n
     ARRAY<TV> relative_velocities;
@@ -455,8 +454,7 @@ Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,
 
     // update positions
     for(int i=0;i<particles.m;i++){const int p=particles(i);deformable_body_collection.particles.X(p)=X_save(p)+dt*V(p);}
-    exchange(rigid_X_save(rigid_body.particle_index),rigid_body.X());
-    exchange(rigid_rotation_save(rigid_body.particle_index),rigid_body.Rotation());
+    exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
     rigid_body.Update_Angular_Velocity();
 
     return true;
@@ -465,8 +463,8 @@ Process_Deformable_Contact_With_Kinematic_Rigid_Body(RIGID_BODY<TV>& rigid_body,
 // Function Update_Rigid_Deformable_Contact_Pair
 //#####################################################################
 template<class TV> bool RIGID_DEFORMABLE_COLLISIONS<TV>::
-Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,const T epsilon_scale,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,
-    ARRAY<ROTATION<TV> >& rigid_rotation_save,const T collision_body_thickness,const bool process_contact_unconditionally)
+Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const T time,const T epsilon_scale,ARRAY<TV>& X_save,
+    ARRAY<FRAME<TV> >& rigid_frame_save,const T collision_body_thickness,const bool process_contact_unconditionally)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
@@ -477,8 +475,7 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
     // do not collide with hard bound particles or if both rigid body and particle have infinite inertia
     if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(particle_index)>=0 || (rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX)) return false;
 
-    exchange(rigid_X_save(rigid_body.particle_index),rigid_body.X());
-    exchange(rigid_rotation_save(rigid_body.particle_index),rigid_body.Rotation());
+    exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
     rigid_body.Update_Angular_Velocity();
     // NOTE: positions and normals are now at time n
 
@@ -496,14 +493,12 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
     TV relative_velocity=particles.V(particle_index)-rigid_body.Pointwise_Object_Velocity(X(particle_index));
     TV normal=rigid_body.implicit_object->Extended_Normal(X(particle_index));
     if(!process_contact_unconditionally && TV::Dot_Product(relative_velocity,normal)>=0){
-        exchange(rigid_X_save(rigid_body.particle_index),rigid_body.X());
-        exchange(rigid_rotation_save(rigid_body.particle_index),rigid_body.Rotation());
+        exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
         rigid_body.Update_Angular_Velocity();
         return false;} // do nothing in case of separating pair
 
     T depth;if(!process_contact_unconditionally && !rigid_body.Implicit_Geometry_Lazy_Inside_And_Value(particles.X(particle_index),depth,collision_body_thickness)){
-        exchange(rigid_X_save(rigid_body.particle_index),rigid_body.X());
-        exchange(rigid_rotation_save(rigid_body.particle_index),rigid_body.Rotation());
+        exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
         rigid_body.Update_Angular_Velocity();
         return false;}
     depth-=collision_body_thickness;
@@ -532,8 +527,7 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
         rigid_body_collisions.collision_callbacks.Save_Position(rigid_body.particle_index);
         rigid_body_collisions.Euler_Step_Position(rigid_body.particle_index,dt_recomputed,time);}
     else{
-        exchange(rigid_X_save(rigid_body.particle_index),rigid_body.X());
-        exchange(rigid_rotation_save(rigid_body.particle_index),rigid_body.Rotation());
+        exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
         rigid_body.Update_Angular_Velocity();}
 
     return true;
@@ -591,7 +585,7 @@ Process_Precomputed_Contact_With_Kinematic_Rigid_Bodies()
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
 Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body,const bool use_saved_pairs,const bool use_existing_contact,
-    ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<TV>& rigid_velocity_difference,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& X_save,
+    ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<TV>& rigid_velocity_difference,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& X_save,
     const T collision_body_thickness)
 {
     RIGID_BODY_SKIP_COLLISION_CHECK& skip_collision_check=rigid_body_collisions.skip_collision_check;
@@ -648,7 +642,7 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
                         // TODO: this needs to use the same used_saved_pairs stuff as below to get the contact pairs right
                         ARRAY<int> particles;Get_Particles_Contacting_Rigid_Body(rigid_body,particles,true);if(!particles.m) continue;
                         for(int k=0;k<particles.m;k++)
-                            if(Update_Rigid_Deformable_Contact_Pair(rigid_body,particles(k),dt,time,epsilon_scale,X_save,rigid_X_save,rigid_rotation_save,collision_body_thickness))
+                            if(Update_Rigid_Deformable_Contact_Pair(rigid_body,particles(k),dt,time,epsilon_scale,X_save,rigid_frame_save,collision_body_thickness))
                                 need_another_level_iteration=need_another_iteration=true;}}}
 
                 if(articulated_rigid_body && articulated_rigid_body->use_krylov_prestab){
@@ -667,12 +661,12 @@ Process_Contact(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articulated_
                 const HASHTABLE<int>* contact_particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index);
                 if(!contact_particles) continue;
                 for(HASHTABLE<int>::ITERATOR i(*contact_particles);i.Valid();i.Next()){int p=i.Key();
-                    Update_Rigid_Deformable_Contact_Pair(rigid_body,p,dt,time,1,X_save,rigid_X_save,rigid_rotation_save,collision_body_thickness,true);}}
+                    Update_Rigid_Deformable_Contact_Pair(rigid_body,p,dt,time,1,X_save,rigid_frame_save,collision_body_thickness,true);}}
             else{
                 ARRAY<int> particles;
                 Get_Particles_Contacting_Rigid_Body(rigid_body,particles,true);
                 for(int k=0;k<particles.m;k++){
-                    Update_Rigid_Deformable_Contact_Pair(rigid_body,particles(k),dt,time,1,X_save,rigid_X_save,rigid_rotation_save,collision_body_thickness);}}}
+                    Update_Rigid_Deformable_Contact_Pair(rigid_body,particles(k),dt,time,1,X_save,rigid_frame_save,collision_body_thickness);}}}
     if(rigid_body_collisions.prune_stacks_from_contact) rigid_body_collisions.Apply_Stacking_Contact();
 }
 //#####################################################################
@@ -699,30 +693,28 @@ Get_Particles_Contacting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int>&
 // Function Set_Collision_Velocities
 //#####################################################################
 template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
-Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,ARRAY_VIEW<const ROTATION<TV> >& rigid_rotation_save,
+Set_Collision_Velocities(ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > twist,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& rigid_frame_save,
     ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,ARRAY<TV>& V_save)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     // TODO: rigid/rigid
     ARRAY_VIEW<const TV> X(solids_parameters.use_trapezoidal_rule_for_velocities?ARRAY_VIEW<const TV>(X_save)
         :ARRAY_VIEW<const TV>(deformable_body_collection.particles.X)); // n+1 positions
-    ARRAY_VIEW<const TV> rigid_X(solids_parameters.use_trapezoidal_rule_for_velocities?ARRAY_VIEW<const TV>(rigid_X_save)
-        :ARRAY_VIEW<const TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.X)); // n+1 frames
-    ARRAY_VIEW<const ROTATION<TV> > rigid_rotation(solids_parameters.use_trapezoidal_rule_for_velocities?ARRAY_VIEW<const ROTATION<TV> >(rigid_rotation_save)
-        :ARRAY_VIEW<const ROTATION<TV> >(solid_body_collection.rigid_body_collection.rigid_body_particle.rotation)); // n+1 frames
+    ARRAY_VIEW<const FRAME<TV> > rigid_frame(solids_parameters.use_trapezoidal_rule_for_velocities?ARRAY_VIEW<const FRAME<TV> >(rigid_frame_save)
+        :ARRAY_VIEW<const FRAME<TV> >(solid_body_collection.rigid_body_collection.rigid_body_particle.frame)); // n+1 frames
     ARRAY<PRECOMPUTE_CONTACT_PROJECTION*> precompute_boundary_list;
     for(int body=0;body<precompute_contact_projections.m;body++){
         PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(body),*precompute_boundary=0;const int rigid_p=precompute.rigid_body.particle_index;
         T_WORLD_SPACE_INERTIA_TENSOR inverse_inertia;
         if(solids_parameters.use_trapezoidal_rule_for_velocities) inverse_inertia=precompute.rigid_body.World_Space_Inertia_Tensor_Inverse();
         for(int i=0;i<precompute.particles.m;i++){const int p=precompute.particles(i);
-            TV V_rel=RIGID_BODY<TV>::Pointwise_Object_Velocity(twist(rigid_p),rigid_X(rigid_p),X(p))-V(p);
+            TV V_rel=RIGID_BODY<TV>::Pointwise_Object_Velocity(twist(rigid_p),rigid_frame(rigid_p).t,X(p))-V(p);
             TV V_rel_target;
             if(solids_parameters.use_trapezoidal_rule_for_velocities){
                 // X_save and frame_save should be at n+1 for trapezoidal rule
                 TWIST<TV> twist_n(rigid_velocity_save(rigid_p).linear,inverse_inertia*rigid_angular_momentum_save(rigid_p));
                 // want N^T V^{n+1}_rel = N^T(2 V^{n+1/2}_rel - V^n_rel) >= 0
-                V_rel_target=(T).5*(RIGID_BODY<TV>::Pointwise_Object_Velocity(twist_n,rigid_X(rigid_p),X(p))-V_save(p));}
+                V_rel_target=(T).5*(RIGID_BODY<TV>::Pointwise_Object_Velocity(twist_n,rigid_frame(rigid_p).t,X(p))-V_save(p));}
             if(TV::Dot_Product(V_rel-V_rel_target,precompute.N(i))>=0){ // TODO: double check normal time should be n+1 for both trap and b.e.
                 if(!precompute_boundary) precompute_boundary=new PRECOMPUTE_CONTACT_PROJECTION(precompute.rigid_body,true);
                 precompute_boundary->particles.Append(p);
@@ -825,7 +817,7 @@ Initialize_Rigid_Deformable_Contact_Projection(PRECOMPUTE_CONTACT_PROJECTION& pr
     MATRIX<T,TV::dimension> L;MATRIX<T,T_SPIN::dimension,TV::dimension> rL;MATRIX<T,T_SPIN::dimension> rLr;
     for(int i=0;i<precompute.particles.m;i++){const int p=precompute.particles(i);
         precompute.N(i)=precompute.rigid_body.implicit_object->Extended_Normal(X(p));
-        const T one_over_NT_K_N=deformable_body_collection.particles.mass(p);precompute.r(i)=X(p)-precompute.rigid_body.X();precompute.N_over_NT_K_N(i)=precompute.N(i)*one_over_NT_K_N;
+        const T one_over_NT_K_N=deformable_body_collection.particles.mass(p);precompute.r(i)=X(p)-precompute.rigid_body.Frame().t;precompute.N_over_NT_K_N(i)=precompute.N(i)*one_over_NT_K_N;
         if(has_infinite_inertia) continue;
         precompute.rN(i)=TV::Cross_Product(precompute.r(i),precompute.N(i));
         L+=MATRIX<T,TV::dimension>::Outer_Product(precompute.N(i),precompute.N_over_NT_K_N(i));
@@ -854,7 +846,7 @@ Apply_Rigid_Deformable_Contact_Projection(ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> 
     // construct the rhs
     TV Lv;T_SPIN rLv;ARRAY<T> N_V_over_NT_K_N(precompute.particles.m);
     for(int i=0;i<precompute.particles.m;i++){const int p=precompute.particles(i);
-        const TV V_rel=twist.linear+TV::Cross_Product(twist.angular,X(p)-precompute.rigid_body.X())-V(p);
+        const TV V_rel=twist.linear+TV::Cross_Product(twist.angular,X(p)-precompute.rigid_body.Frame().t)-V(p);
         N_V_over_NT_K_N(i)=TV::Dot_Product(precompute.N_over_NT_K_N(i),precompute.V_rel_target(i)-V_rel);
         if(has_infinite_inertia) continue;
         Lv+=precompute.N(i)*N_V_over_NT_K_N(i);
@@ -944,7 +936,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         TV ms[2];VECTOR<T,T_SPIN::dimension> mrs[2];MATRIX<T,T_SPIN::dimension,TV::dimension> mr[2];MATRIX<T,T_SPIN::dimension> mrr[2];
         T m=0; // non static particles
         for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);
-            T mass=particles.mass(p);TV radius=particles.X(p)-parent_rigid_body.X();
+            T mass=particles.mass(p);TV radius=particles.X(p)-parent_rigid_body.Frame().t;
             m+=mass;ms[0]+=mass*particle_distances(i);mrs[0]+=mass*TV::Cross_Product(radius,particle_distances(i));
             MATRIX<T,T_SPIN::dimension,TV::dimension> ri=MATRIX<T,T_SPIN::dimension,TV::dimension>::Cross_Product_Matrix(radius);
             mr[0]+=mass*ri;mrr[0]+=mass*ri.Times_Transpose(ri);}
@@ -955,8 +947,8 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         for(int i=0;i<rigid_body_interactions.m;i++){
             RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
             int index=parent_other_rigid_body.Has_Infinite_Inertia()?1:0;
-            if(index){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
-            TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.X();
+            if(index){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.Frame().t;number_of_static_bodies++;}
+            TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.Frame().t;
             K_inverse_sum[index]+=K_inverse(i);ms[index]+=K_inverse_s;mrs[index]+=TV::Cross_Product(radius,K_inverse_s);
             MATRIX<T,T_SPIN::dimension,TV::dimension> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);
             mr[index]+=r_K_inverse;mrr[index]+=r_K_inverse.Times_Cross_Product_Matrix_Transpose(radius);}
@@ -976,7 +968,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             T_SYMMETRIC_MATRIX R_R_transpose;
             for(int i=0;i<rigid_body_interactions.m;i++){
                 RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
-                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=T_SYMMETRIC_MATRIX::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.X()-centroid);}
+                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=T_SYMMETRIC_MATRIX::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
             R_R_transpose.Solve_Eigenproblem(eigenvalues,eigenvectors);
             int rank=TV::Componentwise_Greater_Equal(eigenvalues.To_Vector(),TV::All_Ones_Vector()*threshold).Number_True();
             if(rank==0) equation_type=1; // 3/6 dof (2/3 dof in 2d) specified by static bodies
@@ -1028,24 +1020,24 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
 
     // apply push to particles
     for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);
-        Apply_Displacement_To_Particle(p,-particle_distances(i)+velocity+TV::Cross_Product(angular_velocity,particles.X(p)-parent_rigid_body.X()));}
+        Apply_Displacement_To_Particle(p,-particle_distances(i)+velocity+TV::Cross_Product(angular_velocity,particles.X(p)-parent_rigid_body.Frame().t));}
 
     // apply push to other rigid bodies
     for(int i=0;i<rigid_body_interactions.m;i++) if(!rigid_body_collection.Rigid_Body(rigid_body_interactions(i)).Has_Infinite_Inertia()){
         RIGID_BODY<TV>& other_rigid_body=rigid_body_collection.Rigid_Body(rigid_body_interactions(i));
         RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(other_rigid_body);
-        TV impulse=K_inverse(i)*(-rigid_body_distances(i)+velocity+TV::Cross_Product(angular_velocity,rigid_body_collision_locations(i)-parent_rigid_body.X()));
-        T_SPIN other_angular_velocity=parent_other_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(rigid_body_collision_locations(i)-parent_other_rigid_body.X(),impulse);
-        parent_other_rigid_body.X()+=impulse/parent_other_rigid_body.Mass();
-        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation) parent_other_rigid_body.Rotation()=ROTATION<TV>::From_Rotation_Vector(other_angular_velocity)*parent_other_rigid_body.Rotation();parent_other_rigid_body.Rotation().Normalize();
+        TV impulse=K_inverse(i)*(-rigid_body_distances(i)+velocity+TV::Cross_Product(angular_velocity,rigid_body_collision_locations(i)-parent_rigid_body.Frame().t));
+        T_SPIN other_angular_velocity=parent_other_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(rigid_body_collision_locations(i)-parent_other_rigid_body.Frame().t,impulse);
+        parent_other_rigid_body.Frame().t+=impulse/parent_other_rigid_body.Mass();
+        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation) parent_other_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(other_angular_velocity)*parent_other_rigid_body.Frame().r;parent_other_rigid_body.Frame().r.Normalize();
         parent_other_rigid_body.Update_Angular_Velocity();
         parent_other_rigid_body.Update_Bounding_Box();
         rigid_body_collisions.skip_collision_check.Set_Last_Moved(other_rigid_body.particle_index);}
 
     // apply push to the rigid body
     if(!parent_rigid_body.Has_Infinite_Inertia()){
-        parent_rigid_body.X()+=velocity;
-        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation) parent_rigid_body.Rotation()=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*parent_rigid_body.Rotation();parent_rigid_body.Rotation().Normalize();
+        parent_rigid_body.Frame().t+=velocity;
+        if(solids_parameters.rigid_body_collision_parameters.use_push_out_rotation) parent_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*parent_rigid_body.Frame().r;parent_rigid_body.Frame().r.Normalize();
         parent_rigid_body.Update_Angular_Velocity();
         parent_rigid_body.Update_Bounding_Box();
         rigid_body_collisions.skip_collision_check.Set_Last_Moved(rigid_body.particle_index);}
@@ -1138,9 +1130,9 @@ Push_Out_From_Particle(const int particle)
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(bodies(i));
         RIGID_BODY<TV>& parent_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body);
         TV impulse=K_inverse(i)*(-rigid_body_distances(i)+velocity);
-        T_SPIN angular_velocity=parent_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(particle_location-parent_rigid_body.X(),impulse);
-        rigid_body.X()+=impulse/parent_rigid_body.Mass();
-        rigid_body.Rotation()=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*rigid_body.Rotation();rigid_body.Rotation().Normalize();
+        T_SPIN angular_velocity=parent_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(particle_location-parent_rigid_body.Frame().t,impulse);
+        rigid_body.Frame().t+=impulse/parent_rigid_body.Mass();
+        rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*rigid_body.Frame().r;rigid_body.Frame().r.Normalize();
         rigid_body_collisions.skip_collision_check.Set_Last_Moved(rigid_body.particle_index);
         parent_rigid_body.Update_Angular_Velocity();}
 

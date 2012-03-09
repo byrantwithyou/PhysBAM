@@ -121,7 +121,7 @@ public:
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -261,7 +261,7 @@ void Display_Pattern()
         RIGID_BODY<TV>* new_body=new RIGID_BODY<TV>(rigid_body_collection,true);
         new_body->Add_Structure(*fracture_pattern.regions(i)->triangulated_surface);
         new_body->Add_Structure(*fracture_pattern.regions(i)->implicit_object);
-        new_body->X()-=TV(fracture_pattern.regions(i)->fracture_offset)*fracture_pattern.regions(i)->implicit_object->levelset.grid.DX();
+        new_body->Frame().t-=TV(fracture_pattern.regions(i)->fracture_offset)*fracture_pattern.regions(i)->implicit_object->levelset.grid.DX();
         rigid_body_collection.Add_Rigid_Body_And_Geometry(new_body);}
 }
 //#####################################################################
@@ -308,7 +308,7 @@ void Single_Cube()
     solids_parameters.rigid_body_collision_parameters.use_fracture_pattern=true;
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body;
-    rigid_body.Set_Frame(FRAME<TV>());
+    rigid_body.Frame()=FRAME<TV>();
     rigid_body.fracture_threshold=(T)3.0;
 
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/Fracture_Patterns/fracture_pattern-%d",data_directory.c_str(),fracture_pattern_index),fracture_pattern);
@@ -325,9 +325,9 @@ void Cube_Stack()
     solid_body_collection.print_residuals=false;
 
     RIGID_BODY<TV>& rigid_body_1=tests.Add_Rigid_Body("box",1,(T).5,true,use_nonanalytic_levelsets);
-    rigid_body_1.X()=TV(0,(T)-.5,0);
+    rigid_body_1.Frame().t=TV(0,(T)-.5,0);
     RIGID_BODY<TV>& rigid_body_2=tests.Add_Rigid_Body("box",(T).5,(T).5,true,use_nonanalytic_levelsets);
-    rigid_body_2.X()=TV(0,(T)1,0);
+    rigid_body_2.Frame().t=TV(0,(T)1,0);
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
 }
@@ -347,7 +347,7 @@ void Single_Cylinder()
     RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).35,(T).5,true,true);
     sphere_initial_location=TV((T)15,(T)0,(T)0);
     sphere_velocity=TV((T)-10,(T)0,(T)0);
-    sphere_body.X()=sphere_initial_location;
+    sphere_body.Frame().t=sphere_initial_location;
     sphere_body.Is_Kinematic()=true;
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
@@ -368,23 +368,23 @@ void Sphere_Pillar()
         if(i==90) continue;
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(STRING_UTILITIES::string_sprintf("Fractured_Pillar/fragment.%02d",i),1,(T).5);(void)rigid_body;
         rigid_body.Update_Bounding_Box();T_ORIENTED_BOX oriented_box=rigid_body.Oriented_Bounding_Box();
-        T min_side_length=FLT_MAX;TV saved_frame=rigid_body.X();
+        T min_side_length=FLT_MAX;TV saved_frame=rigid_body.Frame().t;
         for(int dim=0;dim<TV::m;dim++) min_side_length=min(min_side_length,oriented_box.edges.Column(dim).Magnitude());
         rigid_body_collection.rigid_body_particle.Remove_Body(rigid_body.particle_index);
-        RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",min_side_length/(T)2.5,(T).5,true,use_nonanalytic_levelsets);sphere.X()=saved_frame;
+        RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",min_side_length/(T)2.5,(T).5,true,use_nonanalytic_levelsets);sphere.Frame().t=saved_frame;
         if(sphere.Mass()<(T)1e-5) rigid_body_collection.rigid_body_particle.Remove_Body(sphere.particle_index);}
     rigid_body_collection.rigid_geometry_collection.Destroy_Unreferenced_Geometry();
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
     RIGID_BODY<TV>& wall1=tests.Add_Ground((T).5,-2,1);
-    wall1.Set_Frame(FRAME<TV>(TV((T)1.5,0,0),ROTATION<TV>((T)(pi/2),TV(0,0,1))));
+    wall1.Frame()=FRAME<TV>(TV((T)1.5,0,0),ROTATION<TV>((T)(pi/2),TV(0,0,1)));
     RIGID_BODY<TV>& wall2=tests.Add_Ground((T).5,-2,1);
-    wall2.Set_Frame(FRAME<TV>(TV((T)-.5,0,0),ROTATION<TV>((T)(1.5*pi),TV(0,0,1))));
+    wall2.Frame()=FRAME<TV>(TV((T)-.5,0,0),ROTATION<TV>((T)(1.5*pi),TV(0,0,1)));
     RIGID_BODY<TV>& wall3=tests.Add_Ground((T).5,-2,1);
-    wall3.Set_Frame(FRAME<TV>(TV(0,0,(T)-.5),ROTATION<TV>((T)(pi/2),TV(1,0,0))));
+    wall3.Frame()=FRAME<TV>(TV(0,0,(T)-.5),ROTATION<TV>((T)(pi/2),TV(1,0,0)));
     RIGID_BODY<TV>& wall4=tests.Add_Ground((T).5,-2,1);
-    wall4.Set_Frame(FRAME<TV>(TV(0,0,(T)1.5),ROTATION<TV>((T)(1.5*pi),TV(1,0,0))));
+    wall4.Frame()=FRAME<TV>(TV(0,0,(T)1.5),ROTATION<TV>((T)(1.5*pi),TV(1,0,0)));
     (void)ground;
 }
 //#####################################################################
@@ -397,7 +397,7 @@ void Tall_Cube_Stack()
 
     for(int i=0;i<10;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).5,(T).5,true,use_nonanalytic_levelsets);
-        rigid_body.X()=TV(0,(T)-.5+i,0);}
+        rigid_body.Frame().t=TV(0,(T)-.5+i,0);}
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
     (void)ground;
 }
@@ -435,7 +435,7 @@ void Ball_Hitting_Wall()
     for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
         implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
     rigid_body->Add_Structure(implicit_object);
-    rigid_body->Rotation()=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
+    rigid_body->Frame().r=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
     rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
 
     RIGID_BODY<TV>* sphere_body;
@@ -453,14 +453,14 @@ void Ball_Hitting_Wall()
             break;
         case 3:
             rigid_body->fracture_threshold=(T)1.0;
-            if(fracture_pattern_index==5) rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
+            if(fracture_pattern_index==5) rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,0,(T)1))*ROTATION<TV>((T)pi/2,TV(0,(T)1,0));
             sphere_body=&tests.Add_Rigid_Body("sphere",(T).5,(T).5,true,true);
             sphere_initial_location=TV((T)15,(T)-1,(T)-2);
             break;
         case 4:
             rigid_body->fracture_threshold=FLT_MAX;
             sphere_body=&tests.Add_Rigid_Body("sphere_refined",(T).25,(T).5,true,true);
-            sphere_body->Rotation()=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1));
+            sphere_body->Frame().r=ROTATION<TV>((T)-pi/2,TV(0,0,(T)1));
             sphere_initial_location=TV((T)20,(T)0,(T)0);
             sphere_body->fracture_threshold=(T).1;
             break;
@@ -476,7 +476,7 @@ void Ball_Hitting_Wall()
             sphere_initial_location=TV((T)10,(T)-1,(T)-2);
             sphere_body2=&tests.Add_Rigid_Body("sphere",(T).35,(T).5,true,true);
             sphere2_initial_location=TV((T)22,(T).5,(T)1.5);
-            sphere_body2->X()=sphere2_initial_location;
+            sphere_body2->Frame().t=sphere2_initial_location;
             sphere_body2->Is_Kinematic()=true;
             solids_parameters.rigid_body_collision_parameters.allow_refracturing=true;
             break;
@@ -486,7 +486,7 @@ void Ball_Hitting_Wall()
             sphere_initial_location=TV((T)10,(T)0,(T)0);
             sphere_body2=&tests.Add_Rigid_Body("sphere",(T).5,(T).5,true,true);
             sphere2_initial_location=TV((T)-20,(T)0,(T)-1.5);
-            sphere_body2->X()=sphere2_initial_location;
+            sphere_body2->Frame().t=sphere2_initial_location;
             sphere_body2->Is_Kinematic()=true;
             solids_parameters.rigid_body_collision_parameters.allow_refracturing=true;
             break;
@@ -494,7 +494,7 @@ void Ball_Hitting_Wall()
             PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized param number %d",parameter));}
     if(fracture_pattern_index==8) sphere_velocity=TV((T)-10,(T)0,(T)0);
     else sphere_velocity=TV((T)-15,(T)0,(T)0);
-    sphere_body->X()=sphere_initial_location;
+    sphere_body->Frame().t=sphere_initial_location;
     sphere_body->Is_Kinematic()=true;
     
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
@@ -512,13 +512,13 @@ void Poor_Bunny()
     solid_body_collection.print_residuals=false;
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("bunny",3,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body;
-    rigid_body.X()=TV(0,(T)-1,0);
+    rigid_body.Frame().t=TV(0,(T)-1,0);
     rigid_body.fracture_threshold=(T)10.0;
 
     RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T).2,(T).5,true,true);
     sphere_initial_location=TV((T)0,(T)-1,(T)35);
     sphere_velocity=TV((T)0,(T)0,(T)-20);
-    sphere_body.X()=sphere_initial_location;
+    sphere_body.Frame().t=sphere_initial_location;
     sphere_body.Is_Kinematic()=true;
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-2,1);
@@ -563,7 +563,7 @@ void Raining_Spheres()
     for(NODE_ITERATOR iterator(implicit_object.levelset.grid);iterator.Valid();iterator.Next())
         implicit_object.levelset.phi(iterator.index)=box.Signed_Distance(iterator.Location());
     rigid_body->Add_Structure(implicit_object);
-    rigid_body->X()=TV(0,(T)-.2,0);
+    rigid_body->Frame().t=TV(0,(T)-.2,0);
     rigid_body->fracture_threshold=(T)FLT_MAX;
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Mass(5);
@@ -571,22 +571,22 @@ void Raining_Spheres()
     rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);
 
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body2;
-    rigid_body2.X()=TV((T)-2.6,(T)-1.2,(T)-1.5);
+    rigid_body2.Frame().t=TV((T)-2.6,(T)-1.2,(T)-1.5);
     rigid_body2.fracture_threshold=(T)FLT_MAX;
     rigid_body2.is_static=true;
     rigid_body2.Set_Mass(2.5);
     RIGID_BODY<TV>& rigid_body3=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body3;
-    rigid_body3.X()=TV((T)-2.6,(T)-1.2,(T)1.5);
+    rigid_body3.Frame().t=TV((T)-2.6,(T)-1.2,(T)1.5);
     rigid_body3.fracture_threshold=(T)FLT_MAX;
     rigid_body3.is_static=true;
     rigid_body3.Set_Mass(2.5);
     RIGID_BODY<TV>& rigid_body4=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body4;
-    rigid_body4.X()=TV((T)2.6,(T)-1.2,(T)-1.5);
+    rigid_body4.Frame().t=TV((T)2.6,(T)-1.2,(T)-1.5);
     rigid_body4.fracture_threshold=(T)FLT_MAX;
     rigid_body4.is_static=true;
     rigid_body4.Set_Mass(2.5);
     RIGID_BODY<TV>& rigid_body5=tests.Add_Rigid_Body("cyllink",(T).4,(T).5,true,use_nonanalytic_levelsets);(void)rigid_body5;
-    rigid_body5.X()=TV((T)2.6,(T)-1.2,(T)1.5);
+    rigid_body5.Frame().t=TV((T)2.6,(T)-1.2,(T)1.5);
     rigid_body5.fracture_threshold=(T)FLT_MAX;
     rigid_body5.is_static=true;
     rigid_body5.Set_Mass(2.5);
@@ -594,11 +594,11 @@ void Raining_Spheres()
     RIGID_BODY<TV>& large_sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T).2,true,true);
     int world_height;
     if(parameter==25){
-        large_sphere_body.X()=TV((T)0,(T)60,(T)0);
+        large_sphere_body.Frame().t=TV((T)0,(T)60,(T)0);
         world_height=40;}
     else{
         world_height=100*(parameter/100); // 100 in height for each 100 spheres
-        large_sphere_body.X()=TV((T)0,(T)world_height+20,(T)0);}
+        large_sphere_body.Frame().t=TV((T)0,(T)world_height+20,(T)0);}
     large_sphere_body.fracture_threshold=(T)FLT_MAX;
     large_sphere_body.Set_Coefficient_Of_Restitution(0);
     large_sphere_body.Set_Mass((T)10);
@@ -617,7 +617,7 @@ void Raining_Spheres()
     for(int i=0;i<num_spheres;i++){
         RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere_refined",(T).35,(T).2,true,true);
         sphere_body.Update_Bounding_Box();
-        sphere_body.Set_Frame(Find_Placement(random,sphere_body.axis_aligned_bounding_box,bounding_boxes,world,false));
+        sphere_body.Frame()=Find_Placement(random,sphere_body.axis_aligned_bounding_box,bounding_boxes,world,false);
         sphere_body.Set_Mass((T)0.15);
         sphere_body.fracture_threshold=(T).25;
         if(maximum_fall_speed){
@@ -1121,7 +1121,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     else if(test_number==10 && frame==10)
         solids_parameters.rigid_body_collision_parameters.use_fracture_pattern=true;
     else if(test_number==12){
-        if(rigid_body_collection.rigid_body_particle.X(6).y<=5 && rigid_body_collection.Rigid_Body(5).is_static){
+        if(rigid_body_collection.rigid_body_particle.frame(6).t.y<=5 && rigid_body_collection.Rigid_Body(5).is_static){
             for(int id=int(1);id<=int(5);id++)
               rigid_body_collection.Rigid_Body(id).is_static=false;
             rigid_body_collection.Rigid_Body(int(1)).fracture_threshold=(T)3.0;
@@ -1228,21 +1228,21 @@ void Friction_Test()
     TWIST<TV> twist(frame.r.Rotate(TV(-initial_speed_down_ramp,0,0)),TV());
 
     rigid_body=&tests.Add_Rigid_Body("box",box_size,mu);
-    rigid_body->Set_Frame(frame);
+    rigid_body->Frame()=frame;
     rigid_body->Twist()=twist;
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("box");
 
     frame.t.z+=(T).2;
     rigid_body=&tests.Add_Rigid_Body("sphere",(T).05,0);
-    rigid_body->X()=frame.t;
+    rigid_body->Frame().t=frame.t;
     rigid_body->Set_Name("analytic solution");
     rigid_body->Is_Kinematic()=true;
     kinematic_id=rigid_body->particle_index;
 
     RIGID_BODY<TV>& ground=tests.Add_Ground(mu,0,0);
     ground.Set_Coefficient_Of_Rolling_Friction(1);
-    ground.Rotation()=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
+    ground.Frame().r=ROTATION<TV>(ground_angle_rad,TV(0,0,1));
 }
 //#####################################################################
 // Function Find_Placement

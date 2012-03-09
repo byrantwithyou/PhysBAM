@@ -271,11 +271,11 @@ Update_Box_Box_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,const 
     ORIENTED_BOX<TV> box1_transformed(box1,body1.Frame());
     ORIENTED_BOX<TV> box2_transformed(box2,body2.Frame());
 
-    TV collision_normal=body1.X()-body2.X();collision_normal.Normalize();
+    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
     if(!box1_transformed.Intersection(box2_transformed)){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(collision_normal,body1.Twist().linear-body2.Twist().linear)>=0) return false;
-    TV collision_location=(body1.X()-body2.X())*.5+body1.X();
+    TV collision_location=(body1.Frame().t-body2.Frame().t)*.5+body1.Frame().t;
     rigid_body_collisions.Update_Collision_Pair_Helper(body1,body2,dt,time,collision_location,collision_normal,
         body1.Pointwise_Object_Velocity(collision_location)-body2.Pointwise_Object_Velocity(collision_location),mpi_one_ghost);
     return true;
@@ -299,7 +299,7 @@ Update_Sphere_Sphere_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,
     SPHERE<TV>& sphere2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >&>(*object2).analytic;
 
     TV sphere1_center=(body1.Frame()*transform1).t,sphere2_center=(body2.Frame()*transform2).t;
-    TV collision_normal=body1.X()-body2.X();collision_normal.Normalize();
+    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
     T d=(sphere1_center-sphere2_center).Magnitude(),r1=sphere1.radius,r2=sphere2.radius;
     if(d>r1+r2){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
@@ -343,7 +343,7 @@ Update_Box_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,cons
             transformed_point(0)*=.5;
             points.Append(transformed_point);}}
 
-    TV collision_normal=-body1->Rotation().Rotated_Axis(0);
+    TV collision_normal=-body1->Frame().r.Rotated_Axis(0);
     if(!intersect){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
@@ -376,8 +376,8 @@ Update_Sphere_Plane_Collision(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,c
     SPHERE<TV>& sphere=implicit_sphere->analytic;
 
     TV sphere_center=(body2->Frame()*transform).t;
-    TV collision_normal=-body1->Rotation().Rotated_Axis(1);
-    T separation=TV::Dot_Product(body1->X()-sphere_center,collision_normal);
+    TV collision_normal=-body1->Frame().r.Rotated_Axis(1);
+    T separation=TV::Dot_Product(body1->Frame().t-sphere_center,collision_normal);
     if(separation>=sphere.radius){rigid_body_collisions.skip_collision_check.Set_Last_Checked(i1,i2);return false;}
     rigid_body_collisions.pairs_processed_by_collisions.Set(VECTOR<int,2>(i1,i2).Sorted());
     if(TV::Dot_Product(body1->Twist().linear-body2->Twist().linear,collision_normal)>=0) return false;
@@ -562,11 +562,9 @@ Process_Push_Out_Legacy()
     while(need_another_iteration && ++iteration<=push_out_iterations){
         if(mpi_rigids){
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_X_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            mpi_rigid_rotation_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
-                mpi_rigid_X_save(p)=rigid_body_collection.rigid_body_particle.X(p);
-                mpi_rigid_rotation_save(p)=rigid_body_collection.rigid_body_particle.rotation(p);}}
+            mpi_rigid_frame_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++)
+                mpi_rigid_frame_save(p)=rigid_body_collection.rigid_body_particle.frame(p);}
 
         need_another_iteration=false;
         if(use_freezing_with_push_out)
@@ -622,7 +620,7 @@ Process_Push_Out_Legacy()
         if(mpi_rigids){
             int need_another_iteration_int=(int)need_another_iteration;
             need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;
-            mpi_rigids->Exchange_All_Pushes(rigid_body_collection,mpi_rigid_X_save,mpi_rigid_rotation_save,*this);}}
+            mpi_rigids->Exchange_All_Pushes(rigid_body_collection,mpi_rigid_frame_save,*this);}}
     if(use_freezing_with_push_out) for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
@@ -739,8 +737,8 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
                 continue;
             RIGID_BODY<TV>& parent_other_rigid_body=rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
             int index=parent_other_rigid_body.Has_Infinite_Inertia()?1:0;
-            if(index>=0){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.X();number_of_static_bodies++;}
-            TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.X();
+            if(index>=0){centroid+=rigid_body_collision_locations(i)-parent_rigid_body.Frame().t;number_of_static_bodies++;}
+            TV K_inverse_s=K_inverse(i)*rigid_body_distances(i),radius=rigid_body_collision_locations(i)-parent_rigid_body.Frame().t;
             K_inverse_sum[index]+=K_inverse(i);ms[index]+=K_inverse_s;mrs[index]+=TV::Cross_Product(radius,K_inverse_s);
             MATRIX<T,T_SPIN::dimension,TV::dimension> r_K_inverse=K_inverse(i).Cross_Product_Matrix_Times(radius);
             mr[index]+=r_K_inverse;mrr[index]+=r_K_inverse.Times_Cross_Product_Matrix_Transpose(radius);}
@@ -760,7 +758,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             SYMMETRIC_MATRIX<T,TV::dimension> R_R_transpose;
             for(int i=0;i<rigid_body_interactions.m;i++){
                 RIGID_BODY<TV>& parent_other_rigid_body=rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
-                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=SYMMETRIC_MATRIX<T,TV::dimension>::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.X()-centroid);}
+                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=SYMMETRIC_MATRIX<T,TV::dimension>::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
             R_R_transpose.Solve_Eigenproblem(eigenvalues,eigenvectors);
             int rank=TV::Componentwise_Greater_Equal(eigenvalues.To_Vector(),TV::All_Ones_Vector()*threshold).Number_True();
             if(rank==0) equation_type=1; // 3/6 dof (2/3 dof in 2d) specified by static bodies
@@ -814,20 +812,22 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
     for(int i=0;i<rigid_body_interactions.m;i++) if(!rigid_body_collection.Rigid_Body(rigid_body_interactions(i)).Has_Infinite_Inertia()){
         RIGID_BODY<TV>& other_rigid_body=rigid_body_collection.Rigid_Body(rigid_body_interactions(i));
         RIGID_BODY<TV>& parent_other_rigid_body=rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(other_rigid_body);
-        TV impulse=K_inverse(i)*(-rigid_body_distances(i)+velocity+TV::Cross_Product(angular_velocity,rigid_body_collision_locations(i)-parent_rigid_body.X()));
-        T_SPIN other_angular_velocity=parent_other_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(rigid_body_collision_locations(i)-parent_other_rigid_body.X(),impulse);
-        parent_other_rigid_body.X()+=impulse/parent_other_rigid_body.Mass();
-        if(parameters.use_push_out_rotation)
-            parent_other_rigid_body.Rotation()=ROTATION<TV>::From_Rotation_Vector(other_angular_velocity)*parent_other_rigid_body.Rotation();parent_other_rigid_body.Rotation().Normalize();
+        TV impulse=K_inverse(i)*(-rigid_body_distances(i)+velocity+TV::Cross_Product(angular_velocity,rigid_body_collision_locations(i)-parent_rigid_body.Frame().t));
+        T_SPIN other_angular_velocity=parent_other_rigid_body.World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(rigid_body_collision_locations(i)-parent_other_rigid_body.Frame().t,impulse);
+        parent_other_rigid_body.Frame().t+=impulse/parent_other_rigid_body.Mass();
+        if(parameters.use_push_out_rotation){
+            parent_other_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(other_angular_velocity)*parent_other_rigid_body.Frame().r;
+            parent_other_rigid_body.Frame().r.Normalize();}
         parent_other_rigid_body.Update_Angular_Velocity();
         parent_other_rigid_body.Update_Bounding_Box();
         skip_collision_check.Set_Last_Moved(other_rigid_body.particle_index);}
 
     // apply push to the rigid body
     if(!parent_rigid_body.Has_Infinite_Inertia()){
-        parent_rigid_body.X()+=velocity;
-        if(parameters.use_push_out_rotation)
-            parent_rigid_body.Rotation()=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*parent_rigid_body.Rotation();parent_rigid_body.Rotation().Normalize();
+        parent_rigid_body.Frame().t+=velocity;
+        if(parameters.use_push_out_rotation){
+            parent_rigid_body.Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*parent_rigid_body.Frame().r;
+            parent_rigid_body.Frame().r.Normalize();}
         parent_rigid_body.Update_Angular_Velocity();
         parent_rigid_body.Update_Bounding_Box();
         skip_collision_check.Set_Last_Moved(rigid_body.particle_index);}

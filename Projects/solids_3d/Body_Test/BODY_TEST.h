@@ -63,7 +63,7 @@ public:
         tests.Create_Cloth_Panel(20,1,1,0);
         //deformable_body_collection.Add_Structure(&cloth);
         tests.Add_Ground();
-        body1=&tests.Add_Rigid_Body("sphere",(T).25,(T)0);body1->X().z=.5;
+        body1=&tests.Add_Rigid_Body("sphere",(T).25,(T)0);body1->Frame().t.z=.5;
         ground=&solid_body_collection.rigid_body_collection.Rigid_Body(1);
         deformable_body_collection.particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
         deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);

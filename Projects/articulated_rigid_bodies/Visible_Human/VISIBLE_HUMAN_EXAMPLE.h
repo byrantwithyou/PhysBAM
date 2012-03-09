@@ -183,7 +183,7 @@ void Initialize_Rigid_Bodies()
     if(add_block){
         int id=rigid_body_particles.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/box");
         RIGID_BODY<TV>* rigid_body=arb->rigid_body_list.rigid_bodies(id);
-        rigid_body->X()=TV(0,1,(T)1.4);
+        rigid_body->Frame().t=TV(0,1,(T)1.4);
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Coefficient_Of_Friction(1);
         rigid_body->Set_Name("block");
@@ -438,14 +438,14 @@ void Default_Example2()
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Coefficient_Of_Friction(1);
         rigid_body->Set_Name("flat_hand_right");
-        rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+        rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
 
         id=rigid_body_particles.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/New_Visible_Human_Bones/flat_hand_left",1,true,false,false);
         rigid_body=arb->rigid_body_list(id);
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Coefficient_Of_Friction(1);
         rigid_body->Set_Name("flat_hand_left");
-        rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+        rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
     }
 
     bool verbose=parameter_list.Get_Parameter("verbose",false);
@@ -659,7 +659,7 @@ void Push_Up()
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Coefficient_Of_Friction(1);
         rigid_body->Set_Name("flat_hand_right");
-        rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+        rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
         //rigid_body->Set_Mass(200);
 
         id=rigid_body_particles.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/New_Visible_Human_Bones/flat_hand_left",1,true,false,false);
@@ -667,7 +667,7 @@ void Push_Up()
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Coefficient_Of_Friction(1);
         rigid_body->Set_Name("flat_hand_left");
-        rigid_body->Set_Frame(skeleton_frame*rigid_body->Frame());
+        rigid_body->Frame()=skeleton_frame*rigid_body->Frame();
         //rigid_body->Set_Mass(200);
     }
     
@@ -922,11 +922,11 @@ void Add_Foot_Ground_Joints()
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.deformable_object.rigid_body_particles;
     RIGID_BODY<TV>* ground=arb->rigid_body_list.rigid_bodies(arb->rigid_body_list.rigid_bodies.m);
     JOINT<TV>* joint=new POINT_JOINT<TV>();
-    joint->Set_Joint_To_Parent_Frame(ground->Frame().Inverse()*FRAME<TV>(da_man->bones(VISIBLE_HUMAN<T>::BONE_R_TOE_1)->X()));
+    joint->Set_Joint_To_Parent_Frame(ground->Frame().Inverse()*FRAME<TV>(da_man->bones(VISIBLE_HUMAN<T>::BONE_R_TOE_1)->Frame().t));
     arb->joint_mesh.Add_Articulation(ground->particle_index,da_man->bones(VISIBLE_HUMAN<T>::BONE_R_ANKLE)->particle_index,joint);
     
     joint=new POINT_JOINT<TV>();
-    joint->Set_Joint_To_Parent_Frame(ground->Frame().Inverse()*FRAME<TV>(da_man->bones(VISIBLE_HUMAN<T>::BONE_L_TOE_1)->X()));
+    joint->Set_Joint_To_Parent_Frame(ground->Frame().Inverse()*FRAME<TV>(da_man->bones(VISIBLE_HUMAN<T>::BONE_L_TOE_1)->Frame().t));
     arb->joint_mesh.Add_Articulation(ground->particle_index,da_man->bones(VISIBLE_HUMAN<T>::BONE_L_ANKLE)->particle_index,joint);
 }
 //#####################################################################

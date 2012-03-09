@@ -89,7 +89,7 @@ Prepare_Backward_Euler_System(RIGIDS_BACKWARD_EULER_SYSTEM<TV>& system,const T d
     V_all=B_all;
     rigid_body_collection.Update_Angular_Momentum();
     Diagnostics(dt,current_position_time,0,0,604,"Before boundary conditions");
-    system.Set_Global_Boundary_Conditions(V_all,rigid_X_save,rigid_rotation_save,rigid_velocity_save,rigid_angular_momentum_save,rigids_parameters.implicit_solve_parameters.test_system,
+    system.Set_Global_Boundary_Conditions(V_all,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,rigids_parameters.implicit_solve_parameters.test_system,
         rigids_parameters.implicit_solve_parameters.print_matrix);
     if(velocity_update && !rigids_parameters.use_post_cg_constraints) Apply_Constraints(dt,current_velocity_time);
 
@@ -181,16 +181,13 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 template<class TV> void RIGIDS_EVOLUTION<TV>::
 Average_And_Exchange_Position()
 {
-    assert(rigid_X_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size() && rigid_rotation_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size());
+    assert(rigid_frame_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size());
     const ARRAY<int>& simulated_rigid_body_particles=rigid_body_collection.simulated_rigid_body_particles;
     ARRAY<int> rigid_body_indices(simulated_rigid_body_particles);rigid_body_indices.Append_Elements(rigid_body_collection.kinematic_rigid_bodies);
     for(int i=0;i<rigid_body_indices.Size();i++){int p=rigid_body_indices(i);
-        TV tmp_X=TV::Interpolate(rigid_body_collection.rigid_body_particle.X(p),rigid_X_save(p),(T).5);
-        rigid_X_save(p)=rigid_body_collection.rigid_body_particle.X(p);
-        rigid_body_collection.rigid_body_particle.X(p)=tmp_X;
-        ROTATION<TV> tmp_rotation=ROTATION<TV>::Spherical_Linear_Interpolation(rigid_body_collection.rigid_body_particle.rotation(p),rigid_rotation_save(p),(T).5);
-        rigid_rotation_save(p)=rigid_body_collection.rigid_body_particle.rotation(p);
-        rigid_body_collection.rigid_body_particle.rotation(p)=tmp_rotation;}
+        FRAME<TV> tmp=FRAME<TV>::Interpolation(rigid_body_collection.rigid_body_particle.frame(p),rigid_frame_save(p),(T).5);
+        rigid_frame_save(p)=rigid_body_collection.rigid_body_particle.frame(p);
+        rigid_body_collection.rigid_body_particle.frame(p)=tmp;}
     for(int i=0;i<rigid_body_indices.m;i++) rigid_body_collection.Rigid_Body(rigid_body_indices(i)).Update_Angular_Velocity();
 }
 //#####################################################################
@@ -258,7 +255,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 
         // save position and velocity for later trapezoidal rule
         Save_Velocity();
-        Save_Position(rigid_X_save,rigid_rotation_save);}
+        Save_Position(rigid_frame_save);}
 
     rigid_body_collection.Update_Position_Based_State(time+dt);
 
@@ -285,7 +282,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
  
     Diagnostics(dt,time,0,2,12,"add elastic collisions");
 
-    Restore_Position(rigid_X_save,rigid_rotation_save);
+    Restore_Position(rigid_frame_save);
     Diagnostics(dt,time,0,0,13,"restore position");
     if(advance_rigid_bodies){
         articulated_rigid_body.Apply_Poststabilization(rigids_parameters.implicit_solve_parameters.test_system,rigids_parameters.implicit_solve_parameters.print_matrix);
@@ -353,7 +350,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time, const bool solids)
         Trapezoidal_Step_Velocity(dt,time);
         Diagnostics(dt,time,2,1,29,"trazepoid rule");
 
-        Restore_Position(rigid_X_save,rigid_rotation_save); // move to final positions at time time+dt
+        Restore_Position(rigid_frame_save); // move to final positions at time time+dt
         Diagnostics(dt,time,2,2,30,"restore position");
         if(advance_rigid_bodies){
             articulated_rigid_body.Apply_Poststabilization(rigids_parameters.implicit_solve_parameters.test_system,rigids_parameters.implicit_solve_parameters.print_matrix);
@@ -400,20 +397,19 @@ Apply_Constraints(const T dt,const T time)
             articulated_rigid_body.Compute_Position_Based_State(dt,time);
             articulated_rigid_body.Solve_Velocities_for_PD(time,dt,rigids_parameters.implicit_solve_parameters.test_system,rigids_parameters.implicit_solve_parameters.print_matrix);}
         Diagnostics(dt,time,2,2,35,"solve velocities for pd");}
-    Save_Position(rigid_X_save_for_constraints,rigid_rotation_save_for_constraints);
+    Save_Position(rigid_frame_save_for_constraints);
 
     Diagnostics(dt,time,2,2,137,"consistent contact");
     ARRAY<TWIST<TV> > rigid_velocity_save_mpi,rigid_velocity_mpi;
     ARRAY<T_SPIN> rigid_angular_momentum_save_mpi,rigid_angular_momentum_mpi;
-    ARRAY<TV> rigid_X_save_mpi,rigid_X_mpi;
-    ARRAY<ROTATION<TV> > rigid_rotation_save_mpi,rigid_rotation_mpi;
+    ARRAY<FRAME<TV> > rigid_frame_save_mpi,rigid_frame_mpi;
     ARRAY<ARRAY<int>,PARTITION_ID> particles_of_partition;
     ARRAY<PARTITION_ID> partition_id_from_particle_index;
     Update_Positions_And_Apply_Contact_Forces(dt,time,true);use_existing_contact=false;
     Diagnostics(dt,time,4,2,37,"contact, prestabilization");
     if(rigid_body_collisions->prune_stacks_from_contact) rigid_body_collisions->Construct_Stacks();
     if(rigid_body_collisions->prune_contact_using_velocity) rigid_body_collisions->Compute_Contact_Frequency();
-    Restore_Position(rigid_X_save_for_constraints,rigid_rotation_save_for_constraints);
+    Restore_Position(rigid_frame_save_for_constraints);
     Diagnostics(dt,time,2,2,38,"restore position");
     if(advance_rigid_bodies){
         articulated_rigid_body.Apply_Poststabilization(rigids_parameters.implicit_solve_parameters.test_system,rigids_parameters.implicit_solve_parameters.print_matrix);
@@ -476,8 +472,7 @@ Update_Positions_And_Apply_Contact_Forces(const T dt,const T time,const bool use
     // rigid/rigid shock propagation
     ARRAY<TWIST<TV> > rigid_velocity_save_mpi,rigid_velocity_mpi;
     ARRAY<T_SPIN> rigid_angular_momentum_save_mpi,rigid_angular_momentum_mpi;
-    ARRAY<TV> rigid_X_save_mpi,rigid_X_mpi;
-    ARRAY<ROTATION<TV> > rigid_rotation_save_mpi,rigid_rotation_mpi;
+    ARRAY<FRAME<TV> > rigid_frame_save_mpi,rigid_frame_mpi;
     ARRAY<ARRAY<int>,PARTITION_ID> particles_of_partition;
     ARRAY<PARTITION_ID> partition_id_from_particle_index;
 
@@ -586,10 +581,12 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
     // initialize kinematic object positions and velocities
     if(!restart){
         kinematic_evolution.Get_Current_Kinematic_Keyframes(1/frame_rate,time);
-        kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.X,rigid_body_collection.rigid_body_particle.rotation,time);
+        kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.frame,time);
         kinematic_evolution.Set_External_Velocities(rigid_body_collection.rigid_body_particle.twist,time,time);
         rigid_body_collection.Update_Angular_Momentum();
-        for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){rigid_body_collection.rigid_body_particle.rotation(i).Normalize();}}
+        for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+            if(rigid_body_collection.Is_Active(i))
+                rigid_body_collection.rigid_body_particle.frame(i).r.Normalize();}
 
     RIGID_BODY_COLLISIONS<TV>::Adjust_Bounding_Boxes(rigid_body_collection);
     // rigid body collisions
@@ -636,7 +633,7 @@ Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_t
 template<class T>
 inline int Correct_Orientation_For_Kinetic_Energy_Using_Direction(RIGID_BODY<VECTOR<T,3> >& rigid_body,const T KE0,const VECTOR<T,3>& direction,const bool use_extrema)
 {
-    typedef VECTOR<T,3> TV;ROTATION<TV>& R=rigid_body.Rotation();const TV &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
+    typedef VECTOR<T,3> TV;ROTATION<TV>& R=rigid_body.Frame().r;const TV &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
     T KE=(T).5*TV::Dot_Product(w,L),k=KE-KE0,error=abs(k);
     if(error<=4*std::numeric_limits<T>::epsilon()*KE0) return 0;
     if(KE0<(T)sqr(std::numeric_limits<T>::epsilon())) return -1;
@@ -675,7 +672,7 @@ inline bool Correct_Orientation_For_Kinetic_Energy(RIGID_BODY<VECTOR<T,3> >& rig
     int component;
     if((T).5*TV::Dot_Product(w,L)>KE0) component=rigid_body.Inertia_Tensor().To_Vector().Arg_Max();
     else component=rigid_body.Inertia_Tensor().To_Vector().Arg_Min();
-    TV axis=rigid_body.Rotation().Rotate(TV::Axis_Vector(component));
+    TV axis=rigid_body.Frame().r.Rotate(TV::Axis_Vector(component));
     status=Correct_Orientation_For_Kinetic_Energy_Using_Direction(rigid_body,KE0,TV::Cross_Product(axis,L),true);
     if(status==3) return Correct_Orientation_For_Kinetic_Energy(rigid_body,KE0,iteration+1);
     return status<=0;
@@ -686,7 +683,8 @@ inline bool Correct_Orientation_For_Kinetic_Energy(RIGID_BODY<VECTOR<T,3> >& rig
 template<class T>
 inline void Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,3> >& rigid_body,bool correct_evolution_energy)
 {
-    typedef VECTOR<T,3> TV;ROTATION<TV>& R=rigid_body.Rotation();const TV &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
+    typedef VECTOR<T,3> TV;ROTATION<TV>& R=rigid_body.Frame().r;
+    const TV &w=rigid_body.Twist().angular,&L=rigid_body.Angular_Momentum();
     T KE0=(T).5*TV::Dot_Product(w,L);
     TV rotate_amount=w-(T).5*dt*rigid_body.World_Space_Inertia_Tensor_Inverse_Times(TV::Cross_Product(w,L));
     R=ROTATION<TV>::From_Rotation_Vector(dt*rotate_amount)*R;R.Normalize();
@@ -699,7 +697,8 @@ inline void Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,3> >& rigid_bo
 template<class T>
 inline void Update_Rotation_Helper(const T dt,RIGID_BODY<VECTOR<T,2> >& rigid_body,bool correct_evolution_energy)
 {
-    rigid_body.Rotation()=ROTATION<VECTOR<T,2> >::From_Rotation_Vector(dt*rigid_body.Twist().angular)*rigid_body.Rotation();rigid_body.Rotation().Normalize();
+    rigid_body.Frame().r=ROTATION<VECTOR<T,2> >::From_Rotation_Vector(dt*rigid_body.Twist().angular)*rigid_body.Frame().r;
+    rigid_body.Frame().r.Normalize();
 }
 //#####################################################################
 // Function Update_Rotation_Helper
@@ -716,9 +715,9 @@ Euler_Step_Position(const T dt,const T time,const int p)
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
     if(rigid_body.is_static) return;
     else if(rigid_body_collection.rigid_body_particle.kinematic(p)){
-        kinematic_evolution.Set_External_Positions(rigid_body.X(),rigid_body.Rotation(),time+dt,p);}
+        kinematic_evolution.Set_External_Positions(rigid_body.Frame(),time+dt,p);}
     else{
-        rigid_body.X()+=dt*rigid_body.Twist().linear;
+        rigid_body.Frame().t+=dt*rigid_body.Twist().linear;
         Update_Rotation_Helper(dt,rigid_body,rigids_parameters.rigid_body_evolution_parameters.correct_evolution_energy);}
 }
 //#####################################################################
@@ -729,7 +728,7 @@ Euler_Step_Position(const T dt,const T time)
 {
     for(int i=0;i<rigid_body_collection.dynamic_rigid_body_particles.m;i++)
         Euler_Step_Position(dt,time,rigid_body_collection.dynamic_rigid_body_particles(i)); // TODO: avoid unnecessary Update_Angular_Velocity
-    kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.X,rigid_body_collection.rigid_body_particle.rotation,time+dt);
+    kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.frame,time+dt);
     rigid_body_collection.Update_Angular_Velocity(); // Note: Possibly remove as we restore velocities right after this function.
     rigid_body_collection.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();
 }
@@ -765,30 +764,26 @@ Clamp_Velocities()
 // Function Save_Position
 //#####################################################################
 template<class TV> void RIGIDS_EVOLUTION<TV>::
-Save_Position(ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation)
+Save_Position(ARRAY<FRAME<TV> >& rigid_frame)
 {
     const ARRAY<int>& simulated_rigid_body_particles=rigid_body_collection.simulated_rigid_body_particles;
-    rigid_X.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-    rigid_rotation.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-    rigid_X.Subset(simulated_rigid_body_particles)=rigid_body_collection.rigid_body_particle.X.Subset(simulated_rigid_body_particles);
-    rigid_rotation.Subset(simulated_rigid_body_particles)=rigid_body_collection.rigid_body_particle.rotation.Subset(simulated_rigid_body_particles);
+    rigid_frame.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
+    rigid_frame.Subset(simulated_rigid_body_particles)=rigid_body_collection.rigid_body_particle.frame.Subset(simulated_rigid_body_particles);
     for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
-        if(!rigid_body_collection.Rigid_Body(i).Is_Simulated()){rigid_X(i)=rigid_body_collection.rigid_body_particle.X(i);rigid_rotation(i)=rigid_body_collection.rigid_body_particle.rotation(i);}}
+        if(!rigid_body_collection.Rigid_Body(i).Is_Simulated()){rigid_frame(i)=rigid_body_collection.rigid_body_particle.frame(i);}}
 }
 //#####################################################################
 // Function Restore_Position
 //#####################################################################
 template<class TV> void RIGIDS_EVOLUTION<TV>::
-Restore_Position(ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation)
+Restore_Position(ARRAY_VIEW<const FRAME<TV> > rigid_frame)
 {
     const ARRAY<int>& simulated_rigid_body_particles=rigid_body_collection.simulated_rigid_body_particles;
-    PHYSBAM_ASSERT(rigid_X.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
-    PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
-    rigid_body_collection.rigid_body_particle.X.Subset(simulated_rigid_body_particles)=rigid_X.Subset(simulated_rigid_body_particles);
-    rigid_body_collection.rigid_body_particle.rotation.Subset(simulated_rigid_body_particles)=rigid_rotation.Subset(simulated_rigid_body_particles);
+    PHYSBAM_ASSERT(rigid_frame.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
+    rigid_body_collection.rigid_body_particle.frame.Subset(simulated_rigid_body_particles)=rigid_frame.Subset(simulated_rigid_body_particles);
     for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
     for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
-        if(!body.Is_Simulated()){rigid_body_collection.rigid_body_particle.X(i)=rigid_X(i);rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation(i);body.Update_Angular_Velocity();}}
+        if(!body.Is_Simulated()){rigid_body_collection.rigid_body_particle.frame(i)=rigid_frame(i);body.Update_Angular_Velocity();}}
 }
 //#####################################################################
 template class RIGIDS_EVOLUTION<VECTOR<float,1> >;

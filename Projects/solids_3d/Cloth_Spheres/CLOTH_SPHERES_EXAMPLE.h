@@ -100,7 +100,7 @@ virtual void Get_Initial_Data()
 
     for(int i=0;i<2;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",sphere_scale,(T).1);
-        rigid_body.X()=TV::Axis_Vector(2)*(T)(2*i-3)*sphere_x_position;
+        rigid_body.Frame().t=TV::Axis_Vector(2)*(T)(2*i-3)*sphere_x_position;
         rigid_body.Is_Kinematic()=true;}
 
     LOG::cout<<"deformable_body_collection.deformable_geometry.structures.m="<<deformable_body_collection.deformable_geometry.structures.m<<std::endl;

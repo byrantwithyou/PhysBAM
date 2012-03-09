@@ -472,7 +472,7 @@ Initialize_Bodies()
         head=&tests.Add_Rigid_Body(rigid_model,(T)1,(T)0,true);
         //head->is_static=true
         rigid_body_collection.rigid_body_particle.kinematic(head->particle_index)=true;
-        init_frame=FRAME<TV>(head->X(),head->Rotation());
+        init_frame=head->Frame();
         implicit_rigid_body=head;}
 
     // ignore collisions on nodes that start inside
@@ -501,7 +501,7 @@ Initialize_Bodies()
             interp_points.Append(implicit_rigid_body->World_Space_Point(implicit_rigid_body->simplicial_object->Get_Element(tri_indicies(i)).Center()));
             interp_normals.Append(implicit_rigid_body->simplicial_object->Get_Element(tri_indicies(i)).Normal());}
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("pick",(T).05,(T)0);
-        init_pick=FRAME<TV>(sphere.X(),sphere.Rotation());
+        init_pick=sphere.Frame();
         sphere_id=sphere.particle_index;
         sphere.Is_Kinematic()=true;}
         

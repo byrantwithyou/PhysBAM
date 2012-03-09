@@ -104,8 +104,8 @@ public:
                 if(TV::dimension==2) model_file_name="../../Public_Data/Rigid_Bodies_2D/circle";
                 else model_file_name="../../Public_Data/Rigid_Bodies/sphere";
                 rigid_particle_id=rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,T(.07),true,true,true,true);
-                rigid_geometry_collection.particles.X(rigid_particle_id)=TV::Constant_Vector(T(.25));
-                rigid_geometry_collection.particles.X(rigid_particle_id)(1)=0.5;
+                rigid_geometry_collection.particles.frame(rigid_particle_id).t=TV::Constant_Vector(T(.25));
+                rigid_geometry_collection.particles.frame(rigid_particle_id).t(1)=0.5;
                 rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=true;
                 break;
             case 3:
@@ -173,7 +173,7 @@ public:
             int first_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.First_Cell_Center()),second_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(iterator.Second_Cell_Center());
             if(first_cell_in_solid+second_cell_in_solid==1 || (test_number==3 && first_cell_in_solid+second_cell_in_solid==2)){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-                TV rigid_velocity=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.X(rigid_particle_id),iterator.Location());
+                TV rigid_velocity=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,iterator.Location());
                 TV fluid_velocity;
                 fluid_velocity(iterator.Axis())=face_velocities.Component(iterator.Axis())(iterator.Face_Index());
                 for(int i=1;i<TV::dimension;i++){int axis=(iterator.Axis()-1+i)%TV::dimension+1;
@@ -187,7 +187,7 @@ public:
                 if(projected_velocity<0) face_velocities.Component(iterator.Axis())(iterator.Face_Index())=(fluid_velocity-rigid_normal*projected_velocity)(iterator.Axis());}
             else if(first_cell_in_solid+second_cell_in_solid==2 && test_number==2){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-                face_velocities.Component(iterator.Axis())(iterator.Face_Index())=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.X(rigid_particle_id),iterator.Location())(iterator.Axis());}}}}
+                face_velocities.Component(iterator.Axis())(iterator.Face_Index())=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,iterator.Location())(iterator.Axis());}}}}
 
     void Initialize_Fields()
     {for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()) face_velocities(iterator.Full_Index())=0;

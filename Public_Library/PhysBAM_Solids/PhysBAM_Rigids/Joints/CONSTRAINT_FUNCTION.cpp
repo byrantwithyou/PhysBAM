@@ -66,9 +66,9 @@ Initialize()
 {
     FRAME<TV> projected_frame[2];
     for(int i=0;i<2;i++){
-        p[i]=rigid_body[i]->X();
+        p[i]=rigid_body[i]->Frame().t;
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
-        projected_frame[i]=FRAME<TV>(p[i]+dt*rigid_body[i]->Twist().linear,ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*rigid_body[i]->Rotation());}
+        projected_frame[i]=FRAME<TV>(p[i]+dt*rigid_body[i]->Twist().linear,ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*rigid_body[i]->Frame().r);}
     c=projected_frame[0].t-projected_frame[1].t;
     TV desired_translation=(joint.F_jp()*projected_frame[0].Inverse()*projected_frame[1]*joint.F_cj()).t;joint.Constrain_Prismatically(desired_translation);
     TV ap[2]={rigid_body[0]->World_Space_Point(joint.F_pj()*desired_translation),rigid_body[1]->World_Space_Point(joint.F_cj().t)};
@@ -111,9 +111,9 @@ Initialize()
     for(int i=0;i<2;i++){
         if(!rigid_body[i]->Has_Infinite_Inertia()) inverse_inertia[i]=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
-        q_projected_body[i]=dt_angular_velocity[i]+rigid_body[i]->Rotation().Angle();}
+        q_projected_body[i]=dt_angular_velocity[i]+rigid_body[i]->Frame().r.Angle();}
     T_SPIN desired_angles=(joint.F_jp().r*joint.F_cj().r).Rotation_Vector()-q_projected_body[0]+q_projected_body[1];joint.Constrain_Angles(desired_angles);
-    q_w_old[0]=(rigid_body[0]->Rotation()*joint.F_pj().r).Rotation_Vector()+desired_angles;q_w_old[1]=(rigid_body[1]->Rotation()*joint.F_cj().r).Rotation_Vector();
+    q_w_old[0]=(rigid_body[0]->Frame().r*joint.F_pj().r).Rotation_Vector()+desired_angles;q_w_old[1]=(rigid_body[1]->Frame().r*joint.F_cj().r).Rotation_Vector();
     metric_tensor=inverse_inertia[0]+inverse_inertia[1];
     length_scale_squared=max(rigid_body[0]->Length_Scale_Squared(),rigid_body[1]->Length_Scale_Squared());
 }
@@ -266,20 +266,20 @@ Initialize()
 {
     FRAME<TV> projected_frame[2];
     for(int i=0;i<2;i++){
-        p[i]=rigid_body[i]->X();q[i]=rigid_body[i]->Rotation();
+        p[i]=rigid_body[i]->Frame();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
-        projected_frame[i]=FRAME<TV>(p[i]+dt*rigid_body[i]->Twist().linear,ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*q[i]);}
+        projected_frame[i]=FRAME<TV>(p[i].t+dt*rigid_body[i]->Twist().linear,ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*p[i].r);}
     c=projected_frame[0].t-projected_frame[1].t;
     TV desired_translation=(joint.F_jp()*projected_frame[0].Inverse()*projected_frame[1]*joint.F_cj()).t;joint.Constrain_Prismatically(desired_translation);
     TV ap[2]={rigid_body[0]->World_Space_Point(joint.F_pj()*desired_translation),rigid_body[1]->World_Space_Point(joint.F_cj().t)};
     location=(T).5*(ap[0]+ap[1]);
     one_over_m=0;
     for(int i=0;i<2;i++){
-        r[i]=ap[i]-p[i];
+        r[i]=ap[i]-p[i].t;
         if(!rigid_body[i]->Has_Infinite_Inertia()){
             one_over_m+=(T)1/rigid_body[i]->Mass();
-            inverse_inertia_rhat_star[i]=rigid_body[i]->World_Space_Inertia_Tensor_Inverse().Times_Cross_Product_Matrix(location-p[i]);
-            metric_tensor-=inverse_inertia_rhat_star[i].Cross_Product_Matrix_Times(location-p[i]);}}
+            inverse_inertia_rhat_star[i]=rigid_body[i]->World_Space_Inertia_Tensor_Inverse().Times_Cross_Product_Matrix(location-p[i].t);
+            metric_tensor-=inverse_inertia_rhat_star[i].Cross_Product_Matrix_Times(location-p[i].t);}}
     metric_tensor+=one_over_m;
 }
 //#####################################################################
@@ -345,12 +345,12 @@ Initialize()
     for(int i=0;i<2;i++){
         if(!rigid_body[i]->Has_Infinite_Inertia()) inverse_inertia[i]=rigid_body[i]->World_Space_Inertia_Tensor_Inverse();
         dt_angular_velocity[i]=dt*rigid_body[i]->Twist().angular;
-        q_projected_body[i]=ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*rigid_body[i]->Rotation();}
+        q_projected_body[i]=ROTATION<TV>::From_Rotation_Vector(dt_angular_velocity[i])*rigid_body[i]->Frame().r;}
     ROTATION<TV> q_projected_joint=(joint.F_jp().r*q_projected_body[0].Inverse()*q_projected_body[1]*joint.F_cj().r).Normalized();
     TV desired_angles=q_projected_joint.Euler_Angles();
     joint.Constrain_Angles(desired_angles);
     ROTATION<TV> q_target=ROTATION<TV>::From_Euler_Angles(desired_angles).Normalized();
-    q_w_old[0]=(rigid_body[0]->Rotation()*joint.F_pj().r*q_target).Normalized();q_w_old[1]=(rigid_body[1]->Rotation()*joint.F_cj().r).Normalized();
+    q_w_old[0]=(rigid_body[0]->Frame().r*joint.F_pj().r*q_target).Normalized();q_w_old[1]=(rigid_body[1]->Frame().r*joint.F_cj().r).Normalized();
     for(int i=0;i<2;i++) modified_b_star[i]=q_w_old[i].Quaternion().s-MATRIX<T,3>::Cross_Product_Matrix(q_w_old[i].Quaternion().v);
     metric_tensor=inverse_inertia[0]+inverse_inertia[1];
     length_scale_squared=max(rigid_body[0]->Length_Scale_Squared(),rigid_body[1]->Length_Scale_Squared());
@@ -406,7 +406,7 @@ Jacobian(const T_IMPULSE& j) const
 template<class T> void LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Initialize()
 {
-    for(int i=0;i<2;i++) rhat[i]=linear.location-linear.p[i];
+    for(int i=0;i<2;i++) rhat[i]=linear.location-linear.p[i].t;
     one_over_m_matrix=linear.one_over_m*DIAGONAL_MATRIX<T,3>::Identity_Matrix();
     // compute the metric tensor
     MATRIX<T,3> cross_term=linear.inverse_inertia_rhat_star[0]+linear.inverse_inertia_rhat_star[1];

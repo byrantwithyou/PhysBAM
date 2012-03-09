@@ -57,7 +57,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,
                 const RIGID_GEOMETRY<TV>& rigid_geometry=rigid_collision_geometry->rigid_geometry;
                 int rigid_body_index=rigid_geometry.particle_index;
                 T face_area=cell_size*one_over_dx[axis],face_pressure=pressure_at_faces.Component(axis)(face_index);
-                TV center_of_mass=rigid_geometry.X(),force=face_area*face_pressure*direction*TV::Axis_Vector(axis);
+                TV center_of_mass=rigid_geometry.Frame().t,force=face_area*face_pressure*direction*TV::Axis_Vector(axis);
                 rigid_F(rigid_body_index).linear+=force;
                 rigid_F(rigid_body_index).angular+=TV::Cross_Product(location-center_of_mass,force);}
             else PHYSBAM_FATAL_ERROR("deformable part not implemented");}}

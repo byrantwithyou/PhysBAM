@@ -50,7 +50,7 @@ public:
     {return RIGID_BODY_STATE<TV>(rigid_geometry_collection.Rigid_Geometry(particle).Frame(),rigid_body_particle.twist(particle));}
 
     void Set_State(const int particle,const RIGID_BODY_STATE<TV>& state)
-    {rigid_body_particle.X(particle)=state.frame.t;rigid_body_particle.rotation(particle)=state.frame.r;rigid_body_particle.twist(particle)=state.twist;}
+    {rigid_body_particle.frame(particle)=state.frame;rigid_body_particle.twist(particle)=state.twist;}
 
     bool Exists(const int particle) const
     {return particle>=0 && particle<rigid_body_particle.array_collection->Size() && rigid_body_particle.rigid_geometry(particle);}

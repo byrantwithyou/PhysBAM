@@ -203,7 +203,7 @@ template<class T> RIGID_BODY<VECTOR<T,3> >& BRIDGE_EXAMPLE<T>::
 Add_Rigid_Body(const std::string& filename,const T scale,const T cof,const T cor,const FRAME<TV>& frame,const std::string& name,const T mass_scale)
 {
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filename,scale,cof);
-    rigid_body.Set_Frame(frame);
+    rigid_body.Frame()=frame;
     rigid_body.Set_Coefficient_Of_Restitution(cor);
     rigid_body.Set_Name(name);
     if(mass_scale) rigid_body.Set_Mass(rigid_body.Mass()*mass_scale);
@@ -231,8 +231,8 @@ template<class T> void BRIDGE_EXAMPLE<T>::
 Preprocess_Frame(const int frame)
 {
     if(frame>start_rolling && frame<=start_rolling+num_rolling_frames){
-        box1->X()+=TV((T).1/num_rolling_frames,0,0);
-        box2->X()-=TV((T).1/num_rolling_frames,0,0);}
+        box1->Frame().t+=TV((T).1/num_rolling_frames,0,0);
+        box2->Frame().t-=TV((T).1/num_rolling_frames,0,0);}
 }
 //#####################################################################
 template class BRIDGE_EXAMPLE<float>;

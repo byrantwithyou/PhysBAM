@@ -68,7 +68,7 @@ public:
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
@@ -127,14 +127,14 @@ void Kinematic()
         T boxsize2=(T)0.5;
         rigid_body=&tests.Add_Analytic_Box(VECTOR<T,1>(boxsize1));
         rigid_body->Set_Coefficient_Of_Friction(stack_mu);
-        rigid_body->X()=TV(2*baseboxsize+boxsize1);
+        rigid_body->Frame().t=TV(2*baseboxsize+boxsize1);
         rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
         rigid_body->Set_Mass(smallboxmass);
         rigid_body->Set_Name("stack box 1a");
 
         rigid_body=&tests.Add_Analytic_Box(VECTOR<T,1>(boxsize2));
         rigid_body->Set_Coefficient_Of_Friction(stack_mu);
-        rigid_body->X()=TV(2*baseboxsize+2*boxsize1+boxsize2);
+        rigid_body->Frame().t=TV(2*baseboxsize+2*boxsize1+boxsize2);
         rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
         rigid_body->Set_Mass(smallboxmass);
         rigid_body->Set_Name("stack box 1b");}
@@ -154,7 +154,7 @@ void Kinematic()
     curve.Add_Control_Point((T)6,FRAME<TV>(t1,r0));
     curve.Add_Control_Point((T)8,FRAME<TV>(t1,r0));
 
-    rigid_body->Set_Frame(curve.Value(0));
+    rigid_body->Frame()=curve.Value(0);
     rigid_body->Twist()=curve.Derivative(0);
 
     last_frame=(int)(15*frame_rate);

@@ -443,7 +443,7 @@ void Set_Rigid_Body_Parameters(int rigid_body_index,TV position,T mass,bool is_k
 {
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Restitution((T)1);
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Friction((T)1);
-    rigid_body_collection.rigid_body_particle.X(rigid_body_index)=position;
+    rigid_body_collection.rigid_body_particle.frame(rigid_body_index).t=position;
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Mass(mass);
     rigid_body_collection.Rigid_Body(rigid_body_index).Is_Kinematic()=is_kinematic;
     rigid_body_collection.Rigid_Body(rigid_body_index).simplicial_object->mesh.Initialize_Adjacent_Elements();

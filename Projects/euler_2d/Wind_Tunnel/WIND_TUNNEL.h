@@ -209,15 +209,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     if(test_number==1){
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(TV((T)2.5,(T).3));
-        rect.X()=TV((T)1.85,(T).05); // left most end .6 from the left of the domain (so translating 1.25+.6). Top most end .2 unit from the bottom (total height=.15+.05(translation)=.2)
+        rect.Frame().t=TV((T)1.85,(T).05); // left most end .6 from the left of the domain (so translating 1.25+.6). Top most end .2 unit from the bottom (total height=.15+.05(translation)=.2)
         rect.is_static=true;}
     else if(test_number==2){
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(TV((T)1.8,(T).3));
-        rect.X()=TV((T)1.5,(T).35);
+        rect.Frame().t=TV((T)1.5,(T).35);
         rect.is_static=true;}
     else if(test_number==3){
         square=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.X(square)=TV((T)1.25,(T).55);
+        rigid_body_collection.rigid_body_particle.frame(square).t=TV((T)1.25,(T).55);
         rigid_body_collection.Rigid_Body(square).Is_Kinematic()=true;}
     else return;
 

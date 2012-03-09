@@ -150,7 +150,7 @@ public:
         }
     }
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
@@ -421,8 +421,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,1))));
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",10,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",10,(T)0);
-            box1.X()=TV(0,-10);
-            box2.X()=TV(0,12);
+            box1.Frame().t=TV(0,-10);
+            box2.Frame().t=TV(0,12);
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
@@ -437,8 +437,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",1,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",1,(T)0);
-            box1.X()=TV(0,-2);
-            box2.X()=TV(0,2);
+            box1.Frame().t=TV(0,-2);
+            box2.Frame().t=TV(0,2);
             box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
@@ -458,8 +458,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             //RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",4,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",(T).2,(T)0);
-            //box1.X()=TV(0,-10);
-            box2.X()=TV(0,12);
+            //box1.Frame().t=TV(0,-10);
+            box2.Frame().t=TV(0,12);
             //box1.is_static=true;
             box2.is_static=false;
             kinematic_id=box2.particle_index;
@@ -472,7 +472,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 	case 21:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",1,(T)0);
-            box1.X()=TV(0,-6);
+            box1.Frame().t=TV(0,-6);
             box1.is_static=true;
 	    break;
 }

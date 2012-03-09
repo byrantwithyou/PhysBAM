@@ -67,7 +67,7 @@ template<class TV> RIGID_GEOMETRY<TV>::
 template<class TV> TV RIGID_GEOMETRY<TV>::
 Pointwise_Object_Velocity(const TV& X) const
 {
-    return Pointwise_Object_Velocity(Twist(),this->X(),X);
+    return Pointwise_Object_Velocity(Twist(),Frame().t,X);
 }
 //#####################################################################
 // Function Pointwise_Object_Velocity_At_Particle

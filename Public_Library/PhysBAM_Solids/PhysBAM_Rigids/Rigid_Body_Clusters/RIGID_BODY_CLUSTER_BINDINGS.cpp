@@ -182,7 +182,7 @@ Set_Binding_Active(const int parent_particle,const bool active,GRID_BASED_COLLIS
 
     cluster.active=active;
     if(!active){
-        rigid_body_collection.rigid_body_particle.X(parent_particle)=TV::All_Ones_Vector()*1e10;
+        rigid_body_collection.rigid_body_particle.frame(parent_particle).t=TV::All_Ones_Vector()*1e10;
         rigid_body_collection.rigid_body_particle.twist(parent_particle).linear=TV::All_Ones_Vector()*1e10;
         rigid_body_collection.rigid_body_particle.twist(parent_particle).angular=T_SPIN::All_Ones_Vector()*1e10;}
     for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++) if(active) Make_Active_Parent(parent_particle,binding_index(cluster.children(i)));
@@ -282,7 +282,7 @@ Distribute_Force_To_Parents(ARRAY_VIEW<TWIST<TV> > wrench_full) const
             if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
             wrench_full(parent).linear+=wrench_full(child).linear;
             wrench_full(parent).angular+=wrench_full(child).angular
-                +TV::Cross_Product(rigid_body_collection.rigid_body_particle.X(child)-rigid_body_collection.rigid_body_particle.X(parent),wrench_full(child).linear);}}
+                +TV::Cross_Product(rigid_body_collection.rigid_body_particle.frame(child).t-rigid_body_collection.rigid_body_particle.frame(parent).t,wrench_full(child).linear);}}
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Positions
@@ -294,7 +294,7 @@ Clamp_Particles_To_Embedded_Positions(const int parent) const
     if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
         const int child=cluster.children(j);
         if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
-        rigid_body_collection.Rigid_Body(child).Set_Frame(rigid_body_collection.Rigid_Body(parent).Frame()*cluster.child_to_parent(j));}
+        rigid_body_collection.Rigid_Body(child).Frame()=rigid_body_collection.Rigid_Body(parent).Frame()*cluster.child_to_parent(j);}
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Velocities
@@ -306,7 +306,7 @@ Clamp_Particles_To_Embedded_Velocities(const int parent) const
     if(cluster.active) for(RIGID_CLUSTER_CONSTITUENT_ID j(0);j<cluster.children.Size();j++){
         const int child=cluster.children(j);
         if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
-        rigid_body_collection.rigid_body_particle.twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particle.X(child));
+        rigid_body_collection.rigid_body_particle.twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particle.frame(child).t);
         rigid_body_collection.rigid_body_particle.twist(child).angular=rigid_body_collection.rigid_body_particle.twist(parent).angular;
         rigid_body_collection.Rigid_Body(child).Update_Angular_Momentum();}
 }
@@ -321,7 +321,7 @@ Clamp_Particles_To_Embedded_Velocities(const int parent,ARRAY_VIEW<TWIST<TV> >& 
         const int child=cluster.children(j);
         if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) continue;
         twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(
-            twist(parent),rigid_body_collection.rigid_body_particle.X(parent),rigid_body_collection.rigid_body_particle.X(child));
+            twist(parent),rigid_body_collection.rigid_body_particle.frame(parent).t,rigid_body_collection.rigid_body_particle.frame(child).t);
         twist(child).angular=twist(parent).angular;}
 }
 //#####################################################################
@@ -362,9 +362,9 @@ namespace{
         parent_body.Angular_Momentum()=T_SPIN();
         for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
             int child=cluster.children(i);RIGID_BODY<TV>& child_body=rigid_body_collection.Rigid_Body(child);
-            TV s=(child_body.X()-parent_body.X());
+            TV s=(child_body.Frame().t-parent_body.Frame().t);
             inertia_tensor+=child_body.World_Space_Inertia_Tensor()+MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(child_body.Mass()*s).Times_Cross_Product_Matrix_Transpose_With_Symmetric_Result(s);
-            parent_body.Angular_Momentum()+=TV::Cross_Product(child_body.X()-parent_body.X(),child_body.Mass()*child_body.Twist().linear)
+            parent_body.Angular_Momentum()+=TV::Cross_Product(child_body.Frame().t-parent_body.Frame().t,child_body.Mass()*child_body.Twist().linear)
                 +child_body.Angular_Momentum();}
         // diagonalize inertia tensor and update angular velocity
         parent_body.Diagonalize_Inertia_Tensor(inertia_tensor);
@@ -378,11 +378,10 @@ Distribute_Mass_To_Parent(const int parent)
     if(cluster.infinite_body){
         RIGID_BODY<TV> *parent_body=&rigid_body_collection.Rigid_Body(parent),*child_body=&rigid_body_collection.Rigid_Body(cluster.infinite_body);
         parent_body->is_static=child_body->is_static;rbp.kinematic(parent)=rigid_body_collection.rigid_body_particle.kinematic(cluster.infinite_body);
-        parent_body->X()=child_body->X();parent_body->Rotation()=child_body->Rotation();parent_body->Twist()=child_body->Twist();
+        parent_body->Frame()=child_body->Frame();parent_body->Twist()=child_body->Twist();
         parent_body->Mass()=child_body->Mass();parent_body->Angular_Momentum()=child_body->Angular_Momentum();}
     else{
-        rbp.X(parent)=TV();
-        rbp.rotation(parent)=ROTATION<TV>();
+        rbp.frame(parent)=FRAME<TV>();
         rbp.twist(parent)=TWIST<TV>();
         rbp.mass(parent)=T();
         rbp.inertia_tensor(parent)=typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR();
@@ -390,9 +389,9 @@ Distribute_Mass_To_Parent(const int parent)
         for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
             int child=cluster.children(i);
             rbp.mass(parent)+=rbp.mass(child);
-            rbp.X(parent)+=rbp.X(child)*rbp.mass(child);
+            rbp.frame(parent).t+=rbp.frame(child).t*rbp.mass(child);
             rbp.twist(parent).linear+=rbp.twist(child).linear*rbp.mass(child);}
-        rbp.X(parent)/=rbp.mass(parent);
+        rbp.frame(parent).t/=rbp.mass(parent);
         rbp.twist(parent).linear/=rbp.mass(parent);
         Distribute_Mass_To_Parents_Helper(rigid_body_collection,cluster,parent);}
     for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
@@ -476,7 +475,7 @@ Clamp_Particle_To_Embedded_Position(const int child) const
     if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) return;
     FRAME<TV> child_to_parent;
     int parent=Binding(child,child_to_parent);
-    rigid_body_collection.Rigid_Body(child).Set_Frame(rigid_body_collection.Rigid_Body(parent).Frame()*child_to_parent);
+    rigid_body_collection.Rigid_Body(child).Frame()=rigid_body_collection.Rigid_Body(parent).Frame()*child_to_parent;
 }
 //#####################################################################
 // Function Clamp_Particle_To_Embedded_Velocity
@@ -487,7 +486,7 @@ Clamp_Particle_To_Embedded_Velocity(const int child) const
     if(rigid_body_collection.Rigid_Body(child).Has_Infinite_Inertia()) return;
     FRAME<TV> child_to_parent;
     int parent=Binding(child,child_to_parent);
-    rigid_body_collection.rigid_body_particle.twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particle.X(child));
+    rigid_body_collection.rigid_body_particle.twist(child).linear=rigid_body_collection.Rigid_Body(parent).Pointwise_Object_Velocity(rigid_body_collection.rigid_body_particle.frame(child).t);
     rigid_body_collection.rigid_body_particle.twist(child).angular=rigid_body_collection.rigid_body_particle.twist(parent).angular;
     rigid_body_collection.Rigid_Body(child).Update_Angular_Momentum();
 }

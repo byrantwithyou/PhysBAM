@@ -70,7 +70,7 @@ public:
     void Align_Deformable_Bodies_With_Rigid_Bodies() PHYSBAM_OVERRIDE {}
     void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
@@ -117,12 +117,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(start_on_fridge){
         RIGID_BODY<TV>* rigid_body=0;
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T)1);
-        rigid_body->X()=TV(0,(T)10.21,0);
+        rigid_body->Frame().t=TV(0,(T)10.21,0);
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Name("fridge");
         rigid_body->is_static=true;
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T)1);
-        rigid_body->X()=TV(0,(T)32.21,0);
+        rigid_body->Frame().t=TV(0,(T)32.21,0);
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Name("fridge");
         rigid_body->is_static=true;}
@@ -140,13 +140,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Make_Gun()
 {
     gun=&tests.Add_Rigid_Body("ARB/gun",1,(T)1);
-    gun->X()=TV(0,initial_height+(T)1.3,0);
+    gun->Frame().t=TV(0,initial_height+(T)1.3,0);
     gun->Set_Coefficient_Of_Restitution(0);
     gun->Set_Name("gun");
 
     lid=&tests.Add_Rigid_Body("ARB/tanklid",(T)1.05,(T)1);
-    lid->X()=TV((T)-.5,initial_height+(T)2.3,0);//+TV(-7,(T)33.79,11);
-    lid->Rotation()=ROTATION<TV>((T)pi/4,TV(0,0,1));
+    lid->Frame().t=TV((T)-.5,initial_height+(T)2.3,0);//+TV(-7,(T)33.79,11);
+    lid->Frame().r=ROTATION<TV>((T)pi/4,TV(0,0,1));
     lid->Set_Coefficient_Of_Restitution(0);
     lid->Set_Name("lid");
 }
@@ -157,7 +157,7 @@ void Make_Center()
 {
     // axel - num_joints+2
     body=&tests.Add_Rigid_Body("ARB/tankbody",(T)1.025,(T)1);
-    body->X()=TV(0,initial_height+(T).25,0);
+    body->Frame().t=TV(0,initial_height+(T).25,0);
     body->Set_Coefficient_Of_Restitution(0);
     body->Set_Name("tankbody");
 }
@@ -177,8 +177,8 @@ void Make_Tread(const T z_shift,int tread_side)
     T radius=(T).685;
     for(int k=0;k<num_joints+1;k++){
         rigid_body=&tests.Add_Rigid_Body("ARB/tread3_subdivided",(T).5,(T)1);
-        rigid_body->X()=TV(start+k*split+(T).5*split,initial_height+radius,z_shift)+move;
-        rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
+        rigid_body->Frame().t=TV(start+k*split+(T).5*split,initial_height+radius,z_shift)+move;
+        rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
         rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
@@ -188,8 +188,8 @@ void Make_Tread(const T z_shift,int tread_side)
     T angle_start=2*(T)pi/5;T angle=(T)pi/5;
     for(int k=0;k<5;k++){
         rigid_body=&tests.Add_Rigid_Body("ARB/tread3_subdivided",(T).5,(T)1);
-        rigid_body->X()=TV(-start+radius2*cos(angle_start-k*angle),initial_height+radius2*sin(angle_start-k*angle),z_shift)+move;
-        rigid_body->Rotation()=ROTATION<TV>(-(k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
+        rigid_body->Frame().t=TV(-start+radius2*cos(angle_start-k*angle),initial_height+radius2*sin(angle_start-k*angle),z_shift)+move;
+        rigid_body->Frame().r=ROTATION<TV>(-(k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0); 
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
         rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
@@ -197,8 +197,8 @@ void Make_Tread(const T z_shift,int tread_side)
     // bottom treads
     for(int k=num_joints;k>=0;k--){
         rigid_body=&tests.Add_Rigid_Body("ARB/tread3_subdivided",(T).5,(T)1);
-        rigid_body->X()=TV(start+k*split+(T).5*split,initial_height-radius,z_shift)+move;
-        rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));
+        rigid_body->Frame().t=TV(start+k*split+(T).5*split,initial_height-radius,z_shift)+move;
+        rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
         rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
@@ -206,8 +206,8 @@ void Make_Tread(const T z_shift,int tread_side)
     // end 2
     for(int k=4;k>=0;k--){
         rigid_body=&tests.Add_Rigid_Body("ARB/tread3_subdivided",(T).5,(T)1);
-        rigid_body->X()=TV(start-radius2*cos(angle_start-k*angle),initial_height+radius2*sin(angle_start-k*angle),z_shift)+move;
-        rigid_body->Rotation()=ROTATION<TV>((k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
+        rigid_body->Frame().t=TV(start-radius2*cos(angle_start-k*angle),initial_height+radius2*sin(angle_start-k*angle),z_shift)+move;
+        rigid_body->Frame().r=ROTATION<TV>((k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0); 
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
         rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
@@ -216,23 +216,23 @@ void Make_Tread(const T z_shift,int tread_side)
 
     // cogs - num_joints+3
     rigid_body=&tests.Add_Rigid_Body("ARB/gear3",(T).55,(T)1);
-    rigid_body->X()=TV(start,initial_height,z_shift)+move;
-    rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0));
+    rigid_body->Frame().t=TV(start,initial_height,z_shift)+move;
+    rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Inertia_Tensor()*=10;
     rigid_body->Set_Name("wheel1");
     gears[3*tread_side]=rigid_body;
 
     rigid_body=&tests.Add_Rigid_Body("ARB/gear3",(T).55,(T)1);
-    rigid_body->X()=TV(0,initial_height,z_shift)+move;
-    rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0));
+    rigid_body->Frame().t=TV(0,initial_height,z_shift)+move;
+    rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("wheel2");
     gears[3*tread_side+1]=rigid_body;
 
     rigid_body=&tests.Add_Rigid_Body("ARB/gear3",(T).55,(T)1);
-    rigid_body->X()=TV(-start,initial_height,z_shift)+move;
-    rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0));
+    rigid_body->Frame().t=TV(-start,initial_height,z_shift)+move;
+    rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Inertia_Tensor()*=10;
     rigid_body->Set_Name("wheel3");
@@ -312,10 +312,10 @@ void Reset_Joints()
     for(int s=0;s<=1;s++) for(int i=0;i<34;i++){int index=34*s+i;
         int gear_index=next_gear[index];
         RIGID_BODY<TV> *gear=joint_gears[gear_index],*tread=treads[s](i+1);
-        TV gear_axis=gear->Rotation().Rotated_X_Axis();
-        TV up=body->Rotation().Rotated_Y_Axis();up-=TV::Dot_Product(up,gear_axis)*gear_axis;
+        TV gear_axis=gear->Frame().r.Rotated_X_Axis();
+        TV up=body->Frame().r.Rotated_Y_Axis();up-=TV::Dot_Product(up,gear_axis)*gear_axis;
         TV forward=TV::Cross_Product(gear_axis,up);
-        TV offset=tread->X()-gear->X();
+        TV offset=tread->Frame().t-gear->Frame().t;
         T angle_x=TV::Dot_Product(forward,offset);
         T angle_y=TV::Dot_Product(up,offset);
         T angle=atan2(angle_y,angle_x);if(!(gear_index&1)) angle+=(T)pi;angle=fmod(angle+(T)two_pi,(T)two_pi);

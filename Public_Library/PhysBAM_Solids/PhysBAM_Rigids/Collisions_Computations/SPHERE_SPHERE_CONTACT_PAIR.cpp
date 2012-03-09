@@ -41,7 +41,7 @@ bool Update_Sphere_Sphere_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_col
     SPHERE<TV>& sphere2=dynamic_cast<ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >&>(*object2).analytic;
 
     TV sphere1_center=(body1.Frame()*transform1).t,sphere2_center=(body2.Frame()*transform2).t;
-    TV collision_normal=body1.X()-body2.X();collision_normal.Normalize();
+    TV collision_normal=body1.Frame().t-body2.Frame().t;collision_normal.Normalize();
     T d=(sphere1_center-sphere2_center).Magnitude(),r1=sphere1.radius,r2=sphere2.radius;
     if(d>r1+r2){rigid_body_collisions.skip_collision_check.Set_Last_Checked(id_1,id_2);return false;}
     if(TV::Dot_Product(collision_normal,body1.Twist().linear-body2.Twist().linear)>=0) return false;

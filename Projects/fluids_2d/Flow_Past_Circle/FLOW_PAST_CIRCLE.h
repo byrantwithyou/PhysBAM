@@ -98,7 +98,7 @@ public:
     void Read_Output_Files_Fluids(const int frame) PHYSBAM_OVERRIDE {}
     void Self_Collisions_Begin_Callback(const T time,const int substep) PHYSBAM_OVERRIDE {}
     void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -145,7 +145,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Sphere(circle.radius,fluids_parameters.density,7);
-    rigid_body.X()=circle.center;
+    rigid_body.Frame().t=circle.center;
     rigid_body.is_static=true;
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(solid_body_collection.rigid_body_collection.rigid_geometry_collection);
     fluids_parameters.incompressible_iterations=1000;

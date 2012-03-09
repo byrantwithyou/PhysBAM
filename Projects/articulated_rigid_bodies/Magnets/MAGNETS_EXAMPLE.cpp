@@ -70,13 +70,13 @@ Initialize_Bodies()
 
     T up_shift=31;
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T).5);
-    rigid_body->X()=TV(0,0,(T)11.5);
+    rigid_body->Frame().t=TV(0,0,(T)11.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("parent");
     rigid_body->is_static=true;
     parent_id=rigid_body->particle_index;
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T).5);
-    rigid_body->X()=TV(0,22,(T)11.5);
+    rigid_body->Frame().t=TV(0,22,(T)11.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("parent");
     rigid_body->is_static=true;
@@ -96,18 +96,18 @@ Initialize_Bodies()
     Drop_Letter("G_xsub",parent_id,TV(9,up_shift,0),ROTATION<TV>(),false);
 
     rigid_body=&tests.Add_Rigid_Body("plank",(T).5,(T).5);
-    rigid_body->X()=TV(10,17+(T)2.375,(T)1.5);
+    rigid_body->Frame().t=TV(10,17+(T)2.375,(T)1.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("handle");
     rigid_body->is_static=true;
     rigid_body=&tests.Add_Rigid_Body("plank",(T).5,(T).5);
-    rigid_body->X()=TV(10,17-(T)2.375,(T)1.5);
+    rigid_body->Frame().t=TV(10,17-(T)2.375,(T)1.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("handle");
     rigid_body->is_static=true;
     rigid_body=&tests.Add_Rigid_Body("plank",(T).5,(T).5);
-    rigid_body->X()=TV(10,17,-1);
-    rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(1,0,0));
+    rigid_body->Frame().t=TV(10,17,-1);
+    rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Set_Name("handle");
     rigid_body->is_static=true;
@@ -156,8 +156,8 @@ template<class T> void MAGNETS_EXAMPLE<T>::
 Drop_Letter(std::string letter,int parent_id,TV start,ROTATION<TV> orient,bool stop_in_middle)
 {
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Letters/"+letter,(T)1.9,(T).5);
-    rigid_body.X()=start;
-    rigid_body.Rotation()=orient*ROTATION<TV>((T)pi,TV(0,1,0));
+    rigid_body.Frame().t=start;
+    rigid_body.Frame().r=orient*ROTATION<TV>((T)pi,TV(0,1,0));
     rigid_body.Set_Coefficient_Of_Restitution(0);
     rigid_body.Set_Name("letter");
 

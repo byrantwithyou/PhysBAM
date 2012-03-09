@@ -196,7 +196,7 @@ void Initialize()
         rigid_geometry_collection.particles.structure_ids(1)(1)=rigid_geometry_collection.structure_list.Add_Element(rigid_geometry.structures(1));
         rigid_geometry_collection.particles.structure_ids(1)(2)=rigid_geometry_collection.structure_list.Add_Element(rigid_geometry.structures(2));
         rigid_geometry_collection.Update_Kinematic_Particles();
-        rigid_geometry_collection.particles.X(1).y=solid_position((T)0);
+        rigid_geometry_collection.particles.frame(1).t.y=solid_position((T)0);
 
         collision_bodies_affecting_fluid.Initialize_Grids();
         collision_bodies_affecting_fluid.Add_Bodies(rigid_geometry_collection);
@@ -340,8 +340,8 @@ void Euler_Step(const T dt, const T time){
     for(typename T_GRID::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
         velocity(iterator.Cell_Index())=fluid_velocity_field(iterator.Location(),time);
 
-    rigid_geometry_collection.particles.X(1).y=solid_position(time);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
-    rigid_geometry_collection.particles.X(1).y=solid_position(time+dt);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);
+    rigid_geometry_collection.particles.frame(1).t.y=solid_position(time);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
+    rigid_geometry_collection.particles.frame(1).t.y=solid_position(time+dt);collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE,time+dt);
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
     collision_bodies_affecting_fluid.Restore_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_NEW_STATE);
     collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
@@ -373,7 +373,7 @@ void Euler_Step(const T dt, const T time){
         for(typename T_GRID::CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
             rho(iterator.Cell_Index())=analytic_solution(iterator.Location(),time);
             phi(iterator.Cell_Index())=initial_phi(iterator.Location()-time*velocity(iterator.Cell_Index()));}
-        rigid_geometry_collection.particles.X(1).y=solid_position(time+dt);
+        rigid_geometry_collection.particles.frame(1).t.y=solid_position(time+dt);
         return;}
 
     boundary.Fill_Ghost_Cells(grid,rho,rho_tmp,dt,time,3);

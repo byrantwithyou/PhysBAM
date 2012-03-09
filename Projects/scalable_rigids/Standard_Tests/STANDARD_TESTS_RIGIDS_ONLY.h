@@ -84,7 +84,7 @@ public:
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
 
@@ -198,7 +198,7 @@ void Ring_Test()
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
             rigid_body.is_static=true;
-            rigid_body.X()=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
+            rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
     tests.Add_Ground(mu);
 }
@@ -233,7 +233,7 @@ void Bone_Test()
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
             rigid_body.is_static=true;
-            rigid_body.X()=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
+            rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
     tests.Add_Ground(mu);
 }
@@ -254,28 +254,28 @@ void Sphere_Test()
     STREAM_TYPE stream_type((float)0);
 
     RIGID_BODY<TV>& left_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.y,size.z));
-    left_wall.X()=VECTOR<T,3>(lower_corner.x,center.y,center.z);
-    left_wall.Rotation()=ROTATION<VECTOR<T,3> >(-(T).5*(T)pi,VECTOR<T,3>(0,0,1));
+    left_wall.Frame().t=VECTOR<T,3>(lower_corner.x,center.y,center.z);
+    left_wall.Frame().r=ROTATION<VECTOR<T,3> >(-(T).5*(T)pi,VECTOR<T,3>(0,0,1));
     left_wall.Set_Name("left wall");
 
     RIGID_BODY<TV>& right_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.y,size.z));
-    right_wall.X()=VECTOR<T,3>(upper_corner.x,center.y,center.z);
-    right_wall.Rotation()=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(0,0,1));
+    right_wall.Frame().t=VECTOR<T,3>(upper_corner.x,center.y,center.z);
+    right_wall.Frame().r=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(0,0,1));
     right_wall.Set_Name("right wall");
 
     RIGID_BODY<TV>& bottom_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.z));
-    bottom_wall.X()=VECTOR<T,3>(center.x,lower_corner.y,center.z);
-    bottom_wall.Rotation()=ROTATION<TV>(0,TV(0,0,1));
+    bottom_wall.Frame().t=VECTOR<T,3>(center.x,lower_corner.y,center.z);
+    bottom_wall.Frame().r=ROTATION<TV>(0,TV(0,0,1));
     bottom_wall.Set_Name("bottom wall");
 
     RIGID_BODY<TV>& front_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.y));
-    front_wall.X()=VECTOR<T,3>(center.x,center.y,lower_corner.z);
-    front_wall.Rotation()=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(1,0,0));
+    front_wall.Frame().t=VECTOR<T,3>(center.x,center.y,lower_corner.z);
+    front_wall.Frame().r=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(1,0,0));
     front_wall.Set_Name("front wall");
 
     RIGID_BODY<TV>& back_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.y));
-    back_wall.X()=VECTOR<T,3>(center.x,center.y,upper_corner.z);
-    back_wall.Rotation()=ROTATION<VECTOR<T,3> >((T)-.5*(T)pi,VECTOR<T,3>(1,0,0));
+    back_wall.Frame().t=VECTOR<T,3>(center.x,center.y,upper_corner.z);
+    back_wall.Frame().r=ROTATION<VECTOR<T,3> >((T)-.5*(T)pi,VECTOR<T,3>(1,0,0));
     back_wall.Set_Name("back wall");
 
     //char* object_names[]={"subdivided_box","sphere","New_Bones/Cranium_1","New_Bones/Pelvis_1","New_Bones/Right_Hand"};//,"dumbbell","bowl","spoon"};
@@ -298,15 +298,15 @@ void Bounce(const T angle)
     T x_pos[]={-3,0,3},cor[]={(T)1.0,(T).5,0};
     for(int i=0;i<3;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
-        rigid_body.X()=TV(x_pos[i],5,0);rigid_body.Set_Coefficient_Of_Restitution(cor[i]);
+        rigid_body.Frame().t=TV(x_pos[i],5,0);rigid_body.Set_Coefficient_Of_Restitution(cor[i]);
         rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("sphere (cor %g)",cor[i]));}
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
-    rigid_body.X()=TV(x_pos[2],8,0);rigid_body.Set_Coefficient_Of_Restitution(0);
+    rigid_body.Frame().t=TV(x_pos[2],8,0);rigid_body.Set_Coefficient_Of_Restitution(0);
     rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("sphere"));
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,0,1,1);
-    ground.Rotation()=ROTATION<TV>(angle,TV(0,0,1));
+    ground.Frame().r=ROTATION<TV>(angle,TV(0,0,1));
 }
 //#####################################################################
 // Function Bricks
@@ -326,7 +326,7 @@ void Bricks()
         for(int y=0;y<height;y++)
         {
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,1);
-            rigid_body.X()=TV(2.0*x+offset*(y%2),2.0*y-1.0,0);
+            rigid_body.Frame().t=TV(2.0*x+offset*(y%2),2.0*y-1.0,0);
             rigid_body.Set_Coefficient_Of_Restitution(0);
             
         }
@@ -348,7 +348,7 @@ void Brick_Wall(int number)
         for(int y=0;y<height;y++)
         {
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,1);
-            rigid_body.X()=TV(2.0*x+offset*(y%2),2.0*y-1.0,0);
+            rigid_body.Frame().t=TV(2.0*x+offset*(y%2),2.0*y-1.0,0);
             rigid_body.Set_Coefficient_Of_Restitution(0);
         }
 
@@ -363,28 +363,28 @@ void Construct_Wall(TV lower_corner, TV upper_corner, TV center, TV size, T coef
     STREAM_TYPE stream_type((float)0);
 
     RIGID_BODY<TV>& left_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.y,size.z));
-    left_wall.X()=VECTOR<T,3>(lower_corner.x,center.y,center.z);
-    left_wall.Rotation()=ROTATION<VECTOR<T,3> >(-(T).5*(T)pi,VECTOR<T,3>(0,0,1));
+    left_wall.Frame().t=VECTOR<T,3>(lower_corner.x,center.y,center.z);
+    left_wall.Frame().r=ROTATION<VECTOR<T,3> >(-(T).5*(T)pi,VECTOR<T,3>(0,0,1));
     left_wall.Set_Name("left wall");
 
     RIGID_BODY<TV>& right_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.y,size.z));
-    right_wall.X()=VECTOR<T,3>(upper_corner.x,center.y,center.z);
-    right_wall.Rotation()=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(0,0,1));
+    right_wall.Frame().t=VECTOR<T,3>(upper_corner.x,center.y,center.z);
+    right_wall.Frame().r=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(0,0,1));
     right_wall.Set_Name("right wall");
 
     RIGID_BODY<TV>& bottom_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.z));
-    bottom_wall.X()=VECTOR<T,3>(center.x,lower_corner.y,center.z);
-    bottom_wall.Rotation()=ROTATION<TV>(0,TV(0,0,1));
+    bottom_wall.Frame().t=VECTOR<T,3>(center.x,lower_corner.y,center.z);
+    bottom_wall.Frame().r=ROTATION<TV>(0,TV(0,0,1));
     bottom_wall.Set_Name("bottom wall");
 
     RIGID_BODY<TV>& front_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.y));
-    front_wall.X()=VECTOR<T,3>(center.x,center.y,lower_corner.z);
-    front_wall.Rotation()=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(1,0,0));
+    front_wall.Frame().t=VECTOR<T,3>(center.x,center.y,lower_corner.z);
+    front_wall.Frame().r=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(1,0,0));
     front_wall.Set_Name("front wall");
 
     RIGID_BODY<TV>& back_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.y));
-    back_wall.X()=VECTOR<T,3>(center.x,center.y,upper_corner.z);
-    back_wall.Rotation()=ROTATION<VECTOR<T,3> >((T)-.5*(T)pi,VECTOR<T,3>(1,0,0));
+    back_wall.Frame().t=VECTOR<T,3>(center.x,center.y,upper_corner.z);
+    back_wall.Frame().r=ROTATION<VECTOR<T,3> >((T)-.5*(T)pi,VECTOR<T,3>(1,0,0));
     back_wall.Set_Name("back wall");
 }
 
@@ -476,7 +476,7 @@ void Push_Out()
     for(int y=0;y<height;y++)
     {
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,1);
-        rigid_body.X()=TV(0,0.5+(y-1)*1.5,0);
+        rigid_body.Frame().t=TV(0,0.5+(y-1)*1.5,0);
         rigid_body.Set_Coefficient_Of_Restitution(0);
     }
 
@@ -501,8 +501,8 @@ void Angled_Bricks()
         for(int y=0;y<height;y++)
         {
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,0);
-            rigid_body.X()=TV(x*2.0,(2*angle_offset)*y-angle_offset,0);
-            rigid_body.Rotation()=ROTATION<TV>((y%2)?angle:-angle,VECTOR<T,3>(0,0,1));
+            rigid_body.Frame().t=TV(x*2.0,(2*angle_offset)*y-angle_offset,0);
+            rigid_body.Frame().r=ROTATION<TV>((y%2)?angle:-angle,VECTOR<T,3>(0,0,1));
             rigid_body.Set_Coefficient_Of_Restitution(0);
         }
 

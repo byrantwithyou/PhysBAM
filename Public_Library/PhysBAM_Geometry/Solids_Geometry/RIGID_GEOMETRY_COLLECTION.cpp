@@ -112,7 +112,7 @@ Add_Rigid_Geometry(RIGID_GEOMETRY<TV>* rigid_geometry,STREAM_TYPE stream_type,co
 
     // structures
     ARRAY<int> structure_ids;
-    TV structure_center=particles.X(id);
+    TV structure_center=particles.frame(id).t;
     if(TV::dimension==2){
         if(read_simplicial_boundary && !Find_Or_Read_Structure(stream_type,structure_ids,basename+".curve2d",scaling_factor,structure_center))
             LOG::cout<<"Note: No curve2d file for "<<basename<<std::endl;

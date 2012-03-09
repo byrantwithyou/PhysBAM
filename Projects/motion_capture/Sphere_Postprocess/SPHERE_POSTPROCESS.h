@@ -79,7 +79,7 @@ public:
     void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options
@@ -128,7 +128,7 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE
 {
     if(test_number==1){
-        twist.linear=v_array(grid.Clamp_To_Cell(solid_body_collection.rigid_body_collection.rigid_body_particle.X(id)));
+        twist.linear=v_array(grid.Clamp_To_Cell(solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id).t));
         return true;}
     return false;
 }
@@ -166,7 +166,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE 
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
-    if(test_number==1) for(int id=0;id<rigid_body_particles.array_collection->Size();id++) rigid_body_particles.X(id)=frame_start(id).t+v_array(grid.Clamp_To_Cell(frame_start(id).t))*(1./frame_rate);
+    if(test_number==1) for(int id=0;id<rigid_body_particles.array_collection->Size();id++) rigid_body_particles.frame(id).t=frame_start(id).t+v_array(grid.Clamp_To_Cell(frame_start(id).t))*(1./frame_rate);
 }
 //#####################################################################
 // Function Initialize_Bodies
@@ -182,7 +182,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     for(int i=0;i<num_particles_x;i++) for(int j=0;j<num_particles_z;j++) for(int k=0;k<num_particles_y;k++){
         TV position=TV((float)i/(float)(num_particles_x+1)*xwidth+grid.domain.min_corner.x,(float)k/(float)(num_particles_y+1)*ywidth+grid.domain.min_corner.y,(float)j/(float)(num_particles_z+1)*zwidth+grid.domain.min_corner.z);
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",.1,(T).1);
-        rigid_body.X()=position;rigid_body.Is_Kinematic()=true;
+        rigid_body.Frame().t=position;rigid_body.Is_Kinematic()=true;
     }
 
     frame_start.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size());

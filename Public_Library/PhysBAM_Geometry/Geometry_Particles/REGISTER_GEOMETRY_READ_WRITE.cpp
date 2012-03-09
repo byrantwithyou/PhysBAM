@@ -21,7 +21,7 @@ void Register_Free_Particles();
 void Initialize_Geometry_Particle()
 {
     static bool done=false;if(done) return;done=true;
-    Register_Attribute_Name(ATTRIBUTE_ID_ROTATION,"rotation");
+    Register_Attribute_Name(ATTRIBUTE_ID_FRAME,"frame");
     Register_Attribute_Name(ATTRIBUTE_ID_TWIST,"twist");
     Register_Attribute_Name(ATTRIBUTE_ID_RIGID_GEOMETRY,"rigid_geometry");
     Register_Attribute_Name(ATTRIBUTE_ID_X,"X");

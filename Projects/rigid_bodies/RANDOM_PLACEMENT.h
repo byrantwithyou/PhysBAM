@@ -81,7 +81,7 @@ protected:
     virtual void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body)=0;
 
     virtual void Assign_Orientation(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body)
-    {Generate_Orientation<T>(random_numbers,max_orientation_angle,body.Rotation());}
+    {Generate_Orientation<T>(random_numbers,max_orientation_angle,body.Frame().r);}
 
     virtual void Assign_Velocity(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body)
     {body.Twist().linear=random_numbers.template Get_Direction<TV>();
@@ -155,7 +155,7 @@ protected:
     TV d=random_numbers.template Get_Direction<TV>();
     d.y=0;if(d.Magnitude()>0) d.Normalize();
     T h=random_numbers.Get_Uniform_Number((T)0,(T)height);
-    body.X()=base+r*d+TV(0,h,0);}
+    body.Frame().t=base+r*d+TV(0,h,0);}
 
 private:
     bool boundary_only;
@@ -178,8 +178,8 @@ public:
 
 protected:
     void Assign_Position(RANDOM_NUMBERS<T>& random_numbers,RIGID_BODY<TV>& body) PHYSBAM_OVERRIDE
-    {body.X().x=random_numbers.Get_Uniform_Number((T)box.min_corner.x,(T)box.max_corner.x);
-    body.X().y=random_numbers.Get_Uniform_Number((T)box.min_corner.y,(T)box.max_corner.y);}
+    {body.Frame().t.x=random_numbers.Get_Uniform_Number((T)box.min_corner.x,(T)box.max_corner.x);
+    body.Frame().t.y=random_numbers.Get_Uniform_Number((T)box.min_corner.y,(T)box.max_corner.y);}
 
 private:
     RANGE<TV> box;

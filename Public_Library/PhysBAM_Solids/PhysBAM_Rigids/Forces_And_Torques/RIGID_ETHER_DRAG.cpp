@@ -29,9 +29,9 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TWIST<TV> > rigid_F,const T time) con
 {
     for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){int k=iterator.Data();
         if(use_spatially_varying_wind){
-            if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particle.X(k)))
+            if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particle.frame(k).t))
                 rigid_F(k).linear+=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particle.mass(k)*
-                    Spatially_Varying_Wind_Velocity(rigid_body_collection.rigid_body_particle.X(k));
+                    Spatially_Varying_Wind_Velocity(rigid_body_collection.rigid_body_particle.frame(k).t);
             else if(use_constant_wind) rigid_F(k).linear+=constant_wind_viscosity*rigid_body_collection.rigid_body_particle.mass(k)*constant_wind;}
         else if(use_constant_wind) rigid_F(k).linear+=constant_wind_viscosity*rigid_body_collection.rigid_body_particle.mass(k)*constant_wind;}
 }
@@ -43,7 +43,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TWIST<TV> > rigid_V,ARRAY_VIEW<TW
 {
     for(ELEMENT_ITERATOR iterator(force_rigid_body_particles);iterator.Valid();iterator.Next()){int k=iterator.Data();
         if(use_spatially_varying_wind){
-            if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particle.X(k)))
+            if(spatially_varying_wind_domain.Lazy_Inside(rigid_body_collection.rigid_body_particle.frame(k).t))
                 rigid_F(k).linear-=spatially_varying_wind_viscosity*rigid_body_collection.rigid_body_particle.mass(k)*rigid_V(k).linear;
             else if(use_constant_wind) rigid_F(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particle.mass(k)*rigid_V(k).linear;}
         else if(use_constant_wind) rigid_F(k).linear-=constant_wind_viscosity*rigid_body_collection.rigid_body_particle.mass(k)*rigid_V(k).linear;

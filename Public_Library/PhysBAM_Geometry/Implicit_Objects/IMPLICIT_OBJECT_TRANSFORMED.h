@@ -44,10 +44,10 @@ public:
     {return transform->Frame().Inverse_Times(world_space_point);}
 
     TV World_Space_Vector(const TV& object_space_vector) const
-    {return transform->Rotation().Rotate(object_space_vector);}
+    {return transform->Frame().r.Rotate(object_space_vector);}
 
     TV Object_Space_Vector(const TV& world_space_vector) const
-    {return transform->Rotation().Inverse_Rotate(world_space_vector);}
+    {return transform->Frame().r.Inverse_Rotate(world_space_vector);}
 
     TV World_Space_Unitless_Vector(const TV& object_space_vector) const
     {return World_Space_Vector(object_space_vector);}
@@ -70,7 +70,7 @@ public:
     return T_ORIENTED_BOX(world_space_box,transform->Frame().Inverse()).Axis_Aligned_Bounding_Box();}
 
     T_SYMMETRIC_MATRIX World_Space_Length_Hessian(const T_SYMMETRIC_MATRIX& object_space_hessian) const
-    {return T_SYMMETRIC_MATRIX::Conjugate(transform->Rotation().Rotation_Matrix(),object_space_hessian);}
+    {return T_SYMMETRIC_MATRIX::Conjugate(transform->Frame().r.Rotation_Matrix(),object_space_hessian);}
 
     static std::string Name_Helper()
     {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,TRANSFORM::Static_Name().c_str());}

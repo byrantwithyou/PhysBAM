@@ -137,9 +137,9 @@ public:
 private: 
     ARRAY<bool,JOINT_ID> pd_state_save,joint_function_active_save;
     ARRAY<T,JOINT_ID> k_p_save;
-    ARRAY<TV> X_save,V_save,rigid_velocity_save,rigid_X_save;
+    ARRAY<TV> X_save,V_save,rigid_velocity_save;
     ARRAY<T_SPIN> rigid_angular_momentum_save;
-    ARRAY<ROTATION<TV> > rigid_rotation_save;
+    ARRAY<FRAME<TV> > rigid_frame_save;
     ARRAY<TV> V_pd,rigid_velocity_pd;
     ARRAY<T_SPIN> rigid_angular_momentum_pd;
     bool project_at_frame_boundaries_save;
@@ -243,8 +243,8 @@ public:
     //void Add_Velocity_Independent_Forces_Helper(ARRAY_VIEW<TV> F,ARRAY_VIEW<TWIST<TV> > rigid_F,const T time,const RIGID_BODY<TV>& rigid_body,const TV& location,
     //    const TV& impulse,const T_SPIN& angular_impulse) const;
     JOINT_FUNCTION<TV>* Create_Joint_Function(const JOINT_ID joint_id);
-    void Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation);
-    void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation);
+    void Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame);
+    void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame);
     void Save_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angular_momentum);
     void Restore_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angular_momentum);
     void Save_Nested_State(T_FACE_ARRAYS_SCALAR& face_velocities);
@@ -253,7 +253,7 @@ public:
     void Restore_State(T_FACE_ARRAYS_SCALAR& face_velocities);
     void Save_PD_State();
     void Restore_PD_State();
-    void Propogate_Solid_Helper(ARRAY<int>& cluster_bodies,TV& cluster_translation,TWIST<TV>& cluster_twist);
+    void Propogate_Solid_Helper(ARRAY<int>& cluster_bodies,FRAME<TV>& cluster_frame,TWIST<TV>& cluster_twist);
     void Make_Cluster_List(int parent,ARRAY<int>& child_bodies);
     void Project_Solid_Velocities(const T time);
     void Project_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);

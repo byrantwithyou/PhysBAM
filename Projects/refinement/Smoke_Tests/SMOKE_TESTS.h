@@ -219,7 +219,7 @@ public:
             int first_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(local_iterator.First_Cell_Center()),second_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(local_iterator.Second_Cell_Center());
             if(first_cell_in_solid+second_cell_in_solid==1 || (test_number==3 && first_cell_in_solid+second_cell_in_solid==2)){
                 psi_N.Component(local_iterator.Axis())(local_iterator.Face_Index())=true;
-                TV rigid_velocity=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.X(rigid_particle_id),local_iterator.Location());
+                TV rigid_velocity=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,local_iterator.Location());
                 TV fluid_velocity;
                 fluid_velocity(local_iterator.Axis())=local_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index());
                 for(int i=1;i<TV::dimension;i++){int axis=(local_iterator.Axis()-1+i)%TV::dimension+1;
@@ -233,7 +233,7 @@ public:
                 if(projected_velocity<0) local_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index())=(fluid_velocity-rigid_normal*projected_velocity)(local_iterator.Axis());}
             else if(first_cell_in_solid+second_cell_in_solid==2 && test_number==2){
                 psi_N.Component(local_iterator.Axis())(local_iterator.Face_Index())=true;
-                fine_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index())=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.X(rigid_particle_id),local_iterator.Location())(local_iterator.Axis());}}}}
+                fine_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index())=RIGID_GEOMETRY<TV>::Pointwise_Object_Velocity(rigid_geometry_collection.particles.twist(rigid_particle_id),rigid_geometry_collection.particles.frame(rigid_particle_id).t,local_iterator.Location())(local_iterator.Axis());}}}}
 
     void Set_Boundary_Conditions(const T time)
     {fine_psi_N.Fill(false);projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
@@ -518,8 +518,8 @@ public:
                 else model_file_name="../../Public_Data/Rigid_Bodies/sphere";
                 radius=0.07;
                 rigid_particle_id=rigid_geometry_collection.Add_Rigid_Geometry(stream_type,model_file_name,radius,true,true,true,true);
-                rigid_geometry_collection.particles.X(rigid_particle_id)=TV::Constant_Vector(0.25);
-                rigid_geometry_collection.particles.X(rigid_particle_id)(1)=0.5;
+                rigid_geometry_collection.particles.frame(rigid_particle_id).t=TV::Constant_Vector(0.25);
+                rigid_geometry_collection.particles.frame(rigid_particle_id).t(1)=0.5;
                 rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->is_static=true;
                 break;
             case 3:

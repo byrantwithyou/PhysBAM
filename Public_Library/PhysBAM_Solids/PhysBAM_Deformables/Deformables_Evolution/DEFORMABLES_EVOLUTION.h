@@ -30,8 +30,8 @@ public:
     RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection;
     KINEMATIC_EVOLUTION<TV> kinematic_evolution;
     TRIANGLE_REPULSIONS<TV>* repulsions;
-    ARRAY<TV> X_save,V_save,rigid_X_save,rigid_velocity_save;
-    ARRAY<ROTATION<TV> > rigid_rotation_save;
+    ARRAY<TV> X_save,V_save,rigid_velocity_save;
+    ARRAY<FRAME<TV> > rigid_frame_save;
     ARRAY<TV> V_difference,rigid_velocity_difference;
 
     DEFORMABLES_PARAMETERS<TV>& deformables_parameters;
@@ -42,8 +42,8 @@ public:
     DEFORMABLES_EVOLUTION_CALLBACKS<TV>* deformables_evolution_callbacks;
 private:
     ARRAY<TWIST<TV> > rigid_V_save;
-    ARRAY<TV> X_save_for_constraints,rigid_X_save_for_constraints;    
-    ARRAY<ROTATION<TV> > rigid_rotation_save_for_constraints;
+    ARRAY<TV> X_save_for_constraints;
+    ARRAY<FRAME<TV> > rigid_frame_save_for_constraints;
 public:
 
     DEFORMABLES_EVOLUTION(DEFORMABLES_PARAMETERS<TV>& deformables_parameters_input,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input);
@@ -82,8 +82,8 @@ protected:
     void Compute_Momentum_Differences();
     void Save_Velocity();
     void Restore_Velocity() const;
-    void Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation);
-    void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation);
+    void Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame);
+    void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame);
     void Exchange_Velocity();
 //#####################################################################
 };

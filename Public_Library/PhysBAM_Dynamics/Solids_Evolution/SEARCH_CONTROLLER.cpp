@@ -95,34 +95,36 @@ Create_Joint_Function(const JOINT_ID joint_id)
 // Function Save_Position
 //#####################################################################
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
-Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation)
+Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     X.Resize(particles.array_collection->Size(),false,false);
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
-    rigid_X.Resize(rigid_body_particles.array_collection->Size(),false,false);
-    rigid_rotation.Resize(rigid_body_particles.array_collection->Size(),false,false);
-    for(int i=0;i<rigid_body_particles.array_collection->Size();i++) if(solid_body_collection.rigid_body_collection.Is_Active(i)){rigid_X(i)=rigid_body_particles.X(i);rigid_rotation(i)=rigid_body_particles.rotation(i);}
+    rigid_frame.Resize(rigid_body_particles.array_collection->Size(),false,false);
+    for(int i=0;i<rigid_body_particles.array_collection->Size();i++)
+        if(solid_body_collection.rigid_body_collection.Is_Active(i))
+            rigid_frame(i)=rigid_body_particles.frame(i);
 }
 //#####################################################################
 // Function Restore_Position
 //#####################################################################
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
-Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation)
+Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
-    PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_X.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
-    PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
+    PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());
+    PHYSBAM_ASSERT(rigid_frame.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
     for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
     for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
-        RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);rigid_body_collection.rigid_body_particle.X(i)=rigid_X(i);
-        rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation(i);body.Update_Angular_Velocity();}
+        RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+        rigid_body_collection.rigid_body_particle.frame(i)=rigid_frame(i);
+        body.Update_Angular_Velocity();}
 }
 //#####################################################################
 // Function Save_Velocity
@@ -177,7 +179,7 @@ Save_State(T_FACE_ARRAYS_SCALAR& face_velocities)
     rigid_bindings.Clamp_Particles_To_Embedded_Velocities();
     ARRAY<int> active_clusters;
     rigid_bindings.Deactivate_And_Return_Clusters(active_clusters,0);
-    Save_Position(X_save,rigid_X_save,rigid_rotation_save);
+    Save_Position(X_save,rigid_frame_save);
     Save_Velocity(V_save,rigid_velocity_save,rigid_angular_momentum_save);
     time_save=driver->Time();
     rigid_bindings.Reactivate_Bindings(active_clusters);            
@@ -201,7 +203,7 @@ Restore_State(T_FACE_ARRAYS_SCALAR& face_velocities)
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     ARRAY<int> active_clusters;
     rigid_bindings.Deactivate_And_Return_Clusters(active_clusters,0);
-    Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
+    Restore_Position(X_save,rigid_frame_save);
     Restore_Velocity(V_save,rigid_velocity_save,rigid_angular_momentum_save);
     driver->Set_Time(time_save);
     rigid_bindings.Reactivate_Bindings(active_clusters);            
@@ -274,12 +276,12 @@ Restore_PD_State()
 // Function Propogate_Solid_Helper
 //#####################################################################
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
-Propogate_Solid_Helper(ARRAY<int>& cluster_bodies,TV& cluster_translation,TWIST<TV>& cluster_twist)
+Propogate_Solid_Helper(ARRAY<int>& cluster_bodies,FRAME<TV>& cluster_frame,TWIST<TV>& cluster_twist)
 {
     RIGID_BODY_PARTICLES<TV>& rbp=solid_body_collection.rigid_body_collection.rigid_body_particle;
     for(int i=0;i<cluster_bodies.m;i++){
         int child=cluster_bodies(i);
-        rbp.twist(child).linear=cluster_twist.linear+TV::Cross_Product(cluster_twist.angular,rbp.X(child)-cluster_translation);
+        rbp.twist(child).linear=cluster_twist.linear+TV::Cross_Product(cluster_twist.angular,rbp.frame(child).t-cluster_frame.t);
         //TODO(mlentine): change this to momentum not velocity
         rbp.twist(child).angular=cluster_twist.angular;
         solid_body_collection.rigid_body_collection.Rigid_Body(child).Update_Angular_Momentum();}
@@ -310,8 +312,7 @@ Project_Solid_Velocities(const T time)
 {
     RIGID_BODY_CLUSTER_BINDINGS<TV>& rigid_bindings=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings;
     RIGID_BODY_PARTICLES<TV>& rbp=solid_body_collection.rigid_body_collection.rigid_body_particle;
-    TV cluster_translation;
-    ROTATION<TV> cluster_rotation;
+    FRAME<TV> cluster_frame;
     TWIST<TV> cluster_twist;
     T cluster_mass=0;
     T_INERTIA_TENSOR cluster_inertia_tensor;
@@ -324,10 +325,10 @@ Project_Solid_Velocities(const T time)
         RIGID_BODY<TV> *parent_body=Parent(joint.id_number),*child_body=Child(joint.id_number);
         if((parent_body->Has_Infinite_Inertia() || child_body->Has_Infinite_Inertia()) && !(parent_body->Has_Infinite_Inertia() && child_body->Has_Infinite_Inertia())){
             if(parent_body->Has_Infinite_Inertia()){
-                cluster_rotation=parent_body->Rotation();cluster_translation=parent_body->X();cluster_twist=parent_body->Twist();
+                cluster_frame=parent_body->Frame();cluster_twist=parent_body->Twist();
                 cluster_mass=parent_body->Mass();cluster_inertia_tensor=parent_body->Inertia_Tensor();cluster_momentum=parent_body->Angular_Momentum();}
             else{
-                cluster_rotation=child_body->Rotation();cluster_translation=child_body->X();cluster_twist=child_body->Twist();
+                cluster_frame=child_body->Frame();cluster_twist=child_body->Twist();
                 cluster_mass=child_body->Mass();cluster_inertia_tensor=child_body->Inertia_Tensor();cluster_momentum=child_body->Angular_Momentum();}
             cluster_list.Remove_All();
             if(use_clusters && joint_clusters(joint.id_number).x){
@@ -348,7 +349,7 @@ Project_Solid_Velocities(const T time)
                 else cluster_list.Append(child_body->particle_index);}
             ARRAY<int> active_clusters;
             rigid_bindings.Deactivate_And_Return_Clusters(active_clusters,(incorporate_fluids?fluids_parameters->collision_bodies_affecting_fluid:0));
-            Propogate_Solid_Helper(cluster_list,cluster_translation,cluster_twist);
+            Propogate_Solid_Helper(cluster_list,cluster_frame,cluster_twist);
             rigid_bindings.Reactivate_Bindings(active_clusters);            
             has_kinematic=true;}}
     if(has_kinematic) return;
@@ -357,18 +358,18 @@ Project_Solid_Velocities(const T time)
     for(int i=0;i<cluster_list.m;i++){
         int child=cluster_list(i);
         cluster_mass+=rbp.mass(child);
-        cluster_translation+=rbp.X(child)*rbp.mass(child);
+        cluster_frame.t+=rbp.frame(child).t*rbp.mass(child);
         cluster_twist.linear+=rbp.twist(child).linear*rbp.mass(child);}
-    cluster_translation/=cluster_mass;
+    cluster_frame.t/=cluster_mass;
     cluster_twist.linear/=cluster_mass;
     for(int i=0;i<cluster_list.m;i++){
         int child=cluster_list(i);
         RIGID_BODY<TV>& child_body=solid_body_collection.rigid_body_collection.Rigid_Body(child);
-        TV s=(child_body.X()-cluster_translation);
+        TV s=(child_body.Frame().t-cluster_frame.t);
         inertia_tensor+=child_body.World_Space_Inertia_Tensor()+MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(child_body.Mass()*s).Times_Cross_Product_Matrix_Transpose_With_Symmetric_Result(s);
-        cluster_momentum+=TV::Cross_Product(child_body.X()-cluster_translation,child_body.Mass()*child_body.Twist().linear)+child_body.Angular_Momentum();}
-    Diagonalize_Inertia_Tensor(inertia_tensor,cluster_inertia_tensor,cluster_rotation);
-    Propogate_Solid_Helper(cluster_list,cluster_translation,cluster_twist);
+        cluster_momentum+=TV::Cross_Product(child_body.Frame().t-cluster_frame.t,child_body.Mass()*child_body.Twist().linear)+child_body.Angular_Momentum();}
+    Diagonalize_Inertia_Tensor(inertia_tensor,cluster_inertia_tensor,cluster_frame.r);
+    Propogate_Solid_Helper(cluster_list,cluster_frame,cluster_twist);
 }
 //#####################################################################
 // Function Project_Velocities
@@ -414,7 +415,7 @@ template<class T> VECTOR<T,1> Set_PD_Targets_Helper(RIGID_BODY<VECTOR<T,1> > *pa
 template<class T> VECTOR<T,1> Set_PD_Targets_Helper(RIGID_BODY<VECTOR<T,2> > *parent,JOINT<VECTOR<T,2> >* joint)
 {return joint->joint_function->Angular_Velocity();}
 template<class T> VECTOR<T,3> Set_PD_Targets_Helper(RIGID_BODY<VECTOR<T,3> > *parent,JOINT<VECTOR<T,3> >* joint)
-{return (parent->Rotation()*joint->F_pj().r).Inverse_Rotate(joint->joint_function->Angular_Velocity());}
+{return (parent->Frame().r*joint->F_pj().r).Inverse_Rotate(joint->joint_function->Angular_Velocity());}
 template<class TV> void SEARCH_CONTROLLER<TV>::
 Set_PD_Targets()
 {

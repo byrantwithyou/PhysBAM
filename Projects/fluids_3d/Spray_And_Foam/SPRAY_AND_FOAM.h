@@ -140,12 +140,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
       rigid_body_collection.Rigid_Body(beach).frame.r=QUATERNION<T>::From_Euler_Angles(0,0,-.1);
     */
     lighthouse=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/lighthouse",(T)2,true,true,false);
-    rigid_body_collection.rigid_body_particle.X(lighthouse)=TV((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(lighthouse).Is_Kinematic()=true;
+    rigid_body_collection.rigid_body_particle.frame(lighthouse).t=TV((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(lighthouse).Is_Kinematic()=true;
     cove=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/cove",(T)1,true,true,false);
-    rigid_body_collection.rigid_body_particle.X(cove)=TV((T)-80,(T)11,(T)40);rigid_body_collection.Rigid_Body(cove).Is_Kinematic()=true;
+    rigid_body_collection.rigid_body_particle.frame(cove).t=TV((T)-80,(T)11,(T)40);rigid_body_collection.Rigid_Body(cove).Is_Kinematic()=true;
     /*lighthouse=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/lighthouse",(T)2,true,true,false);
       cove=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/cove",(T)1,true,true,false);
-      rigid_body_collection.rigid_body_particle(cove)->X()=TV((T)-80,(T)11,(T)40);rigid_body_collection.rigid_body_particle(cove)->is_kinematic=true;
+      rigid_body_collection.rigid_body_particle(cove)->Frame().t=TV((T)-80,(T)11,(T)40);rigid_body_collection.rigid_body_particle(cove)->is_kinematic=true;
     */
     fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);
     object_phi.Resize(fluids_parameters.grid->Domain_Indices(3));object_V.Resize(*fluids_parameters.grid,3);

@@ -75,7 +75,7 @@ public:
 //#####################################################################
     void Force(const VECTOR_T& V,VECTOR_T& F) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& F) const PHYSBAM_OVERRIDE;
-    void Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,
+    void Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<FRAME<TV> >& rigid_frame_save,
         ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,bool test_system,bool print_matrix) const;// TODO: The meaning of this function has changed.
     void Project(KRYLOV_VECTOR_BASE<T>& V) const PHYSBAM_OVERRIDE;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& V1,const KRYLOV_VECTOR_BASE<T>& V2) const PHYSBAM_OVERRIDE;

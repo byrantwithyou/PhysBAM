@@ -123,7 +123,7 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
     // rigid body
     std::string rgd=TV::dimension==2?"rgd2d":"rgd";
     if(read_rgd_file){
-        try{FILE_UTILITIES::Read_From_File(stream_type,basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->X(),rigid_body->Rotation());}
+        try{FILE_UTILITIES::Read_From_File(stream_type,basename+"."+rgd,rigid_body->Mass(),rigid_body->Inertia_Tensor(),rigid_body->Frame());}
         catch(FILESYSTEM_ERROR&){LOG::cout<<"Note: No "<<rgd<<" file for "<<basename<<" (using default values)"<<std::endl;}}
     if(scaling_factor!=1) rigid_body->Rescale(scaling_factor);
     rigid_body->Update_Angular_Velocity();

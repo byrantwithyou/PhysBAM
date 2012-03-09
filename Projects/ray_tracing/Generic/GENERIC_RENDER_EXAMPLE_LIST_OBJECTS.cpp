@@ -153,7 +153,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                         if(!lio) PHYSBAM_FATAL_ERROR("Should have levelset implicit object");
                         TRIANGULATED_SURFACE<T>* surface_from_levelset=DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(lio->levelset);
                         object=rendering_triangulated_surface=new RENDERING_TRIANGULATED_SURFACE<T>(*surface_from_levelset->Create_Compact_Copy(),triangles_per_hierarchy_group);
-                        rigid_body_collection.Rigid_Body(id).Set_Frame(rigid_body_collection.Rigid_Body(id).Frame()*levelset_frame);
+                        rigid_body_collection.Rigid_Body(id).Frame()=rigid_body_collection.Rigid_Body(id).Frame()*levelset_frame;
                         delete surface_from_levelset;}
                     else object=rendering_triangulated_surface=new RENDERING_TRIANGULATED_SURFACE<T>(*rigid_body_collection.Rigid_Body(id).simplicial_object->Create_Compact_Copy(),triangles_per_hierarchy_group);
                     rendering_triangulated_surface->triangulated_surface.particles.Store_Velocity();

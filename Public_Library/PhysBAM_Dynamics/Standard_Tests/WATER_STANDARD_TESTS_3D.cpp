@@ -325,11 +325,11 @@ Initialize_Bodies()
 {
     if(test_number==4){
         sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/sphere",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.X(sphere)=TV((T)1.25,(T).55,(T).5);
+        rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T)1.25,(T).55,(T).5);
         rigid_body_collection.rigid_body_particle.kinematic(sphere)=true;}
     else if (test_number==20){
         sphere=rigid_body_collection.Add_Rigid_Body(example.stream_type,example.data_directory+"/Rigid_Bodies/sphere",(T).1,true,true,false);
-        rigid_body_collection.rigid_body_particle.X(sphere)=TV((T).8,(T).1,(T).5);
+        rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).8,(T).1,(T).5);
         rigid_body_collection.rigid_body_particle.kinematic(sphere)=true;}
     if(use_inaccurate_body_collisions){
         inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);

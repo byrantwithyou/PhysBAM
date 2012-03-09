@@ -38,10 +38,10 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
     FRACTURE_REGION<T> body_region(body.simplicial_object,dynamic_cast<LEVELSET_IMPLICIT_OBJECT<TV>*>(implicit_object),use_particle_optimization);
     body_region.need_destroy_data=false;
     MATRIX<T,3> R_ed;
-    body_region.levelset_T=body.Rotation().Rotate(levelset_frame.t)+body.X();
-    body_region.levelset_RS=(body.Rotation()*levelset_frame.r).Rotation_Matrix();
-    body_region.object_T=body.X();
-    body_region.object_RS=body.Rotation().Rotation_Matrix();
+    body_region.levelset_T=body.Frame().r.Rotate(levelset_frame.t)+body.Frame().t;
+    body_region.levelset_RS=(body.Frame().r*levelset_frame.r).Rotation_Matrix();
+    body_region.object_T=body.Frame().t;
+    body_region.object_RS=body.Frame().r.Rotation_Matrix();
     R_ed=body_region.levelset_RS*DIAGONAL_MATRIX<T,3>(body_region.implicit_object->levelset.grid.dX);
     body_region.extra_levelset_frame=levelset_frame;
     body_region.fracture_offset=body_region.implicit_object->levelset.grid.Closest_Node(body_region.levelset_RS.Inverse()*(point_of_impact-body_region.levelset_T))-TV_INT::All_Ones_Vector();
@@ -61,7 +61,7 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
             new_body->Set_Coefficient_Of_Friction(body.coefficient_of_friction);new_body->Set_Coefficient_Of_Restitution(body.coefficient_of_restitution);
             T_WORLD_SPACE_INERTIA_TENSOR inertia;
             new_regions(i)->extra_levelset_frame=levelset_frame;
-            new_regions(i)->Compute_Inertial_Properties(density,new_body->X(),new_body->Mass(),inertia);
+            new_regions(i)->Compute_Inertial_Properties(density,new_body->Frame().t,new_body->Mass(),inertia);
             new_body->Diagonalize_Inertia_Tensor(inertia);
             new_body->Add_Structure(*new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(new_regions(i)->implicit_object,true,new FRAME<TV>(new_body->Frame().Inverse_Times(levelset_frame))));
             new_body->Add_Structure(*new_regions(i)->triangulated_surface);
@@ -70,9 +70,9 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
             new_regions(i)->need_destroy_data=false;
             delete new_regions(i);
             
-            new_body->Set_Frame(body.Frame()*new_body->Frame());
+            new_body->Frame()=body.Frame()*new_body->Frame();
             new_body->Twist().angular=body.Twist().angular;
-            new_body->Twist().linear=body.Twist().linear+VECTOR<T,3>::Cross_Product(body.Twist().angular,new_body->X()-body.X());
+            new_body->Twist().linear=body.Twist().linear+VECTOR<T,3>::Cross_Product(body.Twist().angular,new_body->Frame().t-body.Frame().t);
             new_body->Update_Angular_Momentum();
             new_body->simplicial_object->Initialize_Hierarchy();
             new_body->simplicial_object->Update_Bounding_Box();

@@ -121,7 +121,7 @@ Compute_Position_Based_State(const T dt,const T time)
                 continue;}
 
             // compute 6x6 matrix assuming impulse applied at r2 and measured at r1
-            TV r1=joint_location(joint_index_1)-rigid_body.X(),r2=joint_location(joint_index_2)-rigid_body.X();
+            TV r1=joint_location(joint_index_1)-rigid_body.Frame().t,r2=joint_location(joint_index_2)-rigid_body.Frame().t;
             MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(r1),r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(r2);
             MATRIX<T,3> c21=I_inverse.Times_Cross_Product_Matrix(r2),c12=I_inverse.Cross_Product_Matrix_Times(-r1);
             MATRIX<T,3> c11=c21.Cross_Product_Matrix_Times(-r1)+1/rigid_body.Mass();
@@ -157,13 +157,13 @@ Compute_Position_Based_State(const T dt,const T time)
             for(int t=0;t<2;t++){ // loop over parent and child
                 int body_id=body_indices[t];RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(body_id);
                 if(!body.Has_Infinite_Inertia() && muscle_list->muscle_attachments_on_rigid_body(body_id).m){
-                    TV r_joint=joint_location(i)-body.X();
+                    TV r_joint=joint_location(i)-body.Frame().t;
                     SYMMETRIC_MATRIX<T,3> I_inverse=body.World_Space_Inertia_Tensor_Inverse();
                     for(int j=0;j<muscle_list->muscle_attachments_on_rigid_body(body_id).m;j++){
                         TRIPLE<int,ATTACHMENT_POINT<TV>*,ATTACHMENT_POINT<TV>*>& muscle_attachments=muscle_list->muscle_attachments_on_rigid_body(body_id)(j);
                         int muscle_index=muscle_attachments.x;
                         // compute 6x1 vector which is the change in linear and angular velocity in response to unit muscle impulse along its line of action
-                        TV r_attach=muscle_attachments.y->Embedded_Position()-body.X();
+                        TV r_attach=muscle_attachments.y->Embedded_Position()-body.Frame().t;
                         TV direction=(muscle_attachments.z->Embedded_Position()-muscle_attachments.y->Embedded_Position()).Normalized();
                         TV c21_along_direction=I_inverse*TV::Cross_Product(r_attach,direction);
                         TV c11_along_direction=TV::Cross_Product(c21_along_direction,r_joint)+direction/body.Mass();

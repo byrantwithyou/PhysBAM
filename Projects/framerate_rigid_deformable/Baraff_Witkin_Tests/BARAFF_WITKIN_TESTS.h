@@ -347,7 +347,7 @@ void Cloth_Body_Test()
         solid_body_collection.deformable_body_collection.particles.mass(node3)+=m;}
 
     RIGID_BODY<TV>& body=tests.Add_Rigid_Body("box",(T).25,(T)0);
-    body.X()=TV((T).5,(T)-.75,(T).5);
+    body.Frame().t=TV((T).5,(T)-.75,(T).5);
     body.is_static=true;
 }
 //#####################################################################

@@ -30,7 +30,7 @@ template<class T> void
 Compute_Desired_PD_Velocity_Helper(const T dt,const T time,JOINT_FUNCTION<VECTOR<T,3> >& jf)
 {
     typedef VECTOR<T,3> T_SPIN;typedef VECTOR<T,3> TV;
-    ROTATION<TV> Fp_wj=jf.parent->Rotation()*jf.joint.F_pj().r;
+    ROTATION<TV> Fp_wj=jf.parent->Frame().r*jf.joint.F_pj().r;
     if(!jf.target_position){T_SPIN target=Fp_wj.Rotate(jf.Target_Angular_Velocity(time));jf.desired_angular_velocity=(jf.Angular_Velocity()-target)*exp(-jf.k_v*dt)+target;return;}
     T_SPIN rotation_axis_to_current_target=Fp_wj.Rotate((jf.Target_Angle(time)*jf.Angle().Inverse()).Rotation_Vector());
     T_SPIN rotation_axis_to_next_target=Fp_wj.Rotate((jf.Target_Angle(time+dt)*jf.Angle().Inverse()).Rotation_Vector());

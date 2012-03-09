@@ -65,7 +65,7 @@ Initialize()
     example.Initialize_Bodies();
     example.collision_bodies_affecting_fluid.Add_Bodies(example.rigid_geometry_collection);
     kinematic_evolution.Get_Current_Kinematic_Keyframes(1/example.frame_rate,time);
-    kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);
+    kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
     kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
 
     example.phi_boundary_water.Set_Velocity_Pointer(example.fine_face_velocities);
@@ -206,13 +206,13 @@ Advance_To_Target_Time(const T target_time)
         if(example.use_collidable_advection) example.collision_bodies_affecting_fluid.Save_State(COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE,time);
 
         // kinematic_update
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);
+        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
         kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
         for(int i=0;i<example.rigid_geometry_collection.kinematic_rigid_geometry.m;i++){
             RIGID_GEOMETRY<TV>& rigid_geometry=example.rigid_geometry_collection.Rigid_Geometry(i);            
-            rigid_geometry.X()+=dt*rigid_geometry.Twist().linear;
-            rigid_geometry.Rotation()=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Rotation();rigid_geometry.Rotation().Normalize();}
-        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time+dt);
+            rigid_geometry.Frame().t+=dt*rigid_geometry.Twist().linear;
+            rigid_geometry.Frame().r=ROTATION<TV>::From_Rotation_Vector(dt*rigid_geometry.Twist().angular)*rigid_geometry.Frame().r;rigid_geometry.Frame().r.Normalize();}
+        kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time+dt);
  
         LOG::Time("Collision setup 1");
         PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& pls=example.particle_levelset_evolution.Particle_Levelset(0);

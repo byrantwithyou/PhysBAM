@@ -26,7 +26,7 @@ public:
     virtual ~RIGID_GEOMETRY_EXAMPLE_VELOCITIES();
 
 //#####################################################################
-    virtual void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time); // set external positions
+    virtual void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > rotation,const T time); // set external positions
     virtual void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time); // velocity and angular velocity
     virtual void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id);
     virtual bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id); // Return true if twist was set

@@ -149,8 +149,7 @@ Reinitialize(bool force)
                 id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);}
             else id=opengl_component_rigid_body_collection.rigid_body_collection.Add_Rigid_Body(STREAM_TYPE(RW()),rigid_filename,scale*body_motion.trajectories(i)(0).length,true,true,false,true);
             body_motion.ui_position(i).length=(T)1;
-            opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.X(id)=TV();
-            opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<TV>();
+            opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.frame(id)=FRAME<TV>();
             opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).Update_Bounding_Box();
             id_to_index.Insert(id,i);
             opengl_component_rigid_body_collection.Initialize_One_Body(id,true);}}
@@ -158,7 +157,7 @@ Reinitialize(bool force)
         FRAME<TV> rigid_base_transform_i=rigid_body_base_transform;
         T new_length=body_motion.trajectories(id_to_index.Get(id))(frame+1).length;
         rigid_base_transform_i.t*=new_length/default_length;
-        opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).Set_Frame(body_motion.trajectories(id_to_index.Get(id))(frame+1).targeted_transform*rigid_base_transform_i);
+        opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).Frame()=body_motion.trajectories(id_to_index.Get(id))(frame+1).targeted_transform*rigid_base_transform_i;
         T scale=body_motion.ui_position(id_to_index.Get(id)).length;
         if(scale!=1&&scale>0){
             scale/=ui_scale;

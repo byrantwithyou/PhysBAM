@@ -133,7 +133,7 @@ bool Normal_Is_Admissible(RIGID_BODY<VECTOR<T,3> >& body,int particle,VECTOR<T,3
 
     ARRAY<int>& incident_elements=mesh.topologically_sorted_incident_elements->operator()(particle);
 
-    TV normal_residual=body.Rotation().Inverse_Rotate(normal);
+    TV normal_residual=body.Frame().r.Inverse_Rotate(normal);
 
     for(int i=0;i<incident_elements.m;i++)
     {

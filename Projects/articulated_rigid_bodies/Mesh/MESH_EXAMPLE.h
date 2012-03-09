@@ -64,7 +64,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
@@ -107,34 +107,34 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         for(int col=0;col<num_cols;col++){
             id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"plank",(T).15,true,with_phi);
             rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
-            rigid_body->X()=TV(x_shift+1+2*col,y_shift,z_shift+2*row);
-            rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0));
+            rigid_body->Frame().t=TV(x_shift+1+2*col,y_shift,z_shift+2*row);
+            rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
             rigid_body->Set_Coefficient_Of_Restitution(0);
             rigid_body->Set_Name("mesh");}
         for(int col=0;col<num_cols+1;col++){
             id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"sphere",(T).15,true,with_phi);
             rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
-            rigid_body->X()=TV(x_shift+2*col,y_shift,z_shift+2*row);
+            rigid_body->Frame().t=TV(x_shift+2*col,y_shift,z_shift+2*row);
             rigid_body->Set_Coefficient_Of_Restitution(0);
             rigid_body->Set_Name("mesh_joint");}
         for(int col=0;col<num_cols+1;col++){
             id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"plank",(T).15,true,with_phi);
             rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
-            rigid_body->X()=TV(x_shift+2*col,y_shift,z_shift+1+2*row);
+            rigid_body->Frame().t=TV(x_shift+2*col,y_shift,z_shift+1+2*row);
             rigid_body->Set_Coefficient_Of_Restitution(0);
             rigid_body->Set_Name("mesh");}            
         if(row==num_rows-1){
             for(int col=0;col<num_cols+1;col++){
                 id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"sphere",(T).15,true,with_phi);
                 rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
-                rigid_body->X()=TV(x_shift+2*col,y_shift,z_shift+2+2*row);
+                rigid_body->Frame().t=TV(x_shift+2*col,y_shift,z_shift+2+2*row);
                 rigid_body->Set_Coefficient_Of_Restitution(0);
                 rigid_body->Set_Name("mesh_joint");}}}
     for(int col=0;col<num_cols;col++){
         id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"plank",(T).15,true,with_phi);
         rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
-        rigid_body->X()=TV(x_shift+1+2*col,y_shift,z_shift+2*num_rows);
-        rigid_body->Rotation()=ROTATION<TV>((T)pi/2,TV(0,1,0));
+        rigid_body->Frame().t=TV(x_shift+1+2*col,y_shift,z_shift+2*num_rows);
+        rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Name("mesh");}
 
@@ -252,24 +252,24 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     handle[1]=&arb->rigid_body_collection.Rigid_Body(2*num_cols+1);
     handle[2]=&arb->rigid_body_collection.Rigid_Body(num_cols*num_rows+2*(num_cols+1)*num_rows+1);
     handle[3]=&arb->rigid_body_collection.Rigid_Body(num_cols*num_rows+2*(num_cols+1)*num_rows+num_cols+1);
-    for(int i=0;i<4;i++){handle[i]->is_static=true;pos[i]=handle[i]->X();}
+    for(int i=0;i<4;i++){handle[i]->is_static=true;pos[i]=handle[i]->Frame().t;}
 
 #if 1
     // boxes
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",1,.5);
-    rigid_body->X()=TV(-3,1.25,-3);
+    rigid_body->Frame().t=TV(-3,1.25,-3);
     rigid_body->Set_Coefficient_Of_Restitution(0.5);
 
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",1,.5);
-    rigid_body->X()=TV(-3,1.25,3);
+    rigid_body->Frame().t=TV(-3,1.25,3);
     rigid_body->Set_Coefficient_Of_Restitution(0.5);
 
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",1,.5);
-    rigid_body->X()=TV(3,1.25,3);
+    rigid_body->Frame().t=TV(3,1.25,3);
     rigid_body->Set_Coefficient_Of_Restitution(0.5);
 
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",1,.5);
-    rigid_body->X()=TV(3,1.25,-3);
+    rigid_body->Frame().t=TV(3,1.25,-3);
     rigid_body->Set_Coefficient_Of_Restitution(0.5);
 #endif
 
@@ -288,7 +288,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     TV center=(T).25*(pos[0]+pos[1]+pos[2]+pos[3]),top(center.x,15,center.z);
     if(frame<12){
         T increment=frame*(T).01;
-        for(int i=0;i<4;i++) handle[i]->X()=TV((1-increment)*pos[i]);}
+        for(int i=0;i<4;i++) handle[i]->Frame().t=TV((1-increment)*pos[i]);}
     
 }
 };

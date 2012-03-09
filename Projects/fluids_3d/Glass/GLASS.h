@@ -234,7 +234,7 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     glass=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/glass_cylinder",(T).03,true,true,false);
-    rigid_body_collection.rigid_body_particle.X(glass)=VECTOR<T,3>(0,(T)0.06,0);
+    rigid_body_collection.rigid_body_particle.frame(glass).t=VECTOR<T,3>(0,(T)0.06,0);
     rigid_body_collection.Rigid_Body(glass).Is_Kinematic()=true;
 
     inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);

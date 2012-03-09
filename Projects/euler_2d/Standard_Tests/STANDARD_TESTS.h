@@ -100,7 +100,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE {}
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id) PHYSBAM_OVERRIDE {return false;}
@@ -262,7 +262,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(test_number==1){
         int sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).05,true,true,false);
         rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Friction((T)1);
-        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.X(sphere)=TV((T).15,(T).05);
+        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).05);
         rigid_body_collection.Rigid_Body(sphere).Set_Mass(pi*.05*.05*10.77);}
     else if(test_number==2){
         TRIANGULATED_AREA<T>& top_boundary=tests.Create_Mattress(GRID<TV>(101,26,RANGE<TV>(TV(0,(T).5),TV((T)1,(T).75))),true,0,(T)3.1538,true);
@@ -333,9 +333,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
 
         int sphere=rigid_body.particle_index;
-        rigid_body.Rotation()=ROTATION<TV>::From_Angle((T)pi/4);
+        rigid_body.Frame().r=ROTATION<TV>::From_Angle((T)pi/4);
         rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Friction((T)1);
-        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.X(sphere)=TV((T).15,(T).04);
+        rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).04);
         
         MASS_PROPERTIES<TV> mass_properties(*curve,true);
         mass_properties.Set_Density((T).1077);
@@ -394,7 +394,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
     if(test_number==1 || test_number==4){
         RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
         int rigid_body_index=0;
-        position=rigid_body_particles.X(rigid_body_index);
+        position=rigid_body_particles.frame(rigid_body_index).t;
         velocity=rigid_body_particles.twist(rigid_body_index).linear;
         rotation=rigid_body_particles.twist(rigid_body_index).angular.x;}
     else if(test_number==3){

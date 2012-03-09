@@ -359,8 +359,7 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         Write_Substep("Before declustered evolution",substep,1);
 
         rigid_bindings.callbacks->Pre_Advance_Unclustered(dt,time);
-        example.solids_evolution->kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particle.X,
-            example.solid_body_collection.rigid_body_collection.rigid_body_particle.rotation,time);
+        example.solids_evolution->kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particle.frame,time);
         example.solids_evolution->kinematic_evolution.Set_External_Velocities(example.solid_body_collection.rigid_body_collection.rigid_body_particle.twist,time,time);
         example.solid_body_collection.rigid_body_collection.Update_Angular_Momentum();
         solids_evolution.Advance_One_Time_Step_Position(dt,time,!example.solids_fluids_parameters.mpi_solid_fluid || example.solids_fluids_parameters.mpi_solid_fluid->Solid_Node());
@@ -369,7 +368,7 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
 
         Write_Substep("After declustered evolution",substep,1);
         NEWMARK_EVOLUTION<TV>& newmark_evolution=dynamic_cast<NEWMARK_EVOLUTION<TV>&>(*example.solids_evolution);
-        example.solids_evolution->Restore_Position_After_Hypothetical_Position_Evolution(newmark_evolution.X_save,newmark_evolution.rigid_X_save,newmark_evolution.rigid_rotation_save);
+        example.solids_evolution->Restore_Position_After_Hypothetical_Position_Evolution(newmark_evolution.X_save,newmark_evolution.rigid_frame_save);
         rigid_bindings.Reactivate_Bindings(active_clusters);
         Write_Substep("After restore",substep,1);
 
@@ -605,7 +604,7 @@ Solid_Position_Update(const T dt,const int substep)
         if((solids_parameters.triangle_collision_parameters.repulsion_pair_update_count++)%solids_parameters.triangle_collision_parameters.repulsion_pair_update_frequency==0){
             example.solid_body_collection.deformable_body_collection.triangle_repulsions.Update_Faces_And_Hierarchies_With_Collision_Free_Positions(&deformable_body_collection.particles.X);
             example.solid_body_collection.deformable_body_collection.triangle_repulsions.Compute_Interaction_Pairs(deformable_body_collection.particles.X);}
-        solids_evolution.kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particle.X,example.solid_body_collection.rigid_body_collection.rigid_body_particle.rotation,time);
+        solids_evolution.kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particle.frame,time);
         solids_evolution.kinematic_evolution.Set_External_Velocities(example.solid_body_collection.rigid_body_collection.rigid_body_particle.twist,time,time);
         example.solid_body_collection.rigid_body_collection.Update_Angular_Momentum();
         solids_evolution.Advance_One_Time_Step_Position(dt,time,!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node());
@@ -617,7 +616,7 @@ Solid_Position_Update(const T dt,const int substep)
             solids_parameters.triangle_collision_parameters.steps_since_self_collision_free=0;}}
     else{
         solids_evolution_callbacks->Update_Solids_Parameters(time+dt);
-        solids_evolution.kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particle.X,example.solid_body_collection.rigid_body_collection.rigid_body_particle.rotation,time+dt);
+        solids_evolution.kinematic_evolution.Set_External_Positions(example.solid_body_collection.rigid_body_collection.rigid_body_particle.frame,time+dt);
         solids_evolution.kinematic_evolution.Set_External_Velocities(example.solid_body_collection.rigid_body_collection.rigid_body_particle.twist,time+dt,time+dt);
         example.solid_body_collection.rigid_body_collection.Update_Angular_Momentum();
         dynamic_cast<NEWMARK_EVOLUTION<TV>&>(solids_evolution).Backward_Euler_Step_Velocity_Helper(dt/2,time,time,false);}

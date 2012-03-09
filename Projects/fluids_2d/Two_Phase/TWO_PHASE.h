@@ -156,7 +156,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     if(test_number==2||test_number==3){
         sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).001,true,true,false);
-        rigid_body_collection.rigid_body_particle.X(sphere)=TV((T).0,(T).005);
+        rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).0,(T).005);
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=true;}
     if(use_inaccurate_body_collisions){
         inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);

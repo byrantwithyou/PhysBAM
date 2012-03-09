@@ -345,7 +345,7 @@ void Get_Constrained_Particle_Data()
             RIGID_BODY<TV>& plank_rigid_body=*arb->rigid_body_list.rigid_bodies(plank_ids(p));
             if (!plank_rigid_body.Implicit_Geometry_Lazy_Outside(particles.X(i))) {
                 enslaved_nodes(p).Append(i);
-//                positions_relative_to_plank_frames(p).Append(plank_rigid_body.Rotation().Inverse_Rotate(particles.X(i)-plank_rigid_body.X()));}}}
+//                positions_relative_to_plank_frames(p).Append(plank_rigid_body.Frame().r.Inverse_Rotate(particles.X(i)-plank_rigid_body.Frame().t));}}}
                 positions_relative_to_plank_frames(p).Append(plank_rigid_body.Frame().Inverse_Times(particles.X(i)));}}}
 }
 //#####################################################################
@@ -371,7 +371,7 @@ void Simple_Muscle_Across_Joint()
         int id=plank_ids(i)=solids_parameters.rigid_body_parameters.list.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/plank",(T).2);
         RIGID_BODY<TV>* rigid_body=&rigid_body_particles.Rigid_Body(id);
         rigid_body->simplicial_object->Rescale(plank_rescale.x,plank_rescale.y,plank_rescale.z);
-        rigid_body->Rotation()=QUATERNION<T>(pi/2,TV(0,1,0));
+        rigid_body->Frame().r=QUATERNION<T>(pi/2,TV(0,1,0));
         rigid_body->Set_Coefficient_Of_Restitution(0.5);
         rigid_body->Set_Coefficient_Of_Friction(1);
         rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("body_%d",i));

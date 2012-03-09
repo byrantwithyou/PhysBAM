@@ -82,7 +82,7 @@ Advance_To_Target_Time(const T target_time)
         if((triangle_collision_parameters.repulsion_pair_update_count++)%triangle_collision_parameters.repulsion_pair_update_frequency==0){
             example.deformable_body_collection.triangle_repulsions.Update_Faces_And_Hierarchies_With_Collision_Free_Positions(&example.deformable_body_collection.particles.X);
             example.deformable_body_collection.triangle_repulsions.Compute_Interaction_Pairs(example.deformable_body_collection.particles.X);}
-        example.deformables_evolution->kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.X,example.rigid_geometry_collection.particles.rotation,time);
+        example.deformables_evolution->kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);
         example.deformables_evolution->kinematic_evolution.Set_External_Velocities(example.rigid_geometry_collection.particles.twist,time,time);
         example.deformables_evolution->Advance_One_Time_Step_Position(dt,time);
 

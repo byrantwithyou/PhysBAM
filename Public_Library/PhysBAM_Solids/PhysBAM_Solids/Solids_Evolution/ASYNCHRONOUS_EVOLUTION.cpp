@@ -154,8 +154,7 @@ Rewind_Coarsescale_Particle_Positions()
     for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++) if (!finescale_forces_particles_map.Contains(i)){
         solid_body_collection.deformable_body_collection.particles.X(i)=X_n(i);}
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if (!finescale_forces_rigid_body_particles_map.Contains(i)){
-        solid_body_collection.rigid_body_collection.rigid_body_particle.X(i)=rigid_X_n(i);
-        solid_body_collection.rigid_body_collection.rigid_body_particle.rotation(i)=rigid_rotation_n(i);}
+        solid_body_collection.rigid_body_collection.rigid_body_particle.frame(i)=rigid_frame_n(i);}
 }
 //#####################################################################
 // Function Store_State
@@ -166,8 +165,7 @@ Store_State(const T time)
     X_n=solid_body_collection.deformable_body_collection.particles.X;
     V_n=solid_body_collection.deformable_body_collection.particles.V;
     twist_n=solid_body_collection.rigid_body_collection.rigid_body_particle.twist;
-    rigid_X_n=solid_body_collection.rigid_body_collection.rigid_body_particle.X;
-    rigid_rotation_n=solid_body_collection.rigid_body_collection.rigid_body_particle.rotation;
+    rigid_frame_n=solid_body_collection.rigid_body_collection.rigid_body_particle.frame;
     angular_momentum_n=solid_body_collection.rigid_body_collection.rigid_body_particle.angular_momentum;
     time_n=time;
 }
@@ -180,8 +178,7 @@ Store_Time_np1_State()
     X_np1=solid_body_collection.deformable_body_collection.particles.X;
     V_np1=solid_body_collection.deformable_body_collection.particles.V;
     twist_np1=solid_body_collection.rigid_body_collection.rigid_body_particle.twist;
-    rigid_X_np1=solid_body_collection.rigid_body_collection.rigid_body_particle.X;
-    rigid_rotation_np1=solid_body_collection.rigid_body_collection.rigid_body_particle.rotation;
+    rigid_frame_np1=solid_body_collection.rigid_body_collection.rigid_body_particle.frame;
     angular_momentum_np1=solid_body_collection.rigid_body_collection.rigid_body_particle.angular_momentum;
 }
 //#####################################################################
@@ -193,8 +190,7 @@ Store_Time_Last_Finescale_State()
     X_last_finescale=solid_body_collection.deformable_body_collection.particles.X;
     V_last_finescale=solid_body_collection.deformable_body_collection.particles.V;
     twist_last_finescale=solid_body_collection.rigid_body_collection.rigid_body_particle.twist;
-    rigid_X_last_finescale=solid_body_collection.rigid_body_collection.rigid_body_particle.X;
-    rigid_rotation_last_finescale=solid_body_collection.rigid_body_collection.rigid_body_particle.rotation;
+    rigid_frame_last_finescale=solid_body_collection.rigid_body_collection.rigid_body_particle.frame;
     angular_momentum_last_finescale=solid_body_collection.rigid_body_collection.rigid_body_particle.angular_momentum;
 }
 //#####################################################################

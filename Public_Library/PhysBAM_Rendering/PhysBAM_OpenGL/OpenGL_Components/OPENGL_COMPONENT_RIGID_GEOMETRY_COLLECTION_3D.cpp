@@ -425,7 +425,7 @@ Update_Object_Labels()
     int idx=0;
     for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++) if(draw_object(i)){
         if(draw_velocity_vectors || draw_angular_velocity_vectors){idx++;
-            positions(idx)=rigid_geometry_collection->particles.X(i);
+            positions(idx)=rigid_geometry_collection->particles.frame(i).t;
             if(draw_velocity_vectors)
                 velocity_vectors(idx)=rigid_geometry_collection->particles.twist(i).linear;
             if(draw_angular_velocity_vectors){
@@ -433,7 +433,7 @@ Update_Object_Labels()
                 angular_velocity_vectors(idx)=rigid_geometry_collection->particles.twist(i).angular;}}
         if(opengl_triangulated_surface(i)){
             if(output_positions)
-                opengl_triangulated_surface(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f %.3f>",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.X(i).x,rigid_geometry_collection->particles.X(i).y,rigid_geometry_collection->particles.X(i).z));
+                opengl_triangulated_surface(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f %.3f %.3f>",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.frame(i).t.x,rigid_geometry_collection->particles.frame(i).t.y,rigid_geometry_collection->particles.frame(i).t.z));
             else opengl_triangulated_surface(i)->Set_Name(rigid_geometry_collection->Rigid_Geometry(i).name);}}
 }
 //#####################################################################
@@ -545,7 +545,7 @@ Display(const int in_color) const
         glColor3f(1,1,1);
         for(int i=0;i<opengl_triangulated_surface.Size();i++)
             if(draw_object(i) && rigid_geometry_collection->Rigid_Geometry(i).name.length())
-                OpenGL_String(rigid_geometry_collection->particles.X(i),rigid_geometry_collection->Rigid_Geometry(i).name);
+                OpenGL_String(rigid_geometry_collection->particles.frame(i).t,rigid_geometry_collection->Rigid_Geometry(i).name);
         glPopAttrib();}
 #endif
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();

@@ -105,7 +105,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
@@ -352,7 +352,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize_Joint_Between_For_Parallel(JOINT<TV>* joint,const RIGID_BODY<TV>& parent,const RIGID_BODY<TV>& child,const RIGID_BODY<TV>& parent_cluster,const RIGID_BODY<TV>& child_cluster,ROTATION<TV> rotation,T ratio)
 {
-    FRAME<TV> J((ratio*child.X()+(1-ratio)*parent.X()),rotation);
+    FRAME<TV> J((ratio*child.Frame().t+(1-ratio)*parent.Frame().t),rotation);
     joint->Set_Parent_To_Joint_Frame(J.Inverse_Times(parent_cluster.Frame()));
     joint->Set_Child_To_Joint_Frame(J.Inverse_Times(child_cluster.Frame()));
 }
@@ -415,7 +415,7 @@ void Cylinder_And_Block()
     T friction=(T)0;
     RIGID_BODY<TV>& kinematic_body=tests.Add_Rigid_Body("square_refined",(T).95,friction);
     kinematic_body.Is_Kinematic()=1;
-    kinematic_body.X()=TV(0,(T)1);
+    kinematic_body.Frame().t=TV(0,(T)1);
     kinematic_body.Update_Bounding_Box();
 
     T width=0;
@@ -425,8 +425,8 @@ void Cylinder_And_Block()
         //default: width=(T)2;}
     width=.25;
     RIGID_BODY<TV>& dynamic_body=tests.Add_Analytic_Box(TV(width,(T)4));
-    dynamic_body.Rotation()=ROTATION<TV>::From_Angle((T)pi*initial_angle/180);
-    dynamic_body.X()=TV(0,(T)1)+(T)3*dynamic_body.Rotation().Rotate(TV(0,(T)1));
+    dynamic_body.Frame().r=ROTATION<TV>::From_Angle((T)pi*initial_angle/180);
+    dynamic_body.Frame().t=TV(0,(T)1)+(T)3*dynamic_body.Frame().r.Rotate(TV(0,(T)1));
     dynamic_body.Update_Bounding_Box();
 
     static const T volume=width*(T)4;
@@ -520,7 +520,7 @@ void Joints_From_List(int joint_type)
         arb.joint_mesh.Add_Articulation(id,id+1,joint);
         controller->objective(joint->id_number)=DRAG;
         joint->Set_Joint_To_Parent_Frame(FRAME<TV>());
-        //joint->Set_Joint_To_Child_Frame(FRAME<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.X(id).t-solid_body_collection.rigid_body_collection.Rigid_Body(id+1).Frame(),solid_body_collection.rigid_body_collection.Rigid_Body(id+1).Rotation().Inverse()));
+        //joint->Set_Joint_To_Child_Frame(FRAME<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.X(id).t-solid_body_collection.rigid_body_collection.Rigid_Body(id+1).Frame(),solid_body_collection.rigid_body_collection.Rigid_Body(id+1).Frame().r.Inverse()));
         joint->Set_Joint_To_Child_Frame(solid_body_collection.rigid_body_collection.Rigid_Body(id+1).Frame().Inverse()*solid_body_collection.rigid_body_collection.Rigid_Body(id).Frame());
         JOINT_FUNCTION<TV>* joint_function=arb.Create_Joint_Function(joint->id_number);
         joint_function->Set_k_p(1000);}

@@ -103,11 +103,11 @@ void Parse_Options() PHYSBAM_OVERRIDE
         int rigid_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/square_refined",(T).1,true,true,false);
         rigid=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
         //rigid->is_kinematic=true;
-        rigid->X()=TV((T).5,(T).4);
+        rigid->Frame().t=TV((T).5,(T).4);
         rigid->coefficient_of_restitution=(T)0;
         rigid2=&solid_body_collection.rigid_body_collection.Rigid_Body(rigid_id);
         //rigid->is_kinematic=true;
-        //rigid2->X()=TV((T).1,(T).4);
+        //rigid2->Frame().t=TV((T).1,(T).4);
         //rigid2->is_kinematic=true;
         int ground_id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",(T)1,true,true,false);
         solid_body_collection.rigid_body_collection.Rigid_Body(ground_id).is_static=true;

@@ -124,7 +124,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     V_all=B_all;
     rigid_body_collection.Update_Angular_Momentum();
     Diagnostics(dt,current_position_time,0,0,604,"Before boundary conditions");
-    system.Set_Global_Boundary_Conditions(V_all,X_save,rigid_X_save,rigid_rotation_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
+    system.Set_Global_Boundary_Conditions(V_all,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
         solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
     if(velocity_update && !solids_parameters.use_post_cg_constraints){
         Apply_Constraints(dt,current_velocity_time);}
@@ -254,7 +254,7 @@ Average_And_Exchange_Position()
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     assert(X_save.m==particles.array_collection->Size());
-    assert(rigid_X_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size() && rigid_rotation_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size());
+    assert(rigid_frame_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size());
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
     INDIRECT_ARRAY<ARRAY<TV> > X_save_fragment(X_save,simulated_particles);
@@ -262,12 +262,9 @@ Average_And_Exchange_Position()
     for(int i=0;i<X_fragment.Size();i++){TV X_average=(T).5*(X_fragment(i)+X_save_fragment(i));X_save_fragment(i)=X_fragment(i);X_fragment(i)=X_average;}
     ARRAY<int> rigid_body_indices(simulated_rigid_body_particles);rigid_body_indices.Append_Elements(solid_body_collection.rigid_body_collection.kinematic_rigid_bodies);
     for(int i=0;i<rigid_body_indices.Size();i++){int p=rigid_body_indices(i);
-        TV tmp_X=TV::Interpolate(rigid_body_collection.rigid_body_particle.X(p),rigid_X_save(p),(T).5);
-        rigid_X_save(p)=rigid_body_collection.rigid_body_particle.X(p);
-        rigid_body_collection.rigid_body_particle.X(p)=tmp_X;
-        ROTATION<TV> tmp_rotation=ROTATION<TV>::Spherical_Linear_Interpolation(rigid_body_collection.rigid_body_particle.rotation(p),rigid_rotation_save(p),(T).5);
-        rigid_rotation_save(p)=rigid_body_collection.rigid_body_particle.rotation(p);
-        rigid_body_collection.rigid_body_particle.rotation(p)=tmp_rotation;}
+        FRAME<TV> tmp=FRAME<TV>::Interpolation(rigid_body_collection.rigid_body_particle.frame(p),rigid_frame_save(p),(T).5);
+        rigid_frame_save(p)=rigid_body_collection.rigid_body_particle.frame(p);
+        rigid_body_collection.rigid_body_particle.frame(p)=tmp;}
     for(int i=0;i<rigid_body_indices.m;i++) rigid_body_collection.Rigid_Body(rigid_body_indices(i)).Update_Angular_Velocity();
 }
 //#####################################################################
@@ -362,7 +359,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
 
         // save position and velocity for later trapezoidal rule
         Save_Velocity();
-        Save_Position(X_save,rigid_X_save,rigid_rotation_save);
+        Save_Position(X_save,rigid_frame_save);
 
         if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions) solid_body_collection.deformable_body_collection.collisions.Activate_Collisions(false);}
 
@@ -401,7 +398,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     Process_Collisions(dt,time,advance_rigid_bodies);
     Diagnostics(dt,time,0,2,12,"add elastic collisions");
 
-    Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
+    Restore_Position(X_save,rigid_frame_save);
     Diagnostics(dt,time,0,0,13,"restore position");
     if(advance_rigid_bodies){
         articulated_rigid_body.Apply_Poststabilization(solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
@@ -512,7 +509,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
 {
     if(solids_parameters.use_rigid_deformable_contact)
-        rigid_deformable_collisions->Add_Elastic_Collisions(dt,time,rigid_rotation_save,rigid_angular_momentum_difference,rigid_velocity_difference,rigid_X_save,rigid_velocity_save,
+        rigid_deformable_collisions->Add_Elastic_Collisions(dt,time,rigid_frame_save,rigid_angular_momentum_difference,rigid_velocity_difference,rigid_velocity_save,
             rigid_angular_momentum_save,X_save,V_save);
     else if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions){
         if(solids_parameters.rigid_body_collision_parameters.perform_collisions && advance_rigid_bodies) rigid_body_collisions->Add_Elastic_Collisions(dt,time);
@@ -556,7 +553,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids)
         solids_evolution_callbacks->Filter_Velocities(dt,time+dt,true);
         Diagnostics(dt,time,2,1,29,"trazepoid rule");
 
-        Restore_Position(X_save,rigid_X_save,rigid_rotation_save); // move to final positions at time time+dt
+        Restore_Position(X_save,rigid_frame_save); // move to final positions at time time+dt
         Diagnostics(dt,time,2,2,30,"restore position");
         if(advance_rigid_bodies){
             articulated_rigid_body.Apply_Poststabilization(solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
@@ -606,14 +603,14 @@ Apply_Constraints(const T dt,const T time)
             articulated_rigid_body.Compute_Position_Based_State(dt,time);
             articulated_rigid_body.Solve_Velocities_for_PD(time,dt,solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);}
         Diagnostics(dt,time,2,2,35,"solve velocities for pd");}
-    Save_Position(X_save_for_constraints,rigid_X_save_for_constraints,rigid_rotation_save_for_constraints);
+    Save_Position(X_save_for_constraints,rigid_frame_save_for_constraints);
     if(solids_parameters.rigid_body_collision_parameters.use_persistant_contact){rigid_deformable_collisions->Process_Precomputed_Contact_With_Rigid_Bodies();use_existing_contact=true;}
     Diagnostics(dt,time,2,2,137,"consistent contact");
     Update_Positions_And_Apply_Contact_Forces(dt,time,true);use_existing_contact=false;
     Diagnostics(dt,time,4,2,37,"contact, prestabilization");
     if(rigid_body_collisions->prune_stacks_from_contact) rigid_body_collisions->Construct_Stacks();
     if(rigid_body_collisions->prune_contact_using_velocity) rigid_body_collisions->Compute_Contact_Frequency();
-    Restore_Position(X_save_for_constraints,rigid_X_save_for_constraints,rigid_rotation_save_for_constraints);
+    Restore_Position(X_save_for_constraints,rigid_frame_save_for_constraints);
     Diagnostics(dt,time,2,2,38,"restore position");
     if(advance_rigid_bodies){
         articulated_rigid_body.Apply_Poststabilization(solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
@@ -685,8 +682,8 @@ Update_Positions_And_Apply_Contact_Forces(const T dt,const T time,const bool use
         rigid_body.Update_Bounding_Box();}
 
     if(solids_parameters.use_rigid_deformable_contact){
-        rigid_deformable_collisions->Process_Contact(dt,time,articulated_rigid_body,use_saved_pairs,use_existing_contact,rigid_X_save,
-            rigid_rotation_save,rigid_velocity_difference,rigid_angular_momentum_difference,X_save,solids_parameters.rigid_body_collision_parameters.collision_body_thickness);
+        rigid_deformable_collisions->Process_Contact(dt,time,articulated_rigid_body,use_saved_pairs,use_existing_contact,rigid_frame_save,rigid_velocity_difference,
+            rigid_angular_momentum_difference,X_save,solids_parameters.rigid_body_collision_parameters.collision_body_thickness);
         // TODO: rigid/deformable shock propagation step
         if(solids_parameters.rigid_body_collision_parameters.perform_contact && solids_parameters.rigid_body_collision_parameters.use_shock_propagation)
             rigid_body_collisions->Shock_Propagation_Using_Graph(dt,time,articulated_rigid_body,use_saved_pairs);}
@@ -815,10 +812,10 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
     // initialize kinematic object positions and velocities
     if(!restart){
         kinematic_evolution.Get_Current_Kinematic_Keyframes(1/frame_rate,time);
-        kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.X,rigid_body_collection.rigid_body_particle.rotation,time);
+        kinematic_evolution.Set_External_Positions(rigid_body_collection.rigid_body_particle.frame,time);
         kinematic_evolution.Set_External_Velocities(rigid_body_collection.rigid_body_particle.twist,time,time);
         rigid_body_collection.Update_Angular_Momentum();
-        for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){rigid_body_collection.rigid_body_particle.rotation(i).Normalize();}}
+        for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){rigid_body_collection.rigid_body_particle.frame(i).r.Normalize();}}
 
     RIGID_BODY_COLLISIONS<TV>::Adjust_Bounding_Boxes(rigid_body_collection);
     // rigid body collisions

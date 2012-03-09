@@ -74,7 +74,7 @@ public:
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
@@ -122,7 +122,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,(T).6);
             rigid_body.is_static=true;
             rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
-            rigid_body.X()=TV((i-(num_poles+1)/(T)2)*7,10,(j-(num_poles+1)/(T)2)*7);}}
+            rigid_body.Frame().t=TV((i-(num_poles+1)/(T)2)*7,10,(j-(num_poles+1)/(T)2)*7);}}
 
     tests.Add_Ground((T).5,0,(T).5);
     tests.Add_Gravity();
@@ -142,8 +142,8 @@ void Make_Block_Chain(TV shift,ROTATION<TV> orient,int& num_joints,int& num_bodi
     for(int i=0;i<12;i++){
         int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/subdivided_box");
         rigid_bodies[i]=&arb->rigid_body_collection.Rigid_Body(id);
-        rigid_bodies[i]->X()=orient.Rotate(positions[i])+shift;
-        rigid_bodies[i]->Rotation()=orient;
+        rigid_bodies[i]->Frame().t=orient.Rotate(positions[i])+shift;
+        rigid_bodies[i]->Frame().r=orient;
         rigid_bodies[i]->Set_Coefficient_Of_Restitution(0.5);}
 
     rigid_bodies[12]=rigid_bodies[0];

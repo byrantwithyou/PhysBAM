@@ -389,8 +389,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRIDE
 {   
-    solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Set_Frame(attachment_frame_controls->Cranium_Frame());
-    solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->Set_Frame(attachment_frame_controls->Jaw_Frame());
+    solids_parameters.rigid_body_parameters.list.rigid_bodies(1)->Frame()=attachment_frame_controls->Cranium_Frame();
+    solids_parameters.rigid_body_parameters.list.rigid_bodies(2)->Frame()=attachment_frame_controls->Jaw_Frame();
 }
 //#####################################################################
 };

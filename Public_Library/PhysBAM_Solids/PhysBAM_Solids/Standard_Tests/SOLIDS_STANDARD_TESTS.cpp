@@ -78,7 +78,7 @@ Bind_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& particle_
 // Function PD_Curl
 //#####################################################################
 template<class TV> void SOLIDS_STANDARD_TESTS<TV>::
-PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const int number_of_joints,const bool parent_static,const T friction)
+PD_Curl(const T scale,const FRAME<TV>& frame,const T k_p,const int number_of_joints,const bool parent_static,const T friction)
 {
     PHYSBAM_ASSERT(scale>0);
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
@@ -87,8 +87,7 @@ PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const
 
     // Create first body
     parent_body=&Add_Rigid_Body("miniplank25wide2",scale,friction);
-    parent_body->X()=shift;
-    parent_body->Rotation()=orient;
+    parent_body->Frame()=frame;
     parent_body->Set_Name("parent");
     parent_body->Set_Mass(50);
     parent_body->is_static=parent_static;
@@ -98,8 +97,7 @@ PD_Curl(const T scale,const TV shift,const ROTATION<TV> orient,const T k_p,const
     for(int i=0;i<number_of_joints;i++){
         cheight+=scale*(T)1.25;
         child_body=&Add_Rigid_Body("miniplank25wide2",scale,friction);
-        child_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-        child_body->Rotation()=orient;
+        child_body->Frame()=frame*FRAME<TV>(TV(cheight,0,0));
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
         child_body->Set_Mass(50);
@@ -129,7 +127,7 @@ Create_Rigid_Body_From_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahe
     mass_properties.Set_Density(density);rigid_body->Mass().mass=mass_properties.Mass();
     FRAME<TV> frame_local;
     mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles));
-    rigid_body->Set_Frame(frame_local);
+    rigid_body->Frame()=frame_local;
     rigid_body->Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(tetrahedralized_volume,*tetrahedralized_volume.triangulated_surface,cell_size,subdivision_loops,
         create_levelset_test,use_levelset_maker,levels_of_octree);
     return rigid_body;
@@ -154,7 +152,7 @@ Create_Rigid_Body_From_Fracture_Tetrahedralized_Volume(EMBEDDED_MATERIAL_SURFACE
     mass_properties.Set_Density(density);rigid_body->Mass().mass=mass_properties.Mass();
     FRAME<TV> frame_local;
     mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles));
-    rigid_body->Set_Frame(frame_local);
+    rigid_body->Frame()=frame_local;
     embedded_material_surface.embedded_object.Update_Embedded_Particle_Positions();
     rigid_body->Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(tetrahedralized_volume,material_surface,cell_size,subdivision_loops,create_levelset_test,
         use_levelset_maker,levels_of_octree);
@@ -172,7 +170,7 @@ Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulate
     mass_properties.Set_Density(density);rigid_body->Mass()=mass_properties.Mass();
     FRAME<TV> frame_local;
     mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Inertia_Tensor(),dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(triangulated_surface.particles));
-    rigid_body->Set_Frame(frame_local);
+    rigid_body->Frame()=frame_local;
     rigid_body->Add_Structure(triangulated_surface);
     return rigid_body;
 }
@@ -248,7 +246,7 @@ Create_Rigid_Body_From_Triangulated_Area(TRIANGULATED_AREA<T>& triangulated_area
 #define INSTANTIATION_HELPER2(T) \
     INSTANTIATION_HELPER2_1D(T) \
     INSTANTIATION_HELPER2_ALL(T,3) \
-    template void SOLIDS_STANDARD_TESTS<VECTOR<T,3> >::PD_Curl(const T,const VECTOR<T,3>,const ROTATION<VECTOR<T,3> >,const T,const int,const bool,const T);
+    template void SOLIDS_STANDARD_TESTS<VECTOR<T,3> >::PD_Curl(const T,const FRAME<VECTOR<T,3> >&,const T,const int,const bool,const T);
 
 INSTANTIATION_HELPER2(float);
 template SOLIDS_STANDARD_TESTS<VECTOR<float,2> >::SOLIDS_STANDARD_TESTS(EXAMPLE<VECTOR<float,2> >&,SOLID_BODY_COLLECTION<VECTOR<float,2> >&);

@@ -82,7 +82,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 // Function Set_Global_Boundary_Conditions
 //#####################################################################
 template<class TV> void BACKWARD_EULER_SYSTEM<TV>::
-Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,
+Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& rigid_frame_save,
     ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,ARRAY<TV>& V_save,bool test_system,bool print_matrix) const
 {
     SOLIDS_PARAMETERS<TV>& solids_parameters=solids_evolution.solids_parameters;
@@ -98,12 +98,10 @@ Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_
         PHYSBAM_ASSERT(ARRAY_VIEW<TV>::Same_Array(V.V.array,solid_body_collection.deformable_body_collection.particles.V) && ARRAY_VIEW<TWIST<TV> >::Same_Array(V.rigid_V.array,solid_body_collection.rigid_body_collection.rigid_body_particle.twist));
         if(solids_parameters.use_post_cg_constraints){// TODO: may just want to call Apply_Constraints in this case too
             if(solids_evolution.solids_parameters.use_rigid_deformable_contact && solid_body_collection.deformable_body_collection.collisions.collisions_on)
-            {
-                ARRAY_VIEW<const ROTATION<TV> > rigid_rotation_save_array_view(rigid_rotation_save);
-                solids_evolution.rigid_deformable_collisions->Set_Collision_Velocities(V.V.array,V.rigid_V.array,X_save,rigid_X_save,rigid_rotation_save_array_view,rigid_velocity_save,rigid_angular_momentum_save,V_save);
-            }
+                solids_evolution.rigid_deformable_collisions->Set_Collision_Velocities(V.V.array,V.rigid_V.array,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save);
             if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,false,false);}}
 }
+
 //#####################################################################
 // Function Project
 //#####################################################################

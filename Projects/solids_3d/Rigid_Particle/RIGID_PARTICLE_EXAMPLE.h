@@ -86,8 +86,8 @@ virtual void Get_Initial_Data()
     // rigid bodies
     for(int i=0;i<3;i++){
         solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/subdivided_box",(T)1.0);
-        rigid_body_collection.rigid_body_particle.X(i)=TV((T)5*i+(T).5,initial_height,0);
-        rigid_body_collection.rigid_body_particle.rotation(i)=ROTATION<TV>::From_Rotation_Vector(TV());
+        rigid_body_collection.rigid_body_particle.frame(i).t=TV((T)5*i+(T).5,initial_height,0);
+        rigid_body_collection.rigid_body_particle.frame(i).r=ROTATION<TV>::From_Rotation_Vector(TV());
         rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Friction(0);
         rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T).5);
         T mass_scale_factor=10/rigid_body_collection.rigid_body_particle.mass(i);
@@ -161,7 +161,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T veloc
 //#####################################################################
 void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM_OVERRIDE
 {
-    if(id==ground_id) frame.t.x=solid_body_collection.rigid_body_collection.rigid_body_particle.X(2).x;
+    if(id==ground_id) frame.t.x=solid_body_collection.rigid_body_collection.rigid_body_particle.frame(2).t.x;
 }
 //#####################################################################
 };

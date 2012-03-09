@@ -52,7 +52,7 @@ template<class TV> void SOLID_SYSTEM_MPI_SLIP<TV>::
 Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& BV) const
 {
     VECTOR_T& V=debug_cast<VECTOR_T&>(BV);
-    solid_system.Set_Global_Boundary_Conditions(V,newmark_evolution.X_save,newmark_evolution.rigid_X_save,newmark_evolution.rigid_rotation_save,newmark_evolution.rigid_velocity_save,
+    solid_system.Set_Global_Boundary_Conditions(V,newmark_evolution.X_save,newmark_evolution.rigid_frame_save,newmark_evolution.rigid_velocity_save,
         newmark_evolution.rigid_angular_momentum_save,newmark_evolution.V_save,newmark_evolution.solids_parameters.implicit_solve_parameters.test_system,
         newmark_evolution.solids_parameters.implicit_solve_parameters.print_matrix);
 }

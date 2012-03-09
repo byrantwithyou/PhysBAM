@@ -242,7 +242,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     point_simplices.Update_Point_Simplex_List();
     
     rigid_body->Add_Structure(point_simplices);
-    rigid_body->X()=TV(piston_initial_position);
+    rigid_body->Frame().t=TV(piston_initial_position);
     rigid_body->Twist().linear=TV(piston_speed);
     rigid_body->Is_Kinematic()=true;
     piston=rigid_body_collection.Add_Rigid_Body_And_Geometry(rigid_body);

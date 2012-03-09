@@ -46,15 +46,14 @@ Rigid_Cluster_Fracture(const T dt_full_advance,const T dt_cfl,const int substep)
         example.rigid_body_collection.Update_Simulated_Particles();
 
         rigid_bindings.callbacks->Pre_Advance_Unclustered(dt,time);
-        example.rigids_evolution->kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particle.X,
-            example.rigid_body_collection.rigid_body_particle.rotation,time);
+        example.rigids_evolution->kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particle.frame,time);
         example.rigids_evolution->kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particle.twist,time,time);
         example.rigid_body_collection.Update_Angular_Momentum();
         rigids_evolution.Advance_One_Time_Step_Position(dt,time,true);
         rigid_bindings.callbacks->Post_Advance_Unclustered(dt,time);
         rigid_bindings.callbacks->Compute_New_Clusters_Based_On_Unclustered_Strain();
 
-        example.rigids_evolution->Restore_Position(rigids_evolution.rigid_X_save,rigids_evolution.rigid_rotation_save);
+        example.rigids_evolution->Restore_Position(rigids_evolution.rigid_frame_save);
         rigid_bindings.Reactivate_Bindings(active_clusters);
 
         rigid_bindings.callbacks->Create_New_Clusters();
@@ -104,8 +103,7 @@ Advance_To_Target_Time(const T target_time)
         Rigid_Cluster_Fracture(target_time-time,dt,substep);
 
         example.Preprocess_Substep(dt,time);
-        rigids_evolution.kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particle.X,
-            example.rigid_body_collection.rigid_body_particle.rotation,time);
+        rigids_evolution.kinematic_evolution.Set_External_Positions(example.rigid_body_collection.rigid_body_particle.frame,time);
         rigids_evolution.kinematic_evolution.Set_External_Velocities(example.rigid_body_collection.rigid_body_particle.twist,time,time);
         example.rigid_body_collection.Update_Angular_Momentum();
         rigids_evolution.Advance_One_Time_Step_Position(dt,time,true);

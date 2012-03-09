@@ -66,7 +66,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 // Function Set_Global_Boundary_Conditions
 //#####################################################################
 template<class TV> void RIGIDS_BACKWARD_EULER_SYSTEM<TV>::
-Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save,
+Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<FRAME<TV> >& rigid_frame_save,
     ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_save,bool test_system,bool print_matrix) const
 {
     rigids_evolution.kinematic_evolution.Set_External_Velocities(V.rigid_V.array,current_velocity_time+dt,current_position_time);

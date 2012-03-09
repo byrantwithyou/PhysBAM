@@ -155,7 +155,7 @@ public:
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
     void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
 
 //#####################################################################
 // Function Register_Options
@@ -353,9 +353,9 @@ void Hanging_Sphere()
 
     RIGID_BODY<TV>& box=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
     box.is_static=true;
-    box.X()=TV(0,3,0);
+    box.Frame().t=TV(0,3,0);
     RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,(T)0);
-    sphere.X()=TV();
+    sphere.Frame().t=TV();
 
     LOG::cout<<"we currently have particles.array_collection->Size()= "<<particles.array_collection->Size()<<std::endl;
     particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
@@ -403,8 +403,8 @@ void Rigid_Spring()
 {
     RIGID_BODY<TV>& body_a=tests.Add_Rigid_Body("sphere",1,(T)0);
     RIGID_BODY<TV>& body_b=tests.Add_Rigid_Body("sphere",1,(T)0);
-    body_a.Set_Frame(FRAME<TV>(TV(0,0,0)));
-    body_b.Set_Frame(FRAME<TV>(TV(3,0,0)));
+    body_a.Frame()=FRAME<TV>(TV(0,0,0));
+    body_b.Frame()=FRAME<TV>(TV(3,0,0));
 
     TV at[6]={TV(),TV(),TV(1,0,0),TV(0,1,0),TV(0,0,1),TV(1,1,1)};
 
@@ -424,7 +424,7 @@ void Rigid_Spring_Cloth()
     ARRAY<int,VECTOR<int,2> > body_indices(0,grid_m,0,grid_n);
     for(int i=0;i<grid_m;i++)for(int j=0;j<grid_n;j++){
         RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",1,(T)0);
-        body.Set_Frame(FRAME<TV>(TV(2*i,0,2*j)));
+        body.Frame()=FRAME<TV>(TV(2*i,0,2*j));
         body_indices(i,j)=body.particle_index;}
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
@@ -454,9 +454,9 @@ void Single_Particle()
     RIGID_BODY<TV>& body_a=tests.Add_Rigid_Body("sphere",1,(T)0);body_a.Set_Mass(FLT_MAX);
     RIGID_BODY<TV>& body_b=tests.Add_Rigid_Body("sphere",1,(T)0);
     RIGID_BODY<TV>& body_c=tests.Add_Rigid_Body("sphere",1,(T)0);body_c.Set_Mass(FLT_MAX);
-    body_a.Set_Frame(FRAME<TV>(TV(-3,0,0)));
-    body_b.Set_Frame(FRAME<TV>(TV(.5,0,0)));
-    body_c.Set_Frame(FRAME<TV>(TV(3,0,0)));
+    body_a.Frame()=FRAME<TV>(TV(-3,0,0));
+    body_b.Frame()=FRAME<TV>(TV(.5,0,0));
+    body_c.Frame()=FRAME<TV>(TV(3,0,0));
 
     RIGID_LINEAR_SPRINGS<TV>* spring=new RIGID_LINEAR_SPRINGS<TV>(rigid_body_collection);
     spring->Add_Spring(body_a.particle_index,body_b.particle_index,TV(),TV());
@@ -479,7 +479,7 @@ void Impulse_Chain()
     ARRAY<int> body_indices;
     for(int i=0;i<grid_m;i++){
         RIGID_BODY<TV>& body=tests.Add_Rigid_Body("sphere",(T).5,(T)0);
-        body.Set_Frame(FRAME<TV>(TV(2*i,0,0)));
+        body.Frame()=FRAME<TV>(TV(2*i,0,0));
         body_indices.Append(body.particle_index);}
 
     solid_body_collection.rigid_body_collection.Rigid_Body(body_indices(0)).Is_Kinematic()=true;

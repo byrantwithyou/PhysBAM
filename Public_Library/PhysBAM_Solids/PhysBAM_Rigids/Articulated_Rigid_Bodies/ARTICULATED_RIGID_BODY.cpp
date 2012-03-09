@@ -222,8 +222,7 @@ Update_Child_From_Parents(const int child_id,const ARRAY<int>& parents)
         JOINT<TV>& joint=*joint_mesh(edge_id);
         FRAME<TV> F_wc=rigid_body_collection.Rigid_Body(parents(p)).Frame()*joint.F_pc(); // TODO: looks broken, should be line below?
         F_wc_sum_t+=F_wc.t;rotations.Append(F_wc.r);}
-    rigid_body_collection.Rigid_Body(child_id).X()=F_wc_sum_t/(T)parents.m;
-    rigid_body_collection.Rigid_Body(child_id).Rotation()=ROTATION<TV>::Average_Rotation(rotations);
+    rigid_body_collection.Rigid_Body(child_id).Frame()=FRAME<TV>(F_wc_sum_t/(T)parents.m,ROTATION<TV>::Average_Rotation(rotations));
 }
 //#####################################################################
 // Function Update_Parent_Joint_States
@@ -434,7 +433,7 @@ Initialize_Poststabilization_Projection()
         MATRIX_MXN<T> R_D[2],M_inverse_R_D[2];
         TV location=joint.Location(*rigid_bodies[0],*rigid_bodies[1]);
         for(int j=0;j<2;j++){
-            MATRIX_MXN<T> r_star_p=prismatic_constraints.Cross_Product_Matrix_Times(location-rigid_bodies[j]->X());
+            MATRIX_MXN<T> r_star_p=prismatic_constraints.Cross_Product_Matrix_Times(location-rigid_bodies[j]->Frame().t);
             R_D[j].Resize(d+s,p+a);
             R_D[j].Set_Submatrix(0,0,prismatic_constraints);
             R_D[j].Set_Submatrix(d,0,r_star_p);
@@ -539,7 +538,7 @@ Effective_Inertia_Inverse(MATRIX<T,d+s>& inertia_inverse,JOINT_ID joint_id) cons
     T_WORLD_SPACE_INERTIA_TENSOR inertia_inverse_parent=parent_body.World_Space_Inertia_Tensor_Inverse();
     T_WORLD_SPACE_INERTIA_TENSOR inertia_inverse_child=child_body.World_Space_Inertia_Tensor_Inverse();
     TV location=(T).5*(parent_body.World_Space_Point(joint_mesh(joint_id)->frame_pj.t)+child_body.World_Space_Point(joint_mesh(joint_id)->frame_cj.t));
-    MATRIX<T,s,d> cross_term=inertia_inverse_parent*MATRIX<T,s,d>::Cross_Product_Matrix(location-parent_body.X())+inertia_inverse_child*MATRIX<T,s,d>::Cross_Product_Matrix(location-child_body.X());
+    MATRIX<T,s,d> cross_term=inertia_inverse_parent*MATRIX<T,s,d>::Cross_Product_Matrix(location-parent_body.Frame().t)+inertia_inverse_child*MATRIX<T,s,d>::Cross_Product_Matrix(location-child_body.Frame().t);
     inertia_inverse.Add_To_Submatrix(0,0,MATRIX<T,d>(parent_body.Impulse_Factor(location)+child_body.Impulse_Factor(location)));
     inertia_inverse.Add_To_Submatrix(0,d,cross_term.Transposed());
     inertia_inverse.Add_To_Submatrix(d,0,cross_term);

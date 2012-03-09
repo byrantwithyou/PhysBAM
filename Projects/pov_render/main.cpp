@@ -132,8 +132,8 @@ void Emit_Rigid_Body_Frame(std::ofstream& fout,const HASHTABLE<std::string,std::
 {
     RIGID_BODY_COLLECTION<TV>& collection=Load_Rigid_Body_Collection(options.Get("location"),frame);
     RIGID_BODY<TV>& rigid_body=collection.Rigid_Body(atoi(options.Get("index").c_str()));
-    MATRIX<T,3> rot=rigid_body.Rotation().Rotation_Matrix();
-    TV X=rigid_body.X();
+    MATRIX<T,3> rot=rigid_body.Frame().r.Rotation_Matrix();
+    TV X=rigid_body.Frame().t;
     fout<<"matrix < ";
     for(int i=0;i<3;i++)
         for(int j=0;j<3;j++)

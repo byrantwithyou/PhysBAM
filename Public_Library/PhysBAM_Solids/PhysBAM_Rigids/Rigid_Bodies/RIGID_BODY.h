@@ -26,7 +26,7 @@ class RIGID_BODY:public RIGID_GEOMETRY<TV>
 public:
     typedef RIGID_GEOMETRY<TV> BASE;
     typedef int HAS_TYPED_READ_WRITE;
-    using BASE::Rotation;using BASE::X;using BASE::Twist;using BASE::particle_index;using BASE::bounding_box_up_to_date;using BASE::is_static;
+    using BASE::Frame;using BASE::Twist;using BASE::particle_index;using BASE::bounding_box_up_to_date;using BASE::is_static;
     using BASE::simplicial_object;using BASE::implicit_object;using BASE::World_Space_Simplex_Bounding_Box;using BASE::coefficient_of_friction;
     using BASE::Add_Structure;
 
@@ -87,19 +87,19 @@ public:
     {return !is_static && !rigid_body_collection.rigid_body_particle.kinematic(particle_index);}
 
     T_WORLD_SPACE_INERTIA_TENSOR World_Space_Inertia_Tensor() const // relative to the center of mass
-    {return Rigid_Mass().World_Space_Inertia_Tensor(Rotation());}
+    {return Rigid_Mass().World_Space_Inertia_Tensor(Frame().r);}
 
     T_WORLD_SPACE_INERTIA_TENSOR World_Space_Inertia_Tensor_Inverse() const // relative to the center of mass
-    {return Rigid_Mass().World_Space_Inertia_Tensor_Inverse(Rotation());};
+    {return Rigid_Mass().World_Space_Inertia_Tensor_Inverse(Frame().r);};
 
     T_WORLD_SPACE_INERTIA_TENSOR World_Space_Inertia_Tensor(const TV& reference_point) const // relative to a reference point
-    {return Rigid_Mass().World_Space_Inertia_Tensor(FRAME<TV>(X(),Rotation()),reference_point);}
+    {return Rigid_Mass().World_Space_Inertia_Tensor(Frame(),reference_point);}
 
     T_SPIN World_Space_Inertia_Tensor_Times(const T_SPIN& angular_velocity) const
-    {return Rigid_Mass().World_Space_Inertia_Tensor_Times(Rotation(),angular_velocity);}
+    {return Rigid_Mass().World_Space_Inertia_Tensor_Times(Frame().r,angular_velocity);}
 
     T_SPIN World_Space_Inertia_Tensor_Inverse_Times(const T_SPIN& angular_momentum) const
-    {return Rigid_Mass().World_Space_Inertia_Tensor_Inverse_Times(Rotation(),angular_momentum);}
+    {return Rigid_Mass().World_Space_Inertia_Tensor_Inverse_Times(Frame().r,angular_momentum);}
 
     void Update_Angular_Velocity() // needs to be called to keep the angular velocity valid
     {Twist().angular=World_Space_Inertia_Tensor_Inverse_Times(Angular_Momentum());}
@@ -141,7 +141,7 @@ public:
     {return (T).5*Mass()*Twist().linear.Magnitude_Squared();}
 
     T Rotational_Kinetic_Energy() const
-    {return Rigid_Mass().Rotational_Kinetic_Energy(Rotation(),Angular_Momentum());}
+    {return Rigid_Mass().Rotational_Kinetic_Energy(Frame().r,Angular_Momentum());}
 
     T Kinetic_Energy(const TWIST<TV>& twist) const
     {if(Has_Infinite_Inertia()) return 0;return (T).5*Mass()*twist.linear.Magnitude_Squared()+(T).5*TV::SPIN::Dot_Product(World_Space_Inertia_Tensor_Times(twist.angular),twist.angular);}
@@ -161,7 +161,7 @@ public:
 
     T_SYMMETRIC_MATRIX Impulse_Factor(const TV& location) const
     {if(Has_Infinite_Inertia()) return T_SYMMETRIC_MATRIX(); // return zero matrix
-    return Conjugate_With_Cross_Product_Matrix(location-X(),World_Space_Inertia_Tensor_Inverse())+1/Mass();}
+    return Conjugate_With_Cross_Product_Matrix(location-Frame().t,World_Space_Inertia_Tensor_Inverse())+1/Mass();}
 
     T_SYMMETRIC_MATRIX Object_Space_Impulse_Factor(const TV& object_space_location) const
     {if(Has_Infinite_Inertia()) return T_SYMMETRIC_MATRIX(); // return zero matrix
@@ -175,16 +175,16 @@ public:
     {return state.World_Space_Vector(simplicial_object->Normal(id));}
 
     void Save_State(RIGID_BODY_STATE<TV>& state,const T time=0) const
-    {state.time=time;state.frame.t=X();state.frame.r=Rotation();state.twist=Twist();state.angular_momentum=Angular_Momentum();}
+    {state.time=time;state.frame=Frame();state.twist=Twist();state.angular_momentum=Angular_Momentum();}
 
     void Restore_State(const RIGID_BODY_STATE<TV>& state)
-    {X()=state.frame.t;Rotation()=state.frame.r;Twist()=state.twist;Angular_Momentum()=state.angular_momentum;}
+    {Frame()=state.frame;Twist()=state.twist;Angular_Momentum()=state.angular_momentum;}
 
     TWIST<TV> Gather(const TWIST<TV>& wrench,const TV& location) const
-    {return TWIST<TV>(wrench.linear,wrench.angular+TV::Cross_Product(location-X(),wrench.linear));}
+    {return TWIST<TV>(wrench.linear,wrench.angular+TV::Cross_Product(location-Frame().t,wrench.linear));}
 
     TWIST<TV> Scatter(const TWIST<TV>& twist,const TV& location) const
-    {return TWIST<TV>(twist.linear+TV::Cross_Product(twist.angular,location-X()),twist.angular);}
+    {return TWIST<TV>(twist.linear+TV::Cross_Product(twist.angular,location-Frame().t),twist.angular);}
 
     TWIST<TV> Inertia_Inverse_Times(const TWIST<TV>& wrench) const
     {if(Has_Infinite_Inertia()) return TWIST<TV>();

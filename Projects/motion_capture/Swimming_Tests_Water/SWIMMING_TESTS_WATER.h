@@ -311,7 +311,7 @@ void Floppy_Human()
             rigid_base_transform.t/=body_motion.trajectories(1)(1).length;}
         FRAME<TV> rigid_base_transform_i=rigid_base_transform;
         rigid_base_transform_i.t*=length;
-        rigid_body.Set_Frame(body_motion.trajectories(i)(1).targeted_transform*rigid_base_transform_i);}
+        rigid_body.Frame()=body_motion.trajectories(i)(1).targeted_transform*rigid_base_transform_i;}
     
     Create_Joints_From_Hierarchy(body_motion.name_to_track_index.Get("Root"));
 
@@ -365,7 +365,7 @@ void Floppy_Fish()
         T bone_scale=scale*bone_scales[i];
         RIGID_BODY<TV>& bone=solids_tests.Add_Rigid_Body("miniplank25wide2",bone_scale,friction);
         bones.Append(&bone);
-        bone.Set_Frame(FRAME<TV>(bone_positions[i]));
+        bone.Frame()=FRAME<TV>(bone_positions[i]);
         bone.Set_Mass(bone_density*bone_unscaled_volume*std::pow(bone_scale,TV::dimension));}
 
     T joint_strengths[4]={(T)500,(T)500,(T)200,(T)100};

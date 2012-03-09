@@ -34,8 +34,8 @@ public:
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time);
     virtual void Set_External_Velocities(TWIST<TV>& twist,const T time,const int id);
     virtual void Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id);
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time);
-    virtual void Set_External_Positions(TV& X,ROTATION<TV>& rotation,const T time,const int id);
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time);
+    virtual void Set_External_Positions(FRAME<TV>& frame,const T time,const int id);
     void Get_Current_Kinematic_Keyframes(const T dt,const T time);
     void Reset_Kinematic_Rigid_Bodies(const T time);
 //#####################################################################

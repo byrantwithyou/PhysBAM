@@ -51,7 +51,7 @@ public:
     void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
 
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > F,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
 
@@ -99,21 +99,21 @@ void Get_Initial_Data()
     if(test_number<=4){
         rigid_body1=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
         rigid_body2=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-        rigid_body1->X()=TV(0,2,0);
+        rigid_body1->Frame().t=TV(0,2,0);
         rigid_body1->Set_Name("parent");
         rigid_body2->Set_Name("child");}
 
     switch(test_number){
         case 1: // point joint
             last_frame=96;
-            rigid_body2->X()=TV(0,4,2);
+            rigid_body2->Frame().t=TV(0,4,2);
             joint=new POINT_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1,-1)));
             break;
         case 2: // rigid with prismatic translation
             last_frame=96;
-            rigid_body2->X()=TV((T)2.5,2,0);
+            rigid_body2->Frame().t=TV((T)2.5,2,0);
             joint=new RIGID_JOINT<TV>();((RIGID_JOINT<TV>*)joint)->Set_Prismatic_Component_Translation(TV((T).5,0,0));
             arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1)));
@@ -121,14 +121,14 @@ void Get_Initial_Data()
             break;
         case 3: // hinge
             last_frame=96;
-            rigid_body2->X()=TV(2,4,0);
+            rigid_body2->Frame().t=TV(2,4,0);
             joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1,1),ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-1,-1,1),ROTATION<TV>((T)pi/2,TV(0,0,1))*ROTATION<TV>(-(T)pi/2,TV(0,1,0))));
             break;
         case 4: // twist
             last_frame=96;
-            rigid_body2->X()=TV((T)2.1,2,0);
+            rigid_body2->Frame().t=TV((T)2.1,2,0);
             joint=new ANGLE_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body1->particle_index,rigid_body2->particle_index,joint);
             joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,0,0)));
             joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(-(T)1.1,0,0)));
@@ -139,7 +139,7 @@ void Get_Initial_Data()
             last_frame=240;
             for(int i=0;i<8;i++){
                 RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-                rigid_body.X()=TV((T)2*i,(T)2*i,(T)2*i);
+                rigid_body.Frame().t=TV((T)2*i,(T)2*i,(T)2*i);
                 rigid_body.Set_Coefficient_Of_Restitution((T).9);
                 if(i>0){
                     joint=new RIGID_JOINT<TV>();arb.joint_mesh.Add_Articulation(rigid_body.particle_index-1,rigid_body.particle_index,joint);

@@ -53,6 +53,7 @@ template<class T,int d> struct HAS_CHEAP_COPY<VECTOR<T,d> > {static const bool v
 
 template<class T,int d,class SCALAR> struct REPLACE_FLOATING_POINT<VECTOR<T,d>,SCALAR>{typedef VECTOR<typename REPLACE_FLOATING_POINT<T,SCALAR>::TYPE,d> TYPE;};
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<TWIST<TV>,SCALAR>{typedef TWIST<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
+template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<FRAME<TV>,SCALAR>{typedef FRAME<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
 template<class TV,class SCALAR> struct REPLACE_FLOATING_POINT<ROTATION<TV>,SCALAR>{typedef ROTATION<typename REPLACE_FLOATING_POINT<TV,SCALAR>::TYPE> TYPE;};
 
 }

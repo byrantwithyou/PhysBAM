@@ -63,13 +63,13 @@ public:
     virtual bool Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,int& repulsions_found,int& collisions_found,const bool exit_early=false);
     virtual void Postprocess_Frame(const int frame);
 protected:
-    void Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation);
-    void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_Rotation);
+    void Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame);
+    void Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame);
     //void Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id); // convenience wrapper
     void Clamp_Velocities();
 public:
     void Initialize_World_Space_Masses();
-    void Restore_Position_After_Hypothetical_Position_Evolution(ARRAY<TV>& X_save,ARRAY<TV>& rigid_X_save,ARRAY<ROTATION<TV> >& rigid_rotation_save);
+    void Restore_Position_After_Hypothetical_Position_Evolution(ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& rigid_frame_save);
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time);
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time);
     void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time);

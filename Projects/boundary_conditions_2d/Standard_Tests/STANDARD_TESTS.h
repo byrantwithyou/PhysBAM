@@ -144,7 +144,7 @@ public:
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
     void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE {}
     void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
@@ -514,7 +514,7 @@ void Rigid_Circle()
     T radius=.3;
     RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("circle",(T)radius,(T)0);
     rigid_body.thin_shell=false;
-    rigid_body.Set_Frame(FRAME<TV>(TV((T).5,(T).5)));
+    rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).5));
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
     rigid_body.Set_Name("circle");
     T density=100;
@@ -584,8 +584,8 @@ void Bounding_Edge_From_Endpoints(int i,const TV& p1,const TV& p2,typename VBC::
     plane_types[i]=t;
 
     int id=solid_body_collection.rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/ground",len/200);
-    solid_body_collection.rigid_body_collection.rigid_body_particle.X(id)=planes[i].x1;
-    solid_body_collection.rigid_body_collection.rigid_body_particle.rotation(id)=ROTATION<VECTOR<T,2> >::From_Rotated_Vector(TV(0,1),planes[i].normal);
+    solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id).t=planes[i].x1;
+    solid_body_collection.rigid_body_collection.rigid_body_particle.frame(id).r=ROTATION<VECTOR<T,2> >::From_Rotated_Vector(TV(0,1),planes[i].normal);
     solid_body_collection.rigid_body_collection.Rigid_Body(id).is_static=true;
 }
 //#####################################################################

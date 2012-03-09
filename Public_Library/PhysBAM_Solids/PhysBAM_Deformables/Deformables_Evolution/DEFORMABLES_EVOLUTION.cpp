@@ -172,18 +172,15 @@ Average_And_Exchange_Position()
 {
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     assert(X_save.m==particles.array_collection->Size());
-    assert(rigid_X_save.m==rigid_geometry_collection.particles.array_collection->Size() && rigid_rotation_save.m==rigid_geometry_collection.particles.array_collection->Size());
+    assert(rigid_frame_save.m==rigid_geometry_collection.particles.array_collection->Size());
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
     INDIRECT_ARRAY<ARRAY<TV> > X_save_fragment(X_save,simulated_particles);
     INDIRECT_ARRAY<ARRAY_VIEW<TV> > X_fragment(particles.X,simulated_particles);
     for(int i=0;i<X_fragment.Size();i++){TV X_average=(T).5*(X_fragment(i)+X_save_fragment(i));X_save_fragment(i)=X_fragment(i);X_fragment(i)=X_average;}
     for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.Size();i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i); //this needs to be the kinematic bodies
-        TV tmp_X=TV::Interpolate(rigid_geometry_collection.particles.X(p),rigid_X_save(p),(T).5);
-        rigid_X_save(p)=rigid_geometry_collection.particles.X(p);
-        rigid_geometry_collection.particles.X(p)=tmp_X;
-        ROTATION<TV> tmp_rotation=ROTATION<TV>::Spherical_Linear_Interpolation(rigid_geometry_collection.particles.rotation(p),rigid_rotation_save(p),(T).5);
-        rigid_rotation_save(p)=rigid_geometry_collection.particles.rotation(p);
-        rigid_geometry_collection.particles.rotation(p)=tmp_rotation;}
+        FRAME<TV> tmp=FRAME<TV>::Interpolation(rigid_geometry_collection.particles.frame(p),rigid_frame_save(p),(T).5);
+        rigid_frame_save(p)=rigid_geometry_collection.particles.frame(p);
+        rigid_geometry_collection.particles.frame(p)=tmp;}
 }
 //#####################################################################
 // Function Trapezoidal_Step_Velocity
@@ -245,7 +242,7 @@ Advance_One_Time_Step_Position(const T dt,const T time)
     deformables_evolution_callbacks->Update_Deformables_Parameters(time);
     // save position and velocity for later trapezoidal rule
     Save_Velocity();
-    Save_Position(X_save,rigid_X_save,rigid_rotation_save);
+    Save_Position(X_save,rigid_frame_save);
 
     if(deformables_parameters.deformable_object_collision_parameters.perform_collision_body_collisions) deformable_body_collection.collisions.Activate_Collisions(false);
 
@@ -270,7 +267,7 @@ Advance_One_Time_Step_Position(const T dt,const T time)
             deformable_body_collection.soft_bindings,X_save,dt,0);
         if(interactions) LOG::Stat("collision body collisions",interactions);}
 
-    Restore_Position(X_save,rigid_X_save,rigid_rotation_save);
+    Restore_Position(X_save,rigid_frame_save);
     Diagnostics(dt,time,0,0,13,"restore position");
     Save_Velocity();
 
@@ -309,7 +306,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time)
         Trapezoidal_Step_Velocity(dt,time);
         Diagnostics(dt,time,2,1,29,"trazepoid rule");
 
-        Restore_Position(X_save,rigid_X_save,rigid_rotation_save); // move to final positions at time time+dt
+        Restore_Position(X_save,rigid_frame_save); // move to final positions at time time+dt
         Diagnostics(dt,time,2,2,30,"restore position");}
     else{
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data_Global(deformable_body_collection.particles.X);
@@ -331,11 +328,11 @@ Advance_One_Time_Step_Velocity(const T dt,const T time)
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Apply_Constraints(const T dt,const T time)
 {
-    Save_Position(X_save_for_constraints,rigid_X_save_for_constraints,rigid_rotation_save_for_constraints);
+    Save_Position(X_save_for_constraints,rigid_frame_save_for_constraints);
     if(deformables_parameters.deformable_object_collision_parameters.use_existing_contact) use_existing_contact=true;
     Update_Positions_And_Apply_Contact_Forces(dt,time,false);use_existing_contact=false;
     Diagnostics(dt,time,4,2,37,"contact, prestabilization");
-    Restore_Position(X_save_for_constraints,rigid_X_save_for_constraints,rigid_rotation_save_for_constraints);
+    Restore_Position(X_save_for_constraints,rigid_frame_save_for_constraints);
     Diagnostics(dt,time,2,2,38,"restore position");
     // modify velocity with inelastic and friction repulsions
     if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,false,true);
@@ -458,9 +455,9 @@ Initialize_Rigid_Bodies(const T frame_rate, const bool restart)
     // initialize kinematic object positions and velocities
     if(!restart){
         kinematic_evolution.Get_Current_Kinematic_Keyframes(1/frame_rate,time);
-        kinematic_evolution.Set_External_Positions(rigid_geometry_collection.particles.X,rigid_geometry_collection.particles.rotation,time);
+        kinematic_evolution.Set_External_Positions(rigid_geometry_collection.particles.frame,time);
         kinematic_evolution.Set_External_Velocities(rigid_geometry_collection.particles.twist,time,time);
-        for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){rigid_geometry_collection.particles.rotation(i).Normalize();}}
+        for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){rigid_geometry_collection.particles.frame(i).r.Normalize();}}
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -496,7 +493,7 @@ Euler_Step_Position(const T dt,const T time,const int p)
 {
     RIGID_GEOMETRY<TV>& rigid_geometry=rigid_geometry_collection.Rigid_Geometry(p);
     if(rigid_geometry.is_static) return;
-    kinematic_evolution.Set_External_Positions(rigid_geometry.X(),rigid_geometry.Rotation(),time+dt,p);
+    kinematic_evolution.Set_External_Positions(rigid_geometry.Frame(),time+dt,p);
 }
 //#####################################################################
 // Function Euler_Step_Position
@@ -507,7 +504,7 @@ Euler_Step_Position(const T dt,const T time)
     MPI_SOLIDS<TV>* mpi_solids=deformable_body_collection.mpi_solids;
     deformable_body_collection.particles.Euler_Step_Position(deformable_body_collection.dynamic_particles,dt);
     Set_External_Positions(deformable_body_collection.particles.X,time+dt);
-    kinematic_evolution.Set_External_Positions(rigid_geometry_collection.particles.X,rigid_geometry_collection.particles.rotation,time+dt);
+    kinematic_evolution.Set_External_Positions(rigid_geometry_collection.particles.frame,time+dt);
     deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
     if(mpi_solids){
          mpi_solids->Exchange_Force_Boundary_Data_Global(deformable_body_collection.particles.X);
@@ -521,31 +518,30 @@ Euler_Step_Position(const T dt,const T time)
 // Function Save_Position
 //#####################################################################
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
-Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation)
+Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame)
 {
 
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
     X.Resize(particles.array_collection->Size(),false,false);
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
-    rigid_X.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
-    rigid_rotation.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
-    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
-        rigid_X(i)=rigid_geometry_collection.particles.X(i);rigid_rotation(i)=rigid_geometry_collection.particles.rotation(i);}
+    rigid_frame.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
+    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++)
+        if(rigid_geometry_collection.Is_Active(i))
+            rigid_frame(i)=rigid_geometry_collection.particles.frame(i);
 }
 //#####################################################################
 // Function Restore_Position
 //#####################################################################
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
-Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation)
+Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame)
 { 
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
-    PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_X.Size()==rigid_geometry_collection.particles.array_collection->Size());
-    PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_geometry_collection.particles.array_collection->Size());
+    PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_frame.Size()==rigid_geometry_collection.particles.array_collection->Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
     for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
-        rigid_geometry_collection.particles.X(i)=rigid_X(i);rigid_geometry_collection.particles.rotation(i)=rigid_rotation(i);}
+        rigid_geometry_collection.particles.frame(i)=rigid_frame(i);}
 }
 //#####################################################################
 // Function Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions

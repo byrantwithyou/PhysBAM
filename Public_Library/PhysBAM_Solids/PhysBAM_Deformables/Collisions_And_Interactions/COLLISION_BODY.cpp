@@ -109,7 +109,7 @@ Adjust_Point_For_Collision(COLLISION_GEOMETRY<TV>& body,const TV& X_old,TV& X,TV
     // impulse accumulation
     if(body.impulse_accumulator){
         TV impulse_on_particle=point_mass*(V-V_save);
-        body.impulse_accumulator->Add_Impulse(X,-TWIST<TV>(impulse_on_particle,TV::Cross_Product(X-rigid_geometry.X(),impulse_on_particle)));}
+        body.impulse_accumulator->Add_Impulse(X,-TWIST<TV>(impulse_on_particle,TV::Cross_Product(X-rigid_geometry.Frame().t,impulse_on_particle)));}
     // update position
     X=X_collision+(1-theta)*dt*(VN_body*normal+VT_half);
     // set collision state

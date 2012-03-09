@@ -130,7 +130,7 @@ void Rigid_Particle_Segment()
     // add two rigid spheres
     for(int i=0;i<2;i++){
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,0);
-        T sign=(T)(2*i-3);sphere.X()+=TV::Axis_Vector(1)*(sign*2);
+        T sign=(T)(2*i-3);sphere.Frame().t+=TV::Axis_Vector(1)*(sign*2);
         segment_mesh.elements(1)(i)=particles.array_collection->Add_Element();
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,segment_mesh.elements(1)(i),solid_body_collection.rigid_body_collection,sphere.particle_index,sign*TV()));}
 }

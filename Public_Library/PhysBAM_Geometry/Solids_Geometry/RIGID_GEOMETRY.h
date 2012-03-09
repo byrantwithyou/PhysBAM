@@ -84,31 +84,19 @@ public:
     {return Frame().Inverse_Times(world_space_point);}
 
     TV Object_Space_Vector(const TV& world_space_vector) const
-    {return Rotation().Inverse_Rotate(world_space_vector);}
+    {return Frame().r.Inverse_Rotate(world_space_vector);}
 
     TV World_Space_Point(const TV& object_space_point) const
     {return Frame()*object_space_point;}
 
     TV World_Space_Vector(const TV& object_space_vector) const
-    {return Rotation().Rotate(object_space_vector);}
+    {return Frame().r.Rotate(object_space_vector);}
 
-    TV& X() PHYSBAM_ALWAYS_INLINE
-    {return rigid_geometry_collection.particles.X(particle_index);}
-    
-    const TV& X() const PHYSBAM_ALWAYS_INLINE
-    {return rigid_geometry_collection.particles.X(particle_index);}
+    FRAME<TV>& Frame() PHYSBAM_ALWAYS_INLINE
+    {return rigid_geometry_collection.particles.frame(particle_index);}
 
-    ROTATION<TV>& Rotation() PHYSBAM_ALWAYS_INLINE
-    {return rigid_geometry_collection.particles.rotation(particle_index);}
-    
-    const ROTATION<TV>& Rotation() const PHYSBAM_ALWAYS_INLINE
-    {return rigid_geometry_collection.particles.rotation(particle_index);}
-
-    const FRAME<TV> Frame() const PHYSBAM_ALWAYS_INLINE
-    {return FRAME<TV>(X(),Rotation());}
-
-    void Set_Frame(const FRAME<TV>& frame) PHYSBAM_ALWAYS_INLINE
-    {X()=frame.t;Rotation()=frame.r;}
+    const FRAME<TV>& Frame() const PHYSBAM_ALWAYS_INLINE
+    {return rigid_geometry_collection.particles.frame(particle_index);}
 
     TWIST<TV>& Twist() PHYSBAM_ALWAYS_INLINE
     {return rigid_geometry_collection.particles.twist(particle_index);}

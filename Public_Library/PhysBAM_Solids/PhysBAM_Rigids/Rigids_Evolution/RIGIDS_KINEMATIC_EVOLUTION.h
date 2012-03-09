@@ -33,7 +33,7 @@ public:
 //#####################################################################
     void Set_External_Velocities(TWIST<TV>& twist,const T time,const int id);
     void Set_Kinematic_Velocities(TWIST<TV>& twist,const T frame_dt,const T time,const int id);
-    void Set_External_Positions(TV& X,ROTATION<TV>& rotation,const T time,const int id);
+    void Set_External_Positions(FRAME<TV>& frame,const T time,const int id);
 //#####################################################################
 };
 }

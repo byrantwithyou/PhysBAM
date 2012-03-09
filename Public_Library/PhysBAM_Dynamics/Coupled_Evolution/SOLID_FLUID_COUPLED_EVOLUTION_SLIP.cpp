@@ -152,7 +152,7 @@ Process_Collisions(const T dt,const T time,const bool advance_rigid_bodies)
 
                     TV object_space_collision_location;
                     {
-                        RAY<TV> intersection_ray(body.Object_Space_Point(body.X()),-body.Object_Space_Point(pressure_impulses_twist(rigid_particle_index).linear));
+                        RAY<TV> intersection_ray(body.Object_Space_Point(body.Frame().t),-body.Object_Space_Point(pressure_impulses_twist(rigid_particle_index).linear));
                         body.simplicial_object->Initialize_Hierarchy();body.simplicial_object->Refresh_Auxiliary_Structures();
                         if(!INTERSECTION::Intersects(intersection_ray,*body.simplicial_object,(T)1e-6)){LOG::cout<<"Unable to find a point of impact"<<std::endl;continue;}
                         object_space_collision_location=intersection_ray.Point(intersection_ray.t_max); // already in object space

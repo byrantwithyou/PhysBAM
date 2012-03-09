@@ -82,7 +82,7 @@ public:
     void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
@@ -138,7 +138,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
       case 5:{ // cluster with rigid block of same size
           Large_Cluster_Square(FRAME<TV>(TV(0,2),rotation));
           RIGID_BODY<TV>* rigid_body=&tests.Add_Rigid_Body("subdivided_box",2,(T).5);
-          rigid_body->Set_Frame(FRAME<TV>(TV(10,2),rotation));
+          rigid_body->Frame()=FRAME<TV>(TV(10,2),rotation);
           break;}
       default: PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized test number %d",test_number));}
 
@@ -162,8 +162,8 @@ void Point_Joint()
     JOINT<TV>* joint=0;
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("square_refined",1,(T).5);
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("square_refined",1,(T).5);
-    rigid_body1.X()=TV(0,2);
-    rigid_body2.X()=TV(2,4);
+    rigid_body1.Frame().t=TV(0,2);
+    rigid_body2.Frame().t=TV(2,4);
     rigid_body1.Set_Name("parent");
     rigid_body2.Set_Name("child");
 
@@ -179,8 +179,8 @@ void Rigid_Joint()
     last_frame=96;
     RIGID_BODY<TV>& rigid_body1=tests.Add_Rigid_Body("square_refined",1,(T).5);
     RIGID_BODY<TV>& rigid_body2=tests.Add_Rigid_Body("square_refined",1,(T).5);
-    rigid_body1.X()=TV(0,2);
-    rigid_body2.X()=TV((T)2.5,2);
+    rigid_body1.Frame().t=TV(0,2);
+    rigid_body2.Frame().t=TV((T)2.5,2);
     rigid_body1.Set_Name("parent");
     rigid_body2.Set_Name("child");
 
@@ -198,7 +198,7 @@ void Multiple_Rigid_Joints()
     JOINT<TV>* joint=0;
     for(int i=0;i<8;i++){
         RIGID_BODY<TV>&rigid_body=tests.Add_Rigid_Body("square_refined",1,(T)0);
-        rigid_body.X()=TV((T)2*i,(T)2*i);
+        rigid_body.Frame().t=TV((T)2*i,(T)2*i);
         rigid_body.Set_Coefficient_Of_Restitution(1);
         if(i>0){
             joint=new RIGID_JOINT<TV>();arb->joint_mesh.Add_Articulation(rigid_body.particle_index-1,rigid_body.particle_index,joint);
@@ -218,7 +218,7 @@ void PD_Example()
 
     // Create first body
     parent_body=&tests.Add_Rigid_Body("square_refined",(T).2,(T).5);
-    parent_body->X()=TV(cheight,0);
+    parent_body->Frame().t=TV(cheight,0);
     parent_body->Set_Name("parent");
     parent_body->Set_Mass(5);
     parent_body->is_static=true;
@@ -228,7 +228,7 @@ void PD_Example()
     for(int i=0;i<njoints;i++){
         cheight+=1.25;
         child_body=&tests.Add_Rigid_Body("square_refined",(T).2,(T).5);
-        child_body->X()=TV(cheight,0);
+        child_body->Frame().t=TV(cheight,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
 
@@ -263,7 +263,7 @@ int Large_Cluster_Square(FRAME<TV>shift_frame,T scale=1)
         bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
         bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child::%d",bodies(i)));
         solids_parameters.collision_body_list.Add_Body(bodies(i));}
-    for(int i=-1;i<=1;i+=2) for(int j=-1;j<=1;j+=2) bodies(++count)->Set_Frame(shift_frame*FRAME<TV>(TV((T)j,(T)i)));
+    for(int i=-1;i<=1;i+=2) for(int j=-1;j<=1;j+=2) bodies(++count)->Frame()=shift_frame*FRAME<TV>(TV((T)j,(T)i));
     tests.Add_Gravity();
     int cluster_id=rigid_body_particles.Add_Cluster_Body(&bodies);
     rigid_body_particles.Rigid_Body(cluster_id).Set_Name("combo_square");

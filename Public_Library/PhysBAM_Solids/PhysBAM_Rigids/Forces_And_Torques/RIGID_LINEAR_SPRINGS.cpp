@@ -98,8 +98,8 @@ Update_Position_Based_State(const T time)
         state.direction=X2-X1;
         current_lengths(s)=state.direction.Normalize();
         state.coefficient=damping(s)/restlength(s);
-        state.r(0)=X1-Body(s,0).X();
-        state.r(1)=X2-Body(s,1).X();}
+        state.r(0)=X1-Body(s,0).Frame().t;
+        state.r(1)=X2-Body(s,1).Frame().t;}
 }
 //#####################################################################
 // Function Add_Force

@@ -149,7 +149,7 @@ T Initial_Phi_Object(const VECTOR<T,3>& X) const
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {    
     waterfall=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/fractal_box_mesh",(T)2,true,true,false);
-    rigid_body_collection.rigid_body_particle.X(waterfall)=VECTOR<T,3>((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(waterfall).Is_Kinematic()=true;
+    rigid_body_collection.rigid_body_particle.frame(waterfall).t=VECTOR<T,3>((T)25,(T)-2,(T)30);rigid_body_collection.Rigid_Body(waterfall).Is_Kinematic()=true;
     inaccurate_union.collision_bodies.Add_Bodies(rigid_body_collection.rigid_geometry_collection);
     fluids_parameters.collision_bodies_affecting_fluid->collision_geometry_collection.Add_Body(&inaccurate_union,0,false);
 }

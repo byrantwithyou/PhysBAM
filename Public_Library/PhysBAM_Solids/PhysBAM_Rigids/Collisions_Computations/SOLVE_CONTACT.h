@@ -67,8 +67,8 @@ public:
         id(0)=body_1.particle_index;
         id(1)=body_2.particle_index;
 
-        TV r_1=location-body_1.X();
-        TV r_2=location-body_2.X();
+        TV r_1=location-body_1.Frame().t;
+        TV r_2=location-body_2.Frame().t;
 
         normal_constraint(0).linear=-normal;
         normal_constraint(0).angular=TV::Cross_Product(normal,r_1);

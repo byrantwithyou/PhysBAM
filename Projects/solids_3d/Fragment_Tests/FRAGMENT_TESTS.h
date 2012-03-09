@@ -79,7 +79,7 @@ void Get_Initial_Data()
             T density=TV::dimension==1?1:TV::dimension==2?100:1000;
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,density);
             particles.X(count)=hair_layout_grid.X(i,j,hair_layout_grid.counts.z);count++;}}
-    //RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T)0.15);sphere_body.X()=TV(0,(T)-1.2,0);
+    //RIGID_BODY<TV>& sphere_body=tests.Add_Rigid_Body("sphere",(T)1,(T)0.15);sphere_body.Frame().t=TV(0,(T)-1.2,0);
 
     deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);

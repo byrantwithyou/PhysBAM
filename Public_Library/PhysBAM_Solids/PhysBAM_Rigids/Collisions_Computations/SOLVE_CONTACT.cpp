@@ -221,7 +221,7 @@ void Update_Contact_Pair_Helper(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions
     RIGID_BODY<TV>& parent_body_1=rigid_body_collection.Rigid_Body(parent_id_1);
     RIGID_BODY<TV>& parent_body_2=rigid_body_collection.Rigid_Body(parent_id_2);
     rigid_body_collisions.rigid_body_particle_intersections.Set(Tuple(body1.particle_index,body2.particle_index,collision_location));
-    RIGID_BODY<TV>::Apply_Collision_Impulse(parent_body_1,parent_body_2,body1.Rotation(),body2.Rotation(),collision_location,collision_normal,collision_relative_velocity,
+    RIGID_BODY<TV>::Apply_Collision_Impulse(parent_body_1,parent_body_2,body1.Frame().r,body2.Frame().r,collision_location,collision_normal,collision_relative_velocity,
         -1+epsilon_scale,RIGID_BODY<TV>::Coefficient_Of_Friction(parent_body_1,parent_body_2),false,rolling_friction,correct_contact_energy,mpi_one_ghost);
     collision_callbacks.Save_Position(parent_id_1);collision_callbacks.Save_Position(parent_id_2); // fix saved values & re-evolve bodies
     Euler_Step_Position(rigid_body_collisions,collision_callbacks,parent_id_1,dt,time);Euler_Step_Position(rigid_body_collisions,collision_callbacks,parent_id_2,dt,time);

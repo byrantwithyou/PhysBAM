@@ -135,7 +135,7 @@ template<class TV> void RIGID_BODY<TV>::
 Apply_Impulse_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_impulse,const bool half_impulse_for_accumulator)
 {
     if(Has_Infinite_Inertia()) return;
-    T_SPIN total_angular_impulse=TV::Cross_Product(location-X(),impulse)+angular_impulse;
+    T_SPIN total_angular_impulse=TV::Cross_Product(location-Frame().t,impulse)+angular_impulse;
     Twist().linear+=impulse/Mass();
     Angular_Momentum()+=total_angular_impulse;
     Update_Angular_Velocity();
@@ -163,7 +163,7 @@ Compute_Clamped_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& lo
     TV velocity_adjustment;
     for(int i=0;i<2;i++) if(bodies[i]->rigid_body_collection.rigid_body_particle.kinematic(bodies[i]->particle_index)) velocity_adjustment=bodies[i]->Pointwise_Object_Velocity(location);
     for(int i=0;i<2;i++) if(!bodies[i]->Has_Infinite_Inertia()){
-        jr[i]=TV::Cross_Product(location-bodies[i]->X(),impulse.linear)+impulse.angular;
+        jr[i]=TV::Cross_Product(location-bodies[i]->Frame().t,impulse.linear)+impulse.angular;
         I_inverse_jr[i]=bodies[i]->Rigid_Mass().World_Space_Inertia_Tensor_Inverse_Times(*saved_rotation[i],jr[i]);
         impulse_ratio_num[i]=Dot_Product(impulse.linear,bodies[i]->Twist().linear-velocity_adjustment)+Dot_Product(I_inverse_jr[i],bodies[i]->Angular_Momentum());
         impulse_ratio_denom[i]=impulse_linear_magnitude_squared/bodies[i]->Mass()+Dot_Product(jr[i],I_inverse_jr[i]);}
@@ -187,11 +187,11 @@ Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTA
     if(!coefficient_of_friction){ // frictionless case
         T nT_impulse1_n=0;
         if(!body1.Has_Infinite_Inertia()){
-            T_SPIN r1xn=TV::Cross_Product(location-body1.X(),normal);
+            T_SPIN r1xn=TV::Cross_Product(location-body1.Frame().t,normal);
             nT_impulse1_n=1/body1.Mass()+Dot_Product(r1xn,body1.World_Space_Inertia_Tensor_Inverse()*r1xn);}
         T nT_impulse2_n=0;
         if(!body2.Has_Infinite_Inertia()){
-            T_SPIN r2xn=TV::Cross_Product(location-body2.X(),normal);
+            T_SPIN r2xn=TV::Cross_Product(location-body2.Frame().t,normal);
             nT_impulse2_n=1/body2.Mass()+Dot_Product(r2xn,body2.World_Space_Inertia_Tensor_Inverse()*r2xn);}
         impulse.linear=-(1+coefficient_of_restitution)*TV::Dot_Product(relative_velocity,normal)*normal/(nT_impulse1_n+nT_impulse2_n);}
     else{ // friction case
@@ -301,7 +301,7 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_
     if(!body2.Has_Infinite_Inertia()){I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();m1_inv_plus_m2_inv+=1/body2.Mass();}
 
     // fill in NXN constrained matrix C
-    TV r1=location-body1.X(),r2=location-body2.X();
+    TV r1=location-body1.Frame().t,r2=location-body2.Frame().t;
     int angular_constrained_axes=angular_constraint_matrix.Columns(),prismatic_constrained_axes=prismatic_constraint_matrix.Columns();
     MATRIX_MXN<T> r_cross_P_1=prismatic_constraint_matrix.Cross_Product_Matrix_Times(r1),r_cross_P_2=prismatic_constraint_matrix.Cross_Product_Matrix_Times(r2);
     MATRIX_MXN<T> P_T_r_cross_T_I_inverse_1=r_cross_P_1.Transpose_Times(I_inverse_1),P_T_r_cross_T_I_inverse_2=r_cross_P_2.Transpose_Times(I_inverse_2);
@@ -340,9 +340,9 @@ template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Hel
     const TWIST<TV>& delta_relative_twist_at_location)
 {
     MATRIX<T,1> I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();
-    SYMMETRIC_MATRIX<T,2> c11=I_inverse_1.Conjugate_With_Cross_Product_Matrix(location-body1.X())+
-        I_inverse_2.Conjugate_With_Cross_Product_Matrix(location-body2.X())+1/body1.Mass()+1/body2.Mass();
-    MATRIX<T,1,2> c12=I_inverse_1.Times_Cross_Product_Matrix(location-body1.X())+I_inverse_2.Times_Cross_Product_Matrix(location-body2.X());
+    SYMMETRIC_MATRIX<T,2> c11=I_inverse_1.Conjugate_With_Cross_Product_Matrix(location-body1.Frame().t)+
+        I_inverse_2.Conjugate_With_Cross_Product_Matrix(location-body2.Frame().t)+1/body1.Mass()+1/body2.Mass();
+    MATRIX<T,1,2> c12=I_inverse_1.Times_Cross_Product_Matrix(location-body1.Frame().t)+I_inverse_2.Times_Cross_Product_Matrix(location-body2.Frame().t);
     MATRIX<T,1> c22=I_inverse_1+I_inverse_2;
     SYMMETRIC_MATRIX<T,3> A(c11.x11,c11.x21,c12(0,0),c11.x22,c12(0,1),c22.x11);
 
@@ -354,8 +354,8 @@ template<class T,class TV> static TWIST<TV> Find_Impulse_And_Angular_Impulse_Hel
     const TWIST<TV>& delta_relative_twist_at_location)
 {
     SYMMETRIC_MATRIX<T,3> I_inverse_1=body1.World_Space_Inertia_Tensor_Inverse(),I_inverse_2=body2.World_Space_Inertia_Tensor_Inverse();
-    MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(location-body1.X()),r_cross_I_inverse_1=r_cross_1*I_inverse_1,
-                r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(location-body2.X()),r_cross_I_inverse_2=r_cross_2*I_inverse_2;
+    MATRIX<T,3> r_cross_1=MATRIX<T,3>::Cross_Product_Matrix(location-body1.Frame().t),r_cross_I_inverse_1=r_cross_1*I_inverse_1,
+                r_cross_2=MATRIX<T,3>::Cross_Product_Matrix(location-body2.Frame().t),r_cross_I_inverse_2=r_cross_2*I_inverse_2;
     SYMMETRIC_MATRIX<T,3> c11=SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(r_cross_I_inverse_1,r_cross_1)+
                               SYMMETRIC_MATRIX<T,3>::Times_Transpose_With_Symmetric_Result(r_cross_I_inverse_2,r_cross_2)+1/body1.Mass()+1/body2.Mass();
     MATRIX<T,3> c12=-(r_cross_I_inverse_1+r_cross_I_inverse_2);
@@ -373,7 +373,7 @@ Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV
     PHYSBAM_ASSERT(!body1.Has_Infinite_Inertia() || !body2.Has_Infinite_Inertia());
 
     if(body1.Has_Infinite_Inertia() || body2.Has_Infinite_Inertia()){
-        const RIGID_BODY<TV>& body=(!body1.Has_Infinite_Inertia())?body1:body2;TV r(location-body.X());
+        const RIGID_BODY<TV>& body=(!body1.Has_Infinite_Inertia())?body1:body2;TV r(location-body.Frame().t);
         TV impulse_linear=body.Mass()*(delta_relative_twist_at_location.linear+TV::Cross_Product(r,delta_relative_twist_at_location.angular));
         T_SPIN impulse_angular=body.World_Space_Inertia_Tensor()*delta_relative_twist_at_location.angular-TV::Cross_Product(r,impulse_linear);
         return TWIST<TV>(impulse_linear,impulse_angular);}
@@ -395,9 +395,9 @@ Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const 
     for(int i=0;i<2;i++) if(!body[i]->Has_Infinite_Inertia()){
         T sign=(T)1-2*i;
         TV velocity=impulse/(body[i]->Mass()*sign);
-        T_SPIN angular_velocity=body[i]->World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(location-body[i]->X(),sign*impulse);
-        body[i]->X()+=velocity;
-        body[i]->Rotation()=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*body[i]->Rotation();body[i]->Rotation().Normalize();
+        T_SPIN angular_velocity=body[i]->World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(location-body[i]->Frame().t,sign*impulse);
+        body[i]->Frame().t+=velocity;
+        body[i]->Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*body[i]->Frame().r;body[i]->Frame().r.Normalize();
         body[i]->Update_Angular_Velocity();
         if(body[i]->impulse_accumulator) body[i]->impulse_accumulator->Add_Impulse(location,(half_impulse_for_accumulator?(T).5:(T)1)*TWIST<TV>(velocity,angular_velocity));} //NOTE: These are not impulses but thats ok as we just want to keep track of the changes
 }
@@ -441,7 +441,7 @@ Diagonalize_Inertia_Tensor_Helper(const T_WORLD_INERTIA& inertia_input,T_INERTIA
 template<class TV> void RIGID_BODY<TV>::
 Diagonalize_Inertia_Tensor(const T_WORLD_SPACE_INERTIA_TENSOR& inertia_tensor_at_center_of_mass)
 {
-    Diagonalize_Inertia_Tensor_Helper(inertia_tensor_at_center_of_mass,Inertia_Tensor(),Rotation());
+    Diagonalize_Inertia_Tensor_Helper(inertia_tensor_at_center_of_mass,Inertia_Tensor(),Frame().r);
     Update_Angular_Velocity();
 }
 //#####################################################################
@@ -479,7 +479,7 @@ Effective_Inertia_Inverse(MATRIX<T,mm>& extended_mass_inverse,const TV& location
 {
     if(Has_Infinite_Inertia()){extended_mass_inverse=MATRIX<T,mm>();return;}
 
-    TV r=location-X();
+    TV r=location-Frame().t;
     MATRIX<T,T_SPIN::m> Ii=World_Space_Inertia_Tensor_Inverse();
     MATRIX<T,T_SPIN::m,TV::m> Ii_rs=Ii.Times_Cross_Product_Matrix(r);
     MATRIX<T,TV::m> mi_rst_Ii_rs=Ii_rs.Cross_Product_Matrix_Transpose_Times(r)+1/Mass();
@@ -496,7 +496,7 @@ Effective_Inertia(MATRIX<T,mm>& extended_mass_inverse,const TV& location) const
 {
     PHYSBAM_ASSERT(!Has_Infinite_Inertia());
 
-    TV r=location-X();
+    TV r=location-Frame().t;
     T m=Mass();
     MATRIX<T,TV::m> A=MATRIX<T,TV::m>()+m;
     MATRIX<T,T_SPIN::m,TV::m> B=-m*MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(r);
@@ -523,7 +523,7 @@ Effective_Inertia_Times(const TWIST<TV>& twist,const TV& location) const
 {
     PHYSBAM_ASSERT(!Has_Infinite_Inertia());
 
-    TV r=location-X();
+    TV r=location-Frame().t;
     T_SPIN torque=twist.angular-TV::Cross_Product(r,twist.linear);
     T_SPIN omega=World_Space_Inertia_Tensor_Times(torque);
     return TWIST<TV>(twist.linear*Mass()-TV::Cross_Product(omega,r),omega);
@@ -532,13 +532,13 @@ template<class TV> void RIGID_BODY<TV>::
 Gather_Matrix(MATRIX<T,mm>& gather,const TV& location) const
 {
     gather.Set_Identity_Matrix();
-    gather.Set_Submatrix(TV::m,0,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()));
+    gather.Set_Submatrix(TV::m,0,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-Frame().t));
 }
 template<class TV> void RIGID_BODY<TV>::
 Scatter_Matrix(MATRIX<T,mm>& scatter,const TV& location) const
 {
     scatter.Set_Identity_Matrix();
-    scatter.Set_Submatrix(0,TV::m,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-X()).Transposed());
+    scatter.Set_Submatrix(0,TV::m,MATRIX<T,T_SPIN::m,TV::m>::Cross_Product_Matrix(location-Frame().t).Transposed());
 }
 //#####################################################################
 template class RIGID_BODY<VECTOR<float,1> >;

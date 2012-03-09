@@ -31,8 +31,7 @@ public:
     RIGIDS_KINEMATIC_EVOLUTION<TV> kinematic_evolution;
     ARRAY<TWIST<TV> > rigid_velocity_save;
     ARRAY<T_SPIN> rigid_angular_momentum_save;
-    ARRAY<TV> rigid_X_save;
-    ARRAY<ROTATION<TV> > rigid_rotation_save;
+    ARRAY<FRAME<TV> > rigid_frame_save;
     ARRAY<TV> rigid_velocity_difference;
     ARRAY<T_SPIN> rigid_angular_momentum_difference;
     bool use_existing_contact;
@@ -47,8 +46,7 @@ public:
     MPI_RIGIDS<TV>* mpi_rigids;
 private:
     ARRAY<TWIST<TV> > rigid_V_save,saved_pd;
-    ARRAY<TV> rigid_X_save_for_constraints;
-    ARRAY<ROTATION<TV> > rigid_rotation_save_for_constraints;
+    ARRAY<FRAME<TV> > rigid_frame_save_for_constraints;
 public:
 
     RIGIDS_EVOLUTION(RIGIDS_PARAMETERS<TV>& rigids_parameters_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
@@ -75,7 +73,7 @@ public:
     void Initialize_World_Space_Masses();
     void Clamp_Velocities();
     //void CFL(const bool verbose);
-    void Restore_Position(ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation);
+    void Restore_Position(ARRAY_VIEW<const FRAME<TV> > rigid_frame);
 protected:
     void Average_And_Exchange_Position();
     void Trapezoidal_Step_Velocity(const T dt,const T time);
@@ -89,7 +87,7 @@ protected:
     void Save_Velocity(ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<T_SPIN>& rigid_angular_momentum_save);
     void Restore_Velocity();
     void Restore_Velocity(ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<T_SPIN>& rigid_angular_momentum_save);
-    void Save_Position(ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation);
+    void Save_Position(ARRAY<FRAME<TV> >& rigid_frame);
     void Exchange_Velocity();
 //#####################################################################
 };

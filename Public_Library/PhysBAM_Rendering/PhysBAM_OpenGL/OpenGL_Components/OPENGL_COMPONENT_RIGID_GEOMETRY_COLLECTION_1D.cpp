@@ -145,7 +145,7 @@ Update_Object_Labels()
             if(opengl_point_simplices(i)){
                 if(output_positions){
                     //rigid_geometry_collection->Rigid_Geometry(i).Update_Angular_Velocity();
-                    opengl_point_simplices(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f>",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.X(i).x));}
+                    opengl_point_simplices(i)->Set_Name(STRING_UTILITIES::string_sprintf("%s <%.3f>",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.frame(i).t.x));}
                 else opengl_point_simplices(i)->Set_Name(rigid_geometry_collection->Rigid_Geometry(i).name);}}}
 }
 //#####################################################################
@@ -193,7 +193,7 @@ Display(const int in_color) const
             glColor3f(1,1,1);
             for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
                 if(draw_object(i) && rigid_geometry_collection->Rigid_Geometry(i).name.length()){
-                    OpenGL_String(rigid_geometry_collection->particles.X(i),STRING_UTILITIES::string_sprintf("%s %f",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.twist(i).linear.x));}}}
+                    OpenGL_String(rigid_geometry_collection->particles.frame(i).t,STRING_UTILITIES::string_sprintf("%s %f",rigid_geometry_collection->Rigid_Geometry(i).name.c_str(),rigid_geometry_collection->particles.twist(i).linear.x));}}}
 #endif
         glPopAttrib();}
 }

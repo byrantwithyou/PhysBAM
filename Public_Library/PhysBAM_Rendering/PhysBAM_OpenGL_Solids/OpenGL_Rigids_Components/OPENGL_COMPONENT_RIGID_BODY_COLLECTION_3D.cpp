@@ -287,11 +287,11 @@ Display(const int in_color) const
         OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
         OpenGL_Begin(GL_LINES);
         for(int i=0;i<forces_and_torques.Size();i++) if(rigid_body_collection.Is_Active(i)){
-            OpenGL_Line(rigid_body_collection.rigid_body_particle.X(i),rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x);}
+            OpenGL_Line(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x);}
         OpenGL_End();
         for(int i=0;i<forces_and_torques.Size();i++) if(rigid_body_collection.Is_Active(i)){
             std::string label=STRING_UTILITIES::string_sprintf("F=%.3f %.3f %.3f, T=%.3f %.3f %.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).x.z,forces_and_torques(i).y.x,forces_and_torques(i).y.y,forces_and_torques(i).y.z);
-            OpenGL_String(rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x,label);}
+            OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x,label);}
         glPopAttrib();}
 
     if(slice && slice->Is_Slice_Mode()) glPopAttrib();

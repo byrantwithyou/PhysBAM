@@ -203,11 +203,11 @@ Display(const int in_color) const
                 OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
                 OpenGL_Begin(GL_LINES);
                 for(int i=0;i<forces_and_torques.Size();i++)
-                    OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particle.X(i),rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x);
+                    OPENGL_SHAPES::Draw_Arrow(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x);
                 OpenGL_End();
                 for(int i=0;i<forces_and_torques.Size();i++){
                     std::string label=STRING_UTILITIES::string_sprintf("F=%.3f %.3f, T=%.3f",forces_and_torques(i).x.x,forces_and_torques(i).x.y,forces_and_torques(i).y);
-                    OpenGL_String(rigid_body_collection.rigid_body_particle.X(i)+scale*forces_and_torques(i).x,label);}}
+                    OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t+scale*forces_and_torques(i).x,label);}}
 
             for(int i=0;i<extra_components.Size();i++)
                 for(int j=0;j<extra_components(i).m;j++)
@@ -217,7 +217,7 @@ Display(const int in_color) const
                 glColor3f(1,1,1);
                 for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
                     if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length())
-                        OpenGL_String(rigid_body_collection.rigid_body_particle.X(i),rigid_body_collection.Rigid_Body(i).name);}}
+                        OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.Rigid_Body(i).name);}}
         glPopAttrib();}
 }
 //#####################################################################

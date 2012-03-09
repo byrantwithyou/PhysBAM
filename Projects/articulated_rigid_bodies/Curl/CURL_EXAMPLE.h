@@ -84,7 +84,7 @@ public:
     void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,ARRAY_VIEW<ROTATION<TV> > rotation,const T time) PHYSBAM_OVERRIDE {}
+    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
     void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
     void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
     void Add_External_Impulse(ARRAY_VIEW<TV> V,const int node,const T time,const T dt) PHYSBAM_OVERRIDE {}
@@ -135,7 +135,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           break;
         case 2: // point constraint
           rigid_body=&tests.Add_Rigid_Body("sphere",(T).5,(T).5);
-          rigid_body->X()=parameter_list.Get_Parameter("ball_position",TV((T)1.5,4,0));
+          rigid_body->Frame().t=parameter_list.Get_Parameter("ball_position",TV((T)1.5,4,0));
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
           rigid_body->Set_Name("ball");
           rigid_body->Set_Mass(parameter_list.Get_Parameter("ball_mass",(T)1));
@@ -155,7 +155,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           break;
       case 3:
           rigid_body=&tests.Add_Rigid_Body("subdivided_box",(T).75,(T)1);
-          rigid_body->X()=TV(parameter_list.Get_Parameter("block_x",(T)8),(T).875,0);
+          rigid_body->Frame().t=TV(parameter_list.Get_Parameter("block_x",(T)8),(T).875,0);
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
           rigid_body->Set_Name("block");
           rigid_body->Set_Mass(parameter_list.Get_Parameter("block_mass",(T)1));
@@ -188,8 +188,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           PD_Plank_Curl_Test(num_joints,num_rigid_bodies,TV(0,0,0),ROTATION<TV>(),parameter_list.Get_Parameter("k_p",(T)25));
 
           rigid_body=&tests.Add_Rigid_Body("miniplank25wide2",parameter_list.Get_Parameter("wall_scale",(T)2),(T).5);
-          rigid_body->X()=parameter_list.Get_Parameter("wall_position",TV());
-          rigid_body->Rotation()=ROTATION<TV>((T)pi/2,parameter_list.Get_Parameter("wall_rotation_vector",TV(0,0,1)));
+          rigid_body->Frame().t=parameter_list.Get_Parameter("wall_position",TV());
+          rigid_body->Frame().r=ROTATION<TV>((T)pi/2,parameter_list.Get_Parameter("wall_rotation_vector",TV(0,0,1)));
           rigid_body->Set_Coefficient_Of_Restitution(1);
           rigid_body->Set_Name("wall");
           rigid_body->is_static=true;
@@ -207,15 +207,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
       default:
           LOG::cout<<"make bodies for testing"<<std::endl;
           rigid_body=&tests.Add_Rigid_Body("short_plank_subdivided",1,(T).5);
-          rigid_body->X()=TV(0,0,0);
-          rigid_body->Rotation()=ROTATION<TV>(-(T)pi/2,TV(0,1,0));
+          rigid_body->Frame().t=TV(0,0,0);
+          rigid_body->Frame().r=ROTATION<TV>(-(T)pi/2,TV(0,1,0));
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
           rigid_body->Set_Name("parent");
           rigid_body->is_static=true;
           shelf11=rigid_body;
 
           rigid_body=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-          rigid_body->X()=TV(1,10,0);
+          rigid_body->Frame().t=TV(1,10,0);
           rigid_body->Twist().linear=TV(0,0,0);
           rigid_body->Angular_Momentum()=TV(2,3,5);
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
@@ -244,8 +244,8 @@ void PD_Plank_Curl_Test(int& num_joints,int& num_rigid_bodies,TV shift,ROTATION<
     T desired_x=parameter_list.Get_Parameter("desired_x",(T)0);
     // Create first body
     parent_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T)1);
-    parent_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-    parent_body->Rotation()=orient;
+    parent_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
+    parent_body->Frame().r=orient;
     //parent_body->Angular_Momentum()=TV(0,0,2);
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
     parent_body->Set_Name("parent");
@@ -259,8 +259,8 @@ void PD_Plank_Curl_Test(int& num_joints,int& num_rigid_bodies,TV shift,ROTATION<
     for(int i=0;i<njoints;i++){
         cheight+=(T)1.25;
         child_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T).5);
-        child_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-        child_body->Rotation()=orient;
+        child_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
+        child_body->Frame().r=orient;
         child_body->Twist().linear=TV(0,0,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
@@ -316,7 +316,7 @@ void Raise_To_Horizontal(int& num_joints,int& num_rigid_bodies,const int num_lin
     T desired_x=parameter_list.Get_Parameter("desired_x",(T)0);
     // Create first body
     parent_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T)1);
-    parent_body->X()=TV(-(T).625,-(T).625,0);
+    parent_body->Frame().t=TV(-(T).625,-(T).625,0);
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
     parent_body->Set_Coefficient_Of_Friction(1);
     parent_body->Set_Name("parent");
@@ -328,8 +328,8 @@ void Raise_To_Horizontal(int& num_joints,int& num_rigid_bodies,const int num_lin
     for(int i=0;i<num_links;i++){
         cheight-=(T)1.25;
         child_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T).5);
-        child_body->X()=TV(0,cheight,0);
-        child_body->Rotation()=ROTATION<TV>(-(T)pi/2,TV(0,0,1));
+        child_body->Frame().t=TV(0,cheight,0);
+        child_body->Frame().r=ROTATION<TV>(-(T)pi/2,TV(0,0,1));
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
 
@@ -378,8 +378,8 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
     T desired_x=parameter_list.Get_Parameter("desired_x",(T)0);
     // Create first body
     parent_body=&tests.Add_Rigid_Body("subdivided_box",1,(T)1,false);
-    parent_body->X()=TV(0,0,0);
-    parent_body->Rotation()=ROTATION<TV>::From_Components((T).5,-(T).5,-(T).5,-(T).5);
+    parent_body->Frame().t=TV(0,0,0);
+    parent_body->Frame().r=ROTATION<TV>::From_Components((T).5,-(T).5,-(T).5,-(T).5);
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
     parent_body->Twist().linear=TV((T).1,0,0);
     //parent_body->Angular_Momentum()=TV(0,0,2);
@@ -394,8 +394,8 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
     for(int i=0;i<num_links;i++){
         cheight-=(T)2.5;
         child_body=&tests.Add_Rigid_Body("subdivided_box",1,(T).5,false);
-        child_body->X()=TV(0,cheight,0);
-        child_body->Rotation()=ROTATION<TV>::From_Components((T).5,-(T).5,-(T).5,-(T).5);
+        child_body->Frame().t=TV(0,cheight,0);
+        child_body->Frame().r=ROTATION<TV>::From_Components((T).5,-(T).5,-(T).5,-(T).5);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
         child_body->Set_Mass((T).001);
@@ -434,7 +434,7 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
 
     for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(i);
-        if(rigid_body_collection.rigid_body_particle.kinematic(i)){FRAME<TV> frame;Set_Kinematic_Positions(frame,0,i);rigid_body.Set_Frame(frame);}}
+        if(rigid_body_collection.rigid_body_particle.kinematic(i)){FRAME<TV> frame;Set_Kinematic_Positions(frame,0,i);rigid_body.Frame()=frame;}}
 
     LOG::cout<<"initializing point joint example"<<std::endl;
 }
@@ -449,8 +449,8 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
 
     // Create first body
     parent_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T)1);
-    parent_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-    parent_body->Rotation()=orient;
+    parent_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
+    parent_body->Frame().r=orient;
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
     parent_body->Set_Name("parent");
     parent_body->is_static=true;
@@ -463,8 +463,8 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
     for(int i=0;i<njoints;i++){
         cheight+=(T)1.25;
         child_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T)1);
-        child_body->X()=orient.Rotate(TV(cheight,0,0))+shift;
-        child_body->Rotation()=orient;
+        child_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
+        child_body->Frame().r=orient;
         child_body->Twist().linear=TV(0,0,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
         child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
@@ -508,7 +508,7 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
     arb->Update_With_Breadth_First_Directed_Graph(int(1));
 
 //    jitter_body->Save_State(1,0);
-//    jitter_body->X()=TV(2,0,0);
+//    jitter_body->Frame().t=TV(2,0,0);
 //    jitter_body->Save_State(2,2);
 
     LOG::cout<<"initializing point joint example"<<std::endl;
@@ -540,9 +540,9 @@ void Set_Kinematic_Positions(FRAME<TV>& frame,const T time,const int id) PHYSBAM
 void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 {
     if(selection==7){//jitter test
-        //jitter_body->X()=TV(0,(T)-.1+(T).2*sin(fmod(100*time,(T)pi)),0);
-/*        if(jitter_body->X().x<2){
-            jitter_body->X()+=TV((T).005,0,0);
+        //jitter_body->Frame().t=TV(0,(T)-.1+(T).2*sin(fmod(100*time,(T)pi)),0);
+/*        if(jitter_body->Frame().t.x<2){
+            jitter_body->Frame().t+=TV((T).005,0,0);
         }
 */  }
     PHYSBAM_FATAL_ERROR("pd is now done in the framework");
@@ -551,7 +551,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function){
             JOINT<TV>* joint=arb->joint_mesh.joints(i);JOINT_FUNCTION<TV>* jfunc=joint->joint_function;
             RIGID_BODY<TV>* parent=arb->Parent(joint->id_number),*child=arb->Child(joint->id_number);
-            ROTATION<TV> Fp_wj=parent->Rotation()*joint->F_pj().r;
+            ROTATION<TV> Fp_wj=parent->Frame().r*joint->F_pj().r;
             TV rotation_axis_to_current_target=Fp_wj.Rotate((jfunc->Target_Angle(time)*jfunc->Angle().Inverse()).Rotation_Vector());
             T target_minus_current_angle=rotation_axis_to_current_target.Normalize();
             target_minus_current_angle=wrap(target_minus_current_angle,-(T)pi,(T)pi);
@@ -575,7 +575,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     for(int i=0;i<rigid_body_particles.array_collection->Size();i++){
         LOG::cout<<i<<": "<<rigid_body_particles.angular_momentum(i)<<std::endl;
         total_linear_momentum+=rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear;
-        total_angular_momentum+=TV::Cross_Product(rigid_body_particles.X(i),rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear)+rigid_body_particles.angular_momentum(i);}
+        total_angular_momentum+=TV::Cross_Product(rigid_body_particles.frame(i).t,rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear)+rigid_body_particles.angular_momentum(i);}
     LOG::cout<<"MOMENTA === linear "<<total_linear_momentum<<", angular "<<total_angular_momentum<<std::endl;
 }
 //#####################################################################
