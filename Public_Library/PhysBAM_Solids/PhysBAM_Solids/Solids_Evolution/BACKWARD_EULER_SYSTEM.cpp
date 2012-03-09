@@ -17,7 +17,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/ASYNCHRONOUS_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <climits>
@@ -112,9 +111,6 @@ Project(KRYLOV_VECTOR_BASE<T>& BV) const
     // Applying the projections in this order is equivalent to repeating Zero_Out_Enslaved_Velocity_Nodes after Poststabilization_Projection, which is a (mass) symmetric projection.
     solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.V.array,current_velocity_time+dt,current_position_time);
     solids_evolution.Zero_Out_Enslaved_Velocity_Nodes(V.rigid_V.array,current_velocity_time+dt,current_position_time);
-    if(NEWMARK_EVOLUTION<TV>* newmark=dynamic_cast<NEWMARK_EVOLUTION<TV>*>(&solids_evolution)){
-        if(newmark->asynchronous_evolution){
-            for(int i=0;i<solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++) newmark->asynchronous_evolution->Project(V);}}
     if(!velocity_update){if(arb) arb->Poststabilization_Projection(V.rigid_V.array,true);return;}
     for(int i=0;i<solids_evolution.solids_parameters.implicit_solve_parameters.cg_projection_iterations;i++){
         int middle_projection=1;

@@ -15,7 +15,6 @@ namespace PhysBAM{
 template<class T> class TRIANGLE_REPULSIONS;
 template<class TV> class COLLISION_PARTICLE_STATE;
 template<class TV> class BACKWARD_EULER_SYSTEM;
-template<class TV> class ASYNCHRONOUS_EVOLUTION;
 template<class TV> class RIGIDS_NEWMARK_COLLISION_CALLBACKS;
 template<class T> class KRYLOV_SYSTEM_BASE;
 
@@ -44,7 +43,6 @@ public:
     ARRAY<TV> V_difference,rigid_velocity_difference;
     ARRAY<T_SPIN> rigid_angular_momentum_difference;
     bool use_existing_contact;
-    ASYNCHRONOUS_EVOLUTION<TV>* asynchronous_evolution;
     bool print_matrix;
 
     T postelasticforces_PE;

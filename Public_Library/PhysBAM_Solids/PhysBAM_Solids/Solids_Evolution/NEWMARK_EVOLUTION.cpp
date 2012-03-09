@@ -44,7 +44,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/ASYNCHRONOUS_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/BACKWARD_EULER_SYSTEM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <stdexcept>
@@ -55,7 +54,7 @@ using namespace PhysBAM;
 template<class TV> NEWMARK_EVOLUTION<TV>::
 NEWMARK_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input)
     :SOLIDS_EVOLUTION<TV>(solids_parameters_input,solid_body_collection_input),rigids_evolution_callbacks(*new RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>(*this)),repulsions(0),
-    use_existing_contact(false),asynchronous_evolution(0),print_matrix(false)
+    use_existing_contact(false),print_matrix(false)
 {
 }
 //#####################################################################
@@ -115,7 +114,6 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
         articulated_rigid_body.Poststabilization_Projection(rigid_B_full,true);
         for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);rigid_B_full(p)=world_space_rigid_mass(p)*rigid_B_full(p);}}
 
-    if(asynchronous_evolution) asynchronous_evolution->Project(B_all);
     for(int i=0;i<solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
         B_full(p)=particles.V(p)+dt*particles.one_over_mass(p)*B_full(p);}
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
@@ -164,7 +162,6 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
             GENERALIZED_VELOCITY<TV> V_projected_all(V_projected,rigid_V_projected,solid_body_collection);
             system.Project(V_projected_all);*/}
         else{
-            if(asynchronous_evolution) asynchronous_evolution->Project(F_all);
             for(int i=0;i<solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
                 particles.V(p)=B_full(p)+dt*particles.one_over_mass(p)*F_full(p);}
             for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
@@ -369,10 +366,7 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     // get momentum difference for v^n -> v^{n+1/2} udpate
     if(articulated_rigid_body.Has_Actuators()) example_forces_and_velocities.Set_PD_Targets(dt,time);
 
-    if(asynchronous_evolution && asynchronous_evolution->Take_Full_Backward_Euler_Step_For_Position_Update()){
-        Backward_Euler_Step_Velocity_Helper(dt,time,time,false);
-        asynchronous_evolution->Position_Velocity_Update(dt,time);}
-    else Backward_Euler_Step_Velocity_Helper(dt/2,time,time,false); // update V implicitly to time+dt/2
+    Backward_Euler_Step_Velocity_Helper(dt/2,time,time,false); // update V implicitly to time+dt/2
 
     Diagnostics(dt,time,1,0,5,"backward Euler");
         
