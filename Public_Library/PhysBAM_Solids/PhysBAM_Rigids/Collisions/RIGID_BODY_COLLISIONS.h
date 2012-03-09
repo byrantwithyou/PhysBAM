@@ -22,7 +22,6 @@
 #include <string>
 namespace PhysBAM{
 
-template<class TV> class RIGIDS_EVOLUTION;
 template<class TV> class RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES;
 template<class TV> class RIGID_BODY_CLUSTER_BINDINGS;
 template<class TV> class FRACTURE_PATTERN;

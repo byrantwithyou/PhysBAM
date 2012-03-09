@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/PARTITION_ID.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGIDS_ONLY_COLLISION_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
