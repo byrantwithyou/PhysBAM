@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
@@ -15,7 +16,7 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Dynamics/Read_Write/Particles/READ_WRITE_PARTICLES.h>
+#include <PhysBAM_Dynamics/Read_Write/Particles/READ_WRITE_DYNAMIC_PARTICLES.h>
 #include <fstream>
 using namespace PhysBAM;
 
