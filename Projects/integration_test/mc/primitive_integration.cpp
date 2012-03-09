@@ -79,8 +79,6 @@ int main(int argc, char* argv[])
         LOG::cout<<"integral   "<<F.Definite_Integral(range)<<std::endl;
         F.Integrate(1);
 
-        LOG::cout<<"poly "<<F<<std::endl;
-
         VECTOR<TV,3> triangle1;
         VECTOR<TV,3> triangle2;
         VECTOR<TV,3> triangle3;
