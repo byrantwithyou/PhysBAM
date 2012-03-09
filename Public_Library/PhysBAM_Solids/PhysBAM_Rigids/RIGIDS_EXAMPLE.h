@@ -40,7 +40,7 @@ public:
     MPI_RIGIDS<TV>* mpi_rigids;
     TV_INT processes_per_dimension;
 
-    RIGIDS_EXAMPLE(const STREAM_TYPE stream_type,const int array_collection_type=0);
+    RIGIDS_EXAMPLE(const STREAM_TYPE stream_type);
     virtual ~RIGIDS_EXAMPLE();
 
 //#####################################################################

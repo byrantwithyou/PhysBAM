@@ -8,7 +8,6 @@
 #define __RIGID_GEOMETRY_PARTICLES__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
@@ -34,18 +33,11 @@ public:
     ARRAY_VIEW<TWIST<TV> > twist;
     ARRAY_VIEW<VECTOR<int,3> > structure_ids;
 
-    RIGID_GEOMETRY_PARTICLES(ARRAY_COLLECTION* array_collection_input)
-        :rigid_geometry(0,0),frame(0,0),twist(0,0),structure_ids(0,0)
-    {delete array_collection;array_collection=array_collection_input;Initialize_Array_Collection();}
-
     RIGID_GEOMETRY_PARTICLES()
         :rigid_geometry(0,0),frame(0,0),twist(0,0),structure_ids(0,0)
-    {Initialize_Array_Collection();}
-
-    void Initialize_Array_Collection()
     {array_collection->Add_Array(ATTRIBUTE_ID_RIGID_GEOMETRY,&rigid_geometry);array_collection->Add_Array(ATTRIBUTE_ID_FRAME,&frame);
     array_collection->Add_Array(ATTRIBUTE_ID_TWIST,&twist);array_collection->Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);}
-    
+
     ~RIGID_GEOMETRY_PARTICLES()
     {}
 

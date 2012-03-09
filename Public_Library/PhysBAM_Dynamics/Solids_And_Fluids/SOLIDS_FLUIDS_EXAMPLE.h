@@ -45,7 +45,7 @@ public:
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
 
-    SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,const int array_collection_type=0);
+    SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE();
 
     void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)

@@ -32,8 +32,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLE_BODY_COLLECTION<TV>::
-DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list,ARRAY_COLLECTION* array_collection)
-    :particles(*new DEFORMABLE_PARTICLES<TV>(array_collection?array_collection:new ARRAY_COLLECTION())),deformable_geometry(*new DEFORMABLE_GEOMETRY_COLLECTION<TV>(particles)),simulate(true),
+DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list)
+    :particles(*new DEFORMABLE_PARTICLES<TV>),deformable_geometry(*new DEFORMABLE_GEOMETRY_COLLECTION<TV>(particles)),simulate(true),
     owns_data(true),binding_list(*new BINDING_LIST<TV>(*this)),soft_bindings(*new SOFT_BINDINGS<TV>(binding_list)),mpi_solids(0),implicit_damping(true),
     print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0),
     deformables_example_forces_and_velocities(deformables_example_forces_and_velocities_input),

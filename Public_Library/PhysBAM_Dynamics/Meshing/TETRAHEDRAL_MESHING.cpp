@@ -38,7 +38,7 @@
 using namespace PhysBAM;
 template<class T> TETRAHEDRAL_MESHING<T>::
 TETRAHEDRAL_MESHING(const STREAM_TYPE stream_type)
-    :solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(new EXAMPLE_FORCES_AND_VELOCITIES<TV>(),0)),
+    :solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(new EXAMPLE_FORCES_AND_VELOCITIES<TV>())),
     solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
     implicit_surface(0),level_set_forces_and_velocities(0),
     stream_type(stream_type),output_directory("meshing_data"),frame(0),extra_refinement_criteria(0),dependent_nodes(0),boundary_mesh(0)

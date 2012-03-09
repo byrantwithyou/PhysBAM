@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SOLID_BODY_COLLECTION
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/EXTERNAL_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_HASHTABLE.h>
@@ -30,10 +29,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLID_BODY_COLLECTION<TV>::
-SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities_input,int array_collection_type)
+SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities_input)
     :collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(example_forces_and_velocities_input,collision_body_list,array_collection_type?new EXTERNAL_ARRAY_COLLECTION():new ARRAY_COLLECTION())),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(example_forces_and_velocities_input,&collision_body_list,array_collection_type?new EXTERNAL_ARRAY_COLLECTION():new ARRAY_COLLECTION())),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(example_forces_and_velocities_input,collision_body_list)),
+    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(example_forces_and_velocities_input,&collision_body_list)),
     example_forces_and_velocities(example_forces_and_velocities_input),print_energy(false),simulate(true),iterations_used_diagnostic(0)
 {
     deformable_body_collection.binding_list.deformable_body_collection=&deformable_body_collection;

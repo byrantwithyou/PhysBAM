@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RIGIDS_EXAMPLE
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/EXTERNAL_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
@@ -23,9 +22,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> RIGIDS_EXAMPLE<TV>::
-RIGIDS_EXAMPLE(const STREAM_TYPE stream_type,const int array_collection_type)
+RIGIDS_EXAMPLE(const STREAM_TYPE stream_type)
     :BASE((Initialize_Geometry_Particle(),Initialize_Rigids_Particles(),stream_type)),rigids_parameters(*new RIGIDS_PARAMETERS<TV>),collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
-    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(this,&collision_body_list,array_collection_type?new EXTERNAL_ARRAY_COLLECTION():new ARRAY_COLLECTION())),
+    rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(this,&collision_body_list)),
     rigids_evolution(new RIGIDS_EVOLUTION<TV>(rigids_parameters,rigid_body_collection)),mpi_rigids(0)
 {
     Initialize_Read_Write_Structures();

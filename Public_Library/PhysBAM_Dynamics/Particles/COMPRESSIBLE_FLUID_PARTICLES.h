@@ -27,7 +27,6 @@ public:
     ARRAY_VIEW<TV> grad_phi;
     ARRAY_VIEW<TV> V;
 
-    //COMPRESSIBLE_FLUID_PARTICLES(ARRAY_COLLECTION* array_collection_input);
     COMPRESSIBLE_FLUID_PARTICLES();
     virtual ~COMPRESSIBLE_FLUID_PARTICLES();
 

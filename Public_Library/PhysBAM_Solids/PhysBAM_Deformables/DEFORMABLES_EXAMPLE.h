@@ -40,7 +40,7 @@ public:
     RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection; //kinematic,static bodies
     DEFORMABLES_EVOLUTION<TV>* deformables_evolution;
 
-    DEFORMABLES_EXAMPLE(const STREAM_TYPE stream_type,const int array_collection_type=0);
+    DEFORMABLES_EXAMPLE(const STREAM_TYPE stream_type);
     virtual ~DEFORMABLES_EXAMPLE();
 
 //#####################################################################

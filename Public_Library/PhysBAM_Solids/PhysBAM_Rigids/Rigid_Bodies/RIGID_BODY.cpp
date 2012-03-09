@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/EXTERNAL_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
@@ -40,8 +39,7 @@ RIGID_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool create_co
     :BASE(rigid_body_collection_input.rigid_geometry_collection,create_collision_geometry,-1),rigid_body_collection(rigid_body_collection_input),
     is_temporarily_static(false),fracture_threshold(FLT_MAX),thin_shell(false),CFL_initialized(false)
 {
-    EXTERNAL_ARRAY_COLLECTION* array_collection=dynamic_cast<EXTERNAL_ARRAY_COLLECTION*>(rigid_body_collection.rigid_body_particle.array_collection);
-    if(!array_collection || array_collection->Owns_Element(ATTRIBUTE_ID_RIGID_MASS)) Set_Rigid_Mass(RIGID_BODY_MASS<TV>::Identity_Mass());
+    Set_Rigid_Mass(RIGID_BODY_MASS<TV>::Identity_Mass());
     Angular_Momentum()=T_SPIN();
     rigid_body_collection.rigid_body_particle.kinematic(particle_index)=false;
     Set_Coefficient_Of_Restitution();
@@ -55,8 +53,7 @@ RIGID_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,bool create_co
     :BASE(rigid_body_collection_input.rigid_geometry_collection,create_collision_geometry,index),rigid_body_collection(rigid_body_collection_input),
     is_temporarily_static(false),fracture_threshold(FLT_MAX),thin_shell(false),CFL_initialized(false)
 {
-    EXTERNAL_ARRAY_COLLECTION* array_collection=dynamic_cast<EXTERNAL_ARRAY_COLLECTION*>(rigid_body_collection.rigid_body_particle.array_collection);
-    if(!array_collection || array_collection->Owns_Element(ATTRIBUTE_ID_RIGID_MASS)) Set_Rigid_Mass(RIGID_BODY_MASS<TV>::Identity_Mass());
+    Set_Rigid_Mass(RIGID_BODY_MASS<TV>::Identity_Mass());
     Angular_Momentum()=T_SPIN();
     rigid_body_collection.rigid_body_particle.kinematic(particle_index)=false;
     Set_Coefficient_Of_Restitution();

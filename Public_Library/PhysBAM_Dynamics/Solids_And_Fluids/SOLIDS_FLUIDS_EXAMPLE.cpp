@@ -27,9 +27,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLIDS_FLUIDS_EXAMPLE<TV>::
-SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type,const int array_collection_type)
+SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type)
     :BASE((Initialize_Particles(),stream_type)),use_melting(false),
-    solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this,array_collection_type)),
+    solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),
     solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection))
 {
     Initialize_Read_Write_General_Structures();

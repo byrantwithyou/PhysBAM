@@ -31,7 +31,6 @@ public:
     ARRAY_VIEW<T> one_over_effective_mass;
     bool store_mass;
 
-    DEFORMABLE_PARTICLES(ARRAY_COLLECTION* array_collection_input);
     DEFORMABLE_PARTICLES();
     virtual ~DEFORMABLE_PARTICLES();
 
@@ -55,7 +54,6 @@ public:
     TV Center_Of_Mass() const;
     void Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings);
     template<class T_INDICES> void Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDICES& indices,const bool copy_existing_elements=true);
-    void Initialize_Array_Collection();
 //#####################################################################
 };
 }

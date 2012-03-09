@@ -23,7 +23,6 @@ public:
     ARRAY_VIEW<TV> X,V;
     bool store_velocity;
 
-    GEOMETRY_PARTICLES(ARRAY_COLLECTION* array_collection_input);
     GEOMETRY_PARTICLES();
     virtual ~GEOMETRY_PARTICLES();
 
@@ -38,8 +37,6 @@ public:
     void Euler_Step(const T_INDICES& indices,const ARRAY<TV>& F,const ARRAY<T>& mass,const T dt)
     {V.Subset(indices)+=dt/mass.Subset(indices)*F.Subset(indices);}
 
-//#####################################################################
-    void Initialize_Array_Collection();
 //#####################################################################
 };
 }

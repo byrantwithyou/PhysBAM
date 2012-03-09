@@ -54,7 +54,7 @@ public:
     int resolution;
     DEBUG_PARTICLES<TV>& debug_particles;
 
-    SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type,const int array_collection_type=0);
+    SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 
     void Get_Levelset_Velocity(const T_GRID& grid,T_LEVELSET& levelset,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE

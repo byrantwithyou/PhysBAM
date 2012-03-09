@@ -82,8 +82,13 @@ Write_Arrays(std::ostream& output,const ARRAY_COLLECTION& object)
     for(ATTRIBUTE_INDEX i(0);i<object.arrays.m;i++){
         const ARRAY_COLLECTION_ELEMENT_BASE* entry=object.arrays(i);
         const READ_WRITE_ARRAY_COLLECTION_FUNCTIONS* read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(entry->Hashed_Id()));
-        if(!read_write_functions || !read_write_functions->Write || !read_write_functions->Write_Size)
+        if(!read_write_functions || !read_write_functions->Write || !read_write_functions->Write_Size){
+            ARRAY<ATTRIBUTE_ID> keys;
+            Read_Write_Array_Collection_Registry().Get_Keys(keys);
+            for(int i=0;i<keys.m;i++) LOG::cout<<((unsigned)Value(Type_Only(keys(i)))>>16)<<"  "<<Id_Only(keys(i))<<" > "<<Read_Write_Array_Collection_Registry().Get(keys(i)).name<<std::endl;
+            LOG::cout<<keys<<std::endl;
             PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No write registered for id %i (type %s)\n",Value(entry->id),typeid(*entry).name()));
+        }
 
         int calculated_write_size=read_write_functions->Write_Size(*entry);
         Write_Binary<RW>(output,entry->Typed_Hashed_Id(RW()),calculated_write_size);

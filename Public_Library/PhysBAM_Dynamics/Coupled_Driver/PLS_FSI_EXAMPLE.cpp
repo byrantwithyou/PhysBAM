@@ -70,7 +70,7 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 template<class TV> PLS_FSI_EXAMPLE<TV>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE((Initialize_Particles(),stream_type)),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
-    solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this,0)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
+    solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
     fluids_parameters(number_of_regions,fluids_parameters.WATER),fluid_collection(*fluids_parameters.grid),resolution(0),convection_order(1),use_pls_evolution_for_structure(false),
     two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),m(1),s(1),kg(1)
 {

@@ -12,16 +12,6 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLE_PARTICLES<TV>::
-DEFORMABLE_PARTICLES(ARRAY_COLLECTION* array_collection_input)
-    :mass(0,0),one_over_mass(0,0),effective_mass(0,0),one_over_effective_mass(0,0),store_mass(false)
-{
-    delete array_collection;array_collection=array_collection_input;
-    Initialize_Array_Collection();
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> DEFORMABLE_PARTICLES<TV>::
 DEFORMABLE_PARTICLES()
     :mass(0,0),one_over_mass(0,0),effective_mass(0,0),one_over_effective_mass(0,0),store_mass(false)
 {
@@ -71,14 +61,6 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDI
     for(int i=0;i<indices.Size();i++){int p=indices(i);
         one_over_effective_mass(p)=soft_bindings.One_Over_Effective_Mass(p);
         effective_mass(p)=Robust_Inverse(one_over_effective_mass(p));}
-}
-//#####################################################################
-// Function Initialize_Array_Collection
-//#####################################################################
-template<class TV> void DEFORMABLE_PARTICLES<TV>::
-Initialize_Array_Collection()
-{
-    GEOMETRY_PARTICLES<TV>::Initialize_Array_Collection();
 }
 //#####################################################################
 template class DEFORMABLE_PARTICLES<VECTOR<float,1> >;

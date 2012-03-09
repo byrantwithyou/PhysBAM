@@ -34,7 +34,7 @@ void Initialize_Geometry_Particle()
 
     #define READ_WRITE_VECTOR_HELPER(T,RW,d) \
         Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<VECTOR<T,d> >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<ROTATION<VECTOR<T,d> > >(); \
+        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<FRAME<VECTOR<T,d> > >(); \
         Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<TWIST<VECTOR<T,d> > >(); \
         Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<RIGID_GEOMETRY<VECTOR<T,d> >*>();
 

@@ -48,7 +48,7 @@ public:
     bool simulate;
     int iterations_used_diagnostic;
 
-    SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities_input,int array_collection_type=0);
+    SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velocities_input);
     virtual ~SOLID_BODY_COLLECTION();
 
     void Print_Diagnostics(const bool print_diagnostics_input=true)

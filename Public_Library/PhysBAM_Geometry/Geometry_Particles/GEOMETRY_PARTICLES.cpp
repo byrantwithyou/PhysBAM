@@ -9,33 +9,17 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> GEOMETRY_PARTICLES<TV>::
-GEOMETRY_PARTICLES(ARRAY_COLLECTION* array_collection_input)
-    :X(0,0),V(0,0),store_velocity(false)
-{
-    delete array_collection;array_collection=array_collection_input;
-    Initialize_Array_Collection();
-}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> GEOMETRY_PARTICLES<TV>::
 GEOMETRY_PARTICLES()
     :X(0,0),V(0,0),store_velocity(false)
-{}
+{
+    array_collection->Add_Array(ATTRIBUTE_ID_X,&X);
+}
 //#####################################################################
 // Destructor 
 //#####################################################################
 template<class TV> GEOMETRY_PARTICLES<TV>::
 ~GEOMETRY_PARTICLES()
 {}
-//#####################################################################
-// Function Initialize_Array_Collection
-//#####################################################################
-template<class TV> void GEOMETRY_PARTICLES<TV>::
-Initialize_Array_Collection()
-{
-    array_collection->Add_Array(ATTRIBUTE_ID_X,&X);
-}
 //#####################################################################
 template class GEOMETRY_PARTICLES<VECTOR<float,1> >;
 template class GEOMETRY_PARTICLES<VECTOR<float,2> >;

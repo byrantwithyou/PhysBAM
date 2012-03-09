@@ -42,8 +42,7 @@ public:
     bool print_energy;
     int iterations_used_diagnostic;
 
-    RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input,
-        ARRAY_COLLECTION* array_collection=0);
+    RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input);
     virtual ~RIGID_BODY_COLLECTION();
 
     RIGID_BODY_STATE<TV> State(const int particle) const

@@ -44,8 +44,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
-SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type,const int array_collection_type)
-    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type,array_collection_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(0),
+SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type)
+    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(0),
     debug_particles(*new DEBUG_PARTICLES<TV>)
 {}
 //#####################################################################

@@ -38,10 +38,9 @@ struct ALLOCATE_BODY_HELPER:public ALLOCATE_HELPER<TV>
 // Constructor
 //#####################################################################
 template<class TV> RIGID_BODY_COLLECTION<TV>::
-RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input,
-    ARRAY_COLLECTION* array_collection)
+RIGID_BODY_COLLECTION(RIGIDS_EXAMPLE_FORCES_AND_VELOCITIES<TV>* rigids_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list_input)
     :rigid_geometry_collection(rigid_body_particle,rigids_example_forces_and_velocities_input,collision_body_list_input,new ALLOCATE_BODY_HELPER<TV>(*this)),
-    rigid_body_particle(array_collection?array_collection:new ARRAY_COLLECTION),articulated_rigid_body(*new ARTICULATED_RIGID_BODY<TV>(*this)),
+    articulated_rigid_body(*new ARTICULATED_RIGID_BODY<TV>(*this)),
     rigid_body_cluster_bindings(*new RIGID_BODY_CLUSTER_BINDINGS<TV>(*this,articulated_rigid_body)),rigids_example_forces_and_velocities(rigids_example_forces_and_velocities_input),
     dynamic_rigid_body_particles(0),static_rigid_bodies(rigid_geometry_collection.static_rigid_geometry),kinematic_rigid_bodies(rigid_geometry_collection.kinematic_rigid_geometry),
     static_and_kinematic_rigid_bodies(0),print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0)

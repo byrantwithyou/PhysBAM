@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DEFORMABLES_EXAMPLE
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/EXTERNAL_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/ROTATION.h>
@@ -30,10 +29,10 @@ void Initialize_Geometry_Particle();
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLES_EXAMPLE<TV>::
-DEFORMABLES_EXAMPLE(const STREAM_TYPE stream_type,const int array_collection_type)
+DEFORMABLES_EXAMPLE(const STREAM_TYPE stream_type)
     :BASE((Initialize_Geometry_Particle(),Initialize_Deformables_Particles(),stream_type)),deformables_parameters(*new DEFORMABLES_PARAMETERS<TV>),collision_body_list(*new COLLISION_GEOMETRY_COLLECTION<TV>),
-    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(this,collision_body_list,array_collection_type?new EXTERNAL_ARRAY_COLLECTION():new ARRAY_COLLECTION())),
-    rigid_geometry_collection(*new RIGID_GEOMETRY_COLLECTION<TV>(*new RIGID_GEOMETRY_PARTICLES<TV>(array_collection_type?new EXTERNAL_ARRAY_COLLECTION():new ARRAY_COLLECTION()),this,&collision_body_list)),
+    deformable_body_collection(*new DEFORMABLE_BODY_COLLECTION<TV>(this,collision_body_list)),
+    rigid_geometry_collection(*new RIGID_GEOMETRY_COLLECTION<TV>(*new RIGID_GEOMETRY_PARTICLES<TV>,this,&collision_body_list)),
     deformables_evolution(new DEFORMABLES_EVOLUTION<TV>(deformables_parameters,deformable_body_collection,rigid_geometry_collection))
 {
     Initialize_Read_Write_Structures();

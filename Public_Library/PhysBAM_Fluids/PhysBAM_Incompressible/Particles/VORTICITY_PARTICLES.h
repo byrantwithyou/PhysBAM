@@ -23,7 +23,6 @@ public:
     ARRAY_VIEW<typename TV::SPIN> vorticity;
     ARRAY_VIEW<T> radius;
 
-    //VORTICITY_PARTICLES(ARRAY_COLLECTION* array_collection_input);
     VORTICITY_PARTICLES();
     virtual ~VORTICITY_PARTICLES();
 };

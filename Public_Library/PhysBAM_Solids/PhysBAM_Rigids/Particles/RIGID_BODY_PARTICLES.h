@@ -28,7 +28,6 @@ public:
     ARRAY_VIEW<T_INERTIA_TENSOR> inertia_tensor;
     ARRAY_VIEW<bool> kinematic;
 
-    RIGID_BODY_PARTICLES(ARRAY_COLLECTION* array_collection);
     RIGID_BODY_PARTICLES();
     virtual ~RIGID_BODY_PARTICLES();
 
@@ -45,8 +44,6 @@ public:
     void Remove_Body(const int p)
     {BASE::Remove_Geometry(p);}
 
-//#####################################################################
-    void Initialize_Array_Collection();
 //#####################################################################
 };
 }

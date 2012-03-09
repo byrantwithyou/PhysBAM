@@ -72,8 +72,7 @@ public:
     bool use_nonembedded_self_collision; // TODO: have one of these per fragment
     bool check_stale;
 
-    DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list,
-        ARRAY_COLLECTION* array_collection=0);
+    DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
     virtual ~DEFORMABLE_BODY_COLLECTION();
 
     template<class T_FORCE> T_FORCE
