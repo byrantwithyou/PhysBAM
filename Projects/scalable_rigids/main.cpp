@@ -5,7 +5,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/RIGIDS_DRIVER.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
-#include "Standard_Tests/STANDARD_TESTS_RIGIDS_ONLY.h"
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
@@ -316,10 +315,7 @@ int main(int argc,char* argv[])
     
     std::cout << "A3 " << std::endl << A3 << std::endl;*/
 #else
-    EXAMPLE<TV>* example;
-
-    if(PARSE_ARGS::Find_And_Remove("-rigids_only",argc,argv)) example=new STANDARD_TESTS_RIGIDS_ONLY<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
+    EXAMPLE<TV>* example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(argc,argv);
 
     if(RIGIDS_EXAMPLE<TV>* rigids_example=dynamic_cast<RIGIDS_EXAMPLE<TV>*>(example)){

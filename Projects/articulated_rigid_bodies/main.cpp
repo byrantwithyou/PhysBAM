@@ -25,7 +25,6 @@
 //#include "Skeleton/SKELETON_EXAMPLE.h"
 //#include "Snake/SNAKE_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
-#include "Standard_Tests/STANDARD_TESTS_RIGIDS_ONLY.h"
 #include "Tank/TANK_EXAMPLE.h"
 //#include "TP/TP_EXAMPLE.h"
 //#include "Visible_Human/VISIBLE_HUMAN_EXAMPLE.h"
@@ -46,7 +45,6 @@ int main(int argc,char** argv)
     else if(PARSE_ARGS::Find_And_Remove("-bridge",argc,argv)) example=new BRIDGE_EXAMPLE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-magnets",argc,argv)) example=new MAGNETS_EXAMPLE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-curl",argc,argv)) example=new CURL_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-rigids_only",argc,argv)) example=new STANDARD_TESTS_RIGIDS_ONLY<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(argc,argv);
 

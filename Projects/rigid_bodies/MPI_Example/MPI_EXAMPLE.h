@@ -25,37 +25,38 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Body_Clusters/RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/RIGIDS_EXAMPLE.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Standard_Tests/RIGIDS_STANDARD_TESTS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
+#include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
+#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../../rigid_bodies/RANDOM_PLACEMENT.h"
 namespace PhysBAM{
 
 template<class T_input>
-class MPI_EXAMPLE:public RIGIDS_EXAMPLE<VECTOR<T_input,3> >
+class MPI_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;
 public:
     int width, height, num_bodies;
 
-    typedef RIGIDS_EXAMPLE<TV> BASE;
-    using BASE::rigids_parameters;using BASE::rigid_body_collection;using BASE::rigids_evolution;using BASE::test_number;using BASE::frame_rate;
-    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;using BASE::processes_per_dimension;
+    typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
+    using BASE::solids_parameters;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::test_number;using BASE::frame_rate;
+    using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::stream_type;using BASE::parse_args;
 
-    RIGIDS_STANDARD_TESTS<TV> tests;
+    SOLIDS_STANDARD_TESTS<TV> tests;
 
     int kinematic_body_id;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     MPI_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type),tests(*this,rigid_body_collection)
+        :BASE(stream_type,0,this->fluids_parameters.NONE),tests(*this,solid_body_collection)
     {
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
-        rigids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
-        rigids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
-        //rigids_parameters.rigid_body_collision_parameters.use_shock_propagation=false;
-        rigids_parameters.cfl=1;
+        solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
+        solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
+        //solids_parameters.rigid_body_collision_parameters.use_shock_propagation=false;
+        solids_parameters.cfl=1;
     }
 
     ~MPI_EXAMPLE()
@@ -91,21 +92,21 @@ public:
 //#####################################################################
 void Post_Initialization() PHYSBAM_OVERRIDE
 {
-    RIGID_BODY_COLLISIONS<TV>& collisions=*rigids_evolution->rigid_body_collisions;
+    RIGID_BODY_COLLISIONS<TV>& collisions=*solids_evolution->rigid_body_collisions;
     collisions.Set_Push_Out_Level_Iterations(1);
     if(test_number==9||test_number==10){
         int level=1;
-        rigids_parameters.rigid_body_collision_parameters.collision_iterations=level;
+        solids_parameters.rigid_body_collision_parameters.collision_iterations=level;
         collisions.Set_Collision_Pair_Iterations(level*2);
-        rigids_parameters.rigid_body_collision_parameters.contact_iterations=level;
+        solids_parameters.rigid_body_collision_parameters.contact_iterations=level;
         collisions.Set_Contact_Level_Iterations(level);
         collisions.Set_Contact_Pair_Iterations(level*2);
-        rigids_parameters.rigid_body_collision_parameters.use_shock_propagation=true;
+        solids_parameters.rigid_body_collision_parameters.use_shock_propagation=true;
         collisions.Set_Shock_Propagation_Iterations(level);
         collisions.Set_Shock_Propagation_Level_Iterations(level);
         collisions.Set_Shock_Propagation_Pair_Iterations(level*2);
-        rigids_parameters.rigid_body_collision_parameters.use_push_out=true;
-        rigids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
+        solids_parameters.rigid_body_collision_parameters.use_push_out=true;
+        solids_parameters.rigid_body_collision_parameters.use_legacy_push_out=true;
         collisions.Set_Push_Out_Iterations(level);
         collisions.Set_Push_Out_Level_Iterations(level);
         collisions.Set_Push_Out_Pair_Iterations(level*2);
@@ -116,11 +117,11 @@ void Post_Initialization() PHYSBAM_OVERRIDE
 //#####################################################################
 void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 {
-    RIGID_BODY_COLLISIONS<TV>& collisions=rigid_body_collection.rigid_body_collisions;
+    RIGID_BODY_COLLISIONS<TV>& collisions=*solids_evolution->rigid_body_collisions;
     if(test_number==8){
-        rigids_parameters.rigid_body_collision_parameters.perform_collisions=false;
-        rigids_parameters.rigid_body_collision_parameters.collision_iterations=0;
-        rigids_parameters.rigid_body_collision_parameters.contact_iterations=0;
+        solids_parameters.rigid_body_collision_parameters.perform_collisions=false;
+        solids_parameters.rigid_body_collision_parameters.collision_iterations=0;
+        solids_parameters.rigid_body_collision_parameters.contact_iterations=0;
         collisions.Set_Shock_Propagation_Iterations(0);}
 }
 //#####################################################################
@@ -129,9 +130,6 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-xprocs",0,"procs in the x direction");
-    parse_args->Add_Integer_Argument("-yprocs",0,"procs in the y direction");
-    parse_args->Add_Integer_Argument("-zprocs",0,"procs in the y direction");
     parse_args->Add_Integer_Argument("-width",2,"number of stacks");
     parse_args->Add_Integer_Argument("-height",4,"height of each stack");
     parse_args->Add_Integer_Argument("-num_bodies",6,"number of total bodies");
@@ -143,9 +141,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     output_directory=STRING_UTILITIES::string_sprintf("MPI_Example/Test_%d",test_number);
-    processes_per_dimension.x=parse_args->Get_Integer_Value("-xprocs");
-    processes_per_dimension.y=parse_args->Get_Integer_Value("-yprocs");
-    processes_per_dimension.z=parse_args->Get_Integer_Value("-zprocs");
     width=parse_args->Get_Integer_Value("-width");
     height=parse_args->Get_Integer_Value("-height");
     num_bodies=parse_args->Get_Integer_Value("-num_bodies");
@@ -200,7 +195,7 @@ void Pyramid_Of_Boxes()
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
-    rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Stacked_Boxes
@@ -227,7 +222,7 @@ void Stacked_Boxes() {
 
     tests.Add_Ground(1, -10);
     last_frame = 250;
-    rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Partition_Test
@@ -253,7 +248,7 @@ void Contact_Test_1() {
             rigid_body->Frame().t = TV(i*4,j*2,0);}}
 
     tests.Add_Ground(1, -1);
-    rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Contact_Test_2
@@ -269,7 +264,7 @@ void Contact_Test_2() {
         width--;}
 
     tests.Add_Ground(1, -1);
-    rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection, true));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection, true));
 }
 //#####################################################################
 // Function Simple_Collision_Test
@@ -328,8 +323,8 @@ void Many_Sphere_Test()
     typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;    
      VECTOR<T,3> num_bodies=TV(40,200,40);
      for(int i=0;i<num_bodies.x;i++) for(int j=0;j<num_bodies.y;j++) for(int k=0;k<num_bodies.z;k++){
-        RIGID_BODY_PARTICLES<TV>& particles=rigid_body_collection.rigid_body_particle;    
-        RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection);
+        RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
+        RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection);
         T radius=1;TV center;
         T offset=.1,offset2=.1;if(j%2==0){offset=-.1;offset2=-.1;}
         center=VECTOR<T,3>(3*i+offset,3*j+1,3*k+offset2);
@@ -339,12 +334,12 @@ void Many_Sphere_Test()
         particles.inertia_tensor(rigid_body.particle_index)=T_INERTIA_TENSOR();particles.inertia_tensor(rigid_body.particle_index)+=1;
         SPHERE<TV> sphere(TV(0,0,0),radius);
         rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(sphere));
-        rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
-        rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
-        rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
+        solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
+        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     tests.Add_Ground((T).5,0,0);
-    RIGID_GRAVITY<TV> *gravity=new RIGID_GRAVITY<TV>(rigid_body_collection,true);
-    rigid_body_collection.Add_Force(gravity);
+    RIGID_GRAVITY<TV> *gravity=new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,true);
+    solid_body_collection.rigid_body_collection.Add_Force(gravity);
 }
 //#####################################################################
 // Function Cluster_Fracture
@@ -355,7 +350,7 @@ void Break_Levelset()
     typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
     ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
     ARRAY<int>* referenced_rigid_particles=new ARRAY<int>;
-    RIGID_BODY_PARTICLES<TV>& particles=rigid_body_collection.rigid_body_particle;    
+    RIGID_BODY_PARTICLES<TV>& particles=solid_body_collection.rigid_body_collection.rigid_body_particle;    
     GRID<TV>& grid=*new GRID<TV>;
     ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
     LEVELSET_3D<GRID<TV> > levelset(grid,phi);
@@ -368,7 +363,7 @@ void Break_Levelset()
         TV_INT cell=levelset.grid.Cell(iterator.Location(),0);
         if(!phi.Valid_Index(cell)) continue;
         if(phi(cell)>0) continue;
-        RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(rigid_body_collection);
+        RIGID_BODY<TV>& rigid_body=*new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection);
         children.Append(rigid_body.particle_index);
         referenced_rigid_particles->Append(rigid_body.particle_index);
         particles.frame(rigid_body.particle_index)=FRAME<TV>(iterator.Location());
@@ -381,19 +376,19 @@ void Break_Levelset()
         //rigid_body.Add_Structure(*new ANALYTIC_IMPLICIT_OBJECT<SPHERE<TV> >(box));
         if(!surface) surface=TESSELLATION::Generate_Triangles(box);
         rigid_body.Add_Structure(*surface);  
-        rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
-        rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
-        rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
+        solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(&rigid_body);
+        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_body),rigid_body.particle_index,true);
+        solid_body_collection.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(rigid_body.particle_index)->add_to_spatial_partition=true;}
     tests.Add_Ground((T).5,-2,0);
     
-    rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(rigid_body_collection,referenced_rigid_particles));
+    solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 }
 //#####################################################################
 // Function Postprocess_Frame
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    rigid_body_collection.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();
+    solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();
 }
 //#####################################################################
 };

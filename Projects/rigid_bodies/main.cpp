@@ -7,7 +7,6 @@
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "MPI_Example/MPI_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
-#include "Standard_Tests/STANDARD_TESTS_RIGIDS_ONLY.h"
 using namespace PhysBAM;
 
 int main(int argc,char* argv[])
@@ -19,8 +18,7 @@ int main(int argc,char* argv[])
 
     EXAMPLE<TV>* example;
 
-    if(PARSE_ARGS::Find_And_Remove("-rigids_only",argc,argv)) example=new STANDARD_TESTS_RIGIDS_ONLY<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-testmpi",argc,argv)) example=new MPI_EXAMPLE<T>(stream_type);
+    if(PARSE_ARGS::Find_And_Remove("-testmpi",argc,argv)) example=new MPI_EXAMPLE<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
     example->Parse(argc,argv);

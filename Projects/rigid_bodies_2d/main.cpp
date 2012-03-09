@@ -5,8 +5,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Parallel_Computation/MPI_RIGIDS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/RIGIDS_DRIVER.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
+#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_DRIVER_UNIFORM.h>
 #include "Standard_Tests/STANDARD_TESTS.h"
 using namespace PhysBAM;
 
@@ -24,10 +24,7 @@ int main(int argc,char *argv[])
     example.want_mpi_world=true;
     example.Parse(argc,argv);
 
-    if(example.mpi_world->initialized) example.mpi_rigids=new MPI_RIGIDS<TV>();
-    example.Adjust_Output_Directory_For_MPI(example.mpi_rigids);
-
-    RIGIDS_DRIVER<TV> driver(example);
+    SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(example);
     driver.Execute_Main_Program();
 
     return 0;
