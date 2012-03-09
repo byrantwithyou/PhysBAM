@@ -78,7 +78,7 @@ Bounding_Box() const
 template<class T,class RW> void OPENGL_COMPONENT_SEGMENT_ADHESION<T,RW>::
 Reinitialize(bool force)
 {
-    const PARTICLES<TV>& real_particles=opengl_component_deformable_body.deformable_body_collection.particles;
+    const DEFORMABLE_PARTICLES<TV>& real_particles=opengl_component_deformable_body.deformable_body_collection.particles;
     (const_cast<OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>& >(opengl_component_deformable_body)).Reinitialize(force);
 
     if(!draw || !(force || !valid || (is_animation && frame_loaded!=frame) || (!is_animation && frame_loaded<0))) return;

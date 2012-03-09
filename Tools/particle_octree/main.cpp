@@ -159,7 +159,7 @@ int main(int argc, char* argv[])
         if(particles) for(int p=0;p<particles->number;p++){
             if(implicit_surface.levelset.Phi(particles->X(p))>0) {
                 if(!particles_array(i,j,ij)) particles_array(i,j,ij)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<T,VECTOR_3D<T> >();
-                PARTICLES::Move_Particle(*particles,*particles_array(i,j,ij),p);}}}
+                DEFORMABLE_PARTICLES::Move_Particle(*particles,*particles_array(i,j,ij),p);}}}
 
     std::cout<<"Creating octree grid"<<std::endl;
     Pad_Grid(implicit_surface.levelset.grid);

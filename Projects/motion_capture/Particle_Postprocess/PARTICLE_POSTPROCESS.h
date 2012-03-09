@@ -200,7 +200,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // correct number nodes
     for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();

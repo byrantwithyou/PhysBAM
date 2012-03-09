@@ -728,7 +728,7 @@ FRAME<TV> Find_Placement(RANDOM_NUMBERS<T>& random,const RANGE<TV>& bounding_box
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     // Add rigid bodies and initialize deformable objects into solids_tests

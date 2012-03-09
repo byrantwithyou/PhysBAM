@@ -162,7 +162,7 @@ Check_For_Intersection(const bool grow_thickness_to_find_first_self_intersection
 template<class TV> void TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>::
 Save_Self_Collision_Free_State() // assumes mass does not change
 {
-    PARTICLES<TV>& full_particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& full_particles=deformable_body_collection.particles;
     X_self_collision_free=full_particles.X;
     V_self_collision_free=full_particles.V;
 }
@@ -172,7 +172,7 @@ Save_Self_Collision_Free_State() // assumes mass does not change
 template<class TV> void TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>::
 Restore_Self_Collision_Free_State()
 {
-    PARTICLES<TV>& full_particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& full_particles=deformable_body_collection.particles;
     full_particles.X=X_self_collision_free;
     full_particles.V=V_self_collision_free;
 }

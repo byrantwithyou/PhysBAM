@@ -10,7 +10,7 @@
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_ARCBALL.h>
@@ -37,7 +37,7 @@ public:
     std::string filename;
     std::string rigid_body_filename;
     std::string mesh_filename;
-    PARTICLES<TV> particles;
+    DEFORMABLE_PARTICLES<TV> particles;
     TRIANGLE_MESH human_tri_mesh;
     TETRAHEDRON_MESH human_tet_mesh;
     TRIANGULATED_SURFACE<T> human_surface;

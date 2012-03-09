@@ -27,7 +27,7 @@ public:
     using BASE::parameters;using BASE::plastic_parameters;using BASE::use_plasticity;using BASE::compute_half_forces;
     using BASE::mesh;typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;using BASE::Compute_Plasticity;
 
-    LINEAR_ALTITUDE_SPRINGS_2D(PARTICLES<TV>& particles,TRIANGLE_MESH& mesh)
+    LINEAR_ALTITUDE_SPRINGS_2D(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& mesh)
         :LINEAR_ALTITUDE_SPRINGS<TV,2>(particles,mesh)
     {}
 
@@ -51,7 +51,7 @@ public:
 };
 
 template<class T> LINEAR_ALTITUDE_SPRINGS_2D<T>*
-Create_Altitude_Springs(PARTICLES<VECTOR<T,2> >& particles,TRIANGLE_MESH& mesh,const T stiffness=200,const T overdamping_fraction=2,
+Create_Altitude_Springs(DEFORMABLE_PARTICLES<VECTOR<T,2> >& particles,TRIANGLE_MESH& mesh,const T stiffness=200,const T overdamping_fraction=2,
     const bool use_compressed_by_threshold_only=true,const T fraction_compression=.1,const bool limit_time_step_by_strain_rate=true,
     const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true)
 {
@@ -64,7 +64,7 @@ Create_Altitude_Springs(TRIANGULATED_AREA<T>& object,const T stiffness=200,const
     const bool use_compressed_by_threshold_only=true,const T fraction_compression=.1,const bool limit_time_step_by_strain_rate=true,
     const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true)
 {
-    return Create_Altitude_Springs(dynamic_cast<PARTICLES<VECTOR<T,2> >&>(object.particles),object.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,fraction_compression,
+    return Create_Altitude_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,2> >&>(object.particles),object.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,fraction_compression,
         limit_time_step_by_strain_rate,max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose);
 }
 

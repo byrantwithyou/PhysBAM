@@ -60,7 +60,7 @@ public:
     T_SPRING_HASH* springs;
     ARRAY<int> segments_with_springs;
 
-    GUIDE_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh_input,SEGMENT_MESH& guide_mesh_input,
+    GUIDE_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh_input,SEGMENT_MESH& guide_mesh_input,
         ARRAY<HAIR_ID>& particle_to_spring_id_input,ARRAY<int,HAIR_ID>& roots_input);
 
     virtual ~GUIDE_ADHESION();

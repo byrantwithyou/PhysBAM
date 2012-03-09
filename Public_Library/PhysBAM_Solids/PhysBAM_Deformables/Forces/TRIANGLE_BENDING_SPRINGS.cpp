@@ -8,13 +8,13 @@
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/TRIANGLE_BENDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T> TRIANGLE_BENDING_SPRINGS<T>::
-TRIANGLE_BENDING_SPRINGS(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,const bool implicit)
+TRIANGLE_BENDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,const bool implicit)
     :LINEAR_SPRINGS<TV>(particles,bending_segment_mesh,implicit)
 {
     Initialize(triangle_mesh);
@@ -52,7 +52,7 @@ Initialize(TRIANGLE_MESH& triangle_mesh)
 // Function Create_Bending_Springs
 //#####################################################################
 template<class T> TRIANGLE_BENDING_SPRINGS<T>* PhysBAM::
-Create_Bending_Springs(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T stiffness,const T overdamping_fraction,
+Create_Bending_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T stiffness,const T overdamping_fraction,
     const bool limit_time_step_by_strain_rate,const T max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const T restlength_enlargement_fraction,
     const bool verbose,const bool implicit)
 {
@@ -74,7 +74,7 @@ template<class T> TRIANGLE_BENDING_SPRINGS<T>* PhysBAM::
 Create_Bending_Springs(TRIANGULATED_SURFACE<T>& triangulated_surface,const T stiffness,const T overdamping_fraction,const bool limit_time_step_by_strain_rate,
     const T max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const T restlength_enlargement_fraction,const bool verbose,const bool implicit)
 {
-    return Create_Bending_Springs(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
+    return Create_Bending_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
         use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################

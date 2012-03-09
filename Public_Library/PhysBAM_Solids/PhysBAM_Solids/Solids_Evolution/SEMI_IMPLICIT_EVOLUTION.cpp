@@ -18,7 +18,7 @@ using namespace PhysBAM;
 template<class T> void SEMI_IMPLICIT_EVOLUTION<T>::
 Advance_One_Time_Step(const T dt,const T time)
 {
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.binding_list;
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*deformable_object.example_forces_and_velocities;
 

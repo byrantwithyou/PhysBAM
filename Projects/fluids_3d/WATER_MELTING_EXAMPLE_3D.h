@@ -124,7 +124,7 @@ void Modify_Fluid_For_Melting(const T dt,const T time)
             LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
             RED_GREEN_GRID_3D<T>& grid=levelset.grid;
             EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_tetrahedralized_volume=levelset.embedded_tetrahedralized_volume;
-            PARTICLES<T,VECTOR_3D<T> >& particles=embedded_tetrahedralized_volume.particles;
+            DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=embedded_tetrahedralized_volume.particles;
             ARRAY<VECTOR_3D<T> > cell_based_X(grid.number_of_nodes);
             ARRAY<VECTOR_3D<T> > cell_based_V(grid.number_of_nodes);
             for(int i=0;i<grid.number_of_nodes;i++)if(levelset.node_to_particle_mapping(i)){

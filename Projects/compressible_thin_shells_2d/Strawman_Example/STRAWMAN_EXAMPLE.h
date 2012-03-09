@@ -30,7 +30,7 @@
 #include <PhysBAM_Geometry/Read_Write/Implicit_Objects/READ_WRITE_ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Particles/READ_WRITE_RIGIDS_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/GEOMETRY_BOUNDARY_POLICY.h>

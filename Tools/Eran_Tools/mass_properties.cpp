@@ -5,7 +5,7 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
@@ -24,7 +24,7 @@ Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
     LOG::cout<<"using "<<(IS_SAME<T,float>::value?"floats":"doubles")<<std::endl;
 
     TRIANGLE_MESH mesh;
-    PARTICLES<TV> particles;
+    DEFORMABLE_PARTICLES<TV> particles;
     TRIANGULATED_SURFACE<T> surface(mesh,particles);
     FILE_UTILITIES::Read_From_File<RW>(filename,surface);
     surface.Update_Triangle_List();

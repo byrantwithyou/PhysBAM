@@ -29,7 +29,7 @@ public:
     typedef typename BASE::ELEMENT_ITERATOR ELEMENT_ITERATOR;
     using BASE::parameters;using BASE::Compute_Plasticity;
 
-    LINEAR_ALTITUDE_SPRINGS_3D(PARTICLES<TV>& particles,TETRAHEDRON_MESH& tetrahedron_mesh);
+    LINEAR_ALTITUDE_SPRINGS_3D(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& tetrahedron_mesh);
     virtual ~LINEAR_ALTITUDE_SPRINGS_3D();
 
 //#####################################################################
@@ -58,7 +58,7 @@ public:
 };
 
 template<class T> LINEAR_ALTITUDE_SPRINGS_3D<T>*
-Create_Altitude_Springs(PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,
+Create_Altitude_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,
     const T stiffness=200,const T overdamping_fraction=2,const bool use_compressed_by_threshold_only=true,const T fraction_compression=.1,const bool limit_time_step_by_strain_rate=true,
     const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true);
 

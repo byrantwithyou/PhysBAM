@@ -17,7 +17,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV,int d> class LEVELSET_GRAIN_BOUNDARIES;
@@ -44,7 +44,7 @@ public:
     int number_of_fracture_initiations;
     T_EMBEDDED_OBJECT& embedded_object;
 private:
-    PARTICLES<TV> reference_particles;
+    DEFORMABLE_PARTICLES<TV> reference_particles;
     T_MESH reference_mesh;
 public:
     T_SIMPLICIAL_OBJECT reference_simplicial_object;

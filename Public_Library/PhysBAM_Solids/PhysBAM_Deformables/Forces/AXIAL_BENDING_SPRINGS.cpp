@@ -12,14 +12,14 @@
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/AXIAL_BENDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using ::std::sqrt;
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T> AXIAL_BENDING_SPRINGS<T>::
-AXIAL_BENDING_SPRINGS(PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input)
+AXIAL_BENDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input)
     :DEFORMABLES_FORCES<TV>(particles_input),triangle_mesh(triangle_mesh_input),verbose(false)
 {
     Initialize();
@@ -333,7 +333,7 @@ Effective_Impulse_Factor(int s) const
 // Function Create_Axial_Bending_Springs
 //#####################################################################
 template<class T> AXIAL_BENDING_SPRINGS<T>* PhysBAM::
-Create_Axial_Bending_Springs(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T clamped_restlength,const T stiffness,const T overdamping_fraction,
+Create_Axial_Bending_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T clamped_restlength,const T stiffness,const T overdamping_fraction,
     const bool limit_time_step_by_strain_rate,const T max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const bool verbose)
 {
     AXIAL_BENDING_SPRINGS<T>* axial=new AXIAL_BENDING_SPRINGS<T>(particles,triangle_mesh);
@@ -354,15 +354,15 @@ Create_Axial_Bending_Springs(TRIANGULATED_SURFACE<T>& triangulated_surface,
     const T clamped_restlength,const T stiffness,const T overdamping_fraction,const bool limit_time_step_by_strain_rate,const T max_strain_per_time_step,
     const bool use_rest_state_for_strain_rate,const bool verbose)
 {
-    return Create_Axial_Bending_Springs(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,clamped_restlength,stiffness,overdamping_fraction,limit_time_step_by_strain_rate,
+    return Create_Axial_Bending_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,clamped_restlength,stiffness,overdamping_fraction,limit_time_step_by_strain_rate,
         max_strain_per_time_step,use_rest_state_for_strain_rate,verbose);
 }
 //#####################################################################
 template class AXIAL_BENDING_SPRINGS<float>;
 template AXIAL_BENDING_SPRINGS<float>* PhysBAM::Create_Axial_Bending_Springs<float>(TRIANGULATED_SURFACE<float>&,float,float,float,bool,float,bool,bool);
-template AXIAL_BENDING_SPRINGS<float>* PhysBAM::Create_Axial_Bending_Springs<float>(PARTICLES<VECTOR<float,3> >&,TRIANGLE_MESH&,float,float,float,bool,float,bool,bool);
+template AXIAL_BENDING_SPRINGS<float>* PhysBAM::Create_Axial_Bending_Springs<float>(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,TRIANGLE_MESH&,float,float,float,bool,float,bool,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class AXIAL_BENDING_SPRINGS<double>;
 template AXIAL_BENDING_SPRINGS<double>* PhysBAM::Create_Axial_Bending_Springs<double>(TRIANGULATED_SURFACE<double>&,double,double,double,bool,double,bool,bool);
-template AXIAL_BENDING_SPRINGS<double>* PhysBAM::Create_Axial_Bending_Springs<double>(PARTICLES<VECTOR<double,3> >&,TRIANGLE_MESH&,double,double,double,bool,double,bool,bool);
+template AXIAL_BENDING_SPRINGS<double>* PhysBAM::Create_Axial_Bending_Springs<double>(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,TRIANGLE_MESH&,double,double,double,bool,double,bool,bool);
 #endif

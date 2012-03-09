@@ -12,7 +12,7 @@ namespace PhysBAM{
 
 template<class TV> class RIGID_BODY_COLLECTION;
 template<class TV> class SOLID_BODY_COLLECTION;
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 
 template<class TV>
 class PARTICLE_CONNECTIVITY
@@ -27,7 +27,7 @@ private:
     friend class SOLID_BODY_COLLECTION<TV>;
 public:
 
-    PARTICLE_CONNECTIVITY(const PARTICLES<TV>& particles,const RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    PARTICLE_CONNECTIVITY(const DEFORMABLE_PARTICLES<TV>& particles,const RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
 
     ~PARTICLE_CONNECTIVITY()
     {}

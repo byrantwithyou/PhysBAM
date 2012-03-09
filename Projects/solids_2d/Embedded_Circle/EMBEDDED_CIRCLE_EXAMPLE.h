@@ -53,7 +53,7 @@ virtual void Get_Initial_Data()
     EMBEDDED_TRIANGULATED_AREA<T>& embedded_triangulated_area=*solids_parameters.deformable_body_parameters.list(index).embedded_triangulated_area;
     TRIANGLES_OF_MATERIAL_2D<T>& triangles_of_material=*solids_parameters.deformable_body_parameters.list(index).triangles_of_material;
     TRIANGULATED_AREA<T>& triangulated_area=embedded_triangulated_area.triangulated_area;
-    PARTICLES<T,VECTOR_2D<T> >& particles=triangulated_area.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=triangulated_area.particles;
     
     RED_GREEN_GRID_2D<T> red_green_grid;
     GRID<TV> red_green_uniform_grid(4*m_input+1,4*n_input+1,circle.Bounding_Box());

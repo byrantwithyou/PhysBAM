@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Add_Dependencies

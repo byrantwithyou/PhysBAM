@@ -47,8 +47,8 @@ public:
 
     // tet collisions
     bool use_tetrahedral_collisions;
-    ARRAY<PARTICLES<T,VECTOR<T,3> >*> undeformed_tetrahedron_particles;
-    ARRAY<PARTICLES<T,VECTOR<T,3> >*> undeformed_triangle_particles;
+    ARRAY<DEFORMABLE_PARTICLES<T,VECTOR<T,3> >*> undeformed_tetrahedron_particles;
+    ARRAY<DEFORMABLE_PARTICLES<T,VECTOR<T,3> >*> undeformed_triangle_particles;
     ARRAY<TRIANGULATED_SURFACE<T>*> undeformed_triangulated_surface;
     ARRAY<LEVELSET_IMPLICIT_SURFACE<T>*> undeformed_levelset;
     T undeformed_levelset_resolution;
@@ -232,7 +232,7 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         LEVELSET_TETRAHEDRALIZED_VOLUME<T>& levelset=*melting_parameters.levelsets(object);
         RED_GREEN_GRID_3D<T>& grid=levelset.grid;
         EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_tetrahedralized_volume=levelset.embedded_tetrahedralized_volume;
-        PARTICLES<T,VECTOR<T,3> >& particles=embedded_tetrahedralized_volume.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=embedded_tetrahedralized_volume.particles;
         // map data to the cell based indices
         ARRAY<VECTOR<T,3> > cell_based_X(grid.number_of_nodes);
         for(int i=0;i<grid.number_of_nodes;i++)if(levelset.node_to_particle_mapping(i))
@@ -248,7 +248,7 @@ void Melting_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 void Initialize_Particle_Positions_And_Velocities(const int object)
 {
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solids_parameters.deformable_body_parameters.list(object).embedded_tetrahedralized_volume->tetrahedralized_volume;
-    PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
 
     particles.Update_Velocity();
     tetrahedralized_volume.Update_Bounding_Box();
@@ -276,9 +276,9 @@ void Initialize_Forces()
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.embedded_tetrahedralized_volume->tetrahedralized_volume;
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_object.embedded_tetrahedralized_volume_boundary_surface->boundary_surface;
             // save undeformed geometry
-            undeformed_tetrahedron_particles(object)=new PARTICLES<T,VECTOR<T,3> >;undeformed_tetrahedron_particles(object)->array_collection->Add_Elements(tetrahedralized_volume.particles.array_collection->Size());
+            undeformed_tetrahedron_particles(object)=new DEFORMABLE_PARTICLES<T,VECTOR<T,3> >;undeformed_tetrahedron_particles(object)->array_collection->Add_Elements(tetrahedralized_volume.particles.array_collection->Size());
             ARRAY<VECTOR<T,3> >::copy_up_to(tetrahedralized_volume.particles.X.array,undeformed_tetrahedron_particles(object)->X.array,tetrahedralized_volume.particles.array_collection->Size());
-            undeformed_triangle_particles(object)=new PARTICLES<T,VECTOR<T,3> >;undeformed_triangle_particles(object)->array_collection->Add_Elements(triangulated_surface.particles.array_collection->Size());
+            undeformed_triangle_particles(object)=new DEFORMABLE_PARTICLES<T,VECTOR<T,3> >;undeformed_triangle_particles(object)->array_collection->Add_Elements(triangulated_surface.particles.array_collection->Size());
             ARRAY<VECTOR<T,3> >::copy_up_to(triangulated_surface.particles.X.array,undeformed_triangle_particles(object)->X.array,triangulated_surface.particles.array_collection->Size());
             undeformed_triangulated_surface(object)=new TRIANGULATED_SURFACE<T>(triangulated_surface.triangle_mesh,*undeformed_triangle_particles(object));
             undeformed_triangulated_surface(object)->Update_Bounding_Box();undeformed_triangulated_surface(object)->Update_Triangle_List();undeformed_triangulated_surface(object)->Initialize_Triangle_Hierarchy();

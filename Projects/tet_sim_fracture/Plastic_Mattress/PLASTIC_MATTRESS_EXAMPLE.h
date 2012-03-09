@@ -65,7 +65,7 @@ public:
 void Get_Initial_Data()
 {
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& embedding=*EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::Create(particles);
     deformable_object.Add_Structure(&embedding);
     deformable_object.collisions.collision_structures.Append(&embedding);

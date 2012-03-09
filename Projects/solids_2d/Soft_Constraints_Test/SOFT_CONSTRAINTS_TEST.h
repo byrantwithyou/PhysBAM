@@ -56,7 +56,7 @@ void Get_Initial_Data()
 
     // triangulated area
     TRIANGULATED_AREA<T>& triangulated_area=*TRIANGULATED_AREA<T>::Create();
-    PARTICLES<TV>& area_particles=triangulated_area.particles;
+    DEFORMABLE_PARTICLES<TV>& area_particles=triangulated_area.particles;
     triangulated_area.Initialize_Square_Mesh_And_Particles(mattress_grid);
     area_particles.Update_Velocity();area_particles.Store_Mass();
     triangulated_area.Set_Density(10);triangulated_area.Set_Mass_Of_Particles(false);
@@ -74,7 +74,7 @@ void Get_Initial_Data()
 
     // segmented curve
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create();
-    PARTICLES<TV>& curve_particles=segmented_curve.particles;
+    DEFORMABLE_PARTICLES<TV>& curve_particles=segmented_curve.particles;
     segmented_curve.mesh.Initialize_Straight_Mesh(4);curve_particles.array_collection->Add_Elements(segmented_curve.mesh.number_nodes);
     curve_particles.Update_Velocity();curve_particles.Store_Mass();
     for(int i=0;i<4;i++) segmented_curve.particles.X(i)=VECTOR<T,2>(i,1); // TODO: remove
@@ -126,8 +126,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
     TRIANGULATED_AREA<T>& triangulated_area=deformable_object.template Find_Structure<TRIANGULATED_AREA<T>&>();
-    PARTICLES<TV>& particles=deformable_object.particles;
-    PARTICLE_SUBSET<PARTICLES<TV> >& area_particles=*new PARTICLE_SUBSET<PARTICLES<TV> >(particles);
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
+    PARTICLE_SUBSET<DEFORMABLE_PARTICLES<TV> >& area_particles=*new PARTICLE_SUBSET<DEFORMABLE_PARTICLES<TV> >(particles);
     triangulated_area.mesh.elements.Flattened().Get_Unique(area_particles.active_indices);
     area_particles.Update_Subset_Index_From_Element_Index();
     solid_body_collection.Add_Force(new GRAVITY<TV>(area_particles));

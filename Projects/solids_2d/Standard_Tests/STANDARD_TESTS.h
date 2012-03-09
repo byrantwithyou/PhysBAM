@@ -308,7 +308,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
@@ -398,7 +398,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             tests.Add_Ground();
             break;}
         case 11:{
-            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(*new PARTICLES<TV>);segmented_curve.Clean_Memory();
+            SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(*new DEFORMABLE_PARTICLES<TV>);segmented_curve.Clean_Memory();
             int num_particles=500;segmented_curve.mesh.Initialize_Straight_Mesh(num_particles,false);segmented_curve.particles.array_collection->Add_Elements(num_particles);
             for(int p=0;p<num_particles;p++) segmented_curve.particles.X(p)=VECTOR<T,2>(0,(T)p/num_particles+(T).01);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,1);

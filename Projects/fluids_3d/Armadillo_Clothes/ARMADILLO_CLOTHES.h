@@ -187,12 +187,12 @@ void Initialize_Armadillo()
     std::string tri_file=output_directory+"/armadillo.tri",phi_file=output_directory+"/armadillo.phi";
     FILE_UTILITIES::Create_Directory(output_directory);
     if(!FILE_UTILITIES::File_Exists(tri_file)){
-        TETRAHEDRON_MESH tetrahedron_mesh;PARTICLES<T,VECTOR<T,3> > particles;TETRAHEDRALIZED_VOLUME<T> tetrahedralized_volume(tetrahedron_mesh,particles);
+        TETRAHEDRON_MESH tetrahedron_mesh;DEFORMABLE_PARTICLES<T,VECTOR<T,3> > particles;TETRAHEDRALIZED_VOLUME<T> tetrahedralized_volume(tetrahedron_mesh,particles);
         FILE_UTILITIES::Read_From_File<RW>(data_directory+"/Tetrahedralized_Volumes/armadillo_380K.tet",tetrahedralized_volume);
         tetrahedralized_volume.Initialize_Triangulated_Surface();tetrahedralized_volume.triangulated_surface->Discard_Valence_Zero_Particles_And_Renumber();
         FILE_UTILITIES::Write_To_File<RW>(tri_file,*tetrahedralized_volume.triangulated_surface);}
     if(!FILE_UTILITIES::File_Exists(phi_file)){
-        TRIANGLE_MESH triangle_mesh;PARTICLES<T,VECTOR<T,3> > particles;TRIANGULATED_SURFACE<T> triangulated_surface(triangle_mesh,particles);
+        TRIANGLE_MESH triangle_mesh;DEFORMABLE_PARTICLES<T,VECTOR<T,3> > particles;TRIANGULATED_SURFACE<T> triangulated_surface(triangle_mesh,particles);
         GRID<TV> grid;ARRAY<T,VECTOR<int,3> > phi;LEVELSET_3D<GRID<TV> > levelset(grid,phi);
         FILE_UTILITIES::Read_From_File<RW>(tri_file,triangulated_surface);
         triangulated_surface.Update_Bounding_Box();BOX_3D<T>& box=*triangulated_surface.bounding_box;
@@ -279,7 +279,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
 void Initialize_Particle_Positions_And_Velocities(const int object)
 {
     TRIANGULATED_SURFACE<T>& triangulated_surface=solids_parameters.deformable_body_parameters.list(object).embedded_triangulated_surface->triangulated_surface;
-    PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
 
     if(example_number>4){
         T influence_factor=3.5;T pull_factor=2;T normal_push=.2;T normal_influence_factor=2;

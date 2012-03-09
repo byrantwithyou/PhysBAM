@@ -215,7 +215,7 @@ void Curtain()
 //#####################################################################
 void Triangle_Permutations()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solids_parameters.cfl=(T)50;
     frame_rate=30;
     last_frame=(int)(7*frame_rate);
@@ -235,7 +235,7 @@ void Triangle_Permutations()
 //#####################################################################
 void Single_Triangle()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solids_parameters.cfl=(T)50;
     frame_rate=30;
     last_frame=(int)(7*frame_rate);
@@ -258,7 +258,7 @@ void Single_Triangle()
 //#####################################################################
 void Shear_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solids_parameters.cfl=(T)50;
     frame_rate=30;
     last_frame=(int)(7*frame_rate);
@@ -276,7 +276,7 @@ void Shear_Test()
 //#####################################################################
 void Bending_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     solids_parameters.cfl=(T)50;
     frame_rate=30;
     last_frame=(int)(7*frame_rate);

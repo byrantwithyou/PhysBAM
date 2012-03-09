@@ -85,7 +85,7 @@ void Get_Initial_Data()
     bool automatically_add_to_collision_structures=true;
     // deformable bodies
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
@@ -146,7 +146,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list=deformable_body_collection.collisions.collision_body_list;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;

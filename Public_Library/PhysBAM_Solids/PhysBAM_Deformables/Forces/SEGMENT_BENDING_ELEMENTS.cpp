@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_ELEMENTS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Add_Dependencies

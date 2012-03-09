@@ -141,7 +141,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(draw_flesh){
 /*
         DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection;
-        PARTICLES<TV>& particles=deformable_object.particles;    
+        DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;    
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         solid_body_collection.Add_Force(Create_Quasistatic_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,true));
         solid_body_collection.Update_Fragments();}

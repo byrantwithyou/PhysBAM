@@ -23,7 +23,7 @@ BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection)
 // Constructor
 //#####################################################################
 template<class TV> BINDING_LIST<TV>::
-BINDING_LIST(PARTICLES<TV>& particles)
+BINDING_LIST(DEFORMABLE_PARTICLES<TV>& particles)
     :particles(particles),deformable_body_collection(0)
 {}
 //#####################################################################

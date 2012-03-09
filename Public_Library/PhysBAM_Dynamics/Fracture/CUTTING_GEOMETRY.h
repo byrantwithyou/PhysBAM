@@ -18,7 +18,7 @@
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/ROBUST_SIMPLEX_INTERACTIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Dynamics/Fracture/CUTTING_PARTICLES.h>
 #include <PhysBAM_Dynamics/Fracture/CUTTING_POLYGON.h>
 #include <PhysBAM_Dynamics/Fracture/CUTTING_SIMPLICES.h>

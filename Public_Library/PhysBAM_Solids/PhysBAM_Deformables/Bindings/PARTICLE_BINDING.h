@@ -22,16 +22,16 @@ public:
 
     int parent;
 
-    PARTICLE_BINDING(PARTICLES<TV>& particles_input)
+    PARTICLE_BINDING(DEFORMABLE_PARTICLES<TV>& particles_input)
         :BINDING<TV>(particles_input),parent(0)
     {}
 
-    PARTICLE_BINDING(PARTICLES<TV>& particles_input,const int particle_index_input,const int parent_input)
+    PARTICLE_BINDING(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input,const int parent_input)
         :BINDING<TV>(particles_input,particle_index_input),parent(parent_input)
     {}
 
     static PARTICLE_BINDING* Create(GEOMETRY_PARTICLES<TV>& particles)
-    {return new PARTICLE_BINDING(dynamic_cast<PARTICLES<TV>&>(particles));}
+    {return new PARTICLE_BINDING(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles));}
 
     virtual int Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static int Static_Name()

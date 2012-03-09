@@ -322,7 +322,7 @@ template<class T> void KANG<T>::
 Initialize_Bodies()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     switch(test_number){
         case 1: Kang_Circle();break;

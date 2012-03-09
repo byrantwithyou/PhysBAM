@@ -489,7 +489,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
         position=rigid_body_particles.X(rigid_body_index).x;
         velocity=rigid_body_particles.twist(rigid_body_index).linear.x;}
     else if(test_number==3 || test_number==4){
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         int particle_index=1;
         position=particles.X(particle_index).x;
         velocity=particles.V(particle_index).x;}

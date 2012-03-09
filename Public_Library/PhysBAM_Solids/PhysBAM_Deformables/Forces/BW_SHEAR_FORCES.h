@@ -23,7 +23,7 @@ public:
     typedef typename FORCE_ELEMENTS::ITERATOR TRIANGLE_ITERATOR;
     typedef typename BASE::FREQUENCY_DATA FREQUENCY_DATA;
 
-    BW_SHEAR_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
+    BW_SHEAR_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
 
     virtual ~BW_SHEAR_FORCES();
 
@@ -35,6 +35,6 @@ public:
 };
 
 template<class TV> BW_SHEAR_FORCES<TV>*
-Create_BW_Shear_Force(PARTICLES<TV>& particles,TRIANGLE_MESH& segment_mesh,const typename TV::SCALAR stiffness_coefficient_input,const typename TV::SCALAR damping_coefficient_input);
+Create_BW_Shear_Force(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& segment_mesh,const typename TV::SCALAR stiffness_coefficient_input,const typename TV::SCALAR damping_coefficient_input);
 }
 #endif

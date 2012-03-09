@@ -372,7 +372,7 @@ void Initialize_Edge_Forces(T stiffness,T damping,ARRAY<SEGMENTED_CURVE<TV>*>& s
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
@@ -680,7 +680,7 @@ void Single_Hair()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SEGMENTED_CURVE<TV>& edges=*SEGMENTED_CURVE<TV>::Create(particles);
     SEGMENTED_CURVE<TV>& extra_edges =*SEGMENTED_CURVE<TV>::Create(particles);
     SEGMENTED_CURVE<TV>& bending_edges=*SEGMENTED_CURVE<TV>::Create(particles);
@@ -894,7 +894,7 @@ void Read_Saved_Interpolation_Curve_From_File(const std::string& filename,ARRAY<
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     T print_diagnostics=false;
     if((test_number==15 || test_number==16) && print_diagnostics){ // print stats
@@ -999,7 +999,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     if(test_number==8 && frame==1){
         RANDOM_NUMBERS<T> random;random.Set_Seed(1823);
         T perturbation_size=side_length/number_side_panels*4;
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         for(int p=0;p<particles.array_collection->Size();p++) particles.X(p).y+=random.Get_Uniform_Number((T)0,perturbation_size);}
     if((test_number==10 || test_number==12) && frame<=sim_length+1)
         for(int i=0;i<num_controlled_particles;i++){
@@ -1393,7 +1393,7 @@ void Asynchronous_Sphere()
                 if(number_of_rings>0){
                     TRIANGULATED_SURFACE<T>& surface=volume->Get_Boundary_Object();
                     ARRAY_VIEW<int> flattened(surface.mesh.elements.Flattened());
-                    PARTICLES<TV>& particles=deformable_body_collection.particles;
+                    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
                     T top=-FLT_MAX,bottom=FLT_MAX;
                     for(int i=0;i<flattened.Size();i++){int p=flattened(i);
                         if(particles.X(p)(1)>top) top=particles.X(p)(1);
@@ -1654,7 +1654,7 @@ void Gravity_Test()
 {
     last_frame=20;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     ARRAY<int> empty_list;
     LOG::cout<<std::setprecision(16);
 
@@ -1684,7 +1684,7 @@ void Ether_Drag_Test()
 {
     last_frame=20;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     ARRAY<int> empty_list;
     LOG::cout<<std::setprecision(16);
 
@@ -1725,7 +1725,7 @@ void Spring_Test()
     // parameter=3: two springs along y with no initial displacement, with gravity
     
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SEGMENTED_CURVE<TV>* segmented_curve=0;
     ARRAY<int> empty_list;
     LOG::cout<<std::setprecision(16);
@@ -1777,7 +1777,7 @@ void One_Spring_Test()
     last_frame=1;
     if(parameter>=5 && parameter<=10) substeps_per_frame=3;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SEGMENTED_CURVE<TV>* segmented_curve=0;
     ARRAY<int> empty_list;
     LOG::cout<<std::setprecision(16);
@@ -2226,7 +2226,7 @@ VECTOR<T,2> Analytic_Solution_Asyn_Stability_Mixed(const T x,T v,const T m,const
 //#####################################################################
 void Initialize_Sphere_Analytic_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     if(asynchronous_evolution->both_forces_particles_indices.m){
         mixed_particle_index=asynchronous_evolution->both_forces_particles_indices(0);
@@ -2409,7 +2409,7 @@ void Asynchronous_Projected_Sphere()
         if(use_async || test_implicit_in_explicit_out){
             // Fill particle map
             if(treat_bottom_async){
-                PARTICLES<TV>& particles=deformable_body_collection.particles;
+                DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
                 T top=-FLT_MAX,bottom=FLT_MAX;
                 for(int i=0;i<particles.array_collection->Size();i++){int p=i;
                     if(particles.X(p)(1)>top) top=particles.X(p)(1);
@@ -2418,7 +2418,7 @@ void Asynchronous_Projected_Sphere()
                     if(particles.X(p)(1)<=(top-bottom)*coverage_percent+bottom)
                         particle_map.Set(p,p);}}
             else if(treat_left_async){
-                PARTICLES<TV>& particles=deformable_body_collection.particles;
+                DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
                 T right=-FLT_MAX,left=FLT_MAX;
                 for(int i=0;i<particles.array_collection->Size();i++){int p=i;
                     if(particles.X(p)(0)>right) right=particles.X(p)(0);

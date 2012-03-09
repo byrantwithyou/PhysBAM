@@ -38,7 +38,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/ROBUST_SIMPLEX_INTERACTIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SIMPLEX_INTERACTIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Dynamics/Fracture/CUTTING_POLYGON.h>
 #include <PhysBAM_Dynamics/Fracture/CUTTING_SIMPLICES.h>
 #include <PhysBAM_Dynamics/Fracture/CUTTING_TETRAHEDRALIZED_VOLUME.h>
@@ -141,7 +141,7 @@ Cut_Material(const TRIANGULATED_SURFACE<T>& cutting_triangulated_surface_input,c
     if(next_tetrahedralized_volume) delete next_tetrahedralized_volume;
     next_tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create();
     next_tetrahedralized_volume->particles.Store_Velocity();
-    dynamic_cast<PARTICLES<TV>&>(next_tetrahedralized_volume->particles).Store_Mass();
+    dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(next_tetrahedralized_volume->particles).Store_Mass();
     cutting_triangulated_surface=&cutting_triangulated_surface_input;
 
     LOG::Time("Initializing acceleration structures");
@@ -157,7 +157,7 @@ Cut_Material(const TRIANGULATED_SURFACE<T>& cutting_triangulated_surface_input,c
     current_tetrahedralized_volume->mesh.Initialize_Element_Edges();
     current_tetrahedralized_volume->Initialize_Hierarchy();
     current_tetrahedralized_volume->particles.Store_Velocity();
-    dynamic_cast<PARTICLES<TV>&>(current_tetrahedralized_volume->particles).Store_Mass();
+    dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(current_tetrahedralized_volume->particles).Store_Mass();
 
     LOG::Time("Finding triangle tet intersections");
     Find_Triangle_Tet_Intersections(first_new);
@@ -1184,12 +1184,12 @@ Duplicate_And_Merge_Elements()
 {
     // new structures
     union_vertices=UNION_FIND<>(num_new_particles);union_vertices.parents.Fill(0);
-    PARTICLES<TV>& new_particles=dynamic_cast<PARTICLES<TV>&>(next_tetrahedralized_volume->particles);
+    DEFORMABLE_PARTICLES<TV>& new_particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(next_tetrahedralized_volume->particles);
     new_particle_indices.Resize(num_new_particles,true,false,-1);
     // original embedding structures
     const ARRAY<VECTOR<int,4> >& current_embedding_tetrahedrons=current_tetrahedralized_volume->mesh.elements;
     const TRIANGLE_MESH& current_embedding_faces=*current_tetrahedralized_volume->mesh.triangle_mesh;
-    const PARTICLES<TV>& current_embedding_vertices=dynamic_cast<PARTICLES<TV>&>(current_tetrahedralized_volume->particles);
+    const DEFORMABLE_PARTICLES<TV>& current_embedding_vertices=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(current_tetrahedralized_volume->particles);
     // collapse faces
     for(int eface=0;eface<current_embedding_faces.elements.m;eface++){const VECTOR<int,3>& particles_on_current_face=current_embedding_faces.elements(eface);
         ARRAY<int> tet_indices_for_this_face;

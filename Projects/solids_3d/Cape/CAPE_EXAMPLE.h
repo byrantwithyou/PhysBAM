@@ -23,9 +23,9 @@ public:
     VECTOR_3D<T> ball_1_start,ball_1_velocity;
     //int cloth_particles,cloth_triangles;
     TRIANGLE_MESH* full_triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >* full_particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >* full_particles;
     TETRAHEDRON_MESH buddha_mesh;
-    PARTICLES<T,VECTOR_3D<T> > buddha_particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > buddha_particles;
     TETRAHEDRALIZED_VOLUME<T> buddha_volume;
     int buddha_frame;
     char* buddha_directory;
@@ -49,7 +49,7 @@ public:
     CAPE_COLLISIONS<T>* cape_collisions;
     ARRAY<int> attachments;
     
-    PARTICLES<T,VECTOR_3D<T> > visual_particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > visual_particles;
     TRIANGLE_MESH visual_mesh;
     TRIANGULATED_SURFACE<T> visual_surface;
     ARRAY<int,VECTOR<int,1> > visual_mapping;
@@ -137,7 +137,7 @@ public:
     if(time<beginning_of_time)ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy(VECTOR_3D<T>(0),buddha_particles.V);
     std::cout<<"done\n";}
     
-    bool Corner_Search(ARRAY<ARRAY<int> >& graph,PARTICLES<T,VECTOR_3D<T> >& particles,ARRAY<VECTOR_3D<T> >& edge,ARRAY<bool>& marks,int node,int goal)
+    bool Corner_Search(ARRAY<ARRAY<int> >& graph,DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles,ARRAY<VECTOR_3D<T> >& edge,ARRAY<bool>& marks,int node,int goal)
     {marks(node)=true;
     std::cout<<"node "<<node<<", degree "<<graph(node).m<<"\n";
     for(int a=0;a<graph(node).m;a++){
@@ -149,7 +149,7 @@ public:
     
     void Retriangulate(TRIANGULATED_SURFACE<T>& triangulated_surface)
     {TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >& X=particles.X;
     triangle_mesh.Initialize_Neighbor_Nodes();
     triangle_mesh.Initialize_Boundary_Mesh();
@@ -200,7 +200,7 @@ public:
     
     void Extract_Component(TRIANGULATED_SURFACE<T>& triangulated_surface,int seed,TRIANGULATED_SURFACE<T>& component)
     {TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     if(!triangle_mesh.neighbor_nodes)triangle_mesh.Initialize_Neighbor_Nodes();
     int count=0;ARRAY<int> mark(1,particles.array_collection->Size());ARRAY<int> stack;
     stack.Append(seed);mark(seed)=++count;
@@ -229,7 +229,7 @@ public:
 void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
 {
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     full_triangle_mesh=&triangle_mesh;full_particles=&particles;
     
  //   if(!restart_step_number){
@@ -341,7 +341,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
 //#####################################################################
 void Read_Data_Files(TRIANGULATED_SURFACE<T>& triangulated_surface,T& time,const int frame)
 {
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     std::ifstream input;char filename[256];
     visual_particles.Read_Deformable_Dynamic_Variables_Float(output_directory,frame);
     std::cout<<"reading "<<particles.array_collection->Size()<<"\n";
@@ -358,7 +358,7 @@ void Read_Data_Files(TRIANGULATED_SURFACE<T>& triangulated_surface,T& time,const
 void Write_Data_Files(const TRIANGULATED_SURFACE<T>& triangulated_surface,const ARRAY<RIGID_BODY<TV>*>& rigid_bodies,const T time,const int frame)
 {      
     bool visual=true;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     std::fstream output;char filename[256];
     if(frame == 0){
         sprintf(filename,"%s/triangle_mesh",output_directory);output.open(filename,std::ios::out|std::ios::binary);
@@ -388,7 +388,7 @@ void Write_Data_Files(const TRIANGULATED_SURFACE<T>& triangulated_surface,const 
 void Initialize_Diagonalized_Finite_Volume_Model(DEFORMABLE_OBJECT<T,VECTOR_3D<T> >& deformable_object,TRIANGULATED_SURFACE<T>& triangulated_surface)
 {
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     
     strain=new STRAIN_MEASURE_S3D<T>(triangulated_surface);
     diagonalized_constitutive_model=new DIAGONALIZED_LINEAR_FVM_2D<T>(youngs_modulus,poissons_ratio,Rayleigh_coefficient);

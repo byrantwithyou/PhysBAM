@@ -39,7 +39,7 @@ public:
     COLLISION_GEOMETRY_ID collision_body_list_id;
     bool perform_self_collision;
 
-    COLLISION_PENALTY_FORCES(PARTICLES<TV>& particles)
+    COLLISION_PENALTY_FORCES(DEFORMABLE_PARTICLES<TV>& particles)
         :DEFORMABLES_FORCES<TV>(particles),collision_body_list_id(0)
     {
         Set_Stiffness();Set_Separation_Parameter();Set_Self_Collision_Reciprocity_Factor();Set_Perform_Self_Collision();

@@ -26,7 +26,7 @@ class TETRAHEDRALIZED_VOLUME_FIELD
     typedef VECTOR<T,3> TV;
 public:
     TETRAHEDRON_MESH mesh;
-    PARTICLES<TV> particles;
+    DEFORMABLE_PARTICLES<TV> particles;
     TETRAHEDRALIZED_VOLUME<T> field_volume; 
     ARRAY<T> field;
     T default_value;
@@ -74,7 +74,7 @@ class TETRAHEDRALIZED_VOLUME_SURFACE_FIELD
     typedef VECTOR<T,3> TV;
 public:
     TETRAHEDRON_MESH mesh;
-    PARTICLES<TV> particles;
+    DEFORMABLE_PARTICLES<TV> particles;
     TETRAHEDRALIZED_VOLUME<T> field_volume; 
     ARRAY<T> field;
     T default_value;

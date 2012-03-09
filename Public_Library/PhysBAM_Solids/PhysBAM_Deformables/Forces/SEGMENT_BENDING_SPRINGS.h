@@ -22,7 +22,7 @@ public:
 
     SEGMENT_MESH bending_segment_mesh;
 
-    SEGMENT_BENDING_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const bool implicit=false);
+    SEGMENT_BENDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const bool implicit=false);
 
     virtual ~SEGMENT_BENDING_SPRINGS();
 
@@ -32,7 +32,7 @@ public:
 };
 
 template<class TV> SEGMENT_BENDING_SPRINGS<TV>*
-Create_Segment_Bending_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2/(1+sqrt((typename TV::SCALAR)2)),
+Create_Segment_Bending_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2/(1+sqrt((typename TV::SCALAR)2)),
     const typename TV::SCALAR overdamping_fraction=2,const bool limit_time_step_by_strain_rate=true,const typename TV::SCALAR max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,
     const typename TV::SCALAR restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
 

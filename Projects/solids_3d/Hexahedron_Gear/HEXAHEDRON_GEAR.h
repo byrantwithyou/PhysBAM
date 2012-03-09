@@ -90,7 +90,7 @@ void Get_Initial_Data()
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Hexahedralized_Volume();
     HEXAHEDRALIZED_VOLUME<T>& hexahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).hexahedralized_volume;
     HEXAHEDRON_MESH& hexahedron_mesh=hexahedralized_volume.hexahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=hexahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=hexahedralized_volume.particles;
 
     int resolution=20;
     GRID<TV> grid(3*resolution+1,3*resolution+1,3*resolution+1,(T)-1,(T)1,(T)-1,(T)1,(T)-1,(T)1);
@@ -174,7 +174,7 @@ void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRI
     solids_parameters.rigid_body_parameters.list.rigid_bodies(gear[1])->frame.r=QUATERNION<T>(roller_speed*time,VECTOR_3D<T>(0,0,1))*roller_orientation;
     if(gear_triangle_collisions)
         for(int g=0;g<2;g++){
-            PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.extra_collision_surfaces(g+1)->particles;
+            DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.extra_collision_surfaces(g+1)->particles;
             RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list.rigid_bodies(gear[g]);
             for(int p=0;p<particles.array_collection->Size();p++){
                 particles.X(p)=rigid_body.World_Space_Point(rigid_body.triangulated_surface->particles.X(p));
@@ -188,7 +188,7 @@ void Add_External_Forces(ARRAY<VECTOR_3D<T> >& F,const T time,const int id) PHYS
     if(!gear_repulsion_stiffness) return;
     DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(1);
     SEGMENT_MESH& segment_mesh=*deformable_object.hexahedralized_volume->triangulated_surface->triangle_mesh.segment_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object.particles;
     T stiffness=gear_repulsion_stiffness/(gear_repulsion_sampling-1);
     if(time<42/frame_rate) stiffness=0;
     else if(time<60/frame_rate) stiffness*=(time*frame_rate-42)/(60-42);
@@ -207,8 +207,8 @@ void Add_External_Forces(ARRAY<VECTOR_3D<T> >& F,const T time,const int id) PHYS
 //#####################################################################
 void Remesh_Gears()
 {
-    TRIANGLE_MESH bad_mesh;PARTICLES<T,VECTOR_3D<T> > bad_particles;TRIANGULATED_SURFACE<T> bad_surface(bad_mesh,bad_particles);
-    TRIANGLE_MESH good_mesh;PARTICLES<T,VECTOR_3D<T> > good_particles;TRIANGULATED_SURFACE<T> good_surface(good_mesh,good_particles);
+    TRIANGLE_MESH bad_mesh;DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > bad_particles;TRIANGULATED_SURFACE<T> bad_surface(bad_mesh,bad_particles);
+    TRIANGLE_MESH good_mesh;DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > good_particles;TRIANGULATED_SURFACE<T> good_surface(good_mesh,good_particles);
     FILE_UTILITIES::Read_From_File<RW>(data_directory+"/Rigid_Bodies/gear.tri",bad_surface);
     bad_surface.Update_Bounding_Box();BOX_3D<T> box=*bad_surface.bounding_box;
     std::cout<<"box = "<<box<<std::endl;

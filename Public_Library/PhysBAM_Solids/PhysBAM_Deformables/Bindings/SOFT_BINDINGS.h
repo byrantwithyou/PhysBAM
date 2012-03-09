@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class TV> class BINDING;
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 
 template<class TV>
 class SOFT_BINDINGS:public NONCOPYABLE
@@ -22,7 +22,7 @@ public:
     typedef int HAS_TYPED_READ_WRITE;
 
     BINDING_LIST<TV>& binding_list;
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     ARRAY<VECTOR<int,2> > bindings; // (particle_index,parent) pairs
     ARRAY<bool> use_impulses_for_collisions;
     ARRAY<int> bindings_using_impulses_for_collisions;

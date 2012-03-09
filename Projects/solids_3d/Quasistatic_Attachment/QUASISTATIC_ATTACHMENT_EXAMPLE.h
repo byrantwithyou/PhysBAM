@@ -72,7 +72,7 @@ void Get_Initial_Data()
 
     //append new dynamic particles
     for(int i=0;i<solids_parameters.deformable_body_parameters.list.deformable_objects.m;i++){
-        PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(i).tetrahedralized_volume->particles;particles.Update_Velocity();
+        DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(i).tetrahedralized_volume->particles;particles.Update_Velocity();
         particles.Increase_Array_Size(2*particles.array_collection->Size());
         for(int p=1;p<particles.array_collection->Size();p++)
         {int index=particles.array_collection->Add_Element();particles.X(index)=particles.X(p);particles.V(index)=particles.V(p);particles.mass(index)=particles.mass(p);}}

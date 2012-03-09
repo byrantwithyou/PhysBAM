@@ -33,7 +33,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DEFORMABLE_BODY_COLLECTION<TV>::
 DEFORMABLE_BODY_COLLECTION(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>* deformables_example_forces_and_velocities_input,COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list,ARRAY_COLLECTION* array_collection)
-    :particles(*new PARTICLES<TV>(array_collection?array_collection:new ARRAY_COLLECTION())),deformable_geometry(*new DEFORMABLE_GEOMETRY_COLLECTION<TV>(particles)),simulate(true),
+    :particles(*new DEFORMABLE_PARTICLES<TV>(array_collection?array_collection:new ARRAY_COLLECTION())),deformable_geometry(*new DEFORMABLE_GEOMETRY_COLLECTION<TV>(particles)),simulate(true),
     owns_data(true),binding_list(*new BINDING_LIST<TV>(*this)),soft_bindings(*new SOFT_BINDINGS<TV>(binding_list)),mpi_solids(0),implicit_damping(true),
     print_diagnostics(false),print_residuals(false),print_energy(false),iterations_used_diagnostic(0),
     deformables_example_forces_and_velocities(deformables_example_forces_and_velocities_input),
@@ -188,7 +188,7 @@ Write(const STREAM_TYPE stream_type,const std::string& prefix,const std::string&
     const bool write_from_every_process) const
 {
     if(mpi_solids){
-        PARTICLES<TV>& const_particles=const_cast<PARTICLES<TV>&>(particles);
+        DEFORMABLE_PARTICLES<TV>& const_particles=const_cast<DEFORMABLE_PARTICLES<TV>&>(particles);
         mpi_solids->Gather_Data(const_particles.X,const_particles.V);
         if(mpi_solids->rank && !write_from_every_process) return;}
     deformable_geometry.Write(stream_type,prefix,static_prefix,frame,static_frame,include_static_variables);

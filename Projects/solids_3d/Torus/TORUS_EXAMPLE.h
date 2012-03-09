@@ -36,7 +36,7 @@ public:
     TETRAHEDRON_COLLISION_BODY<T>* torus_collision_body;
     TRIANGULATED_SURFACE<T>* undeformed_triangulated_surface;
     LEVELSET_IMPLICIT_SURFACE<T>* undeformed_levelset;
-    PARTICLES<T,VECTOR_3D<T> > undeformed_positions;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > undeformed_positions;
     bool use_tetrahedron_collisions;
     T bounding_box_percentage_for_levelset_grid_size;
 
@@ -78,7 +78,7 @@ void Get_Initial_Data()
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_file);tetrahedralized_volume.template Read<RW>(*input);delete input;
     std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;

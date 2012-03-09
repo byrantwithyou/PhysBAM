@@ -41,7 +41,7 @@ void Initialize_Body(const bool use_axial_springs,const VECTOR_3D<T>& offset)
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).triangulated_surface;
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
 
 #if 1
     triangle_mesh.number_nodes=4;

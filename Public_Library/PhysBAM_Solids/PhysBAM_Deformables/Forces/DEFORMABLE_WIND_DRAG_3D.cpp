@@ -8,7 +8,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLE_WIND_DRAG_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 template<class T> const LINEAR_INSIDE_CONSTANT_OUTSIDE_INTERPOLATION_UNIFORM<GRID<VECTOR<T,3> >,T> DEFORMABLE_WIND_DRAG_3D<T>::interpolation;
@@ -28,11 +28,11 @@ template<class T> TRIANGULATED_SURFACE<T>& Triangulated_Surface(TETRAHEDRALIZED_
 }}
 template<class T> template<class T_OBJECT> DEFORMABLE_WIND_DRAG_3D<T>::
 DEFORMABLE_WIND_DRAG_3D(T_OBJECT& object)
-    :DEFORMABLES_FORCES<TV>(dynamic_cast<PARTICLES<TV>&>(object.particles)),triangulated_surface(&Triangulated_Surface(object)),use_constant_wind(false),
+    :DEFORMABLES_FORCES<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles)),triangulated_surface(&Triangulated_Surface(object)),use_constant_wind(false),
     use_spatially_varying_wind(false),spatially_varying_wind(0),wind_density(0),spatially_varying_wind_density(0),spatially_varying_wind_pressure(0),linear_normal_viscosity(0),mpi_solids(0)
 {}
 template<class T> DEFORMABLE_WIND_DRAG_3D<T>::
-DEFORMABLE_WIND_DRAG_3D(PARTICLES<TV>& deformable_body_particles_input)
+DEFORMABLE_WIND_DRAG_3D(DEFORMABLE_PARTICLES<TV>& deformable_body_particles_input)
     :DEFORMABLES_FORCES<TV>(deformable_body_particles_input),triangulated_surface(0),use_constant_wind(false),
     use_spatially_varying_wind(false),spatially_varying_wind(0),wind_density(0),spatially_varying_wind_density(0),spatially_varying_wind_pressure(0),linear_normal_viscosity(0),mpi_solids(0)
 {}

@@ -182,7 +182,7 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
 void Initialize_Particle_Positions_And_Velocities(const int object)
 {
     TRIANGULATED_SURFACE<T>& triangulated_surface=solids_parameters.deformable_body_parameters.list(object).embedded_triangulated_surface->triangulated_surface;
-    PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
 
     particles.Update_Velocity();
     triangulated_surface.Update_Bounding_Box();

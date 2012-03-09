@@ -59,7 +59,7 @@ void Get_Initial_Data()
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
 
     FILE_UTILITIES::Read_From_File<RW>(input_file,tetrahedralized_volume);
     std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;

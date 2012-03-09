@@ -25,7 +25,7 @@ Initialize(const RIGID_BODY_FRACTURE_OBJECT_3D<T>& fracture_object_input,const V
 
     fracture_object=&fracture_object_input;impulses=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>&>(*collision_body_impulse_accumulator).accumulated_node_impulses;
 
-    const PARTICLES<TV>& particles=fracture_object->particles;
+    const DEFORMABLE_PARTICLES<TV>& particles=fracture_object->particles;
     null_space_nodes=null_space_nodes_input;
 
     null_space_position=fracture_object->Frame()*particles.X(null_space_nodes(0));

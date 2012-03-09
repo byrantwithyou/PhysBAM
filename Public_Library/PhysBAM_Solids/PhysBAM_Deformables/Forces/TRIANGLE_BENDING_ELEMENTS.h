@@ -48,7 +48,7 @@ private:
     FORCE_ELEMENTS force_quadruples;
 public:
 
-    TRIANGLE_BENDING_ELEMENTS(PARTICLES<TV>& particles)
+    TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles)
         :DEFORMABLES_FORCES<TV>(particles),
         bending_quadruples(bending_quadruples_default),plastic_yield(0),plastic_hardening(0),sine_half_elastic_angle(0),area_cutoff(0),
         reference_bending_quadruples_hashtable(0),bending_quadruples_save(0),reference_sine_half_rest_angle(0),plastic_yield_save(0),sine_half_elastic_angle_save(0)
@@ -57,7 +57,7 @@ public:
         Limit_Time_Step_By_Strain_Rate(false);
     }
 
-    TRIANGLE_BENDING_ELEMENTS(PARTICLES<TV>& particles,ARRAY<VECTOR<int,4> >& bending_quadruples_input)
+    TRIANGLE_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,ARRAY<VECTOR<int,4> >& bending_quadruples_input)
         :DEFORMABLES_FORCES<TV>(particles),bending_quadruples(bending_quadruples_input),bending_stiffness(bending_quadruples_input.m),
         sine_half_rest_angle(bending_quadruples_input.m),damping(bending_quadruples_input.m),plastic_yield(0),plastic_hardening(0),sine_half_elastic_angle(0),area_cutoff(0),
         reference_bending_quadruples_hashtable(0),bending_quadruples_save(0),reference_sine_half_rest_angle(0),plastic_yield_save(0),sine_half_elastic_angle_save(0)
@@ -131,7 +131,7 @@ public:
 };
 
 template<class T> TRIANGLE_BENDING_ELEMENTS<T>*
-Create_Bending_Elements(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,const T stiffness=1e-3,const T damping=1e-3,
+Create_Bending_Elements(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,const T stiffness=1e-3,const T damping=1e-3,
     const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool use_plasticity=false,const T plastic_yield=3,const T plastic_hardening=1,
     const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true)
 {
@@ -154,7 +154,7 @@ Create_Bending_Elements(TRIANGULATED_SURFACE<T>& triangulated_surface,const T st
     const T damping=1e-3,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool use_plasticity=false,const T plastic_yield=3,const T plastic_hardening=1,
     const T cutoff_fraction_of_minimum_area=0,const T cutoff_fraction_of_triangles=0,const bool verbose=true)
 {
-    return Create_Bending_Elements(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,stiffness,damping,limit_time_step_by_strain_rate,max_strain_per_time_step,use_plasticity,
+    return Create_Bending_Elements(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,stiffness,damping,limit_time_step_by_strain_rate,max_strain_per_time_step,use_plasticity,
         plastic_yield,plastic_hardening,cutoff_fraction_of_minimum_area,cutoff_fraction_of_triangles,verbose);
 }
 

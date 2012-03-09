@@ -26,7 +26,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SURFACE_TENSION_FORCE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Fracture/FRACTURE_PATTERN.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
@@ -283,7 +283,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
 Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update,const bool leakproof_solve)
 {
     static int solve_id=-1;solve_id++;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     EULER_PROJECTION_UNIFORM<T_GRID>& euler_projection=fluids_parameters.euler->euler_projection;
     bool solids=Simulate_Solids();
@@ -629,7 +629,7 @@ Get_Coupled_Faces_And_Interpolated_Solid_Velocities(const COLLISION_AWARE_INDEX_
     const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T_FACE_ARRAYS_BOOL& psi_N_domain,T_FACE_ARRAYS_BOOL& psi_N,
     ARRAY<T,COUPLING_CONSTRAINT_ID>& coupling_face_velocities)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
 
     psi_N=psi_N_domain;

@@ -73,7 +73,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
@@ -126,7 +126,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Rigid_Particle_Segment()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     // add two rigid spheres
     for(int i=0;i<2;i++){
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,0);
@@ -140,7 +140,7 @@ void Rigid_Particle_Segment()
 void Deformable_Segment()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     for(int i=0;i<2;i++){
         T sign=(T)(2*i-3);
         int particle=particles.array_collection->Add_Element();

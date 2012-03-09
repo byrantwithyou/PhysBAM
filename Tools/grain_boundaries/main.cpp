@@ -67,11 +67,11 @@ int main(int argc,const char *argv[])
 
     if(!tri_input_geom && !tet_input_geom) PHYSBAM_FATAL_ERROR();
 
-    PARTICLES<TV> fracturing_geom_particles;
+    DEFORMABLE_PARTICLES<TV> fracturing_geom_particles;
     TETRAHEDRON_MESH fracturing_geom_mesh;
     TETRAHEDRALIZED_VOLUME<T> fracturing_geom(fracturing_geom_mesh,fracturing_geom_particles);
 
-    PARTICLES<TV> model_geom_particles;
+    DEFORMABLE_PARTICLES<TV> model_geom_particles;
     TETRAHEDRON_MESH model_geom_mesh;
     TETRAHEDRALIZED_VOLUME<T> model_geom(model_geom_mesh,model_geom_particles);
 

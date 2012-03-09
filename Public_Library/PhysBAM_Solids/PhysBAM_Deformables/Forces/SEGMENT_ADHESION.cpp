@@ -18,7 +18,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/EDGE_EDGE_INITIAL_CULL_VISITOR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_ADHESION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 
 // TODO: use worst case CFL
@@ -28,7 +28,7 @@ using namespace PhysBAM;
 // Function SEGMENT_ADHESION
 //#####################################################################
 template<class TV> SEGMENT_ADHESION<TV>::
-SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id,HASHTABLE<VECTOR<int,4> >& intersecting_edge_edge_pairs)
+SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id,HASHTABLE<VECTOR<int,4> >& intersecting_edge_edge_pairs)
     :DEFORMABLES_FORCES<TV>(particles),mpi_solids(0),mesh(mesh),curve(mesh,dynamic_cast<GEOMETRY_PARTICLES<TV>&>(particles)),restlength((T).001),max_connections(5),
     particle_to_spring_id(particle_to_spring_id),internal_curve(internal_mesh,particles),external_curve(external_mesh,particles),springs(new T_SPRING_HASH()),
     segments_with_springs(mesh.elements.m),intersecting_edge_edge_pairs(intersecting_edge_edge_pairs)
@@ -39,7 +39,7 @@ SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& par
 // Function SEGMENT_ADHESION
 //#####################################################################
 template<class TV> SEGMENT_ADHESION<TV>::
-SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id)
+SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id)
     :DEFORMABLES_FORCES<TV>(particles),mpi_solids(0),mesh(mesh),curve(mesh,particles),restlength((T).001),max_connections(5),
     particle_to_spring_id(particle_to_spring_id),internal_curve(internal_mesh,particles),external_curve(external_mesh,particles),springs(new T_SPRING_HASH()),
     segments_with_springs(mesh.elements.m),intersecting_edge_edge_pairs(default_intersecting_edge_edge_pairs)

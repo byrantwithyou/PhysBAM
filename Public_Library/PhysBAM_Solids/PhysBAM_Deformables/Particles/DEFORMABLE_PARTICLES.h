@@ -2,7 +2,7 @@
 // Copyright 2004-2009, Ronald Fedkiw, Geoffrey Irving, Nipun Kwatra, Michael Lentine, Andrew Selle, Tamar Shinar, Eftychios Sifakis, Joseph Teran.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class PARTICLES
+// Class DEFORMABLE_PARTICLES
 //#####################################################################
 #ifndef __PARTICLES__
 #define __PARTICLES__
@@ -18,10 +18,10 @@ namespace PhysBAM{
 template<class TV> class SOFT_BINDINGS; 
 
 template<class TV>
-class PARTICLES:public CLONEABLE<PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > // X, V
+class DEFORMABLE_PARTICLES:public CLONEABLE<DEFORMABLE_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > // X, V
 {
     typedef typename TV::SCALAR T;
-    typedef CLONEABLE<PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
+    typedef CLONEABLE<DEFORMABLE_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
 public:
     using BASE::array_collection;using BASE::X;using BASE::V;
 
@@ -31,9 +31,9 @@ public:
     ARRAY_VIEW<T> one_over_effective_mass;
     bool store_mass;
 
-    PARTICLES(ARRAY_COLLECTION* array_collection_input);
-    PARTICLES();
-    virtual ~PARTICLES();
+    DEFORMABLE_PARTICLES(ARRAY_COLLECTION* array_collection_input);
+    DEFORMABLE_PARTICLES();
+    virtual ~DEFORMABLE_PARTICLES();
 
     void Store_Mass(bool store=true)
     {store_mass=store;if(store) array_collection->Add_Array(ATTRIBUTE_ID_MASS,&mass);else array_collection->Remove_Array(ATTRIBUTE_ID_MASS);}

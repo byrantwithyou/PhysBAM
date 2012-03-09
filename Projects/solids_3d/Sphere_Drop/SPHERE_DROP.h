@@ -42,7 +42,7 @@ void Get_Initial_Data()
 {
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Surface(); 
     TRIANGULATED_SURFACE<T>& triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).triangulated_surface;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     
     std::fstream input;char filename[256];sprintf(filename,"../../Public_Data/Rigid_Bodies/sphere.tri");input.open(filename,std::ios::in|std::ios::binary);
     triangulated_surface.template Read<RW>(input);input.close();

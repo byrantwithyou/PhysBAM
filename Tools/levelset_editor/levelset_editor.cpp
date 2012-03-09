@@ -14,7 +14,7 @@
 #include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/BASIC_VISUALIZATION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MOUSE_HANDLER.h>
@@ -34,7 +34,7 @@ class ATTACHMENT_VISUALIZATION:public BASIC_VISUALIZATION,public OPENGL_MOUSE_HA
 {
     typedef VECTOR<T,3> TV;
 public:
-    PARTICLES<TV> particles;
+    DEFORMABLE_PARTICLES<TV> particles;
     TRIANGLE_MESH tri_mesh;
     TRIANGULATED_SURFACE<T> tri_surface;
     OPENGL_GRID_3D<T>* opengl_grid_3d;

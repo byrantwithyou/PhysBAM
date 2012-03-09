@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
 template<class T>
@@ -19,7 +19,7 @@ class STRAIN_MEASURE_HEXAHEDRONS:public NONCOPYABLE
 public:
     HEXAHEDRALIZED_VOLUME<T>& mesh_object;
     HEXAHEDRON_MESH& mesh;
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     ARRAY<VECTOR<ARRAY<TV>,8>  > H_DmH_inverse; // 8x3 matrix per gauss point per element
     ARRAY<VECTOR<T,8> > DmH_determinant;
     T DmH_minimum_altitude; // this is only vaguely an altitude
@@ -29,7 +29,7 @@ private:
 public:
     
     STRAIN_MEASURE_HEXAHEDRONS(HEXAHEDRALIZED_VOLUME<T>& mesh_object_input)
-        :mesh_object(mesh_object_input),mesh(mesh_object.mesh),particles(dynamic_cast<PARTICLES<TV>&>(mesh_object.particles)),
+        :mesh_object(mesh_object_input),mesh(mesh_object.mesh),particles(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(mesh_object.particles)),
             H_DmH_inverse_save(0)
     {
         Initialize_H();

@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 namespace PhysBAM{
 
@@ -34,7 +34,7 @@ public:
     ARRAY<MATRIX_4X4<T> > weights_outer_product;
 
 public: 
-    BARYCENTRIC_TETRAHEDRON_SPRING_CONSTRAINT(PARTICLES<T,VECTOR<T,3> >& particles_input,ARRAY<int>& constrained_tets_input,ARRAY<VECTOR<T,3> >& constrained_location_weights_input,ARRAY<VECTOR<T,3> >& constrained_node_locations_input,TETRAHEDRON_MESH& mesh_input,T stiffness,T damping)
+    BARYCENTRIC_TETRAHEDRON_SPRING_CONSTRAINT(DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles_input,ARRAY<int>& constrained_tets_input,ARRAY<VECTOR<T,3> >& constrained_location_weights_input,ARRAY<VECTOR<T,3> >& constrained_node_locations_input,TETRAHEDRON_MESH& mesh_input,T stiffness,T damping)
         :SOLIDS_FORCES<T,VECTOR<T,3> >(particles_input),constrained_tets(constrained_tets_input),constrained_node_locations(constrained_node_locations_input),tetrahedron_mesh(mesh_input),constrained_location_weights(constrained_location_weights_input)
     {
         Set_Stiffness(stiffness);Set_Damping(damping);

@@ -5,14 +5,14 @@
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_POINT_ATTRACTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> LINEAR_POINT_ATTRACTION<TV>::
 LINEAR_POINT_ATTRACTION(T_MESH& mesh,const TV& pt,T coefficient_input)
-    :BASE(dynamic_cast<PARTICLES<TV>&>(mesh.particles)),surface(mesh),coefficient(coefficient_input),point(pt),dt(0),apply_explicit_forces(true),apply_implicit_forces(true)
+    :BASE(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(mesh.particles)),surface(mesh),coefficient(coefficient_input),point(pt),dt(0),apply_explicit_forces(true),apply_implicit_forces(true)
 {
     mesh.mesh.elements.Flattened().Get_Unique(referenced_particles);
 }

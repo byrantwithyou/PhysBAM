@@ -65,7 +65,7 @@ virtual void Get_Initial_Data()
     EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_tetrahedralized_volume=*deformable_object.embedded_tetrahedralized_volume;
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& embedded_tetrahedralized_volume_boundary_surface=*deformable_object.embedded_tetrahedralized_volume_boundary_surface;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=embedded_tetrahedralized_volume.tetrahedralized_volume;
-    PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
     
     GRID<TV> torus_grid(m_input,n_input,mn_input,torus.bounding_box);
     if(!cube_mesh) tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(torus_grid);else tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(torus_grid);

@@ -32,12 +32,12 @@ public:
     ARRAY<TV,TV_INT>* spatially_varying_wind;
     LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> vector_interpolation;
 
-    DEFORMABLE_ETHER_DRAG(PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0)
+    DEFORMABLE_ETHER_DRAG(DEFORMABLE_PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0)
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,influenced_particles_input),use_constant_wind(dynamic_ether_viscosity!=0),
         constant_wind_viscosity(dynamic_ether_viscosity),constant_wind_angular_viscosity(angular_viscosity),use_spatially_varying_wind(false),spatially_varying_wind_viscosity(0)
     {}
 
-    DEFORMABLE_ETHER_DRAG(PARTICLES<TV>& particles_input,const bool influence_all_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0)
+    DEFORMABLE_ETHER_DRAG(DEFORMABLE_PARTICLES<TV>& particles_input,const bool influence_all_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0)
         :POINTWISE_DEFORMABLE_FORCE<TV>(particles_input,influence_all_particles_input),use_constant_wind(dynamic_ether_viscosity!=0),
         constant_wind_viscosity(dynamic_ether_viscosity),constant_wind_angular_viscosity(angular_viscosity),use_spatially_varying_wind(false),spatially_varying_wind_viscosity(0)
     {}

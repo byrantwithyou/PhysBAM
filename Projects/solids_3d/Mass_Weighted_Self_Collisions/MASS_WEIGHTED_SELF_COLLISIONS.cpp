@@ -50,7 +50,7 @@ Initialize_Bodies()
 {
     //helper references
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     ARRAY<float> masses;

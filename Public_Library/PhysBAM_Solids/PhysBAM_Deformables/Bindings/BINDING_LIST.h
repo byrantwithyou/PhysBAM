@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
@@ -22,7 +22,7 @@ class BINDING_LIST:public NONCOPYABLE
 public:
     typedef int HAS_TYPED_READ_WRITE;
 
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     ARRAY<BINDING<TV>*> bindings;
     ARRAY<int> binding_index_from_particle_index;
     DEFORMABLE_BODY_COLLECTION<TV>* deformable_body_collection;
@@ -31,7 +31,7 @@ public:
     mutable ARRAY<int>* frame_list;
 
     BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
-    BINDING_LIST(PARTICLES<TV>& particles); // use of this constructor disables some features
+    BINDING_LIST(DEFORMABLE_PARTICLES<TV>& particles); // use of this constructor disables some features
     virtual ~BINDING_LIST();
 
     int Binding_Index_From_Particle_Index(const int particle) const

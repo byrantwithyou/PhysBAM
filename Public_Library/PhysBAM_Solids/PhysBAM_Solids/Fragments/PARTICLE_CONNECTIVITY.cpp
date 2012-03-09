@@ -4,7 +4,7 @@
 //#####################################################################
 // Class PARTICLE_CONNECTIVITY
 //#####################################################################
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fragments/PARTICLE_CONNECTIVITY.h>
@@ -13,7 +13,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> PARTICLE_CONNECTIVITY<TV>::
-PARTICLE_CONNECTIVITY(const PARTICLES<TV>& particles,const RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
+PARTICLE_CONNECTIVITY(const DEFORMABLE_PARTICLES<TV>& particles,const RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
     :particles_number(particles.array_collection->Size()),rigid_body_collection(rigid_body_collection),union_find(particles_number+rigid_body_collection.rigid_body_particle.array_collection->Size())
 {}
 //#####################################################################

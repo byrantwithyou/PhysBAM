@@ -7,10 +7,10 @@
 
 using namespace PhysBAM;
 
-template<class PARTICLES,class RW>
+template<class DEFORMABLE_PARTICLES,class RW>
 void Compact(const std::string &filename)
 {
-    ARRAYS<VECTOR<PARTICLES*,3> > particles_per_cell;
+    ARRAYS<VECTOR<DEFORMABLE_PARTICLES*,3> > particles_per_cell;
     FILE_UTILITIES::Read_From_File<RW>(filename,particles_per_cell);
     int total_cells=particles_per_cell.m*particles_per_cell.n*particles_per_cell.mn;
     int non_null_cells=0,zero_particle_cells=0;

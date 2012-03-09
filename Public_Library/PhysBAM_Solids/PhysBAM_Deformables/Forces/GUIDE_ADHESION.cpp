@@ -16,13 +16,13 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/GUIDE_ADHESION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> GUIDE_ADHESION<TV>::
-GUIDE_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh_input,SEGMENT_MESH& guide_mesh_input,
+GUIDE_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh_input,SEGMENT_MESH& guide_mesh_input,
     ARRAY<HAIR_ID>& particle_to_spring_id_input,ARRAY<int,HAIR_ID>& roots_input)
     :DEFORMABLES_FORCES<TV>(particles),mesh(mesh_input),guide_mesh(guide_mesh_input),curve(mesh,particles),guide_curve(guide_mesh,particles),
     thickness(10),max_connections(2000),particle_to_spring_id(particle_to_spring_id_input),roots(roots_input),one_over_effective_mass(particles.one_over_effective_mass),

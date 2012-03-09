@@ -15,7 +15,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_TET_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <fstream>
 #include <iostream>
 using namespace PhysBAM;
@@ -23,7 +23,7 @@ using namespace PhysBAM;
 // LINEAR_TET_SPRINGS
 //#####################################################################
 template<class T> LINEAR_TET_SPRINGS<T>::
-LINEAR_TET_SPRINGS(PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh,const bool implicit)
+LINEAR_TET_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& mesh,const bool implicit)
     :DEFORMABLES_FORCES<TV>(particles),mesh(mesh),spring_parameters(mesh.elements.Size(),false),
     edge_restlength_squared(mesh.elements.Size(),false),minimum_edge_compression_squared((T)1e-6),minimum_sin((T)pi/(T)180)
 {
@@ -363,7 +363,7 @@ Edge_Indices(unsigned char pair_id)
         default: PHYSBAM_FATAL_ERROR();}
 }
 template<class T> LINEAR_TET_SPRINGS<T>* PhysBAM::
-Create_Tet_Springs(PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,const T stiffness,const T overdamping_fraction,
+Create_Tet_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,const T stiffness,const T overdamping_fraction,
     const bool use_compressed_by_threshold_only/*=true*/,const T fraction_compression/*=(T).1*/,const bool limit_time_step_by_strain_rate/*=true*/,const T max_strain_per_time_step/*=(T).1*/,
     const bool use_rest_state_for_strain_rate/*=true*/,const T restlength_enlargement_fraction/*=0*/,const bool verbose/*=true*/,const bool implicit/*=false*/)
 {
@@ -384,7 +384,7 @@ Create_Tet_Springs(TETRAHEDRALIZED_VOLUME<T>& volume,const T stiffness,
     const T overdamping_fraction,const bool use_compressed_by_threshold_only/*=true*/,const T fraction_compression/*=(T).1*/,const bool limit_time_step_by_strain_rate/*=true*/,
     const T max_strain_per_time_step/*=(T).1*/,const bool use_rest_state_for_strain_rate/*=true*/,const T restlength_enlargement_fraction/*=0*/,const bool verbose/*=true*/,const bool implicit/*=false*/)
 {
-    return Create_Tet_Springs(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(volume.particles),volume.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,fraction_compression,limit_time_step_by_strain_rate,
+    return Create_Tet_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(volume.particles),volume.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,fraction_compression,limit_time_step_by_strain_rate,
         max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################

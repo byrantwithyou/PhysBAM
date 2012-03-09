@@ -25,7 +25,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLE_OBJECT_COLLISIONS<TV>::
-DEFORMABLE_OBJECT_COLLISIONS(PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
+DEFORMABLE_OBJECT_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
     COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list)
     :particles(particles),deformable_body_collection(deformable_body_collection),deformable_object_structures(deformable_object_structures),collision_body_list(collision_body_list),
     collision_tolerance((T)1e-6),use_spatial_partition(true),disable_multiple_levelset_collisions(true),use_protectors(false),maximum_levelset_collision_projection_velocity(FLT_MAX),

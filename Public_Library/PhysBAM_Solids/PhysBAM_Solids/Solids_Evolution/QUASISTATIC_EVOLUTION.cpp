@@ -15,7 +15,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -84,7 +84,7 @@ QUASISTATIC_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_
 template<class TV> void QUASISTATIC_EVOLUTION<TV>::
 One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     const ARRAY<int>& dynamic_particles=solid_body_collection.deformable_body_collection.dynamic_particles;
 
     dX_full.Resize(particles.array_collection->Size()); // an initial guess might be passed in for dX, otherwise it's zero
@@ -113,7 +113,7 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
 template<class TV> void QUASISTATIC_EVOLUTION<TV>::
 Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     const ARRAY<int>& dynamic_particles=solid_body_collection.deformable_body_collection.dynamic_particles;

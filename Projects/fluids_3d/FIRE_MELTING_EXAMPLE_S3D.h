@@ -70,7 +70,7 @@ void Melting_Substep(const T dt,const T time)
     for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(object);
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
-        PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
         ARRAY<T>& temperature=*melting_parameters.temperature(object);ARRAY<T> old_temperature(temperature);
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         for(int n=0;n<temperature.m;n++){
@@ -109,9 +109,9 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
     for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(object);
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
-        PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
         TRIANGULATED_SURFACE<T>& material_surface=deformable_object.triangles_of_material->material_surface;
-        PARTICLES<T,VECTOR<T,3> >& material_particles=material_surface.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& material_particles=material_surface.particles;
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
@@ -154,9 +154,9 @@ void Adjust_Phi_With_Sources(const T time)
     for(int object=0;object<melting_parameters.levelsets.m;object++){
         LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> >& levelset=*melting_parameters.levelsets(object);
         DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(melting_parameters.body_index(object));
-        PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
         TRIANGULATED_SURFACE<T>& material_surface=deformable_object.triangles_of_material->material_surface;
-        PARTICLES<T,VECTOR<T,3> >& material_particles=material_surface.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& material_particles=material_surface.particles;
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface

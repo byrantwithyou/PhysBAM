@@ -194,7 +194,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 {
     LOG::cout<<"PREPROCESS_SOLIDS_SUBSTEP ---------------------------"<<std::endl;
-    PARTICLES<TV> particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV> particles=solid_body_collection.deformable_body_collection.particles;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     ARRAY<bool> marked(particles.array_collection->Size());marked.Fill(false);
 
@@ -260,7 +260,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Add_Skin_Mesh()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Mattress(mattress_grid);
@@ -335,7 +335,7 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 //#####################################################################
 void Get_Constrained_Particle_Data()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
  
     enslaved_nodes.Resize(num_planks);
     positions_relative_to_plank_frames.Resize(num_planks);

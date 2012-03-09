@@ -226,11 +226,11 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Constrained_Spring_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=FLT_MAX;
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=FLT_MAX;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)0,(T)0);segmented_curve.particles.X(new_edge_node2)=TV((T)1,(T)0);
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
     last_frame=1000;
@@ -240,11 +240,11 @@ void Constrained_Spring_Test()
 //#####################################################################
 void Constrained_Spring_Gravity_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=FLT_MAX;
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=FLT_MAX;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)0,(T)0);segmented_curve.particles.X(new_edge_node2)=TV((T)0,(T)-1);
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
     last_frame=1000;
@@ -254,10 +254,10 @@ void Constrained_Spring_Gravity_Test()
 //#####################################################################
 void Single_Spring_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)0,(T)0);segmented_curve.particles.X(new_edge_node2)=TV((T)1,(T)0);
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
     last_frame=1000;
@@ -267,12 +267,12 @@ void Single_Spring_Test()
 //#####################################################################
 void Two_Spring_Test(const T midpoint_location)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
     int new_edge_node3=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)-1,(T)0);segmented_curve.particles.X(new_edge_node2)=TV(midpoint_location,(T)0);segmented_curve.particles.X(new_edge_node3)=TV((T)1,(T)0);
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node2,new_edge_node3));
@@ -283,12 +283,12 @@ void Two_Spring_Test(const T midpoint_location)
 //#####################################################################
  void Three_Spring_Test(const T height)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
     int new_edge_node3=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)0,(T)0);segmented_curve.particles.X(new_edge_node2)=TV((T)0.5, height);segmented_curve.particles.X(new_edge_node3)=TV((T)1,(T)0);
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node2,new_edge_node3));
@@ -300,7 +300,7 @@ void Two_Spring_Test(const T midpoint_location)
 //#####################################################################
  void Ten_Spring_Test()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
     int new_edge_node3=segmented_curve.particles.array_collection->Add_Element();int new_edge_node4=segmented_curve.particles.array_collection->Add_Element();
@@ -308,12 +308,12 @@ void Two_Spring_Test(const T midpoint_location)
     int new_edge_node7=segmented_curve.particles.array_collection->Add_Element();int new_edge_node8=segmented_curve.particles.array_collection->Add_Element();
     int new_edge_node9=segmented_curve.particles.array_collection->Add_Element();int new_edge_node10=segmented_curve.particles.array_collection->Add_Element();
     int new_edge_node11=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node4)=
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node5)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node6)=
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node7)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node8)=
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node9)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node10)=
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node11)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node4)=
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node5)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node6)=
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node7)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node8)=
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node9)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node10)=
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node11)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)0,(T)0);segmented_curve.particles.X(new_edge_node2)=TV((T)1,(T)0);segmented_curve.particles.X(new_edge_node3)=TV((T)2,(T)0);
     segmented_curve.particles.X(new_edge_node4)=TV((T)3,(T)0);segmented_curve.particles.X(new_edge_node5)=TV((T)4,(T)0);segmented_curve.particles.X(new_edge_node6)=TV((T)5,(T)0);
     segmented_curve.particles.X(new_edge_node7)=TV((T)6,(T)0);segmented_curve.particles.X(new_edge_node8)=TV((T)7,(T)0);segmented_curve.particles.X(new_edge_node9)=TV((T)8,(T)0);
@@ -336,12 +336,12 @@ void Two_Spring_Test(const T midpoint_location)
 //#####################################################################
 void Constrained_Two_Spring_Test(const T midpoint_location)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&segmented_curve);
     int new_edge_node1=segmented_curve.particles.array_collection->Add_Element();int new_edge_node2=segmented_curve.particles.array_collection->Add_Element();
     int new_edge_node3=segmented_curve.particles.array_collection->Add_Element();
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=FLT_MAX;
-    static_cast<PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node1)=static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node3)=FLT_MAX;
+    static_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles).mass(new_edge_node2)=(T)1;
     segmented_curve.particles.X(new_edge_node1)=TV((T)-1,(T)0);segmented_curve.particles.X(new_edge_node2)=TV(midpoint_location,(T)0);segmented_curve.particles.X(new_edge_node3)=TV((T)1,(T)0);
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node1,new_edge_node2));
     segmented_curve.mesh.elements.Append(VECTOR<int,2>(new_edge_node2,new_edge_node3));
@@ -353,7 +353,7 @@ void Constrained_Two_Spring_Test(const T midpoint_location)
 void Single_Spring_Moving_To_Right_Test()
 {
     Single_Spring_Test();
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     particles.V(1)=particles.V(2)=TV((T)1,(T)0);
 }
 //#####################################################################
@@ -363,7 +363,7 @@ void Spring_Mesh()
 {
     int grid_m=100,grid_n=100;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     particles.array_collection->Add_Elements(grid_m*grid_n);
 
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
@@ -382,7 +382,7 @@ void Spring_Mesh()
 void Hanging_Cloth_Test()
 {
     int m=number_side_panels+1,n=(int)(aspect_ratio*number_side_panels)+1;
-    PARTICLES<TV>& particles=*(new PARTICLES<TV>());
+    DEFORMABLE_PARTICLES<TV>& particles=*(new DEFORMABLE_PARTICLES<TV>());
     particles.Store_Mass();
 
     TRIANGLE_MESH mesh;

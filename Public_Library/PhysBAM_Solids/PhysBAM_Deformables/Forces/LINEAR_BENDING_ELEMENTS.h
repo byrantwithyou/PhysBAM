@@ -30,7 +30,7 @@ private:
     SPARSE_MATRIX_FLAT_NXN<T> stiffness_matrix_upper;
 public:
 
-    LINEAR_BENDING_ELEMENTS(PARTICLES<TV>& particles,T_MESH& mesh);
+    LINEAR_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles,T_MESH& mesh);
     ~LINEAR_BENDING_ELEMENTS();
 
     void Set_Stiffness(const T stiffness_input)
@@ -61,7 +61,7 @@ private:
 };
 
 template<class TV> LINEAR_BENDING_ELEMENTS<TV>*
-Create_Linear_Bending_Elements(PARTICLES<TV>& particles,typename MESH_POLICY<TV::m-1>::MESH& mesh,const typename TV::SCALAR stiffness,
+Create_Linear_Bending_Elements(DEFORMABLE_PARTICLES<TV>& particles,typename MESH_POLICY<TV::m-1>::MESH& mesh,const typename TV::SCALAR stiffness,
     const typename TV::SCALAR damping)
 {
     LINEAR_BENDING_ELEMENTS<TV>* bend=new LINEAR_BENDING_ELEMENTS<TV>(particles,mesh);

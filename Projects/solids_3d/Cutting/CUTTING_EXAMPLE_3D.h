@@ -60,7 +60,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Initialize_Bodies_Without_Embedding()
 {
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
 
     TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_better_3d/Output_Orig/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0.5,0))),false,true);
     tet_volume.Update_Bounding_Box();
@@ -96,7 +96,7 @@ void Initialize_Bodies_Without_Embedding()
 void Initialize_Bodies_With_Embedding()
 {
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
 
     TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_3d/Output_Dup/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,4.5,0))),false,true);
     tet_volume.Update_Bounding_Box();

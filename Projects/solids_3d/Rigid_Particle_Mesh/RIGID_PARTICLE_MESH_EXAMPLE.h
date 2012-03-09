@@ -56,7 +56,7 @@ public:
 void Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filename,const FRAME<TV>& frame,const bool with_phi)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filename,(T).15,0,with_phi);
     rigid_body.X()=frame.t;
     rigid_body.Rotation()=frame.r;
@@ -72,7 +72,7 @@ void Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filena
 void Add_Point_Joint(const int joint_id,const int plank_id,const TV& plank_object_space_position,const int sphere_id,const TV& sphere_object_space_position)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // add deformable particles for each of the sphere and plank
     int sphere_particle=particles.array_collection->Add_Element();
@@ -110,7 +110,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.cfl=(T).2;

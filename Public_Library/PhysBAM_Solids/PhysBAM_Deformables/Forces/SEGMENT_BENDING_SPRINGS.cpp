@@ -7,13 +7,13 @@
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> SEGMENT_BENDING_SPRINGS<TV>::
-SEGMENT_BENDING_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const bool implicit)
+SEGMENT_BENDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const bool implicit)
     :LINEAR_SPRINGS<TV>(particles,bending_segment_mesh,implicit)
 {
     Initialize(segment_mesh);
@@ -49,7 +49,7 @@ Initialize(SEGMENT_MESH& segment_mesh_input)
 // Function Create_Segment_Bending_Springs
 //#####################################################################
 template<class TV> SEGMENT_BENDING_SPRINGS<TV>* PhysBAM::
-Create_Segment_Bending_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness,const typename TV::SCALAR overdamping_fraction,
+Create_Segment_Bending_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness,const typename TV::SCALAR overdamping_fraction,
     const bool limit_time_step_by_strain_rate,const typename TV::SCALAR max_strain_per_time_step,const bool use_rest_state_for_strain_rate,
     const typename TV::SCALAR restlength_enlargement_fraction,const bool verbose,const bool implicit)
 {
@@ -71,7 +71,7 @@ Create_Segment_Bending_Springs(SEGMENTED_CURVE<TV>& segmented_curve,const typena
     const bool limit_time_step_by_strain_rate,const typename TV::SCALAR max_strain_per_time_step,const bool use_rest_state_for_strain_rate,
     const typename TV::SCALAR restlength_enlargement_fraction,const bool verbose,const bool implicit)
 {
-    return Create_Segment_Bending_Springs(dynamic_cast<PARTICLES<TV>&>(segmented_curve.particles),segmented_curve.mesh,stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
+    return Create_Segment_Bending_Springs(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(segmented_curve.particles),segmented_curve.mesh,stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
         use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################

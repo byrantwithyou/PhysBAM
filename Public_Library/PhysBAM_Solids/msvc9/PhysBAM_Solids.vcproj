@@ -1019,11 +1019,11 @@
 					>
 				</File>
 				<File
-					RelativePath="..\PhysBAM_Deformables\Particles\PARTICLES.cpp"
+					RelativePath="..\PhysBAM_Deformables\Particles\DEFORMABLE_PARTICLES.cpp"
 					>
 				</File>
 				<File
-					RelativePath="..\PhysBAM_Deformables\Particles\PARTICLES.h"
+					RelativePath="..\PhysBAM_Deformables\Particles\DEFORMABLE_PARTICLES.h"
 					>
 				</File>
 			</Filter>

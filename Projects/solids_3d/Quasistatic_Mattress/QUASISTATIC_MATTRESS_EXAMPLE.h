@@ -103,7 +103,7 @@ void Get_Initial_Data()
     deformable_object.Add_Structure(TETRAHEDRALIZED_VOLUME<T>::Create(deformable_object.particles));
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.mesh;
-    PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
 
     if(!cube_mesh) tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(mattress_grid);
     else tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);

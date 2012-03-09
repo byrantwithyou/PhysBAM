@@ -31,7 +31,7 @@ public:
     T constant_base_youngs_modulus;
     ARRAY<T> correction_force;
 
-    MULTILINEAR_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh)
+    MULTILINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh)
         :LINEAR_SPRINGS<TV>(particles,segment_mesh,false)
     {}
 
@@ -59,7 +59,7 @@ private:
 };
 
 template<class T,class TV> MULTILINEAR_SPRINGS<TV>*
-Create_Multilinear_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const ARRAY<VECTOR<T,2> >& compression_intervals,
+Create_Multilinear_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const ARRAY<VECTOR<T,2> >& compression_intervals,
     const ARRAY<VECTOR<T,2> >& stretching_intervals,const T stiffness=2e3,const T overdamping_fraction=1,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,
     const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true)
 {

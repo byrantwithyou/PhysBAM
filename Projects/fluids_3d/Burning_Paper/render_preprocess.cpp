@@ -38,8 +38,8 @@ template<class T,class RW> void Process(int argc,char* argv[])
     DEFORMABLE_OBJECT_3D<T>& deformable_object=deformable_object_list(1);
     assert(deformable_object.embedded_triangulated_surface);
     deformable_object.triangles_of_material->Create_Material_Surface();
-    PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
-    PARTICLES<T,VECTOR<T,3> >& material_particles=deformable_object.triangles_of_material->material_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& material_particles=deformable_object.triangles_of_material->material_surface.particles;
     
     LEVELSET_TRIANGULATED_OBJECT<T,VECTOR<T,3> > levelset(*deformable_object.embedded_triangulated_surface);
     FILE_UTILITIES::Read_From_File<RW>(o+"levelset"+f,levelset);

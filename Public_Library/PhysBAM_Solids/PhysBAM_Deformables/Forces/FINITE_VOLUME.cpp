@@ -28,14 +28,14 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/PLASTICITY_MODEL.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DIAGONALIZED_SEMI_IMPLICIT_ELEMENT.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV,int d> FINITE_VOLUME<TV,d>::
 FINITE_VOLUME(const bool use_uniform_density_input,STRAIN_MEASURE<TV,d>& strain_measure,CONSTITUTIVE_MODEL<T,d>& constitutive_model,PLASTICITY_MODEL<T,d>* plasticity_model)
-    :DEFORMABLES_FORCES<TV>(dynamic_cast<PARTICLES<TV>&>(strain_measure.particles)),strain_measure(strain_measure),constitutive_model(constitutive_model),
+    :DEFORMABLES_FORCES<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(strain_measure.particles)),strain_measure(strain_measure),constitutive_model(constitutive_model),
     plasticity_model(plasticity_model),dPi_dFe(0),dP_dFe(0),Be_scales_save(0),V(0),twice_max_strain_per_time_step(0),semi_implicit_data(0),use_uniform_density(use_uniform_density_input),
     density_list(0),implicit_surface(0),node_stiffness(0),edge_stiffness(0),force_segments(0),destroy_data(false),half_force_size(0),total_half_force_size(0)
 {

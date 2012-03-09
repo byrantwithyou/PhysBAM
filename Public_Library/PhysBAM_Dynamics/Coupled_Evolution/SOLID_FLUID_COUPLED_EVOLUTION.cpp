@@ -134,7 +134,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     int colors=0;
     // Doing super fragments for s-f coupling requires connectivity through fluid.
 
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
@@ -672,7 +672,7 @@ template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Compute_W(const T current_position_time)
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
     const GRID<TV>& grid=Get_Grid();
@@ -1091,7 +1091,7 @@ Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<VECTOR_ND<T> >& right_hand_side,c
 {
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
     for(int i=0;i<colors;i++){
         if(poisson->filled_region_touches_dirichlet(i)||poisson->solve_neumann_regions){
@@ -1114,7 +1114,7 @@ Average_Solid_Projected_Face_Velocities_For_Energy_Update(const T_FACE_ARRAYS_SC
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
 Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_FACE_ARRAYS_SCALAR& face_velocities)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
 

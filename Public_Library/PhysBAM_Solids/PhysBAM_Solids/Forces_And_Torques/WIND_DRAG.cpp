@@ -9,7 +9,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/WIND_DRAG.h>
 using namespace PhysBAM;
@@ -31,11 +31,11 @@ template<class TV> typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::O
 }}
 template<class TV> template<class T_OBJECT> WIND_DRAG<TV>::
 WIND_DRAG(T_OBJECT& object,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
-    :SOLIDS_FORCES<TV>(dynamic_cast<PARTICLES<TV>&>(object.particles),rigid_body_collection_input),deformable_simplicial_object(&Simplicial_Object<TV>(object)),rigid_body(0),use_constant_wind(false),
+    :SOLIDS_FORCES<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles),rigid_body_collection_input),deformable_simplicial_object(&Simplicial_Object<TV>(object)),rigid_body(0),use_constant_wind(false),
     use_spatially_varying_wind(false),spatially_varying_wind(0),wind_density(0),spatially_varying_wind_density(0),spatially_varying_wind_pressure(0),linear_normal_viscosity(0),mpi_solids(0)
 {}
 template<class TV> WIND_DRAG<TV>::
-WIND_DRAG(RIGID_BODY<TV>& rigid_body_input,PARTICLES<TV>& deformable_body_particles_input)
+WIND_DRAG(RIGID_BODY<TV>& rigid_body_input,DEFORMABLE_PARTICLES<TV>& deformable_body_particles_input)
     :SOLIDS_FORCES<TV>(deformable_body_particles_input,rigid_body_input.rigid_body_collection),deformable_simplicial_object(0),rigid_body(&rigid_body_input),use_constant_wind(false),
     use_spatially_varying_wind(false),spatially_varying_wind(0),wind_density(0),spatially_varying_wind_density(0),spatially_varying_wind_pressure(0),linear_normal_viscosity(0),mpi_solids(0)
 {}

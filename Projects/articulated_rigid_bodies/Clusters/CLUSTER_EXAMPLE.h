@@ -208,7 +208,7 @@ void Rigid_Constraint_Speed_Up_Test(int& num_joints,int& num_rigid_bodies,VECTOR
 void Cubes_With_Constraints(int& num_joints,int& num_rigid_bodies,VECTOR<T,3> shift,const bool velocity_on=true)
 {
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=deformable_object.rigid_body_particles;
     ARRAY<RIGID_BODY<TV>*>& rigid_bodies=solids_parameters.rigid_body_parameters.list.rigid_bodies;
     SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);

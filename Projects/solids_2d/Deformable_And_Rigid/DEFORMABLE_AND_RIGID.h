@@ -53,14 +53,14 @@ void Get_Initial_Data()
     solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Area();
     TRIANGULATED_AREA<T>& triangulated_area=*solids_parameters.deformable_body_parameters.list(1).triangulated_area;
     TRIANGLE_MESH& triangle_mesh=triangulated_area.triangle_mesh;
-    PARTICLES<T,VECTOR_2D<T> >& particles=solids_parameters.deformable_body_parameters.list(1).particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=solids_parameters.deformable_body_parameters.list(1).particles;
 
     triangulated_area.Initialize_Square_Mesh_And_Particles(mattress_grid);
 
     triangulated_area.Set_Density(1000);
     triangulated_area.Set_Mass_Of_Particles(true);
 
-    std::cout << "PARTICLES MASS " << particles.mass(1) << std::endl;
+    std::cout << "DEFORMABLE_PARTICLES MASS " << particles.mass(1) << std::endl;
 
     triangulated_area.Update_Bounding_Box();
     VECTOR_2D<T> center(triangulated_area.bounding_box->Center());T bottom=triangulated_area.bounding_box->ymin;

@@ -15,7 +15,7 @@ class BINDING_SPRINGS:public IMPLICIT_ZERO_LENGTH_SPRINGS<TV>
 {
     typedef typename TV::SCALAR T;
 public:
-    BINDING_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input)
+    BINDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input)
         :IMPLICIT_ZERO_LENGTH_SPRINGS<TV>(particles,segment_mesh_input)
     {}
 
@@ -27,7 +27,7 @@ public:
 };
 
 template<class TV> BINDING_SPRINGS<TV>*
-Create_Edge_Binding_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2e3,
+Create_Edge_Binding_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2e3,
     const typename TV::SCALAR overdamping_fraction=1,const bool verbose=true)
 {
     BINDING_SPRINGS<TV>* ls=new BINDING_SPRINGS<TV>(particles,segment_mesh);

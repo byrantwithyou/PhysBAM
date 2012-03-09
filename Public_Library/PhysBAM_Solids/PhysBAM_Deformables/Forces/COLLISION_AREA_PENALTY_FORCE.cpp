@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);}
 namespace PhysBAM{template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);}
@@ -15,7 +15,7 @@ namespace PhysBAM{template<class TV,class ATTR> void Debug_Particle_Set_Attribut
 // Constructor
 //#####################################################################
 template<class TV> COLLISION_AREA_PENALTY_FORCE<TV>::
-COLLISION_AREA_PENALTY_FORCE(PARTICLES<TV>& particles)
+COLLISION_AREA_PENALTY_FORCE(DEFORMABLE_PARTICLES<TV>& particles)
     :BASE(particles),volume_collisions(*new VOLUME_COLLISIONS<TV>),force_coefficient(1e6)
 {
 }

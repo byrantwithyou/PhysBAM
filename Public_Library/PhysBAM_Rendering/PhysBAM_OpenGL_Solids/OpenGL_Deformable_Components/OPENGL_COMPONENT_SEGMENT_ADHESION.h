@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_GRID_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
@@ -41,7 +41,7 @@ protected:
 public:
     std::string filename;
     const OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D<T,RW>& opengl_component_deformable_body;
-    PARTICLES<TV> particles;
+    DEFORMABLE_PARTICLES<TV> particles;
     SEGMENT_MESH segment_mesh;
     SEGMENTED_CURVE<TV> segmented_curve;
     OPENGL_SEGMENTED_CURVE_3D<T> opengl_segmented_curve;

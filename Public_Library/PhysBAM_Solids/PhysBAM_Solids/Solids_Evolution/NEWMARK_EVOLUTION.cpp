@@ -72,7 +72,7 @@ template<class TV> NEWMARK_EVOLUTION<TV>::
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
@@ -142,7 +142,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T current_position_time,const bool velocity_update)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
     GENERALIZED_VELOCITY<TV> F_all(F_full,rigid_F_full,solid_body_collection);
@@ -195,7 +195,7 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
@@ -251,7 +251,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Average_And_Exchange_Position()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     assert(X_save.m==particles.array_collection->Size());
     assert(rigid_X_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size() && rigid_rotation_save.m==rigid_body_collection.rigid_body_particle.array_collection->Size());
@@ -277,7 +277,7 @@ Average_And_Exchange_Position()
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Trapezoidal_Step_Velocity(const T dt,const T time)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     // save V at time
@@ -310,7 +310,7 @@ Trapezoidal_Step_Velocity(const T dt,const T time)
 template<class TV> void NEWMARK_EVOLUTION<TV>::
 Backward_Euler_Step_Velocity(const T dt,const T time)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     Backward_Euler_Step_Velocity_Helper(dt,time,time+dt,true);
@@ -442,7 +442,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Apply_Projections_In_Position_Update(const T dt,const T time)
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     // iterate over rigid/rigid
     if(rigid_body_collection.dynamic_rigid_body_particles.m && solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg){
@@ -628,7 +628,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Print_Maximum_Velocities(const T time) const
 {
     LOG::cout<<"time = "<<time<<std::endl;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     int max_index=-1;T max_magnitude_squared=-FLT_MAX;const INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&>& V=particles.V.Subset(solid_body_collection.deformable_body_collection.dynamic_particles);
     for(int i=0;i<V.Size();i++){T magnitude_squared=V(i).Magnitude_Squared();if(magnitude_squared>max_magnitude_squared){max_magnitude_squared=magnitude_squared;max_index=i;}}
@@ -741,7 +741,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Compute_Momentum_Differences()
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     rigid_velocity_difference.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());rigid_angular_momentum_difference.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
     V_difference.Resize(particles.array_collection->Size());
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
@@ -758,7 +758,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Save_Velocity()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     V_save.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
     rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
@@ -775,7 +775,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Restore_Velocity() const
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=V_save.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_body_collection.rigid_body_particle.twist(p).linear=rigid_velocity_save(p).linear;
@@ -791,7 +791,7 @@ template<class TV> void NEWMARK_EVOLUTION<TV>::
 Exchange_Velocity()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     V_save.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity_save.Resize(rigid_body_particles.array_collection->Size(),false,false);
     rigid_angular_momentum_save.Resize(rigid_body_particles.array_collection->Size(),false,false);

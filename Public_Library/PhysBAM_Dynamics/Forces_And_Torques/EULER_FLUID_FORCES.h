@@ -39,7 +39,7 @@ class EULER_FLUID_FORCES:public SOLIDS_FORCES<typename T_GRID::VECTOR_T>
 public:
     EULER_FLUID_FORCES(const T_GRID& grid_input,const T_FACE_ARRAYS_SCALAR& pressure_at_faces_input,
         const T_FACE_ARRAYS_BOOL& solid_fluid_face_input,const T_ARRAYS_BOOL& cells_inside_fluid_input,
-        const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid_input,PARTICLES<TV>& particles_input,
+        const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid_input,DEFORMABLE_PARTICLES<TV>& particles_input,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);
 
     virtual ~EULER_FLUID_FORCES();

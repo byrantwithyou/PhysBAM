@@ -9,7 +9,7 @@
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/BW_COLLISIONS.h>
@@ -36,7 +36,7 @@ template<class TV> BW_COLLISIONS<TV>::
 template<class TV> void BW_COLLISIONS<TV>::
 Detect_Cloth_Body_Contact()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
 
     // Detect cloth/body constraints
@@ -54,7 +54,7 @@ Detect_Cloth_Body_Contact()
 template<class TV> void BW_COLLISIONS<TV>::
 Remove_Separating_Cloth_Body_Contacts(BW_BACKWARD_EULER_SYSTEM<TV>& system,KRYLOV_VECTOR_BASE<T>& R,KRYLOV_VECTOR_BASE<T>& B,KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& Q)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     R=B;system.Multiply(V,Q);R-=Q;
     VECTOR_T& actual_R=debug_cast<VECTOR_T&>(R);
     for(int i=cloth_body_constraints.m-1;i>=0;i--){

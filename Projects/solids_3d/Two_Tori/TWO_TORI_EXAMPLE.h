@@ -26,7 +26,7 @@ public:
     VECTOR_3D<T> initial_velocity1,initial_angular_velocity1,initial_velocity2,initial_angular_velocity2;
     ARRAY<TETRAHEDRALIZED_VOLUME<T>*> ring;
     ARRAY<TETRAHEDRON_COLLISION_BODY<T>*> ring_collision_body;
-    PARTICLES<T,VECTOR_3D<T> > undeformed_positions;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > undeformed_positions;
     LEVELSET_IMPLICIT_SURFACE<T>* undeformed_levelset;
     TRIANGULATED_SURFACE<T>* undeformed_triangulated_surface;
     ARRAY<int> intersecting_points;
@@ -119,7 +119,7 @@ void Get_Initial_Data()
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
         ring.Append(solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume);
         TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-        PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
         
         std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_file);tetrahedralized_volume.template Read<RW>(*input);delete input;
         std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
@@ -155,7 +155,7 @@ void Get_Initial_Data()
 //#####################################################################
 void Create_Singleton_Geometry(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T edge_length=(T).25)
 {
-    PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
     particles.Increase_Array_Size(4);
     particles.X(particles.array_collection->Add_Element())=VECTOR_3D<T>(0,0,0);
     particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(1,0,0);

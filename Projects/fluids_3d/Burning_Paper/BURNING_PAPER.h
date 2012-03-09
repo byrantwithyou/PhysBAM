@@ -344,7 +344,7 @@ void Initialize_Phi(const int object,ARRAY<T>& phi)
 void Initialize_Particle_Positions_And_Velocities(const int object)
 {
     TRIANGULATED_SURFACE<T>& triangulated_surface=solids_parameters.deformable_body_parameters.list(object).embedded_triangulated_surface->triangulated_surface;
-    PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=solids_parameters.deformable_body_parameters.list(object).particles;
 
     particles.Update_Velocity();
     triangulated_surface.Update_Bounding_Box();
@@ -381,7 +381,7 @@ void Initialize_Forces()
         solids_parameters.implicit_solve_parameters.cg_tolerance=1e-3;}
 
     TRIANGULATED_SURFACE<T>& triangulated_surface=solids_parameters.deformable_body_parameters.list(1).embedded_triangulated_surface->triangulated_surface;
-    PARTICLES<T,VECTOR<T,3> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> >& particles=triangulated_surface.particles;
 
     solids_parameters.deformable_body_parameters.list(1).particles.Store_Mass();
     triangulated_surface.Set_Density(1);

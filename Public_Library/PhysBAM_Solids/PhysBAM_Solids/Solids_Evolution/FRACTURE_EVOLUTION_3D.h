@@ -36,7 +36,7 @@ public:
     SOLIDS_PARAMETERS<TV>& solids_parameters;
     FRACTURE_OBJECT<TV,3>* fracture_object;
     PLASTICITY_MODEL<T,3>* plasticity_model;
-    PARTICLES<TV> rigid_body_deformable_body_particles;
+    DEFORMABLE_PARTICLES<TV> rigid_body_deformable_body_particles;
     ARRAY<int> particle_to_rigid_body_id;
     ARRAY<int> deformable_to_rigid_particles;
     ARRAY<int> rigid_bodies_with_impulse;

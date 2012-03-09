@@ -97,7 +97,7 @@ Create_Joint_Function(const JOINT_ID joint_id)
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     X.Resize(particles.array_collection->Size(),false,false);
@@ -112,7 +112,7 @@ Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotati
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
@@ -130,7 +130,7 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Save_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angular_momentum)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     V.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);rigid_angular_momentum.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
     V.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
@@ -145,7 +145,7 @@ Save_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angula
 template<class T_GRID> void SEARCH_CONTROLLER<T_GRID>::
 Restore_Velocity(ARRAY<TV>& V,ARRAY<TV>& rigid_velocity,ARRAY<T_SPIN>& rigid_angular_momentum)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     particles.V.Subset(solid_body_collection.deformable_body_collection.simulated_particles)=V.Subset(solid_body_collection.deformable_body_collection.simulated_particles);
     for(int i=0;i<solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles(i);
         rigid_body_collection.rigid_body_particle.twist(p).linear=rigid_velocity(p);

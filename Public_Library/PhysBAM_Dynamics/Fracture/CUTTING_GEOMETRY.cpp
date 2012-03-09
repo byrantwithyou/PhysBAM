@@ -20,7 +20,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV,int d_input> CUTTING_GEOMETRY<TV,d_input>::
 CUTTING_GEOMETRY(const bool verbose)
-    :cutting(*new T_CUT_MESH,*new PARTICLES<TV>()),cutting_simplices(new T_CUTTING_SIMPLICES),intersection_registry(new T_INTERSECTION_REGISTRY(*cutting_simplices)),verbose(verbose),
+    :cutting(*new T_CUT_MESH,*new DEFORMABLE_PARTICLES<TV>()),cutting_simplices(new T_CUTTING_SIMPLICES),intersection_registry(new T_INTERSECTION_REGISTRY(*cutting_simplices)),verbose(verbose),
     first_new_cut_element(1)
 {
     Set_Intersection_Thickness();
@@ -77,7 +77,7 @@ namespace{
         embedding.mesh.Initialize_Element_Edges();
         embedding.Initialize_Hierarchy();
         embedding.particles.Store_Velocity();
-        dynamic_cast<PARTICLES<VECTOR<T,3> >&>(embedding.particles).Store_Mass();
+        dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(embedding.particles).Store_Mass();
     }
     template<class T> void Initialize_Cutting_Acceleration_Structures(SEGMENTED_CURVE_2D<T>& cutting,TRIANGULATED_AREA<T>& embedding)
     {
@@ -87,7 +87,7 @@ namespace{
         embedding.mesh.Initialize_Edge_Triangles();
         embedding.Initialize_Hierarchy();
         embedding.particles.Store_Velocity();
-        dynamic_cast<PARTICLES<VECTOR<T,2> >&>(embedding.particles).Store_Mass();
+        dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,2> >&>(embedding.particles).Store_Mass();
         cutting.mesh.Initialize_Incident_Elements();
     }
     template<class T> void Initialize_Cutting_Acceleration_Structures(SEGMENTED_CURVE<VECTOR<T,3> >& cutting,TRIANGULATED_SURFACE<T>& embedding)
@@ -98,7 +98,7 @@ namespace{
         embedding.mesh.Initialize_Edge_Triangles();
         embedding.Initialize_Hierarchy();
         embedding.particles.Store_Velocity();
-        dynamic_cast<PARTICLES<VECTOR<T,3> >&>(embedding.particles).Store_Mass();
+        dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(embedding.particles).Store_Mass();
     }
 }
 //#####################################################################
@@ -329,7 +329,7 @@ Cut_Material(T_EMBEDDING_OBJECT& next_embedding_input)
     next_embedding=&next_embedding_input;
     if(next_embedding->mesh.elements.m || next_embedding->particles.array_collection->Size()) PHYSBAM_FATAL_ERROR("Non empty inputted next embedding");
     next_embedding->particles.Store_Velocity();
-    dynamic_cast<PARTICLES<TV>&>(next_embedding->particles).Store_Mass();
+    dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(next_embedding->particles).Store_Mass();
     
     LOG::Time("Initializing acceleration structures");Initialize_Cutting_Acceleration_Structures<T>(cutting,*current_embedding);
     LOG::Time("Finding cutting intersections");Cutting_Intersections_Helper(*this);

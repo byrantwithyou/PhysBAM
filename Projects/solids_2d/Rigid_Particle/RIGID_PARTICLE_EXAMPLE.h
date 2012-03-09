@@ -50,7 +50,7 @@ public:
 virtual void Get_Initial_Data()
 {
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=deformable_object.rigid_body_particles;
     ARRAY<RIGID_BODY<TV>*>& rigid_bodies=solids_parameters.rigid_body_parameters.list.rigid_bodies;
     SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(particles);
@@ -99,10 +99,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
     SEGMENTED_CURVE<TV>& segmented_curve=deformable_object.template Find_Structure<SEGMENTED_CURVE<TV>&>();
 
-    PARTICLE_SUBSET<PARTICLES<TV> > gravity_particles(particles);
+    PARTICLE_SUBSET<DEFORMABLE_PARTICLES<TV> > gravity_particles(particles);
     for(int i=21;i<=23;i++) gravity_particles.active_indices.Append(i);
     gravity_particles.Update_Subset_Index_From_Element_Index();
 

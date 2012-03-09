@@ -12,14 +12,14 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BW_SHEAR_FORCES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cfloat>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> BW_SHEAR_FORCES<TV>::
-BW_SHEAR_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input)
+BW_SHEAR_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input)
     :BW_MATERIAL_SPACE_FORCES<TV,1>(particles,triangle_mesh_input,stiffness_coefficient_input,damping_coefficient_input)
 {
 }
@@ -80,7 +80,7 @@ Potential_Energy(const T time) const
 // Function Create_BW_Shear_Force
 //#####################################################################
 template<class TV> BW_SHEAR_FORCES<TV>* PhysBAM::
-Create_BW_Shear_Force(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,const typename TV::SCALAR stiffness_coefficient_input,const typename TV::SCALAR damping_coefficient_input)
+Create_BW_Shear_Force(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,const typename TV::SCALAR stiffness_coefficient_input,const typename TV::SCALAR damping_coefficient_input)
 {
     BW_SHEAR_FORCES<TV>* sf=new BW_SHEAR_FORCES<TV>(particles,triangle_mesh,stiffness_coefficient_input,damping_coefficient_input);
     return sf;
@@ -88,7 +88,7 @@ Create_BW_Shear_Force(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,cons
 //#####################################################################
 #define INSTANTIATION_HELPER(T) \
     template class BW_SHEAR_FORCES<VECTOR<T,3> >; \
-    template BW_SHEAR_FORCES<VECTOR<T,3> >* PhysBAM::Create_BW_Shear_Force<VECTOR<T,3> >(PARTICLES<VECTOR<T,3> >&,TRIANGLE_MESH&,const T,const T);
+    template BW_SHEAR_FORCES<VECTOR<T,3> >* PhysBAM::Create_BW_Shear_Force<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,TRIANGLE_MESH&,const T,const T);
 
 INSTANTIATION_HELPER(float)
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

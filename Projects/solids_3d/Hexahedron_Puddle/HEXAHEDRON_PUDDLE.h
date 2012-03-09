@@ -51,7 +51,7 @@ void Get_Initial_Data()
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Hexahedralized_Volume();
     HEXAHEDRALIZED_VOLUME<T>& hexahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).hexahedralized_volume;
     HEXAHEDRON_MESH& hexahedron_mesh=hexahedralized_volume.hexahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=hexahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=hexahedralized_volume.particles;
 
     int resolution=15;
     GRID<TV> grid(3*resolution+1,3*resolution+1,resolution+1,(T)-1,(T)1,(T)-1,(T)1,-(T)one_third,(T)one_third);

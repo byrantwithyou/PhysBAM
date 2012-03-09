@@ -517,7 +517,7 @@ template<class TV,class T_ARRAY,class T_MASS_ARRAY> inline void Update_Velocity_
 template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions)
 {
-    PARTICLES<TV>& particles=geometry.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=geometry.deformable_body_collection.particles;
     int attempts=0,total_attempts=1;if(!elastic_repulsion && !friction) total_attempts=point_face_inelastic_collision_repulsion_attempts;
     int inverted_pairs=0,applied_impulses=0;
     ARRAY_VIEW<TV> V(particles.V);
@@ -599,7 +599,7 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
 template<class TV> template<class T_ARRAY,class S> void TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,3>&,const bool use_repulsions)
 {
-    PARTICLES<TV>& particles=geometry.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=geometry.deformable_body_collection.particles;
     int attempts=0,total_attempts=1;if(!elastic_repulsion && !friction) total_attempts=edge_edge_inelastic_collision_repulsion_attempts;
     int inverted_pairs=0,applied_impulses=0;
     ARRAY_VIEW<TV> V(particles.V);

@@ -8,7 +8,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 
 const ATTRIBUTE_ID ATTRIBUTE_ID_MASS(7);
 const ATTRIBUTE_ID ATTRIBUTE_ID_ONE_OVER_MASS(19);

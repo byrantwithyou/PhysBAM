@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
 template<class T> class TETRAHEDRALIZED_VOLUME;
@@ -24,7 +24,7 @@ class TETRAHEDRON_COLLISION_BODY:public COLLISION_GEOMETRY<VECTOR<T_input,3> >
 public:
     using COLLISION_GEOMETRY<TV>::Set_Collision_Thickness;using COLLISION_GEOMETRY<TV>::collision_thickness;
 
-    PARTICLES<TV> &particles,&undeformed_particles;
+    DEFORMABLE_PARTICLES<TV> &particles,&undeformed_particles;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume;
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface;
     TRIANGULATED_SURFACE<T>& triangulated_surface;
@@ -75,7 +75,7 @@ private:
     void Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X,TV& V,SOFT_BINDINGS<TV>& soft_bindings,const T one_over_mass,const T dt,const TV& weights,
         TV& position_change);
 public:
-    int Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
+    int Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
         const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
         ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table);
     const RANGE<TV>& Axis_Aligned_Bounding_Box() const PHYSBAM_OVERRIDE;

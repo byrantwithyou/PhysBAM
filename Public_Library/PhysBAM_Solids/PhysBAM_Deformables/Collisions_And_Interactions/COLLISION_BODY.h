@@ -24,7 +24,7 @@ namespace PhysBAM{
 template<class T_GRID,class ID> class OBJECTS_IN_CELL;
 template<class TV> class BINDING_LIST;
 template<class TV> class SOFT_BINDINGS;
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 template<class TV> class FRAME;
 template<class TV> class RANGE;
 template<class TV> class COLLISION_PARTICLE_STATE;
@@ -41,7 +41,7 @@ private:
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
     typedef typename IF<TV::dimension==2,T,typename IF<TV::dimension==1,ONE,TV>::TYPE>::TYPE T_WEIGHTS;
 public:
-    static int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body,ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,
+    static int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body,ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,
         const ARRAY<int>& nodes_to_check,const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
         ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,
         const HASHTABLE<int,T> *thickness_table);
@@ -55,7 +55,7 @@ class COLLISION_BODY
 {
 public:
     typedef typename TV::SCALAR T;
-    static int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body, ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,
+    static int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body, ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,
         const ARRAY<int>& nodes_to_check,const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
         ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,
         const HASHTABLE<int,T> *thickness_table)
@@ -70,7 +70,7 @@ class COLLISION_BODY<VECTOR<T,3> >
 {
 public:
     typedef VECTOR<T,3> TV;
-    static int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body, ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,
+    static int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body, ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,
         const ARRAY<int>& nodes_to_check,const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
         ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,
         const HASHTABLE<int,T> *thickness_table)

@@ -36,7 +36,7 @@ private:
     mutable ARRAY<TWIST<TV> > rigid_F_temp;
 
 public:
-    SCALED_DEFORMABLES_FORCES(DEFORMABLES_FORCES<TV>* base_force_input,PARTICLES<TV>& particles_input,const ARRAY<TV>& X_n_input,const ARRAY<TV>& V_n_input);
+    SCALED_DEFORMABLES_FORCES(DEFORMABLES_FORCES<TV>* base_force_input,DEFORMABLE_PARTICLES<TV>& particles_input,const ARRAY<TV>& X_n_input,const ARRAY<TV>& V_n_input);
 
     virtual ~SCALED_DEFORMABLES_FORCES();
 

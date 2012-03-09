@@ -14,7 +14,7 @@ class CAPE_COLLISIONS
 {
 public:
     TRIANGLE_MESH &triangle_mesh_1,&triangle_mesh_2;
-    PARTICLES<T,VECTOR_3D<T> > &particles_1,&particles_2;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > &particles_1,&particles_2;
     TRIANGULATED_SURFACE<T> &surface_1,&surface_2;
     TRIANGLE_HIERARCHY<T> *hierarchy_1,*hierarchy_2;
     ARRAY<T> distances;

@@ -6,13 +6,13 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> PARTICLES<TV>::
-PARTICLES(ARRAY_COLLECTION* array_collection_input)
+template<class TV> DEFORMABLE_PARTICLES<TV>::
+DEFORMABLE_PARTICLES(ARRAY_COLLECTION* array_collection_input)
     :mass(0,0),one_over_mass(0,0),effective_mass(0,0),one_over_effective_mass(0,0),store_mass(false)
 {
     delete array_collection;array_collection=array_collection_input;
@@ -21,21 +21,21 @@ PARTICLES(ARRAY_COLLECTION* array_collection_input)
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> PARTICLES<TV>::
-PARTICLES()
+template<class TV> DEFORMABLE_PARTICLES<TV>::
+DEFORMABLE_PARTICLES()
     :mass(0,0),one_over_mass(0,0),effective_mass(0,0),one_over_effective_mass(0,0),store_mass(false)
 {
 }
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> PARTICLES<TV>::
-~PARTICLES()
+template<class TV> DEFORMABLE_PARTICLES<TV>::
+~DEFORMABLE_PARTICLES()
 {}
 //#####################################################################
 // Function Center_Of_Mass
 //#####################################################################
-template<class TV> TV PARTICLES<TV>::
+template<class TV> TV DEFORMABLE_PARTICLES<TV>::
 Center_Of_Mass() const
 {
     if(this->store_mass){
@@ -46,7 +46,7 @@ Center_Of_Mass() const
 //#####################################################################
 // Function Compute_Auxiliary_Attributes
 //#####################################################################
-template<class TV> void PARTICLES<TV>::
+template<class TV> void DEFORMABLE_PARTICLES<TV>::
 Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings)
 {
     Compute_Auxiliary_Attributes(soft_bindings,IDENTITY_ARRAY<>(soft_bindings.particles.array_collection->Size()),false);
@@ -54,7 +54,7 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings)
 //#####################################################################
 // Function Compute_Auxiliary_Attributes
 //#####################################################################
-template<class TV> template<class T_INDICES> void PARTICLES<TV>::
+template<class TV> template<class T_INDICES> void DEFORMABLE_PARTICLES<TV>::
 Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDICES& indices,const bool copy_existing_elements)
 {
     if(array_collection->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS))
@@ -75,18 +75,18 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDI
 //#####################################################################
 // Function Initialize_Array_Collection
 //#####################################################################
-template<class TV> void PARTICLES<TV>::
+template<class TV> void DEFORMABLE_PARTICLES<TV>::
 Initialize_Array_Collection()
 {
     GEOMETRY_PARTICLES<TV>::Initialize_Array_Collection();
 }
 //#####################################################################
-template class PARTICLES<VECTOR<float,1> >;
-template class PARTICLES<VECTOR<float,2> >;
-template class PARTICLES<VECTOR<float,3> >;
+template class DEFORMABLE_PARTICLES<VECTOR<float,1> >;
+template class DEFORMABLE_PARTICLES<VECTOR<float,2> >;
+template class DEFORMABLE_PARTICLES<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class PARTICLES<VECTOR<double,1> >;
-template class PARTICLES<VECTOR<double,2> >;
-template class PARTICLES<VECTOR<double,3> >;
+template class DEFORMABLE_PARTICLES<VECTOR<double,1> >;
+template class DEFORMABLE_PARTICLES<VECTOR<double,2> >;
+template class DEFORMABLE_PARTICLES<VECTOR<double,3> >;
 #endif
 }

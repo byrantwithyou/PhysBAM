@@ -145,7 +145,7 @@ int Add_Deformable_Object(const int number_of_vertices,const VECTOR_2D<T>& start
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Segmented_Curve();
     SEGMENTED_CURVE_2D<T>& segmented_curve=*solids_parameters.deformable_body_parameters.list(index).segmented_curve;
     SEGMENT_MESH& segment_mesh=segmented_curve.segment_mesh;
-    PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
     segment_mesh.Initialize_Straight_Mesh(number_of_vertices);
     for(int i=0;i<number_of_vertices;i++){
         int index=particles.array_collection->Add_Element();assert(index==i);
@@ -161,7 +161,7 @@ int Add_Circle_Deformable_Object(const int number_of_vertices)
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Segmented_Curve();
     SEGMENTED_CURVE_2D<T>& segmented_curve=*solids_parameters.deformable_body_parameters.list(index).segmented_curve;
     SEGMENT_MESH& segment_mesh=segmented_curve.segment_mesh;
-    PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
     segment_mesh.Initialize_Straight_Mesh(number_of_vertices,true);
     for(int i=0;i<number_of_vertices;i++){
         int index=particles.array_collection->Add_Element();assert(index==i);
@@ -239,7 +239,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
         solids_parameters.deformable_body_parameters.list.template Read_Dynamic_Variables<RW>(presimulation_output_directory,frame);
 #else
         DEFORMABLE_OBJECT_2D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(1);
-        PARTICLES<T,VECTOR_2D<T> >& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=deformable_object.particles;
         for(int i=0;i<particles.array_collection->Size();i++){
             particles.X(i)=center+radius*particles.V(i).Normalized()+particles.V(i)*time;}
 

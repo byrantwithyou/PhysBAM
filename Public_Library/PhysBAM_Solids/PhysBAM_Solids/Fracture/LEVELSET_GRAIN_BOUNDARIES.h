@@ -8,7 +8,7 @@
 #define __LEVELSET_GRAIN_BOUNDARIES__
 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_GRAIN_BOUNDARIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_OBJECT.h>
@@ -24,7 +24,7 @@ public:
     using FRACTURE_GRAIN_BOUNDARIES<TV,d>::seed_weakness_multipliers_callback;using FRACTURE_GRAIN_BOUNDARIES<TV,d>::node_smallest_distance;using FRACTURE_GRAIN_BOUNDARIES<TV,d>::is_breakable;
     using FRACTURE_GRAIN_BOUNDARIES<TV,d>::node_region;using FRACTURE_GRAIN_BOUNDARIES<TV,d>::fracture_callbacks;using FRACTURE_GRAIN_BOUNDARIES<TV,d>::is_levelset_grain_boundary;
 
-    LEVELSET_GRAIN_BOUNDARIES(const PARTICLES<TV>& particles,const SIMPLEX_MESH<d>& mesh_input,const ARRAY<TV>& seed_positions_input,const ARRAY<T>& seed_weakness_multipliers_input,const FRAME<TV> frame,
+    LEVELSET_GRAIN_BOUNDARIES(const DEFORMABLE_PARTICLES<TV>& particles,const SIMPLEX_MESH<d>& mesh_input,const ARRAY<TV>& seed_positions_input,const ARRAY<T>& seed_weakness_multipliers_input,const FRAME<TV> frame,
                               const FRACTURE_CALLBACKS<TV>* fracture_callbacks_input=0)
         :FRACTURE_GRAIN_BOUNDARIES<TV,d>(particles,mesh_input,seed_positions_input,seed_weakness_multipliers_input,frame,fracture_callbacks_input)
     {

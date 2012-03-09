@@ -13,7 +13,7 @@ using namespace PhysBAM;
 // Function Create_Structure
 //#####################################################################
 template<class TV> BINDING<TV>* BINDING<TV>::
-Create(TYPED_ISTREAM& input,PARTICLES<TV>& particles)
+Create(TYPED_ISTREAM& input,DEFORMABLE_PARTICLES<TV>& particles)
 {
     try{
         int name;Read_Binary(input,name);
@@ -44,7 +44,7 @@ Write(TYPED_OSTREAM& output) const
 // Function Create_From_Name
 //#####################################################################
 template<class TV> BINDING<TV>* BINDING<TV>::
-Create_From_Name(const int name,PARTICLES<TV>& particles)
+Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
 {
     BINDING* binding=BINDING_REGISTRY<TV>::Name_To_Factory(name)->Create(dynamic_cast<GEOMETRY_PARTICLES<TV>&>(particles));
     if(!binding){LOG::cerr<<name<<" has no Create(GEOMETRY_PARTICLES<TV>& particles) function."<<std::endl;PHYSBAM_FATAL_ERROR();}

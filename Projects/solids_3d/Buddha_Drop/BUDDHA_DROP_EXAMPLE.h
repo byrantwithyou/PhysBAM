@@ -54,7 +54,7 @@ public:
 virtual void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
 {
     std::fstream input;char filename[256];
-    TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;        
+    TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;        
     sprintf(filename,"../../Public_Data/Triangulated_Surfaces/buddha.tri");
     input.open(filename,std::ios::in|std::ios::binary);assert(input.is_open());
     triangulated_surface.Read_Float(input);input.close();    

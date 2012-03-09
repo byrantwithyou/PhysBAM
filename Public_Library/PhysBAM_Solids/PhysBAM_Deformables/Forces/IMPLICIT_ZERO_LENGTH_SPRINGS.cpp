@@ -11,11 +11,11 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/IMPLICIT_ZERO_LENGTH_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using ::std::sqrt;
 using namespace PhysBAM;
 template<class TV> IMPLICIT_ZERO_LENGTH_SPRINGS<TV>::
-IMPLICIT_ZERO_LENGTH_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input)
+IMPLICIT_ZERO_LENGTH_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input)
     :DEFORMABLES_FORCES<TV>(particles),segment_mesh(segment_mesh_input)
 {
     Set_Stiffness(0);Set_Damping(0);
@@ -137,7 +137,7 @@ Potential_Energy(const T time) const
     return potential_energy;
 }
 template<class T,class TV> IMPLICIT_ZERO_LENGTH_SPRINGS<TV>* PhysBAM::
-Create_Edge_Zero_Length_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const T stiffness,const T overdamping_fraction,const bool verbose)
+Create_Edge_Zero_Length_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const T stiffness,const T overdamping_fraction,const bool verbose)
 {
     IMPLICIT_ZERO_LENGTH_SPRINGS<TV>* zls=new IMPLICIT_ZERO_LENGTH_SPRINGS<TV>(particles,segment_mesh);
     zls->Set_Stiffness(stiffness);
@@ -147,9 +147,9 @@ Create_Edge_Zero_Length_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_m
 //#####################################################################
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,2> >;
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >;
-template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<float,VECTOR<float,3> >(PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,float,float,bool);
+template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<float,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<float,VECTOR<float,3> >(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,SEGMENT_MESH&,float,float,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,2> >;
 template class IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >;
-template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<double,VECTOR<double,3> >(PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,double,double,bool);
+template IMPLICIT_ZERO_LENGTH_SPRINGS<VECTOR<double,3> >* PhysBAM::Create_Edge_Zero_Length_Springs<double,VECTOR<double,3> >(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,SEGMENT_MESH&,double,double,bool);
 #endif

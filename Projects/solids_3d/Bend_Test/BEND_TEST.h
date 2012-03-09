@@ -108,7 +108,7 @@ public:
 void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
 {
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
 
     particles.Update_Velocity();particles.Store_Mass();
 

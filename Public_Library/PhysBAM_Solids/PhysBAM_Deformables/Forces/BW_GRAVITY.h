@@ -26,7 +26,7 @@ public:
     FORCE_ELEMENTS force_particles;
 public:
 
-    BW_GRAVITY(PARTICLES<TV>& particles_input,const T gravity_input,const TV& downward_direction_input)
+    BW_GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,const T gravity_input,const TV& downward_direction_input)
         :DEFORMABLES_FORCES<TV>(particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
     {}
 

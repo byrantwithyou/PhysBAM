@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_S3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using ::std::sqrt;
 using namespace PhysBAM;
 //#####################################################################

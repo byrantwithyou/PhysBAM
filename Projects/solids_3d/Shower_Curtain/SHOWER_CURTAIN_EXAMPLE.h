@@ -91,7 +91,7 @@ public:
 int Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filename,const FRAME_3D<T>& frame,const T scale,const bool with_phi)
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filename,scale,0,with_phi);
     rigid_body.frame=frame;
     rigid_body.Set_Coefficient_Of_Restitution(0);
@@ -110,7 +110,7 @@ int Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filenam
 void Add_Torus_Binding(const int torus_id,const int particle_id)
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
     // add deformable particles for each of the sphere and plank
     VECTOR<T,3> plate_object_space_position=solids_parameters.rigid_body_parameters.list(torus_id)->frame.Inverse()*particles.X(particle_id);
@@ -126,7 +126,7 @@ void Add_Torus_Binding(const int torus_id,const int particle_id)
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
     T x_shift=0,y_shift=0,z_shift=0;
 

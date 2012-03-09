@@ -339,7 +339,7 @@ void Initialize_Bodies()
         Add_To_Fluid_Simulation(*deformable_object,true,true,pressure_force_scale);
     
         for(int i=0;i<deformable_object_enslaved_nodes(id).m;i++){
-            std::cout << "SETTING PARTICLES " << deformable_object_enslaved_nodes(id)(i) << " to large mass" << std::endl;
+            std::cout << "SETTING DEFORMABLE_PARTICLES " << deformable_object_enslaved_nodes(id)(i) << " to large mass" << std::endl;
             deformable_object->triangulated_surface->particles.mass(deformable_object_enslaved_nodes(id)(i))=1e30;}
     }
 

@@ -5,13 +5,13 @@
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
 #include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/POINTWISE_FORCE.h>
 using namespace PhysBAM;
 template<class TV> POINTWISE_FORCE<TV>::
-POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
+POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
     ARRAY<int>* influenced_rigid_body_particles_input)
     :SOLIDS_FORCES<TV>(particles_input,rigid_body_collection_input),influenced_particles(influenced_particles_input),
     influenced_rigid_body_particles(influenced_rigid_body_particles_input),
@@ -19,7 +19,7 @@ POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_
 {
 }
 template<class TV> POINTWISE_FORCE<TV>::
-POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
+POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
     const bool influence_all_rigid_body_particles_input)
     :SOLIDS_FORCES<TV>(particles_input,rigid_body_collection_input),influenced_particles(0),influenced_rigid_body_particles(0),need_destroy_influenced_particles(true),
     need_destroy_influenced_rigid_body_particles(true),influence_all_particles(influence_all_particles_input),influence_all_rigid_body_particles(influence_all_rigid_body_particles_input),
@@ -27,7 +27,7 @@ POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_
 {
 }
 template<class TV> template<class T_MESH> POINTWISE_FORCE<TV>::
-POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const T_MESH& mesh,ARRAY<int>* influenced_rigid_body_particles_input)
+POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const T_MESH& mesh,ARRAY<int>* influenced_rigid_body_particles_input)
     :SOLIDS_FORCES<TV>(particles_input,rigid_body_collection_input),influenced_particles(new ARRAY<int>),
     influenced_rigid_body_particles(influenced_rigid_body_particles_input),
     need_destroy_influenced_particles(true),need_destroy_influenced_rigid_body_particles(false),influence_all_particles(false),influence_all_rigid_body_particles(false)
@@ -70,12 +70,12 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_par
 template class POINTWISE_FORCE<VECTOR<float,1> >;
 template class POINTWISE_FORCE<VECTOR<float,2> >;
 template class POINTWISE_FORCE<VECTOR<float,3> >;
-template POINTWISE_FORCE<VECTOR<float,3> >::POINTWISE_FORCE(PARTICLES<VECTOR<float,3> >&,RIGID_BODY_COLLECTION<VECTOR<float,3> >&,TETRAHEDRON_MESH const&,ARRAY<int,int>*);
-template POINTWISE_FORCE<VECTOR<float,3> >::POINTWISE_FORCE(PARTICLES<VECTOR<float,3> >&,RIGID_BODY_COLLECTION<VECTOR<float,3> >&,TRIANGLE_MESH const&,ARRAY<int,int>*);
+template POINTWISE_FORCE<VECTOR<float,3> >::POINTWISE_FORCE(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,RIGID_BODY_COLLECTION<VECTOR<float,3> >&,TETRAHEDRON_MESH const&,ARRAY<int,int>*);
+template POINTWISE_FORCE<VECTOR<float,3> >::POINTWISE_FORCE(DEFORMABLE_PARTICLES<VECTOR<float,3> >&,RIGID_BODY_COLLECTION<VECTOR<float,3> >&,TRIANGLE_MESH const&,ARRAY<int,int>*);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class POINTWISE_FORCE<VECTOR<double,1> >;
 template class POINTWISE_FORCE<VECTOR<double,2> >;
 template class POINTWISE_FORCE<VECTOR<double,3> >;
-template POINTWISE_FORCE<VECTOR<double,3> >::POINTWISE_FORCE(PARTICLES<VECTOR<double,3> >&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&,TETRAHEDRON_MESH const&,ARRAY<int,int>*);
-template POINTWISE_FORCE<VECTOR<double,3> >::POINTWISE_FORCE(PARTICLES<VECTOR<double,3> >&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&,TRIANGLE_MESH const&,ARRAY<int,int>*);
+template POINTWISE_FORCE<VECTOR<double,3> >::POINTWISE_FORCE(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&,TETRAHEDRON_MESH const&,ARRAY<int,int>*);
+template POINTWISE_FORCE<VECTOR<double,3> >::POINTWISE_FORCE(DEFORMABLE_PARTICLES<VECTOR<double,3> >&,RIGID_BODY_COLLECTION<VECTOR<double,3> >&,TRIANGLE_MESH const&,ARRAY<int,int>*);
 #endif

@@ -131,7 +131,7 @@ void Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time) PHYS
             int sign=random.Get_Uniform_Integer(0,1);if(sign==0)sign=-1;
             vorticity_particles.vorticity(particle_id)=VECTOR<T,3>(0,(T)sign*vorticity_magnitude,0);
             seeded++;
-            std::cout<<"ADDING PARTICLES"<<std::endl;}}
+            std::cout<<"ADDING DEFORMABLE_PARTICLES"<<std::endl;}}
 }
 //#####################################################################
 // Function Initialize_Phi

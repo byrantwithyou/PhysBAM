@@ -236,7 +236,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     controller=new SEARCH_CONTROLLER<T_GRID>(solid_body_collection,driver);
@@ -544,7 +544,7 @@ void Constant_Wind()
         //if(use_clustering && Value(id)<=body_motion.trajectories.m) continue;
         if(body_motion.trajectories.m && Value(id)>body_motion.trajectories.m) continue;
         WIND_DRAG<TV>* drag=new WIND_DRAG<TV>(solid_body_collection.rigid_body_collection.Rigid_Body(id),
-            static_cast<PARTICLES<TV>&>(solid_body_collection.deformable_body_collection.particles));
+            static_cast<DEFORMABLE_PARTICLES<TV>&>(solid_body_collection.deformable_body_collection.particles));
         drag->Use_Constant_Wind(0,TV((T)100,0));drag->Set_Wind_Density((T).1);
         solid_body_collection.Add_Force(drag);}
 }
@@ -555,7 +555,7 @@ void Spatially_Varying_Wind()
 {
     for(int id(1);id<=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++){
         WIND_DRAG<TV>* drag=new WIND_DRAG<TV>(solid_body_collection.rigid_body_collection.Rigid_Body(id),
-            static_cast<PARTICLES<TV>&>(solid_body_collection.deformable_body_collection.particles));
+            static_cast<DEFORMABLE_PARTICLES<TV>&>(solid_body_collection.deformable_body_collection.particles));
         drag->Set_Wind_Density((T)-10);solid_body_collection.Add_Force(drag);}
     Setup_Spatially_Varying_Wind(0);
 }

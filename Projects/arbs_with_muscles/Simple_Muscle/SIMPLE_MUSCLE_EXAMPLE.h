@@ -139,7 +139,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
 
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     solid_body_collection.deformable_object.Add_Force(Create_Quasistatic_Diagonalized_Finite_Volume(tetrahedralized_volume,new DIAGONALIZED_NEO_HOOKEAN<T,3>((T)1e5,(T).45)));
@@ -493,7 +493,7 @@ void Add_Deformable_Body(const std::string& filename,const GEOMETRY_TYPE type,RI
 //#####################################################################
 // Function Set_Initial_Particle_Configuration
 //#####################################################################
-void Set_Initial_Particle_Configuration(PARTICLES<TV>& particles,const int index)
+void Set_Initial_Particle_Configuration(DEFORMABLE_PARTICLES<TV>& particles,const int index)
 {
     if(deformable_body_initial_states(index)){
         LOG::cout<<"Deformable body "<<index<<" - Total Particles : "<<particles.array_collection->Size()<<std::endl;
@@ -509,7 +509,7 @@ void Set_Initial_Particle_Configuration(PARTICLES<TV>& particles,const int index
 STRUCTURE<TV>* Create_Tetrahedralized_Volume(int index)
 {
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create();
-    PARTICLES<TV>& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=tetrahedralized_volume.particles;
     GRID<TV> mattress_grid(mattress_dimensions.x,mattress_dimensions.y,mattress_dimensions.z,(T)-.25,(T).25,(T)-3.2,(T)1.10,(T)-.30,(T).30);
     tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
     deformable_body_rest_positions(index)=particles.X.array;
@@ -607,7 +607,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 //#####################################################################
 void Get_Constrained_Particle_Data()
 {
-    PARTICLES<TV>& particles=(solid_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>()).particles;
+    DEFORMABLE_PARTICLES<TV>& particles=(solid_body_collection.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>()).particles;
  
     enslaved_nodes.Resize(num_planks);
     positions_relative_to_plank_frames.Resize(num_planks);

@@ -10,7 +10,7 @@
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/VIRTUAL_NODE_ALGORITHM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/VIRTUAL_NODES.h>
 namespace PhysBAM{
@@ -108,7 +108,7 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
 {
     assert(embedded_object.simplicial_object.mesh.number_nodes==embedded_object.particles.array_collection->Size() && embedded_object.embedded_mesh.number_nodes==embedded_object.particles.array_collection->Size()
         && embedded_object.embedded_particles.subset_index_from_point_cloud_index.m==embedded_object.particles.array_collection->Size());
-    PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(embedded_object.particles);
+    DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(embedded_object.particles);
     SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
 
     // construct new virtual nodes

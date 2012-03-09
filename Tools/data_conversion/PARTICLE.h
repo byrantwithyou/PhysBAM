@@ -4,7 +4,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license 
 // contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class PARTICLES  
+// Class DEFORMABLE_PARTICLES  
 //##################################################################### 
 //
 //#####################################################################
@@ -23,7 +23,7 @@
 namespace PhysBAM{
 
 template<class T>
-class PARTICLES
+class DEFORMABLE_PARTICLES
 {
 public:
     int number; // total active particles 
@@ -39,13 +39,13 @@ protected:
     bool store_position,store_velocity,store_acceleration,update_position,update_velocity;
 
 public:
-    PARTICLES()
+    DEFORMABLE_PARTICLES()
                     :number(0),array_size(0),array_buffer_size(0),smallest_inactive_index(1),number_of_attributes(7),
                      store_mass(false),store_radius(false),store_temperature(false),store_density(false),store_age(false),store_id(false),
                      store_position(false),store_velocity(false),store_acceleration(false),update_position(false),update_velocity(false)
     {}
 
-    virtual ~PARTICLES()
+    virtual ~DEFORMABLE_PARTICLES()
     {}
 
 protected:
@@ -106,7 +106,7 @@ public:
     {if(smallest_inactive_index == number+1) return true;else return false;}
 
     void Default()
-    {std::cout << "THIS PARTICLES FUNCTION IS NOT DEFINED!" << std::endl;}
+    {std::cout << "THIS DEFORMABLE_PARTICLES FUNCTION IS NOT DEFINED!" << std::endl;}
 
 protected:
     void Read(std::istream &input_stream)

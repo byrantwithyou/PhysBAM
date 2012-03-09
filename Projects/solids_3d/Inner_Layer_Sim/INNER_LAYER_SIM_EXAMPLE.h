@@ -279,7 +279,7 @@ void Get_Initial_Data()
     solids_parameters.deformable_body_parameters.list.deformable_objects(index)->Allocate_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).triangulated_surface;
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_file);triangulated_surface.template Read<RW>(*input);delete input;
     std::cout << "total vertices = " << particles.array_size << std::endl;std::cout << "total triangles = " << triangle_mesh.triangles.m << std::endl;
     particles.store_velocity = false; particles.Update_Velocity();  // forcing velocity resize - not sure why this is needed

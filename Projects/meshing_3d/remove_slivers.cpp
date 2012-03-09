@@ -27,7 +27,7 @@ int main(int argc,char **argv)
     T aspect_ratio=parse_args.Get_Double_Value("-aspect_ratio"); 
 
     TETRAHEDRON_MESH tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> > particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > particles;
     TETRAHEDRALIZED_VOLUME<T> tetrahedralized_volume(tetrahedron_mesh,particles);
 
     FILE_UTILITIES::Read_From_File<RW>(input_file,tetrahedralized_volume);

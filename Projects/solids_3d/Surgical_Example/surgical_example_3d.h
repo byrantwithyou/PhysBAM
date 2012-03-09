@@ -37,7 +37,7 @@ public:
     ARRAY<VECTOR<T,3> > attached_node_locations,attached_node_velocities;
     SEGMENT_MESH hook_attachment_mesh;
     TETRAHEDRALIZED_VOLUME<T>* tissue_tet_vol;
-    PARTICLES<T,VECTOR<T,3> > material_space_particles;
+    DEFORMABLE_PARTICLES<T,VECTOR<T,3> > material_space_particles;
     TETRAHEDRALIZED_VOLUME<T>* material_space_tissue_tet_vol;
     TRIANGULATED_SURFACE<T>* tissue_surface;
     LINEAR_SPRINGS<T,TV>* ls;
@@ -108,7 +108,7 @@ public:
     int Add_Hook(const TV hook_location)
     {
         DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-        PARTICLES<T,TV>& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
         TV hook_location_changed=hook_location;
         hook_location_changed.y-=(T).01;
@@ -154,7 +154,7 @@ public:
     int Add_Suture(const TV suture_end1,const TV suture_end2)
     {
         DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-        PARTICLES<T,TV>& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
         TV suture_end1_changed=suture_end1;TV suture_end2_changed=suture_end2;
         suture_end1_changed.y-=(T).01;suture_end2_changed.y-=(T).01;
@@ -213,7 +213,7 @@ public:
     void Initialize_Bodies_With_Embedding()
     {
         DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-        PARTICLES<T,TV>& particles=deformable_object.particles;
+        DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
         TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../../Personal_Libraries/Joey_Library/data/Output_Dup/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0,0))),false,true);
         tissue_tet_vol=&tet_volume;   

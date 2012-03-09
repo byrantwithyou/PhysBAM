@@ -30,7 +30,7 @@ class SOLIDS_FORCES:public NONCOPYABLE
 public:
     typedef typename RIGIDS_FORCES<TV>::FREQUENCY_DATA RIGID_FREQUENCY_DATA;
     typedef typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 protected:
     T cfl_number;
@@ -46,7 +46,7 @@ public:
     int unique_id;
     bool compute_half_forces;
 
-    SOLIDS_FORCES(PARTICLES<TV>& particles,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
+    SOLIDS_FORCES(DEFORMABLE_PARTICLES<TV>& particles,RIGID_BODY_COLLECTION<TV>& rigid_body_collection);
     virtual ~SOLIDS_FORCES();
 
     static int Get_Unique_Id()

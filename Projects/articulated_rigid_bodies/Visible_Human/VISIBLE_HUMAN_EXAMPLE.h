@@ -156,7 +156,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     Get_Initial_Data();
     if(draw_flesh){
         DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
-        PARTICLES<TV>& particles=deformable_object.particles;    
+        DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;    
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         if(use_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(particles));
         solid_body_collection.Add_Force(Create_Quasistatic_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,true));
@@ -1008,7 +1008,7 @@ void Add_Deformable_Body(const std::string& filename,const GEOMETRY_TYPE type,RI
 void Initialize_Tetrahedron_Collisions(const int id_number,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,TRIANGULATED_SURFACE<T>* triangulated_surface=0)
 {
     TETRAHEDRON_COLLISION_BODY<T>& tetrahedron_collision_body=*(new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume,triangulated_surface));
-    PARTICLES<TV>& undeformed_particles=*(new PARTICLES<TV>(tetrahedralized_volume.particles));
+    DEFORMABLE_PARTICLES<TV>& undeformed_particles=*(new DEFORMABLE_PARTICLES<TV>(tetrahedralized_volume.particles));
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(tetrahedron_collision_body.triangulated_surface->mesh,undeformed_particles));
     undeformed_triangulated_surface.Update_Triangle_List();undeformed_triangulated_surface.Initialize_Triangle_Hierarchy();
 
@@ -1038,7 +1038,7 @@ void Initialize_Tetrahedron_Collisions(const int id_number,TETRAHEDRALIZED_VOLUM
 STRUCTURE<TV>* Create_Tetrahedralized_Volume(int index)
 {
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create();
-    PARTICLES<TV>& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=tetrahedralized_volume.particles;
     assert(deformable_body_geometry_filenames(index)!="");
     FILE_UTILITIES::Read_From_File(stream_type,deformable_body_geometry_filenames(index),tetrahedralized_volume);
     LOG::cout<<"Deformable body "<<index<<" - Total Tetrahedra : "<<tetrahedralized_volume.mesh.elements.m<<std::endl;
@@ -1050,7 +1050,7 @@ STRUCTURE<TV>* Create_Tetrahedralized_Volume(int index)
 //#####################################################################
 // Function Set_Initial_Particle_Configuration
 //#####################################################################
-void Set_Initial_Particle_Configuration(PARTICLES<TV>& particles,const int index)
+void Set_Initial_Particle_Configuration(DEFORMABLE_PARTICLES<TV>& particles,const int index)
 {
     if(deformable_body_initial_states(index)){
         LOG::cout<<"Deformable body "<<index<<" - Total Particles : "<<particles.array_collection->Size()<<std::endl;
@@ -1071,7 +1071,7 @@ void Get_Constrained_Particle_Data()
     for(int i=0;i<VISIBLE_HUMAN<T>::num_bones;i++)
         if(da_man->bones(i)->particle_index) {bone_ids.Append(da_man->bones(i)->particle_index); num_bones_present++;}
 
-    PARTICLES<TV>& particles=(solid_body_collection.deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>()).particles;
+    DEFORMABLE_PARTICLES<TV>& particles=(solid_body_collection.deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>()).particles;
  
     enslaved_nodes.Resize(num_bones_present);
     positions_relative_to_bone_frames.Resize(num_bones_present);

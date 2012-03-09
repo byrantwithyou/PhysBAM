@@ -47,7 +47,7 @@ private:
 public:
     bool verbose;
 
-    AXIAL_BENDING_SPRINGS(PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input);
+    AXIAL_BENDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles_input,TRIANGLE_MESH& triangle_mesh_input);
 
     virtual ~AXIAL_BENDING_SPRINGS();
 
@@ -96,7 +96,7 @@ public:
 };
 
 template<class T> AXIAL_BENDING_SPRINGS<T>*
-Create_Axial_Bending_Springs(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T clamped_restlength=(T).01,
+Create_Axial_Bending_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T clamped_restlength=(T).01,
     const T stiffness=2/(1+sqrt((T)2)),const T overdamping_fraction=2,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,
     const bool use_rest_state_for_strain_rate=true,const bool verbose=true);
 

@@ -34,7 +34,7 @@ static const int self_collision_subcycles=4;
 //#####################################################################
 template<class TV,int d> INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure)
-    :DEFORMABLES_FORCES<TV>(dynamic_cast<PARTICLES<TV>&>(strain_measure.particles)),strain_measure(strain_measure),
+    :DEFORMABLES_FORCES<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(strain_measure.particles)),strain_measure(strain_measure),
     disable_projection(false),minimum_volume_recovery_time_scale(0),max_cg_iterations(20),mpi_solids(0),merge_at_boundary(false),use_neumann(false),
     use_self_moving_projection(true),use_rigid_clamp_projection(true),use_diagonal_preconditioner(false),repulsions(0)
 {

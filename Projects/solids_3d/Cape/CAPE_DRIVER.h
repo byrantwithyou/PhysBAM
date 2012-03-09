@@ -24,7 +24,7 @@ public:
     T time;
     T real_time_start,real_time_last;
     TRIANGLE_MESH triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> > particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > particles;
     TRIANGULATED_SURFACE<T> triangulated_surface;
     DEFORMABLE_OBJECT<T,VECTOR_3D<T> > deformable_object;
     TRIANGLE_COLLISIONS<T>* triangle_collisions;

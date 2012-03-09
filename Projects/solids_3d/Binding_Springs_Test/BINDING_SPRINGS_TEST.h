@@ -87,7 +87,7 @@ void Get_Initial_Data()
 {
     // deformable bodies
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
@@ -117,7 +117,7 @@ void Get_Initial_Data()
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     output_directory=STRING_UTILITIES::string_sprintf("Binding_Springs_Test/Test_%d",test_number);
     frame_rate=24;
@@ -176,7 +176,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     if(LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>())
         linear_springs->Print_Deformation_Statistics();
 
-/*    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+/*    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     LOG::cout<<"Frame "<<frame<<std::endl;
       for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"X("<<p<<")="<<particles.X(p)<<std::endl;*/
 }
@@ -186,7 +186,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 void Stability_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     particles.array_collection->Add_Elements(2);
     particles.mass.Fill((T)1);
@@ -205,7 +205,7 @@ void Stability_Test()
 void Segments()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     particles.array_collection->Add_Elements(6);
     particles.mass.Fill((T)1);
@@ -235,7 +235,7 @@ void Segments()
 void Sphere()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     TRIANGULATED_SURFACE<T>& sphere1=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Surfaces/sphere.tri",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-1,(T)3,0))),true,true);
     int sphere_particles=particles.array_collection->Size();
@@ -254,7 +254,7 @@ void Sphere()
 void Falling_Sphere()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",
@@ -327,7 +327,7 @@ void Falling_Embedded_Sphere()
 void Embedded_Segments()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     particles.array_collection->Add_Elements(7);
 

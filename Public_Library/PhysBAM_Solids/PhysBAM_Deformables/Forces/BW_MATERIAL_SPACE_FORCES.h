@@ -46,7 +46,7 @@ protected:
     };
     ARRAY<MATERIAL_FORCE_STATE> material_force_states;
 public:
-    BW_MATERIAL_SPACE_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
+    BW_MATERIAL_SPACE_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
 
     virtual ~BW_MATERIAL_SPACE_FORCES();
 

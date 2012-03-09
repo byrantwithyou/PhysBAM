@@ -11,7 +11,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 namespace PhysBAM{
 
@@ -71,7 +71,7 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 {
     if(!use_external_forces) return;
 
-    PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(mesh_object.particles);
+    DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(mesh_object.particles);
     const ARRAY<int>& boundary_nodes=*mesh_object.mesh.boundary_nodes;
     T_BOUNDARY_OBJECT& boundary_object=mesh_object.Get_Boundary_Object();
 

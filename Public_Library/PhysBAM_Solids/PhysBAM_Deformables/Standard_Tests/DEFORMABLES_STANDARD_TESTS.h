@@ -15,7 +15,7 @@
 namespace PhysBAM{
 
 template<class TV> class SOFT_BINDINGS;
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 template<class TV> class GEOMETRY_PARTICLES;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class TV> class EXAMPLE;
@@ -97,7 +97,7 @@ public:
     TRIANGULATED_SURFACE<T>& Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_GEOMETRY_STATE<TV>* initial_state,
         TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices);
     void Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,
-        PARTICLES<VECTOR<T,3> > >& particles_to_embed,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
+        DEFORMABLE_PARTICLES<VECTOR<T,3> > >& particles_to_embed,TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two);
     void Mark_Hard_Bindings_With_Free_Particles();
     void Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_SURFACE<T>& surface,ARRAY<bool>* segments_intersected,ARRAY<bool>* triangles_intersected,
         T thickness_over_two,ARRAY<T>* segment_weights,ARRAY<VECTOR<T,3> >* triangle_weights);

@@ -59,7 +59,7 @@ void Get_Initial_Data()
     EMBEDDED_TRIANGULATED_SURFACE<T>& embedded_triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).embedded_triangulated_surface;
     TRIANGLES_OF_MATERIAL_3D<T>& triangles_of_material=*solids_parameters.deformable_body_parameters.list(index).triangles_of_material;
     TRIANGULATED_SURFACE<T>& triangulated_surface=embedded_triangulated_surface.triangulated_surface;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     
     FILE_UTILITIES::Read_From_File<RW>(data_directory+"/Rigid_Bodies/sphere.tri",triangulated_surface);
     particles.Update_Velocity();particles.Store_Mass();

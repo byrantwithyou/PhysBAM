@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Dynamics/Forces_And_Torques/EULER_FLUID_FORCES.h>
 using ::std::sqrt;
 using namespace PhysBAM;
@@ -18,7 +18,7 @@ using namespace PhysBAM;
 template<class T_GRID> EULER_FLUID_FORCES<T_GRID>::
 EULER_FLUID_FORCES(const T_GRID& grid_input,const T_FACE_ARRAYS_SCALAR& pressure_at_faces_input,
     const T_FACE_ARRAYS_BOOL& solid_fluid_face_input,const T_ARRAYS_BOOL& cells_inside_fluid_input,
-    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid_input,PARTICLES<TV>& particles_input,
+    const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid_input,DEFORMABLE_PARTICLES<TV>& particles_input,
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input):SOLIDS_FORCES<TV>(particles_input,rigid_body_collection_input),
     grid(grid_input),pressure_at_faces(pressure_at_faces_input),solid_fluid_face(solid_fluid_face_input),
     cells_inside_fluid(cells_inside_fluid_input),collision_bodies_affecting_fluid(collision_bodies_affecting_fluid_input)

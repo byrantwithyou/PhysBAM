@@ -20,7 +20,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Boundaries/BOUNDARY_EULER_EQUATIONS_SOLID_WALL_SLIP.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_CALLBACKS.h>
@@ -232,7 +232,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     POINT_SIMPLICES_1D<T>& point_simplices=*POINT_SIMPLICES_1D<T>::Create();
     POINT_SIMPLEX_MESH& mesh=point_simplices.mesh;
-    PARTICLES<TV>& particles=static_cast<PARTICLES<TV>&>(point_simplices.particles);
+    DEFORMABLE_PARTICLES<TV>& particles=static_cast<DEFORMABLE_PARTICLES<TV>&>(point_simplices.particles);
     particles.Store_Mass();
     mesh.number_nodes=2;mesh.elements.Exact_Resize(2);
     mesh.elements(0).Set(0);mesh.elements(1).Set(1);

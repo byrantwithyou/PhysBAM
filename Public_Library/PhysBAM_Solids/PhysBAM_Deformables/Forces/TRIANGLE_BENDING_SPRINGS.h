@@ -25,7 +25,7 @@ public:
 
     SEGMENT_MESH bending_segment_mesh;
 
-    TRIANGLE_BENDING_SPRINGS(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,const bool implicit=false);
+    TRIANGLE_BENDING_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh,const bool implicit=false);
 
     virtual ~TRIANGLE_BENDING_SPRINGS();
 
@@ -39,7 +39,7 @@ public:
 };
 
 template<class T> TRIANGLE_BENDING_SPRINGS<T>*
-Create_Bending_Springs(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T stiffness=2/(1+sqrt((T)2)),
+Create_Bending_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& triangle_mesh,const T stiffness=2/(1+sqrt((T)2)),
     const T overdamping_fraction=2,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,
     const T restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
 

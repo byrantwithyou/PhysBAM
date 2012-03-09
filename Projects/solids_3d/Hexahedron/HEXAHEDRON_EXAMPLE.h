@@ -60,7 +60,7 @@ void Get_Initial_Data()
 {
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Hexahedralized_Volume();
     HEXAHEDRALIZED_VOLUME<T>& hexahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).hexahedralized_volume;
-    PARTICLES<T,VECTOR_3D<T> >& hex_particles=hexahedralized_volume.particles;HEXAHEDRON_MESH& hexahedron_mesh=hexahedralized_volume.hexahedron_mesh;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& hex_particles=hexahedralized_volume.particles;HEXAHEDRON_MESH& hexahedron_mesh=hexahedralized_volume.hexahedron_mesh;
 
     if(read_geometry_from_file){
         FILE_UTILITIES::Read_From_File<T>(data_directory+"/Delp_Muscles/idealized_biceps.hex.gz",hexahedralized_volume);
@@ -81,7 +81,7 @@ void Get_Initial_Data()
     if(compare_with_tets){
         index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
-        PARTICLES<T,VECTOR_3D<T> >& tet_particles=tetrahedralized_volume.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& tet_particles=tetrahedralized_volume.particles;
         tet_particles.Initialize_Particles(hex_particles);HEXAHEDRALIZED_VOLUME<T> hex_copy(hexahedralized_volume.hexahedron_mesh,tet_particles);
         hex_copy.Initialize_Tetrahedralized_Volume();
         tetrahedralized_volume.tetrahedron_mesh.Initialize_Tetrahedron_Mesh(hex_copy.tetrahedralized_volume->tetrahedron_mesh.tetrahedrons);

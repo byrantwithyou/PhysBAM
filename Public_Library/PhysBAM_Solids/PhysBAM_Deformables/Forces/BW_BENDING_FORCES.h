@@ -40,7 +40,7 @@ public:
     MATRIX<VECTOR<VECTOR<T,3>,3>,4> dq_b_i_j_t;
     bool assume_constant_normal_length;
 
-    BW_BENDING_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
+    BW_BENDING_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
 
     virtual ~BW_BENDING_FORCES();
 
@@ -54,6 +54,6 @@ public:
 };
 
 template<class TV> BW_BENDING_FORCES<TV>*
-Create_BW_Bending_Force(PARTICLES<TV>& particles,TRIANGLE_MESH& segment_mesh,const typename TV::SCALAR stiffness_coefficient_input,const typename TV::SCALAR damping_coefficient_input);
+Create_BW_Bending_Force(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& segment_mesh,const typename TV::SCALAR stiffness_coefficient_input,const typename TV::SCALAR damping_coefficient_input);
 }
 #endif

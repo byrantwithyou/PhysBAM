@@ -7,7 +7,7 @@
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cstring>
 #include <fstream>
 using namespace PhysBAM;
@@ -19,7 +19,7 @@ using namespace std;
 int main(int argc,char *argv[])
 {
     TETRAHEDRON_MESH tet_mesh;
-    PARTICLES<VECTOR<float,3> > particles;
+    DEFORMABLE_PARTICLES<VECTOR<float,3> > particles;
     TETRAHEDRALIZED_VOLUME<float> tet_vol(tet_mesh,particles);
     FILE_UTILITIES::Read_From_File<float>(argv[1],tet_vol);
     std::cout<<"tet_vol.particles.number="<<tet_vol.particles.array_collection->Size()<<std::endl;

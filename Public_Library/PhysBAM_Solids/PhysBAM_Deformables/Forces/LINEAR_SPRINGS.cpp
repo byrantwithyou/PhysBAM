@@ -28,7 +28,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS_SYSTEM.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cfloat>
 using ::std::sqrt;
 using namespace PhysBAM;
@@ -36,7 +36,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> LINEAR_SPRINGS<TV>::
-LINEAR_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input,const bool implicit)
+LINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input,const bool implicit)
     :DEFORMABLES_FORCES<TV>(particles),segment_mesh(segment_mesh_input),use_plasticity(false),cache_strain(false),verbose(false)
 {
     Set_Stiffness(0);Set_Damping(0);
@@ -480,7 +480,7 @@ Effective_Impulse_Factor(int s) const
 // Function Create_Edge_Springs
 //#####################################################################
 template<class TV> LINEAR_SPRINGS<TV>* PhysBAM::
-Create_Edge_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness,const typename TV::SCALAR overdamping_fraction,
+Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness,const typename TV::SCALAR overdamping_fraction,
     const bool limit_time_step_by_strain_rate,const typename TV::SCALAR max_strain_per_time_step,const bool use_rest_state_for_strain_rate,
     const typename TV::SCALAR restlength_enlargement_fraction,const bool verbose,const bool implicit)
 {
@@ -504,7 +504,7 @@ Create_Edge_Springs(T_OBJECT& object,
     const typename T_OBJECT::SCALAR max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const typename T_OBJECT::SCALAR restlength_enlargement_fraction,
     const bool verbose,const bool implicit)
 {
-    return Create_Edge_Springs(dynamic_cast<PARTICLES<typename T_OBJECT::VECTOR_T>&>(object.particles),object.Get_Segment_Mesh(),stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
+    return Create_Edge_Springs(dynamic_cast<DEFORMABLE_PARTICLES<typename T_OBJECT::VECTOR_T>&>(object.particles),object.Get_Segment_Mesh(),stiffness,overdamping_fraction,limit_time_step_by_strain_rate,max_strain_per_time_step,
         use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose,implicit);
 }
 //#####################################################################
@@ -521,7 +521,7 @@ Create_Edge_Springs(T_OBJECT& object,
         TETRAHEDRALIZED_VOLUME<T>::SCALAR,bool,TETRAHEDRALIZED_VOLUME<T>::SCALAR,bool,TETRAHEDRALIZED_VOLUME<T>::SCALAR,bool,bool); \
     template LINEAR_SPRINGS<TRIANGULATED_SURFACE<T>::VECTOR_T>* PhysBAM::Create_Edge_Springs<TRIANGULATED_SURFACE<T> >(TRIANGULATED_SURFACE<T>&,TRIANGULATED_SURFACE<T>::SCALAR, \
         TRIANGULATED_SURFACE<T>::SCALAR,bool,TRIANGULATED_SURFACE<T>::SCALAR,bool,TRIANGULATED_SURFACE<T>::SCALAR,bool,bool); \
-    template LINEAR_SPRINGS<VECTOR<T,3> >* PhysBAM::Create_Edge_Springs<VECTOR<T,3> >(PARTICLES<VECTOR<T,3> >&,SEGMENT_MESH&,VECTOR<T,3>::SCALAR,VECTOR<T,3>::SCALAR,bool, \
+    template LINEAR_SPRINGS<VECTOR<T,3> >* PhysBAM::Create_Edge_Springs<VECTOR<T,3> >(DEFORMABLE_PARTICLES<VECTOR<T,3> >&,SEGMENT_MESH&,VECTOR<T,3>::SCALAR,VECTOR<T,3>::SCALAR,bool, \
         VECTOR<T,3>::SCALAR,bool,VECTOR<T,3>::SCALAR,bool,bool); \
     template LINEAR_SPRINGS<SEGMENTED_CURVE_2D<T>::VECTOR_T>* PhysBAM::Create_Edge_Springs<SEGMENTED_CURVE_2D<T> >(SEGMENTED_CURVE_2D<T>&,SEGMENTED_CURVE_2D<T>::SCALAR, \
         SEGMENTED_CURVE_2D<T>::SCALAR,bool,SEGMENTED_CURVE_2D<T>::SCALAR,bool,SEGMENTED_CURVE_2D<T>::SCALAR,bool,bool); \

@@ -102,7 +102,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Initialize_Redgreen()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     output_directory="Simple_Hard_Binding/output";
     last_frame=120;
@@ -143,7 +143,7 @@ void Initialize_Redgreen()
 void Subsample_Surface()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
@@ -165,7 +165,7 @@ void Subsample_Surface()
 void Get_Initial_Data()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     // Initialize simulation geometry
@@ -247,7 +247,7 @@ VECTOR<int,3> Parent_Nodes(const int leaf_triangle) const
 void Add_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list,ARRAY<VECTOR<int,2> >& new_soft_bindings)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     for(int i=0;i<subsamples;i++){
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
@@ -271,7 +271,7 @@ void Add_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list,ARR
 void Delete_Subsamples(const int triangle)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     
     // only need to delete the particles
@@ -309,7 +309,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     if(!dynamic_subsampling) return;
 
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list=deformable_body_collection.collisions.collision_body_list;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;

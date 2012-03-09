@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/POINTWISE_DEFORMABLE_FORCE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Update_Mpi

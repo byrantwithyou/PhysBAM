@@ -65,7 +65,7 @@ void Get_Initial_Data()
 {
     // deformable bodies
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
     BINDING_LIST<T,TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<T,TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
@@ -126,7 +126,7 @@ void Get_Initial_Data()
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
     Get_Initial_Data();
 

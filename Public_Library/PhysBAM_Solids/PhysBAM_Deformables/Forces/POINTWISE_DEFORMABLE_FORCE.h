@@ -32,18 +32,18 @@ protected:
 public:
     FORCE_ELEMENTS force_particles;
 
-    POINTWISE_DEFORMABLE_FORCE(PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input)
+    POINTWISE_DEFORMABLE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,ARRAY<int>* influenced_particles_input)
         :DEFORMABLES_FORCES<TV>(particles_input),influenced_particles(influenced_particles_input),
         need_destroy_influenced_particles(false),influence_all_particles(false),mpi_solids(0)
     {}
 
-    POINTWISE_DEFORMABLE_FORCE(PARTICLES<TV>& particles_input,const bool influence_all_particles_input)
+    POINTWISE_DEFORMABLE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,const bool influence_all_particles_input)
         :DEFORMABLES_FORCES<TV>(particles_input),influenced_particles(0),need_destroy_influenced_particles(true),
         influence_all_particles(influence_all_particles_input),mpi_solids(0)
     {}
 
     template<class T_MESH>
-    POINTWISE_DEFORMABLE_FORCE(PARTICLES<TV>& particles_input,const T_MESH& mesh)
+    POINTWISE_DEFORMABLE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,const T_MESH& mesh)
         :DEFORMABLES_FORCES<TV>(particles_input),influenced_particles(new ARRAY<int>),
         need_destroy_influenced_particles(true),influence_all_particles(false)
     {

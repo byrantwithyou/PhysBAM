@@ -14,7 +14,7 @@
 #include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_CALLBACKS.h>
@@ -36,7 +36,7 @@ public:
     using BASE::Angular_Momentum;using BASE::simplicial_object;using BASE::implicit_object;using BASE::thin_shell;using BASE::particle_index;using BASE::axis_aligned_bounding_box;
     using BASE::Frame;using BASE::Twist;using BASE::Mass;using BASE::Inertia_Tensor;using BASE::Update_Angular_Velocity;using BASE::CFL_initialized;using BASE::Initialize_CFL;using BASE::bounding_box_radius;
 
-    PARTICLES<TV> particles; // object space particles
+    DEFORMABLE_PARTICLES<TV> particles; // object space particles
     SOLID_BODY_COLLECTION<TV>& solid_body_collection; // this is the global deformable object
     ARRAY<int>& particle_to_rigid_body_id;
     ARRAY<int>& deformable_to_rigid_particles; // which rigid_body_particles each deformable particle matches to (internal fractures may cause many to 1 mapping)
@@ -51,7 +51,7 @@ public:
     ARRAY<int> old_triangles;
     ARRAY<int> partial_triangles;
 
-    RIGID_BODY_FRACTURE_OBJECT_3D(PARTICLES<TV>& deformable_body_particles,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
+    RIGID_BODY_FRACTURE_OBJECT_3D(DEFORMABLE_PARTICLES<TV>& deformable_body_particles,SOLID_BODY_COLLECTION<TV>& solid_body_collection_input,
         ARRAY<int>& particle_to_rigid_body_id_input,ARRAY<int>& deformable_to_rigid_particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input)
         :RIGID_BODY<TV>(rigid_body_collection_input,true),solid_body_collection(solid_body_collection_input),
         particle_to_rigid_body_id(particle_to_rigid_body_id_input),deformable_to_rigid_particles(deformable_to_rigid_particles_input),parent_rigid_body_id(0),fracture_threshold(0)
@@ -137,7 +137,7 @@ public:
     void Align_Deformable_Object_With_Rigid_Body()
     {
         // currently contains all particles
-        PARTICLES<TV>& deformable_particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& deformable_particles=solid_body_collection.deformable_body_collection.particles;
         for(int p=0;p<rigid_to_deformable_particles.m;p++) {
             deformable_particles.array_collection->Copy_Element(*particles.array_collection,deformable_to_rigid_particles(rigid_to_deformable_particles(p)),rigid_to_deformable_particles(p));
             deformable_particles.X(rigid_to_deformable_particles(p))=Frame()*particles.X(deformable_to_rigid_particles(rigid_to_deformable_particles(p)));

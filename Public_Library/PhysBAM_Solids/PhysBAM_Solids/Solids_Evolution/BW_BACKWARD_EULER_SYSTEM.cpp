@@ -77,7 +77,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 template<class TV> void BW_BACKWARD_EULER_SYSTEM<TV>::
 Project_Helper(KRYLOV_VECTOR_BASE<T>& BV,const bool negate) const
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     // User constrained nodes
     VECTOR_T& V=debug_cast<VECTOR_T&>(BV);

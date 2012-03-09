@@ -182,7 +182,7 @@ Initialize_Bodies()
 {
     //helper references
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
@@ -281,7 +281,7 @@ Initialize_Bodies()
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
         particles.array_collection->Add_Elements(guide_edges.particles.array_collection->Size());
         for(int i=0;i<guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
-        for(int i=0;i<guide_edges.particles.array_collection->Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<PARTICLES<TV>&>(guide_edges.particles).V(i);}
+        for(int i=0;i<guide_edges.particles.array_collection->Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<DEFORMABLE_PARTICLES<TV>&>(guide_edges.particles).V(i);}
     }
 
     if(use_guide){
@@ -843,7 +843,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 {
     //if(time<start_time) return;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);

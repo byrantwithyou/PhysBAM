@@ -81,7 +81,7 @@ protected:
     bool print_number_used;
 public:
 
-    LINEAR_ALTITUDE_SPRINGS(PARTICLES<TV>& particles,T_MESH& mesh_input);
+    LINEAR_ALTITUDE_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,T_MESH& mesh_input);
 
     virtual ~LINEAR_ALTITUDE_SPRINGS();
 
@@ -110,7 +110,7 @@ public:
 };
 
 template<class T,class TV,class T_MESH> typename SOLIDS_FORCES_POLICY<TV,T_MESH::dimension>::LINEAR_ALTITUDE_SPRINGS*
-Create_Altitude_Springs_Base(PARTICLES<TV>& particles,T_MESH& mesh,const T stiffness,const T overdamping_fraction,
+Create_Altitude_Springs_Base(DEFORMABLE_PARTICLES<TV>& particles,T_MESH& mesh,const T stiffness,const T overdamping_fraction,
     const bool use_compressed_by_threshold_only,const T fraction_compression,const bool limit_time_step_by_strain_rate,const T max_strain_per_time_step,
     const bool use_rest_state_for_strain_rate,const T restlength_enlargement_fraction,const bool verbose);
 

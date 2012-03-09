@@ -81,7 +81,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
 {
     DEFORMABLE_OBJECT_3D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(1);
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.embedded_tetrahedralized_volume->tetrahedralized_volume;
-    PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object.particles;
 
     particles.Update_Velocity();
     tetrahedralized_volume.Update_Bounding_Box();

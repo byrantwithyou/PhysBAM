@@ -190,7 +190,7 @@ void Initialize_Levelset_Velocity(const int object,ARRAY<VECTOR_2D<T> >& V)
 void Initialize_Particle_Positions_And_Velocities(const int object)
 {
     TRIANGULATED_AREA<T>& triangulated_area=solids_parameters.deformable_body_parameters.list(object).embedded_triangulated_area->triangulated_area;
-    PARTICLES<T,VECTOR_2D<T> >& particles=triangulated_area.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=triangulated_area.particles;
 
     particles.Update_Velocity();
     triangulated_area.Update_Bounding_Box();

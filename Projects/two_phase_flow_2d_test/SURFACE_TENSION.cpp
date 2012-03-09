@@ -424,7 +424,7 @@ template<class T> void SURFACE_TENSION<T>::
 Initialize_Bodies()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 //    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
@@ -476,7 +476,7 @@ Initialize_Bodies()
 template<class T> void SURFACE_TENSION<T>::
 Kang_Circle(bool use_surface)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(test_number==7){
         fluids_parameters.gravity=(T)(8e-4)*m/(s*s);
         fluids_parameters.density=(T)10000*kg/(m*m);
@@ -634,7 +634,7 @@ Oscillating_Circle(bool use_surface)
 template<class T> void SURFACE_TENSION<T>::
 Sine_Wave()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     use_massless_structure=true;
     solid_body_collection.Set_CFL_Number(10);
     fluids_parameters.use_particle_levelset=true;
@@ -756,7 +756,7 @@ Test_Analytic_Pressure(T time)
 template<class T> void SURFACE_TENSION<T>::
 Solid_Circle()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     SPHERE<TV> object(TV(),1);
     solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
     particles.mass+=(T)1/particles.mass.m;
@@ -948,7 +948,7 @@ Write_Output_Files(const int frame) const
 template<class T> void SURFACE_TENSION<T>::
 Initialize_Surface_Particles(int number)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     number_surface_particles=number;
     PHYSBAM_ASSERT(particles.array_collection->Size()==0);
     particles.array_collection->Add_Elements(number_surface_particles);
@@ -963,7 +963,7 @@ Initialize_Surface_Particles(int number)
 template<class T> void SURFACE_TENSION<T>::
 Rebuild_Surface()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     for(int i=0;i<number_surface_particles;i++)
         particles.X(i)=TV();
 
@@ -1122,7 +1122,7 @@ template<class T> void SURFACE_TENSION<T>::
 FSI_Analytic_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     T solid_gravity=(T)9.8*m/(s*s);

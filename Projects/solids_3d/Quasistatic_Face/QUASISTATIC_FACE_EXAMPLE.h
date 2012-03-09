@@ -106,7 +106,7 @@ void Get_Initial_Data()
     solids_parameters.deformable_body_parameters.list(1).Allocate_Tetrahedralized_Volume();
     TETRAHEDRALIZED_VOLUME<T> &tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume;
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
     std::string input_file;
     std::istream *input;
 
@@ -157,7 +157,7 @@ void Initialize_Tetrahedron_Collisions()
     std::cout<<"Initializing geometric structures for self collision"<<std::endl;
     TETRAHEDRALIZED_VOLUME<T> &tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume;
     TETRAHEDRON_COLLISION_BODY<T> *face_collision_body=new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume);
-    PARTICLES<T,VECTOR_3D<T> >* undeformed_particles=new PARTICLES<T,VECTOR_3D<T> >(tetrahedralized_volume.particles);
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >* undeformed_particles=new DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >(tetrahedralized_volume.particles);
     TRIANGULATED_SURFACE<T> *undeformed_triangulated_surface=new TRIANGULATED_SURFACE<T>(tetrahedralized_volume.triangulated_surface->triangle_mesh,*undeformed_particles);
     undeformed_triangulated_surface->Update_Triangle_List();undeformed_triangulated_surface->Initialize_Triangle_Hierarchy();
 

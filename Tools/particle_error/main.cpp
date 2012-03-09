@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Read_Write/Particles/READ_WRITE_PARTICLES.h>
 #include <fstream>
@@ -18,7 +18,7 @@ template<class T,class RW> void Compute_Errors(const std::string& input_base,con
 {
     typedef VECTOR<T,2> TV;
 
-    ARRAY<PARTICLES<TV> > particles(resolutions.m);
+    ARRAY<DEFORMABLE_PARTICLES<TV> > particles(resolutions.m);
     ARRAY<ARRAY<T> > errors(resolutions.m);
     for(int i=particles.m;i>=1;i--) errors(i).Resize(last_frame);
 

@@ -8,7 +8,7 @@
 #define __FRACTURE_GRAIN_BOUNDARIES__
 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_CALLBACKS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_OBJECT.h>
 namespace PhysBAM{
@@ -29,7 +29,7 @@ public:
     const FRACTURE_CALLBACKS<TV>* fracture_callbacks;
     bool is_levelset_grain_boundary;
 
-    FRACTURE_GRAIN_BOUNDARIES(const PARTICLES<TV>& particles,const SIMPLEX_MESH<d>& mesh_input,const ARRAY<TV>& seed_positions_input,const ARRAY<T>& seed_weakness_multipliers_input,const FRAME<TV> frame,
+    FRACTURE_GRAIN_BOUNDARIES(const DEFORMABLE_PARTICLES<TV>& particles,const SIMPLEX_MESH<d>& mesh_input,const ARRAY<TV>& seed_positions_input,const ARRAY<T>& seed_weakness_multipliers_input,const FRAME<TV> frame,
                               const FRACTURE_CALLBACKS<TV>* fracture_callbacks_input=0)
         :mesh(mesh_input),seed_positions(seed_positions_input),seed_weakness_multipliers(seed_weakness_multipliers_input),fracture_callbacks(fracture_callbacks_input),is_levelset_grain_boundary(false)
     {}

@@ -44,7 +44,7 @@ void Get_Initial_Data()
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).triangulated_surface;
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     cloth_grid.Initialize(number_side_panels+1,(int)(aspect_ratio*number_side_panels)+1,0,1,0,aspect_ratio);
     triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles.array_collection->Add_Elements(triangle_mesh.number_nodes);

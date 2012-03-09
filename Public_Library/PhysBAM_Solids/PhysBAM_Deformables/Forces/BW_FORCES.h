@@ -48,7 +48,7 @@ protected:
     ARRAY<STATE> states;
 public:
     FORCE_ELEMENTS force_simplices;
-    BW_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
+    BW_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input);
 
     virtual ~BW_FORCES();
 

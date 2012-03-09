@@ -480,7 +480,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
             LOG::cout<<"velocity at "<<X<<" : "<<V<<std::endl;}}
     if(test_number==43){
         ARRAY<T,FACE_INDEX<2> > face_velocities_copy(fluid_collection.incompressible_fluid_collection.face_velocities);
-        PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(test_43_triangulated_area->particles);
+        DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(test_43_triangulated_area->particles);
         RANGE<TV_INT> domain_indices=fluids_parameters.grid->Domain_Indices();
         T volume=fluids_parameters.grid->Cell_Size();
         double kinetic_energy=0;
@@ -617,7 +617,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
         }
 
         // structure velocities
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         for(int i=0;i<particles.array_collection->Size();i++)
             particles.V(i)=Oscillating_Disk_Domain_Velocity_Sample(particles.X(i));
     }
@@ -829,7 +829,7 @@ void Balloon()
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
@@ -1122,7 +1122,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 void Uniform_Flow_Test()
 {
 //    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-//    PARTICLES<TV>& particles=deformable_body_collection.particles;
+//    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     last_frame=1000;
@@ -1155,9 +1155,9 @@ void Uniform_Flow_Test()
 void Deformable_Uniform_Flow_Test()
 {
 //    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-//    PARTICLES<TV>& particles=deformable_body_collection.particles;
+//    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     last_frame=1000;
     (*fluids_parameters.grid).Initialize(resolution,(int)(2*resolution),(T)-.5,(T).5,(T)-1,(T)1,true);
@@ -1199,7 +1199,7 @@ void Deformable_Uniform_Flow_Test()
 void Falling_Rigid_Circle_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     fluids_parameters.use_coupled_implicit_viscosity=true;
@@ -1244,7 +1244,7 @@ void Falling_Rigid_Circle_Test()
 void Flexible_Beam_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     //RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     (*fluids_parameters.grid).Initialize((int)(2*resolution),resolution,(T)0,(T)2,(T)0,(T)1,true);
@@ -1303,7 +1303,7 @@ void Flexible_Beam_Test()
 void Vibrating_Circle()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize((int)(2*resolution),resolution,(T)0,(T)2,(T)0,(T)1,true);
     fluids_parameters.gravity=(T)0;
@@ -1352,7 +1352,7 @@ void Vibrating_Circle()
 void Refine_Circle()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize((int)(2*resolution),resolution,(T)0,(T)2,(T)0,(T)1,true);
     fluids_parameters.gravity=(T)0;
@@ -1399,7 +1399,7 @@ void Refine_Circle()
 void Analytic_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
 
@@ -1447,7 +1447,7 @@ void Analytic_Test()
 void Flow_Past_Fixed_Cylinder()
 {
 //    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-//    PARTICLES<TV>& particles=deformable_body_collection.particles;
+//    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 //    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     fluids_parameters.use_coupled_implicit_viscosity=true;
@@ -1529,7 +1529,7 @@ TV Oscillating_Disk_Domain_Velocity_Sample(TV location)
 void Oscillating_Disk()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     frame_rate=1000;
     last_frame=(int)frame_rate; // one second;
@@ -1599,7 +1599,7 @@ void Oscillating_Disk()
 void Flexible_Filament_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     //RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     (*fluids_parameters.grid).Initialize((int)(3*resolution)+1,resolution+1,(T)0,(T)3,(T)0,(T)1);
@@ -1659,7 +1659,7 @@ void Flexible_Filament_Test()
 void Simple_Fluid_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize((int)(2*resolution),resolution,(T)0,(T)2,(T)0,(T)1,true);
     fluids_parameters.gravity=(T)0;
@@ -1690,7 +1690,7 @@ void Simple_Fluid_Test()
 void Coupled_Viscosity_Test()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     (*fluids_parameters.grid).Initialize((int)(2*resolution),resolution,(T)0,(T)2,(T)0,(T)1,true);
     fluids_parameters.gravity=(T)0;

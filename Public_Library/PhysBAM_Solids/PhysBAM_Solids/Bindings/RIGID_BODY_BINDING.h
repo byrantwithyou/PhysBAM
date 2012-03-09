@@ -28,18 +28,18 @@ public:
     int rigid_body_particle_index;
     TV object_space_position;
 
-    RIGID_BODY_BINDING(PARTICLES<TV>& particles_input)
+    RIGID_BODY_BINDING(DEFORMABLE_PARTICLES<TV>& particles_input)
         :BINDING<TV>(particles_input),rigid_body_collection(0),rigid_body_particle_index(0)
     {}
 
-    RIGID_BODY_BINDING(PARTICLES<TV>& particles_input,const int particle_index_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
+    RIGID_BODY_BINDING(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,
         const int rigid_body_particle_index_input,const TV& object_space_position_input)
         :BINDING<TV>(particles_input,particle_index_input),rigid_body_collection(&rigid_body_collection_input),rigid_body_particle_index(rigid_body_particle_index_input),
         object_space_position(object_space_position_input)
     {}
 
     static RIGID_BODY_BINDING* Create(GEOMETRY_PARTICLES<TV>& particles)
-    {return new RIGID_BODY_BINDING(dynamic_cast<PARTICLES<TV>&>(particles));}
+    {return new RIGID_BODY_BINDING(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles));}
 
     virtual int Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static int Static_Name()

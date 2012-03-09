@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION.h>
@@ -17,7 +17,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> FLUID_TO_SOLID_INTERPOLATION<TV>::
-FLUID_TO_SOLID_INTERPOLATION(const COLLISION_AWARE_INDEX_MAP<TV>& map,const PARTICLES<TV>& particles_input)
+FLUID_TO_SOLID_INTERPOLATION(const COLLISION_AWARE_INDEX_MAP<TV>& map,const DEFORMABLE_PARTICLES<TV>& particles_input)
     :FLUID_TO_SOLID_INTERPOLATION_BASE<TV>(map),max_dist(2),particles(particles_input)
 {
 }

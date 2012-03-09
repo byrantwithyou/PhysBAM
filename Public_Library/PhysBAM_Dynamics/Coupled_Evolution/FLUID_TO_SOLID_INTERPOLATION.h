@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_BASE.h>
 
@@ -32,9 +32,9 @@ public:
     T max_dist;
     ARRAY<VECTOR<ARRAY<ENTRY>,TV::m> > entries;
     ARRAY<int> coupled_particles;
-    const PARTICLES<TV>& particles;
+    const DEFORMABLE_PARTICLES<TV>& particles;
 
-    FLUID_TO_SOLID_INTERPOLATION(const COLLISION_AWARE_INDEX_MAP<TV>& map,const PARTICLES<TV>& particles_input);
+    FLUID_TO_SOLID_INTERPOLATION(const COLLISION_AWARE_INDEX_MAP<TV>& map,const DEFORMABLE_PARTICLES<TV>& particles_input);
     virtual ~FLUID_TO_SOLID_INTERPOLATION();
 
 //#####################################################################

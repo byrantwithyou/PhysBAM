@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
@@ -62,7 +62,7 @@ namespace {
 template<class T> void Exchange_Solid_Positions_And_Velocities_Helper(const MPI_SOLID_FLUID<VECTOR<T,1> >& mpi,SOLID_BODY_COLLECTION<VECTOR<T,1> >& solid_body_collection)
 {
     int tag=mpi.Get_Unique_Tag();
-    PARTICLES<VECTOR<T,1> >& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<VECTOR<T,1> >& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<VECTOR<T,1> >& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     if(mpi.Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(mpi.fluid_ranks.n);ARRAY<MPI::Request> requests;
@@ -87,7 +87,7 @@ template<class TV> void MPI_SOLID_FLUID<TV>::
 Exchange_Solid_Positions_And_Velocities(SOLID_BODY_COLLECTION<TV>& solid_body_collection) const
 {
     int tag=Get_Unique_Tag();
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     if(Solid_Node()){
         ARRAY<ARRAY<char> > send_buffers(fluid_ranks.n);ARRAY<MPI::Request> requests;

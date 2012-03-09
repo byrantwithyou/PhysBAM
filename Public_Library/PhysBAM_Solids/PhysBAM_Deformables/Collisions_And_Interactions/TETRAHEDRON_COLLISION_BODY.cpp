@@ -24,7 +24,7 @@ template<class T> static TRIANGULATED_SURFACE<T>& Triangulated_Surface_Helper(TE
 template<class T> TETRAHEDRON_COLLISION_BODY<T>::
 TETRAHEDRON_COLLISION_BODY(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume_input,TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface_input,
     IMPLICIT_OBJECT<TV>& implicit_surface_input,TRIANGULATED_SURFACE<T>* triangulated_surface_input)
-    :particles(dynamic_cast<PARTICLES<TV>&>(tetrahedralized_volume_input.particles)),undeformed_particles(dynamic_cast<PARTICLES<TV>&>(undeformed_triangulated_surface_input.particles)),tetrahedralized_volume(tetrahedralized_volume_input),
+    :particles(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume_input.particles)),undeformed_particles(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(undeformed_triangulated_surface_input.particles)),tetrahedralized_volume(tetrahedralized_volume_input),
     undeformed_triangulated_surface(undeformed_triangulated_surface_input),triangulated_surface(Triangulated_Surface_Helper(tetrahedralized_volume_input,triangulated_surface_input)),
     implicit_surface(implicit_surface_input)
 {
@@ -251,7 +251,7 @@ Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X
 // Function Adjust_Nodes_For_Collisions
 //#####################################################################
 template<class T> int TETRAHEDRON_COLLISION_BODY<T>::
-Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
+Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
     const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
     ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
 {

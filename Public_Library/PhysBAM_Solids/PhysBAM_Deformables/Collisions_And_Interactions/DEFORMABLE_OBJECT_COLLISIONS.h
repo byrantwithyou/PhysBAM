@@ -13,7 +13,7 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
 #endif
@@ -30,7 +30,7 @@ class DEFORMABLE_OBJECT_COLLISIONS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     ARRAY<STRUCTURE<TV>*>& deformable_object_structures;
     COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list;
@@ -58,7 +58,7 @@ private:
     bool use_structure_collide_collision_body;
 public:
 
-    DEFORMABLE_OBJECT_COLLISIONS(PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
+    DEFORMABLE_OBJECT_COLLISIONS(DEFORMABLE_PARTICLES<TV>& particles,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,ARRAY<STRUCTURE<TV>*>& deformable_object_structures,
         COLLISION_GEOMETRY_COLLECTION<TV>& collision_body_list);
 
     virtual ~DEFORMABLE_OBJECT_COLLISIONS();

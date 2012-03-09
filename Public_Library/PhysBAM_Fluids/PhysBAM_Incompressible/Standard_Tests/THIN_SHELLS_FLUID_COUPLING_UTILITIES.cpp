@@ -15,7 +15,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -133,7 +133,7 @@ Add_Deformable_Object_From_File(const STREAM_TYPE stream_type,DEFORMABLE_BODY_CO
 {
     TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create(deformable_body_collection.particles);
     int index=deformable_body_collection.deformable_geometry.Add_Structure(&triangulated_surface);
-    PARTICLES<VECTOR<T,3> >& particles=dynamic_cast<PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles);
+    DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles=dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles);
 
     particles.Store_Velocity(false);particles.Store_Mass(false); // need to do this before reading it in
     FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_surface);

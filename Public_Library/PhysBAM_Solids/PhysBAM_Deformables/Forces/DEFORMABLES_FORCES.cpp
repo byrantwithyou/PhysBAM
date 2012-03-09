@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> DEFORMABLES_FORCES<TV>::
-DEFORMABLES_FORCES(PARTICLES<TV>& particles)
+DEFORMABLES_FORCES(DEFORMABLE_PARTICLES<TV>& particles)
     :particles(particles),cfl_number((T)1),allow_external_cfl_number(true),cfl_initialized(false),use_velocity_independent_forces(true),
     use_velocity_dependent_forces(true),use_force_differential(true),use_implicit_velocity_independent_forces(false),use_position_based_state(true),
     unique_id(Get_Unique_Id()),compute_half_forces(false)

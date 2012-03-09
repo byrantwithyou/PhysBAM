@@ -1,8 +1,8 @@
 /* dataconv
  * -----------------
  * Includes converters to convert double files to float files and vice versa.
- * Adding the particle parameter requires putting the PARTICLES.h file included
- * in this directory into Public_Library/Particles/PARTICLES.h and recompiling.
+ * Adding the particle parameter requires putting the DEFORMABLE_PARTICLES.h file included
+ * in this directory into Public_Library/Particles/DEFORMABLE_PARTICLES.h and recompiling.
  * The code is organized by program functionality (dtof, ftod, etc.).
  *
  * The exectutable produced takes the following command line:

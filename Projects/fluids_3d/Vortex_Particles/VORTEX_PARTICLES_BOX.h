@@ -105,7 +105,7 @@ void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T time,const
             vorticity_particles.X(particle_id)=grid.X(i,j,ij)+random.Get_Uniform_Vector(cell_lower,cell_upper);
             int sign=random.Get_Uniform_Integer(0,1);if(sign==0)sign=-1;
             vorticity_particles.vorticity(particle_id)=VECTOR<T,3>(0,(T)sign*vorticity_magnitude,0);
-            std::cout<<"ADDING PARTICLES"<<std::endl;}
+            std::cout<<"ADDING DEFORMABLE_PARTICLES"<<std::endl;}
 }
 //#####################################################################
 // Function Initialize_Phi

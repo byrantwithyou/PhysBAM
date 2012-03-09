@@ -106,7 +106,7 @@ Initialize_Bodies()
 {
     //helper references
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
@@ -282,7 +282,7 @@ template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     INTERPOLATION_CURVE<T,FRAME<TV> > interp_start,interp_start2,interp_end;
     FRAME<TV> frame;
     T duration=(T)last_frame/(T)frame_rate;
@@ -489,7 +489,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
     //if(time<start_time) return;
     return;
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);

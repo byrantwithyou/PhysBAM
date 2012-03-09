@@ -8,7 +8,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/HYPOTHETICAL_CUT_TETRAHEDRONS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/HYPOTHETICAL_NODE.h>
 using namespace PhysBAM;
@@ -92,7 +92,7 @@ Initialize_Quad_Cut(const int i,const int j)
     int ep2=embedded_object.Embedded_Particle_On_Segment(l,j);
     int ep3=embedded_object.Embedded_Particle_On_Segment(j,k);
     int ep4=embedded_object.Embedded_Particle_On_Segment(k,i);
-    PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(embedded_object.simplicial_object.particles);
+    DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(embedded_object.simplicial_object.particles);
     assert(TETRAHEDRON<T>::Signed_Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l))>0);
     if(ep1&&ep2&&!ep3&&!ep4){
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));

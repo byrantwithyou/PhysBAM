@@ -20,7 +20,7 @@ template<class TV> class BINDING_LIST;
 template<class TV> class DEFORMABLE_GEOMETRY_COLLECTION;
 template<class TV> class COLLISION_GEOMETRY_COLLECTION;
 template<class TV> class DEFORMABLE_OBJECT_COLLISIONS;
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 template<class TV> class SOFT_BINDINGS;
 template<class TV> class TRIANGLE_REPULSIONS;
 template<class TV> class TRIANGLE_COLLISIONS;
@@ -38,7 +38,7 @@ class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef typename DEFORMABLES_FORCES<TV>::FREQUENCY_DATA T_FREQUENCY_DEFORMABLE;
 public:
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     DEFORMABLE_GEOMETRY_COLLECTION<TV>& deformable_geometry;
     bool simulate; // TODO: use one of those per fragment
     bool owns_data;

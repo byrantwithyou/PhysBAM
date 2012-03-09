@@ -39,7 +39,7 @@ class DEFORMABLES_FORCES:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
 protected:
     T cfl_number;
     bool allow_external_cfl_number;
@@ -62,7 +62,7 @@ public:
     int unique_id;
     bool compute_half_forces;
 
-    DEFORMABLES_FORCES(PARTICLES<TV>& particles);
+    DEFORMABLES_FORCES(DEFORMABLE_PARTICLES<TV>& particles);
     virtual ~DEFORMABLES_FORCES();
 
     static int Get_Unique_Id()

@@ -16,14 +16,14 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_FINITE_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV,int d> LINEAR_FINITE_VOLUME<TV,d>::
 LINEAR_FINITE_VOLUME(T_OBJECT& object,const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient)
-    :DEFORMABLES_FORCES<TV>(dynamic_cast<PARTICLES<TV>&>(object.particles)),object(object),mesh(object.mesh),use_uniform_density(false),density_list(0)
+    :DEFORMABLES_FORCES<TV>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles)),object(object),mesh(object.mesh),use_uniform_density(false),density_list(0)
 {
     assert(poissons_ratio!=-1 && poissons_ratio!=.5);
     lambda=youngs_modulus*poissons_ratio/((1+poissons_ratio)*(1-2*poissons_ratio));

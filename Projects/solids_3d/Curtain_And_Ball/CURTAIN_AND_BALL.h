@@ -28,7 +28,7 @@ public:
     T aspect_ratio,side_length;
     bool collide_against_sphere_triangulated_surface,collide_against_sphere_particles;
     RIGID_BODY_LIST_3D<T> rigid_bodies_to_collide_against;
-    PARTICLES<T,VECTOR_3D<T> > sphere_particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > sphere_particles;
     TRIANGULATED_SURFACE<T>* sphere_surface;
 
     CURTAIN_AND_BALL()
@@ -55,7 +55,7 @@ void Get_Initial_Data()
     int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).triangulated_surface;
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
 
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
     triangle_mesh.Initialize_Herring_Bone_Mesh(m,n);

@@ -9,13 +9,13 @@
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SCALED_DEFORMABLES_FORCES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> SCALED_DEFORMABLES_FORCES<TV>::
-SCALED_DEFORMABLES_FORCES(DEFORMABLES_FORCES<TV>* base_force_input,PARTICLES<TV>& particles_input,const ARRAY<TV>& X_n_input,const ARRAY<TV>& V_n_input)
+SCALED_DEFORMABLES_FORCES(DEFORMABLES_FORCES<TV>* base_force_input,DEFORMABLE_PARTICLES<TV>& particles_input,const ARRAY<TV>& X_n_input,const ARRAY<TV>& V_n_input)
     :DEFORMABLES_FORCES<TV>(particles_input),base_force(base_force_input),
     rewind_positions(false),rewind_velocities(false),X_n(X_n_input),V_n(V_n_input),
     particle_positions_rewound(false),particle_velocities_rewound(false)

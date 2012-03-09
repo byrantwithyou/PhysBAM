@@ -12,14 +12,14 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BW_MATERIAL_SPACE_FORCES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <cfloat>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV,int d> BW_MATERIAL_SPACE_FORCES<TV,d>::
-BW_MATERIAL_SPACE_FORCES(PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input)
+BW_MATERIAL_SPACE_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& triangle_mesh_input,const T stiffness_coefficient_input,const T damping_coefficient_input)
     :BW_FORCES<TV,d,3>(particles,triangle_mesh_input,stiffness_coefficient_input,damping_coefficient_input)
 {
     // Save initial state

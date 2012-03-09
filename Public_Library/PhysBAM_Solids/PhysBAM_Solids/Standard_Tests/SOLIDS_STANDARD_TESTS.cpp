@@ -67,7 +67,7 @@ Bind_Unbound_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& p
 template<class TV> template<class T_ARRAY> void SOLIDS_STANDARD_TESTS<TV>::
 Bind_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body,const T_ARRAY& particle_array)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     for(typename T_ARRAY::ELEMENT i=0;i<particle_array.Size();i++){int p=particle_array(i);
@@ -128,7 +128,7 @@ Create_Rigid_Body_From_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahe
     MASS_PROPERTIES<TV> mass_properties(*tetrahedralized_volume.triangulated_surface,true);
     mass_properties.Set_Density(density);rigid_body->Mass().mass=mass_properties.Mass();
     FRAME<TV> frame_local;
-    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<PARTICLES<TV>&>(tetrahedralized_volume.particles));
+    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles));
     rigid_body->Set_Frame(frame_local);
     rigid_body->Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(tetrahedralized_volume,*tetrahedralized_volume.triangulated_surface,cell_size,subdivision_loops,
         create_levelset_test,use_levelset_maker,levels_of_octree);
@@ -153,7 +153,7 @@ Create_Rigid_Body_From_Fracture_Tetrahedralized_Volume(EMBEDDED_MATERIAL_SURFACE
     MASS_PROPERTIES<TV> mass_properties(material_surface,false);
     mass_properties.Set_Density(density);rigid_body->Mass().mass=mass_properties.Mass();
     FRAME<TV> frame_local;
-    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<PARTICLES<TV>&>(tetrahedralized_volume.particles));
+    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Mass().inertia_tensor,dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(tetrahedralized_volume.particles));
     rigid_body->Set_Frame(frame_local);
     embedded_material_surface.embedded_object.Update_Embedded_Particle_Positions();
     rigid_body->Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(tetrahedralized_volume,material_surface,cell_size,subdivision_loops,create_levelset_test,
@@ -171,7 +171,7 @@ Create_Rigid_Body_From_Triangulated_Surface(TRIANGULATED_SURFACE<T>& triangulate
     MASS_PROPERTIES<TV> mass_properties(triangulated_surface,true);
     mass_properties.Set_Density(density);rigid_body->Mass()=mass_properties.Mass();
     FRAME<TV> frame_local;
-    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Inertia_Tensor(),dynamic_cast<PARTICLES<TV>&>(triangulated_surface.particles));
+    mass_properties.Transform_To_Object_Frame(frame_local,rigid_body->Inertia_Tensor(),dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(triangulated_surface.particles));
     rigid_body->Set_Frame(frame_local);
     rigid_body->Add_Structure(triangulated_surface);
     return rigid_body;

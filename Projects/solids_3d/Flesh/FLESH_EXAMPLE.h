@@ -133,7 +133,7 @@ void Initialize_Tetrahedron_Collisions()
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
 
     TETRAHEDRON_COLLISION_BODY<T>& tetrahedron_collision_body=*(new TETRAHEDRON_COLLISION_BODY<T>(tetrahedralized_volume));
-    PARTICLES<TV>& undeformed_particles=*(new PARTICLES<TV>(tetrahedralized_volume.particles));
+    DEFORMABLE_PARTICLES<TV>& undeformed_particles=*(new DEFORMABLE_PARTICLES<TV>(tetrahedralized_volume.particles));
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(tetrahedron_collision_body.triangulated_surface->mesh,undeformed_particles));
     undeformed_triangulated_surface.Update_Triangle_List();undeformed_triangulated_surface.Initialize_Triangle_Hierarchy();
 

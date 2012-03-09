@@ -32,12 +32,12 @@ public:
     FORCE_ELEMENTS force_particles;
     FORCE_ELEMENTS force_rigid_body_particles;
 
-    POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
+    POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
         ARRAY<int>* influenced_rigid_body_particles_input);
-    POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
+    POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
         const bool influence_all_rigid_body_particles_input);
     template<class T_MESH>
-    POINTWISE_FORCE(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const T_MESH& mesh,ARRAY<int>* influenced_rigid_body_particles_input);
+    POINTWISE_FORCE(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const T_MESH& mesh,ARRAY<int>* influenced_rigid_body_particles_input);
     virtual ~POINTWISE_FORCE();
 
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE

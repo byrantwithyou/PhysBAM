@@ -7,11 +7,11 @@
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 using ::std::sqrt;
 using namespace PhysBAM;
 template<class T> LINEAR_ALTITUDE_SPRINGS_3D<T>::
-LINEAR_ALTITUDE_SPRINGS_3D(PARTICLES<TV>& particles,TETRAHEDRON_MESH& tetrahedron_mesh)
+LINEAR_ALTITUDE_SPRINGS_3D(DEFORMABLE_PARTICLES<TV>& particles,TETRAHEDRON_MESH& tetrahedron_mesh)
     :LINEAR_ALTITUDE_SPRINGS<VECTOR<T,3>,3>(particles,tetrahedron_mesh)
 {
     use_shortest_spring_only=true;
@@ -423,7 +423,7 @@ Potential_Energy(const T time) const
 }
 
 template<class T> LINEAR_ALTITUDE_SPRINGS_3D<T>* PhysBAM::
-Create_Altitude_Springs(PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,
+Create_Altitude_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TETRAHEDRON_MESH& mesh,
     const T stiffness,const T overdamping_fraction,const bool use_compressed_by_threshold_only,const T fraction_compression,const bool limit_time_step_by_strain_rate,
     const T max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const T restlength_enlargement_fraction,const bool verbose)
 {
@@ -436,7 +436,7 @@ Create_Altitude_Springs(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,
     const bool limit_time_step_by_strain_rate,const T max_strain_per_time_step,const bool use_rest_state_for_strain_rate,const T restlength_enlargement_fraction,
     const bool verbose)
 {
-    return Create_Altitude_Springs(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(tetrahedralized_volume.particles),tetrahedralized_volume.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,
+    return Create_Altitude_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(tetrahedralized_volume.particles),tetrahedralized_volume.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,
         fraction_compression,limit_time_step_by_strain_rate,max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose);
 }
 //#####################################################################

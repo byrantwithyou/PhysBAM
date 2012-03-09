@@ -24,20 +24,20 @@ public:
     TV downward_direction;
 public:
 
-    GRAVITY(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
+    GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
         ARRAY<int>* influenced_rigid_body_particles_input,const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
         :POINTWISE_FORCE<TV>(particles_input,rigid_body_collection_input,influenced_particles_input,influenced_rigid_body_particles_input),gravity(gravity_input),
         downward_direction(downward_direction_input)
     {}
 
-    GRAVITY(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
+    GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
         const bool influence_all_rigid_body_particles_input,const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
         :POINTWISE_FORCE<TV>(particles_input,rigid_body_collection_input,influence_all_particles_input,influence_all_rigid_body_particles_input),
         gravity(gravity_input),downward_direction(downward_direction_input)
     {}
 
     template<class T_MESH>
-    GRAVITY(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const T_MESH& mesh,ARRAY<int>* influenced_rigid_body_particles_input,
+    GRAVITY(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const T_MESH& mesh,ARRAY<int>* influenced_rigid_body_particles_input,
         const T gravity_input=9.8,const TV& downward_direction_input=-TV::Axis_Vector(1-(TV::dimension==1)))
         :POINTWISE_FORCE<TV>(particles_input,rigid_body_collection_input,mesh,influenced_rigid_body_particles_input),gravity(gravity_input),downward_direction(downward_direction_input)
     {

@@ -61,7 +61,7 @@ protected:
 
 public:
     FORCE_ELEMENTS force_segments;
-    LINEAR_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input,const bool implicit);
+    LINEAR_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input,const bool implicit);
 
     virtual ~LINEAR_SPRINGS();
 
@@ -122,7 +122,7 @@ public:
 };
 
 template<class TV> LINEAR_SPRINGS<TV>*
-Create_Edge_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2e3,
+Create_Edge_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const typename TV::SCALAR stiffness=2e3,
     const typename TV::SCALAR overdamping_fraction=1,const bool limit_time_step_by_strain_rate=true,const typename TV::SCALAR max_strain_per_time_step=.1,
     const bool use_rest_state_for_strain_rate=true,const typename TV::SCALAR restlength_enlargement_fraction=0,const bool verbose=true,const bool implicit=false);
 

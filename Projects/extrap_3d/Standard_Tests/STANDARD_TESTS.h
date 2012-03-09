@@ -641,7 +641,7 @@ void Get_Initial_Data()
     bool automatically_add_to_collision_structures=true;
     // deformable bodies
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
@@ -1640,7 +1640,7 @@ void Get_Initial_Data()
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     Get_Initial_Data();
 
@@ -2101,7 +2101,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     T final_time=50;
     if(test_number==24){
         int m=mattress_grid.counts.x;
@@ -2182,7 +2182,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(test_number==24){
         int m=mattress_grid.counts.x;
 	int n=mattress_grid.counts.y;
@@ -2426,7 +2426,7 @@ void Update_Time_Varying_Material_Properties(const T time)
 //#####################################################################
 void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     
     //if (true)
     //{
@@ -2469,7 +2469,7 @@ void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE
 void Bind_Intersecting_Particles()
 {
     if(nobind) return;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     bool added_binding=false;
@@ -2499,7 +2499,7 @@ void Preprocess_Frame(const int frame)
 
     if(test_number==52)
     {
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
         int m=mattress_grid.counts.x;
         int n=mattress_grid.counts.y;
@@ -2557,7 +2557,7 @@ void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE
 {
     T v0=4,v1=6;
     if(test_number==50 || test_number==51){
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         ARRAY<bool> use(particles.X.m);
         use.Subset(externally_forced).Fill(true);
         for(int p=0;p<particles.X.m;p++)
@@ -2723,7 +2723,7 @@ T Contour_Crossing(const TV& g0,const TV& v0,const TV& g1,const TV& v1)
 //#####################################################################
 void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,3>& icm)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ARRAY<TV,VECTOR<int,2> > evec(1,image_size,1,image_size);
     ARRAY<TV,VECTOR<int,2> > grad(1,image_size,1,image_size);
     for(int i=0;i<image_size;i++)
@@ -2781,7 +2781,7 @@ void Plot_Contour_Landscape(int frame)
     sprintf(buff, "%s/data/%03d.txt", output_directory.c_str(), frame);
     std::ofstream out(buff);
 
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     FINITE_VOLUME<TV,3>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,3>&>();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,3>* icm=fv.isotropic_model;
     bool is_neo=dynamic_cast<NEO_HOOKEAN<T,3>*>(icm);

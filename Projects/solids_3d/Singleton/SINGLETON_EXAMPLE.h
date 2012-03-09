@@ -60,7 +60,7 @@ void Get_Initial_Data()
     solids_parameters.deformable_body_parameters.list(1).Allocate_Tetrahedralized_Volume();
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume;
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(1).particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(1).particles;
 
     particles.Increase_Array_Size(4);
     particles.X(particles.array_collection->Add_Element())=VECTOR_3D<T>(0,0,0);

@@ -34,7 +34,7 @@ int main(int argc,char* argv[])
         DEFORMABLE_OBJECT<TV> deformable_object(collision_body_list);
         deformable_object.Read(STREAM_TYPE(RW()),"",frame,-1,true);
         TETRAHEDRALIZED_VOLUME<T>& volume=deformable_object.Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-        PARTICLES<TV>& particles=volume.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=volume.particles;
         // find components
         UNION_FIND<> union_find(particles.array_collection->Size());
         for(int t=0;t<volume.mesh.elements.m;t++) union_find.Union(volume.mesh.elements(t));

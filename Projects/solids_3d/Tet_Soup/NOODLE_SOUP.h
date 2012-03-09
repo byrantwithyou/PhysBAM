@@ -34,7 +34,7 @@ public:
     T bowl_scale;
     std::string noodle_data_directory;
     DEFORMABLE_OBJECT<T,TV> noodle_deformable_object;
-    PARTICLE_SUBSET<PARTICLES<T,TV> > gravity_particles;
+    PARTICLE_SUBSET<DEFORMABLE_PARTICLES<T,TV> > gravity_particles;
     ARRAY<TRIANGULATED_SURFACE<T>*> noodles;
 
     NOODLE_SOUP(const PARSE_ARGS& parse_args):
@@ -67,7 +67,7 @@ public:
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
     // read coarse sphere to get the dynamic particles
     TETRAHEDRALIZED_VOLUME<T>& dynamic_volume=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",
@@ -139,7 +139,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 // Function Get_Intersecting_Tetrahedron
 //#####################################################################
-int Get_Intersecting_Tetrahedron(const PARTICLES<T,TV>& particles,const TV& location,const TETRAHEDRALIZED_VOLUME<T>& dynamic_volume)
+int Get_Intersecting_Tetrahedron(const DEFORMABLE_PARTICLES<T,TV>& particles,const TV& location,const TETRAHEDRALIZED_VOLUME<T>& dynamic_volume)
 {
     ARRAY<int> intersection_list;dynamic_volume.tetrahedron_hierarchy->Intersection_List(location,intersection_list);
     for(int i=0;i<intersection_list.m;i++) if(TETRAHEDRON<T>(particles.X.Subset(dynamic_volume.mesh.elements(intersection_list(i)))).Inside(location)) return intersection_list(i);

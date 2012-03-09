@@ -73,8 +73,8 @@ public:
     HASHTABLE<VECTOR<int,4> >& intersecting_edge_edge_pairs;
     HASHTABLE<VECTOR<int,4> > default_intersecting_edge_edge_pairs;
 
-    SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id,HASHTABLE<VECTOR<int,4> >& intersecting_edge_edge_pairs);
-    SEGMENT_ADHESION(PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id);
+    SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id,HASHTABLE<VECTOR<int,4> >& intersecting_edge_edge_pairs);
+    SEGMENT_ADHESION(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& mesh,ARRAY<HAIR_ID>& particle_to_spring_id);
 
     virtual ~SEGMENT_ADHESION()
     {

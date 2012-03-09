@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV> class IMPLICIT_OBJECT;
@@ -24,7 +24,7 @@ public:
     TRIANGLE_MESH triangle_mesh;
     TRIANGULATED_AREA<T> triangulated_area;
     COLLISION_GEOMETRY_COLLECTION<TV> collision_body_list;
-    PARTICLES<VECTOR<T,2> > particles;
+    DEFORMABLE_PARTICLES<VECTOR<T,2> > particles;
     std::string output_directory;
     bool preserve_altitude;
 private:

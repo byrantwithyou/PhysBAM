@@ -77,7 +77,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 #if 0
     id=solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>* triangulated_surface=solids_parameters.deformable_body_parameters.list(id).triangulated_surface;
-    PARTICLES<T,VECTOR_3D<T> >* particles=&triangulated_surface->particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >* particles=&triangulated_surface->particles;
     triangulated_surface->triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
     particles->array_collection->Add_Elements(triangulated_surface->triangle_mesh.number_nodes);
     for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
@@ -105,7 +105,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     id=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(id).tetrahedralized_volume;
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_file);tetrahedralized_volume.template Read<RW>(*input);delete input;
     std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;

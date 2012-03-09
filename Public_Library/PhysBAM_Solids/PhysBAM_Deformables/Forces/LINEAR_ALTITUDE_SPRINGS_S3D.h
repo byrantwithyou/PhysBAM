@@ -30,7 +30,7 @@ public:
 
     ARRAY<bool>* triangle_inverted;
 
-    LINEAR_ALTITUDE_SPRINGS_S3D(PARTICLES<TV>& particles,TRIANGLE_MESH& mesh)
+    LINEAR_ALTITUDE_SPRINGS_S3D(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& mesh)
         :LINEAR_ALTITUDE_SPRINGS<TV,2>(particles,mesh),triangle_inverted(0)
     {}
 
@@ -55,7 +55,7 @@ public:
 };
 
 template<class T> LINEAR_ALTITUDE_SPRINGS_S3D<T>*
-Create_Altitude_Springs(PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,const T stiffness=4/(1+sqrt((T)2)),
+Create_Altitude_Springs(DEFORMABLE_PARTICLES<VECTOR<T,3> >& particles,TRIANGLE_MESH& mesh,const T stiffness=4/(1+sqrt((T)2)),
     const T overdamping_fraction=2,const bool use_compressed_by_threshold_only=true,const T fraction_compression=.1,const bool limit_time_step_by_strain_rate=true,
     const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true)
 {
@@ -69,7 +69,7 @@ Create_Altitude_Springs(TRIANGULATED_SURFACE<T>& triangulated_surface,
     const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,
     const bool verbose=true)
 {
-    return Create_Altitude_Springs(dynamic_cast<PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,
+    return Create_Altitude_Springs(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,3> >&>(triangulated_surface.particles),triangulated_surface.mesh,stiffness,overdamping_fraction,use_compressed_by_threshold_only,
         fraction_compression,limit_time_step_by_strain_rate,max_strain_per_time_step,use_rest_state_for_strain_rate,restlength_enlargement_fraction,verbose);
 }
 

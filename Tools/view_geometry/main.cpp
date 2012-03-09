@@ -21,7 +21,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_AXES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BASIC_CALLBACKS.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BOX_3D.h>
@@ -204,7 +204,7 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& 
     try{
         TRIANGULATED_AREA<T>* area;
         FILE_UTILITIES::Create_From_File<T>(filename,area);
-        TRIANGULATED_SURFACE<T>* surface=new TRIANGULATED_SURFACE<T>(area->mesh,*new PARTICLES<VECTOR<T,3> >);
+        TRIANGULATED_SURFACE<T>* surface=new TRIANGULATED_SURFACE<T>(area->mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
         surface->particles.array_collection->Add_Elements(area->particles.array_collection->Size());
         for(int p=0;p<area->particles.array_collection->Size();p++)surface->particles.X(p)=VECTOR<T,3>(area->particles.X(p));
         area->Update_Bounding_Box();

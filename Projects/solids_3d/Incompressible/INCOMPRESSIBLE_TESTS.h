@@ -248,7 +248,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
     std::string sphere_filename=data_directory+"/Tetrahedralized_Volumes/";
@@ -757,7 +757,7 @@ void Add_Incompressible_Force(T_OBJECT* object)
 void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     if(test_number==17 || test_number==18){
         LOG::SCOPE scope("restart hack","restart hack");
@@ -799,7 +799,7 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
 void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     if(BINDING_SPRINGS<TV>* binding_springs=solid_body_collection.template Find_Force<BINDING_SPRINGS<TV>*>()){

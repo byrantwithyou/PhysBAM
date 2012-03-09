@@ -17,7 +17,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Geometry/Fourier_Transforms_Calculations/DEEP_WATER_EVOLUTION_HEIGHTS.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/FLUID_CONTROL_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Solids_And_Fluids/FLUID_CONTROL_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -87,7 +87,7 @@ public:
         int horizontal_cells=15*cells+1;
         if(test_number==2){
             SEGMENT_MESH* sine_segment=new SEGMENT_MESH();sine_segment->Initialize_Straight_Mesh(horizontal_cells,false);
-            PARTICLES<TV>* sine_particles=new PARTICLES<TV>();sine_particles->Increase_Array_Size(horizontal_cells);
+            DEFORMABLE_PARTICLES<TV>* sine_particles=new DEFORMABLE_PARTICLES<TV>();sine_particles->Increase_Array_Size(horizontal_cells);
             for(int p=0;p<horizontal_cells;p++){T t=(p-1)/(T)(horizontal_cells-1);sine_particles->X(p)=TV(1.5*t,.4+.25*sin(13*pi*t));}
             sine_curve=new SEGMENTED_CURVE_2D<T>(*sine_segment,*sine_particles);}
 

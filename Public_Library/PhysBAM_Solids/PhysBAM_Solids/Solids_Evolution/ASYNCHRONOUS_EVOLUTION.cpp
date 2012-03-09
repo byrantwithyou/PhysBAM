@@ -15,7 +15,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SCALED_DEFORMABLES_FORCES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
@@ -218,7 +218,7 @@ Add_Finescale_Force(DEFORMABLES_FORCES<TV>* force,const ARRAY<int>& affected_par
 template<class TV> void ASYNCHRONOUS_EVOLUTION<TV>::
 Add_Coarsescale_Force(DEFORMABLES_FORCES<TV>* force,const ARRAY<int>& affected_particle_indices_list,const ARRAY<int>& affected_rigid_body_particle_indices_list,const bool implicit_velocity_independent,const bool add_to_blobs)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     force->use_implicit_velocity_independent_forces=implicit_velocity_independent;
     SCALED_DEFORMABLES_FORCES<TV>* scaled_coarsescale_force=new SCALED_DEFORMABLES_FORCES<TV>(force,particles,X_n,V_n);
@@ -417,7 +417,7 @@ Position_Velocity_Update(const T dt,const T time)
         Average_Velocities();
         return;}
 
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
 
     finescale_force_on_particles.Resize(particles.array_collection->Size(),false,false);

@@ -54,7 +54,7 @@ public:
 void Get_Initial_Data()
 {
     TETRAHEDRON_MESH torus_mesh;
-    PARTICLES<T,VECTOR_3D<T> > torus_particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > torus_particles;
     TETRAHEDRALIZED_VOLUME<T> torus_volume(torus_mesh,torus_particles);
     FILE_UTILITIES::Read_From_File<RW>(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",torus_volume);
     std::cout<<"torus vertices = "<<torus_particles.array_collection->Size()<<"\ntorus tetrahedra = "<<torus_mesh.tetrahedrons.m<<"\n";
@@ -70,7 +70,7 @@ void Get_Initial_Data()
         int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Tetrahedralized_Volume();
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*solids_parameters.deformable_body_parameters.list(index).tetrahedralized_volume;
         TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-        PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
+        DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
         tetrahedron_mesh.Initialize_Tetrahedron_Mesh(torus_mesh);particles.Initialize_Particles(torus_particles);
         particles.Update_Velocity();particles.Store_Mass();
         tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);

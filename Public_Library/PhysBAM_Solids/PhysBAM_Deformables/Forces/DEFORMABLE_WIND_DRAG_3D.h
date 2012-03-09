@@ -58,7 +58,7 @@ private:
 public:
 
     template<class T_OBJECT> DEFORMABLE_WIND_DRAG_3D(T_OBJECT& object);
-    DEFORMABLE_WIND_DRAG_3D(PARTICLES<TV>& deformable_body_particles_input);
+    DEFORMABLE_WIND_DRAG_3D(DEFORMABLE_PARTICLES<TV>& deformable_body_particles_input);
     virtual ~DEFORMABLE_WIND_DRAG_3D();
 
     void Use_Constant_Wind(const T viscosity_input,const TV& wind_input=TV())

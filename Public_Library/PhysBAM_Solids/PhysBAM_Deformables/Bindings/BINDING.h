@@ -12,10 +12,10 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Geometry/Registry/REGISTRY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 
-template<class TV> class PARTICLES;
+template<class TV> class DEFORMABLE_PARTICLES;
 class SEGMENT_MESH;
 template<class ID> class SPARSE_UNION_FIND;
 
@@ -26,14 +26,14 @@ class BINDING:public NONCOPYABLE
 public:
     typedef TV VECTOR_T;
 
-    PARTICLES<TV>& particles;
+    DEFORMABLE_PARTICLES<TV>& particles;
     int particle_index;
 
-    BINDING(PARTICLES<TV>& particles_input)
+    BINDING(DEFORMABLE_PARTICLES<TV>& particles_input)
         :particles(particles_input),particle_index(0)
     {}
 
-    BINDING(PARTICLES<TV>& particles_input,const int particle_index_input)
+    BINDING(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input)
         :particles(particles_input),particle_index(particle_index_input)
     {}
 
@@ -82,10 +82,10 @@ public:
     static int Static_Name() {return -1;}
     virtual std::string Extension() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Extension();}
     static std::string Static_Extension() {return "";}
-    static BINDING* Create(TYPED_ISTREAM& input,PARTICLES<TV>& particles);
+    static BINDING* Create(TYPED_ISTREAM& input,DEFORMABLE_PARTICLES<TV>& particles);
     void Write(TYPED_OSTREAM& output) const;
 private:
-    static BINDING* Create_From_Name(const int name,PARTICLES<TV>& particles);
+    static BINDING* Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles);
 //#####################################################################
 };
 
@@ -99,7 +99,7 @@ class BINDING_REGISTRY:public REGISTRY<BINDING<TV>,int,BINDING_REGISTRY<TV> >
 {
 public:
     template<class T_OBJECT> static T_OBJECT* Create_Representative()
-    {static PARTICLES<TV> particles;return T_OBJECT::Create(particles);}
+    {static DEFORMABLE_PARTICLES<TV> particles;return T_OBJECT::Create(particles);}
 };
 }
 #endif

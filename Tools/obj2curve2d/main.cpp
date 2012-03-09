@@ -4,7 +4,7 @@
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <fstream>
 #include <iostream>
@@ -35,7 +35,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     }while(!input->eof());
     delete input;
 
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     SEGMENTED_CURVE_2D<T>* segmented_curve_2d=SEGMENTED_CURVE_2D<T>::Create(particles);
 
     for(int t=0;t<segments.m;t++)

@@ -1191,7 +1191,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(Surface_Wrapper_Overloads,Surface_Wrapper,2,4);
     # Function single_particles
     ######################################################################
     def single_particles(self):
-        self.include("PhysBAM_Tools/Particles/PARTICLES.h")
+        self.include("PhysBAM_Tools/Particles/DEFORMABLE_PARTICLES.h")
         name='SINGLE_PARTICLES'
         cppclass='SINGLE_PARTICLES<PARTICLES_BASE>'
         self.defs.append('class_<%s,boost::noncopyable>("%s",no_init)\n'%(cppclass,name))
@@ -1203,7 +1203,7 @@ BOOST_PYTHON_FUNCTION_OVERLOADS(Surface_Wrapper_Overloads,Surface_Wrapper,2,4);
     # Function particle_base
     ######################################################################
     def particle_base(self):
-        self.include("PhysBAM_Tools/Particles/PARTICLES.h")
+        self.include("PhysBAM_Tools/Particles/DEFORMABLE_PARTICLES.h")
         self.include("boost/shared_ptr.hpp>\nusing boost::shared_ptr;//This file is convoluted.")
         name=cppclass='PARTICLES_BASE'
         self.defs.append('class_<%s,bases<CLONEABLE_BASE>,boost::noncopyable>("%s",no_init)\n'%(cppclass,name))
@@ -1251,8 +1251,8 @@ void Add_Particles(PARTICLES_BASE& particles,const int count)
     # Function particles
     ######################################################################
     def particles(self,name,TV):
-        self.include("PhysBAM_Tools/Particles/PARTICLES.h")
-        cppclass="PARTICLES<%s >"%(TV)
+        self.include("PhysBAM_Tools/Particles/DEFORMABLE_PARTICLES.h")
+        cppclass="DEFORMABLE_PARTICLES<%s >"%(TV)
         self.defs.append("class_<%s,boost::noncopyable,bases<PARTICLES_BASE> >(\"%s\")\n"%(cppclass,name))
         self.defs.append(";\n")
 
@@ -1263,7 +1263,7 @@ void Add_Particles(PARTICLES_BASE& particles,const int count)
         self.include_class(cppclass)
         self.defs.append('{\n')
         self.typedef(TV='%s::VECTOR_T'%cppclass)
-        self.defs.append('class_<%s,boost::noncopyable,bases<PARTICLES<TV> > >("%s")\n'%(cppclass,name))
+        self.defs.append('class_<%s,boost::noncopyable,bases<DEFORMABLE_PARTICLES<TV> > >("%s")\n'%(cppclass,name))
         if cppclass.startswith('DEFORMABLE_BODY_PARTICLES'):
             for member in ['Store_Velocity','Store_Mass','Delete_Particle']:
                 self.member_function(cppclass,member)

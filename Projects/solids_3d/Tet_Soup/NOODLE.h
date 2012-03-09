@@ -62,7 +62,7 @@ public:
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<T,TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("bowl",bowl_scale,0,true);
     rigid_body.frame.r=QUATERNION<T>::Rotation_Quaternion(-TV::Axis_Vector(3),-TV::Axis_Vector(2));

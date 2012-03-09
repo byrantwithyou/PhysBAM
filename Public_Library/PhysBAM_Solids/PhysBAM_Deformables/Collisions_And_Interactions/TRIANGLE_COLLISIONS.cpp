@@ -27,7 +27,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -123,7 +123,7 @@ template<class TV> int TRIANGLE_COLLISIONS<TV>::
 Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_early)
 {
     LOG::SCOPE scope("collisions","checking collisions");
-    PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
     ARRAY_VIEW<TV> X(full_particles.X),X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,collisions_in_attempt=0,
         point_face_collisions=0,edge_edge_collisions=0;
@@ -720,7 +720,7 @@ Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
 {
     typedef typename TV::SPIN T_SPIN;
 
-    PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
+    DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
     if(output_collision_results){
         LOG::cout<<"TOTAL RIGID GROUPS = "<<rigid_lists.m<<std::endl;
         for(int list=0;list<rigid_lists.m;list++) LOG::cout<<"LIST "<<list<<" = "<<rigid_lists(list).m<<" POINTS"<<std::endl<<rigid_lists(list);}

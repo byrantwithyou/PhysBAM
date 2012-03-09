@@ -26,7 +26,7 @@ public:
     FRAME_3D<T> incline_frame;
     T ground_friction_coefficient;
     enum {LEVELSET,COARSE_TRIANGULATED_SURFACE,DENSE_TRIANGULATED_SURFACE} collision_object_type;
-    PARTICLES<T,VECTOR_3D<T> > plane_particles; // transformed plane particles
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > plane_particles; // transformed plane particles
     TRIANGULATED_SURFACE<T>* plane_surface;
     bool use_repulsions_only;
     
@@ -63,7 +63,7 @@ public:
     {int index=solids_parameters.deformable_body_parameters.list.Add_Deformable_Triangulated_Surface();
     TRIANGULATED_SURFACE<T>& triangulated_surface=*solids_parameters.deformable_body_parameters.list(index).triangulated_surface;
     TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     
     // initialize cloth
     GRID<TV> cloth_grid(number_side_panels+1,(int)(aspect_ratio*number_side_panels)+1,0,1,0,aspect_ratio);

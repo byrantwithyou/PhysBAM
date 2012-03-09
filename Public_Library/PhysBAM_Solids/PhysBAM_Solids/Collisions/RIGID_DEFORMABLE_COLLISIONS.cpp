@@ -145,7 +145,7 @@ Get_Point_Surface_Element_Pairs_Helper(const RIGID_DEFORMABLE_COLLISIONS<VECTOR<
     //tetrahedralized_volume.hierarchy->Update_Boxes(collision_thickness);
     typedef VECTOR<T,3> TV;
     const ARRAY<TETRAHEDRON_COLLISION_BODY<T>*>& tetrahedron_candidates=rigid_deformable_collisions.particle_tetrahedron_candidates.Get(particle_index);
-    PARTICLES<TV>& particles=rigid_deformable_collisions.solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=rigid_deformable_collisions.solid_body_collection.deformable_body_collection.particles;
     ARRAY<int> particles_to_ignore;particles_to_ignore.Append(particle_index);
     particles_to_ignore.Append_Elements(rigid_deformable_collisions.solid_body_collection.deformable_body_collection.soft_bindings.Parents(particle_index));
     for(int i=0;i<tetrahedron_candidates.m;i++){TETRAHEDRON_COLLISION_BODY<T>& collision_body=*tetrahedron_candidates(i);
@@ -184,7 +184,7 @@ template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
 Apply_Impulse(const int particle,RIGID_BODY<TV>& rigid_body,const TV& impulse)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     // adjust the particle
@@ -208,7 +208,7 @@ template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
 Apply_Displacement_To_Particle(const int particle_index,const TV& particle_delta_X)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     particles.X(particle_index)+=particle_delta_X;
@@ -242,7 +242,7 @@ Apply_Rigid_Deformable_Collision_Impulse(RIGID_BODY<TV>& rigid_body,const int pa
     const T coefficient_of_friction,const bool clamp_friction_magnitude,TV& impulse,bool allow_pull,bool apply_impulse)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // TODO: can this be made more efficient for the case of a static/kinematic rigid body?
 
@@ -287,7 +287,7 @@ Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int part
     ARRAY<ROTATION<TV> >& rigid_rotation_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,ARRAY<TV>& rigid_velocity_difference)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
@@ -469,7 +469,7 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
     ARRAY<ROTATION<TV> >& rigid_rotation_save,const T collision_body_thickness,const bool process_contact_unconditionally)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     ARRAY<TV>& X=X_save;
@@ -890,7 +890,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
     RIGID_BODY<TV>& parent_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body);
     T threshold=rigid_body.Length_Scale_Squared()*(T)1e-2;
 
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     
     ARRAY<int> particle_interactions,rigid_body_interactions;ARRAY<TV> particle_distances,rigid_body_collision_locations,rigid_body_distances;
@@ -1089,7 +1089,7 @@ template<class TV> bool RIGID_DEFORMABLE_COLLISIONS<TV>::
 Push_Out_From_Particle(const int particle)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     // Sync soft binding
@@ -1158,7 +1158,7 @@ template<class TV> TV RIGID_DEFORMABLE_COLLISIONS<TV>::
 Pull_In_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int particle_index,const T dt,const TV& original_relative_velocity,const bool check_succeeded_only,const bool apply_impulse)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 

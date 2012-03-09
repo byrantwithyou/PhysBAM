@@ -15,7 +15,7 @@
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -86,7 +86,7 @@ One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_sa
 {
     typedef KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<TV> > > KRYLOV_VECTOR_T;
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
     dV_full.Resize(particles.array_collection->Size()); // an initial guess might be passed in for dV, otherwise it's zero
     R_full.Resize(particles.array_collection->Size(),false,false);F_full.Resize(particles.array_collection->Size(),false,false);S_full.Resize(particles.array_collection->Size(),false,false);
@@ -117,7 +117,7 @@ template<class TV> void BACKWARD_EULER_EVOLUTION<TV>::
 Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TODO: Split this into position/velocity parts
 {
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
 
     solid_body_collection.Enforce_Definiteness(true);example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);

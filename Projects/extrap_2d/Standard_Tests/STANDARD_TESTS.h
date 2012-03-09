@@ -379,7 +379,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
     switch(test_number){
@@ -677,7 +677,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Place_Triangle(int tri,T s1,T s2,T a,T b,TV shift)
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ROTATION<TV> rot(ROTATION<TV>::From_Angle(a)),rot2(ROTATION<TV>::From_Angle(b+a));
     TV com(0,sqrt(3)/6);
     for(int i=0;i<3;i++) particles.X(3*tri+i)=rot2.Rotate(TV(s1,s2)*rot.Inverse_Rotate(particles.X(3*tri+i)-com))+shift;
@@ -854,7 +854,7 @@ void Preprocess_Frame(const int frame)
     if(test_number==100 || test_number==31 || test_number==30) Plot_Contour_Landscape(frame);
     if(test_number==33 && frame==2)
     {
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         particles.X(5)=TV(-.08,-.16);
         particles.X(3)=particles.X(5);
         particles.X(3).x*=-1;
@@ -1135,7 +1135,7 @@ void Add_Primary_Contour_Segments(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>& icm)
 void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
 {
     TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),true,RIGID_BODY_STATE<TV>());
-    TRIANGULATED_SURFACE<T> ts(ta.mesh,*new PARTICLES<VECTOR<T,3> >);
+    TRIANGULATED_SURFACE<T> ts(ta.mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
     ts.particles.array_collection->Add_Elements(ta.particles.X.m);
     for(int i=0;i<ta.particles.X.m;i++){
         TV X=ta.particles.X(i);
@@ -1152,7 +1152,7 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
 //#####################################################################
 void Plot_Energy_Landscape()
 {
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     ARRAY<TV> F(particles.X.m);
     ARRAY<TWIST<TV> > TW;
     ARRAY<TV> X;
@@ -1196,7 +1196,7 @@ void Plot_Contour_Landscape(int frame)
 
     if(test_number==31) out<<"tristretch"<<std::endl;
 
-    PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     FINITE_VOLUME<TV,2>& fv=solid_body_collection.deformable_body_collection.template Find_Force<FINITE_VOLUME<TV,2>&>();
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=fv.isotropic_model;
     bool is_neo=dynamic_cast<NEO_HOOKEAN<T,2>*>(icm) || dynamic_cast<RC2_EXTRAPOLATED<T,2>*>(icm);
@@ -1233,7 +1233,7 @@ void Energy_Profile_Plot(int frame)
         TRIANGULATED_AREA<T> ta(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>);
         ta.Initialize_Square_Mesh_And_Particles(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),false);
 
-        energy_mesh=new TRIANGULATED_SURFACE<T>(ta.mesh,*new PARTICLES<VECTOR<T,3> >);
+        energy_mesh=new TRIANGULATED_SURFACE<T>(ta.mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
         energy_mesh->particles.array_collection->Add_Elements(ta.particles.X.m);
         for(int i=0;i<ta.particles.X.m;i++){
             TV X=ta.particles.X(i);

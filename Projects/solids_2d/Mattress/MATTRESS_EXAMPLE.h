@@ -63,7 +63,7 @@ public:
 void Get_Initial_Data() PHYSBAM_OVERRIDE
 {
     DEFORMABLE_OBJECT_2D<T>& deformable_object=solid_body_collection.deformable_object;
-    PARTICLES<TV>& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
     TRIANGULATED_AREA<T>& triangulated_area=*TRIANGULATED_AREA<T>::Create(particles);
     deformable_object.Add_Structure(&triangulated_area);
 

@@ -99,7 +99,7 @@ Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<TV>::
 Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_GEOMETRY_STATE<TV>& initial_state,const T density)
 {
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
     segmented_curve.Initialize_Straight_Mesh_And_Particles(square_grid);
     LOG::cout<<"Adding Segmented Curve - Segments = "<<segmented_curve.mesh.elements.m<<std::endl;
@@ -115,7 +115,7 @@ Create_Segmented_Curve(const GRID<VECTOR<T,1> >& square_grid,const RIGID_GEOMETR
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<TV>::
 Create_Segmented_Curve(const int m,const RIGID_GEOMETRY_STATE<TV>& initial_state,const T initial_radius,const T density)
 {
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
     segmented_curve.Initialize_Circle_Mesh_And_Particles(m,initial_radius);
     LOG::cout<<"Adding Segmented Curve - Segments = "<<segmented_curve.mesh.elements.m<<std::endl;
@@ -133,7 +133,7 @@ Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_GEOMETRY_S
 {
     PHYSBAM_ASSERT(scale>0);
     PHYSBAM_ASSERT(density>0);
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
     FILE_UTILITIES::Read_From_File(example.stream_type,filename,tetrahedralized_volume);
     tetrahedralized_volume.Rescale(scale);
@@ -150,7 +150,7 @@ Create_Tetrahedralized_Volume(const std::string& filename,const RIGID_GEOMETRY_S
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJECT& DEFORMABLES_STANDARD_TESTS<TV>::
 Create_Triangulated_Object(const GRID<TV>& square_grid,const RIGID_GEOMETRY_STATE<TV>& initial_state,const T density)
 {
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_TRIANGULATED_OBJECT& triangulated_object=*T_TRIANGULATED_OBJECT::Create(particles);
     triangulated_object.Initialize_Square_Mesh_And_Particles(square_grid);
     triangulated_object.Check_Signed_Areas_And_Make_Consistent(true);
@@ -168,7 +168,7 @@ template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::TRIANGULATED_OBJ
 Create_Triangulated_Object(const std::string& filename,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass,const T scale)
 {
     PHYSBAM_ASSERT(scale>0);
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_TRIANGULATED_OBJECT& triangulated_object=*T_TRIANGULATED_OBJECT::Create(particles);
     FILE_UTILITIES::Read_From_File(example.stream_type,filename,triangulated_object);
     triangulated_object.Rescale(scale);
@@ -186,7 +186,7 @@ Create_Triangulated_Object(const std::string& filename,const RIGID_GEOMETRY_STAT
 template<class TV> typename TOPOLOGY_BASED_GEOMETRY_POLICY<TV>::SEGMENTED_CURVE& DEFORMABLES_STANDARD_TESTS<TV>::
 Create_Segmented_Curve(const std::string& filename,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center,const bool use_constant_mass)
 {
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     T_SEGMENTED_CURVE& segmented_curve=*T_SEGMENTED_CURVE::Create(particles);
     FILE_UTILITIES::Read_From_File(example.stream_type,filename,segmented_curve);
     LOG::cout<<"Adding Segmented Curve - Segments = "<<segmented_curve.mesh.elements.m<<std::endl;
@@ -204,7 +204,7 @@ template<class TV> TRIANGULATED_AREA<typename TV::SCALAR>& DEFORMABLES_STANDARD_
 Create_Mattress(const GRID<VECTOR<T,2> >& mattress_grid,const bool use_constant_mass,const RIGID_GEOMETRY_STATE<TV>* initial_state,const T density,const bool reverse_triangles)
 {
     PHYSBAM_ASSERT(density>0);
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     TRIANGULATED_AREA<T>& triangulated_area=*TRIANGULATED_AREA<T>::Create(particles);
     triangulated_area.Initialize_Square_Mesh_And_Particles(mattress_grid,reverse_triangles);
     triangulated_area.Check_Signed_Areas_And_Make_Consistent(true);
@@ -223,7 +223,7 @@ template<class TV> TETRAHEDRALIZED_VOLUME<typename TV::SCALAR>& DEFORMABLES_STAN
 Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_mass,const RIGID_GEOMETRY_STATE<TV>* initial_state,const T density)
 {
     PHYSBAM_ASSERT(density>0);
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
     tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
     LOG::cout<<"Adding Mattress - Total Tetrahedra : "<<tetrahedralized_volume.mesh.elements.m<<std::endl;
@@ -240,7 +240,7 @@ Create_Mattress(const GRID<VECTOR<T,3> >& mattress_grid,const bool use_constant_
 template<class TV> template<class T_SHAPE> EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDARD_TESTS<TV>::
 Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_GEOMETRY_STATE<TV>& initial_state,const bool relative_to_box_center)
 {
-    PARTICLES<TV>& particles=*(new PARTICLES<TV>());
+    DEFORMABLE_PARTICLES<TV>& particles=*(new DEFORMABLE_PARTICLES<TV>());
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& embedding=*EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::Create(particles);
     EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_tetrahedralized_volume=embedding.embedded_object;
     embedded_tetrahedralized_volume.Set_Interpolation_Fraction_Threshold((T)1e-2);
@@ -267,7 +267,7 @@ template<class TV> template<class T_OBJECT> void DEFORMABLES_STANDARD_TESTS<TV>:
 Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bindings,HASHTABLE<int,int>* persistent_soft_bindings,const bool embedded_only,
     const bool use_impulses_for_collisions)
 {
-    PARTICLES<TV>& particles=soft_bindings.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=soft_bindings.particles;
     ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
     ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(particles.array_collection->Size()));
     for(int i=0;i<nodes.m;i++) if(!embedded_only || soft_bindings.binding_list.Binding_Index_From_Particle_Index(nodes(i))>=0){
@@ -328,7 +328,7 @@ Initialize_Tetrahedron_Collisions(const int id_number,TETRAHEDRALIZED_VOLUME<T>&
     if(!triangulated_surface){
         if(!tetrahedralized_volume.triangulated_surface) tetrahedralized_volume.Initialize_Triangulated_Surface();
         triangulated_surface=tetrahedralized_volume.triangulated_surface;}
-    PARTICLES<TV>& undeformed_particles=*deformable_body_collection.particles.Clone();
+    DEFORMABLE_PARTICLES<TV>& undeformed_particles=*deformable_body_collection.particles.Clone();
     TRIANGULATED_SURFACE<T>& undeformed_triangulated_surface=*(new TRIANGULATED_SURFACE<T>(triangulated_surface->mesh,undeformed_particles));
     undeformed_triangulated_surface.Update_Triangle_List();undeformed_triangulated_surface.Initialize_Hierarchy();
     std::string levelset_filename=STRING_UTILITIES::string_sprintf("%s/common/deformable_body_undeformed_levelset_%d.phi",example.output_directory.c_str(),id_number);
@@ -342,7 +342,7 @@ template<class TV> TRIANGULATED_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDA
 Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_BINDINGS<TV>& soft_bindings,const bool use_impulses_for_collisions) const
 {
     assert(&triangulated_surface.particles==&soft_bindings.particles);
-    PARTICLES<TV>& particles=soft_bindings.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=soft_bindings.particles;
     ARRAY<int> triangulated_surface_nodes;triangulated_surface.mesh.elements.Flattened().Get_Unique(triangulated_surface_nodes);
     ARRAY<int> child_particles(particles.array_collection->Size());
     particles.array_collection->Preallocate(particles.array_collection->Size()+triangulated_surface_nodes.m);
@@ -361,7 +361,7 @@ Set_Mass_Of_Particles(const T_OBJECT& object,const T density,const bool use_cons
 {
     PHYSBAM_ASSERT(density>0);
     if(!object.mesh.elements.m) return;
-    PARTICLES<TV>& particles=dynamic_cast<PARTICLES<TV>&>(object.particles);
+    DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(object.particles);
     particles.Store_Mass();
     ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
     if(use_constant_mass&&nodes.m){
@@ -383,7 +383,7 @@ template<class TV> TRIANGULATED_SURFACE<typename TV::SCALAR>& DEFORMABLES_STANDA
 Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspect_ratio,const RIGID_GEOMETRY_STATE<TV>* initial_state,
     TRIANGULATED_SURFACE_CLIPPING_HELPER<T> *clipping_function,ARRAY<int>* particle_indices)
 {
-    PARTICLES<TV>& particles=*(new PARTICLES<TV>());
+    DEFORMABLE_PARTICLES<TV>& particles=*(new DEFORMABLE_PARTICLES<TV>());
     TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
     TRIANGLE_MESH& mesh=triangulated_surface.mesh;
     particles.Store_Mass();
@@ -402,7 +402,7 @@ Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspe
 // Function Embed_Particles_In_Tetrahedralized_Volume
 //#####################################################################
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
-Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,PARTICLES<VECTOR<T,3> > >& particles_to_embed,
+Embed_Particles_In_Tetrahedralized_Volume(BINDING_LIST<VECTOR<T,3> >& binding_list,const POINT_CLOUD_SUBSET<VECTOR<T,3>,DEFORMABLE_PARTICLES<VECTOR<T,3> > >& particles_to_embed,
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const T thickness_over_two)
 {
     bool tetrahedron_list_initialized=tetrahedralized_volume.tetrahedron_list!=0;if(!tetrahedron_list_initialized) tetrahedralized_volume.Update_Tetrahedron_List();
@@ -582,7 +582,7 @@ Create_Regular_Embedded_Surface(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>
     box.Scale_About_Center(cells*dx/box.Edge_Lengths());
     GRID<TV> grid(TV_INT(cells)+1,box);
 
-    PARTICLES<TV>& particles=*new PARTICLES<TV>;
+    DEFORMABLE_PARTICLES<TV>& particles=*new DEFORMABLE_PARTICLES<TV>;
     TETRAHEDRALIZED_VOLUME<T>& volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
     volume.Initialize_Cube_Mesh_And_Particles(grid);
     particles.Store_Velocity();

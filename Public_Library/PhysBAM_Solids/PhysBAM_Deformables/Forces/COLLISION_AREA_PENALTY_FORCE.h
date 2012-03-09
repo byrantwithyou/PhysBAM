@@ -23,7 +23,7 @@ public:
     VOLUME_COLLISIONS<TV>& volume_collisions;
     T force_coefficient;
 
-    COLLISION_AREA_PENALTY_FORCE(PARTICLES<TV>& particles);
+    COLLISION_AREA_PENALTY_FORCE(DEFORMABLE_PARTICLES<TV>& particles);
 
     virtual ~COLLISION_AREA_PENALTY_FORCE();
 

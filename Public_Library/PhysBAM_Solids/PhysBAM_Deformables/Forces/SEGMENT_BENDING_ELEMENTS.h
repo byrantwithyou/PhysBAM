@@ -35,7 +35,7 @@ private:
     FORCE_ELEMENTS force_triples;
 public:
 
-    SEGMENT_BENDING_ELEMENTS(PARTICLES<TV>& particles)
+    SEGMENT_BENDING_ELEMENTS(DEFORMABLE_PARTICLES<TV>& particles)
         :DEFORMABLES_FORCES<TV>(particles)
     {}
 
@@ -62,7 +62,7 @@ public:
 };
 
 template<class T> SEGMENT_BENDING_ELEMENTS<T>*
-Create_Bending_Elements(PARTICLES<VECTOR<T,2> >& particles,SEGMENT_MESH& mesh,const T stiffness=1e-3,const T damping=1,
+Create_Bending_Elements(DEFORMABLE_PARTICLES<VECTOR<T,2> >& particles,SEGMENT_MESH& mesh,const T stiffness=1e-3,const T damping=1,
     const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool verbose=true)
 {
     SEGMENT_BENDING_ELEMENTS<T>* bend=new SEGMENT_BENDING_ELEMENTS<T>(particles);
@@ -76,7 +76,7 @@ template<class T> SEGMENT_BENDING_ELEMENTS<T>*
 Create_Bending_Elements(SEGMENTED_CURVE<VECTOR<T,2> >& segmented_curve,const T stiffness=1e-3,
     const T damping=1,const bool limit_time_step_by_strain_rate=true,const T max_strain_per_time_step=.1,const bool verbose=true)
 {
-    return Create_Bending_Elements(dynamic_cast<PARTICLES<VECTOR<T,2> >&>(segmented_curve.particles),segmented_curve.mesh,stiffness,damping,limit_time_step_by_strain_rate,
+    return Create_Bending_Elements(dynamic_cast<DEFORMABLE_PARTICLES<VECTOR<T,2> >&>(segmented_curve.particles),segmented_curve.mesh,stiffness,damping,limit_time_step_by_strain_rate,
         max_strain_per_time_step,verbose);
 }
 

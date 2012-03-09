@@ -32,9 +32,9 @@ public:
     T_ARRAYS_TV* spatially_varying_wind;
     LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> vector_interpolation;
 
-    ETHER_DRAG(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
+    ETHER_DRAG(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,ARRAY<int>* influenced_particles_input,
         ARRAY<int>* influenced_rigid_body_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0);
-    ETHER_DRAG(PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
+    ETHER_DRAG(DEFORMABLE_PARTICLES<TV>& particles_input,RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,const bool influence_all_particles_input,
         const bool influence_all_rigid_body_particles_input,T dynamic_ether_viscosity=0,T angular_viscosity=0);
     virtual ~ETHER_DRAG();
 

@@ -30,7 +30,7 @@ protected:
     FORCE_ELEMENTS force_segments;
 
 public:
-    IMPLICIT_ZERO_LENGTH_SPRINGS(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input);
+    IMPLICIT_ZERO_LENGTH_SPRINGS(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh_input);
     virtual ~IMPLICIT_ZERO_LENGTH_SPRINGS();
 
     virtual void Set_Stiffness(const T stiffness_input)
@@ -72,6 +72,6 @@ public:
 };
 
 template<class T,class TV> IMPLICIT_ZERO_LENGTH_SPRINGS<TV>*
-Create_Edge_Zero_Length_Springs(PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const T stiffness=2e3,const T overdamping_fraction=1,const bool verbose=true);
+Create_Edge_Zero_Length_Springs(DEFORMABLE_PARTICLES<TV>& particles,SEGMENT_MESH& segment_mesh,const T stiffness=2e3,const T overdamping_fraction=1,const bool verbose=true);
 }
 #endif

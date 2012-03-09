@@ -34,7 +34,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/BINDING_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <stdexcept>
 using namespace PhysBAM;
 //#####################################################################
@@ -60,7 +60,7 @@ template<class TV> DEFORMABLES_EVOLUTION<TV>::
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Prepare_Backward_Euler_System(DEFORMABLES_BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update)
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_GEOMETRY_PARTICLES<TV>& rigid_geometry_particles=rigid_geometry_collection.particles;
     MPI_SOLIDS<TV>* mpi_solids=deformable_body_collection.mpi_solids;
 
@@ -107,7 +107,7 @@ Prepare_Backward_Euler_System(DEFORMABLES_BACKWARD_EULER_SYSTEM<TV>& system,cons
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Finish_Backward_Euler_Step(const T dt,const T current_position_time,const bool velocity_update)
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     DEFORMABLES_VELOCITY<TV> F_all(F_full,rigid_F_full,deformable_body_collection,rigid_geometry_collection);
 
     if(velocity_update && deformables_parameters.use_post_cg_constraints){ // return rhs + dt Fd V^n+1 for friction processing
@@ -123,7 +123,7 @@ Finish_Backward_Euler_Step(const T dt,const T current_position_time,const bool v
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,const T current_position_time,const bool velocity_update)
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_GEOMETRY_PARTICLES<TV>& rigid_geometry_particles=rigid_geometry_collection.particles;
     MPI_SOLIDS<TV>* mpi_solids=deformable_body_collection.mpi_solids;
     DEFORMABLES_BACKWARD_EULER_SYSTEM<TV> system(*this,deformable_body_collection,dt,current_velocity_time,current_position_time,mpi_solids,
@@ -170,7 +170,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Average_And_Exchange_Position()
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     assert(X_save.m==particles.array_collection->Size());
     assert(rigid_X_save.m==rigid_geometry_collection.particles.array_collection->Size() && rigid_rotation_save.m==rigid_geometry_collection.particles.array_collection->Size());
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
@@ -192,7 +192,7 @@ Average_And_Exchange_Position()
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Trapezoidal_Step_Velocity(const T dt,const T time)
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // save V at time
     Save_Velocity();
@@ -216,7 +216,7 @@ Trapezoidal_Step_Velocity(const T dt,const T time)
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Backward_Euler_Step_Velocity(const T dt,const T time)
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     
     Backward_Euler_Step_Velocity_Helper(dt,time,time+dt,true);
     // enforce boundary conditions again
@@ -347,7 +347,7 @@ template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Print_Maximum_Velocities(const T time) const
 {
     LOG::cout<<"time = "<<time<<std::endl;
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     int max_index=-1;T max_magnitude_squared=-FLT_MAX;const INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&>& V=particles.V.Subset(deformable_body_collection.dynamic_particles);
     for(int i=0;i<V.Size();i++){T magnitude_squared=V(i).Magnitude_Squared();if(magnitude_squared>max_magnitude_squared){max_magnitude_squared=magnitude_squared;max_index=i;}}
     if(max_index>-1){
@@ -404,7 +404,7 @@ Update_Velocity_Using_Stored_Differences(const T dt,const T time)
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Compute_Momentum_Differences()
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     V_difference.Resize(particles.array_collection->Size());
     for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
         int p=deformable_body_collection.simulated_particles(i);V_difference(p)=particles.V(p)-V_save(p);}
@@ -415,7 +415,7 @@ Compute_Momentum_Differences()
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Save_Velocity()
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     V_save.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity_save.Resize(rigid_geometry_collection.particles.array_collection->Size(),false,false);
     V_save.Subset(deformable_body_collection.simulated_particles)=particles.V.Subset(deformable_body_collection.simulated_particles);
@@ -429,7 +429,7 @@ template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Restore_Velocity() const
 {
 
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     particles.V.Subset(deformable_body_collection.simulated_particles)=V_save.Subset(deformable_body_collection.simulated_particles);
     for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i)){
         rigid_geometry_collection.particles.twist(i).linear=rigid_velocity_save(i);}
@@ -441,7 +441,7 @@ template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Exchange_Velocity()
 {
 
-    PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_GEOMETRY_PARTICLES<TV>& rigid_geometry_particles=rigid_geometry_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;RIGID_GEOMETRY_PARTICLES<TV>& rigid_geometry_particles=rigid_geometry_collection.particles;
     V_save.Resize(particles.array_collection->Size(),false,false);
     rigid_velocity_save.Resize(rigid_geometry_particles.array_collection->Size(),false,false);
     for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
@@ -524,7 +524,7 @@ template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotation)
 {
 
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
     X.Resize(particles.array_collection->Size(),false,false);
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
@@ -539,7 +539,7 @@ Save_Position(ARRAY<TV>& X,ARRAY<TV>& rigid_X,ARRAY<ROTATION<TV> >& rigid_rotati
 template<class TV> void DEFORMABLES_EVOLUTION<TV>::
 Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<const ROTATION<TV> > rigid_rotation)
 { 
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     const ARRAY<int>& simulated_particles=deformable_body_collection.simulated_particles;
     PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_X.Size()==rigid_geometry_collection.particles.array_collection->Size());
     PHYSBAM_ASSERT(rigid_rotation.Size()==rigid_geometry_collection.particles.array_collection->Size());
@@ -553,7 +553,7 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const TV> rigid_X,ARRAY_VIEW<
 template<class TV> bool DEFORMABLES_EVOLUTION<TV>::
 Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,int& repulsions_found,int& collisions_found,const bool exit_early)
 {
-    PARTICLES<TV>& particles=deformable_body_collection.particles;
+    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry=deformable_body_collection.triangle_repulsions_and_collisions_geometry;
     ARRAY<bool>& modified=geometry.modified_full;ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
 

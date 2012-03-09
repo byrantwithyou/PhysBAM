@@ -56,7 +56,7 @@ void Get_Initial_Data()
     deformable_object.Allocate_Tetrahedralized_Volume();
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=*deformable_object.tetrahedralized_volume;
     TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
-    PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object.particles;
+    DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=deformable_object.particles;
 
     std::string input_file=data_directory+"/VH_Muscles/"+muscle_name+".tet";
     std::ifstream input;FILE_UTILITIES::Safe_Open(input,input_file);tetrahedralized_volume.template Read<RW>(input);input.close();

@@ -21,7 +21,7 @@
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/MASS_PROPERTIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fragments/PARTICLE_CONNECTIVITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -277,7 +277,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& bottom_collisions=*new DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>(bottom_boundary_curve);
         bottom_collisions.object.Initialize_Hierarchy();Add_To_Fluid_Simulation(bottom_collisions);
 
-        PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
+        DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
         for(int i=0;i<particles.array_collection->Size();i++)
             if(particles.X(i).x==(T)0 || particles.X(i).x==(T)1 || particles.X(i).y==(T)0 || (abs(particles.X(i).y-(T).75) < 1e-10)) bound_particles.Append(i);
 

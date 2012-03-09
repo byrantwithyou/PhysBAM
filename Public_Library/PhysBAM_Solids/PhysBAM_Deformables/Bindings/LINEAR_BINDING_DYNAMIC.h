@@ -25,16 +25,16 @@ public:
     ARRAY<int> parents;
     ARRAY<T> weights; // weights should sum to 1
 
-    LINEAR_BINDING_DYNAMIC(PARTICLES<TV>& particles_input)
+    LINEAR_BINDING_DYNAMIC(DEFORMABLE_PARTICLES<TV>& particles_input)
         :BINDING<TV>(particles_input)
     {}
 
-    LINEAR_BINDING_DYNAMIC(PARTICLES<TV>& particles_input,const int particle_index_input,const int number_of_parents)
+    LINEAR_BINDING_DYNAMIC(DEFORMABLE_PARTICLES<TV>& particles_input,const int particle_index_input,const int number_of_parents)
         :BINDING<TV>(particles_input,particle_index_input),parents(number_of_parents),weights(number_of_parents)
     {}
 
     static LINEAR_BINDING_DYNAMIC* Create(GEOMETRY_PARTICLES<TV>& particles)
-    {return new LINEAR_BINDING_DYNAMIC(dynamic_cast<PARTICLES<TV>&>(particles));}
+    {return new LINEAR_BINDING_DYNAMIC(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles));}
 
     virtual int Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static int Static_Name()
