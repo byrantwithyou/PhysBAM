@@ -46,7 +46,6 @@
 //#include "Sphere_ILM/SPHERE_ILM.h"
 //#include "Sphere_Into_Water/SPHERE_INTO_WATER.h"
 //#include "Splash/SPLASH.h"
-#include "Spray_And_Foam/SPRAY_AND_FOAM.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
 #include "Standard_Tests_Multiphase/STANDARD_TESTS_MULTIPHASE.h"
 #include "Standard_Tests_Smoke/STANDARD_TESTS_SMOKE.h"
@@ -79,7 +78,6 @@ int main(int argc,char* argv[])
     else if(PARSE_ARGS::Find_And_Remove("glass",argc,argv)) example=new GLASS<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("lighthouse",argc,argv)) example=new LIGHTHOUSE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("sheeting",argc,argv)) example=new SHEETING<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("spray",argc,argv)) example=new SPRAY_AND_FOAM<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("dsd_fire_ball",argc,argv)) example=new DSD_FIRE_BALL_EXAMPLE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("dsd_no_navier",argc,argv)) example=new DSD_NO_NAVIER_STOKES<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("twophase",argc,argv)) example=new TWO_PHASE<T>(stream_type);
@@ -118,7 +116,6 @@ int main(int argc,char* argv[])
     //FLOW_PAST_SPHERE<T> example(stream_type);
     //BURNING_PAPER<T> example(example_number);
     //ARMADILLO_CLOTHES<T> example(stream_type);
-    //SPRAY_AND_FOAM<T> example(stream_type);
     //UNDERWATER_DOME<T> example(stream_type);
     //SOLID_FLUID_COUPLING_TEST<T> example(stream_type);
     example->want_mpi_world=true;
