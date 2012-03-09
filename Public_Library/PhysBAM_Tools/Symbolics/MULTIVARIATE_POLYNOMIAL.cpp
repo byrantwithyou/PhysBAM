@@ -149,7 +149,7 @@ Shift_Variable(int v,T shift)
     for(int i=1;i<=mx;i++){
         table[i][0]=1;
         table[i][i]=table[i-1][i-1]*shift;
-        for(int j=1;j<mx;j++)
+        for(int j=1;j<i;j++)
             table[i][j]=table[i-1][j-1]*shift+table[i-1][j];}
     for(int i=terms.m-1;i>=0;i--){
         for(int j=1;j<=terms(i).power(v);j++){
@@ -170,7 +170,7 @@ Shear(int v,int w,T shift) // v -> v + shift * w
     for(int i=1;i<=mx;i++){
         table[i][0]=1;
         table[i][i]=table[i-1][i-1]*shift;
-        for(int j=1;j<mx;j++)
+        for(int j=1;j<i;j++)
             table[i][j]=table[i-1][j-1]*shift+table[i-1][j];}
     for(int i=terms.m-1;i>=0;i--){
         for(int j=1;j<=terms(i).power(v);j++){
@@ -232,7 +232,7 @@ Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const
 
     copy.Shift(vertices(0));
     TV a=vertices(1)-vertices(0);
-    TV b=vertices(1)-vertices(0);
+    TV b=vertices(2)-vertices(0);
     
     TV_INT mp=copy.Max_Power();
     assert(mp.Max()<20);
@@ -242,7 +242,7 @@ Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const
         for(int i=1;i<=mp(v);i++){
             table[v][i][0]=table[v][i-1][0]*a(v);
             table[v][i][i]=table[v][i-1][i-1]*b(v);
-            for(int j=1;j<mp(v);j++)
+            for(int j=1;j<i;j++)
                 table[v][i][j]=table[v][i-1][j-1]*b(v)+table[v][i-1][j]*a(v);}}
     
     typedef VECTOR<T,2> TV2;
@@ -297,7 +297,7 @@ Integrate_Over_Primitive(const VECTOR<TV,2>& vertices) const
     MULTIVARIATE_POLYNOMIAL<TV1> barycentric;
     for(int i=0;i<copy.terms.m;i++){
         TV_INT power=copy.terms(i).power;
-        int scale=1;
+        T scale=1;
         for(int v=0;v<TV::m;v++) scale*=table[v][power(v)];
         barycentric.terms.Append(MULTIVARIATE_MONOMIAL<TV1>(TV_INT1(copy.terms(i).Power_Sum()),copy.terms(i).coeff*scale));}
     barycentric.Simplify();
