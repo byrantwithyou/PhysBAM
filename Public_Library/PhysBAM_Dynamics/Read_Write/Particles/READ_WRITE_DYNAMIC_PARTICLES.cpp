@@ -4,6 +4,8 @@
 //#####################################################################
 // Class READ_WRITE_PARTICLES
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
+#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
