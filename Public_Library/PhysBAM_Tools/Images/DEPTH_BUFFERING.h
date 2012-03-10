@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DEPTH_BUFFERING
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __DEPTH_BUFFERING__
 #define __DEPTH_BUFFERING__
 
@@ -20,7 +19,7 @@ class PRIMITIVE
 {
 public:
 
-    enum TYPE{EMPTY,POINT,SEGMENT,TRIANGLE};
+    enum TYPE{EMPTY=0,POINT,SEGMENT,TRIANGLE};
     typedef VECTOR<T,3> TV;
     
     VECTOR<TV,3> vertices;
@@ -28,7 +27,7 @@ public:
     int style;
 
     ARRAY<VECTOR<TV, 3> > elements;
-    
+
     PRIMITIVE();
     PRIMITIVE(const TV &a,const int style);
     PRIMITIVE(const TV &a,const TV &b,const int style);
@@ -51,8 +50,8 @@ public:
     int Add_Element(const TV &a,const TV &b,const int style);
     int Add_Element(const TV &a,const TV &b,const TV &c,const int style);
 
+    void Process_Primitives();
 //#####################################################################
 };
 }
-#endif
 #endif

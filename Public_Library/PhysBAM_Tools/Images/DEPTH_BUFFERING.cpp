@@ -18,8 +18,8 @@ PRIMITIVE()
 template<class T> PRIMITIVE<T>::
 PRIMITIVE(const TV &a,const int style):style(style)
 { 
-    vertices(0)=a;
     type=POINT;
+    vertices(0)=a;
 }
 //#####################################################################
 // Constructor
@@ -27,9 +27,9 @@ PRIMITIVE(const TV &a,const int style):style(style)
 template<class T> PRIMITIVE<T>::
 PRIMITIVE(const TV &a,const TV &b,const int style):style(style)
 { 
+    type=SEGMENT;
     vertices(0)=a;
     vertices(1)=b;
-    type=SEGMENT;
 }
 //#####################################################################
 // Constructor
@@ -37,10 +37,10 @@ PRIMITIVE(const TV &a,const TV &b,const int style):style(style)
 template<class T> PRIMITIVE<T>::
 PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style):style(style)
 { 
+    type=TRIANGLE;
     vertices(0)=a;
     vertices(1)=b;
     vertices(2)=c;
-    type=TRIANGLE;
 }
 //#####################################################################
 // Function Add_Element
@@ -68,6 +68,18 @@ Add_Element(const TV &a,const TV &b,const TV &c,const int style)
 {
     primitives.Append(PRIMITIVE<T>(a,b,c,style));
     return primitives.Size()-1;
+}
+//#####################################################################
+// Function Process_Primitives
+//#####################################################################
+template<class T> void DEPTH_BUFFERING<T>::
+Process_Primitives(const TV &a,const TV &b,const TV &c,const int style)
+{
+    for(int i=0;i<primitives.m;i++){
+        primitives(i).Remove_All();
+        primitives(i).Clean_Memory();}
+    
+    
 }
 //#####################################################################
 template class PRIMITIVE<float>;
