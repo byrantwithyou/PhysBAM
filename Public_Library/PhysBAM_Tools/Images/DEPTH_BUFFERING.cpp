@@ -73,11 +73,11 @@ Add_Element(const TV &a,const TV &b,const TV &c,const int style)
 // Function Process_Primitives
 //#####################################################################
 template<class T> void DEPTH_BUFFERING<T>::
-Process_Primitives(const TV &a,const TV &b,const TV &c,const int style)
+Process_Primitives()
 {
     for(int i=0;i<primitives.m;i++){
-        primitives(i).Remove_All();
-        primitives(i).Clean_Memory();}
+        primitives(i).elements.Remove_All();
+        primitives(i).elements.Clean_Memory();}
     
     
 }
