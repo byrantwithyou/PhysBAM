@@ -15,6 +15,36 @@ typedef VECTOR<int,3> TV_INT;
 typedef VECTOR<T,2> TV2;
 typedef VECTOR<int,2> TV_INT2;
 
+template<class TV>
+void Integral_Test()
+{
+    typedef typename TV::SCALAR T;
+    RANDOM_NUMBERS<T> random;
+    VECTOR<TV,3> pts;
+    random.Fill_Uniform(pts(0),-(T)1,(T)1);
+    random.Fill_Uniform(pts(1),-(T)1,(T)1);
+    random.Fill_Uniform(pts(2),-(T)1,(T)1);
+
+    MULTIVARIATE_POLYNOMIAL<TV> P;
+    for(int i=0;i<10;i++){
+        TV power;
+        random.Fill_Uniform(power,0,(T)5);
+        P.terms.Append(MULTIVARIATE_MONOMIAL<TV>(VECTOR<int,TV::m>(power),random.Get_Uniform_Number(-1,1)));}
+    P.Simplify();
+    std::cout<<P<<std::endl;
+
+    int N=1000000;
+    T i0=P.Integrate_Over_Primitive(pts),i1=0;
+    for(int i=0;i<N;i++){
+        VECTOR<T,2> uv;
+        random.Fill_Uniform(uv,0,1);
+        if(uv.Sum()>1) uv=(T)1-uv;
+        TV pt=pts(0)+(pts(1)-pts(0))*uv.x+(pts(2)-pts(0))*uv.y;
+        i1+=P.Value(pt);}
+    i1*=TV::Cross_Product(pts(1)-pts(0),pts(2)-pts(0)).Magnitude()/(2*N);
+    LOG::cout<<"integrals c "<<i0<<"  r "<<i1<<"  e "<<abs(i1-i0)<<std::endl;
+}
+
 int main(int argc, char* argv[])
 {
     LOG::cout<<"### LINEAR POLYNOMIAL OVER A TRIANGLE"<<std::endl;
@@ -141,6 +171,9 @@ int main(int argc, char* argv[])
             F.Integrate_Over_Primitive(interval1)-
             F.Integrate_Over_Primitive(interval2)<<std::endl;
     }
+
+    Integral_Test<VECTOR<T,2> >();
+    Integral_Test<VECTOR<T,3> >();
     
     return 0;
 }
