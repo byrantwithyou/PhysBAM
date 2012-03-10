@@ -82,20 +82,24 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
         MARCHING_CUBES<TV>::Get_Elements_For_Cell(elements,elements,dir,enclose_inside,phi,it.index);
 
         if(!elements.m){ // Uncut cell; emit the standard stencil
-            for(UNIFORM_ARRAY_ITERATOR<TV::m> it(coarse_range);it.Valid();it.Next())
-                Add_Uncut_Stencil(helper,it.index,enclose_inside);
+            for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next())
+                Add_Uncut_Stencil(helper,it.index*2+it.index+1,enclose_inside);
             continue;}
 
-        Cut_Elements(cut_elements,elements,double_coarse_range,RANGE<TV>::Unit_Box(),dir);
-        RANGE<TV_INT> flat_range(coarse_range);
+        RANGE<TV_INT> flat_range(double_coarse_range);
         flat_range.max_corner(dir)=1;
+        Cut_Elements(cut_elements,elements,double_coarse_range,RANGE<TV>::Unit_Box(),dir);
 
         for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
             for(int i=0;i<overlap_polynomials.m;i++){
                 ARRAY<T_FACE> elements;
-                for(UNIFORM_ARRAY_ITERATOR<TV::m> it3(overlap_polynomials(i).range);it2.Valid();it2.Next())
-                    elements.Append_Elements(cut_elements(it2.index*2+it3.index+1));
-                Add_Cut_Stencil(helper,elements,it.index*coarse_factor+it2.index,dir,enclose_inside,it2.index,overlap_polynomials(i));}}}
+                for(UNIFORM_ARRAY_ITERATOR<TV::m> it3(overlap_polynomials(i).range);it3.Valid();it3.Next()){
+                    TV_INT index=it2.index*coarse_factor+it3.index+1;
+                    index(dir)=0;
+                    elements.Append_Elements(cut_elements(index));}
+                Add_Cut_Stencil(helper,elements,it.index*coarse_factor+it2.index,dir,enclose_inside,it2.index,overlap_polynomials(i));}}
+        for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
+            cut_elements(it2.index).Remove_All();}
 }
 //#####################################################################
 // Function Cut_Elements
@@ -138,10 +142,11 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
 
     T volume_inside=0;
     ARRAY<T_FACE> projected_elements(elements);
+    T mn=(T)op.range.min_corner(dir)/2,mx=(T)op.range.max_corner(dir)/2;
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++){
             projected_elements(i).X(j)=projected_elements(i).X(j)*coarse_factor-TV(sub_cell)-(T).5;
-            projected_elements(i).X(j)(dir)=clamp(projected_elements(i).X(j)(dir),(T)0,(T)1);}
+            projected_elements(i).X(j)(dir)=clamp(projected_elements(i).X(j)(dir),mn,mx);}
         volume_inside+=Volume(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)),dir);}
 
     // Check for full or empty cell.
@@ -151,14 +156,14 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
     Add_Uncut_Stencil(helper,cell,!inside);
     if(frac<1e-14) return;
 
-    ARRAY<MATRIX_ENTRY> open_entries; // stencil with no boundary conditions
-    RANGE<TV> box=RANGE<TV>(op.range)/2;
+    MULTIVARIATE_POLYNOMIAL<TV> poly(op.polynomial);
+    poly.Integrate(dir);
     TV_INT index0=op.index_offset0+cell;
     TV_INT index1=op.index_offset1+cell;
 
     T integral=0;
     for(int i=0;i<projected_elements.m;i++)
-        integral+=op.polynomial.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)))*projected_elements(i).Normal()(dir);
+        integral+=poly.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)))*projected_elements(i).Normal()(dir);
 
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,inside),integral));
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,!inside),-integral));
@@ -178,7 +183,7 @@ Cut_Elements(ARRAY<ARRAY<T_FACE>,TV_INT>& cut_elements,const ARRAY<T_FACE>& elem
             TV pt=domain.min_corner+domain.Edge_Lengths()*TV(new_size)/TV(size);
             typename BASIC_GEOMETRY_POLICY<TV>::HYPERPLANE plane(TV::Axis_Vector(a),pt);
             for(int i=0;i<elements.m;i++)
-                T_FACE::Cut_With_Hyperplane(elements(i),plane,t1,t0,1e-14);
+                T_FACE::Cut_With_Hyperplane(elements(i),plane,t0,t1,1e-14);
             RANGE<TV> domain0(domain),domain1(domain);
             RANGE<TV_INT> range0(range),range1(range);
             domain0.max_corner(a)=domain1.min_corner(a)=pt(a);
