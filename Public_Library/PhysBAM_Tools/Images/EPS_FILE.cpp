@@ -107,7 +107,7 @@ Write_Tail()
     Emit(shift);
     (*stream)<<"translate"<<std::endl;
     (*stream)<<scale<<" "<<scale<<" scale"<<std::endl;
-    (*stream)<<1/scale<<" setlinewidth"<<std::endl;
+    (*stream)<<3/scale<<" setlinewidth"<<std::endl;
 }
 //#####################################################################
 // Function Compute_Transform

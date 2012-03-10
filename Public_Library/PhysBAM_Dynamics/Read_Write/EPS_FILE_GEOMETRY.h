@@ -9,6 +9,7 @@
 namespace PhysBAM{
 
 template<class T> class TRIANGLE_2D;
+template<class T> class SEGMENT_2D;
 template<class TV> class SPHERE;
 
 template<class T>
@@ -17,7 +18,7 @@ class EPS_FILE_GEOMETRY:public EPS_FILE<T>
     typedef VECTOR<T,2> TV;
     typedef EPS_FILE<T> BASE;
 public:
-    using BASE::Line_Color;using BASE::stream;
+    using BASE::Line_Color;using BASE::stream;using BASE::Draw_Object;
 
     EPS_FILE_GEOMETRY(const std::string& filename,const RANGE<TV>& box=RANGE<TV>(TV(),TV(500,500)))
         :EPS_FILE<T>(filename,box)
@@ -31,11 +32,13 @@ public:
     {(*stream)<<"gsave ";Line_Color(color);Draw_Object(object);(*stream)<<"grestore"<<std::endl;}
 
     void Draw_Object(const TRIANGLE_2D<T>& tri)
-    {(*stream)<<tri.X[0]<<" moveto "<<tri.X[1]<<" lineto "<<tri.X[2]<<" lineto closepath stroke"<<std::endl;Bound(tri.X);}
+    {Draw_Line(tri.X[0],tri.X[1]);Draw_Line(tri.X[1],tri.X[2]);Draw_Line(tri.X[2],tri.X[0]);}
+
+    void Draw_Object(const SEGMENT_2D<T>& seg)
+    {Draw_Line(seg.x1,seg.x2);}
 
     void Draw_Object(const SPHERE<TV>& circle)
-    {(*stream)<<circle.center<<" "<<circle.radius<<" 0 360 arc stroke"<<std::endl;Bound(circle.center-circle.radius);Bound(circle.center+circle.radius);}
-
+    {Emit_Point(circle.center);(*stream)<<circle.radius<<" 0 360 arc stroke"<<std::endl;Bound(circle.center-circle.radius);Bound(circle.center+circle.radius);}
 
 //#####################################################################
 };
