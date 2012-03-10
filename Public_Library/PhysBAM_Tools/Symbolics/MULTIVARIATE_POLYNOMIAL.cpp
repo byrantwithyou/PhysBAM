@@ -223,6 +223,28 @@ Definite_Integral(const RANGE<TV>& domain) const
     return s;
 }
 //#####################################################################
+// Function Definite_Integral
+//#####################################################################
+template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
+Value(const TV& pt) const
+{
+    TV_INT max_power=Max_Power();
+    assert(max_power.Max()<20);
+    T powers[TV::m][20];
+    for(int i=0;i<TV::m;i++){
+        powers[i][0]=1;
+        for(int j=1;j<=max_power(i);j++)
+            powers[i][j]=powers[i][j-1]*pt(i);}
+    T s=0;
+    for(int i=0;i<terms.m;i++){
+        TV_INT p1=terms(i).power;
+        T t=terms(i).coeff;
+        for(int j=0;j<TV::m;j++)
+            t*=powers[j][terms(i).power(j)];
+        s+=t;}
+    return s;
+}
+//#####################################################################
 // Function Integrate_Over_Primitive
 //#####################################################################
 template<class TV> typename TV::ELEMENT MULTIVARIATE_POLYNOMIAL<TV>::
