@@ -16,18 +16,23 @@
 namespace PhysBAM{
 
 template<class T>
-struct PRIMITIVE
+class PRIMITIVE
 {
-    enum TYPE{EMPTY=0,POINT=1,SEGMENT,TRIANGLE};
+public:
+
+    enum TYPE{EMPTY,POINT,SEGMENT,TRIANGLE};
     typedef VECTOR<T,3> TV;
     
     VECTOR<TV,3> vertices;
     TYPE type;
+    int style;
+
+    ARRAY<VECTOR<TV, 3> > elements;
     
-    PRIMITIVE() {type=EMPTY;}
-    PRIMITIVE(const TV &a) {vertices(0)=a; type=POINT;}
-    PRIMITIVE(const TV &a,const TV &b) {vertices(0)=a; vertices(1)=b; type=SEGMENT;}
-    PRIMITIVE(const TV &a,const TV &b,const TV &c) {vertices(0)=a; vertices(1)=b; vertices(3)=c; type=TRIANGLE;}
+    PRIMITIVE();
+    PRIMITIVE(const TV &a,const int style);
+    PRIMITIVE(const TV &a,const TV &b,const int style);
+    PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style);
 };
 
 template<class T>
@@ -42,9 +47,9 @@ public:
     DEPTH_BUFFERING(){}
     ~DEPTH_BUFFERING(){}
     
-    int Add_Element(const TV &a) {primitives.Append(PRIMITIVE<T>(a)); return primitives.Size()-1;}
-    int Add_Element(const TV &a,const TV &b) {primitives.Append(PRIMITIVE<T>(a,b)); return primitives.Size()-1;}
-    int Add_Element(const TV &a,const TV &b,const TV &c) {primitives.Append(PRIMITIVE<T>(a,b,c)); return primitives.Size()-1;}
+    int Add_Element(const TV &a,const int style);
+    int Add_Element(const TV &a,const TV &b,const int style);
+    int Add_Element(const TV &a,const TV &b,const TV &c,const int style);
 
 //#####################################################################
 };
