@@ -6,4 +6,5 @@ Automatic_Program(env,"mc/view_case",["mc/view_case.cpp"])
 Automatic_Program(env,"mc/view_case2",["mc/view_case2.cpp"])
 Automatic_Program(env,"mc/view_levelset",["mc/view_levelset.cpp"])
 Automatic_Program(env,"mc/primitive_integration",["mc/primitive_integration.cpp"])
+Automatic_Program(env,"mc/depth_buffering",["mc/depth_buffering.cpp"])
 
