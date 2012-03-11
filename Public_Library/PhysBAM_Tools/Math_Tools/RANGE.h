@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Math_Tools/ZERO.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <cassert>
 #include <cfloat>
 #include <iostream>

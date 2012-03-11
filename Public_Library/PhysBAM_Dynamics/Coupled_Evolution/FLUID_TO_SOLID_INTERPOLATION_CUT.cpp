@@ -79,8 +79,8 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
                     SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
                     TV e1=segment.Point_From_Barycentric_Coordinates(e.a);
                     TV e2=segment.Point_From_Barycentric_Coordinates(e.b);
-                    eps.Line_Color(VECTOR<T,3>::Axis_Vector((i+1)%3));
-                    eps.Draw_Line(e1,e2);}}
+                    eps.cur_format.line_color=VECTOR<T,3>::Axis_Vector((i+1)%3);
+                    eps.Draw_Object(e1,e2);}}
             PHYSBAM_ASSERT(number_cut<=2);}
 
         for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next())

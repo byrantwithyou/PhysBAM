@@ -2,7 +2,6 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_ORIGIN_AREAS.h>
-#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 
 //extern PhysBAM::ARRAY<int> trap_cases;
 using namespace PhysBAM;

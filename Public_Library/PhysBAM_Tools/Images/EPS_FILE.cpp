@@ -6,10 +6,15 @@ template<class T> EPS_FILE<T>::
 // Constructor
 //#####################################################################
 EPS_FILE(const std::string& filename,const RANGE<TV>& box)
-    :stream(FILE_UTILITIES::Safe_Open_Output(filename,false,false)),bounding_box(RANGE<TV>::Empty_Box()),output_box(box),fixed_bounding_box(false),
-    head_offset(0)
+    :VECTOR_IMAGE<T>(filename,box),head_offset(0),effective_line_width(-1),effective_point_radius(-1),effective_line_opacity(-1),effective_fill_opacity(-1)
 {
-    Write_Head();
+    stream<<"%!PS-Adobe-3.0 EPSF-3.0"<<std::endl;
+    stream<<"%%BoundingBox: ";
+    Emit(output_box.min_corner);
+    Emit(output_box.max_corner);
+    stream<<std::endl;
+    head_offset=stream.tellp();
+    stream<<"                                                                                                    "<<std::endl;
 }
 //#####################################################################
 // Destructor
@@ -17,16 +22,15 @@ EPS_FILE(const std::string& filename,const RANGE<TV>& box)
 template<class T> EPS_FILE<T>::
 ~EPS_FILE()
 {
-    Finish();
-    delete stream;
-}
-//#####################################################################
-// Function Finish
-//#####################################################################
-template<class T> void EPS_FILE<T>::
-Finish()
-{
-    Write_Tail();
+    if(!stream) return;
+    T scale;
+    TV shift;
+    Compute_Transform(scale,shift);
+    stream.seekp(head_offset,std::ios::beg);
+    Emit(shift);
+    stream<<"translate"<<std::endl;
+    stream<<scale<<" "<<scale<<" scale"<<std::endl;
+    stream<<3/scale<<" setlinewidth"<<std::endl;
 }
 //#####################################################################
 // Function Emit
@@ -34,7 +38,7 @@ Finish()
 template<class T> void EPS_FILE<T>::
 Emit(const std::string& str)
 {
-    (*stream)<<str<<" ";
+    stream<<str<<" ";
 }
 //#####################################################################
 // Function Emit
@@ -42,72 +46,7 @@ Emit(const std::string& str)
 template<class T> void EPS_FILE<T>::
 Emit(const TV &pt)
 {
-    (*stream)<<pt.x<<" "<<pt.y<<" ";
-}
-//#####################################################################
-// Function Bound
-//#####################################################################
-template<class T> void EPS_FILE<T>::
-Bound(const TV& pt)
-{
-    if(!fixed_bounding_box) bounding_box.Enlarge_To_Include_Point(pt);
-}
-//#####################################################################
-// Function Bound
-//#####################################################################
-template<class T> template<int d> void EPS_FILE<T>::
-Bound(const VECTOR<TV,d>& pts)
-{
-    for(int i=0;i<d;i++) Bound(pts(i));
-}
-//#####################################################################
-// Function Draw_Object_Colored
-//#####################################################################
-template<class T> template<class T_OBJECT> void EPS_FILE<T>::
-Draw_Object_Colored(const T_OBJECT& object,const VECTOR<T,3>& color)
-{
-    (*stream)<<"gsave ";
-    Line_Color(color);
-    Draw_Object(object);
-    (*stream)<<"grestore"<<std::endl;
-}
-//#####################################################################
-// Function Line_Color
-//#####################################################################
-template<class T> void EPS_FILE<T>::
-Line_Color(const VECTOR<T,3>& color)
-{
-    (*stream)<<color.x<<" "<<color.y<<" "<<color.z<<" setrgbcolor"<<std::endl;
-}
-//#####################################################################
-// Function Write_Head
-//#####################################################################
-template<class T> void EPS_FILE<T>::
-Write_Head()
-{
-    (*stream)<<"%!PS-Adobe-3.0 EPSF-3.0"<<std::endl;
-    (*stream)<<"%%BoundingBox: ";
-    Emit(output_box.min_corner);
-    Emit(output_box.max_corner);
-    (*stream)<<std::endl;
-    head_offset=stream->tellp();
-    (*stream)<<"                                                                                                    "<<std::endl;
-    Set_Point_Size((T)0.01);
-}
-//#####################################################################
-// Function Write_Tail
-//#####################################################################
-template<class T> void EPS_FILE<T>::
-Write_Tail()
-{
-    T scale;
-    TV shift;
-    Compute_Transform(scale,shift);
-    stream->seekp(head_offset,std::ios::beg);
-    Emit(shift);
-    (*stream)<<"translate"<<std::endl;
-    (*stream)<<scale<<" "<<scale<<" scale"<<std::endl;
-    (*stream)<<3/scale<<" setlinewidth"<<std::endl;
+    stream<<pt.x<<" "<<pt.y<<" ";
 }
 //#####################################################################
 // Function Compute_Transform
@@ -123,47 +62,114 @@ Compute_Transform(T& scale,TV& shift)
         shift=output_box.min_corner-bounding_box.min_corner*scale;}
 }
 //#####################################################################
-// Function Set_Point_Size
+// Function Update_Effective_Formatting
 //#####################################################################
 template<class T> void EPS_FILE<T>::
-Set_Point_Size(T size)
+Update_Effective_Formatting()
 {
-    (*stream)<<"/pointradius "<<size<<" def"<<std::endl;
+    if(effective_line_color!=cur_format.line_color){
+        effective_line_color=cur_format.line_color;
+        stream<<effective_line_color.x<<" "<<effective_line_color.y<<" "<<effective_line_color.z<<" setrgbcolor"<<std::endl;}
+//    VECTOR<T,3> effective_fill_color;
+//    T effective_line_width,effective_point_radius,effective_line_opacity,effective_fill_opacity;
 }
 //#####################################################################
 // Function Draw_Point
 //#####################################################################
 template<class T> void EPS_FILE<T>::
-Draw_Point(const TV &pt)
+Emit_Object(const TV &pt,T radius)
 {
+    if(!cur_format.line_style && !cur_format.fill_style) return;
+    Update_Effective_Formatting();
+    Emit("newpath");
     Emit(pt);
-    (*stream)<<"newpath pointradius 0 360 arc closepath fill stroke"<<std::endl;
-    Bound(pt);
+    stream<<radius<<" 0 360 arc closepath";
+    if(cur_format.fill_style) Emit("fill");
+    if(cur_format.line_style) Emit("stroke");
+    stream<<std::endl;
 }
 //#####################################################################
 // Function Draw_Line
 //#####################################################################
 template<class T> void EPS_FILE<T>::
-Draw_Line(const TV &a,const TV &b)
+Emit_Object(const TV &a,const TV &b)
 {
-    Emit(a);
-    (*stream)<<"moveto ";
-    Emit(b);
-    (*stream)<<"lineto stroke"<<std::endl;
-    Bound(a);
-    Bound(b);
+    if(!cur_format.line_style) return;
+    Update_Effective_Formatting();
+    Mt(a);
+    Lt(b);
+    stream<<"stroke"<<std::endl;
 }
 //#####################################################################
 // Function Draw_Object
 //#####################################################################
 template<class T> void EPS_FILE<T>::
-Draw_Object(const RANGE<TV>& box)
+Emit_Object(const TV &a,const TV &b,const TV &c)
 {
+    if(!cur_format.line_style && !cur_format.fill_style) return;
+    Update_Effective_Formatting();
+    Emit("newpath");
+    Mt(a);
+    Lt(b);
+    Lt(c);
+    Emit("closepath");
+    if(cur_format.fill_style) Emit("fill");
+    if(cur_format.line_style) Emit("stroke");
+    stream<<std::endl;
+}
+//#####################################################################
+// Function Draw_Object
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Emit_Object(const RANGE<TV>& box)
+{
+    if(!cur_format.line_style && !cur_format.fill_style) return;
+    Update_Effective_Formatting();
     TV a(box.min_corner.x,box.max_corner.y),b(box.max_corner.x,box.min_corner.y);
-    Draw_Line(box.min_corner,a);
-    Draw_Line(box.min_corner,b);
-    Draw_Line(box.max_corner,a);
-    Draw_Line(box.max_corner,b);
+    Emit("newpath");
+    Mt(box.min_corner);
+    Lt(a);
+    Lt(box.max_corner);
+    Lt(b);
+    Emit("closepath");
+    if(cur_format.fill_style) Emit("fill");
+    if(cur_format.line_style) Emit("stroke");
+    stream<<std::endl;
+}
+//#####################################################################
+// Function Draw_Object
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Emit_Object(ARRAY_VIEW<TV> pts)
+{
+    if(!cur_format.line_style && !cur_format.fill_style) return;
+    Update_Effective_Formatting();
+    if(!pts.Size()) return;
+    Emit("newpath");
+    Mt(pts(0));
+    for(int i=1;i<pts.Size();i++) Lt(pts(i));
+    Emit("closepath");
+    if(cur_format.fill_style) Emit("fill");
+    if(cur_format.line_style) Emit("stroke");
+    stream<<std::endl;
+}
+//#####################################################################
+// Function Mt
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Mt(const TV &pt)
+{
+    Emit(pt);
+    Emit("moveto");
+}
+//#####################################################################
+// Function Lt
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Lt(const TV &pt)
+{
+    Emit(pt);
+    Emit("lineto");
 }
 template class EPS_FILE<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
