@@ -42,25 +42,13 @@ DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style):style(sty
 //#####################################################################
 // Function Initialize_Bounding_Box
 //#####################################################################
-template<class T> void DISPLAY_PRIMITIVE<T>::
+template<class T> void DISPLAY_PRIMITIVE_CUTTING<T>::
 Initialize_Bounding_Box()
 {
     bounding_box=RANGE<TV2>::Bounding_Box(
         DB::Project(vertices(0)),
         DB::Project(vertices(1)),
         DB::Project(vertices(2)));
-}
-//#####################################################################
-// Function Centroid
-//#####################################################################
-template<class T> VECTOR<T,3> DISPLAY_PRIMITIVE<T>::
-Centroid()
-{
-    switch(type){
-        case TRIANGLE: return (vertices(0)+vertices(1)+vertices(2))/3; break;
-        case SEGMENT: return (vertices(0)+vertices(1))/2; break;
-        case POINT: return vertices(0); break;
-        default: PHYSBAM_FATAL_ERROR(); return TV(); break;}
 }
 //#####################################################################
 // Function Initialize_Elements
@@ -98,7 +86,7 @@ Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p)
                 Cut_By_Plane(PLANE<T>(TV(0,-1,0),p.vertices(0)+TV(0,-1,0)*DB_TOL_POINT));
                 Cut_By_Plane(PLANE<T>(TV(0,0,-1),p.vertices(0)+TV(0,0,-1)*DB_TOL_POINT));
             }break;
-            default:break;
+            default: PHYSBAM_FATAL_ERROR();
         }
     }
 }
@@ -143,6 +131,18 @@ Cut_By_Plane(const PLANE<T> &p,T tol)
     elements.Exchange(cut_elements);    
 }
 //#####################################################################
+// Function Centroid
+//#####################################################################
+template<class T> T DISPLAY_PRIMITIVE_ORDERING<T>::
+Centroid() const
+{
+    switch(type){
+        case TRIANGLE: return (vertices(0).z+vertices(1).z+vertices(2).z)/3; break;
+        case SEGMENT: return (vertices(0).z+vertices(1).z)/2+DB_SIZE_SEGMENT; break;
+        case POINT: return vertices(0).z+DB_SIZE_POINT; break;
+        default: PHYSBAM_FATAL_ERROR(); return 0;}
+}
+//#####################################################################
 // Function Get_Cutting_Plane
 //#####################################################################
 template<class T> PLANE<T> DEPTH_BUFFERING<T>::
@@ -180,14 +180,26 @@ Add_Element(const TV &a,const TV &b,const TV &c,const int style)
 //#####################################################################
 // Function Process_Primitives
 //#####################################################################
-template<class T> void DEPTH_BUFFERING<T>::
+template<class T> ARRAY<DISPLAY_PRIMITIVE_ORDERING<T> >& DEPTH_BUFFERING<T>::
 Process_Primitives()
 {
     for(int i=0;i<primitives_cutting.m;i++) {
         primitives_cutting(i).Initialize_Elements();
         primitives_cutting(i).Initialize_Bounding_Box();
     };
-    for(int i=0;i<primitives_cutting.m;i++) for(int j=0;j<primitives_cutting.m;j++) if(i!=j) primitives_cutting(i).Cut_By_Primitive(primitives_cutting(j));
+    for(int i=0;i<primitives_cutting.m;i++) 
+        for(int j=0;j<primitives_cutting.m;j++)
+            if(i!=j)
+                primitives_cutting(i).Cut_By_Primitive(primitives_cutting(j));
+    primitives_ordering.Clean_Memory();
+    for(int i=0;i<primitives_cutting.m;i++){
+        ARRAY<VECTOR<TV, 3> >& elements=primitives_cutting(i).elements;
+        PRIMITIVE_TYPE type=primitives_cutting(i).type;
+        int style=primitives_cutting(i).style;
+        for(int j=0;j<elements.m;j++)
+            primitives_ordering.Append(DISPLAY_PRIMITIVE_ORDERING<T>(elements(i),type,style,i));}
+    primitives_ordering.Sort();
+    return primitives_ordering;
 }
 //#####################################################################
 template class DISPLAY_PRIMITIVE<float>;

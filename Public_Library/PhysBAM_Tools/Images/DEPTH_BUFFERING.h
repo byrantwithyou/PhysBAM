@@ -23,6 +23,8 @@ namespace PhysBAM{
 
 template<class T> class DEPTH_BUFFERING;
 
+enum PRIMITIVE_TYPE{EMPTY=0,POINT,SEGMENT,TRIANGLE};
+
 template<class T>
 class DISPLAY_PRIMITIVE
 {
@@ -32,10 +34,8 @@ class DISPLAY_PRIMITIVE
 
 public:
 
-    enum TYPE{EMPTY=0,POINT,SEGMENT,TRIANGLE};
-    
     VECTOR<TV,3> vertices;
-    TYPE type;
+    PRIMITIVE_TYPE type;
     int style;
     RANGE<TV2> bounding_box;
 
@@ -43,8 +43,6 @@ public:
     DISPLAY_PRIMITIVE(const TV &a,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style);
-    void Initialize_Bounding_Box();
-    VECTOR<T,3> Centroid();
 };
 
 template<class T>
@@ -55,10 +53,9 @@ class DISPLAY_PRIMITIVE_CUTTING:public DISPLAY_PRIMITIVE<T>
     typedef DEPTH_BUFFERING<T> DB;
     typedef DISPLAY_PRIMITIVE<T> BASE;
 
-    using BASE::EMPTY;using BASE::POINT;using BASE::SEGMENT;using BASE::TRIANGLE;
-    using BASE::vertices;using BASE::type;using BASE::style;using BASE::bounding_box;
-
 public:
+
+    using BASE::vertices;using BASE::type;using BASE::style;using BASE::bounding_box;
 
     DISPLAY_PRIMITIVE_CUTTING():DISPLAY_PRIMITIVE<T>(){}
     DISPLAY_PRIMITIVE_CUTTING(const TV &a,const int style):DISPLAY_PRIMITIVE<T>(a,style){}
@@ -66,6 +63,7 @@ public:
     DISPLAY_PRIMITIVE_CUTTING(const TV &a,const TV &b,const TV &c,const int style):DISPLAY_PRIMITIVE<T>(a,b,c,style){}
         
     ARRAY<VECTOR<TV, 3> > elements;
+    void Initialize_Bounding_Box();
     void Initialize_Elements();
     void Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p);
     void Cut_By_Plane(const PLANE<T> &p,T tol=DB_TOL_PLANE);
@@ -79,17 +77,22 @@ class DISPLAY_PRIMITIVE_ORDERING:public DISPLAY_PRIMITIVE<T>
     typedef DEPTH_BUFFERING<T> DB;
     typedef DISPLAY_PRIMITIVE<T> BASE;
 
-    using BASE::EMPTY;using BASE::POINT;using BASE::SEGMENT;using BASE::TRIANGLE;
+public:
+
     using BASE::vertices;using BASE::type;using BASE::style;using BASE::bounding_box;
 
-public:
-    
     int parent;
-
+    
     DISPLAY_PRIMITIVE_ORDERING():DISPLAY_PRIMITIVE<T>(){}
-    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const int style,const int parent):DISPLAY_PRIMITIVE<T>(a,style),parent(parent){}
-    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const int style,const int parent):DISPLAY_PRIMITIVE<T>(a,b,style),parent(parent){}
-    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const TV &c,const int style,const int parent):DISPLAY_PRIMITIVE<T>(a,b,c,style),parent(parent){}
+    DISPLAY_PRIMITIVE_ORDERING(const VECTOR<TV,3> vertices,const PRIMITIVE_TYPE type, const int style,const int parent){
+        this->vertices=vertices;
+        this->type=type;
+        this->style=style;
+        this->parent=parent;
+    }
+
+    T Centroid() const;
+    bool operator< (const DISPLAY_PRIMITIVE_ORDERING<T>& p) const {return (Centroid()<p.Centroid());}
 };
 
 template<class T>
@@ -114,7 +117,7 @@ public:
     int Add_Element(const TV &a,const TV &b,const int style);
     int Add_Element(const TV &a,const TV &b,const TV &c,const int style);
 
-    void Process_Primitives();
+    ARRAY<DISPLAY_PRIMITIVE_ORDERING<T> >& Process_Primitives();
 //#####################################################################
 };
 }
