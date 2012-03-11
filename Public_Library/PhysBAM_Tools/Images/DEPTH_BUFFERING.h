@@ -62,7 +62,7 @@ public:
 
     static VECTOR<T,2> Project(const VECTOR<T,3> &a) {return VECTOR<T,2>(a(0),a(1));}
     static VECTOR<T,3> Embed  (const VECTOR<T,2> &a) {return VECTOR<T,3>(a(0),a(1),0);}
-    static PLANE<T> Cutting_Plane(const TV &a,const TV &b);
+    static PLANE<T> Get_Cutting_Plane(const TV &a,const TV &b);
 
     int Add_Element(const TV &a,const int style);
     int Add_Element(const TV &a,const TV &b,const int style);

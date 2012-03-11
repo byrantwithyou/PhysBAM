@@ -63,18 +63,12 @@ Initialize_Bounding_Box()
 template<class T> void DISPLAY_PRIMITIVE<T>::
 Cut_By_Primitive(const DISPLAY_PRIMITIVE<T> &p)
 {
-    if(!(type==POINT||p.type==POINT||RANGE<TV2>::Intersect(bounding_box,p.bounding_box).Empty())){
-        switch(p.type){
-            case SEGMENT:{
-                Cut_By_Plane(DB::Cutting_Plane(p.vertices(0),p.vertices(1)));
-            }break;
-            case TRIANGLE:{
-                Cut_By_Plane(DB::Cutting_Plane(p.vertices(0),p.vertices(1)));
-                Cut_By_Plane(DB::Cutting_Plane(p.vertices(1),p.vertices(2)));
-                Cut_By_Plane(DB::Cutting_Plane(p.vertices(2),p.vertices(0)));
-                Cut_By_Plane(PLANE<T>(p.vertices(0),p.vertices(1),p.vertices(2)));
-            }break;
-            default:;}}
+    if(p.type==TRIANGLE && type!=POINT && !RANGE<TV2>::Intersect(bounding_box,p.bounding_box).Empty()){
+        Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(0),p.vertices(1)));
+        Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(1),p.vertices(2)));
+        Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(2),p.vertices(0)));
+        Cut_By_Plane(PLANE<T>(p.vertices(0),p.vertices(1),p.vertices(2)));
+    }
 }
 //#####################################################################
 // Function Cut_By_Plane
@@ -85,10 +79,10 @@ Cut_By_Plane(const PLANE<T> &p)
     
 }
 //#####################################################################
-// Function Cutting_Plane
+// Function Get_Cutting_Plane
 //#####################################################################
 template<class T> PLANE<T> DEPTH_BUFFERING<T>::
-Cutting_Plane(const TV &a,const TV &b)
+Get_Cutting_Plane(const TV &a,const TV &b)
 { 
     return PLANE<T>(Embed(Project(a-b).Rotate_Clockwise_90().Normalized()),a);
 }
