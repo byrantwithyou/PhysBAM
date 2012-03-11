@@ -26,7 +26,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
-#include <PhysBAM_Dynamics/Read_Write/Particles/READ_WRITE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Class MERGER

@@ -9,10 +9,10 @@
 
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
 #include <PhysBAM_Tools/Math_Tools/ZERO.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLES_FORWARD.h>
 #include "QUANTITY.h"
 #include <boost/type_traits/is_integral.hpp>
 namespace PhysBAM{

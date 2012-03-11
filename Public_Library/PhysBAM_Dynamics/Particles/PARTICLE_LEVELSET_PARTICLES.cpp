@@ -3,8 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
+#include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
