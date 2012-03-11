@@ -51,6 +51,18 @@ Initialize_Bounding_Box()
         DB::Project(vertices(2)));
 }
 //#####################################################################
+// Function Centroid
+//#####################################################################
+template<class T> VECTOR<T,3> DISPLAY_PRIMITIVE<T>::
+Centroid()
+{
+    switch(type){
+        case TRIANGLE: return (vertices(0)+vertices(1)+vertices(2))/3; break;
+        case SEGMENT: return (vertices(0)+vertices(1))/2; break;
+        case POINT: return vertices(0); break;
+        default: PHYSBAM_FATAL_ERROR(); return TV(); break;}
+}
+//#####################################################################
 // Function Initialize_Elements
 //#####################################################################
 template<class T> void DISPLAY_PRIMITIVE_CUTTING<T>::
@@ -65,11 +77,29 @@ Initialize_Elements()
 template<class T> void DISPLAY_PRIMITIVE_CUTTING<T>::
 Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p)
 {
-    if(p.type==TRIANGLE && type!=POINT && !RANGE<TV2>::Intersect(bounding_box,p.bounding_box).Empty()){
-        Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(0),p.vertices(1)));
-        Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(1),p.vertices(2)));
-        Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(2),p.vertices(0)));
-        Cut_By_Plane(PLANE<T>(p.vertices(0),p.vertices(1),p.vertices(2)));
+    if(type!=POINT && !RANGE<TV2>::Intersect(bounding_box,p.bounding_box).Empty()){
+        switch(p.type){
+            case TRIANGLE:{
+                Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(0),p.vertices(1)));
+                Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(1),p.vertices(2)));
+                Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(2),p.vertices(0)));
+                Cut_By_Plane(PLANE<T>(p.vertices(0),p.vertices(1),p.vertices(2)));
+            }break;
+            case SEGMENT:{
+                PLANE<T> plane=DB::Get_Cutting_Plane(p.vertices(0),p.vertices(1));
+                Cut_By_Plane(PLANE<T>(plane.normal,plane.x1+plane.normal*DB_TOL_SEGMENT));
+                Cut_By_Plane(PLANE<T>(plane.normal,plane.x1-plane.normal*DB_TOL_SEGMENT));
+            }break;
+            case POINT:{
+                Cut_By_Plane(PLANE<T>(TV(1,0,0),p.vertices(0)+TV(1,0,0)*DB_TOL_POINT));
+                Cut_By_Plane(PLANE<T>(TV(0,1,0),p.vertices(0)+TV(0,1,0)*DB_TOL_POINT));
+                Cut_By_Plane(PLANE<T>(TV(0,0,1),p.vertices(0)+TV(0,0,1)*DB_TOL_POINT));
+                Cut_By_Plane(PLANE<T>(TV(-1,0,0),p.vertices(0)+TV(-1,0,0)*DB_TOL_POINT));
+                Cut_By_Plane(PLANE<T>(TV(0,-1,0),p.vertices(0)+TV(0,-1,0)*DB_TOL_POINT));
+                Cut_By_Plane(PLANE<T>(TV(0,0,-1),p.vertices(0)+TV(0,0,-1)*DB_TOL_POINT));
+            }break;
+            default:break;
+        }
     }
 }
 //#####################################################################
@@ -158,8 +188,6 @@ Process_Primitives()
         primitives_cutting(i).Initialize_Bounding_Box();
     };
     for(int i=0;i<primitives_cutting.m;i++) for(int j=0;j<primitives_cutting.m;j++) if(i!=j) primitives_cutting(i).Cut_By_Primitive(primitives_cutting(j));
-    
-    
 }
 //#####################################################################
 template class DISPLAY_PRIMITIVE<float>;

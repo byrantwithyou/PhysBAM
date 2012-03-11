@@ -13,6 +13,12 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 
+#define DB_TOL_PLANE    1e-7
+#define DB_TOL_POINT    2e-2
+#define DB_TOL_SEGMENT  1e-2
+#define DB_SIZE_POINT   2e-2
+#define DB_SIZE_SEGMENT 1e-2
+
 namespace PhysBAM{
 
 template<class T> class DEPTH_BUFFERING;
@@ -38,6 +44,7 @@ public:
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style);
     void Initialize_Bounding_Box();
+    VECTOR<T,3> Centroid();
 };
 
 template<class T>
@@ -61,7 +68,7 @@ public:
     ARRAY<VECTOR<TV, 3> > elements;
     void Initialize_Elements();
     void Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p);
-    void Cut_By_Plane(const PLANE<T> &p,T tol=0);
+    void Cut_By_Plane(const PLANE<T> &p,T tol=DB_TOL_PLANE);
 };
 
 template<class T>
@@ -80,9 +87,9 @@ public:
     int parent;
 
     DISPLAY_PRIMITIVE_ORDERING():DISPLAY_PRIMITIVE<T>(){}
-    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const int style):DISPLAY_PRIMITIVE<T>(a,style){}
-    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const int style):DISPLAY_PRIMITIVE<T>(a,b,style){}
-    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const TV &c,const int style):DISPLAY_PRIMITIVE<T>(a,b,c,style){}
+    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const int style,const int parent):DISPLAY_PRIMITIVE<T>(a,style),parent(parent){}
+    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const int style,const int parent):DISPLAY_PRIMITIVE<T>(a,b,style),parent(parent){}
+    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const TV &c,const int style,const int parent):DISPLAY_PRIMITIVE<T>(a,b,c,style),parent(parent){}
 };
 
 template<class T>
