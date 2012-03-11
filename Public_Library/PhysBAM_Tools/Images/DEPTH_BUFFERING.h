@@ -20,31 +20,69 @@ template<class T> class DEPTH_BUFFERING;
 template<class T>
 class DISPLAY_PRIMITIVE
 {
-public:
-
     typedef VECTOR<T,3> TV;
     typedef VECTOR<T,2> TV2;
     typedef DEPTH_BUFFERING<T> DB;
+
+public:
 
     enum TYPE{EMPTY=0,POINT,SEGMENT,TRIANGLE};
     
     VECTOR<TV,3> vertices;
     TYPE type;
     int style;
-
     RANGE<TV2> bounding_box;
-    ARRAY<VECTOR<TV, 3> > elements;
 
     DISPLAY_PRIMITIVE() {type=EMPTY;}
     DISPLAY_PRIMITIVE(const TV &a,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style);
-
     void Initialize_Bounding_Box();
+};
+
+template<class T>
+class DISPLAY_PRIMITIVE_CUTTING:public DISPLAY_PRIMITIVE<T>
+{
+    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,2> TV2;
+    typedef DEPTH_BUFFERING<T> DB;
+    typedef DISPLAY_PRIMITIVE<T> BASE;
+
+    using BASE::EMPTY;using BASE::POINT;using BASE::SEGMENT;using BASE::TRIANGLE;
+    using BASE::vertices;using BASE::type;using BASE::style;using BASE::bounding_box;
+
+public:
+
+    DISPLAY_PRIMITIVE_CUTTING():DISPLAY_PRIMITIVE<T>(){}
+    DISPLAY_PRIMITIVE_CUTTING(const TV &a,const int style):DISPLAY_PRIMITIVE<T>(a,style){}
+    DISPLAY_PRIMITIVE_CUTTING(const TV &a,const TV &b,const int style):DISPLAY_PRIMITIVE<T>(a,b,style){}
+    DISPLAY_PRIMITIVE_CUTTING(const TV &a,const TV &b,const TV &c,const int style):DISPLAY_PRIMITIVE<T>(a,b,c,style){}
+        
+    ARRAY<VECTOR<TV, 3> > elements;
     void Initialize_Elements();
-    
-    void Cut_By_Primitive(const DISPLAY_PRIMITIVE<T> &p);
+    void Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p);
     void Cut_By_Plane(const PLANE<T> &p,T tol=0);
+};
+
+template<class T>
+class DISPLAY_PRIMITIVE_ORDERING:public DISPLAY_PRIMITIVE<T>
+{
+    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,2> TV2;
+    typedef DEPTH_BUFFERING<T> DB;
+    typedef DISPLAY_PRIMITIVE<T> BASE;
+
+    using BASE::EMPTY;using BASE::POINT;using BASE::SEGMENT;using BASE::TRIANGLE;
+    using BASE::vertices;using BASE::type;using BASE::style;using BASE::bounding_box;
+
+public:
+    
+    int parent;
+
+    DISPLAY_PRIMITIVE_ORDERING():DISPLAY_PRIMITIVE<T>(){}
+    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const int style):DISPLAY_PRIMITIVE<T>(a,style){}
+    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const int style):DISPLAY_PRIMITIVE<T>(a,b,style){}
+    DISPLAY_PRIMITIVE_ORDERING(const TV &a,const TV &b,const TV &c,const int style):DISPLAY_PRIMITIVE<T>(a,b,c,style){}
 };
 
 template<class T>
@@ -53,9 +91,10 @@ class DEPTH_BUFFERING
     typedef VECTOR<T,3> TV;
     typedef VECTOR<T,2> TV2;
 
-    ARRAY<DISPLAY_PRIMITIVE<T> > primitives;
-
 public:
+
+    ARRAY<DISPLAY_PRIMITIVE_CUTTING<T> > primitives_cutting;
+    ARRAY<DISPLAY_PRIMITIVE_ORDERING<T> > primitives_ordering;
 
     DEPTH_BUFFERING(){}
     ~DEPTH_BUFFERING(){}

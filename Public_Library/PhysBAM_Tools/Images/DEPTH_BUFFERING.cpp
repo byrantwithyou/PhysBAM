@@ -40,15 +40,6 @@ DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style):style(sty
     vertices(2)=c;
 }
 //#####################################################################
-// Function Initialize_Elements
-//#####################################################################
-template<class T> void DISPLAY_PRIMITIVE<T>::
-Initialize_Elements()
-{
-    elements.Clean_Memory();
-    elements.Append(vertices);
-}
-//#####################################################################
 // Function Initialize_Bounding_Box
 //#####################################################################
 template<class T> void DISPLAY_PRIMITIVE<T>::
@@ -60,10 +51,19 @@ Initialize_Bounding_Box()
         DB::Project(vertices(2)));
 }
 //#####################################################################
+// Function Initialize_Elements
+//#####################################################################
+template<class T> void DISPLAY_PRIMITIVE_CUTTING<T>::
+Initialize_Elements()
+{
+    elements.Clean_Memory();
+    elements.Append(vertices);
+}
+//#####################################################################
 // Function Cut_By_Primitive
 //#####################################################################
-template<class T> void DISPLAY_PRIMITIVE<T>::
-Cut_By_Primitive(const DISPLAY_PRIMITIVE<T> &p)
+template<class T> void DISPLAY_PRIMITIVE_CUTTING<T>::
+Cut_By_Primitive(const DISPLAY_PRIMITIVE_CUTTING<T> &p)
 {
     if(p.type==TRIANGLE && type!=POINT && !RANGE<TV2>::Intersect(bounding_box,p.bounding_box).Empty()){
         Cut_By_Plane(DB::Get_Cutting_Plane(p.vertices(0),p.vertices(1)));
@@ -75,20 +75,21 @@ Cut_By_Primitive(const DISPLAY_PRIMITIVE<T> &p)
 //#####################################################################
 // Function Cut_By_Plane
 //#####################################################################
-template<class T> void DISPLAY_PRIMITIVE<T>::
+template<class T> void DISPLAY_PRIMITIVE_CUTTING<T>::
 Cut_By_Plane(const PLANE<T> &p,T tol)
 {
     ARRAY<VECTOR<TV, 3> > cut_elements;
-    for(int i=0;i<elements.m;i++){
-        if(type==SEGMENT){
+    if(type==SEGMENT){
+        for(int i=0;i<elements.m;i++){
             VECTOR<T,2> phi_nodes;
             for(int i=0;i<2;i++){phi_nodes(i)=p.Signed_Distance(vertices(i));}
             if(phi_nodes(0)*phi_nodes(1)<0){
                 T theta=LEVELSET_UTILITIES<T>::Theta(phi_nodes(0),phi_nodes(1));
                 TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(vertices(0),vertices(1),theta);
                 if(theta>tol) cut_elements.Append(VECTOR<TV,3>(vertices(0),interface_location,interface_location));
-                if(1-theta>tol) cut_elements.Append(VECTOR<TV,3>(interface_location,vertices(1),vertices(1)));}}
-        if(type==TRIANGLE){
+                if(1-theta>tol) cut_elements.Append(VECTOR<TV,3>(interface_location,vertices(1),vertices(1)));}}}
+    if(type==TRIANGLE){
+        for(int i=0;i<elements.m;i++){
             VECTOR<T,3> phi_nodes;
             for(int i=0;i<3;i++){phi_nodes(i)=p.Signed_Distance(vertices(i));}
             int positive_count=0,single_node_sign;
@@ -125,8 +126,8 @@ Get_Cutting_Plane(const TV &a,const TV &b)
 template<class T> int DEPTH_BUFFERING<T>::
 Add_Element(const TV &a,const int style)
 { 
-    primitives.Append(DISPLAY_PRIMITIVE<T>(a,style));
-    return primitives.Size()-1;
+    primitives_cutting.Append(DISPLAY_PRIMITIVE_CUTTING<T>(a,style));
+    return primitives_cutting.Size()-1;
 }
 //#####################################################################
 // Function Add_Element
@@ -134,8 +135,8 @@ Add_Element(const TV &a,const int style)
 template<class T> int DEPTH_BUFFERING<T>::
 Add_Element(const TV &a,const TV &b,const int style)
 {
-    primitives.Append(DISPLAY_PRIMITIVE<T>(a,b,style));
-    return primitives.Size()-1;
+    primitives_cutting.Append(DISPLAY_PRIMITIVE_CUTTING<T>(a,b,style));
+    return primitives_cutting.Size()-1;
 }
 //#####################################################################
 // Function Add_Element
@@ -143,8 +144,8 @@ Add_Element(const TV &a,const TV &b,const int style)
 template<class T> int DEPTH_BUFFERING<T>::
 Add_Element(const TV &a,const TV &b,const TV &c,const int style)
 {
-    primitives.Append(DISPLAY_PRIMITIVE<T>(a,b,c,style));
-    return primitives.Size()-1;
+    primitives_cutting.Append(DISPLAY_PRIMITIVE_CUTTING<T>(a,b,c,style));
+    return primitives_cutting.Size()-1;
 }
 //#####################################################################
 // Function Process_Primitives
@@ -152,11 +153,13 @@ Add_Element(const TV &a,const TV &b,const TV &c,const int style)
 template<class T> void DEPTH_BUFFERING<T>::
 Process_Primitives()
 {
-    for(int i=0;i<primitives.m;i++) {
-        primitives(i).Initialize_Elements();
-        primitives(i).Initialize_Bounding_Box();
+    for(int i=0;i<primitives_cutting.m;i++) {
+        primitives_cutting(i).Initialize_Elements();
+        primitives_cutting(i).Initialize_Bounding_Box();
     };
-    for(int i=0;i<primitives.m;i++) for(int j=0;j<primitives.m;j++) if(i!=j) primitives(i).Cut_By_Primitive(primitives(j));
+    for(int i=0;i<primitives_cutting.m;i++) for(int j=0;j<primitives_cutting.m;j++) if(i!=j) primitives_cutting(i).Cut_By_Primitive(primitives_cutting(j));
+    
+    
 }
 //#####################################################################
 template class DISPLAY_PRIMITIVE<float>;
