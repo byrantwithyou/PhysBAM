@@ -44,7 +44,7 @@ public:
     void Initialize_Elements();
     
     void Cut_By_Primitive(const DISPLAY_PRIMITIVE<T> &p);
-    void Cut_By_Plane(const PLANE<T> &p);
+    void Cut_By_Plane(const PLANE<T> &p,T tol=0);
 };
 
 template<class T>

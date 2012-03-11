@@ -3,6 +3,8 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Images/DEPTH_BUFFERING.h>
+#include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -74,9 +76,40 @@ Cut_By_Primitive(const DISPLAY_PRIMITIVE<T> &p)
 // Function Cut_By_Plane
 //#####################################################################
 template<class T> void DISPLAY_PRIMITIVE<T>::
-Cut_By_Plane(const PLANE<T> &p)
+Cut_By_Plane(const PLANE<T> &p,T tol)
 {
-    
+    ARRAY<VECTOR<TV, 3> > cut_elements;
+    for(int i=0;i<elements.m;i++){
+        if(type==SEGMENT){
+            VECTOR<T,2> phi_nodes;
+            for(int i=0;i<2;i++){phi_nodes(i)=p.Signed_Distance(vertices(i));}
+            if(phi_nodes(0)*phi_nodes(1)<0){
+                T theta=LEVELSET_UTILITIES<T>::Theta(phi_nodes(0),phi_nodes(1));
+                TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(vertices(0),vertices(1),theta);
+                if(theta>tol) cut_elements.Append(VECTOR<TV,3>(vertices(0),interface_location,interface_location));
+                if(1-theta>tol) cut_elements.Append(VECTOR<TV,3>(interface_location,vertices(1),vertices(1)));}}
+        if(type==TRIANGLE){
+            VECTOR<T,3> phi_nodes;
+            for(int i=0;i<3;i++){phi_nodes(i)=p.Signed_Distance(vertices(i));}
+            int positive_count=0,single_node_sign;
+            for(int i=0;i<3;i++) if(phi_nodes(i)>0) positive_count++;
+            switch(positive_count){
+                case 0:case 3:
+                    cut_elements.Append(vertices);break;
+                case 1:case 2:
+                    single_node_sign=positive_count==1?1:-1;
+                        for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
+                                VECTOR<TV,2> interface_locations;int index=(i+1)%3;
+                                VECTOR<T,2> theta;
+                                VECTOR<int,2> other_locations;
+                                for(int j=0;j<2;j++,index=(index+1)%3){
+                                    other_locations(j)=index;
+                                    theta(j)=LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index));
+                                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(vertices(i),vertices(index),theta(j));}
+                                if(1-theta(0)>tol) cut_elements.Append(VECTOR<TV,3>(interface_locations(0),vertices(other_locations(0)),vertices(other_locations(1))));
+                                if(1-theta(1)>tol) cut_elements.Append(VECTOR<TV,3>(interface_locations(0),vertices(other_locations(1)),interface_locations(1)));
+                                if(theta(0)>tol && theta(1)>tol) cut_elements.Append(VECTOR<TV,3>(vertices(i),interface_locations(0),interface_locations(1)));}}}}
+    elements.Exchange(cut_elements);    
 }
 //#####################################################################
 // Function Get_Cutting_Plane
