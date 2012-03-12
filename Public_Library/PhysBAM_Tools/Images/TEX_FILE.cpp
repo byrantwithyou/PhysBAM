@@ -37,7 +37,8 @@ template<class T> TEX_FILE<T>::
     Emit(bounding_box.max_corner);
     stream.seekp(unit_offset,std::ios::beg);
     TV bb=bounding_box.Edge_Lengths(),ob=output_box.Edge_Lengths();
-    T sc=0;
+    T sc=1e5;
+    std::cout<<bounding_box<<"  "<<output_box<<std::endl;
     if(bb.x>0) sc=min(sc,ob.x/bb.x);
     if(bb.y>0) sc=min(sc,ob.y/bb.y);
     stream<<sc;
@@ -48,7 +49,7 @@ template<class T> TEX_FILE<T>::
 template<class T> void TEX_FILE<T>::
 Emit(const TV &pt)
 {
-    stream<<"("<<pt.x<<" "<<pt.y<<")";
+    stream<<"("<<pt.x<<","<<pt.y<<")";
 }
 //#####################################################################
 // Function Update_Effective_Formatting
@@ -77,7 +78,7 @@ Emit_Options(bool line,bool fill)
         stream<<",linecolor=lc";
         if(cur_format.line_style>1) stream<<",linestyle="<<line_style_str[cur_format.line_style];
         if(cur_format.line_opacity!=1) stream<<",opacity="<<cur_format.line_opacity;
-        if(cur_format.arrow_style) stream<<",arrowstyle="<<cur_format.arrow_style;}
+        if(cur_format.arrow_style) stream<<",arrows="<<cur_format.arrow_style;}
     else stream<<"linestyle=none";
 
     if(fill && cur_format.fill_style && cur_format.fill_opacity){

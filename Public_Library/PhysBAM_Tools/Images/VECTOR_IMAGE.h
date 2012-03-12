@@ -49,7 +49,7 @@ public:
     void Draw_Object(const TV &a,const TV &b,const TV &c); // triangle
     void Draw_Object(ARRAY_VIEW<TV> pts); // polygon
     template <int d> void Draw_Object(const VECTOR<TV,d>& pts) // polygon
-    {Draw_Object(ARRAY_VIEW<TV>(d,&pts(0)));}
+    {Draw_Object(ARRAY_VIEW<TV>(d,const_cast<TV*>(&pts(0))));}
     void Draw_Object(const TV &pt,T radius); // circle
     void Draw_Object(const RANGE<TV>& box);
 
