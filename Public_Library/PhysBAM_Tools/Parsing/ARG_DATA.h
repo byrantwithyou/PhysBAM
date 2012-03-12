@@ -10,9 +10,6 @@
 
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
-#endif
 #include <string>
 namespace PhysBAM{
 

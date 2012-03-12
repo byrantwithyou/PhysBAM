@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/QUEUE.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PREFERENCES.h>
@@ -235,17 +234,17 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
     if(selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_VERTEX_3D){
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_3D<T> *)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,curve.particles,index);}
+        curve.particles.Print(output_stream,index);}
     else if(selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D){
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T> *)selection)->index;
         int node1,node2;curve.mesh.elements(index).Get(node1,node2);
         output_stream<<"Segment "<<index<<" ("<<node1<<", "<<node2<<")"<<std::endl;
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,curve.particles,node1);
+        curve.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,curve.particles,node2);}
+        curve.particles.Print(output_stream,node2);}
     else if(selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_3D){
         int node1,node2;
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_3D<T> *)selection)->index;

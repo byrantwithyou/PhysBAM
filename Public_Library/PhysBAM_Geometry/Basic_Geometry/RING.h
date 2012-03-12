@@ -15,6 +15,7 @@ class RING
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     T height,outer_radius,inner_radius;
@@ -37,6 +38,15 @@ public:
     {TV plane_normal=X1-X2;height=plane_normal.Normalize();
     plane1.x1=X1;plane1.normal=plane_normal;
     plane2.x1=X2;plane2.normal=-plane_normal;}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,plane1.x1,plane2.x1,outer_radius,inner_radius);
+    Set_Endpoints(plane1.x1,plane2.x1);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,plane1.x1,plane2.x1,outer_radius,inner_radius);}
 
 //#####################################################################
     RANGE<TV> Bounding_Box() const;

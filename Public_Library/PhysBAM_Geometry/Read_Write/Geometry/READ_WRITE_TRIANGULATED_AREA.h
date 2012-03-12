@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_TRIANGULATED_AREA__
 #define __READ_WRITE_TRIANGULATED_AREA__
 
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 namespace PhysBAM{
 

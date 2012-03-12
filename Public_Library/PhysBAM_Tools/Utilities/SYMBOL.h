@@ -22,6 +22,8 @@ class SYMBOL
 protected:
     int key; // a key into an internal hash table
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     SYMBOL() // equivalent to SYMBOL("")
         :key(0)
     {}
@@ -58,6 +60,9 @@ public:
     friend inline int Hash_Reduce(const SYMBOL symbol)
     {return symbol.key;}
 
+    template<class RW> void Read(std::istream& input);
+    template<class RW> void Write(std::ostream& output) const;
+
 //#####################################################################
     const std::string& Name() const;
 //#####################################################################
@@ -73,5 +78,7 @@ struct SYMBOL_MAPPING
 };
 SYMBOL_MAPPING& Mapping();
 //#####################################################################
+inline std::ostream& operator<<(std::ostream& output,const SYMBOL symbol)
+{return output<<symbol.Name();}
 }
 #endif

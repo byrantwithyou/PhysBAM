@@ -23,6 +23,7 @@ public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=1,n=1};
     typedef MATRIX_BASE<T,MATRIX<T,1> > BASE;using BASE::operator*;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     T x11;
 
@@ -265,6 +266,11 @@ public:
     void Fast_Singular_Value_Decomposition(MATRIX& U,MATRIX& D,MATRIX& V) const
     {U.x11=V.x11=1;D=*this;}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x11);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x11);}
 //#####################################################################
 };
 

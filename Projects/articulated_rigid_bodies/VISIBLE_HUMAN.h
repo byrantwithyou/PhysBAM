@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Interpolation/BSPLINE_QUATERNION.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_FRAME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/ANGLE_JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_FUNCTION.h>

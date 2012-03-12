@@ -16,6 +16,7 @@ template<class T>
 class SPARSE_VECTOR_ND
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     int n;
     ARRAY<int> indices;
     ARRAY<T> x;
@@ -70,7 +71,18 @@ public:
 
     void Write_Internal_Arrays(std::ostream& output_stream)
     {for(int i=0;i<indices.m;i++) output_stream<<indices(i)<<", "<<x(i)<<std::endl;}
+
+    // template<class RW> void Read(std::istream& input)
+    // {Read_Binary<RW>(input,n,number_of_active_indices);
+    // delete[] indices;delete[] x;indices=new int[number_of_active_indices+1];x=new T[number_of_active_indices+1];
+    // for(int i=0;i<=number_of_active_indices;i++){Read_Binary<RW>(input,indices[i]);Read_Binary<RW>(input,x[i]);}}
+
+    // template<class RW> void Write(std::ostream& output) const
+    // {Write_Binary<RW>(output,n,number_of_active_indices);
+    // for(int i=0;i<=number_of_active_indices;i++){Write_Binary<RW>(output,indices[i]);Write_Binary<RW>(output,x[i]);}}
 //#####################################################################
 };
+template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const SPARSE_VECTOR_ND<T>& v)
+{for(int i=0;i<v.n;i++)output_stream<<v(i)<<" ";output_stream<<std::endl;return output_stream;}
 }
 #endif

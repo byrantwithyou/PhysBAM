@@ -8,6 +8,7 @@
 #define __ELEMENT_ID__
 
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
 
@@ -20,6 +21,7 @@ class ELEMENT_ID
 {
     T id_value;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T VALUE;
     enum WORKAROUND{capability_flags=flags};
 
@@ -87,6 +89,13 @@ public:
     ID operator-() const
     {STATIC_ASSERT(flags&ELEMENT_ID_HELPER::negate);return ID(-id_value);}
 
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,id_value);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,id_value);}
 //#####################################################################
 };
 
@@ -110,6 +119,10 @@ Value(ID i)
 PHYSBAM_DECLARE_ELEMENT_ID(INITIAL_SIZE,int,ELEMENT_ID_HELPER::equality);
 
 //#####################################################################
+template<class ID,class T,int flags> inline std::ostream& operator<<(std::ostream& output,const ELEMENT_ID<ID,T,flags> id)
+{return output<<id.Value();}
+
+template<class ID,class T,int flags> inline std::istream& operator>>(std::istream& input,ELEMENT_ID<ID,T,flags>& id)
+{T i;input>>i;id=ID(i);return input;}
 }
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_ELEMENT_ID.h>
 #endif

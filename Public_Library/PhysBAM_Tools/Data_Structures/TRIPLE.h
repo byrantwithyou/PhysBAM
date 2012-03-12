@@ -7,12 +7,14 @@
 #ifndef __TRIPLE__
 #define __TRIPLE__
 
+#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
-
 template<class T1,class T2,class T3>
 class TRIPLE
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     T1 x;T2 y;T3 z;
 
     TRIPLE(int input=0) 
@@ -29,11 +31,20 @@ public:
     bool operator!=(const TRIPLE& t) const
     {return !(*this==t);}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x,y,z);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x,y,z);}
+
 //#####################################################################
 };  
 template<class T1,class T2,class T3>
 inline TRIPLE<T1,T2,T3> Tuple(const T1& x,const T2& y,const T3& z)
 {return TRIPLE<T1,T2,T3>(x,y,z);}
+
+template<class T1,class T2,class T3>
+inline std::ostream& operator<<(std::ostream& output,const TRIPLE<T1,T2,T3>& object)
+{output<<"("<<object.x<<" "<<object.y<<" "<<object.z<<")";return output;}
 }
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_TRIPLE.h>
 #endif

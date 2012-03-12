@@ -5,8 +5,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
@@ -146,7 +144,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         if(current_index>=0){
             // real_selection->index is index into particles array at time of selection.  Not very useful. current_index is more useful
             output_stream<<"current index = "<<current_index<<std::endl;
-            Read_Write<GEOMETRY_PARTICLES<TV>,RW>::Print(output_stream,particles,current_index);}}
+            particles.Print(output_stream,current_index);}}
 }
 //#####################################################################
 // Function Create_Or_Destroy_Selection_After_Frame_Change

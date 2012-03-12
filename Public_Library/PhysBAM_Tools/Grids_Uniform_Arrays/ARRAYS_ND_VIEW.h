@@ -12,9 +12,7 @@
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
-#endif
 #include <PhysBAM_Tools/Utilities/EXCEPTIONS.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
@@ -27,6 +25,7 @@ class ARRAY_VIEW<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<VECTOR<typename REMOVE_
     template<class S> struct COPY_CONST:public IF<IS_CONST<T>::value,typename ADD_CONST<S>::TYPE,S>{};
     typedef ARRAYS_ND_BASE<VECTOR<typename REMOVE_CONST<T>::TYPE,d> > BASE;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename REMOVE_CONST<T>::TYPE ELEMENT;typedef TV_INT INDEX;
     typedef T& RESULT_TYPE;
 
@@ -83,6 +82,10 @@ public:
 
     static bool Same_Array(const ARRAY_VIEW& array1,const ARRAY_VIEW& array2)
     {return array1.Get_Array_Pointer()==array2.Get_Array_Pointer();}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 };
 }

@@ -4,8 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>

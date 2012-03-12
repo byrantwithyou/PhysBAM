@@ -8,7 +8,6 @@
 #define __OPENGL_BASIC_CALLBACKS__
 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_CALLBACK.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
 namespace PhysBAM{

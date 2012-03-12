@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_EMBEDDED_TETRAHEDRALIZED_VOLUME__
 #define __READ_WRITE_EMBEDDED_TETRAHEDRALIZED_VOLUME__
 
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_EMBEDDED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 namespace PhysBAM{
 

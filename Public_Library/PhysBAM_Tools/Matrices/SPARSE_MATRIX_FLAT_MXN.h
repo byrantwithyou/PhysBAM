@@ -16,6 +16,7 @@ template<class T>
 class SPARSE_MATRIX_FLAT_MXN
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     int m,n; // size of the m by n matrix
     ARRAY<int> offsets;
@@ -47,6 +48,12 @@ public:
 
     void Add_Element(const int i,const int j,const T element)
     {(*this)(i,j)+=element;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,m,n,offsets,A);}
+
+    template<class RW> void Write(std::ostream& output)
+    {Write_Binary<RW>(output,m,n,offsets,A);}
 
 //#####################################################################
     SPARSE_MATRIX_FLAT_NXN<T>* Create_Submatrix(const INTERVAL<int>& rows);

@@ -29,6 +29,7 @@ public:
 private:
     bool need_destroy_particles;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
 
     EMBEDDING(GEOMETRY_PARTICLES<TV>& particles_input);
 
@@ -51,7 +52,11 @@ public:
     void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE
     {material_surface.Mark_Nodes_Referenced(marks,mark);}
 
-public:
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    {material_surface.Clean_Memory();Read_Binary(input,material_surface_mesh);}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Binary(output,material_surface_mesh);}
 
 //#####################################################################
 };

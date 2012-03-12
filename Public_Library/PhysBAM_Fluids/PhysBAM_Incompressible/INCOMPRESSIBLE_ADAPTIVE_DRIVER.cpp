@@ -9,7 +9,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_ADAPTIVE_DRIVER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_ADAPTIVE_EXAMPLE.h>
 
-#include <PhysBAM_Tools/Read_Write/Math_Tools/READ_WRITE_RANGE.h>
 using namespace PhysBAM;
 namespace{
 template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

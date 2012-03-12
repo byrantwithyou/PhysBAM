@@ -32,6 +32,7 @@ public:
     typedef ARRAY_VIEW<T,TV_INT> T_ARRAY_VIEW;
     typedef T ELEMENT;typedef FACE_INDEX<d> INDEX;typedef T& RESULT_TYPE;typedef const T& CONST_RESULT_TYPE;
     typedef typename SCALAR_POLICY<T>::TYPE SCALAR;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     RANGE<TV_INT> domain_indices;
     VECTOR<T_ARRAY_VIEW,dimension> data;
@@ -176,8 +177,29 @@ public:
     INDIRECT_ARRAY<const ARRAY,T_INDICES&> Subset(const T_INDICES& indices) const
     {return INDIRECT_ARRAY<const ARRAY,T_INDICES&>(*this,indices);}
     
+    template<class RW> void Read(std::istream& input)
+    {Clean_Memory();Read_Binary<RW>(input,domain_indices);Read_Binary<RW>(input,buffer_size);
+    if(buffer_size<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative array size %d",buffer_size));
+    if(!buffer_size) return;
+    base_pointer=new T[buffer_size];
+    Read_Binary_Array<RW>(input,base_pointer,buffer_size);
+    T* p_start=base_pointer;
+    for(int i=0;i<d;i++){
+        RANGE<TV_INT> domain;
+        Read_Binary<RW>(input,domain);
+        T_ARRAY_VIEW array_new(domain,p_start);
+        T_ARRAY_VIEW::Exchange_Arrays(array_new,data(i));
+        p_start+=(domain.Edge_Lengths()).Product();}}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,domain_indices);Write_Binary<RW>(output,buffer_size);Write_Binary_Array<RW>(output,base_pointer,buffer_size);for(int i=0;i<d;i++) Write_Binary<RW>(output,data(i).domain);}
 //#####################################################################
 };
+
+template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<1> >& a)
+{for(int i=a.domain_indices.min_corner.x;i<a.domain_indices.max_corner.x+1;i++) output_stream<<a.Component(0)(i)<<" ";output_stream<<std::endl;return output_stream;}
+
+template<class T,int d> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAY<T,FACE_INDEX<d> >& a)
+{for(int i=0;i<d;i++) output_stream<<a.data(i)<<std::endl;return output_stream;}
 }
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_FACE_ARRAYS.h>
 #endif

@@ -35,6 +35,7 @@ class EMBEDDED_OBJECT:public STRUCTURE<TV>
     typedef typename MESH_POLICY<d-1>::MESH T_BOUNDARY_MESH;
     typedef typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT T_EMBEDDED_OBJECT;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     enum WORKAROUND1 {topological_dimension=d};
     enum WORKAROUND2 {max_subelements_per_element=2*d-2};
 
@@ -162,6 +163,9 @@ public:
     virtual std::string Name() const PHYSBAM_OVERRIDE {return Static_Name();}
     static std::string Static_Name()
     {return STRING_UTILITIES::string_sprintf("EMBEDDED_OBJECT<T,VECTOR<T,%d>,%d>",TV::dimension,d);}
+
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
 
 //#####################################################################
     virtual void Clean_Memory();

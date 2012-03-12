@@ -74,6 +74,24 @@ public:
 
     static std::string Name_Helper()
     {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,TRANSFORM::Static_Name().c_str());}
+
+    template<class READ_TRANSFORM> void Read_Transform_Helper(TYPED_ISTREAM& input,const READ_TRANSFORM& transform_input)
+    {PHYSBAM_FATAL_ERROR();}
+
+    void Read_Transform_Helper(TYPED_ISTREAM& input,const FRAME<TV>& transform_input)
+    {transform=new FRAME<TV>();Read_Binary(input,(FRAME<TV>&)*transform);owns_transform=true;}
+
+    void Read_Transform_Helper(TYPED_ISTREAM& input)
+    {Read_Transform_Helper(input,*transform);}
+
+    template<class READ_TRANSFORM> void Write_Transform_Helper(TYPED_OSTREAM& output,const READ_TRANSFORM& transform_input) const
+    {PHYSBAM_FATAL_ERROR();}
+
+    void Write_Transform_Helper(TYPED_OSTREAM& output,const FRAME<TV>& transform_input) const
+    {Write_Binary(output,transform_input);}
+
+    void Write_Transform_Helper(TYPED_OSTREAM& output) const
+    {Write_Transform_Helper(output,*transform);}
 };
 
 template<class TV> class IMPLICIT_OBJECT_TRANSFORMED_HELPER<TV,typename TV::SCALAR>
@@ -138,6 +156,12 @@ public:
 
     static std::string Name_Helper()
     {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,T>",TV::dimension);}
+
+    void Read_Transform_Helper(TYPED_ISTREAM& input)
+    {Read_Binary(input,center,scale,one_over_scale,center_adjustment);}
+
+    void Write_Transform_Helper(TYPED_OSTREAM& output) const
+    {Write_Binary(output,center,scale,one_over_scale,center_adjustment);}
 };
 
 template<class TV,class TRANSFORM>
@@ -147,11 +171,13 @@ class IMPLICIT_OBJECT_TRANSFORMED:public IMPLICIT_OBJECT<TV>,public IMPLICIT_OBJ
     typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     enum WORKAROUND {d=TV::m};
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     typedef IMPLICIT_OBJECT<TV> BASE;
     typedef IMPLICIT_OBJECT_TRANSFORMED_HELPER<TV,TRANSFORM> BASE_HELPER;
     using BASE::box;using BASE_HELPER::Name_Helper;using BASE_HELPER::Object_Space_Box;using BASE_HELPER::World_Space_Length;using BASE_HELPER::World_Space_Box;
     using BASE_HELPER::Scale_Transform;using BASE_HELPER::Object_Space_Point;using BASE_HELPER::World_Space_Unitless_Vector;using BASE_HELPER::Object_Space_Length;
     using BASE_HELPER::World_Space_Point;using BASE_HELPER::World_Space_Length_Hessian;using BASE_HELPER::World_Space_Vector;using BASE_HELPER::Object_Space_Unitless_Vector;
+    using BASE_HELPER::Read_Transform_Helper;using BASE_HELPER::Write_Transform_Helper;
 
     bool owns_implicit_object;
     IMPLICIT_OBJECT<TV>* object_space_implicit_object;
@@ -186,6 +212,14 @@ public:
 
     static std::string Static_Name()
     {return Name_Helper();}
+
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    {Read_Transform_Helper(input);std::string name;Read_Binary(input,name);
+    object_space_implicit_object=dynamic_cast<IMPLICIT_OBJECT<TV>*>(STRUCTURE<TV>::Create_From_Name(name));
+    object_space_implicit_object->Read(input);}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Transform_Helper(output);Write_Binary(output,object_space_implicit_object->Name(),*object_space_implicit_object);}
 
     bool Intersection(RAY<TV>& ray,const T thickness) const PHYSBAM_OVERRIDE;
     TV Closest_Point_On_Boundary(const TV& location,const T tolerance=0,const int max_iterations=1,T* distance=0) const PHYSBAM_OVERRIDE;
@@ -228,4 +262,3 @@ public:
 };
 }
 #endif
-

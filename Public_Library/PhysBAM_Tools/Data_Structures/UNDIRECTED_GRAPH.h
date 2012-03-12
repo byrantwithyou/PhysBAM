@@ -16,10 +16,24 @@ class DIRECTED_GRAPH_CORE;
 class UNDIRECTED_GRAPH_CORE
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     ARRAY<PAIR<int,int> > edges; // edges(e) returns (parent,child) of edge e
     ARRAY<ARRAY<int> > adjacent_edges; // adjacent_edges(j) returns list of edges connected to node j
 
     explicit UNDIRECTED_GRAPH_CORE(const int number_nodes=0,const int number_edges=0);
+
+    template<class RW> void Read(std::istream& input)
+    {ARRAY<int,int> parent_node_index,child_node_index;
+    Read_Binary<RW>(input,parent_node_index,child_node_index,adjacent_edges);
+    if(parent_node_index.Size()!=child_node_index.Size()) PHYSBAM_FATAL_ERROR();
+    edges.Resize(parent_node_index.Size(),false,false);
+    for(int e=0;e<edges.m;e++){edges(e).x=parent_node_index(e);edges(e).y=child_node_index(e);}}
+
+    template<class RW> void Write(std::ostream& output) const
+    {ARRAY<int,int> parent_node_index(edges.m,false),child_node_index(edges.m,false);
+    for(int e=0;e<edges.m;e++){parent_node_index(e)=edges(e).x;child_node_index(e)=edges(e).y;}
+    Write_Binary<RW>(output,parent_node_index,child_node_index,adjacent_edges);}
 
 //##################################################################### 
     void Reset();
@@ -39,6 +53,8 @@ template<class ID,class EID>
 class UNDIRECTED_GRAPH
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     UNDIRECTED_GRAPH_CORE core;
 
     explicit UNDIRECTED_GRAPH(const ID number_nodes=ID(),const EID number_edges=EID())
@@ -80,6 +96,12 @@ public:
 
     void Depth_First_Directed_Graph(const ID root_node,DIRECTED_GRAPH<ID>& directed_graph)
     {core.Depth_First_Directed_Graph(Value(root_node,directed_graph.core));}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,core);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,core);}
 
 //#####################################################################
 };

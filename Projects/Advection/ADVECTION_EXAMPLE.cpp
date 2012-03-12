@@ -4,8 +4,6 @@
 //#####################################################################
 //#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_FACE_ARRAYS.h>
 #include "ADVECTION_EXAMPLE.h"
 #include <pthread.h>
 using namespace PhysBAM;

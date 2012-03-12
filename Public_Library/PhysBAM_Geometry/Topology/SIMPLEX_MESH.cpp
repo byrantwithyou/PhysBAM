@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #endif
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology/SIMPLEX_MESH.h>
@@ -345,6 +344,29 @@ Simplices_On_Subsimplex(const VECTOR<int,d2>& subsimplex_nodes,ARRAY<int>& simpl
         if(Nodes_In_Simplex(other_nodes,simplex)) simplices_on_subsimplex.Append(simplex);}
 }
 //#####################################################################
+// Function Read
+//#####################################################################
+template<int d> template<class RW> void SIMPLEX_MESH<d>::
+Read(std::istream& input)
+{
+    Clean_Memory();
+    int backward_compatible;Read_Binary<RW>(input,number_nodes,backward_compatible,elements);
+    if(elements.m){
+        int min_index=elements.Flattened().Min(),max_index=elements.Flattened().Min();
+        if(number_nodes<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative number_nodes = %d",number_nodes));
+        if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
+        if(max_index>=number_nodes) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d (number_nodes = %d)",min_index,number_nodes));
+    }
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<int d> template<class RW> void SIMPLEX_MESH<d>::
+Write(std::ostream& output) const
+{
+    Write_Binary<RW>(output,number_nodes,d+1,elements);
+}
+//#####################################################################
 template class SIMPLEX_MESH<0>;
 template class SIMPLEX_MESH<1>;
 template class SIMPLEX_MESH<2>;
@@ -357,4 +379,20 @@ template void SIMPLEX_MESH<1>::Mark_Nodes_Referenced(ARRAY<int>&,const int&) con
 template void SIMPLEX_MESH<2>::Mark_Nodes_Referenced(ARRAY<int>&,const int&) const;
 template void SIMPLEX_MESH<3>::Mark_Nodes_Referenced(ARRAY<int>&,const int&) const;
 template void SIMPLEX_MESH<3>::Mark_Nodes_Referenced(ARRAY<bool>&,const bool&) const;
+template void SIMPLEX_MESH<0>::Read<float>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<0>::Write<float>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<1>::Read<float>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<1>::Write<float>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<2>::Read<float>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<2>::Write<float>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<3>::Read<float>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<3>::Write<float>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<0>::Read<double>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<0>::Write<double>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<1>::Read<double>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<1>::Write<double>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<2>::Read<double>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<2>::Write<double>(std::basic_ostream<char,std::char_traits<char> >&) const;
+template void SIMPLEX_MESH<3>::Read<double>(std::basic_istream<char,std::char_traits<char> >&);
+template void SIMPLEX_MESH<3>::Write<double>(std::basic_ostream<char,std::char_traits<char> >&) const;
 }

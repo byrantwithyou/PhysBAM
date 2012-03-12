@@ -87,6 +87,12 @@ public:
     VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
     {return analytic.Principal_Curvatures(X);}
 
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    {Read_Binary(input,analytic);Update_Box();}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Binary(output,analytic);}
+
 //#####################################################################
 };
 }

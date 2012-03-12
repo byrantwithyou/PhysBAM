@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>

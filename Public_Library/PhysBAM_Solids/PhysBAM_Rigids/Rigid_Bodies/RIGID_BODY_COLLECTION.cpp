@@ -4,10 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_DIAGONAL_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX_0X0.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX_1X1.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>

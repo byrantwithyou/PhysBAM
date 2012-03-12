@@ -21,6 +21,7 @@ template<class T,int m_input,int n_input> // n_input=m_input
 class MATRIX:public MATRIX_BASE<T,MATRIX<T,m_input,n_input> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     enum WORKAROUND1 {m=m_input,n=n_input,size=n_input*m_input};
     STATIC_ASSERT((!((m>=2 && m<=3 && n>=2 && n<=3) || (m==4 && n==4) || (m==0 && n==0)))); // 0x0, 1x1, 2x2, 2x3, 3x2, 3x3, and 4x4 are specialized
     typedef T SCALAR;typedef MATRIX_BASE<T,MATRIX<T,m_input,n_input> > BASE;
@@ -203,6 +204,12 @@ public:
 
     T Parallelepiped_Measure() const
     {STATIC_ASSERT(n==1);return sqrt(Frobenius_Norm_Squared());}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary_Array<RW>(input,x,m*n);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary_Array<RW>(output,x,m*n);}
 };
 
 template<class T,int m,int n>

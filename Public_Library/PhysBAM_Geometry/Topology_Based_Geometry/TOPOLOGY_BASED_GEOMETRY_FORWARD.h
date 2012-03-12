@@ -27,7 +27,5 @@ template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED;
 template<class TV> class LEVELSET_IMPLICIT_OBJECT;
 template<class TV> class MULTIBODY_LEVELSET_IMPLICIT_OBJECT;
 
-void Initialize_Read_Write_Structures();
-
 }
 #endif

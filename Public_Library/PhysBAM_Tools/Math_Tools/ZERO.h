@@ -7,10 +7,13 @@
 #ifndef __ZERO__
 #define __ZERO__
 
+#include <iostream>
 namespace PhysBAM{
 
 struct ZERO
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     bool operator!() const
     {return true;}
 
@@ -47,6 +50,11 @@ struct ZERO
     bool operator!=(const ZERO) const
     {return false;}
     
+    template<class RW> void Read(std::istream& input)
+    {}
+
+    template<class RW> void Write(std::ostream& output) const
+    {}
 //#####################################################################
 };
 
@@ -80,5 +88,8 @@ template<class T> inline ZERO operator*(const ZERO,const T&)
 template<class T> inline ZERO operator*(const T&,const ZERO)
 {return ZERO();}
 
+inline std::ostream&
+operator<<(std::ostream& output,const ZERO)
+{return output<<0;}
 }
 #endif

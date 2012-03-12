@@ -26,6 +26,7 @@ class LEVELSET_UNIFORM:public LEVELSET<typename T_GRID_input::SCALAR,T_GRID_inpu
     typedef typename GRID_ARRAYS_POLICY<T_GRID_input>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_GRID_input::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID_input::CELL_ITERATOR CELL_ITERATOR;
     typedef typename INTERPOLATION_POLICY<T_GRID_input>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T_GRID_input T_GRID;
     typedef LEVELSET<T,T_GRID> BASE;
     using BASE::interpolation;using BASE::secondary_interpolation;using BASE::curvature_interpolation;using BASE::curvature_motion;using BASE::sigma;using BASE::max_time_step;
@@ -114,6 +115,14 @@ public:
     phi_value=interpolation->From_Base_Node(grid,phi,clamped_X,index);
     if(magnitude_squared>0) phi_value=sqrt(magnitude_squared+sqr(max((T)0,phi_value)));
     return phi_value>contour_value;}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,grid,phi);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,grid,phi);}
 
 //#####################################################################
     T Collision_Aware_Phi(const TV& location) const;

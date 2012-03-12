@@ -4,9 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Computations/GRADIENT_UNIFORM.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
@@ -16,8 +13,6 @@
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_FAST_LEVELSET.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Uniform/READ_WRITE_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Dynamics/Geometry/REMOVED_PARTICLES_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Dynamics/Level_Sets/REMOVED_PARTICLES_PROCESSING.h>
 #include <PhysBAM_Dynamics/Level_Sets/UNIFORM_REMOVED_PARTICLES_PROCESSING.h>

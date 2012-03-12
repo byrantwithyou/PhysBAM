@@ -2,7 +2,6 @@
 // Copyright 2007-2008, Craig Schroeder, Tamar Shinar.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_FREE_PARTICLES.h>
 using namespace PhysBAM;
 //##################################################################### 
@@ -21,7 +20,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection) co
     BASE::Print_Selection_Info(output_stream,selection);
     if(selection->type!=OPENGL_SELECTION::POINTS_3D) return;
     int particle_index=points.indices(dynamic_cast<OPENGL_SELECTION_POINTS_3D<T>*>(selection)->index);
-    Read_Write<GEOMETRY_PARTICLES<TV>,T>::Print(output_stream,deformable_geometry_collection.particles,particle_index);
+    deformable_geometry_collection.particles.Print(output_stream,particle_index);
 }
 //#####################################################################
 template class OPENGL_FREE_PARTICLES<VECTOR<float,2> >;

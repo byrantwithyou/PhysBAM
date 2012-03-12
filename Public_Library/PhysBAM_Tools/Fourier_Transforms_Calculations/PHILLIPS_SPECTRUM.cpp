@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################

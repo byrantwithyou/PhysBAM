@@ -182,6 +182,35 @@ typename TV::SCALAR MESH_OBJECT<TV,T_MESH>::Volumetric_Volume()
     return Filled_Volume_Helper(*this);
 }
 //#####################################################################
+// Function Read
+//#####################################################################
+template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
+Read(TYPED_ISTREAM& input)
+{
+    int size;
+    Read_Binary(input,mesh,size);
+    particles.array_collection->Clean_Memory(); // strip everything away except for position
+    particles.array_collection->Resize(size);
+    if(input.type.use_doubles) Read_Binary_Array<double>(input.stream,particles.X.Get_Array_Pointer(),size);
+    else Read_Binary_Array<float>(input.stream,particles.X.Get_Array_Pointer(),size);
+    if(mesh.elements.m){
+#ifndef COMPILE_WITH_READ_ONE_BASED_DATA
+        int min_index=mesh.elements.Flattened().Min(),max_index=mesh.elements.Flattened().Max();
+        if(min_index<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid vertex index %d",min_index));
+        if(max_index>=particles.array_collection->Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read invalid vertex index %d (particles.array_collection->Size() = %d)",max_index,particles.array_collection->Size()));
+#endif
+        Update_Number_Nodes();}
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
+Write(TYPED_OSTREAM& output) const
+{
+    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR("number_nodes mismatch");
+    Write_Binary(output,mesh,particles.X);
+}
+//#####################################################################
 template class MESH_OBJECT<VECTOR<float,1>,POINT_SIMPLEX_MESH>;
 template class MESH_OBJECT<VECTOR<float,1>,SEGMENT_MESH>;
 template class MESH_OBJECT<VECTOR<float,2>,SEGMENT_MESH>;

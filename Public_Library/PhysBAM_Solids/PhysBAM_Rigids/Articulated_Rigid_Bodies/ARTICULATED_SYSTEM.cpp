@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_ELEMENT_ID.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>

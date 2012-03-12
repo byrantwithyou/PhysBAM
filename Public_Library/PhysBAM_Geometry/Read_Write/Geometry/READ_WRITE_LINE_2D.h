@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_LINE_2D__
 #define __READ_WRITE_LINE_2D__
 
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 namespace PhysBAM{
 

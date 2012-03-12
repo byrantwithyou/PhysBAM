@@ -20,6 +20,7 @@ template<class T>
 class SYMMETRIC_MATRIX<T,2>
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND1 {m=2,n=2};
 
@@ -252,6 +253,12 @@ public:
 
     static SYMMETRIC_MATRIX Transpose_Times_With_Symmetric_Result(const MATRIX<T,2>& A,const UPPER_TRIANGULAR_MATRIX<T,2>& B) // A^t*B and assume symmetric result, 4 mults, 1 adds
     {return SYMMETRIC_MATRIX(A.x[0]*B.x11,A.x[2]*B.x11,A.x[2]*B.x12+A.x[3]*B.x22);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x11,x21,x22);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x11,x21,x22);}
 
 //#####################################################################
     void Solve_Eigenproblem(DIAGONAL_MATRIX<T,2>& eigenvalues,MATRIX<T,2>& eigenvectors) const;

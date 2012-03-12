@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Images/EPS_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -16,7 +17,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
-#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 #include <cassert>
 #include <cmath>
 #include <iomanip>
@@ -283,23 +283,23 @@ void Case_Test()
     rn.Fill_Uniform(d,-1,1);
 
     {
-        EPS_FILE_GEOMETRY<T> eps("case.eps");
-        eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
-        eps.Draw_Point(TV());
-        eps.Draw_Point(TV(-1,0));
-        eps.Draw_Point(TV(1,0));
-        eps.Draw_Point(TV(0,1));
-        eps.Draw_Point(TV(0,-1));
-        eps.Line_Color(VECTOR<T,3>(1,0,0));
-        eps.Draw_Line(a,b);
-        eps.Draw_Point(a);
-        eps.Draw_Line(TV(),a/a.Max_Abs());
-        eps.Draw_Line(TV(),b/b.Max_Abs());
-        eps.Line_Color(VECTOR<T,3>(0,1,0));
-        eps.Draw_Line(c,d);
-        eps.Draw_Point(c);
-        eps.Draw_Line(TV(),c/c.Max_Abs());
-        eps.Draw_Line(TV(),d/d.Max_Abs());
+        EPS_FILE<T> eps("case.eps");
+        eps.cur_format.line_color=VECTOR<T,3>(.5,.5,.5);
+        eps.Draw_Object(TV());
+        eps.Draw_Object(TV(-1,0));
+        eps.Draw_Object(TV(1,0));
+        eps.Draw_Object(TV(0,1));
+        eps.Draw_Object(TV(0,-1));
+        eps.cur_format.line_color=VECTOR<T,3>(1,0,0);
+        eps.Draw_Object(a,b);
+        eps.Draw_Object(a);
+        eps.Draw_Object(TV(),a/a.Max_Abs());
+        eps.Draw_Object(TV(),b/b.Max_Abs());
+        eps.cur_format.line_color=VECTOR<T,3>(0,1,0);
+        eps.Draw_Object(c,d);
+        eps.Draw_Object(c);
+        eps.Draw_Object(TV(),c/c.Max_Abs());
+        eps.Draw_Object(TV(),d/d.Max_Abs());
     }
 
     trap_cases.Remove_All();

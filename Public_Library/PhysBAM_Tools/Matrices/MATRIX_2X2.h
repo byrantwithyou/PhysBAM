@@ -19,6 +19,7 @@ template<class T>
 class MATRIX<T,2>:public MATRIX_BASE<T,MATRIX<T,2> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND1 {m=2,n=2};
     typedef MATRIX_BASE<T,MATRIX<T,2> > BASE;using BASE::operator*;using BASE::Transpose_Times;using BASE::Times_Transpose;
@@ -283,6 +284,12 @@ public:
 
     T Simplex_Minimum_Altitude() const
     {return Determinant()/sqrt(max(Column(0).Magnitude_Squared(),Column(1).Magnitude_Squared(),(Column(0)-Column(1)).Magnitude_Squared()));}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary_Array<RW>(input,x,m*n);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary_Array<RW>(output,x,m*n);}
 
 //#####################################################################
 };

@@ -16,10 +16,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
-#endif
-#include <PhysBAM_Tools/Read_Write/Math_Tools/READ_WRITE_RANGE.h>
 #endif
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

@@ -15,12 +15,19 @@ namespace PhysBAM{
 class DIRECTED_GRAPH_CORE
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     ARRAY<ARRAY<int> > parents,children;
     ARRAY<int> level_of_node; // all cycles are condensed into one level
     ARRAY<ARRAY<int> > nodes_in_level;
 
     DIRECTED_GRAPH_CORE(int number_nodes);
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,parents,children,level_of_node,nodes_in_level);}
+        
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,parents,children,level_of_node,nodes_in_level);}
 //#####################################################################
     void Reset();
     void Initialize(const int number_nodes);
@@ -43,6 +50,8 @@ template<class ID>
 class DIRECTED_GRAPH
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     DIRECTED_GRAPH_CORE core;
     template<class PID,class EID> friend class UNDIRECTED_GRAPH;
 
@@ -106,6 +115,12 @@ public:
 
     void Maximal_Depth_On_Acyclic_Graph(ARRAY<int,ID>& depths) const // depth is 1-based
     {core.Maximal_Depth_On_Acyclic_Graph((ARRAY<int>&)depths);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,core);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,core);}
 //#####################################################################
 };
 }

@@ -7,15 +7,12 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Read_Write/Implicit_Objects/READ_WRITE_ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
@@ -66,8 +63,6 @@ void Initialize()
 {
     // All this just to get a stupid line...
     Initialize_Rigids_Particles();
-    Register_Read_Write_Analytic_Implicit_Object();
-    Register_Read_Write_Point_Simplices_1d();
     RIGID_GEOMETRY<TV>& rigid_geometry=*new RIGID_GEOMETRY<TV>(rigid_geometry_collection,true);
     ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> >& implicit_structure=
         *new ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> >(POINT_SIMPLEX_1D<T>(TV(0),true));

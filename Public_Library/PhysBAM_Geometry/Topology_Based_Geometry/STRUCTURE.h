@@ -9,6 +9,8 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
@@ -24,6 +26,7 @@ class STRUCTURE:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     typedef T SCALAR;
     typedef TV VECTOR_T;
 
@@ -33,6 +36,28 @@ protected:
     STRUCTURE();
 public:
     virtual ~STRUCTURE();
+
+    virtual void Read(TYPED_ISTREAM& input)=0;
+
+    void Read_Structure(TYPED_ISTREAM& input)
+    {std::string name;Read_Binary(input,name);
+    if(name!=Name()){LOG::cerr<<"Trying to read in a "<<name<<" as a "<<Name()<<std::endl;PHYSBAM_FATAL_ERROR();}
+    Read(input);}
+
+    virtual void Write(TYPED_OSTREAM& output) const=0;
+
+    void Write_Structure(TYPED_OSTREAM& output)
+    {Write_Binary(output,Name());Write(output);}
+
+    static STRUCTURE<TV>* Create_Structure(TYPED_ISTREAM& input,GEOMETRY_PARTICLES<TV>& particles)
+    {std::string name;Read_Binary(input,name);
+    STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Name(name,particles);
+    structure->Read(input);return structure;}
+
+    template<class RW>
+    static STRUCTURE<TV>* Create_From_File(const std::string& filename)
+    {STRUCTURE<TV>* structure=STRUCTURE<TV>::Create_From_Extension(FILE_UTILITIES::Get_File_Extension(filename));
+    FILE_UTILITIES::template Read_From_File<RW>(filename,*structure);return structure;}
 
 //#####################################################################
     virtual std::string Name() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Name();}

@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_3D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/PHOTON_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>

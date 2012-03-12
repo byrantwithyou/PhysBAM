@@ -52,5 +52,4 @@ private:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Fracture/READ_WRITE_EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 #endif

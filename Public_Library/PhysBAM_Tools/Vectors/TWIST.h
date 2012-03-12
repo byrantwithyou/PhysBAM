@@ -24,6 +24,7 @@ class TWIST
     typedef typename TV::SPIN T_SPIN;
 public:
     typedef T SCALAR;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     enum WORKAROUND {dimension=TV::m+T_SPIN::m,m=dimension};
 
@@ -80,6 +81,12 @@ public:
 
     static T Dot_Product(const TWIST& v1,const TWIST& v2)
     {return TV::Dot_Product(v1.linear,v2.linear)+T_SPIN::Dot_Product(v1.angular,v2.angular);};
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,linear,angular);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,linear,angular);}
 //#####################################################################
 };
 // global functions
@@ -96,8 +103,10 @@ template<class TV> struct PRODUCT<TWIST<TV>,typename TV::SCALAR> {typedef TWIST<
 template<class TV> struct QUOTIENT<TWIST<TV>,typename TV::SCALAR> {typedef TWIST<TV> TYPE;};
 //#####################################################################
 
+template<class TV> inline std::istream& operator>>(std::istream& input,TWIST<TV>& v)
+{FILE_UTILITIES::Ignore(input,'(');input>>v.linear>>v.angular;FILE_UTILITIES::Ignore(input,')');return input;}
+
+template<class TV> inline std::ostream& operator<<(std::ostream& output,const TWIST<TV>& v)
+{output<<"("<<v.linear<<"  "<<v.angular<<")";return output;}
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_TWIST.h>
-#endif
 #endif

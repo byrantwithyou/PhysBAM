@@ -21,6 +21,7 @@ template<class T>
 class COMPLEX
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
 
     T re,im;
@@ -125,10 +126,19 @@ public:
     static COMPLEX<T> Unit_Polar(const T theta)
     {return COMPLEX<T>(cos(theta),sin(theta));}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,re,im);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,re,im);}
 //#####################################################################
 };
 template<class T>
 inline COMPLEX<T> operator*(const T a,const COMPLEX<T>& c)
 {return COMPLEX<T>(a*c.re,a*c.im);}
+
+template<class T>
+inline std::ostream& operator<<(std::ostream& output_stream,const COMPLEX<T>& c)
+{output_stream<<"("<<c.re<<" "<<c.im<<")";return output_stream;}
 }
 #endif

@@ -2,9 +2,6 @@
 // Copyright 2009, Michael Lentine, Avi Robinson-Mosher, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_FACE_INDEX.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
@@ -32,7 +29,6 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     //incompressible.Add_Force(new FLUID_GRAVITY<GRID<TV> >());
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     Initialize_Geometry_Particle();
-    Initialize_Read_Write_Structures();
 }
 //#####################################################################
 // ~INCOMPRESSIBLE_EXAMPLE

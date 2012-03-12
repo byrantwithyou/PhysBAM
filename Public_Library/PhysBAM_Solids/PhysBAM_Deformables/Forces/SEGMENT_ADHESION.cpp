@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_HASHTABLE.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>

@@ -8,7 +8,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
@@ -171,10 +170,10 @@ Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,c
     else{ // read in for the first time
         STRUCTURE<TV>* structure=0;
         if(!stream_type.use_doubles)
-            structure=Read_Write<STRUCTURE<TV>,float>::Create_From_File(filename);
+            structure=STRUCTURE<TV>::template Create_From_File<double>(filename);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         else
-            structure=Read_Write<STRUCTURE<TV>,double>::Create_From_File(filename);
+            structure=STRUCTURE<TV>::template Create_From_File<float>(filename);
 #endif
         if(scaling_factor!=1){
             Wrap_Structure_Helper(structure,center);

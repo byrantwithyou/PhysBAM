@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Arrays/ATTRIBUTE_ID.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION_ELEMENT.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_HASHTABLE.h>
 namespace PhysBAM{
 
 struct READ_WRITE_ARRAY_COLLECTION_FUNCTIONS_HELPER

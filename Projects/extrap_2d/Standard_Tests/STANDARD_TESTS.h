@@ -31,6 +31,7 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
+#include <PhysBAM_Tools/Images/EPS_FILE.h>
 #include <PhysBAM_Tools/Images/PPM_FILE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
@@ -42,7 +43,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -78,7 +78,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include <fstream>
 namespace PhysBAM{
@@ -1046,24 +1045,24 @@ void Dump_Scatter_Plot(int frame)
     RANGE<TV> box(-image_size,image_size,-image_size,image_size);
     char buff[1000];
     sprintf(buff, "svd-plot-%04d.eps", frame);
-    EPS_FILE_GEOMETRY<T> eps(buff,box);
-    eps.Set_Point_Size(4*sigma_range/image_size);
+    EPS_FILE<T> eps(buff,box);
+    eps.cur_format.point_radius=4*sigma_range/image_size;
     eps.fixed_bounding_box=true;
     eps.bounding_box=RANGE<TV>(-sigma_range,sigma_range,-sigma_range,sigma_range);
     for(int i=0;i<contrail.m;i++){
-        eps.Line_Color(contrail_colors(i));
+        eps.cur_format.line_color=contrail_colors(i);
         for(int j=1;j<contrail(i).m;j++)
-            eps.Draw_Line(contrail(i)(j-1),contrail(i)(j));}
+            eps.Draw_Object(contrail(i)(j-1),contrail(i)(j));}
     for(int i=0;i<contrail.m;i++){
-        eps.Line_Color(contrail_colors(i));
-        eps.Draw_Point(contrail(i).Last());}
-    eps.Line_Color(VECTOR<T,3>());
+        eps.cur_format.line_color=contrail_colors(i);
+        eps.Draw_Object(contrail(i).Last());}
+    eps.cur_format.line_color=VECTOR<T,3>();
 
     for(int i=0;i<contour_segments.m;i++)
-        eps.Draw_Line(contour_segments(i).x,contour_segments(i).y);
+        eps.Draw_Object(contour_segments(i).x,contour_segments(i).y);
 
-    eps.Draw_Line(TV(0,-image_size),TV(0,image_size));
-    eps.Draw_Line(TV(-image_size,0),TV(image_size,0));
+    eps.Draw_Object(TV(0,-image_size),TV(0,image_size));
+    eps.Draw_Object(TV(-image_size,0),TV(image_size,0));
 }
 //#####################################################################
 // Function Contour_Crossing
@@ -1276,10 +1275,7 @@ void Energy_Profile_Plot(int frame)
         std::ostream* output_raw=FILE_UTILITIES::Safe_Open_Output(dual_directory+"/"+f+"/deformable_object_structures");
         TYPED_OSTREAM output(*output_raw,this->stream_type);
         Write_Binary(output,1);
-        if(!this->stream_type.use_doubles) Read_Write<STRUCTURE<VECTOR<T,3> >,float>::Write_Structure(*output_raw,*energy_mesh);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        else Read_Write<STRUCTURE<VECTOR<T,3> >,double>::Write_Structure(*output_raw,*energy_mesh);
-#endif
+        energy_mesh->Write_Structure(output);
         delete output_raw;}
 
     FILE_UTILITIES::Write_To_Text_File(dual_directory+"/common/last_frame",frame,"\n");

@@ -146,6 +146,9 @@ public:
     bool Intersection(RAY<TV>& ray,const T thickness) const PHYSBAM_OVERRIDE
     {PHYSBAM_NOT_IMPLEMENTED();}
 
+    virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}
+    virtual void Write(TYPED_OSTREAM& output) const {PHYSBAM_FATAL_ERROR();}
+
 //#####################################################################
 };
 }

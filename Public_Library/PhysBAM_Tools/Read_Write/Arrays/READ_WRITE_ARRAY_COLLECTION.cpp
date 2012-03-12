@@ -4,10 +4,7 @@
 //#####################################################################
 // Class READ_WRITE_ARRAY_COLLECTION
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_ELEMENT_ID.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_HASHTABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_1D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
@@ -112,4 +109,3 @@ Print(std::ostream& output,const ARRAY_COLLECTION& object,const int p)
 template class Read_Write<ARRAY_COLLECTION,float>;
 template class Read_Write<ARRAY_COLLECTION,double>;
 }
-#endif

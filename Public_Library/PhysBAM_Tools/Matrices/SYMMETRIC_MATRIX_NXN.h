@@ -20,6 +20,7 @@ template<class T>
 class SYMMETRIC_MATRIX_NXN
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     int n; // size of the n by n matrix
     int size; // number of elements in the matrix: (n*n+n)/2
     T *x; // pointer to the one dimensional data
@@ -50,6 +51,17 @@ public:
 
     const T& Element_Lower(int i,int j) const
     {assert((unsigned)i<n && (unsigned)j<=i);return x[((2*n-j-1)*j>>1)+i];}
+
+    template<class RW> void Read(std::istream& input)
+    {delete[] x;
+    Read_Binary<RW>(input,n);
+    assert(n>=0);
+    size=(n*n+n)/2;
+    x=0;
+    if(n>0){x=new T[size];Read_Binary_Array<RW>(input,x,size);}}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,n);Write_Binary_Array<RW>(output,x,size);}
 
 //#####################################################################
     static SYMMETRIC_MATRIX_NXN<T> Outer_Product(const VECTOR_ND<T>& u);

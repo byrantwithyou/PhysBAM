@@ -7,10 +7,13 @@
 #ifndef __ONE__
 #define __ONE__
 
+#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 
 struct ONE
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     bool operator!() const
     {return false;}
 
@@ -25,6 +28,12 @@ struct ONE
 
     static ONE One()
     {return ONE();}
+
+    template<class RW> void Read(std::istream& input)
+    {}
+
+    template<class RW> void Write(std::ostream& output) const
+    {}
 
 //#####################################################################
 };
@@ -44,5 +53,8 @@ template<class T> inline T& operator*=(T& x,const ONE)
 template<class T> inline T& operator/=(T& x,const ONE)
 {return x;}
 
+inline std::ostream&
+operator<<(std::ostream& output,const ONE)
+{return output<<1;}
 }
 #endif

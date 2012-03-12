@@ -19,6 +19,8 @@ class LOCAL_GRID
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     T_GRID grid;
     MPI_UNIFORM_GRID<T_GRID> mpi_grid;
     const T_GRID& global_grid;
@@ -31,6 +33,9 @@ public:
 
     RANGE<TV_INT> Interior_Region(const RANGE<TV_INT>& sentinels) const
     {return grid.Get_MAC_Grid().Domain_Indices()+sentinels;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,grid);Initialize();}
 
 //#####################################################################
     void Initialize();

@@ -26,6 +26,8 @@ private:
 
     void (*deleter)(void*);
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     ARRAY<void*> array; // real type: ID2 -> T*
     HASHTABLE<void*,int> pointer_to_id_map; // T* -> ID
     ARRAY<int> index_to_id_map; // ID2 -> ID
@@ -39,6 +41,14 @@ public:
 
     bool Is_Active(const int id) const
     {return id_to_index_map.Valid_Index(id) && id_to_index_map(id)>=0;}
+
+    // Reads the set of active id's and updates the index<->id maps.
+    // needs_init is filled with id's of those elements which have become newly active and need to be initialized.
+    template<class RW> void Read(const std::string& prefix,ARRAY<int>& needs_init);
+
+    // Writes the set of active id's.
+    // needs_write indicates which elements have not been written since their creation, so derived classes should write those out (and reset the needs_write list).
+    template<class RW> void Write(const std::string& prefix) const;
 
     void Clean_Memory();
     void Remove_All();
@@ -129,6 +139,12 @@ public:
 
     void Fill_Needs_Write() // all elements will be written during the next Write()
     {core.Fill_Needs_Write();}
+
+    template<class RW> void Read(const std::string& prefix,ARRAY<ID>& needs_init)
+    {core.template Read<RW>(prefix,reinterpret_cast<ARRAY<int>&>(needs_init));}
+
+    template<class RW> void Write(const std::string& prefix) const
+    {core.template Write<RW>(prefix);}
 
 private:
     static T* Cast(void* pointer)

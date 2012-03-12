@@ -25,6 +25,7 @@ class FRAME
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
 
     TV t; // defaults to 0
@@ -105,7 +106,18 @@ public:
     static std::string Static_Name()
     {return STRING_UTILITIES::string_sprintf("FRAME<VECTOR<T,%d> >",TV::m);}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,t,r);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,t,r);}
+
 //#####################################################################
 };
+template<class TV> inline std::istream& operator>>(std::istream& input,FRAME<TV>& f)
+{FILE_UTILITIES::Ignore(input,'(');input>>f.t>>f.r;FILE_UTILITIES::Ignore(input,')');return input;}
+
+template<class TV> inline std::ostream& operator<<(std::ostream& output,const FRAME<TV>& f)
+{output<<"("<<f.t<<"  "<<f.r<<")";return output;}
 }
 #endif

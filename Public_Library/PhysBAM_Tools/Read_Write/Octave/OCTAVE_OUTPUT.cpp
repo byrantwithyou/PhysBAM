@@ -377,7 +377,7 @@ Write_Entry(int x)
 template<class T> template<class T2,int d> void OCTAVE_OUTPUT<T>::
 Write_Entry(const VECTOR<T2,d>& x)
 {
-    Write_Raw(out,x);
+    x.Write_Raw(out);
     out<<"\n";
 }
 template class OCTAVE_OUTPUT<float>;

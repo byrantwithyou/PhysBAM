@@ -77,6 +77,9 @@ public:
     T Minimum_Cell_Size() const PHYSBAM_OVERRIDE
     {return minimum_cell_size;}
 
+    virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}
+    virtual void Write(TYPED_OSTREAM& output) const {PHYSBAM_FATAL_ERROR();}
+
 //#####################################################################
 };
 }

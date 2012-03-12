@@ -31,6 +31,7 @@ class RANGE
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     template<class T2> struct REBIND{typedef RANGE<T2> TYPE;};
     typedef T SCALAR;
     typedef TV VECTOR_T;
@@ -331,6 +332,12 @@ public:
     RANGE<TV> Axis_Aligned_Bounding_Box() const
     {return *this;}
 
+    template<class RW> void Read(std::istream& input)
+    {for(int i=0;i<TV::dimension;i++) Read_Binary<RW>(input,min_corner(i),max_corner(i));}
+
+    template<class RW> void Write(std::ostream& output) const
+    {for(int i=0;i<TV::dimension;i++) Write_Binary<RW>(output,min_corner(i),max_corner(i));}
+
 //#####################################################################
     TV Normal(const int aggregate) const;
     TV Normal(const TV& X) const;
@@ -353,6 +360,13 @@ inline RANGE<TV> operator-(const RANGE<TV>& b,const TV& a)
 
 template<class TV> inline RANGE<TV> operator*(const typename TV::SCALAR a,const RANGE<TV>& box)
 {return box*a;}
+
+template<class TV>
+inline std::ostream& operator<<(std::ostream& output,const RANGE<TV>& box)
+{output<<"("<<box.min_corner<<" "<<box.max_corner<<")";return output;}
+
+template<class TV>
+inline std::istream& operator>>(std::istream& input,RANGE<TV>& box)
+{FILE_UTILITIES::Ignore(input,'(');input>>box.min_corner>>box.max_corner;FILE_UTILITIES::Ignore(input,')');return input;}
 }
-#include <PhysBAM_Tools/Read_Write/Math_Tools/READ_WRITE_RANGE.h>
 #endif

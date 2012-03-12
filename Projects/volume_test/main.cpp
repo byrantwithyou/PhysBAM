@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Images/EPS_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -12,7 +13,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_ORIGIN_AREAS.h>
-#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 #include <iomanip>
 using namespace PhysBAM;
 
@@ -61,31 +61,31 @@ void Case_Test()
     for(int i=0;i<3;i++){
         char file[100];
         sprintf(file, "dump-%c-%i.eps", 'x'+i-1, cnt);
-        EPS_FILE_GEOMETRY<T> eps(file);
-        eps.Line_Color(VECTOR<T,3>(.5,.5,.5));
-        eps.Draw_Point(VECTOR<T,2>(0,0));
-        eps.Draw_Point(VECTOR<T,2>(1,1));
-        eps.Draw_Point(VECTOR<T,2>(-1,-1));
-        eps.Line_Color(VECTOR<T,3>(1,0,0));
-        eps.Draw_Line(a.Remove_Index(i),b.Remove_Index(i));
-        eps.Draw_Line(b.Remove_Index(i),c.Remove_Index(i));
-        eps.Draw_Line(c.Remove_Index(i),a.Remove_Index(i));
-        eps.Line_Color(VECTOR<T,3>(0,1,0));
-        eps.Draw_Line(d.Remove_Index(i),e.Remove_Index(i));
-        eps.Draw_Line(e.Remove_Index(i),f.Remove_Index(i));
-        eps.Draw_Line(f.Remove_Index(i),d.Remove_Index(i));
+        EPS_FILE<T> eps(file);
+        eps.cur_format.line_color=VECTOR<T,3>(.5,.5,.5);
+        eps.Draw_Object(VECTOR<T,2>(0,0));
+        eps.Draw_Object(VECTOR<T,2>(1,1));
+        eps.Draw_Object(VECTOR<T,2>(-1,-1));
+        eps.cur_format.line_color=VECTOR<T,3>(1,0,0);
+        eps.Draw_Object(a.Remove_Index(i),b.Remove_Index(i));
+        eps.Draw_Object(b.Remove_Index(i),c.Remove_Index(i));
+        eps.Draw_Object(c.Remove_Index(i),a.Remove_Index(i));
+        eps.cur_format.line_color=VECTOR<T,3>(0,1,0);
+        eps.Draw_Object(d.Remove_Index(i),e.Remove_Index(i));
+        eps.Draw_Object(e.Remove_Index(i),f.Remove_Index(i));
+        eps.Draw_Object(f.Remove_Index(i),d.Remove_Index(i));
         
-        eps.Line_Color(VECTOR<T,3>(1,0,0));
-        eps.Draw_Point(a.Remove_Index(i));
-        eps.Draw_Point(d.Remove_Index(i));
+        eps.cur_format.line_color=VECTOR<T,3>(1,0,0);
+        eps.Draw_Object(a.Remove_Index(i));
+        eps.Draw_Object(d.Remove_Index(i));
 
-        eps.Line_Color(VECTOR<T,3>(0,1,0));
-        eps.Draw_Point(b.Remove_Index(i));
-        eps.Draw_Point(e.Remove_Index(i));
+        eps.cur_format.line_color=VECTOR<T,3>(0,1,0);
+        eps.Draw_Object(b.Remove_Index(i));
+        eps.Draw_Object(e.Remove_Index(i));
 
-        eps.Line_Color(VECTOR<T,3>(0,0,1));
-        eps.Draw_Point(c.Remove_Index(i));
-        eps.Draw_Point(f.Remove_Index(i));}
+        eps.cur_format.line_color=VECTOR<T,3>(0,0,1);
+        eps.Draw_Object(c.Remove_Index(i));
+        eps.Draw_Object(f.Remove_Index(i));}
 
     ORIGIN_AREAS::VOL_DATA<T,3,6> data;
     TV pts[6]={a,b,c,d,e,f};

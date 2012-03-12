@@ -20,6 +20,7 @@ template<class T>
 class SPARSE_MATRIX_NXN
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     int n; // size of the n by n matrix
     ARRAY<SPARSE_VECTOR_ND<T>*> A;
     VECTOR_ND<int>* diagonal_index;
@@ -202,6 +203,12 @@ public:
     {for(int i=0;i<n;i++)LOG::cout<<A(i)->number_of_active_indices<<" ";LOG::cout<<std::endl;}
 #endif
 
+    template<class RW> void Read(std::istream& input)
+    {Clean_Memory();Read_Binary<RW>(input,n);A.Resize(n);
+    for(int i=0;i<n;i++){A(i)=new SPARSE_VECTOR_ND<T>(n);Read_Binary<RW>(input,*A(i));}}
+
+    template<class RW> static void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,n);for(int i=0;i<n;i++)Write_Binary<RW>(output,*A(i));}
 //#####################################################################
 };
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_NXN<T>& A)

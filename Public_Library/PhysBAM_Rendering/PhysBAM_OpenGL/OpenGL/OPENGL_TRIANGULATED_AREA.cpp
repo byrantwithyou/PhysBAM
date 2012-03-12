@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PREFERENCES.h>
@@ -161,7 +160,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         int index=((OPENGL_SELECTION_TRIANGULATED_AREA_VERTEX<T>*)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(triangulated_area.particles.X(index))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,triangulated_area.particles,index);}
+        triangulated_area.particles.Print(output_stream,index);}
     else if(selection->type == OPENGL_SELECTION::TRIANGULATED_AREA_SEGMENT){
         PHYSBAM_ASSERT(triangulated_area.mesh.segment_mesh);
         int index=((OPENGL_SELECTION_TRIANGULATED_AREA_SEGMENT<T>*)selection)->index;
@@ -170,11 +169,11 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(triangulated_area.particles.X(node1))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,triangulated_area.particles,node1);
+        triangulated_area.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(triangulated_area.particles.X(node2))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,triangulated_area.particles,node2);}
+        triangulated_area.particles.Print(output_stream,node2);}
     else if(selection->type == OPENGL_SELECTION::TRIANGULATED_AREA_TRIANGLE){
         int index=((OPENGL_SELECTION_TRIANGULATED_AREA_TRIANGLE<T>*)selection)->index;
         int node1,node2,node3;triangulated_area.mesh.elements(index).Get(node1,node2,node3);
@@ -182,15 +181,15 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(triangulated_area.particles.X(node1))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,triangulated_area.particles,node1);
+        triangulated_area.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(triangulated_area.particles.X(node2))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,triangulated_area.particles,node2);
+        triangulated_area.particles.Print(output_stream,node2);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node3<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(triangulated_area.particles.X(node3))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,triangulated_area.particles,node3);}
+        triangulated_area.particles.Print(output_stream,node3);}
 }
 //#####################################################################
 // Function Get_Vertex_Selection

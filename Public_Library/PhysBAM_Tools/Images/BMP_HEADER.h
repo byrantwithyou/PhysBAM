@@ -16,6 +16,7 @@
 namespace PhysBAM{
 
 struct BMP_HEADER{
+    typedef int HAS_UNTYPED_READ_WRITE;
     char file_type[2]; // must be "BM"
     int file_size;
     short reserved1;
@@ -48,9 +49,43 @@ struct BMP_HEADER{
     number_of_colors=0;
     number_of_important_colors=0;} 
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,file_type[0],file_type[1],file_size,reserved1,reserved2,offset,info_header_size);
+    Read_Binary<RW>(input,w,h,number_of_bitplanes,bits_per_pixel,type_of_compression);
+    Read_Binary<RW>(input,bitmap_size,x_pixels_per_meter,y_pixels_per_meter,number_of_colors,number_of_important_colors);
+
+    //check validity
+    if(file_type[0]!='B' || file_type[1]!='M') PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Illegal file type: %c%c",file_type[0],file_type[1]));
+    if(info_header_size != 40) LOG::cerr<<"Warning: weird info_header_size: "<<info_header_size<<" (expected 40)"<<std::endl;
+    if(number_of_bitplanes != 1) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Illegal number of bitplanes: %d (must be 1)",number_of_bitplanes));
+    if(bits_per_pixel != 24) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Number of bits per pixel: %d (the only supported number is 24)",bits_per_pixel));
+    if(type_of_compression != 0) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Type of compression %d (the only supported type is 0)",type_of_compression));}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,file_type[0],file_type[1],file_size,reserved1,reserved2,offset,info_header_size);
+    Write_Binary<RW>(output,w,h,number_of_bitplanes,bits_per_pixel,type_of_compression);
+    Write_Binary<RW>(output,bitmap_size,x_pixels_per_meter,y_pixels_per_meter,number_of_colors,number_of_important_colors);}
 //#####################################################################
 };
+template<class T>
+inline std::ostream& operator<<(std::ostream& output,const BMP_HEADER& header)
+{output<<"BMP_HEADER:"<<std::endl
+    <<"file_type: "<<header.file_type[0]<<" "<<header.file_type[1]<<std::endl
+    <<"file_size  "<<int(header.file_size)<<std::endl
+    <<"reserved1  "<<int(header.reserved1)<<std::endl
+    <<"reserved2  "<<int(header.reserved2)<<std::endl
+    <<"offset     "<<int(header.offset)<<std::endl
+    <<"info_header_size    "<<header.info_header_size<<std::endl
+    <<"w "<<header.w<<", h "<<header.h<<std::endl
+    <<"number_of_bitplanes "<<int(header.number_of_bitplanes)<<std::endl
+    <<"bits_per_pixel      "<<int(header.bits_per_pixel)<<std::endl
+    <<"type_of_compression "<<header.type_of_compression<<std::endl
+    <<"bitmap_size         "<<header.bitmap_size<<std::endl
+    <<"x_pixels_per_meter  "<<header.x_pixels_per_meter<<std::endl
+    <<"y_pixels_per_meter  "<<header.y_pixels_per_meter<<std::endl
+    <<"number_of_colors    "<<header.number_of_colors<<std::endl
+    <<"number_of_important_colors "<<header.number_of_important_colors<<std::endl;
+return output;}
 }
-#include <PhysBAM_Tools/Read_Write/Images/READ_WRITE_BMP_HEADER.h>
 #endif
 #endif

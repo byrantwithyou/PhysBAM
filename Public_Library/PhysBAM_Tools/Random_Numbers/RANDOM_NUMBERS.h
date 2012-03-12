@@ -30,10 +30,10 @@ template<class T,class GENERATOR=MT19937<T> >
 class RANDOM_NUMBERS:public NONCOPYABLE
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     int gaussian_iset; // Used to force Get_Gaussian to reset
     T gset; // used internally by Get_Gaussian
     GENERATOR random_number_generator;
-public:
 
     T Get_Number()
     {return random_number_generator();} // in [0,1)
@@ -43,6 +43,12 @@ public:
 
     template<class T2,class T_ARRAY,class ID> void Fill_Uniform(ARRAY_BASE<T2,T_ARRAY,ID>& array,const T a,const T b)
     {T_ARRAY& derived=array.Derived();for(ID i(0);i<derived.Size();i++) Fill_Uniform(derived(i),a,b);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,gaussian_iset,gset);input>>random_number_generator;}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,gaussian_iset,gset);output<<random_number_generator;}
 
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));

@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING.h>
 namespace PhysBAM{
 

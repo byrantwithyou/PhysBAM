@@ -5,8 +5,6 @@
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_0X0.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGIDS_PARTICLES_FORWARD.h>

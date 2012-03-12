@@ -8,8 +8,6 @@
 #ifndef __READ_WRITE_RIGID_GEOMETRY_COLLECTION__
 #define __READ_WRITE_RIGID_GEOMETRY_COLLECTION__
 
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_STRUCTURE_LIST.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>

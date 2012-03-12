@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
 #include <PhysBAM_Tools/Math_Tools/ZERO.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <cfloat>
 namespace PhysBAM{
@@ -22,6 +23,7 @@ template<class T>
 class INTERVAL
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     template<class T2> struct REBIND{typedef INTERVAL<T2> TYPE;};
     typedef T SCALAR;
 
@@ -196,6 +198,12 @@ public:
     T Signed_Distance(const T& X) const
     {return abs(X-Center())-Size();}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,min_corner,max_corner);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,min_corner,max_corner);}
+
 //#####################################################################
 };
 
@@ -209,5 +217,9 @@ inline INTERVAL<T> operator-(const T& a,const INTERVAL<T>& b)
 
 template<class T> inline INTERVAL<T> operator*(const typename T::SCALAR a,const INTERVAL<T>& interval)
 {return interval*a;}
+
+template<class T>
+inline std::ostream& operator<<(std::ostream& output,const INTERVAL<T>& interval)
+{output<<"("<<interval.min_corner<<" "<<interval.max_corner<<")";return output;}
 }
 #endif

@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Tools/Random_Numbers/NOISE.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_OPEN_WATER.h>

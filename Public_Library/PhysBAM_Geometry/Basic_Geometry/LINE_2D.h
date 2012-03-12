@@ -69,4 +69,5 @@ public:
 //##################################################################### 
 };
 }
+#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_LINE_2D.h>
 #endif

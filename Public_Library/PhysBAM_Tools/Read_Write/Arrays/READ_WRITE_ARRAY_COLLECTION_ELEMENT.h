@@ -10,10 +10,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION_ELEMENT.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_FRAME.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_TWIST.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
 

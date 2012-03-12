@@ -9,7 +9,6 @@
 #define __READ_WRITE_READ_WRITE_ARRAY_COLLECTOIN_ID__
 
 #include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION_ID.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_ELEMENT_ID.h>
 namespace PhysBAM{
 
 template<class RW>

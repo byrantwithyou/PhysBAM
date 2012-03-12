@@ -26,6 +26,7 @@ class LEVELSET_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<TV>
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<T,d-1> T_PRINCIPAL_CURVATURES;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     typedef IMPLICIT_OBJECT<TV> BASE;
     using BASE::box;
 
@@ -41,6 +42,12 @@ public:
 
     LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input);
     virtual ~LEVELSET_IMPLICIT_OBJECT();
+
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    {Read_Binary(input,levelset);Update_Box();Update_Minimum_Cell_Size();}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Binary(output,levelset);}
 
 //###########################################################################
     static LEVELSET_IMPLICIT_OBJECT<TV>* Create();
@@ -81,5 +88,4 @@ public:
 //###########################################################################
 };
 }
-#include <PhysBAM_Geometry/Read_Write/Implicit_Objects_Uniform/READ_WRITE_LEVELSET_IMPLICIT_OBJECT.h>
 #endif

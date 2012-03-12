@@ -27,6 +27,7 @@ class MESH_OBJECT:public STRUCTURE<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     enum WORKAROUND1 {dimension=T_MESH::dimension};
     typedef T_MESH MESH;
     typedef typename MESH_TO_OBJECT<TV,T_MESH>::TYPE T_DERIVED_OBJECT;
@@ -54,6 +55,9 @@ public:
 
     void Own_Particles()
     {need_destroy_particles=true;}
+
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE;
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE;
 
 //#####################################################################
     virtual void Clean_Memory();

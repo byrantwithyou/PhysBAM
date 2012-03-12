@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_FACE_INDEX.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include "ACCURACY_INFO.h"
 #include "HEADER.h"

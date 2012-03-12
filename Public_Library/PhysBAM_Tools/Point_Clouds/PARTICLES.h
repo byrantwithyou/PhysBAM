@@ -16,6 +16,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <memory>
 namespace PhysBAM{
@@ -27,6 +28,7 @@ class PARTICLES:public CLONEABLE<PARTICLES<TV> >
 public:
     typedef T SCALAR;
     typedef TV VECTOR_T;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     ARRAY_COLLECTION* array_collection;
 
@@ -49,7 +51,18 @@ public:
 
     bool operator!=(const PARTICLES<TV>& particles) const
     {return !(*this==particles);}
+
+    template<class RW> void Read(std::istream& input)
+    {int version;
+    Read_Binary<RW>(input,version);
+    if(version!=1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized particle version %d",(int)version));
+    Read_Binary<RW>(input,*array_collection);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,1,*array_collection);}
+
+    void Print(std::ostream& output,const int p)
+    {Read_Write<ARRAY_COLLECTION,float>::Print(output,*array_collection,p);}
 };
 }
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #endif

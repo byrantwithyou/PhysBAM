@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PREFERENCES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SEGMENTED_CURVE_2D.h>
@@ -157,7 +156,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_VERTEX_2D<T> *)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(curve.particles.X(index))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,curve.particles,index);}
+        curve.particles.Print(output_stream,index);}
     else if (selection->type == OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_2D) {
         int index=((OPENGL_SELECTION_SEGMENTED_CURVE_SEGMENT_2D<T> *)selection)->index;
         int node1,node2;curve.mesh.elements(index).Get(node1,node2);
@@ -165,11 +164,11 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(curve.particles.X(node1))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,curve.particles,node1);
+        curve.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(curve.particles.X(node2))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,2> >,T>::Print(output_stream,curve.particles,node2);}
+        curve.particles.Print(output_stream,node2);}
 }
 //#####################################################################
 // Function Clear_Highlight

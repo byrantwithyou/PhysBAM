@@ -191,6 +191,12 @@ public:
     static std::string Static_Extension()
     {return TV::dimension==2?"mphi2d":"mphi";}
 
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE // TODO -- fix to read/write levelsets
+    {/*Read_Binary(input,levelsets);*/Update_Box();Update_Minimum_Cell_Size();}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Binary(output,*levelsets);}
+
 //###########################################################################
 };
 

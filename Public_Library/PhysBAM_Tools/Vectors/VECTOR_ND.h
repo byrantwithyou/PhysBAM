@@ -19,6 +19,7 @@ template<class T>
 class VECTOR_ND:public VECTOR_BASE<T,VECTOR_ND<T> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;typedef VECTOR_BASE<T,VECTOR_ND<T> > BASE;
     template<class T2> struct REBIND{typedef VECTOR_ND<T2> TYPE;};
     typedef T ELEMENT;
@@ -108,10 +109,16 @@ public:
     bool Owns_Data() const
     {return owns_data;}
 
+    template<class RW>
+    void Read(std::istream& input)
+    {assert(Owns_Data());Read_Binary<RW>(input,n);delete[] x;x=new T[n];Read_Binary_Array<RW>(input,x,n);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,n);Write_Binary_Array<RW>(output,x,n);}
 //#####################################################################
 };
+template<class T> inline std::istream& operator>>(std::istream& input,VECTOR_ND<T>& v)
+{FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<v.n;i++) input>>v(i);FILE_UTILITIES::Ignore(input,']');return input;}
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_ND.h>
-#endif
 #endif

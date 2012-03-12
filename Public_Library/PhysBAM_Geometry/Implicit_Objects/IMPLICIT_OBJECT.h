@@ -22,6 +22,7 @@ class IMPLICIT_OBJECT:public STRUCTURE<TV>
     typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     typedef VECTOR<T,d-1> T_CURVATURES;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     RANGE<TV> box; // box containing the voxelized implicit surface

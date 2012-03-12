@@ -18,6 +18,7 @@ class TORUS
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
     TV center,axis;
     T inner_radius,outer_radius;
@@ -46,6 +47,14 @@ public:
 
     static std::string Name()
     {return "TORUS<T>";}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,center,axis,inner_radius,outer_radius);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,center,axis,inner_radius,outer_radius);}
 
 //#####################################################################
 };   

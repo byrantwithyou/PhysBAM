@@ -7,7 +7,6 @@
 #ifndef __EMBEDDED_MATERIAL_SURFACE__
 #define __EMBEDDED_MATERIAL_SURFACE__
 
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDING_POLICY.h>
@@ -21,6 +20,7 @@ class EMBEDDED_MATERIAL_SURFACE:public EMBEDDING<TV>
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     typedef typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT T_EMBEDDED_OBJECT;
     typedef EMBEDDING<TV> BASE;
     using BASE::particles;using BASE::material_surface_mesh;using BASE::material_surface;
@@ -48,6 +48,12 @@ public:
 
 public:
 
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    {material_surface.Clean_Memory();Read_Binary(input,material_surface_mesh,previously_perturbed,embedded_object);}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Binary(output,material_surface_mesh,previously_perturbed,embedded_object);}
+
 //#####################################################################
     static typename EMBEDDING_POLICY<TV,d>::EMBEDDING* Create();
     static typename EMBEDDING_POLICY<TV,d>::EMBEDDING* Create(GEOMETRY_PARTICLES<TV>& new_particles);
@@ -61,5 +67,4 @@ protected:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Fracture/READ_WRITE_EMBEDDED_MATERIAL_SURFACE.h>
 #endif

@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_EMBEDDED_TRIANGULATED_OBJECT__
 #define __READ_WRITE_EMBEDDED_TRIANGULATED_OBJECT__
 
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_EMBEDDED_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TRIANGULATED_OBJECT.h>
 namespace PhysBAM{
 

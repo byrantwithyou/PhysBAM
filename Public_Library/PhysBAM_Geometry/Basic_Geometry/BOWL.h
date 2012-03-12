@@ -15,7 +15,7 @@ class BOWL
     typedef VECTOR<T,3> TV;
 
 public:
-
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     T hole_radius,depth,thickness;
@@ -41,6 +41,12 @@ public:
         T dr;
         T signed_distance,c1,c2;
     };
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,hole_radius,depth,thickness,height,inner_radius,outer_radius);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,hole_radius,depth,thickness,height,inner_radius,outer_radius);}
 
 //#####################################################################
     RANGE<TV> Bounding_Box() const;

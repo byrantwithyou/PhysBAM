@@ -23,6 +23,7 @@ template<class T>
 class DIAGONAL_MATRIX<T,3>
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND1 {m=3,n=3};
 
@@ -232,6 +233,12 @@ public:
 
     VECTOR<T,3> To_Vector() const
     {return VECTOR<T,3>(x11,x22,x33);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x11,x22,x33);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x11,x22,x33);}
 
 //#####################################################################
     MATRIX<T,3> Times_Transpose(const MATRIX<T,3>& A) const;

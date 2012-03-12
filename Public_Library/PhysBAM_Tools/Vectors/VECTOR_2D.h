@@ -48,6 +48,7 @@ public:
     typedef T* iterator; // for stl
     enum WORKAROUND1 {dimension=2};
     enum WORKAROUND2 {m=2};
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     T x,y;
 
@@ -416,6 +417,13 @@ public:
     const T* end() const // for stl
     {return &y+1;}
 
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,x,y);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x,y);}
 //#####################################################################
 };
 
@@ -523,8 +531,8 @@ template<class T> struct QUOTIENT<VECTOR<T,2>,T>{typedef VECTOR<T,2> TYPE;};
 template<class T> struct QUOTIENT<T,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
 template<class T> struct NEGATION<VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
 //#####################################################################
+template<class T>
+inline std::istream& operator>>(std::istream& input,VECTOR<T,2>& v)
+{FILE_UTILITIES::Ignore(input,'[');input>>v.x>>v.y;FILE_UTILITIES::Ignore(input,']');return input;}
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_2D.h>
-#endif
 #endif

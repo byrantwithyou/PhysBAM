@@ -9,8 +9,6 @@
 #define __READ_WRITE_TETRAHEDRALIZED_VOLUME__
 
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
-#include <PhysBAM_Tools/Read_Write/Math_Tools/READ_WRITE_RANGE.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 namespace PhysBAM{
 

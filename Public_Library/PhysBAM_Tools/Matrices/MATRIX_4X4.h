@@ -16,6 +16,7 @@ template<class T>
 class MATRIX<T,4>:public MATRIX_BASE<T,MATRIX<T,4> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;typedef MATRIX_BASE<T,MATRIX<T,4> > BASE;
     using BASE::operator*;using BASE::Transpose_Times;using BASE::Times_Transpose;
 
@@ -191,6 +192,12 @@ public:
     template<class T_MATRIX>
     void Set_Submatrix(const int istart,const int jstart,const T_MATRIX& a)
     {for(int i=0;i<a.Rows();i++) for(int j=0;j<a.Columns();j++) (*this)(istart+i,jstart+j)=a(i,j);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary_Array<RW>(input,x,16);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary_Array<RW>(output,x,16);}
 
 //#####################################################################
     MATRIX operator*(const MATRIX& A) const;

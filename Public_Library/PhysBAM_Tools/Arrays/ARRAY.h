@@ -24,6 +24,7 @@ template<class T,class ID>
 class ARRAY:public ARRAY_BASE<T,ARRAY<T,ID>,ID>
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     template<class T2> struct REBIND{typedef ARRAY<T2,ID> TYPE;};
     template<int length> struct REBIND_LENGTH:public PhysBAM::REBIND_LENGTH<ARRAY,length>{};
     typedef T ELEMENT;typedef ID INDEX;
@@ -213,6 +214,19 @@ public:
     {STATIC_ASSERT(!IS_CONST<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     exchange(m,other.m);exchange(base_pointer,other.base_pointer);exchange(buffer_size,other.buffer_size);}
 
+    template<class RW> void Read(std::istream& input)
+    {Clean_Memory();ID m;Read_Binary<RW>(input,m);
+    if(m<ID()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative array size %d",Value(m)));
+    if(!m) return;
+    Exact_Resize(m);
+    Read_Binary_Array<RW>(input,Get_Array_Pointer(),Value(m));}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Prefix<RW>(output,m);}
+
+    template<class RW> void Write_Prefix(std::ostream& output,const ID prefix) const
+    {PHYSBAM_ASSERT(ID(0)<=prefix && prefix<=Size());
+    Write_Binary<RW>(output,Value(prefix));Write_Binary_Array<RW>(output,Get_Array_Pointer(),Value(prefix));}
 //#####################################################################
 };
 }

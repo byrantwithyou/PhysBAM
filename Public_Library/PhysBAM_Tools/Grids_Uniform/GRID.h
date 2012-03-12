@@ -53,6 +53,7 @@ public:
     typedef TV_INT INDEX; typedef FACE_INDEX<TV::m> INDEX_FACE;
     typedef UNIFORM_TAG<TV> GRID_TAG;
     typedef BLOCK_UNIFORM<GRID<TV> > BLOCK;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     TV_INT counts;
     RANGE<TV> domain;
@@ -551,12 +552,22 @@ public:
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<VECTOR<T2,1> >& array,const int ghost_cells) const
     {for(int s=0;s<ghost_cells;s++) array(-1-s)=array(counts.x+s)=constant;}
     
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,counts);
+    Read_Binary<RW>(input,domain,MAC_offset);
+    Initialize(counts,domain,MAC_offset!=0);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,counts,domain,MAC_offset);}
+
 //#####################################################################
     void Initialize(const TV_INT& counts_input,const RANGE<TV>& box,const bool MAC_grid=false);
     static GRID<TV> Create_Grid_Given_Cell_Size(const RANGE<TV>& domain,const T cell_size,const bool mac_grid,const int boundary_nodes=0);
     static GRID<TV> Create_Even_Sized_Grid_Given_Cell_Size(const RANGE<TV>& domain,const T cell_size,const bool mac_grid,const int boundary_nodes=0);
 //#####################################################################
 };
+template<class TV>
+inline std::ostream& operator<<(std::ostream& output,const GRID<TV>& grid)
+{output<<"("<<grid.domain<<" "<<grid.counts<<")";return output;}
 }
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #endif

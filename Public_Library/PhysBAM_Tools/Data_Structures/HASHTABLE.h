@@ -35,6 +35,7 @@ public:
     typedef HASHTABLE_ITERATOR<TK,T> ITERATOR;
     typedef HASHTABLE_ITERATOR<TK,const T> CONST_ITERATOR;
     typedef FIELD_PROJECTOR<HASHTABLE_ENTRY_TEMPLATE<TK,T>,HASHTABLE_ENTRY_STATE,&HASHTABLE_ENTRY_TEMPLATE<TK,T>::state> T_FIELD_PROJECTOR;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     ARRAY<ENTRY> table;
     int number_of_entries;
@@ -229,7 +230,49 @@ public:
     const ENTRY* end() const
     {return table.Get_Array_Pointer()+table.Size();}
 
+    template<class RW> void Read(typename IF<IS_SAME<T,void>::value,std::istream&,UNUSABLE>::TYPE input) // void version
+    {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
+    for(int i=0;i<entries;i++){TK key;Read_Binary<RW>(input,key);Insert(key);}}
+
+    template<class RW> void Read(typename IF<IS_SAME<T,void>::value,UNUSABLE,std::istream&>::TYPE input) // non-void version
+    {int entries;Read_Binary<RW>(input,entries);Initialize_New_Table(entries);
+    for(int i=0;i<entries;i++){TK key;T value;Read_Binary<RW>(input,key,value);Insert(key,value);}}
+
+    template<class RW> void Write(typename IF<IS_SAME<T,void>::value,std::ostream&,UNUSABLE>::TYPE output) const // void version
+    {Write_Binary<RW>(output,number_of_entries);
+    for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key);}
+
+    template<class RW> void Write(typename IF<IS_SAME<T,void>::value,UNUSABLE,std::ostream&>::TYPE output) const // non-void version
+    {Write_Binary<RW>(output,number_of_entries);
+    for(int h=0;h<table.m;h++) if(table(h).state==ENTRY_ACTIVE) Write_Binary<RW>(output,table(h).key,table(h).data);}
+
 //#####################################################################
 };
+}
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
+namespace PhysBAM{
+template<class K,class T>
+std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,T>& hashtable)
+{
+    output<<"(";
+    bool first=true;
+    for(typename HASHTABLE<K,const T>::ITERATOR iterator(hashtable);iterator.Valid();iterator.Next()){
+        if(!first) output<<" ";first=false;
+        output<<iterator.Key()<<":"<<iterator.Data();}
+    output<<")";
+    return output;
+}
+
+template<class K>
+std::ostream& operator<<(std::ostream& output,const HASHTABLE<K,void>& hashtable)
+{
+    output<<"(";
+    bool first=true;
+    for(typename HASHTABLE<K,void>::ITERATOR iterator(hashtable);iterator.Valid();iterator.Next()){
+        if(!first) output<<" ";first=false;
+        output<<iterator.Key();}
+    output<<")";
+    return output;
+}
 }
 #endif

@@ -20,6 +20,7 @@ class QUATERNION
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
 
     T s;
@@ -116,6 +117,12 @@ public:
 
     static T Dot_Product(const QUATERNION& q1,const QUATERNION& q2)
     {return q1.s*q2.s+TV::Dot_Product(q1.v,q2.v);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,s,v);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,s,v);}
 
 //#####################################################################
 };

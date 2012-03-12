@@ -7,10 +7,7 @@
 #ifndef __READ_WRITE_PHONEME__
 #define __READ_WRITE_PHONEME__
 
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_ND.h>
 #include <PhysBAM_Dynamics/Motion/PHONEME.h>
 namespace PhysBAM{
 

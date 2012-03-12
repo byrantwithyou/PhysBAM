@@ -16,6 +16,7 @@ class FREE_PARTICLES:public STRUCTURE<TV>
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     ARRAY<int> nodes;
 
     FREE_PARTICLES();
@@ -27,6 +28,12 @@ public:
 
     static FREE_PARTICLES* Create(GEOMETRY_PARTICLES<TV>& particles)
     {return Create();}
+
+    void Read(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
+    {Read_Binary(input,nodes);}
+
+    void Write(TYPED_OSTREAM& output) const PHYSBAM_OVERRIDE
+    {Write_Binary(output,nodes);}
 
 //######################################################################
     static FREE_PARTICLES* Create();

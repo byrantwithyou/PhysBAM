@@ -18,7 +18,6 @@
 #define __MPI_EXAMPLE__
 
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_FRAME.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
 #include <PhysBAM_Geometry/Tessellation/RANGE_TESSELLATION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Forces_And_Torques/RIGID_GRAVITY.h>

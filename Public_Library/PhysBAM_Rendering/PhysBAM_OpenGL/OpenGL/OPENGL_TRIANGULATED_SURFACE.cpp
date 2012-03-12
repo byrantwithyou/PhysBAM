@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_PREFERENCES.h>
@@ -332,7 +331,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection,MAT
         int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_VERTEX<T>*)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(index))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,surface.particles,index);}
+        surface.particles.Print(output_stream,index);}
     else if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT){
         PHYSBAM_ASSERT(surface.mesh.segment_mesh);
         int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_SEGMENT<T>*)selection)->index;
@@ -341,11 +340,11 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node1))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,surface.particles,node1);
+        surface.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node2))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,surface.particles,node2);}
+        surface.particles.Print(output_stream,node2);}
     else if(selection->type == OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE){
         int index=((OPENGL_SELECTION_TRIANGULATED_SURFACE_TRIANGLE<T>*)selection)->index;
         int node1,node2,node3;surface.mesh.elements(index).Get(node1,node2,node3);
@@ -353,15 +352,15 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node1<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node1))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,surface.particles,node1);
+        surface.particles.Print(output_stream,node1);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node2<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node2))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,surface.particles,node2);
+        surface.particles.Print(output_stream,node2);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<node3<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(surface.particles.X(node3))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,surface.particles,node3);}
+        surface.particles.Print(output_stream,node3);}
 }
 //#####################################################################
 // Function Get_Vertex_Selection

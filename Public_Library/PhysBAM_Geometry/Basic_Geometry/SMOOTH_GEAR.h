@@ -19,6 +19,7 @@ class SMOOTH_GEAR<VECTOR<T,2> >
 {
     typedef VECTOR<T,2> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     T r,s,co,ci,den;
@@ -34,6 +35,12 @@ public:
         bool flip,ui;
         TV Y,dY,P;
     };
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,r,s,n);Compute_Centers();}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,r,s,n);}
 
 //#####################################################################
     void Compute_Centers();
@@ -60,6 +67,7 @@ class SMOOTH_GEAR<VECTOR<T,3> >
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;typedef SMOOTH_GEAR<VECTOR<T,2> > GEAR;
 
     GEAR g;
@@ -67,6 +75,12 @@ public:
 
     SMOOTH_GEAR(T R=1,T S=.4,int N=8,T W=1);
     SMOOTH_GEAR(const TV& dimensions,int N=8);
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,w,g);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,w,g);}
 
 //#####################################################################
     RANGE<TV> Bounding_Box() const;

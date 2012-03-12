@@ -14,9 +14,7 @@
 #include <PhysBAM_Tools/Images/RGB_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Read

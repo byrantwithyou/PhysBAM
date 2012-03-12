@@ -16,6 +16,7 @@ class PLANE
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     TV normal;
@@ -91,6 +92,14 @@ public:
 
     static std::string Name()
     {return "PLANE<T>";}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,normal,x1);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,normal,x1);}
 
 //#####################################################################
     bool Segment_Plane_Intersection(const TV& endpoint1,const TV& endpoint2,T& interpolation_fraction) const;

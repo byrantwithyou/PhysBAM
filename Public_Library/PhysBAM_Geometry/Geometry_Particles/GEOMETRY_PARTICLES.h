@@ -18,7 +18,7 @@ class GEOMETRY_PARTICLES:public CLONEABLE<GEOMETRY_PARTICLES<TV>,PARTICLES<TV> >
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<GEOMETRY_PARTICLES<TV>,PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;
+    using BASE::array_collection;using BASE::HAS_UNTYPED_READ_WRITE;
 
     ARRAY_VIEW<TV> X,V;
     bool store_velocity;

@@ -17,6 +17,8 @@ template<class T>
 class IMAGE
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     IMAGE()
     {}
 

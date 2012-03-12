@@ -19,6 +19,7 @@ template<class T,int d>
 class ARRAY<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<VECTOR<T,d> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef VECTOR<int,d> TV_INT;
     enum WORKAROUND1 {dimension=d};
     template<class T2> struct REBIND{typedef ARRAY<T2,TV_INT> TYPE;};
@@ -170,7 +171,48 @@ public:
     {a.array.Exchange(b.array);
     exchange(a.domain,b.domain);exchange(a.counts,b.counts);
     a.Calculate_Acceleration_Constants();b.Calculate_Acceleration_Constants();}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_With_Length<RW>(input,1);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_With_Length<RW>(output,1);}
+
+protected:
+    template<class RW>
+    void Read_With_Length(std::istream& input,const int length2)
+    {int read_length;Read_Binary<RW>(input,read_length,domain);
+    if(read_length!=length2) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Read length %d not equal to %d",read_length,length2));
+    if(counts.Min()<0) throw READ_ERROR("Invalid negative array size");
+#ifdef COMPILE_WITH_READ_ONE_BASED_DATA
+    domain.min_corner-=1;
+#endif
+    counts=domain.Edge_Lengths();
+    int size=counts.Product();
+    if(size!=array.Size()){
+        delete[] array.Get_Array_Pointer();
+        ARRAY_VIEW<T> new_array(size,new T[size]);
+        array.Exchange(new_array);
+    }
+    Read_Binary_Array<RW>(input,array.Get_Array_Pointer(),array.Size());Calculate_Acceleration_Constants();}
+
+    template<class RW>
+    void Write_With_Length(std::ostream& output,const int length2) const
+    {Write_Binary<RW>(output,length2,domain);Write_Binary_Array<RW>(output,array.Get_Array_Pointer(),array.Size());}
 //#####################################################################
 };
+
+template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAYS_ND_BASE<VECTOR<T,1> >& a)
+{for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++) output_stream<<a(i)<<" ";output_stream<<std::endl;return output_stream;}
+
+template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<VECTOR<T,2> >& a)
+{for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<a.domain.max_corner.y;j++) output<<a(i,j)<<" ";output<<std::endl;}return output;}
+
+template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<VECTOR<T,3> >& a)
+{for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<a.domain.max_corner.y;j++){for(int ij=a.domain.min_corner.z;ij<a.domain.max_corner.z;ij++)output<<a(i,j,ij)<<" ";output<<std::endl;}
+    output<<"------------------------------------------"<<std::endl;}
+return output;}
 }
 #endif

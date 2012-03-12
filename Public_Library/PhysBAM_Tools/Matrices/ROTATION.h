@@ -30,6 +30,7 @@ class ROTATION<VECTOR<T,1> >
     typedef VECTOR<T,1> TV;
     typedef VECTOR<T,0> T_SPIN;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
 
     bool operator==(const ROTATION<TV>& r) const
@@ -104,7 +105,20 @@ public:
     static ROTATION Average_Rotation(const ARRAY<ROTATION>&)
     {return ROTATION();}
 
+    template<class RW> void Read(std::istream& input)
+    {}
+
+    template<class RW> void Write(std::ostream& output) const
+    {}
 };
+
+template<class T>
+inline std::ostream& operator<<(std::ostream& output_stream,const ROTATION<VECTOR<T,1> >& r)
+{return output_stream;}
+
+template<class T>
+inline std::istream& operator>>(std::istream& input_stream,ROTATION<VECTOR<T,1> >& r)
+{return input_stream;}
 
 //#####################################################################
 // 2D
@@ -124,6 +138,7 @@ private:
     {}
 
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
 
     ROTATION()
@@ -209,12 +224,26 @@ public:
     static ROTATION<TV> From_Euler_Angles(const VECTOR<T,1>& angle)
     {return From_Rotation_Vector(angle);}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,c);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,c);}
+
 //#####################################################################
     static ROTATION<TV> From_Rotated_Vector(const TV& v1,const TV& v2);
     ROTATION<TV> Scale_Angle(const T a) const;
     static ROTATION<TV> Spherical_Linear_Interpolation(const ROTATION<TV>& r1,const ROTATION<TV>& r2,const T t);
     static ROTATION<TV> Average_Rotation(const ARRAY<ROTATION<TV> >& rotations);
 };
+
+template<class T>
+inline std::ostream& operator<<(std::ostream& output_stream,const ROTATION<VECTOR<T,2> >& r)
+{return output_stream<<r.Complex();}
+
+template<class T>
+inline std::istream& operator>>(std::istream& input_stream,ROTATION<VECTOR<T,2> >& r)
+{COMPLEX<T> c;input_stream>>c;r=ROTATION<VECTOR<T,3> >::From_Complex(c);return input_stream;}
 
 //#####################################################################
 // 3D
@@ -239,6 +268,7 @@ private:
 
     class UNUSABLE {};
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
 
     ROTATION()
@@ -321,6 +351,12 @@ public:
     TV Rotated_Axis(const int axis) const
     {assert((unsigned)axis<3);if(axis==0) return Rotated_X_Axis();if(axis==1) return Rotated_Y_Axis();return Rotated_Z_Axis();}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,q);if(!IS_SAME<T,int>::value && !Is_Normalized()) PHYSBAM_FATAL_ERROR("Read nonnormalized rotation");}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,q);}
+
 //#####################################################################
     TV Rotation_Vector() const;
     static ROTATION<TV> From_Rotation_Vector(const TV& v);
@@ -340,6 +376,14 @@ public:
     static ROTATION<TV> From_Rotated_Vector(const TV& initial_vector,const TV& final_vector);
 };
 //#####################################################################
+
+template<class T>
+inline std::ostream& operator<<(std::ostream& output,const ROTATION<VECTOR<T,3> >& r)
+{return output<<r.Quaternion();}
+
+template<class T>
+inline std::istream& operator>>(std::istream& input,ROTATION<VECTOR<T,3> >& r)
+{QUATERNION<T> q;input>>q;r=ROTATION<VECTOR<T,3> >::From_Quaternion(q);return input;}
 
 template<> inline VECTOR<int,3> ROTATION<VECTOR<int,3> >::
 Rotate(const VECTOR<int,3>& v) const // homogenous of degree 2 in q, since we can't usefully assume normalization for integer case

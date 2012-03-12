@@ -72,6 +72,9 @@ public:
     T Min_Phi() const PHYSBAM_OVERRIDE
     {return -sphere.radius;}
 
+    virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}
+    virtual void Write(TYPED_OSTREAM& output) const {PHYSBAM_FATAL_ERROR();}
+
 //#####################################################################
 };
 }

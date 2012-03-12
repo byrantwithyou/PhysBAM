@@ -6,7 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/DYNAMIC_LIST.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-namespace PhysBAM{
+using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -149,4 +149,45 @@ Fill_Needs_Write()
     needs_write=index_to_id_map;
 }
 //#####################################################################
+// Constructor
+//#####################################################################
+template<class RW> void DYNAMIC_LIST_CORE::
+Read(const std::string& prefix,ARRAY<int>& needs_init)
+{
+    pointer_to_id_map.Clean_Memory();
+    needs_init.Remove_All();
+    needs_write.Remove_All();
+    ARRAY<int> active_ids;char version;
+    FILE_UTILITIES::Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,active_ids);
+    PHYSBAM_ASSERT(version==1);
+    ARRAY<void*> new_array;
+    ARRAY<bool> element_copied(array.Size());
+    id_to_index_map.Resize(next_unique_id,true,true,-1);
+    for(int i=0;i<active_ids.Size();i++){
+        int index=id_to_index_map(active_ids(i));
+        if(index>=0){new_array.Append(array(index));element_copied(index)=true;}
+        else{new_array.Append((void*)(0));needs_init.Append(active_ids(i));}}
+    for(int i=0;i<array.Size();i++)if(!element_copied(i)) Delete_And_Clear(array(i));
+    index_to_id_map.Resize(active_ids.Size());
+    id_to_index_map.Fill(-1);
+    for(int i=0;i<new_array.Size();i++){
+        pointer_to_id_map.Set(new_array(i),active_ids(i));
+        index_to_id_map(i)=active_ids(i);
+        id_to_index_map(active_ids(i))=i;}
+    array.Exchange(new_array);
 }
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class RW> void DYNAMIC_LIST_CORE::
+Write(const std::string& prefix) const
+{
+    const char version=1;
+    FILE_UTILITIES::Write_To_File<RW>(STRING_UTILITIES::string_sprintf("%sactive_ids",prefix.c_str()),version,next_unique_id,index_to_id_map);
+    for(int i=needs_write.m-1;i>=0;i--) if(id_to_index_map(needs_write(i))<0) needs_write.Remove_Index_Lazy(i);
+    // handle case of new element which was removed without being written
+}
+template void DYNAMIC_LIST_CORE::Read<double>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<int,int>&);
+template void DYNAMIC_LIST_CORE::Read<float>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&,ARRAY<int,int>&);
+template void DYNAMIC_LIST_CORE::Write<double>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&) const;
+template void DYNAMIC_LIST_CORE::Write<float>(std::basic_string<char,std::char_traits<char>,std::allocator<char> > const&) const;

@@ -19,6 +19,7 @@ class SPHERE
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     TV center;
@@ -67,6 +68,14 @@ public:
 
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const
     {return VECTOR<T,d-1>::All_Ones_Vector()/radius;}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,center,radius);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,center,radius);}
 
 //#####################################################################
     void Sector_Volumes(const TV& origin,T volumes[1<<d],const T thickness_over_two=0) const;

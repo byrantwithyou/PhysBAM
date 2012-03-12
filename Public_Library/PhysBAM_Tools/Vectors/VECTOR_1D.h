@@ -17,6 +17,7 @@
 #include <PhysBAM_Tools/Math_Tools/rint.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_0D.h>
@@ -48,6 +49,7 @@ public:
     typedef T* iterator; // for stl
     enum WORKAROUND1 {dimension=1};
     enum WORKAROUND2 {m=1};
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     T x;
 
@@ -348,6 +350,13 @@ public:
     const T* end() const // for stl
     {return &x+1;}
 
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,x);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x);}
 //#####################################################################
 };
 
@@ -451,8 +460,8 @@ template<class T> struct QUOTIENT<VECTOR<T,1>,T>{typedef VECTOR<T,1> TYPE;};
 template<class T> struct QUOTIENT<T,VECTOR<T,1> >{typedef VECTOR<T,1> TYPE;};
 template<class T> struct NEGATION<VECTOR<T,1> >{typedef VECTOR<T,1> TYPE;};
 //#####################################################################
+template<class T>
+inline std::istream& operator>>(std::istream& input,VECTOR<T,1>& v)
+{FILE_UTILITIES::Ignore(input,'[');input>>v.x;FILE_UTILITIES::Ignore(input,']');return input;}
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_1D.h>
-#endif
 #endif

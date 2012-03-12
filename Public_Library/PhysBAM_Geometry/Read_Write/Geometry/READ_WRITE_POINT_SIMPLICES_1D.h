@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_POINT_SIMPLICES_1D__
 #define __READ_WRITE_POINT_SIMPLICES_1D__
 
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 namespace PhysBAM{
 

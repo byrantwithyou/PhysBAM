@@ -8,8 +8,6 @@
 #define __DEFORMABLE_OBJECT_FLUID_COLLISIONS__
 
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>

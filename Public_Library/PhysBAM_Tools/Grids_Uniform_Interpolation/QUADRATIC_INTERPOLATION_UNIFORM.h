@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 

@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_FACE_INDEX.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/LEVELSET_FACE_POISSON_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/LEVELSET_INDEX_MAP_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>

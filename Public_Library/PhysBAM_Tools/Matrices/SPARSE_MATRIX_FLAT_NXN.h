@@ -17,16 +17,24 @@ namespace PhysBAM{
 template<class T>
 struct SPARSE_MATRIX_ENTRY
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
     int j;T a;
     SPARSE_MATRIX_ENTRY():j(-1),a(0){}
     SPARSE_MATRIX_ENTRY(int index,T value):j(index),a(value){}
     bool operator<(const SPARSE_MATRIX_ENTRY& s) const {return j<s.j;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,j,a);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,j,a);}
 };
 
 template<class T>
 class SPARSE_MATRIX_FLAT_NXN
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     int n; // size of the n by n matrix
     ARRAY<int> offsets;
@@ -49,6 +57,12 @@ public:
 
     const T operator()(const int i,const int j) const
     {int index=Find_Index(i,j);assert(A(index).j==j);return A(index).a;}
+
+    template<class RW> void Read(std::istream& input)
+    {diagonal_index.Clean_Memory();delete C;C=0;Read_Binary<RW>(input,n,offsets,A);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,n,offsets,A);}
 
 //#####################################################################
     SPARSE_MATRIX_FLAT_NXN();

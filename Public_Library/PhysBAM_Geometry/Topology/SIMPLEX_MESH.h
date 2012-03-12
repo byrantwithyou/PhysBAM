@@ -20,6 +20,7 @@ template<int d>
 class SIMPLEX_MESH
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     enum WORKAROUND {dimension=d};
 
     int number_nodes; // number of nodes in the mesh
@@ -75,6 +76,9 @@ public:
 
     template<class T_CONNECTIVITY> void Add_Connectivity(T_CONNECTIVITY& particle_connectivity) const
     {for(int t=0;t<elements.m;t++) particle_connectivity.Union(elements(t));}
+
+    template<class RW> void Read(std::istream& input);
+    template<class RW> void Write(std::ostream& output) const;
 
 //#####################################################################
     virtual void Clean_Memory();

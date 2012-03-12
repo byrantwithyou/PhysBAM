@@ -8,12 +8,16 @@
 #define __PAIR__
 
 #include <PhysBAM_Tools/Math_Tools/choice.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <iostream>
 namespace PhysBAM{
 
 template<class T1,class T2>
 class PAIR
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     template<int i> struct GET:public IF<i==0,T1,T2>{};
 
     T1 x;T2 y;
@@ -50,11 +54,24 @@ public:
     void Get(T1& a,T2& b) const
     {a=x;b=y;}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x,y);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x,y);}
+
 //#####################################################################
 };  
 template<class T1,class T2>
 inline PAIR<T1,T2> Tuple(const T1& x,const T2& y)
 {return PAIR<T1,T2>(x,y);}
+
+template<class T1,class T2>
+inline std::istream& operator>>(std::istream& input,PAIR<T1,T2>& p)
+{FILE_UTILITIES::Ignore(input,'(');input>>p.x>>p.y;FILE_UTILITIES::Ignore(input,')');return input;}
+
+template<class T1,class T2>
+inline std::ostream& operator<<(std::ostream& output,const PAIR<T1,T2>& p)
+{output<<"("<<p.x<<" "<<p.y<<")";return output;}
 }
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
 #endif

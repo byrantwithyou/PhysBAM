@@ -16,6 +16,8 @@ class SIDED_FACE_INDEX
 {
     typedef VECTOR<int,d> TV_INT;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     SIDED_FACE_INDEX()
         :side(0),axis(0)
     {}
@@ -49,6 +51,15 @@ public:
 
     TV_INT Ghost_Cell_Index() const
     {return side==1?index-TV_INT::Axis_Vector(axis):index;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,side,axis,index);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,side,axis,index);}
 };
+template<int d>
+inline std::ostream& operator<<(std::ostream& output,const SIDED_FACE_INDEX<d>& fi)
+{output<<"("<<fi.side<<" "<<fi.axis<<" "<<fi.index<<")";return output;}
 }
 #endif

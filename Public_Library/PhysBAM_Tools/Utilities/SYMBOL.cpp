@@ -52,11 +52,28 @@ Name_To_Key(const std::string& name)
 //#####################################################################
 // Function Mapping
 //#####################################################################
-SYMBOL_MAPPING&
-Mapping()
+SYMBOL_MAPPING& Mapping()
 {
     static SYMBOL_MAPPING mapping;
     return mapping;
+}
+//#####################################################################
+// Function Read
+//#####################################################################
+template<class RW> void SYMBOL::
+Read(std::istream& input)
+{
+    std::string name;
+    Read_Binary<RW>(input,name);
+    key=Mapping().Name_To_Key(name);
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class RW> void SYMBOL::
+Write(std::ostream& output) const
+{
+    Write_Binary<RW>(output,Name());
 }
 //#####################################################################
 }

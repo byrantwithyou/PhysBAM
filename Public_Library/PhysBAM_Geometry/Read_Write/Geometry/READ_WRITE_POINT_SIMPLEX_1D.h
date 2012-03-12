@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_POINT_SIMPLEX_1D__
 #define __READ_WRITE_POINT_SIMPLEX_1D__
 
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_1D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 namespace PhysBAM{
 

@@ -26,6 +26,7 @@ public:
     enum {dimension=d};
     typedef ARRAY<T,FACE_INDEX<d> > BASE;
     typedef ARRAY_VIEW<T,TV_INT> T_ARRAY_VIEW;
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     template<class T2> struct REBIND{typedef ARRAY<T2,SIDED_FACE_INDEX<dimension> > TYPE;};
     typedef T ELEMENT;

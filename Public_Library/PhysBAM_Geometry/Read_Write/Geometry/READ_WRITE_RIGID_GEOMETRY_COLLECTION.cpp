@@ -16,7 +16,7 @@ using namespace PhysBAM;
 template<class RW,class TV> void Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,RW>::
 Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,RIGID_GEOMETRY_COLLECTION<TV>& object,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
 {
-    Read_Write<STRUCTURE_LIST<TV,int>,RW>::Read(directory,"rigid_body_structure_",frame,object.structure_list);
+    object.structure_list.template Read<RW>(directory,"rigid_body_structure_",frame);
     ARRAY<RIGID_GEOMETRY<TV>*> bodies(object.particles.rigid_geometry);
     object.particles.rigid_geometry.Fill(0);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",directory.c_str(),frame),object.particles);
@@ -81,7 +81,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
 template<class RW,class TV> void Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,RW>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame,const RIGID_GEOMETRY_COLLECTION<TV>& object)
 {
-    Read_Write<STRUCTURE_LIST<TV,int>,RW>::Write(directory,"rigid_body_structure_",frame,object.structure_list);
+    object.structure_list.template Write<RW>(directory,"rigid_body_structure_",frame);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",directory.c_str(),frame),object.particles);
 
     // update names

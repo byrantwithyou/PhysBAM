@@ -5,8 +5,6 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
-#include <PhysBAM_Tools/Read_Write/Point_Clouds/READ_WRITE_PARTICLES.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
@@ -593,7 +591,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_VERTEX<T>*)selection)->index;
         output_stream<<"Vertex "<<index<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(index))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,index);}
+        particles->Print(output_stream,index);}
     else if(selection->type==OPENGL_SELECTION::TETRAHEDRALIZED_VOLUME_TETRAHEDRON){
         int index=((OPENGL_SELECTION_TETRAHEDRALIZED_VOLUME_TETRAHEDRON<T>*)selection)->index;
         const VECTOR<int,4>& nodes=mesh->elements(index);
@@ -602,19 +600,19 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION* selection,MAT
         output_stream<<std::endl;
         output_stream<<"Vertex "<<nodes[0]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[0]))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[0]);
+        particles->Print(output_stream,nodes[0]);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<nodes[1]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[1]))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[1]);
+        particles->Print(output_stream,nodes[1]);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<nodes[2]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[2]))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[2]);
+        particles->Print(output_stream,nodes[2]);
         output_stream<<std::endl;
         output_stream<<"Vertex "<<nodes[3]<<std::endl;
         if(transform){output_stream<<"WORLD Position "<<transform->Homogeneous_Times(particles->X(nodes[3]))<<std::endl;}
-        Read_Write<GEOMETRY_PARTICLES<VECTOR<T,3> >,T>::Print(output_stream,*particles,nodes[3]);
+        particles->Print(output_stream,nodes[3]);
 
         T distance;TV min_normal,weights;
         int spring=Find_Shortest_Spring(nodes,distance,min_normal,weights);

@@ -48,6 +48,9 @@ public:
     T Integration_Step(const T phi) const PHYSBAM_OVERRIDE
     {return max(phi,particle_processing->tolerance);}
     
+    virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}
+    virtual void Write(TYPED_OSTREAM& output) const {PHYSBAM_FATAL_ERROR();}
+
 //###########################################################################
 };
 }

@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_ORIENTED_BOX__
 #define __READ_WRITE_ORIENTED_BOX__
 
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 namespace PhysBAM{
 

@@ -207,6 +207,26 @@ Calculate_Boundary_From_Levelset_On_Nodes(ARRAY<T>& phi,const bool discard_eleme
     TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Calculate_Boundary_From_Levelset_On_Nodes(*this,phi,discard_elements_outside_levelset,verbose);
 }
 //#####################################################################
+// Function Read_Helper
+//#####################################################################
+template<class TV,int d> void EMBEDDED_OBJECT<TV,d>::
+Read(TYPED_ISTREAM& input)
+{
+    Clean_Memory(); // reads entire simplicial_object instead of just simplicial_mesh
+    int backward_compatible;
+    Read_Binary(input,embedded_particles,backward_compatible,parent_particles,interpolation_fraction,simplicial_object,embedded_mesh,backward_compatible);
+    Read_Binary(input,node_in_simplex_is_material,interpolation_fraction_threshold,orientation_index);
+}
+//#####################################################################
+// Function Write
+//#####################################################################
+template<class TV,int d> void EMBEDDED_OBJECT<TV,d>::
+Write(TYPED_OSTREAM& output) const
+{
+    Write_Binary(output,embedded_particles,2,parent_particles,interpolation_fraction,simplicial_object,embedded_mesh,d+1,node_in_simplex_is_material);
+    Write_Binary(output,interpolation_fraction_threshold,orientation_index);
+}
+//#####################################################################
 template class EMBEDDED_OBJECT<VECTOR<float,2>,2>;
 template class EMBEDDED_OBJECT<VECTOR<float,3>,2>;
 template class EMBEDDED_OBJECT<VECTOR<float,3>,3>;

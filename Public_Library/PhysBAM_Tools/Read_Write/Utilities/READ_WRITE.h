@@ -95,10 +95,10 @@ class Read_Write
 {
 public:
     // Making this "virtual" base class.  Nothing should use it directly.
-    static void Read(std::istream& input,T& d)
+    void Read(std::istream& input,T& d)
     {STATIC_ASSERT((T)false);}
 
-    static void Write(std::ostream& output,const T& d)
+    void Write(std::ostream& output,const T& d)
     {STATIC_ASSERT((T)false);}
 };
 //#####################################################################
@@ -107,10 +107,10 @@ public:
 template<class T,class RW> class Read_Write<T,RW,typename ENABLE_IF<IS_BINARY_IO_SAFE<T,RW>::value>::TYPE>
 {
 public:
-    static void Read(std::istream& input,T& d)
+    void Read(std::istream& input,T& d)
     {input.read(reinterpret_cast<char*>(&d),sizeof(T));}
 
-    static void Write(std::ostream& output,const T& d)
+    void Write(std::ostream& output,const T& d)
     {output.write(reinterpret_cast<const char*>(&d),sizeof(T));}
 };
 //#####################################################################
@@ -119,38 +119,11 @@ public:
 template<class T,class RW> class Read_Write<T,RW,typename ENABLE_IF<(IS_INTEGRAL<T>::value || IS_ENUM<T>::value) && !IS_BINARY_IO_SAFE<T,RW>::value>::TYPE>
 {
 public:
-    static void Read(std::istream& input,T& d)
+    void Read(std::istream& input,T& d)
     {Read_Primitive(input,d);}
 
-    static void Write(std::ostream& output,const T& d)
+    void Write(std::ostream& output,const T& d)
     {Write_Primitive(output,d);}
-};
-//#####################################################################
-// Read_Write for float and double
-//#####################################################################
-template<class T,class RW> class Read_Write<T,RW,typename ENABLE_IF<(IS_SAME<T,float>::value || IS_SAME<T,double>::value) && !IS_BINARY_IO_SAFE<T,RW>::value>::TYPE>
-{
-public:
-    static void Read(std::istream& input,T& d)
-    {RW tmp;Read_Primitive(input,tmp);d=(T)tmp;}
-
-    static void Write(std::ostream& output,const T& d)
-    {Write_Primitive(output,(RW)d);}
-};
-//#####################################################################
-// Read_Write for pointers to data
-//#####################################################################
-template<class T,class RW>
-class Read_Write<T*,RW>
-{
-public:
-    static void Read(std::istream& input,T*& d)
-    {bool data_exists;Read_Primitive(input,data_exists);
-    if(data_exists){d=new T();Read_Binary<RW>(input,*d);}else d=0;} // potential memory leak if d pointed elsewhere
-
-    static void Write(std::ostream& output,T* const& d)
-    {Write_Primitive(output,d!=0); // write a bool tag indicating whether pointer's data follows
-    if(d) Write_Binary<RW>(output,*d);}
 };
 //#####################################################################
 // Read_Write for std::string's

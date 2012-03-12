@@ -19,6 +19,7 @@ template<class T>
 class MATRIX<T,3>:public MATRIX_BASE<T,MATRIX<T,3> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;typedef MATRIX_BASE<T,MATRIX<T,3> > BASE;
     enum WORKAROUND1 {m=3,n=3};
     using BASE::operator*;using BASE::Times_Transpose;using BASE::Transpose_Times;
@@ -350,6 +351,12 @@ public:
 
     static MATRIX<T,3> Cross_Product_Matrix(const VECTOR<T,3>& v)
     {return MATRIX<T,3>(0,v.z,-v.y,-v.z,0,v.x,v.y,-v.x,0);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary_Array<RW>(input,x,m*n);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary_Array<RW>(output,x,m*n);}
 
 //#####################################################################
     MATRIX(const MATRIX_MXN<T>& matrix_input);

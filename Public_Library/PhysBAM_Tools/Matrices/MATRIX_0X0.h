@@ -17,6 +17,7 @@ class MATRIX<T,0>:public MATRIX_BASE<T,MATRIX<T,0> >
 public:
     typedef T SCALAR;
     enum WORKAROUND1 {m=0,n=0};
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     explicit MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(),INITIAL_SIZE nn=INITIAL_SIZE())
     {assert(mm==INITIAL_SIZE() && nn==INITIAL_SIZE());}
@@ -207,6 +208,12 @@ public:
 
     MATRIX<T,1,0> Cross_Product_Matrix_Transpose_Times(const VECTOR<T,1>& v)
     {return MATRIX<T,1,0>();}
+
+    template<class RW> void Read(std::istream& input)
+    {}
+
+    template<class RW> void Write(std::ostream& output) const
+    {}
 
 //#####################################################################
 };

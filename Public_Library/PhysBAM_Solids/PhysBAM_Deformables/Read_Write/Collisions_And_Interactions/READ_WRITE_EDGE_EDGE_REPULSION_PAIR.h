@@ -8,7 +8,6 @@
 #define __READ_WRITE_EDGE_EDGE_REPULSION_PAIR__
 
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS.h>
 namespace PhysBAM{
 

@@ -22,6 +22,7 @@ class VECTOR<T,0>:public VECTOR_BASE<T,VECTOR<T,0> >
 {
     struct UNUSABLE{};
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     enum WORKAROUND1 {dimension=0};
     enum WORKAROUND2 {m=0};
     typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
@@ -150,6 +151,14 @@ public:
 
     static VECTOR Componentwise_Max(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR();}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {}
 };
 
 template<class T> inline VECTOR<T,0>
@@ -183,8 +192,8 @@ template<class T> struct QUOTIENT<VECTOR<T,0>,T>{typedef VECTOR<T,0> TYPE;};
 template<class T> struct QUOTIENT<T,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
 template<class T> struct NEGATION<VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
 //#####################################################################
+template<class T>
+inline std::istream& operator>>(std::istream& input,VECTOR<T,0>&)
+{if(input.peek()=='[') input.get();if(input.peek()==']') input.get();return input;}
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_0D.h>
-#endif
 #endif

@@ -55,6 +55,9 @@ public:
     VECTOR<T,2> horizontal_normal=slice_normal.x*horizontal_direction;
     return TV(horizontal_normal.x,slice_normal.y,horizontal_normal.y);}
 
+    virtual void Read(TYPED_ISTREAM& input) {PHYSBAM_FATAL_ERROR();}
+    virtual void Write(TYPED_OSTREAM& output) const {PHYSBAM_FATAL_ERROR();}
+
 //#####################################################################
 };
 }

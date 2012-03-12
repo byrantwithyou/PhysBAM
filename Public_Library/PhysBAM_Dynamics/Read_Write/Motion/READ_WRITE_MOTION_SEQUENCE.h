@@ -7,8 +7,6 @@
 #ifndef __READ_WRITE_MOTION_SEQUENCE__
 #define __READ_WRITE_MOTION_SEQUENCE__
 
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform_Arrays/READ_WRITE_ARRAYS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
 #include <PhysBAM_Dynamics/Motion/MOTION_SEQUENCE.h>
 namespace PhysBAM{

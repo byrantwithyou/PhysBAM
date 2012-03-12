@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_HEXAHEDRALIZED_VOLUME__
 #define __READ_WRITE_HEXAHEDRALIZED_VOLUME__
 
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Read_Write/Topology/READ_WRITE_HEXAHEDRON_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 namespace PhysBAM{

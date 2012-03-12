@@ -27,6 +27,7 @@ class ARRAY_VIEW:public ARRAY_BASE<typename REMOVE_CONST<T>::TYPE,ARRAY_VIEW<T,I
     template<class S> struct COPY_CONST:public IF<IS_CONST<T>::value,typename ADD_CONST<S>::TYPE,S>{};
     typedef ARRAY_BASE<typename REMOVE_CONST<T>::TYPE,ARRAY_VIEW<T,ID>,ID> BASE;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename REMOVE_CONST<T>::TYPE ELEMENT;typedef ID INDEX;
     typedef T& RESULT_TYPE;
 
@@ -35,7 +36,6 @@ public:
     friend class ARRAY_VIEW<typename IF<IS_CONST<T>::value,ELEMENT,const ELEMENT>::TYPE,ID>;
     typename COPY_CONST<T*>::TYPE base_pointer;
 
-public:
     using BASE::Same_Array;
 
     ARRAY_VIEW(const ID m,T* raw_data)
@@ -100,6 +100,16 @@ public:
     void Exchange(ARRAY_VIEW& other)
     {STATIC_ASSERT(!IS_CONST<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     exchange(m,other.m);exchange(base_pointer,other.base_pointer);}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {ID read_size;Read_Binary<RW>(input,read_size);
+    if(read_size!=Size()) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Expected size %d, read %d",Size(),read_size));
+    Read_Binary_Array<RW>(input,Get_Array_Pointer(),Value(Size()));}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {ID m=Size();Write_Binary<RW>(output,m);Write_Binary_Array<RW>(output,Get_Array_Pointer(),Value(m));}
 
 //#####################################################################
 };

@@ -8,7 +8,6 @@
 #ifndef __READ_WRITE_SEGMENTED_CURVE__
 #define __READ_WRITE_SEGMENTED_CURVE__
 
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_MESH_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 namespace PhysBAM{
 

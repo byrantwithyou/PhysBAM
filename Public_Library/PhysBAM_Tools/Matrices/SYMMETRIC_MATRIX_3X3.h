@@ -21,6 +21,7 @@ template<class T>
 class SYMMETRIC_MATRIX<T,3>
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND1 {m=3,n=3};
 
@@ -288,6 +289,12 @@ public:
 
     SYMMETRIC_MATRIX<T,3> Conjugate_With_Cross_Product_Matrix(const VECTOR<T,3>& v) const
     {return Cross_Product_Matrix_Times(v).Times_Cross_Product_Matrix_With_Symmetric_Result(-v);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,x11,x21,x31,x22,x32,x33);}
+
+    template<class RW>  void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x11,x21,x31,x22,x32,x33);}
 
 //#####################################################################
     MATRIX<T,3> operator*(const DIAGONAL_MATRIX<T,3>& A) const;

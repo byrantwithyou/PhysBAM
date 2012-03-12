@@ -32,6 +32,7 @@ class INDIRECT_ARRAY:public INDIRECT_ARRAY_BASE<T_INDICES>,
     struct UNUSABLE{};
     typedef typename IF<IS_ARRAY_VIEW<T_ARRAY>::value,T_ARRAY,T_ARRAY&>::TYPE T_ARRAY_VIEW;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T ELEMENT;typedef ID INDEX;
     typedef typename ARRAY_RESULT_TYPE<T_ARRAY>::TYPE RESULT_TYPE;
     typedef typename T_ARRAY::CONST_RESULT_TYPE CONST_RESULT_TYPE;
@@ -94,6 +95,11 @@ private:
     static ID Offset_If_Contiguous(const ARRAY_PLUS_SCALAR<int,T_INDICES_2>& indices)
     {return indices.c+Offset_If_Contiguous(indices.array);}
 
+    template<class RW> void Read(std::istream& input)
+    {PHYSBAM_NOT_IMPLEMENTED();}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,Size());Write_Binary_Array<RW>(output,Get_Array_Pointer(),Size());}
 //#####################################################################
 };
 }

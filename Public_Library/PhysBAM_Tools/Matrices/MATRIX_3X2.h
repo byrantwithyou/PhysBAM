@@ -19,6 +19,7 @@ template<class T>
 class MATRIX<T,3,2>:public MATRIX_BASE<T,MATRIX<T,3,2> >
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;typedef MATRIX_BASE<T,MATRIX<T,3,2> > BASE;
     enum WORKAROUND1 {m=3,n=2};
     using BASE::operator*;using BASE::Times_Transpose;using BASE::Transpose_Times;
@@ -211,6 +212,12 @@ public:
 
     static MATRIX Outer_Product(const VECTOR<T,3>& u,const VECTOR<T,2>& v)
     {MATRIX result;for(int i=0;i<3;i++) for(int j=0;j<2;j++) result(i,j)=u(i)*v(j);return result;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary_Array<RW>(input,x,m*n);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary_Array<RW>(output,x,m*n);}
 
 //#####################################################################
     void Fast_Singular_Value_Decomposition(MATRIX& U,DIAGONAL_MATRIX<T,2>& singular_values,MATRIX<T,2>& V) const;

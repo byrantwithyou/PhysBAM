@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 #include <PhysBAM_Dynamics/Motion/FACE_CONTROL_SET.h>
 namespace PhysBAM{

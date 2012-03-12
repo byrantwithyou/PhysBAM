@@ -15,6 +15,7 @@ class CYLINDER
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     T height,radius;
@@ -47,6 +48,15 @@ public:
 
     static std::string Name() 
     {return "CYLINDER<T>";}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,plane1.x1,plane2.x1,radius);
+    Set_Endpoints(plane1.x1,plane2.x1);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,plane1.x1,plane2.x1,radius);}
 
 //#####################################################################
     TV Normal(const TV& location) const;

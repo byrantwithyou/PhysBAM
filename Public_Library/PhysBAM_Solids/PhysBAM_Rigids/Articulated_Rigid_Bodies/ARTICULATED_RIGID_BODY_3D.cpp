@@ -6,9 +6,6 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Optimization/LINEAR_PROGRAMMING.h>
 #include <PhysBAM_Tools/Optimization/QUADRATIC_PROGRAMMING.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_PAIR.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_FRAME.h>
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_ND.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT.h>

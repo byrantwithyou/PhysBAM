@@ -36,6 +36,7 @@ public:
     typedef T* iterator; // for stl
     enum WORKAROUND1 {dimension=d};
     enum WORKAROUND2 {m=d};
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     T array[d];
 
@@ -303,6 +304,11 @@ public:
     const T* end() const // for stl
     {return array+d;}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary_Array<RW>(input,array,d);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary_Array<RW>(output,array,d);}
 //#####################################################################
     int Dominant_Axis() const;
 //#####################################################################
@@ -391,7 +397,4 @@ template<class T,int d> struct QUOTIENT<VECTOR<T,d>,VECTOR<T,d>,typename ENABLE_
 template<class T,int d> struct QUOTIENT<T,VECTOR<T,d>,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
 //#####################################################################
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR.h>
-#endif
 #endif

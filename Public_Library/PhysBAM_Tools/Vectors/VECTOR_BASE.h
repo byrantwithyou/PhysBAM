@@ -229,6 +229,9 @@ public:
     static T_VECTOR1 Componentwise_And(const VECTOR_BASE<bool,T_VECTOR1>& u,const VECTOR_BASE<bool,T_VECTOR2>& v)
     {Assert_Same_Size(u,v);T_VECTOR1 result(INITIAL_SIZE(u.Size()));for(int i=0;i<u.Size();i++) result(i)=(u(i) && v(i));return result;}
 
+    void Write_Raw(std::ostream& output) const
+    {int m=Size();for(int i=0;i<m;i++){output<<(*this)(i);if(i<m-1) output<<" ";}}
+
 //#####################################################################
 };
 
@@ -262,6 +265,9 @@ template<class T,class T_VECTOR> T_VECTOR& operator/=(VECTOR_BASE<T,T_VECTOR>& v
 template<class T_VECTOR1,class T_VECTOR2> struct CAN_ASSIGN<T_VECTOR1,T_VECTOR2,typename ENABLE_IF<IS_VECTOR<T_VECTOR1>::value && IS_VECTOR<T_VECTOR2>::value && CAN_ASSIGN<typename T_VECTOR1::ELEMENT,typename T_VECTOR2::ELEMENT>::value && !IS_SAME<T_VECTOR1,T_VECTOR2>::value>::TYPE>
 {static const bool value=true;};
 //#####################################################################
+template<class T,class T_VECTOR> inline std::ostream&
+operator<<(std::ostream& output,const VECTOR_BASE<T,T_VECTOR>& a)
+{output<<"[";a.Write_Raw(output);output<<"]";return output;}
 }
 #include <PhysBAM_Tools/Vectors/VECTOR_EXPRESSION.h>
 #endif

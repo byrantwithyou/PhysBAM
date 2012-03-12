@@ -7,7 +7,6 @@
 #ifndef __READ_WRITE_JOINT_ID__
 #define __READ_WRITE_JOINT_ID__
 
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_ELEMENT_ID.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 

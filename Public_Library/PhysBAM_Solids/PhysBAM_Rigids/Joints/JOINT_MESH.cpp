@@ -4,9 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_DYNAMIC_LIST.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_UNDIRECTED_GRAPH.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_FRAME.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/ANGLE_JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/NORMAL_JOINT.h>
@@ -48,12 +45,8 @@ Read(TYPED_ISTREAM& input,const std::string& directory,const int frame) // assum
 {
     std::string prefix=STRING_UTILITIES::string_sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
     ARRAY<JOINT_ID> needs_init;
-    if(!input.type.use_doubles)
-        Read_Write<DYNAMIC_LIST<JOINT<TV>,JOINT_ID>,float>::Read(dynamic_list,prefix,needs_init);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    else
-        Read_Write<DYNAMIC_LIST<JOINT<TV>,JOINT_ID>,double>::Read(dynamic_list,prefix,needs_init);
-#endif
+    if(!input.type.use_doubles) dynamic_list.template Read<float>(prefix,needs_init);
+    else dynamic_list.template Read<double>(prefix,needs_init);
     for(int i=0;i<joints.m;i++){JOINT_TYPE joint_type;Read_Binary(input,joint_type);
         delete joints(i);
         ARRAY<JOINT<TV>*>& nonconst_joints=const_cast<ARRAY<JOINT<TV>*>&>(joints);        
@@ -75,10 +68,8 @@ Write(TYPED_OSTREAM& output,const std::string& directory,const int frame) const
 {
     std::string prefix=STRING_UTILITIES::string_sprintf("%s/%d/joint_mesh_",directory.c_str(),frame);
     if(!output.type.use_doubles)
-        Read_Write<DYNAMIC_LIST<JOINT<TV>,JOINT_ID>,float>::Write(dynamic_list,prefix);
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<DYNAMIC_LIST<JOINT<TV>,JOINT_ID>,double>::Write(dynamic_list,prefix);
-#endif
+        dynamic_list.template Write<float>(prefix);
+    else dynamic_list.template Write<double>(prefix);
     for(int i=0;i<joints.m;i++){
         JOINT_TYPE joint_type;
         const std::type_info& type=typeid(*joints(i));

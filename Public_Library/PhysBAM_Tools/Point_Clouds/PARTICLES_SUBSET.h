@@ -17,6 +17,7 @@ class PARTICLES_SUBSET
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
 
     T_PARTICLES& point_cloud;
     ARRAY<int> active_indices; // TODO: improve names
@@ -90,6 +91,12 @@ public:
 
     void Initialize_Subset(const PARTICLES_SUBSET& subset)
     {active_indices=subset.active_indices;subset_index_from_point_cloud_index=subset.subset_index_from_point_cloud_index;array_collection->number=active_indices.m;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,active_indices);Update_Subset_Index_From_Element_Index();}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,active_indices);}
 //#####################################################################
 };
 }

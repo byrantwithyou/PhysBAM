@@ -15,6 +15,8 @@ class FACE_INDEX
 {
     typedef VECTOR<int,d> TV_INT;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
+
     FACE_INDEX()
         :axis(0)
     {}
@@ -37,7 +39,15 @@ public:
 
     TV_INT Cell_Index(int j) const
     {TV_INT i(index);i(axis)+=j-2;return i;}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,axis,index);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,axis,index);}
 };
+template<int d>
+inline std::ostream& operator<<(std::ostream& output,const FACE_INDEX<d>& fi)
+{output<<"("<<fi.axis<<" "<<fi.index<<")";return output;}
 }
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_FACE_INDEX.h>
 #endif

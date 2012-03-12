@@ -108,4 +108,5 @@ public:
     {return "POINT_SIMPLEX_1D<T>";}
 };
 }
+#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_POINT_SIMPLEX_1D.h>
 #endif

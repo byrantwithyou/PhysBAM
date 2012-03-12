@@ -12,9 +12,6 @@
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_TRIPLE.h>
-#include <PhysBAM_Tools/Read_Write/Matrices_And_Vectors/READ_WRITE_MATRIX.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>

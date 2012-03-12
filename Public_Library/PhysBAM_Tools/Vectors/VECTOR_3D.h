@@ -35,6 +35,7 @@ class VECTOR<T,3>:public VECTOR_BASE<T,VECTOR<T,3> >
 {
     struct UNUSABLE{};
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     template<class T2> struct REBIND{typedef VECTOR<T2,3> TYPE;};
     typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
     typedef T ELEMENT;
@@ -402,6 +403,13 @@ public:
     const T* end() const // for stl
     {return &z+1;}
 
+    template<class RW>
+    void Read(std::istream& input)
+    {Read_Binary<RW>(input,x,y,z);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,x,y,z);}
 //#####################################################################
 };
 
@@ -510,8 +518,8 @@ template<class T> struct QUOTIENT<VECTOR<T,3>,T>{typedef VECTOR<T,3> TYPE;};
 template<class T> struct QUOTIENT<T,VECTOR<T,3> >{typedef VECTOR<T,3> TYPE;};
 template<class T> struct NEGATION<VECTOR<T,3> >{typedef VECTOR<T,3> TYPE;};
 //#####################################################################
+template<class T>
+inline std::istream& operator>>(std::istream& input,VECTOR<T,3>& v)
+{FILE_UTILITIES::Ignore(input,'[');input>>v.x>>v.y>>v.z;FILE_UTILITIES::Ignore(input,']');return input;}
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Vectors/READ_WRITE_VECTOR_3D.h>
-#endif
 #endif

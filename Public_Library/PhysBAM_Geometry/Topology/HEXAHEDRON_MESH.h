@@ -18,6 +18,7 @@ class TRIANGLE_MESH;
 class HEXAHEDRON_MESH
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef VECTOR<int,8> ELEMENT_TYPE;
     enum {dimension=3};
 
@@ -69,6 +70,14 @@ public:
 
     template<class T_CONNECTIVITY> void Add_Connectivity(T_CONNECTIVITY& connectivity) const
     {for(int t=0;t<elements.m;t++) connectivity.Union(elements(t));}
+
+    template<class RW>
+    void Read(std::istream& input)
+    {Clean_Memory();int backward_compatible;Read_Binary<RW>(input,number_nodes,backward_compatible);Read_Binary<RW>(input,elements);}
+
+    template<class RW>
+    void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,number_nodes,8);Write_Binary<RW>(output,elements);}
 
 //#####################################################################
     void Delete_Auxiliary_Structures();

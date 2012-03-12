@@ -70,6 +70,10 @@ template<class T,class HAS> struct HAS_TYPED_READ{enum {value=false};};
 template<class T> struct HAS_TYPED_READ<T,typename FIRST<void,typename T::HAS_TYPED_READ_WRITE>::TYPE>{enum {value=true};};
 template<class T,class HAS> struct HAS_TYPED_WRITE{enum {value=false};};
 template<class T> struct HAS_TYPED_WRITE<T,typename FIRST<void,typename T::HAS_TYPED_READ_WRITE>::TYPE>{enum {value=true};};
+template<class T,class HAS> struct HAS_UNTYPED_READ{enum {value=false};};
+template<class T> struct HAS_UNTYPED_READ<T,typename FIRST<void,typename T::HAS_UNTYPED_READ_WRITE>::TYPE>{enum {value=true};};
+template<class T,class HAS> struct HAS_UNTYPED_WRITE{enum {value=false};};
+template<class T> struct HAS_UNTYPED_WRITE<T,typename FIRST<void,typename T::HAS_UNTYPED_READ_WRITE>::TYPE>{enum {value=true};};
 //#####################################################################
 }
 #endif

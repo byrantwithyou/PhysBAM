@@ -5,7 +5,6 @@
 // Class EMBEDDED_MATERIAL_SURFACE
 //##################################################################### 
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
