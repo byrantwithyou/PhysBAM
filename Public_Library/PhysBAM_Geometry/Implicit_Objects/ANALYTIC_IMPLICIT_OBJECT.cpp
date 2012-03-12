@@ -17,10 +17,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_BOUNDED_HORIZONTAL_PLANE.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_LINE_2D.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_ORIENTED_BOX.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>
 using namespace PhysBAM;
 //#####################################################################

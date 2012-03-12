@@ -23,6 +23,7 @@ class ORIENTED_BOX
     enum WORKAROUND{d=TV::dimension};
     typedef typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX T_DIAGONAL_MATRIX;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     TV corner; // root corner of the box
@@ -119,6 +120,12 @@ public:
     VECTOR<T,TV::dimension-1> Principal_Curvatures(const TV& X) const
     {return VECTOR<T,TV::dimension-1>();}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,corner,edges);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,corner,edges);}
+
 //#####################################################################
     bool Intersection(const ORIENTED_BOX& box) const;
     bool Intersection(const RANGE<TV>& box) const;
@@ -131,5 +138,8 @@ private:
     void Project_Points_Onto_Line(const TV& direction,T& line_min,T& line_max) const;
 //#####################################################################
 };
+template<class TV>
+inline std::ostream& operator<<(std::ostream& output_stream,const ORIENTED_BOX<TV>& box)
+{output_stream<<"("<<box.corner<<")   (";for(int i=0;i<TV::dimension-1;i++) output_stream<<box.edges.Column(i)<<" : ";output_stream<<box.edges.Column(TV::dimension-1)<<")";return output_stream;}
 }
 #endif

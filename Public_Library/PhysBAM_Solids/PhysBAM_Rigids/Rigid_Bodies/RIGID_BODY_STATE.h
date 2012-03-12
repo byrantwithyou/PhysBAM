@@ -18,6 +18,7 @@ class RIGID_BODY_STATE:public RIGID_GEOMETRY_STATE<TV>
     typedef typename TV::SPIN T_SPIN;
     typedef RIGID_GEOMETRY_STATE<TV> BASE;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     using BASE::frame;using BASE::twist;using BASE::Object_Space_Vector;using BASE::World_Space_Vector;
     T_SPIN angular_momentum;
 
@@ -81,8 +82,13 @@ public:
     void Update_Angular_Momentum(const DIAGONAL_MATRIX<T,3>& inertia_tensor) // assumes a valid angular_velocity
     {STATIC_ASSERT(TV::m==3);angular_momentum=World_Space_Vector(inertia_tensor*Object_Space_Vector(twist.angular));}
 
+    template<class RW> void Read(std::istream& input)
+    {char version;Read_Binary<RW>(input,version,time,frame,twist.linear,angular_momentum,twist.angular);assert(version==1);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {char version=1;Write_Binary<RW>(output,version,time,frame,twist.linear,angular_momentum,twist.angular);}
+
 //#####################################################################
 };
 }
-//#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Rigid_Bodies/READ_WRITE_RIGID_BODY_STATE.h>
 #endif

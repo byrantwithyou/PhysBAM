@@ -21,6 +21,7 @@ class POINT_SIMPLEX_1D
 {
     typedef VECTOR<T,1> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     TV x1;
@@ -106,7 +107,12 @@ public:
 
     static std::string Name()
     {return "POINT_SIMPLEX_1D<T>";}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,direction,x1);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,direction,x1);}
 };
 }
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_POINT_SIMPLEX_1D.h>
 #endif

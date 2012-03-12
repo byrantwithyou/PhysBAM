@@ -17,6 +17,7 @@ class LINE_2D
 {
     typedef VECTOR<T,2> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
 
     TV normal;
@@ -66,8 +67,13 @@ public:
 
     static std::string Name()
     {return "LINE_2D<T>";}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,normal,x1);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,normal,x1);}
 //##################################################################### 
 };
 }
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_LINE_2D.h>
 #endif

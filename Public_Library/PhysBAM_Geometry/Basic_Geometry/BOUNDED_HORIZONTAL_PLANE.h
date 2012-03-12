@@ -17,6 +17,7 @@ class BOUNDED_HORIZONTAL_PLANE
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T; 
 
     T half_width;
@@ -57,6 +58,12 @@ public:
 
     static std::string Name()
     {return STRING_UTILITIES::string_sprintf("BOUNDED_HORIZONTAL_PLANE<VECTOR<T,%d> >",TV::m);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,half_width);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,half_width);}
 //#####################################################################
 };
 }
