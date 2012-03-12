@@ -43,6 +43,8 @@ public:
     DISPLAY_PRIMITIVE(const TV &a,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const int style);
     DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style);
+
+    VECTOR<VECTOR<T,2>,3> Flatten() const;
 };
 
 template<class T>

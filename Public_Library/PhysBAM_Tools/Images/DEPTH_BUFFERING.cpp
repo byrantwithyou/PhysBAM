@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Images/DEPTH_BUFFERING.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -38,6 +39,14 @@ DISPLAY_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style):style(sty
     vertices(0)=a;
     vertices(1)=b;
     vertices(2)=c;
+}
+//#####################################################################
+// Function Flatten
+//#####################################################################
+template<class T> VECTOR<VECTOR<T,2>,3> DISPLAY_PRIMITIVE<T>::
+Flatten() const
+{
+    return VECTOR<VECTOR<T,2>,3>(DB::Project(vertices(0)),DB::Project(vertices(1)),DB::Project(vertices(2)));
 }
 //#####################################################################
 // Function Initialize_Bounding_Box
@@ -98,23 +107,24 @@ Cut_By_Plane(const PLANE<T> &p,T tol)
 {
     ARRAY<VECTOR<TV, 3> > cut_elements;
     if(type==SEGMENT){
-        for(int i=0;i<elements.m;i++){
+        for(int k=0;k<elements.m;k++){
             VECTOR<T,2> phi_nodes;
-            for(int i=0;i<2;i++){phi_nodes(i)=p.Signed_Distance(vertices(i));}
+            for(int i=0;i<2;i++){phi_nodes(i)=p.Signed_Distance(elements(k)(i));}
             if(phi_nodes(0)*phi_nodes(1)<0){
                 T theta=LEVELSET_UTILITIES<T>::Theta(phi_nodes(0),phi_nodes(1));
-                TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(vertices(0),vertices(1),theta);
-                if(theta>tol) cut_elements.Append(VECTOR<TV,3>(vertices(0),interface_location,interface_location));
-                if(1-theta>tol) cut_elements.Append(VECTOR<TV,3>(interface_location,vertices(1),vertices(1)));}}}
+                TV interface_location=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(elements(k)(0),elements(k)(1),theta);
+                if(theta>tol) cut_elements.Append(VECTOR<TV,3>(elements(k)(0),interface_location,interface_location));
+                if(1-theta>tol) cut_elements.Append(VECTOR<TV,3>(interface_location,elements(k)(1),elements(k)(1)));
+            }else{cut_elements.Append(VECTOR<TV,3>(elements(k)(0),elements(k)(1),elements(k)(1)));}}}
     if(type==TRIANGLE){
-        for(int i=0;i<elements.m;i++){
+        for(int k=0;k<elements.m;k++){
             VECTOR<T,3> phi_nodes;
-            for(int i=0;i<3;i++){phi_nodes(i)=p.Signed_Distance(vertices(i));}
+            for(int i=0;i<3;i++){phi_nodes(i)=p.Signed_Distance(elements(k)(i));}
             int positive_count=0,single_node_sign;
             for(int i=0;i<3;i++) if(phi_nodes(i)>0) positive_count++;
             switch(positive_count){
                 case 0:case 3:
-                    cut_elements.Append(vertices);break;
+                    cut_elements.Append(elements(k));break;
                 case 1:case 2:
                     single_node_sign=positive_count==1?1:-1;
                         for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
@@ -124,11 +134,12 @@ Cut_By_Plane(const PLANE<T> &p,T tol)
                                 for(int j=0;j<2;j++,index=(index+1)%3){
                                     other_locations(j)=index;
                                     theta(j)=LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index));
-                                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(vertices(i),vertices(index),theta(j));}
-                                if(1-theta(0)>tol) cut_elements.Append(VECTOR<TV,3>(interface_locations(0),vertices(other_locations(0)),vertices(other_locations(1))));
-                                if(1-theta(1)>tol) cut_elements.Append(VECTOR<TV,3>(interface_locations(0),vertices(other_locations(1)),interface_locations(1)));
-                                if(theta(0)>tol && theta(1)>tol) cut_elements.Append(VECTOR<TV,3>(vertices(i),interface_locations(0),interface_locations(1)));}}}}
-    elements.Exchange(cut_elements);    
+                                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(elements(k)(i),elements(k)(index),theta(j));}
+                                if(1-theta(0)>tol) cut_elements.Append(VECTOR<TV,3>(interface_locations(0),elements(k)(other_locations(0)),elements(k)(other_locations(1))));
+                                if(1-theta(1)>tol) cut_elements.Append(VECTOR<TV,3>(interface_locations(0),elements(k)(other_locations(1)),interface_locations(1)));
+                                if(theta(0)>tol && theta(1)>tol) cut_elements.Append(VECTOR<TV,3>(elements(k)(i),interface_locations(0),interface_locations(1)));}}}}
+    elements.Exchange(cut_elements);
+    LOG::cout<<cut_elements<<std::endl;
 }
 //#####################################################################
 // Function Centroid
@@ -197,7 +208,7 @@ Process_Primitives()
         PRIMITIVE_TYPE type=primitives_cutting(i).type;
         int style=primitives_cutting(i).style;
         for(int j=0;j<elements.m;j++)
-            primitives_ordering.Append(DISPLAY_PRIMITIVE_ORDERING<T>(elements(i),type,style,i));}
+            primitives_ordering.Append(DISPLAY_PRIMITIVE_ORDERING<T>(elements(j),type,style,i));}
     primitives_ordering.Sort();
     return primitives_ordering;
 }

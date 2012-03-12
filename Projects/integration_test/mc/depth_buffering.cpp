@@ -4,10 +4,12 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Images/DEPTH_BUFFERING.h>
+#include <PhysBAM_Tools/Images/EPS_FILE.h>
+#include <PhysBAM_Tools/Images/TEX_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
-#include <PhysBAM_Dynamics/Read_Write/EPS_FILE_GEOMETRY.h>
 
 using namespace PhysBAM;
 
@@ -16,25 +18,63 @@ typedef VECTOR<T,3> TV;
 typedef VECTOR<int,3> TV_INT;
 typedef VECTOR<T,2> TV2;
 typedef VECTOR<int,2> TV_INT2;
-typedef DEPTH_BUFFERING<T> DB;
 
-int main()
+int main(int argc, char* argv[])
 {
+    PARSE_ARGS parse_args;
+    parse_args.Add_String_Argument("-o","out.tex","output filename");
+    parse_args.Parse(argc,argv);
+    std::string file=parse_args.Get_String_Value("-o");
+
+    VECTOR_IMAGE<T>* vi;
+    if(file.length()>=4 && file.substr(file.length()-4)==".eps")
+        vi=new EPS_FILE<T>(file);
+    else vi=new TEX_FILE<T>(file);
+
+    TV2 mx_pt=TV2(1,1);
+    T margin=.2;
+    vi->Use_Fixed_Bounding_Box(RANGE<TV2>(TV2()-margin,mx_pt+margin));
+    vi->cur_format.line_width=0.05;
+    vi->cur_format.line_color=TV(1,0,0);
+    vi->cur_format.fill_opacity=0.5;
+    vi->cur_format.fill_style=1;
+
     DEPTH_BUFFERING<T> db;
-    db.Add_Element(TV(0,0,0),TV(1,0,0),TV(0,1,1),0);
-    db.Add_Element(TV(0,0,1),TV(1,0,1),TV(0,1,0),1);
+    // db.Add_Element(TV(0,0,0),TV(1,0.2,0),TV(0.5,1.1,1),0);
+    db.Add_Element(TV(0.1,-0.1,1),TV(1,0.1,1),TV(0,1,0),1);
+    db.Add_Element(TV(-0.1,0.1,0),TV(1.1,0.3,-1),TV(1,0.6,2),2);
     ARRAY<DISPLAY_PRIMITIVE_ORDERING<T> >& dps=db.Process_Primitives();
-    EPS_FILE_GEOMETRY<T> f("out.eps");
 
     for(int i=0;i<dps.m;i++){
-        TRIANGLE_2D<T> triangle(DB::Project(dps(i).vertices(0)),DB::Project(dps(i).vertices(1)),DB::Project(dps(i).vertices(2)));
+        VECTOR<TV2,3> tri=dps(i).Flatten();
         switch(dps(i).style){
             case 0:
-                f.Fill_Object(triangle,"0 0 1");
+                vi->cur_format.line_color=TV(1,0,0);
+                vi->cur_format.fill_style=1;
+                vi->Draw_Object(tri(0),tri(1),tri(2));
+                // vi->cur_format.line_color=TV(0,0,0);
+                // vi->cur_format.fill_style=0;
+                // vi->Draw_Object(tri(0),tri(1),tri(2));
                 break;
             case 1:
-                // f.Draw_Object(triangle);
+                vi->cur_format.line_color=TV(0,0,1);
+                vi->cur_format.fill_style=1;
+                vi->Draw_Object(tri(0),tri(1),tri(2));
+                // vi->cur_format.line_color=TV(0,0,0);
+                // vi->cur_format.fill_style=0;
+                // vi->Draw_Object(tri(0),tri(1),tri(2));
+                break;
+            case 2:
+                vi->cur_format.line_color=TV(0,1,0);
+                vi->cur_format.fill_style=1;
+                vi->Draw_Object(tri(0),tri(1),tri(2));
+                // vi->cur_format.line_color=TV(0,0,0);
+                // vi->cur_format.fill_style=0;
+                // vi->Draw_Object(tri(0),tri(1),tri(2));
                 break;
             default: break;}}
+
+    delete vi;    
+
     return 0;
 }
