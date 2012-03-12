@@ -45,10 +45,10 @@ void tri(TV a,TV b,TV c,const TV& linecolor, const TV& color, T width, T opacity
     vi->cur_format.line_width=width;
     vi->cur_format.line_color=linecolor;
     vi->cur_format.fill_color=color;
-    vi->cur_format.line_opacity=opacity;
+    vi->cur_format.fill_opacity=opacity;
     vi->cur_format.fill_style=1;
     vi->Draw_Object(to2d(a),to2d(b),to2d(c));
-    vi->cur_format.line_opacity=1;
+    vi->cur_format.fill_opacity=1;
     vi->cur_format.fill_style=0;
     if(sg<=0) norm(a,b,c,linecolor,color,width,opacity,normal_length);
 }
@@ -65,6 +65,7 @@ void cube_edge(int a, int v, T width, int cs, T pt_width)
     if(A!=B || cs==-1){
         vi->cur_format.line_style=0;
         vi->cur_format.fill_style=1;
+        vi->cur_format.fill_color=TV();
         vi->Draw_Object(to2d((corners[v]+corners[v|mask])/2), pt_width);
         vi->cur_format.line_style=1;
         vi->cur_format.fill_style=0;}
@@ -95,7 +96,7 @@ int main(int argc, char* argv[])
     const MARCHING_CUBES_CASE<3>& cs = table(case_number>=0?case_number:0);
 
     V2 mx_pt=to2d(TV(1,1,0));
-    T margin=.5;
+    T margin=.2;
     vi->Use_Fixed_Bounding_Box(RANGE<V2>(V2()-margin,mx_pt+margin));
 
     for(int v=0;v<8;v++) corners[v]=TV(v&1,v/2&1,v/4&1);
