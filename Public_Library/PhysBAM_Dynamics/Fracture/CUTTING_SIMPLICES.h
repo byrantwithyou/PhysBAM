@@ -20,6 +20,7 @@ template<class T,int d>
 class CUTTING_SIMPLICES
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     ARRAY<CUTTING_SIMPLEX<T,d> > simplices;
     int index_for_last_old_cutting_simplex;
 
@@ -84,8 +85,13 @@ public:
                   <<", parent = "<<simplex.parent<<", weights = ";
          for(int j=0;j<d;j++) LOG::cout<<simplex.weights(j)<<"; ";
          LOG::cout<<std::endl;}}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,simplices,index_for_last_old_cutting_simplex);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,simplices,index_for_last_old_cutting_simplex);}
 //#####################################################################    
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Fracture/READ_WRITE_CUTTING_SIMPLICES.h>
 #endif

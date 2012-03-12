@@ -16,6 +16,7 @@ namespace PhysBAM{
 class OPENGL_MATERIAL
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     OPENGL_COLOR ambient, diffuse, specular;
     float shininess;
 
@@ -63,9 +64,15 @@ public:
     {return OPENGL_MATERIAL(OPENGL_COLOR::Affine_Combination(t,material1.ambient,material2.ambient),OPENGL_COLOR::Affine_Combination(t,material1.diffuse,material2.diffuse),
         OPENGL_COLOR::Affine_Combination(t,material1.specular,material2.specular),material1.shininess+t*(material2.shininess-material1.shininess));}
 
+    template<class RW> void Read(std::istream& input)
+    {char version;Read_Binary<RW>(input,version);
+    if(version!=1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized OPENGL_MATERIAL version %d",version));
+    Read_Binary<RW>(input,ambient,diffuse,specular,shininess);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {char version=1;Write_Binary<RW>(output,version,ambient,diffuse,specular,shininess);}
 //########################################################################
 };
 }
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/Read_Write/OpenGL/READ_WRITE_OPENGL_MATERIAL.h>
 #endif
 

@@ -13,6 +13,7 @@ namespace PhysBAM{
 class CUTTING_POLYGON
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     enum POLYGON_TYPE {FACE_BOUNDARY,FACE_INTERIOR,TRIANGLE_CLIPPED};
     int polygon_index; // indexes into polygon_mesh
     int simplex_owner; // indexes into cutting_simplices
@@ -25,8 +26,13 @@ public:
     CUTTING_POLYGON(const int polygon_index,const int simplex_owner,const bool flipped,const POLYGON_TYPE polygon_type)
         :polygon_index(polygon_index),simplex_owner(simplex_owner),flipped(flipped),polygon_type(polygon_type)
     {}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,polygon_index,simplex_owner,flipped,polygon_type);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,polygon_index,simplex_owner,flipped,polygon_type);}
 //#####################################################################    
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Fracture/READ_WRITE_CUTTING_POLYGON.h>
 #endif

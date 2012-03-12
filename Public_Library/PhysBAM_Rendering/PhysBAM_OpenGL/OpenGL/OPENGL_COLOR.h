@@ -16,6 +16,7 @@ namespace PhysBAM{
 class OPENGL_COLOR
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     GLfloat rgba[4];
 
     explicit OPENGL_COLOR(const float red=0,const float green=0,const float blue=0,const float alpha=1)
@@ -119,6 +120,5 @@ inline std::ostream& operator<<(std::ostream& output_stream,const OPENGL_COLOR& 
 {output_stream<<c.rgba[0]<<" "<<c.rgba[1]<<" "<<c.rgba[2]<<" "<<c.rgba[3];return output_stream;}
 
 }
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/Read_Write/OpenGL/READ_WRITE_OPENGL_COLOR.h>
 #endif
 

@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Read_Write/Rendering_Shaders/READ_WRITE_SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Lights/RENDERING_LIGHT.h>
 #include "GENERIC_RENDER_EXAMPLE.h"

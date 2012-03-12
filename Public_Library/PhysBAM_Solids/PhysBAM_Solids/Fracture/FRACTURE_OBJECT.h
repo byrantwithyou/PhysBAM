@@ -32,6 +32,7 @@ class FRACTURE_OBJECT:public NONCOPYABLE
     typedef typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX T_DIAGONAL_MATRIX;
     typedef typename MESH_POLICY<d>::MESH T_MESH;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     T eigenvector_coefficient; // post processing fracture normal
     T fracture_bias_direction_coefficient; // post processing fracture normal
     T fracture_bias_propagation_coefficient; // post processing fracture normal
@@ -120,5 +121,4 @@ protected:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Solids/Read_Write/Fracture/READ_WRITE_FRACTURE_OBJECT.h>
 #endif

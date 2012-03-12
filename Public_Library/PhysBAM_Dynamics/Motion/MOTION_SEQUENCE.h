@@ -18,6 +18,7 @@ class MOTION_SEQUENCE
 {
     typedef VECTOR<T,1> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     GRID<TV> time_grid;
     ARRAY<ARRAY<T2,VECTOR<int,1> > > trajectories;
     ARRAY<ARRAY<bool,VECTOR<int,1> > > valid;
@@ -89,5 +90,4 @@ public:
 //#####################################################################
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Motion/READ_WRITE_MOTION_SEQUENCE.h>
 #endif

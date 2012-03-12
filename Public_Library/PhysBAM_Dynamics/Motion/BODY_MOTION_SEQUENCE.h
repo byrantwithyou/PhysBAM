@@ -12,12 +12,12 @@
 #include <PhysBAM_Dynamics/Motion/MOTION_SEQUENCE.h>
 
 namespace PhysBAM{
-
 template<class T>
 class BODY_MOTION_SEQUENCE:public MOTION_SEQUENCE<T,BONE<T> >
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     ARRAY<ARRAY<std::string> > bone_hierarchy;
     ARRAY<BONE<T> > base_position;
     ARRAY<BONE<T> > ui_position; //internal use only - this should not be read or writen
@@ -134,8 +134,15 @@ public:
     void Set_Targeted(int bone,int frame,FRAME<TV>& f)
     {this->trajectories(bone)(frame).targeted_transform=f;}
 
+    template<class RW> void Read(std::istream& input)
+    {/*Read_Binary<RW>(input,bone_hierarchy,base_position,time_grid,trajectories,valid,names,saved_frame);Update_Name_Lookup();ui_position.Resize(base_position.m);
+    for(int i=0;i<trajectories.m;i++) for(int j=0;j<trajectories(i).counts.x;j++){
+        trajectories(i)(j).translation=trajectories(i)(j).targeted_translation=FRAME<TV>(trajectories(i)(j).transform.t,ROTATION<TV>());
+        trajectories(i)(j).rotation=trajectories(i)(j).targeted_rotation=FRAME<TV>(TV(),trajectories(i)(j).transform.r);}*/}
+
+    template<class RW> void Write(std::ostream& output) const
+    {/*Write_Binary<RW>(output,bone_hierarchy,base_position,time_grid,trajectories,valid,names,saved_frame);*/}
 //#####################################################################
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Motion/READ_WRITE_BODY_MOTION_SEQUENCE.h>
 #endif

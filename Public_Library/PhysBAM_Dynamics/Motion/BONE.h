@@ -14,6 +14,7 @@ class BONE
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     FRAME<TV> transform,targeted_transform;
     FRAME<TV> rotation,targeted_rotation;
     FRAME<TV> translation,targeted_translation;
@@ -38,8 +39,17 @@ public:
     void Rescale(T scaling_factor)
     {transform.t*=scaling_factor;targeted_transform.t*=scaling_factor;length*=scaling_factor;}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,transform,targeted_transform,length);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,transform,targeted_transform,length);}
 //#####################################################################    
 };
+template<class T> inline std::istream& operator>>(std::istream& input,BONE<T>& bone)
+{PHYSBAM_NOT_IMPLEMENTED();}
+
+template<class T> inline std::ostream& operator<<(std::ostream& output,const BONE<T>& bone)
+{output<<bone.targeted_transform<<" "<<bone.transform<<" "<<bone.length;return output;}
 }
-#include <PhysBAM_Dynamics/Read_Write/Motion/READ_WRITE_BONE.h>
 #endif

@@ -16,5 +16,4 @@ PHYSBAM_DECLARE_ELEMENT_ID(JOINT_ID,int,ELEMENT_ID_HELPER::for_loop|ELEMENT_ID_H
 typedef int JOINT_ID;
 #endif
 }
-#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Joints/READ_WRITE_JOINT_ID.h>
 #endif

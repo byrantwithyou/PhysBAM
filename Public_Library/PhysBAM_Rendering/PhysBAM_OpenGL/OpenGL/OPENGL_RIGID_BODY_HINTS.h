@@ -19,6 +19,7 @@ namespace PhysBAM
 class OPENGL_RIGID_BODY_HINTS
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     OPENGL_MATERIAL material;
     bool            include_bounding_box;
 
@@ -32,7 +33,13 @@ public:
         : material(material), include_bounding_box(include_bounding_box)
     {}
 
+    template<class RW> void Read(std::istream& input)
+    {char version;Read_Binary<RW>(input,version);
+    if(version!=1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized OPENGL_RIGID_BODY_HINTS version %d",version));
+    Read_Binary<RW>(input,material,include_bounding_box);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {char version=1;Write_Binary<RW>(output,version,material,include_bounding_box);}
 };
 }
-#include <PhysBAM_Rendering/PhysBAM_OpenGL/Read_Write/OpenGL/READ_WRITE_OPENGL_RIGID_BODY_HINTS.h>
 #endif

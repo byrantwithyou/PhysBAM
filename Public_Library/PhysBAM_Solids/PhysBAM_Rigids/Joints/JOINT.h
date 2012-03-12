@@ -22,6 +22,7 @@ class JOINT:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     typedef typename TV::SPIN T_SPIN;
     enum{dof=T_SPIN::dimension};
 
@@ -61,6 +62,12 @@ public:
     void Set_Joint_Function(JOINT_FUNCTION<TV>* joint_function_input)
     {joint_function=joint_function_input;}
 
+    virtual void Read(TYPED_ISTREAM& input)
+    {Read_Binary(input,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);}
+
+    virtual void Write(TYPED_OSTREAM& output) const
+    {Write_Binary(output,id_number,frame_pj,frame_jp,frame_cj,frame_jc,J,J_inverse,name);}
+
 //#####################################################################
     //FRAME<TV> Joint_Error() const;
     virtual VECTOR<bool,TV::SPIN::dimension> Angular_Constraints() const;
@@ -95,5 +102,4 @@ protected:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Joints/READ_WRITE_JOINT.h>
 #endif

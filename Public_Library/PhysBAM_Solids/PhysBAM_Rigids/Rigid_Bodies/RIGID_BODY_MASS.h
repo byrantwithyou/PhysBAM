@@ -26,6 +26,7 @@ class RIGID_BODY_MASS
     typedef typename TV::SCALAR T;
     typedef typename IF<world_space,typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR,typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR>::TYPE T_INERTIA_TENSOR;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     T mass;
     T_INERTIA_TENSOR inertia_tensor;
@@ -133,12 +134,21 @@ public:
     {STATIC_ASSERT((AND<NOT<world_space>::value,TV::m==3>::value));TV object_space_angular_momentum=orientation.Inverse_Rotate(angular_momentum);
     return (T).5*inertia_tensor.Inverse_Inner_Product(object_space_angular_momentum,object_space_angular_momentum);}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,mass,inertia_tensor);PHYSBAM_ASSERT(Valid());}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,mass,inertia_tensor);}
 //#####################################################################
 };
 
 //#####################################################################
 template<class TV,bool b> struct PRODUCT<RIGID_BODY_MASS<TV,b>,TWIST<TV> > {typedef TWIST<TV> TYPE;};
 //#####################################################################
+template<class TV> inline std::istream& operator>>(std::istream& input,RIGID_BODY_MASS<TV>& mass)
+{input>>mass.mass>>mass.inertia_tensor;return input;}
+
+template<class TV> inline std::ostream& operator<<(std::ostream& output,const RIGID_BODY_MASS<TV>& mass)
+{output<<mass.mass<<" "<<mass.inertia_tensor;return output;}
 }
-#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Rigid_Bodies/READ_WRITE_RIGID_BODY_MASS.h>
 #endif

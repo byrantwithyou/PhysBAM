@@ -19,6 +19,7 @@ class PHONEME
 {
     typedef VECTOR<T,3> TV;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     std::string name,previous_name,next_name;
     int frame_length;
     T time_length;
@@ -86,8 +87,13 @@ public:
     RANGE<VECTOR<T,1> > Time_Range() const
     {return RANGE<VECTOR<T,1> >(time_length*((T)(controls.domain.min_corner.x-1))/((T)(frame_length-1)),time_length*((T)(controls.domain.max_corner.x-1))/((T)(frame_length-1)));}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,name,previous_name,next_name,frame_length,time_length,controls);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,name,previous_name,next_name,frame_length,time_length,controls);}
+
 //#####################################################################
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Motion/READ_WRITE_PHONEME.h>
 #endif

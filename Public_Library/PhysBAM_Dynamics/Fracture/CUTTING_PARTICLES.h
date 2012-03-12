@@ -14,6 +14,7 @@ namespace PhysBAM{
 class CUTTING_PARTICLES
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     enum CUTTING_PARTICLE_ID_TYPE {TET_NODE_ID,INTERSECTION_ID,TET_NODE_AND_INTERSECTION_ID};
     ARRAY<int> tet_node_indices;
     ARRAY<int> intersection_indices;
@@ -35,7 +36,12 @@ public:
     {return particle_ids_types.m;}
 
     void Print() const;
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,tet_node_indices,intersection_indices,particle_ids_types,intersection_to_particle_id,tet_node_to_particle_id);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,tet_node_indices,intersection_indices,particle_ids_types,intersection_to_particle_id,tet_node_to_particle_id);}
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Fracture/READ_WRITE_CUTTING_PARTICLES.h>
 #endif

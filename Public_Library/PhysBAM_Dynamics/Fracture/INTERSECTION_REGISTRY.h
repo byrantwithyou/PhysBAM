@@ -16,6 +16,7 @@ class INTERSECTION_REGISTRY
 {
     struct UNUSABLE{};
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     CUTTING_SIMPLICES<T,d>& cutting_simplices;
     ARRAY<ARRAY<int> > intersections_on_simplex;
     ARRAY<ARRAY<int> > simplices_on_intersection;
@@ -68,5 +69,4 @@ public:
 //#####################################################################    
 };
 }
-#include <PhysBAM_Dynamics/Read_Write/Fracture/READ_WRITE_INTERSECTION_REGISTRY.h>
 #endif

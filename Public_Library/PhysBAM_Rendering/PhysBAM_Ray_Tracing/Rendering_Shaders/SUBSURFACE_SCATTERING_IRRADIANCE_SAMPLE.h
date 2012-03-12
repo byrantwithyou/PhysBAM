@@ -28,8 +28,13 @@ public:
         :position(position_input),normal(normal_input),area(area_input)
     {}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,position,normal,transmitted_irradiance,transmitted_irradiance_product,area);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,position,normal,transmitted_irradiance,transmitted_irradiance_product,area);}
+
 //#####################################################################
 };
 }
-#include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Read_Write/Rendering_Shaders/READ_WRITE_SUBSURFACE_SCATTERING_IRRADIANCE_SAMPLE.h>
 #endif

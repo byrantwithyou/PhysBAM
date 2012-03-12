@@ -1,4 +1,4 @@
-//#####################################################################
+ //#####################################################################
 // Copyright 2006, Geoffrey Irving, Andrew Selle, Tamar Shinar, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
@@ -71,5 +71,4 @@ public:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Fracture/READ_WRITE_EMBEDDING.h>
 #endif
