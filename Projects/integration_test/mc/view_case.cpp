@@ -149,13 +149,13 @@ int main(int argc, char* argv[])
     cube_edge(1, 0, edge_width, case_number, edge_radius);
     cube_edge(1, 1, edge_width, case_number, edge_radius);
 
+    vi->cur_format.fill_style=1;
+    vi->cur_format.line_style=0;
     for(int v=0;v<4;v++){
-        vi->cur_format.fill_style=1;
-        vi->cur_format.line_style=0;
         vi->cur_format.fill_color=TV(case_number>=0 && case_number&(1<<v),0,0);
-        vi->Draw_Object(to2d(corners[v]),corner_radius);
-        vi->cur_format.fill_style=0;
-        vi->cur_format.line_style=1;}
+        vi->Draw_Object(to2d(corners[v]),corner_radius);}
+    vi->cur_format.fill_style=0;
+    vi->cur_format.line_style=1;
 
     if(case_number>=0){
         TV p(1.2,-.1,1);
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
         vi->cur_format.line_style=0;
         vi->cur_format.fill_color=TV::Axis_Vector(cs.proj_dir);
         vi->cur_format.fill_opacity=.5;
-        vi->Draw_Object(VECTOR<V2,4>(to2d(q),to2d(q+a*dx),to2d(q+a*dx+b*dx),to2d(q+b*dx)));
+        vi->Draw_Object(VECTOR<V2,4>(to2d(p),to2d(p+a*dx),to2d(p+a*dx+b*dx),to2d(p+b*dx)));
         vi->cur_format.fill_color=TV(cs.enclose_inside,0,0);
         vi->cur_format.fill_opacity=1;
         vi->Draw_Object(to2d(TV(1.3,0,1.1)),corner_radius/2);

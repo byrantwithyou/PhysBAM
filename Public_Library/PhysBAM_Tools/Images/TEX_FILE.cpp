@@ -59,10 +59,10 @@ Update_Effective_Formatting()
 {
     if(effective_line_color!=cur_format.line_color){
         effective_line_color=cur_format.line_color;
-        stream<<"\\definecolor{fc}{rgb}{"<<effective_line_color.x<<","<<effective_line_color.y<<","<<effective_line_color.z<<"}\n";}
+        stream<<"\\definecolor{lc}{rgb}{"<<effective_line_color.x<<","<<effective_line_color.y<<","<<effective_line_color.z<<"}\n";}
     if(effective_fill_color!=cur_format.fill_color){
         effective_fill_color=cur_format.fill_color;
-        stream<<"\\definecolor{lc}{rgb}{"<<effective_fill_color.x<<","<<effective_fill_color.y<<","<<effective_fill_color.z<<"}\n";}
+        stream<<"\\definecolor{fc}{rgb}{"<<effective_fill_color.x<<","<<effective_fill_color.y<<","<<effective_fill_color.z<<"}\n";}
 }
 //#####################################################################
 // Function Emit_Options
