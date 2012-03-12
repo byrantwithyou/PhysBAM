@@ -6,6 +6,7 @@
 #define __EPS_FILE_GEOMETRY__
 
 #include <PhysBAM_Tools/Images/EPS_FILE.h>
+#include <string>
 namespace PhysBAM{
 
 template<class T> class TRIANGLE_2D;
@@ -31,6 +32,17 @@ public:
     void Draw_Object_Colored(const T_OBJECT& object,const VECTOR<T,3>& color)
     {(*stream)<<"gsave ";Line_Color(color);Draw_Object(object);(*stream)<<"grestore"<<std::endl;}
 
+    void Fill_Object(const TRIANGLE_2D<T>& tri, std::string color)
+    {(*stream)<<color<<" setrgbcolor"<<std::endl<<
+            "newpath"<<std::endl<<
+            tri.X(0).x<<" "<<tri.X(0).y<<" moveto"<<std::endl<<
+            tri.X(1).x<<" "<<tri.X(1).y<<" lineto"<<std::endl<<
+            tri.X(2).x<<" "<<tri.X(2).y<<" lineto"<<std::endl<<
+            "closepath"<<std::endl<<
+            "fill"<<std::endl<<
+            "0 0 0 setrgbcolor"<<std::endl<<
+            std::endl;}
+    
     void Draw_Object(const TRIANGLE_2D<T>& tri)
     {Draw_Line(tri.X[0],tri.X[1]);Draw_Line(tri.X[1],tri.X[2]);Draw_Line(tri.X[2],tri.X[0]);}
 
