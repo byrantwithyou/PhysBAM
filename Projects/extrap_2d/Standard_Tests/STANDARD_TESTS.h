@@ -31,7 +31,6 @@
 #ifndef __STANDARD_TESTS__
 #define __STANDARD_TESTS__
 
-#include <PhysBAM_Tools/Images/EPS_FILE.h>
 #include <PhysBAM_Tools/Images/PPM_FILE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
@@ -43,6 +42,7 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Images/EPS_FILE.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

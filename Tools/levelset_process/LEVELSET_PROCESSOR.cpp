@@ -4,7 +4,6 @@
 //#####################################################################
 // Class LEVELSET_PROCESSOR
 //#####################################################################
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
 #include "LEVELSET_PROCESSOR.h"
 using namespace PhysBAM;
 //#####################################################################

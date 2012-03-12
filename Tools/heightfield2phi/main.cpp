@@ -12,17 +12,12 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_MAKER.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Heat_Flows/HEAT_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_RLE_Computations/DUALCONTOUR_RLE_3D.h>
 #include <PhysBAM_Geometry/Grids_RLE_Level_Sets/LEVELSET_RLE.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Dyadic/DYADIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_SURFACE_MAKER.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_RLE_Level_Sets/READ_WRITE_LEVELSET_RLE.h>
-#include <PhysBAM_Tools/Read_Write/Grids_RLE/READ_WRITE_RLE_GRID_3D.h>
-#include <PhysBAM_Tools/Read_Write/Grids_RLE/READ_WRITE_RLE_RUN_3D.h>
 
 using namespace PhysBAM;
 using namespace FILE_UTILITIES;

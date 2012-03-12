@@ -4,11 +4,11 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Images/EPS_FILE.h>
-#include <PhysBAM_Tools/Images/TEX_FILE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <PhysBAM_Geometry/Images/EPS_FILE.h>
+#include <PhysBAM_Geometry/Images/TEX_FILE.h>
 #include <map>
 using namespace PhysBAM;
 

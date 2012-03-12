@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Images/EPS_FILE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
@@ -14,6 +13,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_SEGMENT_2D_INTERSECTION.h>
+#include <PhysBAM_Geometry/Images/EPS_FILE.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>

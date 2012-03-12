@@ -1,5 +1,5 @@
-#include <PhysBAM_Tools/Images/EPS_FILE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
+#include <PhysBAM_Geometry/Images/EPS_FILE.h>
 using namespace PhysBAM;
 template<class T> EPS_FILE<T>::
 //#####################################################################

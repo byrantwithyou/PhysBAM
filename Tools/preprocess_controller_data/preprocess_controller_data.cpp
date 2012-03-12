@@ -4,15 +4,12 @@
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Data_Structures/READ_WRITE_DIRECTED_GRAPH.h>
 #include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
 #include <utility>
-#include <PhysBAM_Dynamics/Solids_Evolution/SEARCH_CONTROLLER.h>
 
 using namespace PhysBAM;
 

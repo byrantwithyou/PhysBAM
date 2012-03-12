@@ -4,10 +4,6 @@
 //#####################################################################
 // MAIN
 //#####################################################################
-#include <PhysBAM_Tools/Read_Write/Grids_Uniform/READ_WRITE_GRID.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include "COMMANDS.h"
 #include "LEVELSET_PROCESSOR.h"

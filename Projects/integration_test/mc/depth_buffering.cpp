@@ -4,12 +4,12 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Images/DEPTH_BUFFERING.h>
-#include <PhysBAM_Tools/Images/EPS_FILE.h>
-#include <PhysBAM_Tools/Images/TEX_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <PhysBAM_Geometry/Images/EPS_FILE.h>
+#include <PhysBAM_Geometry/Images/TEX_FILE.h>
 
 using namespace PhysBAM;
 

@@ -3,7 +3,6 @@
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Math_Tools/READ_WRITE_INTERVAL.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <iomanip>
 

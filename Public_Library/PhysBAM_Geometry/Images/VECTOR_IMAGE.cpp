@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Images/VECTOR_IMAGE.h>
+#include <PhysBAM_Geometry/Images/VECTOR_IMAGE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
