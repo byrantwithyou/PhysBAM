@@ -44,6 +44,12 @@ public:
     number_nodes=m*n;quadrilaterals.Resize((m-1)*(n-1));
     int t=0;for(int j=0;j<n-1;j++) for(int i=0;i<m-1;i++){t++;quadrilaterals(t)(0)=i+m*(j-1);quadrilaterals(t)(1)=(i+1)+m*(j-1);quadrilaterals(t)(2)=i+m*j;quadrilaterals(t)(3)=(i+1)+m*j;}}
 
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,number_nodes,quadrilaterals);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,number_nodes,quadrilaterals);}
+
 //#####################################################################
 };   
 }

@@ -118,10 +118,10 @@ public:
     int Split_Connected_Component(const int node);
     void Compute_Tetrahedron_Volumes();
     void Compute_Nodal_Volumes(bool save_tetrahedron_volumes=false);
+    void Print_Statistics(std::ostream& output);
 private:
     void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #endif

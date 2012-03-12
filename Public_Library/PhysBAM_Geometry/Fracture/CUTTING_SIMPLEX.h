@@ -24,6 +24,7 @@ template<class T,int d> int Hash_Reduce(const CUTTING_SIMPLEX<T,d>& s);
 template<class T,int d>
 struct CUTTING_SIMPLEX
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef CUTTING_SIMPLEX_COORDINATE<T,d> GET_ADAPTIVE_WEIGHTS_RESULT_TYPE;
     enum SIMPLEX_TYPE {GLOBAL_EMBEDDING_FACE,LOCAL_EMBEDDING_FACE,GLOBAL_CUT_FACE,LOCAL_CUT_FACE};
 
@@ -36,6 +37,12 @@ struct CUTTING_SIMPLEX
     VECTOR<VECTOR<T,d>,d+1> element_original_coordinates;
     VECTOR<VECTOR<T,d>,d> simplex_original_coordinates;
     VECTOR<bool,d> node_in_embedded_simplex;
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,type,parent,element_owner,nodes,weights,abs_tol,element_original_coordinates,simplex_original_coordinates,node_in_embedded_simplex);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,type,parent,element_owner,nodes,weights,abs_tol,element_original_coordinates,simplex_original_coordinates,node_in_embedded_simplex);}
 
     template<class TT,int dd> friend int Hash_Reduce(const CUTTING_SIMPLEX<TT,dd> s);
     CUTTING_SIMPLEX();
@@ -52,5 +59,4 @@ private:
 //#####################################################################
 };
 }
-#include <PhysBAM_Geometry/Read_Write/Fracture/READ_WRITE_CUTTING_SIMPLEX.h>
 #endif

@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_AXES.h>
@@ -97,16 +96,7 @@ Reinitialize(const bool force,const bool read_geometry)
         valid=false;
         if(!FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",basedir.c_str(),frame))) return;
 
-        if(read_geometry){
-            if(!STREAM_TYPE(RW()).use_doubles)
-                Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Read(STREAM_TYPE(RW()),basedir,frame,*rigid_geometry_collection,&needs_init,&needs_destroy);
-            else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-                Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Read(STREAM_TYPE(RW()),basedir,frame,*rigid_geometry_collection,&needs_init,&needs_destroy);
-#else
-            PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
-        }
+        if(read_geometry) rigid_geometry_collection->Read(STREAM_TYPE(RW()),basedir,frame,&needs_init,&needs_destroy);
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_geometry_collection->particles.array_collection->Size()));

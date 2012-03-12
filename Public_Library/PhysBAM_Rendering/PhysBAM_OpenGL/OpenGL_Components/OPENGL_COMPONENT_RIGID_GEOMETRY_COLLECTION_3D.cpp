@@ -9,7 +9,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -143,17 +142,7 @@ Reinitialize(const bool force,const bool read_geometry)
         if(!FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",basedir.c_str(),frame))) return;
 
         // TODO: currently reads in all structures, should only read in certain kinds based on read_triangulated_surface,read_implicit_surface,read_tetrahedralized_volume
-        if(read_geometry){
-            if(!STREAM_TYPE(RW()).use_doubles)
-                Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Read(STREAM_TYPE(RW()),basedir,frame,*rigid_geometry_collection);
-            else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-                Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Read(STREAM_TYPE(RW()),basedir,frame,*rigid_geometry_collection);
-#else
-                PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
-        }
-
+        if(read_geometry) rigid_geometry_collection->Read(STREAM_TYPE(RW()),basedir,frame);
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         // only enlarge array as we read in more geometry to memory

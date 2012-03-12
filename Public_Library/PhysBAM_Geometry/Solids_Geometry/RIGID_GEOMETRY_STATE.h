@@ -75,8 +75,13 @@ public:
     template<class RW> static void Write_Frame(std::ostream& output,const FRAME<VECTOR<T,3> >& f)
     {Write_Binary<RW>(output,f);}
 
+    template<class RW> void Read(std::istream& input)
+    {char version;Read_Binary<RW>(input,version,time);Read_Frame<RW>(input,frame);Read_Binary<RW>(input,twist.linear,twist.angular);assert(version==1);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {char version=1;Write_Binary<RW>(output,version,time);Write_Frame<RW>(output,frame);Write_Binary<RW>(output,twist.linear,twist.angular);}
+
 //#####################################################################
 };
 }
-#include <PhysBAM_Geometry/Read_Write/Solids_Geometry/READ_WRITE_RIGID_GEOMETRY_STATE.h>
 #endif

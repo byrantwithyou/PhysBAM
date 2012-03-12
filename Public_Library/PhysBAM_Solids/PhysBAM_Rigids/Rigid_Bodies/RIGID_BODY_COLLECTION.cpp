@@ -9,7 +9,6 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
@@ -174,15 +173,7 @@ Update_Angular_Momentum(const ARRAY<int>& rigid_body_particles)
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init,ARRAY<int>* needs_destroy)
 {
-    if(!stream_type.use_doubles)
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Read(stream_type,directory,frame,rigid_geometry_collection,needs_init,needs_destroy);
-    else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Read(stream_type,directory,frame,rigid_geometry_collection,needs_init,needs_destroy);
-#else
-        PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
-
+    rigid_geometry_collection.Read(stream_type,directory,frame,needs_init,needs_destroy);
 }
 //#####################################################################
 // Function Write
@@ -190,14 +181,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
 template<class TV> void RIGID_BODY_COLLECTION<TV>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
 {
-    if(!stream_type.use_doubles)
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Write(stream_type,directory,frame,rigid_geometry_collection);
-    else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Write(stream_type,directory,frame,rigid_geometry_collection);
-#else
-        PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
+    rigid_geometry_collection.Write(stream_type,directory,frame);
     articulated_rigid_body.Write(stream_type,directory,frame);
 }
 //#####################################################################

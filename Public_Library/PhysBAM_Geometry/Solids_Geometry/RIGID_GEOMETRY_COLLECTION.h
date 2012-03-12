@@ -21,6 +21,7 @@ class RIGID_GEOMETRY_COLLECTION:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     RIGID_GEOMETRY_PARTICLES<TV>& particles;
     COLLISION_GEOMETRY_COLLECTION<TV>* collision_body_list;
     STRUCTURE_LIST<TV,int>& structure_list;
@@ -68,6 +69,8 @@ public:
     bool Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_id,const std::string& filename,const T scaling_factor,const TV& center);
 #endif
     void Destroy_Unreferenced_Geometry();
+    void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
+    void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;
 //#####################################################################
 };
 }

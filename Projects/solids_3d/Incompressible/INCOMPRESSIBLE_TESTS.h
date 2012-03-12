@@ -35,7 +35,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_WORLD.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
@@ -723,7 +722,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++){
         TETRAHEDRALIZED_VOLUME<T>* volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(deformable_body_collection.deformable_geometry.structures(i));
         TRIANGULATED_SURFACE<T>* surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(deformable_body_collection.deformable_geometry.structures(i));
-        if(volume){LOG::SCOPE scope("mesh statistics","mesh statistics");Read_Write<TETRAHEDRALIZED_VOLUME<T>,T>::Print_Statistics(LOG::cout,*volume);}
+        if(volume){LOG::SCOPE scope("mesh statistics","mesh statistics");volume->Print_Statistics(LOG::cout);}
         Add_Incompressible_Force(volume);
         Add_Incompressible_Force(surface);}}
     solid_body_collection.Update_Simulated_Particles();

@@ -5,8 +5,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
@@ -180,14 +178,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
-    if(!stream_type.use_doubles)
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
-    else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
-#else
-        PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
+    rigid_geometry_collection.Write(stream_type,output_directory,frame);
 }
 //#####################################################################
 // Read_Output_Files
@@ -208,15 +199,7 @@ Read_Output_Files(const int frame)
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
     filename=output_directory+"/"+f+"/mac_velocities";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
-    if(!stream_type.use_doubles)
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Read(stream_type,output_directory,frame,rigid_geometry_collection);
-    else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Read(stream_type,output_directory,frame,rigid_geometry_collection);
-#else
-        PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
-
+    rigid_geometry_collection.Read(stream_type,output_directory,frame);
 }
 //#####################################################################
 template class WATER_EXAMPLE<VECTOR<float,2> >;

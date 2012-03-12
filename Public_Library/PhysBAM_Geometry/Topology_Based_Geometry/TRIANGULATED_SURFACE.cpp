@@ -5,6 +5,7 @@
 // Class TRIANGULATED_SURFACE
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
@@ -566,6 +567,37 @@ Create_Compact_Copy() const
     TRIANGULATED_SURFACE* triangulated_surface=new TRIANGULATED_SURFACE(*triangle_mesh,*deformable_geometry_particle);
     triangulated_surface->Update_Number_Nodes();
     return triangulated_surface;
+}
+//#####################################################################
+// Function Print_Statistics
+//#####################################################################
+template<class T> void TRIANGULATED_SURFACE<T>::
+Print_Statistics(std::ostream& output,TRIANGULATED_SURFACE<T>& object,const T thickness_over_2)
+{
+    if(object.mesh.number_nodes!=object.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    int index;object.Update_Bounding_Box();
+    if(!object.mesh.incident_elements) object.mesh.Initialize_Incident_Elements();
+
+    output<<"triangles = "<<object.mesh.elements.m<<std::endl;
+    output<<"particles = "<<object.particles.array_collection->Size()<<std::endl;
+    {int particles_touched=0;for(int p=0;p<object.particles.array_collection->Size();p++) if((*object.mesh.incident_elements)(p).m) particles_touched++;
+    output<<"particles touched = "<<particles_touched<<std::endl;}
+    output<<"bounding box = "<<*object.bounding_box<<std::endl;
+    if(object.particles.store_velocity){
+        int index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(object.particles.V);
+        output<<"max_speed = "<<object.particles.V(index).Magnitude()<<" ("<<index<<")"<<std::endl;}
+    output<<"total area = "<<object.Total_Area()<<std::endl;
+    output<<"min area = "<<object.Minimum_Area(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"min altitude = "<<object.Minimum_Altitude(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"min edge length = "<<object.Minimum_Edge_Length(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"max edge length = "<<object.Maximum_Edge_Length(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"min angle = "<<object.Minimum_Angle(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"max angle = "<<object.Maximum_Angle(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"ave min angle = "<<object.Average_Minimum_Angle()<<std::endl;
+    output<<"ave max angle = "<<object.Average_Maximum_Angle()<<std::endl;
+    output<<"max aspect ratio = "<<object.Maximum_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"ave aspect ratio = "<<object.Average_Aspect_Ratio()<<std::endl;
+    if(object.Check_For_Self_Intersection(thickness_over_2)) output<<"found self intersections"<<std::endl;else output<<"no self intersections"<<std::endl;
 }
 //#####################################################################
 template class TRIANGULATED_SURFACE<float>;

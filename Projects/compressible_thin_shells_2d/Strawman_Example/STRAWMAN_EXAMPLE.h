@@ -18,11 +18,9 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Geometry/Read_Write/Grids_Uniform_Level_Sets/READ_WRITE_FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Particles/READ_WRITE_RIGIDS_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
@@ -401,7 +399,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
 
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/center_velocities",velocity);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/mac_velocities",face_velocities);
-    Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,T>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
+    rigid_geometry_collection.Write(stream_type,output_directory,frame);
 
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/density",rho);
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/phi",phi);

@@ -11,10 +11,9 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_POINT_SIMPLICES_1D.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Particles/READ_WRITE_RIGIDS_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
@@ -203,7 +202,7 @@ void Write_Output_Files(const T& time,const std::string& frame_title)
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/center_velocities",velocity);
 
     rigid_geometry_collection.particles.frame(1).t.x=solid_position(time);
-    Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,RW>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
+    rigid_geometry_collection.Write(stream_type,output_directory,frame);
 
     ARRAY<T,TV_INT> rho_analytic(grid.Domain_Indices(3));
     for(typename GRID<TV>::CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){

@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/INTERRUPTS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
@@ -718,7 +717,7 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/bindings",solid_body_collection.deformable_body_collection.binding_list);}
     // write diagnostics
     {std::ostream* output(FILE_UTILITIES::Safe_Open_Output(output_directory+"/diagnostics."+f,false));
-    Read_Write<TETRAHEDRALIZED_VOLUME<T>,T>::Print_Statistics(*output,tetrahedralized_volume);
+    tetrahedralized_volume.Print_Statistics(*output);
     int index;
     *output<<"max_phi = "<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index);*output<<" ("<<index<<")"<<std::endl;
     LINEAR_SPRINGS<TV>* linear_springs=solid_body_collection.template Find_Force<LINEAR_SPRINGS<TV>*>();

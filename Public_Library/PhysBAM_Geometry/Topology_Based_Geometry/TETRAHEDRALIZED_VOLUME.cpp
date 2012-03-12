@@ -6,6 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -642,6 +643,43 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Compute_Nodal_Volumes(bool save_tetrahedron_volumes)
 {
     TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Compute_Nodal_Volumes(*this,save_tetrahedron_volumes);
+}
+template<class T> void TETRAHEDRALIZED_VOLUME<T>::
+Print_Statistics(std::ostream& output)
+{
+    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    Update_Bounding_Box();
+    if(!mesh.segment_mesh) mesh.Initialize_Segment_Mesh();
+    if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
+    if(!mesh.adjacent_elements) mesh.Initialize_Adjacent_Elements();
+    if(!mesh.boundary_mesh) mesh.Initialize_Boundary_Mesh();
+
+    output<<"tetrahedrons = "<<mesh.elements.m<<std::endl;
+    output<<"particles = "<<particles.array_collection->Size()<<std::endl;
+    {int particles_touched=0;for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.incident_elements)(p).m) particles_touched++;
+    output<<"particles touched = "<<particles_touched<<std::endl;}
+    output<<"bounding box = "<<*bounding_box<<std::endl;
+    if(particles.store_velocity){
+        int index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(particles.V);
+        output<<"max_speed = "<<particles.V(index).Magnitude()<<" ("<<index<<")"<<std::endl;}
+    int index;
+    output<<"total volume = "<<Total_Volume()<<std::endl;
+    output<<"max_aspect_ratio = "<<Maximum_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"max_boundary_aspect_ratio = "<<Maximum_Boundary_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"max_interior_aspect_ratio = "<<Maximum_Interior_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"avg_boundary_aspect_ratio = "<<Average_Boundary_Aspect_Ratio()<<std::endl;
+    output<<"avg_interior_aspect_ratio = "<<Average_Interior_Aspect_Ratio()<<std::endl;
+    output<<"min_volume = "<<Minimum_Volume(&index)<<std::endl;
+    output<<"min_angle = "<<180/pi*Minimum_Angle()<<std::endl;
+    output<<"max_angle = "<<180/pi*Maximum_Angle()<<std::endl;
+    output<<"min_dihedral_angle = "<<180/pi*Minimum_Dihedral_Angle()<<std::endl;
+    output<<"max_dihedral_angle = "<<180/pi*Maximum_Dihedral_Angle()<<std::endl;
+    output<<"min_edge_length = "<<Minimum_Edge_Length()<<std::endl;
+    output<<"max_edge_length = "<<Maximum_Edge_Length()<<std::endl;
+    output<<"min_altitude = "<<Minimum_Altitude()<<std::endl;
+
+    ARRAY<int> nonmanifold_nodes;mesh.boundary_mesh->Non_Manifold_Nodes(nonmanifold_nodes);
+    output<<nonmanifold_nodes.m<<" nonmanifold nodes = "<<nonmanifold_nodes;
 }
 //#####################################################################
 template class TETRAHEDRALIZED_VOLUME<float>;

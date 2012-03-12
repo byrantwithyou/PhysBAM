@@ -16,6 +16,7 @@ class SEGMENT_MESH;
 class POLYGON_MESH
 {
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     int number_nodes; // number of nodes in the mesh
     ARRAY<ARRAY<ARRAY<int> > > elements; // for each polygon, loop component, and vertex 
     SEGMENT_MESH* segment_mesh; // elements guaranteed to be lexographically ordered
@@ -39,6 +40,12 @@ public:
     
     void Add_Nodes(const int new_nodes)
     {Set_Number_Nodes(number_nodes+new_nodes);}
+
+    template<class RW> void Read(std::istream& input)
+    {Clean_Memory();Read_Binary<RW>(input,number_nodes,elements);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,number_nodes,elements);}
 
 //#####################################################################
     virtual void Clean_Memory();

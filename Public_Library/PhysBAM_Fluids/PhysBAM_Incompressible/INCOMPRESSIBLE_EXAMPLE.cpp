@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
-#include <PhysBAM_Geometry/Read_Write/Geometry/READ_WRITE_RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
@@ -69,14 +68,8 @@ Write_Output_Files(const int frame)
     else{
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/density",density);}
-    if(!stream_type.use_doubles)
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
-    else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Write(stream_type,output_directory,frame,rigid_geometry_collection);
-#else
-        PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
+    rigid_geometry_collection.Write(stream_type,output_directory,frame);
+    PHYSBAM_FATAL_ERROR("Cannot read doubles");
 }
 template<class TV> void INCOMPRESSIBLE_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
@@ -95,14 +88,7 @@ Read_Output_Files(const int frame)
         if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading wjc "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,advection_conservative->sum_jc);}
         filename=output_directory+"/"+f+"/weights_barjc_cell";
         if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading wjc cell "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,advection_conservative->sum_jc_cell);}}
-    if(!stream_type.use_doubles)
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,float>::Read(stream_type,output_directory,frame,rigid_geometry_collection);
-    else
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        Read_Write<RIGID_GEOMETRY_COLLECTION<TV>,double>::Read(stream_type,output_directory,frame,rigid_geometry_collection);
-#else
-        PHYSBAM_FATAL_ERROR("Cannot read doubles");
-#endif
+    rigid_geometry_collection.Read(stream_type,output_directory,frame);
 }
 //#####################################################################
 template class INCOMPRESSIBLE_EXAMPLE<VECTOR<float,1> >;
