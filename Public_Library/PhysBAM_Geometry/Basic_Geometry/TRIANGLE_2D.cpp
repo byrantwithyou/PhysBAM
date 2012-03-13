@@ -154,6 +154,31 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_2D<T>& triangle
             break;}
 }
 //#####################################################################
+// Function Cut_With_Hyperplane_And_Discard_Outside_Simplices
+//#####################################################################
+template<class T> bool TRIANGLE_2D<T>::
+Intersects(const TRIANGLE_2D& tri) const
+{
+    const TRIANGLE_2D* tris[2]={this,&tri};
+    int cs=0;
+
+    for(int t=0;t<2;t++)
+        for(int v=0;v<3;v++){
+            for(int e=0;e<3;e++)
+                cs|=(Signed_Area(tris[t]->X(v),tris[1-t]->X(e),tris[1-t]->X((e+1)%3))>=0)<<(9*t+3*v+e);
+            int x=(cs>>(9*t+3*v))&7;
+            if(x==7 || x==0) return true;} // Vertex inside
+
+    for(int i=0;i<3;i++)
+        for(int j=0;j<3;j++){
+            int in=(i+1)%3,jn=(j+1)%3;
+            if(((cs>>(3*j+i))^(cs>>(3*jn+i)))&1)
+                if(((cs>>(9+3*i+j))^(cs>>(9+3*in+j)))&1)
+                    return true;} // Edge-edge intersection
+
+    return false;
+}
+//#####################################################################
 #define INSTANTIATION_HELPER(T) \
     template T TRIANGLE_2D<T>::Negative_Material(const ARRAY<VECTOR<T,2> >& X,const ARRAY<T>& phis,const VECTOR<int,3>& indices);\
     template void TRIANGLE_2D<T>::Cut_With_Hyperplane(ARRAY<VECTOR<T,2> >& X,const LINE_2D<T>& cutting_plane,const VECTOR<int,3>& indices,ARRAY<VECTOR<int,3> >& left_tris, \
@@ -164,6 +189,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_2D<T>& triangle
     template void TRIANGLE_2D<T>::Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_2D<T>& triangle,const LINE_2D<T>& cutting_plane,ARRAY<TRIANGLE_2D<T> >& negative_triangles) const;
 
 INSTANTIATION_HELPER(float)
+template bool TRIANGLE_2D<float>::Intersects(TRIANGLE_2D<float> const&) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 INSTANTIATION_HELPER(double)
+template bool TRIANGLE_2D<double>::Intersects(TRIANGLE_2D<double> const&) const;
 #endif

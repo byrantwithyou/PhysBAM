@@ -179,6 +179,7 @@ public:
     return VECTOR<T,3>::Triple_Product(b.Append(b.Magnitude_Squared()),c.Append(c.Magnitude_Squared()),d.Append(d.Magnitude_Squared()))>=0;}
 
 //#####################################################################
+    bool Intersects(const TRIANGLE_2D& tri) const;
     static T Negative_Material(const ARRAY<TV>& X,const ARRAY<T>& phis,const VECTOR<int,3>& indices);
     static void Cut_With_Hyperplane(ARRAY<TV>& X,const LINE_2D<T>& cutting_plane,const VECTOR<int,3>& indices,ARRAY<VECTOR<int,3> >& left_tris,
         ARRAY<VECTOR<int,3> >& right_tris);
