@@ -20,17 +20,15 @@ class SURFACE_PRIMITIVE
 
 public:
 
-    int num_veritces;
+    int num_vertices;
     VECTOR<TV,3> vertices;
     int parent;
     RANGE<TV2> bounding_box;
 
-    SURFACE_PRIMITIVE() {type=EMPTY;}
-    SURFACE_PRIMITIVE(const TV &a,const int style);
-    SURFACE_PRIMITIVE(const TV &a,const TV &b,const int style);
-    SURFACE_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int style);
-
-    void Initialize_Bounding_Box();
+    SURFACE_PRIMITIVE() {num_vertices=0;}
+    SURFACE_PRIMITIVE(const TV &a,const int pa);
+    SURFACE_PRIMITIVE(const TV &a,const TV &b,const int pa);
+    SURFACE_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int pa);
 };
 
 template<class T>
@@ -40,10 +38,15 @@ class HIDDEN_SURFACE_PRIMITIVES
     typedef VECTOR<T,2> TV2;
 
 public:
+
+    ARRAY<SURFACE_PRIMITIVE<T> > primitives;
+    ARRAY<int> order;
+
     void Initialize(DIRECTED_GRAPH<>& dg);
-    void Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside);
-    bool Test_Edge(int a,int b); // 0=no edge, 1=a->b
-    int Emit_Node(int a);
+    void Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside){}
+    bool Test_Edge(int a,int b){return true;} // 0=no edge, 1=a->b
+    void Emit_Node(int a) {order.Append(a);}
+    bool Projections_Intersect(int a,int b);
 };
 }
 #endif
