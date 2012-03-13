@@ -326,7 +326,32 @@ Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane
             positive_triangles.Append(triangle);break;
             break;}
 }
-
+template<class T> bool TRIANGLE_3D<T>::
+Intersects(const TRIANGLE_3D<T>& triangle,INTERSECTS_HELPER* ih) const
+{
+    INTERSECTS_HELPER lh[2],*h=ih?ih:lh; // h[0].w is a z, h[1].w is a y.
+    TV X[2][3]={{x1,x2,x3},{triangle.x1,triangle.x2,triangle.x3}};
+    for(int i=0;i<2;i++) h[i].n=(X[i][0]-X[i][2]).Cross(X[i][1]-X[i][2]);
+    TV r=h[0].n.Cross(h[1].n);
+    for(int k=0;k<2;k++){
+        h[k].neg=0;
+        h[k].pos=0;
+        for(int i=0;i<3;i++){
+            h[k].x(i)=r.Dot(X[k][i]);
+            h[k].w(i)=h[1-k].n.Dot(X[k][i]-X[1-k][0]);
+            h[k].neg|=(h[k].w(i)<0)<<i;
+            h[k].pos|=(h[k].w(i)>0)<<i;}
+        if(!h[k].neg || !h[k].pos) return false;
+        for(h[k].i[0]=0;h[k].i[0]<3;h[k].i[0]++) if(h[k].pos==(1<<h[k].i[0]) || h[k].neg==(1<<h[k].i[0])) break;
+        h[k].i[1]=h[k].i[0]+1;
+        if(h[k].i[1]>2) h[k].i[1]=0;
+        h[k].i[2]=3-h[k].i[0]-h[k].i[1];
+        for(int j=0;j<2;j++){
+            h[k].th[j]=h[0].w(h[k].i[0])/(h[0].w(h[k].i[0])-h[0].w(h[k].i[j+1]));
+            h[k].t[j]=h[k].x(h[k].i[0])+h[k].th[j]*(h[k].x(h[k].i[j+1])-h[k].x(h[k].i[0]));}}
+    for(int k=0;k<2;k++) if(min(h[k].t[0],h[k].t[1])>=max(h[1-k].t[0],h[1-k].t[1])) return false;
+    return true;
+}
 //#####################################################################
 template class TRIANGLE_3D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

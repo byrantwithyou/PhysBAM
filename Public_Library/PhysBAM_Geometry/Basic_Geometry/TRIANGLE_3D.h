@@ -186,6 +186,13 @@ public:
     void Clip_To_Box(const RANGE<TV>& box,ARRAY<TRIANGLE_3D<T> >& clipped_simplices) const;
     static void Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles);
     static void Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles,ARRAY<TRIANGLE_3D<T> >& positive_triangles,T tol=0);
+    struct INTERSECTS_HELPER
+    {
+        TV n,x,w;
+        int pos,neg,i[3];
+        T th[2],t[2];
+    };
+    bool Intersects(const TRIANGLE_3D<T>& triangle,INTERSECTS_HELPER* ih=0) const;
 //#####################################################################
 };
 
