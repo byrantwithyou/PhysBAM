@@ -207,7 +207,7 @@ public:
     {Clean_Memory();Read_Binary<RW>(input,n);A.Resize(n);
     for(int i=0;i<n;i++){A(i)=new SPARSE_VECTOR_ND<T>(n);Read_Binary<RW>(input,*A(i));}}
 
-    template<class RW> static void Write(std::ostream& output) const
+    template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,n);for(int i=0;i<n;i++)Write_Binary<RW>(output,*A(i));}
 //#####################################################################
 };

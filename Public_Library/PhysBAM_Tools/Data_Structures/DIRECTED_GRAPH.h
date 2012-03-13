@@ -25,7 +25,7 @@ public:
 
     template<class RW> void Read(std::istream& input)
     {Read_Binary<RW>(input,parents,children,level_of_node,nodes_in_level);}
-        
+
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,parents,children,level_of_node,nodes_in_level);}
 //#####################################################################
@@ -55,7 +55,7 @@ public:
     DIRECTED_GRAPH_CORE core;
     template<class PID,class EID> friend class UNDIRECTED_GRAPH;
 
-    DIRECTED_GRAPH(const ID number_nodes)
+    DIRECTED_GRAPH(const ID number_nodes=ID())
         :core(Value(number_nodes))
     {}
 

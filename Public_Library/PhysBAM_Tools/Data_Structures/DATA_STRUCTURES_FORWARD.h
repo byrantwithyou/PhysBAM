@@ -21,8 +21,8 @@ template<class ID=int> class OPERATION_HASH;
 template<class T> class QUEUE;
 template<class T> class STACK;
 
-template<class ID> class DIRECTED_GRAPH;
-template<class ID,class EID> class UNDIRECTED_GRAPH;
+template<class ID=int> class DIRECTED_GRAPH;
+template<class ID=int,class EID=int> class UNDIRECTED_GRAPH;
 
 struct INITIAL_SIZE;
 }
