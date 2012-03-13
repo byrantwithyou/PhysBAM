@@ -262,6 +262,9 @@ public:
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
     {return v1.x*v2.x+v1.y*v2.y+v1.z*v2.z;}
 
+    T Dot(const VECTOR& v) const
+    {return x*v.x+y*v.y+z*v.z;}
+
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR(min(v1.x,v2.x),min(v1.y,v2.y),min(v1.z,v2.z));}
 
@@ -288,6 +291,9 @@ public:
 
     static VECTOR Cross_Product(const VECTOR& v1,const VECTOR& v2) // 6 mults, 3 adds
     {return VECTOR(v1.y*v2.z-v1.z*v2.y,v1.z*v2.x-v1.x*v2.z,v1.x*v2.y-v1.y*v2.x);}
+
+    VECTOR Cross(const VECTOR& v) const // 6 mults, 3 adds
+    {return VECTOR(y*v.z-z*v.y,z*v.x-x*v.z,x*v.y-y*v.x);}
 
     static T Angle_Between(const VECTOR& u,const VECTOR& v) // 0 .. pi
     {T s=Cross_Product(u,v).Magnitude(),c=Dot_Product(u,v);return atan2(s,c);}

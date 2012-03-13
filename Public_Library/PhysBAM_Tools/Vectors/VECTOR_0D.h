@@ -134,6 +134,9 @@ public:
     VECTOR Normalized() const
     {return *this;}
 
+    T Dot(const VECTOR&) const
+    {return T();}
+
     static T Dot_Product(const VECTOR&,const VECTOR&)
     {return T();}
 

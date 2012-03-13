@@ -255,8 +255,11 @@ public:
     int Dominant_Axis() const
     {return (abs(x)>abs(y))?0:1;}
 
+    T Dot(const VECTOR& v) const
+    {return x*v.x+y*v.y;}
+ 
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
-    {return v1.x*v2.x+v1.y*v2.y;}
+    {return v1.Dot(v2);}
 
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR(min(v1.x,v2.x),min(v1.y,v2.y));}

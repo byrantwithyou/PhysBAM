@@ -215,8 +215,11 @@ public:
     int Dominant_Axis() const
     {return 0;}
 
+    T Dot(const VECTOR& v) const
+    {return x*v.x;}
+
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
-    {return v1.x*v2.x;}
+    {return v1.Dot(v2);}
 
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR(min(v1.x,v2.x));}
