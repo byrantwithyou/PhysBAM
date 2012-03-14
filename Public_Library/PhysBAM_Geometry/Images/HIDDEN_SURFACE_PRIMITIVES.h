@@ -51,11 +51,11 @@ public:
     bool Test_Edge(int a,int b) {return Projections_Intersect(a,b);} // 0=no edge, 1=a->b
     void Emit_Node(int a) {order.Append(a);}
     bool Projections_Intersect(int a,int b);
-    void Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
+    void Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
         ARRAY<VECTOR<int,2> >& pairs,HASHTABLE<VECTOR<int,2> >& edges);
-    void Handle_Intersection(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
+    void Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
         ARRAY<VECTOR<int,2> >& pairs,HASHTABLE<VECTOR<int,2> >& edges);
-    void Add_Edge(DIRECTED_GRAPH<>& dg,HASHTABLE<VECTOR<int,2> >& edges,int a,int b);
+    void Add_Edge(HASHTABLE<VECTOR<int,2> >& edges,int a,int b);
     PLANE<T> Get_Cutting_Plane(const TV &a,const TV &b);
 };
 }

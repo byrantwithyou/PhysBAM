@@ -65,13 +65,12 @@ Projections_Intersect(int a,int b)
     PHYSBAM_FATAL_ERROR();
 }
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
-Add_Edge(DIRECTED_GRAPH<>& dg,HASHTABLE<VECTOR<int,2> >& edges,int a,int b)
+Add_Edge(HASHTABLE<VECTOR<int,2> >& edges,int a,int b)
 {
-    dg.Add_Edge(a,b);
     edges.Set(VECTOR<int,2>(a,b));
 }
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
-Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
+Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
     ARRAY<VECTOR<int,2> >& pairs,HASHTABLE<VECTOR<int,2> >& edges)
 {
     int index[2]={a,b};
@@ -84,14 +83,14 @@ Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARR
         if(!rz || !ih[0].neg || !ih[0].pos || !ih[1].neg || !ih[1].pos) return;
         int i=rz>0?1:-1;
         int in_front=max(i*ih[0].t[0],i*ih[0].t[1])<max(i*ih[1].t[0],i*ih[1].t[1]);
-        Add_Edge(dg,edges,index[in_front],index[1-in_front]);
+        Add_Edge(edges,index[in_front],index[1-in_front]);
         return;}
 
     int cut_index=abs(ih[0].n.z)>abs(ih[1].n.z);
     if(!intersects){
         int ind=ih[cut_index].w.Arg_Abs_Max();
         int in_front=(ih[cut_index].w[ind]>0)==(ih[1-cut_index].n.z>0);
-        Add_Edge(dg,edges,index[in_front],index[1-in_front]);
+        Add_Edge(edges,index[in_front],index[1-in_front]);
         return;}
 
     const TV& X0=primitive[cut_index]->vertices(ih[cut_index].i[0]);
@@ -115,24 +114,24 @@ Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARR
         adjacency_list(adj(i)).Append(new1);
         if(adj(i)==index[1-cut_index]) continue;
         if(edges.Contains(VECTOR<int,2>(index[cut_index],adj(i)))){
-            Add_Edge(dg,edges,new0,adj(i));
-            Add_Edge(dg,edges,new1,adj(i));}
+            Add_Edge(edges,new0,adj(i));
+            Add_Edge(edges,new1,adj(i));}
         else if(edges.Contains(VECTOR<int,2>(adj(i),index[cut_index]))){
-            Add_Edge(dg,edges,adj(i),new0);
-            Add_Edge(dg,edges,adj(i),new1);}
+            Add_Edge(edges,adj(i),new0);
+            Add_Edge(edges,adj(i),new1);}
         else{
             pairs.Append(VECTOR<int,2>(new0,adj(i)));
             pairs.Append(VECTOR<int,2>(new1,adj(i)));}}
 
     int in_front=(ih[cut_index].w[ih[cut_index].i[0]]>0)==(ih[1-cut_index].n.z>0);
-    Add_Edge(dg,edges,index[in_front],index[1-in_front]);
+    Add_Edge(edges,index[in_front],index[1-in_front]);
     index[cut_index]=new0;
-    Add_Edge(dg,edges,index[1-in_front],index[in_front]);
+    Add_Edge(edges,index[1-in_front],index[in_front]);
     index[cut_index]=new1;
-    Add_Edge(dg,edges,index[1-in_front],index[in_front]);
+    Add_Edge(edges,index[1-in_front],index[in_front]);
 }
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
-Handle_Intersection(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<int,2> >& pairs,
+Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<int,2> >& pairs,
     HASHTABLE<VECTOR<int,2> >& edges)
 {
     int index[2]={a,b};
@@ -143,7 +142,7 @@ Handle_Intersection(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacen
         case 1*3: PHYSBAM_FATAL_ERROR();break;
         case 2*2: PHYSBAM_FATAL_ERROR();break;
         case 2*3: PHYSBAM_FATAL_ERROR();break;
-        case 3*3: Handle_Intersection_Triangle_Triangle(dg,a,b,adjacency_list,pairs,edges);break;}
+        case 3*3: Handle_Intersection_Triangle_Triangle(a,b,adjacency_list,pairs,edges);break;}
 }
 //#####################################################################
 // Function Initialize
@@ -151,15 +150,12 @@ Handle_Intersection(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacen
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
 Initialize(DIRECTED_GRAPH<>& dg)
 {
-    dg.Initialize(primitives.m);
     BOX_HIERARCHY<TV2> bh;
     for(int i=0;i<primitives.m;i++)
         bh.box_hierarchy.Append(primitives(i).bounding_box);
     bh.Set_Leaf_Boxes(bh.box_hierarchy,true);
     ARRAY<ARRAY<int> > intersection_list(primitives.m),adjacency_list(primitives.m);
     BOX_VISITOR_TRIVIAL visitor(intersection_list);
-//    bh.Intersection_List(visitor);
-
     bh.Intersection_List(bh,visitor,ZERO());
 
     HASHTABLE<VECTOR<int,2> > edges;
@@ -173,7 +169,11 @@ Initialize(DIRECTED_GRAPH<>& dg)
                 adjacency_list(k).Append(i);}}
 
     for(int i=0;i<pairs.m;i++)
-        Handle_Intersection(dg,pairs(i).x,pairs(i).y,adjacency_list,pairs,edges);
+        Handle_Intersection(pairs(i).x,pairs(i).y,adjacency_list,pairs,edges);
+
+    dg.Initialize(primitives.m);
+    for(HASHTABLE<VECTOR<int,2> >::ITERATOR it(edges);it.Valid();it.Next())
+        dg.Add_Edge(it.Key().x,it.Key().y);
 }
 template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
 Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside)
