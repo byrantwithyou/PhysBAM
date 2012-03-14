@@ -7,8 +7,9 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
-#include <PhysBAM_Geometry/Images/DEPTH_BUFFERING.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
+#include <PhysBAM_Geometry/Images/HIDDEN_SURFACE.h>
+#include <PhysBAM_Geometry/Images/HIDDEN_SURFACE_PRIMITIVES.h>
 #include <PhysBAM_Geometry/Images/TEX_FILE.h>
 
 using namespace PhysBAM;
@@ -34,45 +35,21 @@ int main(int argc, char* argv[])
     TV2 mx_pt=TV2(1,1);
     T margin=.2;
     vi->Use_Fixed_Bounding_Box(RANGE<TV2>(TV2()-margin,mx_pt+margin));
-    vi->cur_format.line_width=0.05;
-    vi->cur_format.line_color=TV(1,0,0);
-    vi->cur_format.fill_opacity=0.5;
     vi->cur_format.fill_style=1;
+    vi->cur_format.line_style=0;
 
-    DEPTH_BUFFERING<T> db;
-    // db.Add_Element(TV(0,0,0),TV(1,0.2,0),TV(0.5,1.1,1),0);
-    db.Add_Element(TV(0.1,-0.1,1),TV(1,0.1,1),TV(0,1,0),1);
-    db.Add_Element(TV(-0.1,0.1,0),TV(1.1,0.3,-1),TV(1,0.6,2),2);
-    ARRAY<DISPLAY_PRIMITIVE_ORDERING<T> >& dps=db.Process_Primitives();
+    HIDDEN_SURFACE_PRIMITIVES<T> hsp;
+    HIDDEN_SURFACE<T> hs(hsp);
+    // hsp.Add_Element(TV(0,0,0),TV(1,0.2,0),TV(0.5,1.1,1),0);
+    // hsp.Add_Element(TV(0.1,-0.1,1),TV(1,0.1,1),TV(0,1,0),1);
+    hsp.Add(TV(-0.1,0.1,0),TV(1.1,0.3,-1),TV(1,0.6,2));
+    hs.Compute();
 
-    for(int i=0;i<dps.m;i++){
-        VECTOR<TV2,3> tri=dps(i).Flatten();
-        switch(dps(i).style){
-            case 0:
-                vi->cur_format.line_color=TV(1,0,0);
-                vi->cur_format.fill_style=1;
-                vi->Draw_Object(tri(0),tri(1),tri(2));
-                // vi->cur_format.line_color=TV(0,0,0);
-                // vi->cur_format.fill_style=0;
-                // vi->Draw_Object(tri(0),tri(1),tri(2));
-                break;
-            case 1:
-                vi->cur_format.line_color=TV(0,0,1);
-                vi->cur_format.fill_style=1;
-                vi->Draw_Object(tri(0),tri(1),tri(2));
-                // vi->cur_format.line_color=TV(0,0,0);
-                // vi->cur_format.fill_style=0;
-                // vi->Draw_Object(tri(0),tri(1),tri(2));
-                break;
-            case 2:
-                vi->cur_format.line_color=TV(0,1,0);
-                vi->cur_format.fill_style=1;
-                vi->Draw_Object(tri(0),tri(1),tri(2));
-                // vi->cur_format.line_color=TV(0,0,0);
-                // vi->cur_format.fill_style=0;
-                // vi->Draw_Object(tri(0),tri(1),tri(2));
-                break;
-            default: break;}}
+    for(int i=0;i<hsp.order.m;i++){
+        SURFACE_PRIMITIVE<T>& sp=hsp.primitives(hsp.order(i));
+        vi->cur_format.fill_color=TV::Axis_Vector(sp.parent);
+        PHYSBAM_ASSERT(sp.num_vertices==3);
+        vi->Draw_Object(sp.vertices(0).Remove_Index(2),sp.vertices(1).Remove_Index(2),sp.vertices(2).Remove_Index(2));}
 
     delete vi;    
 
