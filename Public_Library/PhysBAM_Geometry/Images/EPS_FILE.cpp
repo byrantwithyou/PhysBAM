@@ -70,7 +70,7 @@ Stroke()
     if(!cur_format.line_style) return;
     if(effective_color!=cur_format.line_color){
         effective_color=cur_format.line_color;
-        stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor"<<std::endl;}
+        stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor ";}
     Emit("stroke");
 }
 //#####################################################################
@@ -80,10 +80,12 @@ template<class T> void EPS_FILE<T>::
 Fill()
 {
     if(!cur_format.fill_style) return;
+    if(cur_format.line_style) Emit("gsave");
     if(effective_color!=cur_format.fill_color){
         effective_color=cur_format.fill_color;
-        stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor"<<std::endl;}
+        stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor ";}
     Emit("fill");
+    if(cur_format.line_style) Emit("grestore");
 }
 //#####################################################################
 // Function Update_Effective_Formatting
