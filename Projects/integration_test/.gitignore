@@ -6,3 +6,7 @@ view_case2_debug
 view_case_debug
 integration_test
 integration_test_debug
+primitive_integration
+primitive_integration_debug
+depth_buffering
+view_case2
