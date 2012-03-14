@@ -39,7 +39,8 @@ public:
     T normal_variance_threshold;
     ARRAY<TV>* vertex_normals;    
     ARRAY<VECTOR<TV,3> >* face_vertex_normals;    
-    
+
+    TRIANGULATED_SURFACE();
     TRIANGULATED_SURFACE(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
     virtual ~TRIANGULATED_SURFACE();
 

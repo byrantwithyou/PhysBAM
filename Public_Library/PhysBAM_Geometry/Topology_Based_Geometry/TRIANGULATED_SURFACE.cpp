@@ -51,6 +51,20 @@ static bool registered=Register_Triangulated_Surface();
 // Constructor
 //#####################################################################
 template<class T> TRIANGULATED_SURFACE<T>::
+TRIANGULATED_SURFACE()
+    :MESH_OBJECT<TV,TRIANGLE_MESH>(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>),
+    triangle_list(0),segment_lengths(0),hierarchy(0),particle_hierarchy(0),
+    avoid_normal_interpolation_across_sharp_edges(false),normal_variance_threshold((T).1),
+    vertex_normals(0),face_vertex_normals(0)
+{
+    PHYSBAM_ASSERT(registered);
+    Use_Face_Normals();
+    this->need_destroy_mesh=this->need_destroy_particles=true;
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> TRIANGULATED_SURFACE<T>::
 TRIANGULATED_SURFACE(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :MESH_OBJECT<TV,TRIANGLE_MESH>(triangle_mesh_input,particles_input),
     triangle_list(0),segment_lengths(0),hierarchy(0),particle_hierarchy(0),

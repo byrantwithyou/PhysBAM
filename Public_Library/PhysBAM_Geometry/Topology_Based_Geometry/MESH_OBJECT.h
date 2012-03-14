@@ -37,7 +37,6 @@ public:
     RANGE<TV>* bounding_box;
     PARTICLE_PARTITION<TV>* particle_partition;
     TV_INT desired_particle_partition_counts;
-private:
     bool need_destroy_mesh,need_destroy_particles;
 protected:
     MESH_OBJECT(T_MESH& mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
