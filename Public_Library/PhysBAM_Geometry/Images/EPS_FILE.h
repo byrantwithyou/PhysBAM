@@ -24,7 +24,7 @@ public:
     typedef VECTOR<T,2> TV;
     int head_offset;
 
-    VECTOR<T,3> effective_line_color,effective_fill_color;
+    VECTOR<T,3> effective_color;
     T effective_line_width,effective_point_radius,effective_line_opacity,effective_fill_opacity;
 
     EPS_FILE(const std::string& filename,const RANGE<TV>& box=RANGE<TV>(TV(),TV(500,500)));
@@ -36,6 +36,8 @@ public:
     void Update_Effective_Formatting();
     void Mt(const TV &pt);
     void Lt(const TV &pt);
+    void Stroke();
+    void Fill();
 
 protected:
     virtual void Emit_Object(const TV &a,const TV &b); // line

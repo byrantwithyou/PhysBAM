@@ -65,12 +65,35 @@ Compute_Transform(T& scale,TV& shift)
 // Function Update_Effective_Formatting
 //#####################################################################
 template<class T> void EPS_FILE<T>::
+Stroke()
+{
+    if(!cur_format.line_style) return;
+    if(effective_color!=cur_format.line_color){
+        effective_color=cur_format.line_color;
+        stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor"<<std::endl;}
+    Emit("stroke");
+}
+//#####################################################################
+// Function Update_Effective_Formatting
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Fill()
+{
+    if(!cur_format.fill_style) return;
+    if(effective_color!=cur_format.fill_color){
+        effective_color=cur_format.fill_color;
+        stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor"<<std::endl;}
+    Emit("fill");
+}
+//#####################################################################
+// Function Update_Effective_Formatting
+//#####################################################################
+template<class T> void EPS_FILE<T>::
 Update_Effective_Formatting()
 {
-    if(effective_line_color!=cur_format.line_color){
-        effective_line_color=cur_format.line_color;
-        stream<<effective_line_color.x<<" "<<effective_line_color.y<<" "<<effective_line_color.z<<" setrgbcolor"<<std::endl;}
-//    VECTOR<T,3> effective_fill_color;
+    // if(effective_color!=cur_format.line_color){
+    //     effective_color=cur_format.line_color;
+    //     stream<<effective_color.x<<" "<<effective_color.y<<" "<<effective_color.z<<" setrgbcolor"<<std::endl;}
 //    T effective_line_width,effective_point_radius,effective_line_opacity,effective_fill_opacity;
 }
 //#####################################################################
@@ -84,8 +107,8 @@ Emit_Object(const TV &pt,T radius)
     Emit("newpath");
     Emit(pt);
     stream<<radius<<" 0 360 arc closepath";
-    if(cur_format.fill_style) Emit("fill");
-    if(cur_format.line_style) Emit("stroke");
+    Fill();
+    Stroke();
     stream<<std::endl;
 }
 //#####################################################################
@@ -98,7 +121,8 @@ Emit_Object(const TV &a,const TV &b)
     Update_Effective_Formatting();
     Mt(a);
     Lt(b);
-    stream<<"stroke"<<std::endl;
+    Stroke();
+    stream<<std::endl;
 }
 //#####################################################################
 // Function Draw_Object
@@ -113,8 +137,8 @@ Emit_Object(const TV &a,const TV &b,const TV &c)
     Lt(b);
     Lt(c);
     Emit("closepath");
-    if(cur_format.fill_style) Emit("fill");
-    if(cur_format.line_style) Emit("stroke");
+    Fill();
+    Stroke();
     stream<<std::endl;
 }
 //#####################################################################
@@ -132,8 +156,8 @@ Emit_Object(const RANGE<TV>& box)
     Lt(box.max_corner);
     Lt(b);
     Emit("closepath");
-    if(cur_format.fill_style) Emit("fill");
-    if(cur_format.line_style) Emit("stroke");
+    Fill();
+    Stroke();
     stream<<std::endl;
 }
 //#####################################################################
@@ -149,8 +173,8 @@ Emit_Object(ARRAY_VIEW<TV> pts)
     Mt(pts(0));
     for(int i=1;i<pts.Size();i++) Lt(pts(i));
     Emit("closepath");
-    if(cur_format.fill_style) Emit("fill");
-    if(cur_format.line_style) Emit("stroke");
+    Fill();
+    Stroke();
     stream<<std::endl;
 }
 //#####################################################################
