@@ -77,9 +77,7 @@ Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARR
     int index[2]={a,b};
     SURFACE_PRIMITIVE<T>* primitive[2]={&primitives(index[0]),&primitives(index[1])};
     typename TRIANGLE_3D<T>::INTERSECTS_HELPER ih[2];
-    TRIANGLE_3D<T> triangle[2]={
-        TRIANGLE_3D<T>(primitive[0]->vertices(0),primitive[0]->vertices(1),primitive[0]->vertices(2)),
-        TRIANGLE_3D<T>(primitive[1]->vertices(0),primitive[1]->vertices(1),primitive[1]->vertices(2))};
+    TRIANGLE_3D<T> triangle[2]={TRIANGLE_3D<T>(primitive[0]->vertices),TRIANGLE_3D<T>(primitive[1]->vertices)};
     bool intersects=triangle[0].Intersects(triangle[1],ih);
     if(ih[0].n.z==0 && ih[1].n.z==0){
         T rz=(ih[0].n.Cross(ih[1].n)).z;
@@ -176,6 +174,47 @@ Initialize(DIRECTED_GRAPH<>& dg)
 
     for(int i=0;i<pairs.m;i++)
         Handle_Intersection(dg,pairs(i).x,pairs(i).y,adjacency_list,pairs,edges);
+}
+template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
+Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside)
+{
+    TRIANGLE_3D<T> triangle(primitives(divide).vertices);
+    PLANE<T> plane0=Get_Cutting_Plane(primitives(cutter).vertices(0),primitives(cutter).vertices(1));
+    PLANE<T> plane1=Get_Cutting_Plane(primitives(cutter).vertices(1),primitives(cutter).vertices(2));
+    PLANE<T> plane2=Get_Cutting_Plane(primitives(cutter).vertices(2),primitives(cutter).vertices(0));
+    bool flip=plane0.Lazy_Inside(primitives(cutter).vertices(2));
+    if(flip){
+        plane0.normal=-plane0.normal;
+        plane1.normal=-plane1.normal;
+        plane2.normal=-plane2.normal;}
+    ARRAY<TRIANGLE_3D<T> > inside_triangles0,inside_triangles1,inside_triangles,outside_triangles;
+    triangle.Cut_With_Hyperplane(triangle,plane0,inside_triangles0,outside_triangles);
+    for(int i=0;i<inside_triangles0.m;i++)
+        triangle.Cut_With_Hyperplane(inside_triangles0(i),plane1,inside_triangles1,outside_triangles);
+    for(int i=0;i<inside_triangles1.m;i++)
+        triangle.Cut_With_Hyperplane(inside_triangles1(i),plane2,inside_triangles,outside_triangles);
+
+    if(!inside_triangles.m) return false; // Cutting wasn't necessary
+    primitives(divide).vertices(0)=inside_triangles(0).x1;
+    primitives(divide).vertices(1)=inside_triangles(0).x2;
+    primitives(divide).vertices(2)=inside_triangles(0).x3;
+    inside.Append(divide);
+    for(int i=1;i<inside_triangles.m;i++){
+        SURFACE_PRIMITIVE<T> sp(inside_triangles(i).x1,inside_triangles(i).x2,inside_triangles(i).x3,primitives(divide).parent);
+        inside.Append(primitives.Append(sp));}
+    for(int i=0;i<outside_triangles.m;i++){
+        SURFACE_PRIMITIVE<T> sp(outside_triangles(i).x1,outside_triangles(i).x2,outside_triangles(i).x3,primitives(divide).parent);
+        outside.Append(primitives.Append(sp));}
+
+    return true;
+}
+//#####################################################################
+// Function Get_Cutting_Plane
+//#####################################################################
+template<class T> PLANE<T> HIDDEN_SURFACE_PRIMITIVES<T>::
+Get_Cutting_Plane(const TV &a,const TV &b)
+{ 
+    return PLANE<T>((a-b).Remove_Index(2).Rotate_Clockwise_90().Normalized().Append(0),a);
 }
 template class HIDDEN_SURFACE_PRIMITIVES<float>;
 template class HIDDEN_SURFACE_PRIMITIVES<double>;

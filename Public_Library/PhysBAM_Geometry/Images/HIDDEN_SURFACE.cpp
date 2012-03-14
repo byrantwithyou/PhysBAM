@@ -57,7 +57,9 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
         // Divide the nodes; update node_map.
         ARRAY<ARRAY<int> > inside_list(children.m),outside_list(children.m);
         for(int i=0;i<children.m;i++){
-            primitives.Divide_Primitive(children(i),index,inside_list(i),outside_list(i));
+            if(!primitives.Divide_Primitive(children(i),index,inside_list(i),outside_list(i))){
+                outside_list(i).Append(children(i));
+                continue;}
             node_map(children(i))=inside_list(i)(0);
             inside_list(i)(0)=children(i);
             for(int j=1;j<inside_list(i).m;j++){

@@ -147,7 +147,7 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
         for(int j=0;j<TV::m;j++){
             projected_elements(i).X(j)=projected_elements(i).X(j)*coarse_factor-TV(sub_cell)-(T).5;
             projected_elements(i).X(j)(dir)=clamp(projected_elements(i).X(j)(dir),mn,mx);}
-        volume_inside+=Volume(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)),dir);}
+        volume_inside+=Volume(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).X(0)),dir);}
 
     // Check for full or empty cell.
     T full_volume=(T)op.range.Size()/(1<<TV::m);
@@ -163,7 +163,7 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
 
     T integral=0;
     for(int i=0;i<projected_elements.m;i++)
-        integral+=poly.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i)))*projected_elements(i).Normal()(dir);
+        integral+=poly.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).X(0)))*projected_elements(i).Normal()(dir);
 
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,inside),integral));
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,!inside),-integral));

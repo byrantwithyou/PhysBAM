@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 
 namespace PhysBAM{
 
@@ -43,8 +44,8 @@ public:
     ARRAY<int> order;
 
     void Initialize(DIRECTED_GRAPH<>& dg);
-    void Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside){}
-    bool Test_Edge(int a,int b){return true;} // 0=no edge, 1=a->b
+    bool Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside);
+    bool Test_Edge(int a,int b) {return Projections_Intersect(a,b);} // 0=no edge, 1=a->b
     void Emit_Node(int a) {order.Append(a);}
     bool Projections_Intersect(int a,int b);
     void Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
@@ -52,6 +53,7 @@ public:
     void Handle_Intersection(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
         ARRAY<VECTOR<int,2> >& pairs,HASHTABLE<VECTOR<int,2> >& edges);
     void Add_Edge(DIRECTED_GRAPH<>& dg,HASHTABLE<VECTOR<int,2> >& edges,int a,int b);
+    PLANE<T> Get_Cutting_Plane(const TV &a,const TV &b);
 };
 }
 #endif
