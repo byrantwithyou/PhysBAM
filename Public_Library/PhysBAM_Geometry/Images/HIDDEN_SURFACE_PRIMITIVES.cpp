@@ -17,7 +17,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> SURFACE_PRIMITIVE<T>::
-SURFACE_PRIMITIVE(const TV &a,const int pa):parent(pa)
+SURFACE_PRIMITIVE(const TV &a,const int pa)
+    :parent(pa)
 { 
     num_vertices=1;
     vertices(0)=a;
@@ -27,7 +28,8 @@ SURFACE_PRIMITIVE(const TV &a,const int pa):parent(pa)
 // Constructor
 //#####################################################################
 template<class T> SURFACE_PRIMITIVE<T>::
-SURFACE_PRIMITIVE(const TV &a,const TV &b,const int pa):parent(pa)
+SURFACE_PRIMITIVE(const TV &a,const TV &b,const int pa)
+    :parent(pa)
 { 
     num_vertices=2;
     vertices(0)=a;
@@ -38,13 +40,20 @@ SURFACE_PRIMITIVE(const TV &a,const TV &b,const int pa):parent(pa)
 // Constructor
 //#####################################################################
 template<class T> SURFACE_PRIMITIVE<T>::
-SURFACE_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int pa):parent(pa)
+SURFACE_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int pa)
+    :parent(pa)
 { 
     num_vertices=3;
     vertices(0)=a;
     vertices(1)=b;
     vertices(2)=c;
     bounding_box=RANGE<TV2>::Bounding_Box(a.Remove_Index(2),b.Remove_Index(2),c.Remove_Index(2));
+}
+template<class T> TRIANGLE_3D<T> SURFACE_PRIMITIVE<T>::
+As_Triangle() const
+{
+    PHYSBAM_ASSERT(num_vertices==3);
+    return TRIANGLE_3D<T>(vertices);
 }
 template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
 Projections_Intersect(int a,int b)
@@ -73,10 +82,12 @@ template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
 Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,
     ARRAY<VECTOR<int,2> >& pairs,HASHTABLE<VECTOR<int,2> >& edges)
 {
+    primitives.Preallocate(primitives.m+2); // Don't resize on us later
+
     int index[2]={a,b};
     SURFACE_PRIMITIVE<T>* primitive[2]={&primitives(index[0]),&primitives(index[1])};
     typename TRIANGLE_3D<T>::INTERSECTS_HELPER ih[2];
-    TRIANGLE_3D<T> triangle[2]={TRIANGLE_3D<T>(primitive[0]->vertices),TRIANGLE_3D<T>(primitive[1]->vertices)};
+    TRIANGLE_3D<T> triangle[2]={primitive[0]->As_Triangle(),primitive[1]->As_Triangle()};
     bool intersects=triangle[0].Intersects(triangle[1],ih);
     if(ih[0].n.z==0 && ih[1].n.z==0){
         T rz=(ih[0].n.Cross(ih[1].n)).z;
@@ -96,8 +107,8 @@ Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_
     const TV& X0=primitive[cut_index]->vertices(ih[cut_index].i[0]);
     TV& X1=primitive[cut_index]->vertices(ih[cut_index].i[1]);
     TV& X2=primitive[cut_index]->vertices(ih[cut_index].i[2]);
-    TV cut0=X0+ih[cut_index].t[0]*(X1-X0);
-    TV cut1=X0+ih[cut_index].t[1]*(X2-X0);
+    TV cut0=X0+ih[cut_index].th[0]*(X1-X0);
+    TV cut1=X0+ih[cut_index].th[1]*(X2-X0);
     int new0=Add(cut0,X1,X2,primitive[cut_index]->parent);
     int new1=Add(cut0,X2,cut1,primitive[cut_index]->parent);
     X1=cut0;
@@ -178,7 +189,7 @@ Initialize(DIRECTED_GRAPH<>& dg)
 template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
 Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside)
 {
-    TRIANGLE_3D<T> triangle(primitives(divide).vertices);
+    TRIANGLE_3D<T> triangle(primitives(divide).As_Triangle());
     PLANE<T> plane0=Get_Cutting_Plane(primitives(cutter).vertices(0),primitives(cutter).vertices(1));
     PLANE<T> plane1=Get_Cutting_Plane(primitives(cutter).vertices(1),primitives(cutter).vertices(2));
     PLANE<T> plane2=Get_Cutting_Plane(primitives(cutter).vertices(2),primitives(cutter).vertices(0));

@@ -30,6 +30,8 @@ public:
     SURFACE_PRIMITIVE(const TV &a,const int pa);
     SURFACE_PRIMITIVE(const TV &a,const TV &b,const int pa);
     SURFACE_PRIMITIVE(const TV &a,const TV &b,const TV &c,const int pa);
+
+    TRIANGLE_3D<T> As_Triangle() const;
 };
 
 template<class T>
