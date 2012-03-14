@@ -40,8 +40,8 @@ int main(int argc, char* argv[])
 
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
     HIDDEN_SURFACE<T> hs(hsp);
-    // hsp.Add_Element(TV(0,0,0),TV(1,0.2,0),TV(0.5,1.1,1),0);
-    // hsp.Add_Element(TV(0.1,-0.1,1),TV(1,0.1,1),TV(0,1,0),1);
+    hsp.Add(TV(0,0,0),TV(1,0.2,0),TV(0.5,1.1,1));
+    hsp.Add(TV(0.1,-0.1,1),TV(1,0.1,1),TV(0,1,0));
     hsp.Add(TV(-0.1,0.1,0),TV(1.1,0.3,-1),TV(1,0.6,2));
     hs.Compute();
 
