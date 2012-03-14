@@ -153,7 +153,7 @@ public:
     void Close_Surface(const bool merge_coincident_vertices,const T merge_coincident_vertices_threshold,const bool fill_holes,const bool verbose=false);
     void Remove_Degenerate_Triangles(const T area_threshold=(T)1e-8);
     TRIANGULATED_SURFACE* Create_Compact_Copy() const;
-    void Print_Statistics(std::ostream& output,TRIANGULATED_SURFACE<T>& object,const T thickness_over_2=(T)1e-8);
+    void Print_Statistics(std::ostream& output,const T thickness_over_2=(T)1e-8);
 private:
     void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
 //#####################################################################

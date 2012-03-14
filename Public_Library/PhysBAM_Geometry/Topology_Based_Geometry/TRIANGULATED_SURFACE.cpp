@@ -586,32 +586,32 @@ Create_Compact_Copy() const
 // Function Print_Statistics
 //#####################################################################
 template<class T> void TRIANGULATED_SURFACE<T>::
-Print_Statistics(std::ostream& output,TRIANGULATED_SURFACE<T>& object,const T thickness_over_2)
+Print_Statistics(std::ostream& output,const T thickness_over_2)
 {
-    if(object.mesh.number_nodes!=object.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
-    int index;object.Update_Bounding_Box();
-    if(!object.mesh.incident_elements) object.mesh.Initialize_Incident_Elements();
+    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    int index;Update_Bounding_Box();
+    if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
 
-    output<<"triangles = "<<object.mesh.elements.m<<std::endl;
-    output<<"particles = "<<object.particles.array_collection->Size()<<std::endl;
-    {int particles_touched=0;for(int p=0;p<object.particles.array_collection->Size();p++) if((*object.mesh.incident_elements)(p).m) particles_touched++;
+    output<<"triangles = "<<mesh.elements.m<<std::endl;
+    output<<"particles = "<<particles.array_collection->Size()<<std::endl;
+    {int particles_touched=0;for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.incident_elements)(p).m) particles_touched++;
     output<<"particles touched = "<<particles_touched<<std::endl;}
-    output<<"bounding box = "<<*object.bounding_box<<std::endl;
-    if(object.particles.store_velocity){
-        int index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(object.particles.V);
-        output<<"max_speed = "<<object.particles.V(index).Magnitude()<<" ("<<index<<")"<<std::endl;}
-    output<<"total area = "<<object.Total_Area()<<std::endl;
-    output<<"min area = "<<object.Minimum_Area(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"min altitude = "<<object.Minimum_Altitude(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"min edge length = "<<object.Minimum_Edge_Length(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"max edge length = "<<object.Maximum_Edge_Length(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"min angle = "<<object.Minimum_Angle(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"max angle = "<<object.Maximum_Angle(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"ave min angle = "<<object.Average_Minimum_Angle()<<std::endl;
-    output<<"ave max angle = "<<object.Average_Maximum_Angle()<<std::endl;
-    output<<"max aspect ratio = "<<object.Maximum_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
-    output<<"ave aspect ratio = "<<object.Average_Aspect_Ratio()<<std::endl;
-    if(object.Check_For_Self_Intersection(thickness_over_2)) output<<"found self intersections"<<std::endl;else output<<"no self intersections"<<std::endl;
+    output<<"bounding box = "<<*bounding_box<<std::endl;
+    if(particles.store_velocity){
+        int index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(particles.V);
+        output<<"max_speed = "<<particles.V(index).Magnitude()<<" ("<<index<<")"<<std::endl;}
+    output<<"total area = "<<Total_Area()<<std::endl;
+    output<<"min area = "<<Minimum_Area(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"min altitude = "<<Minimum_Altitude(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"min edge length = "<<Minimum_Edge_Length(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"max edge length = "<<Maximum_Edge_Length(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"min angle = "<<Minimum_Angle(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"max angle = "<<Maximum_Angle(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"ave min angle = "<<Average_Minimum_Angle()<<std::endl;
+    output<<"ave max angle = "<<Average_Maximum_Angle()<<std::endl;
+    output<<"max aspect ratio = "<<Maximum_Aspect_Ratio(&index);output<<" ("<<index<<")"<<std::endl;
+    output<<"ave aspect ratio = "<<Average_Aspect_Ratio()<<std::endl;
+    if(Check_For_Self_Intersection(thickness_over_2)) output<<"found self intersections"<<std::endl;else output<<"no self intersections"<<std::endl;
 }
 //#####################################################################
 template class TRIANGULATED_SURFACE<float>;
