@@ -347,7 +347,7 @@ Intersects(const TRIANGLE_3D<T>& triangle,INTERSECTS_HELPER* ih) const
         if(h[k].i[1]>2) h[k].i[1]=0;
         h[k].i[2]=3-h[k].i[0]-h[k].i[1];
         for(int j=0;j<2;j++){
-            h[k].th[j]=h[0].w(h[k].i[0])/(h[0].w(h[k].i[0])-h[0].w(h[k].i[j+1]));
+            h[k].th[j]=h[k].w(h[k].i[0])/(h[k].w(h[k].i[0])-h[k].w(h[k].i[j+1]));
             h[k].t[j]=h[k].x(h[k].i[0])+h[k].th[j]*(h[k].x(h[k].i[j+1])-h[k].x(h[k].i[0]));}}
     for(int k=0;k<2;k++) if(min(h[k].t[0],h[k].t[1])>=max(h[1-k].t[0],h[1-k].t[1])) return false;
     return true;

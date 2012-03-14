@@ -184,7 +184,8 @@ Initialize(DIRECTED_GRAPH<>& dg)
 
     dg.Initialize(primitives.m);
     for(HASHTABLE<VECTOR<int,2> >::ITERATOR it(edges);it.Valid();it.Next())
-        dg.Add_Edge(it.Key().x,it.Key().y);
+        if(Test_Edge(it.Key().x,it.Key().y))
+            dg.Add_Edge(it.Key().x,it.Key().y);
 }
 template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
 Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside)
@@ -193,7 +194,7 @@ Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside)
     PLANE<T> plane0=Get_Cutting_Plane(primitives(cutter).vertices(0),primitives(cutter).vertices(1));
     PLANE<T> plane1=Get_Cutting_Plane(primitives(cutter).vertices(1),primitives(cutter).vertices(2));
     PLANE<T> plane2=Get_Cutting_Plane(primitives(cutter).vertices(2),primitives(cutter).vertices(0));
-    bool flip=plane0.Lazy_Inside(primitives(cutter).vertices(2));
+    bool flip=!plane0.Lazy_Inside(primitives(cutter).vertices(2));
     if(flip){
         plane0.normal=-plane0.normal;
         plane1.normal=-plane1.normal;

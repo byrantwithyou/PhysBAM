@@ -20,7 +20,7 @@ Break_Graph(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
     int num_components=graph.Strongly_Connected_Components(components);
     ARRAY<ARRAY<int> > component_nodes(num_components);
     for(int i=0;i<components.m;i++) component_nodes(components(i)).Append(i);
-    for(int i=0;i<component_nodes.m;i++){
+    for(int i=component_nodes.m-1;i>=0;i--){
         if(component_nodes(i).m==1){
             primitives.Emit_Node(node_map(component_nodes(i)(0)));
             continue;}
@@ -59,7 +59,7 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
         // Divide the nodes; update node_map.
         ARRAY<ARRAY<int> > inside_list(children.m),outside_list(children.m);
         for(int i=0;i<children.m;i++){
-            if(!primitives.Divide_Primitive(children(i),index,inside_list(i),outside_list(i))){
+            if(!primitives.Divide_Primitive(node_map(children(i)),node_map(index),inside_list(i),outside_list(i))){
                 outside_list(i).Append(children(i));
                 continue;}
             node_map(children(i))=inside_list(i)(0);
@@ -98,17 +98,17 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
                     // Add (inside, inside) edges
                     for(int k=0;k<pin.m;k++)
                         for(int m=0;m<cin.m;m++)
-                            if(primitives.Test_Edge(pin(k),cin(m)))
+                            if(primitives.Test_Edge(node_map(pin(k)),node_map(cin(m))))
                                 new_graph.Add_Edge(pin(k),cin(m));
                     // Add (outside, outside) edges
                     for(int k=0;k<pout.m;k++)
                         for(int m=0;m<cout.m;m++)
-                            if(primitives.Test_Edge(pout(k),cout(m)))
+                            if(primitives.Test_Edge(node_map(pout(k)),node_map(cout(m))))
                                 new_graph.Add_Edge(pout(k),cout(m));}
                 else{ // Add (outside, normal) edges
                     int m=ch(j);
                     for(int k=0;k<pout.m;k++)
-                        if(primitives.Test_Edge(pout(k),m))
+                        if(primitives.Test_Edge(node_map(pout(k)),node_map(m)))
                             new_graph.Add_Edge(pout(k),m);}}
 
         // Add (normal, outside) edges
@@ -118,7 +118,7 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
                 int m=pa(j);
                 if(child_index(m)<0 && m!=index)
                     for(int k=0;k<cout.m;k++)
-                        if(primitives.Test_Edge(m,cout(k)))
+                        if(primitives.Test_Edge(node_map(m),node_map(cout(k))))
                             new_graph.Add_Edge(m,cout(k));}}
 
         graph.Reset();
