@@ -43,6 +43,9 @@ public:
     ARRAY<SURFACE_PRIMITIVE<T> > primitives;
     ARRAY<int> order;
 
+    int Add(const TV &a,int pa=-1);
+    int Add(const TV &a,const TV &b,int pa=-1);
+    int Add(const TV &a,const TV &b,const TV &c,int pa=-1);
     void Initialize(DIRECTED_GRAPH<>& dg);
     bool Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside);
     bool Test_Edge(int a,int b) {return Projections_Intersect(a,b);} // 0=no edge, 1=a->b

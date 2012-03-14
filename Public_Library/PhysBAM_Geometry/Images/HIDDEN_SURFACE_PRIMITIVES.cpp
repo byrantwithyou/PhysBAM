@@ -21,7 +21,7 @@ SURFACE_PRIMITIVE(const TV &a,const int pa):parent(pa)
 { 
     num_vertices=1;
     vertices(0)=a;
-    bounding_box=RANGE<TV2>::Bounding_Box(a.Remove_Index(2));
+    bounding_box=RANGE<TV2>(a.Remove_Index(2));
 }
 //#####################################################################
 // Constructor
@@ -99,8 +99,8 @@ Handle_Intersection_Triangle_Triangle(DIRECTED_GRAPH<>& dg,int a,int b,ARRAY<ARR
     TV& X2=primitive[cut_index]->vertices(ih[cut_index].i[2]);
     TV cut0=X0+ih[cut_index].t[0]*(X1-X0);
     TV cut1=X0+ih[cut_index].t[1]*(X2-X0);
-    int new0=primitives.Append(SURFACE_PRIMITIVE<T>(cut0,X1,X2,primitive[cut_index]->parent));
-    int new1=primitives.Append(SURFACE_PRIMITIVE<T>(cut0,X2,cut1,primitive[cut_index]->parent));
+    int new0=Add(cut0,X1,X2,primitive[cut_index]->parent);
+    int new1=Add(cut0,X2,cut1,primitive[cut_index]->parent);
     X1=cut0;
     X2=cut1;
 
@@ -199,12 +199,10 @@ Divide_Primitive(int divide,int cutter,ARRAY<int>& inside,ARRAY<int>& outside)
     primitives(divide).vertices(1)=inside_triangles(0).x2;
     primitives(divide).vertices(2)=inside_triangles(0).x3;
     inside.Append(divide);
-    for(int i=1;i<inside_triangles.m;i++){
-        SURFACE_PRIMITIVE<T> sp(inside_triangles(i).x1,inside_triangles(i).x2,inside_triangles(i).x3,primitives(divide).parent);
-        inside.Append(primitives.Append(sp));}
-    for(int i=0;i<outside_triangles.m;i++){
-        SURFACE_PRIMITIVE<T> sp(outside_triangles(i).x1,outside_triangles(i).x2,outside_triangles(i).x3,primitives(divide).parent);
-        outside.Append(primitives.Append(sp));}
+    for(int i=1;i<inside_triangles.m;i++)
+        inside.Append(Add(inside_triangles(i).x1,inside_triangles(i).x2,inside_triangles(i).x3,primitives(divide).parent));
+    for(int i=0;i<outside_triangles.m;i++)
+        outside.Append(Add(outside_triangles(i).x1,outside_triangles(i).x2,outside_triangles(i).x3,primitives(divide).parent));
 
     return true;
 }
@@ -215,6 +213,21 @@ template<class T> PLANE<T> HIDDEN_SURFACE_PRIMITIVES<T>::
 Get_Cutting_Plane(const TV &a,const TV &b)
 { 
     return PLANE<T>((a-b).Remove_Index(2).Rotate_Clockwise_90().Normalized().Append(0),a);
+}
+template<class T> int HIDDEN_SURFACE_PRIMITIVES<T>::
+Add(const TV &a,int pa)
+{
+    return primitives.Append(SURFACE_PRIMITIVE<T>(a,pa>=0?pa:primitives.m));
+}
+template<class T> int HIDDEN_SURFACE_PRIMITIVES<T>::
+Add(const TV &a,const TV &b,int pa)
+{
+    return primitives.Append(SURFACE_PRIMITIVE<T>(a,b,pa>=0?pa:primitives.m));
+}
+template<class T> int HIDDEN_SURFACE_PRIMITIVES<T>::
+Add(const TV &a,const TV &b,const TV &c,int pa)
+{
+    return primitives.Append(SURFACE_PRIMITIVE<T>(a,b,c,pa>=0?pa:primitives.m));
 }
 template class HIDDEN_SURFACE_PRIMITIVES<float>;
 template class HIDDEN_SURFACE_PRIMITIVES<double>;
