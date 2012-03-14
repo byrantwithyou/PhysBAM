@@ -38,7 +38,6 @@ template<class T> TEX_FILE<T>::
     stream.seekp(unit_offset,std::ios::beg);
     TV bb=bounding_box.Edge_Lengths(),ob=output_box.Edge_Lengths();
     T sc=1e5;
-    std::cout<<bounding_box<<"  "<<output_box<<std::endl;
     if(bb.x>0) sc=min(sc,ob.x/bb.x);
     if(bb.y>0) sc=min(sc,ob.y/bb.y);
     stream<<sc;
