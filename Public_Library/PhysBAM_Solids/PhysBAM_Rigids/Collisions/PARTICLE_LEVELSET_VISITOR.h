@@ -40,7 +40,7 @@ struct PARTICLE_LEVELSET_VISITOR
 
     ~PARTICLE_LEVELSET_VISITOR();
 
-    bool Cull(const int box) const
+    bool Cull_Self(const int box) const
     {TV center=rotation*box_hierarchy(box).Center()+translation;
     return object_space_implicit_object.Lazy_Outside_Extended_Levelset(center,box_radius(box)+contour_value);}
 

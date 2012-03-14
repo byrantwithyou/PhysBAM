@@ -56,7 +56,7 @@ Intersection_List(const BOX_HIERARCHY<TV>& other_hierarchy,T_VISITOR& visitor,co
 
     while(!stack.Empty()){
         int box=stack.Pop();
-        if(box>self_leaves && !visitor.Cull_Self(box)){
+        if(box>=self_leaves && !visitor.Cull_Self(box)){
             int child_box1,child_box2;self_children(box-self_leaves).Get(child_box1,child_box2);
             stack.Push(child_box1);stack.Push(child_box2);
             Intersection_List(*this,visitor,child_box1,child_box2,extra_thickness);}}
@@ -71,7 +71,7 @@ Intersection_List(T_VISITOR& visitor) const
     STACK<int> stack;stack.Exchange(traversal_stack); // borrow stack ownership to improve aliasing semantics
     stack.Remove_All();stack.Push(root);
     while(!stack.Empty()){int box=stack.Pop();
-        if(visitor.Cull(box)) continue;
+        if(visitor.Cull_Self(box)) continue;
         if(Leaf(box)) visitor.Store(box);
         else{
             int child_box1,child_box2;children(box-leaves).Get(child_box1,child_box2);
