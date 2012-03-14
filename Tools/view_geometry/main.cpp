@@ -215,7 +215,7 @@ template<class T> void Add_Tri_File(const std::string& filename,OPENGL_WORLD& wo
         FILE_UTILITIES::Create_From_File<T>(filename,surface);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
         LOG::cout<<"filename = "<<filename<<std::endl;
-        if(print_statistics) Read_Write<TRIANGULATED_SURFACE<T>,T>::Print_Statistics(LOG::cout,*surface);}
+        if(print_statistics) surface->Print_Statistics(LOG::cout);}
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*surface,false,
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Red()),OPENGL_MATERIAL::Plastic(OPENGL_COLOR::Blue()));
         if(triangulated_surface_highlight_boundary) opengl_triangulated_surface->highlight_boundary=true;
@@ -309,7 +309,7 @@ template<class T> void Add_Tet_File(const std::string& filename,OPENGL_WORLD& wo
         FILE_UTILITIES::Create_From_File<T>(filename,tetrahedralized_volume);
         {LOG::SCOPE scope("mesh statistics","mesh statistics");
         LOG::cout<<"filename = "<<filename<<std::endl;
-        if(print_statistics) Read_Write<TETRAHEDRALIZED_VOLUME<T>,T>::Print_Statistics(LOG::cout,*tetrahedralized_volume);}
+        if(print_statistics) tetrahedralized_volume->Print_Statistics(LOG::cout);}
         OPENGL_TETRAHEDRALIZED_VOLUME<T>* tets=new OPENGL_TETRAHEDRALIZED_VOLUME<T>(&(tetrahedralized_volume->mesh),&(tetrahedralized_volume->particles),
             OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.9),float(.1),float(.1))),OPENGL_MATERIAL::Plastic(OPENGL_COLOR(float(.1),float(.9),float(.1))));
         world.Bind_Key('c',new OPENGL_CALLBACK_CROSS_SECTION<T>(*tets));
