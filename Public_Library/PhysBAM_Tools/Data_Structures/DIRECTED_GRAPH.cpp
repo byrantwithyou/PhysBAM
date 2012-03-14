@@ -8,6 +8,7 @@
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <fstream>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -192,6 +193,17 @@ Visit_Assuming_Cycle_Free(const int index,ARRAY<int>& finish_time,ARRAY<int>& no
     finish_time(index)=time;
     node_index(time)=index;
     time++;
+}
+void DIRECTED_GRAPH_CORE::
+Print_Graphvis(const char* file) const
+{
+    std::ofstream fout(file);
+    fout<<"digraph dg {"<<std::endl;
+    for(int i=0;i<children.m;i++){
+        if(!children(i).m && !parents(i).m) fout<<"  "<<i<<std::endl;
+        for(int j=0;j<children(i).m;j++)
+            fout<<"  "<<i<<" -> "<<children(i)(j)<<std::endl;}
+    fout<<"};"<<std::endl;
 }
 //#####################################################################
 

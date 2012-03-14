@@ -39,6 +39,7 @@ public:
     int Strongly_Connected_Components(ARRAY<int>& component_id); // returns total number of components
     void Generate_Levels(); // collapses all cycles into a single level
     void Maximal_Depth_On_Acyclic_Graph(ARRAY<int>& depths) const; // depth is 1-based
+    void Print_Graphvis(const char* file) const;
 private:
     void Visit(const int index,ARRAY<int>& finish_time,ARRAY<int>& node_index,ARRAY<short >& visit_tag,int& time,bool& cycle_free);
     void Visit_Transpose(const int index,ARRAY<short>& visit_tag,ARRAY<int>& component);
@@ -121,6 +122,9 @@ public:
 
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,core);}
+
+    void Print_Graphvis(const char* file) const
+    {core.Print_Graphvis(file);}
 //#####################################################################
 };
 }
