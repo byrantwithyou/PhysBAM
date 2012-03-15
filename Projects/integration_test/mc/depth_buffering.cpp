@@ -30,9 +30,12 @@ int main(int argc, char* argv[])
 
     LOG::cout<<std::setprecision(16);
     RANDOM_NUMBERS<T> random;
-    int N=50;
+    int N=100;
     ARRAY<TV> colors(N);
     random.Fill_Uniform(colors,0,1);
+
+    HIDDEN_SURFACE_PRIMITIVES<T> hsp;
+    HIDDEN_SURFACE<T> hs(hsp);
 
 #if 1
     for(int i=0;i<N;i++){
@@ -52,7 +55,7 @@ int main(int argc, char* argv[])
     else vi=new TEX_FILE<T>(file);
 
     TV2 mx_pt=TV2(1,1);
-    T margin=.2;
+    T margin=.05;
     vi->Use_Fixed_Bounding_Box(RANGE<TV2>(TV2()-margin,mx_pt+margin));
     vi->cur_format.fill_style=1;
     vi->cur_format.line_style=0;
