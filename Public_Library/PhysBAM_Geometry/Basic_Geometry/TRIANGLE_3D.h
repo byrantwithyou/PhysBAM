@@ -189,10 +189,10 @@ public:
     struct INTERSECTS_HELPER
     {
         TV n,x,w;
-        int pos,neg,i[3];
+        int pos,neg,is,i[2];
         T th[2],t[2];
     };
-    bool Intersects(const TRIANGLE_3D<T>& triangle,INTERSECTS_HELPER* ih=0) const;
+    bool Intersects(const TRIANGLE_3D<T>& triangle,T theta_tol=0,INTERSECTS_HELPER* ih=0) const;
 //#####################################################################
 };
 

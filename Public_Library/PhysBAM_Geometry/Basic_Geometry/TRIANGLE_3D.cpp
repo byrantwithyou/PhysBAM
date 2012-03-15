@@ -327,7 +327,7 @@ Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane
             break;}
 }
 template<class T> bool TRIANGLE_3D<T>::
-Intersects(const TRIANGLE_3D<T>& triangle,INTERSECTS_HELPER* ih) const
+Intersects(const TRIANGLE_3D<T>& triangle,T theta_tol,INTERSECTS_HELPER* ih) const
 {
     INTERSECTS_HELPER lh[2],*h=ih?ih:lh; // h[0].w is a z, h[1].w is a y.
     TV X[2][3]={{x1,x2,x3},{triangle.x1,triangle.x2,triangle.x3}};
@@ -340,15 +340,33 @@ Intersects(const TRIANGLE_3D<T>& triangle,INTERSECTS_HELPER* ih) const
             h[k].x(i)=r.Dot(X[k][i]);
             h[k].w(i)=h[1-k].n.Dot(X[k][i]-X[1-k][0]);
             h[k].neg|=(h[k].w(i)<0)<<i;
-            h[k].pos|=(h[k].w(i)>0)<<i;}
-        if(!h[k].neg || !h[k].pos) return false;
-        for(h[k].i[0]=0;h[k].i[0]<3;h[k].i[0]++) if(h[k].pos==(1<<h[k].i[0]) || h[k].neg==(1<<h[k].i[0])) break;
-        h[k].i[1]=h[k].i[0]+1;
-        if(h[k].i[1]>2) h[k].i[1]=0;
-        h[k].i[2]=3-h[k].i[0]-h[k].i[1];
+            h[k].pos|=(h[k].w(i)>0)<<i;}}
+    for(int k=0;k<2;k++) if(!h[k].neg || !h[k].pos) return false;
+    for(int k=0;k<2;k++){
+        for(h[k].is=0;h[k].is<3;h[k].is++) if(h[k].pos==(1<<h[k].is) || h[k].neg==(1<<h[k].is)) break;
+        h[k].i[0]=h[k].is+1;
+        if(h[k].i[0]>2) h[k].i[0]=0;
+        h[k].i[1]=3-h[k].is-h[k].i[0];
         for(int j=0;j<2;j++){
-            h[k].th[j]=h[k].w(h[k].i[0])/(h[k].w(h[k].i[0])-h[k].w(h[k].i[j+1]));
-            h[k].t[j]=h[k].x(h[k].i[0])+h[k].th[j]*(h[k].x(h[k].i[j+1])-h[k].x(h[k].i[0]));}}
+            h[k].th[j]=h[k].w(h[k].is)/(h[k].w(h[k].is)-h[k].w(h[k].i[j]));
+            h[k].t[j]=h[k].x(h[k].is)+h[k].th[j]*(h[k].x(h[k].i[j])-h[k].x(h[k].is));}}
+
+    if(theta_tol>0){
+        for(int k=0;k<2;k++)
+            for(int j=0;j<2;j++)
+                if(h[k].th[j]<theta_tol){
+                    h[k].th[j]=0;
+                    h[k].th[1-j]=0;
+                    h[k].neg&=~(1<<h[k].is);
+                    h[k].pos&=~(1<<h[k].is);}
+        for(int k=0;k<2;k++)
+            for(int j=0;j<2;j++)
+                if(1-h[k].th[j]<theta_tol){
+                    h[k].th[j]=1;
+                    h[k].neg&=~(1<<h[k].i[j]);
+                    h[k].pos&=~(1<<h[k].i[j]);}
+        for(int k=0;k<2;k++) if(!h[k].neg || !h[k].pos) return false;}
+
     for(int k=0;k<2;k++) if(min(h[k].t[0],h[k].t[1])>=max(h[1-k].t[0],h[1-k].t[1])) return false;
     return true;
 }
