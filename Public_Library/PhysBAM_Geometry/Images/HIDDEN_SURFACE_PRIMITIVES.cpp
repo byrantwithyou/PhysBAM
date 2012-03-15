@@ -152,7 +152,7 @@ Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_
     if(new0>=0){
         index[cut_index]=new0;
         Add_Edge(edges,index[1-in_front],index[in_front]);}
-    if(new0>=1){
+    if(new1>=0){
         index[cut_index]=new1;
         Add_Edge(edges,index[1-in_front],index[in_front]);}
 }
