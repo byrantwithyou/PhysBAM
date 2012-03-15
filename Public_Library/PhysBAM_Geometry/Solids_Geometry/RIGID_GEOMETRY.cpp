@@ -38,7 +38,9 @@ RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bo
         particle_index=rigid_geometry_collection.particles.array_collection->Add_Element();
         rigid_geometry_collection.particles.structure_ids(particle_index)=VECTOR<int,3>(-1,-1,-1);
     }
-    assert(!rigid_geometry_collection.particles.rigid_geometry(particle_index));
+    if(particle_index>=rigid_geometry_collection.particles.rigid_geometry.m)
+        rigid_geometry_collection.particles.rigid_geometry.Resize(particle_index+1);
+    else assert(!rigid_geometry_collection.particles.rigid_geometry(particle_index));
     rigid_geometry_collection.particles.rigid_geometry(particle_index)=dynamic_cast<RIGID_GEOMETRY<TV>*>(this);
 
     Set_Surface_Roughness();

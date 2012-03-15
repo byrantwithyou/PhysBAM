@@ -14,8 +14,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDING.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Dynamics/Read_Write/Particles/READ_WRITE_DYNAMIC_PARTICLES.h>
 #include <fstream>
 using namespace PhysBAM;
 
@@ -215,8 +213,6 @@ void Emit_Camera(std::ofstream& fout,const HASHTABLE<std::string,std::string>& o
 int main(int argc, char *argv[]) 
 {  
     PROCESS_UTILITIES::Set_Backtrace(true);
-    Initialize_Particles();
-    Initialize_Read_Write_General_Structures();
 
     PARSE_ARGS parse_args;
     parse_args.Set_Extra_Arguments(-1, "<scene file> <output scene file> <frame number>");

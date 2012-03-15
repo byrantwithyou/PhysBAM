@@ -19,6 +19,7 @@ class ARRAY_COLLECTION_ELEMENT:public CLONEABLE<ARRAY_COLLECTION_ELEMENT<T>,ARRA
 {
     typedef CLONEABLE<ARRAY_COLLECTION_ELEMENT<T>,ARRAY_COLLECTION_ELEMENT_BASE> BASE;
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     using BASE::owns_data;using BASE::id;
     ARRAY_VIEW<T>* array;
     int buffer_size;
@@ -83,6 +84,20 @@ public:
 
     ATTRIBUTE_ID Typed_Hashed_Id(double) const
     {return ATTRIBUTE_ID(Hash(typeid(ARRAY_COLLECTION_ELEMENT<typename REPLACE_FLOATING_POINT<T,double>::TYPE>).name())*0x10000+Value(id));}
+
+    virtual void Read(TYPED_ISTREAM& input)
+    {if(!IS_POINTER<T>::value) Read_Binary(input,*array);}
+
+    virtual void Write(TYPED_OSTREAM& output) const
+    {if(!IS_POINTER<T>::value) Write_Binary(output,*array);}
+
+    virtual int Write_Size(bool use_doubles) const
+    {return IS_POINTER<T>::value?0:(use_doubles?sizeof(double):sizeof(float))*array->Size()+sizeof(int);}
+
+    virtual void Print(std::ostream& output,const int p) const
+    {if(const char* name=Get_Attribute_Name(id)) output<<name;
+    else output<<"id "<<id;
+    output<<" = "<<(*array)(p)<<std::endl;}
 };
 }
 #endif

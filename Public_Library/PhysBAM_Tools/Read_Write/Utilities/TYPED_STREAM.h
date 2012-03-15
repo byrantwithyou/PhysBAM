@@ -41,10 +41,6 @@ public:
     TYPED_ISTREAM(std::istream& stream_input,const STREAM_TYPE type_input)
         :stream(stream_input),type(type_input)
     {}
-
-    template<class T> void Read(T& d)
-    {if(!type.use_doubles) Read_Write<T,float>::Read(stream,d);
-    else Read_Write<T,double>::Read(stream,d);}
 };
 //#####################################################################
 // Class TYPED_OSTREAM
@@ -58,10 +54,6 @@ public:
     TYPED_OSTREAM(std::ostream& stream_input,const STREAM_TYPE type_input)
         :stream(stream_input),type(type_input)
     {}
-
-    template<class T> void Write(const T& d)
-    {if(!type.use_doubles) Read_Write<T,float>::Write(stream,d);
-    else Read_Write<T,double>::Write(stream,d);}
 };
 //#####################################################################
 // Detect whether a type has Read/Write taking typed streams

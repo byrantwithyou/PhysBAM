@@ -7,7 +7,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/PLS_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -21,7 +20,6 @@ PLS_EXAMPLE(const STREAM_TYPE stream_type_input)
     projection(mac_grid),particle_levelset_evolution(mac_grid,number_of_ghost_cells),incompressible(mac_grid,projection),boundary(0),
     collision_bodies_affecting_fluid(mac_grid)
 {
-    Initialize_Particles();Initialize_Read_Write_General_Structures();
     incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;

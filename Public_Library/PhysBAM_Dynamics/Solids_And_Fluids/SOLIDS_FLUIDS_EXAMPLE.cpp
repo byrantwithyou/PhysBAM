@@ -16,7 +16,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/MPI_SOLID_FLUID.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE.h>
@@ -28,11 +27,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLIDS_FLUIDS_EXAMPLE<TV>::
 SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE((Initialize_Particles(),stream_type)),use_melting(false),
-    solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),
-    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection))
+    :BASE(stream_type),use_melting(false),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
+    solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection))
 {
-    Initialize_Read_Write_General_Structures();
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
 }

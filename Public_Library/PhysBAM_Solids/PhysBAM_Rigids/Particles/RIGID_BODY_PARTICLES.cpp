@@ -29,6 +29,15 @@ template<class TV> RIGID_BODY_PARTICLES<TV>::
 {
     Delete_All_Particles();
 }
+static int Initialize_Rigids_Particles()
+{
+    Register_Attribute_Name(ATTRIBUTE_ID_RIGID_MASS,"rigid_mass");
+    Register_Attribute_Name(ATTRIBUTE_ID_RIGID_INERTIA_TENSOR,"rigid_inertia_tensor");
+    Register_Attribute_Name(ATTRIBUTE_ID_ANGULAR_MOMENTUM,"angular_momentum");
+    Register_Attribute_Name(ATTRIBUTE_ID_KINEMATIC,"kinematic");
+    return 0;
+}
+int initialize_rigids_particles=Initialize_Rigids_Particles();
 //#####################################################################
 template class RIGID_BODY_PARTICLES<VECTOR<float,1> >;
 template class RIGID_BODY_PARTICLES<VECTOR<float,2> >;

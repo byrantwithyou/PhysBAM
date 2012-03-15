@@ -7,7 +7,6 @@
 
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 namespace PhysBAM{
-void Initialize_Particles();
 
 template<class TV> class SPH_PARTICLES;
 template<class TV> class PARTICLE_LEVELSET_PARTICLES;

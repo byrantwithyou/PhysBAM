@@ -15,6 +15,7 @@ namespace PhysBAM{
 class ARRAY_COLLECTION_ELEMENT_BASE:public CLONEABLE_ABSTRACT<ARRAY_COLLECTION_ELEMENT_BASE>
 {
 public:
+    typedef int HAS_TYPED_READ_WRITE;
     ATTRIBUTE_ID id;
     bool owns_data;
 
@@ -35,6 +36,10 @@ public:
     virtual ATTRIBUTE_ID Hashed_Id() const=0;
     virtual ATTRIBUTE_ID Typed_Hashed_Id(float) const=0;
     virtual ATTRIBUTE_ID Typed_Hashed_Id(double) const=0;
+    virtual void Read(TYPED_ISTREAM& input)=0;
+    virtual void Write(TYPED_OSTREAM& output) const=0;
+    virtual int Write_Size(bool use_doubles) const=0;
+    virtual void Print(std::ostream& output,const int p) const=0;
 };
 }
 #endif

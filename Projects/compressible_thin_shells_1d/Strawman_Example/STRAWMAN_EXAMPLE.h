@@ -15,7 +15,6 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Particles/READ_WRITE_RIGIDS_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 
 namespace PhysBAM{
@@ -61,7 +60,6 @@ class STRAWMAN_EXAMPLE
 void Initialize()
 {
     // All this just to get a stupid line...
-    Initialize_Rigids_Particles();
     RIGID_GEOMETRY<TV>& rigid_geometry=*new RIGID_GEOMETRY<TV>(rigid_geometry_collection,true);
     ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> >& implicit_structure=
         *new ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<T> >(POINT_SIMPLEX_1D<T>(TV(0),true));

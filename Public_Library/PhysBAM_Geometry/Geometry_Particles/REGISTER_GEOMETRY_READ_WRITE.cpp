@@ -5,22 +5,18 @@
 // Class REGISTER_GEOMETRY_READ_WRITE
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 namespace PhysBAM{
-bool Register_Implicit_Object_Transformed(); // TODO(jontg): Move these out of here
-bool Register_Analytic_Implicit_Object();
 void Register_Attribute_Name(const ATTRIBUTE_ID id,const char* name);
-void Register_Free_Particles();
 
-void Initialize_Geometry_Particle()
+static int Initialize_Geometry_Particle()
 {
-    static bool done=false;if(done) return;done=true;
     Register_Attribute_Name(ATTRIBUTE_ID_FRAME,"frame");
     Register_Attribute_Name(ATTRIBUTE_ID_TWIST,"twist");
     Register_Attribute_Name(ATTRIBUTE_ID_RIGID_GEOMETRY,"rigid_geometry");
@@ -32,34 +28,32 @@ void Initialize_Geometry_Particle()
     Register_Attribute_Name(ATTRIBUTE_ID_RADIUS,"radius");
     Register_Attribute_Name(ATTRIBUTE_ID_DISPLAY_SIZE,"display_size");
 
-    #define READ_WRITE_VECTOR_HELPER(T,RW,d) \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<VECTOR<T,d> >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<FRAME<VECTOR<T,d> > >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<TWIST<VECTOR<T,d> > >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<RIGID_GEOMETRY<VECTOR<T,d> >*>();
+    #define READ_WRITE_VECTOR_HELPER(T,d) \
+        ARRAY_COLLECTION::Register_Read_Write<VECTOR<T,d> >(); \
+        ARRAY_COLLECTION::Register_Read_Write<FRAME<VECTOR<T,d> > >(); \
+        ARRAY_COLLECTION::Register_Read_Write<TWIST<VECTOR<T,d> > >();
 
-    #define READ_WRITE_SCALAR_HELPER(T,RW) \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<T>(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<VECTOR<T,0> >(); \
-        READ_WRITE_VECTOR_HELPER(T,RW,1);READ_WRITE_VECTOR_HELPER(T,RW,2);READ_WRITE_VECTOR_HELPER(T,RW,3);
+    #define READ_WRITE_SCALAR_HELPER(T) \
+        ARRAY_COLLECTION::Register_Read_Write<T>(); \
+        ARRAY_COLLECTION::Register_Read_Write<VECTOR<T,0> >(); \
+        ARRAY_COLLECTION::Register_Read_Write<DIAGONAL_MATRIX<T,3> >(); \
+        ARRAY_COLLECTION::Register_Read_Write<MATRIX<T,1,1> >(); \
+        ARRAY_COLLECTION::Register_Read_Write<MATRIX<T,0,0> >(); \
+        READ_WRITE_VECTOR_HELPER(T,1);READ_WRITE_VECTOR_HELPER(T,2);READ_WRITE_VECTOR_HELPER(T,3);
 
-    #define READ_WRITE_HELPER(RW) \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<VECTOR<int,1> >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<VECTOR<int,2> >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<VECTOR<int,3> >(); \
-        Read_Write<ARRAY_COLLECTION,RW>::Register_Read_Write<int>();
+    ARRAY_COLLECTION::Register_Read_Write<VECTOR<int,1> >();
+    ARRAY_COLLECTION::Register_Read_Write<VECTOR<int,2> >();
+    ARRAY_COLLECTION::Register_Read_Write<VECTOR<int,3> >();
+    ARRAY_COLLECTION::Register_Read_Write<int>();
+    ARRAY_COLLECTION::Register_Read_Write<bool>();
+    ARRAY_COLLECTION::Register_Read_Write<unsigned short>();
 
-    READ_WRITE_SCALAR_HELPER(float,float);
-    READ_WRITE_SCALAR_HELPER(float,double);
-    READ_WRITE_HELPER(float);
+    READ_WRITE_SCALAR_HELPER(float);
     #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    READ_WRITE_SCALAR_HELPER(double,float);
-    READ_WRITE_SCALAR_HELPER(double,double);
-    READ_WRITE_HELPER(double);
+    READ_WRITE_SCALAR_HELPER(double);
     #endif
 
-    Register_Implicit_Object_Transformed();
-    Register_Analytic_Implicit_Object();
-    Register_Free_Particles();
+    return 0;
 }
+int initialize_geometry_particle=Initialize_Geometry_Particle();
 }

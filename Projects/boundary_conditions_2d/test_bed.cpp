@@ -1,7 +1,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
 #include <cmath>
 #include "ACCURACY_INFO.h"
 #include "BOUNDARY_CONDITIONS_BOX.h"
@@ -18,7 +17,6 @@ int main(int argc,char* argv[])
     const int d=TV::m;
     typedef VECTOR<int,d> TV_INT;
 
-    Initialize_Geometry_Particle();
     TEST_COMMON<TV> tc;
     tc.Init_1();
     tc.parse_args.Add_String_Argument("-bc_types","sfwf","[swf][swf][swf][swf] source/wall/free for left, bottom, right, top");

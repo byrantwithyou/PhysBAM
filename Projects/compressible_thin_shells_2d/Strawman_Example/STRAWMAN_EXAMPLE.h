@@ -22,11 +22,9 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Particles/READ_WRITE_RIGIDS_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_LINEAR_EXTRAPOLATION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/GEOMETRY_BOUNDARY_POLICY.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
@@ -166,10 +164,7 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
 //#####################################################################
 void Initialize()
 {
-    Initialize_Read_Write_General_Structures();
-
     { // All this just to get a line...
-        Initialize_Rigids_Particles();
         RIGID_GEOMETRY<TV>& rigid_geometry=*new RIGID_GEOMETRY<TV>(rigid_geometry_collection,true);
         ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >& implicit_structure=*new ANALYTIC_IMPLICIT_OBJECT<LINE_2D<T> >(LINE_2D<T>(TV(0,1),TV(0,0)));
         rigid_geometry.Add_Structure(implicit_structure);
@@ -200,7 +195,6 @@ void Initialize()
 
     { // PLS
         T time=Time_At_Frame(0);
-        Initialize_Particles();
         collision_bodies_affecting_fluid.Compute_Psi_N_Zero_Velocity(face_valid_mask);
         for(typename T_GRID::FACE_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
             face_valid_mask(iterator.Full_Index())=!face_valid_mask(iterator.Full_Index());

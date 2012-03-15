@@ -9,7 +9,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include "WATER_EXAMPLE.h"
 using namespace PhysBAM;
 //#####################################################################
@@ -24,7 +23,6 @@ WATER_EXAMPLE(const STREAM_TYPE stream_type_input,int number_of_threads,int refi
     projection(refine>1?*new PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >(mac_grid,particle_levelset_evolution.particle_levelset.levelset,refine):*new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(mac_grid,false,false,false,false,thread_queue)),
     particle_levelset_evolution(mac_grid,number_of_ghost_cells),incompressible(mac_grid,projection),boundary(0),rigid_geometry_collection(this),collision_bodies_affecting_fluid(mac_grid)
 {
-    Initialize_Particles();Initialize_Read_Write_General_Structures();
     incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(1)=true;domain_boundary(i)(2)=true;}
     domain_boundary(2)(2)=false;

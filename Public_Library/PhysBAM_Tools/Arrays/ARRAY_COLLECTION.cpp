@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <sstream>
-namespace PhysBAM{
+using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -233,4 +233,87 @@ Reallocate_Buffer(int new_size)
         arrays(i)->Reallocate(buffer_size);
 }
 //#####################################################################
+// Function Read_Write_Array_Collection_Registry
+//#####################################################################
+HASHTABLE<ATTRIBUTE_ID,READ_WRITE_ARRAY_COLLECTION_FUNCTIONS>& ARRAY_COLLECTION::
+Read_Write_Array_Collection_Registry()
+{
+    static HASHTABLE<ATTRIBUTE_ID,READ_WRITE_ARRAY_COLLECTION_FUNCTIONS> read_write_array_collection_registry;
+    return read_write_array_collection_registry;
 }
+//#####################################################################
+// Function Attribute_Names_Registry
+//#####################################################################
+static HASHTABLE<ATTRIBUTE_ID,const char*>& Attribute_Names_Registry()
+{
+    static HASHTABLE<ATTRIBUTE_ID,const char*> names_registry;
+    return names_registry;
+}
+//#####################################################################
+// Function Register_Attribute_Name
+//#####################################################################
+void PhysBAM::Register_Attribute_Name(const ATTRIBUTE_ID id,const char* name)
+{
+    PHYSBAM_ASSERT(Attribute_Names_Registry().Set(id,name));
+}
+//#####################################################################
+// Function Register_Attribute_Name
+//#####################################################################
+const char* PhysBAM::Get_Attribute_Name(const ATTRIBUTE_ID id)
+{
+    if(const char** name=Attribute_Names_Registry().Get_Pointer(id)) return *name;
+    return 0;
+}
+//#####################################################################
+// Function Read_Arrays
+//#####################################################################
+void ARRAY_COLLECTION::
+Read(TYPED_ISTREAM& input)
+{
+    int size;
+    Read_Binary(input,size);
+    if(size<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative size %d",size));
+    Clean_Memory();
+    Resize(size);
+    ATTRIBUTE_INDEX num_attributes;
+    Read_Binary(input,size,num_attributes);
+    Resize(size);
+
+    for(ATTRIBUTE_INDEX i(0);i<num_attributes;i++){
+        ATTRIBUTE_ID hashed_id;int read_size;
+        Read_Binary(input,hashed_id,read_size);
+
+        READ_WRITE_ARRAY_COLLECTION_FUNCTIONS* read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(hashed_id));
+        if(!read_write_functions){input.stream.ignore(read_size);continue;}
+
+        ATTRIBUTE_INDEX index=Get_Attribute_Index(Id_Only(hashed_id));
+        if(index<ATTRIBUTE_INDEX()) index=Add_Array(Id_Only(hashed_id),read_write_functions->sample_attribute->Clone_Default());
+        // TODO: this really ought to know whether we're running in float or double
+        arrays(index)->Read(input);
+        arrays(index)->id=Id_Only(hashed_id);}
+}
+//#####################################################################
+// Function Write_Arrays
+//#####################################################################
+void ARRAY_COLLECTION::
+Write(TYPED_OSTREAM& output) const
+{
+    Write_Binary(output,Size());
+    Write_Binary(output,number,arrays.m);
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){
+        const ARRAY_COLLECTION_ELEMENT_BASE* entry=arrays(i);
+        int calculated_write_size=entry->Write_Size(output.type.use_doubles);
+        Write_Binary(output,output.type.use_doubles?entry->Typed_Hashed_Id(0.):entry->Typed_Hashed_Id(0.f),calculated_write_size);
+        if(calculated_write_size) entry->Write(output);}
+}
+//#####################################################################
+// Function Print
+//#####################################################################
+void ARRAY_COLLECTION::
+Print(std::ostream& output,const int p) const
+{
+    if(p<0 || p>=number) throw INDEX_ERROR("Index out of range");
+    for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) arrays(i)->Print(output,p);
+}
+//#####################################################################
+

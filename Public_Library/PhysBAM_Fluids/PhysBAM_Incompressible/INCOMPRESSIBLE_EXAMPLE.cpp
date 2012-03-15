@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
@@ -27,7 +26,6 @@ INCOMPRESSIBLE_EXAMPLE(const STREAM_TYPE stream_type_input)
     //incompressible.Add_Force(new INCOMPRESSIBILITY<GRID<TV> >(projection));
     //incompressible.Add_Force(new FLUID_GRAVITY<GRID<TV> >());
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
-    Initialize_Geometry_Particle();
 }
 //#####################################################################
 // ~INCOMPRESSIBLE_EXAMPLE

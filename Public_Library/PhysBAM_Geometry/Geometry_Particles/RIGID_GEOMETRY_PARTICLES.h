@@ -28,18 +28,13 @@ class RIGID_GEOMETRY_PARTICLES:public CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,PAR
 public:
     using BASE::array_collection;
 
-    ARRAY_VIEW<RIGID_GEOMETRY<TV>*> rigid_geometry;
+    ARRAY<RIGID_GEOMETRY<TV>*> rigid_geometry;
     ARRAY_VIEW<FRAME<TV> > frame;
     ARRAY_VIEW<TWIST<TV> > twist;
     ARRAY_VIEW<VECTOR<int,3> > structure_ids;
 
-    RIGID_GEOMETRY_PARTICLES()
-        :rigid_geometry(0,0),frame(0,0),twist(0,0),structure_ids(0,0)
-    {array_collection->Add_Array(ATTRIBUTE_ID_RIGID_GEOMETRY,&rigid_geometry);array_collection->Add_Array(ATTRIBUTE_ID_FRAME,&frame);
-    array_collection->Add_Array(ATTRIBUTE_ID_TWIST,&twist);array_collection->Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);}
-
-    ~RIGID_GEOMETRY_PARTICLES()
-    {}
+    RIGID_GEOMETRY_PARTICLES();
+    virtual ~RIGID_GEOMETRY_PARTICLES();
 
 //#####################################################################
     void Resize(const int new_size);

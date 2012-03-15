@@ -8,13 +8,9 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Particles/READ_WRITE_DEFORMABLES_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Read_Write/Particles/READ_WRITE_RIGIDS_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/NEWMARK_EVOLUTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/SOLIDS_EXAMPLE.h>
@@ -25,10 +21,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOLIDS_EXAMPLE<TV>::
 SOLIDS_EXAMPLE(const STREAM_TYPE stream_type)
-    :BASE((Initialize_Geometry_Particle(),Initialize_Rigids_Particles(),Initialize_Deformables_Particles(),stream_type)),
-    solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection))
+    :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),
+    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection))
 {
-    Initialize_Read_Write_Solids_Structures();
     Set_Write_Substeps_Level(-1);
 }
 //#####################################################################

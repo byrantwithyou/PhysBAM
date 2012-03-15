@@ -8,6 +8,9 @@
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING_DYNAMIC.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/PARTICLE_BINDING.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Create_Structure
@@ -51,6 +54,26 @@ Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
     return binding;
 }
 //#####################################################################
+static int Initialize_Bindings()
+{
+#define HELPER(T,d) \
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<PARTICLE_BINDING<VECTOR<T,d> > >(); \
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING<VECTOR<T,d>,2> >(); \
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING<VECTOR<T,d>,3> >(); \
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING<VECTOR<T,d>,4> >(); \
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING_DYNAMIC<VECTOR<T,d> > >();
+
+    HELPER(float,1)
+    HELPER(float,2)
+    HELPER(float,3)
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+    HELPER(double,1)
+    HELPER(double,2)
+    HELPER(double,3)
+#endif
+    return 0;
+}
+int initialize_bindings=Initialize_Bindings();
 template class BINDING<VECTOR<float,1> >;
 template class BINDING<VECTOR<float,2> >;
 template class BINDING<VECTOR<float,3> >;

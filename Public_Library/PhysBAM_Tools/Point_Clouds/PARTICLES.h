@@ -16,7 +16,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <memory>
 namespace PhysBAM{
@@ -62,7 +61,7 @@ public:
     {Write_Binary<RW>(output,1,*array_collection);}
 
     void Print(std::ostream& output,const int p)
-    {Read_Write<ARRAY_COLLECTION,float>::Print(output,*array_collection,p);}
+    {array_collection->Print(output,p);}
 };
 }
 #endif

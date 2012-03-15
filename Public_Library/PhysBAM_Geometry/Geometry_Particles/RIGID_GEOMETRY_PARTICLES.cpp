@@ -6,6 +6,18 @@
 #include <PhysBAM_Geometry/Geometry_Particles/RIGID_GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 namespace PhysBAM{
+template<class TV> RIGID_GEOMETRY_PARTICLES<TV>::
+RIGID_GEOMETRY_PARTICLES()
+    :rigid_geometry(0,0),frame(0,0),twist(0,0),structure_ids(0,0)
+{
+    array_collection->Add_Array(ATTRIBUTE_ID_FRAME,&frame);
+    array_collection->Add_Array(ATTRIBUTE_ID_TWIST,&twist);
+    array_collection->Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);
+}
+template<class TV> RIGID_GEOMETRY_PARTICLES<TV>::
+~RIGID_GEOMETRY_PARTICLES()
+{
+}
 //#####################################################################
 // Resize
 //#####################################################################
@@ -14,6 +26,7 @@ Resize(const int new_size)
 {
     for(int p=new_size;p<array_collection->Size();p++)
         if(rigid_geometry(p)) Remove_Geometry(p);
+    rigid_geometry.Resize(new_size);
     array_collection->Resize(new_size);
 }
 //#####################################################################
@@ -23,6 +36,7 @@ template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Remove_Geometry(const int p)
 {
     delete rigid_geometry(p);
+    rigid_geometry(p)=0;
 }
 //#####################################################################
 // Function Clean_Memory
@@ -31,6 +45,7 @@ template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Clean_Memory()
 {
     for(int p=0;p<array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
+    rigid_geometry.Clean_Memory();
     array_collection->Clean_Memory();
 }
 //#####################################################################
@@ -40,6 +55,7 @@ template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Delete_All_Particles()
 {
     for(int p=0;p<array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
+    rigid_geometry.Remove_All();
     array_collection->Delete_All_Elements();
 }
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,1> >;

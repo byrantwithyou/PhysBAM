@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/PLS_REFINEMENT_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -21,7 +20,6 @@ PLS_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input)
     //projection(coarse_mac_grid,false,false,true,true),particle_levelset_evolution(fine_mac_grid),incompressible(fine_mac_grid,projection),boundary(0),
     rigid_geometry_collection(this),collision_bodies_affecting_fluid(fine_mac_grid)
 {
-    Initialize_Particles();Initialize_Read_Write_General_Structures();
     incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){non_mpi_boundary(i)(0)=true;non_mpi_boundary(i)(1)=true;}
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}

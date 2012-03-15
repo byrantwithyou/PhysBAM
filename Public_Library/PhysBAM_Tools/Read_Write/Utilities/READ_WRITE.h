@@ -7,7 +7,6 @@
 // Functions for reading and writing which do the correct thing for objects, pointers, primitive types, etc. In general, use Read/Write_Binary (and Read/Write_Binary_Array) using T for the type
 // of the object you're reading/writing and RW the underlying floating point scalar type (float/double).
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __Read_Write__
 #define __Read_Write__
 
@@ -86,62 +85,5 @@ inline void Write_Primitive<bool>(std::ostream& output,const bool& d)
 {char c=(char)d;output.write(&c,1);}
 
 #endif
-
-//#####################################################################
-// Read_Write for objects
-//#####################################################################
-template<class T,class RW,class ENABLER>
-class Read_Write
-{
-public:
-    // Making this "virtual" base class.  Nothing should use it directly.
-    void Read(std::istream& input,T& d)
-    {STATIC_ASSERT((T)false);}
-
-    void Write(std::ostream& output,const T& d)
-    {STATIC_ASSERT((T)false);}
-};
-//#####################################################################
-// Read_Write for binary I/O safe types
-//#####################################################################
-template<class T,class RW> class Read_Write<T,RW,typename ENABLE_IF<IS_BINARY_IO_SAFE<T,RW>::value>::TYPE>
-{
-public:
-    void Read(std::istream& input,T& d)
-    {input.read(reinterpret_cast<char*>(&d),sizeof(T));}
-
-    void Write(std::ostream& output,const T& d)
-    {output.write(reinterpret_cast<const char*>(&d),sizeof(T));}
-};
-//#####################################################################
-// Read_Write for integral types (bool, char, int, etc.) and enums
-//#####################################################################
-template<class T,class RW> class Read_Write<T,RW,typename ENABLE_IF<(IS_INTEGRAL<T>::value || IS_ENUM<T>::value) && !IS_BINARY_IO_SAFE<T,RW>::value>::TYPE>
-{
-public:
-    void Read(std::istream& input,T& d)
-    {Read_Primitive(input,d);}
-
-    void Write(std::ostream& output,const T& d)
-    {Write_Primitive(output,d);}
-};
-//#####################################################################
-// Read_Write for std::string's
-//#####################################################################
-template<class RW>
-class Read_Write<std::string,RW>
-{
-public:
-    static void Read(std::istream& input,std::string& d)
-    {int n;Read_Primitive(input,n);
-    char* buffer=new char[n];input.read(buffer,n);d.assign(buffer,buffer+n);delete[] buffer;}
-
-    static void Write(std::ostream& output,const std::string& d)
-    {int n=int(d.size());Write_Primitive(output,n);
-    const char* s=d.c_str();output.write(s,n);}
-};
-//#####################################################################
 }
-#endif
-
 #endif

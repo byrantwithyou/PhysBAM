@@ -18,9 +18,27 @@
 #include <memory>
 namespace PhysBAM{
 
+struct READ_WRITE_ARRAY_COLLECTION_FUNCTIONS_HELPER
+{
+    ARRAY<ARRAY_COLLECTION_ELEMENT_BASE*> samples;
+    ~READ_WRITE_ARRAY_COLLECTION_FUNCTIONS_HELPER()
+    {samples.Delete_Pointers_And_Clean_Memory();}
+};
+
+struct READ_WRITE_ARRAY_COLLECTION_FUNCTIONS
+{
+    std::string name;
+    ARRAY_COLLECTION_ELEMENT_BASE* sample_attribute;
+};
+
+void Register_Attribute_Name(const ATTRIBUTE_ID id,const char* name);
+const char* Get_Attribute_Name(const ATTRIBUTE_ID id);
+
 class ARRAY_COLLECTION:public CLONEABLE<ARRAY_COLLECTION>,public NONCOPYABLE
 {
 public:
+    typedef int HAS_TYPED_READ_WRITE;
+    static HASHTABLE<ATTRIBUTE_ID,READ_WRITE_ARRAY_COLLECTION_FUNCTIONS>& Read_Write_Array_Collection_Registry();
     int number;
     int buffer_size;
     ARRAY<ARRAY_COLLECTION_ELEMENT_BASE*,ATTRIBUTE_INDEX> arrays;
@@ -122,7 +140,25 @@ public:
     void Take(ARRAY_COLLECTION& source)
     {Append(source);source.Delete_All_Elements();}
 
+    static ATTRIBUTE_ID Type_Only(ATTRIBUTE_ID id)
+    {return ATTRIBUTE_ID(Value(id)&0xFFFF0000);}
+
+    static ATTRIBUTE_ID Id_Only(ATTRIBUTE_ID id)
+    {return ATTRIBUTE_ID(Value(id)&0x0000FFFF);}
+
+    template<class E> static void Register_Read_Write()
+    {static READ_WRITE_ARRAY_COLLECTION_FUNCTIONS_HELPER sample_helper;
+    READ_WRITE_ARRAY_COLLECTION_FUNCTIONS functions;
+    functions.sample_attribute=new ARRAY_COLLECTION_ELEMENT<E>();
+    printf("Register: %s\n", typeid(E).name());
+    functions.sample_attribute->id=ATTRIBUTE_ID();
+    PHYSBAM_ASSERT(Read_Write_Array_Collection_Registry().Set(Type_Only(functions.sample_attribute->Hashed_Id()),functions));
+    sample_helper.samples.Append(functions.sample_attribute);}
+
 //#####################################################################
+    void Read(TYPED_ISTREAM& input);
+    void Write(TYPED_OSTREAM& output) const;
+    void Print(std::ostream& output,const int p) const;
     virtual void Clean_Memory();
     bool operator==(const ARRAY_COLLECTION& collection) const;
     virtual void Resize(const int new_size);

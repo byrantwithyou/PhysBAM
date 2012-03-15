@@ -23,7 +23,7 @@ using namespace PhysBAM;
 // Register this class as read-write
 //#####################################################################
 namespace PhysBAM{
-bool Register_Analytic_Implicit_Object(){
+static bool Register_Analytic_Implicit_Object(){
     static bool done=false;if(done) return true;done=true;
     STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<RANGE<VECTOR<float,1> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<ANALYTIC_IMPLICIT_OBJECT<POINT_SIMPLEX_1D<float> > >();

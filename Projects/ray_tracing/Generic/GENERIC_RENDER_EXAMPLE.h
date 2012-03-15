@@ -16,7 +16,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_UNIFORM_GRID_ACCELERATOR.h>
@@ -53,8 +52,6 @@ public:
     GENERIC_RENDER_EXAMPLE(const std::string& filename_input,const int frame_input)
         :RAY_TRACING_EXAMPLE<T>(),use_spatial_partition(false),body_list(0)
     {
-        Initialize_Particles();
-        Initialize_Read_Write_General_Structures();
         frame=frame_input;parser=new GENERIC_PARSER<T>(filename_input,frame);
     }
 

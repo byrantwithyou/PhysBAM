@@ -633,7 +633,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         RIGID_GEOMETRY<TV> *body=&rigid_geometry_collection->Rigid_Geometry(real_selection->body_id);
 
         if(!body->name.empty()){output_stream<<"Name ="<<body->name<<std::endl;}
-        Read_Write<ARRAY_COLLECTION,RW>::Print(output_stream,*rigid_geometry_collection->particles.array_collection,real_selection->body_id);
+        rigid_geometry_collection->particles.array_collection->Print(output_stream,real_selection->body_id);
 
         MATRIX<T,4> body_transform=body->Frame().Matrix();
 

@@ -62,6 +62,15 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDI
         one_over_effective_mass(p)=soft_bindings.One_Over_Effective_Mass(p);
         effective_mass(p)=Robust_Inverse(one_over_effective_mass(p));}
 }
+static int Initialize_Deformables_Particles()
+{
+    Register_Attribute_Name(ATTRIBUTE_ID_MASS,"mass");
+    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_MASS,"one_over_mass");
+    Register_Attribute_Name(ATTRIBUTE_ID_EFFECTIVE_MASS,"effective_mass");
+    Register_Attribute_Name(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,"one_over_effective_mass");
+    return 0;
+}
+int initialize_deformables_particles=Initialize_Deformables_Particles();
 //#####################################################################
 template class DEFORMABLE_PARTICLES<VECTOR<float,1> >;
 template class DEFORMABLE_PARTICLES<VECTOR<float,2> >;

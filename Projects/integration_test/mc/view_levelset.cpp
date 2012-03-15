@@ -16,7 +16,6 @@
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 using namespace PhysBAM;
 
@@ -27,8 +26,6 @@ typedef VECTOR<T,2> V2;
 
 int main(int argc, char* argv[])
 {
-    Initialize_Particles();
-    Initialize_Read_Write_General_Structures();
     PARSE_ARGS parse_args;
     parse_args.Add_String_Argument("-o","surface.tri","output filename");
     parse_args.Add_String_Argument("-i","<none>","input level set");

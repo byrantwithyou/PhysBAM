@@ -26,6 +26,19 @@ COMPRESSIBLE_FLUID_PARTICLES()
 template<class TV> COMPRESSIBLE_FLUID_PARTICLES<TV>::
 ~COMPRESSIBLE_FLUID_PARTICLES()
 {}
+static int Initialize_Compressible_Particles()
+{
+    Register_Attribute_Name(ATTRIBUTE_ID_VORTICITY,"vorticity");
+    Register_Attribute_Name(ATTRIBUTE_ID_E,"E");
+    Register_Attribute_Name(ATTRIBUTE_ID_RHO,"rho");
+    Register_Attribute_Name(ATTRIBUTE_ID_PHI,"phi");
+    Register_Attribute_Name(ATTRIBUTE_ID_GRAD_PHI,"grad_phi");
+    Register_Attribute_Name(ATTRIBUTE_ID_AGE,"age");
+    Register_Attribute_Name(ATTRIBUTE_ID_MATERIAL_VOLUME,"material_volume");
+    Register_Attribute_Name(ATTRIBUTE_ID_QUANTIZED_COLLISION_DISTANCE,"quantized_collision_distance");
+    return 0;
+}
+int initialize_compressible_particles=Initialize_Compressible_Particles();
 //#####################################################################
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<float,1> >;
 template class COMPRESSIBLE_FLUID_PARTICLES<VECTOR<float,2> >;

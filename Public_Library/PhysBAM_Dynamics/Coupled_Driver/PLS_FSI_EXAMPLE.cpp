@@ -40,7 +40,6 @@
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
 #include <PhysBAM_Dynamics/Forces_And_Torques/EULER_FLUID_FORCES.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
@@ -57,12 +56,11 @@ namespace PhysBAM{template<class TV> void Add_Debug_Particle(const TV& X, const 
 #endif
 template<class TV> PLS_FSI_EXAMPLE<TV>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
-    :BASE((Initialize_Particles(),stream_type)),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
+    :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
     fluids_parameters(number_of_regions,fluids_parameters.WATER),fluid_collection(*fluids_parameters.grid),resolution(0),convection_order(1),use_pls_evolution_for_structure(false),
     two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),m(1),s(1),kg(1)
 {
-    Initialize_Read_Write_General_Structures();
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
 }

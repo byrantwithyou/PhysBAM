@@ -15,8 +15,7 @@
 // Register this class as read-write
 //#####################################################################
 namespace PhysBAM{
-bool Register_Implicit_Object_Transformed(){
-    static bool done=false;if(done) return true;done=true;
+static bool Register_Implicit_Object_Transformed(){
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,2>,FRAME<VECTOR<float,2> > > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,3>,FRAME<VECTOR<float,3> > > >();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
