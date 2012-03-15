@@ -12,6 +12,7 @@
 
 namespace PhysBAM{
 
+// Arrows point away from eye.
 template<class T>
 class HIDDEN_SURFACE
 {

@@ -88,7 +88,7 @@ Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_
     SURFACE_PRIMITIVE<T>* primitive[2]={&primitives(index[0]),&primitives(index[1])};
     typename TRIANGLE_3D<T>::INTERSECTS_HELPER ih[2];
     TRIANGLE_3D<T> triangle[2]={primitive[0]->As_Triangle(),primitive[1]->As_Triangle()};
-    bool intersects=triangle[0].Intersects(triangle[1],ih);
+    bool intersects=triangle[0].Intersects(triangle[1],1e-12,ih);
     if(ih[0].n.z==0 && ih[1].n.z==0){
         T rz=(ih[0].n.Cross(ih[1].n)).z;
         if(!rz || !ih[0].neg || !ih[0].pos || !ih[1].neg || !ih[1].pos) return;
@@ -99,47 +99,62 @@ Handle_Intersection_Triangle_Triangle(int a,int b,ARRAY<ARRAY<int> >& adjacency_
 
     int cut_index=abs(ih[0].n.z)>abs(ih[1].n.z);
     if(!intersects){
-        int ind=ih[cut_index].w.Arg_Abs_Max();
-        int in_front=(ih[cut_index].w[ind]>0)==(ih[1-cut_index].n.z>0);
-        Add_Edge(edges,index[in_front],index[1-in_front]);
-        return;}
+        bool ci_diff=ih[cut_index].neg && ih[cut_index].pos;
+        bool nci_diff=ih[1-cut_index].neg && ih[1-cut_index].pos;
+        if(!ci_diff || !nci_diff){
+            if(ci_diff) cut_index=1-cut_index;
+            int ind=ih[cut_index].w.Arg_Abs_Max();
+            int in_front=((ih[cut_index].w[ind]>0)!=(ih[1-cut_index].n.z>0))^cut_index;
+            Add_Edge(edges,index[in_front],index[1-in_front]);
+            return;}
 
-    const TV& X0=primitive[cut_index]->vertices(ih[cut_index].i[0]);
-    TV& X1=primitive[cut_index]->vertices(ih[cut_index].i[1]);
-    TV& X2=primitive[cut_index]->vertices(ih[cut_index].i[2]);
+        int st=(ih[0].t[0]+ih[0].t[1]>ih[1].t[0]+ih[1].t[1]),ind0=argmax(ih[0].t[0],ih[0].t[1]),ind1=argmin(ih[1].t[0],ih[1].t[1]);
+        if(st){ind0=1-ind0;ind1=1-ind1;}
+        TV u(ih[0].x(ih[0].is)-ih[0].x(ih[0].i[ind0]),0,ih[0].w(ih[0].is)-ih[0].w(ih[0].i[ind0]));
+        TV v(ih[1].x(ih[1].is)-ih[1].x(ih[1].i[ind1]),ih[1].w(ih[1].is)-ih[1].w(ih[1].i[ind1]),0);
+        TV e(ih[0].n.Cross(ih[1].n).z,ih[0].n.z,ih[1].n.z);
+        int in_front=(TV::Triple_Product(u,v,e)<0)^st^(u.z>0)^(v.y>0);
+        Add_Edge(edges,index[in_front],index[1-in_front]);
+        return;
+    }
+
+    const TV& X0=primitive[cut_index]->vertices(ih[cut_index].is);
+    TV& X1=primitive[cut_index]->vertices(ih[cut_index].i[0]);
+    TV& X2=primitive[cut_index]->vertices(ih[cut_index].i[1]);
     TV cut0=X0+ih[cut_index].th[0]*(X1-X0);
     TV cut1=X0+ih[cut_index].th[1]*(X2-X0);
-    int new0=Add(cut0,X1,X2,primitive[cut_index]->parent);
-    int new1=Add(cut0,X2,cut1,primitive[cut_index]->parent);
+    int new0=ih[cut_index].th[0]<1?Add(cut0,X1,X2,primitive[cut_index]->parent):-1;
+    int new1=ih[cut_index].th[1]<1?Add(cut0,X2,cut1,primitive[cut_index]->parent):-1;
     X1=cut0;
     X2=cut1;
 
-    int adj0=adjacency_list.Append(ARRAY<int>());
-    int adj1=adjacency_list.Append(ARRAY<int>());
-    PHYSBAM_ASSERT(adj0==new0 && adj1==new1);
+    if(new0>=0) adjacency_list.Append(ARRAY<int>());
+    if(new1>=0) adjacency_list.Append(ARRAY<int>());
     ARRAY<int>& adj=adjacency_list(index[cut_index]);
     for(int i=0;i<adj.m;i++){
-        adjacency_list(new0).Append(adj(i));
-        adjacency_list(new1).Append(adj(i));
-        adjacency_list(adj(i)).Append(new0);
-        adjacency_list(adj(i)).Append(new1);
+        if(new0>=0) adjacency_list(new0).Append(adj(i));
+        if(new1>=0) adjacency_list(new1).Append(adj(i));
+        if(new0>=0) adjacency_list(adj(i)).Append(new0);
+        if(new1>=0) adjacency_list(adj(i)).Append(new1);
         if(adj(i)==index[1-cut_index]) continue;
         if(edges.Contains(VECTOR<int,2>(index[cut_index],adj(i)))){
-            Add_Edge(edges,new0,adj(i));
-            Add_Edge(edges,new1,adj(i));}
+            if(new0>=0) Add_Edge(edges,new0,adj(i));
+            if(new1>=0) Add_Edge(edges,new1,adj(i));}
         else if(edges.Contains(VECTOR<int,2>(adj(i),index[cut_index]))){
-            Add_Edge(edges,adj(i),new0);
-            Add_Edge(edges,adj(i),new1);}
+            if(new0>=0) Add_Edge(edges,adj(i),new0);
+            if(new1>=0) Add_Edge(edges,adj(i),new1);}
         else{
-            pairs.Append(VECTOR<int,2>(new0,adj(i)));
-            pairs.Append(VECTOR<int,2>(new1,adj(i)));}}
+            if(new0>=0) pairs.Append(VECTOR<int,2>(new0,adj(i)));
+            if(new1>=0) pairs.Append(VECTOR<int,2>(new1,adj(i)));}}
 
-    int in_front=(ih[cut_index].w[ih[cut_index].i[0]]>0)==(ih[1-cut_index].n.z>0);
+    int in_front=((ih[cut_index].w(ih[cut_index].is)>0)!=(ih[1-cut_index].n.z>0))^cut_index;
     Add_Edge(edges,index[in_front],index[1-in_front]);
-    index[cut_index]=new0;
-    Add_Edge(edges,index[1-in_front],index[in_front]);
-    index[cut_index]=new1;
-    Add_Edge(edges,index[1-in_front],index[in_front]);
+    if(new0>=0){
+        index[cut_index]=new0;
+        Add_Edge(edges,index[1-in_front],index[in_front]);}
+    if(new0>=1){
+        index[cut_index]=new1;
+        Add_Edge(edges,index[1-in_front],index[in_front]);}
 }
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
 Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<int,2> >& pairs,
@@ -180,7 +195,8 @@ Initialize(DIRECTED_GRAPH<>& dg)
                 adjacency_list(k).Append(i);}}
 
     for(int i=0;i<pairs.m;i++)
-        Handle_Intersection(pairs(i).x,pairs(i).y,adjacency_list,pairs,edges);
+        if(Projections_Intersect(pairs(i).x,pairs(i).y))
+            Handle_Intersection(pairs(i).x,pairs(i).y,adjacency_list,pairs,edges);
 
     dg.Initialize(primitives.m);
     for(HASHTABLE<VECTOR<int,2> >::ITERATOR it(edges);it.Valid();it.Next())
