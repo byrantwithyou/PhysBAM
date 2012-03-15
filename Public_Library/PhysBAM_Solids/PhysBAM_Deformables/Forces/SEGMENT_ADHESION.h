@@ -22,6 +22,7 @@ class SEGMENT_ADHESION_SPRING_STATE
 {
     typedef typename TV::SCALAR T;
 public:
+    typedef int HAS_UNTYPED_READ_WRITE;
     VECTOR<int,4> nodes;
     VECTOR<T,2> weights;
     TV normal;
@@ -32,6 +33,13 @@ public:
     SEGMENT_ADHESION_SPRING_STATE()
         :distance(0),damping(0),external(false)
     {}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,nodes,weights,normal,distance,damping);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,nodes,weights,normal,distance,damping);}
+
 };
 
 template<class TV>
@@ -102,5 +110,4 @@ public:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Forces_And_Torques/READ_WRITE_SEGMENT_ADHESION_SPRING_STATE.h>
 #endif

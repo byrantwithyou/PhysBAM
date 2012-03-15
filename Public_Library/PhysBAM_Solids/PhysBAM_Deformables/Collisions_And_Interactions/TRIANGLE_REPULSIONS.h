@@ -21,6 +21,7 @@ template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 template<class TV>
 struct POINT_FACE_REPULSION_PAIR
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename TV::SCALAR T;
     typedef T SCALAR;
     enum WORKAROUND {d=TV::m,count=TV::m+1};
@@ -35,6 +36,12 @@ struct POINT_FACE_REPULSION_PAIR
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,nodes,distance,weights,normal);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,nodes,distance,weights,normal);}
 };
 
 template<class T>
@@ -58,6 +65,7 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >
 template<class T>
 struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND {d=2,count=2};
     typedef VECTOR<T,2> TV;
@@ -73,11 +81,18 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,nodes,distance,normal);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,nodes,distance,normal);}
 };
 
 template<class T>
 struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >
 {
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef T SCALAR;
     enum WORKAROUND {d=3,count=4};
     typedef VECTOR<T,3> TV;
@@ -93,6 +108,12 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,nodes,distance,weights,normal);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,nodes,distance,weights,normal);}
 };
 
 template<class TV>
@@ -271,6 +292,4 @@ private:
 //#####################################################################
 };
 }
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Collisions_And_Interactions/READ_WRITE_EDGE_EDGE_REPULSION_PAIR.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Collisions_And_Interactions/READ_WRITE_POINT_FACE_REPULSION_PAIR.h>
 #endif

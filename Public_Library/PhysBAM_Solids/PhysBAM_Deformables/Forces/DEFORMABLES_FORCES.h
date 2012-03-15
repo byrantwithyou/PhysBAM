@@ -24,6 +24,7 @@ class SEGMENT_MESH;
 
 template<class TV>
 struct FORCE_DATA{
+    typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename TV::SCALAR T;
 
     FORCE_DATA():state(0)
@@ -32,6 +33,12 @@ struct FORCE_DATA{
     std::string name;
     T state; // holds signed strech for springs
     TV first_action_point,second_action_point;
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,name,state,first_action_point,second_action_point);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,name,state,first_action_point,second_action_point);}
 };
 
 template<class TV>
@@ -107,5 +114,4 @@ struct SPRINGS_TAG{};
 struct FINITE_VOLUME_TAG{};
 
 }
-#include <PhysBAM_Solids/PhysBAM_Deformables/Read_Write/Forces_And_Torques/READ_WRITE_FORCE_DATA.h>
 #endif
