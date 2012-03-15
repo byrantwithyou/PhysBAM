@@ -12,7 +12,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <fstream>
 #include <iostream>
 #include <ostream>
@@ -39,8 +38,6 @@ void Dump_Rigid_Baody_Simplicial_Object_Particles(const STREAM_TYPE& stream_type
 int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
-    Initialize_Particles();
-    Initialize_Read_Write_General_Structures();
 
     PARSE_ARGS parse_args;
     parse_args.Add_Option_Argument("-float","data should be in float format");

@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
@@ -113,9 +114,6 @@ Find_Dimension(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    Initialize_Particles();
-    Initialize_Read_Write_Structures();
-
     PARSE_ARGS parse_args;
     parse_args.Add_Double_Argument("-start",0,"start range");
     parse_args.Add_Double_Argument("-end",0,"end range");

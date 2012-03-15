@@ -3,7 +3,6 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <fstream>
 #include <iostream>
 
@@ -26,17 +25,16 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
     (*output)<<header;
 
     for(int p=0;p<tetrahedralized_volume->particles.array_collection->Size();p++)
-        (*output)<<STRING_UTILITIES::string_sprintf("v %lg %lg %lg\n",tetrahedralized_volume->particles.X(p)[1],tetrahedralized_volume->particles.X(p)[2],tetrahedralized_volume->particles.X(p)[3]);
+        (*output)<<STRING_UTILITIES::string_sprintf("v %lg %lg %lg\n",tetrahedralized_volume->particles.X(p)[0],tetrahedralized_volume->particles.X(p)[1],tetrahedralized_volume->particles.X(p)[2]);
 
     for(int e=0;e<tetrahedralized_volume->mesh.elements.m;e++)
-        (*output)<<STRING_UTILITIES::string_sprintf("f %d %d %d %d\n",tetrahedralized_volume->mesh.elements(e)[1],tetrahedralized_volume->mesh.elements(e)[2],tetrahedralized_volume->mesh.elements(e)[3],tetrahedralized_volume->mesh.elements(e)[4]);
+        (*output)<<STRING_UTILITIES::string_sprintf("f %d %d %d %d\n",tetrahedralized_volume->mesh.elements(e)[0],tetrahedralized_volume->mesh.elements(e)[1],tetrahedralized_volume->mesh.elements(e)[2],tetrahedralized_volume->mesh.elements(e)[3]);
     delete output;
 }
 
 int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
-    Initialize_Read_Write_General_Structures();
 
     bool type_double=false;
 

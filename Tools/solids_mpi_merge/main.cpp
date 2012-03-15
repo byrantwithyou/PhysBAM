@@ -167,9 +167,6 @@ Do_Merge(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    Initialize_Particles();
-    Initialize_Read_Write_Structures();
-
     PARSE_ARGS parse_args;
     parse_args.Add_Option_Argument("-f","force");
     parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");

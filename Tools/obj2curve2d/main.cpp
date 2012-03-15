@@ -4,7 +4,6 @@
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <fstream>
 #include <iostream>
 
@@ -49,7 +48,6 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
-    Initialize_Read_Write_General_Structures();
 
     bool type_double=false;
 

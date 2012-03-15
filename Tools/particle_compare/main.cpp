@@ -9,10 +9,10 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Arrays/READ_WRITE_ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 using namespace PhysBAM;
@@ -220,9 +220,6 @@ Find_Dimension(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    Initialize_Particles();
-    Initialize_Read_Write_Structures();
-
     PARSE_ARGS parse_args;
     parse_args.Add_Integer_Argument("-frame",-1,"frame output");
     parse_args.Add_Integer_Argument("-type",-1,"particle type");

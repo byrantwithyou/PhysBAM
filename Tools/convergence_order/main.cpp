@@ -67,9 +67,6 @@ Find_Dimension(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    Initialize_Particles();
-    Initialize_Read_Write_Structures();
-
     PARSE_ARGS parse_args;
     parse_args.Add_Double_Argument("-start",0,"start range");
     parse_args.Add_Double_Argument("-end",0,"end range");

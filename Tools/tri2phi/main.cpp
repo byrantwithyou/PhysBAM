@@ -4,11 +4,9 @@
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
-#include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <fstream>
 #include <iostream>
 
@@ -191,8 +189,6 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
 
 int main(int argc,char *argv[])
 {
-    Initialize_Geometry_Particle();
-    Initialize_Read_Write_General_Structures();
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
     bool type_double=false;

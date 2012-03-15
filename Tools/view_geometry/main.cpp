@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Geometry_Particles/REGISTER_GEOMETRY_READ_WRITE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
@@ -30,7 +29,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WINDOW.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <cstring>
 #include <fstream>
 using namespace PhysBAM;
@@ -108,8 +106,6 @@ public:
 int main(int argc,char *argv[])
 {
     bool type_double=false;    
-    Initialize_Geometry_Particle();
-    Initialize_Read_Write_General_Structures();
 
     OPENGL_WORLD world;
     world.Add_Light(new OPENGL_LIGHT(VECTOR<double,3>(1,1,1),.8));

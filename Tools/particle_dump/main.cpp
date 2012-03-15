@@ -1,9 +1,9 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
-#include <PhysBAM_Dynamics/Geometry/GENERAL_GEOMETRY_FORWARD.h>
 #include <fstream>
 #include <iostream>
 
@@ -15,14 +15,12 @@ void Read_Particles(const STREAM_TYPE& stream_type,const std::string& file)
     PARTICLES<TV> particles;
     FILE_UTILITIES::Read_From_File(stream_type,file,particles);
     for(int i=0;i<particles.array_collection->Size();i++)
-        Read_Write<PARTICLES<TV>,typename TV::SCALAR>::Print(std::cout,particles,i);
+        particles.Print(std::cout,i);
 }
 
 int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
-    Initialize_Particles();
-    Initialize_Read_Write_General_Structures();
 
     bool type_double=false;
     int dim=3;

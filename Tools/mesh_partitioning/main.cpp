@@ -68,7 +68,7 @@ public:
         for(int t=0;t<tetrahedralized_volume->mesh.elements.m;t++){
             VECTOR<int,4> nodes=tetrahedralized_volume->mesh.elements(t);
             VECTOR<int,4> element_labels=VECTOR<int,4>(node_labels.Subset(nodes)).Sorted();
-            if(element_labels[1]==element_labels[4]) visualization_mesh.elements.Append(nodes);}
+            if(element_labels[0]==element_labels[3]) visualization_mesh.elements.Append(nodes);}
         FILE_UTILITIES::Write_To_File<T>(output_directory+"/partitioning.tet",visualization_volume);}}
 
 //#####################################################################
