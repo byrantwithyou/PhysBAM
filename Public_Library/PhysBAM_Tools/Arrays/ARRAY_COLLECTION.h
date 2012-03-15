@@ -150,7 +150,6 @@ public:
     {static READ_WRITE_ARRAY_COLLECTION_FUNCTIONS_HELPER sample_helper;
     READ_WRITE_ARRAY_COLLECTION_FUNCTIONS functions;
     functions.sample_attribute=new ARRAY_COLLECTION_ELEMENT<E>();
-    printf("Register: %s\n", typeid(E).name());
     functions.sample_attribute->id=ATTRIBUTE_ID();
     PHYSBAM_ASSERT(Read_Write_Array_Collection_Registry().Set(Type_Only(functions.sample_attribute->Hashed_Id()),functions));
     sample_helper.samples.Append(functions.sample_attribute);}
