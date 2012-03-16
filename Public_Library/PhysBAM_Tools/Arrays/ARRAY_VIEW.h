@@ -38,6 +38,10 @@ public:
 
     using BASE::Same_Array;
 
+    ARRAY_VIEW()
+        :m(0),base_pointer(0)
+    {}
+
     ARRAY_VIEW(const ID m,T* raw_data)
         :m(m),base_pointer(raw_data)
     {}
