@@ -57,27 +57,24 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
         child_index.Subset(children)=IDENTITY_ARRAY<>(children.m);
 
         // Divide the nodes; update node_map.
-        ARRAY<ARRAY<int> > inside_list(children.m),outside_list(children.m);
+        ARRAY<int> inside_list(children.m),outside_list(children.m);
         for(int i=0;i<children.m;i++){
-            if(!primitives.Divide_Primitive(node_map(children(i)),node_map(index),inside_list(i),outside_list(i))){
-                outside_list(i).Append(children(i));
-                continue;}
-            node_map(children(i))=inside_list(i)(0);
-            inside_list(i)(0)=children(i);
-            for(int j=1;j<inside_list(i).m;j++){
-                int k=node_map.Append(inside_list(i)(j));
-                inside_list(i)(j)=k;}
-            for(int j=0;j<outside_list(i).m;j++){
-                int k=node_map.Append(outside_list(i)(j));
-                outside_list(i)(j)=k;}}
+            int added=primitives.Divide_Primitive(node_map(children(i)),node_map(index));
+            if(added>=0) outside_list(i)=added;
+            else outside_list(i)=-1;
+            if(added!=node_map(children(i))) inside_list(i)=node_map(children(i));
+            else inside_list(i)=-1;
+
+            if(inside_list(i)>=0 && inside_list(i)>=0)
+                outside_list(i)=node_map.Append(outside_list(i));}
 
         new_graph.Initialize(node_map.m);
 
         // Node types: normal, index, inside, outside
         // add (index, inside) edges
         for(int i=0;i<inside_list.m;i++)
-            for(int j=0;j<inside_list(i).m;j++)
-                new_graph.Add_Edge(index,inside_list(i)(j));
+            if(inside_list(i)>=0)
+                new_graph.Add_Edge(index,inside_list(i));
 
         // add (normal, normal) and (normal,index) edges
         for(int i=0;i<num_nodes;i++){
@@ -89,37 +86,36 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
 
         for(int i=0;i<children.m;i++){
             int p=children(i);
-            const ARRAY<int>& ch=graph.Children(p),&pin=inside_list(i),&pout=outside_list(i);
+            const ARRAY<int>& ch=graph.Children(p);
+            int pin=inside_list(i),pout=outside_list(i);
             for(int j=0;j<ch.m;j++)
                 if(child_index(ch(j))>=0){
                     int child=child_index(ch(j));
-                    const ARRAY<int>& cin=inside_list(child);
-                    const ARRAY<int>& cout=outside_list(child);
+                    int cin=inside_list(child);
+                    int cout=outside_list(child);
                     // Add (inside, inside) edges
-                    for(int k=0;k<pin.m;k++)
-                        for(int m=0;m<cin.m;m++)
-                            if(primitives.Test_Edge(node_map(pin(k)),node_map(cin(m))))
-                                new_graph.Add_Edge(pin(k),cin(m));
+                    if(pin>=0 && cin>=0)
+                        if(primitives.Test_Edge(node_map(pin),node_map(cin)))
+                            new_graph.Add_Edge(pin,cin);
                     // Add (outside, outside) edges
-                    for(int k=0;k<pout.m;k++)
-                        for(int m=0;m<cout.m;m++)
-                            if(primitives.Test_Edge(node_map(pout(k)),node_map(cout(m))))
-                                new_graph.Add_Edge(pout(k),cout(m));}
+                    if(pout>=0 && cout>=0)
+                        if(primitives.Test_Edge(node_map(pout),node_map(cout)))
+                            new_graph.Add_Edge(pout,cout);}
                 else{ // Add (outside, normal) edges
                     int m=ch(j);
-                    for(int k=0;k<pout.m;k++)
-                        if(primitives.Test_Edge(node_map(pout(k)),node_map(m)))
-                            new_graph.Add_Edge(pout(k),m);}}
+                    if(pout>=0)
+                        if(primitives.Test_Edge(node_map(pout),node_map(m)))
+                            new_graph.Add_Edge(pout,m);}}
 
         // Add (normal, outside) edges
         for(int i=0;i<children.m;i++){
-            const ARRAY<int>& pa=graph.Parents(children(i)),&cout=outside_list(i);
+            const ARRAY<int>& pa=graph.Parents(children(i));
+            int cout=outside_list(i);
+            if(cout<0) continue;
             for(int j=0;j<pa.m;j++){
                 int m=pa(j);
                 if(child_index(m)<0 && m!=index)
-                    for(int k=0;k<cout.m;k++)
-                        if(primitives.Test_Edge(node_map(m),node_map(cout(k))))
-                            new_graph.Add_Edge(m,cout(k));}}
+                    new_graph.Add_Edge(m,cout);}}
 
         graph.Reset();
     }
