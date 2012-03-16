@@ -48,6 +48,7 @@ public:
     void Draw_Object(const TV &a,const TV &b); // line
     void Draw_Object(const TV &a,const TV &b,const TV &c); // triangle
     void Draw_Object(ARRAY_VIEW<TV> pts); // polygon
+    void Draw_Object(ARRAY_VIEW<TV> outside,ARRAY_VIEW<ARRAY_VIEW<TV> > holes); // polygon with holes
     template <int d> void Draw_Object(const VECTOR<TV,d>& pts) // polygon
     {Draw_Object(ARRAY_VIEW<TV>(d,const_cast<TV*>(&pts(0))));}
     void Draw_Object(const TV &pt,T radius); // circle
@@ -57,6 +58,7 @@ protected:
     virtual void Emit_Object(const TV &a,const TV &b)=0; // line
     virtual void Emit_Object(const TV &a,const TV &b,const TV &c)=0; // triangle
     virtual void Emit_Object(ARRAY_VIEW<TV> pts)=0; // polygon
+    virtual void Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes)=0; // polygon with holes
     virtual void Emit_Object(const TV &pt,T radius)=0; // circle
     virtual void Emit_Object(const RANGE<TV>& box)=0;
 //#####################################################################

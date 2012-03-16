@@ -180,6 +180,27 @@ Emit_Object(ARRAY_VIEW<TV> pts)
     stream<<std::endl;
 }
 //#####################################################################
+// Function Draw_Object
+//#####################################################################
+template<class T> void EPS_FILE<T>::
+Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes)
+{
+    if(!cur_format.line_style && !cur_format.fill_style) return;
+    Update_Effective_Formatting();
+    if(!pts.Size()) return;
+    Emit("newpath");
+    Mt(pts(0));
+    for(int i=1;i<pts.Size();i++) Lt(pts(i));
+    Emit("closepath");
+    for(int h=0;h<holes.Size();h++){
+        Mt(holes(h)(0));
+        for(int i=1;i<holes(h).Size();i++) Lt(holes(h)(i));
+        Emit("closepath");}
+    Fill();
+    Stroke();
+    stream<<std::endl;
+}
+//#####################################################################
 // Function Mt
 //#####################################################################
 template<class T> void EPS_FILE<T>::

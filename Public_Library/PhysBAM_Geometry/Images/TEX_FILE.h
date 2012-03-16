@@ -37,6 +37,7 @@ protected:
     virtual void Emit_Object(const TV &a,const TV &b); // line
     virtual void Emit_Object(const TV &a,const TV &b,const TV &c); // triangle
     virtual void Emit_Object(ARRAY_VIEW<TV> pts); // polygon
+    virtual void Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes); // polygon with holes
     virtual void Emit_Object(const TV &pt,T radius); // circle
     virtual void Emit_Object(const RANGE<TV>& box);
     void Compute_Transform(T& scale,TV& shift);

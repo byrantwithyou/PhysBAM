@@ -203,6 +203,28 @@ Emit_Object(ARRAY_VIEW<TV> pts)
         for(int i=0;i<pts.Size();i++) Emit(pts(i));
         stream<<std::endl;}
 }
+//#####################################################################
+// Function Emit_Object
+//#####################################################################
+template<class T> void TEX_FILE<T>::
+Emit_Object(ARRAY_VIEW<TV> pts,ARRAY_VIEW<ARRAY_VIEW<TV> > holes)
+{
+    // TODO: fix
+    if(!pts.Size()) return;
+    if(!cur_format.line_style && !cur_format.fill_style) return;
+    Update_Effective_Formatting();
+
+    stream<<"\\pspolygon";
+    bool split=Emit_Options(true,true);
+    for(int i=0;i<pts.Size();i++) Emit(pts(i));
+    stream<<std::endl;
+
+    if(split){
+        stream<<"\\pspolygon";
+        Emit_Options(true,false);
+        for(int i=0;i<pts.Size();i++) Emit(pts(i));
+        stream<<std::endl;}
+}
 template class TEX_FILE<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class TEX_FILE<double>;

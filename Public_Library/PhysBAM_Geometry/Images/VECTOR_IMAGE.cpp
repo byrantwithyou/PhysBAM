@@ -66,6 +66,12 @@ Draw_Object(ARRAY_VIEW<TV> pts)
     for(int i=0;i<pts.Size();i++) Bound(pts(i));
     Emit_Object(pts);
 }
+template<class T> void VECTOR_IMAGE<T>::
+Draw_Object(ARRAY_VIEW<TV> outside,ARRAY_VIEW<ARRAY_VIEW<TV> > holes)
+{
+    for(int i=0;i<outside.Size();i++) Bound(outside(i));
+    Emit_Object(outside,holes);
+}
 //#####################################################################
 // Function Draw_Object
 //#####################################################################
