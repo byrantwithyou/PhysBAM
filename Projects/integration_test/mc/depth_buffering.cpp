@@ -13,6 +13,14 @@
 #include <PhysBAM_Geometry/Images/HIDDEN_SURFACE_PRIMITIVES.h>
 #include <PhysBAM_Geometry/Images/TEX_FILE.h>
 
+#include <iostream>
+#include <vector>
+
+#include <boost/foreach.hpp>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/io/wkt/wkt.hpp>
+
 using namespace PhysBAM;
 
 typedef double T;
@@ -20,6 +28,8 @@ typedef VECTOR<T,3> TV;
 typedef VECTOR<int,3> TV_INT;
 typedef VECTOR<T,2> TV2;
 typedef VECTOR<int,2> TV_INT2;
+
+
 
 int main(int argc, char* argv[])
 {
@@ -30,22 +40,25 @@ int main(int argc, char* argv[])
 
     LOG::cout<<std::setprecision(16);
     RANDOM_NUMBERS<T> random;
-    int N=100;
+    int N=2;
     ARRAY<TV> colors(N);
     random.Fill_Uniform(colors,0,1);
 
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
     HIDDEN_SURFACE<T> hs(hsp);
+    hsp.Add(TRIANGLE_3D<T>(TV(0.474322478286922,0.9515098861884326,0.6934395227581263),TV(0.0669095863122493,0.1049435273744166,0.1044117480050772),TV(0.7054195252712816,0.6591083586681634,0.1086039636284113)));
+    hsp.Add(TRIANGLE_3D<T>(TV(0.7092869963962585,0.9352117523085326,0.1746512756217271),TV(0.07493319036439061,0.006778978509828448,0.8007136192172766),TV(0.9887051046825945,0.8638312846887857,0.3960262089967728)));
 
-#if 1
+#if 0
     for(int i=0;i<N;i++){
         TV a,b,c;
         random.Fill_Uniform(a,0,1);
         random.Fill_Uniform(b,0,1);
         random.Fill_Uniform(c,0,1);
         LOG::cout<<a<<"  "<<b<<"  "<<c<<std::endl;
-        if(TRIANGLE_3D<T>::Area(a,b,c)<1e-10) continue;
-        hsp.Add(a,b,c);}
+        TRIANGLE_3D<T> tri(a,b,c);
+        if(tri.Area()<1e-10) continue;
+        hsp.Add(tri);}
 #endif
     hs.Compute();
 
@@ -62,9 +75,14 @@ int main(int argc, char* argv[])
 
     for(int i=0;i<hsp.order.m;i++){
         SURFACE_PRIMITIVE<T>& sp=hsp.primitives(hsp.order(i));
-        vi->cur_format.fill_color=colors(sp.parent);
-        PHYSBAM_ASSERT(sp.num_vertices==3);
-        vi->Draw_Object(sp.vertices(0).Remove_Index(2),sp.vertices(1).Remove_Index(2),sp.vertices(2).Remove_Index(2));}
+        for(int c=0;c<sp.projection.Size();c++){
+            SURFACE_PRIMITIVE<T>::POLYGON& poly=sp.projection(c);
+            vi->cur_format.fill_color=colors(sp.parent);
+            ARRAY<ARRAY_VIEW<TV2> > holes(poly.inners().Size());
+            for(int j=0;j<poly.inners().Size();j++)
+                holes(j)=poly.inners()(j);
+            ARRAY_VIEW<TV2> pts(poly.outer());
+            vi->Draw_Object(pts,holes);}}
 
     delete vi;    
 
