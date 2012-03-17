@@ -102,8 +102,6 @@ Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<
     boost::geometry::intersection(quad,primitives(a).projection,int_quad);
     T area_tri=boost::geometry::area(int_tri);
     T area_quad=boost::geometry::area(int_quad);
-    T area_a=boost::geometry::area(primitives(a).projection);
-    T area_b=boost::geometry::area(primitives(b).projection);
     if(area_tri<area_tol && area_quad<area_tol)
         return;
 
