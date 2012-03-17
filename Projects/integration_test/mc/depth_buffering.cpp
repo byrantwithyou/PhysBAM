@@ -40,22 +40,20 @@ int main(int argc, char* argv[])
 
     LOG::cout<<std::setprecision(16);
     RANDOM_NUMBERS<T> random;
-    int N=2;
+    int N=12;
     ARRAY<TV> colors(N);
     random.Fill_Uniform(colors,0,1);
 
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
     HIDDEN_SURFACE<T> hs(hsp);
-    hsp.Add(TRIANGLE_3D<T>(TV(0.474322478286922,0.9515098861884326,0.6934395227581263),TV(0.0669095863122493,0.1049435273744166,0.1044117480050772),TV(0.7054195252712816,0.6591083586681634,0.1086039636284113)));
-    hsp.Add(TRIANGLE_3D<T>(TV(0.7092869963962585,0.9352117523085326,0.1746512756217271),TV(0.07493319036439061,0.006778978509828448,0.8007136192172766),TV(0.9887051046825945,0.8638312846887857,0.3960262089967728)));
 
-#if 0
+#if 1
     for(int i=0;i<N;i++){
         TV a,b,c;
         random.Fill_Uniform(a,0,1);
         random.Fill_Uniform(b,0,1);
         random.Fill_Uniform(c,0,1);
-        LOG::cout<<a<<"  "<<b<<"  "<<c<<std::endl;
+        printf("    hsp.Add(TRIANGLE_3D<T>(TV(%.16f,%.16f,%.16f),TV(%.16f,%.16f,%.16f),TV(%.16f,%.16f,%.16f)));\n",a.x,a.y,a.z,b.x,b.y,b.z,c.x,c.y,c.z);
         TRIANGLE_3D<T> tri(a,b,c);
         if(tri.Area()<1e-10) continue;
         hsp.Add(tri);}
@@ -79,8 +77,9 @@ int main(int argc, char* argv[])
             SURFACE_PRIMITIVE<T>::POLYGON& poly=sp.projection(c);
             vi->cur_format.fill_color=colors(sp.parent);
             ARRAY<ARRAY_VIEW<TV2> > holes(poly.inners().Size());
-            for(int j=0;j<poly.inners().Size();j++)
-                holes(j)=poly.inners()(j);
+            if(holes.m) printf("HOLES: %i\n", holes.m);
+            for(int j=0;j<poly.inners().Size();j++){ARRAY_VIEW<TV2> av(poly.inners()(j));
+                holes(j).Exchange(av);}
             ARRAY_VIEW<TV2> pts(poly.outer());
             vi->Draw_Object(pts,holes);}}
 
