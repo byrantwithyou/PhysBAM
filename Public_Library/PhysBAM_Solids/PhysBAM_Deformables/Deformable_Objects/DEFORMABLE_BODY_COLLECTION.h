@@ -28,7 +28,6 @@ template<class TV> class DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES;
 template<class TV> class MPI_SOLIDS;
 template<class TV> class DEFORMABLES_FORCES;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
-class ARRAY_COLLECTION;
 
 template<class TV>
 class DEFORMABLE_BODY_COLLECTION:public NONCOPYABLE
