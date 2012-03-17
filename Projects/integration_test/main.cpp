@@ -11,9 +11,13 @@
 #include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+#include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MAPPING.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 
 using namespace PhysBAM;
@@ -68,6 +72,10 @@ void Integration_Test(int argc,char* argv[])
     vdy_stencil.Differentiate(1);
     vdy_stencil.Dice_Stencil();
 
+    SEGMENTED_CURVE_2D<T> curve;
+    MARCHING_CUBES<TV>::Create_Surface(curve,coarse_grid,phi);
+    BASIS_STENCIL_BOUNDARY_UNIFORM<TV> q_stencil(curve);
+
     CELL_MAPPING<TV> index_map_p(grid),index_map_u(grid),index_map_v(grid);
     index_map_p.periodic.Fill(true);
     index_map_u.periodic.Fill(true);
@@ -86,34 +94,52 @@ void Integration_Test(int argc,char* argv[])
     LOG::cout<<"udy ";udy_stencil.Print();
     LOG::cout<<"vdy ";vdy_stencil.Print();
 
-    LOG::cout<<"udx udx"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udx_stencil,udx_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
     helper.Scale(2*mu);
-    LOG::cout<<"udy udy"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udy_stencil,udy_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
     helper.Scale(mu);
-    LOG::cout<<"udy vdx"<<std::endl;
-    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udy_stencil,vdx_stencil,index_map_u,index_map_v,phi).Compute_Matrix(helper);
-    helper.Scale(mu);
-    LOG::cout<<"vdx udy"<<std::endl;
-    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdx_stencil,udy_stencil,index_map_v,index_map_u,phi).Compute_Matrix(helper);
-    helper.Scale(mu);
-    LOG::cout<<"vdx vdx"<<std::endl;
+    helper.start=0;
+    INTERVAL<int> block_uu=helper.Get_Block();
+
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdx_stencil,vdx_stencil,index_map_v,index_map_v,phi).Compute_Matrix(helper);
     helper.Scale(2*mu);
-    LOG::cout<<"vdy vdy"<<std::endl;
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdy_stencil,vdy_stencil,index_map_v,index_map_v,phi).Compute_Matrix(helper);
     helper.Scale(mu);
-    LOG::cout<<"udx p"<<std::endl;
+    helper.start=block_uu.max_corner;
+    INTERVAL<int> block_vv=helper.Get_Block();
+
+    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udy_stencil,vdx_stencil,index_map_u,index_map_v,phi).Compute_Matrix(helper);
+    helper.Scale(mu);
+    INTERVAL<int> block_uv=helper.Get_Block();
+
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udx_stencil,p_stencil,index_map_u,index_map_p,phi).Compute_Matrix(helper);
-    LOG::cout<<"vdy p"<<std::endl;
+    INTERVAL<int> block_up=helper.Get_Block();
+
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdy_stencil,p_stencil,index_map_v,index_map_p,phi).Compute_Matrix(helper);
-    LOG::cout<<"p udx"<<std::endl;
-    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,p_stencil,udx_stencil,index_map_p,index_map_u,phi).Compute_Matrix(helper);
-    LOG::cout<<"p vdy"<<std::endl;
-    BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,p_stencil,vdy_stencil,index_map_p,index_map_v,phi).Compute_Matrix(helper);
+    INTERVAL<int> block_vp=helper.Get_Block();
+
+    BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>(grid,u_stencil,q_stencil,index_map_u).Compute_Matrix(helper);
+    INTERVAL<int> block_uq=helper.Get_Block();
+
+    BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>(grid,v_stencil,q_stencil,index_map_v).Compute_Matrix(helper);
+    INTERVAL<int> block_vq=helper.Get_Block();
+
+    int start_v=index_map_u.next_index;
+    int start_p=index_map_v.next_index+start_v;
+    int start_uq=index_map_p.next_index+start_p;
+    int start_vq=curve.mesh.elements.m+start_uq;
+    int total=curve.mesh.elements.m+start_vq;
+
+    helper.Shift(start_v,start_v,block_vv);
+    helper.Shift(0,start_v,block_uv);
+    helper.Shift(0,start_p,block_up);
+    helper.Shift(start_v,start_p,block_vp);
+    helper.Shift(0,start_uq,block_uq);
+    helper.Shift(start_v,start_vq,block_vq);
+    helper.Add_Transpose(INTERVAL<int>(block_uv.min_corner,block_vq.max_corner));
+
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
-    helper.Set_Matrix(3*grid.counts.Product(),3*grid.counts.Product(),matrix,1e-14);
+    helper.Set_Matrix(total,total,matrix,1e-14);
 
     OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
 };
