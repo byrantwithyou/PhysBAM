@@ -94,7 +94,6 @@ Normalize_Control_Points()
 //     T offset=Start_Time(),total=Range();
 //     for(int i=0;i<control_points_times.m;i++) control_points_times(i)=(control_points_times(i)-offset)/total;
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################
 // Function Print_Control_Points_And_Times
 //#####################################################################
@@ -103,7 +102,6 @@ Print_Control_Points_And_Times()
 {
     for(int i=0;i<control_points.m;i++) LOG::cout<<"Time: "<<control_points_times(i)<<", Control Point: "<<control_points(i)<<std::endl;
 }
-#endif
 template class BSPLINE<float,VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BSPLINE<double,VECTOR<double,3> >;

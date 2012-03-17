@@ -30,16 +30,12 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
     int iterations;for(iterations=0;;iterations++){
         bool restart=!iterations || (restart_iterations && iterations%restart_iterations==0);
         if(restart){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(print_residuals) LOG::cout<<"restarting cg"<<std::endl;
-#endif
             r=b;system.Multiply(x,q);r-=q;system.Project(r);}
         // stopping conditions
         system.Project_Nullspace(r);
         convergence_norm=system.Convergence_Norm(r);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(print_residuals) LOG::cout<<convergence_norm<<std::endl;
-#endif
         if(convergence_norm<=tolerance && (iterations>=min_iterations || convergence_norm<small_number)){
             if(print_diagnostics) LOG::Stat("cg iterations",iterations);if(iterations_used) *iterations_used=iterations;return true;}
         if(iterations==max_iterations) break;
@@ -51,18 +47,14 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         system.Multiply(s,q);
         system.Project(q);
         T s_dot_q=(T)system.Inner_Product(s,q);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(s_dot_q<=0) LOG::cout<<"CG: matrix appears indefinite or singular, s_dot_q/s_dot_s="<<s_dot_q/(T)system.Inner_Product(s,s)<<std::endl;
-#endif
         T alpha=s_dot_q?rho/s_dot_q:(T)FLT_MAX;
         x.Copy(alpha,s,x);
         r.Copy(-alpha,q,r);
         rho_old=rho;}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(print_diagnostics) LOG::Stat("cg iterations",iterations);if(iterations_used) *iterations_used=iterations;
     if(print_diagnostics) LOG::cout<<"cg not converged after "<<max_iterations<<" iterations, error = "<<convergence_norm<<std::endl;
-#endif
     return false;
 }
 //#####################################################################

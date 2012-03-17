@@ -5,7 +5,6 @@
 // Class EXR_FILE 
 // Requires OpenEXR (http://www.openexr.com/)
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef _EXR_FILE_h
 #define _EXR_FILE_h
 
@@ -30,5 +29,4 @@ public:
 //#####################################################################
 };
 }
-#endif
 #endif

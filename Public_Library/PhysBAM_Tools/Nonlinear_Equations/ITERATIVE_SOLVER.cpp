@@ -24,9 +24,7 @@ Bisection_Root(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
         T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;}else{a=m;Fa=Fm;}}
 
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Bisection_Root failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return (T).5*(a+b);
 }
@@ -40,9 +38,7 @@ Newton_Root(NONLINEAR_FUNCTION<T(T)>& F,T x0)
     while(abs(Fx)>tolerance && iterations++<max_iterations){
         assert(abs(Fprime)>tolerance);x-=Fx/Fprime;Fx=F(x);Fprime=F.Prime(x);}
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Newton_Root failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x;
 }
@@ -56,9 +52,7 @@ Secant_Root(NONLINEAR_FUNCTION<T(T)>& F,T x0,T x1)
     while(abs(Fx)>tolerance && iterations++<max_iterations){
         assert(abs(Fx-Fx_old)>tolerance);T x_temp=x;x-=Fx*(x-x_old)/(Fx-Fx_old);x_old=x_temp;Fx_old=Fx;Fx=F(x);}
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Secant_Root failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x;
 }
@@ -80,9 +74,7 @@ Bisection_Secant_Root(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
                 T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}
                 x_old=a;x=b;Fx_old=Fa;Fx=Fb;}}} // update secant points
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Bisection_Secant_Root failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x;
 }
@@ -110,9 +102,7 @@ Bisection_Secant_Root_For_Thin_Shells(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
                 else if(Fa*Fm<=0){b=m;Fb=Fm;}else{a=m;Fa=Fm;}
                 x_old=a;x=b;Fx_old=Fa;Fx=Fb;}}} // update secant points
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Bisection_Secant_Root failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x;
 }
@@ -134,9 +124,7 @@ Bisection_Newton_Root(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
                 T m=(T).5*(a+b),Fm=F(m);if(Fa*Fm<=0){b=m;}else{a=m;Fa=Fm;}
                 x=a;Fx=Fa;Fprime=F.Prime(x);}}} // update newton points
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Newton_Secant_Root failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x;
 }
@@ -151,9 +139,7 @@ Golden_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
         if(Fx1>Fx2){a=x1;x1=x2;x2=a+tau*(b-a);Fx1=Fx2;Fx2=F(x2);}
         else{b=x2;x2=x1;x1=a+(1-tau)*(b-a);Fx2=Fx1;Fx1=F(x1);}}
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Golden_Minimum failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return (T).5*(a+b);
 }
@@ -170,9 +156,7 @@ Parabolic_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T x0,T x1,T x2)
         T x=(d0F*(x2+x1)+d1F*(x0+x2)+d2F*(x1+x0))/(2*denominator);
         x0=x1;x1=x2;x2=x;d0=x2-x1;d1=x0-x2;d2=x1-x0;Fx0=Fx1;Fx1=Fx2;Fx2=F(x2);}
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Parabolic_Minimum failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x2;
 }
@@ -203,9 +187,7 @@ Golden_Parabolic_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T a,T b)
                 if(Fx>Fm){b=x;Fb=Fx;}else{a=m;m=x;Fa=Fm;Fm=Fx;} // update golden points
                 x0=a;x1=b;x2=m;Fx0=Fa;Fx1=Fb;Fx2=Fm;}}} // update parabolic points
     if(iterations==max_iterations){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Golden_Parabolic_Minimum failed with max iterations"<<std::endl;
-#endif
         return 0;}
     return x2;
 }
@@ -221,9 +203,7 @@ Steepest_Decent(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
         int iterations_save=iterations;T alpha=Golden_Parabolic_Minimum(line,0,alpha_max);iterations=iterations_save;
         x-=alpha*partial_x;y-=alpha*partial_y;
         partial_x=F.Partial_X(x,y);partial_y=F.Partial_Y(x,y);}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(iterations==max_iterations) LOG::cout<<"Steepest_Decent failed with max iterations"<<std::endl;
-#endif
 }
 //#####################################################################
 // Function Conjugate_Gradient
@@ -243,9 +223,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
             x+=alpha*s_x;y+=alpha*s_y;
             partial_x_old=partial_x;partial_y_old=partial_y;
             partial_x=F.Partial_X(x,y);partial_y=F.Partial_Y(x,y);}}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(iterations==max_iterations) LOG::cout<<"Conjugate_Gradient failed with max iterations"<<std::endl;
-#endif
 }
 //#####################################################################
 // Function Conjugate_Gradient
@@ -284,9 +262,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
             grad_old.Copy(grad);
             F.Gradient(x,grad);
             grad_dot_grad=grad.Dot(grad);}}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(iterations==max_iterations) LOG::cout<<"Conjugate_Gradient failed with max iterations"<<std::endl;
-#endif
     delete &grad;
     delete &grad_old;
     delete &s;

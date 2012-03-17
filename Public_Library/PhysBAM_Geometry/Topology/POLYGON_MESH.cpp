@@ -203,12 +203,10 @@ Opposite_Oriented_Element(const int element) const
                 if(oriented_edge.y) exchange(node1,node2);
                 if(!Oriented_Edge_In_Element(node1,node2,element)){candidate_elements.Remove_Index_Lazy(candidate);goto Next_Candidate;}}
         Next_Candidate:;}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(candidate_elements.m>1){ 
         LOG::cout << "Input: " << elements(element) << std::endl;
         for(int i=0;i<candidate_elements.m;i++)
             LOG::cout << "Candidate: " << elements(candidate_elements(i)) << std::endl;}
-#endif
     if(candidate_elements.m>1) PHYSBAM_FATAL_ERROR();
     if(candidate_elements.m) return candidate_elements(0); else return -1;
 }

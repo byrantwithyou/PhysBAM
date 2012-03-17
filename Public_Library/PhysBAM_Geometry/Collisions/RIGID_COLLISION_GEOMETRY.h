@@ -66,10 +66,8 @@ public:
     void Restore_State(const int state_index) PHYSBAM_OVERRIDE;
     void Average_States(const int state1, const int state2, const int result_state,const T interpolation_distance) PHYSBAM_OVERRIDE;
     void Delete_State(const int state_index) PHYSBAM_OVERRIDE;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT    
     void Read_State(TYPED_ISTREAM& input,const int state_index) PHYSBAM_OVERRIDE;
     void Write_State(TYPED_OSTREAM& output,const int state_index) const PHYSBAM_OVERRIDE;
-#endif
 //#####################################################################
 };
 }

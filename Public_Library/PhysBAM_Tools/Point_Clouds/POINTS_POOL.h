@@ -85,9 +85,7 @@ public:
 private:
     void Allocate_New_Batch()
     {PHYSBAM_ASSERT(!template_particles.array_collection->Size()); // make sure our clones are empty
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"Particle Pool: Allocating another "<<allocation_batch_size<<" particles"<<std::endl;
-#endif
     CLONE_ARRAY<T_PARTICLES>* batch=new CLONE_ARRAY<T_PARTICLES>(template_particles,allocation_batch_size);
     for(int i=0;i<allocation_batch_size;i++) (*batch)(i).array_collection->Preallocate(number_particles_per_cell);
     allocated_batches.Append(batch);

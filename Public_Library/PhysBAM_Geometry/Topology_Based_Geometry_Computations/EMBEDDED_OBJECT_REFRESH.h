@@ -93,9 +93,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
     }
 
     if(eo.embedded_particles.active_indices.m){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Calculate_Boundary_From_Levelset_On_Nodes cannot be called with existing embedded particles"<<std::endl;
-#endif
         PHYSBAM_FATAL_ERROR();}
 
     eo.Initialize_Parents_To_Embedded_Particles_Hash_Table();
@@ -129,12 +127,10 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
     if(!segment_mesh_defined){delete eo.simplicial_object.mesh.segment_mesh;eo.simplicial_object.mesh.segment_mesh=0;}
     if(!embedded_incident_elements_defined){delete eo.embedded_mesh.incident_elements;eo.embedded_mesh.incident_elements=0;}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(verbose){
         LOG::cout << "total particles = " << eo.particles.array_collection->Size() << std::endl;
         LOG::cout << "total elements = " << eo.simplicial_object.mesh.elements.m << std::endl;
         LOG::cout << "total embedded subelements = " << eo.embedded_mesh.elements.m << std::endl;}
-#endif
 }
 }
 }

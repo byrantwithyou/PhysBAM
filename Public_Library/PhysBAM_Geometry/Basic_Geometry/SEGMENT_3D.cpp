@@ -136,9 +136,7 @@ Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v
             else if(abs(u.y) > abs(u.x) && abs(u.y) > abs(u.z)) normal=VECTOR<T,3>(1,0,1);
             else normal=VECTOR<T,3>(1,1,0);
             normal=normal-VECTOR<T,3>::Dot_Product(normal,u)/VECTOR<T,3>::Dot_Product(u,u)*u;normal.Normalize();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout << "                                            PICKING RANDOM NORMAL !!!!!!!!!!!!!!!!!!!!!!!" << std::endl;
-#endif
     }}
 }
 //#####################################################################

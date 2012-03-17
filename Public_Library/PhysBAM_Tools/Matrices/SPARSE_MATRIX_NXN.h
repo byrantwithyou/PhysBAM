@@ -115,15 +115,11 @@ public:
     for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         if(row(i)<=0){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout<<"Diagonal Entry "<<i<<" Contains Non Positive Element: "<<row(i)<<std::endl<<row;
-#endif
             return false;}
         T sum=0;for(int j=0;j<row.number_of_active_indices;j++) sum+=row.x[j];
         if(sum<-tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout<<"Sum Of Row "<<i<<" Is Negative: "<<sum<<std::endl<<row;
-#endif
             return_value=false;}}
     return return_value;}
 
@@ -198,10 +194,8 @@ public:
         Gauss_Seidel_Single_Iteration(x,b);
         T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual<tolerance) return;}}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Write_Row_Lengths()
     {for(int i=0;i<n;i++)LOG::cout<<A(i)->number_of_active_indices<<" ";LOG::cout<<std::endl;}
-#endif
 
     template<class RW> void Read(std::istream& input)
     {Clean_Memory();Read_Binary<RW>(input,n);A.Resize(n);

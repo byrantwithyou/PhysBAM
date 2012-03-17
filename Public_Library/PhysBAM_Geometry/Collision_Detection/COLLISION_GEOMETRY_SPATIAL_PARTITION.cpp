@@ -96,10 +96,8 @@ Compute_Voxel_Size(const SPATIAL_PARTITION_VOXEL_SIZE_HEURISTIC heuristic,const 
     else PHYSBAM_FATAL_ERROR();
     if(voxel_size==0) voxel_size=(T)1; // doesn't matter what value
     one_over_voxel_size=(T)1/voxel_size;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"Collision Body Spatial Partition voxel size="<<voxel_size<<" heuristic="<<heuristic<<" # of boxes="<<number_of_boxes<<" voxel_size_scale_factor="<<voxel_size_scale_factor
         <<std::endl;
-#endif
 }
 //#####################################################################
 // Function Reinitialize

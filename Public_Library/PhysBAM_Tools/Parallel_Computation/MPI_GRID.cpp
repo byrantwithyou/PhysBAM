@@ -38,9 +38,7 @@ MPI_GRID(T_GRID& local_grid_input,const int number_of_ghost_cells_input,const bo
     LOG::SCOPE scope("MPI INITIALIZE","Initializing MPI");
     if(!group) number_of_processes=MPI::COMM_WORLD.Get_size();
     else number_of_processes=group->Get_size();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"number of processes = "<<number_of_processes<<std::endl;
-#endif
 
     // extract global grid and divide among processes
     global_grid=local_grid.Get_Regular_Grid(); // Split_Grid and Initialize_Communicator currently assume grid is non-MAC
@@ -143,19 +141,15 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
             process_ranks(node)=process_ranks(wrapped_node);}
         // allocate communicator
         *comm=group?MPI::COMM_WORLD.Create(*group):MPI::COMM_WORLD.Dup();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout << "After Create comm " << std::endl;
-#endif
     }
     all_coordinates.Resize(number_of_processes);
     for(NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next())
         all_coordinates(process_ranks(iterator.Node_Index())+1)=iterator.Node_Index();
     rank=comm->Get_rank();
     coordinates=all_coordinates(rank+1);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"process_ranks = \n"<<process_ranks<<std::endl;
     LOG::cout<<"coordinates = "<<coordinates<<std::endl;
-#endif
 }
 template<class T> static void Fill_Process_Ranks(GRID<VECTOR<T,1> >& process_grid,ARRAY<int,VECTOR<int,1> >& process_ranks,ARRAY<int>& axes)
 {
@@ -194,14 +188,12 @@ Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls)
     for(int i=0;i<T_GRID::number_of_neighbors_per_node;i++)
         if(side_neighbor_ranks(i)!=MPI::PROC_NULL) domain_walls(i/2)(i&1?0:1)=false;
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"mpi world rank = "<<MPI::COMM_WORLD.Get_rank()<<std::endl;
     LOG::cout<<"mpi cartesian rank = "<<rank<<std::endl;
     for(int axis=0;axis<T_GRID::dimension;axis++)
         LOG::cout<<"mpi boundaries "<<axis<<" = "<<boundaries(axis)(coordinates[axis])<<" to "<<boundaries(axis)(coordinates[axis]+1)<<std::endl;
     LOG::cout<<"mpi topology = "<<process_grid.Domain_Indices()<<std::endl;
     LOG::cout<<"mpi process ranks = \n"<<process_ranks;
-#endif
 }
 //#####################################################################
 // Function Neighbor
@@ -258,9 +250,7 @@ Split_Grid(const GRID<VECTOR<T,2> >& global_grid,const VECTOR<int,2>& processes_
             LOG::cerr<<"Don't know how to divide domain in both directions."<<std::endl;PHYSBAM_NOT_IMPLEMENTED();}
         count.y=number_of_processes/count.x;}
     PHYSBAM_ASSERT(count.x*count.y==number_of_processes);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"dividing domain into "<<count.x<<" by "<<count.y<<" processor grid"<<std::endl;
-#endif
     boundaries.Resize(1);
     Split_Dimension(m,count.x,boundaries(0));
     Split_Dimension(n,count.y,boundaries(1));
@@ -287,9 +277,7 @@ Split_Grid(const GRID<VECTOR<T,3> >& global_grid,const VECTOR<int,3>& processes_
                 if(surface_area<minimum_surface_area){count=test_count;minimum_surface_area=surface_area;}}}
         if(minimum_surface_area==INT_MAX){LOG::cerr<<"Don't know how to divide domain in all directions."<<std::endl;PHYSBAM_NOT_IMPLEMENTED();}}
     PHYSBAM_ASSERT(count.x*count.y*count.z==number_of_processes);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"dividing domain into "<<count.x<<" by "<<count.y<<" by "<<count.z<<" processor grid"<<std::endl;
-#endif
     boundaries.Resize(3);
     Split_Dimension(m,count.x,boundaries(0));
     Split_Dimension(n,count.y,boundaries(1));

@@ -31,21 +31,15 @@ bool Find_First_Segment_Triangle_Intersection(TRIANGULATED_SURFACE<T>& ts,const 
     const bool update_bounding_boxes)
 {
     if(ts.Segment_Triangle_Intersection(test_segment_mesh,X,thickness_over_2,update_bounding_boxes)){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"SELF INTERSECTIONS !"<<std::endl;
-#endif
         return true;}
     else{
         for(int loops=0;loops<max_coarsening_attempts;loops++){
             T distance=(1<<loops)*thickness_over_2;
             if(ts.Segment_Triangle_Intersection(test_segment_mesh,X,distance,false)){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout<<"collision at a proximity < "<<distance<<std::endl;
-#endif
                 return true;}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             else LOG::cout<<"ok at a proximity = "<<distance<<std::endl;
-#endif
     }}
     return false;
 }

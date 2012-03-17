@@ -136,9 +136,7 @@ Stop(const int id)
 void TIMER::
 Print_Stats(const int id,const char* str)
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"Total elapsed time for "<<str<<" is "<<timers(id).accumulator*resolution*.001<<" s."<<std::endl;
-#endif
 }
 //#####################################################################
 }

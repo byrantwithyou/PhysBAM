@@ -2,7 +2,6 @@
 // Copyright 2008, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
@@ -307,4 +306,3 @@ template class MOV_WRITER<float>;
 template class MOV_WRITER<double>;
 #endif
 }
-#endif

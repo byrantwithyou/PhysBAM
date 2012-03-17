@@ -132,10 +132,8 @@ template<class TV> void COLLISION_GEOMETRY<TV>::Save_State(const int state_index
 template<class TV> void COLLISION_GEOMETRY<TV>::Restore_State(const int state_index){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void COLLISION_GEOMETRY<TV>::Average_States(const int state1,const int state2,const int result_state,const T interpolation_distance){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void COLLISION_GEOMETRY<TV>::Delete_State(const int state_index){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class TV> void COLLISION_GEOMETRY<TV>::Read_State(TYPED_ISTREAM& input,const int state_index){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void COLLISION_GEOMETRY<TV>::Write_State(TYPED_OSTREAM& output,const int state_index) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-#endif
 //#####################################################################
 template class COLLISION_GEOMETRY<VECTOR<float,1> >;
 template class COLLISION_GEOMETRY<VECTOR<float,2> >;

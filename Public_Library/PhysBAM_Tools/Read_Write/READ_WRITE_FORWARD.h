@@ -4,7 +4,6 @@
 //#####################################################################
 // Header READ_WRITE_FORWARD
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __READ_WRITE_FORWARD__
 #define __READ_WRITE_FORWARD__
 
@@ -33,5 +32,4 @@ template<class T> class PPM_FILE;
 template<class T> class RGB_FILE;
 
 }
-#endif
 #endif

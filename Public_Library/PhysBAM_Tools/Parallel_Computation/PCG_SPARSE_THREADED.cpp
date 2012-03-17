@@ -51,9 +51,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     b_interior-=temp_interior;
     if(enforce_compatibility) b_interior-=(T)(Global_Sum((T)b_interior.Sum_Double_Precision(),tid)/global_n);
     if(Global_Max(b_interior.Max_Abs())<=global_tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
-#endif
         return;}
 
     SPARSE_MATRIX_FLAT_NXN<T>* C=0;
@@ -89,14 +87,12 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(enforce_compatibility) b_interior-=(T)(Global_Sum((T)b_interior.Sum_Double_Precision(),tid)/global_n);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T residual=Global_Max(b_interior.Max_Abs());
 
         // check for convergence
         if(show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
         if(iteration==desired_iterations-1){if(show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
-#endif
     }
     delete C;
 }
@@ -129,9 +125,7 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
     threaded_iterator.template Run<VECTOR_ND<T>&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Max,b,local_sum);
     T max_val=0;for(int i=0;i<num_intervals;i++) max_val=max(max_val,local_sum(i));
     if(max_val<=global_tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
-#endif
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
@@ -172,7 +166,6 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
             for(int i=0;i<num_intervals;i++) sum+=local_sum(i);
             threaded_iterator.template Run<VECTOR_ND<T>&,T>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Subtract,b,sum/global_n);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         threaded_iterator.template Run<VECTOR_ND<T>&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Threaded_Max,b,local_sum);
         T residual=0;for(int i=0;i<num_intervals;i++) residual=max(residual,local_sum(i));
 
@@ -180,7 +173,6 @@ Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
         if(show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
         if(iteration==desired_iterations){if(show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
-#endif
     }
     delete C;
 }
@@ -214,9 +206,7 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
     threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Max,domain_index,all_interior_indices,b_interior,local_sum);
     T max_val=0;for(int i=0;i<num_domains;i++) max_val=max(max_val,local_sum(i));
     if(max_val<=global_tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
-#endif
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
@@ -252,7 +242,6 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
             //threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,T>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Distribute,domain_index,all_interior_indices,b_interior,sum/global_n);}
             for(int i=0;i<num_domains;i++) b_interior(i)-=sum/global_n;}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,ARRAY<VECTOR_ND<T> >&,ARRAY<T>&>(*this,&PCG_SPARSE_THREADED<TV>::Solve_Max,domain_index,all_interior_indices,b_interior,local_sum);
         T residual=0;for(int i=0;i<num_domains;i++) residual=max(residual,local_sum(i));
 
@@ -260,7 +249,6 @@ Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threa
         if(show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
         if(iteration==desired_iterations){if(show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
-#endif
     }
     for(int i=0;i<num_domains;i++) delete C(i);
 }

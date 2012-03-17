@@ -32,9 +32,7 @@ public:
     int new_percent_done=100*done/total;
     if(new_percent_done>percent_done){
         percent_done=new_percent_done;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(print){LOG::cout<<percent_done<<"% "<<std::flush;if(percent_done==100) LOG::cout<<std::endl;}
-#endif
         return true;}
     return false;}
 

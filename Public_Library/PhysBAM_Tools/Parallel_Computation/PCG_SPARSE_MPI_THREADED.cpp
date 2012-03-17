@@ -56,9 +56,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     b_interior-=temp_interior;
     if(pcg.enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision(),tid)/global_n);
     if(Global_Max(b_interior.Max_Abs())<=global_tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(pcg.show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
-#endif
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
@@ -93,14 +91,12 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(pcg.enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision(),tid)/global_n);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T residual=Global_Max(b_interior.Max_Abs());
 
         // check for convergence
         if(pcg.show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(pcg.show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
         if(iteration==desired_iterations-1){if(pcg.show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
-#endif
     }
     if(pcg.show_results) LOG::Time("Done");
     Fill_Ghost_Cells(x);

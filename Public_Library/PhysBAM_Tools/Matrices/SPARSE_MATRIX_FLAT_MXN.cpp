@@ -473,10 +473,8 @@ Create_NXN_Matrix()
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Write_Row_Lengths()
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     for(int i=0;i<m;i++) LOG::cout<<offsets(i+1)-offsets(i)<<" ";
     LOG::cout<<std::endl;
-#endif
 }
 //#####################################################################
 // Function Print_Row
@@ -484,10 +482,8 @@ Write_Row_Lengths()
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Print_Row(const int row)
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     for(int i=0;i<n;i++) if(Element_Present(row,i)) LOG::cout<<"Col: "<<i<<" Val: "<<(*this)(row,i)<<",  ";
     LOG::cout<<std::endl;
-#endif
 }
 //#####################################################################
 // Function operator<<

@@ -122,21 +122,15 @@ Find_First_Segment_Segment_Intersection(const SEGMENT_MESH& test_segment_mesh,AR
     const bool update_bounding_boxes)
 {
     if(Segment_Segment_Intersection(test_segment_mesh,X,thickness_over_2,update_bounding_boxes)){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"SELF INTERSECTIONS !"<<std::endl;
-#endif
         return true;}
     else{
         for(int loops=0;loops<max_coarsening_attempts;loops++){
             T distance=pow((T)2,loops)*thickness_over_2;
             if(Segment_Segment_Intersection(test_segment_mesh,X,distance,false)){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout<<"collision at a proximity < "<<distance<<std::endl;
-#endif
                 return true;}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             else LOG::cout<<"ok at a proximity = "<<distance<<std::endl;
-#endif
     }}
     return false;
 }

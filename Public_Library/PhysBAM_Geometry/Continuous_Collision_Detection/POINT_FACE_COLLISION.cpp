@@ -99,9 +99,7 @@ Point_Face_Collision(const SEGMENT_2D<T>& seg_fault,const VECTOR<T,2>& x,const V
     else{
         quadratic.Compute_Roots_In_Interval(0,dt);
         if(quadratic.roots==0)return false;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         else if(quadratic.roots==-1){LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;collision_time_temp=0;}
-#endif
         else if(quadratic.roots==1)collision_time_temp=quadratic.root1;
         else collision_time_temp=quadratic.root1;}
     SEGMENT_2D<double> segment((VECTOR<double,2>)seg_fault.x1+collision_time_temp*(VECTOR<double,2>)v1,(VECTOR<double,2>)seg_fault.x2+collision_time_temp*(VECTOR<double,2>)v2);

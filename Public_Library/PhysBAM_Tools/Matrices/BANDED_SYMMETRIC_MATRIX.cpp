@@ -120,7 +120,6 @@ Eigenvalues(ARRAY<T>& eigenvalues) const
 template<class T,int bandwidth> void BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
 Print_Spectral_Information() const
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(!Size()){
         LOG::cout<<"eigenvalue range = null, condition = null"<<std::endl;
         return;}
@@ -129,7 +128,6 @@ Print_Spectral_Information() const
     T condition=lambda_min*lambda_max>0?Robust_Divide(maxabs(lambda_min,lambda_max),minabs(lambda_min,lambda_max)):0;
     LOG::cout<<"eigenvalue range = "<<lambda_min<<" "<<lambda_max<<", condition = "<<condition<<std::endl;
     Sort(D);LOG::cout<<"eigenvalues = "<<D;
-#endif
 }
 //#####################################################################
 template class BANDED_SYMMETRIC_MATRIX<float,3>;

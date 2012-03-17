@@ -29,7 +29,6 @@ public:
 
     virtual ~TEST_BASE(){}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     virtual void Report_Test_Result(TEST_RESULT result,int n) const
     {LOG::cout<<"Test "<<Identify_Test(n)<<(result==success?" PASSED.":result==failure?" FAILED.":" INCONCLUSIVE.")<<std::endl;}
 
@@ -43,19 +42,6 @@ public:
     {if(result==registry_failure) Report_Registry_Failure(suite_name);
     else if(result==out_of_range) test->Report_Out_Of_Range(n);
     else test->Report_Test_Result(result,n);}
-#else
-    virtual void Report_Test_Result(TEST_RESULT result,int n) const
-    {}
-
-    virtual void Report_Out_Of_Range(int n) const
-    {}
-
-    static void Report_Registry_Failure(std::string suite_name)
-    {}
-
-    static void Report_Result(TEST_RESULT result,const std::string& suite_name,int n,TEST_BASE* test)
-    {}
-#endif
 
     static TEST_RESULT Merge_Results(const TEST_RESULT a, const TEST_RESULT b)
     {if(a==failure || b==failure) return failure;

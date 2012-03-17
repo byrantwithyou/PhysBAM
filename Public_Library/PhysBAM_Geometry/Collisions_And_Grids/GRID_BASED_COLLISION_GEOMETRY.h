@@ -85,10 +85,8 @@ public:
     bool Push_Out_Point(TV& X,const T collision_distance,const bool check_particle_crossover,bool& particle_crossover,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Occupied_Block(const T_BLOCK& block) const;
     bool Swept_Occupied_Block(const T_BLOCK& block) const;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT    
     void Read_State(TYPED_ISTREAM& input,const int state_index);
     void Write_State(TYPED_OSTREAM& output,const int state_index) const;
-#endif    
 //#####################################################################
 };
 }

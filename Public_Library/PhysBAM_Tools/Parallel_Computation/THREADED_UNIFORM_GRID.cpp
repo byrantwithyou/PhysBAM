@@ -57,9 +57,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     if(skip_initialization) return;
 
     if(tid==1) LOG::SCOPE scope("THREADED INITIALIZE","Initializing Threading");
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(tid==1) LOG::cout<<"number of processes = "<<number_of_processes<<std::endl;
-#endif
 
 #ifdef USE_PTHREADS
     if(tid==1){
@@ -107,10 +105,8 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     for(NODE_ITERATOR iterator(process_grid);iterator.Valid();iterator.Next())
         all_coordinates(process_ranks(iterator.Node_Index())+1)=iterator.Node_Index();
     coordinates=all_coordinates(tid);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"process_ranks = \n"<<process_ranks<<std::endl;
     LOG::cout<<"coordinates = "<<coordinates<<std::endl;
-#endif
     
     side_neighbor_ranks.Resize(T_GRID::number_of_neighbors_per_node);
     side_neighbor_directions.Resize(T_GRID::number_of_neighbors_per_node);
@@ -178,13 +174,11 @@ Initialize(VECTOR<VECTOR<bool,2>,T_GRID::dimension>& domain_walls)
     for(int i=0;i<T_GRID::number_of_neighbors_per_node;i++)
         if(side_neighbor_ranks(i)!=-1) domain_walls(i/2)(i&1?0:1)=false;
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"rank = "<<rank<<std::endl;
     for(int axis=0;axis<T_GRID::dimension;axis++)
         LOG::cout<<"boundaries "<<axis<<" = "<<boundaries(axis)(coordinates[axis])<<" to "<<boundaries(axis)(coordinates[axis]+1)<<std::endl;
     LOG::cout<<"topology = "<<process_grid.Domain_Indices()<<std::endl;
     LOG::cout<<"process ranks = \n"<<process_ranks;
-#endif
 }
 //#####################################################################
 // Function Synchronize_Dt

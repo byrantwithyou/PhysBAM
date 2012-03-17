@@ -101,13 +101,11 @@ public:
 //#####################################################################
 };
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class TV> std::ostream &operator<<(std::ostream &output,const RAY<TV> &ray)
 {output<<"endpoint = "<<ray.endpoint<<", direction = "<<ray.direction<<", ";
 if(ray.semi_infinite) output<<"semi infinite";else output<<"t_max = "<<ray.t_max;output<<std::endl;
 return output;
 }
-#endif
 
 }
 #endif

@@ -26,7 +26,6 @@
 // Basically in order for commandline parsing to be less ambiguous, extra arguments can come either before the first parameter
 // or after a special delimiter '--' at the end of the commandline.
 //##################################################################### 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __PARAMETER_LIST__
 #define __PARAMETER_LIST__
 
@@ -166,5 +165,4 @@ private:
     bool Find_And_Remove_From_Commandline_Parameter_Map(const std::string& long_name,const std::string& short_name,std::string& value_string);
 };
 }
-#endif
 #endif

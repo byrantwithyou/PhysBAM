@@ -2,7 +2,6 @@
 // Copyright 2008, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __MOV_FILE__
 #define __MOV_FILE__
 
@@ -30,5 +29,4 @@ public:
 //#####################################################################
 };
 }
-#endif
 #endif

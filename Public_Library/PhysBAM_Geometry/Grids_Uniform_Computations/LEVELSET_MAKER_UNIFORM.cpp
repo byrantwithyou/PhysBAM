@@ -142,9 +142,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             ARRAY<int> region_size(number_of_colors);
             for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(colors(i,j,k)>0) region_size(colors(i,j,k))++;
             int max_region_size=region_size.Max();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
-#endif
             // flip smaller regions back to positive sign
             for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(colors(i,j,k)>0 && region_size(colors(i,j,k))<max_region_size) phi(i,j,k)*=-1;}
     }
@@ -153,9 +151,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         ARRAY<int,TV_INT> colors(grid.Domain_Indices());colors.Fill(-1);
         FLOOD_FILL_3D flood_fill;flood_fill.Optimize_Fill_For_Single_Cell_Regions(true);
         int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked_x,edge_is_blocked_y,edge_is_blocked_z);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"(got "<<number_of_colors<<" colors)... "<<std::endl;
-#endif
         if(number_of_colors==1 && !phi_offset){ // there is only one color. check if the whole domain is inside or outside then return
             if(triangulated_surface.Inside(grid.X(1,1,1))) phi.Fill(-FLT_MAX);
             else phi.Fill(FLT_MAX);
@@ -168,9 +164,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             ARRAY<TV_INT> path_nodes;
             bool path_exists=flood_fill.Path_Between_Nodes(RANGE<TV_INT>(1,grid.counts.x,1,grid.counts.y,1,grid.counts.z),path_start_node,path_end_node,
                                                            edge_is_blocked_x,edge_is_blocked_y,edge_is_blocked_z,&path_nodes);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose){LOG::cout<<"Path between "<<path_start_node<<" and "<<path_end_node<<" "<<(path_exists?"exists":"doesn't exist")<<std::endl;}
-#endif
             ARRAY<bool,TV_INT> path(grid.Domain_Indices());
             for(int i=0;i<path_nodes.m;i++){path(path_nodes(i))=true;}
             FILE_UTILITIES::Write_To_File<T>("path.debug",path);}*/
@@ -198,9 +192,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
             ARRAY<int> region_size(number_of_colors);
             for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(colors(i,j,k)>0 && color_is_inside(colors(i,j,k))) region_size(colors(i,j,k))++;
             int max_region_size=region_size.Max();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"Keeping only largest inside region (max region size = "<<max_region_size<<")... "<<std::flush;
-#endif
             for(int i=0;i<number_of_colors;i++) if(color_is_inside(i) && region_size(i)<max_region_size) color_is_inside(i)=false;}
         if(flip_sign_if_corners_are_inside){ // If the majority of corners are labelled as inside then we flip signs
             int num_corners_inside=(int)color_is_inside(colors(1,1,1))+(int)color_is_inside(colors(1,1,grid.counts.z))+
@@ -208,9 +200,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
                                    (int)color_is_inside(colors(grid.counts.x,1,1))+(int)color_is_inside(colors(grid.counts.x,1,grid.counts.z))+
                                    (int)color_is_inside(colors(grid.counts.x,grid.counts.y,1))+(int)color_is_inside(colors(grid.counts.x,grid.counts.y,grid.counts.z));
             if(num_corners_inside>4){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 if(verbose) LOG::cout<<"Majority of corners are inside -- flipping sign!"<<std::endl;
-#endif
                 for(int i=0;i<number_of_colors;i++) color_is_inside(i)=!color_is_inside(i);}}
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) if(color_is_inside(colors(i,j,k))) phi(i,j,k)*=-1;}
 
@@ -260,9 +250,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         FILE_UTILITIES::Write_To_File<T>("levelset.debug",levelset);
         if(compute_velocity)FILE_UTILITIES::Write_To_File<T>("velocity.debug",velocity);}*/
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(verbose) LOG::cout<<"Done"<<std::endl;
-#endif
 
     // delete acceleration structures if defined in this function
     if(!incident_triangles_defined){delete triangulated_surface.mesh.incident_elements;triangulated_surface.mesh.incident_elements=0;}

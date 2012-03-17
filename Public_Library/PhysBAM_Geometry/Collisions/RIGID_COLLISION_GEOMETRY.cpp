@@ -314,7 +314,6 @@ template<class TV> void RIGID_COLLISION_GEOMETRY_BASE<TV>::
 Delete_State(const int state_index)
 {
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################
 // Function Read_State
 //#####################################################################
@@ -332,7 +331,6 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 {
     Write_Binary(output,saved_states(state_index));
 }
-#endif
 //#####################################################################
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<float,1> >;
 template class RIGID_COLLISION_GEOMETRY_BASE<VECTOR<float,2> >;

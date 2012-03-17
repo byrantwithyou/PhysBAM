@@ -65,9 +65,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
             for(int index=A_array(p).offsets(i);index<A_array(p).offsets(i+1);index++)
                 global_A(global_i,partition_array(p).Translate_Index(A_array(p).A(index).j))=A_array(p).A(index).a;}
         // solve linear system
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(pcg.show_results) LOG::cout<<"solving "<<global_A.n<<" cells to tolerance "<<tolerance<<std::endl;
-#endif
         assert(global_A.Symmetric());global_A.Positive_Diagonal_And_Nonnegative_Row_Sum((T)1e-4);
         pcg.Solve(global_A,global_x,global_b,q,s,r,k,z,tolerance);
         // take apart result
@@ -112,9 +110,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
     A.Times(x,temp);b_interior-=temp_interior;
     if(pcg.enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision())/global_n);
     if(Global_Max(b_interior.Max_Abs())<=global_tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(pcg.show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
-#endif
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
@@ -147,14 +143,12 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(pcg.enforce_compatibility) b_interior-=(T)(Global_Sum(b_interior.Sum_Double_Precision())/global_n);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T residual=Global_Max(b_interior.Max_Abs());
 
         // check for convergence
         if(pcg.show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(pcg.show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
         if(iteration==desired_iterations){if(pcg.show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
-#endif
     }
 
     Fill_Ghost_Cells(x);
@@ -188,9 +182,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
     A.Times(x_global,temp);b_local-=temp;
     if(pcg.enforce_compatibility) b_local-=(T)(Global_Sum(b_local.Sum_Double_Precision())/global_n);
     if(Global_Max(b_local.Max_Abs())<=global_tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(pcg.show_results) LOG::cout<<"NO ITERATIONS NEEDED"<<std::endl;
-#endif
         return;}
 
     // find an incomplete cholesky preconditioner - actually an LU that saves square roots, and an inverted diagonal to save on divides
@@ -223,14 +215,12 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
         if(pcg.enforce_compatibility) b_local-=(T)(Global_Sum(b_local.Sum_Double_Precision())/global_n);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T residual=Global_Max(b_local.Max_Abs());
 
         // check for convergence
         if(pcg.show_residual) LOG::cout<<residual<<std::endl;
         if(residual<=global_tolerance){if(pcg.show_results) LOG::cout<<"NUMBER OF ITERATIONS = "<<iteration<<std::endl;break;}
         if(iteration==desired_iterations-1){if(pcg.show_results) LOG::cout<<"DID NOT CONVERGE IN "<<iteration<<" ITERATIONS"<<std::endl;break;}
-#endif
     }
 
     // Copy stuff back into x_local

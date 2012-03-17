@@ -13,7 +13,6 @@ namespace PhysBAM{
 //#####################################################################
 void Debug_Print_Helper(const char* prefix,...)
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<prefix<<": ";
     va_list marker;va_start(marker,prefix);
     bool first=true;
@@ -24,7 +23,6 @@ void Debug_Print_Helper(const char* prefix,...)
         LOG::cout<<name<<"="<<value;}
     va_end(marker);
     LOG::cout<<std::endl;
-#endif
 }
 //#####################################################################
 }

@@ -65,9 +65,7 @@ public:
     int Add_Rigid_Geometry(RIGID_GEOMETRY<TV>* rigid_geometry,STREAM_TYPE stream_type,const std::string& basename,const T scaling_factor,
         const bool read_simplicial_boundary,const bool read_implicit_object,const bool read_simplicial_interior,const bool read_rgd_file);
     bool Register_Analytic_Replacement_Structure(const std::string& filename,const T scaling_factor,STRUCTURE<TV>* structure); // passing in zero skips reading
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     bool Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_id,const std::string& filename,const T scaling_factor,const TV& center);
-#endif
     void Destroy_Unreferenced_Geometry();
     void Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,ARRAY<int>* needs_init=0,ARRAY<int>* needs_destroy=0);
     void Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const;

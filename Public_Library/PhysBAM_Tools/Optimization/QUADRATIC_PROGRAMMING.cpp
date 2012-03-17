@@ -46,12 +46,10 @@ Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>
         for(int j=0;j<N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
         givens_rotate(b(i),b(i+1),v.x,v.y);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(check_last_column && abs(A(A.n,A.n))<tolerance){
         LOG::cout << "Found near-zero on diagonal during attempt to update upper triangular matrix!" << std::endl;
         LOG::cout << A << std::endl;
         /*PHYSBAM_FATAL_ERROR();*/}
-#endif
 }
 //####################################################################################
 // Find_Optimal_Solution
@@ -69,11 +67,9 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
 
     int iteration=1;
     for(;;iteration++){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(debug_optimization){
             LOG::cout<<"************* ITERATION "<<iteration<< ":\nB:\n"<<B<<"\nS:\n"<<S<<"\nN:\n"<<N<<"\nb:\n"<<b<<"\nb_N:\n"<<b_N<<std::endl;
             LOG::cout<<"permute_B:\n"<<permute_B<<"\npermute_S:\n"<<permute_S<<"\npermute_N:\n"<<permute_N<<"\n\nx_B:\n"<<x_B<<"\nx_S:\n"<<x_S<<std::endl;}
-#endif
 
         // update permute and full x vector
         permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
@@ -96,9 +92,7 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             VECTOR_ND<T> p_S=D_hat_times_Z.Normal_Equations_Solve(rhs);
             VECTOR_ND<T> p_B=negative_B_inverse_S*p_S;
            
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(debug_optimization) LOG::cout<<"Got p_B\n"<<p_B<<"\nGot p_S\n"<<p_S<<std::endl;
-#endif
 
             // check ones in B
             for(int i=0;i<B.n;i++) if(abs(p_B(i)*alpha)>=step_tolerance){
@@ -114,9 +108,7 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
                     alpha=max((T)0,(x_min(permute_S(i)).y-x_S(i))/p_S(i));limiting_index=-i;limiting_value=x_min(permute_S(i)).y;}}
 
             assert(alpha>=0);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(debug_optimization) LOG::cout << "alpha="<<alpha<<", limiting_index="<<limiting_index<<", limiting_value="<<limiting_value<<std::endl;
-#endif
 
             x_B+=alpha*p_B;x_S+=alpha*p_S;
 
@@ -131,20 +123,16 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             VECTOR_ND<T> pi=B.Transpose_Lower_Triangular_Solve(gradient_B);
             VECTOR_ND<T> sigma(gradient_N-N.Transpose_Times(pi));
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(debug_optimization) LOG::cout<<"gradient_B =\n"<<gradient_B<<"\ngradient_N =\n"<<gradient_N<<"\npi =\n"<<pi<<"\nsigma =\n"<<sigma<<std::endl;
-#endif
             
             int index_to_release=-1;T sigma_to_release=0;
             for(int i=0;i<N.n;i++) if((sigma(i)<0 && x_min(permute_N(i)).x && b_N(i)==x_min(permute_N(i)).y) ||
                                        (sigma(i)>0 && x_max(permute_N(i)).x && b_N(i)==x_max(permute_N(i)).y))
                 if(abs(sigma(i))>sigma_to_release){sigma_to_release=abs(sigma(i));index_to_release=i;}
             
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(index_to_release<0){if(debug_optimization)LOG::cout << "QP: Nothing to release!" << std::endl;break;} // TODO: how handle this case?
 
             if(debug_optimization) LOG::cout << "Releasing index " << index_to_release << " (muscle " << permute_N(index_to_release) << ")" << std::endl;
-#endif
             
             // move column of N (index_to_release) into S (update S and permute_S)
             S.Resize(S.m,S.n+1);x_S.Resize(S.n);permute_S.Resize(S.n);
@@ -156,9 +144,7 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
         else if(limiting_index<0){ // constrain variable from S
             limiting_index*=-1; // make positive
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(debug_optimization) LOG::cout << "Constraining S index " << limiting_index << " (muscle " << permute_S(limiting_index) << ") to " << limiting_value << std::endl;
-#endif
 
             // move column of S (limiting_index) into N (update N, b_N, and permute_N)
             N.Resize(N.m,N.n+1);b_N.Resize(N.n);permute_N.Resize(N.n);
@@ -171,10 +157,8 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             assert(S.n); // S should not be empty if we got to this case (we'd be doing lagrange multipliers instead)
 
             if(debug_optimization){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout << "Constraining B index " << limiting_index << " (muscle " << permute_B(limiting_index) << ") to " << limiting_value << std::endl;
                 LOG::cout << "BEFORE COLUMN SWITCH\nB:\n" << B << "\nS:\n" << S << "\nN:\n" << N << std::endl;
-#endif
             }
 
             // move column from B to N
@@ -184,25 +168,19 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
 
             // re-factor B (ignoring last column, which we will attempt to fill from S next)
             Update_Upper_Triangular_Matrix_After_Column_Shift(B,S,N,b,limiting_index,tolerance,false); // make upper triangular again
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(debug_optimization) LOG::cout << "AFTER COLUMN B->N AND REFACTORING B\nB:\n" << B << "\nS:\n" << S << "\nN:\n" << N << std::endl;
-#endif
 
             // now choose the best column from S to stick in last column of B
             int s_column=-1;T largest_s_diagonal=0;
             for(int j=0;j<S.n;j++)if(abs(S(S.m,j))>largest_s_diagonal){s_column=j;largest_s_diagonal=abs(S(S.m,j));}
             if(s_column<0){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout<<"Bottom row of B,S is all zero!"<<std::endl;
-#endif
                 break;}
 
             // copy column from S to B and remove from S
             for(int i=0;i<B.n;i++)B(i,B.n)=S(i,s_column);permute_B(B.n)=permute_S(s_column);x_B(B.n)=x_S(s_column);
             Remove_Column(s_column,S,permute_S,&x_S);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(debug_optimization) LOG::cout << "AFTER MOVING S COLUMN ("<<s_column<<") TO B\nB:\n" << B << "\nS:\n" << S << "\nN:\n" << N << std::endl;
-#endif
         }
     }
 
@@ -210,11 +188,9 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
     permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
     x_unpermuted=x.Unpermute(permute);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(debug_optimization) LOG::cout << "Result x_B:\n"<<x_B<<"\nResult x_S:\n"<<x_S<<"\nResult permute:\n"<<permute<<"\nResult x:\n"<<x<<std::endl;
 
     LOG::cout << "QP finished in " << iteration << " iterations" << std::endl;
-#endif
 }
 //####################################################################################
 template class QUADRATIC_PROGRAMMING<float>;

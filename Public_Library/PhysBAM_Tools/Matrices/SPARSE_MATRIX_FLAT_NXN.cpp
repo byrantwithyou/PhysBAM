@@ -221,15 +221,11 @@ Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance) const
     bool return_value=true;
     for(int i=0;i<n;i++){
         if((*this)(i,i)<=0){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout<<"diagonal entry "<<i<<" contains nonpositive element: "<<(*this)(i,i)<<std::endl;
-#endif
             return false;}
         T sum=0;for(int index=offsets(i);index<offsets(i+1);index++)sum+=A(index).a;
         if(sum<-tolerance){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout<<"sum of row "<<i<<" is negative: "<<sum<<std::endl;
-#endif
             return_value=false;}}
     return return_value;
 }
@@ -349,9 +345,7 @@ Gauss_Seidel_Solve(VECTOR_ND<T>& x,const VECTOR_ND<T>& b,const T tolerance,const
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Write_Row_Lengths()
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     for(int i=0;i<n;i++)LOG::cout<<offsets(i+1)-offsets(i)<<" ";LOG::cout<<std::endl;
-#endif
 }
 //#####################################################################
 // Function Print_Row
@@ -359,10 +353,8 @@ Write_Row_Lengths()
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Print_Row(const int row)
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     for(int i=0;i<n;i++)if(Element_Present(row,i))LOG::cout<<"Col: "<<i<<" Val: "<<(*this)(row,i)<<",  ";
     LOG::cout<<std::endl;
-#endif
 }
 //#####################################################################
 // Function Reset

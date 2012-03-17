@@ -46,11 +46,7 @@ MPI_WORLD()
 MPI_WORLD::
 MPI_WORLD(int& argc,char**& argv)
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     Initialize(PARSE_ARGS::Find_And_Remove("-mpi",argc,argv));
-#else
-    Initialize(false);
-#endif
 }
 //#####################################################################
 // Function Initialize
@@ -71,9 +67,7 @@ Initialize(bool force_mpi)
     bool check_version=!getenv("PHYSBAM_SKIP_MPI_VERSION_CHECK");
 #ifdef LAM_MPI
     if(getenv("LAMRANK")){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Detected LAM Runtime Environment"<<std::endl;
-#endif
         use_mpi=true;
         if(check_version){
             FILE* laminfo=popen("laminfo -version lam full","r");
@@ -87,9 +81,7 @@ Initialize(bool force_mpi)
     if(getenv("LAMRANK"))
         PHYSBAM_FATAL_ERROR("MPI version check failed: compiled with OpenMPI, run in LAM/MPI");
     if(getenv("OMPI_MCA_universe") || getenv("OMPI_UNIVERSE_SIZE")){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Detected OpenMPI Runtime Environment"<<std::endl;
-#endif
         use_mpi=true;
         if(check_version){
             std::string compiled_version=STRING_UTILITIES::string_sprintf("%d.%d.%d",OMPI_MAJOR_VERSION,OMPI_MINOR_VERSION,OMPI_RELEASE_VERSION);

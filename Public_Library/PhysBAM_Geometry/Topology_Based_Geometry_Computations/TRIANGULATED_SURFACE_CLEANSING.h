@@ -37,9 +37,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
         maximum_boundary_segment_length=max(maximum_boundary_segment_length,length);}
 
     if(merge_coincident_vertices && maximum_boundary_segment_length>0){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"MERGING VERTICES (threshold="<<merge_coincident_vertices_threshold<<")"<<std::endl;
-#endif
         int number_merged=0;
         PARTICLE_3D_SPATIAL_PARTITION<T> particle_spatial_partition(ts.particles,2*maximum_boundary_segment_length);
         particle_spatial_partition.Reinitialize();particle_spatial_partition.Reset_Pair_Finder();
@@ -55,24 +53,18 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
                 T real_threshold=merge_coincident_vertices_threshold*min(minimum_incident_boundary_segment_length(index1),minimum_incident_boundary_segment_length(closest_index2));
                 if(closest_distance_squared<=sqr(real_threshold)){
                     number_merged++;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                     if(verbose) LOG::cout<<index1<<"->"<<closest_index2<<" "<<std::flush;
-#endif
                     for(int j=0;j<(*ts.mesh.incident_elements)(index1).m;j++){
                         int t=(*ts.mesh.incident_elements)(index1)(j);
                         if(ts.mesh.elements(t)(0)==index1)ts.mesh.elements(t)(0)=closest_index2;
                         else if(ts.mesh.elements(t)(1)==index1)ts.mesh.elements(t)(1)=closest_index2;
                         else if(ts.mesh.elements(t)(2)==index1)ts.mesh.elements(t)(2)=closest_index2;}
                     (*ts.mesh.incident_elements)(closest_index2).Append_Elements((*ts.mesh.incident_elements)(index1));}}} // dynamically update the incident triangles list
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<std::endl<<number_merged<<" vertices merged"<<std::endl<<std::endl;
-#endif
         ts.Refresh_Auxiliary_Structures();}
 
     if(fill_holes){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"HOLE FILLING"<<std::endl;
-#endif
         bool connected_segments_defined=(ts.mesh.boundary_mesh->connected_segments!=0);if(!connected_segments_defined) ts.mesh.boundary_mesh->Initialize_Connected_Segments();
         ARRAY<ARRAY<VECTOR<int,2> > >& connected_segments=*ts.mesh.boundary_mesh->connected_segments;
         for(int i=0;i<connected_segments.m;i++){
@@ -84,18 +76,12 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
                 TV velocity;
                 for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);velocity+=ts.particles.V(node1)+ts.particles.V(node2);}
                 ts.particles.V(new_particle_index)=velocity/(T)(2*connected_segments(i).m);}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose){LOG::cout<<"Adding particle "<<new_particle_index<<": "<<ts.particles.X(new_particle_index)<<std::endl;LOG::cout<<"Adding triangles: "<<std::flush;}
-#endif
             for(int j=0;j<connected_segments(i).m;j++){ // assumes segment orientation is consistent with triangle orientation!
                 int node1,node2;connected_segments(i)(j).Get(node1,node2);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 if(verbose) LOG::cout<<"("<<node2<<","<<node1<<","<<new_particle_index<<") "<<std::flush;
-#endif
                 ts.mesh.elements.Append(VECTOR<int,3>(node2,node1,new_particle_index));}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<std::endl<<std::endl;
-#endif
         }
         if(!connected_segments_defined){delete ts.mesh.boundary_mesh->connected_segments;ts.mesh.boundary_mesh->connected_segments=0;}}
 

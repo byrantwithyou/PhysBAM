@@ -171,7 +171,6 @@ Swept_Occupied_Block(const T_BLOCK& block) const
 {
     return swept_occupied_blocks(block.Block());
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //##################################################################### 
 // Function Read_State
 //##################################################################### 
@@ -188,12 +187,10 @@ Write_State(TYPED_OSTREAM& output,const int state_index) const
 {
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i)) collision_geometry_collection.bodies(i)->Write_State(output,state_index);
 }
-#endif
 //#####################################################################
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,2> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<float,3> > >;
-
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,1> > >;
 template class GRID_BASED_COLLISION_GEOMETRY<GRID<VECTOR<double,2> > >;

@@ -302,11 +302,9 @@ template<class T>
 inline SYMMETRIC_MATRIX<T,2> clamp_max(const SYMMETRIC_MATRIX<T,2>& x,const SYMMETRIC_MATRIX<T,2>& xmax)
 {return SYMMETRIC_MATRIX<T,2>(clamp_max(x.x11,xmax.x11),clamp_max(x.x21,xmax.x21),clamp_max(x.x22,xmax.x22));}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::ostream& operator<< (std::ostream& output_stream,const SYMMETRIC_MATRIX<T,2>& A)
 {output_stream<<"["<<A.x11<<" "<<A.x21<<" ; "<<A.x21<<" "<<A.x22<<"]";return output_stream;}
-#endif
 
 template<class T>
 inline SYMMETRIC_MATRIX<T,2> log(const SYMMETRIC_MATRIX<T,2>& A)

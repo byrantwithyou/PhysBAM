@@ -207,11 +207,9 @@ Add_Structure(STRUCTURE<TV>& structure)
 template<class TV> void RIGID_GEOMETRY<TV>::
 Print_Names(const RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection,const ARRAY<int>& ids)
 {
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout<<"{";
     for(int i=0;i<ids.m;i++){LOG::cout<<"\""<<rigid_geometry_collection.particles.rigid_geometry(ids(i))->name<<"\"";if(i<ids.m) LOG::cout<<", ";}
     LOG::cout<<"}";
-#endif
 }
 //#####################################################################
 // Function Object_Space_Bounding_Box

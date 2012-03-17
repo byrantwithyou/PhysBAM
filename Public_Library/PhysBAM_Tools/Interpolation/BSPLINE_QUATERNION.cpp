@@ -58,23 +58,13 @@ Create_Closed_Points()
 {
     BSPLINE<T,ROTATION<TV> >::Create_Closed_Points();
     for(int i=k-2;i>=0;i--){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Comparing "<<i<<": "<<control_points(i)<<" and "<<i+1<<": "<<control_points(i+1)<<std::endl;
-#endif
         control_points(i)=ROTATION<TV>::Switch_Hemisphere(control_points(i+1),control_points(i));
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-        LOG::cout<<"   result: "<<control_points(i)<<std::endl;
-#endif
-    }
+        LOG::cout<<"   result: "<<control_points(i)<<std::endl;}
     if(k>2) for(int i=control_points.m-(k-2);i<control_points.m;i++){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Comparing "<<i<<": "<<control_points(i)<<" and "<<i+1<<": "<<control_points(i+1)<<std::endl;
-#endif
         control_points(i)=ROTATION<TV>::Switch_Hemisphere(control_points(i+1),control_points(i));
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-        LOG::cout<<"   result: "<<control_points(i)<<std::endl;
-#endif
-    }
+        LOG::cout<<"   result: "<<control_points(i)<<std::endl;}
 }
 //#####################################################################
 // Function Quaternion_Check

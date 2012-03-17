@@ -124,9 +124,7 @@ Segment_Segment_Interaction(const SEGMENT_2D<T>& segment,const VECTOR<T,2>& v1,c
             else if(abs(u.y) > abs(u.x) && abs(u.y)) normal=VECTOR<T,2>(1,0);
             else normal=VECTOR<T,2>(0,1);
             normal=normal-VECTOR<T,2>::Dot_Product(normal,u)/VECTOR<T,2>::Dot_Product(u,u)*u;normal.Normalize();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout << "                                            PICKING RANDOM NORMAL !!!!!!!!!!!!!!!!!!!!!!!" <<  std::endl;
-#endif
     }}
     relative_speed=VECTOR<T,2>::Dot_Product(velocity1-velocity2,normal); // relative speed is in the normal direction
     return 1;

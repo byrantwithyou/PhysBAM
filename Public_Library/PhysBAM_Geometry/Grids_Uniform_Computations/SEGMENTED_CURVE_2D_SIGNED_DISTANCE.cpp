@@ -30,13 +30,9 @@ template<class T> void Calculate(SEGMENTED_CURVE_2D<T>& curve,const GRID<VECTOR<
         if(print_progress){
             cells_done++;int new_progress=(int)((T)100*cells_done/total_cells);
             if(new_progress > progress){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout<<new_progress<<"% "<<std::flush;
-#endif
                 progress=new_progress;}}}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(print_progress) LOG::cout<<std::endl;
-#endif
 
     if(!bounding_box_defined){delete curve.bounding_box;curve.bounding_box=0;}
 }

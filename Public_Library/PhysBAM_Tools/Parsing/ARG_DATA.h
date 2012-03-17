@@ -4,7 +4,6 @@
 //#####################################################################
 // Class ARG_DATA  
 //##################################################################### 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __ARG_DATA__
 #define __ARG_DATA__
 
@@ -85,7 +84,6 @@ public:
     void Print_Synopsis() const
     {if(type==OPTION)LOG::cerr<<"["<<str<<"]";else LOG::cerr<<"["<<str<<" <"<<val_name<<">]";}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Print_Description(int column_width) const
     {LOG::cerr.flags(std::ios::left);LOG::cerr.width(column_width);
     switch(type){
@@ -95,10 +93,8 @@ public:
     case VECTOR2:LOG::cerr<<str<<desc<<" (default <"<<vector_2d_default<<">)";break;
     case VECTOR3:LOG::cerr<<str<<desc<<" (default <"<<vector_3d_default<<">)";break;
     case STRING:LOG::cerr<<str<<desc;if(string_default.length())LOG::cerr<<" (default "<<string_default<<")";break;}}
-#endif
 
 //#####################################################################
 };
 }
-#endif
 #endif

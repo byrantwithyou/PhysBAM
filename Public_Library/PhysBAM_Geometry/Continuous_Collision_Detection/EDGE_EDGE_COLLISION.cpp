@@ -29,9 +29,7 @@ Edge_Edge_Collision(const POINT_2D<T>& pt,const POINT_2D<T>& point,const INDIREC
     quadratic.Compute_Roots_In_Interval(0,dt);
     if(quadratic.roots==0)return false;
     else if(quadratic.roots==-1){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;
-#endif
         collision_time=0;}
     else if(quadratic.roots==1)collision_time=(T)quadratic.root1;
     else collision_time=min((T)quadratic.root1,(T)quadratic.root2);

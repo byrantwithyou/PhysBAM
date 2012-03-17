@@ -4,7 +4,6 @@
 //#####################################################################
 // Class PARSE_ARGS  
 //##################################################################### 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __PARSE_ARGS__
 #define __PARSE_ARGS__
 
@@ -57,11 +56,8 @@ public:
     static int Find_And_Remove_Integer(const char *str,int& argc,char** argv);
     static double Find_And_Remove_Double(const char *str,int& argc,char** argv);
     void Print_Usage(bool do_exit=false) const;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     static std::string Print_Arguments(int argc,char* argv[]);
-#endif
 //#####################################################################
 };
 }
-#endif
 #endif

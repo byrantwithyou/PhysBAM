@@ -4,7 +4,6 @@
 //#####################################################################
 // Class PARAMETER_LIST_CONTAINER
 //##################################################################### 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __PARAMETER_LIST_CONTAINER__
 #define __PARAMETER_LIST_CONTAINER__
 
@@ -38,5 +37,4 @@ private:
 //##################################################################### 
 };
 }
-#endif
 #endif

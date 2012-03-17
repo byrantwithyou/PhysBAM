@@ -9,7 +9,6 @@
 //   JPEG parameter struct mismatch: library thinks size is 372, caller expects 376
 // with gcc which goes away if you don't use -malign-double
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef _JPG_FILE_h
 #define _JPG_FILE_h
 
@@ -33,5 +32,4 @@ public:
 //#####################################################################
 };
 }
-#endif
 #endif

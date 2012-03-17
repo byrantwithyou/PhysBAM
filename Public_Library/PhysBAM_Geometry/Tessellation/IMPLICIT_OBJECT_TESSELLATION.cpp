@@ -116,9 +116,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(IMPLICIT_OBJECT<VE
     else if(const ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<TORUS<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else if(const ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >* implicit=dynamic_cast<const ANALYTIC_IMPLICIT_OBJECT<CYLINDER<T> >*>(&implicit_input)) return Generate_Triangles(implicit->analytic);
     else{
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Trying to generate triangles on an object of type:\n\t"<<typeid(implicit_input).name()<<std::endl;
-#endif
         PHYSBAM_FATAL_ERROR();}
 }
 //#####################################################################

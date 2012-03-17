@@ -2,7 +2,6 @@
 // Copyright 2007, Geoffrey Irving, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT__
 #define __SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT__
 
@@ -61,5 +60,4 @@ public:
 //#####################################################################
 };
 }
-#endif
 #endif

@@ -10,8 +10,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#endif
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology/SIMPLEX_MESH.h>
 #include <climits>

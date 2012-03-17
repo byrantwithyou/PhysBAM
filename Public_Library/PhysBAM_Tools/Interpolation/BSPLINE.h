@@ -42,9 +42,7 @@ public:
     void Clamp_End_Points();
     virtual void Create_Closed_Points();
     void Normalize_Control_Points();
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Print_Control_Points_And_Times();
-#endif
 //#####################################################################
 };
 }

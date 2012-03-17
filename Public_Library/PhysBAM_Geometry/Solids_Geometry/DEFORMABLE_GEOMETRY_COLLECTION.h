@@ -35,7 +35,6 @@ public:
     Find_Structure(const int index=0) const
     {return Find_Type<T_STRUCTURE>(structures,index);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Read(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables)
     {Read(stream_type,prefix,prefix,frame,static_frame,include_static_variables);}
 
@@ -51,7 +50,6 @@ private:
     void Write_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
     void Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
 //#####################################################################
-#endif
 };
 }
 #endif

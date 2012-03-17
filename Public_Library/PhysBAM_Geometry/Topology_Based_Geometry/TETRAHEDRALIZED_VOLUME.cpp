@@ -123,9 +123,7 @@ Check_Signed_Volumes_And_Make_Consistent(bool verbose)
         TV x1(particles.X(i)),x2(particles.X(j)),x3(particles.X(k)),x4(particles.X(l));
         T sign_of_volume=TV::Dot_Product(TV::Cross_Product(x2-x1,x3-x1),x4-x1); // left out division by 6
         if(sign_of_volume < 0){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout<<"tetrahedron number "<<t<<" is oriented improperly."<<std::endl;
-#endif
             exchange(mesh.elements(t)(2),mesh.elements(t)(3));}}
     if(tetrahedron_list) Update_Tetrahedron_List();
 }

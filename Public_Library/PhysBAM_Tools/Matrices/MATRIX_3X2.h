@@ -248,10 +248,8 @@ inline MATRIX<T,3,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,3>& A,const MATRI
 {return MATRIX<T,3,2>(A.x11*B.x[0]+A.x12*B.x[1]+A.x13*B.x[2],A.x22*B.x[1]+A.x23*B.x[2],A.x33*B.x[2],
     A.x11*B.x[3]+A.x12*B.x[4]+A.x13*B.x[5],A.x22*B.x[4]+A.x23*B.x[5],A.x33*B.x[5]);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,3,2>& A)
 {FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<3;i++){for(int j=0;j<2;j++) input>>A.x[i+j*3];FILE_UTILITIES::Ignore(input,';');}FILE_UTILITIES::Ignore(input,']');return input;}
-#endif
 }
 #endif

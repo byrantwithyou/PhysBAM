@@ -34,13 +34,9 @@ template<class T> void Calculate_Heaviside_Function(TRIANGULATED_SURFACE<T>& sur
         if(print_progress){
             cells_done++;int new_progress=(int)((T)100*cells_done/total_cells);
             if(new_progress > progress){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
                 LOG::cout<<new_progress<<"% "<<std::flush;
-#endif
                 progress=new_progress;}}}
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(print_progress) LOG::cout<<std::endl;
-#endif
 
     // delete acceleration structures if defined in this function
     if(!adjacent_elements_defined){delete surface.mesh.adjacent_elements;surface.mesh.adjacent_elements=0;}

@@ -11,9 +11,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Log/LOG.h>
-#endif
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -445,7 +443,6 @@ public:
     {STATIC_ASSERT(d==1);TV_INT i,s(TV_INT::Componentwise_Greater_Equal(offset,TV_INT())),c(s*2-1),e(s*domain.Edge_Lengths()),a(domain.max_corner-e),b(domain.min_corner+e);
     for(i.x=a.x;i.x<=b.x;i.x+=c.x) (*this)(i)=(*this)(i+offset);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     void Print_Grid_Array(VECTOR<int,1> counts,int ghost_cells=0)
     {for(int i=-ghost_cells;i<counts.x+ghost_cells;i++) LOG::cout<<(operator()(VECTOR<int,1>(i)));LOG::cout<<std::endl;}
 
@@ -462,7 +459,6 @@ public:
             LOG::cout<<std::endl;}
         LOG::cout<<std::endl;}
     LOG::cout<<std::endl;}
-#endif
 
 //#####################################################################
 };

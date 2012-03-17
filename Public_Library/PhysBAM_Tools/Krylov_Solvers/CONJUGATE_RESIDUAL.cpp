@@ -33,15 +33,11 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
     int iterations;for(iterations=0;;iterations++){
         bool restart=!iterations || (restart_iterations && iterations%restart_iterations==0);
         if(restart){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(print_residuals) LOG::cout<<"restarting conjugate_residual"<<std::endl;
-#endif
             r=b;system.Multiply(x,p);r-=p;system.Project(r);}
         // stopping conditions
         convergence_norm=system.Convergence_Norm(r);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(print_residuals) LOG::cout<<convergence_norm<<std::endl;
-#endif
         residual_magnitude_squared=(T)system.Inner_Product(r,r);
         nullspace_measure=(residual_magnitude_squared>small_number*small_number*100)?abs(rho_old/residual_magnitude_squared):0;
         if((convergence_norm<=tolerance || (iterations && nullspace_measure<=nullspace_tolerance)) &&
@@ -64,10 +60,8 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         r.Copy(-alpha,ap,r);
         rho_old=rho;}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(print_diagnostics) LOG::Stat("conjugate_residual iterations",iterations);
     if(print_diagnostics) LOG::cout<<"conjugate_residual not converged after "<<max_iterations<<" iterations, error = "<<convergence_norm<<std::endl;
-#endif
     if(iterations_used) *iterations_used=iterations;
     return false;
 }

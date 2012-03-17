@@ -34,12 +34,10 @@ Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>
         for(int j=0;j<N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
         givens_rotate(b(i),b(i+1),v.x,v.y);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(check_last_column && abs(A(A.n,A.n))<tolerance){
         LOG::cout << "Found near-zero on diagonal during attempt to update upper triangular matrix!" << std::endl;
         LOG::cout << A << std::endl;
         /*PHYSBAM_FATAL_ERROR()*/}
-#endif
 }
 //####################################################################################
 // Function Find_Feasible_Solution
@@ -61,12 +59,10 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
         // solve
         x_B=B.Upper_Triangular_Solve(b-N*x_N);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose){
             LOG::cout<<"************* ITERATION "<<iteration<< ":\nB:\n"<<B<<"\nN:\n"<<N<<"\nb:\n"<<b<<"\nx_N:\n"<<x_N<<std::endl;
             LOG::cout<<"permute_B:\n"<<permute_B<<"\npermute_N:\n"<<permute_N<<"\nx_B:\n"<<x_B<<std::endl;
             MATRIX_MXN<T> inverse;B.LU_Inverse(inverse);LOG::cout<<"B^-1 * N:\n"<<inverse*N<<"\nB^-1 * b:\n"<<inverse*b<<std::endl;}
-#endif
 
         bool have_unsatisfied_constraint=false;
         // TODO: maybe use tolerance to consider anything in [x_min-tol,x_max+tol] as being in feasible region
@@ -79,39 +75,31 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
                 if(x_max(permute_B(i)).x) x_B(i)=min(x_B(i),x_max(permute_B(i)).y);}}
 
         if(!have_unsatisfied_constraint){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose)LOG::cout << "All constraints satisfied!" << std::endl;
-#endif
             break;} // done
 
         VECTOR_ND<T> pi=B.Transpose_Lower_Triangular_Solve(c_B),sigma(-N.Transpose_Times(pi));
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"c_B =\n"<<c_B<<"pi =\n"<<pi<<"sigma =\n"<<sigma<<std::endl;
-#endif
 
         int index_to_release=-1;T sigma_to_release=0;
         for(int i=0;i<N.n;i++) if((sigma(i)<0 && x_min(permute_N(i)).x && x_N(i)==x_min(permute_N(i)).y) ||
                                    (sigma(i)>0 && x_max(permute_N(i)).x && x_N(i)==x_max(permute_N(i)).y))
             if(abs(sigma(i))>sigma_to_release){sigma_to_release=abs(sigma(i));index_to_release=i;}
       
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         T sigma_tolerance=(T)1e-10;
         if(sigma_to_release<sigma_tolerance || index_to_release<0){
             LOG::cout << "No feasible point found for given constraints!" << std::endl;
             break;} // TODO: how handle this case?
 
         if(verbose) LOG::cout << "Releasing index " << index_to_release << " (muscle " << permute_N(index_to_release) << ")" << std::endl;
-#endif
 
         VECTOR_ND<T> p_N(N.n);
         if(x_min(permute_N(index_to_release)).x && x_N(index_to_release)==x_min(permute_N(index_to_release)).y) p_N(index_to_release)=1;
         else if(x_max(permute_N(index_to_release)).x && x_N(index_to_release)==x_max(permute_N(index_to_release)).y) p_N(index_to_release)=-1;
         VECTOR_ND<T> p_B(-B.Upper_Triangular_Solve(N*p_N));
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"Got p_B\n"<<p_B<<"\nGot p_N\n"<<p_N<<std::endl;
-#endif
 
         T alpha=FLT_MAX,limiting_value=0;int limiting_index=-1;
         // clamp based on other constraint for variable we are releasing (limiting_index=-2 used to indicate this case)
@@ -129,9 +117,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
                 alpha=max((T)0,(x_min(permute_B(i)).y-x_B(i))/p_B(i));limiting_index=i;limiting_value=x_min(permute_B(i)).y;}}
 
         assert(alpha>=0);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(verbose) LOG::cout<<"alpha="<<alpha<<", limiting_index="<<limiting_index<<", limiting_value="<<limiting_value<<"\nx_in_feasible_region = "<<x_in_feasible_region<<std::endl;
-#endif
 
         // robustly detect when a variable enters feasible region as a result of moving by alpha
         for(int i=0;i<B.n;i++) if(!x_in_feasible_region(permute_B(i))){
@@ -146,24 +132,18 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
                 if(p_B(i)>0 && x_min(permute_B(i)).x && (x_min(permute_B(i)).y-x_B(i))/p_B(i)>alpha){alpha=(x_min(permute_B(i)).y-x_B(i))/p_B(i);limiting_index=i;}
                 else if(p_B(i)<0 && x_max(permute_B(i)).x && (x_max(permute_B(i)).y-x_B(i))/p_B(i)>alpha){alpha=(x_max(permute_B(i)).y-x_B(i))/p_B(i);limiting_index=i;}
             x_B+=alpha*p_B;
-#endif
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             LOG::cout << "No limiting index, picking alpha="<<alpha<<" (reaching index"<<limiting_index<<")"<<std::endl;
 #endif
             break;} // TODO: how handle this case?
 
         if(limiting_index==-2){ // p_N(i) limits alpha, switch x_N to be opposite end's constraint
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout << "Active constraint " << index_to_release << " (muscle " << permute_N(index_to_release) << ") switched to bound " << limiting_value << std::endl;
-#endif
             x_N(index_to_release)=limiting_value;}
         else{
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose){
                 LOG::cout << "limiting_index="<<limiting_index<<" (muscle " << permute_B(limiting_index) << ") getting constrained to " << limiting_value 
                           << ", index_to_release="<<index_to_release<<" (muscle " << permute_N(index_to_release) << ") released from " << x_N(index_to_release) << ")" << std::endl;
                 LOG::cout << "BEFORE COLUMN SWITCH ("<<limiting_index<<","<<index_to_release<<")\nB:\n"<<B<<"\nN:\n"<<N<<std::endl;}
-#endif
 
             // put B column "limiting_index" in N column "index_to_release", and put N column "index_to_release" in
             // the last column of B (after shifting the other columns left)
@@ -175,21 +155,15 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
             x_N(index_to_release)=limiting_value;
             x_in_feasible_region(permute_N(index_to_release))=true;
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout << "AFTER COLUMN SWITCH\nB:\n"<<B<<"\nN:\n"<<N<<std::endl;
-#endif
 
             Update_Upper_Triangular_Matrix_After_Column_Shift(B,N,b,limiting_index,tolerance); // make upper triangular again
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(verbose) LOG::cout << "AFTER MAKING UPPER TRIANGULAR\nB:\n"<<B<<"\nN:\n"<<N<<std::endl;
-#endif
         }
     }
 
     if(x_in_feasible_region.Number_False()){ // have some values not in feasible region 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout << "PHYSBAM_WARNING: clamping values into feasible region after unsuccessful LP solve" << std::endl;
-#endif
         for(int i=0;i<x_B.n;i++) if(!x_in_feasible_region(permute_B(i))){
             if(x_min(permute_B(i)).x) x_B(i)=max(x_B(i),x_min(permute_B(i)).y);
             if(x_max(permute_B(i)).x) x_B(i)=min(x_B(i),x_max(permute_B(i)).y);}}
@@ -198,10 +172,8 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
     VECTOR_ND<T> x(B.n+N.n);x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_N);
     x_unpermuted=x.Unpermute(permute);
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     LOG::cout << "LP finished in " << iteration << " iterations" << std::endl;
     if(verbose) LOG::cout<<"LP Result x_B:\n"<<x_B<<"\nLP Result permute:\n"<<permute<<std::endl;
-#endif
 }
 //####################################################################################
 template class LINEAR_PROGRAMMING<float>;
