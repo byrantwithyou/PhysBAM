@@ -496,10 +496,10 @@ void Add_Deformable_Body(const std::string& filename,const GEOMETRY_TYPE type,RI
 void Set_Initial_Particle_Configuration(DEFORMABLE_PARTICLES<TV>& particles,const int index)
 {
     if(deformable_body_initial_states(index)){
-        LOG::cout<<"Deformable body "<<index<<" - Total Particles : "<<particles.array_collection->Size()<<std::endl;
-        BOX_3D<T> bounding_box(particles.X(1));for(int i=2;i<=particles.array_collection->Size();i++) bounding_box.Enlarge_To_Include_Point(particles.X(i));TV center=bounding_box.Center();
+        LOG::cout<<"Deformable body "<<index<<" - Total Particles : "<<particles.Size()<<std::endl;
+        BOX_3D<T> bounding_box(particles.X(1));for(int i=2;i<=particles.Size();i++) bounding_box.Enlarge_To_Include_Point(particles.X(i));TV center=bounding_box.Center();
         RIGID_BODY_STATE<TV>& state=*deformable_body_initial_states(index);
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             particles.X(p)=state.frame*(particles.X(p)-center);
             particles.V(p)=state.velocity+TV::Cross_Product(state.angular_velocity,particles.X(p)-state.frame.t);}}
 }

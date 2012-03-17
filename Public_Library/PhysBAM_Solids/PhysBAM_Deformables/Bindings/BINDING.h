@@ -69,8 +69,8 @@ public:
     virtual TV Embedded_Acceleration(ARRAY_VIEW<const TV> F,ARRAY_VIEW<const TWIST<TV> > wrench) const=0;
     virtual T One_Over_Effective_Mass() const=0; // returns a lower bound when effective mass is direction dependent
     virtual void Apply_Impulse(const TV& impulse)=0;
-    virtual void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle)=0; // skip_particle.m == particles.array_collection->Size()
-    virtual void Apply_Velocity_Change_To_Parents_Based_On_Embedding(const TV& dV,const ARRAY<bool>* skip_particle)=0; // skip_particle.m == particles.array_collection->Size()
+    virtual void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle)=0; // skip_particle.m == particles.Size()
+    virtual void Apply_Velocity_Change_To_Parents_Based_On_Embedding(const TV& dV,const ARRAY<bool>* skip_particle)=0; // skip_particle.m == particles.Size()
     virtual void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,const TV& force) const=0;
     virtual void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full,const TV& force) const=0;
     virtual void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const=0;

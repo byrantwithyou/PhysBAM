@@ -40,11 +40,11 @@ Detect_Cloth_Body_Contact()
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
 
     // Detect cloth/body constraints
-    for(int rb=0;rb<rigid_body_particles.array_collection->Size();rb++){
+    for(int rb=0;rb<rigid_body_particles.Size();rb++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(rb);
         IMPLICIT_OBJECT<VECTOR<T,TV::m> >& object_space_implicit_object=*rigid_body.implicit_object->object_space_implicit_object;
         FRAME<TV> frame=rigid_body.Frame().Inverse();
-        for(int p=0;p<particles.array_collection->Size();p++)
+        for(int p=0;p<particles.Size();p++)
             if(object_space_implicit_object.Lazy_Inside(frame*particles.X(p)))
                 cloth_body_constraints.Append_Unique(PAIR<int,int>(p,rb));}
 }

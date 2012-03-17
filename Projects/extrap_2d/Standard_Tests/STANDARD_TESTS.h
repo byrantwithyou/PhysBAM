@@ -485,9 +485,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;
         case 31:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
-            int a=particles.array_collection->Add_Element();
-            int b=particles.array_collection->Add_Element();
-            int c=particles.array_collection->Add_Element();
+            int a=particles.Add_Element();
+            int b=particles.Add_Element();
+            int c=particles.Add_Element();
             particles.X(a)=TV(4.1,sqrt(3)/2-1.5);
             particles.X(b)=TV(4.1-.5,-1.5);
             particles.X(c)=TV(4.1+.5,-1.5);
@@ -501,9 +501,9 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 32:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
-            int a=particles.array_collection->Add_Element();
-            int b=particles.array_collection->Add_Element();
-            int c=particles.array_collection->Add_Element();
+            int a=particles.Add_Element();
+            int b=particles.Add_Element();
+            int c=particles.Add_Element();
             particles.X(a)=TV(1,0);
             particles.X(b)=TV(0,1);
             particles.X(c)=TV(0,0);
@@ -515,7 +515,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 33:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
-            ta->particles.array_collection->Add_Elements(7);
+            ta->particles.Add_Elements(7);
             for(int i=0;i<7;i++) ta->particles.X(i)=TV((T).5*(i-4),(T).5*sqrt(3)*(i%2));
             for(int i=0;i<5;i++) ta->mesh.elements.Append(VECTOR<int,3>(i,i+1,i+2));
             ta->Update_Number_Nodes();
@@ -526,13 +526,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 100:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
             if(parameter==1){
-                particles.array_collection->Add_Elements(3);
+                particles.Add_Elements(3);
                 particles.X(0)=TV(-.5,0)*1.5;
                 particles.X(1)=TV(.5,0)*1.5;
                 particles.X(2)=TV(0,sqrt(3)/2)*1.5;
                 ta->mesh.elements.Append(VECTOR<int,3>(0,1,2));}
             else{
-                particles.array_collection->Add_Elements(9);
+                particles.Add_Elements(9);
                 particles.X(0)=TV(-.5,0);
                 particles.X(1)=TV(.5,0);
                 particles.X(2)=TV(0,sqrt(3)/2);
@@ -1135,7 +1135,7 @@ void Plot_Energy_Density(ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm,T stiffness)
 {
     TRIANGULATED_AREA<T>& ta=tests.Create_Mattress(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),true,RIGID_BODY_STATE<TV>());
     TRIANGULATED_SURFACE<T> ts(ta.mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
-    ts.particles.array_collection->Add_Elements(ta.particles.X.m);
+    ts.particles.Add_Elements(ta.particles.X.m);
     for(int i=0;i<ta.particles.X.m;i++){
         TV X=ta.particles.X(i);
         X.x+=1.1e-4;
@@ -1233,7 +1233,7 @@ void Energy_Profile_Plot(int frame)
         ta.Initialize_Square_Mesh_And_Particles(GRID<TV>(2+image_size+1,2+image_size+1,-sigma_range,sigma_range,-sigma_range,sigma_range),false);
 
         energy_mesh=new TRIANGULATED_SURFACE<T>(ta.mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
-        energy_mesh->particles.array_collection->Add_Elements(ta.particles.X.m);
+        energy_mesh->particles.Add_Elements(ta.particles.X.m);
         for(int i=0;i<ta.particles.X.m;i++){
             TV X=ta.particles.X(i);
             X.x+=1.1e-4;
@@ -1254,7 +1254,7 @@ void Energy_Profile_Plot(int frame)
     FILE_UTILITIES::Create_Directory(dual_directory+"/common");
 
     LOG::cout<<this->debug_particles.debug_particles.X.m<<std::endl;
-    energy_particles.array_collection->Add_Elements(this->debug_particles.debug_particles.X.m);
+    energy_particles.Add_Elements(this->debug_particles.debug_particles.X.m);
     LOG::cout<<energy_particles.X.m<<std::endl;
     for(int i=0;i<energy_particles.X.m;i++){
         TV X=this->debug_particles.debug_particles.X(i);
@@ -1264,7 +1264,7 @@ void Energy_Profile_Plot(int frame)
 
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",dual_directory.c_str(),frame));
     FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",dual_directory.c_str(),frame),energy_particles);
-    energy_particles.array_collection->Delete_All_Elements();
+    energy_particles.Delete_All_Elements();
 
     FILE_UTILITIES::Write_To_File(this->stream_type,dual_directory+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",energy_mesh->particles);
     if(frame==1 || (this->restart && frame==this->first_frame)){

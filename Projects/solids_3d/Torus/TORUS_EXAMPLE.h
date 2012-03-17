@@ -81,13 +81,13 @@ void Get_Initial_Data()
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_file);tetrahedralized_volume.template Read<RW>(*input);delete input;
-    std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
+    std::cout << "total vertices = " << particles.Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
     particles.Update_Velocity();particles.Store_Mass(); // in case they're not stored in the file!
 
     tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}
@@ -100,7 +100,7 @@ void Get_Initial_Data()
 
     if(use_tetrahedron_collisions){
         solids_parameters.perform_self_collision=false;
-        undeformed_positions.array_collection->Add_Elements(particles.array_collection->Size());
+        undeformed_positions.Add_Elements(particles.Size());
         ARRAY<VECTOR_3D<T> >::copy(particles.X.array,undeformed_positions.X.array);
         this->Initialize_Tetrahedron_Collisions();}
 }

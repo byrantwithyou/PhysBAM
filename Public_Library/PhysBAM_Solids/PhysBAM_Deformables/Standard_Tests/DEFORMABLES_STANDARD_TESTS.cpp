@@ -79,11 +79,11 @@ Copy_And_Add_Structure(T_STRUCTURE& structure,ARRAY<int>* particle_indices)
 template<class TV> void DEFORMABLES_STANDARD_TESTS<TV>::
 Set_Initial_Particle_Configuration(GEOMETRY_PARTICLES<TV>& particles,const RIGID_GEOMETRY_STATE<TV>& state,const bool relative_to_box_center)
 {
-    LOG::cout<<"Deformable body - Total Particles : "<<particles.array_collection->Size()<<std::endl;
+    LOG::cout<<"Deformable body - Total Particles : "<<particles.Size()<<std::endl;
     particles.Store_Velocity();
     if(relative_to_box_center){
         particles.X-=RANGE<TV>::Bounding_Box(particles.X).Center();}
-    for(int p=0;p<particles.array_collection->Size();p++){
+    for(int p=0;p<particles.Size();p++){
         particles.X(p)=state.frame*(particles.X(p));
         particles.V(p)=state.Pointwise_Object_Velocity(particles.X(p));}
 }
@@ -240,14 +240,14 @@ Create_Embedded_Tetrahedralized_Volume(const T_SHAPE& shape,const RIGID_GEOMETRY
     embedded_tetrahedralized_volume.Set_Interpolation_Fraction_Threshold((T)1e-2);
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=embedded_tetrahedralized_volume.simplicial_object;
     GRID<TV> grid(13,13,13,RANGE<TV>::Centered_Box());tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(grid);
-    ARRAY<T> phi(particles.array_collection->Size());
+    ARRAY<T> phi(particles.Size());
     for(int p=0;p<phi.m;p++) phi(p)=shape.Signed_Distance(particles.X(p));
     // compute embedded surface
     particles.Store_Velocity();
     T density=TV::dimension==1?1:TV::dimension==2?100:1000;
     Set_Mass_Of_Particles(tetrahedralized_volume,density,true);
     embedded_tetrahedralized_volume.Calculate_Boundary_From_Levelset_On_Nodes(phi);
-    tetrahedralized_volume.mesh.number_nodes=particles.array_collection->Size();
+    tetrahedralized_volume.mesh.number_nodes=particles.Size();
     embedding.Create_Material_Surface_From_Manifold_Embedded_Surface();
     Set_Initial_Particle_Configuration(particles,initial_state,relative_to_box_center);
     EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& copy=Copy_And_Add_Structure(embedding);
@@ -263,14 +263,14 @@ Substitute_Soft_Bindings_For_Nodes(T_OBJECT& object,SOFT_BINDINGS<TV>& soft_bind
 {
     DEFORMABLE_PARTICLES<TV>& particles=soft_bindings.particles;
     ARRAY<int> nodes;object.mesh.elements.Flattened().Get_Unique(nodes);
-    ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(particles.array_collection->Size()));
+    ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(particles.Size()));
     for(int i=0;i<nodes.m;i++) if(!embedded_only || soft_bindings.binding_list.Binding_Index_From_Particle_Index(nodes(i))>=0){
         int node=nodes(i),bound_node;
         if(persistent_soft_bindings && persistent_soft_bindings->Get(node,bound_node))
             persistent_soft_bindings->Delete(node);
         else{
-            bound_node=particles.array_collection->Add_Element_From_Deletion_List();
-            particles.array_collection->Copy_Element(*particles.array_collection,node,bound_node);}
+            bound_node=particles.Add_Element_From_Deletion_List();
+            particles.Copy_Element(particles,node,bound_node);}
         map_to_new_particles(node)=bound_node;
         soft_bindings.Add_Binding(VECTOR<int,2>(bound_node,node),use_impulses_for_collisions);}
     for(int i=0;i<object.mesh.elements.m;i++) object.mesh.elements(i)=map_to_new_particles.Subset(object.mesh.elements(i));
@@ -338,10 +338,10 @@ Create_Drifted_Surface(const TRIANGULATED_SURFACE<T>& triangulated_surface,SOFT_
     assert(&triangulated_surface.particles==&soft_bindings.particles);
     DEFORMABLE_PARTICLES<TV>& particles=soft_bindings.particles;
     ARRAY<int> triangulated_surface_nodes;triangulated_surface.mesh.elements.Flattened().Get_Unique(triangulated_surface_nodes);
-    ARRAY<int> child_particles(particles.array_collection->Size());
-    particles.array_collection->Preallocate(particles.array_collection->Size()+triangulated_surface_nodes.m);
+    ARRAY<int> child_particles(particles.Size());
+    particles.Preallocate(particles.Size()+triangulated_surface_nodes.m);
     for(int i=0;i<triangulated_surface_nodes.m;i++){int p=triangulated_surface_nodes(i);
-        child_particles(p)=particles.array_collection->Append(*particles.array_collection,p);
+        child_particles(p)=particles.Append(particles,p);
         soft_bindings.Add_Binding(VECTOR<int,2>(child_particles(p),p),use_impulses_for_collisions);}
     TRIANGULATED_SURFACE<T>& drifted_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
     for(int i=0;i<triangulated_surface.mesh.elements.m;i++) drifted_surface.mesh.elements.Append(VECTOR<int,3>::Map(child_particles,triangulated_surface.mesh.elements(i)));
@@ -382,7 +382,7 @@ Create_Cloth_Panel(const int number_side_panels,const T side_length,const T aspe
     TRIANGLE_MESH& mesh=triangulated_surface.mesh;
     particles.Store_Mass();
     int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
-    mesh.Initialize_Herring_Bone_Mesh(m,n);particles.array_collection->Add_Elements(mesh.number_nodes);
+    mesh.Initialize_Herring_Bone_Mesh(m,n);particles.Add_Elements(mesh.number_nodes);
     T mass_node=aspect_ratio*sqr(side_length)/(m*n);particles.mass.Fill(mass_node); // TODO: make this consistent with the density attribute
     T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++) particles.X(i+m*j)=TV(i*dx,(T).5,j*dy);
@@ -547,8 +547,8 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     if(bind_edges){
         FREE_PARTICLES<TV>* free_particles=new FREE_PARTICLES<TV>;
         for(int i=0;i<edge_bindings.m;i++){
-            int hb=binding_list.particles.array_collection->Add_Element();
-            int sb=binding_list.particles.array_collection->Add_Element();
+            int hb=binding_list.particles.Add_Element();
+            int sb=binding_list.particles.Add_Element();
             VECTOR<int,2> pa(volume_particle_map.Subset(edge_bindings(i).x));
             VECTOR<T,2> we(1-edge_bindings(i).y,edge_bindings(i).y);
             binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(binding_list.particles,hb,pa,we));

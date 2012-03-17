@@ -62,7 +62,7 @@ public:
 
     void Initialize_Segment_Index_From_Midpoint_Index()
     {if(segment_index_from_midpoint_index) delete segment_index_from_midpoint_index;
-    segment_index_from_midpoint_index=new ARRAY<int>(object.particles.array_collection->Size());
+    segment_index_from_midpoint_index=new ARRAY<int>(object.particles.Size());
     for(int s=0;s<segment_midpoints.m;s++) if(segment_midpoints(s)) (*segment_index_from_midpoint_index)(segment_midpoints(s))=s;}
 
     void Add_Free_Segment_Midpoint(const VECTOR<int,2>& endpoints,const int midpoint)

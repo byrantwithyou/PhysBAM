@@ -97,7 +97,7 @@ int Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filenam
     rigid_body.Set_Coefficient_Of_Restitution(0);
     rigid_body.Set_Name(rigid_body_name);
     int rigid_body_particle=tests.Add_Rigid_Body_Particle(rigid_body);
-    int gravity_particle=particles.array_collection->Add_Element();
+    int gravity_particle=particles.Add_Element();
     particles.mass(gravity_particle)=rigid_body.mass.mass;
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<T,TV>(particles,gravity_particle,deformable_object.rigid_body_particles,rigid_body_particle,TV()));
     stored_bindings.Append(PAIR<int,TV>(rigid_body_particle,TV()));

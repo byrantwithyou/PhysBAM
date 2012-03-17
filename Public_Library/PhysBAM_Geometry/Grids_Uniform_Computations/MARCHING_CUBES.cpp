@@ -207,7 +207,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
                 int e=(cs.surface[i]>>5*j)&31;
                 FACE_INDEX<TV::m> fi(e/4,it.index+bits(MARCHING_CUBES_CASE<TV::m>::vertex_lookup[e][0]));
                 if(!ht.Get(fi,face(j))){
-                    int index=surface.particles.array_collection->Add_Element();
+                    int index=surface.particles.Add_Element();
                     face(j)=index;
                     ht.Set(fi,index);
                     surface.particles.X(index)=pts[e];}}

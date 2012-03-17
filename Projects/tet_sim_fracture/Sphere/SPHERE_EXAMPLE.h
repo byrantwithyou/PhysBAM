@@ -82,7 +82,7 @@ void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED_VOLUME&
 
     //shift above floor && scale
     int i;
-    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.7;}
+    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.7;}
     embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
     
     if(restart_step_number == 0){
@@ -124,9 +124,9 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
 {
     PARTICLE_3D<double>& particles=embedded_tetrahedralized_volume.tetrahedralized_volume.particles;
     TETRAHEDRON_MESH& mesh=embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh;
-    ARRAY<int>particle_replicated(1,particles.array_collection->Size());
+    ARRAY<int>particle_replicated(1,particles.Size());
     ARRAY<int>tetrahedron_label(1,mesh.tetrahedrons.m);
-    if(particle_replicated.m != particles.array_collection->Size()) particle_replicated.Resize(1,particles.array_collection->Size());
+    if(particle_replicated.m != particles.Size()) particle_replicated.Resize(1,particles.Size());
     if(tetrahedron_label.m != mesh.tetrahedrons.m) {std::cout << "error with tetrahedron_label passed" << std::endl;return;}
     int incident_tetrahedrons_defined=(int)mesh.incident_tetrahedrons;if(!incident_tetrahedrons_defined) mesh.Initialize_Incident_Tetrahedrons();
     int number_on_positive_side=0,number_on_negative_side=0,number_intersecting_boundary=0;
@@ -154,7 +154,7 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
             for(int a=0;a<4;a++){
                 int node=mesh.tetrahedrons(a,t);
                 if(!particle_replicated(node)){
-                    int new_index=particles.array_collection->Add_Element();assert(new_index == particles.array_collection->Size());particle_replicated(node)=new_index;number_of_new_particles++;
+                    int new_index=particles.Add_Element();assert(new_index == particles.Size());particle_replicated(node)=new_index;number_of_new_particles++;
                     particles.X(new_index)=particles.X(node);particles.V(new_index)=particles.V(node);// still need to set mass
                 }
             }
@@ -185,12 +185,12 @@ virtual void Fracture_Along_Level_Set(EMBEDDED_TETRAHEDRALIZED_VOLUME& embedded_
     }
 
     //repair phi
-    embedded_tetrahedralized_volume.phi.Resize(particles.array_collection->Size());
+    embedded_tetrahedralized_volume.phi.Resize(particles.Size());
     for(p=0;p<particle_replicated.m;p++){
         if(particle_replicated(p)) embedded_tetrahedralized_volume.phi(particle_replicated(p))=embedded_tetrahedralized_volume.phi(p);
     }
 
-    mesh.number_nodes=particles.array_collection->Size();
+    mesh.number_nodes=particles.Size();
     if(!incident_tetrahedrons_defined){delete mesh.incident_tetrahedrons;mesh.incident_tetrahedrons=0;}
 }
 //#####################################################################

@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_SUBSET.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_SUBSET.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
@@ -44,7 +44,7 @@ public:
     ARRAY<VECTOR<int,2> > parent_particles; // has length embedded_particles.active_indices.m, indexes into particles
     ARRAY<T> interpolation_fraction; // has length embedded_particles.active_indices.m
     T interpolation_fraction_threshold;
-    ARRAY<int>* embedded_children_index; // has length particles.array_collection->Size(), indexes into embedded children
+    ARRAY<int>* embedded_children_index; // has length particles.Size(), indexes into embedded children
     ARRAY<ARRAY<int> >* embedded_children; // indexes into embedded_particles
     HASHTABLE<VECTOR<int,2>,int>* parents_to_embedded_particles_hash_table; // indexes into embedded_particles
     int hashtable_multiplier;
@@ -155,7 +155,7 @@ public:
     {return Add_Embedded_Particle_If_Not_Already_There(VECTOR<int,2>(node1,node2),interpolation_fraction_input);}
 
     void Update_Number_Nodes() PHYSBAM_OVERRIDE
-    {simplicial_object.Update_Number_Nodes();embedded_mesh.Set_Number_Nodes(particles.array_collection->Size());embedded_particles.Update_Number_Nodes();}
+    {simplicial_object.Update_Number_Nodes();embedded_mesh.Set_Number_Nodes(particles.Size());embedded_particles.Update_Number_Nodes();}
 
     void Mark_Nodes_Referenced(ARRAY<int>& marks,const int mark) const PHYSBAM_OVERRIDE
     {simplicial_object.Mark_Nodes_Referenced(marks,mark);embedded_object.Mark_Nodes_Referenced(marks,mark);}

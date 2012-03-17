@@ -168,7 +168,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
     ARRAY<int> surface_particles;
     while(1){
         triangulated_surface.mesh.elements.Flattened().Get_Unique(surface_particles);
-        ARRAY<T> particle_distances(particles.array_collection->Size());
+        ARRAY<T> particle_distances(particles.Size());
         particle_distances.Subset(surface_particles).Fill((T)FLT_MAX);
         for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
             for(COLLISION_GEOMETRY_ID body(0);body<collision_body_list.bodies.m;body++)
@@ -186,7 +186,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
     // reinitialize bindings
     redgreen->Initialize_Segment_Index_From_Midpoint_Index();
-    for(int i=0;i<old_midpoints.m;i++) if(!(*redgreen->segment_index_from_midpoint_index)(old_midpoints(i))) particles.array_collection->Add_To_Deletion_List(old_midpoints(i));
+    for(int i=0;i<old_midpoints.m;i++) if(!(*redgreen->segment_index_from_midpoint_index)(old_midpoints(i))) particles.Add_To_Deletion_List(old_midpoints(i));
     delete redgreen->free_segment_midpoints;redgreen->free_segment_midpoints=0;
     ARRAY<int> parents;ARRAY<T> weights;
     binding_list.Clean_Memory();
@@ -195,7 +195,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         redgreen->Unrefined_Parents(surface_particles(i),parents,weights);
         switch(parents.m){
           case 1:
-//            binding_list.Add_Binding(new PARTICLE_BINDING<TV>(particles,particles.array_collection->Add_Element(),surface_particles(i)));
+//            binding_list.Add_Binding(new PARTICLE_BINDING<TV>(particles,particles.Add_Element(),surface_particles(i)));
             break;
           case 2: 
             binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,surface_particles(i),VECTOR<int,2>(parents(1),parents(2)),VECTOR<T,2>(weights(1),weights(2))));
@@ -214,7 +214,7 @@ void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE
         old_bound_particles.Append(bound_node);}
     soft_bindings.Clean_Memory();
     tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings,&free_soft_bound_particles);
-    for(int i=0;i<old_bound_particles.m;i++) if(!soft_bindings.Particle_Is_Bound(old_bound_particles(i))) particles.array_collection->Add_To_Deletion_List(old_bound_particles(i));
+    for(int i=0;i<old_bound_particles.m;i++) if(!soft_bindings.Particle_Is_Bound(old_bound_particles(i))) particles.Add_To_Deletion_List(old_bound_particles(i));
 
     // correct number nodes
     for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();

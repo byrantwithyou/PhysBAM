@@ -45,8 +45,8 @@ std::string output_directory;
 template<class TV> DEBUG_PARTICLES_HELPER<TV>::DEBUG_PARTICLES_HELPER()
     :particle(*new GEOMETRY_PARTICLES<TV>)
 {
-    ATTRIBUTE_INDEX index=particle.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    attribute=particle.array_collection->template Get_Array_From_Index<VECTOR<T,3> >(index);
+    ATTRIBUTE_INDEX index=particle.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    attribute=particle.template Get_Array_From_Index<VECTOR<T,3> >(index);
 }
 
 template<class TV> DEBUG_PARTICLES_HELPER<TV>::~DEBUG_PARTICLES_HELPER()
@@ -58,7 +58,7 @@ template<class TV>
 void Add_Debug_Particle(const TV& x,const VECTOR<typename TV::SCALAR,3>& color)
 {
     DEBUG_PARTICLES_HELPER<TV>& dp_helper=Debug_Particles_Helper<TV>();
-    int p=dp_helper.particle.array_collection->Add_Element();
+    int p=dp_helper.particle.Add_Element();
     dp_helper.particle.X(p)=x;
     (*dp_helper.attribute)(p)=color;
 }
@@ -81,7 +81,7 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
     FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
     DEBUG_PARTICLES_HELPER<TV>& dp_helper=Debug_Particles_Helper<TV>();
     FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/debug_particles.gz",dp_helper.particle);
-    dp_helper.particle.array_collection->Delete_All_Elements();
+    dp_helper.particle.Delete_All_Elements();
     if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
     frame++;
 }

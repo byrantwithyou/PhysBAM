@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/choice.h>
 #include <PhysBAM_Tools/Parallel_Computation/PARTITION_ID.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_SUBSET.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_SUBSET.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>

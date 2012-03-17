@@ -114,8 +114,8 @@ Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time)
             TV cell_upper=(T).5*fluids_parameters.grid->dX,cell_lower=-cell_upper;
             for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
                 if(source.Lazy_Inside(iterator.Location()) && time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).005){
-                    LOG::cout<<"adding particle now have "<<vorticity_particles.array_collection->Size()+1<<std::endl;
-                    add_count++;int particle_id=vorticity_particles.array_collection->Add_Element(); 
+                    LOG::cout<<"adding particle now have "<<vorticity_particles.Size()+1<<std::endl;
+                    add_count++;int particle_id=vorticity_particles.Add_Element(); 
                     vorticity_particles.radius(particle_id)=particle_radius;
                     vorticity_particles.X(particle_id)=iterator.Location()+random.Get_Uniform_Vector(cell_lower,cell_upper);
                     vorticity_particles.vorticity(particle_id)=(T)source_vorticity_magnitude*TV::Cross_Product(TV(0,1,0),(vorticity_particles.X(particle_id)-source.Center()).Normalized()).Normalized();}}

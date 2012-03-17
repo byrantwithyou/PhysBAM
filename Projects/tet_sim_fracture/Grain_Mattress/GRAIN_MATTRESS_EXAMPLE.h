@@ -72,7 +72,7 @@ void Get_Initial_Data()
     if(!cube_mesh) tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(mattress_grid);
     else tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
     embedded_object.embedded_particles.Update_Subset_Index_From_Element_Index(); // TODO: make this unnecessary
-    embedded_object.embedded_mesh.number_nodes=particles.array_collection->Size();
+    embedded_object.embedded_mesh.number_nodes=particles.Size();
     particles.Store_Velocity();
 
     tetrahedralized_volume.Update_Bounding_Box();
@@ -81,7 +81,7 @@ void Get_Initial_Data()
         particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}
-    LOG::cout << "total vertices = " << particles.array_collection->Size() << std::endl;
+    LOG::cout << "total vertices = " << particles.Size() << std::endl;
     LOG::cout << "total tets = " << tetrahedralized_volume.mesh.elements.m << std::endl;
     tetrahedralized_volume.Set_Density(1000);
     tetrahedralized_volume.Set_Mass_Of_Particles();

@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_2D.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
@@ -83,7 +83,7 @@ public:
         cut=range;
         tets.subset.Preallocate(tets.mesh->elements.m);
         ymin=FLT_MAX;ymax=-FLT_MAX;
-        for(int p=0;p<tets.particles->array_collection->Size();p++){
+        for(int p=0;p<tets.particles->Size();p++){
             ymin=PhysBAM::min(ymin,tets.particles->X(p).y);
             ymax=PhysBAM::max(ymax,tets.particles->X(p).y);}
     }
@@ -192,8 +192,8 @@ template<class T> void Add_Tri2D_File(const std::string& filename,OPENGL_WORLD& 
         TRIANGULATED_AREA<T>* area;
         FILE_UTILITIES::Create_From_File<T>(filename,area);
         TRIANGULATED_SURFACE<T>* surface=new TRIANGULATED_SURFACE<T>(area->mesh,*new DEFORMABLE_PARTICLES<VECTOR<T,3> >);
-        surface->particles.array_collection->Add_Elements(area->particles.array_collection->Size());
-        for(int p=0;p<area->particles.array_collection->Size();p++)surface->particles.X(p)=VECTOR<T,3>(area->particles.X(p));
+        surface->particles.Add_Elements(area->particles.Size());
+        for(int p=0;p<area->particles.Size();p++)surface->particles.X(p)=VECTOR<T,3>(area->particles.X(p));
         area->Update_Bounding_Box();
         LOG::cout<<"bounding box: "<<*area->bounding_box<<std::endl;
         OPENGL_TRIANGULATED_SURFACE<T>* opengl_triangulated_surface=new OPENGL_TRIANGULATED_SURFACE<T>(*surface,false);

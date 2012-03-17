@@ -84,7 +84,7 @@ template<class T> void Update_Faces_And_Hierarchies_With_Collision_Free_Position
 template<class TV> void STRUCTURE_INTERACTION_GEOMETRY<TV>::
 Update_Faces_And_Hierarchies_With_Collision_Free_Positions(ARRAY_VIEW<const T> node_thickness,const T node_thickness_multiplier,ARRAY_VIEW<const TV> X_old_full)
 {
-    PHYSBAM_ASSERT(node_thickness.Size()==full_particles.array_collection->Size());
+    PHYSBAM_ASSERT(node_thickness.Size()==full_particles.Size());
     PHYSBAM_ASSERT(node_thickness_multiplier>=1);
     if(segmented_curve){
         segmented_curve->hierarchy->Update_Leaf_Boxes(X_old_full);

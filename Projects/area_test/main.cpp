@@ -156,7 +156,7 @@ void Test_Triangulated_Areas()
     TRIANGULATED_AREA<T>* ta2=TESSELLATION::Generate_Triangles(SPHERE<TV>(TV((T).5,(T).02),1),3);
 
     ta2->mesh.elements.Flattened()+=ta1->particles.X.m;
-    ta1->particles.array_collection->Append(*ta2->particles.array_collection);
+    ta1->particles.Append(ta2->particles);
     ta1->mesh.elements.Append_Elements(ta2->mesh.elements);
     ta1->Update_Number_Nodes();
     delete ta2;

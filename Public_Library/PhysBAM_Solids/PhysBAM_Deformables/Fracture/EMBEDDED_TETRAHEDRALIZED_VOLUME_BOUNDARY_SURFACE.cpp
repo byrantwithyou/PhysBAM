@@ -47,7 +47,7 @@ Create_Material_Surface_From_Manifold_Embedded_Surface(const bool verbose)
     material_surface_mesh.Clean_Memory();material_surface.Clean_Memory();
     TETRAHEDRON_MESH& mesh=embedded_object.simplicial_object.mesh;
     embedded_object.Update_Embedded_Particle_Positions(); // TODO: remove these?
-    material_surface_mesh.number_nodes=particles.array_collection->Size();
+    material_surface_mesh.number_nodes=particles.Size();
     material_surface_mesh.elements.Append_Elements(embedded_object.embedded_object.mesh.elements); // add embedded elements to boundary mesh
     ARRAY<bool> node_is_material(mesh.number_nodes);
     for(int t=0;t<mesh.elements.m;t++) node_is_material.Subset(mesh.elements(t))=embedded_object.node_in_simplex_is_material(t);

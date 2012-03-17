@@ -71,7 +71,7 @@ Close_Surface(TRIANGULATED_SURFACE<T>& ts,const bool merge_coincident_vertices,c
             TV centroid;
             for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);centroid+=ts.particles.X(node1)+ts.particles.X(node2);}
             centroid/=(T)(2*connected_segments(i).m); // assuming we count each node exactly twice, this gives us the average
-            int new_particle_index=ts.particles.array_collection->Add_Element();ts.mesh.number_nodes++;ts.particles.X(new_particle_index)=centroid;
+            int new_particle_index=ts.particles.Add_Element();ts.mesh.number_nodes++;ts.particles.X(new_particle_index)=centroid;
             if(ts.particles.store_velocity){
                 TV velocity;
                 for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);velocity+=ts.particles.V(node1)+ts.particles.V(node2);}

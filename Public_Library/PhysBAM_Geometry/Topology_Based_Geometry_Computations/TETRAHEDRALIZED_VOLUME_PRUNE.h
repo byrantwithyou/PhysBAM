@@ -21,7 +21,7 @@ namespace TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS
 template<class T>
 void Discard_Spikes_From_Adjacent_Elements(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<int>* deletion_list)
 {
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=tv.mesh.adjacent_elements!=0;if(!adjacent_elements_defined) tv.mesh.Initialize_Adjacent_Elements();
     if(deletion_list){
         deletion_list->Resize(0);
@@ -40,7 +40,7 @@ void Discard_Spikes_From_Adjacent_Elements(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<i
 template<class T>
 void Interior_Edges_With_Boundary_Nodes(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<VECTOR<int,2> >* deletion_list)
 {
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     bool neighbor_nodes_defined=tv.mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) tv.mesh.Initialize_Neighbor_Nodes();
     bool node_on_boundary_defined=tv.mesh.node_on_boundary!=0;if(!node_on_boundary_defined) tv.mesh.Initialize_Node_On_Boundary();
     bool boundary_nodes_defined=tv.mesh.boundary_nodes!=0;if(!boundary_nodes_defined) tv.mesh.Initialize_Boundary_Nodes();
@@ -76,7 +76,7 @@ void Interior_Edges_With_Boundary_Nodes(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<VECT
 template<class T>
 void Discard_Spikes(TETRAHEDRALIZED_VOLUME<T>& tv,ARRAY<int>* deletion_list)
 {
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     bool node_on_boundary_defined=tv.mesh.node_on_boundary!=0;if(!node_on_boundary_defined) tv.mesh.Initialize_Node_On_Boundary();
     if(deletion_list){
         deletion_list->Resize(0);

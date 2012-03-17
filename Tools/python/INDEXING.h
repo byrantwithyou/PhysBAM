@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 #include <boost/python/suite/indexing/indexing_suite.hpp>

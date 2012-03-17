@@ -359,7 +359,7 @@ Initialize_Components_And_Key_Bindings()
     filename=basedir+"/%d/positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
         positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_PARTICLES<TV> >(filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
-        positive_particles_component->particles->array_collection->template Add_Array<int>(ATTRIBUTE_ID_ID);
+        positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!positive_particles_component->Uses_Sets()) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
         Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('!',positive_particles_component->Toggle_Draw_Point_Numbers_CB());
@@ -371,7 +371,7 @@ Initialize_Components_And_Key_Bindings()
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_1",start_frame)){
         negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_PARTICLES<TV> >(filename,
             basedir+"/%d/negative_particles_%d",true,particles_stored_per_cell_uniform);
-        negative_particles_component->particles->array_collection->template Add_Array<int>(ATTRIBUTE_ID_ID);
+        negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!negative_particles_component->Uses_Sets()) negative_particles_component->opengl_points->color=OPENGL_COLOR(0,.5,1);
         Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('@',negative_particles_component->Toggle_Draw_Point_Numbers_CB());

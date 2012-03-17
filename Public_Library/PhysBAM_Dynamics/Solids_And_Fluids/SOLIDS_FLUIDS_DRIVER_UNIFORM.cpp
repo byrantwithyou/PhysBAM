@@ -94,8 +94,8 @@ Initialize()
     // this needs to be before Initialize_Fluids_Grids
     if(example.fluids_parameters.use_sph_for_removed_negative_particles){
         PARTICLE_LEVELSET_UNIFORM<T_GRID>& pls=example.fluids_parameters.particle_levelset_evolution->particle_levelset;
-        pls.template_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
-        pls.template_removed_particles.array_collection->template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
+        pls.template_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
+        pls.template_removed_particles.template Add_Array<T>(ATTRIBUTE_ID_MATERIAL_VOLUME);
         example.fluids_parameters.sph_evolution=new SPH_EVOLUTION_UNIFORM<T_GRID>(grid,*incompressible,example.fluids_parameters,particle_levelset_evolution);
         example.fluids_parameters.sph_evolution->Set_SPH_Callbacks(example);
         example.fluids_parameters.fluid_boundary=&example.fluids_parameters.fluid_boundary_water;}
@@ -968,14 +968,14 @@ Advect_Fluid(const T dt,const int substep)
         LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV> interpolation;
         if(pls.use_removed_positive_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++){
+            for(int p=0;p<particles.Size();p++){
                 TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(grid,*advection_face_velocities_ghost,X);
                 if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=fluids_parameters.removed_positive_particle_buoyancy_constant*fluids_parameters.gravity_direction; // buoyancy
                 particles.V(p)=V;}}
         if(pls.use_removed_negative_particles) for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
-            if(fluids_parameters.use_body_force) for(int p=0;p<particles.array_collection->Size();p++)
+            for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*fluids_parameters.gravity*fluids_parameters.gravity_direction; // ballistic
+            if(fluids_parameters.use_body_force) for(int p=0;p<particles.Size();p++)
                 particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(grid,incompressible->force,particles.X(p));}} // external forces
     if(fluids_parameters.sph) fluids_parameters.sph_evolution->sph_particles.V+=dt*incompressible->gravity*incompressible->downward_direction; // ballistic
     if(fluids_parameters.use_soot){
@@ -1409,16 +1409,16 @@ Write_Output_Files(const int frame)
             if(number_of_regions==1) pls=&example.fluids_parameters.particle_levelset_evolution->particle_levelset;
             else pls=example.fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->positive_particles(iterator.Cell_Index()))
-                number_of_positive_particles+=pls->positive_particles(iterator.Cell_Index())->array_collection->Size();
+                number_of_positive_particles+=pls->positive_particles(iterator.Cell_Index())->Size();
             for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->negative_particles(iterator.Cell_Index()))
-                number_of_negative_particles+=pls->negative_particles(iterator.Cell_Index())->array_collection->Size();
+                number_of_negative_particles+=pls->negative_particles(iterator.Cell_Index())->Size();
             LOG::cout<<number_of_positive_particles<<" positive and "<<number_of_negative_particles<<" negative particles "<<std::endl;
             if(pls->use_removed_positive_particles)
                 for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_positive_particles(iterator.Cell_Index()))
-                    number_of_removed_positive_particles+=pls->removed_positive_particles(iterator.Cell_Index())->array_collection->Size();
+                    number_of_removed_positive_particles+=pls->removed_positive_particles(iterator.Cell_Index())->Size();
             if(pls->use_removed_negative_particles)
                 for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) if(pls->removed_negative_particles(iterator.Cell_Index()))
-                    number_of_removed_negative_particles+=pls->removed_negative_particles(iterator.Cell_Index())->array_collection->Size();
+                    number_of_removed_negative_particles+=pls->removed_negative_particles(iterator.Cell_Index())->Size();
             LOG::cout<<number_of_removed_positive_particles<<" positive and "<<number_of_removed_negative_particles<<" negative removed particles "<<std::endl;}}
 
     Write_Time(frame);

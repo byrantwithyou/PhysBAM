@@ -77,11 +77,11 @@ public:
     {TRIANGULATED_SURFACE<T>* surface;
     TV u_vector=texture_vector1,v_vector=texture_vector2;
     GEOMETRY_PARTICLES<TV>* particles=new GEOMETRY_PARTICLES<TV>();
-    int vertex_1=particles->array_collection->Add_Element(),vertex_2=particles->array_collection->Add_Element(),vertex_3=particles->array_collection->Add_Element(),vertex_4=particles->array_collection->Add_Element();
+    int vertex_1=particles->Add_Element(),vertex_2=particles->Add_Element(),vertex_3=particles->Add_Element(),vertex_4=particles->Add_Element();
     particles->X(vertex_1)=(plane.x1);particles->X(vertex_2)=(plane.x1+u_vector);
     particles->X(vertex_3)=(plane.x1+u_vector+v_vector);particles->X(vertex_4)=(plane.x1+v_vector);
     ARRAY<VECTOR<int,3> > triangles(2);triangles(0).Set(0,1,3);triangles(1).Set(3,1,2);
-    TRIANGLE_MESH* mesh=new TRIANGLE_MESH(particles->array_collection->Size(),triangles);
+    TRIANGLE_MESH* mesh=new TRIANGLE_MESH(particles->Size(),triangles);
     surface=new TRIANGULATED_SURFACE<T>(*mesh,*particles);
     surface->Update_Triangle_List();surface->Update_Vertex_Normals();return surface;};
     

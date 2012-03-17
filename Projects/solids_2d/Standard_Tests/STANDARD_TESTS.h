@@ -331,12 +331,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             VECTOR<int,2> refine(3,8);int number_new_particles=(refine.y-refine.x+1)*(mattress_grid.counts.y-1);
             ARRAY<int> deleted_elements;deleted_elements.Preallocate(2*number_new_particles);
             ARRAY<VECTOR<int,3> > new_elements;new_elements.Preallocate(4*number_new_particles);
-            triangulated_area.particles.array_collection->Preallocate(number_new_particles);triangulated_area.Initialize_Square_Mesh_And_Particles(mattress_grid);
+            triangulated_area.particles.Preallocate(number_new_particles);triangulated_area.Initialize_Square_Mesh_And_Particles(mattress_grid);
             for(int t=1;t<=mesh.elements.m;t+=2){
                 VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[0]%mattress_grid.counts.x,j_minus_one=nodes1[0]/mattress_grid.counts.x;
                 if(i>refine.x+j_minus_one&&i<refine.y+j_minus_one){
                     VECTOR<int,3> nodes2=mesh.elements(t+1);
-                    int center_node=triangulated_area.particles.array_collection->Add_Element();
+                    int center_node=triangulated_area.particles.Add_Element();
                     triangulated_area.particles.X(center_node)=mattress_grid.Center(i,j_minus_one+1);
                     deleted_elements.Append(t);deleted_elements.Append(t+1);
                     new_elements.Append(VECTOR<int,3>(nodes1[0],nodes1[1],center_node));
@@ -347,7 +347,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 for(int t=1;t<=mesh.elements.m;t+=2){
                     VECTOR<int,3> nodes1=mesh.elements(t);int i=nodes1[0]%mattress_grid.counts.x,j_minus_one=nodes1[0]/mattress_grid.counts.x;
                     if(i==refine.x+j_minus_one||i==refine.y+j_minus_one){
-                        int center_node=triangulated_area.particles.array_collection->Add_Element();
+                        int center_node=triangulated_area.particles.Add_Element();
                         triangulated_area.particles.X(center_node)=mattress_grid.Center(i,j_minus_one+1);
                         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,center_node,VECTOR<int,2>(nodes1[0],nodes1[2]),TV((T).5,(T).5)));
                         if(i==refine.x+j_minus_one){
@@ -387,19 +387,19 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create();segmented_curve.Clean_Memory();
             int num_particles=51;T scale_factor=(T).1;segmented_curve.mesh.Initialize_Straight_Mesh(num_particles,false);
             for(int p=0;p<num_particles;p++){
-                int index=segmented_curve.particles.array_collection->Add_Element();segment_ramp_particles.Append(index);
+                int index=segmented_curve.particles.Add_Element();segment_ramp_particles.Append(index);
                 T x=(p-num_particles/2-1)*scale_factor;segmented_curve.particles.X(index)=VECTOR<T,2>((T)p,x*x*x);}
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,100);
             tests.Set_Initial_Particle_Configuration(segmented_curve.particles,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,20))),true);
             tests.Copy_And_Add_Structure(segmented_curve);
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
-            int new_free_node=particles.array_collection->Add_Element();particles.X(new_free_node)=TV(20,35);free_particles.nodes.Append(new_free_node);
+            int new_free_node=particles.Add_Element();particles.X(new_free_node)=TV(20,35);free_particles.nodes.Append(new_free_node);
             particles.mass(new_free_node)=particles.mass(0);
             tests.Add_Ground();
             break;}
         case 11:{
             SEGMENTED_CURVE<TV>& segmented_curve=*SEGMENTED_CURVE<TV>::Create(*new DEFORMABLE_PARTICLES<TV>);segmented_curve.Clean_Memory();
-            int num_particles=500;segmented_curve.mesh.Initialize_Straight_Mesh(num_particles,false);segmented_curve.particles.array_collection->Add_Elements(num_particles);
+            int num_particles=500;segmented_curve.mesh.Initialize_Straight_Mesh(num_particles,false);segmented_curve.particles.Add_Elements(num_particles);
             for(int p=0;p<num_particles;p++) segmented_curve.particles.X(p)=VECTOR<T,2>(0,(T)p/num_particles+(T).01);
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(segmented_curve,1);
             tests.Set_Initial_Particle_Configuration(segmented_curve.particles,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T).5),ROTATION<TV>::From_Angle((T).01))),true);

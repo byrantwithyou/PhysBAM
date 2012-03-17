@@ -38,7 +38,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SMOOTH_GEAR<
     typedef VECTOR<int,3> E;
     ARRAY<VECTOR<T,2> > pts;
     Boundary_Points(pts, gear.g, n);
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(pts.m*2+2);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(pts.m*2+2);
     for(int i=0;i<pts.m;i++){
         particles.X(i)=pts(i).Append(-gear.w);
         particles.X(i+pts.m)=pts(i).Append(gear.w);}
@@ -63,9 +63,9 @@ template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SMOOTH_GEAR<VEC
     TRIANGULATED_AREA<T>* area=TRIANGULATED_AREA<T>::Create();
     ARRAY<VECTOR<T,2> > pts;
     Boundary_Points(pts, gear, n);
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;particles.array_collection->Add_Elements(pts.m);
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;particles.Add_Elements(pts.m);
     area->particles.X=pts;
-    particles.array_collection->Add_Element();
+    particles.Add_Element();
     area->particles.X.Last()=TV();
     for(int i=0;i<pts.m-1;i++) area->mesh.elements.Append(E(i,i+1,area->particles.X.m));
     area->mesh.elements.Append(E(pts.m,1,area->particles.X.m));
@@ -77,7 +77,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SMOOTH_GEAR<V
     SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create();
     ARRAY<VECTOR<T,2> > pts;
     Boundary_Points(pts, gear, n);
-    curve->particles.array_collection->Add_Elements(pts.m);
+    curve->particles.Add_Elements(pts.m);
     curve->particles.X=pts;
     for(int i=0;i<pts.m-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
     curve->mesh.elements.Append(VECTOR<int,2>(pts.m-1,0));

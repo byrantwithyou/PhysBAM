@@ -24,7 +24,7 @@ public:
     T Blending_Fraction(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,
         const RENDERING_OBJECT<T>& intersection_object,const VECTOR<T,3>& intersection_point,const VECTOR<T,3>& same_side_normal) const
     {const RENDERING_TRIANGULATED_SURFACE<T>& triangulated_surface=*(const RENDERING_TRIANGULATED_SURFACE<T>*)&intersection_object;
-    assert(triangulated_surface.triangulated_surface.particles.array_collection->Size()==field.m);
+    assert(triangulated_surface.triangulated_surface.particles.Size()==field.m);
     int i,j,k;triangulated_surface.triangulated_surface.mesh.elements(ray.ray.aggregate_id).Get(i,j,k);
     ARRAY_VIEW<const VECTOR<T,3> > X(triangulated_surface.triangulated_surface.particles.X);
     VECTOR<T,3> weights=TRIANGLE_3D<T>::Barycentric_Coordinates(triangulated_surface.Object_Space_Point(intersection_point),X(i),X(j),X(k));

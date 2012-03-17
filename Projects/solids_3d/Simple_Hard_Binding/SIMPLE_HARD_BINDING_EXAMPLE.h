@@ -153,9 +153,9 @@ void Subsample_Surface()
     for(int i=0;i<subsamples*surface->mesh.elements.m;i++){
         int triangle=random_numbers.Get_Uniform_Integer(1,surface->mesh.elements.m);
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
-        int hard_bound_particle=particles.array_collection->Add_Element();
+        int hard_bound_particle=particles.Add_Element();
         binding_list.Add_Binding(new LINEAR_BINDING<TV,3>(particles,hard_bound_particle,surface->mesh.elements(triangle),weights));
-        int soft_bound_particle=particles.array_collection->Add_Element();
+        int soft_bound_particle=particles.Add_Element();
         soft_bindings.Add_Binding(VECTOR<int,2>(soft_bound_particle,hard_bound_particle),true);
         free_particles.nodes.Append(soft_bound_particle);}
 }
@@ -252,7 +252,7 @@ void Add_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list,ARR
     for(int i=0;i<subsamples;i++){
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
         // add hard binding
-        int hard_bound_particle=particles.array_collection->Add_Element_From_Deletion_List();
+        int hard_bound_particle=particles.Add_Element_From_Deletion_List();
         // get the parents in the coarse mesh
         VECTOR<int,3> parents=Parent_Nodes(triangle);
         TV location=TRIANGLE_3D<T>(particles.X.Subset(surface->mesh.elements(triangle))).Point_From_Barycentric_Coordinates(weights);
@@ -260,7 +260,7 @@ void Add_Subsamples(const int triangle,ARRAY<BINDING<TV>*>& new_binding_list,ARR
         weights=TRIANGLE_3D<T>(particles.X.Subset(parents)).Barycentric_Coordinates(location);
         new_binding_list.Append(new LINEAR_BINDING<TV,3>(particles,hard_bound_particle,parents,weights));
         // add soft binding
-        int soft_bound_particle=particles.array_collection->Add_Element_From_Deletion_List();
+        int soft_bound_particle=particles.Add_Element_From_Deletion_List();
         new_soft_bindings.Append(VECTOR<int,2>(soft_bound_particle,hard_bound_particle));
         // add to triangle_free_particles
         triangle_free_particles(triangle).Append(soft_bound_particle);}
@@ -278,8 +278,8 @@ void Delete_Subsamples(const int triangle)
     for(int i=0;i<triangle_free_particles(triangle).m;i++){
         int soft_bound_particle=triangle_free_particles(triangle)(i);
         int hard_bound_particle=soft_bindings.Parent(soft_bound_particle);
-        particles.array_collection->Add_To_Deletion_List(soft_bound_particle);
-        particles.array_collection->Add_To_Deletion_List(hard_bound_particle);}
+        particles.Add_To_Deletion_List(soft_bound_particle);
+        particles.Add_To_Deletion_List(hard_bound_particle);}
 
     triangle_free_particles(triangle).Clean_Memory();
 }
@@ -330,7 +330,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     // the minimum distance of each particle to a collision object
     ARRAY<ARRAY<T>,COLLISION_GEOMETRY_ID> particle_distances(collision_body_list.Size());
     for(COLLISION_GEOMETRY_ID i(0);i<particle_distances.Size();i++){
-        particle_distances(i).Resize(particles.array_collection->Size());
+        particle_distances(i).Resize(particles.Size());
         INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> subset=particle_distances(i).Subset(surface_particles);subset.Fill((T)FLT_MAX);}
     for(int i=0;i<surface_particles.m;i++){int p=surface_particles(i);
         for(COLLISION_GEOMETRY_ID body(0);body<collision_body_list.Size();body++)

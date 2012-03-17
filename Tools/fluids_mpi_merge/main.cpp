@@ -325,7 +325,7 @@ Merge_Particles(const std::string& filename)
             T_PARTICLES *&from_particles=local_data(p)(local.Node_Index()),*&to_particles=global_data(global.Node_Index());
             if(!from_particles) continue;
             if(!to_particles){exchange(to_particles,from_particles);continue;}
-            to_particles->array_collection->Append(*from_particles->array_collection);}}}
+            to_particles->Append(from_particles);}}}
     // write
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/"+filename,global_data);
     // free memory

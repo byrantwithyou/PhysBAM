@@ -19,9 +19,9 @@ template<class TV,class T_MESH>
 STRUCTURE<TV>* Append_Particles_And_Create_Copy(const MESH_OBJECT<TV,T_MESH>& mo,GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) // number_nodes must be set elsewhere
 {
     typename MESH_TO_OBJECT<TV,T_MESH>::TYPE* object=mo.Create(new_particles);
-    int offset=new_particles.array_collection->Size();
-    new_particles.array_collection->Append(*mo.particles.array_collection);
-    if(particle_indices) for(int p=0;p<mo.particles.array_collection->Size();p++) particle_indices->Append(p+offset);
+    int offset=new_particles.Size();
+    new_particles.Append(mo.particles);
+    if(particle_indices) for(int p=0;p<mo.particles.Size();p++) particle_indices->Append(p+offset);
     object->mesh.Initialize_Mesh_With_Particle_Offset(mo.mesh,offset);
     return object;
 }

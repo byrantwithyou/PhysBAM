@@ -1559,10 +1559,10 @@ void Get_Initial_Data()
             break;}
         case 53:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            int a=particles.array_collection->Add_Element();
-            int b=particles.array_collection->Add_Element();
-            int c=particles.array_collection->Add_Element();
-            int d=particles.array_collection->Add_Element();
+            int a=particles.Add_Element();
+            int b=particles.Add_Element();
+            int c=particles.Add_Element();
+            int d=particles.Add_Element();
             particles.X(a)=TV(1,0,0);
             particles.X(b)=TV(0,-1,0);
             particles.X(c)=TV(0,.5,.5);
@@ -1576,10 +1576,10 @@ void Get_Initial_Data()
             break;}
         case 54: case 55:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            int a=particles.array_collection->Add_Element();
-            int b=particles.array_collection->Add_Element();
-            int c=particles.array_collection->Add_Element();
-            int d=particles.array_collection->Add_Element();
+            int a=particles.Add_Element();
+            int b=particles.Add_Element();
+            int c=particles.Add_Element();
+            int d=particles.Add_Element();
             particles.X(a)=TV(1,0,0);
             particles.X(b)=TV(0,0,0);
             particles.X(c)=TV(0,0,1);
@@ -1605,7 +1605,7 @@ void Get_Initial_Data()
             break;}
         case 100:{
             TETRAHEDRALIZED_VOLUME<T>* tv=TETRAHEDRALIZED_VOLUME<T>::Create(particles);
-            particles.array_collection->Add_Elements(4);
+            particles.Add_Elements(4);
             particles.X(0)=TV(0,1,0);
 /*            particles.X(1)=TV(1/sqrt(3.),0,0);
             particles.X(2)=TV(-1/sqrt(12),0,.5);
@@ -2391,7 +2391,7 @@ void Update_Time_Varying_Material_Properties(const T time)
     if(time<critical) forces_are_removed=true;
     //if (forces_are_removed){ LOG::cout << "Hey look " << time << std::endl;}
     if(time>critical && forces_are_removed){
-       //  int n=deformable_body_collection.particles.array_collection->Size();LOG::cout << "Hey look at me " << n << std::endl;
+       //  int n=deformable_body_collection.particles.Size();LOG::cout << "Hey look at me " << n << std::endl;
         //for(int i=0;i<n;i++){deformable_body_collection.particles.X(i).y=10.0;}
                     forces_are_removed=false;
         

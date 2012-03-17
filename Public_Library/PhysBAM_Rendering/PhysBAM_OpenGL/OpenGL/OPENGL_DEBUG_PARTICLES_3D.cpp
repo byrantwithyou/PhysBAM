@@ -60,8 +60,8 @@ Display(const int in_color) const
     glGetIntegerv(GL_RENDER_MODE,&mode);
 #endif
 
-    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    ARRAY_VIEW<TV>* V=particles.array_collection->template Get_Array<TV>(ATTRIBUTE_ID_V);
+    ARRAY_VIEW<VECTOR<T,3> >* colors=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<TV>* V=particles.template Get_Array<TV>(ATTRIBUTE_ID_V);
 
 #ifndef USE_OPENGLES
     if(draw_velocities && V && mode!=GL_SELECT){

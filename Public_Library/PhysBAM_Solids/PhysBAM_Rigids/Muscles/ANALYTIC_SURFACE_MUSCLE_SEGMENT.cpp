@@ -165,7 +165,7 @@ template<class T> void ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
 Initialize_Inside_Particles(const TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
 {
     GEOMETRY_PARTICLES<TV>& particles=tetrahedralized_volume.particles;
-    inside_particle_rest_positions.Resize(particles.array_collection->Size());inside_particle_segments.Resize(particles.array_collection->Size());
+    inside_particle_rest_positions.Resize(particles.Size());inside_particle_segments.Resize(particles.Size());
     for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++){
         for(int v=0;v<4;v++){int node=tetrahedralized_volume.mesh.elements(t)(v);
             inside_particle_rest_positions(node)=frame.Inverse()*particles.X(node);
@@ -178,7 +178,7 @@ Initialize_Inside_Particles(const TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_vol
 template<class T> void ANALYTIC_SURFACE_MUSCLE_SEGMENT<T>::
 Get_Local_Positions_For_Particles(const int m,const int n,GEOMETRY_PARTICLES<TV>& particles)
 {
-    assert(particles.array_collection->Size()==m*n+2);
+    assert(particles.Size()==m*n+2);
     T length=Length(),dtheta=(T)two_pi/n;
     for(int i=0;i<m;i++){
         T x_fraction=i/(T)(m-1);T distance_from_axis=Get_Fractional_Curve_Value(x_fraction,false);

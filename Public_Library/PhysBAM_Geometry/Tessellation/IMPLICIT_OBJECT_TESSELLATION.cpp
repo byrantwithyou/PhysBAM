@@ -68,8 +68,8 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLI
 {
     TRIANGULATED_SURFACE<T>* triangles_1=Generate_Triangles(*implicit->implicit_object1);
     TRIANGULATED_SURFACE<T>* triangles_2=Generate_Triangles(*implicit->implicit_object2);
-    assert(triangles_1->particles.array_collection->Size()==triangles_2->particles.array_collection->Size());
-    for(int i=0;i<triangles_1->particles.array_collection->Size();i++)
+    assert(triangles_1->particles.Size()==triangles_2->particles.Size());
+    for(int i=0;i<triangles_1->particles.Size();i++)
         triangles_1->particles.X(i)=(1-implicit->alpha)*triangles_1->particles.X(i)+implicit->alpha*triangles_2->particles.X(i);
     return triangles_1;
 }
@@ -80,14 +80,14 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLI
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,3>,RIGID_GEOMETRY<VECTOR<T,3> > >* implicit)
 { // TODO(jontg): Better way to templatize this?
     TRIANGULATED_SURFACE<T>* surface=Generate_Triangles(*implicit->object_space_implicit_object);
-    for(int i=0;i<surface->particles.array_collection->Size();i++) surface->particles.X(i)=implicit->World_Space_Point(surface->particles.X(i));
+    for(int i=0;i<surface->particles.Size();i++) surface->particles.X(i)=implicit->World_Space_Point(surface->particles.X(i));
     return surface;
 }
 
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,3>,FRAME<VECTOR<T,3> > >* implicit)
 { // TODO(jontg): Better way to templatize this?
     TRIANGULATED_SURFACE<T>* surface=Generate_Triangles(*implicit->object_space_implicit_object);
-    for(int i=0;i<surface->particles.array_collection->Size();i++) surface->particles.X(i)=implicit->World_Space_Point(surface->particles.X(i));
+    for(int i=0;i<surface->particles.Size();i++) surface->particles.X(i)=implicit->World_Space_Point(surface->particles.X(i));
     return surface;
 }
 }

@@ -98,12 +98,12 @@ Update_Solids_Parameters(const T time)
         solids_parameters.rigid_body_evolution_parameters.max_rigid_body_angular_velocity=max_angular_velocity;
         arb.Set_Iterative_Tolerance((T)1e-3);
         arb.Set_Max_Iterations(100);
-        for(int i=box2->particle_index+2;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.Rigid_Body(i).is_static=true;}
+        for(int i=box2->particle_index+2;i<=rigid_body_collection.rigid_body_particle.Size();i++) rigid_body_collection.Rigid_Body(i).is_static=true;}
     else{
         solids_parameters.rigid_body_evolution_parameters.clamp_rigid_body_velocities=false;
         arb.Set_Iterative_Tolerance((T)1e-5);
         arb.Set_Max_Iterations(1000);
-        for(int i=box2->particle_index+2;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.Rigid_Body(i).is_static=false;}
+        for(int i=box2->particle_index+2;i<=rigid_body_collection.rigid_body_particle.Size();i++) rigid_body_collection.Rigid_Body(i).is_static=false;}
 }
 //#####################################################################
 // Function Make_Lathe_Chains

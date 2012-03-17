@@ -33,7 +33,7 @@ Initialize(const RIGID_BODY_FRACTURE_OBJECT_3D<T>& fracture_object_input,const V
     direction1=x1_x2_direction.Normalized();
 
     //make sure x1_x2 and x1_x3 are not collinear
-    while(direction1==x1_x3_direction.Normalized()&& null_space_nodes(2)<particles.array_collection->Size()){null_space_nodes(2)++;x1_x3_direction=fracture_object->Frame()*particles.X(null_space_nodes(2))-null_space_position;}
+    while(direction1==x1_x3_direction.Normalized()&& null_space_nodes(2)<particles.Size()){null_space_nodes(2)++;x1_x3_direction=fracture_object->Frame()*particles.X(null_space_nodes(2))-null_space_position;}
     direction2=TV::Cross_Product(x1_x2_direction,x1_x3_direction).Normalized();
 
     // New way of removing null space

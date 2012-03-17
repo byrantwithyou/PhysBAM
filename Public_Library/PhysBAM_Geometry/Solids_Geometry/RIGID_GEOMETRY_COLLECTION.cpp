@@ -70,7 +70,7 @@ template<class TV> RIGID_GEOMETRY_COLLECTION<TV>::
 template<class TV> bool RIGID_GEOMETRY_COLLECTION<TV>::
 Exists(const int particle) const
 {
-    return particle>=0 && particle<particles.array_collection->Size() && particles.rigid_geometry(particle);
+    return particle>=0 && particle<particles.Size() && particles.rigid_geometry(particle);
 }
 //#####################################################################
 // Function Exists
@@ -87,7 +87,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Update_Kinematic_Particles()
 {
     static_rigid_geometry.Remove_All();kinematic_rigid_geometry.Remove_All();
-    for(int p=0;p<particles.array_collection->Size();p++) if(Is_Active(p)){RIGID_GEOMETRY<TV>& rigid_geometry=Rigid_Geometry(p);
+    for(int p=0;p<particles.Size();p++) if(Is_Active(p)){RIGID_GEOMETRY<TV>& rigid_geometry=Rigid_Geometry(p);
         if(rigid_geometry.is_static) static_rigid_geometry.Append(p); else kinematic_rigid_geometry.Append(p);}
 }
 //#####################################################################
@@ -188,7 +188,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Destroy_Unreferenced_Geometry() 
 {
     ARRAY<bool> referenced(structure_list.Number_Of_Active_Elements());
-    for(int i=0;i<particles.array_collection->Size();i++) for(int j=0;j<particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j)>=0)
+    for(int i=0;i<particles.Size();i++) for(int j=0;j<particles.structure_ids(i).m;j++) if(particles.structure_ids(i)(j)>=0)
         referenced(structure_list.Element_Index(particles.structure_ids(i)(j)))=true;
     for(int i=structure_list.Number_Of_Active_Elements()-1;i>=0;i--) if(!referenced(i)) structure_list.Remove_Element(structure_list.Active_Element_Id(i));
 }
@@ -226,11 +226,11 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
     if(last_read_active!=local_frame && FILE_UTILITIES::File_Exists(active_name)){
         FILE_UTILITIES::Read_From_File(stream_type,active_name,version,next_id,active_ids);
         last_read_active=local_frame;PHYSBAM_ASSERT(version==1);
-        if(needs_destroy) for(int i=next_id;i<particles.array_collection->Size();i++) if(!particles.rigid_geometry(i)) needs_destroy->Append(i);
+        if(needs_destroy) for(int i=next_id;i<particles.Size();i++) if(!particles.rigid_geometry(i)) needs_destroy->Append(i);
         particles.Resize(next_id);}
     else{
-        for(int id=0;id<particles.array_collection->Size();id++) if(Is_Active(id)) active_ids.Append(id);
-        next_id=particles.array_collection->Size();}
+        for(int id=0;id<particles.Size();id++) if(Is_Active(id)) active_ids.Append(id);
+        next_id=particles.Size();}
     if(particles.rigid_geometry.Subset(active_ids).Contains(0)){ // don't need to re-read these things if we will not be initializing any newly-active bodies
         std::string key_file_list=STRING_UTILITIES::string_sprintf("%s/common/rigid_body_key_list",directory.c_str());
         std::string key_file=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_key",directory.c_str(),frame);
@@ -277,15 +277,15 @@ Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",directory.c_str(),frame),particles);
 
     // update names
-    rigid_body_names.Resize(particles.array_collection->Size());
+    rigid_body_names.Resize(particles.Size());
     ARRAY<int> active_ids;
-    for(int id=0;id<particles.array_collection->Size();id++) if(Is_Active(id)){active_ids.Append(id);rigid_body_names(id)=Rigid_Geometry(id).name;}
+    for(int id=0;id<particles.Size();id++) if(Is_Active(id)){active_ids.Append(id);rigid_body_names(id)=Rigid_Geometry(id).name;}
     if(active_ids.m>0 && !(check_stale && is_stale_active)){
         if(check_stale){
             if(!frame_list_active) frame_list_active=new ARRAY<int>;frame_list_active->Append(frame);
             FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/common/rigid_body_active_ids_list",directory.c_str()),*frame_list_active);
             is_stale_active=false;}
-        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,particles.array_collection->Size(),active_ids);}
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_active_ids",directory.c_str(),frame),(char)1,particles.Size(),active_ids);}
     std::ostream* output=FILE_UTILITIES::Safe_Open_Output(directory+"/common/rigid_body_names",false);
     *output<<rigid_body_names.Size()<<std::endl;
     for(int i=0;i<rigid_body_names.Size();i++) *output<<rigid_body_names(i)<<std::endl;

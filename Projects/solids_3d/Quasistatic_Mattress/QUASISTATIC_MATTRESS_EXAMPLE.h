@@ -107,7 +107,7 @@ void Get_Initial_Data()
 
     if(!cube_mesh) tetrahedralized_volume.Initialize_Octahedron_Mesh_And_Particles(mattress_grid);
     else tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
-    std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.elements.m << std::endl;
+    std::cout << "total vertices = " << particles.Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.elements.m << std::endl;
 
     particles.Store_Velocity(false);particles.Store_Mass();
     tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);

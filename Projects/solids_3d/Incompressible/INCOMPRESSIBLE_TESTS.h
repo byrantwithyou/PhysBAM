@@ -403,7 +403,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& buddha=tests.Create_Tetrahedralized_Volume(buddha_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             buddha.Update_Bounding_Box();
             TV center(buddha.bounding_box->Center());
-            for(int i=0;i<particles.array_collection->Size();i++){
+            for(int i=0;i<particles.Size();i++){
                 particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
                 particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center)*buddha_resize;
                 particles.X(i).y+=(T)2.234;}
@@ -423,7 +423,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TETRAHEDRALIZED_VOLUME<T>& buddha=tests.Create_Tetrahedralized_Volume(buddha_filename,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),true,false,1000);
             buddha.Update_Bounding_Box();
             TV center(buddha.bounding_box->Center());
-            for(int i=0;i<particles.array_collection->Size();i++){
+            for(int i=0;i<particles.Size();i++){
                 particles.X(i).y+=(T)2.234;}
 
             use_gravity=true;
@@ -706,7 +706,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.deformable_body_collection.mpi_solids->KD_Tree_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,ARRAY<TV>(particles.X));
         else{LOG::cout<<"needs 2 or 4 procs"<<std::endl;PHYSBAM_FATAL_ERROR();}}
     
-    LOG::cout<<"number of particles: "<<deformable_body_collection.particles.array_collection->Size()<<std::endl;
+    LOG::cout<<"number of particles: "<<deformable_body_collection.particles.Size()<<std::endl;
     if(use_gravity) solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
     {LOG::SCOPE scope("creating finite volume","creating finite volume");
     LOG::Stat("use_neohookean",use_neohookean);
@@ -763,11 +763,11 @@ void Read_Output_Files_Solids(const int frame) PHYSBAM_OVERRIDE
         FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/deformable_body_collection_particles."+FILE_UTILITIES::Number_To_String(frame),particles);
         TETRAHEDRALIZED_VOLUME<T>& volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         int particles_per_torus=volume.mesh.number_nodes/tori_initial_states.m;
-        if(volume.mesh.number_nodes%particles_per_torus!=0 || particles.array_collection->Size()%particles_per_torus!=0) PHYSBAM_FATAL_ERROR();
-        int number_of_tori_read=particles.array_collection->Size()/particles_per_torus;
+        if(volume.mesh.number_nodes%particles_per_torus!=0 || particles.Size()%particles_per_torus!=0) PHYSBAM_FATAL_ERROR();
+        int number_of_tori_read=particles.Size()/particles_per_torus;
         int number_of_old_tori=number_of_tori_read;
         if(number_of_tori_read>tori_initial_states.m) PHYSBAM_FATAL_ERROR();
-        particles.array_collection->Add_Elements(particles_per_torus*(tori_initial_states.m-number_of_tori_read));
+        particles.Add_Elements(particles_per_torus*(tori_initial_states.m-number_of_tori_read));
         T time=Time_At_Frame(frame);
         TV fall_X(0,-(T).5*(T)9.8*sqr(time),0);
         TV fall_V(0,-(T)9.8*time,0);

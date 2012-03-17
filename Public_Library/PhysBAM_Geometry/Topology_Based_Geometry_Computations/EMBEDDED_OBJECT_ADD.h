@@ -36,7 +36,7 @@ Add_Embedded_Particle_To_Embedded_Children(EMBEDDED_OBJECT<TV,d>& eo,const int e
 template<class TV,class T,int d> int
 Add_Embedded_Particle(EMBEDDED_OBJECT<TV,d>& eo,const VECTOR<int,2>& nodes,const T interpolation_fraction_input,const bool reinitialize_hash_table)
 {
-    assert(eo.simplicial_object.mesh.number_nodes==eo.particles.array_collection->Size() && eo.embedded_mesh.number_nodes==eo.particles.array_collection->Size() && eo.Embedded_Particle_On_Segment(nodes)<0);
+    assert(eo.simplicial_object.mesh.number_nodes==eo.particles.Size() && eo.embedded_mesh.number_nodes==eo.particles.Size() && eo.Embedded_Particle_On_Segment(nodes)<0);
     int new_embedded_particle=eo.embedded_particles.Add_Element();
     eo.simplicial_object.mesh.Add_Nodes(1);eo.embedded_mesh.Add_Nodes(1); // Need to update meshes and acceleration structures
     eo.interpolation_fraction.Append(eo.Clamp_Interpolation_Fraction(interpolation_fraction_input));

@@ -278,7 +278,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         bottom_collisions.object.Initialize_Hierarchy();Add_To_Fluid_Simulation(bottom_collisions);
 
         DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
-        for(int i=0;i<particles.array_collection->Size();i++)
+        for(int i=0;i<particles.Size();i++)
             if(particles.X(i).x==(T)0 || particles.X(i).x==(T)1 || particles.X(i).y==(T)0 || (abs(particles.X(i).y-(T).75) < 1e-10)) bound_particles.Append(i);
 
         original_position=solid_body_collection.deformable_body_collection.particles.X(50);
@@ -311,15 +311,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
         SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create(particles);
 
-        particles.array_collection->Add_Elements(8);
+        particles.Add_Elements(8);
         particles.X(0)=TV((T)0     ,(T)-.05);particles.X(1)=TV((T).006 ,(T)-.025);
         particles.X(2)=TV((T).0125 ,(T)0);   particles.X(3)=TV((T).006 ,(T).025);  
         particles.X(4)=TV((T)0     ,(T).05); particles.X(5)=TV((T)-.006,(T).025);  
         particles.X(6)=TV((T)-.0125,(T)0);   particles.X(7)=TV((T)-.006,(T)-.025);
 
-        curve->mesh.number_nodes=particles.array_collection->Size();curve->mesh.elements.Preallocate(particles.array_collection->Size());
-        for(int i=0;i<particles.array_collection->Size()-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
-        curve->mesh.elements.Append(VECTOR<int,2>(particles.array_collection->Size()-1,0));
+        curve->mesh.number_nodes=particles.Size();curve->mesh.elements.Preallocate(particles.Size());
+        for(int i=0;i<particles.Size()-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
+        curve->mesh.elements.Append(VECTOR<int,2>(particles.Size()-1,0));
         curve->Update_Segment_List();curve->Update_Bounding_Box();
         rigid_body.Add_Structure(*curve);
 

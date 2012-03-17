@@ -185,8 +185,8 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR_2D<T> 
 {
     if(use_object){
         if(particle_type == PARTICLE_LEVELSET<T,VECTOR_2D<T> >::NEGATIVE || particle_type == PARTICLE_LEVELSET<T,VECTOR_2D<T> >::REMOVED_NEGATIVE){
-            for(int k=particles.array_collection->Size();k>=1;k--) if(object_levelset.Lazy_Inside_Extended_Levelset(particles.X(k),-fluids_parameters.grid.dx)) particles.Delete_Particle(k);}
-        else for(int k=particles.array_collection->Size();k>=1;k--) if(object_levelset.Lazy_Inside_Extended_Levelset(particles.X(k))) particles.Delete_Particle(k);}
+            for(int k=particles.Size();k>=1;k--) if(object_levelset.Lazy_Inside_Extended_Levelset(particles.X(k),-fluids_parameters.grid.dx)) particles.Delete_Particle(k);}
+        else for(int k=particles.Size();k>=1;k--) if(object_levelset.Lazy_Inside_Extended_Levelset(particles.X(k))) particles.Delete_Particle(k);}
 }
 //#####################################################################
 // Function Get_Object_Velocities

@@ -131,7 +131,7 @@ Reinitialize(bool force)
         std::string frame_filename=STRING_UTILITIES::string_sprintf(filename.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(frame_filename)) FILE_UTILITIES::Read_From_File<RW>(frame_filename,body_motion);
         else return;}
-    if(body_motion.names.m!=opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size()){
+    if(body_motion.names.m!=opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.Size()){
         opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.Resize(0);
         opengl_component_rigid_body_collection.rigid_body_collection.rigid_geometry_collection.always_create_structure=true;
         RIGID_BODY<TV> *rigid_body;
@@ -152,7 +152,7 @@ Reinitialize(bool force)
             opengl_component_rigid_body_collection.rigid_body_collection.Rigid_Body(id).Update_Bounding_Box();
             id_to_index.Insert(id,i);
             opengl_component_rigid_body_collection.Initialize_One_Body(id,true);}}
-    for(int id=0;id<opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();id++){
+    for(int id=0;id<opengl_component_rigid_body_collection.rigid_body_collection.rigid_body_particle.Size();id++){
         FRAME<TV> rigid_base_transform_i=rigid_body_base_transform;
         T new_length=body_motion.trajectories(id_to_index.Get(id))(frame+1).length;
         rigid_base_transform_i.t*=new_length/default_length;

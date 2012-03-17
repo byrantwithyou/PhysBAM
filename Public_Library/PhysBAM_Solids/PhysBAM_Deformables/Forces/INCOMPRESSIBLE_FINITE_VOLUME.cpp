@@ -54,8 +54,8 @@ INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure)
                 int b=boundary_mesh.Simplex(element.Remove_Index(i));
                 if(b>=0) boundary_to_element(b).Set(t,i);}}
 
-    node_regions.Resize(particles.array_collection->Size());
-    for(int p=0;p<particles.array_collection->Size();p++){ARRAY<int>& incident=(*mesh.incident_elements)(p);
+    node_regions.Resize(particles.Size());
+    for(int p=0;p<particles.Size();p++){ARRAY<int>& incident=(*mesh.incident_elements)(p);
         for(int j=0;j<incident.m;j++) node_regions(p).Append_Unique_Elements(strain_measure.mesh.elements(incident(j)));}
 }
 //#####################################################################
@@ -110,7 +110,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
         if(i>1) boundary_normals(b)=-Bs_per_node(interior).Column(i-1);
         else boundary_normals(b)=Bs_per_node(interior)*VECTOR<T,d>::All_Ones_Vector();}
 
-    volumes_full.Resize(particles.array_collection->Size(),false,false);
+    volumes_full.Resize(particles.Size(),false,false);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY_VIEW<int>&> volumes_subset=volumes_full.Subset(strain_measure.mesh.elements.Flattened());
     volumes_subset.Fill((T)0);
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
@@ -125,7 +125,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 
     if(!rest_volumes_full.m){
         total_rest_volume=total_volume;
-        rest_volumes_full.Resize(particles.array_collection->Size());
+        rest_volumes_full.Resize(particles.Size());
         for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
             rest_volumes_full(p)=volumes_full(p);}}
 
@@ -211,7 +211,7 @@ Make_Incompressible(const T dt,const bool correct_volume)
 
     if(boundary_pressures.m){
         if(TV::m!=d) PHYSBAM_FATAL_ERROR();
-        gradient_full.Resize(particles.array_collection->Size(),false,false);
+        gradient_full.Resize(particles.Size(),false,false);
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> gradient_subset=gradient_full.Subset(force_dynamic_particles_list);
         gradient_subset.Fill(TV());
         T_BOUNDARY_MESH& boundary_mesh=*strain_measure.mesh.boundary_mesh;
@@ -236,10 +236,10 @@ Make_Incompressible(const T dt,const bool correct_volume)
     system.Project(divergence);
     LOG::cout<<"divergence magnitude = "<<system.Magnitude(divergence)<<std::endl;
 
-    pressure_full.Resize(particles.array_collection->Size(),false,false);cg_q_full.Resize(particles.array_collection->Size(),false,false);cg_s_full.Resize(particles.array_collection->Size(),false,false);cg_r_full.Resize(particles.array_collection->Size(),false,false);
+    pressure_full.Resize(particles.Size(),false,false);cg_q_full.Resize(particles.Size(),false,false);cg_s_full.Resize(particles.Size(),false,false);cg_r_full.Resize(particles.Size(),false,false);
     KRYLOV_VECTOR_T pressure(pressure_full,force_dynamic_particles_list),cg_q(cg_q_full,force_dynamic_particles_list),
         cg_s(cg_s_full,force_dynamic_particles_list),cg_r(cg_r_full,force_dynamic_particles_list);
-    cg_t_full.Resize(particles.array_collection->Size(),false,false);
+    cg_t_full.Resize(particles.Size(),false,false);
     KRYLOV_VECTOR_T cg_t(cg_t_full,force_dynamic_particles_list);
     pressure.v.Fill((T)0);
 
@@ -268,7 +268,7 @@ Test_System()
     RANDOM_NUMBERS<T> random;random.Set_Seed(1823);
     Update_Position_Based_State(0,true);
 
-    pressure_full.Resize(particles.array_collection->Size(),false,false);divergence_full.Resize(particles.array_collection->Size(),false,false);
+    pressure_full.Resize(particles.Size(),false,false);divergence_full.Resize(particles.Size(),false,false);
     const ARRAY<int> &fragment_dynamic_particles=force_dynamic_particles_list,
         &fragment_particles=force_dynamic_particles_list;
     INDIRECT_ARRAY<ARRAY<T> > volumes(volumes_full,fragment_dynamic_particles);
@@ -340,7 +340,7 @@ Gradient(ARRAY_VIEW<const T> p,ARRAY<TV>& gradient) const
 {
     ARRAY_VIEW<T> modifiable_p(p.Const_Cast());
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(modifiable_p);
-    gradient.Resize(particles.array_collection->Size(),false,false);
+    gradient.Resize(particles.Size(),false,false);
     gradient.Subset(force_dynamic_particles_list).Fill(TV());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
         VECTOR<int,d+1>& element=strain_measure.mesh.elements(t);
@@ -354,7 +354,7 @@ template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Negative_Divergence(ARRAY_VIEW<const TV> V,ARRAY<T>& divergence) const
 {
     if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(V.Const_Cast());
-    divergence.Resize(particles.array_collection->Size(),false,false);
+    divergence.Resize(particles.Size(),false,false);
     INDIRECT_ARRAY<ARRAY<T>,ARRAY<int>&> divergence_subset=divergence.Subset(force_dynamic_particles_list);
     divergence_subset.Fill(T());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
@@ -368,7 +368,7 @@ Negative_Divergence(ARRAY_VIEW<const TV> V,ARRAY<T>& divergence) const
 template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Diagonal_Elements(ARRAY<T>& D) const
 {
-    ARRAY<TV> forces(particles.array_collection->Size());
+    ARRAY<TV> forces(particles.Size());
     ARRAY<ARRAY<int> >& incident_elements=*strain_measure.mesh.incident_elements;
     for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
         D(p)=T();
@@ -387,7 +387,7 @@ template<class TV,int d> void INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 Update_Preconditioner()
 {
     if(!use_diagonal_preconditioner) return;
-    diagonal_preconditioner_full.Resize(particles.array_collection->Size(),false,false);
+    diagonal_preconditioner_full.Resize(particles.Size(),false,false);
     Diagonal_Elements(diagonal_preconditioner_full);
     for(ELEMENT_ITERATOR iterator(force_dynamic_particles);iterator.Valid();iterator.Next()){int p=iterator.Data();
         diagonal_preconditioner_full(p)=1/sqrt(diagonal_preconditioner_full(p));}
@@ -434,7 +434,7 @@ Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* part
 {
     if(repulsions_input) repulsions=repulsions_input;
 
-    neumann_boundary_count.Resize(particles.array_collection->Size());
+    neumann_boundary_count.Resize(particles.Size());
     // TODO: Unnecessarily expensive
     neumann_boundary_count.Fill(0);
     // TODO: Assuming we are created new simplifies this a little.
@@ -442,7 +442,7 @@ Set_Neumann_Boundary_Conditions(const ARRAY<COLLISION_PARTICLE_STATE<TV> >* part
     projection_data.edge_edge_pairs.Remove_All();
     projection_data.neumann_boundary_nodes.Remove_All();
     // TODO: Unnecessarily expensive
-    projection_data.neumann_boundary_normals.Resize(particles.array_collection->Size());projection_data.neumann_boundary_normals.Fill(TV());
+    projection_data.neumann_boundary_normals.Resize(particles.Size());projection_data.neumann_boundary_normals.Fill(TV());
 
     if(particle_states && use_rigid_clamp_projection)
         for(ELEMENT_ITERATOR inner_iterator(force_dynamic_particles);inner_iterator.Valid();inner_iterator.Next()){int p=inner_iterator.Data();
@@ -523,7 +523,7 @@ Check_Improvement()
      if(mpi_solids) better=mpi_solids->Reduce_Add_Global(better);
      if(mpi_solids) same=mpi_solids->Reduce_Add_Global(same);
      if(mpi_solids) worse=mpi_solids->Reduce_Add_Global(worse);
-    ave_improve/=particles.array_collection->Size();
+    ave_improve/=particles.Size();
     LOG::cout<<"INCOMP STAT total volume error: "<<abs(old_total_volume_accumulated-total_rest_volume)<<" => "<<abs(new_total_volume_accumulated-total_rest_volume)<<std::endl;
     LOG::cout<<"INCOMP STAT better: "<<better<<"    same: "<<same<<"    worse: "<<worse<<std::endl;
     LOG::cout<<"INCOMP STAT improvements -   min: "<<min_improve<<"    ave: "<<ave_improve<<"    max: "<<max_improve<<std::endl;

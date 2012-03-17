@@ -58,11 +58,11 @@ Get_Rigid_Body_Particle_List(const T_ARRAY& array)
 template<class TV> void POINTWISE_FORCE<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,const ARRAY<bool>& rigid_particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    if(influence_all_particles) force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.array_collection->Size())),particle_is_simulated);
+    if(influence_all_particles) force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.Size())),particle_is_simulated);
     else if(influenced_particles) force_particles.Update(*influenced_particles,particle_is_simulated);
 
     if(influence_all_rigid_body_particles){
-        ARRAY<int> all_rigid=Get_Rigid_Body_Particle_List(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particle.array_collection->Size()));
+        ARRAY<int> all_rigid=Get_Rigid_Body_Particle_List(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particle.Size()));
         force_rigid_body_particles.Update(all_rigid,rigid_particle_is_simulated);}
     else if(influenced_rigid_body_particles) force_rigid_body_particles.Update(*influenced_rigid_body_particles,rigid_particle_is_simulated);
 }

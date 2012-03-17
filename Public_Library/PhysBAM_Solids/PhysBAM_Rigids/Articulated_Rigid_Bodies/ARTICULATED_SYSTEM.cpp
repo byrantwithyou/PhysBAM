@@ -42,7 +42,7 @@ Initialize()
     angular_projection.Resize(joint_mesh.Size());
     location.Resize(joint_mesh.Size());
     effective_mass.Resize(joint_mesh.Size());
-    intermediate_twists.Resize(articulated_rigid_body.rigid_body_collection.rigid_body_particle.array_collection->Size());
+    intermediate_twists.Resize(articulated_rigid_body.rigid_body_collection.rigid_body_particle.Size());
     keep_joint.Remove_All();
     for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)){
         const RIGID_BODY<TV>& parent_body=*articulated_rigid_body.Parent(j);
@@ -83,7 +83,7 @@ Gather(const ARRAY_VIEW<const TWIST<TV>,JOINT_ID> x,ARRAY_VIEW<TWIST<TV> > y) co
 template<class TV> void ARTICULATED_SYSTEM<TV>::
 Inverse_Mass(ARRAY_VIEW<TWIST<TV> > x) const
 {
-    for(int i=0;i<articulated_rigid_body.rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+    for(int i=0;i<articulated_rigid_body.rigid_body_collection.rigid_body_particle.Size();i++)
         x(i)=articulated_rigid_body.rigid_body_collection.Rigid_Body(i).Inertia_Inverse_Times(x(i));
 }
 //#####################################################################
@@ -131,7 +131,7 @@ Kinetic_Energy() const
     Inverse_Mass(intermediate_twists);
     intermediate_twists+=articulated_rigid_body.rigid_body_collection.rigid_body_particle.twist;
     T ke=0;
-    for(int i=0;i<articulated_rigid_body.rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<articulated_rigid_body.rigid_body_collection.rigid_body_particle.Size();i++){
         RIGID_BODY<TV>& rb=articulated_rigid_body.rigid_body_collection.Rigid_Body(i);
         if(rb.Has_Infinite_Inertia()) continue;
         TWIST<TV> wrench=rb.Inertia_Times(intermediate_twists(i));

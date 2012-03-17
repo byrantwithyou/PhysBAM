@@ -36,7 +36,7 @@ Potential_Energy(const T time) const
 template<class TV> void BW_GRAVITY<TV>::
 Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
 {
-    force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.array_collection->Size())),particle_is_simulated);
+    force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.Size())),particle_is_simulated);
 }
 //#####################################################################
 template class BW_GRAVITY<VECTOR<float,1> >;

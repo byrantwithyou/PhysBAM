@@ -266,11 +266,11 @@ Delete_Particles_Inside_Objects(typename T_ARRAYS_SCALAR::template REBIND<T_PART
         T_PARTICLES& block_particles=*particles(block_index);
         if(collision_bodies_affecting_fluid->Occupied_Block(block)){
             // TODO: add back contour value??
-            // for(int k=particles.array_collection->Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(particles.X(k),contour_value,body_id,aggregate_id)) particles.Delete_Particle(k);
+            // for(int k=particles.Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(particles.X(k),contour_value,body_id,aggregate_id)) particles.Delete_Particle(k);
             // TODO(jontg): Shouldn't this delete particles inside the solid, not just on the surface?
-            for(int k=block_particles.array_collection->Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(block_particles.X(k),body_id,aggregate_id)) block_particles.array_collection->Delete_Element(k);}
+            for(int k=block_particles.Size()-1;k>=0;k--) if(collision_bodies_affecting_fluid->Inside_Any_Simplex_Of_Any_Body(block_particles.X(k),body_id,aggregate_id)) block_particles.Delete_Element(k);}
         callbacks->Delete_Particles_Inside_Objects(block_particles,particle_type,time);
-        if(block_particles.array_collection->Size()==0) particle_levelset_evolution->particle_levelset.Free_Particle_And_Clear_Pointer(particles(block_index));}}
+        if(block_particles.Size()==0) particle_levelset_evolution->particle_levelset.Free_Particle_And_Clear_Pointer(particles(block_index));}}
 }
 //#####################################################################
 // Function Set_Projection
@@ -603,7 +603,7 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> int FLUIDS_PARAMETERS_
 Total_Number_Of_Particles(const T_ARRAYS_PARTICLES& particles) const
 {
     int total=0;
-    for(CELL_ITERATOR iterator(*grid,3);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) total+=particles(iterator.Cell_Index())->array_collection->Size();
+    for(CELL_ITERATOR iterator(*grid,3);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) total+=particles(iterator.Cell_Index())->Size();
     return total;
 }
 //#####################################################################
@@ -620,7 +620,7 @@ Write_Particles(const STREAM_TYPE stream_type,const PARTICLES<TV>& template_part
     // write out one T_PARTICLES that contains all the particles
     if(write_flattened_particles){
         PARTICLES<TV>* all_particles=template_particles.Clone();
-        all_particles->array_collection->Initialize(particles.array);
+        all_particles->Initialize(particles.array);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s_all",output_directory.c_str(),frame,prefix.c_str()),*all_particles);}
 }
 //#####################################################################
@@ -635,7 +635,7 @@ Read_Particles(const STREAM_TYPE stream_type,const T_PARTICLES& template_particl
     if(typeid(template_particles)!=typeid(T_PARTICLES)) // swap in clones of template_particle for pure T_PARTICLESs
         for(int i=0;i<particles.array.Size();i++) if(particles.array(i)){
             T_PARTICLES* replacement=template_particles.Clone();
-            replacement->array_collection->Initialize(*particles.array(i)->array_collection);
+            replacement->Initialize(*particles.array(i));
             delete particles.array(i);
             particles.array(i)=replacement;}
     LOG::cout<<"Reading "<<Total_Number_Of_Particles(particles)<<" "<<prefix<<std::endl;

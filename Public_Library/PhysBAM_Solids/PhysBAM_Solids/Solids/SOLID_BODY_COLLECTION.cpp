@@ -65,8 +65,8 @@ Update_Simulated_Particles()
 {
     rigid_body_collection.Update_Simulated_Particles();
     deformable_body_collection.Update_Simulated_Particles(*example_forces_and_velocities);
-    int particles_number=deformable_body_collection.particles.array_collection->Size();
-    int rigid_particles_number=rigid_body_collection.rigid_body_particle.array_collection->Size();
+    int particles_number=deformable_body_collection.particles.Size();
+    int rigid_particles_number=rigid_body_collection.rigid_body_particle.Size();
 
     ARRAY<bool> particle_is_simulated(particles_number);
     particle_is_simulated.Subset(deformable_body_collection.simulated_particles).Fill(true);
@@ -101,7 +101,7 @@ Update_Time_Varying_Material_Properties(const T time)
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
-    assert(F_full.Size()==deformable_body_collection.particles.array_collection->Size());
+    assert(F_full.Size()==deformable_body_collection.particles.Size());
     for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_velocity_independent_forces) solids_forces(k)->Add_Velocity_Independent_Forces(F_full,rigid_F_full,time);
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
         if(rigid_body_collection.rigids_forces(k)->use_velocity_independent_forces) rigid_body_collection.rigids_forces(k)->Add_Velocity_Independent_Forces(rigid_F_full,time);
@@ -115,7 +115,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rig
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T time) const
 {
-    assert(F_full.Size()==deformable_body_collection.particles.array_collection->Size());
+    assert(F_full.Size()==deformable_body_collection.particles.Size());
     for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_velocity_dependent_forces) solids_forces(k)->Add_Velocity_Dependent_Forces(V_full,rigid_V_full,F_full,rigid_F_full,time);
     for(int k=0;k<rigid_body_collection.rigids_forces.m;k++)
         if(rigid_body_collection.rigids_forces(k)->use_velocity_dependent_forces) rigid_body_collection.rigids_forces(k)->Add_Velocity_Dependent_Forces(rigid_V_full,rigid_F_full,time);
@@ -129,7 +129,7 @@ template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<const TWIST<TV> > rigid_V_full,ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > rigid_F_full,const T scale,
     const T time) const
 {
-    assert(V_full.Size()==deformable_body_collection.particles.array_collection->Size() && F_full.Size()==deformable_body_collection.particles.array_collection->Size());
+    assert(V_full.Size()==deformable_body_collection.particles.Size() && F_full.Size()==deformable_body_collection.particles.Size());
     F_full.Subset(deformable_body_collection.dynamic_particles).Fill(TV()); // note we zero here because we will scale the forces below
     bool added_d=false,added_r=false;
     for(int k=0;k<solids_forces.m;k++) if(solids_forces(k)->use_implicit_velocity_independent_forces){
@@ -147,7 +147,7 @@ Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<cons
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
 Force_Differential(ARRAY_VIEW<const TV> dX_full,ARRAY_VIEW<TV> dF_full,const T time) const
 {
-    assert(dX_full.Size()==deformable_body_collection.particles.array_collection->Size() && dF_full.Size()==deformable_body_collection.particles.array_collection->Size());
+    assert(dX_full.Size()==deformable_body_collection.particles.Size() && dF_full.Size()==deformable_body_collection.particles.Size());
     dF_full.Subset(deformable_body_collection.simulated_particles).Fill(TV());
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++)
         if(deformable_body_collection.deformables_forces(k)->use_force_differential) deformable_body_collection.deformables_forces(k)->Add_Force_Differential(dX_full,dF_full,time);
@@ -174,10 +174,10 @@ Update_CFL()
         for(int i=0;i<deformable_body_collection.deformables_forces.m;i++){if(!deformable_body_collection.deformables_forces(i)->CFL_Valid()){cfl_valid=false;break;}}}
     else cfl_valid=false;
     if(!cfl_valid){
-        frequency.Resize(deformable_body_collection.particles.array_collection->Size(),false,false);
+        frequency.Resize(deformable_body_collection.particles.Size(),false,false);
         frequency.Subset(deformable_body_collection.simulated_particles).Fill(T_FREQUENCY_DEFORMABLE());
 
-        rigid_frequency.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
+        rigid_frequency.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
         rigid_frequency.Subset(rigid_body_collection.simulated_rigid_body_particles).Fill(T_FREQUENCY_RIGID());
 
         for(int i=0;i<solids_forces.m;i++){solids_forces(i)->Initialize_CFL(frequency,rigid_frequency);solids_forces(i)->Validate_CFL();}

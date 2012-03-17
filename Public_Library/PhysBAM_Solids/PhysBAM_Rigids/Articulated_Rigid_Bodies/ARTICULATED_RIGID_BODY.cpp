@@ -69,7 +69,7 @@ Set_Consistent_Child_Frame(JOINT_ID joint_id)
 template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Initialize_Breadth_First_Directed_Graph(const int root)
 {
-    delete breadth_first_directed_graph;breadth_first_directed_graph=new DIRECTED_GRAPH<int>(rigid_body_collection.rigid_body_particle.array_collection->Size());
+    delete breadth_first_directed_graph;breadth_first_directed_graph=new DIRECTED_GRAPH<int>(rigid_body_collection.rigid_body_particle.Size());
     joint_mesh.undirected_graph.Breadth_First_Directed_Graph(root,*breadth_first_directed_graph);breadth_first_directed_graph->Generate_Levels();
 }
 //#####################################################################
@@ -189,7 +189,7 @@ template<class TV> void ARTICULATED_RIGID_BODY_BASE<TV>::
 Store_Velocities_And_Momenta()
 {
     ARRAY<int>& dynamic_rigid_body_particles=rigid_body_collection.dynamic_rigid_body_particles;
-    linear_velocities_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());angular_momenta_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
+    linear_velocities_save.Resize(rigid_body_collection.rigid_body_particle.Size());angular_momenta_save.Resize(rigid_body_collection.rigid_body_particle.Size());
     angular_momenta_save.Subset(dynamic_rigid_body_particles)=rigid_body_collection.rigid_body_particle.angular_momentum.Subset(dynamic_rigid_body_particles);
     for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         linear_velocities_save(p)=rigid_body_collection.rigid_body_particle.twist(p).linear;}

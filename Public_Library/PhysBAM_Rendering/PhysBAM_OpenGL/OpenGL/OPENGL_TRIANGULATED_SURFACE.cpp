@@ -52,7 +52,7 @@ template<class T> OPENGL_TRIANGULATED_SURFACE<T>::
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Highlight_Current_Node() const
 {
-    int node=current_node%surface.particles.array_collection->Size();
+    int node=current_node%surface.particles.Size();
     OPENGL_SHAPES::Draw_Dot(surface.particles.X(node),OPENGL_COLOR(1,0,1),7);
     if(highlight_neighbors_of_current_node){
         if(!surface.mesh.neighbor_nodes) surface.mesh.Initialize_Neighbor_Nodes();
@@ -66,7 +66,7 @@ Highlight_Current_Node() const
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Print_Triangles_Incident_On_Current_Node()
 {
-    int node=current_node%surface.particles.array_collection->Size();
+    int node=current_node%surface.particles.Size();
     if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
     LOG::cout<<"number of incident triangles to node "<<node<<"="<<(*surface.mesh.incident_elements)(node).m<<std::endl;
     for(int t=0;t<(*surface.mesh.incident_elements)(node).m;t++){
@@ -80,7 +80,7 @@ Print_Triangles_Incident_On_Current_Node()
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Print_Neighbor_Nodes_Of_Current_Node()
 {
-    int node=current_node%surface.particles.array_collection->Size();
+    int node=current_node%surface.particles.Size();
     if(!surface.mesh.neighbor_nodes) surface.mesh.Initialize_Neighbor_Nodes();
     LOG::cout<<"number of neighbors of node "<<node<<"="<<(*surface.mesh.neighbor_nodes)(node).m<<std::endl;
     LOG::cout<<"neighbors of node "<<node<<"={";
@@ -93,7 +93,7 @@ Print_Neighbor_Nodes_Of_Current_Node()
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Draw_Triangles_Incident_On_Current_Node() const
 {
-    int node=current_node%surface.particles.array_collection->Size();
+    int node=current_node%surface.particles.Size();
     if(!surface.mesh.incident_elements) surface.mesh.Initialize_Incident_Elements();
     glDisable(GL_CULL_FACE);
 #ifndef USE_OPENGLES
@@ -137,13 +137,13 @@ template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Initialize_Vertex_Normals()
 {
     if(!vertex_normals) vertex_normals=new ARRAY<VECTOR<T,3> >;
-    vertex_normals->Resize(surface.particles.array_collection->Size());
+    vertex_normals->Resize(surface.particles.Size());
     vertex_normals->Fill(VECTOR<T,3>());
     for(int t=0;t<surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
         VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
         (*vertex_normals)(i)+=normal;(*vertex_normals)(j)+=normal;(*vertex_normals)(k)+=normal;}
-    for(int p=0;p<surface.particles.array_collection->Size();p++)(*vertex_normals)(p).Normalize();
+    for(int p=0;p<surface.particles.Size();p++)(*vertex_normals)(p).Normalize();
 }
 //#####################################################################
 // Function Delete_Vertex_Normals
@@ -173,7 +173,7 @@ Display(const int in_color) const
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
 
-    if(draw_particles) for(int i=0;i<surface.particles.array_collection->Size();i++) OPENGL_SHAPES::Draw_Dot(surface.particles.X(i),OPENGL_COLOR(1,0,1),7);
+    if(draw_particles) for(int i=0;i<surface.particles.Size();i++) OPENGL_SHAPES::Draw_Dot(surface.particles.X(i),OPENGL_COLOR(1,0,1),7);
 
     GLint mode=0;
 #ifndef USE_OPENGLES
@@ -274,7 +274,7 @@ template<class T> RANGE<VECTOR<float,3> > OPENGL_TRIANGULATED_SURFACE<T>::
 Bounding_Box() const
 {
     RANGE<VECTOR<float,3> > box=RANGE<VECTOR<float,3> >::Empty_Box();
-    for(int i=0;i<surface.particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,3>(surface.particles.X(i))));
+    for(int i=0;i<surface.particles.Size();i++) box.Enlarge_To_Include_Point(World_Space_Point(VECTOR<float,3>(surface.particles.X(i))));
     return box;
 }
 //#####################################################################
@@ -437,7 +437,7 @@ Use_Display_List(int input_display_list_id)
 template<class T> void OPENGL_TRIANGULATED_SURFACE<T>::
 Use_Vertex_Colors()
 {
-    if(!vertex_colors) vertex_colors=new ARRAY<OPENGL_COLOR>(surface.particles.array_collection->Size(),false); // TODO: if using big particle pool not efficient
+    if(!vertex_colors) vertex_colors=new ARRAY<OPENGL_COLOR>(surface.particles.Size(),false); // TODO: if using big particle pool not efficient
 }
 //#####################################################################
 // Function Set_Vertex_Color

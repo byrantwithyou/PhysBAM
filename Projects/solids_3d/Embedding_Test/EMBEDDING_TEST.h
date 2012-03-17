@@ -74,9 +74,9 @@ void Get_Initial_Data()
         TETRAHEDRALIZED_VOLUME<T>& volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
         SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
         SEGMENTED_CURVE<TV>& curve2=*SEGMENTED_CURVE<TV>::Create(particles);
-        VECTOR<int,3> tri_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
+        VECTOR<int,3> tri_parts(particles.Add_Element(),particles.Add_Element(),particles.Add_Element());
         VECTOR<int,3> etri_parts=tri_parts;
-        VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
+        VECTOR<int,4> tet_parts(particles.Add_Element(),particles.Add_Element(),particles.Add_Element(),particles.Add_Element());
         particles.mass.Subset(tri_parts).Fill((T)1./3);
         particles.mass.Subset(tet_parts).Fill((T)1./4);
         particles.X(tri_parts[0])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
@@ -93,13 +93,13 @@ void Get_Initial_Data()
             if(tet.Inside(point)){
                 TV coordinates=tet.First_Three_Barycentric_Coordinates(point);
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,tri_parts(i),tet_parts,coordinates));
-                etri_parts[i]=particles.array_collection->Add_Element();
+                etri_parts[i]=particles.Add_Element();
                 LOG::cout<<"embedding particle "<<etri_parts[i]<<" to "<<tri_parts[i]<<std::endl;
                 particles.X(etri_parts[i])=particles.X(tri_parts[i]);
                 curve2.mesh.elements.Append(VECTOR<int,2>(etri_parts[i],tri_parts[i]));
                 soft_bindings.Add_Binding(VECTOR<int,2>(etri_parts[i],tri_parts[i]),false);}}
         if(target_position){
-            int target_particle=particles.array_collection->Add_Element();
+            int target_particle=particles.Add_Element();
             particles.X(target_particle)=particles.X(7);
             particles.mass(target_particle)=1; // TODO: make this work for zero mass
             curve.mesh.elements.Append(VECTOR<int,2>(6,7));
@@ -121,11 +121,11 @@ void Get_Initial_Data()
         TRIANGULATED_SURFACE<T>* surface=(TRIANGULATED_SURFACE<T>*)temporary_surface.Append_Particles_And_Create_Copy(particles);
         TETRAHEDRALIZED_VOLUME<T>& temporary_volume=*TETRAHEDRALIZED_VOLUME<T>::Create();surface->Update_Bounding_Box();
         temporary_volume.Initialize_Cube_Mesh_And_Particles(GRID<TV>(VECTOR<int,3>(2,2,2),*surface->bounding_box));
-        constrained_point=particles.array_collection->Size()+1;
-        LOG::cout<<"particles.array_collection->Size() "<<particles.array_collection->Size()<<std::endl;
+        constrained_point=particles.Size()+1;
+        LOG::cout<<"particles.Size() "<<particles.Size()<<std::endl;
         TETRAHEDRALIZED_VOLUME<T>* volume=(TETRAHEDRALIZED_VOLUME<T>*)temporary_volume.Append_Particles_And_Create_Copy(particles);
         
-        for(int i=0;i<particles.array_collection->Size();i++) particles.mass(i)=0;
+        for(int i=0;i<particles.Size();i++) particles.mass(i)=0;
         //volume->density=float(1)/volume->Total_Volume();
         T density=TV::dimension==1?1:TV::dimension==2?100:1000;
         SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(*surface,density);
@@ -137,7 +137,7 @@ void Get_Initial_Data()
         TRIANGULATED_SURFACE<T>* esurface=(TRIANGULATED_SURFACE<T>::Create(particles));
         HASHTABLE<int,int> hard_to_soft;
         surface->mesh.elements.Flattened().Get_Unique(tri_particles);
-        particles.array_collection->Preallocate(tri_particles.m);
+        particles.Preallocate(tri_particles.m);
         for(int t=0;t<volume->mesh.elements.m;t++){
             const VECTOR<int,4>& nodes=volume->mesh.elements(t);
             TETRAHEDRON<T> tet(particles.X.Subset(nodes));
@@ -145,7 +145,7 @@ void Get_Initial_Data()
                 if(!hard_to_soft.Contains(p)  && tet.Inside(particles.X(p))){
                     TV coordinates=tet.First_Three_Barycentric_Coordinates(particles.X(p));
                     binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,p,nodes,coordinates));
-                    int soft_particle=particles.array_collection->Add_Element(); // TODO: make add more efficient
+                    int soft_particle=particles.Add_Element(); // TODO: make add more efficient
                     particles.mass(soft_particle)=particles.mass(p);
                     particles.X(soft_particle)=particles.X(p);
                     hard_to_soft.Insert(p,soft_particle);
@@ -161,8 +161,8 @@ void Get_Initial_Data()
         TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);
         TETRAHEDRALIZED_VOLUME<T>& volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
         SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
-        VECTOR<int,3> tri_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
-        VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
+        VECTOR<int,3> tri_parts(particles.Add_Element(),particles.Add_Element(),particles.Add_Element());
+        VECTOR<int,4> tet_parts(particles.Add_Element(),particles.Add_Element(),particles.Add_Element(),particles.Add_Element());
         particles.mass.Subset(tri_parts).Fill((T)1./3);
         particles.mass.Subset(tet_parts).Fill((T)1./4);
         particles.X(tri_parts[0])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
@@ -172,12 +172,12 @@ void Get_Initial_Data()
         particles.X(tet_parts[1])=TV((T)-0.433013,(T)-0.018620,(T)0.750000);
         particles.X(tet_parts[2])=TV((T)0.866025,(T)-0.018620,(T)0.000000);
         particles.X(tet_parts[3])=TV((T)0.000000,(T)1.000000,(T)0.000000);
-        particles.array_collection->Add_Element(); // fake soft particle
-        particles.array_collection->Add_Element(); // fake constrained point
+        particles.Add_Element(); // fake soft particle
+        particles.Add_Element(); // fake constrained point
         particles.X(7)=particles.X(8)=particles.X(3);
         particles.mass(7)=particles.mass(8)=particles.mass(3);
         if(test_3_use_bound){
-            particles.array_collection->Add_Element(); // hard bound particle
+            particles.Add_Element(); // hard bound particle
             particles.X(9)=particles.X(1);
             particles.mass(9)=particles.mass(1);
             curve.mesh.elements.Append(VECTOR<int,2>(9,7));
@@ -196,9 +196,9 @@ void Get_Initial_Data()
         TRIANGULATED_SURFACE<T>& e_surface=*TRIANGULATED_SURFACE<T>::Create(particles);
         TETRAHEDRALIZED_VOLUME<T>& volume=*TETRAHEDRALIZED_VOLUME<T>::Create(particles);
         SEGMENTED_CURVE<TV>& curve=*SEGMENTED_CURVE<TV>::Create(particles);
-        VECTOR<int,3> tri_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
+        VECTOR<int,3> tri_parts(particles.Add_Element(),particles.Add_Element(),particles.Add_Element());
         VECTOR<int,3> etri_parts=tri_parts;
-        VECTOR<int,4> tet_parts(particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element(),particles.array_collection->Add_Element());
+        VECTOR<int,4> tet_parts(particles.Add_Element(),particles.Add_Element(),particles.Add_Element(),particles.Add_Element());
         particles.mass.Subset(tri_parts).Fill((T)1./3);
         particles.mass.Subset(tet_parts).Fill((T)1./4);
         particles.X(tri_parts[0])=TV((T)-0.668156,(T)1.666096,(T)1.202544);
@@ -216,13 +216,13 @@ void Get_Initial_Data()
                 LOG::cout<<"found point "<<tri_parts(i)<<" inside the tet "<<std::endl;
                 TV coordinates=tet.First_Three_Barycentric_Coordinates(point);
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,tri_parts(i),tet_parts,coordinates));
-                etri_parts[i]=particles.array_collection->Add_Element();assert(etri_parts[i]==8); // 8
+                etri_parts[i]=particles.Add_Element();assert(etri_parts[i]==8); // 8
                 particles.mass(7)=1;
                 LOG::cout<<"embedding particle "<<etri_parts[i]<<" to "<<tri_parts[i]<<std::endl;
                 particles.X(etri_parts[i])=particles.X(tri_parts[i]);
                 soft_bindings.Add_Binding(VECTOR<int,2>(etri_parts[i],tri_parts[i]),false);
             }}
-        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==9); // 9
+        particles.Add_Element();assert(particles.Size()==9); // 9
         particles.X(8)=particles.X(7);
         particles.mass(8)=1; // TODO: make this work for zero mass
         constrained_point=9;

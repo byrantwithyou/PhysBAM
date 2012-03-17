@@ -206,7 +206,7 @@ int Add_Deformable_Object(const GRID<TV>& cloth_grid,const MATRIX<T,4>& transfor
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
 
     triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
-    particles.array_collection->Add_Elements(triangle_mesh.number_nodes);
+    particles.Add_Elements(triangle_mesh.number_nodes);
     for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);particles.X(node)=transform*VECTOR_3D<T>(cloth_grid.X(i,j));particles.V(node)=VECTOR_3D<T>();}
 

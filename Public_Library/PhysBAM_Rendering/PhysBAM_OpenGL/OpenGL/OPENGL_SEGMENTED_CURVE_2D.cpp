@@ -70,7 +70,7 @@ Display(const int in_color) const
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int t=0;t<curve.particles.array_collection->Size();t++){
+        for(int t=0;t<curve.particles.Size();t++){
             OpenGL_Vertex(curve.particles.X(t),vertices);
         }
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);
@@ -79,7 +79,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
     if (draw_vertex_positions) {
         vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=0;t<curve.particles.array_collection->Size();t++){
+        for(int t=0;t<curve.particles.Size();t++){
             VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,2>(curve.particles.X(t)));
             OpenGL_String(curve.particles.X(t),STRING_UTILITIES::string_sprintf("<%f %f>",world_space_pos.x,world_space_pos.y));
         }
@@ -89,7 +89,7 @@ Display(const int in_color) const
     if (draw_velocities && curve.particles.store_velocity){
         velocity_color.Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int t=0;t<curve.particles.array_collection->Size();t++)
+        for(int t=0;t<curve.particles.Size();t++)
             OPENGL_SHAPES::Draw_Arrow(curve.particles.X(t),curve.particles.X(t)+velocity_scale*curve.particles.V(t),vertices);
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);}
 
@@ -106,7 +106,7 @@ Bounding_Box() const
     float xmin,xmax,ymin,ymax;
     xmin=xmax=curve.particles.X(0).x;
     ymin=ymax=curve.particles.X(0).y;
-    for(int i=0;i<curve.particles.array_collection->Size();i++){
+    for(int i=0;i<curve.particles.Size();i++){
         xmin=min(xmin,(float)curve.particles.X(i).x);xmax=max(xmax,(float)curve.particles.X(i).x);
         ymin=min(ymin,(float)curve.particles.X(i).y);ymax=max(ymax,(float)curve.particles.X(i).y);}
     return World_Space_Box(RANGE<VECTOR<float,3> >(xmin,xmax,ymin,ymax,0,0));

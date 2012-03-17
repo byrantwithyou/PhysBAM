@@ -99,7 +99,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     else tetrahedralized_volume.Initialize_Cube_Mesh_And_Particles(mattress_grid);
 
     for(int i=0;i<mattress_grid.m;i++)for(int k=0;k<mattress_grid.mn;k++){
-        constrained_nodes.Append(tetrahedralized_volume.particles.array_collection->Size()+1-(1+i+k*mattress_grid.m*mattress_grid.n));}
+        constrained_nodes.Append(tetrahedralized_volume.particles.Size()+1-(1+i+k*mattress_grid.m*mattress_grid.n));}
 
 
     tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();
@@ -108,8 +108,8 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     tetrahedralized_volume.particles.Store_Mass();
     tetrahedralized_volume.tetrahedron_mesh.Initialize_Incident_Tetrahedrons();
 
-    phi_on_tet_nodes.Resize(1,tetrahedralized_volume.particles.array_collection->Size());
-    for(int t=0;t<tetrahedralized_volume.particles.array_collection->Size();t++)phi_on_tet_nodes(t)=(*implicit_surface)(tetrahedralized_volume.particles.X(t));
+    phi_on_tet_nodes.Resize(1,tetrahedralized_volume.particles.Size());
+    for(int t=0;t<tetrahedralized_volume.particles.Size();t++)phi_on_tet_nodes(t)=(*implicit_surface)(tetrahedralized_volume.particles.X(t));
 
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
@@ -117,7 +117,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl;
     tetrahedralized_volume.Set_Density(1000);
     tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
@@ -192,7 +192,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
 //
 //    //shift above floor && scale
 //    int i;
-//    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.2;}
+//    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.2;}
 //    embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
 //    
 //    if(restart_step_number == 0){

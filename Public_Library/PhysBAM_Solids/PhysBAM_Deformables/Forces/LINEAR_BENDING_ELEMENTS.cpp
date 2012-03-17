@@ -171,7 +171,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const
 template<class TV> void LINEAR_BENDING_ELEMENTS<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V,ARRAY_VIEW<TV> F,const T time) const
 {
-    PHYSBAM_ASSERT(V.Size()==particles.array_collection->Size());
+    PHYSBAM_ASSERT(V.Size()==particles.Size());
     Add_Force(damping,V,F);
 }
 //#####################################################################

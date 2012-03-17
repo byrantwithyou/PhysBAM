@@ -52,15 +52,15 @@ public:
 
 private:
     void Initialize(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles_input)
-    {particles.array_collection->Initialize(*particles_input.array_collection);
-    ellipsoids.Resize(particles.array_collection->Size());metrics.Resize(particles.array_collection->Size());}
+    {particles.Initialize(particles_input);
+    ellipsoids.Resize(particles.Size());metrics.Resize(particles.Size());}
 
     void Initialize(const GRID<TV>& grid,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,3> >& particles_array)
     {int number_of_particles=0;
-    for(CELL_ITERATOR it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) number_of_particles+=particles_array(it.Cell_Index())->array_collection->Size();
+    for(CELL_ITERATOR it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) number_of_particles+=particles_array(it.Cell_Index())->Size();
     LOG::cout<<"Processing "<<number_of_particles<<" removed particles"<<std::endl;
-    particles.array_collection->Preallocate(number_of_particles);ellipsoids.Resize(number_of_particles);metrics.Resize(number_of_particles);
-    for(CELL_ITERATOR it(grid,3);it.Valid();it.Next())if(particles_array(it.Cell_Index())) particles.array_collection->Take(*particles_array(it.Cell_Index())->array_collection);}
+    particles.Preallocate(number_of_particles);ellipsoids.Resize(number_of_particles);metrics.Resize(number_of_particles);
+    for(CELL_ITERATOR it(grid,3);it.Valid();it.Next()) if(particles_array(it.Cell_Index())) particles.Take(*particles_array(it.Cell_Index()));}
 
 //#####################################################################
 public:

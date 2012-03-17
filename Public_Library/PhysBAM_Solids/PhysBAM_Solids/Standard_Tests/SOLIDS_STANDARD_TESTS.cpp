@@ -46,7 +46,7 @@ Add_Gravity()
 template<class TV> void SOLIDS_STANDARD_TESTS<TV>::
 Bind_Particles_In_Rigid_Body(RIGID_BODY<TV>& rigid_body)
 {
-    Bind_Particles_In_Rigid_Body(rigid_body,IDENTITY_ARRAY<>(solid_body_collection.deformable_body_collection.particles.array_collection->Size()));
+    Bind_Particles_In_Rigid_Body(rigid_body,IDENTITY_ARRAY<>(solid_body_collection.deformable_body_collection.particles.Size()));
 }
 //#####################################################################
 // Function Bind_Unbound_Particles_In_Rigid_Body

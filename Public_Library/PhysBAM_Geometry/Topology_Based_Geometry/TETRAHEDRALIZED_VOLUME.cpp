@@ -254,7 +254,7 @@ Maximum_Aspect_Ratio(int* index) const
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Interior_Aspect_Ratio(int* index)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int t_save=0;T maximum=0;
     if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m == 4){
@@ -271,7 +271,7 @@ Maximum_Interior_Aspect_Ratio(int* index)
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Boundary_Aspect_Ratio(int* index)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int t_save=0;T maximum=0;
     if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m != 4){
@@ -301,7 +301,7 @@ Average_Aspect_Ratio()
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Average_Interior_Aspect_Ratio()
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int total=0;T sum=0;
     if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m == 4){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}}
@@ -317,7 +317,7 @@ Average_Interior_Aspect_Ratio()
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Average_Boundary_Aspect_Ratio()
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
     int total=0;T sum=0;
     if(tetrahedron_list) for(int t=0;t<mesh.elements.m;t++){if((*mesh.adjacent_elements)(t).m != 4){total++;sum+=(*tetrahedron_list)(t).Aspect_Ratio();}}
@@ -359,7 +359,7 @@ Maximum_Dihedral_Angle(int* index) const
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Edge_Length(int* index)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
     int s_save=0;T maximum=0;
     for(int s=0;s<mesh.segment_mesh->elements.m;s++){int i,j;mesh.segment_mesh->elements(s).Get(i,j);
@@ -374,7 +374,7 @@ Maximum_Edge_Length(int* index)
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Minimum_Edge_Length(int* index)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
     int s_save=0;T minimum=FLT_MAX;
     for(int s=0;s<mesh.segment_mesh->elements.m;s++){int i,j;mesh.segment_mesh->elements(s).Get(i,j);
@@ -390,7 +390,7 @@ Minimum_Edge_Length(int* index)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Advance_Interior_Laplacian_Smoothing()
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool neighbor_nodes_defined=mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) mesh.Initialize_Neighbor_Nodes();
     bool node_on_boundary_defined=mesh.node_on_boundary!=0;if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
     // compute the centroid of the neighbors - if on the boundary, just use boundary neighbors
@@ -578,10 +578,10 @@ Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& im
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Maximum_Magnitude_Phi_On_Boundary(const IMPLICIT_OBJECT<TV>& implicit_surface,int* index)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool node_on_boundary_defined=mesh.node_on_boundary!=0;if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
     T phi=0,max_phi=0;int p_save=0;
-    for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.node_on_boundary)(p)){phi=abs(implicit_surface(particles.X(p)));if(phi > max_phi){max_phi=phi;p_save=p;}}
+    for(int p=0;p<particles.Size();p++) if((*mesh.node_on_boundary)(p)){phi=abs(implicit_surface(particles.X(p)));if(phi > max_phi){max_phi=phi;p_save=p;}}
     if(index) *index=p_save;
     if(!node_on_boundary_defined){delete mesh.node_on_boundary;mesh.node_on_boundary=0;}
     return max_phi;
@@ -592,7 +592,7 @@ Maximum_Magnitude_Phi_On_Boundary(const IMPLICIT_OBJECT<TV>& implicit_surface,in
 template<class T> T TETRAHEDRALIZED_VOLUME<T>::
 Volume_Incident_On_A_Particle(const int particle_index)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
     T total_incident_volume=0;
     for(int t=0;t<(*mesh.incident_elements)(particle_index).m;t++){int i,j,k,l;mesh.elements((*mesh.incident_elements)(particle_index)(t)).Get(i,j,k,l);
@@ -645,7 +645,7 @@ Compute_Nodal_Volumes(bool save_tetrahedron_volumes)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Print_Statistics(std::ostream& output)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     Update_Bounding_Box();
     if(!mesh.segment_mesh) mesh.Initialize_Segment_Mesh();
     if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
@@ -653,8 +653,8 @@ Print_Statistics(std::ostream& output)
     if(!mesh.boundary_mesh) mesh.Initialize_Boundary_Mesh();
 
     output<<"tetrahedrons = "<<mesh.elements.m<<std::endl;
-    output<<"particles = "<<particles.array_collection->Size()<<std::endl;
-    {int particles_touched=0;for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.incident_elements)(p).m) particles_touched++;
+    output<<"particles = "<<particles.Size()<<std::endl;
+    {int particles_touched=0;for(int p=0;p<particles.Size();p++) if((*mesh.incident_elements)(p).m) particles_touched++;
     output<<"particles touched = "<<particles_touched<<std::endl;}
     output<<"bounding box = "<<*bounding_box<<std::endl;
     if(particles.store_velocity){

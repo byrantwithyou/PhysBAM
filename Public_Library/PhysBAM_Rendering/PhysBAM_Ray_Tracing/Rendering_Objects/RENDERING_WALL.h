@@ -133,8 +133,8 @@ public:
     {TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
    
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;
-    int vertex_1=particles.array_collection->Add_Element(),vertex_2=particles.array_collection->Add_Element(),vertex_3=particles.array_collection->Add_Element(),vertex_4=particles.array_collection->Add_Element();
-    int vertex_5=particles.array_collection->Add_Element(),vertex_6=particles.array_collection->Add_Element(),vertex_7=particles.array_collection->Add_Element(),vertex_8=particles.array_collection->Add_Element();
+    int vertex_1=particles.Add_Element(),vertex_2=particles.Add_Element(),vertex_3=particles.Add_Element(),vertex_4=particles.Add_Element();
+    int vertex_5=particles.Add_Element(),vertex_6=particles.Add_Element(),vertex_7=particles.Add_Element(),vertex_8=particles.Add_Element();
     particles.X(vertex_1)=(TV(box.min_corner.x,box.min_corner.y,box.max_corner.z));particles.X(vertex_2)=(TV(box.max_corner.x,box.min_corner.y,box.max_corner.z));particles.X(vertex_3)=(TV(box.max_corner.x,box.max_corner.y,box.max_corner.z));particles.X(vertex_4)=(TV(box.min_corner.x,box.max_corner.y,box.max_corner.z));
     particles.X(vertex_5)=(TV(box.min_corner.x,box.min_corner.y,box.min_corner.z));particles.X(vertex_6)=(TV(box.max_corner.x,box.min_corner.y,box.min_corner.z));particles.X(vertex_7)=(TV(box.max_corner.x,box.max_corner.y,box.min_corner.z));particles.X(vertex_8)=(TV(box.min_corner.x,box.max_corner.y,box.min_corner.z));
     
@@ -148,7 +148,7 @@ public:
     if(show_zmin){triangles(triangle_count).Set(4,7,6);triangle_count++;triangles(triangle_count).Set(6,5,4);triangle_count++;};
     if(show_zmax){triangles(triangle_count).Set(0,1,2);triangle_count++;triangles(triangle_count).Set(2,3,0);triangle_count++;};
 
-    surface->mesh.Initialize_Mesh(particles.array_collection->Size(),triangles);
+    surface->mesh.Initialize_Mesh(particles.Size(),triangles);
     surface->Update_Triangle_List();surface->Update_Vertex_Normals();return surface;}
     
     virtual void Get_Texture_Coordinates(const TV& object_space_point,const int aggregate,T& s,T& t) const

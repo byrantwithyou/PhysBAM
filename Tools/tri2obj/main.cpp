@@ -24,7 +24,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
         "\n");
     (*output)<<header;
 
-    for(int p=0;p<triangulated_surface->particles.array_collection->Size();p++)
+    for(int p=0;p<triangulated_surface->particles.Size();p++)
         (*output)<<STRING_UTILITIES::string_sprintf("v %lg %lg %lg\n",triangulated_surface->particles.X(p)[1],triangulated_surface->particles.X(p)[2],triangulated_surface->particles.X(p)[3]);
 
     for(int e=0;e<triangulated_surface->mesh.elements.m;e++)

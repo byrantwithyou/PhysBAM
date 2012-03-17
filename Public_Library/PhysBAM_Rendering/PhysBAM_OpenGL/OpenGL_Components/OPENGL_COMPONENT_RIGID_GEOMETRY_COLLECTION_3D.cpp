@@ -146,7 +146,7 @@ Reinitialize(const bool force,const bool read_geometry)
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
         // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.array_collection->Size());
+        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.Size());
 
         std::string rigid_body_colors_file=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_colors",basedir.c_str(),frame);
         if(FILE_UTILITIES::File_Exists(rigid_body_colors_file)) FILE_UTILITIES::Read_From_File<T>(rigid_body_colors_file,opengl_colors);
@@ -169,7 +169,7 @@ Reinitialize(const bool force,const bool read_geometry)
                 draw_object(particles_of_this_partition(i))=true;}
 
         // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.Size();id++){
             if(rigid_geometry_collection->Is_Active(id)){
                 Update_Geometry(id);
                 RIGID_GEOMETRY<TV>& body=rigid_geometry_collection->Rigid_Geometry(id);
@@ -180,7 +180,7 @@ Reinitialize(const bool force,const bool read_geometry)
                     if(one_sided) Set_Object_Material(id,front_color_map->Lookup(Value(id)));
                     else Set_Object_Material(id,front_color_map->Lookup(Value(id)),back_color_map->Lookup(Value(id)));}}
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
         frame_loaded=frame;
         valid=true;}
@@ -200,14 +200,14 @@ Reinitialize_Without_Files(const bool force)
         valid=false;
 
         // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.array_collection->Size());
+        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.Size());
         Resize_Structures(max_number_of_bodies);
         
         // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
         valid=true;}
 
@@ -225,7 +225,7 @@ Initialize_One_Body(const int body_id,const bool force)
         LOG::cout<<"Init for one body being called\n";
         valid=false;
 
-        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.array_collection->Size());
+        int max_number_of_bodies=max(opengl_triangulated_surface.Size(),rigid_geometry_collection->particles.Size());
         // only enlarge array as we read in more geometry to memory
         opengl_colors.Resize(max_number_of_bodies);opengl_colors.Fill(OPENGL_COLOR::Cyan());
         opengl_triangulated_surface.Resize(max_number_of_bodies);
@@ -242,10 +242,10 @@ Initialize_One_Body(const int body_id,const bool force)
         Create_Geometry(body_id);
 
         // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
 
         valid=true;}
 
@@ -260,10 +260,10 @@ template<class T,class RW> void OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,
 Update_Bodies(const bool update_arb_points)
 {
     // Update active bodies / remove inactive bodies
-    for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
+    for(int id=0;id<rigid_geometry_collection->particles.Size();id++){
         if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
         else Destroy_Geometry(id);}
-    for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
+    for(int id=rigid_geometry_collection->particles.Size();id<opengl_triangulated_surface.Size();id++) Destroy_Geometry(id);
     Update_Object_Labels();
 }
 //#####################################################################
@@ -409,7 +409,7 @@ Update_Object_Labels()
     if(draw_angular_velocity_vectors) angular_velocity_vectors.Resize(number_of_drawn_bodies);
 
     int idx=0;
-    for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++) if(draw_object(i)){
+    for(int i=0;i<rigid_geometry_collection->particles.Size();i++) if(draw_object(i)){
         if(draw_velocity_vectors || draw_angular_velocity_vectors){idx++;
             positions(idx)=rigid_geometry_collection->particles.frame(i).t;
             if(draw_velocity_vectors)
@@ -633,7 +633,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         RIGID_GEOMETRY<TV> *body=&rigid_geometry_collection->Rigid_Geometry(real_selection->body_id);
 
         if(!body->name.empty()){output_stream<<"Name ="<<body->name<<std::endl;}
-        rigid_geometry_collection->particles.array_collection->Print(output_stream,real_selection->body_id);
+        rigid_geometry_collection->particles.Print(output_stream,real_selection->body_id);
 
         MATRIX<T,4> body_transform=body->Frame().Matrix();
 
@@ -842,7 +842,7 @@ Turn_Off_Individual_Smooth_Shading_Prompt()
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
         int object_id;
         STRING_UTILITIES::String_To_Value(OPENGL_WORLD::Singleton()->prompt_response,object_id);
-        if((unsigned)object_id<(unsigned)rigid_geometry_collection->particles.array_collection->Size() && opengl_triangulated_surface(object_id))
+        if((unsigned)object_id<(unsigned)rigid_geometry_collection->particles.Size() && opengl_triangulated_surface(object_id))
             opengl_triangulated_surface(object_id)->Turn_Smooth_Shading_Off();}
 }
 //#####################################################################
@@ -865,7 +865,7 @@ Manipulate_Individual_Body_Prompt()
         std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);
         sstream>>command;
         sstream>>object_id;
-        if((unsigned)object_id<(unsigned)rigid_geometry_collection->particles.array_collection->Size() && opengl_triangulated_surface(object_id)){
+        if((unsigned)object_id<(unsigned)rigid_geometry_collection->particles.Size() && opengl_triangulated_surface(object_id)){
             if(command=="s"){
                 VECTOR<T,3> scale;
                 sstream>>scale;

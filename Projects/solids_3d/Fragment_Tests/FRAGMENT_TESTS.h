@@ -57,7 +57,7 @@ void Get_Initial_Data()
     const int strands=25,strand_segments=50;
     //const int strands=2,strand_segments=50;
     hair_layout_grid.Initialize(strands,strands,strand_segments,-.5,.5,0,1,0,2);
-    particles.array_collection->Add_Elements(hair_layout_grid.Numbers_Of_Nodes().Product());
+    particles.Add_Elements(hair_layout_grid.Numbers_Of_Nodes().Product());
     
     int count=1;
 

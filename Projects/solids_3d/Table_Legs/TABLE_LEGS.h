@@ -66,7 +66,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     triangulated_surface=new TRIANGULATED_SURFACE(*triangle_mesh,*particles);
     triangle_mesh->Initialize_Square_Mesh(m,n);
     particles->Update_Position_And_Velocity();particles->Store_Mass();
-    for(k=0;k<triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
+    for(k=0;k<triangle_mesh->number_nodes;k++) particles->Add_Element();
     if(!restart_step_number){    
         for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             int node=i+m*(j-1);
@@ -223,36 +223,36 @@ void Initialize_Scripted_Objects(ARRAY<RIGID_BODY<TV>*>& scripted_objects,ARRAY<
     // first table leg
     leg1_particles.Store_Position();
     leg1_particles.Set_Array_Buffer_Size(12);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(1)=VECTOR_3D(.25,-2,.25);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(2)=VECTOR_3D(.4,-2,.25);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(3)=VECTOR_3D(.4,-2,.4);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(4)=VECTOR_3D(.25,-2,.4);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(5)=VECTOR_3D(.25,.965,.25);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(6)=VECTOR_3D(.4,.965,.25);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(7)=VECTOR_3D(.4,.965,.4);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(8)=VECTOR_3D(.25,.965,.4);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(9)=VECTOR_3D(.28,1,.28);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(10)=VECTOR_3D(.37,1,.28);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(11)=VECTOR_3D(.37,1,.37);
-    leg1_particles.array_collection->Add_Element(); leg1_particles.X(12)=VECTOR_3D(.28,1,.37);
+    leg1_particles.Add_Element(); leg1_particles.X(1)=VECTOR_3D(.25,-2,.25);
+    leg1_particles.Add_Element(); leg1_particles.X(2)=VECTOR_3D(.4,-2,.25);
+    leg1_particles.Add_Element(); leg1_particles.X(3)=VECTOR_3D(.4,-2,.4);
+    leg1_particles.Add_Element(); leg1_particles.X(4)=VECTOR_3D(.25,-2,.4);
+    leg1_particles.Add_Element(); leg1_particles.X(5)=VECTOR_3D(.25,.965,.25);
+    leg1_particles.Add_Element(); leg1_particles.X(6)=VECTOR_3D(.4,.965,.25);
+    leg1_particles.Add_Element(); leg1_particles.X(7)=VECTOR_3D(.4,.965,.4);
+    leg1_particles.Add_Element(); leg1_particles.X(8)=VECTOR_3D(.25,.965,.4);
+    leg1_particles.Add_Element(); leg1_particles.X(9)=VECTOR_3D(.28,1,.28);
+    leg1_particles.Add_Element(); leg1_particles.X(10)=VECTOR_3D(.37,1,.28);
+    leg1_particles.Add_Element(); leg1_particles.X(11)=VECTOR_3D(.37,1,.37);
+    leg1_particles.Add_Element(); leg1_particles.X(12)=VECTOR_3D(.28,1,.37);
     scripted_objects(2)=new RIGID_TRIANGULATED_SOLID(leg1_surf);
     scripted_objects_friction(2)=0;
     // second table leg
     leg2_particles.Store_Position();
     leg2_particles.Set_Array_Buffer_Size(12);
-    for(int i=0;i<12;i++) {leg2_particles.array_collection->Add_Element(); leg2_particles.X(i)=leg1_particles.X(i)+VECTOR_3D(-.65,0,0);}
+    for(int i=0;i<12;i++) {leg2_particles.Add_Element(); leg2_particles.X(i)=leg1_particles.X(i)+VECTOR_3D(-.65,0,0);}
     scripted_objects(3)=new RIGID_TRIANGULATED_SOLID(leg2_surf);
     scripted_objects_friction(3)=0;
     // third table leg
     leg3_particles.Store_Position();
     leg3_particles.Set_Array_Buffer_Size(12);
-    for(int i=0;i<12;i++) {leg3_particles.array_collection->Add_Element(); leg3_particles.X(i)=leg2_particles.X(i)+VECTOR_3D(0,0,-.65);}
+    for(int i=0;i<12;i++) {leg3_particles.Add_Element(); leg3_particles.X(i)=leg2_particles.X(i)+VECTOR_3D(0,0,-.65);}
     scripted_objects(4)=new RIGID_TRIANGULATED_SOLID(leg3_surf);
     scripted_objects_friction(4)=0;
     // fourth table leg
     leg4_particles.Store_Position();
     leg4_particles.Set_Array_Buffer_Size(12);
-    for(int i=0;i<12;i++) {leg4_particles.array_collection->Add_Element(); leg4_particles.X(i)=leg3_particles.X(i)+VECTOR_3D(.65,0,0);}
+    for(int i=0;i<12;i++) {leg4_particles.Add_Element(); leg4_particles.X(i)=leg3_particles.X(i)+VECTOR_3D(.65,0,0);}
     scripted_objects(5)=new RIGID_TRIANGULATED_SOLID(leg4_surf);
     scripted_objects_friction(5)=0;
     // sphere

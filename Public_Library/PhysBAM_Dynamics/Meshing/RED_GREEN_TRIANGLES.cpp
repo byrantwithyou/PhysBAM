@@ -53,7 +53,7 @@ template<class TV> template<class T_ARRAY> void RED_GREEN_TRIANGLES<TV>::
 Refine_Simplex_List(const T_ARRAY& triangle_list)
 {
     STATIC_ASSERT((IS_SAME<int,typename T_ARRAY::ELEMENT>::value));
-    object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+3*triangle_list.Size());
+    object.particles.Preallocate(object.particles.Size()+3*triangle_list.Size());
     for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
     for(int i=0;i<triangle_list.Size();i++){
         int level,tri;leaf_levels_and_indices(triangle_list(i)).Get(level,tri);
@@ -167,8 +167,8 @@ Ensure_Level_Exists(const int level)
     if(meshes.m > level) return; // it already exists
     meshes.Append(new TRIANGLE_MESH);
     element_edges.Resize(level+1);
-    meshes(level)->number_nodes=object.particles.array_collection->Size();
-    meshes(level)->incident_elements=new ARRAY<ARRAY<int> >(object.particles.array_collection->Size());
+    meshes(level)->number_nodes=object.particles.Size();
+    meshes(level)->incident_elements=new ARRAY<ARRAY<int> >(object.particles.Size());
     parent.Append(new ARRAY<int>(0));children.Append(new ARRAY<VECTOR<int,4> >());
     index_in_stack.Append(new ARRAY<int>(0));leaf_number.Append(new ARRAY<int>(0));
 }
@@ -228,7 +228,7 @@ Add_Midpoint(const int segment,const int level,const int tri)
     int node1,node2,new_node=-1;segment_mesh.elements(segment).Get(node1,node2);
     if(free_segment_midpoints && free_segment_midpoints->Get(VECTOR<int,2>(node1,node2).Sorted(),new_node))
         free_segment_midpoints->Delete(VECTOR<int,2>(node1,node2).Sorted());
-    else new_node=object.particles.array_collection->Add_Element_From_Deletion_List();
+    else new_node=object.particles.Add_Element_From_Deletion_List();
     // define midpoint's position, velocity and acceleration
     object.particles.X(new_node)=(T).5*(object.particles.X(node1)+object.particles.X(node2));
     if(object.particles.store_velocity)
@@ -319,7 +319,7 @@ Rebuild_Object()
             object.mesh.elements(index_into_triangles)=meshes(level)->elements(tri);
             leaf_levels_and_indices(index_into_triangles).Set(level,tri);(*leaf_number(level))(tri)=index_into_triangles;index_into_triangles++;}
         else (*leaf_number(level))(tri)=0;
-    object.mesh.number_nodes=object.particles.array_collection->Size();
+    object.mesh.number_nodes=object.particles.Size();
     object.mesh.Refresh_Auxiliary_Structures();
 }
 //#####################################################################
@@ -378,7 +378,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
         leaf_number(level)->Remove_Sorted_Indices_Lazy(level_triangle_list(level));
 
         // delete edges which have a node that is no longer referenced by the elements
-        ARRAY<int> nodes_referenced(object.particles.array_collection->Size());meshes(level)->Mark_Nodes_Referenced(nodes_referenced,1);
+        ARRAY<int> nodes_referenced(object.particles.Size());meshes(level)->Mark_Nodes_Referenced(nodes_referenced,1);
         ARRAY<int> deleted_edge_indices;
         for(int i=0;i<level_triangle_list(level).m;i++) for(int j=0;j<3;j++){
             int edge=element_edges(level)(level_triangle_list(level)(i))(j);int node1,node2;segment_mesh.elements(edge).Get(node1,node2);
@@ -397,7 +397,7 @@ Print() const
 {
     for(int level=0;level<meshes.m;level++){
         LOG::cout << "There are " << meshes(level)->elements.m << " elements at level " << level << std::endl;
-        LOG::cout << "      and object.particles.array_collection->Size()=" << object.particles.array_collection->Size() << std::endl;
+        LOG::cout << "      and object.particles.Size()=" << object.particles.Size() << std::endl;
         LOG::cout << "      and meshes(level)->incident_elements->m="  << meshes(level)->incident_elements->m << std::endl;}
 }
 //#####################################################################

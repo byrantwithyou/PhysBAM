@@ -575,7 +575,7 @@ void Floppy_Fish()
         fish=&solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,flesh_density,scale);}
 
     // binding the deformable particles to the rigid bodies
-    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) solids_tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     if(fish){
         fish->Update_Number_Nodes();fish->Initialize_Triangulated_Surface();
@@ -743,7 +743,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solids_tests.Copy_And_Add_Structure(tetrahedralized_volume);
             //int frames=16;
             //T initial_velocity=-(T)9.8*(T)frames/24;
-            //for(int i=0;i<particles.array_collection->Size();i++) particles.V(i)=TV((T)0,initial_velocity,(T)0);
+            //for(int i=0;i<particles.Size();i++) particles.V(i)=TV((T)0,initial_velocity,(T)0);
             break;}
         case 15:{
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solids_tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/torus_44K.tet",
@@ -931,7 +931,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.y+(T).04,grid.domain.min_corner.z,grid.domain.max_corner.z);
 
             // slide all the rigid body walls down
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) rigid_body_collection.rigid_body_particle.frame(i).t.y-=(T).75;
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) rigid_body_collection.rigid_body_particle.frame(i).t.y-=(T).75;
 
             RANDOM_NUMBERS<T> random;
 
@@ -975,7 +975,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,solid_density,true);
 
             RANGE<TV> binding_box=RANGE<TV>(TV((T)-2,(T)0,(T)-1),TV(pole_x_location+(T).01,(T)2,(T)1));
-            for(int i=0;i<triangulated_surface.particles.array_collection->Size();i++){TV& position=triangulated_surface.particles.X(i);
+            for(int i=0;i<triangulated_surface.particles.Size();i++){TV& position=triangulated_surface.particles.X(i);
                 if(binding_box.Lazy_Inside(position)){
                     constrained_node_positions.Append(PAIR<int,TV>(i,position));}}
             break;}
@@ -994,10 +994,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)0,(T).5,(T)0))));
             SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(triangulated_surface,solid_density,true);
 
-            for(int i=2*resolution+1;i<=triangulated_surface.particles.array_collection->Size();i+=2*resolution+1)
+            for(int i=2*resolution+1;i<=triangulated_surface.particles.Size();i+=2*resolution+1)
                 constrained_node_positions.Append(PAIR<int,TV>(i,triangulated_surface.particles.X(i)));
 
-//             left_point=triangulated_surface.particles.array_collection->Size();
+//             left_point=triangulated_surface.particles.Size();
 //             right_point=2*resolution+1;
             break;}
         default: LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -1143,7 +1143,7 @@ void Balloon()
 
     ARRAY<int> deletion_list; // List of deleted triangles
     ARRAY<bool> is_constrained;
-    is_constrained.Resize(triangulated_surface.particles.array_collection->Size());
+    is_constrained.Resize(triangulated_surface.particles.Size());
     is_constrained.Fill(false);
 
     for(int i=0;i<triangulated_surface.mesh.elements.m;i++){

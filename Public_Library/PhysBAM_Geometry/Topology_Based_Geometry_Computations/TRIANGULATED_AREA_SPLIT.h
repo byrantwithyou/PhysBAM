@@ -30,7 +30,7 @@ int Split_Node(TRIANGULATED_AREA<T>& ta,const int particle_index,const VECTOR<T,
     int new_particle=0;
     if(tris_incident_on_old_particle.m != 0 && tris_incident_on_new_particle.m != 0){ 
         // new particle - assumes we're storing position, and velocity - user must fix mass outside this function call
-        new_particle=ta.particles.array_collection->Add_Element();ta.mesh.number_nodes=ta.particles.array_collection->Size();
+        new_particle=ta.particles.Add_Element();ta.mesh.number_nodes=ta.particles.Size();
         ta.particles.X(new_particle)=ta.particles.X(particle_index);ta.particles.V(new_particle)=ta.particles.V(particle_index);
         for(t=0;t<(*ta.mesh.incident_elements)(particle_index).m;t++){
             int this_incident_tri=(*ta.mesh.incident_elements)(particle_index)(t);int i,j,k;ta.mesh.elements(this_incident_tri).Get(i,j,k);
@@ -60,7 +60,7 @@ int Split_Connected_Component(TRIANGULATED_AREA<T>& ta,const int node)
     int new_particle=0;
     if(number_marked != marked.m){
         // new particle -- assumes we're storing position, and velocity - user must fix mass outside this function call
-        new_particle=ta.particles.array_collection->Add_Element();ta.mesh.number_nodes=ta.particles.array_collection->Size();
+        new_particle=ta.particles.Add_Element();ta.mesh.number_nodes=ta.particles.Size();
         ta.particles.X(new_particle)=ta.particles.X(node);ta.particles.V(new_particle)=ta.particles.V(node);
         ARRAY<int> empty;ta.mesh.incident_elements->Append(empty);
         ARRAY<int> indices_to_remove(number_marked);int counter=0;

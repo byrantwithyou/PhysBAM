@@ -33,9 +33,9 @@ Initialize_Binding_Mesh(const bool exclude_particles_using_impulses_for_collisio
 {
     delete binding_mesh;
     if(exclude_particles_using_impulses_for_collisions){
-        binding_mesh=new SEGMENT_MESH;binding_mesh->Set_Number_Nodes(particles.array_collection->Size());
+        binding_mesh=new SEGMENT_MESH;binding_mesh->Set_Number_Nodes(particles.Size());
         for(int b=0;b<bindings.m;b++) if(!use_impulses_for_collisions(b)) binding_mesh->elements.Append(bindings(b));}
-    else binding_mesh=new SEGMENT_MESH(particles.array_collection->Size(),bindings);
+    else binding_mesh=new SEGMENT_MESH(particles.Size(),bindings);
 }
 //#####################################################################
 // Function Add_Dependencies
@@ -216,7 +216,7 @@ Read(TYPED_ISTREAM& input)
     Clean_Memory();int backward_compatible;Read_Binary(input,backward_compatible,bindings);
     if(bindings.m) Read_Binary(input,use_impulses_for_collisions); // TODO: remove this backwards compatibility hack after Siggraph
     Update_Binding_Index_From_Particle_Index();
-    if(binding_mesh_save){binding_mesh=binding_mesh_save;binding_mesh->Initialize_Mesh(particles.array_collection->Size(),bindings);}
+    if(binding_mesh_save){binding_mesh=binding_mesh_save;binding_mesh->Initialize_Mesh(particles.Size(),bindings);}
 }
 //#####################################################################
 // Function Write

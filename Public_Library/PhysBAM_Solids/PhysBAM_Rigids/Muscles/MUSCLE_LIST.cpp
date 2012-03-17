@@ -13,8 +13,8 @@ using namespace PhysBAM;
 template<class TV> void MUSCLE_LIST<TV>::
 Initialize_Muscle_Attachments_On_Rigid_Body()
 {
-    muscle_attachments_on_rigid_body.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) muscle_attachments_on_rigid_body(i).Remove_All();
+    muscle_attachments_on_rigid_body.Resize(rigid_body_collection.rigid_body_particle.Size());
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) muscle_attachments_on_rigid_body(i).Remove_All();
     for(int i=0;i<muscles.m;i++){
         ATTACHMENT_POINT<TV>* attachment_1=muscles(i)->attachment_point_1;
         for(int j=0;j<muscles(i)->via_points.m+1;j++){
@@ -27,7 +27,7 @@ Initialize_Muscle_Attachments_On_Rigid_Body()
             attachment_1=attachment_2;}}
 
 #if 0
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) for(int j=0;j<muscle_attachments_on_rigid_body(i).m;j++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) for(int j=0;j<muscle_attachments_on_rigid_body(i).m;j++){
         TRIPLE<int,T_ATTACHMENT_POINT*,T_ATTACHMENT_POINT*>& value=muscle_attachments_on_rigid_body(i)(j);
         LOG::cout<<"Body "<<i<<", muscle "<<value.x<<", pt1 ("<<value.y->Rigid_Body().id_number<<","<<value.y->object_space_position 
            <<"), pt2 ("<<value.z->Rigid_Body().id_number<<","<< value.z->object_space_position<<")"<<std::endl;

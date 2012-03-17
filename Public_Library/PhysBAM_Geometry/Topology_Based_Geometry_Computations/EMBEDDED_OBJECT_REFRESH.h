@@ -22,8 +22,8 @@ template<class TV,int d> void
 Initialize_Parents_To_Embedded_Particles_Hash_Table(EMBEDDED_OBJECT<TV,d>& eo,const int new_hashtable_multiplier)
 {
     if(new_hashtable_multiplier) eo.hashtable_multiplier=new_hashtable_multiplier;
-    if(eo.parents_to_embedded_particles_hash_table && eo.parents_to_embedded_particles_hash_table->Max_Size() >= eo.hashtable_multiplier*eo.particles.array_collection->Size()) return;
-    delete eo.parents_to_embedded_particles_hash_table;eo.parents_to_embedded_particles_hash_table=new HASHTABLE<VECTOR<int,2>,int>(eo.hashtable_multiplier*eo.particles.array_collection->Size());
+    if(eo.parents_to_embedded_particles_hash_table && eo.parents_to_embedded_particles_hash_table->Max_Size() >= eo.hashtable_multiplier*eo.particles.Size()) return;
+    delete eo.parents_to_embedded_particles_hash_table;eo.parents_to_embedded_particles_hash_table=new HASHTABLE<VECTOR<int,2>,int>(eo.hashtable_multiplier*eo.particles.Size());
     for(int p=0;p<eo.embedded_particles.active_indices.m;p++)
         eo.parents_to_embedded_particles_hash_table->Insert(eo.parent_particles(p).Sorted(),p);
 }
@@ -44,7 +44,7 @@ template<class TV,int d> void
 Initialize_Embedded_Children(EMBEDDED_OBJECT<TV,d>& eo)
 {
     delete eo.embedded_children_index;delete eo.embedded_children;
-    eo.embedded_children_index=new ARRAY<int>(eo.particles.array_collection->Size());eo.embedded_children=new ARRAY<ARRAY<int> >();
+    eo.embedded_children_index=new ARRAY<int>(eo.particles.Size());eo.embedded_children=new ARRAY<ARRAY<int> >();
     for(int p=0;p<eo.embedded_particles.active_indices.m;p++) eo.Add_Embedded_Particle_To_Embedded_Children(p);
 }
 //#####################################################################
@@ -88,7 +88,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
             if(phi_t.Min()>0) eo.simplicial_object.mesh.elements.Remove_Index_Lazy(t);
         }
         ARRAY<int> condensation_mapping;eo.simplicial_object.Discard_Valence_Zero_Particles_And_Renumber(condensation_mapping);
-        ARRAY<T> phi_new(eo.particles.array_collection->Size());for(int k=0;k<phi.m;k++) if(condensation_mapping(k)>=0) phi_new(condensation_mapping(k))=phi(k);
+        ARRAY<T> phi_new(eo.particles.Size());for(int k=0;k<phi.m;k++) if(condensation_mapping(k)>=0) phi_new(condensation_mapping(k))=phi(k);
         phi.Exchange(phi_new);
     }
 
@@ -98,7 +98,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
 
     eo.Initialize_Parents_To_Embedded_Particles_Hash_Table();
     eo.embedded_particles.Update_Subset_Index_From_Element_Index(); // TODO: move this somewhere else
-    eo.embedded_mesh.number_nodes=eo.particles.array_collection->Size();
+    eo.embedded_mesh.number_nodes=eo.particles.Size();
 
     bool segment_mesh_defined=eo.simplicial_object.mesh.segment_mesh!=0;if(!segment_mesh_defined) eo.simplicial_object.mesh.Initialize_Segment_Mesh();
     bool embedded_incident_elements_defined=eo.embedded_mesh.incident_elements!=0;if(!embedded_incident_elements_defined) eo.embedded_mesh.Initialize_Incident_Elements();
@@ -128,7 +128,7 @@ Calculate_Boundary_From_Levelset_On_Nodes(EMBEDDED_OBJECT<TV,d>& eo,ARRAY<T>& ph
     if(!embedded_incident_elements_defined){delete eo.embedded_mesh.incident_elements;eo.embedded_mesh.incident_elements=0;}
 
     if(verbose){
-        LOG::cout << "total particles = " << eo.particles.array_collection->Size() << std::endl;
+        LOG::cout << "total particles = " << eo.particles.Size() << std::endl;
         LOG::cout << "total elements = " << eo.simplicial_object.mesh.elements.m << std::endl;
         LOG::cout << "total embedded subelements = " << eo.embedded_mesh.elements.m << std::endl;}
 }

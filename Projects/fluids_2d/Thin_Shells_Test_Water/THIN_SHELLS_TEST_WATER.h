@@ -325,11 +325,11 @@ void Set_External_Velocities(ARRAY<VECTOR_2D<T> >& V,const T time)
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_2D<T> >& V,const T time)
 {
     if(example_number==1){
-        if(fragment_id==FRAGMENT_ID(1)){V(1)=VECTOR_2D<T>(0,0);V(solids_parameters.deformable_body_parameters.list.deformable_objects(fragment_id)->segmented_curve->particles.array_collection->Size())=VECTOR_2D<T>(0,0);}}
+        if(fragment_id==FRAGMENT_ID(1)){V(1)=VECTOR_2D<T>(0,0);V(solids_parameters.deformable_body_parameters.list.deformable_objects(fragment_id)->segmented_curve->particles.Size())=VECTOR_2D<T>(0,0);}}
     else if(example_number==3){
         if(fragment_id==FRAGMENT_ID(1)){V(1)=VECTOR_2D<T>(0,0);}}
     else if(example_number==9){
-        if(fragment_id==FRAGMENT_ID(1)){V(1)=VECTOR_2D<T>(0,0);V(solids_parameters.deformable_body_parameters.list.deformable_objects(fragment_id)->segmented_curve->particles.array_collection->Size())=VECTOR_2D<T>(0,0);}}
+        if(fragment_id==FRAGMENT_ID(1)){V(1)=VECTOR_2D<T>(0,0);V(solids_parameters.deformable_body_parameters.list.deformable_objects(fragment_id)->segmented_curve->particles.Size())=VECTOR_2D<T>(0,0);}}
 }
 //#####################################################################
 // Function Update_Time_Varying_Material_Properties

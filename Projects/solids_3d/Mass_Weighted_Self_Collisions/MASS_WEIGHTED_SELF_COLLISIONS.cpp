@@ -69,7 +69,7 @@ Initialize_Bodies()
     
     switch(test_number){
         case 1:{
-            particles.array_collection->Add_Elements(4);
+            particles.Add_Elements(4);
             particles.X(0)=TV(0,0,0);particles.mass(0)=(T).00333333;particles.V(0)=TV(0,-(T).1,0);
             particles.X(1)=TV((T)0.01,0,0);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,-(T).1,0);
             particles.X(2)=TV(0,0,(T)0.01);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,-(T).1,0);
@@ -84,7 +84,7 @@ Initialize_Bodies()
             deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
         }break;
         case 2:{
-            particles.array_collection->Add_Elements(4);
+            particles.Add_Elements(4);
             particles.X(0)=TV(0,0,(T).005);particles.mass(0)=(T).00333333;particles.V(0)=TV(0,(T).1,0);
             particles.X(1)=TV((T)0.01,0,(T).005);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,(T).1,0);
             particles.X(2)=TV((T).005,(T).01,0);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,-(T).1,0);
@@ -95,7 +95,7 @@ Initialize_Bodies()
             deformable_body_collection.deformable_geometry.Add_Structure(&curve);
         }break;
         case 3:{
-            particles.array_collection->Add_Elements(4);
+            particles.Add_Elements(4);
             particles.X(0)=TV((T).1,(T).1,0);particles.mass(0)=(T).00333333;particles.V(0)=TV(0,0,0);
             particles.X(1)=TV(0,(T).1,0);particles.mass(1)=(T).00333333;particles.V(1)=TV(0,0,0);
             particles.X(2)=TV((T).1,(T).15,(T).1);particles.mass(2)=(T).00333333;particles.V(2)=TV(0,0,-(T).1);
@@ -107,7 +107,7 @@ Initialize_Bodies()
         }break;
         case 4:{
             int max=5;
-            particles.array_collection->Add_Elements(4*max);
+            particles.Add_Elements(4*max);
             for (int i=0;i<max;i++) {
                 particles.X(4*i)=TV(0,(T).02*i,0);particles.mass(4*i)=(T).00333333;particles.V(4*i)=TV(0,-(T).1,0);
                 particles.X(4*i+1)=TV((T)0.01,(T).02*i,0);particles.mass(4*i+1)=(T).00333333;particles.V(4*i+1)=TV(0,-(T).1,0);

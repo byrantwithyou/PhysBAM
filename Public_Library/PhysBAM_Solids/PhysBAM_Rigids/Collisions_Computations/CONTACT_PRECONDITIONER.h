@@ -179,7 +179,7 @@ public:
 
     void Build_Fine_Problem(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,ARRAY<SOLVE_CONTACT::CONTACT<TV> >& contacts_input)
     {
-        fine_to_coarse_bodies_map.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
+        fine_to_coarse_bodies_map.Resize(rigid_body_collection.rigid_body_particle.Size());
         for(int i=0;i<fine_to_coarse_bodies_map.m;i++)
             if(rigid_body_collection.Is_Active(i))
             {

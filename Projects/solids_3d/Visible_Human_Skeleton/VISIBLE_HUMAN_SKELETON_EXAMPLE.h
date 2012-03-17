@@ -216,7 +216,7 @@ RIGID_BODY<TV> *Create_Rigid_Body(std::string basename, T scaling_factor, T bone
     frame.r=QUATERNION<T>(eigenvectors);
     // compute bone local coordinates
     tri_surface->Clean_Memory();
-    for(int p=0;p<tri_surface->particles.array_collection->Size();p++){
+    for(int p=0;p<tri_surface->particles.Size();p++){
         local_coordinate=frame.Local_Coordinate(tri_surface->particles.X(p));
         tri_surface->particles.X(p)=local_coordinate;}
     MASS_PROPERTIES_3D<T> mass_props2(*tri_surface);

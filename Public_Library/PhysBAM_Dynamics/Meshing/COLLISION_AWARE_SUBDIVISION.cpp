@@ -45,7 +45,7 @@ Push_Surface_Outside_Of_Collision_Bodies(const T push_distance,const int max_num
             GEOMETRY_PARTICLES<TV>& particles=structure.triangulated_surface->particles;
             ARRAY_VIEW<TV> X(particles.X),V(particles.V);
             V=X;
-            for(int p=0;p<particles.array_collection->Size();p++) for(COLLISION_GEOMETRY_ID r(0);r<collision_body_list.bodies.m;r++)
+            for(int p=0;p<particles.Size();p++) for(COLLISION_GEOMETRY_ID r(0);r<collision_body_list.bodies.m;r++)
                 if(collision_body_list.Is_Active(r) && collision_body_list.bodies(r)->Implicit_Geometry_Lazy_Inside_And_Value(X(p),depth,push_distance)){
                     depth=push_distance-depth+collision_tolerance;interactions++;
                     COLLISION_BODY_HELPER<TV>::Adjust_Point_For_Collision(*collision_body_list.bodies(r),X(p),depth);}}
@@ -84,10 +84,10 @@ Subdivide()
     ARRAY<TV> goal_X;ARRAY_VIEW<TV> X(full_particles.X),V(full_particles.V);
     for(int s=0;s<geometry.structures.m;s++){
         TRIANGULATED_SURFACE<T>& triangulated_surface=dynamic_cast<TRIANGULATED_SURFACE<T>&>(*geometry.structures(s)); // MUST BE triangulated surface
-        triangulated_surface.mesh.Set_Number_Nodes(full_particles.array_collection->Size());
+        triangulated_surface.mesh.Set_Number_Nodes(full_particles.Size());
         TRIANGLE_SUBDIVISION triangle_subdivision(triangulated_surface.mesh);TRIANGLE_MESH refined_mesh;triangle_subdivision.Refine_Mesh(refined_mesh);
-        int number_new_particles=refined_mesh.number_nodes-full_particles.array_collection->Size();full_particles.array_collection->Add_Elements(number_new_particles);
-        triangle_subdivision.Apply_Linear_Subdivision(X,X);goal_X.Resize(full_particles.array_collection->Size());triangle_subdivision.Apply_Loop_Subdivision(X,goal_X);
+        int number_new_particles=refined_mesh.number_nodes-full_particles.Size();full_particles.Add_Elements(number_new_particles);
+        triangle_subdivision.Apply_Linear_Subdivision(X,X);goal_X.Resize(full_particles.Size());triangle_subdivision.Apply_Loop_Subdivision(X,goal_X);
         triangulated_surface.mesh.Initialize_Mesh(refined_mesh);triangulated_surface.Clean_Memory();} // auxiliary structures are wrong and need to be deleted
 
     TRIANGLE_REPULSIONS<TV> triangle_repulsions(geometry); // TODO: maybe we could move repulsion thickness into the geometry class, then this line goes away

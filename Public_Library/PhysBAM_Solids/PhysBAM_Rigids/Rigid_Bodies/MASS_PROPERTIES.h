@@ -7,7 +7,7 @@
 #ifndef __MASS_PROPERTIES__
 #define __MASS_PROPERTIES__
 
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>

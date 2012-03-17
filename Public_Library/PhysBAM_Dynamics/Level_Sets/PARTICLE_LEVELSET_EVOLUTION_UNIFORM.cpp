@@ -143,7 +143,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) current_time=rungekutta_particles(iterator.Cell_Index())->Main();}
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())){
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(iterator.Cell_Index());
-        for(int k=0;k<cell_particles.array_collection->Size();k++){
+        for(int k=0;k<cell_particles.Size();k++){
             TV velocity;
             particle_levelset.levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(cell_particles,k,velocity,particle_type,(T)1,current_time);
             cell_particles.X(k)+=velocity;}}
@@ -168,7 +168,7 @@ Advance_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const 
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())) current_time=rungekutta_particles(iterator.Cell_Index())->Main();}
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) if(particles(iterator.Cell_Index())){
         PARTICLE_LEVELSET_PARTICLES<TV>& cell_particles=*particles(iterator.Cell_Index());
-        for(int k=0;k<cell_particles.array_collection->Size();k++){
+        for(int k=0;k<cell_particles.Size();k++){
             TV velocity;
             particle_levelset.levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(cell_particles,k,velocity,particle_type,(T)1,current_time);
             cell_particles.X(k)+=velocity;}}

@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
 
@@ -23,7 +23,7 @@ class DEFORMABLE_PARTICLES:public CLONEABLE<DEFORMABLE_PARTICLES<TV>,GEOMETRY_PA
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<DEFORMABLE_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;using BASE::X;using BASE::V;
+    using BASE::X;using BASE::V;using BASE::Remove_Array;using BASE::Get_Attribute_Index;
 
     ARRAY_VIEW<T> mass;
     ARRAY_VIEW<T> one_over_mass;
@@ -35,7 +35,7 @@ public:
     virtual ~DEFORMABLE_PARTICLES();
 
     void Store_Mass(bool store=true)
-    {store_mass=store;if(store) array_collection->Add_Array(ATTRIBUTE_ID_MASS,&mass);else array_collection->Remove_Array(ATTRIBUTE_ID_MASS);}
+    {store_mass=store;if(store) Add_Array(ATTRIBUTE_ID_MASS,&mass);else Remove_Array(ATTRIBUTE_ID_MASS);}
 
     T Min_Mass() const 
     {return mass.Size()?mass.Min():FLT_MAX;}

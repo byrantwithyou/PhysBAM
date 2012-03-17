@@ -57,9 +57,9 @@ template<class TV,int d> STRUCTURE<TV>* EMBEDDED_MATERIAL_SURFACE<TV,d>::
 Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const
 {
     typename EMBEDDING_POLICY<TV,d>::EMBEDDING* embedding=Create(new_particles);
-    int offset=new_particles.array_collection->Size();
-    new_particles.array_collection->Append(*particles.array_collection);
-    if(particle_indices) for(int p=0;p<particles.array_collection->Size();p++) particle_indices->Append(p+offset);
+    int offset=new_particles.Size();
+    new_particles.Append(particles);
+    if(particle_indices) for(int p=0;p<particles.Size();p++) particle_indices->Append(p+offset);
     embedding->embedded_object.embedded_particles.active_indices=embedded_object.embedded_particles.active_indices;
     embedding->embedded_object.embedded_particles.active_indices+=offset;
     embedding->embedded_object.embedded_particles.Update_Subset_Index_From_Element_Index();
@@ -105,12 +105,12 @@ Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_bo
     else free_particles->nodes.Remove_All();
     for(int p=0;p<embedded_particles.active_indices.m;p++) binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles),embedded_particles.active_indices(p),
         parent_particles(p),VECTOR<T,2>((T)1-interpolation_fraction(p),interpolation_fraction(p))));
-    ARRAY<bool> used(deformable_body_collection.particles.array_collection->Size());
+    ARRAY<bool> used(deformable_body_collection.particles.Size());
     used.Subset(material_surface_mesh.elements.Flattened()).Fill(true);
     int j=-1;
     for(int p=0;p<embedded_particles.active_indices.m;p++){
         if(used(embedded_particles.active_indices(p))){
-            if(++j>=soft_particles.m) soft_particles.Append(deformable_body_collection.particles.array_collection->Add_Element());
+            if(++j>=soft_particles.m) soft_particles.Append(deformable_body_collection.particles.Add_Element());
             soft_bindings.Add_Binding(VECTOR<int,2>(soft_particles(j),embedded_particles.active_indices(p)),true);
             free_particles->nodes.Append(soft_particles(j));}}
     number_of_soft_bound_particles=embedded_particles.active_indices.m;

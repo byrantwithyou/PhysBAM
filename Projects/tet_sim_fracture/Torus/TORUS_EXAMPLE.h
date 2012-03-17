@@ -68,7 +68,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     std::fstream input;input.open(input_file,std::ios::in|std::ios::binary);
     if(!input.is_open()){std::cout << "problem opening input torus file" << std::endl;exit(0);}
     tetrahedralized_volume.Read_Float(input);input.close();
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tetrhedra = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
 
     tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();
@@ -84,7 +84,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
     tetrahedralized_volume.Set_Density(500);
     tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
@@ -144,7 +144,7 @@ virtual void Initialize_Bias_Stress_Constants(const EMBEDDED_TETRAHEDRALIZED_VOL
     for(int r=0;r<number_of_regions;r++) {
         T min_distance=1e10;
         int closest_node=0;
-        for(int n=0;n<etv.particles.array_collection->Size();n++){
+        for(int n=0;n<etv.particles.Size();n++){
             if((etv.particles.X(n)-(*initiation_point_positions)(r)).Magnitude()<min_distance){
                 min_distance=(etv.particles.X(n)-(*initiation_point_positions)(r)).Magnitude();
                 closest_node=n;}}

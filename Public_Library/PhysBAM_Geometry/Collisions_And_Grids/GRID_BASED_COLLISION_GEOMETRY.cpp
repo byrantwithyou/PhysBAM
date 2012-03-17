@@ -31,7 +31,7 @@ template<class T_GRID> GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Add_Bodies(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection)
 {
-    for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++) if(rigid_geometry_collection.Is_Active(i))
+    for(int i=0;i<rigid_geometry_collection.particles.Size();i++) if(rigid_geometry_collection.Is_Active(i))
         collision_geometry_collection.Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(rigid_geometry_collection.Rigid_Geometry(i)),i,true);
 }
 //##################################################################### 

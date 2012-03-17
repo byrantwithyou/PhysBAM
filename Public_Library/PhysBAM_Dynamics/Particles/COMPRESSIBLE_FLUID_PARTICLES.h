@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -18,7 +18,6 @@ class COMPRESSIBLE_FLUID_PARTICLES:public CLONEABLE<COMPRESSIBLE_FLUID_PARTICLES
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<COMPRESSIBLE_FLUID_PARTICLES<TV>,PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;
 
     ARRAY_VIEW<TV> X;
     ARRAY_VIEW<T> rho;

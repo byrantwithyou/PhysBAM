@@ -443,7 +443,7 @@ public:
     {
         if(use_collidable_advection) return;
         T tolerance=(T)9.8/24; // dt*gravity where dt=1/24 is based on the length of a frame
-        for(int id=0;id<rigid_geometry_collection.particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
             for(typename GRID<TV>::CELL_ITERATOR iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
                 TV_INT index=iterator.Cell_Index();TV location=fine_mac_grid.X(index);
                 if(particle_levelset_evolution.phi(index)<0 && rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(location)<0){
@@ -459,7 +459,7 @@ public:
     void Extrapolate_Phi_Into_Objects(const T time)
     {
         if(use_collidable_advection) return;
-        for(int id=0;id<rigid_geometry_collection.particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
             ARRAY<T,TV_INT> phi_object(fine_mac_grid.Domain_Indices(3));
             for(typename GRID<TV>::CELL_ITERATOR iterator(fine_mac_grid);iterator.Valid();iterator.Next())
                 phi_object(iterator.Cell_Index())=-rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(iterator.Location());

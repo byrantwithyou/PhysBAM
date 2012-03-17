@@ -37,7 +37,7 @@ OPENGL_COMPONENT_HEIGHTFIELD_2D(const GRID<TV> &grid_input,
     triangulated_surface.mesh.Initialize_Square_Mesh(counts.x,counts.y);
     for (int i=domain.min_corner.x;i<domain.max_corner.x;i++) for(int j=domain.min_corner.y;j<domain.max_corner.y;j++)
     {
-        triangulated_surface.particles.array_collection->Add_Element();
+        triangulated_surface.particles.Add_Element();
     }
 
     height_filename=height_filename_input;
@@ -211,10 +211,10 @@ Update_Surface()
         if(subdivide_surface)
         {
             triangulated_surface.mesh.Initialize_Square_Mesh(grid.counts.x,grid.counts.y);
-            triangulated_surface.particles.array_collection->Clean_Memory();
-            triangulated_surface.particles.array_collection->Preallocate(grid.counts.x*grid.counts.y);
+            triangulated_surface.particles.Clean_Memory();
+            triangulated_surface.particles.Preallocate(grid.counts.x*grid.counts.y);
             for (int i = domain.min_corner.x; i <= domain.max_corner.x; i++) for (int j = domain.min_corner.y; j <= domain.max_corner.y; j++)
-                triangulated_surface.particles.array_collection->Add_Element();
+                triangulated_surface.particles.Add_Element();
         }
 
         for (int i = domain.min_corner.x; i <= domain.max_corner.x; i++) for (int j = domain.min_corner.y; j <= domain.max_corner.y; j++)

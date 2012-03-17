@@ -59,7 +59,7 @@ virtual void Get_Initial_Data()
 
     // add particles and set up segmented curve
     for(int i=0;i<20;i++){
-        particles.array_collection->Add_Element();
+        particles.Add_Element();
         particles.mass(i)=1;
         particles.X(i)=TV((T)i,0);
         if(i>1) segmented_curve.mesh.elements.Append(i,i-1);}
@@ -73,13 +73,13 @@ virtual void Get_Initial_Data()
         rigid_bodies(i)->Set_Coefficient_Of_Friction(0);
         T mass_scale_factor=10/rigid_bodies(i)->mass.mass;
         rigid_bodies(i)->mass*=mass_scale_factor;
-        rigid_body_particles.array_collection->Add_Element();
+        rigid_body_particles.Add_Element();
         rigid_body_particles.mass(i)=rigid_bodies(i)->mass;
         rigid_body_particles.id(i)=i;
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,5*i,rigid_body_particles,i,TV((T)-.5,0)));
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,5*i+1,rigid_body_particles,i,TV((T).5,0)));
         rigid_body_particles.Set_State(i,rigid_bodies(i)->frame);
-        particles.array_collection->Add_Element();
+        particles.Add_Element();
         particles.mass(i+20)=rigid_body_particles.mass(i).mass;
         particles.X(i+20)=TV((T)5*i+(T).5,0);
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,20+i,rigid_body_particles,i,TV()));}

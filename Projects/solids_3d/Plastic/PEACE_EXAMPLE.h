@@ -100,7 +100,7 @@ void Get_Initial_Data(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
     HEAVY_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
 
     std::fstream input;input.open(input_file,std::ios::in|std::ios::binary);tetrahedralized_volume.Read_Float(input);input.close();
-    std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrhedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
+    std::cout << "total vertices = " << particles.Size() << std::endl;std::cout << "total tetrhedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
     tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();tetrahedralized_volume.particles.Delete_Mass(); // in case they're accidently stored in the .tet file
     tetrahedralized_volume.particles.Update_Position_And_Velocity();tetrahedralized_volume.particles.Store_Mass(); // add back with the proper sizes
 
@@ -109,16 +109,16 @@ void Get_Initial_Data(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
     
     if(use_control){
         Initialize_Peace_Levelset("Plastic/peace.sgi");
-        plastic_goal.Exact_Resize(1,particles.array_collection->Size());
+        plastic_goal.Exact_Resize(1,particles.Size());
         T goal_thickness=(T).125,threshold=(T).9;
-        for(int p=0;p<particles.array_collection->Size();p++)plastic_goal(p)=Peace_Map(particles.X(p));
+        for(int p=0;p<particles.Size();p++)plastic_goal(p)=Peace_Map(particles.X(p));
         if(show_goal){ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);/*use_control=false*/;}}
 
-    for(int p=0;p<particles.array_collection->Size();p++)particles.X(p)*=(T).5;
-    if(use_control)for(int p=0;p<particles.array_collection->Size();p++)plastic_goal(p)*=(T).5;
+    for(int p=0;p<particles.Size();p++)particles.X(p)*=(T).5;
+    if(use_control)for(int p=0;p<particles.Size();p++)plastic_goal(p)*=(T).5;
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}

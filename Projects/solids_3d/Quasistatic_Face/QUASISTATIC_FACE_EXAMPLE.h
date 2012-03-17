@@ -112,7 +112,7 @@ void Get_Initial_Data()
 
     input_file=input_directory+"/face_simulation.tet";input=FILE_UTILITIES::Safe_Open_Input(input_file);
     tetrahedralized_volume.template Read<RW>(*input);delete input;
-    std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << particles.Size() << std::endl;
     std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
     particles.Update_Velocity();particles.Store_Mass();
     tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);tetrahedralized_volume.Update_Bounding_Box();

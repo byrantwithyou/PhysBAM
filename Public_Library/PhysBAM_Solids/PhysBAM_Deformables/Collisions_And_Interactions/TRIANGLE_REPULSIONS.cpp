@@ -212,9 +212,9 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
 
     int repulsions=Apply_Repulsions_To_Velocities(dt,point_face_pairs,edge_edge_pairs,true,use_saved_pairs);
     LOG::Stat("adjusting velocity for repulsions",repulsions);
-    if(repulsions) for(int p=0;p<geometry.deformable_body_collection.particles.array_collection->Size();p++) if(modified_full(p)) geometry.deformable_body_collection.particles.X(p)=X_self_collision_free(p)+dt*V(p);
+    if(repulsions) for(int p=0;p<geometry.deformable_body_collection.particles.Size();p++) if(modified_full(p)) geometry.deformable_body_collection.particles.X(p)=X_self_collision_free(p)+dt*V(p);
 // TODO: this is broken
-//    for(int i=0;i<geometry.deformable_body_collection.rigid_body_particles.array_collection->Size();i++){
+//    for(int i=0;i<geometry.deformable_body_collection.rigid_body_particles.Size();i++){
 //        geometry.deformable_body_collection.rigid_body_particles.Frame(i)=geometry.rigid_body_particle_state_collision_free(i).frame;
 //        geometry.deformable_body_collection.rigid_body_particles.Euler_Step_Position(VECTOR<int,1>(i),dt);}
     return repulsions;
@@ -522,7 +522,7 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
     ARRAY_VIEW<TV> V(particles.V);
     ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
     while(++attempts<=total_attempts){
-        impulse_velocities.Resize(particles.array_collection->Size());impulse_velocities=V;
+        impulse_velocities.Resize(particles.Size());impulse_velocities=V;
         pf_target_impulses.Resize(pairs.Size());pf_target_impulses.Fill(TV());
         pf_normals.Resize(pairs.Size());pf_normals.Fill(TV());
         pf_old_speeds.Resize(pairs.Size());pf_old_speeds.Fill(T());
@@ -604,7 +604,7 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
     ARRAY_VIEW<TV> V(particles.V);
     ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
     while(++attempts<=total_attempts){
-        impulse_velocities.Resize(particles.array_collection->Size());impulse_velocities=V;
+        impulse_velocities.Resize(particles.Size());impulse_velocities=V;
         ee_target_impulses.Resize(pairs.Size());ee_target_impulses.Fill(TV());
         ee_normals.Resize(pairs.Size());ee_normals.Fill(TV());
         ee_old_speeds.Resize(pairs.Size());ee_old_speeds.Fill(T());

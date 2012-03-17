@@ -24,7 +24,7 @@ STANDARD_TESTS(const STREAM_TYPE stream_type)
     solid_density(0),solid_width(0),analytic_solution(0)
 {
     LOG::cout<<std::setprecision(16);
-    debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
 }
@@ -359,7 +359,7 @@ Kang_Circle(bool use_surface)
     if(!rebuild_surface && use_surface){
         SPHERE<TV> object(TV((T).02*m,(T).02*m),(T).01*m);
         front_tracked_structure=&solids_tests.Copy_And_Add_Structure(*TESSELLATION::Tessellate_Boundary(object,solid_refinement));
-        solid_body_collection.deformable_body_collection.particles.array_collection->Add_Elements(20*resolution);
+        solid_body_collection.deformable_body_collection.particles.Add_Elements(20*resolution);
         particle_segments.Resize(front_tracked_structure->mesh.elements.Flattened().Max());
         for(int i=0;i<front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
@@ -427,7 +427,7 @@ Oscillating_Circle(bool use_surface)
             T radius=circle_radius+circle_perturbation*cos(oscillation_mode*angle);
             front_tracked_structure->particles.X(i)=TV((T).5*m+radius*cos(angle),(T).5*m+radius*sin(angle));}
         solid_body_collection.deformable_body_collection.particles.mass.Fill((T)1);
-        solid_body_collection.deformable_body_collection.particles.array_collection->Add_Elements(20*resolution);
+        solid_body_collection.deformable_body_collection.particles.Add_Elements(20*resolution);
         particle_segments.Resize(front_tracked_structure->mesh.elements.Flattened().Max());
         for(int i=0;i<front_tracked_structure->mesh.elements.m;i++){
             particle_segments(front_tracked_structure->mesh.elements(i).x).y=i;
@@ -511,8 +511,8 @@ Divide_Segment(int e)
     LOG::cout<<"a p "<<particle_segments<<std::endl;
     int ne=front_tracked_structure->mesh.elements.m+1;
     int p=particle_segments.Append(VECTOR<int,2>(e,ne));
-    LOG::cout<<p<<"  "<<front_tracked_structure->particles.array_collection->Size()<<std::endl;
-    PHYSBAM_ASSERT(p<=front_tracked_structure->particles.array_collection->Size());
+    LOG::cout<<p<<"  "<<front_tracked_structure->particles.Size()<<std::endl;
+    PHYSBAM_ASSERT(p<=front_tracked_structure->particles.Size());
     front_tracked_structure->mesh.elements(e).y=p;
     front_tracked_structure->mesh.elements.Append(VECTOR<int,2>(p,seg.y));
     particle_segments(seg.y).x=ne;
@@ -625,10 +625,10 @@ template<class T> void STANDARD_TESTS<T>::
 Write_Output_Files(const int frame) const
 {
     BASE::Write_Output_Files(frame);
-    if(debug_particles.array_collection->Size() || frame==0){
+    if(debug_particles.Size() || frame==0){
         FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
         FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
-        debug_particles.array_collection->Delete_All_Elements();}
+        debug_particles.Delete_All_Elements();}
 }
 //#####################################################################
 // Function Initialize_Surface_Particles
@@ -638,8 +638,8 @@ Initialize_Surface_Particles(int number)
 {
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     number_surface_particles=number;
-    PHYSBAM_ASSERT(particles.array_collection->Size()==0);
-    particles.array_collection->Add_Elements(number_surface_particles);
+    PHYSBAM_ASSERT(particles.Size()==0);
+    particles.Add_Elements(number_surface_particles);
     rebuild_curve=SEGMENTED_CURVE_2D<T>::Create(particles);
     free_particles=FREE_PARTICLES<TV>::Create(particles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(free_particles);
@@ -760,7 +760,7 @@ FSI_Analytic_Test()
     fluids_parameters.collision_bodies_affecting_fluid->use_collision_face_neighbors=true;
     T solid_gravity=(T)9.8*m/(s*s);
     fluids_parameters.surface_tension=0;
-    debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
     fluids_parameters.gravity=(T)9.8*m;
     fluids_parameters.density=(T)100/(m*m);

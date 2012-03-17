@@ -48,7 +48,7 @@ Update_Joint_Structures(const int parent)
 {
     CLUSTER& cluster=*reverse_bindings.Get(parent);
     HASHTABLE<int> hashtable;
-    articulated_rigid_body.joint_mesh.undirected_graph.Ensure_Number_Nodes(rigid_body_collection.rigid_body_particle.array_collection->Size());
+    articulated_rigid_body.joint_mesh.undirected_graph.Ensure_Number_Nodes(rigid_body_collection.rigid_body_particle.Size());
     for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++)
         hashtable.Set(cluster.children(i));
     for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<cluster.children.Size();i++){
@@ -94,7 +94,7 @@ Add_Binding(const ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID>& child_particles)
     CLUSTER& cluster=*reverse_bindings.Get_Or_Insert(parent,new CLUSTER());
     cluster.parent=parent;
     cluster.stored_active=false;
-    binding_index.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size());
+    binding_index.Resize(rigid_body_collection.rigid_body_particle.Size());
     bool has_static=false,has_kinematic=false;
     for(RIGID_CLUSTER_CONSTITUENT_ID i(0);i<child_particles.Size();i++){
         cluster.children.Append(child_particles(i));

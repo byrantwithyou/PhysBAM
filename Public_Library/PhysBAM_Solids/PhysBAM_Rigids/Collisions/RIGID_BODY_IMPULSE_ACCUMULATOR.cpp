@@ -22,7 +22,7 @@ Reset()
 {
     accumulated_impulse=TWIST<TV>();
     if(accumulated_node_impulses){
-        accumulated_node_impulses->Resize(simplicial_object->particles.array_collection->Size(),false,false);
+        accumulated_node_impulses->Resize(simplicial_object->particles.Size(),false,false);
         accumulated_node_impulses->Fill(TV());}
 }
 //#####################################################################
@@ -33,7 +33,7 @@ Initialize_Simplicial_Object(T_SIMPLICIAL_OBJECT* simplicial_object_input,ARRAY<
 {
     simplicial_object=simplicial_object_input;
     accumulated_node_impulses=accumulated_node_impulses_input;
-    LOG::cout<<" "<<simplicial_object->particles.array_collection->Size();
+    LOG::cout<<" "<<simplicial_object->particles.Size();
 }
 //#####################################################################
 // Function Add_Impulse

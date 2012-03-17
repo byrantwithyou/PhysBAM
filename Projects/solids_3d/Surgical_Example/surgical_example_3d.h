@@ -219,8 +219,8 @@ public:
         tissue_tet_vol=&tet_volume;   
         tet_volume.Update_Bounding_Box();
         tet_volume.Set_Mass_Of_Particles(true);
-        //for(int p=0;p<particles.array_collection->Size();p++)
-        // material_space_particles.X(material_space_particles.array_collection->Add_Element())=particles.X(p);
+        //for(int p=0;p<particles.Size();p++)
+        // material_space_particles.X(material_space_particles.Add_Element())=particles.X(p);
  
         //material_space_tissue_tet_vol=new TETRAHEDRALIZED_VOLUME<T>(tet_volume.mesh,material_space_particles);
         TRIANGULATED_SURFACE<T>& boundary_surface=*TRIANGULATED_SURFACE<T>::Create(tet_volume.particles);
@@ -231,7 +231,7 @@ public:
         boundary_surface.Set_Mass_Of_Particles(true);
         boundary_surface.Update_Bounding_Box();
         solid_body_collection.deformable_object.Add_Structure(&boundary_surface);
-        //for(int p=0;p<particles.array_collection->Size();p++) if(particles.X(p).y>tet_volume.bounding_box->ymax-(T).01) attached_nodes.Append(p);
+        //for(int p=0;p<particles.Size();p++) if(particles.X(p).y>tet_volume.bounding_box->ymax-(T).01) attached_nodes.Append(p);
 
         ARRAY<ARRAY<int> > embedding_map;
         FILE_UTILITIES::Read_From_File<RW>("../../Personal_Libraries/Joey_Library/data/Output_Dup/embedding_map",embedding_map);

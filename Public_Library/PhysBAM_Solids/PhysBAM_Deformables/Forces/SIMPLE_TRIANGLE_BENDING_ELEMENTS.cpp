@@ -97,16 +97,16 @@ Set_Quadruples_From_Triangle_Mesh(TRIANGLE_MESH& mesh)
         //TV direction=shared_edge.Shortest_Vector_Between_Segments(fictitious_edge,weights); // points from fictitious to shared
         // weights.x corresponds to weights on fictitious
         // shared edge
-        int shared_edge_particle=particles.array_collection->Add_Element();
+        int shared_edge_particle=particles.Add_Element();
         //linear_bindings(q).x=binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,shared_edge_particle,VECTOR<int,2>(j,k),VECTOR<T,2>(weights.y,1-weights.y)));
         linear_bindings(q).x=binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,shared_edge_particle,VECTOR<int,2>(j,k),VECTOR<T,2>()));
         // fictitious edge
-        int fictitious_edge_particle=particles.array_collection->Add_Element();
+        int fictitious_edge_particle=particles.Add_Element();
         //linear_bindings(q).y=binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,fictitious_edge_particle,VECTOR<int,2>(i,l),VECTOR<T,2>(weights.x,1-weights.x)));
         linear_bindings(q).y=binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(particles,fictitious_edge_particle,VECTOR<int,2>(i,l),VECTOR<T,2>()));
         spring_connectivity.elements.Append(VECTOR<int,2>(shared_edge_particle,fictitious_edge_particle));
     }
-    spring_connectivity.Set_Number_Nodes(particles.array_collection->Size());
+    spring_connectivity.Set_Number_Nodes(particles.Size());
 }
 //#####################################################################
 // Function Set_Constants_From_Particles

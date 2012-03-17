@@ -270,9 +270,9 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
     for(int s=0;s<sources.m;s++){
         for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
             if(!removed_positive_particles(block)) continue;
-            for(int p=0;p<removed_positive_particles(block)->array_collection->Size();p++)
-                if(sources(s).Inside(world_to_source(s).Homogeneous_Times(removed_positive_particles(block)->X(p)),(T)-1e-4)) removed_positive_particles(block)->array_collection->Add_To_Deletion_List(p);
-            removed_positive_particles(block)->array_collection->Delete_Elements_On_Deletion_List();}}
+            for(int p=0;p<removed_positive_particles(block)->Size();p++)
+                if(sources(s).Inside(world_to_source(s).Homogeneous_Times(removed_positive_particles(block)->X(p)),(T)-1e-4)) removed_positive_particles(block)->Add_To_Deletion_List(p);
+            removed_positive_particles(block)->Delete_Elements_On_Deletion_List();}}
     return false;
 }
 //#####################################################################
@@ -358,10 +358,10 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sph_sources,c
             RANGE<TV> block_bounding_box=block_uniform.Bounding_Box();
             if(sph_sources(s).Lazy_Inside(location)){
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=new PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>();
-                while(removed_negative_particles(block)->array_collection->Size()<target_density_factor*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){
+                while(removed_negative_particles(block)->Size()<target_density_factor*fraction_of_particles_for_sph*fluids_parameters.number_particles_per_cell){
                     TV X=random.Get_Uniform_Vector(block_bounding_box);
-                    int id=removed_negative_particles(block)->array_collection->Add_Element();
-                    (*removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
+                    int id=removed_negative_particles(block)->Add_Element();
+                    (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
                     removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->V(id)=sources_velocity(s);
                     removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}}}
 }

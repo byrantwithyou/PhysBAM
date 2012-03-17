@@ -58,7 +58,7 @@ void Execute_Main_Program()
     example.tetrahedral_meshing.Create_Initial_Mesh(example.bcc_lattice_cell_size,example.use_adaptive_refinement,example.max_subdivision_levels,true,false,example.use_aggressive_tet_pruning);
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=example.tetrahedral_meshing.solid_body_collection.deformable_body_collection;
     LOG::cout<<"tetrahedrons = "<<deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>().mesh.elements.m<<std::endl;
-    LOG::cout<<"particles = "<<deformable_body_collection.particles.array_collection->Size()<<std::endl;
+    LOG::cout<<"particles = "<<deformable_body_collection.particles.Size()<<std::endl;
 
     if(example.use_optimization){
         example.tetrahedral_meshing.Initialize_Optimization();

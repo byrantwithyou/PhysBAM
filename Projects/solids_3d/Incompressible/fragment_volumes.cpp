@@ -36,16 +36,16 @@ int main(int argc,char* argv[])
         TETRAHEDRALIZED_VOLUME<T>& volume=deformable_object.Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         DEFORMABLE_PARTICLES<TV>& particles=volume.particles;
         // find components
-        UNION_FIND<> union_find(particles.array_collection->Size());
+        UNION_FIND<> union_find(particles.Size());
         for(int t=0;t<volume.mesh.elements.m;t++) union_find.Union(volume.mesh.elements(t));
         // compute volumes
-        ARRAY<T> volumes(volume.particles.array_collection->Size());
+        ARRAY<T> volumes(volume.particles.Size());
         for(int t=0;t<volume.mesh.elements.m;t++){VECTOR<int,4>& nodes=volume.mesh.elements(t);
             int root=union_find.Find(nodes[0]);
             volumes(root)+=TETRAHEDRON<T>::Signed_Volume(particles.X(nodes[0]),particles.X(nodes[1]),particles.X(nodes[2]),particles.X(nodes[3]));}
         // print volumes
         RANGE<VECTOR<T,1> > fragment_volume_box=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);
-        for(int p=0;p<particles.array_collection->Size();p++)if(union_find.Is_Root(p)){
+        for(int p=0;p<particles.Size();p++)if(union_find.Is_Root(p)){
             if(frame==0) rest_volume=volumes(p);
             fragment_volume_box.Enlarge_To_Include_Point(VECTOR<T,1>(volumes(p)/rest_volume-1));
             volume_box.Enlarge_To_Include_Point(VECTOR<T,1>(volumes(p)/rest_volume-1));}

@@ -35,7 +35,7 @@ RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bo
 {
     if(index>=0) particle_index=index;
     else{
-        particle_index=rigid_geometry_collection.particles.array_collection->Add_Element();
+        particle_index=rigid_geometry_collection.particles.Add_Element();
         rigid_geometry_collection.particles.structure_ids(particle_index)=VECTOR<int,3>(-1,-1,-1);
     }
     if(particle_index>=rigid_geometry_collection.particles.rigid_geometry.m)

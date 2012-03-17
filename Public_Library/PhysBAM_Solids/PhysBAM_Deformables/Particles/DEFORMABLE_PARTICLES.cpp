@@ -39,7 +39,7 @@ Center_Of_Mass() const
 template<class TV> void DEFORMABLE_PARTICLES<TV>::
 Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings)
 {
-    Compute_Auxiliary_Attributes(soft_bindings,IDENTITY_ARRAY<>(soft_bindings.particles.array_collection->Size()),false);
+    Compute_Auxiliary_Attributes(soft_bindings,IDENTITY_ARRAY<>(soft_bindings.particles.Size()),false);
 }
 //#####################################################################
 // Function Compute_Auxiliary_Attributes
@@ -47,15 +47,15 @@ Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings)
 template<class TV> template<class T_INDICES> void DEFORMABLE_PARTICLES<TV>::
 Compute_Auxiliary_Attributes(const SOFT_BINDINGS<TV>& soft_bindings,const T_INDICES& indices,const bool copy_existing_elements)
 {
-    if(array_collection->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS))
-        array_collection->Remove_Array_Using_Index(array_collection->Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_MASS));
-    array_collection->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS,&one_over_mass);
-    if(array_collection->template Get_Array<T>(ATTRIBUTE_ID_EFFECTIVE_MASS))
-        array_collection->Remove_Array_Using_Index(array_collection->Get_Attribute_Index(ATTRIBUTE_ID_EFFECTIVE_MASS));
-    array_collection->template Add_Array<T>(ATTRIBUTE_ID_EFFECTIVE_MASS,&effective_mass);
-    if(array_collection->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS))
-        array_collection->Remove_Array_Using_Index(array_collection->Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS));
-    array_collection->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,&one_over_effective_mass);
+    if(this->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS))
+        Remove_Array_Using_Index(Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_MASS));
+    this->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_MASS,&one_over_mass);
+    if(this->template Get_Array<T>(ATTRIBUTE_ID_EFFECTIVE_MASS))
+        Remove_Array_Using_Index(Get_Attribute_Index(ATTRIBUTE_ID_EFFECTIVE_MASS));
+    this->template Add_Array<T>(ATTRIBUTE_ID_EFFECTIVE_MASS,&effective_mass);
+    if(this->template Get_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS))
+        Remove_Array_Using_Index(Get_Attribute_Index(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS));
+    this->template Add_Array<T>(ATTRIBUTE_ID_ONE_OVER_EFFECTIVE_MASS,&one_over_effective_mass);
     for(int i=0;i<indices.Size();i++){int p=indices(i);
         one_over_mass(p)=Robust_Inverse(mass(p));}
     for(int i=0;i<indices.Size();i++){int p=indices(i);

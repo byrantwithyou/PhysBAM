@@ -182,7 +182,7 @@ template<class TV> void RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>::
 End_Fracture(const int body_id,ARRAY<int>& added_bodies)
 {
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=evolution.solid_body_collection.rigid_body_collection;
-    int new_size=rigid_body_collection.rigid_body_particle.array_collection->Size();
+    int new_size=rigid_body_collection.rigid_body_particle.Size();
     evolution.rigid_frame_save.Resize(new_size);
     evolution.rigid_velocity_save.Resize(new_size);
     evolution.rigid_angular_momentum_save.Resize(new_size);

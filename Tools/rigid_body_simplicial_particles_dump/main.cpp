@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
@@ -30,8 +30,8 @@ void Dump_Rigid_Baody_Simplicial_Object_Particles(const STREAM_TYPE& stream_type
     RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection=rigid_body_collection.rigid_geometry_collection;
     RIGID_GEOMETRY<TV>& rigid_geometry=rigid_geometry_collection.Rigid_Geometry(rigid_body_id);
 
-    *output_stream<<"Number of Particles="<<rigid_geometry.simplicial_object->particles.array_collection->Size()<<std::endl;
-    for(int t=0;t<rigid_geometry.simplicial_object->particles.array_collection->Size();t++){
+    *output_stream<<"Number of Particles="<<rigid_geometry.simplicial_object->particles.Size()<<std::endl;
+    for(int t=0;t<rigid_geometry.simplicial_object->particles.Size();t++){
         TV X=rigid_geometry.simplicial_object->particles.X(t);
         *output_stream<<"X("<<t<<")="<<rigid_geometry.Frame()*X<<std::endl;}
 }

@@ -14,7 +14,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> PARTICLE_CONNECTIVITY<TV>::
 PARTICLE_CONNECTIVITY(const DEFORMABLE_PARTICLES<TV>& particles,const RIGID_BODY_COLLECTION<TV>& rigid_body_collection)
-    :particles_number(particles.array_collection->Size()),rigid_body_collection(rigid_body_collection),union_find(particles_number+rigid_body_collection.rigid_body_particle.array_collection->Size())
+    :particles_number(particles.Size()),rigid_body_collection(rigid_body_collection),union_find(particles_number+rigid_body_collection.rigid_body_particle.Size())
 {}
 //#####################################################################
 // Function Exclude_Particle
@@ -32,7 +32,7 @@ Exclude_Particle(const int i) const
 template<class TV> void PARTICLE_CONNECTIVITY<TV>::
 Union_All_Rigid_Body_Particles()
 {
-    Union(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particle.array_collection->Size())+particles_number);
+    Union(IDENTITY_ARRAY<>(rigid_body_collection.rigid_body_particle.Size())+particles_number);
 }
 //#####################################################################
 template class PARTICLE_CONNECTIVITY<VECTOR<float,1> >;

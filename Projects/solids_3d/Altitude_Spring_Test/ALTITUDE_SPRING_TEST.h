@@ -57,7 +57,7 @@ void Initialize_Cloth(DEFORMABLE_TRIANGULATED_SURFACE<T>& cloth)
     else{
         int m=(int)(aspect_ratio*number_side_panels)+1,n=number_side_panels+1;
         cloth.triangulated_surface.triangle_mesh.Initialize_Square_Mesh(m,n);
-        for(int k=0;k<cloth.triangulated_surface.triangle_mesh.number_nodes;k++) cloth.triangulated_surface.particles.array_collection->Add_Element();
+        for(int k=0;k<cloth.triangulated_surface.triangle_mesh.number_nodes;k++) cloth.triangulated_surface.particles.Add_Element();
         T mass_node=aspect_ratio*sqr(side_length)/(m*n);ARRAY<T>::copy(mass_node,cloth.triangulated_surface.particles.mass.array);
         T dx=aspect_ratio*side_length/(m-1),dy=side_length/(n-1);
         for(int i=0;i<m;i++) for(int j=0;j<n;j++){int node=i+m*(j-1);
@@ -102,7 +102,7 @@ void Initialize_Cloth(DEFORMABLE_TRIANGULATED_SURFACE<T>& cloth)
     // set up repulsion springs for collisions!!!!!!
     repulsion_springs_initialized=true;
     T average_restlength=ARRAY<T>::sum(ls->restlength)/ls->restlength.m; 
-    T mass_node=cloth.triangulated_surface.particles.mass.Total_Mass(cloth.triangulated_surface.particles)/cloth.triangulated_surface.particles.array_collection->Size();
+    T mass_node=cloth.triangulated_surface.particles.mass.Total_Mass(cloth.triangulated_surface.particles)/cloth.triangulated_surface.particles.Size();
     collisions_repulsion_spring_constant_over_mass_times_length=2*ls->constant_youngs_modulus/(mass_node*average_restlength);
 }
 //#####################################################################

@@ -165,7 +165,7 @@ Rescale(const T scaling_factor)
 template<class T> void TRIANGULATED_AREA<T>::
 Rescale(const T scaling_x,const T scaling_y)
 {
-    for(int k=0;k<particles.array_collection->Size();k++) particles.X(k)*=VECTOR<T,2>(scaling_x,scaling_y);
+    for(int k=0;k<particles.Size();k++) particles.X(k)*=VECTOR<T,2>(scaling_x,scaling_y);
     Refresh_Auxiliary_Structures();
 }
 //#####################################################################

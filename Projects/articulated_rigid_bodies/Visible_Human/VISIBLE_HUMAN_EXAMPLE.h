@@ -1053,10 +1053,10 @@ STRUCTURE<TV>* Create_Tetrahedralized_Volume(int index)
 void Set_Initial_Particle_Configuration(DEFORMABLE_PARTICLES<TV>& particles,const int index)
 {
     if(deformable_body_initial_states(index)){
-        LOG::cout<<"Deformable body "<<index<<" - Total Particles : "<<particles.array_collection->Size()<<std::endl;
-        BOX_3D<T> bounding_box(particles.X(1));for(int i=2;i<=particles.array_collection->Size();i++) bounding_box.Enlarge_To_Include_Point(particles.X(i));TV center=bounding_box.Center();
+        LOG::cout<<"Deformable body "<<index<<" - Total Particles : "<<particles.Size()<<std::endl;
+        BOX_3D<T> bounding_box(particles.X(1));for(int i=2;i<=particles.Size();i++) bounding_box.Enlarge_To_Include_Point(particles.X(i));TV center=bounding_box.Center();
         RIGID_BODY_STATE<TV>& state=*deformable_body_initial_states(index);
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             particles.X(p)=state.frame*(particles.X(p)-center);
             particles.V(p)=state.twist.linear+TV::Cross_Product(state.twist.angular,particles.X(p)-state.frame.t);}}
 }
@@ -1076,7 +1076,7 @@ void Get_Constrained_Particle_Data()
     enslaved_nodes.Resize(num_bones_present);
     positions_relative_to_bone_frames.Resize(num_bones_present);
 
-    for(int i=0;i<particles.array_collection->Size();i++)
+    for(int i=0;i<particles.Size();i++)
         for(int p=0;p<num_bones_present;p++){
             RIGID_BODY<TV>& bone_rigid_body=*arb->rigid_body_list.rigid_bodies(bone_ids(p));
             if (!bone_rigid_body.Implicit_Geometry_Lazy_Outside(particles.X(i))){

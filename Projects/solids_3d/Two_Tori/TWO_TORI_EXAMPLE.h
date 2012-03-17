@@ -122,25 +122,25 @@ void Get_Initial_Data()
         DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;
         
         std::istream* input=FILE_UTILITIES::Safe_Open_Input(input_file);tetrahedralized_volume.template Read<RW>(*input);delete input;
-        std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
+        std::cout << "total vertices = " << particles.Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
         particles.Update_Velocity();particles.Store_Mass(); // in case they're not stored in the file!
 
         if(number_of_objects==1){
-            int old_number_of_particles=particles.array_collection->Size();int old_number_of_tets=tetrahedron_mesh.tetrahedrons.m;
-            for(int p=0;p<old_number_of_particles;p++){int p2=particles.array_collection->Add_Element();particles.X(p2)=particles.X(p);particles.X(p2).y+=initial_height2-initial_height1;}
+            int old_number_of_particles=particles.Size();int old_number_of_tets=tetrahedron_mesh.tetrahedrons.m;
+            for(int p=0;p<old_number_of_particles;p++){int p2=particles.Add_Element();particles.X(p2)=particles.X(p);particles.X(p2).y+=initial_height2-initial_height1;}
             for(int t=0;t<old_number_of_tets;t++){
                 int i,j,k,l;tetrahedron_mesh.tetrahedrons.Get(t,i,j,k,l);
                 tetrahedron_mesh.tetrahedrons.Append(i+old_number_of_particles,j+old_number_of_particles,k+old_number_of_particles,l+old_number_of_particles);}
-            tetrahedron_mesh.number_nodes=particles.array_collection->Size();}
+            tetrahedron_mesh.number_nodes=particles.Size();}
 
         tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
         tetrahedralized_volume.Update_Bounding_Box();
         VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-        for(int i=0;i<particles.array_collection->Size();i++){
+        for(int i=0;i<particles.Size();i++){
             particles.V(i)=initial_velocity[object-1]+VECTOR_3D<T>::Cross_Product(initial_angular_velocity[object-1],particles.X(i)-center);
             particles.X(i)=center+initial_orientation[object-1].Rotate(particles.X(i)-center);
             particles.X(i).y+=initial_height[object-1]-bottom;
-            if(object==1 && use_tetrahedron_collisions){undeformed_positions.array_collection->Add_Element();undeformed_positions.X(i)=particles.X(i);}}}
+            if(object==1 && use_tetrahedron_collisions){undeformed_positions.Add_Element();undeformed_positions.X(i)=particles.X(i);}}}
         
     int index=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>(data_directory+"/Rigid_Bodies/ground");
     solids_parameters.rigid_body_parameters.list.rigid_bodies(index)->Set_Coefficient_Of_Friction((T).3);
@@ -157,10 +157,10 @@ void Create_Singleton_Geometry(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume
 {
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=tetrahedralized_volume.particles;TETRAHEDRON_MESH& tetrahedron_mesh=tetrahedralized_volume.tetrahedron_mesh;
     particles.Increase_Array_Size(4);
-    particles.X(particles.array_collection->Add_Element())=VECTOR_3D<T>(0,0,0);
-    particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(1,0,0);
-    particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(0,1,0);
-    particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(0,0,1);
+    particles.X(particles.Add_Element())=VECTOR_3D<T>(0,0,0);
+    particles.X(particles.Add_Element())=edge_length*VECTOR_3D<T>(1,0,0);
+    particles.X(particles.Add_Element())=edge_length*VECTOR_3D<T>(0,1,0);
+    particles.X(particles.Add_Element())=edge_length*VECTOR_3D<T>(0,0,1);
     tetrahedron_mesh.Clean_Memory();tetrahedron_mesh.number_nodes=4;tetrahedron_mesh.tetrahedrons.Exact_Resize(4,1);
     tetrahedron_mesh.tetrahedrons(1,1)=1;tetrahedron_mesh.tetrahedrons(2,1)=2;tetrahedron_mesh.tetrahedrons(3,1)=3;tetrahedron_mesh.tetrahedrons(4,1)=4;
 }

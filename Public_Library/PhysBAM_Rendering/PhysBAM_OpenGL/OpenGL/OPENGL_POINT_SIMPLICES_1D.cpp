@@ -38,20 +38,20 @@ Display(const int in_color) const
         segment_color.Send_To_GL_Pipeline();
         glPointSize(5.0f);
         vertices.Resize(0);
-        for(int t=0;t<simplices.particles.array_collection->Size();t++){
+        for(int t=0;t<simplices.particles.Size();t++){
             OpenGL_Vertex(simplices.particles.X(t),vertices);}
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
         vertex_color.Send_To_GL_Pipeline();
         glPointSize(10.0f);
         vertices.Resize(0);
-        for(int t=0;t<simplices.particles.array_collection->Size();t++){
+        for(int t=0;t<simplices.particles.Size();t++){
             OpenGL_Vertex(simplices.particles.X(t),vertices);}
         OpenGL_Draw_Arrays(GL_POINTS,2,vertices);}
 
 #ifndef USE_OPENGLES
     if (draw_vertex_positions) {
         vertex_position_color.Send_To_GL_Pipeline();
-        for(int t=0;t<simplices.particles.array_collection->Size();t++){
+        for(int t=0;t<simplices.particles.Size();t++){
             VECTOR<float,3> world_space_pos=World_Space_Point(VECTOR<float,2>(simplices.particles.X(t)));
             OpenGL_String(simplices.particles.X(t),STRING_UTILITIES::string_sprintf("<%f>",world_space_pos.x));}}
 #endif
@@ -67,7 +67,7 @@ Bounding_Box() const
 {
     float xmin,xmax;
     xmin=xmax=simplices.particles.X(1).x;
-    for(int i=0;i<simplices.particles.array_collection->Size();i++){
+    for(int i=0;i<simplices.particles.Size();i++){
         xmin=min(xmin,(float)simplices.particles.X(i).x);xmax=max(xmax,(float)simplices.particles.X(i).x);}
     return World_Space_Box(RANGE<VECTOR<float,3> >(xmin,xmax,0,0,0,0));
 }

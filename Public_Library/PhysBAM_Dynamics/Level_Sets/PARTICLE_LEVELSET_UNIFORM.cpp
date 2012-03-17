@@ -59,9 +59,9 @@ Consistency_Check(RANGE<TV_INT> domain,T_ARRAYS_PARTICLES& particles)
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(cell_particles){
             assert(!hash.Contains(cell_particles));hash.Insert(cell_particles);
-            assert(cell_particles->array_collection->Size()!=0);
-            if(cell_particles->next)assert(cell_particles->array_collection->Size()==particle_pool.number_particles_per_cell);
-            for(int k=0;k<cell_particles->array_collection->Size();k++)
+            assert(cell_particles->Size()!=0);
+            if(cell_particles->next)assert(cell_particles->Size()==particle_pool.number_particles_per_cell);
+            for(int k=0;k<cell_particles->Size();k++)
                 assert(cell_particles->radius(k)>0);
             cell_particles=cell_particles->next;}}
 }
@@ -171,8 +171,8 @@ Adjust_Particle_Radii(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PARTI
     // new radius is negative if the particle is on the wrong side of the interface
     PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=&particles;
     while(cell_particles){
-        if(sign==1) for(int k=0;k<cell_particles->array_collection->Size();k++)cell_particles->radius(k)=max(minimum_particle_radius,min(maximum_particle_radius,levelset.Phi(particles.X(k))));
-        else for(int k=0;k<cell_particles->array_collection->Size();k++)cell_particles->radius(k)=max(minimum_particle_radius,min(maximum_particle_radius,-levelset.Phi(particles.X(k))));
+        if(sign==1) for(int k=0;k<cell_particles->Size();k++)cell_particles->radius(k)=max(minimum_particle_radius,min(maximum_particle_radius,levelset.Phi(particles.X(k))));
+        else for(int k=0;k<cell_particles->Size();k++)cell_particles->radius(k)=max(minimum_particle_radius,min(maximum_particle_radius,-levelset.Phi(particles.X(k))));
         cell_particles=cell_particles->next;}
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
 }
@@ -216,7 +216,7 @@ Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
-        while(cell_particles){for(int k=0;k<cell_particles->array_collection->Size();k++)if(one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
+        while(cell_particles){for(int k=0;k<cell_particles->Size();k++)if(one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
             for(int cell_index=0;cell_index<T_GRID::number_of_cells_per_block;cell_index++){TV_INT cell=block.Cell(cell_index);if(!domain.Lazy_Inside_Half_Open(cell)) continue;
                 T radius_minus_sign_phi=cell_particles->radius(k)-sign*phi(cell);
                 if(radius_minus_sign_phi>0){TV center=levelset.grid.Center(cell);
@@ -252,7 +252,7 @@ Update_Particles_To_Reflect_Mass_Conservation(const T_FAST_LEVELSET& levelset_ol
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
-        while(cell_particles){for(int k=cell_particles->array_collection->Size()-1;k>=0;k--){
+        while(cell_particles){for(int k=cell_particles->Size()-1;k>=0;k--){
             TV X_new=cell_particles->X(k);
             T phi_old=levelset_old.Phi(X_new);
             T phi_new=levelset.Phi(X_new);
@@ -311,16 +311,16 @@ Euler_Step_Removed_Particles(T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& parti
         PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& cell_particles=*particles(block);
         if(!levelset.collision_body_list->Swept_Occupied_Block(T_BLOCK(levelset.grid,block))){
             number_of_non_occupied_cells++;
-            for(int k=cell_particles.array_collection->Size()-1;k>=0;k--) // since not an occupied block, don't need to adjust for objects
+            for(int k=cell_particles.Size()-1;k>=0;k--) // since not an occupied block, don't need to adjust for objects
                 levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(cell_particles,k,cell_particles.V(k),particle_type,dt,time);}
         else{
-            for(int k=cell_particles.array_collection->Size()-1;k>=0;k--){
+            for(int k=cell_particles.Size()-1;k>=0;k--){
                 levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(cell_particles,k,cell_particles.V(k),particle_type,dt,time);
                 T collision_distance=Particle_Collision_Distance(cell_particles.quantized_collision_distance(k));
                 if(!Adjust_Particle_For_Objects(cell_particles.X(k),cell_particles.V(k),cell_particles.radius(k),collision_distance,particle_type,dt,time)){
                     Delete_Particle_And_Clean_Memory(particles(block),cell_particles,k);number_of_deleted_particles++;}}}
         cell_particles.Euler_Step_Position(dt);
-        if(!cell_particles.array_collection->Size()) Free_Particle_And_Clear_Pointer(particles(block));}}
+        if(!cell_particles.Size()) Free_Particle_And_Clear_Pointer(particles(block));}}
     if(verbose){
         if(number_of_deleted_particles) LOG::cout<<"Deleted "<<number_of_deleted_particles<<" "<<PARTICLE_LEVELSET<T_GRID>::Particle_Type_Name(particle_type)<<" due to crossover"<<std::endl;
         if(number_of_non_occupied_cells) LOG::cout<<"Skipped "<<number_of_non_occupied_cells<<" non occupied cells"<<std::endl;}
@@ -363,7 +363,7 @@ Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& 
             // TODO: optimize using slope precomputation
             typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
             T_LINEAR_INTERPOLATION_MAC_HELPER linear_interpolation_mac_helper(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),V);
-            while(cell_particles){for(int k=0;k<cell_particles->array_collection->Size();k++){
+            while(cell_particles){for(int k=0;k<cell_particles->Size();k++){
                 TV velocity=linear_interpolation_mac_helper.Interpolate_Face(cell_particles->X(k));
                 if(enforce_domain_boundaries) levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(*cell_particles,k,velocity,particle_type,dt,time);
                 T collision_distance=Particle_Collision_Distance(cell_particles->quantized_collision_distance(k));
@@ -374,7 +374,7 @@ Euler_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_FACE_ARRAYS_SCALAR& 
         T_LINEAR_INTERPOLATION_SCALAR linear_interpolation;T_FACE_LOOKUP V_lookup(V);
         for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
             typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
-            while(cell_particles){for(int k=0;k<cell_particles->array_collection->Size();k++){
+            while(cell_particles){for(int k=0;k<cell_particles->Size();k++){
                 TV velocity=linear_interpolation.Clamped_To_Array_Face(levelset.grid,V_lookup,cell_particles->X(k));
                 if(enforce_domain_boundaries) levelset.levelset_callbacks->Adjust_Particle_For_Domain_Boundaries(*cell_particles,k,velocity,particle_type,dt,time);
                 T collision_distance=Particle_Collision_Distance(cell_particles->quantized_collision_distance(k));
@@ -413,13 +413,13 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_F
     int max_particles=0;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();if(particles(block_index)){
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block_index);
-        max_particles=max(max_particles,cell_particles->array_collection->Size());
+        max_particles=max(max_particles,cell_particles->Size());
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
         while(cell_particles){
             if(!levelset.collision_body_list || !levelset.collision_body_list->Swept_Occupied_Block(block)){ // not occupied, so advect ignoring objects
                 number_of_non_occupied_cells++;
                 T_LINEAR_INTERPOLATION_MAC_HELPER linear_interpolation_mac_helper(block,V);
-                for(int k=0;k<cell_particles->array_collection->Size();k++){
+                for(int k=0;k<cell_particles->Size();k++){
                     TV velocity=linear_interpolation_mac_helper.Interpolate_Face(cell_particles->X(k));
                     TV X_new=cell_particles->X(k)+dt*velocity;
                     velocity=(T).5*(velocity+linear_interpolation.Clamped_To_Array_Face(levelset.grid,V_lookup,X_new));
@@ -427,7 +427,7 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_F
                     cell_particles->X(k)+=dt*velocity;}}
             else{ // collision aware advection
                 number_of_occupied_cells++;
-                for(int k=cell_particles->array_collection->Size()-1;k>=0;k--){
+                for(int k=cell_particles->Size()-1;k>=0;k--){
                     T collision_distance=Particle_Collision_Distance(cell_particles->quantized_collision_distance(k));
                     // first push particle out
                     if(particle_type==PARTICLE_LEVELSET_NEGATIVE){bool particle_crossover;
@@ -460,7 +460,7 @@ Second_Order_Runge_Kutta_Step_Particles_Threaded(RANGE<TV_INT>& domain,const T_F
                         Delete_Particle_And_Clean_Memory(particles(block_index),*cell_particles,k);number_of_deleted_particles++;}
                     else cell_particles->X(k)+=dt*velocity;}}
             cell_particles=cell_particles->next;}
-        if(particles(block_index)->array_collection->Size()==0) Free_Particle_And_Clear_Pointer(particles(block_index));
+        if(particles(block_index)->Size()==0) Free_Particle_And_Clear_Pointer(particles(block_index));
         }}
     if(verbose){
         LOG::cout<<"max_particles_per_cell "<<max_particles<<std::endl;
@@ -525,7 +525,7 @@ Update_Particle_Cells_Part_One_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES
     typedef typename REMOVE_POINTER<typename T_ARRAYS_PARTICLES::ELEMENT>::TYPE T_PARTICLES;
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
-        while(cell_particles){number_of_particles_per_block(block).Append(cell_particles->array_collection->Size());cell_particles=cell_particles->next;}}
+        while(cell_particles){number_of_particles_per_block(block).Append(cell_particles->Size());cell_particles=cell_particles->next;}}
 }
 //#####################################################################
 // Function Update_Particle_Cells_Threaded
@@ -587,12 +587,12 @@ Delete_Marked_Particles(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles)
         typename T_ARRAYS_PARTICLES::ELEMENT parent_particles=NULL;
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(1){
-            for(int k=0;k<cell_particles->array_collection->Size();k++) if(cell_particles->radius(k)<0){
+            for(int k=0;k<cell_particles->Size();k++) if(cell_particles->radius(k)<0){
                 Delete_Particle_And_Clean_Memory(particles(block),*cell_particles,k);k--;}
             if(!cell_particles->next)break;
             parent_particles=cell_particles;
             cell_particles=cell_particles->next;}
-        if(particles(block)->array_collection->Size()==0) Free_Particle_And_Clear_Pointer(particles(block));}}
+        if(particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(particles(block));}}
 }
 //#####################################################################
 // Function Reseed_Particles
@@ -628,30 +628,30 @@ Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const in
             T unsigned_phi=sign*levelset.phi(cell);if(0<=unsigned_phi && unsigned_phi<=half_band_width) goto NEAR_THE_INTERFACE;}
         
         //TODO (mlentine): Is this right?
-        if(cell_particles.array_collection->Size()==0){Free_Particle_And_Clear_Pointer(particles(block_index));}
+        if(cell_particles.Size()==0){Free_Particle_And_Clear_Pointer(particles(block_index));}
         else{ // delete all non-escaped particles
             PARTICLE_LEVELSET_PARTICLES<TV>* local_cell_particles=&cell_particles;
             while(local_cell_particles){
                 ARRAY<bool> escaped;Identify_Escaped_Particles(block,*local_cell_particles,escaped,sign);
-                for(int index=0;index<local_cell_particles->array_collection->Size();index++) if(!escaped(index)) Add_Particle_To_Deletion_List(deletion_list,*local_cell_particles,index);
+                for(int index=0;index<local_cell_particles->Size();index++) if(!escaped(index)) Add_Particle_To_Deletion_List(deletion_list,*local_cell_particles,index);
                 local_cell_particles=local_cell_particles->next;}
             Delete_Particles_From_Deletion_List(deletion_list,cell_particles);
-            if(cell_particles.array_collection->Size()==0){Free_Particle_And_Clear_Pointer(particles(block_index));}}
+            if(cell_particles.Size()==0){Free_Particle_And_Clear_Pointer(particles(block_index));}}
         continue;
         
         NEAR_THE_INTERFACE:; // can only get here via the goto
-        if(cell_particles.array_collection->Size()<=number_particles_per_cell) continue; //This assumes particle_pool.number_particles_per_cell>number_particles_per_cell
+        if(cell_particles.Size()<=number_particles_per_cell) continue; //This assumes particle_pool.number_particles_per_cell>number_particles_per_cell
         ARRAY<ARRAY<bool> > all_escaped;
         int number_of_escaped_particles=0,total_particles=0;
         PARTICLE_LEVELSET_PARTICLES<TV>* local_cell_particles=&cell_particles;
         while(local_cell_particles){
             ARRAY<bool> escaped;Identify_Escaped_Particles(block,cell_particles,escaped,sign);number_of_escaped_particles+=escaped.Number_True();all_escaped.Append(escaped);
-            total_particles+=local_cell_particles->array_collection->Size();local_cell_particles=local_cell_particles->next;}
+            total_particles+=local_cell_particles->Size();local_cell_particles=local_cell_particles->next;}
         total_particles-=number_of_escaped_particles;
         if(total_particles>number_particles_per_cell){ // too many particles - delete particles with a heap sort
             number_deleted+=total_particles-number_particles_per_cell;int heap_size=0;
             local_cell_particles=&cell_particles;
-            for(int i=0;local_cell_particles;i++){for(int index=0;index<local_cell_particles->array_collection->Size();index++) if(!all_escaped(i)(index)){
+            for(int i=0;local_cell_particles;i++){for(int index=0;index<local_cell_particles->Size();index++) if(!all_escaped(i)(index)){
                 T phi_minus_radius=sign*levelset.Phi(local_cell_particles->X(index))-local_cell_particles->radius(index);
                 if(heap_size<number_particles_per_cell){ // add particle to heap
                     heap_particle_indices(heap_size)=index+particle_pool.number_particles_per_cell*i;heap_phi_minus_radius(heap_size++)=phi_minus_radius;
@@ -666,7 +666,7 @@ Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const in
                     else Add_Particle_To_Deletion_List(deletion_list,*local_cell_particles,index);}} // delete new particle, larger than top of heap
             local_cell_particles=local_cell_particles->next;}
             Delete_Particles_From_Deletion_List(deletion_list,cell_particles);
-            if(cell_particles.array_collection->Size()==0){Free_Particle_And_Clear_Pointer(particles(block_index));}}}}
+            if(cell_particles.Size()==0){Free_Particle_And_Clear_Pointer(particles(block_index));}}}}
     return number_deleted;
 }
 //#####################################################################
@@ -731,9 +731,9 @@ Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
         if(!particles(block_index)) particles(block_index)=Allocate_Particles(template_particles);
         int total_particles=0,total_other_particles=0;
         PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=particles(block_index);
-        while(cell_particles){total_particles+=cell_particles->array_collection->Size();cell_particles=cell_particles->next;}
+        while(cell_particles){total_particles+=cell_particles->Size();cell_particles=cell_particles->next;}
         cell_particles=other_particles(block_index);
-        while(cell_particles){total_other_particles+=cell_particles->array_collection->Size();cell_particles=cell_particles->next;}
+        while(cell_particles){total_other_particles+=cell_particles->Size();cell_particles=cell_particles->next;}
         if(total_particles+total_other_particles>=number_particles_per_cell) continue;
         cell_particles=particles(block_index);
         number_of_particles_to_add(block_index)=number_particles_per_cell-total_particles-total_other_particles;
@@ -761,14 +761,14 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
         T phi_min=sign*minimum_particle_radius,phi_max=sign*half_band_width;if(phi_min>phi_max) exchange(phi_min,phi_max);
         RANGE<TV> block_bounding_box=block.Bounding_Box();
         int attempts=0;
-        ARRAY_VIEW<int>* id=store_unique_particle_id?cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+        ARRAY_VIEW<int>* id=store_unique_particle_id?cell_particles->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
         for(int k=0;k<number_of_particles_to_add(block_index);k++){
             PARTICLE_LEVELSET_PARTICLES<TV>* local_cell_particles=cell_particles;
             //if(mutexes && thread_queue) pthread_mutex_lock(&(*mutexes)((*domain_index)(block_index)));
             int index=Add_Particle(cell_particles);
             //if(mutexes && thread_queue) pthread_mutex_unlock(&(*mutexes)((*domain_index)(block_index)));
             if(local_cell_particles!=cell_particles){
-                if(store_unique_particle_id) id=cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);}
+                if(store_unique_particle_id) id=cell_particles->template Get_Array<int>(ATTRIBUTE_ID_ID);}
             if(id) {
 #ifdef USE_PTHREADS
                 (*id)(index)= __exchange_and_add(&last_unique_particle_id,1);
@@ -806,8 +806,8 @@ Identify_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_
     bool enable_collision_aware_already = levelset.collision_unaware_interpolation != 0;
     if(near_objects && !enable_collision_aware_already) {
         levelset.Enable_Collision_Aware_Interpolation(sign);}
-    escaped.Resize(particles.array_collection->Size());escaped.Fill(false);T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
-    for(int k=0;k<particles.array_collection->Size();k++) if(one_over_radius_multiplier*levelset.Phi(particles.X(k))>particles.radius(k)) escaped(k)=true;
+    escaped.Resize(particles.Size());escaped.Fill(false);T one_over_radius_multiplier=-sign/outside_particle_distance_multiplier;
+    for(int k=0;k<particles.Size();k++) if(one_over_radius_multiplier*levelset.Phi(particles.X(k))>particles.radius(k)) escaped(k)=true;
     if(near_objects && !enable_collision_aware_already) {
         levelset.Disable_Collision_Aware_Interpolation();}
 }
@@ -833,13 +833,13 @@ Delete_Deep_Escaped_Particles(const T radius_fraction,const bool need_to_identif
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
         number_of_positive_particles_deleted+=Delete_Deep_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,radius_fraction,
             need_to_identify_escaped_particles);
-        if(positive_particles(block)->array_collection->Size()==0) Free_Particle_And_Clear_Pointer(positive_particles(block));}}
+        if(positive_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(positive_particles(block));}}
     if(verbose) LOG::cout << "deleted " << number_of_positive_particles_deleted << " particles" << std::endl;
     if(verbose) LOG::cout << "negative particles - ";int number_of_negative_particles_deleted=0;
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
         number_of_negative_particles_deleted+=Delete_Deep_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,radius_fraction,
             need_to_identify_escaped_particles);
-        if(negative_particles(block)->array_collection->Size()==0) Free_Particle_And_Clear_Pointer(negative_particles(block));}}
+        if(negative_particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(negative_particles(block));}}
     if(verbose) LOG::cout << "deleted " << number_of_negative_particles_deleted << " particles" << std::endl;
     for(NODE_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();assert(deletion_list(block).m==0);}
 }
@@ -855,7 +855,7 @@ Delete_Deep_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELS
     int deleted=0;int minus_sign=-sign;
     while(cell_particles){
         if(need_to_identify_escaped_particles) Identify_Escaped_Particles(block,*cell_particles,escaped,sign);
-        for(int k=cell_particles->array_collection->Size()-1;k>=0;k--) if(escaped(k) && minus_sign*levelset.Phi(particles.X(k))>radius_fraction*particles.radius(k)){Add_Particle_To_Deletion_List(this->deletion_list(block.block_index),*cell_particles,k);deleted++;}}
+        for(int k=cell_particles->Size()-1;k>=0;k--) if(escaped(k) && minus_sign*levelset.Phi(particles.X(k))>radius_fraction*particles.radius(k)){Add_Particle_To_Deletion_List(this->deletion_list(block.block_index),*cell_particles,k);deleted++;}}
     Delete_Particles_From_Deletion_List(this->deletion_list(block.block_index),particles); //TODO: Make these deletion list's per domain
     return deleted;
 }
@@ -904,16 +904,16 @@ Delete_Particles_Near_Outside_Grid(RANGE<TV_INT>& domain,int axis,int side)
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(negative_particles(block)){
             Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*negative_particles(block),2*side-1);
-            if(!negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}
+            if(!negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}
         if(positive_particles(block)){
             Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*positive_particles(block),2*side-1);
-            if(!positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}
+            if(!positive_particles(block)->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}
         if(use_removed_negative_particles)if(removed_negative_particles(block)){
             Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_negative_particles(block),2*side-1);
-            if(!removed_negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_negative_particles(block));}
+            if(!removed_negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(removed_negative_particles(block));}
         if(use_removed_positive_particles)if(removed_positive_particles(block)){
             Delete_Particles_Outside_Grid(domain_boundaries[side][axis],axis,*removed_positive_particles(block),2*side-1);
-            if(!removed_positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(removed_positive_particles(block));}}
+            if(!removed_positive_particles(block)->Size()) Free_Particle_And_Clear_Pointer(removed_positive_particles(block));}}
 }
 //#####################################################################
 // Function Delete_Particles_In_Local_Maximum_Phi_Cells
@@ -946,9 +946,9 @@ Delete_Particles_In_Local_Maximum_Phi_Cells_Threaded(RANGE<TV_INT>& domain,const
         TV_INT blocks[T_GRID::number_of_nodes_per_cell];levelset.grid.Nodes_In_Cell_From_Minimum_Corner_Node(cell,blocks);
         for(int i=0;i<T_GRID::number_of_nodes_per_cell;i++){TV location=iterator.Location();
             if(sign==-1&&negative_particles(blocks[i])){PARTICLE_LEVELSET_PARTICLES<TV>* particles=negative_particles(blocks[i]);
-                while(particles){for(int k=0;k<particles->array_collection->Size();k++) if(sqr(particles->radius(k))>=(particles->X(k)-location).Magnitude_Squared()){particles->radius(k)=-1;}particles=particles->next;}}
+                while(particles){for(int k=0;k<particles->Size();k++) if(sqr(particles->radius(k))>=(particles->X(k)-location).Magnitude_Squared()){particles->radius(k)=-1;}particles=particles->next;}}
             else if(sign==1&&positive_particles(blocks[i])){PARTICLE_LEVELSET_PARTICLES<TV>* particles=positive_particles(blocks[i]);
-                while(particles){for(int k=0;k<particles->array_collection->Size();k++) if(sqr(particles->radius(k))>=(particles->X(k)-location).Magnitude_Squared()){particles->radius(k)=-1;}particles=particles->next;}}}}
+                while(particles){for(int k=0;k<particles->Size();k++) if(sqr(particles->radius(k))>=(particles->X(k)-location).Magnitude_Squared()){particles->radius(k)=-1;}particles=particles->next;}}}}
 }
 //#####################################################################
 // Function Delete_Particles_Outside_Grid
@@ -957,7 +957,7 @@ template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int side)
 {
     PARTICLE_LEVELSET_PARTICLES<TV>* local_particles=&particles;
-    while(local_particles){for(int k=0;k<local_particles->array_collection->Size();k++) if(side*local_particles->X(k)[axis]>side*domain_boundary){
+    while(local_particles){for(int k=0;k<local_particles->Size();k++) if(side*local_particles->X(k)[axis]>side*domain_boundary){
         Delete_Particle_And_Clean_Memory(&particles,*local_particles,k);k--;}
     local_particles=local_particles->next;} // side should be -1 or 1
 }
@@ -967,7 +967,7 @@ Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LE
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Outside_Grid(const T domain_boundary,const int axis,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int side)
 {
-    for(int k=particles.array_collection->Size()-1;k>=0;k--) if(side*particles.X(k)[axis]>side*domain_boundary) Delete_Particle_And_Clean_Memory(&particles,particles,k);
+    for(int k=particles.Size()-1;k>=0;k--) if(side*particles.X(k)[axis]>side*domain_boundary) Delete_Particle_And_Clean_Memory(&particles,particles,k);
 }
 //#####################################################################
 // Function Identify_And_Remove_Escaped_Particles
@@ -999,20 +999,20 @@ Identify_And_Remove_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,const T_FAC
         for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
             p+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,removed_positive_particles(block),
                 V_lookup_collidable_lookup,radius_fraction,time);
-            if(!positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}}}
+            if(!positive_particles(block)->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}}}
     else{
         for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(positive_particles(block)){
             p+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*positive_particles(block),escaped_positive_particles(block),1,radius_fraction);
-            if(!positive_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}}}
+            if(!positive_particles(block)->Size()) Free_Particle_And_Clear_Pointer(positive_particles(block));}}}
     if(use_removed_negative_particles){
         for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
             n+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,removed_negative_particles(block),
                 V_lookup_collidable_lookup,radius_fraction,time);
-            if(!negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}}}
+            if(!negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}}}
     else{
         for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(negative_particles(block)){
             n+=Remove_Escaped_Particles(BLOCK_UNIFORM<T_GRID>(levelset.grid,block),*negative_particles(block),escaped_negative_particles(block),-1,radius_fraction);
-            if(!negative_particles(block)->array_collection->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}}}
+            if(!negative_particles(block)->Size()) Free_Particle_And_Clear_Pointer(negative_particles(block));}}}
     //LOG::cout << "new removed positive particles = " << p << std::endl;LOG::cout << "new removed negative particles = " << n << std::endl;
 }
 //#####################################################################
@@ -1048,11 +1048,11 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PA
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     int removed=0;T one_over_radius_multiplier=-sign/radius_fraction;
     // TODO: limit the amount of mass removed - don't let the particles just set their own radii
-    ARRAY_VIEW<int>* id=save_removed_particle_times && store_unique_particle_id?particles.array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+    ARRAY_VIEW<int>* id=save_removed_particle_times && store_unique_particle_id?particles.template Get_Array<int>(ATTRIBUTE_ID_ID):0;
     ARRAY<PAIR<int,T> > removed_particle_times_local;
     ARRAY<bool> local_escaped(escaped);
     PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=&particles;
-    while(cell_particles){for(int k=cell_particles->array_collection->Size()-1;k>=0;k--) if(local_escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
+    while(cell_particles){for(int k=cell_particles->Size()-1;k>=0;k--) if(local_escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
         if(!removed_particles) removed_particles=Allocate_Particles(template_removed_particles);
         removed++;
         if(id) removed_particle_times_local.Append(PAIR<int,T>((*id)(k),time));
@@ -1094,10 +1094,10 @@ Fix_Momentum_With_Escaped_Particles(const T_FACE_ARRAYS_SCALAR& V,const T_ARRAYS
             else removed_particles=template_removed_particles.Clone();}
         T_LINEAR_INTERPOLATION_COLLIDABLE_FACE_SCALAR linear_interpolation_collidable;
         bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block_uniform):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(-1);
-        for(int k=removed_particles->array_collection->Size()-1;k>=0;k--){T fraction=local_momentum_lost/removed_particles->array_collection->Size();
+        for(int k=removed_particles->Size()-1;k>=0;k--){T fraction=local_momentum_lost/removed_particles->Size();
             removed_particles->V(k)+=fraction/mass_scaling;}
-        if(!removed_particles->array_collection->Size() && force) Add_Negative_Particle(iterator.Location(),local_momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,iterator.Location()).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
-        if(!removed_particles->array_collection->Size()) done=false;
+        if(!removed_particles->Size() && force) Add_Negative_Particle(iterator.Location(),local_momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,iterator.Location()).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
+        if(!removed_particles->Size()) done=false;
         if(near_objects) levelset.Disable_Collision_Aware_Interpolation();}}
     PHYSBAM_ASSERT(!force||done);
     return done;
@@ -1121,12 +1121,12 @@ Fix_Momentum_With_Escaped_Particles(const TV& location,const T_FACE_ARRAYS_SCALA
         if(!force) return false;
         else removed_particles=template_removed_particles.Clone();}
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block_uniform):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(-1);
-    for(int k=removed_particles->array_collection->Size()-1;k>=0;k--){T fraction=momentum_lost/removed_particles->array_collection->Size();
+    for(int k=removed_particles->Size()-1;k>=0;k--){T fraction=momentum_lost/removed_particles->Size();
         removed_particles->V(k)+=fraction/mass_scaling;}
-    if(!removed_particles->array_collection->Size() && force) Add_Negative_Particle(location,momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,location).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
+    if(!removed_particles->Size() && force) Add_Negative_Particle(location,momentum_lost/mass_scaling*linear_interpolation_collidable.Clamped_To_Array_Face(levelset.grid,V_lookup_collidable_lookup,location).Normalized(),(unsigned short)(random.Get_Number()*USHRT_MAX));
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
-    PHYSBAM_ASSERT(!force||removed_particles->array_collection->Size());
-    return removed_particles->array_collection->Size() != 0;
+    PHYSBAM_ASSERT(!force||removed_particles->Size());
+    return removed_particles->Size() != 0;
 }
 //#####################################################################
 // Function Remove_Escaped_Particles
@@ -1137,7 +1137,7 @@ Remove_Escaped_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVELSET_PA
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     int deleted=0;T one_over_radius_multiplier=-sign/radius_fraction;
     PARTICLE_LEVELSET_PARTICLES<TV>* cell_particles=&particles;
-    while(cell_particles){for(int k=cell_particles->array_collection->Size()-1;k>=0;k--) if(escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
+    while(cell_particles){for(int k=cell_particles->Size()-1;k>=0;k--) if(escaped(k) && one_over_radius_multiplier*levelset.Phi(cell_particles->X(k))>cell_particles->radius(k)){
         Delete_Particle_And_Clean_Memory(&particles,*cell_particles,k);deleted++;k--;}
         cell_particles=cell_particles->next;}
     if(near_objects) levelset.Disable_Collision_Aware_Interpolation();
@@ -1179,7 +1179,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
     bool near_objects=levelset.collision_body_list?levelset.collision_body_list->Occupied_Block(block):false;if(near_objects) levelset.Enable_Collision_Aware_Interpolation(sign);
     T one_over_radius_multiplier=-sign/radius_fraction;
     T half_unit_sphere_size_over_cell_size=(T).5*(T)unit_sphere_size<TV::dimension>::value/levelset.grid.Cell_Size();
-    for(int k=removed_particles.array_collection->Size()-1;k>=0;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
+    for(int k=removed_particles.Size()-1;k>=0;k--) if(reincorporate_removed_particles_everywhere || (one_over_radius_multiplier*levelset.Phi(removed_particles.X(k))<removed_particles.radius(k))){
         if(!particles) particles=Allocate_Particles(template_particles);
         // rasterize the velocity onto the velocity field
         if(V){
@@ -1280,7 +1280,7 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
         cell_particles->X(index)=location;negative_particles(block)->radius(index)=minimum_particle_radius;
         cell_particles->quantized_collision_distance(index)=quantized_collision_distance;
         if(store_unique_particle_id){
-            ARRAY_VIEW<int>* id=cell_particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
+            ARRAY_VIEW<int>* id=cell_particles->template Get_Array<int>(ATTRIBUTE_ID_ID);
             PHYSBAM_ASSERT(id);
 #ifdef USE_PTHREADS
             (*id)(index)=__exchange_and_add(&last_unique_particle_id,1);
@@ -1294,7 +1294,7 @@ Add_Negative_Particle(const TV& location,const TV& particle_velocity,const unsig
         removed_negative_particles(block)->X(index)=location;removed_negative_particles(block)->radius(index)=minimum_particle_radius;
         removed_negative_particles(block)->V(index)=particle_velocity;removed_negative_particles(block)->quantized_collision_distance(index)=quantized_collision_distance;
         if(store_unique_particle_id){
-            ARRAY_VIEW<int>* id=removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
+            ARRAY_VIEW<int>* id=removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID);
             PHYSBAM_ASSERT(id);
 #ifdef USE_PTHREADS
             (*id)(index)=__exchange_and_add(&last_unique_particle_id,1);

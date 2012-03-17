@@ -533,8 +533,8 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR_2D<T> 
 {
     LEVELSET_2D<T> levelset_objects(fluids_parameters.grid,phi_objects);
     if(particle_type == PARTICLE_LEVELSET<T,VECTOR_2D<T> >::NEGATIVE || particle_type == PARTICLE_LEVELSET<T,VECTOR_2D<T> >::REMOVED_NEGATIVE){
-        for(int k=particles.array_collection->Size();k>=1;k--) if(levelset_objects.Extended_Phi(particles.X(k))<-fluids_parameters.grid.min_dx_dy) particles.Delete_Particle(k);}
-   else for(int k=particles.array_collection->Size();k>=1;k--) if(levelset_objects.Extended_Phi(particles.X(k))<0) particles.Delete_Particle(k);
+        for(int k=particles.Size();k>=1;k--) if(levelset_objects.Extended_Phi(particles.X(k))<-fluids_parameters.grid.min_dx_dy) particles.Delete_Particle(k);}
+   else for(int k=particles.Size();k>=1;k--) if(levelset_objects.Extended_Phi(particles.X(k))<0) particles.Delete_Particle(k);
 }
 //#####################################################################
 // Function Adjust_Particle_For_Objects

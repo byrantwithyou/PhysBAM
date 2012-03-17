@@ -2,35 +2,33 @@
 // Copyright 2008-2009, Geoffrey Irving, Michael Lentine.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class ARRAY_COLLECTION
-//#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <sstream>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-ARRAY_COLLECTION::
-ARRAY_COLLECTION()
+template<class TV> PARTICLES<TV>::
+PARTICLES()
     :number(0),buffer_size(0),delete_data(true)
 {}
 //#####################################################################
 // Constructor
 //#####################################################################
-ARRAY_COLLECTION::
-~ARRAY_COLLECTION()
+template<class TV> PARTICLES<TV>::
+~PARTICLES()
 {
     if(delete_data) for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) delete arrays(i);
 }
 //#####################################################################
 // Function Initialize
 //#####################################################################
-void ARRAY_COLLECTION::
-Initialize(const ARRAY_COLLECTION& elements)
+template<class TV> void PARTICLES<TV>::
+Initialize(const PARTICLES& elements)
 {
     Clean_Memory();
     Add_Arrays(elements);
@@ -39,8 +37,8 @@ Initialize(const ARRAY_COLLECTION& elements)
 //#####################################################################
 // Function Initialize
 //#####################################################################
-void ARRAY_COLLECTION::
-Initialize(ARRAY_VIEW<const ARRAY_COLLECTION* const> elements_per_cell)
+template<class TV> void PARTICLES<TV>::
+Initialize(ARRAY_VIEW<const PARTICLES* const> elements_per_cell)
 {
     Clean_Memory();
     int total_number=0;for(int c=0;c<elements_per_cell.Size();c++) if(elements_per_cell(c)){
@@ -52,21 +50,21 @@ Initialize(ARRAY_VIEW<const ARRAY_COLLECTION* const> elements_per_cell)
 //#####################################################################
 // Function Add_Arrays
 //#####################################################################
-void ARRAY_COLLECTION::
-Add_Arrays(const ARRAY_COLLECTION& collection)
+template<class TV> void PARTICLES<TV>::
+Add_Arrays(const PARTICLES& particles)
 {
     ATTRIBUTE_INDEX i(0),j(0);
-    for(;i<arrays.m && j<collection.arrays.m;i++){
-        if(arrays(i)->id<collection.arrays(j)->id) continue;
-        if(arrays(i)->id>collection.arrays(j)->id) Add_Array(collection.arrays(j)->id,collection.arrays(j)->Clone_Default());
+    for(;i<arrays.m && j<arrays.m;i++){
+        if(arrays(i)->id<arrays(j)->id) continue;
+        if(arrays(i)->id>arrays(j)->id) Add_Array(arrays(j)->id,arrays(j)->Clone_Default());
         j++;}
-    for(;j<collection.arrays.m;j++)
-        Add_Array(collection.arrays(j)->id,collection.arrays(j)->Clone_Default());
+    for(;j<arrays.m;j++)
+        Add_Array(arrays(j)->id,arrays(j)->Clone_Default());
 }
 //#####################################################################
 // Function Add_Elements_From_Deletion_List
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Add_Elements_From_Deletion_List(const int count,ARRAY<int>& added_indices)
 {
     added_indices.Preallocate(added_indices.Size()+count);
@@ -77,7 +75,7 @@ Add_Elements_From_Deletion_List(const int count,ARRAY<int>& added_indices)
 //#####################################################################
 // Function Delete_Elements_On_Deletion_List
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Delete_Elements_On_Deletion_List(const bool preserve_order)
 {
     Sort(deletion_list);
@@ -95,34 +93,34 @@ Delete_Elements_On_Deletion_List(const bool preserve_order)
 //#####################################################################
 // Function Copy_Element_Helper
 //#####################################################################
-void ARRAY_COLLECTION::
-Copy_Element(const ARRAY_COLLECTION& from_collection,const int from,const int to)
+template<class TV> void PARTICLES<TV>::
+Copy_Element(const PARTICLES& from_particles,const int from,const int to)
 {
     ATTRIBUTE_INDEX i(0),j(0);
-    while(i<arrays.m && j<from_collection.arrays.m){
-        if(arrays(i)->id<from_collection.arrays(j)->id) arrays(i++)->Clear(to);
-        else if(arrays(i)->id>from_collection.arrays(j)->id) j++;
-        else arrays(i++)->Copy_Element(*from_collection.arrays(j++),from,to);}
+    while(i<arrays.m && j<from_particles.arrays.m){
+        if(arrays(i)->id<from_particles.arrays(j)->id) arrays(i++)->Clear(to);
+        else if(arrays(i)->id>from_particles.arrays(j)->id) j++;
+        else arrays(i++)->Copy_Element(*from_particles.arrays(j++),from,to);}
     for(;i<arrays.m;i++) arrays(i)->Clear(to);
 }
 //#####################################################################
 // Function Copy_All_Elements_Helper
 //#####################################################################
-void ARRAY_COLLECTION::
-Copy_All_Elements_Helper(const ARRAY_COLLECTION& from_collection,const int offset)
+template<class TV> void PARTICLES<TV>::
+Copy_All_Elements_Helper(const PARTICLES& from_particles,const int offset)
 {
-    PHYSBAM_ASSERT(this!=&from_collection);
+    PHYSBAM_ASSERT(this!=&from_particles);
     ATTRIBUTE_INDEX i(0),j(0);
-    while(i<arrays.m && j<from_collection.arrays.m){
-        if(arrays(i)->id<from_collection.arrays(j)->id) arrays(i++)->Clear_Range(offset+1,offset+from_collection.number);
-        else if(arrays(i)->id>from_collection.arrays(j)->id) j++;
-        else arrays(i++)->Copy_With_Offset(*from_collection.arrays(j++),offset);}
-    for(;i<arrays.m;i++) arrays(i)->Clear_Range(offset+1,offset+from_collection.number);
+    while(i<arrays.m && j<from_particles.arrays.m){
+        if(arrays(i)->id<from_particles.arrays(j)->id) arrays(i++)->Clear_Range(offset+1,offset+from_particles.number);
+        else if(arrays(i)->id>from_particles.arrays(j)->id) j++;
+        else arrays(i++)->Copy_With_Offset(*from_particles.arrays(j++),offset);}
+    for(;i<arrays.m;i++) arrays(i)->Clear_Range(offset+1,offset+from_particles.number);
 }
 //#####################################################################
 // Function Get_Attribute_Index
 //#####################################################################
-ATTRIBUTE_INDEX ARRAY_COLLECTION::
+template<class TV> ATTRIBUTE_INDEX PARTICLES<TV>::
 Find_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
 {
     ATTRIBUTE_INDEX first(0),last(arrays.m);
@@ -135,7 +133,7 @@ Find_Attribute_Index(const ATTRIBUTE_ID attribute_id) const
 //#####################################################################
 // Function Clean_Memory
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Clean_Memory()
 {
     number=buffer_size=0;
@@ -145,21 +143,21 @@ Clean_Memory()
 //#####################################################################
 // operator==
 //#####################################################################
-bool ARRAY_COLLECTION::
-operator==(const ARRAY_COLLECTION& collection) const
+template<class TV> bool PARTICLES<TV>::
+operator==(const PARTICLES& particles) const
 {
-    if(this==&collection) return true;
-    if(arrays.m!=collection.arrays.m) return false;
+    if(this==&particles) return true;
+    if(arrays.m!=arrays.m) return false;
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){
-        if(arrays(i)->id!=collection.arrays(i)->id) return false;
-        assert(typeid(arrays(i))==typeid(collection.arrays(i)));
-        if(arrays(i)!=collection.arrays(i)) return false;}
+        if(arrays(i)->id!=arrays(i)->id) return false;
+        assert(typeid(arrays(i))==typeid(arrays(i)));
+        if(arrays(i)!=arrays(i)) return false;}
     return true;
 }
 //#####################################################################
 // Function Resize
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Resize(const int new_size)
 {
     if(buffer_size<new_size) Reallocate_Buffer(max(4*number/3+2,new_size));
@@ -169,7 +167,7 @@ Resize(const int new_size)
 //#####################################################################
 // Function Add_Array
 //#####################################################################
-ATTRIBUTE_INDEX ARRAY_COLLECTION::
+template<class TV> ATTRIBUTE_INDEX PARTICLES<TV>::
 Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_COLLECTION_ELEMENT_BASE* array)
 {
     ATTRIBUTE_INDEX index=Find_Attribute_Index(attribute_id);
@@ -185,7 +183,7 @@ Add_Array(const ATTRIBUTE_ID attribute_id,ARRAY_COLLECTION_ELEMENT_BASE* array)
 //#####################################################################
 // Function Pack_Size
 //#####################################################################
-int ARRAY_COLLECTION::
+template<class TV> int PARTICLES<TV>::
 Pack_Size() const
 {
     int pack_size=0;
@@ -196,7 +194,7 @@ Pack_Size() const
 //#####################################################################
 // Function Pack
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const
 {
     assert((unsigned)p<(unsigned)number);
@@ -206,7 +204,7 @@ Pack(ARRAY_VIEW<char> buffer,int& position,const int p) const
 //#####################################################################
 // Function Unpack
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)
 {
     assert((unsigned)p<(unsigned)number);
@@ -216,7 +214,7 @@ Unpack(ARRAY_VIEW<const char> buffer,int& position,const int p)
 //#####################################################################
 // Function Copy_Element_Helper
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Copy_Element_Helper(const int from,const int to)
 {
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
@@ -225,21 +223,23 @@ Copy_Element_Helper(const int from,const int to)
 //#####################################################################
 // Function Reallocate_Buffer
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Reallocate_Buffer(int new_size)
 {
     buffer_size=new_size;
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++)
         arrays(i)->Reallocate(buffer_size);
 }
+namespace PhysBAM{
 //#####################################################################
-// Function Read_Write_Array_Collection_Registry
+// Function Attribute_Sample_Registry
 //#####################################################################
-HASHTABLE<ATTRIBUTE_ID,READ_WRITE_ARRAY_COLLECTION_FUNCTIONS>& ARRAY_COLLECTION::
-Read_Write_Array_Collection_Registry()
+static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*>&
+Attribute_Sample_Registry()
 {
-    static HASHTABLE<ATTRIBUTE_ID,READ_WRITE_ARRAY_COLLECTION_FUNCTIONS> read_write_array_collection_registry;
-    return read_write_array_collection_registry;
+    static HASHTABLE<ATTRIBUTE_ID,ARRAY_COLLECTION_ELEMENT_BASE*> registry;
+    return registry;
+}
 }
 //#####################################################################
 // Function Attribute_Names_Registry
@@ -264,12 +264,24 @@ const char* PhysBAM::Get_Attribute_Name(const ATTRIBUTE_ID id)
     if(const char** name=Attribute_Names_Registry().Get_Pointer(id)) return *name;
     return 0;
 }
+inline ATTRIBUTE_ID Type_Only(ATTRIBUTE_ID id)
+{
+    return ATTRIBUTE_ID(Value(id)&0xFFFF0000);
+}
+inline ATTRIBUTE_ID Id_Only(ATTRIBUTE_ID id)
+{
+    return ATTRIBUTE_ID(Value(id)&0x0000FFFF);
+}
 //#####################################################################
 // Function Read_Arrays
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Read(TYPED_ISTREAM& input)
 {
+    int version;
+    Read_Binary(input,version);
+    if(version!=1) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Unrecognized particle version %d",(int)version));
+
     int size;
     Read_Binary(input,size);
     if(size<0) throw READ_ERROR(STRING_UTILITIES::string_sprintf("Invalid negative size %d",size));
@@ -283,11 +295,12 @@ Read(TYPED_ISTREAM& input)
         ATTRIBUTE_ID hashed_id;int read_size;
         Read_Binary(input,hashed_id,read_size);
 
-        READ_WRITE_ARRAY_COLLECTION_FUNCTIONS* read_write_functions=Read_Write_Array_Collection_Registry().Get_Pointer(Type_Only(hashed_id));
-        if(!read_write_functions){input.stream.ignore(read_size);continue;}
+        ARRAY_COLLECTION_ELEMENT_BASE* sample_attribute=0;
+        if(!Attribute_Sample_Registry().Get(Type_Only(hashed_id),sample_attribute)){
+            input.stream.ignore(read_size);continue;}
 
         ATTRIBUTE_INDEX index=Get_Attribute_Index(Id_Only(hashed_id));
-        if(index<ATTRIBUTE_INDEX()) index=Add_Array(Id_Only(hashed_id),read_write_functions->sample_attribute->Clone_Default());
+        if(index<ATTRIBUTE_INDEX()) index=Add_Array(Id_Only(hashed_id),sample_attribute->Clone_Default());
         // TODO: this really ought to know whether we're running in float or double
         arrays(index)->Read(input);
         arrays(index)->id=Id_Only(hashed_id);}
@@ -295,11 +308,10 @@ Read(TYPED_ISTREAM& input)
 //#####################################################################
 // Function Write_Arrays
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Write(TYPED_OSTREAM& output) const
 {
-    Write_Binary(output,Size());
-    Write_Binary(output,number,arrays.m);
+    Write_Binary(output,1,Size(),number,arrays.m);
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++){
         const ARRAY_COLLECTION_ELEMENT_BASE* entry=arrays(i);
         int calculated_write_size=entry->Write_Size(output.type.use_doubles);
@@ -309,11 +321,31 @@ Write(TYPED_OSTREAM& output) const
 //#####################################################################
 // Function Print
 //#####################################################################
-void ARRAY_COLLECTION::
+template<class TV> void PARTICLES<TV>::
 Print(std::ostream& output,const int p) const
 {
     if(p<0 || p>=number) throw INDEX_ERROR("Index out of range");
     for(ATTRIBUTE_INDEX i(0);i<arrays.m;i++) arrays(i)->Print(output,p);
 }
+struct ELEMENT_SAMPLES_HELPER
+{
+    ARRAY<ARRAY_COLLECTION_ELEMENT_BASE*> samples;
+    ~ELEMENT_SAMPLES_HELPER()
+    {samples.Delete_Pointers_And_Clean_Memory();}
+};
+void PhysBAM::Register_Attribute_Sample(ARRAY_COLLECTION_ELEMENT_BASE* element)
+{
+    static ELEMENT_SAMPLES_HELPER sample_helper;
+    element->id=ATTRIBUTE_ID();
+    PHYSBAM_ASSERT(Attribute_Sample_Registry().Set(Type_Only(element->Hashed_Id()),element));
+    sample_helper.samples.Append(element);
+}
 //#####################################################################
-
+template class PARTICLES<VECTOR<float,1> >;
+template class PARTICLES<VECTOR<float,2> >;
+template class PARTICLES<VECTOR<float,3> >;
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+template class PARTICLES<VECTOR<double,1> >;
+template class PARTICLES<VECTOR<double,2> >;
+template class PARTICLES<VECTOR<double,3> >;
+#endif

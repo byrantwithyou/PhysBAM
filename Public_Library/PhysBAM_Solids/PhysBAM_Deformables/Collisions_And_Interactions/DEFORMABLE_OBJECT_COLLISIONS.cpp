@@ -46,7 +46,7 @@ Initialize_Object_Collisions(const bool collide_with_interior,const T collision_
 {
     collision_tolerance=collision_tolerance_input;use_spatial_partition=use_spatial_partition_for_levelset_collisions;
     disable_multiple_levelset_collisions=disable_multiple_levelset_collisions_input;maximum_levelset_collision_projection_velocity=maximum_levelset_collision_projection_velocity_input;
-    check_collision=CONSTANT_ARRAY<bool>(particles.array_collection->Size(),false);particle_states.Resize(particles.array_collection->Size());particle_to_collision_body_id.Resize(particles.array_collection->Size());
+    check_collision=CONSTANT_ARRAY<bool>(particles.Size(),false);particle_states.Resize(particles.Size());particle_to_collision_body_id.Resize(particles.Size());
     Reset_Object_Collisions(); // in case collisions already exist
     for(int c=0;c<collision_structures.m;c++){
         if(TRIANGULATED_AREA<T>* triangulated_area=dynamic_cast<TRIANGULATED_AREA<T>*>(collision_structures(c)))
@@ -227,7 +227,7 @@ Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Update_Simulated_Particles()
 {
-    particle_to_structure.Resize(particles.array_collection->Size(),false,false);particle_to_structure.Fill(0);
+    particle_to_structure.Resize(particles.Size(),false,false);particle_to_structure.Fill(0);
     for(int s=0;s<deformable_object_structures.m;s++) deformable_object_structures(s)->Mark_Nodes_Referenced(particle_to_structure,s);
 }
 //#####################################################################

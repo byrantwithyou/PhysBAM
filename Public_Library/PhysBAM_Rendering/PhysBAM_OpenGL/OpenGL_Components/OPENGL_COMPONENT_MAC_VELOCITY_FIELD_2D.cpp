@@ -199,7 +199,7 @@ Update_Divergence()
 template<class T,class RW> void OPENGL_COMPONENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Update_Streamlines()
 {
-    streamlines.Clean_Memory();streamlines.particles.array_collection->Clean_Memory();streamlines.mesh.Clean_Memory();
+    streamlines.Clean_Memory();streamlines.particles.Clean_Memory();streamlines.mesh.Clean_Memory();
     if(!draw_streamlines || !valid) return;
     
     GRID<TV>& grid=opengl_mac_velocity_field->grid;
@@ -215,14 +215,14 @@ Update_Streamlines()
     FACE_LOOKUP_UNIFORM<GRID<TV> > V_lookup(mac_velocity_field);
 
     for(int i=0;i<number_of_streamlines;i++){
-        int p=streamlines.particles.array_collection->Add_Element();
+        int p=streamlines.particles.Add_Element();
         TV X=streamlines.particles.X(p)=random.Get_Uniform_Vector(grid.domain);
         for(int step=0;step<number_of_steps;step++){
             TV velocity=linear_interpolation.Clamped_To_Array_Face(grid,V_lookup,X);
             TV X_new=X+step_length*velocity;
             velocity=(T).5*(velocity+linear_interpolation.Clamped_To_Array_Face(grid,V_lookup,X_new));
             X_new=grid.Clamp(X+step_length*velocity);
-            int new_particle=streamlines.particles.array_collection->Add_Element();
+            int new_particle=streamlines.particles.Add_Element();
             streamlines.particles.X(new_particle)=X_new;
             streamlines.mesh.elements.Append(VECTOR<int,2>(p,new_particle));
             p=new_particle;

@@ -60,14 +60,14 @@ void Get_Initial_Data()
 
     std::string input_file=data_directory+"/VH_Muscles/"+muscle_name+".tet";
     std::ifstream input;FILE_UTILITIES::Safe_Open(input,input_file);tetrahedralized_volume.template Read<RW>(input);input.close();
-    std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
+    std::cout << "total vertices = " << particles.Size() << std::endl;std::cout << "total tetrahedra = " << tetrahedron_mesh.tetrahedrons.m << std::endl;
     particles.Store_Velocity(false);particles.Store_Velocity(true);particles.Update_Velocity();
     particles.Store_Mass(false);particles.Store_Mass(true);
 
     tetrahedralized_volume.Set_Density(1000);tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->ymin;
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}

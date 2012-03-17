@@ -20,7 +20,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const BOWL<T>& bow
     typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     surface->mesh.Initialize_Torus_Mesh(2*(n_vertical+1),n_radial);
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(2*(n_vertical+1)*n_radial);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(2*(n_vertical+1)*n_radial);
     MATRIX<T,3,2> radial_basis;
     radial_basis.Column(0)=TV(0,0,1);
     radial_basis.Column(1)=TV(1,0,0);

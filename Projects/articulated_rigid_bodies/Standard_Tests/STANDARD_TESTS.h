@@ -474,7 +474,7 @@ void Sphere_Mesh()
     T cylinder_size=edge_length*(T).15;
     T offset_scale=1.5;
     
-    for(int i=0;i<pattern->particles.array_collection->Size();i++){
+    for(int i=0;i<pattern->particles.Size();i++){
         RIGID_BODY<TV>& small_sphere=tests.Add_Rigid_Body("sphere",sphere_size,(T)0);
         small_sphere.Frame().t=structure_scale*pattern->particles.X(i) + offset_scale*structure_scale*TV(0,1,0);}
 
@@ -694,7 +694,7 @@ int Spring_Cluster_Test(FRAME<TV> shift_frame,bool fracture)
     box.is_static=true;
 
     // Add spring
-    particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
+    particles.Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
     RIGID_BODY_BINDING<TV>* binding1=new RIGID_BODY_BINDING<TV>(particles,0,rigid_body_collection,box.particle_index,TV(0,-1,0));
     RIGID_BODY_BINDING<TV>* binding2=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,bodies(0)->particle_index,TV(0,1,0));
     binding_list.Add_Binding(binding1);

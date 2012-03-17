@@ -106,8 +106,8 @@ Mark_Disconnected_Components_In_One_Ring(const EMBEDDED_OBJECT<TV,d>& embedded_o
 template<class TV,int d> void
 Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_to_old_particles,VIRTUAL_NODES& virtual_nodes)
 {
-    assert(embedded_object.simplicial_object.mesh.number_nodes==embedded_object.particles.array_collection->Size() && embedded_object.embedded_mesh.number_nodes==embedded_object.particles.array_collection->Size()
-        && embedded_object.embedded_particles.subset_index_from_point_cloud_index.m==embedded_object.particles.array_collection->Size());
+    assert(embedded_object.simplicial_object.mesh.number_nodes==embedded_object.particles.Size() && embedded_object.embedded_mesh.number_nodes==embedded_object.particles.Size()
+        && embedded_object.embedded_particles.subset_index_from_point_cloud_index.m==embedded_object.particles.Size());
     DEFORMABLE_PARTICLES<TV>& particles=dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(embedded_object.particles);
     SIMPLEX_MESH<d>& mesh=embedded_object.simplicial_object.mesh;
 
@@ -124,20 +124,20 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     virtual_nodes.Initialize_Replicas();
 
     // initialize virtual_node indices and update particles
-    map_to_old_particles=IDENTITY_ARRAY<>(particles.array_collection->Size());
+    map_to_old_particles=IDENTITY_ARRAY<>(particles.Size());
     for(int p=0;p<virtual_nodes.replicas.m;p++){if(!virtual_nodes.replicas(p).m) continue;
         int i=1;
         {VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
         if(!embedded_object.Node_Near_Material(virtual_node.corresponding_real_node)){i++; // reuse old virtual node
             virtual_node.index=virtual_node.corresponding_real_node;}}
         for(;i<=virtual_nodes.replicas(p).m;i++){VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
-            virtual_node.index=particles.array_collection->Append(*particles.array_collection,virtual_node.corresponding_real_node); // duplicating particles produces more mass
+            virtual_node.index=particles.Append(particles,virtual_node.corresponding_real_node); // duplicating particles produces more mass
             map_to_old_particles.Append(virtual_node.corresponding_real_node);}}
 
     // Update meshes and embedded particles if virtual nodes were added
-    embedded_object.embedded_particles.subset_index_from_point_cloud_index.Resize(particles.array_collection->Size());
-    embedded_object.simplicial_object.mesh.Set_Number_Nodes(particles.array_collection->Size());
-    embedded_object.embedded_mesh.Set_Number_Nodes(particles.array_collection->Size());
+    embedded_object.embedded_particles.subset_index_from_point_cloud_index.Resize(particles.Size());
+    embedded_object.simplicial_object.mesh.Set_Number_Nodes(particles.Size());
+    embedded_object.embedded_mesh.Set_Number_Nodes(particles.Size());
 }
 //#####################################################################
 // Function Add_Embedded_Subelement
@@ -225,7 +225,7 @@ Rebuild_Embedded_Object(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
         if(old_embedded_object.parent_particles(old_embedded_particle)!=old_nodes) exchange(nodes[0],nodes[1]); // swap if necessary to preserve node order
         if(embedded_node_already_used(old_embedded_particle)){ // add a new particle and copy state from old particle
             int p=embedded_object.Add_Embedded_Particle(nodes,old_embedded_object.interpolation_fraction(old_embedded_particle),false);
-            embedded_object.embedded_particles.point_cloud.array_collection->Copy_Element(*embedded_object.embedded_particles.point_cloud.array_collection,old_embedded_particle,p);
+            embedded_object.embedded_particles.point_cloud.Copy_Element(embedded_object.embedded_particles.point_cloud,old_embedded_particle,p);
             map_to_old_embedded_particles.Append(old_embedded_particle);}
         else{ // reuse existing embedded particle
             embedded_node_already_used(old_embedded_particle)=true;

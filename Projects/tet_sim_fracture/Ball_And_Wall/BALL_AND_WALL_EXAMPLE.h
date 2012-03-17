@@ -68,7 +68,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
 
     for(int i=0;i<mattress_grid.m;i++)for(int k=0;k<mattress_grid.mn;k++){
         constrained_nodes.Append(1+i+k*mattress_grid.m*mattress_grid.n);
-        constrained_nodes.Append(tetrahedralized_volume.particles.array_collection->Size()+1-(1+i+k*mattress_grid.m*mattress_grid.n));}
+        constrained_nodes.Append(tetrahedralized_volume.particles.Size()+1-(1+i+k*mattress_grid.m*mattress_grid.n));}
    
     tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();
     tetrahedralized_volume.particles.Delete_Mass(); // in case they're accidently stored in the .tet file
@@ -83,7 +83,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl;
     tetrahedralized_volume.Set_Density(1000);
     tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);

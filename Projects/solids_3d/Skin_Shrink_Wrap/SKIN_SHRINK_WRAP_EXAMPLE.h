@@ -98,7 +98,7 @@ void Reset_Restlengths(){
     (*(solids_parameters.deformable_body_parameters.list(1).linear_altitude_springs_s3d(1))).Set_Restlength_From_Particles();}
 void Reset_Velocities(){
     TRIANGULATED_SURFACE<T> *my_skin = solids_parameters.deformable_body_parameters.list(1).triangulated_surface;
-    for(int c=0;c<my_skin->particles.array_collection->Size();c++) {my_skin->particles.V(c) = VECTOR_3D<T>(0,0,0);}}
+    for(int c=0;c<my_skin->particles.Size();c++) {my_skin->particles.V(c) = VECTOR_3D<T>(0,0,0);}}
 void Set_Bending(){
     (*(solids_parameters.deformable_body_parameters.list(1).bending_elements(1))).Set_Sine_Half_Rest_Angle(0.0);}
 
@@ -189,11 +189,11 @@ void Get_Initial_Data() {
     std::cout << "total vertices = " << particles.array_size << std::endl;std::cout << "total triangles = " << triangle_mesh.triangles.m << std::endl;
     particles.store_velocity = false; particles.Update_Velocity();  // forcing velocity resize - not sure why this is needed
     particles.store_mass = false; particles.Store_Mass(); // forcing mass resize - not sure why
-    for(int p=0;p<particles.array_collection->Size();p++) {particles.mass(p) = 0.0;}
+    for(int p=0;p<particles.Size();p++) {particles.mass(p) = 0.0;}
     triangulated_surface.Set_Density(1);triangulated_surface.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     triangulated_surface.Update_Bounding_Box();
-    ever_inside.Resize(solids_parameters.deformable_body_parameters.list(index).triangulated_surface->particles.array_collection->Size());
-    ls_normal.Resize(solids_parameters.deformable_body_parameters.list(index).triangulated_surface->particles.array_collection->Size());
+    ever_inside.Resize(solids_parameters.deformable_body_parameters.list(index).triangulated_surface->particles.Size());
+    ls_normal.Resize(solids_parameters.deformable_body_parameters.list(index).triangulated_surface->particles.Size());
     //Muscle Levleset
     index=solids_parameters.rigid_body_parameters.list.template Add_Rigid_Body<RW>("Skin_Shrink_Wrap/Arm_Output/arm_skin", 1, true, true, true);
     solids_parameters.rigid_body_parameters.list.rigid_bodies(index)->is_static=true;

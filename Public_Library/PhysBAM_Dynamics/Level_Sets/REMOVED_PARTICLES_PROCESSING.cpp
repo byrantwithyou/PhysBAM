@@ -23,15 +23,15 @@ Setup_Processing()
     particle_tree.Create_Left_Balanced_KD_Tree(particles.X);
     tolerance=relative_tolerance*scale*particles.radius.Min();
     particle_domain=RANGE<TV>(particles.X(1));
-    ARRAY<RANGE<TV> > particle_boxes(particles.array_collection->Size());
-    for(int p=0;p<particles.array_collection->Size();p++){
+    ARRAY<RANGE<TV> > particle_boxes(particles.Size());
+    for(int p=0;p<particles.Size();p++){
         ellipsoids(p)=Get_Ellipsoid(p);metrics(p)=ellipsoids(p).Metric_Tensor();
         particle_boxes(p)=particle_blender->Get_Bounding_Box(ellipsoids(p));
         particle_domain.Enlarge_To_Include_Box(particle_boxes(p));}
     particle_grid=GRID<TV>(grid_divisions,grid_divisions,grid_divisions,particle_domain);
     ARRAY<ARRAY<int> ,VECTOR<int,3> > conservative_array(particle_grid.Domain_Indices(1));
     LOG::cout<<"Rasterizing particles to grid..."<<std::endl;
-    for(int p=0;p<particles.array_collection->Size();p++){
+    for(int p=0;p<particles.Size();p++){
         RANGE<VECTOR<int,3> > particle_box=particle_grid.Clamp_To_Cell(particle_boxes(p),1);
         for(CELL_ITERATOR it(particle_grid,particle_box);it.Valid();it.Next())for(int n=0;n<8;n++){
             T distance=REMOVED_PARTICLES_BLENDER_3D<T>::Get_Distance(ellipsoids(p).center,metrics(p),particle_grid.Node(it.Cell_Node_Index(n)));

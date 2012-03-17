@@ -223,7 +223,7 @@ bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
     T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& removed_negative_particles=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_negative_particles;
     RANGE<VECTOR<int,3> > right_grid_nodes=RANGE<VECTOR<int,3> >(TV_INT(fluids_parameters.grid->counts.x-9,-2,-2),TV_INT(fluids_parameters.grid->counts.x+3,fluids_parameters.grid->counts.y+3,fluids_parameters.grid->counts.z+3));
     for(NODE_ITERATOR iterator(*fluids_parameters.grid,right_grid_nodes);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
-        if(removed_negative_particles(block)){removed_negative_particles(block)->array_collection->Delete_All_Elements();removed_negative_particles(block)=0;}}
+        if(removed_negative_particles(block)){removed_negative_particles(block)->Delete_All_Elements();removed_negative_particles(block)=0;}}
     return false;
 }
 //#####################################################################

@@ -67,9 +67,9 @@ void Initialize()
 
     // external forces and velocities
     deformable_object.Set_External_Forces_And_Velocities(*this);
-    enforce_collision_velocity.Resize(particles.array_collection->Size());
-    collision_normal.Resize(particles.array_collection->Size());
-    collision_velocity.Resize(particles.array_collection->Size());
+    enforce_collision_velocity.Resize(particles.Size());
+    collision_normal.Resize(particles.Size());
+    collision_velocity.Resize(particles.Size());
     
     example.cape_collisions->Enable_Constraints(enforce_collision_velocity,collision_normal,collision_velocity);
 
@@ -149,7 +149,7 @@ void Advance_One_Time_Step(const T dt,const bool verbose)
     
     // save velocity for later trapezoidal rule
     V_save.Resize(particles.V.m);   // THIS IS A HACK TO GET THE CAPE EXAMPLE TO WORK
-    ARRAY<VECTOR_3D<T> >::copy_up_to(particles.V.array,V_save,particles.array_collection->Size());
+    ARRAY<VECTOR_3D<T> >::copy_up_to(particles.V.array,V_save,particles.Size());
 
     // update V implicitly to time n+1/2
     if(!deformable_object.Backward_Euler_Step_Velocity(dt/2,time,example.cg_tolerance,example.cg_iterations,false)){
@@ -192,7 +192,7 @@ void Adjust_Nodes_For_Rigid_Body_Collisions(ARRAY<VECTOR_3D<T> >& X,ARRAY<VECTOR
 {
     // Should be accelerated by using the triangle_hierarchy to eliminate tests on parts of the surface that aren't close to rigid bodies.
     int interactions=0;T depth;
-    for(int p=0;p<particles.array_collection->Size();p++) for(int r=0;r<rigid_bodies.m;r++) if(rigid_bodies(r)->Implicit_Surface_Lazy_Inside_And_Value(X(p),depth)){
+    for(int p=0;p<particles.Size();p++) for(int r=0;r<rigid_bodies.m;r++) if(rigid_bodies(r)->Implicit_Surface_Lazy_Inside_And_Value(X(p),depth)){
         depth=max((T)0,-depth)+triangle_collisions->collision_thickness;
         rigid_bodies(r)->Adjust_Point_For_Rigid_Body_Collision(X(p),V(p),depth,dt);
         enforce_collision_velocity(p)=true; // for external forces and velocities

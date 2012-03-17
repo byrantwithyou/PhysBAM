@@ -59,7 +59,7 @@ virtual void Get_Initial_Data()
     GRID<TV> red_green_uniform_grid(4*m_input+1,4*n_input+1,circle.Bounding_Box());
     red_green_grid.Initialize(red_green_uniform_grid,1);
     red_green_grid.Build_Triangulated_Area(triangulated_area);
-    ARRAY<T> phi(particles.array_collection->Size());for(int p=0;p<phi.m;p++) phi(p)=circle.Signed_Distance(particles.X(p));
+    ARRAY<T> phi(particles.Size());for(int p=0;p<phi.m;p++) phi(p)=circle.Signed_Distance(particles.X(p));
     std::cout<<particles.X.array.m<<" "<<particles.V.array.m<<", s "<<particles.store_velocity<<"\n";
     embedded_triangulated_area.Calculate_Segmented_Curve_From_Levelset_On_Triangle_Nodes(phi);
     triangles_of_material.Create_Material_Area();
@@ -68,7 +68,7 @@ virtual void Get_Initial_Data()
     triangulated_area.Set_Density(1000);triangulated_area.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);   
     triangulated_area.Update_Bounding_Box();
     VECTOR_2D<T> center(triangulated_area.bounding_box->Center());T bottom=triangulated_area.bounding_box->ymin;
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.V(i)=initial_velocity+initial_angular_velocity*(particles.X(i)-center).Rotate_Counterclockwise_90();
         particles.X(i).y+=initial_height-bottom;}
 

@@ -286,17 +286,17 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
         CIRCLE<T> head(VECTOR_2D<T>(0,.01),.14*1.05*.5);
         CIRCLE<T> arm1(VECTOR_2D<T>(.38,.07),.1*1.05*.5);
         CIRCLE<T> arm2(VECTOR_2D<T>(-.37,.1),.1*1.05*.5);
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             VECTOR<T,3> d=particles.X(p)-VECTOR<T,3>(head.center);T r=d.Magnitude()/head.radius;
             if(r<influence_factor){
                 particles.X(p)=VECTOR<T,3>(head.center)+(influence_factor+(r-influence_factor)/pull_factor)/r*d;
                 if(r<normal_influence_factor) particles.X(p).z+=head.radius*normal_push*sqr(normal_influence_factor-r);}}
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             VECTOR<T,3> d=particles.X(p)-VECTOR<T,3>(arm1.center);T r=d.Magnitude()/arm1.radius;
             if(r<influence_factor){
                 particles.X(p)=VECTOR<T,3>(arm1.center)+(influence_factor+(r-influence_factor)/pull_factor)/r*d;
                 if(r<normal_influence_factor) particles.X(p).z+=arm1.radius*normal_push*sqr(normal_influence_factor-r);}}
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             VECTOR<T,3> d=particles.X(p)-VECTOR<T,3>(arm2.center);T r=d.Magnitude()/arm2.radius;
             if(r<influence_factor){
                 particles.X(p)=VECTOR<T,3>(arm2.center)+(influence_factor+(r-influence_factor)/pull_factor)/r*d;
@@ -304,14 +304,14 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
 
     particles.Update_Velocity();
     triangulated_surface.Update_Bounding_Box();
-    for(int p=0;p<particles.array_collection->Size();p++){
+    for(int p=0;p<particles.Size();p++){
         particles.X(p)=initial_orientation.Rotate(particles.X(p));
         particles.V(p)=initial_velocity+VECTOR<T,3>::Cross_Product(initial_angular_velocity,particles.X(p));
         particles.X(p)+=initial_position;}
 
     VECTOR<T,3> pivot(0,initial_position.y+.2,10);QUATERNION<T> rotation((T).4*pi,VECTOR<T,3>(1,0,0));
-    for(int p=0;p<particles.array_collection->Size();p++)if(particles.X(p).y>pivot.y) pivot.z=min(pivot.z,particles.X(p).z);
-    for(int p=0;p<particles.array_collection->Size();p++)if(particles.X(p).y>pivot.y) particles.X(p)=pivot+rotation.Rotate(particles.X(p)-pivot);
+    for(int p=0;p<particles.Size();p++)if(particles.X(p).y>pivot.y) pivot.z=min(pivot.z,particles.X(p).z);
+    for(int p=0;p<particles.Size();p++)if(particles.X(p).y>pivot.y) particles.X(p)=pivot+rotation.Rotate(particles.X(p)-pivot);
 }
 //#####################################################################
 // Function Set_Parameter

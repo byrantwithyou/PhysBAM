@@ -95,9 +95,9 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
 
 
 
-    std::cout << "total vertices = " << embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tetrhedra = " << embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
-    std::cout << "total embedded particles = " << embedded_tetrahedralized_volume.embedded_particles.array_collection->Size() << std::endl;
+    std::cout << "total embedded particles = " << embedded_tetrahedralized_volume.embedded_particles.Size() << std::endl;
     std::cout << "parents array size = " << embedded_tetrahedralized_volume.parent_particles.m << std::endl;
     embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();
     embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Delete_Mass(); // in case they're accidently stored in the .tet file
@@ -116,7 +116,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)-center);
         embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl;
     embedded_tetrahedralized_volume.tetrahedralized_volume.Set_Density(1000);
     embedded_tetrahedralized_volume.tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
@@ -126,7 +126,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
 
 
 
-    int hash_max=embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size()*hash_ratio;
+    int hash_max=embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size()*hash_ratio;
     std::cout << "Embedded Particles Hash Table Size: " << hash_max << std::endl;
     embedded_tetrahedralized_volume.Initialize_Parents_To_Embedded_Particles_Hash_Table(hash_max);
     embedded_tetrahedralized_volume.Initialize_Embedded_Sub_Elements_In_Parent_Element();
@@ -154,7 +154,7 @@ virtual void Initialize_Reference_Fracture_Tetrahedralized_Volume(const EMBEDDED
     else rftv.embedded_tetrahedralized_volume.embedded_surface.triangle_mesh.Initialize_Incident_Triangles();
 
     // Initialize hash table
-    int hash_max=rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size()*hash_ratio;
+    int hash_max=rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size()*hash_ratio;
     std::cout << "Reference Embedded Particles Hash Table Size: " << hash_max << std::endl;
     rftv.embedded_tetrahedralized_volume.Initialize_Parents_To_Embedded_Particles_Hash_Table(hash_max);
     

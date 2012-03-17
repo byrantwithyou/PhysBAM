@@ -25,7 +25,7 @@ BW_MATERIAL_SPACE_FORCES(DEFORMABLE_PARTICLES<TV>& particles,TRIANGLE_MESH& tria
     // Save initial state
     states.Resize(triangle_mesh.elements.m,false,false);
     material_force_states.Resize(triangle_mesh.elements.m,false,false);
-    ARRAY<bool> particle_is_simulated(particles.array_collection->Size());particle_is_simulated.Fill(true);
+    ARRAY<bool> particle_is_simulated(particles.Size());particle_is_simulated.Fill(true);
     Update_Mpi(particle_is_simulated,0);
     for(TRIANGLE_ITERATOR iterator(force_simplices);iterator.Valid();iterator.Next()){int s=iterator.Data();
         int node1,node2,node3;triangle_mesh.elements(s).Get(node1,node2,node3);

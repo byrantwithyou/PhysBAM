@@ -51,7 +51,7 @@ public:
 //#####################################################################
 void Remove_Tetrahedra_Completely_Outside_Level_Set(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume,const ARRAY<T>&phi)
 {
-    assert(phi.m == tetrahedralized_volume.particles.array_collection->Size());
+    assert(phi.m == tetrahedralized_volume.particles.Size());
     int t=1;
     while(t <= tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m){
         int i,j,k,l;tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.Get(t,i,j,k,l);
@@ -70,7 +70,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     
     sprintf(filename,"Buddha/buddha_in_five_cut_brick.tet");input.open(filename,std::ios::in|std::ios::binary);assert(input.is_open());
     tetrahedralized_volume.Read_Float(input);input.close();
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tetrhedra = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
     tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();
     tetrahedralized_volume.particles.Delete_Mass(); // in case they're accidently stored in the .tet file
@@ -84,19 +84,19 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     if(!input.is_open()){std::cout << "TROUBLE OPENING " << filename << std::endl;return;}
     levelset_implicit_surface.Read(input);input.close();
 
-    ARRAY<T> phi(1,tetrahedralized_volume.particles.array_collection->Size());
+    ARRAY<T> phi(1,tetrahedralized_volume.particles.Size());
     for(int p=0;p<phi.m;p++) phi(p)=levelset_implicit_surface(tetrahedralized_volume.particles.X(p));
     Remove_Tetrahedra_Completely_Outside_Level_Set(tetrahedralized_volume,phi);
 
     embedded_tetrahedralized_volume.embedded_surface.particles.Store_Position_And_Velocity();
     embedded_tetrahedralized_volume.Calculate_Mass_Of_Embedded_Nodes();
-    int hash_max=tetrahedralized_volume.particles.array_collection->Size()*hash_ratio;
+    int hash_max=tetrahedralized_volume.particles.Size()*hash_ratio;
     std::cout << "Embedded Particles Hash Table Size: " << hash_max << std::endl;
     embedded_tetrahedralized_volume.Initialize_Parents_To_Embedded_Particles_Hash_Table(hash_max);
     embedded_tetrahedralized_volume.Initialize_Embedded_Sub_Elements_In_Parent_Element();
     embedded_tetrahedralized_volume.Initialize_Embedded_Children();
     embedded_tetrahedralized_volume.Set_Interpolation_Fraction_Threshold(interpolation_fraction_threshhold);
-    phi.Resize(1,tetrahedralized_volume.particles.array_collection->Size());
+    phi.Resize(1,tetrahedralized_volume.particles.Size());
     for(int p=0;p<phi.m;p++) phi(p)=levelset_implicit_surface(tetrahedralized_volume.particles.X(p));
     assert(phi.Min() < 0);assert(phi.Max() > 0);
     std::cout << "about to place embedded triangles" << std::endl;
@@ -104,7 +104,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(EMBEDDED_TETRAHEDRALIZED
     embedded_tetrahedralized_volume.embedded_triangle_mesh.Initialize_Incident_Triangles();
     embedded_tetrahedralized_volume.Calculate_Triangulated_Surface_From_Levelset_On_Tetrahedron_Nodes(phi);
     std::cout << "number of embedded_triangles = " << embedded_tetrahedralized_volume.embedded_surface.triangle_mesh.triangles.m << std::endl;
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
     
     tetrahedralized_volume.Update_Bounding_Box();

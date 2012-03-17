@@ -71,7 +71,7 @@ public:
 
     template<class T_ARRAY_T2>
     typename T_ARRAY_T2::ELEMENT Embedded_Value(const T_ARRAY_T2& u) const
-    {assert(u.Size()==particles.array_collection->Size());typedef typename T_ARRAY_T2::ELEMENT T2;
+    {assert(u.Size()==particles.Size());typedef typename T_ARRAY_T2::ELEMENT T2;
     T2 result=T2();for(int i=0;i<d;i++) result+=weights[i]*u(parents[i]);
     return result;}
 

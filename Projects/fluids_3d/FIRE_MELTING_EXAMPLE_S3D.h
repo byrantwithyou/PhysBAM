@@ -115,7 +115,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
-        ARRAY<VECTOR<T,3> > V_save(particles.array_collection->Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
+        ARRAY<VECTOR<T,3> > V_save(particles.Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
         for(int n=0;n<reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
             particles.V(levelset.node_to_particle_mapping(n)).x=reaction(n);
             if(inflammable_levelset) particles.V(levelset.node_to_particle_mapping(n)).y=inflammable_levelset->Phi(node_locations(n));}
@@ -160,7 +160,7 @@ void Adjust_Phi_With_Sources(const T time)
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
-        ARRAY<VECTOR<T,3> > V_save(particles.array_collection->Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
+        ARRAY<VECTOR<T,3> > V_save(particles.Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
         for(int n=0;n<reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
             particles.V(levelset.node_to_particle_mapping(n)).x=reaction(n);
             if(inflammable_levelset) particles.V(levelset.node_to_particle_mapping(n)).y=inflammable_levelset->Phi(node_locations(n));}

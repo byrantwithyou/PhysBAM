@@ -128,8 +128,8 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR<T,3> >
 {
     if(solids_parameters.rigid_body_parameters.list.Number_Of_Elements()<1) return;
     if(particle_type == PARTICLE_LEVELSET<T,VECTOR<T,3> >::NEGATIVE || particle_type == PARTICLE_LEVELSET<T,VECTOR<T,3> >::REMOVED_NEGATIVE){
-        for(int k=particles.array_collection->Size();k>=1;k--) if(solids_parameters.rigid_body_parameters.list(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k),-fluids_parameters.grid.dx)) particles.Delete_Particle(k);}
-    else for(int k=particles.array_collection->Size();k>=1;k--) if(solids_parameters.rigid_body_parameters.list(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.Delete_Particle(k);
+        for(int k=particles.Size();k>=1;k--) if(solids_parameters.rigid_body_parameters.list(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k),-fluids_parameters.grid.dx)) particles.Delete_Particle(k);}
+    else for(int k=particles.Size();k>=1;k--) if(solids_parameters.rigid_body_parameters.list(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.Delete_Particle(k);
 }
 //#####################################################################
 // Function Get_Object_Velocities

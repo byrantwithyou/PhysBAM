@@ -101,10 +101,10 @@ void Get_Initial_Data()
                     continue;}}}
         if(use_soft_bindings){
             // soft bindings
-            particles.array_collection->Preallocate(tri_nodes.m);
+            particles.Preallocate(tri_nodes.m);
             HASHTABLE<int,int> hard_to_soft;
             for(int i=0;i<tri_nodes.m;i++){int hard=tri_nodes(i);
-            int soft=particles.array_collection->Add_Element();
+            int soft=particles.Add_Element();
             hard_to_soft.Insert(hard,soft);
             particles.X(soft)=particles.X(hard);
             soft_bindings.Add_Binding(VECTOR<int,2>(soft,hard),use_impulses);}

@@ -112,13 +112,13 @@ void Create_Duplicate_Mesh(const TRIANGLE_MESH& mesh,TRIANGLE_MESH& duplicate_me
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     ARRAY<int> mesh_nodes;mesh.elements.Flattened().Get_Unique(mesh_nodes);
-    ARRAY<int> child_map(particles.array_collection->Size());
+    ARRAY<int> child_map(particles.Size());
     for(int i=0;i<mesh_nodes.m;i++){int p=mesh_nodes(i);
-        child_map(p)=particles.array_collection->Append(*particles.array_collection,p);}
+        child_map(p)=particles.Append(particles,p);}
     for(int i=0;i<mesh.elements.m;i++) duplicate_mesh.elements.Append(VECTOR<int,3>::Map(child_map,mesh.elements(i)));
-    duplicate_mesh.Set_Number_Nodes(particles.array_collection->Size());
+    duplicate_mesh.Set_Number_Nodes(particles.Size());
 
-    parent_map.Resize(particles.array_collection->Size());for(int p=0;p<child_map.m;p++) if(child_map(p)) parent_map(child_map(p))=p;
+    parent_map.Resize(particles.Size());for(int p=0;p<child_map.m;p++) if(child_map(p)) parent_map(child_map(p))=p;
 }
 //#####################################################################
 // Function Add_Binding

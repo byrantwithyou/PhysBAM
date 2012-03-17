@@ -142,7 +142,7 @@ Reinitialize(const bool force,const bool read_geometry)
             Read_Articulated_Information(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame));}
 
         // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.array_collection->Size());
+        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.Size());
         Resize_Structures(max_number_of_bodies);
 
         std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/rigid_body_forces_and_torques",basedir.c_str(),frame);
@@ -162,10 +162,10 @@ Reinitialize_Without_Files(const bool force)
         valid=false;
 
         ARRAY<int> needs_init;
-        for(int i=0;i<articulated_rigid_body->rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(articulated_rigid_body->rigid_body_collection.Is_Active(i)) needs_init.Append(i);
+        for(int i=0;i<articulated_rigid_body->rigid_body_collection.rigid_body_particle.Size();i++) if(articulated_rigid_body->rigid_body_collection.Is_Active(i)) needs_init.Append(i);
 
         // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.array_collection->Size());
+        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.Size());
         Resize_Structures(max_number_of_bodies);
         BASE::Resize_Structures(max_number_of_bodies);
 
@@ -187,7 +187,7 @@ Initialize_One_Body(const int body_id,const bool force)
         valid=false;
 
         // only enlarge array as we read in more geometry to memory
-        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.array_collection->Size());
+        int max_number_of_bodies=max(extra_components.Size(),rigid_body_collection.rigid_body_particle.Size());
         Resize_Structures(max_number_of_bodies);
 
         BASE::Initialize_One_Body(body_id,force);}
@@ -278,7 +278,7 @@ Display(const int in_color) const
     else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
     else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
 
-    if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size()){
+    if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particle.Size()){
         glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT);
         glDisable(GL_LIGHTING);
         T scale=(T)velocity_field.size/24;

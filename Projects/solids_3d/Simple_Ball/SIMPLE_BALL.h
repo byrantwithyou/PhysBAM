@@ -55,7 +55,7 @@ void Initialize_Cloth_State(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particle
         base_triangle.Set(1,1,2,3);
         triangle_mesh->Initialize_Triangle_Mesh(base_triangle);
         particles->Update_Position_And_Velocity();
-        for(int k=0;k<triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
+        for(int k=0;k<triangle_mesh->number_nodes;k++) particles->Add_Element();
         particles->X(1)=VECTOR_3D(0,.71,0);
         particles->X(2)=VECTOR_3D(2,.71,0);
         particles->X(3)=VECTOR_3D(1,.71,sqrt(3));

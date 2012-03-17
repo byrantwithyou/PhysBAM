@@ -7,7 +7,7 @@
 #ifndef __BASIC_SIMPLEX_POLICY__
 #define __BASIC_SIMPLEX_POLICY__
 
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SPATIAL_ACCELERATION_FORWARD.h>

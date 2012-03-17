@@ -38,9 +38,9 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 
     for(int t=0;t<segments.m;t++)
         segmented_curve_2d->mesh.elements.Append(segments(t));
-    segmented_curve_2d->particles.array_collection->Preallocate(vertices.m);
+    segmented_curve_2d->particles.Preallocate(vertices.m);
     for(int v=0;v<vertices.m;v++)
-        segmented_curve_2d->particles.X(segmented_curve_2d->particles.array_collection->Add_Element())=vertices(v);
+        segmented_curve_2d->particles.X(segmented_curve_2d->particles.Add_Element())=vertices(v);
     segmented_curve_2d->Update_Number_Nodes();
     FILE_UTILITIES::Write_To_File<RW>(output_filename,*segmented_curve_2d);
 }

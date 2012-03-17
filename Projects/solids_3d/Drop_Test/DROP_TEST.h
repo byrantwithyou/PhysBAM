@@ -35,8 +35,8 @@ public:
         input.close();
         double min_y=initial_particles.X(1).y;
         int i;
-        for(i=2; i<=initial_particles.array_collection->Size(); ++i) min_y=min(initial_particles.X(i).y,min_y);
-        for(i=1; i<=initial_particles.array_collection->Size(); ++i) initial_particles.X(i).y+=1e-3-min_y;
+        for(i=2; i<=initial_particles.Size(); ++i) min_y=min(initial_particles.X(i).y,min_y);
+        for(i=1; i<=initial_particles.Size(); ++i) initial_particles.X(i).y+=1e-3-min_y;
         backdoor_id=4;
         final_time=10;
         restart_step_number=0;

@@ -20,14 +20,14 @@ int main(int argc,char *argv[])
     DEFORMABLE_PARTICLES<VECTOR<float,3> > particles;
     TETRAHEDRALIZED_VOLUME<float> tet_vol(tet_mesh,particles);
     FILE_UTILITIES::Read_From_File<float>(argv[1],tet_vol);
-    std::cout<<"tet_vol.particles.number="<<tet_vol.particles.array_collection->Size()<<std::endl;
+    std::cout<<"tet_vol.particles.number="<<tet_vol.particles.Size()<<std::endl;
     std::cout<<"tet_vol.mesh.elements.m="<<tet_vol.mesh.elements.m<<std::endl;
     tet_vol.Update_Bounding_Box();
     std::cout<<"bounding_box size:"<<tet_vol.bounding_box->Size()<<std::endl;
     tet_vol.Initialize_Triangulated_Surface();
     tet_vol.triangulated_surface->Discard_Valence_Zero_Particles_And_Renumber();
     cout<<"triangles.m="<<tet_vol.triangulated_surface->mesh.elements.m<<endl;
-    cout<<"particles.number="<<particles.array_collection->Size()<<endl;
+    cout<<"particles.number="<<particles.Size()<<endl;
     FILE_UTILITIES::Write_To_File<float>(argv[2],*tet_vol.triangulated_surface);
     return 0;
 }

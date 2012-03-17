@@ -87,11 +87,11 @@ Save_Position(ARRAY<TV>& X,ARRAY<FRAME<TV> >& rigid_frame)
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
-    X.Resize(particles.array_collection->Size(),false,false);
+    X.Resize(particles.Size(),false,false);
     X.Subset(simulated_particles)=particles.X.Subset(simulated_particles);
-    rigid_frame.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
+    rigid_frame.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
     rigid_frame.Subset(simulated_rigid_body_particles)=rigid_body_collection.rigid_body_particle.frame.Subset(simulated_rigid_body_particles);
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)){
         if(!rigid_body_collection.Rigid_Body(i).Is_Simulated())rigid_frame(i)=rigid_body_collection.rigid_body_particle.frame(i);}
 }
 //#####################################################################
@@ -105,11 +105,11 @@ Restore_Position(ARRAY_VIEW<const TV> X,ARRAY_VIEW<const FRAME<TV> > rigid_frame
     const ARRAY<int>& simulated_particles=solid_body_collection.deformable_body_collection.simulated_particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     const ARRAY<int>& simulated_rigid_body_particles=solid_body_collection.rigid_body_collection.simulated_rigid_body_particles;
-    PHYSBAM_ASSERT(X.Size()==particles.array_collection->Size());PHYSBAM_ASSERT(rigid_frame.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size());
+    PHYSBAM_ASSERT(X.Size()==particles.Size());PHYSBAM_ASSERT(rigid_frame.Size()==rigid_body_collection.rigid_body_particle.Size());
     particles.X.Subset(simulated_particles)=X.Subset(simulated_particles);
     rigid_body_collection.rigid_body_particle.frame.Subset(simulated_rigid_body_particles)=rigid_frame.Subset(simulated_rigid_body_particles);
     for(int i=0;i<simulated_rigid_body_particles.m;i++) rigid_body_collection.Rigid_Body(simulated_rigid_body_particles(i)).Update_Angular_Velocity();
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)){RIGID_BODY<TV>& body=rigid_body_collection.Rigid_Body(i);
         if(!body.Is_Simulated()){rigid_body_collection.rigid_body_particle.frame(i)=rigid_frame(i);body.Update_Angular_Velocity();}}
 }
 //#####################################################################
@@ -169,7 +169,7 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
         LOG::SCOPE scope("Collisions All Gather","Collisions All Gather");
         solid_body_collection.deformable_body_collection.mpi_solids->All_Gather_Particles(particles.X,particles.V);}
 
-    modified=CONSTANT_ARRAY<bool>(particles.array_collection->Size(),false);
+    modified=CONSTANT_ARRAY<bool>(particles.Size(),false);
 
     // compute average velocity, but save final velocities in case of no repulsion or collisions
     ARRAY<TV> V_save(particles.V);
@@ -194,9 +194,9 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
         PHYSBAM_NOT_IMPLEMENTED("exit_early=true");
     else if(collisions_found>0){ // restore unmodified velocities
         if(solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.mass_modifier) particles.V=V_save;
-        else for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
+        else for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else if(repulsions_found){ // repulsions only, restore velocities for unmodified and apply velocity delta otherwise
-        for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
+        for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
 
     // propagate any changes from soft bound particles to parents
@@ -365,8 +365,8 @@ Clamp_Velocities()
 template<class TV> void SOLIDS_EVOLUTION<TV>::
 Initialize_World_Space_Masses()
 {
-    world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-    world_space_rigid_mass_inverse.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
+    world_space_rigid_mass.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.Size(),false,false);
+    world_space_rigid_mass_inverse.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.Size(),false,false);
     for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
         world_space_rigid_mass(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));
         world_space_rigid_mass_inverse(p)=solid_body_collection.rigid_body_collection.State(p).World_Space_Rigid_Mass_Inverse(RIGID_BODY_MASS<TV>(solid_body_collection.rigid_body_collection.rigid_body_particle.mass(p),solid_body_collection.rigid_body_collection.rigid_body_particle.inertia_tensor(p)));}

@@ -226,7 +226,7 @@ void Skeleton_In_Flesh()
         LOG::cout<<"Joints with only muscle control"<<std::endl;
         for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function && arb->joint_mesh.joints(i)->joint_function->muscle_control)
             LOG::cout<<"\t"<<arb->joint_mesh.joints(i)->name<<std::endl;}
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)) rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)) rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Friction(1);
 }
 //#####################################################################
 // Function Adjust_Joints_For_Skeleton_In_Flesh
@@ -313,7 +313,7 @@ void Augment_Parent_Angle_Z(JOINT<TV>* joint,T angle)
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-//    enlarge_nodes.Resize(solid_body_collection.particles.array_collection->Size());
+//    enlarge_nodes.Resize(solid_body_collection.particles.Size());
 //    enlarge_nodes.Fill(false);
 }
 //#####################################################################

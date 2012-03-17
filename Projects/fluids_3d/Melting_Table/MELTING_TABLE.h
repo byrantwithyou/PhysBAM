@@ -253,7 +253,7 @@ void Initialize_Particle_Positions_And_Velocities(const int object)
     particles.Update_Velocity();
     tetrahedralized_volume.Update_Bounding_Box();
     VECTOR<T,3> center(tetrahedralized_volume.bounding_box->Center());
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.X(i)=center+initial_orientation(object).Rotate(particles.X(i)-center);
         particles.V(i)=initial_velocity(object)+VECTOR<T,3>::Cross_Product(initial_angular_velocity(object),particles.X(i)-center);
         particles.X(i)+=initial_position(object);}
@@ -276,10 +276,10 @@ void Initialize_Forces()
             TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_object.embedded_tetrahedralized_volume->tetrahedralized_volume;
             TRIANGULATED_SURFACE<T>& triangulated_surface=deformable_object.embedded_tetrahedralized_volume_boundary_surface->boundary_surface;
             // save undeformed geometry
-            undeformed_tetrahedron_particles(object)=new DEFORMABLE_PARTICLES<T,VECTOR<T,3> >;undeformed_tetrahedron_particles(object)->array_collection->Add_Elements(tetrahedralized_volume.particles.array_collection->Size());
-            ARRAY<VECTOR<T,3> >::copy_up_to(tetrahedralized_volume.particles.X.array,undeformed_tetrahedron_particles(object)->X.array,tetrahedralized_volume.particles.array_collection->Size());
-            undeformed_triangle_particles(object)=new DEFORMABLE_PARTICLES<T,VECTOR<T,3> >;undeformed_triangle_particles(object)->array_collection->Add_Elements(triangulated_surface.particles.array_collection->Size());
-            ARRAY<VECTOR<T,3> >::copy_up_to(triangulated_surface.particles.X.array,undeformed_triangle_particles(object)->X.array,triangulated_surface.particles.array_collection->Size());
+            undeformed_tetrahedron_particles(object)=new DEFORMABLE_PARTICLES<T,VECTOR<T,3> >;undeformed_tetrahedron_particles(object)->Add_Elements(tetrahedralized_volume.particles.Size());
+            ARRAY<VECTOR<T,3> >::copy_up_to(tetrahedralized_volume.particles.X.array,undeformed_tetrahedron_particles(object)->X.array,tetrahedralized_volume.particles.Size());
+            undeformed_triangle_particles(object)=new DEFORMABLE_PARTICLES<T,VECTOR<T,3> >;undeformed_triangle_particles(object)->Add_Elements(triangulated_surface.particles.Size());
+            ARRAY<VECTOR<T,3> >::copy_up_to(triangulated_surface.particles.X.array,undeformed_triangle_particles(object)->X.array,triangulated_surface.particles.Size());
             undeformed_triangulated_surface(object)=new TRIANGULATED_SURFACE<T>(triangulated_surface.triangle_mesh,*undeformed_triangle_particles(object));
             undeformed_triangulated_surface(object)->Update_Bounding_Box();undeformed_triangulated_surface(object)->Update_Triangle_List();undeformed_triangulated_surface(object)->Initialize_Triangle_Hierarchy();
             // generate material space levelset

@@ -524,7 +524,7 @@ template<class T> T TRIANGULATED_SURFACE<T>::
 Maximum_Magnitude_Phi(const IMPLICIT_OBJECT<TV>& implicit_surface,int* index)
 {
     T phi=0,max_phi=0;int k=0;
-    for(int i=0;i<particles.array_collection->Size();i++){phi=abs(implicit_surface(particles.X(i)));if(phi > max_phi){max_phi=phi;k=i;}}
+    for(int i=0;i<particles.Size();i++){phi=abs(implicit_surface(particles.X(i)));if(phi > max_phi){max_phi=phi;k=i;}}
     if(index)*index=k;return max_phi;
 }
 //#####################################################################
@@ -576,8 +576,8 @@ Create_Compact_Copy() const
             triangle_mesh->elements(i)(j)=a;}}
 
     GEOMETRY_PARTICLES<TV>* deformable_geometry_particle=new GEOMETRY_PARTICLES<TV>;
-    deformable_geometry_particle->array_collection->Add_Elements(new_to_old.Size());
-    deformable_geometry_particle->X.Prefix(deformable_geometry_particle->array_collection->Size())=particles.X.Subset(new_to_old);
+    deformable_geometry_particle->Add_Elements(new_to_old.Size());
+    deformable_geometry_particle->X.Prefix(deformable_geometry_particle->Size())=particles.X.Subset(new_to_old);
     TRIANGULATED_SURFACE* triangulated_surface=new TRIANGULATED_SURFACE(*triangle_mesh,*deformable_geometry_particle);
     triangulated_surface->Update_Number_Nodes();
     return triangulated_surface;
@@ -588,13 +588,13 @@ Create_Compact_Copy() const
 template<class T> void TRIANGULATED_SURFACE<T>::
 Print_Statistics(std::ostream& output,const T thickness_over_2)
 {
-    if(mesh.number_nodes!=particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
     int index;Update_Bounding_Box();
     if(!mesh.incident_elements) mesh.Initialize_Incident_Elements();
 
     output<<"triangles = "<<mesh.elements.m<<std::endl;
-    output<<"particles = "<<particles.array_collection->Size()<<std::endl;
-    {int particles_touched=0;for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.incident_elements)(p).m) particles_touched++;
+    output<<"particles = "<<particles.Size()<<std::endl;
+    {int particles_touched=0;for(int p=0;p<particles.Size();p++) if((*mesh.incident_elements)(p).m) particles_touched++;
     output<<"particles touched = "<<particles_touched<<std::endl;}
     output<<"bounding box = "<<*bounding_box<<std::endl;
     if(particles.store_velocity){

@@ -180,7 +180,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
     U.Resize(elements,false,false);De_inverse_hat.Resize(elements,false,false);Fe_hat.Resize(elements,false,false);
     if(dPi_dFe) dPi_dFe->Resize(elements,false,false);if(dP_dFe) dP_dFe->Resize(elements,false,false);if(V) V->Resize(elements,false,false);
     if(node_stiffness){
-        node_stiffness->Resize(strain_measure.mesh_object.particles.array_collection->Size(),false,false);
+        node_stiffness->Resize(strain_measure.mesh_object.particles.Size(),false,false);
         node_stiffness->Fill(SYMMETRIC_MATRIX<T,TV::m>());}
     if(edge_stiffness){
         edge_stiffness->Resize(strain_measure.mesh.segment_mesh->elements.m,false,false);

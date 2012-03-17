@@ -22,7 +22,7 @@ template<class T,class RW> void Compute_Errors(const std::string& input_base,con
         for(int i=particles.m;i>=1;i--){
             FILE_UTILITIES::Read_From_File<RW>(input_base+STRING_UTILITIES::string_sprintf("%d/%d/deformable_object_particles",resolutions(i),frame),particles(i));
             errors(i)(frame)=0;
-            for(int p=0;p<particles(i).array_collection->Size();p++)
+            for(int p=0;p<particles(i).Size();p++)
                 errors(i)(frame)+=ARRAYS_COMPUTATIONS::Magnitude_Squared(particles(particles.m).X(p)-particles(i).X(p));}}
 
     for(int i=particles.m;i>=1;i--){

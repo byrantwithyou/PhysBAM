@@ -140,18 +140,18 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
 
     if(solids){
-        F_full.Resize(particles.array_collection->Size(),false,false);rigid_F_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-        R_full.Resize(particles.array_collection->Size(),false,false);rigid_R_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-        S_full.Resize(particles.array_collection->Size(),false,false);rigid_S_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-        B_full.Resize(particles.array_collection->Size(),false,false);rigid_B_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-        ar_full.Resize(particles.array_collection->Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-        z_full.Resize(particles.array_collection->Size(),false,false);rigid_z_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-        zaq_full.Resize(particles.array_collection->Size(),false,false);rigid_zaq_full.Resize(rigid_body_particles.array_collection->Size(),false,false);}
+        F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
+        R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
+        S_full.Resize(particles.Size(),false,false);rigid_S_full.Resize(rigid_body_particles.Size(),false,false);
+        B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);
+        ar_full.Resize(particles.Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.Size(),false,false);
+        z_full.Resize(particles.Size(),false,false);rigid_z_full.Resize(rigid_body_particles.Size(),false,false);
+        zaq_full.Resize(particles.Size(),false,false);rigid_zaq_full.Resize(rigid_body_particles.Size(),false,false);}
     else{
         if(fluids && solids_fluids_parameters.mpi_solid_fluid){ // Gather the fluid terms for the RHS of the solid here
-            F_full.Resize(particles.array_collection->Size(),false,false);rigid_F_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-            R_full.Resize(particles.array_collection->Size(),false,false);rigid_R_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-            B_full.Resize(particles.array_collection->Size(),false,false);rigid_B_full.Resize(rigid_body_particles.array_collection->Size(),false,false);}}
+            F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
+            R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
+            B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);}}
 
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),F(F_full,rigid_F_full,solid_body_collection),
         R(R_full,rigid_R_full,solid_body_collection),S(S_full,rigid_S_full,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection),
@@ -165,7 +165,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > > kb_array;
     ARRAY<VECTOR_ND<T> >& b_array=kb_array.v;
 
-    ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.array_collection->Size());
+    ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.Size());
     rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles)=IDENTITY_ARRAY<int>(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m);
 
     BACKWARD_EULER_SYSTEM<TV>* solid_system=0;
@@ -351,7 +351,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         if(fluids){
             RANGE<TV> grid_domain=fluids_parameters.grid->domain;
             grid_domain.Change_Size(fluids_parameters.grid->dX*(T).5);
-            ARRAY<int> boundary_particles(particles.array_collection->Size());boundary_particles.Fill(0);
+            ARRAY<int> boundary_particles(particles.Size());boundary_particles.Fill(0);
             GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid=*fluids_parameters.collision_bodies_affecting_fluid;
             for(COLLISION_GEOMETRY_ID i(0);i<collision_bodies_affecting_fluid.collision_geometry_collection.bodies.m;i++)
                 if(collision_bodies_affecting_fluid.collision_geometry_collection.Is_Active(i)){
@@ -453,8 +453,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 A_array(i).Construct_Incomplete_Cholesky_Factorization(poisson.pcg.modified_incomplete_cholesky,poisson.pcg.modified_incomplete_cholesky_coefficient,
                     poisson.pcg.preconditioner_zero_tolerance,poisson.pcg.preconditioner_zero_replacement); // check to see if the blocks can be preconditioned even though the whole
 
-            ar_full.Resize(particles.array_collection->Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-            z_full.Resize(particles.array_collection->Size(),false,false);rigid_z_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
+            ar_full.Resize(particles.Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.Size(),false,false);
+            z_full.Resize(particles.Size(),false,false);rigid_z_full.Resize(rigid_body_particles.Size(),false,false);
             GENERALIZED_VELOCITY<TV> ar_V(ar_full,rigid_ar_full,solid_body_collection),z_V(z_full,rigid_z_full,solid_body_collection);
             PRESSURE_VELOCITY_VECTOR<TV> V_coupled(V,x_array.v),F_coupled(F,p_array.v),R_coupled(R,r_array.v),S_coupled(S,ap_array.v),B_coupled(B,b_array),ar_coupled(ar_V,ar_array.v),
                 z_coupled(z_V,z_array.v);
@@ -707,7 +707,7 @@ Compute_W(const T current_position_time)
     // populates total_nodal_volume and dual_cell_weights
     // TODO: optimize this by first clipping all simplices against all the face dual cell face planes and storing barycentric weights for the clipped simplices
     // NOTE: assume non-embedded collision surface for now
-    ARRAY<int> particles_to_dynamic_particles_map(particles.array_collection->Size());
+    ARRAY<int> particles_to_dynamic_particles_map(particles.Size());
     particles_to_dynamic_particles_map.Subset(solid_body_collection.deformable_body_collection.dynamic_particles)=
         IDENTITY_ARRAY<int>(solid_body_collection.deformable_body_collection.dynamic_particles.m);
 
@@ -902,7 +902,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     ARRAY<ARRAY<int> > row_counts(colors),kinematic_row_counts(colors);
-    ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.array_collection->Size());
+    ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.Size());
     rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(kinematic_rigid_bodies)=IDENTITY_ARRAY<int>(kinematic_rigid_bodies.m);
 
     for(int i=0;i<colors;i++) kinematic_row_counts(i).Resize(rigid_body_count*rows_per_rigid_body);

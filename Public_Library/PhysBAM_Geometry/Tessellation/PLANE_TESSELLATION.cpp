@@ -17,7 +17,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const PLANE<T>& pl
 {
     typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    surface->particles.array_collection->Add_Elements(4);
+    surface->particles.Add_Elements(4);
     TV u=(T)1000*plane.normal.Unit_Orthogonal_Vector(),v=TV::Cross_Product(plane.normal,u);
     surface->particles.X(0)=plane.x1+u+v;
     surface->particles.X(1)=plane.x1-u+v;

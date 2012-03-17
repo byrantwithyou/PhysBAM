@@ -87,9 +87,9 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     const ARRAY<int>& dynamic_particles=solid_body_collection.deformable_body_collection.dynamic_particles;
 
-    dX_full.Resize(particles.array_collection->Size()); // an initial guess might be passed in for dX, otherwise it's zero
-    B_full.Resize(particles.array_collection->Size(),false,false);
-    R_full.Resize(particles.array_collection->Size(),false,false);F_full.Resize(particles.array_collection->Size(),false,false);S_full.Resize(particles.array_collection->Size(),false,false);
+    dX_full.Resize(particles.Size()); // an initial guess might be passed in for dX, otherwise it's zero
+    B_full.Resize(particles.Size(),false,false);
+    R_full.Resize(particles.Size(),false,false);F_full.Resize(particles.Size(),false,false);S_full.Resize(particles.Size(),false,false);
     KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<TV> > > dX(dX_full,dynamic_particles),B(B_full,dynamic_particles),
         R(R_full,dynamic_particles),F(F_full,dynamic_particles),
         S(S_full,dynamic_particles),*null=0;
@@ -129,7 +129,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
 
     // iterate to steady state
     T supnorm=0;int iteration;
-    dX_full.Resize(particles.array_collection->Size(),false,false);R_full.Resize(particles.array_collection->Size(),false,false);
+    dX_full.Resize(particles.Size(),false,false);R_full.Resize(particles.Size(),false,false);
     for(iteration=0;iteration<solids_parameters.newton_iterations;iteration++){
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> dX_subset=dX_full.Subset(simulated_particles);
         dX_subset.Fill(TV()); // initial guess is zero

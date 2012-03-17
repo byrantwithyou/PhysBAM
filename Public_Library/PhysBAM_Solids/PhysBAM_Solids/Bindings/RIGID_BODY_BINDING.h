@@ -47,7 +47,7 @@ public:
 
     // TODO: This may not handle kinematic/static bodies
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE
-    {dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(particles.array_collection->Size()+rigid_body_particle_index,particle_index));}
+    {dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(particles.Size()+rigid_body_particle_index,particle_index));}
 
     RIGID_BODY<TV>& Rigid_Body() const
     {return rigid_body_collection->Rigid_Body(rigid_body_particle_index);}

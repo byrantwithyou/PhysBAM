@@ -145,11 +145,11 @@ Test_Matrix() const
     ARRAY<T,FORCE_AGGREGATE_ID> aggregate(size),aggregate2(size);
     random.Fill_Uniform(aggregate,-1,1);
 
-    int number=solid_body_collection.deformable_body_collection.deformable_geometry.particles.array_collection->number;
+    int number=solid_body_collection.deformable_body_collection.deformable_geometry.particles.number;
     ARRAY<TV> V(number),V2(number),V3(number),V4(number),V5(number);
     random.Fill_Uniform(V,-1,1);
 
-    int rigid_number=solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.array_collection->number;
+    int rigid_number=solid_body_collection.rigid_body_collection.rigid_geometry_collection.particles.number;
     ARRAY<TWIST<TV> > twist(rigid_number),twist2(rigid_number),twist3(rigid_number),twist4(rigid_number),twist5(rigid_number);
     random.Fill_Uniform(twist,-1,1);
 

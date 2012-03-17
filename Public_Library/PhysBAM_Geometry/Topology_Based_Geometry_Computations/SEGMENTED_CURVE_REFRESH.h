@@ -40,8 +40,8 @@ void Initialize_Straight_Mesh_And_Particles(SEGMENTED_CURVE<TV>& sc,const GRID<V
 {
     sc.Clean_Memory();
     sc.mesh.Initialize_Straight_Mesh(grid.counts.x);
-    sc.particles.array_collection->Preallocate(grid.counts.x);
-    for(int i=0;i<grid.counts.x;i++) sc.particles.X(sc.particles.array_collection->Add_Element()).x=grid.X(VECTOR<int,1>(i)).x;
+    sc.particles.Preallocate(grid.counts.x);
+    for(int i=0;i<grid.counts.x;i++) sc.particles.X(sc.particles.Add_Element()).x=grid.X(VECTOR<int,1>(i)).x;
 }
 //#####################################################################
 // Function Initialize_Circle_Mesh_And_Particles
@@ -51,7 +51,7 @@ void Initialize_Circle_Mesh_And_Particles(SEGMENTED_CURVE<TV>& sc,const int m,co
 {
     sc.Clean_Memory();
     sc.mesh.Initialize_Straight_Mesh(m,true);
-    sc.particles.array_collection->Add_Elements(m);
+    sc.particles.Add_Elements(m);
     for(int p=0;p<m;p++){
         COMPLEX<T> X=COMPLEX<T>::Polar(radius,(T)2*(T)pi/m*p);
         sc.particles.X(p)=TV(VECTOR<T,2>(X.re,X.im));}

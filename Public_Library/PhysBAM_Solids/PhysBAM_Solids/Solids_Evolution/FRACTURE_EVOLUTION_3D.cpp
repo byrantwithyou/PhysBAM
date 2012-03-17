@@ -76,7 +76,7 @@ Initialize_Self_Collision()
         ARRAY<bool>& particle_on_surface=deformable_body_collection.collisions.check_collision;
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.structures.Remove_All();
         solids_parameters.Initialize_Triangle_Collisions(); // false - do not clamp repulsion thickness
-        ARRAY<TV> rest_X(deformable_body_collection.particles.array_collection->Size());
+        ARRAY<TV> rest_X(deformable_body_collection.particles.Size());
         for(int p=0;p<rest_X.m;p++) if(particle_on_surface(p)) rest_X(p)=fracture_object->Rest_Position_Of_Material_Surface_Particle(p);
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_repulsions.Clamp_Repulsion_Thickness_With_Meshes(rest_X,solids_parameters.collisions_repulsion_clamp_fraction);}
 #endif
@@ -126,9 +126,9 @@ Rebuild_Topology()
         LOG::cout<<"MINIMUM SIGNED VOLUME IS NEGATIVE JUST BEFORE BULID CURRENT ETV\n\n"<<std::endl;
 
     ARRAY<int> map_to_old_particles,map_to_old_embedded_particles,map_to_old_simplices;
-    PHYSBAM_DEBUG_PRINT("rebuild_topology",map_to_old_particles.m,map_to_old_embedded_particles.m,deformable_body_collection.particles.array_collection->Size(),(deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>()).particles.array_collection->Size());
+    PHYSBAM_DEBUG_PRINT("rebuild_topology",map_to_old_particles.m,map_to_old_embedded_particles.m,deformable_body_collection.particles.Size(),(deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>()).particles.Size());
     fracture_object->Rebuild_Embedded_Object(map_to_old_particles,map_to_old_embedded_particles,map_to_old_simplices,true);
-    PHYSBAM_DEBUG_PRINT("rebuild_topology",map_to_old_particles.m,map_to_old_embedded_particles.m,deformable_body_collection.particles.array_collection->Size(),(deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>()).particles.array_collection->Size());
+    PHYSBAM_DEBUG_PRINT("rebuild_topology",map_to_old_particles.m,map_to_old_embedded_particles.m,deformable_body_collection.particles.Size(),(deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>()).particles.Size());
     fracture_object->embedded_object.simplicial_object.mesh.Initialize_Segment_Mesh();
     fracture_object->embedded_object.simplicial_object.mesh.Initialize_Element_Edges();
     if(plasticity_model) plasticity_model->Fp_inverse=ARRAY<SYMMETRIC_MATRIX<T,3> >(plasticity_model->Fp_inverse).Subset(map_to_old_simplices);
@@ -338,7 +338,7 @@ Adjust_Nodes_For_Segment_Triangle_Intersections(T threshhold)
     LOG::cout<<"!!!! found "<<intersecting_segment_triangle_pairs.m<<" intersecting edge triangle pairs"<<std::endl;
 
     // loop through intersecting edge triangle pairs
-    ARRAY<TRIPLE<int,int,T> > edge_triangle_perturbations(particles.array_collection->Size());
+    ARRAY<TRIPLE<int,int,T> > edge_triangle_perturbations(particles.Size());
     for(int pair=0;pair<intersecting_segment_triangle_pairs.m;pair++){
         int e,t;intersecting_segment_triangle_pairs(pair).Get(e,t);
         VECTOR<int,2> segment=material_surface.mesh.segment_mesh->elements(e);
@@ -352,11 +352,11 @@ Adjust_Nodes_For_Segment_Triangle_Intersections(T threshhold)
                     edge_triangle_perturbations(segment[a])=TRIPLE<int,int,T>(e,t,perturb_amount);}}}}
 
     // sort by perturbation amount - always perturb with least amounts ones first - NOTE: testing with a VERY VERY primitive sort first.
-    ARRAY<int> permutation(particles.array_collection->Size());for(int i=0;i<permutation.m;i++) permutation(i)=i;
+    ARRAY<int> permutation(particles.Size());for(int i=0;i<permutation.m;i++) permutation(i)=i;
     Sort(permutation,Indirect_Comparison(edge_triangle_perturbations,Field_Comparison(&TRIPLE<int,int,T>::z))); // sort permutation by edge_triangle_perturbation.z
 
     // loop through edge_triangle_perturbation
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         int p=permutation(i);
         TRIPLE<int,int,T>& edge_triangle_perturbation=edge_triangle_perturbations(p);
         if(edge_triangle_perturbation.x){
@@ -407,7 +407,7 @@ Create_Rigid_Body_Fracture_Object(const TV velocity,const TV angular_velocity,co
     RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>* impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*rigid_body);
     TETRAHEDRALIZED_VOLUME<T>& rigid_body_tetrahedralized_volume=rigid_body->template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
     rigid_body_tetrahedralized_volume.Initialize_Hierarchy(true);
-    impulse_accumulator->Initialize_Simplicial_Object(&rigid_body_tetrahedralized_volume,new ARRAY<TV>(tetrahedralized_volume.particles.array_collection->Size()));
+    impulse_accumulator->Initialize_Simplicial_Object(&rigid_body_tetrahedralized_volume,new ARRAY<TV>(tetrahedralized_volume.particles.Size()));
     rigid_body_collection.collision_body_list->Get_Collision_Geometry(rigid_body->particle_index)->impulse_accumulator=impulse_accumulator;
     if(fracture_callbacks && fracture_callbacks->Has_Crack_Map()) rigid_body->Initialize_Grain_Boundaries(*seed_positions,*seed_weakness_multipliers,fracture_callbacks,false);
     else if(seed_positions) rigid_body->Initialize_Grain_Boundaries(*seed_positions,*seed_weakness_multipliers,fracture_callbacks);
@@ -425,8 +425,8 @@ Create_New_Rigid_Bodies_From_Fracture(ARRAY<int>& map_to_old_particles)
     EMBEDDED_MATERIAL_SURFACE<TV,3>& embedding=deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_MATERIAL_SURFACE<TV,3>&>();
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=embedding.embedded_object.simplicial_object;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solids_parameters.solid_body_collection.rigid_body_collection;
-    particle_to_rigid_body_id.Resize(deformable_body_collection.particles.array_collection->Size());
-    deformable_to_rigid_particles.Resize(deformable_body_collection.particles.array_collection->Size());
+    particle_to_rigid_body_id.Resize(deformable_body_collection.particles.Size());
+    deformable_to_rigid_particles.Resize(deformable_body_collection.particles.Size());
     for(int i=0;i<rigid_bodies_with_impulse.m;i++){
         RIGID_BODY_FRACTURE_OBJECT_3D<T>& rigid_body=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>&>(rigid_body_collection.Rigid_Body(rigid_bodies_with_impulse(i)));
 
@@ -458,12 +458,12 @@ Create_New_Rigid_Bodies_From_Fracture(ARRAY<int>& map_to_old_particles)
             RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>* impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*new_rigid_body);
             TETRAHEDRALIZED_VOLUME<T>& new_rigid_body_tetrahedralized_volume=new_rigid_body->template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
             new_rigid_body_tetrahedralized_volume.Initialize_Hierarchy(true);
-            impulse_accumulator->Initialize_Simplicial_Object(&new_rigid_body_tetrahedralized_volume,new ARRAY<TV>(tetrahedralized_volume.particles.array_collection->Size()));
+            impulse_accumulator->Initialize_Simplicial_Object(&new_rigid_body_tetrahedralized_volume,new ARRAY<TV>(tetrahedralized_volume.particles.Size()));
 
             rigid_body_collection.collision_body_list->Get_Collision_Geometry(new_rigid_body->particle_index)->impulse_accumulator=impulse_accumulator;
             PHYSBAM_FATAL_ERROR("fix saved states, saved states are now driven through the fluid collision geometry");
             //if(save_state) new_rigid_body->Save_State(COLLISION_GEOMETRY<TV>::SOLIDS_EVOLUTION_RIGID_BODY_NEW_STATE,time_plus_dt);
-            assert(new_rigid_body_tetrahedralized_volume.mesh.number_nodes==new_rigid_body_tetrahedralized_volume.particles.array_collection->Size());}
+            assert(new_rigid_body_tetrahedralized_volume.mesh.number_nodes==new_rigid_body_tetrahedralized_volume.particles.Size());}
         rigid_body_collection.rigid_body_particle.Remove_Body(rigid_body.particle_index);}// may need it to be without destroying
     // geometry--depends on usage
 #endif
@@ -477,14 +477,14 @@ Substitute_Soft_Bindings_For_Embedded_Nodes(T_EMBEDDED_MATERIAL_SURFACE& object,
 {
 #if 0
     ARRAY<int> nodes;object.material_surface.mesh.elements.Flattened().Get_Unique(nodes);
-    ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(object.material_surface.particles.array_collection->Size()));
+    ARRAY<int> map_to_new_particles(IDENTITY_ARRAY<>(object.material_surface.particles.Size()));
     for(int i=0;i<nodes.m;i++) if(binding_list.Binding_Index_From_Particle_Index(nodes(i))>=0){
         int embedded_node=nodes(i),bound_node;
         if(persistent_soft_bindings && persistent_soft_bindings->Get(embedded_node,bound_node))
             persistent_soft_bindings->Delete(embedded_node);
         else{
-            bound_node=object.material_surface.particles.array_collection->Add_Element_From_Deletion_List();
-            object.material_surface.particles.array_collection->Copy_Element(*object.material_surface.particles.array_collection,embedded_node,bound_node);}
+            bound_node=object.material_surface.particles.Add_Element_From_Deletion_List();
+            object.material_surface.particles.Copy_Element(object.material_surface.particles,embedded_node,bound_node);}
         map_to_new_particles(embedded_node)=bound_node;
         soft_bindings.Add_Binding(VECTOR<int,2>(bound_node,embedded_node),true);}
     for(int i=0;i<object.material_surface.mesh.elements.m;i++) object.material_surface.mesh.elements(i)=VECTOR<int,3>::Map(map_to_new_particles,object.material_surface.mesh.elements(i));
@@ -500,7 +500,7 @@ Process_Rigid_Fracture(const T dt,const T time,SOLIDS_EVOLUTION<TV>* rigid_defor
     rigid_bodies_with_impulse.Resize(0);
 
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solids_parameters.solid_body_collection.rigid_body_collection;
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i))
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i))
         if(RIGID_BODY_FRACTURE_OBJECT_3D<T>* rigid_body_fracture_object=dynamic_cast<RIGID_BODY_FRACTURE_OBJECT_3D<T>*>(&rigid_body_collection.Rigid_Body(i))){
             T threshold_squared=rigid_body_fracture_object->fracture_threshold*rigid_body_fracture_object->fracture_threshold;
             COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* collision_body_impulse_accumulator=
@@ -544,7 +544,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
         RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>& impulse_accumulator=dynamic_cast<RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>&>(*collision_body_impulse_accumulator);
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=rigid_body_fracture_object.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         SIMPLEX_MESH<3>& mesh=tetrahedralized_volume.mesh;mesh.Initialize_Neighbor_Nodes();
-        assert(impulse_accumulator.accumulated_node_impulses->m==mesh.number_nodes && tetrahedralized_volume.particles.array_collection->Size()==mesh.number_nodes);
+        assert(impulse_accumulator.accumulated_node_impulses->m==mesh.number_nodes && tetrahedralized_volume.particles.Size()==mesh.number_nodes);
         ARRAY<int> distance_from_impulse(mesh.number_nodes);
         QUEUE<int> queue(mesh.number_nodes);
         for(int i=0;i<mesh.number_nodes;i++)if((*impulse_accumulator.accumulated_node_impulses)(i).Magnitude_Squared()>0){
@@ -574,7 +574,7 @@ Run_Quasistatics_And_Fracture(const T time,const int max_number_of_fracture_iter
         VECTOR<int,3> largest_nodes(max_node1,max_node2,max_node3);
         dynamic_cast<RIGID_FRACTURE_QUASISTATICS_FORCES<T>&>(*solids_parameters.solid_body_collection.example_forces_and_velocities).Initialize(rigid_body_fracture_object,largest_nodes);
         DEFORMABLE_PARTICLES<TV>& particles=solids_parameters.solid_body_collection.deformable_body_collection.particles;
-        ARRAY<TV>& average_dX=rigid_body_fracture_object.average_dX;average_dX.Fill(TV());average_dX.Resize(particles.array_collection->Size());
+        ARRAY<TV>& average_dX=rigid_body_fracture_object.average_dX;average_dX.Fill(TV());average_dX.Resize(particles.Size());
         // TODO: should transform impulses to world space?
         QUASISTATIC_EVOLUTION<TV> quasistatic_evolution(solids_parameters);quasistatic_evolution.balance_external_forces_only=true;
         quasistatic_evolution.One_Newton_Step_Toward_Steady_State(time,average_dX);

@@ -261,7 +261,7 @@ void Cubes_With_Constraints(int& num_joints,int& num_rigid_bodies,VECTOR<T,3> sh
     if(springs){
         // add particles and set up segmented curve
         for(int i=0;i<4;i++){
-            particles.array_collection->Add_Element();
+            particles.Add_Element();
             particles.mass(i)=1;}
 
         // probably don't need these -- can just sync wiht bindings, but doesn't hurt

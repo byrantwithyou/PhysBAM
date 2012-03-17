@@ -168,7 +168,7 @@ public:
     void Do_Displacement_Map_Per_Vertex(const T perturb_factor,const T perturb_power)
     {LOG::cerr<<"Doing per vertex displacement..." << std::endl;
     // TODO: fix to average all vertex uv's
-    assert(texture_coordinates->m==triangulated_surface.particles.array_collection->Size());
+    assert(texture_coordinates->m==triangulated_surface.particles.Size());
     for(int i=0;i<triangulated_surface.mesh.number_nodes;i++){
         TV current_perturbation=interpolation.Clamped_To_Array_Cell(grid,bump_map_pixels,VECTOR<T,2>((*texture_coordinates)(i).x,(*texture_coordinates)(i).y));
         current_perturbation=(current_perturbation-TV(0.5,0.5,0.5))*(T)2;

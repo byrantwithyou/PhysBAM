@@ -80,7 +80,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl;
     tetrahedralized_volume.Set_Density(1000);
     tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
@@ -95,7 +95,7 @@ virtual void Initialize_Reference_Fracture_Tetrahedralized_Volume(const EMBEDDED
 
     PRINT<T>::Print_Tetrahedron(etv.tetrahedralized_volume.tetrahedron_mesh,1);
     PRINT<T>::Print_Tetrahedron(rftv.embedded_tetrahedralized_volume.tetrahedralized_volume.tetrahedron_mesh,1);
-    std::cout << etv.tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << etv.tetrahedralized_volume.particles.Size() << std::endl;
     
     reference_orientation_index(1)=1;
     

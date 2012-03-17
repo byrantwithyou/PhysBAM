@@ -170,7 +170,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 2:
         case 3:
             Triangulated_Surface_Forces(true,false,false);
-            for(int i=0;i<deformable_body_collection.particles.array_collection->Size();i++)
+            for(int i=0;i<deformable_body_collection.particles.Size();i++)
                 deformable_body_collection.particles.X(i)*=1.2;
             break;
         case 4:{
@@ -223,7 +223,7 @@ void Triangle_Permutations()
     solids_parameters.implicit_solve_parameters.cg_iterations=200;
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-    particles.array_collection->Add_Elements(6);
+    particles.Add_Elements(6);
     particles.mass.Fill((T)1);
     particles.X(0)=TV(0,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,0,1);
     particles.X(3)=TV(0,0,0);particles.X(4)=TV(1,0,0);particles.X(5)=TV(0,0,1);
@@ -243,7 +243,7 @@ void Single_Triangle()
     solids_parameters.implicit_solve_parameters.cg_iterations=200;
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-    particles.array_collection->Add_Elements(3);
+    particles.Add_Elements(3);
     particles.mass.Fill((T)1);
     T theta=0;
     switch(parameter){
@@ -266,7 +266,7 @@ void Shear_Test()
     solids_parameters.implicit_solve_parameters.cg_iterations=200;
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-    particles.array_collection->Add_Elements(3);
+    particles.Add_Elements(3);
     particles.mass.Fill((T)1);
     particles.X(0)=TV(0,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,0,1);
     surface.mesh.elements.Append(VECTOR<int,3>(0,1,2));
@@ -284,7 +284,7 @@ void Bending_Test()
     solids_parameters.implicit_solve_parameters.cg_iterations=200;
     
     TRIANGULATED_SURFACE<T>& surface=*TRIANGULATED_SURFACE<T>::Create(particles);solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&surface);
-    particles.array_collection->Add_Elements(4);
+    particles.Add_Elements(4);
     particles.mass.Fill((T)1);
     T theta=pi/32;
     particles.X(0)=TV(0,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,0,1);particles.X(3)=TV(.5*(1+cos(theta)),sqrt(2)*.5*sin(theta),.5*(1+cos(theta)));
@@ -306,7 +306,7 @@ void Cloth_Table_Test()
     T density=.1;
 
     TRIANGULATED_SURFACE<T>& ts=tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,0);
-    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.Size();i++){
         solid_body_collection.deformable_body_collection.particles.mass(i)=0;}
     for(int i=0;i<ts.mesh.elements.m;i++){
         int node1,node2,node3;ts.mesh.elements(i).Get(node1,node2,node3);
@@ -319,7 +319,7 @@ void Cloth_Table_Test()
         solid_body_collection.deformable_body_collection.particles.mass(node2)+=m;
         solid_body_collection.deformable_body_collection.particles.mass(node3)+=m;}
     T total_mass=0;
-    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.deformable_body_collection.particles.Size();i++){
         total_mass+=solid_body_collection.deformable_body_collection.particles.mass(i);}
     LOG::cout << "total mass " << total_mass << std::endl;
 }

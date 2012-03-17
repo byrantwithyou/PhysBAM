@@ -83,13 +83,13 @@ public:
         EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>& embedding=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>&>();
         TETRAHEDRALIZED_VOLUME<T>& deformable_tetrahedralized_volume=embedding.embedded_object.simplicial_object;
         if(!embedding.material_surface_mesh.elements.m) embedding.Create_Material_Surface();
-        assert(particles.array_collection->Size()==0&&rigid_to_deformable_particles.m==0);
+        assert(particles.Size()==0&&rigid_to_deformable_particles.m==0);
 
-        particles.array_collection->Add_Elements(solid_body_collection.deformable_body_collection.dynamic_particles.m);
+        particles.Add_Elements(solid_body_collection.deformable_body_collection.dynamic_particles.m);
         rigid_to_deformable_particles.Resize(solid_body_collection.deformable_body_collection.dynamic_particles.m);
 
-        particle_to_rigid_body_id.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
-        deformable_to_rigid_particles.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
+        particle_to_rigid_body_id.Resize(solid_body_collection.deformable_body_collection.particles.Size());
+        deformable_to_rigid_particles.Resize(solid_body_collection.deformable_body_collection.particles.Size());
 
         // get all the particles of the material surface
         int index=0;
@@ -113,9 +113,9 @@ public:
             tet_elements.Append(VECTOR<int,4>(deformable_to_rigid_particles(index1),deformable_to_rigid_particles(index2),deformable_to_rigid_particles(index3),deformable_to_rigid_particles(index4)));
             rigid_to_deformable_tets.Append(t);}
 
-        TRIANGULATED_SURFACE<T>* material_surface=new TRIANGULATED_SURFACE<T>(*new TRIANGLE_MESH(particles.array_collection->Size(),tri_elements),particles);
+        TRIANGULATED_SURFACE<T>* material_surface=new TRIANGULATED_SURFACE<T>(*new TRIANGLE_MESH(particles.Size(),tri_elements),particles);
         material_surface->Update_Number_Nodes();
-        TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=new TETRAHEDRALIZED_VOLUME<T>(*new TETRAHEDRON_MESH(particles.array_collection->Size(),tet_elements),particles);
+        TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=new TETRAHEDRALIZED_VOLUME<T>(*new TETRAHEDRON_MESH(particles.Size(),tet_elements),particles);
         tetrahedralized_volume->Update_Number_Nodes();
         tetrahedralized_volume->Initialize_Hierarchy();
 
@@ -124,9 +124,9 @@ public:
         mass_properties.Set_Density(density);Mass()=mass_properties.Mass();
         FRAME<TV> frame_local;mass_properties.Transform_To_Object_Frame(frame_local,Inertia_Tensor());Set_Frame(frame_local);
         FRAME<TV> inverse_frame=Frame().Inverse();
-        for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=inverse_frame*particles.X(i);
+        for(int i=0;i<particles.Size();i++) particles.X(i)=inverse_frame*particles.X(i);
 
-        RANGE<TV> box=RANGE<TV>::Empty_Box();for(int i=0;i<particles.array_collection->Size();i++) box.Enlarge_To_Include_Point(particles.X(i));
+        RANGE<TV> box=RANGE<TV>::Empty_Box();for(int i=0;i<particles.Size();i++) box.Enlarge_To_Include_Point(particles.X(i));
         T uniform_levelset_cell_size=box.Edge_Lengths().Max_Abs()/30; // 30 chosen based on average, don't think this actually used so wanted something reasonable        LOG::cout<<"Bounding box: "<<box<<std::endl;
         LOG::cout<<"cell_size: "<<uniform_levelset_cell_size<<" and edge length: "<<box.Edge_Lengths().Max_Abs()<<std::endl;
 
@@ -139,7 +139,7 @@ public:
         // currently contains all particles
         DEFORMABLE_PARTICLES<TV>& deformable_particles=solid_body_collection.deformable_body_collection.particles;
         for(int p=0;p<rigid_to_deformable_particles.m;p++) {
-            deformable_particles.array_collection->Copy_Element(*particles.array_collection,deformable_to_rigid_particles(rigid_to_deformable_particles(p)),rigid_to_deformable_particles(p));
+            deformable_particles.Copy_Element(particles,deformable_to_rigid_particles(rigid_to_deformable_particles(p)),rigid_to_deformable_particles(p));
             deformable_particles.X(rigid_to_deformable_particles(p))=Frame()*particles.X(deformable_to_rigid_particles(rigid_to_deformable_particles(p)));
             deformable_particles.V(rigid_to_deformable_particles(p))=Pointwise_Object_Velocity(deformable_particles.X(deformable_to_rigid_particles(rigid_to_deformable_particles(p))));}
         solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();

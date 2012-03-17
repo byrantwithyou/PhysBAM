@@ -27,10 +27,10 @@ template<class T> OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>::
 template<class T> void OPENGL_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD<T>::
 Update()
 {
-    V.Resize(tetrahedralized_volume.particles.array_collection->Size());
+    V.Resize(tetrahedralized_volume.particles.Size());
     vector_field.Resize(V.m);
     vector_locations.Resize(V.m);
-    for(int i=0;i<tetrahedralized_volume.particles.array_collection->Size();i++){
+    for(int i=0;i<tetrahedralized_volume.particles.Size();i++){
         vector_field(i)=V(i);vector_locations(i)=tetrahedralized_volume.particles.X(i);}
 }
 //#####################################################################

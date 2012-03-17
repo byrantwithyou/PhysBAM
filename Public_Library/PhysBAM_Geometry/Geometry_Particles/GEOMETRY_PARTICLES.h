@@ -8,7 +8,7 @@
 #define __GEOMETRY_PARTICLES__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 
@@ -18,7 +18,7 @@ class GEOMETRY_PARTICLES:public CLONEABLE<GEOMETRY_PARTICLES<TV>,PARTICLES<TV> >
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<GEOMETRY_PARTICLES<TV>,PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;using BASE::HAS_UNTYPED_READ_WRITE;
+    using BASE::Remove_Array;using BASE::Add_Array;
 
     ARRAY_VIEW<TV> X,V;
     bool store_velocity;
@@ -27,7 +27,7 @@ public:
     virtual ~GEOMETRY_PARTICLES();
 
     void Store_Velocity(bool store=true)
-    {store_velocity=store;if(store) array_collection->Add_Array(ATTRIBUTE_ID_V,&V);else array_collection->Remove_Array(ATTRIBUTE_ID_V);}
+    {store_velocity=store;if(store) Add_Array(ATTRIBUTE_ID_V,&V);else Remove_Array(ATTRIBUTE_ID_V);}
 
     template<class T_INDICES>
     void Euler_Step(const T_INDICES& indices,const T dt)

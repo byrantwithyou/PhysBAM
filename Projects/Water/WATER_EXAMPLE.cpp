@@ -83,7 +83,7 @@ Set_Boundary_Conditions(const T time)
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
                 if((TV::dimension==2 && iterator.Axis()==1)|| (TV::dimension==3 && iterator.Axis()==3)) face_velocities(iterator.Full_Index())=-1;
                 else face_velocities(iterator.Full_Index())=0;}}
-        for(int i=0;i<rigid_geometry_collection.particles.array_collection->Size();i++){
+        for(int i=0;i<rigid_geometry_collection.particles.Size();i++){
             if(rigid_geometry_collection.particles.rigid_geometry(i)->Implicit_Geometry_Lazy_Inside(iterator.Location())){
                 projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
                 face_velocities(iterator.Full_Index())=rigid_geometry_collection.particles.twist(i).linear(iterator.Axis());}}}
@@ -105,7 +105,7 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Adjust_Phi_With_Objects(const T time)
 {
     T tolerance=(T)9.8/24; // dt*gravity where dt=1/24 is based on the length of a frame
-    for(int id=0;id<rigid_geometry_collection.particles.array_collection->Size();id++){
+    for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
         for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Cell_Index();TV location=mac_grid.X(index);
             if(particle_levelset_evolution.phi(index)<0 && rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(location)<0){
@@ -123,7 +123,7 @@ Adjust_Phi_With_Objects(const T time)
 template<class TV> void WATER_EXAMPLE<TV>::
 Extrapolate_Phi_Into_Objects(const T time)
 {
-    for(int id=0;id<rigid_geometry_collection.particles.array_collection->Size();id++){
+    for(int id=0;id<rigid_geometry_collection.particles.Size();id++){
         ARRAY<T,TV_INT> phi_object(mac_grid.Domain_Indices(3));
         for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next())
             phi_object(iterator.Cell_Index())=-rigid_geometry_collection.Rigid_Geometry(id).Implicit_Geometry_Extended_Value(iterator.Location());

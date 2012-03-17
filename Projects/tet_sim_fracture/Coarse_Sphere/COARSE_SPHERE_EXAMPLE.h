@@ -88,7 +88,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
         tetrahedralized_volume.particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i)=center+initial_orientation.Rotate(tetrahedralized_volume.particles.X(i)-center);
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
     tetrahedralized_volume.Set_Density(500);
     tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
@@ -105,7 +105,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(const TETRAHEDRALIZED_VO
     * above call does the following
     *
     embedded_tetrahedralized_volume.embedded_surface.particles.Store_Position();
-    int hash_max=tetrahedralized_volume.particles.array_collection->Size()*hash_ratio;
+    int hash_max=tetrahedralized_volume.particles.Size()*hash_ratio;
     std::cout << "Embedded Particles Hash Table Size: " << hash_max << std::endl;
     embedded_tetrahedralized_volume.Initialize_Parents_To_Embedded_Particles_Hash_Table(hash_max);
     embedded_tetrahedralized_volume.Initialize_Embedded_Triangles_In_Tetrahedron();
@@ -117,7 +117,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(const TETRAHEDRALIZED_VO
     embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
     T radius=(T).8*((tetrahedralized_volume.bounding_box->Size()).Min());
     SPHERE<T> s(tetrahedralized_volume.bounding_box->Center(),radius);
-    ARRAY<T> phi(1,tetrahedralized_volume.particles.array_collection->Size());
+    ARRAY<T> phi(1,tetrahedralized_volume.particles.Size());
     for(int p=0;p<phi.m;p++) {
         VECTOR_3D<T> xp=tetrahedralized_volume.particles.X(p);
         std::cout << xp << std::endl;
@@ -165,7 +165,7 @@ virtual void Initialize_Embedded_Tetrahedralized_Volume(const TETRAHEDRALIZED_VO
 
     //shift above floor && scale
     int i;
-    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.array_collection->Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.2;}
+    for(i=0;i<embedded_tetrahedralized_volume.tetrahedralized_volume.particles.Size();i++) {embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i).y+=3;embedded_tetrahedralized_volume.tetrahedralized_volume.particles.X(i)*=.2;}
     embedded_tetrahedralized_volume.tetrahedralized_volume.Update_Bounding_Box();
     
     if(restart_step_number == 0){

@@ -33,7 +33,7 @@ void Update_Tetrahedron_List(TETRAHEDRALIZED_VOLUME<T>& tv)
 template<class T>
 void Initialize_Hierarchy(TETRAHEDRALIZED_VOLUME<T>& tv,const bool update_boxes) // creates and updates the boxes as well
 {
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     delete tv.hierarchy;
     if(tv.tetrahedron_list) tv.hierarchy=new TETRAHEDRON_HIERARCHY<T>(tv.mesh,tv.particles,*tv.tetrahedron_list,update_boxes);
     else tv.hierarchy=new TETRAHEDRON_HIERARCHY<T>(tv.mesh,tv.particles,update_boxes);
@@ -45,9 +45,9 @@ template<class T>
 void Initialize_Octahedron_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,const GRID<VECTOR<T,3> >& grid)
 {
     int i,j,k,m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z,particle=0;
-    tv.particles.array_collection->Delete_All_Elements();
+    tv.particles.Delete_All_Elements();
     tv.mesh.Initialize_Octahedron_Mesh(m,n,mn);
-    tv.particles.array_collection->Add_Elements(m*n*mn+(m+1)*(n+1)*(mn+1));
+    tv.particles.Add_Elements(m*n*mn+(m+1)*(n+1)*(mn+1));
     for(k=0;k<mn;k++) for(j=0;j<n;j++) for(i=0;i<m;i++) tv.particles.X(particle++)=grid.X(i,j,k);
     for(k=-1;k<mn;k++) for(j=-1;j<n;j++) for(i=-1;i<m;i++) tv.particles.X(particle++)=grid.X(i,j,k)+(T).5*grid.dX;
 }
@@ -58,9 +58,9 @@ template<class T>
 void Initialize_Cube_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,const GRID<VECTOR<T,3> >& grid)
 {
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z,particle=0;
-    tv.particles.array_collection->Delete_All_Elements();
+    tv.particles.Delete_All_Elements();
     tv.mesh.Initialize_Cube_Mesh(m,n,mn);
-    tv.particles.array_collection->Add_Elements(m*n*mn);
+    tv.particles.Add_Elements(m*n*mn);
     for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) tv.particles.X(particle++)=grid.X(i,j,k);
 }
 //#####################################################################
@@ -70,9 +70,9 @@ template<class T>
 void Initialize_Prismatic_Cube_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,const GRID<VECTOR<T,3> >& grid)
 {
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z,particle=0;
-    tv.particles.array_collection->Delete_All_Elements();
+    tv.particles.Delete_All_Elements();
     tv.mesh.Initialize_Prismatic_Cube_Mesh(m,n,mn);
-    tv.particles.array_collection->Add_Elements(m*n*mn);
+    tv.particles.Add_Elements(m*n*mn);
     for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) tv.particles.X(particle++)=grid.X(i,j,k);
 }
 //#####################################################################
@@ -81,7 +81,7 @@ void Initialize_Prismatic_Cube_Mesh_And_Particles(TETRAHEDRALIZED_VOLUME<T>& tv,
 template<class T>
 void Initialize_Triangulated_Surface(TETRAHEDRALIZED_VOLUME<T>& tv)
 {
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     delete tv.triangulated_surface;
     if(!tv.mesh.boundary_mesh) tv.mesh.Initialize_Boundary_Mesh();
     tv.triangulated_surface=new TRIANGULATED_SURFACE<T>(*tv.mesh.boundary_mesh,tv.particles);
@@ -93,7 +93,7 @@ template<class T>
 void Rescale(TETRAHEDRALIZED_VOLUME<T>& tv,const T scaling_x,const T scaling_y,const T scaling_z)
 {
     typedef VECTOR<T,3> TV;
-    for(int k=0;k<tv.particles.array_collection->Size();k++) tv.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
+    for(int k=0;k<tv.particles.Size();k++) tv.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
 }
 //#####################################################################
 // Function Compute_Tetrahedron_Volumes
@@ -113,7 +113,7 @@ template<class T>
 void Compute_Nodal_Volumes(TETRAHEDRALIZED_VOLUME<T>& tv,bool save_tetrahedron_volumes)
 {
     if(!tv.nodal_volumes) tv.nodal_volumes=new ARRAY<T>;
-    *tv.nodal_volumes=CONSTANT_ARRAY<T>(tv.particles.array_collection->Size(),0);
+    *tv.nodal_volumes=CONSTANT_ARRAY<T>(tv.particles.Size(),0);
     if(save_tetrahedron_volumes){
         if(!tv.tetrahedron_volumes) tv.tetrahedron_volumes=new ARRAY<T>;
         tv.tetrahedron_volumes->Resize(tv.mesh.elements.m);

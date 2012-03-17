@@ -63,10 +63,10 @@ void Get_Initial_Data()
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(1).particles;
 
     particles.Increase_Array_Size(4);
-    particles.X(particles.array_collection->Add_Element())=VECTOR_3D<T>(0,0,0);
-    particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(1,0,0);
-    particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(0,1,0);
-    particles.X(particles.array_collection->Add_Element())=edge_length*VECTOR_3D<T>(0,0,1);
+    particles.X(particles.Add_Element())=VECTOR_3D<T>(0,0,0);
+    particles.X(particles.Add_Element())=edge_length*VECTOR_3D<T>(1,0,0);
+    particles.X(particles.Add_Element())=edge_length*VECTOR_3D<T>(0,1,0);
+    particles.X(particles.Add_Element())=edge_length*VECTOR_3D<T>(0,0,1);
     tetrahedron_mesh.Clean_Memory();tetrahedron_mesh.number_nodes=4;tetrahedron_mesh.tetrahedrons.Exact_Resize(4,1);
     tetrahedron_mesh.tetrahedrons(1,1)=1;tetrahedron_mesh.tetrahedrons(2,1)=2;tetrahedron_mesh.tetrahedrons(3,1)=3;tetrahedron_mesh.tetrahedrons(4,1)=4;
 

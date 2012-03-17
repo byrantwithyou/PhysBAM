@@ -315,7 +315,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(use_free_particles){
         FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();
         deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
-        free_particles.nodes.Append_Elements(IDENTITY_ARRAY<>(particles.array_collection->Size()));}
+        free_particles.nodes.Append_Elements(IDENTITY_ARRAY<>(particles.Size()));}
 
     // correct mass
     //binding_list.Distribute_Mass_To_Parents();
@@ -357,8 +357,8 @@ void Hanging_Sphere()
     RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,(T)0);
     sphere.Frame().t=TV();
 
-    LOG::cout<<"we currently have particles.array_collection->Size()= "<<particles.array_collection->Size()<<std::endl;
-    particles.array_collection->Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
+    LOG::cout<<"we currently have particles.Size()= "<<particles.Size()<<std::endl;
+    particles.Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
     RIGID_BODY_BINDING<TV>* binding1=new RIGID_BODY_BINDING<TV>(particles,0,rigid_body_collection,box.particle_index,TV(0,-1,0));
     RIGID_BODY_BINDING<TV>* binding2=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,sphere.particle_index,TV(1,0,0));
     binding_list.Add_Binding(binding1);
@@ -383,7 +383,7 @@ void Dragging_Cube()
     BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
 
     RIGID_BODY<TV>& box=tests.Add_Rigid_Body("subdivided_box",1,(T)0);
-    particles.array_collection->Add_Elements(2);
+    particles.Add_Elements(2);
     particles.mass(0)=particles.mass(1)=(T)1;
     particles.X(1)=TV((T)1.1,(T)1.1,(T)1.1);
     RIGID_BODY_BINDING<TV>* binding=new RIGID_BODY_BINDING<TV>(particles,0,rigid_body_collection,box.particle_index,TV(0,0,0));
@@ -507,7 +507,7 @@ void Spring_Cloth()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    particles.array_collection->Add_Elements(grid_m*grid_n);
+    particles.Add_Elements(grid_m*grid_n);
 
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    
@@ -538,7 +538,7 @@ void Particle_Impulse_Chain()
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    particles.array_collection->Add_Elements(grid_m);
+    particles.Add_Elements(grid_m);
 
     SEGMENTED_CURVE<TV> *segmented_curve=SEGMENTED_CURVE<TV>::Create(particles);
     solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(segmented_curve);    

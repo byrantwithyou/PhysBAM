@@ -21,9 +21,9 @@ void Fractal_Midpoint_Subdivide(TRIANGULATED_SURFACE<T>& surface,const int steps
         TRIANGLE_SUBDIVISION subdivision(surface.mesh);
         TRIANGLE_MESH refined_mesh;
         subdivision.Refine_Mesh(refined_mesh);
-        int number_new_particles=refined_mesh.number_nodes-surface.particles.array_collection->Size();
+        int number_new_particles=refined_mesh.number_nodes-surface.particles.Size();
         ARRAY<VECTOR<T,3> > X_save(surface.particles.X);
-        surface.particles.array_collection->Add_Elements(number_new_particles);
+        surface.particles.Add_Elements(number_new_particles);
         subdivision.Apply_Fractal_Subdivision(X_save,surface.particles.X,std);
         surface.mesh.Initialize_Mesh(refined_mesh);
         std*=ratio;

@@ -218,9 +218,9 @@ virtual void Update_Sources(const T time)
     RANGE<TV_INT> source_nodes(grid.Clamp_To_Cell(source_center-source_radius_vector),grid.Clamp_To_Cell(source_center+source_radius_vector)+TV_INT::All_Ones_Vector());
     for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();
         if(!removed_positive_particles(block)) continue;
-        for(int p=0;p<removed_positive_particles(block)->array_collection->Size();p++)
-            if(sources(1).Inside(world_to_source(1).Homogeneous_Times(removed_positive_particles(block)->X(p)),(T)1e-4)) removed_positive_particles(block)->array_collection->Add_To_Deletion_List(p);
-        removed_positive_particles(block)->array_collection->Delete_Elements_On_Deletion_List();}
+        for(int p=0;p<removed_positive_particles(block)->Size();p++)
+            if(sources(1).Inside(world_to_source(1).Homogeneous_Times(removed_positive_particles(block)->X(p)),(T)1e-4)) removed_positive_particles(block)->Add_To_Deletion_List(p);
+        removed_positive_particles(block)->Delete_Elements_On_Deletion_List();}
 }
 //#####################################################################
 // Function Get_Source_Reseed_Mask

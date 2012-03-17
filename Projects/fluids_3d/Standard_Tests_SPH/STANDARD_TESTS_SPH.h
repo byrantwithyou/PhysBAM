@@ -94,23 +94,23 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
 
     fluids_parameters.sph_evolution->use_variable_density_solve=true;
 
-    //sph_particles.array_collection->Preallocate(number_of_particles);
+    //sph_particles.Preallocate(number_of_particles);
     if(tests.test_number==1){
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=10000;
         for(int i=0;i<number_of_particles;i++){
             TV X=random.Get_Uniform_Vector(TV((T).7,0,(T).4),TV(1,1,(T).6));
-            int id=sph_particles.array_collection->Add_Element();
+            int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}}
     else if(tests.test_number==2){
         int left_particles_number=(int)(one_third*number_of_particles),right_particles_number=(int)(two_thirds*number_of_particles);
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=number_of_particles*(T).5;
         for(int i=0;i<left_particles_number;i++){
             TV X=random.Get_Uniform_Vector(grid.Xmin(),TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y,grid.domain.max_corner.z));
-            int id=sph_particles.array_collection->Add_Element();
+            int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}
         for(int i=0;i<right_particles_number;i++){
             TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y,grid.domain.min_corner.z),grid.Xmax());
-            int id=sph_particles.array_collection->Add_Element();
+            int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}}
 }
 //#####################################################################

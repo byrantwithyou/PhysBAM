@@ -99,7 +99,7 @@ Reinitialize(const bool force,const bool read_geometry)
         if(read_geometry) rigid_geometry_collection->Read(STREAM_TYPE(RW()),basedir,frame,&needs_init,&needs_destroy);
         if(has_init_destroy_information) for(int i=0;i<needs_destroy.m;i++) Destroy_Geometry(needs_destroy(i));
 
-        int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_geometry_collection->particles.array_collection->Size()));
+        int max_number_of_bodies(max(opengl_segmented_curve.Size(),rigid_geometry_collection->particles.Size()));
         // only enlarge array as we read in more geometry to memory
         opengl_segmented_curve.Resize(max_number_of_bodies);
         opengl_triangulated_area.Resize(max_number_of_bodies);
@@ -124,10 +124,10 @@ Reinitialize(const bool force,const bool read_geometry)
                 draw_object(particles_of_this_partition(i))=true;}
 
         // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_geometry_collection->particles.array_collection->Size();id++){
+        for(int id=0;id<rigid_geometry_collection->particles.Size();id++){
             if(rigid_geometry_collection->Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_geometry_collection->particles.array_collection->Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_geometry_collection->particles.Size();id<opengl_segmented_curve.Size();id++) Destroy_Geometry(id);
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame)))
             FILE_UTILITIES::template Read_From_File<RW>(STRING_UTILITIES::string_sprintf("%s/%d/colors",basedir.c_str(),frame),colors);
         for(int id=0;id<colors.m;id++){
@@ -222,7 +222,7 @@ Update_Object_Labels()
         node_velocity_vectors.Resize(number_of_drawn_bodies*4);}
 
     int idx=0;
-    for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
+    for(int i=0;i<rigid_geometry_collection->particles.Size();i++){
         if(draw_object(i)){
             if(draw_velocity_vectors || draw_node_velocity_vectors){idx++;
                 if(draw_velocity_vectors){
@@ -290,35 +290,35 @@ Display(const int in_color) const
 
         if(draw_segmented_curve){
             glPushName(1);
-            for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
+            for(int i=0;i<rigid_geometry_collection->particles.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_triangulated_area){
             glPushName(2);
-            for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
+            for(int i=0;i<rigid_geometry_collection->particles.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_implicit_curve){
             glPushName(3);
-            for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++){
+            for(int i=0;i<rigid_geometry_collection->particles.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display(in_color);
                 glPopName();}
             glPopName();}
 #else
-        if(draw_segmented_curve) for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++)
+        if(draw_segmented_curve) for(int i=0;i<rigid_geometry_collection->particles.Size();i++)
             if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display(in_color);
-        if(draw_triangulated_area) for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++)
+        if(draw_triangulated_area) for(int i=0;i<rigid_geometry_collection->particles.Size();i++)
             if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display(in_color);
-        if(draw_implicit_curve) for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++)
+        if(draw_implicit_curve) for(int i=0;i<rigid_geometry_collection->particles.Size();i++)
             if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display(in_color);
 #endif
         if(draw_individual_axes)
-            for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++)
+            for(int i=0;i<rigid_geometry_collection->particles.Size();i++)
                 if(draw_object(i) && opengl_axes(i)) opengl_axes(i)->Display(in_color);
 #ifndef USE_OPENGLES
         if(mode!=GL_SELECT)
@@ -334,7 +334,7 @@ Display(const int in_color) const
 #ifndef USE_OPENGLES
             if(show_object_names){
                 glColor3f(1,1,1);
-                for(int i=0;i<rigid_geometry_collection->particles.array_collection->Size();i++)
+                for(int i=0;i<rigid_geometry_collection->particles.Size();i++)
                     if(draw_object(i) && rigid_geometry_collection->Rigid_Geometry(i).name.length())
                         OpenGL_String(rigid_geometry_collection->particles.frame(i).t,rigid_geometry_collection->Rigid_Geometry(i).name);}
 #endif
@@ -442,7 +442,7 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         //body->Update_Angular_Velocity();
 
         if(!body->name.empty()){output_stream<<"Name = "<<body->name<<std::endl;}
-        rigid_geometry_collection->particles.array_collection->Print(output_stream,real_selection->body_id);
+        rigid_geometry_collection->particles.Print(output_stream,real_selection->body_id);
 
         MATRIX<T,3> body_transform=body->Frame().Matrix();
 

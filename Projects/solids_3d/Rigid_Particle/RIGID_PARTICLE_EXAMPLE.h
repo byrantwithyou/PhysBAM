@@ -77,7 +77,7 @@ virtual void Get_Initial_Data()
 
     // add particles and set up segmented curve
     for(int i=0;i<20;i++){
-        particles.array_collection->Add_Element();
+        particles.Add_Element();
         particles.mass(i)=1;
         particles.X(i)=TV((T)i,initial_height,0);
         if(i>1) segmented_curve.mesh.elements.Append(VECTOR<int,2>(i,i-1));}

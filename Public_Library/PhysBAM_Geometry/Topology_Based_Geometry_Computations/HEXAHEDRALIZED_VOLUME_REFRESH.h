@@ -40,11 +40,11 @@ void Initialize_Tetrahedralized_Volume(HEXAHEDRALIZED_VOLUME<T>& hv)
     for(int h=0;h<hv.mesh.elements.m;h++){
         ARRAY<int> p(8);hv.mesh.elements(h).Get(p(0),p(1),p(2),p(3),p(4),p(5),p(6),p(7));
         TV hex_center;for(int i=0;i<8;i++) hex_center+=hv.particles.X(p(i));hex_center*=(T).125;
-        hv.particles.X(hv.particles.array_collection->Add_Element())=hex_center;hex_particle_indices(h)=hv.particles.array_collection->Size();}
+        hv.particles.X(hv.particles.Add_Element())=hex_center;hex_particle_indices(h)=hv.particles.Size();}
     //add node in the center of each boundary face
     for(int f=0;f<hv.mesh.faces->m;f++){
         int h=(*hv.mesh.face_hexahedrons)(f)(1),node1,node2,node3,node4;(*hv.mesh.faces)(f).Get(node1,node2,node3,node4);
-        if(h<0){hv.particles.X(hv.particles.array_collection->Add_Element())=(T).25*(hv.particles.X(node1)+hv.particles.X(node2)+hv.particles.X(node3)+hv.particles.X(node4));face_particle_indices(f)=hv.particles.array_collection->Size();}}
+        if(h<0){hv.particles.X(hv.particles.Add_Element())=(T).25*(hv.particles.X(node1)+hv.particles.X(node2)+hv.particles.X(node3)+hv.particles.X(node4));face_particle_indices(f)=hv.particles.Size();}}
     //for each face, add in four tets from the associated octahedron
     for(int f=0;f<hv.mesh.faces->m;f++){
         int h_outward,h_inward,h1,h2,p1,p2,p3,p4,ph_outward,ph_inward;(*hv.mesh.faces)(f).Get(p1,p2,p3,p4);
@@ -61,7 +61,7 @@ void Initialize_Tetrahedralized_Volume(HEXAHEDRALIZED_VOLUME<T>& hv)
         tetrahedron_list.Append(VECTOR<int,4>(p3,ph_inward,p4,ph_outward));tetrahedron_list.Append(VECTOR<int,4>(p4,ph_inward,p1,ph_outward));}
     if(hv.tetrahedralized_volume) delete &(hv.tetrahedralized_volume->mesh);delete hv.tetrahedralized_volume;
     hv.tetrahedralized_volume=TETRAHEDRALIZED_VOLUME<T>::Create(hv.particles);
-    hv.tetrahedralized_volume->mesh.Initialize_Mesh(hv.particles.array_collection->Size(),tetrahedron_list);
+    hv.tetrahedralized_volume->mesh.Initialize_Mesh(hv.particles.Size(),tetrahedron_list);
 }
 //#####################################################################
 // Funcion Initialize_Cube_Mesh_And_Particles
@@ -69,11 +69,11 @@ void Initialize_Tetrahedralized_Volume(HEXAHEDRALIZED_VOLUME<T>& hv)
 template<class T,class TV>
 void Initialize_Cube_Mesh_And_Particles(HEXAHEDRALIZED_VOLUME<T>& hv,const GRID<TV>& grid)
 {
-    hv.particles.array_collection->Delete_All_Elements();
+    hv.particles.Delete_All_Elements();
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     hv.mesh.Initialize_Cube_Mesh(m,n,mn);
-    hv.particles.array_collection->Preallocate(m*n*mn);
-    for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++)for(int i=0;i<m;i++) hv.particles.X(hv.particles.array_collection->Add_Element())=grid.X(i,j,ij);
+    hv.particles.Preallocate(m*n*mn);
+    for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++)for(int i=0;i<m;i++) hv.particles.X(hv.particles.Add_Element())=grid.X(i,j,ij);
 }
 }
 }

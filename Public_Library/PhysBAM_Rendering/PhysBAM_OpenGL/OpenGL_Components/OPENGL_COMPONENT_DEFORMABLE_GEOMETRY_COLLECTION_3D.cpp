@@ -350,7 +350,7 @@ Create_One_Big_Triangulated_Surface_And_Write_To_File()
         TRIANGULATED_SURFACE<T>& individual_boundary_triangulated_surface=*tetrahedralized_volume->triangulated_surface;
         int individual_number_of_triangles=individual_boundary_triangulated_surface.mesh.elements.m;
         for(int t=0;t<individual_number_of_triangles;t++) mesh.elements.Append(individual_boundary_triangulated_surface.mesh.elements(t));}
-    mesh.number_nodes=particles.array_collection->Size();
+    mesh.number_nodes=particles.Size();
     FILE_UTILITIES::Write_To_File<T>("one_big_tri_surface.tri",triangulated_surface);
 }
 //#####################################################################
@@ -550,7 +550,7 @@ Highlight_Particle_Response()
 {
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
         int index=-1;std::istringstream sstream(OPENGL_WORLD::Singleton()->prompt_response);sstream>>index;
-        if(index>=0 && index<deformable_geometry->particles.array_collection->Size()) selected_vertex=index;}
+        if(index>=0 && index<deformable_geometry->particles.Size()) selected_vertex=index;}
     Reinitialize(true);
 }
 //#####################################################################

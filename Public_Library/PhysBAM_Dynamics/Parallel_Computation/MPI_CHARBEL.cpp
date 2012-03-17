@@ -86,7 +86,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
 
     interior_particles_to_recv.Resize(number_of_processes);ghost_particles_to_recv.Resize(number_of_processes);
     global_to_local_physbam_map.Resize(global_particle_count);global_to_local_physbam_map.Fill(0);
-    local_tet_volume->particles.array_collection->Delete_All_Elements();
+    local_tet_volume->particles.Delete_All_Elements();
     for(int i=0;i<number_of_processes;i++){
         ARRAY<int> indices;int position=0;
         MPI_UTILITIES::Unpack(indices,recv_buffers(i),position,*comm);
@@ -95,7 +95,7 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
         for(int new_particle=0;new_particle<indices.m;new_particle+=4){
             for(int p=0;p<4;p++){
                 if(!global_to_local_physbam_map(indices(new_particle+p))){
-                    global_to_local_physbam_map(indices(new_particle+p))=local_tet_volume->particles.array_collection->Add_Element();
+                    global_to_local_physbam_map(indices(new_particle+p))=local_tet_volume->particles.Add_Element();
                     local_tet_volume->particles.X(global_to_local_physbam_map(indices(new_particle+p)))=positions(new_particle+p);}
                 if(domain.Inside(positions(new_particle+p),(T)0)) interior_particles_to_recv(i).Append_Unique(indices(new_particle+p));
                 else ghost_particles_to_recv(i).Append_Unique(indices(new_particle+p));}
@@ -120,8 +120,8 @@ Setup_AEROF_PhysBAM_Mapping(TETRAHEDRALIZED_VOLUME<T>& tet_volume,ARRAY<ARRAY<in
         int position=0;
         MPI_UTILITIES::Unpack(interior_particles_to_send(i),ghost_particles_to_send(i),recv_buffers(i),position,*comm);}
     
-    physbam_particles.array_collection->Add_Elements(local_tet_volume->particles.array_collection->Size());
-    for(int i=0;i<local_tet_volume->particles.array_collection->Size();i++) physbam_particles.X(i)=local_tet_volume->particles.X(i);
+    physbam_particles.Add_Elements(local_tet_volume->particles.Size());
+    for(int i=0;i<local_tet_volume->particles.Size();i++) physbam_particles.X(i)=local_tet_volume->particles.X(i);
 }
 //#####################################################################
 // Function Exchange_Compressible_Data

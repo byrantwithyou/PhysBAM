@@ -22,7 +22,7 @@ void Linearly_Subdivide(TRIANGULATED_SURFACE<T>& ts)
     TRIANGLE_MESH refined_mesh;
     subdivision.Refine_Mesh(refined_mesh);
     ARRAY<VECTOR<T,3> > X_save(ts.particles.X),V_save(ts.particles.V);
-    ts.particles.array_collection->Add_Elements(refined_mesh.number_nodes-ts.particles.array_collection->Size());
+    ts.particles.Add_Elements(refined_mesh.number_nodes-ts.particles.Size());
     if(X_save.Size()) subdivision.Apply_Linear_Subdivision(X_save,ts.particles.X);
     if(V_save.Size()) subdivision.Apply_Linear_Subdivision(V_save,ts.particles.V);
     ts.mesh.Initialize_Mesh(refined_mesh);
@@ -34,7 +34,7 @@ void Loop_Subdivide(TRIANGULATED_SURFACE<T>& ts)
     TRIANGLE_MESH refined_mesh;
     subdivision.Refine_Mesh(refined_mesh);
     ARRAY<VECTOR<T,3> > X_save(ts.particles.X),V_save(ts.particles.V);
-    ts.particles.array_collection->Add_Elements(refined_mesh.number_nodes-ts.particles.array_collection->Size());
+    ts.particles.Add_Elements(refined_mesh.number_nodes-ts.particles.Size());
     if(X_save.Size()) subdivision.Apply_Loop_Subdivision(X_save,ts.particles.X);
     if(V_save.Size()) subdivision.Apply_Loop_Subdivision(V_save,ts.particles.V);
     ts.mesh.Initialize_Mesh(refined_mesh);
@@ -46,7 +46,7 @@ void Root_Three_Subdivide(TRIANGULATED_SURFACE<T>& ts)
     TRIANGLE_MESH refined_mesh;
     subdivision.Refine_Mesh_Dual(refined_mesh);
     ARRAY<VECTOR<T,3> > X_save(ts.particles.X),V_save(ts.particles.V);
-    ts.particles.array_collection->Add_Elements(refined_mesh.number_nodes-ts.particles.array_collection->Size());
+    ts.particles.Add_Elements(refined_mesh.number_nodes-ts.particles.Size());
     if(X_save.Size()) subdivision.Apply_Root_Three_Subdivision(X_save,ts.particles.X);
     if(V_save.Size()) subdivision.Apply_Root_Three_Subdivision(V_save,ts.particles.V);
     ts.mesh.Initialize_Mesh(refined_mesh);

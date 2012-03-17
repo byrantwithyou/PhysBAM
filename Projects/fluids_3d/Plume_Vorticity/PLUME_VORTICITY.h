@@ -102,7 +102,7 @@ void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T dt,const T
     for(int i=0;i<grid.m;i++) for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++)
         if(source_domain.Lazy_Inside(grid.X(i,j,ij)) && time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).02){
             add_count++;
-            int particle_id=vorticity_particles.array_collection->Add_Element(); 
+            int particle_id=vorticity_particles.Add_Element(); 
             vorticity_particles.X(particle_id)=grid.X(i,j,ij)+random.Get_Uniform_Vector(cell_lower,cell_upper);
             vorticity_particles.vorticity(particle_id)=(T)source_vorticity_magnitude*VECTOR<T,3>::Cross_Product((vorticity_particles.X(particle_id)-source_domain.Center()).Robust_Normalized(),VECTOR<T,3>(0,1,0)).Normalized();}
             //vorticity_particles.vorticity(particle_id)=(T)source_vorticity_magnitude*vortex_particle_evolution.grid_vorticity(i,j,ij).Robust_Normalized();}

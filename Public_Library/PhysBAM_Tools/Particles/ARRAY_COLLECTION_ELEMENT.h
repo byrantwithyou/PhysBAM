@@ -7,11 +7,11 @@
 #ifndef __ARRAY_COLLECTION_ELEMENT__
 #define __ARRAY_COLLECTION_ELEMENT__
 
-#include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION_ELEMENT_BASE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Math_Tools/Hash.h>
+#include <PhysBAM_Tools/Particles/ARRAY_COLLECTION_ELEMENT_BASE.h>
 namespace PhysBAM{
 
 template<class T>

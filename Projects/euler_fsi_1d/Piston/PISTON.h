@@ -236,7 +236,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     particles.Store_Mass();
     mesh.number_nodes=2;mesh.elements.Exact_Resize(2);
     mesh.elements(0).Set(0);mesh.elements(1).Set(1);
-    particles.array_collection->Add_Elements(mesh.number_nodes);
+    particles.Add_Elements(mesh.number_nodes);
     particles.X(0)=TV(piston_initial_position-(T)10);
     particles.X(1)=TV(piston_initial_position);
     point_simplices.Update_Point_Simplex_List();

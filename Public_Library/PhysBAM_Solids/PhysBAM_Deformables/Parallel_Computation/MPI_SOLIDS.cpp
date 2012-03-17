@@ -86,7 +86,7 @@ Compute_Mpi_Partition(MPI_PARTITION& mpi_partition,const SEGMENT_MESH& connectiv
     ARRAY<bool> done(partition_id_from_particle_index.Size());
     HASHTABLE<PAIR<int,PARTITION_ID> > pair_done;
     for(int j=0;j<particles_of_partition(Partition()).m;j++){int p=particles_of_partition(Partition())(j);
-        if(p<deformable_body_collection->particles.array_collection->Size()){
+        if(p<deformable_body_collection->particles.Size()){
             const ARRAY<int>& neighbor_particles=(*connectivity.neighbor_nodes)(p);
             for(int i=0;i<neighbor_particles.m;i++){int n=neighbor_particles(i);
                 PARTITION_ID np=partition_id_from_particle_index(n);
@@ -536,7 +536,7 @@ Simple_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inpu
     particles_of_partition.Resize(Number_Of_Partitions());
     RANGE<TV> box=RANGE<TV>::Bounding_Box(X);box.Change_Size(1e-6);GRID<TV> grid(counts+1,box);
     partition_id_from_particle_index.Remove_All();
-    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
+    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_geometry_collection_input.particles.Size());
     for(int p=0;p<X.Size();p++){
         VECTOR<int,TV::m> cell=grid.Clamp_To_Cell(X(p));
         int cell_number=cell[0]-1;for(int i=1;i<TV::m;i++) cell_number=cell_number*counts[i]+cell[i]-1;
@@ -567,7 +567,7 @@ KD_Tree_Partition(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection_inp
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
     LOG::cout<<std::endl;
     partition_id_from_particle_index.Remove_All();
-    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
+    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_geometry_collection_input.particles.Size());
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
         if(partition_id_from_particle_index.Size()) partition_subset.Fill(i);}
@@ -590,7 +590,7 @@ KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collect
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<particles_of_partition(i).Size()<<", ";
     LOG::cout<<std::endl;
     partition_id_from_particle_index.Remove_All();
-    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.array_collection->Size()+rigid_geometry_collection_input.particles.array_collection->Size());
+    partition_id_from_particle_index.Resize(deformable_body_collection_input.particles.Size()+rigid_geometry_collection_input.particles.Size());
     for(PARTITION_ID i(0);i<particles_of_partition.Size();i++){
         INDIRECT_ARRAY<ARRAY<PARTITION_ID> > partition_subset(partition_id_from_particle_index,particles_of_partition(i));
         partition_subset.Fill(i);}
@@ -614,7 +614,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
     int tag=mpi_solids.Get_Unique_Tag();
     if(mpi_solids.rank==0){
         // Color nodes
-        UNION_FIND<> union_find(mpi_solids.deformable_body_collection->particles.array_collection->Size());
+        UNION_FIND<> union_find(mpi_solids.deformable_body_collection->particles.Size());
         ARRAY<unsigned int> processor_masks(pairs.m,false);
         ARRAY<ARRAY<int>,PARTITION_ID> internal_pairs(mpi_solids.particles_of_partition.Size(),false);
         int boundary_count=0;

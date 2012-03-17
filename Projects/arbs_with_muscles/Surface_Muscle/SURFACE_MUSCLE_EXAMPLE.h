@@ -185,7 +185,7 @@ MUSCLE<TV>* Add_Basic_Muscle(const std::string& name,RIGID_BODY<TV>& origin_body
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-//    enlarge_nodes.Resize(solid_body_collection.deformable_body_collection.particles.array_collection->Size());
+//    enlarge_nodes.Resize(solid_body_collection.deformable_body_collection.particles.Size());
 //    enlarge_nodes.Fill(false);
 }
 //#####################################################################
@@ -196,7 +196,7 @@ void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE
     LOG::cout<<"PREPROCESS_SOLIDS_SUBSTEP ---------------------------"<<std::endl;
     DEFORMABLE_PARTICLES<TV> particles=solid_body_collection.deformable_body_collection.particles;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
-    ARRAY<bool> marked(particles.array_collection->Size());marked.Fill(false);
+    ARRAY<bool> marked(particles.Size());marked.Fill(false);
 
     FACE_3D<T>& face_constitutive_model=dynamic_cast<FACE_3D<T>&>(finite_volume->constitutive_model);
 
@@ -354,7 +354,7 @@ void Get_Constrained_Particle_Data()
 void Simple_Muscle_Across_Joint()
 {
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solids_parameters.rigid_body_parameters.list;
-    assert(rigid_body_particles.array_collection->Size()==0);
+    assert(rigid_body_particles.Size()==0);
 
     add_ground=false;
     solids_parameters.gravity=0;

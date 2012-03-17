@@ -105,7 +105,7 @@ Update_Object_Labels()
 {
     BASE::Update_Object_Labels();
     // TODO (zhw): fix this after SIGGRAPH
-/*    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+/*    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
         if(draw_object(i)){
             if(opengl_segmented_curve(i)){
                 if(output_positions){
@@ -127,27 +127,27 @@ Display(const int in_color) const
 
         if(draw_segmented_curve){
             glPushName(1);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_segmented_curve(i)) opengl_segmented_curve(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_triangulated_area){
             glPushName(2);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_triangulated_area(i)) opengl_triangulated_area(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_implicit_curve){
             glPushName(3);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
                 glPushName(Value(i));
                 if(draw_object(i) && opengl_levelset(i)) opengl_levelset(i)->Display(in_color);
                 glPopName();}
             glPopName();}
         if(draw_individual_axes)
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
                 if(draw_object(i) && opengl_axes(i)) opengl_axes(i)->Display(in_color);
 
         // Articulated rigid bodies
@@ -196,7 +196,7 @@ Display(const int in_color) const
             if(draw_velocity_vectors) velocity_field.Display(in_color);
             if(draw_node_velocity_vectors) node_velocity_field.Display(in_color);
 
-            if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particle.array_collection->Size()){
+            if(draw_forces_and_torques && forces_and_torques.Size()==rigid_body_collection.rigid_body_particle.Size()){
                 T scale=(T)velocity_field.size/24;
                 OPENGL_COLOR::Yellow().Send_To_GL_Pipeline();
                 OpenGL_Begin(GL_LINES);
@@ -213,7 +213,7 @@ Display(const int in_color) const
 
             if(show_object_names){
                 glColor3f(1,1,1);
-                for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+                for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
                     if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length())
                         OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t,rigid_body_collection.Rigid_Body(i).name);}}
         glPopAttrib();}

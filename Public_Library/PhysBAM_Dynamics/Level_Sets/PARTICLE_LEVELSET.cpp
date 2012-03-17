@@ -73,11 +73,11 @@ Store_Unique_Particle_Id(const bool store_unique_particle_id_input)
 {
     store_unique_particle_id=store_unique_particle_id_input;
     if(store_unique_particle_id){
-        template_particles.array_collection->template Add_Array<int>(ATTRIBUTE_ID_ID);
-        template_removed_particles.array_collection->template Add_Array<int>(ATTRIBUTE_ID_ID);}
+        template_particles.template Add_Array<int>(ATTRIBUTE_ID_ID);
+        template_removed_particles.template Add_Array<int>(ATTRIBUTE_ID_ID);}
     else{
-        template_particles.array_collection->Remove_Array(ATTRIBUTE_ID_ID);
-        template_removed_particles.array_collection->Remove_Array(ATTRIBUTE_ID_ID);}
+        template_particles.Remove_Array(ATTRIBUTE_ID_ID);
+        template_removed_particles.Remove_Array(ATTRIBUTE_ID_ID);}
 }
 //#####################################################################
 // Function Add_Particle
@@ -112,7 +112,7 @@ Add_Particle(PARTICLE_LEVELSET_PARTICLES<TV>*& particles)
 template<class T_GRID> int PARTICLE_LEVELSET<T_GRID>::
 Add_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*& particles)
 {
-    return particles->array_collection->Add_Element();
+    return particles->Add_Element();
 }
 //#####################################################################
 // Function Add_Particle_To_Deletion_List
@@ -122,7 +122,7 @@ Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
     deletion_list.Append(PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int>(&particles,index));
-    assert(index<particles.array_collection->Size());
+    assert(index<particles.Size());
 }
 //#####################################################################
 // Function Add_Particle_To_Deletion_List
@@ -130,7 +130,7 @@ Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >
 template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
 Add_Particle_To_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >& deletion_list,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int index)
 {
-    particles.array_collection->Add_To_Deletion_List(index);
+    particles.Add_To_Deletion_List(index);
 }
 //#####################################################################
 // Function Delete_Particle
@@ -163,9 +163,9 @@ Delete_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&particles));
     PARTICLE_LEVELSET_PARTICLES<TV> *particles_link=&particles;
     while(particles_link->next){particles_link=particles_link->next;}
-    particles.array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size()-1,index);
-    particles_link->array_collection->Delete_Element(particles_link->array_collection->Size()-1);
-    return particles_link->array_collection->Size()==0;
+    particles.Copy_Element(*particles_link,particles_link->Size()-1,index);
+    particles_link->Delete_Element(particles_link->Size()-1);
+    return particles_link->Size()==0;
 }
 //#####################################################################
 // Function Delete_Particle
@@ -173,8 +173,8 @@ Delete_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index)
 template<class T_GRID> bool PARTICLE_LEVELSET<T_GRID>::
 Delete_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles,const int index)
 {
-    particles.array_collection->Delete_Element(index);
-    return(particles.array_collection->Size()==0);
+    particles.Delete_Element(index);
+    return(particles.Size()==0);
 }
 //#####################################################################
 // Function Delete_Particle
@@ -192,9 +192,9 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
         for(int i=deletion_list.m-1;i>=0;i--) if(deletion_particles==deletion_list(i).x){deletion_list_local.Append(deletion_list(i).y);deletion_list.Remove_Index_Lazy(i);}
         Sort(deletion_list_local);
         for(int i=deletion_list_local.m-1;i>=0;i--){int index=deletion_list_local(i);
-            deletion_particles->array_collection->Copy_Element(*particles_link->array_collection,particles_link->array_collection->Size()-1,index);
-            particles_link->array_collection->Delete_Element(particles_link->array_collection->Size()-1);
-            if(particles_link->array_collection->Size()==0 && parent_particles){
+            deletion_particles->Copy_Element(*particles_link,particles_link->Size()-1,index);
+            particles_link->Delete_Element(particles_link->Size()-1);
+            if(particles_link->Size()==0 && parent_particles){
                 particle_pool.Free_Particle(particles_link);parent_particles->next=0;particles_link=&particles;parent_particles=0;
                 while(particles_link->next){parent_particles=particles_link;particles_link=particles_link->next;}}}
         deletion_particles=&particles;level--;
@@ -207,7 +207,7 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
 template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
 Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >& deletion_list,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles)
 {
-    particles.array_collection->Delete_Elements_On_Deletion_List();
+    particles.Delete_Elements_On_Deletion_List();
 }
 //#####################################################################
 // Function Get_Particle_Link
@@ -217,9 +217,9 @@ Get_Particle_Link(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int absolute_
 {
     PARTICLE_LEVELSET_PARTICLES<TV>* particles_link=&particles;index_in_link=absolute_index;
     while(index_in_link>=particle_pool.number_particles_per_cell){
-        assert(particles_link->next);assert(particles_link->array_collection->Size()==particle_pool.number_particles_per_cell);
+        assert(particles_link->next);assert(particles_link->Size()==particle_pool.number_particles_per_cell);
         particles_link=particles_link->next;index_in_link-=particle_pool.number_particles_per_cell;}
-    assert(index_in_link<particles_link->array_collection->Size());
+    assert(index_in_link<particles_link->Size());
     return *particles_link;
 }
 //#####################################################################
@@ -232,7 +232,7 @@ Copy_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&to_particles));
     int to_index;PARTICLE_LEVELSET_PARTICLES<TV>& to_particles_link=particle_pool.Add_Particle(to_particles,to_index);
     int from_index;PARTICLE_LEVELSET_PARTICLES<TV>& from_particles_link=Get_Particle_Link(from_particles,from_absolute_index,from_index);
-    to_particles_link.array_collection->Copy_Element(*from_particles_link.array_collection,from_index,to_index);
+    to_particles_link.Copy_Element(from_particles_link,from_index,to_index);
 }
 //#####################################################################
 // Function Copy_Particle
@@ -242,7 +242,7 @@ Copy_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&from_particles));
     int from_index;PARTICLE_LEVELSET_PARTICLES<TV>& from_particles_link=Get_Particle_Link(from_particles,from_absolute_index,from_index);
-    to_particles.array_collection->Append(*from_particles_link.array_collection,from_index);
+    to_particles.Append(from_particles_link,from_index);
 }
 //#####################################################################
 // Function Copy_Particle
@@ -252,7 +252,7 @@ Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&to_particles));
     int to_index;PARTICLE_LEVELSET_PARTICLES<TV>& to_particles_link=particle_pool.Add_Particle(to_particles,to_index);
-    to_particles_link.array_collection->Copy_Element(*from_particles.array_collection,from_index,to_index);
+    to_particles_link.Copy_Element(from_particles,from_index,to_index);
 }
 //#####################################################################
 // Function Copy_Particle
@@ -260,7 +260,7 @@ Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
 Copy_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_index)
 {
-    to_particles.array_collection->Append(*from_particles.array_collection,from_index);
+    to_particles.Append(from_particles,from_index);
 }
 //#####################################################################
 // Function Move_Particle
@@ -272,7 +272,7 @@ Move_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&to_particles));
     int to_index;PARTICLE_LEVELSET_PARTICLES<TV>& to_particles_link=particle_pool.Add_Particle(to_particles,to_index);
     int from_index;PARTICLE_LEVELSET_PARTICLES<TV>& from_particles_link=Get_Particle_Link(from_particles,from_absolute_index,from_index);
-    to_particles_link.array_collection->Copy_Element(*from_particles_link.array_collection,from_index,to_index);Delete_Particle(from_particles_link,from_index);
+    to_particles_link.Copy_Element(from_particles_link,from_index,to_index);Delete_Particle(from_particles_link,from_index);
 }
 //#####################################################################
 // Function Move_Particle
@@ -281,9 +281,9 @@ template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
 Move_Particle(PARTICLE_LEVELSET_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_absolute_index)
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&from_particles));
-    int to_index;to_index=to_particles.array_collection->Add_Element();
+    int to_index;to_index=to_particles.Add_Element();
     int from_index;PARTICLE_LEVELSET_PARTICLES<TV>& from_particles_link=Get_Particle_Link(from_particles,from_absolute_index,from_index);
-    to_particles.array_collection->Copy_Element(*from_particles_link.array_collection,from_index,to_index);Delete_Particle(from_particles_link,from_index);
+    to_particles.Copy_Element(from_particles_link,from_index,to_index);Delete_Particle(from_particles_link,from_index);
 }
 //#####################################################################
 // Function Move_Particle
@@ -293,7 +293,7 @@ Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 {
     assert(!dynamic_cast<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>(&to_particles));
     int to_index;PARTICLE_LEVELSET_PARTICLES<TV>& to_particles_link=particle_pool.Add_Particle(to_particles,to_index);
-    to_particles_link.array_collection->Copy_Element(*from_particles.array_collection,from_index,to_index);Delete_Particle(from_particles,from_index);
+    to_particles_link.Copy_Element(from_particles,from_index,to_index);Delete_Particle(from_particles,from_index);
 }
 //#####################################################################
 // Function Move_Particle
@@ -301,7 +301,7 @@ Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 template<class T_GRID> void PARTICLE_LEVELSET<T_GRID>::
 Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& to_particles,const int from_index)
 {
-    to_particles.array_collection->Take(*from_particles.array_collection,from_index);
+    to_particles.Take(from_particles,from_index);
 }
 //#####################################################################
 // Function Compact_Particles
@@ -309,7 +309,7 @@ Move_Particle(PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& from_particles,PARTICLE_L
 template<class T_GRID> template<class T_PARTICLES> void PARTICLE_LEVELSET<T_GRID>::
 Compact_Particles(T_PARTICLES& particles)
 {
-    particles.array_collection->Compact();
+    particles.Compact();
 }
 //#####################################################################
 // Function Allocate_Particle

@@ -25,10 +25,10 @@ template<class T> OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 template<class T> void OPENGL_TRIANGULATED_AREA_BASED_VECTOR_FIELD<T>::
 Update()
 {
-    V.Resize(triangulated_area.particles.array_collection->Size());
+    V.Resize(triangulated_area.particles.Size());
     vector_field.Resize(V.m);
     vector_locations.Resize(V.m);
-    for(int i=0;i<triangulated_area.particles.array_collection->Size();i++){
+    for(int i=0;i<triangulated_area.particles.Size();i++){
         vector_field(i)=V(i);vector_locations(i)=triangulated_area.particles.X(i);}
 }
 //#####################################################################

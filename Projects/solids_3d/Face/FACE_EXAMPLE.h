@@ -283,7 +283,7 @@ void Update_Time_Varying_Material_Properties(const T time)
     int previous_control_frame=1+(int)control_frame;
     T interpolation_fraction=control_frame-(int)control_frame;
     LOG::cout<<"Setting controls for time = "<<time<<std::endl;
-    int number_of_particles=solid_body_collection.deformable_object.particles.array_collection->Size();
+    int number_of_particles=solid_body_collection.deformable_object.particles.Size();
     ARRAY<TV> X_initial(number_of_particles),X_final(number_of_particles);effective_V.Resize(number_of_particles,false,false);
     Read_Controls(control_directory+"/",previous_control_frame);attachment_frame_controls->Set_Attachment_Positions(X_initial);control_parameters.Save_Controls();
     Read_Controls(control_directory+"/",previous_control_frame+1);attachment_frame_controls->Set_Attachment_Positions(X_final);control_parameters.Interpolate(interpolation_fraction);

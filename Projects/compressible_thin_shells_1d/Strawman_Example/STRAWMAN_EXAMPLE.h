@@ -67,7 +67,7 @@ void Initialize()
 
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     POINT_SIMPLICES_1D<T>& segmented_curve=*POINT_SIMPLICES_1D<T>::Create(particles);
-    particles.array_collection->Add_Elements(2);particles.X(1)=TV(0);particles.X(2)=TV(0);
+    particles.Add_Elements(2);particles.X(1)=TV(0);particles.X(2)=TV(0);
 
     segmented_curve.mesh.number_nodes=2;segmented_curve.mesh.directions.Preallocate(2);
     segmented_curve.mesh.elements.Append(TV_INT(1));segmented_curve.mesh.directions(1)=false;

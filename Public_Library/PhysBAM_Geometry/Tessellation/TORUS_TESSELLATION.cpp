@@ -22,7 +22,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const TORUS<T>& to
     TV y=torus.axis.Unit_Orthogonal_Vector();
     MATRIX<T,3> transform(y,TV::Cross_Product(torus.axis,y),torus.axis);
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(m*n);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(m*n);
     TRIANGLE_MESH& mesh=surface->mesh;mesh.number_nodes=m*n;mesh.elements.Preallocate(2*m*n);
     for(int i=0;i<m;++i){
         T axial=torus.inner_radius*cos(i*mscale),inplane=torus.inner_radius*sin(i*mscale)+torus.outer_radius;

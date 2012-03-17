@@ -148,7 +148,7 @@ int Add_Deformable_Object(const int number_of_vertices,const VECTOR_2D<T>& start
     DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
     segment_mesh.Initialize_Straight_Mesh(number_of_vertices);
     for(int i=0;i<number_of_vertices;i++){
-        int index=particles.array_collection->Add_Element();assert(index==i);
+        int index=particles.Add_Element();assert(index==i);
         particles.X(i)=start_position+((T)(i-1)/(number_of_vertices-1))*(end_position-start_position);
         particles.V(i)=VECTOR_2D<T>(0,0);}
     return index;
@@ -164,7 +164,7 @@ int Add_Circle_Deformable_Object(const int number_of_vertices)
     DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=segmented_curve.particles;
     segment_mesh.Initialize_Straight_Mesh(number_of_vertices,true);
     for(int i=0;i<number_of_vertices;i++){
-        int index=particles.array_collection->Add_Element();assert(index==i);
+        int index=particles.Add_Element();assert(index==i);
         T angle=(i-1)*(T)2*pi/number_of_vertices;
         VECTOR_2D<T> radial_direction(cos(angle+.5*pi),sin(angle+.5*pi));
         particles.X(i)=center+radius*radial_direction;
@@ -240,7 +240,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 #else
         DEFORMABLE_OBJECT_2D<T>& deformable_object=solids_parameters.deformable_body_parameters.list(1);
         DEFORMABLE_PARTICLES<T,VECTOR_2D<T> >& particles=deformable_object.particles;
-        for(int i=0;i<particles.array_collection->Size();i++){
+        for(int i=0;i<particles.Size();i++){
             particles.X(i)=center+radius*particles.V(i).Normalized()+particles.V(i)*time;}
 
         SEGMENTED_CURVE_2D<T>* segmented_curve=solids_parameters.deformable_body_parameters.list(1).segmented_curve;

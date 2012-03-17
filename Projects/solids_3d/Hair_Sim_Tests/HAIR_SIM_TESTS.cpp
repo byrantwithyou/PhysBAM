@@ -262,10 +262,10 @@ Initialize_Bodies()
     FILE_UTILITIES::Read_From_File(stream_type,data_directory+"/"+sim_folder+"/project_mesh.gz",project_mesh);
 
     particles.Store_Velocity(true);
-    for(int i=0;i<particles.array_collection->Size();i++) {active_particles.Append(i);}
+    for(int i=0;i<particles.Size();i++) {active_particles.Append(i);}
     
     //fake deformable object for guide hairs
-    offset=particles.array_collection->Size();
+    offset=particles.Size();
     if(!guide_sim_folder.empty()) {
         COLLISION_GEOMETRY_COLLECTION<TV> guide_list;
         guide_object1=new DEFORMABLE_BODY_COLLECTION<TV>(solid_body_collection.example_forces_and_velocities,guide_list);
@@ -273,9 +273,9 @@ Initialize_Bodies()
         guide_object1->Read(stream_type,guide_sim_folder+"/",0,-1,1,solids_parameters.write_from_every_process);
         guide_object2->Read(stream_type,guide_sim_folder+"/",1,-1,0,solids_parameters.write_from_every_process);
         SEGMENTED_CURVE<TV>& guide_edges=guide_object1->deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0);
-        particles.array_collection->Add_Elements(guide_edges.particles.array_collection->Size());
+        particles.Add_Elements(guide_edges.particles.Size());
         for(int i=0;i<guide_edges.mesh.elements.m;i++){sim_guide_edges.mesh.elements.Append(guide_edges.mesh.elements(i)+VECTOR<int,2>(offset,offset));}
-        for(int i=0;i<guide_edges.particles.array_collection->Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<DEFORMABLE_PARTICLES<TV>&>(guide_edges.particles).V(i);}
+        for(int i=0;i<guide_edges.particles.Size();i++){particles.X(offset+i)=guide_edges.particles.X(i);particles.V(offset+i)=static_cast<DEFORMABLE_PARTICLES<TV>&>(guide_edges.particles).V(i);}
     }
 
     if(use_guide){
@@ -298,13 +298,13 @@ Initialize_Bodies()
     assert(masses.m==offset);
     for(int i=0;i<masses.m;i++) {assert(masses(i));particles.mass(i)=masses(i);}
     //for(int i=0;i<masses.m;i++) {assert(masses(i));particles.mass(i)=4.;}
-    for(int i=offset+1;i<=particles.array_collection->Size();i++) particles.mass(i)=FLT_MAX;
+    for(int i=offset+1;i<=particles.Size();i++) particles.mass(i)=FLT_MAX;
     for(int i=1;i<fixed_nodes.m+1;i++) particles.mass(fixed_nodes(i))=FLT_MAX;
 
     // Find edge distances
     if(use_collisions_mass_modify || use_progressive_collision_thickness){
         LOG::cout<<"computing distances..."<<std::endl;
-        distance_to_root.Resize(particles.array_collection->Size());
+        distance_to_root.Resize(particles.Size());
         distance_to_root.Fill(0);
         distance_to_root.Subset(fixed_nodes).Fill(1);
         edges.mesh.Initialize_Neighbor_Nodes();
@@ -318,7 +318,7 @@ Initialize_Bodies()
                         distance_to_root(p)=distance_to_root(neighbor_p)+1;marked++;break;}}}
             if(!marked) break;}
         if(use_progressive_collision_thickness){
-            collision_tolerances.Resize(particles.array_collection->Size());
+            collision_tolerances.Resize(particles.Size());
             for(int p=0;p<distance_to_root.m;p++){
                 collision_tolerances(p)=(T)2e-4*min((T)5,(T)distance_to_root(p));} // only do for the first 10 segments
             LOG::cout<<collision_tolerances<<std::endl;}
@@ -384,14 +384,14 @@ Initialize_Bodies()
         LINEAR_TET_SPRINGS<T> *guide_tet_springs=Create_Tet_Springs(*sim_guide_volume,guide_altitude_stiffness,overdamping_fraction,false,(T).1,true,(T).1,true,(T)0,true);
         guide_tet_springs->Clamp_Restlength(restlength_clamp);
         solid_body_collection.Add_Force(guide_tet_springs);}
-    SPARSE_UNION_FIND<> particle_connectivity(particles.array_collection->Size()+rigid_body_collection.rigid_body_particle.array_collection->Size());
+    SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particle.Size());
     HAIR_ID next_segment_id(0);
     PHYSBAM_FATAL_ERROR();
 #if 0
-    particle_to_spring_id.Resize(particles.array_collection->Size());
+    particle_to_spring_id.Resize(particles.Size());
     edge_springs->Add_Fragment_Connectivity(particle_connectivity);extra_edge_springs->Add_Fragment_Connectivity(particle_connectivity);
     if(torsion_springs) torsion_springs->Add_Fragment_Connectivity(particle_connectivity);bending_springs->Add_Fragment_Connectivity(particle_connectivity);//guide_springs->Add_Fragment_Connectivity(union_find);}
-    for(int p=0;p<particles.array_collection->Size();p++){
+    for(int p=0;p<particles.Size();p++){
         int root=particle_connectivity.Find(p);
         if(particle_to_spring_id(root)==HAIR_ID(0)){
             next_segment_id++;
@@ -481,7 +481,7 @@ Initialize_Bodies()
                 deformable_body_collection.collisions.ignored_nodes.Append(nodes[1]);}}
         Sort(deformable_body_collection.collisions.ignored_nodes);
         for(int i=deformable_body_collection.collisions.ignored_nodes.m;i>1;i--) if(deformable_body_collection.collisions.ignored_nodes(i)==deformable_body_collection.collisions.ignored_nodes(i-1)) deformable_body_collection.collisions.ignored_nodes.Remove_Index_Lazy(i);*/
-        for(int i=0;i<particles.array_collection->Size();i++) 
+        for(int i=0;i<particles.Size();i++) 
             if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(i))) deformable_body_collection.collisions.ignored_nodes.Append(i);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/ignored_nodes",deformable_body_collection.collisions.ignored_nodes);}
 
@@ -503,7 +503,7 @@ Initialize_Bodies()
     if (use_spring_guide&&!guide_sim_folder.empty()){
         ARRAY<int,HAIR_ID> roots(number_of_hairs);
         ARRAY<ARRAY<int>,HAIR_ID> hairs(next_segment_id);
-        for(int p=0;p<particles.array_collection->Size();p++) hairs(particle_to_spring_id(p)).Append(p);
+        for(int p=0;p<particles.Size();p++) hairs(particle_to_spring_id(p)).Append(p);
         for(HAIR_ID i(0);i<number_of_hairs;i++){
             T min_dist=-1;
             for (int p=1;p<=hairs(i).m;p++){
@@ -541,14 +541,14 @@ Initialize_Bodies()
         ARRAY<ARRAY<int>,PARTITION_ID>& particles_of_partition=solid_body_collection.deformable_body_collection.mpi_solids->particles_of_partition;
 
         // give roots first good partition we run across if they don't have something already
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             int representative_particle=spring_id_to_particle(particle_to_spring_id(p));
             partition_id_from_particle_index(p)=partition_id_from_particle_index(representative_particle);}
         // update reverse map of all non root particles to new root (and connected component) asignment)
-//        for(int p=0;p<particles.array_collection->Size();p++) partition_id_from_particle_index(p)=partition_id_from_particle_index(particle_connectivity.Find(p));
+//        for(int p=0;p<particles.Size();p++) partition_id_from_particle_index(p)=partition_id_from_particle_index(particle_connectivity.Find(p));
         // repopulate forward map
         for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) particles_of_partition(i).Remove_All();
-        for(int p=0;p<particles.array_collection->Size();p++) particles_of_partition(partition_id_from_particle_index(p)).Append(p);
+        for(int p=0;p<particles.Size();p++) particles_of_partition(partition_id_from_particle_index(p)).Append(p);
         for(PARTITION_ID i(0);i<particles_of_partition.Size();i++) LOG::cout<<"Partition "<<i<<" has "<<particles_of_partition(i).Size()<<" particles"<<std::endl;
         //partition_fixed_nodes.Resize(solid_body_collection.deformable_body_collection.mpi_solids->Number_Of_Partitions());
         partition_spring_representative.Resize(solid_body_collection.deformable_body_collection.mpi_solids->Number_Of_Partitions());
@@ -647,7 +647,7 @@ template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time)
 {
     for(int i=0;i<fixed_nodes_to_apply.m;i++) V(fixed_nodes_to_apply(i))=TV();
-    if(guide_object1) for (int i=1;i<=guide_object1->particles.array_collection->Size();i++) {V(offset+i)=TV();}
+    if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {V(offset+i)=TV();}
 }
 //#####################################################################
 // Function Set_External_Velocities
@@ -667,7 +667,7 @@ Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_p
         if(frame>current_frame){
             guide_object1=guide_object2;
             guide_object2->Read(stream_type,guide_sim_folder+"/",++current_frame,-1,0,solids_parameters.write_from_every_process);}
-        if(guide_object1) for (int i=1;i<=guide_object1->particles.array_collection->Size();i++) {V(offset+i)=(1-alpha)*guide_object1->particles.V(i)+alpha*guide_object2->particles.V(i);}}
+        if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {V(offset+i)=(1-alpha)*guide_object1->particles.V(i)+alpha*guide_object2->particles.V(i);}}
 }
 //#####################################################################
 // Function Set_External_Positions
@@ -690,7 +690,7 @@ Set_External_Positions(ARRAY_VIEW<TV> X,const T time)
         if(frame>current_frame){
             guide_object1=guide_object2;
             guide_object2->Read(stream_type,guide_sim_folder+"/",++current_frame,-1,0,solids_parameters.write_from_every_process);}
-        if(guide_object1) for (int i=1;i<=guide_object1->particles.array_collection->Size();i++) {X(offset+i)=(1-alpha)*guide_object1->particles.X(i)+alpha*guide_object2->particles.X(i);}}
+        if(guide_object1) for (int i=1;i<=guide_object1->particles.Size();i++) {X(offset+i)=(1-alpha)*guide_object1->particles.X(i)+alpha*guide_object2->particles.X(i);}}
 }
 //#####################################################################
 // Function Add_Connectivity
@@ -841,7 +841,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);
-        for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
+        for(int i=0;i<particles.Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before impulse",2,2);
         particles.X=positions_save;}
     
@@ -887,7 +887,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);
-        for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
+        for(int i=0;i<particles.Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after impulse",2,2);
         particles.X=positions_save;}
 }

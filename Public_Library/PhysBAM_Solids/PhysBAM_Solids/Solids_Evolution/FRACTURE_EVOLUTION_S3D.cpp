@@ -65,7 +65,7 @@ Initialize_Self_Collision()
         ARRAY<bool>& particle_on_surface=deformable_body_collection.collisions.check_collision;
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_collisions.geometry.structures.Remove_All();
         solids_parameters.Initialize_Triangle_Collisions(); // false - do not clamp repulsion thickness
-        ARRAY<TV> rest_X(deformable_body_collection.particles.array_collection->Size());
+        ARRAY<TV> rest_X(deformable_body_collection.particles.Size());
         for(int p=0;p<rest_X.m;p++) if(particle_on_surface(p)) rest_X(p)=fracture_object->Rest_Position_Of_Material_Surface_Particle(p);
         solids_parameters.solid_body_collection.deformable_body_collection.triangle_repulsions.Clamp_Repulsion_Thickness_With_Meshes(rest_X,solids_parameters.collisions_repulsion_clamp_fraction);}
 #endif

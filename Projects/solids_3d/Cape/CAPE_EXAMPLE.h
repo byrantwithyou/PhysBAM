@@ -123,10 +123,10 @@ public:
     ARRAY<VECTOR_3D<T> ,VECTOR<int,1> > Q;
     sprintf(filename,"%s/position.%d",buddha_directory,frame);input.open(filename,std::ios::in|std::ios::binary);Q.Read_Objects_Float(input);input.close();
     sprintf(filename,"%s/position.%d",buddha_directory,frame+1);input.open(filename,std::ios::in|std::ios::binary);buddha_particles.X.Read_Objects_Float(input);input.close();
-    for(int p=0;p<buddha_particles.array_collection->Size();p++)X(p)=(1-fraction)*Q(p)+fraction*buddha_particles.X(p);
+    for(int p=0;p<buddha_particles.Size();p++)X(p)=(1-fraction)*Q(p)+fraction*buddha_particles.X(p);
     sprintf(filename,"%s/velocity.%d",buddha_directory,frame);input.open(filename,std::ios::in|std::ios::binary);Q.Read_Objects_Float(input);input.close();
     sprintf(filename,"%s/velocity.%d",buddha_directory,frame+1);input.open(filename,std::ios::in|std::ios::binary);buddha_particles.V.Read_Objects_Float(input);input.close();
-    for(int p=0;p<buddha_particles.array_collection->Size();p++)V(p)=(1-fraction)*Q(p)+fraction*buddha_particles.V(p);}
+    for(int p=0;p<buddha_particles.Size();p++)V(p)=(1-fraction)*Q(p)+fraction*buddha_particles.V(p);}
     
     void Read_Fractional_Buddha(T time)
     {std::cout<<"reading fractional "<<time<<"\n";
@@ -161,7 +161,7 @@ public:
     corner.Append(12);
     corner.Append(1);
     corner.Append(5);
-    /*for(int p=0;p<particles.array_collection->Size();p++){
+    /*for(int p=0;p<particles.Size();p++){
         std::cout<<p<<" - "<<particles.X(p)<<"\n";/*
         if(!boundary_neighbor_nodes(p).m)continue;
         if(boundary_neighbor_nodes(p).m==2)corner.Append(p);}
@@ -178,7 +178,7 @@ public:
     else if(d4==min_d){exchange(corner(2),corner(4));exchange(cx(2),cx(4));}
     if((cx(1)-cx(3)).Magnitude()>(cx(1)-cx(4)).Magnitude()){exchange(corner(3),corner(4));exchange(cx(3),cx(4));}
     T dist[4][4];for(int a=0;a<4;a++)for(int b=0;b<4;b++)dist[a][b]=(cx(a+1)-cx(b+1)).Magnitude();
-    ARRAY<bool> marks(1,particles.array_collection->Size());
+    ARRAY<bool> marks(1,particles.Size());
     ARRAY<VECTOR_3D<T> > edge1,edge2;
     for(int a=0;a<4;a++)marks(corner(a))=true;
     bool result1=Corner_Search(boundary_neighbor_nodes,particles,edge1,marks,corner(1),corner(2));assert(result1);
@@ -195,27 +195,27 @@ public:
     for(int j=0;j<n;j++)for(int i=0;i<m;i++){
         VECTOR_3D<T> x1=interpolation.Clamped_To_Array(edge1_grid,edge1.array,(T)(i-1)/m);
         VECTOR_3D<T> x2=interpolation.Clamped_To_Array(edge2_grid,edge2.array,(T)(i-1)/m);
-        particles.X(particles.array_collection->Add_Element())=x1+T(j-1)/n*(x2-x1);}
+        particles.X(particles.Add_Element())=x1+T(j-1)/n*(x2-x1);}
     std::fstream output("Cape/tmp.tri",std::ios::binary|std::ios::out);triangulated_surface.Write_Float(output);output.close();}
     
     void Extract_Component(TRIANGULATED_SURFACE<T>& triangulated_surface,int seed,TRIANGULATED_SURFACE<T>& component)
     {TRIANGLE_MESH& triangle_mesh=triangulated_surface.triangle_mesh;
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     if(!triangle_mesh.neighbor_nodes)triangle_mesh.Initialize_Neighbor_Nodes();
-    int count=0;ARRAY<int> mark(1,particles.array_collection->Size());ARRAY<int> stack;
+    int count=0;ARRAY<int> mark(1,particles.Size());ARRAY<int> stack;
     stack.Append(seed);mark(seed)=++count;
     while(stack.m){
         int p;stack.Pop(p);
         for(int a=0;a<(*triangle_mesh.neighbor_nodes)(p).m;a++){
             int q=(*triangle_mesh.neighbor_nodes)(p)(a);
             if(!mark(q)){stack.Append(q);mark(q)=++count;}}}
-    int pmin=particles.array_collection->Size(),pmax=1;
-    for(int p=0;p<particles.array_collection->Size();p++)if(mark(p)){pmin=min(pmin,mark(p));pmax=max(pmax,mark(p));}
+    int pmin=particles.Size(),pmax=1;
+    for(int p=0;p<particles.Size();p++)if(mark(p)){pmin=min(pmin,mark(p));pmax=max(pmax,mark(p));}
     if(pmax-pmin+1!=count){std::cout<<"Lazy\n";exit(1);}
     component.Clean_Memory();component.particles.Clean_Memory();component.triangle_mesh.Clean_Memory();
     component.particles.Increase_Array_Size(count);
     component.particles.Store_Position();
-    for(int p=pmin;p<=pmax;p++){component.particles.X(component.particles.array_collection->Add_Element())=particles.X(p);}
+    for(int p=pmin;p<=pmax;p++){component.particles.X(component.particles.Add_Element())=particles.X(p);}
     component.triangle_mesh.triangles.Append_Elements(triangle_mesh.triangles);
     component.triangle_mesh.number_nodes=count;
     for(int t=0;t<triangle_mesh.triangles.m;t++)for(int a=0;a<3;a++){
@@ -235,7 +235,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
  //   if(!restart_step_number){
         std::ifstream input(cape_file,std::ios::binary);assert(input.is_open());triangulated_surface.Read_Float(input);input.close();
         Retriangulate(triangulated_surface);
-        for(int p=0;p<particles.array_collection->Size();p++)particles.X(p).y+=cloth_height;
+        for(int p=0;p<particles.Size();p++)particles.X(p).y+=cloth_height;
 /*    else{
         std::ifstream input;char filename[200];
         sprintf(filename,"%s/triangle_mesh",output_directory);input.open(filename,std::ios::binary);assert(input);visual_mesh.Read(input);input.close();
@@ -252,8 +252,8 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     char filename[200];sprintf(filename,"%s/tetrahedron_mesh",buddha_directory);
     {std::ifstream input;input.open(filename,std::ios::binary);assert(input);buddha_mesh.Read(input);input.close();}
     buddha_particles.Increase_Array_Size(buddha_mesh.number_nodes);
-    for(int p=0;p<buddha_mesh.number_nodes;p++)buddha_particles.array_collection->Add_Element();
-    buddha_mesh.number_nodes=buddha_particles.array_collection->Size();
+    for(int p=0;p<buddha_mesh.number_nodes;p++)buddha_particles.Add_Element();
+    buddha_mesh.number_nodes=buddha_particles.Size();
     buddha_volume.Initialize_Triangulated_Surface();
 
     triangle_mesh.triangles.Compact();
@@ -267,8 +267,8 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     cape_collisions->ground_thickness=2*cape_collisions->thickness;
     
     Read_Fractional_Buddha(0);
-    barycentric_coordinates.Resize(1,particles.array_collection->Size());
-    attachments.Resize(1,particles.array_collection->Size());
+    barycentric_coordinates.Resize(1,particles.Size());
+    attachments.Resize(1,particles.Size());
     std::cout<<"Turning off collisions for points along the seam...";
     cape_collisions->bound=8*length_scale;
     cape_collisions->thickness*=2;
@@ -277,7 +277,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     std::cout<<"done\n";
     BOX_3D<T> attachment_box(100,-100,100,-100,100,-100);ARRAY<int> attachment_tets;
     std::cout<<"Attaching";
-    for(int p=0;p<particles.array_collection->Size();p++)if((*cape_collisions->disabled)(p))
+    for(int p=0;p<particles.Size();p++)if((*cape_collisions->disabled)(p))
         attachment_box.Enlarge_To_Include_Point(particles.X(p));
     attachment_box.Scale_About_Center((T)1.1);
     for(int t=0;t<buddha_mesh.tetrahedrons.m;t++){
@@ -285,7 +285,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
         BOX_3D<T> box(buddha_particles.X(i));box.Enlarge_To_Include_Point(buddha_particles.X(j));
         box.Enlarge_To_Include_Point(buddha_particles.X(k));box.Enlarge_To_Include_Point(buddha_particles.X(l));
         if(box.Intersection(attachment_box))attachment_tets.Append(t);}
-    for(int p=0;p<particles.array_collection->Size();p++)if((*cape_collisions->disabled)(p)){
+    for(int p=0;p<particles.Size();p++)if((*cape_collisions->disabled)(p)){
         VECTOR_3D<T> X=particles.X(p),w;
         attachments(p)=-1;
         std::cout<<".";
@@ -300,14 +300,14 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     std::cout<<"done\n";
     
     bool neighbor_nodes_defined=triangle_mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined)triangle_mesh.Initialize_Neighbor_Nodes();
-    ARRAY<int> disabled1(1,particles.array_collection->Size());
-    ARRAY<int> disabled2(1,particles.array_collection->Size());
+    ARRAY<int> disabled1(1,particles.Size());
+    ARRAY<int> disabled2(1,particles.Size());
     ARRAY<int>::copy(attachments,disabled1);
-    for(int p=0;p<particles.array_collection->Size();p++)if(disabled1(p)>0)
+    for(int p=0;p<particles.Size();p++)if(disabled1(p)>0)
         for(int a=0;a<(*triangle_mesh.neighbor_nodes)(p).m;a++){
             disabled2((*triangle_mesh.neighbor_nodes)(p)(a))=1;}
     ARRAY<int>::copy(0,disabled1);
-    for(int p=0;p<particles.array_collection->Size();p++)if(disabled2(p)>0)
+    for(int p=0;p<particles.Size();p++)if(disabled2(p)>0)
         for(int a=0;a<(*triangle_mesh.neighbor_nodes)(p).m;a++){
             disabled1((*triangle_mesh.neighbor_nodes)(p)(a))=1;}
     if(!neighbor_nodes_defined){delete triangle_mesh.neighbor_nodes;triangle_mesh.neighbor_nodes=0;}
@@ -318,7 +318,7 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
         if(disabled1(i)>0 || disabled1(j)>0 || disabled1(k)>0)collision_surface->triangle_mesh.triangles(1,t)=0;}
     collision_surface->triangle_mesh.Delete_Triangles_With_Missing_Nodes();
     std::cout<<"collision triangles: "<<collision_surface->triangle_mesh.triangles.m<<"\n";
-    collision_surface->triangle_mesh.number_nodes=particles.array_collection->Size();
+    collision_surface->triangle_mesh.number_nodes=particles.Size();
     
     for(int t=0;t<triangle_mesh.triangles.m;t++){
         int i,j,k;triangle_mesh.triangles.Get(t,i,j,k);
@@ -327,11 +327,11 @@ void Get_Initial_Data(TRIANGULATED_SURFACE<T>& triangulated_surface)
     visual_mesh.triangles.Append_Elements(triangle_mesh.triangles);
     visual_mesh.triangles.Append_Elements(buddha_volume.triangulated_surface->triangle_mesh.triangles);
     for(int t=0;t<buddha_volume.triangulated_surface->triangle_mesh.triangles.m;t++)for(int a=0;a<3;a++)
-        visual_mesh.triangles(a,t+triangle_mesh.triangles.m)+=particles.array_collection->Size();
-    visual_mesh.number_nodes=particles.array_collection->Size()+buddha_particles.array_collection->Size();
+        visual_mesh.triangles(a,t+triangle_mesh.triangles.m)+=particles.Size();
+    visual_mesh.number_nodes=particles.Size()+buddha_particles.Size();
     visual_particles.Initialize_Particles(particles);
-    visual_particles.Increase_Array_Size(buddha_particles.array_collection->Size());
-    for(int p=0;p<buddha_particles.array_collection->Size();p++)visual_particles.array_collection->Add_Element();
+    visual_particles.Increase_Array_Size(buddha_particles.Size());
+    for(int p=0;p<buddha_particles.Size();p++)visual_particles.Add_Element();
     visual_surface.Discard_Valence_Zero_Particles_And_Renumber(visual_mapping);
     
     std::cout<<"triangles = "<<triangle_mesh.triangles.m<<"\n";
@@ -344,9 +344,9 @@ void Read_Data_Files(TRIANGULATED_SURFACE<T>& triangulated_surface,T& time,const
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=triangulated_surface.particles;
     std::ifstream input;char filename[256];
     visual_particles.Read_Deformable_Dynamic_Variables_Float(output_directory,frame);
-    std::cout<<"reading "<<particles.array_collection->Size()<<"\n";
-    ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(visual_particles.X,particles.X,particles.array_collection->Size());
-    ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(visual_particles.V,particles.V,particles.array_collection->Size());
+    std::cout<<"reading "<<particles.Size()<<"\n";
+    ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(visual_particles.X,particles.X,particles.Size());
+    ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(visual_particles.V,particles.V,particles.Size());
     sprintf(filename,"%s/time.%d",output_directory,frame);
     if(FILE_UTILITIES::File_Exists(filename)){
         std::ifstream input(filename,std::ios::binary);Read_Binary_Float(input,time);input.close();
@@ -369,10 +369,10 @@ void Write_Data_Files(const TRIANGULATED_SURFACE<T>& triangulated_surface,const 
         else particles.Write_Deformable_Static_Variables_Float(output_directory);}
     if(visual){
         ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy(VECTOR_3D<T>(0),visual_particles.X);
-        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(particles.X,visual_particles.X,particles.array_collection->Size());
-        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(particles.V,visual_particles.V,particles.array_collection->Size());
+        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(particles.X,visual_particles.X,particles.Size());
+        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::copy_up_to(particles.V,visual_particles.V,particles.Size());
         Read_Fractional_Buddha(time);
-        for(int p=0;p<buddha_particles.array_collection->Size();p++)visual_particles.X(visual_mapping(p+particles.array_collection->Size()))=buddha_particles.X(p);
+        for(int p=0;p<buddha_particles.Size();p++)visual_particles.X(visual_mapping(p+particles.Size()))=buddha_particles.X(p);
         visual_particles.Write_Deformable_Dynamic_Variables_Float(output_directory,frame);}
     else particles.Write_Deformable_Dynamic_Variables_Float(output_directory,frame);
 
@@ -484,7 +484,7 @@ void Initialize_Triangulated_Surface_Collisions(TRIANGULATED_SURFACE<T>& triangu
     // set up repulsion springs for collisions
     if(!collisions_repulsion_spring_constant_over_mass_times_length){
         T average_restlength=ARRAY<T,VECTOR<int,1> >::sum(ls->restlength)/ls->restlength.m;
-        T mass_node=ARRAY<T,VECTOR<int,1> >::sum(triangulated_surface.particles.mass)/triangulated_surface.particles.array_collection->Size();
+        T mass_node=ARRAY<T,VECTOR<int,1> >::sum(triangulated_surface.particles.mass)/triangulated_surface.particles.Size();
         collisions_repulsion_spring_constant_over_mass_times_length=2*ls->constant_youngs_modulus/(mass_node*average_restlength);
         collisions_repulsion_spring_constant_over_mass_times_length/=100;  // FIDDLING
         }

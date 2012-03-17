@@ -97,7 +97,7 @@ Reset_Parents_To_Embedded_Particles_Hash_Table()
 template<class TV,int d> void EMBEDDED_OBJECT<TV,d>::
 Copy_Then_Reset_Parents_To_Embedded_Particles_Hash_Table(HASHTABLE<VECTOR<int,2>,int>*& hash_table_copy)
 {
-    hash_table_copy=parents_to_embedded_particles_hash_table;parents_to_embedded_particles_hash_table=new HASHTABLE<VECTOR<int,2>,int>(hashtable_multiplier*particles.array_collection->Size()); // TODO: Rethink the size
+    hash_table_copy=parents_to_embedded_particles_hash_table;parents_to_embedded_particles_hash_table=new HASHTABLE<VECTOR<int,2>,int>(hashtable_multiplier*particles.Size()); // TODO: Rethink the size
 }
 //#####################################################################
 // Function Initialize_Parents_To_Embedded_Particles_Hash_Table

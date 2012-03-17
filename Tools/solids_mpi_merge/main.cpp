@@ -89,13 +89,13 @@ Merge_Rigid_Data(const int frame)
         local_rigid_collections(p)=new RIGID_BODY_COLLECTION<TV>(0,0);
         local_rigid_collections(p)->Read(STREAM_TYPE(RW()),STRING_UTILITIES::string_sprintf("%s/%d/",input_directory.c_str(),p),frame,&needs_init);
         local_rigid_collections(p)->rigid_geometry_collection.structure_list.Fill_Needs_Write();
-        rigid_body_collection.rigid_body_particle.array_collection->Add_Elements(local_rigid_collections(p)->rigid_body_particle.array_collection->Size());
-        colors.Resize(local_rigid_collections(p)->rigid_body_particle.array_collection->Size());
-        for(int i=0;i<local_rigid_collections(p)->rigid_body_particle.array_collection->Size();i++){
+        rigid_body_collection.rigid_body_particle.Add_Elements(local_rigid_collections(p)->rigid_body_particle.Size());
+        colors.Resize(local_rigid_collections(p)->rigid_body_particle.Size());
+        for(int i=0;i<local_rigid_collections(p)->rigid_body_particle.Size();i++){
             if(!local_rigid_collections(p)->rigid_body_particle.rigid_geometry(i)) continue;
             if(!local_rigid_collections(p)->rigid_geometry_collection.Is_Active(i)) continue;
             colors(i)=p;
-            rigid_body_collection.rigid_body_particle.array_collection->Copy_Element(*local_rigid_collections(p)->rigid_body_particle.array_collection,i,i);
+            rigid_body_collection.rigid_body_particle.Copy_Element(local_rigid_collections(p)->rigid_body_particle,i,i);
             rigid_body_collection.Add_Rigid_Body_And_Geometry(&local_rigid_collections(p)->Rigid_Body(i));}}
     rigid_body_collection.Write(STREAM_TYPE(RW()),output_directory,frame);
     return true;

@@ -101,20 +101,20 @@ void Get_Initial_Data()
         if((r.x>radius)+(r.y>radius)+(r.z>radius)>1)hexahedron_mesh.hexahedrons(k,h)=0;}
     hexahedron_mesh.Delete_Hexahedrons_With_Missing_Nodes();
     hexahedralized_volume.Discard_Valence_Zero_Particles_And_Renumber();
-    std::cout<<"particles = "<<particles.array_collection->Size()<<", hexahedrons = "<<hexahedron_mesh.hexahedrons.m<<std::endl;
+    std::cout<<"particles = "<<particles.Size()<<", hexahedrons = "<<hexahedron_mesh.hexahedrons.m<<std::endl;
 
     hexahedralized_volume.Initialize_Triangulated_Surface();hexahedralized_volume.triangulated_surface->triangle_mesh.Initialize_Segment_Mesh();
     hexahedron_mesh.Initialize_Incident_Hexahedrons();
     hexahedron_mesh.Initialize_Node_On_Boundary();
-    int count=0;for(int p=0;p<particles.array_collection->Size();p++)count+=(*hexahedron_mesh.incident_hexahedrons)(p).m;
+    int count=0;for(int p=0;p<particles.Size();p++)count+=(*hexahedron_mesh.incident_hexahedrons)(p).m;
     std::cout<<count<<std::endl;
-    count=0;for(int p=0;p<particles.array_collection->Size();p++)if((*hexahedron_mesh.node_on_boundary)(p)) count++;
+    count=0;for(int p=0;p<particles.Size();p++)if((*hexahedron_mesh.node_on_boundary)(p)) count++;
     std::cout<<count<<std::endl;
 
     hexahedralized_volume.Set_Density(1000);hexahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);
     hexahedralized_volume.Update_Bounding_Box();
     VECTOR_3D<T> center(hexahedralized_volume.bounding_box->Center());T bottom=hexahedralized_volume.bounding_box->ymin;
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.V(i)=initial_velocity+VECTOR_3D<T>::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}
@@ -176,7 +176,7 @@ void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRI
         for(int g=0;g<2;g++){
             DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.extra_collision_surfaces(g+1)->particles;
             RIGID_BODY<TV>& rigid_body=*solids_parameters.rigid_body_parameters.list.rigid_bodies(gear[g]);
-            for(int p=0;p<particles.array_collection->Size();p++){
+            for(int p=0;p<particles.Size();p++){
                 particles.X(p)=rigid_body.World_Space_Point(rigid_body.triangulated_surface->particles.X(p));
                 particles.V(p)=rigid_body.Pointwise_Object_Velocity(rigid_body.triangulated_surface->particles.X(p));}}
 }
@@ -213,7 +213,7 @@ void Remesh_Gears()
     bad_surface.Update_Bounding_Box();BOX_3D<T> box=*bad_surface.bounding_box;
     std::cout<<"box = "<<box<<std::endl;
     ARRAY<VECTOR_3D<T> > curve;
-    for(int p=0;p<bad_particles.array_collection->Size();p++)if(bad_particles.X(p).z == 0 && bad_particles.X(p).Magnitude()>.1)curve.Append(bad_particles.X(p));
+    for(int p=0;p<bad_particles.Size();p++)if(bad_particles.X(p).z == 0 && bad_particles.X(p).Magnitude()>.1)curve.Append(bad_particles.X(p));
     int n=curve.m;std::cout<<"n = "<<n<<std::endl;
     curve.Append(curve(1));
     std::cout<<"curve.m = "<<curve.m<<std::endl;
@@ -251,18 +251,18 @@ void Remesh_Gears()
     for(int t=0;t<circle_triangles;t++){
         int i,j,k;good_mesh.triangles.Get(t,i,j,k);
         good_mesh.triangles.Append(i+circle_particles,k+circle_particles,j+circle_particles);}
-    for(int j=0;j<m_end;j++)for(int i=0;i<n;i++)good_particles.X(good_particles.array_collection->Add_Element())=(T)j/(m_end-1)*curve(i);
-    for(int j=0;j<m_end;j++)for(int i=0;i<n;i++)good_particles.X(good_particles.array_collection->Add_Element())=(T)j/(m_end-1)*curve(i)+VECTOR_3D<T>(0,0,4);
+    for(int j=0;j<m_end;j++)for(int i=0;i<n;i++)good_particles.X(good_particles.Add_Element())=(T)j/(m_end-1)*curve(i);
+    for(int j=0;j<m_end;j++)for(int i=0;i<n;i++)good_particles.X(good_particles.Add_Element())=(T)j/(m_end-1)*curve(i)+VECTOR_3D<T>(0,0,4);
 
     for(int i=0;i<n;i++)for(int j=0;j<m_body;j++){
-        int a=good_particles.array_collection->Add_Element(),b=good_particles.array_collection->Add_Element(),c=good_particles.array_collection->Add_Element(),d=good_particles.array_collection->Add_Element();
+        int a=good_particles.Add_Element(),b=good_particles.Add_Element(),c=good_particles.Add_Element(),d=good_particles.Add_Element();
         good_particles.X(a)=curve(i)+VECTOR_3D<T>(0,0,(T)4*j/m_body);
         good_particles.X(b)=curve(i)+VECTOR_3D<T>(0,0,(T)4*(j+1)/m_body);
         good_particles.X(c)=curve(i+1)+VECTOR_3D<T>(0,0,(T)4*j/m_body);
         good_particles.X(d)=curve(i+1)+VECTOR_3D<T>(0,0,(T)4*(j+1)/m_body);
         good_mesh.triangles.Append(a,c,b);good_mesh.triangles.Append(b,d,c);}
 
-    good_mesh.number_nodes=good_particles.array_collection->Size();
+    good_mesh.number_nodes=good_particles.Size();
     good_surface.Close_Surface(true,1e-3,false);
     good_surface.Remove_Degenerate_Triangles();
     good_mesh.Make_Orientations_Consistent();

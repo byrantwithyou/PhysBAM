@@ -82,7 +82,7 @@ public:
     {
         ARRAY<int> touching_particle_indices;
         VECTOR<T,3> curr_position;
-        for (int i=0;i<tet_vol->particles.array_collection->Size();i++){
+        for (int i=0;i<tet_vol->particles.Size();i++){
             curr_position=tet_vol->particles.X(i);
             if(Inside_Ellipsoid_Test(curr_position))touching_particle_indices.Append(i);}
 

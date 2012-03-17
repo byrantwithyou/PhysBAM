@@ -81,7 +81,7 @@ template<class TV> RIGID_BODY_COLLISIONS<TV>::
 template<class TV> void RIGID_BODY_COLLISIONS<TV>::
 Initialize_Data_Structures(const bool reset)
 {
-    contact_graph.Initialize();skip_collision_check.Initialize(rigid_body_collection.rigid_body_particle.array_collection->Size(),reset);
+    contact_graph.Initialize();skip_collision_check.Initialize(rigid_body_collection.rigid_body_particle.Size(),reset);
 }
 //#####################################################################
 // Function Adjust_Bounding_Boxes
@@ -497,7 +497,7 @@ Compute_Contact_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* articu
         Get_Contact_Pairs(dt,time,edge_pairs);
 
     if(prune_stacks_from_contact){
-        ARRAY<int> body_stack(rigid_body_collection.rigid_body_particle.array_collection->Size());
+        ARRAY<int> body_stack(rigid_body_collection.rigid_body_particle.Size());
         HASHTABLE<PAIR<int,int> > stack_static_bodies;
         for(int i=0;i<contact_stack.m;i++){
             INDIRECT_ARRAY<ARRAY<int>,ARRAY<int>&> contact_subset=body_stack.Subset(contact_stack(i));
@@ -562,8 +562,8 @@ Process_Push_Out_Legacy()
     while(need_another_iteration && ++iteration<=push_out_iterations){
         if(mpi_rigids){
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_frame_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++)
+            mpi_rigid_frame_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++)
                 mpi_rigid_frame_save(p)=rigid_body_collection.rigid_body_particle.frame(p);}
 
         need_another_iteration=false;
@@ -903,7 +903,7 @@ Construct_Stacks()
     for(int i=0;i<adj.m;i++) for(int j=0;j<contact_graph.directed_graph.Parents(i).m;j++){
         adj(i).Append(contact_graph.directed_graph.Parents(i)(j));adj(contact_graph.directed_graph.Parents(i)(j)).Append(i);}
 
-    ARRAY<int,int> visited(rigid_body_collection.rigid_body_particle.array_collection->Size());
+    ARRAY<int,int> visited(rigid_body_collection.rigid_body_particle.Size());
 
     STACK<int> stack;
     for(int i=0;i<visited.m;i++) if(!visited(i)){
@@ -1101,9 +1101,9 @@ Add_Elastic_Collisions(const T dt,const T time)
     for(int i=0;i<parameters.collision_iterations && need_another_iteration;i++){
         if(mpi_rigids){
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
+            mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+            mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) {
                 mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                 mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
 
@@ -1151,9 +1151,9 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
     while(need_another_iteration && ++iteration<=shock_propagation_iterations){
         if(mpi_rigids){
             mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
+            mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+            mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) {
                 mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                 mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
         

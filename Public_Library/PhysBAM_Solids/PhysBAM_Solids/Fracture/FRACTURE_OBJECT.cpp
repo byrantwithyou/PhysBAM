@@ -29,12 +29,12 @@ FRACTURE_OBJECT(T_EMBEDDED_OBJECT& embedded_object_input)
 {
     random_numbers.Set_Seed(84396);
     reference_mesh.Initialize_Mesh(embedded_object.simplicial_object.mesh);
-    reference_particles.array_collection->Initialize(*embedded_object.particles.array_collection);
+    reference_particles.Initialize(embedded_object.particles);
     Set_Fracture_Bias_Propagation();Set_Fracture_Bias_Stress_Scaling();Set_Fracture_Bias_Magnitude();
     fracture_bias_direction.Resize(embedded_object.simplicial_object.mesh.elements.m);
     fracture_phi_index.Resize(embedded_object.simplicial_object.mesh.elements.m);
     embedded_object.Initialize_Node_In_Simplex_Is_Material();
-    corresponding_node_in_reference=IDENTITY_ARRAY<>(embedded_object.particles.array_collection->Size());
+    corresponding_node_in_reference=IDENTITY_ARRAY<>(embedded_object.particles.Size());
     corresponding_simplex_in_reference=IDENTITY_ARRAY<>(embedded_object.simplicial_object.mesh.elements.m);
 }
 //#####################################################################

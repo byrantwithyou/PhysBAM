@@ -30,7 +30,7 @@ template<class T> RED_GREEN_TETRAHEDRA<T>::
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Refine_Simplex_List(const ARRAY<int>& tetrahedron_list)
 {
-    object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+6*tetrahedron_list.m);
+    object.particles.Preallocate(object.particles.Size()+6*tetrahedron_list.m);
     for(int level=0;level<index_in_stack.m;level++) index_in_stack(level)->Fill(0);
     for(int i=0;i<tetrahedron_list.m;i++){
         int level=leaf_levels_and_indices(tetrahedron_list(i))(0),tet=leaf_levels_and_indices(tetrahedron_list(i))(1);
@@ -50,7 +50,7 @@ Refine_Simplex_List(const ARRAY<int>& tetrahedron_list)
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Subdivide_Segment_List(const ARRAY<VECTOR<int,2> >& segment_list)
 {
-    object.particles.array_collection->Preallocate(object.particles.array_collection->Size()+4*segment_list.m);
+    object.particles.Preallocate(object.particles.Size()+4*segment_list.m);
     for(int i=0;i<index_in_stack.m;i++) index_in_stack(i)->Fill(0);
     for(int i=0;i<segment_list.m;i++){
         int node1,node2;segment_list(i).Get(node1,node2);
@@ -354,8 +354,8 @@ Ensure_Level_Exists(const int level)
 {
     if(meshes.m >= level) return; // it already exists
     meshes.Append(new TETRAHEDRON_MESH);
-    meshes(level)->number_nodes=object.particles.array_collection->Size();
-    meshes(level)->incident_elements=new ARRAY<ARRAY<int> >(object.particles.array_collection->Size());
+    meshes(level)->number_nodes=object.particles.Size();
+    meshes(level)->incident_elements=new ARRAY<ARRAY<int> >(object.particles.Size());
     meshes(level)->element_edges=new ARRAY<VECTOR<int,6> >();
     parent.Append(new ARRAY<int>(0));children.Append(new ARRAY<VECTOR<int,8> >());
     index_in_stack.Append(new ARRAY<int>(0));leaf_number.Append(new ARRAY<int>(0));
@@ -416,7 +416,7 @@ template<class T> int RED_GREEN_TETRAHEDRA<T>::
 Add_Midpoint(const int segment,const int level,const int tet)
 {
     PHYSBAM_ASSERT(segment_midpoints(segment)==-1);
-    int node1,node2;segment_mesh.elements(segment).Get(node1,node2);int new_node=object.particles.array_collection->Add_Element();
+    int node1,node2;segment_mesh.elements(segment).Get(node1,node2);int new_node=object.particles.Add_Element();
     // define midpoint's position, velocity and acceleration
     object.particles.X(new_node)=(T).5*(object.particles.X(node1)+object.particles.X(node2));
     if(object.particles.store_velocity)
@@ -509,7 +509,7 @@ Rebuild_Object()
             for(int i=0;i<4;i++) object.mesh.elements(index_into_tets)(i)=meshes(level)->elements(tet)(i);
             leaf_levels_and_indices(index_into_tets).Set(level,tet);(*leaf_number(level))(tet)=index_into_tets;index_into_tets++;}
         else (*leaf_number(level))(tet)=0;
-    object.mesh.number_nodes=object.particles.array_collection->Size();
+    object.mesh.number_nodes=object.particles.Size();
     object.Refresh_Auxiliary_Structures();
 }
 //#####################################################################
@@ -533,8 +533,8 @@ Coarsen_Green_Refinements(TETRAHEDRON_MESH& final_mesh,ARRAY<int>& t_junctions,A
             for(int i=0;i<4;i++){
                 int child=(*children(level-1))(parent_tet)(i);if(child<0) break;
                 parent_already_coarsened((*leaf_number(level))(child))=true;}}}
-    ARRAY<bool> occurs_in_final_mesh(object.particles.array_collection->Size());final_mesh.Mark_Nodes_Referenced(occurs_in_final_mesh,true);
-    ARRAY<bool> is_t_junction(object.particles.array_collection->Size());
+    ARRAY<bool> occurs_in_final_mesh(object.particles.Size());final_mesh.Mark_Nodes_Referenced(occurs_in_final_mesh,true);
+    ARRAY<bool> is_t_junction(object.particles.Size());
     t_junctions.Clean_Memory();t_junction_parents.Clean_Memory();
     for(int t=0;t<coarse_parents.m;t++){
         int level,tet;coarse_parents(t).Get(level,tet);
@@ -692,7 +692,7 @@ template<class T> void RED_GREEN_TETRAHEDRA<T>::
 Initialize_Segment_Index_From_Midpoint_Index() // TODO: check that this is correct
 {
     if(segment_index_from_midpoint_index) delete segment_index_from_midpoint_index;
-    segment_index_from_midpoint_index=new ARRAY<int>(object.particles.array_collection->Size());
+    segment_index_from_midpoint_index=new ARRAY<int>(object.particles.Size());
     for(int s=0;s<segment_midpoints.m;s++) if(segment_midpoints(s)>=0) (*segment_index_from_midpoint_index)(segment_midpoints(s))=s;
 }
 template<class T> void RED_GREEN_TETRAHEDRA<T>::
@@ -700,7 +700,7 @@ Print() const
 {
     for(int level=0;level<meshes.m;level++){
         LOG::cout << "There are " << meshes(level)->elements.m << " elements at level " << level << std::endl;
-        LOG::cout << "      and object.particles.array_collection->Size()=" << object.particles.array_collection->Size() << std::endl;
+        LOG::cout << "      and object.particles.Size()=" << object.particles.Size() << std::endl;
         LOG::cout << "      and meshes(level)->incident_elements->m="  << meshes(level)->incident_elements->m << std::endl;}
 }
 //#####################################################################

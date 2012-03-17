@@ -91,7 +91,7 @@ Get_Triangulated_Surface()
 {
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;
-    particles.array_collection->Add_Elements(geometry.m);
+    particles.Add_Elements(geometry.m);
     particles.X=geometry;
     ARRAY<TV>* vertex_normals=new ARRAY<TV>(normals);
     TRIANGLE_MESH& mesh=surface->mesh;

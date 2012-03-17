@@ -18,7 +18,7 @@ class PARTICLE_LEVELSET_PARTICLES:public CLONEABLE<PARTICLE_LEVELSET_PARTICLES<T
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<PARTICLE_LEVELSET_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;using BASE::X;
+    using BASE::X;using BASE::Size;using BASE::Add_Array;
 
     ARRAY_VIEW<unsigned short> quantized_collision_distance;
     ARRAY_VIEW<T> age;
@@ -30,7 +30,7 @@ public:
     virtual ~PARTICLE_LEVELSET_PARTICLES();
 
     int Number() const
-    {return next?array_collection->Size()+next->Number():array_collection->Size();}
+    {return next?Size()+next->Number():Size();}
 
 //#####################################################################
 };

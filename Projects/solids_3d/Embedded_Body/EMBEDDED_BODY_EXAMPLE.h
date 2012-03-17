@@ -126,11 +126,11 @@ void Get_Initial_Data()
     input_tetrahedralized_volume.Set_Density((T)1000);input_tetrahedralized_volume.Set_Mass_Of_Particles(false);
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Copy_And_Add_Structure(input_tetrahedralized_volume);
     tetrahedralized_volume.Update_Number_Nodes();
-    int number_of_original_particles=particles.array_collection->Size();
+    int number_of_original_particles=particles.Size();
 
     // determine simulation subset
     ARRAY<bool> particle_is_included(number_of_original_particles);
-    for(int p=0;p<particles.array_collection->Size();p++)
+    for(int p=0;p<particles.Size();p++)
         if(true) // change this to simulate a given subset
             particle_is_included(p)=true;
 
@@ -176,7 +176,7 @@ void Get_Initial_Data()
     EMBEDDING<TV>& embedding=*new EMBEDDING<TV>(particles);
     ARRAY<ARRAY<int> > embedding_parents;ARRAY<ARRAY<T> > embedding_weights;
     FILE_UTILITIES::Read_From_File(stream_type,model_directory+"/body_embedded_surface_bindings",embedding_parents,embedding_weights);
-    int particle_offset=particles.array_collection->Size();particles.array_collection->Add_Elements(embedding_parents.m);
+    int particle_offset=particles.Size();particles.Add_Elements(embedding_parents.m);
     tetrahedralized_volume.Update_Number_Nodes();
     for(int i=0;i<embedding_parents.m;i++){
         LINEAR_BINDING_DYNAMIC<TV>* binding=new LINEAR_BINDING_DYNAMIC<TV>(particles,particle_offset+i,embedding_parents(i).m);

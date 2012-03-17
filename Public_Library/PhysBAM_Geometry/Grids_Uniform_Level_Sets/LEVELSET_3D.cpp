@@ -241,7 +241,7 @@ Approximate_Surface_Area(const T interface_thickness,const T time) const
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
 Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool include_ghost_values) const
 {
-    triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.array_collection->Clean_Memory();
+    triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.Clean_Memory();
     int m_start=1,m_end=grid.counts.x,n_start=1,n_end=grid.counts.y,mn_start=1,mn_end=grid.counts.z;
     if(include_ghost_values){m_start=phi.domain.min_corner.x;m_end=phi.domain.max_corner.x;n_start=phi.domain.min_corner.y;n_end=phi.domain.max_corner.y;mn_start=phi.domain.min_corner.z;mn_end=phi.domain.max_corner.z;}
     ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(m_start,m_end,n_start,n_end,mn_start,mn_end);edge.Fill(VECTOR<int,6>()-1);
@@ -272,7 +272,7 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>&
             Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(1),edge(i,j,k)(3),edge(i,j+1,k)(0),edge(i,j+1,k)(2),edge(i,j+1,k)(4),phi(i,j,k)); // top left
             Append_Triangles(triangulated_surface,edge(i,j+1,k)(4),edge(i,j+1,k+1)(0),edge(i,j,k+1)(5),edge(i+1,j+1,k)(2),edge(i+1,j,k+1)(1),edge(i+1,j,k)(3),phi(i,j+1,k+1)); // top right
             Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(3),edge(i,j,k)(4),edge(i,j+1,k)(4),edge(i,j,k+1)(5),edge(i+1,j,k)(3),phi(i,j,k));} // center
-    triangulated_surface.mesh.number_nodes=triangulated_surface.particles.array_collection->Size();
+    triangulated_surface.mesh.number_nodes=triangulated_surface.particles.Size();
     triangulated_surface.Remove_Degenerate_Triangles();
 }
 //#####################################################################
@@ -283,7 +283,7 @@ If_Zero_Crossing_Add_Particle_By_Index(TRIANGULATED_SURFACE<T>& triangulated_sur
 {
     int index=-1;T phi1=phi(index1),phi2=phi(index2);
     if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
-        index=triangulated_surface.particles.array_collection->Add_Element();
+        index=triangulated_surface.particles.Add_Element();
         triangulated_surface.particles.X(index)=LINEAR_INTERPOLATION<T,TV>::Linear(grid.X(index1),grid.X(index2),LEVELSET_UTILITIES<T>::Theta(phi1,phi2));}
     return index;
 }
@@ -295,7 +295,7 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,T
 {
     assert(tet_grid.domain.min_corner.x >= grid.domain.min_corner.x && tet_grid.domain.max_corner.x < grid.domain.max_corner.x && tet_grid.domain.min_corner.y >= grid.domain.min_corner.y && tet_grid.domain.max_corner.y < grid.domain.max_corner.y && tet_grid.domain.min_corner.z >= grid.domain.min_corner.z &&
                tet_grid.domain.max_corner.z < grid.domain.max_corner.z);
-    triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.array_collection->Clean_Memory();
+    triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.Clean_Memory();
     ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(0,tet_grid.counts.x,0,tet_grid.counts.y,0,tet_grid.counts.z);
     // create particles
     int i;for(i=0;i<tet_grid.counts.x;i++) for(int j=0;j<tet_grid.counts.y;j++) for(int k=0;k<tet_grid.counts.z;k++){
@@ -324,7 +324,7 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,T
             Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(1),edge(i,j,k)(3),edge(i,j+1,k)(0),edge(i,j+1,k)(2),edge(i,j+1,k)(4),Phi(tet_grid.X(i,j,k))); // top left
             Append_Triangles(triangulated_surface,edge(i,j+1,k)(4),edge(i,j+1,k+1)(0),edge(i,j,k+1)(5),edge(i+1,j+1,k)(2),edge(i+1,j,k+1)(1),edge(i+1,j,k)(3),Phi(tet_grid.X(i,j+1,k+1))); // top right
             Append_Triangles(triangulated_surface,edge(i,j,k)(5),edge(i,j,k)(3),edge(i,j,k)(4),edge(i,j+1,k)(4),edge(i,j,k+1)(5),edge(i+1,j,k)(3),Phi(tet_grid.X(i,j,k)));} // center
-    triangulated_surface.mesh.number_nodes=triangulated_surface.particles.array_collection->Size();
+    triangulated_surface.mesh.number_nodes=triangulated_surface.particles.Size();
     triangulated_surface.Remove_Degenerate_Triangles();
 }
 //#####################################################################
@@ -335,7 +335,7 @@ If_Zero_Crossing_Add_Particle(TRIANGULATED_SURFACE<T>& triangulated_surface,cons
 {
     int index=-1;T phi1=Phi(x1),phi2=Phi(x2);
     if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
-        index=triangulated_surface.particles.array_collection->Add_Element();
+        index=triangulated_surface.particles.Add_Element();
         triangulated_surface.particles.X(index)=LINEAR_INTERPOLATION<T,TV>::Linear(x1,x2,LEVELSET_UTILITIES<T>::Theta(phi1,phi2));}
     return index;
 }

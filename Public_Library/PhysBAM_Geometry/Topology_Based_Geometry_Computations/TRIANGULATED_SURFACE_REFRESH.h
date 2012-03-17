@@ -52,7 +52,7 @@ void Rescale(TRIANGULATED_SURFACE<T>& ts,const T scaling_x,const T scaling_y,con
 {
     typedef VECTOR<T,3> TV;
     if(scaling_x*scaling_y*scaling_z<=0) PHYSBAM_FATAL_ERROR();
-    for(int k=0;k<ts.particles.array_collection->Size();k++) ts.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
+    for(int k=0;k<ts.particles.Size();k++) ts.particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
     if(ts.triangle_list) ts.Update_Triangle_List();if(ts.hierarchy) ts.hierarchy->Update_Boxes();if(ts.bounding_box) ts.Update_Bounding_Box();
 }
 //#####################################################################
@@ -78,7 +78,7 @@ void Initialize_Torus_Mesh_And_Particles(TRIANGULATED_SURFACE<T>& ts,const int m
     for(int j=0;j<n;j++){
         T phi=-dj*j,radius=major_radius+minor_radius*cos(phi),z=minor_radius*sin(phi);
         for(int i=0;i<m;i++){
-            int p=ts.particles.array_collection->Add_Element();T theta=di*(i-(T).5*(j&1));
+            int p=ts.particles.Add_Element();T theta=di*(i-(T).5*(j&1));
             ts.particles.X(p)=TV(radius*cos(theta),radius*sin(theta),z);}}
     ts.mesh.Initialize_Torus_Mesh(m,n);
 }
@@ -89,11 +89,11 @@ template<class T>
 void Initialize_Cylinder_Mesh_And_Particles(TRIANGULATED_SURFACE<T>& ts,const int m,const int n,const T length,const T radius,const bool create_caps)
 {
     typedef VECTOR<T,3> TV;
-    ts.particles.array_collection->Delete_All_Elements();T dtheta=(T)two_pi/n;T dlength=length/(m-1);
+    ts.particles.Delete_All_Elements();T dtheta=(T)two_pi/n;T dlength=length/(m-1);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++){
-        int p=ts.particles.array_collection->Add_Element();T theta=j*dtheta;
+        int p=ts.particles.Add_Element();T theta=j*dtheta;
         ts.particles.X(p)=TV(dlength*i,radius*sin(theta),radius*cos(theta));}
-    if(create_caps){int p_1=ts.particles.array_collection->Add_Element();int p_2=ts.particles.array_collection->Add_Element();ts.particles.X(p_1)=TV(0,0,0);ts.particles.X(p_2)=TV(length,0,0);}
+    if(create_caps){int p_1=ts.particles.Add_Element();int p_2=ts.particles.Add_Element();ts.particles.X(p_1)=TV(0,0,0);ts.particles.X(p_2)=TV(length,0,0);}
     ts.mesh.Initialize_Cylinder_Mesh(m,n,create_caps);
 }
 }

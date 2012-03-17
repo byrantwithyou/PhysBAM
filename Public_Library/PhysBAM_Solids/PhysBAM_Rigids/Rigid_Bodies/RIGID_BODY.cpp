@@ -451,7 +451,7 @@ Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_
     Add_Structure(tetrahedralized_volume);
     TRIANGULATED_SURFACE<T>* triangulated_surface_condensed=TRIANGULATED_SURFACE<T>::Create();
     triangulated_surface_condensed->mesh.Initialize_Mesh(triangulated_surface.mesh);
-    triangulated_surface_condensed->particles.array_collection->Initialize(*triangulated_surface.particles.array_collection); 
+    triangulated_surface_condensed->particles.Initialize(triangulated_surface.particles); 
     triangulated_surface_condensed->Discard_Valence_Zero_Particles_And_Renumber();
     for(int i=0;i<subdivision_loops;i++) triangulated_surface_condensed->Linearly_Subdivide();
     Add_Structure(*triangulated_surface_condensed);

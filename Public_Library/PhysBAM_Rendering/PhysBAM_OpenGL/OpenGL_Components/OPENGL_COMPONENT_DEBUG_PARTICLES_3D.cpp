@@ -2,7 +2,6 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -134,10 +133,10 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         
         if(!draw_multiple_particle_sets && 1!=set) return;
     
-        output_stream<<"Selected particle in ["<<component_name<<"("<<1<<")] (total number = "<<particles.array_collection->Size()<<")"<<std::endl;
+        output_stream<<"Selected particle in ["<<component_name<<"("<<1<<")] (total number = "<<particles.Size()<<")"<<std::endl;
     
         int current_index=-1;
-        if(real_selection->index<particles.array_collection->Size()){
+        if(real_selection->index<particles.Size()){
             output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
             current_index=real_selection->index;}
 

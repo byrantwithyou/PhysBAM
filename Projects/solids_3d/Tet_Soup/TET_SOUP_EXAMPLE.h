@@ -97,7 +97,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             int intersecting_tet=Get_Intersecting_Tetrahedron(particles,X(p),dynamic_volume);if(intersecting_tet<0) break;
             intersection_list.Append(intersecting_tet);}
         if(intersection_list.m!=4){i--;continue;}
-        int offset=particles.array_collection->Size();particles.array_collection->Add_Elements(4);
+        int offset=particles.Size();particles.Add_Elements(4);
         tet_soup.mesh.elements.Append(VECTOR<int,4>(1,2,3,4)+offset);
         for(int p=0;p<4;p++){
             VECTOR<int,4> parents=dynamic_volume.mesh.elements(intersection_list(p));

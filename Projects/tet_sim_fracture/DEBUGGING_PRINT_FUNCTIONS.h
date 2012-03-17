@@ -153,25 +153,25 @@ static bool Verify_Child_Structure(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv)
 {
     if(!etv.embedded_children_index)return true;
     if(etv.embedded_children_index->m != etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes){assert(false);return false;}
-    if(etv.tetrahedralized_volume.particles.array_collection->Size() != etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes){assert(false);return false;}
+    if(etv.tetrahedralized_volume.particles.Size() != etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes){assert(false);return false;}
     int total_number_of_children=0;
-    for(int tet_node=0;tet_node<etv.tetrahedralized_volume.particles.array_collection->Size();tet_node++){
+    for(int tet_node=0;tet_node<etv.tetrahedralized_volume.particles.Size();tet_node++){
         if(!Verify_Children_Of_This_Node(etv,tet_node)){assert(false);return false;}
         total_number_of_children+=etv.Number_Of_Children(tet_node);
     }
-    if(total_number_of_children != 2*etv.embedded_particles.array_collection->Size()){assert(false);return false;}
+    if(total_number_of_children != 2*etv.embedded_particles.Size()){assert(false);return false;}
     return true;
 }
 
 static bool Verify_Array_Sizes_In_ETV(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& etv)
 {
-    if(etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes != etv.tetrahedralized_volume.particles.array_collection->Size()){assert(false);return false;}
-    if(etv.embedded_particles.array_collection->Size() != etv.embedded_triangle_mesh.number_nodes){assert(false);return false;}
-    if(etv.parent_particles.m != etv.embedded_particles.array_collection->Size()){assert(false);return false;}
-    if(etv.interpolation_fraction.m != etv.embedded_particles.array_collection->Size()){assert(false);return false;}
+    if(etv.tetrahedralized_volume.tetrahedron_mesh.number_nodes != etv.tetrahedralized_volume.particles.Size()){assert(false);return false;}
+    if(etv.embedded_particles.Size() != etv.embedded_triangle_mesh.number_nodes){assert(false);return false;}
+    if(etv.parent_particles.m != etv.embedded_particles.Size()){assert(false);return false;}
+    if(etv.interpolation_fraction.m != etv.embedded_particles.Size()){assert(false);return false;}
     if(etv.node_in_tetrahedron_is_material.m != etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m){assert(false);return false;}
     if(etv.embedded_sub_elements_in_parent_element_index->m != etv.tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m){assert(false);return false;}
-    if(etv.embedded_children_index && etv.embedded_children_index->m != etv.tetrahedralized_volume.particles.array_collection->Size()){assert(false);return false;}
+    if(etv.embedded_children_index && etv.embedded_children_index->m != etv.tetrahedralized_volume.particles.Size()){assert(false);return false;}
     if(etv.embedded_sub_elements_in_parent_element->m != etv.number_of_embedded_sub_elements_in_parent_element->m){assert(false);return false;}
     return true;
 }

@@ -20,7 +20,7 @@ template<class T>
 VECTOR<T,3> Centroid_Of_Neighbors(const TETRAHEDRALIZED_VOLUME<T>& tv,const int node)
 {
     typedef VECTOR<T,3> TV;
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     bool neighbor_nodes_defined=tv.mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) tv.mesh.Initialize_Neighbor_Nodes();
     TV target;
     int number_of_neighbors=(*tv.mesh.neighbor_nodes)(node).m;

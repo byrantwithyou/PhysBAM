@@ -235,14 +235,14 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> interpolation;
         if(pls.use_removed_positive_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++){
+            for(int p=0;p<particles.Size();p++){
                 TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(example.mac_grid,face_velocities_ghost,X);
                 if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=-TV::Axis_Vector(1)*.3; // buoyancy
                 particles.V(p)=V;}}
         if(pls.use_removed_negative_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=-TV::Axis_Vector(1)*dt*9.8; // ballistic
-            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(example.mac_grid,example.incompressible.force,particles.X(p));} // external forces
+            for(int p=0;p<particles.Size();p++) particles.V(p)+=-TV::Axis_Vector(1)*dt*9.8; // ballistic
+            for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(example.mac_grid,example.incompressible.force,particles.X(p));} // external forces
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
 
         example.particle_levelset_evolution.Make_Signed_Distance();

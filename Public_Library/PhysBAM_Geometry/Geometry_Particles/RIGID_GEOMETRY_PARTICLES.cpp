@@ -10,9 +10,9 @@ template<class TV> RIGID_GEOMETRY_PARTICLES<TV>::
 RIGID_GEOMETRY_PARTICLES()
     :rigid_geometry(0,0),frame(0,0),twist(0,0),structure_ids(0,0)
 {
-    array_collection->Add_Array(ATTRIBUTE_ID_FRAME,&frame);
-    array_collection->Add_Array(ATTRIBUTE_ID_TWIST,&twist);
-    array_collection->Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);
+    Add_Array(ATTRIBUTE_ID_FRAME,&frame);
+    Add_Array(ATTRIBUTE_ID_TWIST,&twist);
+    Add_Array(ATTRIBUTE_ID_STRUCTURE_IDS,&structure_ids);
 }
 template<class TV> RIGID_GEOMETRY_PARTICLES<TV>::
 ~RIGID_GEOMETRY_PARTICLES()
@@ -24,10 +24,10 @@ template<class TV> RIGID_GEOMETRY_PARTICLES<TV>::
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Resize(const int new_size)
 {
-    for(int p=new_size;p<array_collection->Size();p++)
+    for(int p=new_size;p<Size();p++)
         if(rigid_geometry(p)) Remove_Geometry(p);
     rigid_geometry.Resize(new_size);
-    array_collection->Resize(new_size);
+    BASE::Resize(new_size);
 }
 //#####################################################################
 // Remove_Geometry
@@ -44,9 +44,9 @@ Remove_Geometry(const int p)
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Clean_Memory()
 {
-    for(int p=0;p<array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
+    for(int p=0;p<Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
     rigid_geometry.Clean_Memory();
-    array_collection->Clean_Memory();
+    BASE::Clean_Memory();
 }
 //#####################################################################
 // Function Clean_Memory
@@ -54,9 +54,9 @@ Clean_Memory()
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Delete_All_Particles()
 {
-    for(int p=0;p<array_collection->Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
+    for(int p=0;p<Size();p++) if(rigid_geometry(p)) Remove_Geometry(p);
     rigid_geometry.Remove_All();
-    array_collection->Delete_All_Elements();
+    BASE::Delete_All_Elements();
 }
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,1> >;
 template class RIGID_GEOMETRY_PARTICLES<VECTOR<float,2> >;

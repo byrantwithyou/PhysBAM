@@ -58,7 +58,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
     std::fstream input;input.open(input_file,std::ios::in|std::ios::binary);
     if(!input.is_open()){std::cout << "problem opening input torus file" << std::endl;exit(0);}
     tetrahedralized_volume.Read_Float(input);input.close();
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tetrhedra = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
 
     tetrahedralized_volume.particles.Delete_Velocity_And_Acceleration();
@@ -77,7 +77,7 @@ void Initialize_Tetrahedralized_Volume(TETRAHEDRALIZED_VOLUME<T>& tetrahedralize
         tetrahedralized_volume.particles.X(i).y+=initial_height-bottom;}
     T scale=10;
     for(int i=0;i<tetrahedralized_volume.particles.array_size;i++){tetrahedralized_volume.particles.X(i)*=scale;tetrahedralized_volume.particles.V(i)*=scale;}
-    std::cout << "total vertices = " << tetrahedralized_volume.particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << tetrahedralized_volume.particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.tetrahedron_mesh.tetrahedrons.m << std::endl; 
     tetrahedralized_volume.Set_Density(500);
     tetrahedralized_volume.Set_Mass_Of_Particles(solids_parameters.use_constant_mass);

@@ -482,12 +482,12 @@ void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated)
         static bool first_time=true;
         if(restart && first_time){ // rebuild the particle deletion list
             PHYSBAM_ASSERT(old_number_particles); // ensure Initialize_Dynamic_Subsampling was called 
-            LOG::cout<<"DEBUG rebuilding particle deletion list, particles.array_collection->Size()="<<particles.array_collection->Size()<<", old_number_particles="<<old_number_particles<<std::endl; 
-            for(int p=old_number_particles+1;p<=particles.array_collection->Size();p++) particles.array_collection->Add_To_Deletion_List(p);
+            LOG::cout<<"DEBUG rebuilding particle deletion list, particles.Size()="<<particles.Size()<<", old_number_particles="<<old_number_particles<<std::endl; 
+            for(int p=old_number_particles+1;p<=particles.Size();p++) particles.Add_To_Deletion_List(p);
             binding_list.Clean_Memory();soft_bindings.Clean_Memory(); // clear bindings: assumes all bindings are for dynamic samples
-            LOG::cout<<"DEBUG number of particles in the deletion list="<<particles.array_collection->deletion_list.m<<std::endl;
+            LOG::cout<<"DEBUG number of particles in the deletion list="<<particles.deletion_list.m<<std::endl;
             first_time=false;}
-        particle_is_simulated.Subset(particles.array_collection->deletion_list).Fill(false);}
+        particle_is_simulated.Subset(particles.deletion_list).Fill(false);}
 }
 //#####################################################################
 // Function Push_Out_Test
@@ -674,7 +674,7 @@ void Sliding_Test()
     rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("box 2 mu=%.2f",mu));
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
-    int particle_rest=solid_body_collection.deformable_body_collection.particles.array_collection->Add_Element(),particle_fall=solid_body_collection.deformable_body_collection.particles.array_collection->Add_Element();
+    int particle_rest=solid_body_collection.deformable_body_collection.particles.Add_Element(),particle_fall=solid_body_collection.deformable_body_collection.particles.Add_Element();
     solid_body_collection.deformable_body_collection.particles.mass(particle_rest)=1;solid_body_collection.deformable_body_collection.particles.mass(particle_fall)=1;
     solid_body_collection.deformable_body_collection.particles.X(particle_rest)=TV(0,0,(T).8);solid_body_collection.deformable_body_collection.particles.X(particle_fall)=TV(0,(T).2,(T)1.4);
     free_particles.nodes.Append(particle_rest);free_particles.nodes.Append(particle_fall);
@@ -851,7 +851,7 @@ void Floppy_Fish()
     else tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/fish_42K.tet",fish_state,true,false,1000,(T)1);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
     ground=&tests.Add_Ground(friction,0,0);
 
@@ -1013,7 +1013,7 @@ void Ring_Drop()
         RANGE<TV> box(-TV((T)4.5,(T)4.5,(T)1),TV((T)4.5,(T)4.5,(T)1));
         FRAME<TV> frame=Find_Placement(random,box*scale,bounding_boxes,world,true);
         tests.Make_Lathe_Chain(frame,scale,mu);
-        int last=solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();
+        int last=solid_body_collection.rigid_body_collection.rigid_body_particle.Size();
         T d=max((T)0,bounding_boxes.Last().Center().y-world.min_corner.y),clamp_time=d<h?0:base_t+(d-h)/maximum_fall_speed;
         for(int id=last-5;id<=last;id++){
             solid_body_collection.rigid_body_collection.Rigid_Body(id).Set_Mass(ring_mass/6);
@@ -1101,7 +1101,7 @@ void Cubes_Friction()
     tests.Create_Mattress(GRID<TV>(VECTOR<int,3>(5,5,5),RANGE<TV>(TV(-(T)1,-(T)1,-(T)1),TV((T)1,(T)1,(T)1))*box_size),false,&state);
 
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();solid_body_collection.deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
-    int particle_rest=solid_body_collection.deformable_body_collection.particles.array_collection->Add_Element();
+    int particle_rest=solid_body_collection.deformable_body_collection.particles.Add_Element();
     solid_body_collection.deformable_body_collection.particles.mass(particle_rest)=1;
     solid_body_collection.deformable_body_collection.particles.X(particle_rest)=TV(0,0,(T).4);
     free_particles.nodes.Append(particle_rest);
@@ -1195,7 +1195,7 @@ void Sidewinding()
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/snake_8K.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(center,snake_rotation)),false,false,1000,(T).5);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
+    for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) tests.Bind_Particles_In_Rigid_Body(rigid_body_collection.Rigid_Body(p));
 
 //     {RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("subdivided_box",(T).3,friction);
 //     rigid_body.Frame().t=TV((T)0,(T).3,-10);
@@ -1296,7 +1296,7 @@ void Add_Maggot(const T scale,const RIGID_BODY_STATE<TV>& state,const std::strin
     tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/maggot_"+resolution+"K.tet",state,false,false,1000,(T)1.2*scale);
 
     // binding the deformable particles to the rigid bodies
-    for(int p=rigid_body_collection.rigid_body_particle.array_collection->Size()-number_of_joints;p<=rigid_body_collection.rigid_body_particle.array_collection->Size();p++){
+    for(int p=rigid_body_collection.rigid_body_particle.Size()-number_of_joints;p<=rigid_body_collection.rigid_body_particle.Size();p++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);
         rigid_body.Twist().angular=state.twist.angular;
         rigid_body.Twist().linear=state.Pointwise_Object_Velocity(rigid_body.Frame().t);
@@ -1466,7 +1466,7 @@ void Initialize_Dynamic_Subsampling()
     FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create(deformable_body_collection.particles);
     deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
 
-    old_number_particles=deformable_body_collection.particles.array_collection->Size();
+    old_number_particles=deformable_body_collection.particles.Size();
     triangle_free_particles.Resize(surface_elements.m);
 
 //    solids_parameters.write_static_variables_every_frame=true;
@@ -1483,9 +1483,9 @@ void Add_Subsamples(const int surface_triangle_index,ARRAY<BINDING<TV>*>& new_bi
     ARRAY<int>& particle_subsamples=triangle_free_particles(surface_triangle_index);
     for(int i=0;i<subsamples;i++){
         VECTOR<T,3> weights;do{weights=random_numbers.Get_Uniform_Vector(TV(),TV(1,1,1));}while(weights.x+weights.y>=1);weights.z=(T)1-weights.x-weights.y;
-        int hard_bound_particle=particles.array_collection->Add_Element_From_Deletion_List();
+        int hard_bound_particle=particles.Add_Element_From_Deletion_List();
         new_binding_list.Append(new LINEAR_BINDING<TV,3>(particles,hard_bound_particle,triangle,weights));
-        int soft_bound_particle=particles.array_collection->Add_Element_From_Deletion_List();
+        int soft_bound_particle=particles.Add_Element_From_Deletion_List();
         new_soft_bindings.Append(VECTOR<int,2>(soft_bound_particle,hard_bound_particle));
         particle_subsamples.Append(soft_bound_particle);}
 }
@@ -1503,8 +1503,8 @@ void Delete_Subsamples(const int surface_triangle_index)
     for(int i=0;i<particle_subsamples.m;i++){
         int soft_bound_particle=particle_subsamples(i);
         int hard_bound_particle=soft_bindings.Parent(soft_bound_particle);
-        particles.array_collection->Add_To_Deletion_List(soft_bound_particle);
-        particles.array_collection->Add_To_Deletion_List(hard_bound_particle);}
+        particles.Add_To_Deletion_List(soft_bound_particle);
+        particles.Add_To_Deletion_List(hard_bound_particle);}
     particle_subsamples.Remove_All();
 }
 //#####################################################################

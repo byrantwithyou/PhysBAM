@@ -68,7 +68,7 @@ public:
     // initialize cloth
     GRID<TV> cloth_grid(number_side_panels+1,(int)(aspect_ratio*number_side_panels)+1,0,1,0,aspect_ratio);
     triangle_mesh.Initialize_Herring_Bone_Mesh(cloth_grid.m,cloth_grid.n);
-    particles.array_collection->Add_Elements(triangle_mesh.number_nodes);
+    particles.Add_Elements(triangle_mesh.number_nodes);
     for(int i=0;i<cloth_grid.m;i++) for(int j=0;j<cloth_grid.n;j++){
         int node=i+cloth_grid.m*(j-1);
         particles.X(node)=VECTOR_3D<T>(cloth_grid.x(i),initial_cloth_height,cloth_grid.y(j));
@@ -91,8 +91,8 @@ public:
     else if(collision_object_type==COARSE_TRIANGULATED_SURFACE || collision_object_type==DENSE_TRIANGULATED_SURFACE){
         std::cout<<"Using triangle collisions"<<std::endl;
         plane_particles.Update_Velocity();plane_particles.Store_Mass();
-        plane_particles.array_collection->Add_Elements(solids_parameters.rigid_body_parameters.list.rigid_bodies(rigid_index)->triangulated_surface->particles.array_collection->Size());
-        for(int p=0;p<plane_particles.array_collection->Size();p++) plane_particles.mass(p)=(T)1e6;
+        plane_particles.Add_Elements(solids_parameters.rigid_body_parameters.list.rigid_bodies(rigid_index)->triangulated_surface->particles.Size());
+        for(int p=0;p<plane_particles.Size();p++) plane_particles.mass(p)=(T)1e6;
         plane_surface=new TRIANGULATED_SURFACE<T>(solids_parameters.rigid_body_parameters.list.rigid_bodies(rigid_index)->triangulated_surface->triangle_mesh,plane_particles);
         Update_Collision_Body_Positions_And_Velocities(initial_time);
         solids_parameters.extra_collision_surfaces.Append(plane_surface);}}
@@ -112,7 +112,7 @@ public:
     void Update_Collision_Body_Positions_And_Velocities(const T time) PHYSBAM_OVERRIDE
     {if(collision_object_type==COARSE_TRIANGULATED_SURFACE || collision_object_type==DENSE_TRIANGULATED_SURFACE){
         const RIGID_BODY<TV>& body=*solids_parameters.rigid_body_parameters.list.rigid_bodies(1);
-        for(int p=0;p<plane_particles.array_collection->Size();p++){
+        for(int p=0;p<plane_particles.Size();p++){
             plane_particles.X(p)=body.World_Space_Point(body.triangulated_surface->particles.X(p));
             plane_particles.V(p)=body.Pointwise_Object_Velocity(plane_particles.X(p));}}}
 

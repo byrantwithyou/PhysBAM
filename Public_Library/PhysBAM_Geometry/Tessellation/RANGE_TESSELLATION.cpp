@@ -17,7 +17,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const RANGE<VECTOR
 {
     typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(8);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(8);
     particles.X(0)=TV(box.min_corner.x,box.min_corner.y,box.max_corner.z);particles.X(1)=TV(box.max_corner.x,box.min_corner.y,box.max_corner.z);
     particles.X(2)=TV(box.max_corner.x,box.max_corner.y,box.max_corner.z);particles.X(3)=TV(box.min_corner.x,box.max_corner.y,box.max_corner.z);
     particles.X(4)=TV(box.min_corner.x,box.min_corner.y,box.min_corner.z);particles.X(5)=TV(box.max_corner.x,box.min_corner.y,box.min_corner.z);

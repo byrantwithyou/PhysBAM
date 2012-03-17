@@ -30,7 +30,7 @@ public:
 
     LINEAR_BLEND_SKINNING(TRIANGULATED_SURFACE<T> &surface_input,BODY_MOTION_SEQUENCE<T> &body_motion_input,T motion_frame_rate_input,int number_particles_input=0,int start_particles_input=1)
         :constant(0.22),motion_frame_rate(motion_frame_rate_input),start_particles(start_particles_input),surface(surface_input),body_motion(body_motion_input)
-    {if(number_particles_input) number_particles=number_particles_input; else number_particles=surface.particles.array_collection->Size()-start_particles+1;}
+    {if(number_particles_input) number_particles=number_particles_input; else number_particles=surface.particles.Size()-start_particles+1;}
 
     int Find_Closest_Bone_And_Distance_Squared(T distance_squared,TV location,int frame)
     {

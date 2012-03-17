@@ -60,8 +60,8 @@ Get_Current_Kinematic_Keyframes(const T dt,const T time)
 {
     if(!use_kinematic_keyframes) return;
     kinematic_current_state.Remove_All();kinematic_next_state.Remove_All();
-    kinematic_current_state.Resize(rigid_geometry_collection.particles.array_collection->Size());
-    kinematic_next_state.Resize(rigid_geometry_collection.particles.array_collection->Size());
+    kinematic_current_state.Resize(rigid_geometry_collection.particles.Size());
+    kinematic_next_state.Resize(rigid_geometry_collection.particles.Size());
     for(int i=0;i<rigid_geometry_collection.kinematic_rigid_geometry.m;i++){int p=rigid_geometry_collection.kinematic_rigid_geometry(i);
         kinematic_current_state(p).time=time;kinematic_next_state(p).time=time+dt;
         rigid_geometry_collection.rigid_geometry_example_velocities->Set_Kinematic_Positions(kinematic_current_state(p).frame,time,p);

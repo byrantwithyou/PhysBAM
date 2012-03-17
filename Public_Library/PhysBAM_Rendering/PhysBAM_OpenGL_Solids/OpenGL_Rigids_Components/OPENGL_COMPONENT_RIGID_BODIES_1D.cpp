@@ -72,7 +72,7 @@ Reinitialize(const bool force)
         ARRAY<int> needs_init;
         rigid_body_collection.Read(STREAM_TYPE(RW()),basedir,frame,&needs_init);
 
-        int max_number_of_bodies(max(opengl_point_simplices.Size(),rigid_body_collection.rigid_body_particle.array_collection->Size()));
+        int max_number_of_bodies(max(opengl_point_simplices.Size(),rigid_body_collection.rigid_body_particle.Size()));
         // only enlarge array as we read in more geometry to memory
         opengl_point_simplices.Resize(max_number_of_bodies);
         opengl_axes.Resize(max_number_of_bodies);
@@ -85,10 +85,10 @@ Reinitialize(const bool force)
             Create_Geometry(id);}
 
         // Update active bodies / remove inactive bodies
-        for(int id=0;id<rigid_body_collection.rigid_body_particle.array_collection->Size();id++){
+        for(int id=0;id<rigid_body_collection.rigid_body_particle.Size();id++){
             if(rigid_body_collection.Is_Active(id)) Update_Geometry(id);
             else Destroy_Geometry(id);}
-        for(int id=rigid_body_collection.rigid_body_particle.array_collection->Size();id<opengl_point_simplices.Size();id++) Destroy_Geometry(id);
+        for(int id=rigid_body_collection.rigid_body_particle.Size();id<opengl_point_simplices.Size();id++) Destroy_Geometry(id);
 
         frame_loaded=frame;
         valid=true;}
@@ -133,7 +133,7 @@ Destroy_Geometry(const int id)
 template<class T,class RW> void OPENGL_COMPONENT_RIGID_BODIES_1D<T,RW>::
 Update_Object_Labels()
 {
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
         if(draw_object(i)){
             if(opengl_point_simplices(i)){
                 if(output_positions){
@@ -178,12 +178,12 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);
 
         if(draw_point_simplices){
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
                 if(draw_object(i) && opengl_point_simplices(i)) opengl_point_simplices(i)->Display(in_color);}}
 
         if(show_object_names){
             glColor3f(1,1,1);
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
                 if(draw_object(i) && rigid_body_collection.Rigid_Body(i).name.length()){
                     OpenGL_String(rigid_body_collection.rigid_body_particle.frame(i).t,STRING_UTILITIES::string_sprintf("%s %f",rigid_body_collection.Rigid_Body(i).name.c_str(),rigid_body_collection.rigid_body_particle.twist(i).linear.x));}}}
         glPopAttrib();}

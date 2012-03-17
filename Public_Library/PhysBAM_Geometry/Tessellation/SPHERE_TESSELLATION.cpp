@@ -20,7 +20,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SPHERE<VECTO
 {
     typedef VECTOR<T,3> TV;
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.array_collection->Add_Elements(6);
+    GEOMETRY_PARTICLES<TV>& particles=surface->particles;particles.Add_Elements(6);
     particles.X(0)=TV(-1,0,0);particles.X(1)=TV(1,0,0);particles.X(2)=TV(0,-1,0);
     particles.X(3)=TV(0,1,0);particles.X(4)=TV(0,0,-1);particles.X(5)=TV(0,0,1);
     ARRAY<VECTOR<int,3> >& triangles=surface->mesh.elements;triangles.Exact_Resize(8);
@@ -29,7 +29,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const SPHERE<VECTO
     surface->mesh.number_nodes=6;
     surface->mesh.Initialize_Neighbor_Nodes();
     for(int i=0;i<levels;i++) surface->Root_Three_Subdivide();
-    for(int p=0;p<particles.array_collection->Size();p++) particles.X(p)=sphere.center+sphere.radius*particles.X(p).Normalized();
+    for(int p=0;p<particles.Size();p++) particles.X(p)=sphere.center+sphere.radius*particles.X(p).Normalized();
     return surface;
 }
 template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T,2> >& circle,int levels)
@@ -38,7 +38,7 @@ template<class T> TRIANGULATED_AREA<T>* Generate_Triangles(const SPHERE<VECTOR<T
     typedef VECTOR<T,2> TV;
     typedef VECTOR<int,3> E;
     TRIANGULATED_AREA<T>* area=TRIANGULATED_AREA<T>::Create();
-    GEOMETRY_PARTICLES<TV>& particles=area->particles;particles.array_collection->Add_Elements(1+3*levels*(levels+1));
+    GEOMETRY_PARTICLES<TV>& particles=area->particles;particles.Add_Elements(1+3*levels*(levels+1));
     particles.X(0)=TV(0,0);
     for(int i=0,k=1;i<levels;i++)
         for(int j=0;j<i*6+6;j++){
@@ -65,7 +65,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* Tessellate_Boundary(const SPHERE<VECTOR
     assert(levels>=1);
     SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create();
     int n=1<<levels;
-    curve->particles.array_collection->Add_Elements(n);
+    curve->particles.Add_Elements(n);
     for(int i=0;i<n;i++) curve->particles.X(i)=VECTOR<T,2>((T)cos(i*two_pi/n),(T)sin(i*two_pi/n))*sphere.radius+sphere.center;
     for(int i=0;i<n-1;i++) curve->mesh.elements.Append(VECTOR<int,2>(i,i+1));
     curve->mesh.elements.Append(VECTOR<int,2>(n-1,0));

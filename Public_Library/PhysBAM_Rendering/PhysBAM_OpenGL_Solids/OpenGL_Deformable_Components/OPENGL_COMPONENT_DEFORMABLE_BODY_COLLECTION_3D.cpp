@@ -50,7 +50,7 @@ template<class T,class RW> TRIANGULATED_SURFACE<T>& OPENGL_COMPONENT_DEFORMABLE_
 Create_Hard_Bound_Boundary_Surface(TRIANGULATED_SURFACE<T>& boundary_surface)
 {
     TRIANGULATED_SURFACE<T>& hard_bound_boundary_surface=*TRIANGULATED_SURFACE<T>::Create(boundary_surface.particles);
-    ARRAY<int> particle_map(IDENTITY_ARRAY<>(boundary_surface.particles.array_collection->Size()));
+    ARRAY<int> particle_map(IDENTITY_ARRAY<>(boundary_surface.particles.Size()));
 #if 0 // TODO: Fix me
     for(int b=0;b<deformable_body_collection.soft_bindings.bindings.m;b++){VECTOR<int,2>& binding=deformable_body_collection.soft_bindings.bindings(b);particle_map(binding.x)=binding.y;}
 #endif

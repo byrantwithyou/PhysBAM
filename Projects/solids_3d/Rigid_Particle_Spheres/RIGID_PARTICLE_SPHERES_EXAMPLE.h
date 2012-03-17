@@ -99,7 +99,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
 
     LOG::cout<<"checking rigid body particle MASS"<<std::endl;
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
         LOG::cout<<"solid_body_collection.rigid_body_collection.rigid_body_particle.mass("<<i<<")="<<solid_body_collection.rigid_body_collection.rigid_body_particle.mass(i)<<std::endl;
     }
 
@@ -131,7 +131,7 @@ void Rigid_Particle_Segment()
     for(int i=0;i<2;i++){
         RIGID_BODY<TV>& sphere=tests.Add_Rigid_Body("sphere",1,0);
         T sign=(T)(2*i-3);sphere.Frame().t+=TV::Axis_Vector(1)*(sign*2);
-        segment_mesh.elements(1)(i)=particles.array_collection->Add_Element();
+        segment_mesh.elements(1)(i)=particles.Add_Element();
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,segment_mesh.elements(1)(i),solid_body_collection.rigid_body_collection,sphere.particle_index,sign*TV()));}
 }
 //#####################################################################
@@ -143,10 +143,10 @@ void Deformable_Segment()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     for(int i=0;i<2;i++){
         T sign=(T)(2*i-3);
-        int particle=particles.array_collection->Add_Element();
+        int particle=particles.Add_Element();
         particles.X(particle)=TV::Axis_Vector(1)*(sign*2);
         particles.mass(particle)=1;
-        int bound_particle=particles.array_collection->Add_Element();
+        int bound_particle=particles.Add_Element();
         solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new PARTICLE_BINDING<TV>(particles,bound_particle,particle));
         segment_mesh.elements(1)(i)=bound_particle;}
 }

@@ -127,9 +127,9 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     ARRAY_VIEW<TV> X(full_particles.X),X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,collisions_in_attempt=0,
         point_face_collisions=0,edge_edge_collisions=0;
-    ARRAY<ARRAY<int> > rigid_lists;ARRAY<int> list_index(full_particles.array_collection->Size()); // index of the rigid list a local node belongs to
+    ARRAY<ARRAY<int> > rigid_lists;ARRAY<int> list_index(full_particles.Size()); // index of the rigid list a local node belongs to
 
-    recently_modified_full.Resize(full_particles.array_collection->Size(),false,false);recently_modified_full.Fill(true);
+    recently_modified_full.Resize(full_particles.Size(),false,false);recently_modified_full.Fill(true);
     ARRAY<TV> V_save;
     ARRAY<TV> X_save;
     // input velocities are average V.  Also want original velocities?  Delta may be sufficient.
@@ -156,7 +156,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         int exited_early=1;
 
         // Make a copy of the particles
-        impulse_velocities.Resize(full_particles.array_collection->Size());for(int i=0;i<full_particles.array_collection->Size();i++) impulse_velocities(i)=full_particles.V(i);
+        impulse_velocities.Resize(full_particles.Size());for(int i=0;i<full_particles.Size();i++) impulse_velocities(i)=full_particles.V(i);
         pf_target_impulses.Resize(point_face_pairs_internal.Size());pf_target_impulses.Fill(TV());
         ee_target_impulses.Resize(edge_edge_pairs_internal.Size());ee_target_impulses.Fill(TV());
         pf_target_weights.Resize(point_face_pairs_internal.Size());pf_target_weights.Fill(VECTOR<T,d+1>());
@@ -213,7 +213,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,rigid_lists);
         // Update positions
         if(collisions_in_attempt){
-            for(int p=0;p<full_particles.array_collection->Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);}
+            for(int p=0;p<full_particles.Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);}
 
         exited_early=0;
         EXIT_EARLY_AND_COMMUNICATE:;
@@ -752,11 +752,11 @@ Stop_Nodes_Before_Self_Collision(const T dt)
 {
     PHYSBAM_FATAL_ERROR(); // This should be fixed to use X instead of X_self_collision_free by adding the argument to the Point_collision and Edge_edge_collision
     int attempts=0,point_face_collisions=0,edge_edge_collisions=0;T collision_time;bool full_stop=false;
-    ARRAY<bool> already_stopped_full(geometry.deformable_body_collection.particles.array_collection->Size());   
+    ARRAY<bool> already_stopped_full(geometry.deformable_body_collection.particles.Size());   
     ARRAY_VIEW<TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
     ARRAY<bool>& modified_full=geometry.modified_full;
     
-    modified_full.Resize(geometry.deformable_body_collection.particles.array_collection->Size(),false,false);modified_full.Fill(false);
+    modified_full.Resize(geometry.deformable_body_collection.particles.Size(),false,false);modified_full.Fill(false);
     while(!attempts || point_face_collisions || edge_edge_collisions){
         LOG::SCOPE scope("Stop Attempt","Stop Attempt");
         if(++attempts > 3) full_stop=true;point_face_collisions=0;edge_edge_collisions=0;

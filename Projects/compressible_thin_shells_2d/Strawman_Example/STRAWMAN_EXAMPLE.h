@@ -171,7 +171,7 @@ void Initialize()
 
         GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
         SEGMENTED_CURVE_2D<T>& segmented_curve=*SEGMENTED_CURVE_2D<T>::Create(particles);
-        particles.array_collection->Add_Elements(2);particles.X(1)=TV(-.1,0);particles.X(2)=TV((T)1.1,0);
+        particles.Add_Elements(2);particles.X(1)=TV(-.1,0);particles.X(2)=TV((T)1.1,0);
         segmented_curve.mesh.number_nodes=2;segmented_curve.mesh.elements.Preallocate(1);
         segmented_curve.mesh.elements.Append(TV_INT(1,2));
         segmented_curve.Update_Segment_List();

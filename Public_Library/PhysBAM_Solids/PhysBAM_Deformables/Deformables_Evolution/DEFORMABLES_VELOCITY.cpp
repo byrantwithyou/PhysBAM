@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> DEFORMABLES_VELOCITY<TV>::
 DEFORMABLES_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection)
-    :V(V_full,deformable_body_collection.dynamic_particles),rigid_V(rigid_V_full,ARRAY<int>(IDENTITY_ARRAY<int>(rigid_geometry_collection.particles.array_collection->Size())))
+    :V(V_full,deformable_body_collection.dynamic_particles),rigid_V(rigid_V_full,ARRAY<int>(IDENTITY_ARRAY<int>(rigid_geometry_collection.particles.Size())))
 {}
 //#####################################################################
 // Constructor

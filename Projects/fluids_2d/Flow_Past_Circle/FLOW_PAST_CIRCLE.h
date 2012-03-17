@@ -57,7 +57,7 @@ public:
         sample_points.Append(TV(2,3));
 
         output_directory="Flow_Past_Circle/output";
-        debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+        debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     }
     
     ~FLOW_PAST_CIRCLE()
@@ -186,10 +186,10 @@ void Set_Dirichlet_Boundary_Conditions(const T time)
 //#####################################################################
 void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 {
-    if(debug_particles.array_collection->Size()){
+    if(debug_particles.Size()){
         FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
         FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
-        debug_particles.array_collection->Delete_All_Elements();}
+        debug_particles.Delete_All_Elements();}
     if(frame==1){
         FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),0));
         FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),0),debug_particles);}
@@ -243,8 +243,8 @@ typename BOUNDARY_CONDITIONS_CALLBACKS<TV>::RAY_TYPE Get_Boundary_Along_Ray(cons
 
     static VECTOR<T,3> color_map[]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,.5,0),VECTOR<T,3>(1,0,1),VECTOR<T,3>(0,.5,0),VECTOR<T,3>(0,1,1),VECTOR<T,3>(1,1,0)};
 
-    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
-        int p=debug_particles.array_collection->Add_Element();
+    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
+        int p=debug_particles.Add_Element();
         debug_particles.X(p)=X1+theta*(X2-X1);
         (*color_attribute)(p)=color_map[type];}
 

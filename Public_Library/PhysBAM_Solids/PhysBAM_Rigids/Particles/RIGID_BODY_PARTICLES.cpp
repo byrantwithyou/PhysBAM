@@ -16,10 +16,10 @@ template<class TV> RIGID_BODY_PARTICLES<TV>::
 RIGID_BODY_PARTICLES()
     :angular_momentum(0,0),mass(0,0),inertia_tensor(0,0),kinematic(0,0)
 {
-    array_collection->Add_Array(ATTRIBUTE_ID_ANGULAR_MOMENTUM,&angular_momentum);
-    array_collection->Add_Array(ATTRIBUTE_ID_RIGID_MASS,&mass);
-    array_collection->Add_Array(ATTRIBUTE_ID_RIGID_INERTIA_TENSOR,&inertia_tensor);
-    array_collection->Add_Array(ATTRIBUTE_ID_KINEMATIC,&kinematic);
+    Add_Array(ATTRIBUTE_ID_ANGULAR_MOMENTUM,&angular_momentum);
+    Add_Array(ATTRIBUTE_ID_RIGID_MASS,&mass);
+    Add_Array(ATTRIBUTE_ID_RIGID_INERTIA_TENSOR,&inertia_tensor);
+    Add_Array(ATTRIBUTE_ID_KINEMATIC,&kinematic);
 }
 //#####################################################################
 // Destructor

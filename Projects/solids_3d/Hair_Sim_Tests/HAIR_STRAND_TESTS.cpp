@@ -162,9 +162,9 @@ Initialize_Bodies()
     extra_edges.Update_Number_Nodes();
     bending_edges.Update_Number_Nodes();
     torsion_edges.Update_Number_Nodes();
-    assert(masses.m==particles.array_collection->Size());
+    assert(masses.m==particles.Size());
     for(int i=0;i<masses.m;i++) {assert(masses(i));particles.mass(i)=masses(i);}
-    //for(int i=0;i<particles.array_collection->Size();i++) {particles.mass(i)=1.;}
+    //for(int i=0;i<particles.Size();i++) {particles.mass(i)=1.;}
     //for(int i=1;i<fixed_nodes.m+1;i++) particles.mass(fixed_nodes(i))=FLT_MAX;
     for(int i=1;i<fixed_nodes_start.m+1;i++) particles.mass(fixed_nodes_start(i))=FLT_MAX;
     for(int i=1;i<fixed_nodes_start.m+1;i++) particles.mass(fixed_nodes_end(i))=FLT_MAX;
@@ -231,12 +231,12 @@ Initialize_Bodies()
 
     PHYSBAM_FATAL_ERROR();
 #if 0
-    SPARSE_UNION_FIND<> particle_connectivity(particles.array_collection->Size()+rigid_body_collection.rigid_body_particle.array_collection->Size());
-    particle_to_spring_id.Resize(particles.array_collection->Size());
+    SPARSE_UNION_FIND<> particle_connectivity(particles.Size()+rigid_body_collection.rigid_body_particle.Size());
+    particle_to_spring_id.Resize(particles.Size());
     edge_springs->Add_Fragment_Connectivity(particle_connectivity);extra_edge_springs->Add_Fragment_Connectivity(particle_connectivity);
     if(torsion_springs) torsion_springs->Add_Fragment_Connectivity(particle_connectivity);bending_springs->Add_Fragment_Connectivity(particle_connectivity);//guide_springs->Add_Fragment_Connectivity(union_find);}
     HAIR_ID next_segment_id(0);
-    for(int p=0;p<particles.array_collection->Size();p++){
+    for(int p=0;p<particles.Size();p++){
         int root=particle_connectivity.Find(p);
         if(particle_to_spring_id(root)==HAIR_ID(0)){
             next_segment_id++;
@@ -491,7 +491,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);
-        for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
+        for(int i=0;i<particles.Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("before impulse",2,2);
         particles.X=positions_save;}
     
@@ -531,7 +531,7 @@ Add_External_Impulses_Helper(ARRAY_VIEW<TV> V,const T time,const T dt,bool use_m
 
     if(write_substeps_level>-1){
         ARRAY<TV> positions_save(particles.X);
-        for(int i=0;i<particles.array_collection->Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
+        for(int i=0;i<particles.Size();i++) particles.X(i)=particles.X(i)+dt*V(i);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after impulse",2,2);
         particles.X=positions_save;}
 }

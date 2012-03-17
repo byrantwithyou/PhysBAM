@@ -157,8 +157,8 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR<T,3> >
 {
     if(rigid_bodies.m<1) return;
     if(particle_type == NEGATIVE || particle_type == REMOVED_NEGATIVE){
-        for(int k=particles.array_collection->Size();k>=1;k--) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k),-grid.dx)) particles.Delete_Particle(k);}
-   else for(int k=particles.array_collection->Size();k>=1;k--) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.Delete_Particle(k);
+        for(int k=particles.Size();k>=1;k--) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k),-grid.dx)) particles.Delete_Particle(k);}
+   else for(int k=particles.Size();k>=1;k--) if(rigid_bodies(1)->Implicit_Surface_Lazy_Inside_Extended_Levelset(particles.X(k))) particles.Delete_Particle(k);
 }
 //#####################################################################
 // Function Get_Source_Velocities

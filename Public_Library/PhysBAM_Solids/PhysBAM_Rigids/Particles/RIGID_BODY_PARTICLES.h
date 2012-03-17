@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/RIGID_GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>
 namespace PhysBAM{
@@ -21,7 +21,7 @@ class RIGID_BODY_PARTICLES:public CLONEABLE<RIGID_BODY_PARTICLES<TV>,RIGID_GEOME
     typedef CLONEABLE<RIGID_BODY_PARTICLES<TV>,RIGID_GEOMETRY_PARTICLES<TV> > BASE;
     typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
 public:
-    using BASE::rigid_geometry;using BASE::array_collection;using BASE::Delete_All_Particles;
+    using BASE::rigid_geometry;using BASE::Delete_All_Particles;using BASE::Add_Array;
 
     ARRAY_VIEW<typename TV::SPIN> angular_momentum;
     ARRAY_VIEW<T> mass;

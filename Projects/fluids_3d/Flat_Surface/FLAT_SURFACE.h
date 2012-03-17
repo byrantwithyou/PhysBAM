@@ -166,7 +166,7 @@ void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<T,VECTOR<T,3> >
 {
     if(!use_objects) return;
     T contour_value=particle_type == PARTICLE_LEVELSET<T,VECTOR<T,3> >::NEGATIVE || particle_type == PARTICLE_LEVELSET<T,VECTOR<T,3> >::REMOVED_NEGATIVE ? -fluids_parameters.grid.dx : 0;
-    for(int k=particles.array_collection->Size();k>=1;k--)if(levelset_object.Lazy_Inside(particles.X(k),contour_value)) particles.Delete_Particle(k);
+    for(int k=particles.Size();k>=1;k--)if(levelset_object.Lazy_Inside(particles.X(k),contour_value)) particles.Delete_Particle(k);
 }
 //#####################################################################
 // Function Get_Object_Velocities

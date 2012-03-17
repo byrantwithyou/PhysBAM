@@ -117,7 +117,7 @@ void Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time) PHYS
 
     // delete particles that are outside the water
     VORTICITY_PARTICLES<T,VECTOR<T,3> >& vorticity_particles=vortex_particle_evolution.vorticity_particles;
-    for(int p=vorticity_particles.array_collection->Size();p>=1;p--) if(fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.Phi(vorticity_particles.X(p))>0)
+    for(int p=vorticity_particles.Size();p>=1;p--) if(fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.Phi(vorticity_particles.X(p))>0)
         vorticity_particles.Delete_Particle(p);
     // seed particles with rejection sampling... to get a location
     T min_cell_size=grid.min_dx_dy_dz;
@@ -125,7 +125,7 @@ void Get_Body_Force(ARRAY<T,FACE_INDEX<3> >& force,const T dt,const T time) PHYS
     while(seeded<number_to_seed){
         VECTOR<T,3> seed_location(min_cell_size,random.Get_Uniform_Number((T)grid.ymin,(T)grid.ymax),random.Get_Uniform_Number((T)grid.zmin,(T)grid.zmax));
         if(fluids_parameters.particle_levelset_evolution->particle_levelset.levelset.Phi(seed_location)<0){
-            int particle_id=vorticity_particles.array_collection->Add_Element(); 
+            int particle_id=vorticity_particles.Add_Element(); 
             vorticity_particles.X(particle_id)=seed_location;
             vorticity_particles.radius(particle_id)=random.Get_Uniform_Number(.5,1.5)*.05;
             int sign=random.Get_Uniform_Integer(0,1);if(sign==0)sign=-1;

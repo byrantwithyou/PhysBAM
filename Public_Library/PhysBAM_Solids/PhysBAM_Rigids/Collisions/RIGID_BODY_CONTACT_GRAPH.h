@@ -23,14 +23,14 @@ public:
     DIRECTED_GRAPH<int> directed_graph; // nodes point to objects which are "above" it
 
     RIGID_BODY_CONTACT_GRAPH(RIGID_BODY_PARTICLES<TV>& rigid_body_particles_input) 
-        :rigid_body_particles(rigid_body_particles_input),directed_graph(rigid_body_particles.array_collection->Size())
+        :rigid_body_particles(rigid_body_particles_input),directed_graph(rigid_body_particles.Size())
     {}
 
     void Reset()
     {directed_graph.Reset();}
 
     void Initialize() // Call when number of rigid bodies has changed
-    {directed_graph.Initialize(rigid_body_particles.array_collection->Size());}
+    {directed_graph.Initialize(rigid_body_particles.Size());}
 
     void Add_Edge(const int body_below,const int body_above) 
     {directed_graph.Add_Edge(body_below,body_above);}
@@ -40,7 +40,7 @@ public:
 
     void Print() const
     {LOG::cout<<"CONTACT_GRAPH:"<<std::endl;
-    for(int i=0;i<rigid_body_particles.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_particles.Size();i++){
         LOG::cout<<"CONTACT_GRAPH\""<<rigid_body_particles.Rigid_Body(i).name<<"\" (LEVEL = "<<directed_graph.Level_Of_Node(i)<<"): ";
         if(directed_graph.Parents(i).m>0){LOG::cout<<" IS ABOVE=";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Parents(i));}
         if(directed_graph.Children(i).m>0){LOG::cout<<" IS BELOW=";RIGID_BODY<TV>::Print_Names(rigid_body_particles,directed_graph.Children(i));}
@@ -54,7 +54,7 @@ public:
         int level_size=directed_graph.Nodes_In_Level(i);total+=level_size;
         if(level_size > max_level_size){max_level_size=level_size;max_level_index=i;}
         if(contact_pairs_for_level(i).m > max_pairs_in_level){max_pairs_in_level=contact_pairs_for_level(i).m;max_pairs_in_level_index=i;}}
-    assert(total==rigid_body_particles.array_collection->Size());
+    assert(total==rigid_body_particles.Size());
     LOG::cout<<"Contact graph statistics: levels="<<number_levels<<", max_level_size="<<max_level_size<<", max_pairs_in_level="<<max_pairs_in_level<<std::endl;
     if(verbose){
         if(max_level_index > 0){

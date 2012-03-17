@@ -205,10 +205,10 @@ Update_Simulated_Particles()
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Update_Simulated_Particles(DEFORMABLES_EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities)
 {
-    int particles_number=particles.array_collection->Size();
+    int particles_number=particles.Size();
 
     ARRAY<bool> particle_is_simulated(particles_number);for(int i=0;i<particles_number;i++) particle_is_simulated(i)=true;
-    particle_is_simulated.Subset(particles.array_collection->deletion_list).Fill(false);
+    particle_is_simulated.Subset(particles.deletion_list).Fill(false);
     example_forces_and_velocities.Set_Deformable_Particle_Is_Simulated(particle_is_simulated);
 
     simulated_particles.Remove_All();
@@ -286,7 +286,7 @@ Update_CFL()
         for(int i=0;i<deformables_forces.m;i++){if(!deformables_forces(i)->CFL_Valid()){cfl_valid=false;break;}}}
     else cfl_valid=false;
     if(!cfl_valid){
-        frequency.Resize(particles.array_collection->Size(),false,false);
+        frequency.Resize(particles.Size(),false,false);
         INDIRECT_ARRAY<ARRAY<T_FREQUENCY_DEFORMABLE>,ARRAY<int>&> frequency_subset=frequency.Subset(simulated_particles);
         frequency_subset.Fill(T_FREQUENCY_DEFORMABLE());
 
@@ -362,7 +362,7 @@ Update_Position_Based_State(const T time,const bool is_position_update)
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,const T time) const
 {
-    assert(F_full.Size()==particles.array_collection->Size());
+    assert(F_full.Size()==particles.Size());
     for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_independent_forces) deformables_forces(k)->Add_Velocity_Independent_Forces(F_full,time);
 }
 //#####################################################################
@@ -372,7 +372,7 @@ Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F_full,const T time) const
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T time) const
 {
-    assert(F_full.Size()==particles.array_collection->Size());
+    assert(F_full.Size()==particles.Size());
     for(int k=0;k<deformables_forces.m;k++) if(deformables_forces(k)->use_velocity_dependent_forces) deformables_forces(k)->Add_Velocity_Dependent_Forces(V_full,F_full,time);
 }
 //#####################################################################
@@ -381,7 +381,7 @@ Add_Velocity_Dependent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
 Implicit_Velocity_Independent_Forces(ARRAY_VIEW<const TV> V_full,ARRAY_VIEW<TV> F_full,const T scale,const T time) const
 {
-    assert(V_full.Size()==particles.array_collection->Size() && F_full.Size()==particles.array_collection->Size());
+    assert(V_full.Size()==particles.Size() && F_full.Size()==particles.Size());
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,ARRAY<int>&> F_subset=F_full.Subset(dynamic_particles);
     F_subset.Fill(TV()); // note we zero here because we will scale the forces below
     bool added=false;

@@ -57,7 +57,7 @@ void Get_Initial_Data()
     DEFORMABLE_PARTICLES<T,VECTOR_3D<T> > torus_particles;
     TETRAHEDRALIZED_VOLUME<T> torus_volume(torus_mesh,torus_particles);
     FILE_UTILITIES::Read_From_File<RW>(data_directory+"/Tetrahedralized_Volumes/adaptive_torus_float.tet",torus_volume);
-    std::cout<<"torus vertices = "<<torus_particles.array_collection->Size()<<"\ntorus tetrahedra = "<<torus_mesh.tetrahedrons.m<<"\n";
+    std::cout<<"torus vertices = "<<torus_particles.Size()<<"\ntorus tetrahedra = "<<torus_mesh.tetrahedrons.m<<"\n";
 
     torus_volume.Update_Bounding_Box();
     VECTOR_3D<T> center=torus_volume.bounding_box->Center();
@@ -82,7 +82,7 @@ void Get_Initial_Data()
         do{orientation.s=random.Get_Uniform_Number(0,1);orientation.v=random.Get_Uniform_Vector(VECTOR_3D<T>(-1,-1,-1),VECTOR_3D<T>(1,1,1));}while(orientation.Magnitude()>1);
         orientation.Normalize();
         std::cout<<"Adding torus "<<index<<" at center "<<new_center<<", orientation "<<orientation<<", angular velocity "<<angular_velocity<<"\n";
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             VECTOR_3D<T> dX=particles.X(p)-center;
             particles.V(p)=VECTOR_3D<T>::Cross_Product(angular_velocity,dX);
             particles.X(p)=new_center+orientation.Rotate(dX);}}

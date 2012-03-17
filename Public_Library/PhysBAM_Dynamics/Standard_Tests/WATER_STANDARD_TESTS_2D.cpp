@@ -361,8 +361,8 @@ Initialize_SPH_Particles()
             TV X=random.Get_Uniform_Vector(particle_region);
             TV_INT block=grid.Block_Index(X,3);
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
-            int id=removed_negative_particles(block)->array_collection->Add_Element();
-            (*removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
+            int id=removed_negative_particles(block)->Add_Element();
+            (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
             removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}
     else if(test_number==9){
         ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,VECTOR<int,2> >& removed_negative_particles=particle_levelset.removed_negative_particles;
@@ -376,8 +376,8 @@ Initialize_SPH_Particles()
                 TV X=random.Get_Uniform_Vector(particle_region);
                 TV_INT block=grid.Block_Index(X,3);
                 if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
-                int id=removed_negative_particles(block)->array_collection->Add_Element();
-                (*removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
+                int id=removed_negative_particles(block)->Add_Element();
+                (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
                 removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}
             particle_region+=TV(1,0);number_of_sph_particles=int(particle_multiplier*number_of_sph_particles);}}
     else if(test_number==10){
@@ -393,8 +393,8 @@ Initialize_SPH_Particles()
             TV X=random.Get_Uniform_Vector(particle_region);
             TV_INT block=grid.Block_Index(X,3);
             if(!removed_negative_particles(block)) removed_negative_particles(block)=particle_levelset.template_removed_particles.Clone();
-            int id=removed_negative_particles(block)->array_collection->Add_Element();
-            (*removed_negative_particles(block)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
+            int id=removed_negative_particles(block)->Add_Element();
+            (*removed_negative_particles(block)->template Get_Array<int>(ATTRIBUTE_ID_ID))(id)=particle_id++;
             removed_negative_particles(block)->X(id)=X;removed_negative_particles(block)->radius(id)=(T).1*grid.Minimum_Edge_Length();}}
 }
 //#####################################################################

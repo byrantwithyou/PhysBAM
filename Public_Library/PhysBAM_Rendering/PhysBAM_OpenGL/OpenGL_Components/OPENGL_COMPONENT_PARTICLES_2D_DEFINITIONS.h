@@ -2,7 +2,6 @@
 // Copyright 2004-2009, Eran Guendelman, Frank Losasso, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/ARRAY_COLLECTION.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -114,7 +113,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
     // We have the OPENGL_POINTS_2D index but need to find the particle index
     int particle_index=0;
     int active_count=0;
-    for(particle_index=0;particle_index<particles_multiple(particle_set)->array_collection->Size();particle_index++){
+    for(particle_index=0;particle_index<particles_multiple(particle_set)->Size();particle_index++){
         if(active_count++==point_index) break;}
     selection->index=particle_index;
     selection->particle_set=particle_set;
@@ -175,7 +174,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) c
         
         if(!draw_multiple_particle_sets && real_selection->particle_set!=set) return;
     
-        output_stream<<"Selected particle in ["<<component_name<<"("<<real_selection->particle_set<<")] (total number = "<<particles->array_collection->Size()<<")"<<std::endl;
+        output_stream<<"Selected particle in ["<<component_name<<"("<<real_selection->particle_set<<")] (total number = "<<particles->Size()<<")"<<std::endl;
     
         int current_index=-1;
         if(real_selection->has_id){
@@ -184,7 +183,7 @@ Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) c
             if(!ids || !ids->Find(real_selection->id,current_index))
                 output_stream<<"  Doesn't exist"<<std::endl;}
         else{
-            if(real_selection->index<particles_multiple(real_selection->particle_set)->array_collection->Size()){
+            if(real_selection->index<particles_multiple(real_selection->particle_set)->Size()){
                 output_stream<<"  Selected by index "<<real_selection->index<<std::endl;
                 current_index=real_selection->index;}}
 
@@ -227,7 +226,7 @@ Get_Current_Index_Of_Selection(OPENGL_SELECTION *selection) const
     if (real_selection->has_id){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(real_selection->particle_set);
         if(ids) ids->Find(real_selection->id,current_index);}
-    else if (real_selection->index<particles_multiple(real_selection->particle_set)->array_collection->Size()) current_index=real_selection->index;
+    else if (real_selection->index<particles_multiple(real_selection->particle_set)->Size()) current_index=real_selection->index;
 
     return current_index;
 }
@@ -257,12 +256,12 @@ Reinitialize(bool force)
             if(particles_stored_per_cell_uniform){
                 ARRAY<T_PARTICLES*,VECTOR<int,2> > particles_per_cell;
                 Read_Binary<RW>(*input_file,particles_per_cell);
-                ARRAY<ARRAY_COLLECTION*> initialization_array(particles_per_cell.array.Size());
+                ARRAY<PARTICLES<VECTOR<T,2> >*> initialization_array(particles_per_cell.array.Size());
                 for(int j=0;j<particles_per_cell.array.Size();j++){
-                    if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j)->array_collection;
+                    if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j);
                     else initialization_array(j)=0;}
-                ARRAY_VIEW<const ARRAY_COLLECTION* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());
-                particles_multiple(i)->array_collection->Initialize(initialization_array_view);
+                ARRAY_VIEW<const PARTICLES<VECTOR<T,2> >* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());
+                particles_multiple(i)->Initialize(initialization_array_view);
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
             else{
                 Read_Binary<RW>(*input_file,*particles_multiple(i));}
@@ -382,12 +381,12 @@ Apply_Id_Selection()
 {
     for(int current_set=0;current_set<number_of_sets;current_set++){
         opengl_points_multiple(current_set)->Clear_Selection();
-        if (use_ids && valid && opengl_points_multiple(current_set)->points.m == particles_multiple(current_set)->array_collection->Size())
+        if (use_ids && valid && opengl_points_multiple(current_set)->points.m == particles_multiple(current_set)->Size())
         {
             ARRAY_VIEW<int>* ids=Get_Particles_Id_Array(current_set);
             if(!ids) continue;
             int idx=0;
-            for(int i=0;i<particles_multiple(current_set)->array_collection->Size();i++){
+            for(int i=0;i<particles_multiple(current_set)->Size();i++){
                 int dummy;
                 if(selected_ids(current_set).Find((*ids)(i),dummy)) opengl_points_multiple(current_set)->Select_Point(idx);
                 idx++;}
@@ -399,7 +398,7 @@ template<class T,class T_PARTICLES,class RW> ARRAY_VIEW<int>* OPENGL_COMPONENT_P
 Get_Particles_Id_Array(int set_number) const
 {
     if(set_number<0) set_number=set;
-    ARRAY_VIEW<int>* ids=particles_multiple(set_number)->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
+    ARRAY_VIEW<int>* ids=particles_multiple(set_number)->template Get_Array<int>(ATTRIBUTE_ID_ID);
     if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;
 }

@@ -79,7 +79,7 @@ void Get_Initial_Data()
         tetrahedralized_volumes(i)->Update_Tetrahedron_List();tetrahedralized_volumes(i)->Initialize_Tetrahedron_Hierarchy();}
 
     particles.Set_Array_Buffer_Size(1000);
-    ARRAY<int> map_to_hard_bound_particles(particles.array_collection->Size());
+    ARRAY<int> map_to_hard_bound_particles(particles.Size());
     for(int volume=0;volume<tetrahedralized_volumes.m;volume++){
         int particles_embedded=0;
         ARRAY<int> nodes_of_structure;tetrahedralized_volumes(volume)->mesh.elements.Flattened().Get_Unique(nodes_of_structure);
@@ -94,7 +94,7 @@ void Get_Initial_Data()
             if(candidate_embeddings.m>1) PHYSBAM_FATAL_ERROR();
             if(candidate_embeddings.m==1){int other_volume,tet;candidate_embeddings(1).Get(other_volume,tet);
                 VECTOR<T,3> weights;weights=(*tetrahedralized_volumes(other_volume)->tetrahedron_list)(tet).Barycentric_Coordinates(X);
-                int embedded_particle=particles.array_collection->Add_Element();
+                int embedded_particle=particles.Add_Element();
                 binding_list.Add_Binding(new LINEAR_BINDING<T,TV,4>(particles,embedded_particle,tetrahedralized_volumes(other_volume)->mesh.elements(tet),weights));
                 map_to_hard_bound_particles(nodes_of_structure(i))=embedded_particle;
                 particles_embedded++;}}

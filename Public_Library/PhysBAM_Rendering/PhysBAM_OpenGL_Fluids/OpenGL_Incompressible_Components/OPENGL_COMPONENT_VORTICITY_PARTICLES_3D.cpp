@@ -18,9 +18,9 @@ Reinitialize(bool force)
     OPENGL_COMPONENT_PARTICLES_3D<T,VORTICITY_PARTICLES<VECTOR<T,3> >,RW>::Reinitialize(force);
     if(!have_velocities){
         have_velocities=true;
-        opengl_vector_field.vector_field.Resize(particles->array_collection->Size());
+        opengl_vector_field.vector_field.Resize(particles->Size());
         int idx=1;
-        for(int i=0;i<particles->array_collection->Size();i++)
+        for(int i=0;i<particles->Size();i++)
             opengl_vector_field.vector_field(idx++)=particles->vorticity(i);}
 }
 template class OPENGL_COMPONENT_VORTICITY_PARTICLES_3D<float,float>;

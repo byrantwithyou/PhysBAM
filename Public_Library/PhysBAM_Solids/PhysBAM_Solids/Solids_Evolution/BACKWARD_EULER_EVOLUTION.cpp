@@ -88,9 +88,9 @@ One_Newton_Step_Backward_Euler(const T dt,const T time,ARRAY_VIEW<const TV> V_sa
     EXAMPLE_FORCES_AND_VELOCITIES<TV>& example_forces_and_velocities=*solid_body_collection.example_forces_and_velocities;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
 
-    dV_full.Resize(particles.array_collection->Size()); // an initial guess might be passed in for dV, otherwise it's zero
-    R_full.Resize(particles.array_collection->Size(),false,false);F_full.Resize(particles.array_collection->Size(),false,false);S_full.Resize(particles.array_collection->Size(),false,false);
-    B_full.Resize(particles.array_collection->Size(),false,false);
+    dV_full.Resize(particles.Size()); // an initial guess might be passed in for dV, otherwise it's zero
+    R_full.Resize(particles.Size(),false,false);F_full.Resize(particles.Size(),false,false);S_full.Resize(particles.Size(),false,false);
+    B_full.Resize(particles.Size(),false,false);
     KRYLOV_VECTOR_T dV(dV_full,solid_body_collection.deformable_body_collection.dynamic_particles),R(R_full,solid_body_collection.deformable_body_collection.dynamic_particles),F(F_full,solid_body_collection.deformable_body_collection.dynamic_particles),
         S(S_full,solid_body_collection.deformable_body_collection.dynamic_particles),V(particles.V,solid_body_collection.deformable_body_collection.dynamic_particles),B(B_full,solid_body_collection.deformable_body_collection.dynamic_particles),*null=0;
     INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass(particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles);
@@ -129,7 +129,7 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
 
     // iterate to steady state
     T supnorm=0;int iteration;
-    dV_full.Resize(particles.array_collection->Size(),false,false);R_full.Resize(particles.array_collection->Size(),false,false);
+    dV_full.Resize(particles.Size(),false,false);R_full.Resize(particles.Size(),false,false);
     for(iteration=0;iteration<solids_parameters.newton_iterations;iteration++){
         dV_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
         One_Newton_Step_Backward_Euler(dt,time+dt,V_save,dV_full);

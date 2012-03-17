@@ -131,7 +131,7 @@ Get_Selection(GLuint* buffer,int buffer_size)
     // We have the OPENGL_POINTS_3D index but need to find the particle index
     int point_index=buffer[0],particle_index=0;
     int active_count=0;
-    for(particle_index=0;particle_index<particles->array_collection->Size();particle_index++)if(++active_count==point_index) break;
+    for(particle_index=0;particle_index<particles->Size();particle_index++)if(++active_count==point_index) break;
     selection->index=particle_index;
     ARRAY_VIEW<int>* ids=0;if(use_ids) ids=Get_Particles_Id_Array();
     if(ids){selection->has_id=true;selection->id=(*ids)(particle_index);}
@@ -192,7 +192,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
             output_stream<<"   Selected by id "<<real_selection->id<<std::endl;
             ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
             if(!ids || !ids->Find(real_selection->id,current_index)) output_stream<<"   Doesn't exist"<<std::endl;}
-        else if(real_selection->index<particles->array_collection->Size()){
+        else if(real_selection->index<particles->Size()){
             output_stream<<"   Selected by index "<<real_selection->index<<std::endl;
             current_index=real_selection->index;}
         
@@ -241,7 +241,7 @@ Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const
     if(real_selection->has_id){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
         if(ids) ids->Find(real_selection->id,current_index);}
-    else if(real_selection->index<particles->array_collection->Size()) current_index=real_selection->index;
+    else if(real_selection->index<particles->Size()) current_index=real_selection->index;
     return current_index;
 }
 //#####################################################################
@@ -263,12 +263,12 @@ Reinitialize(bool force)
             if(particles_stored_per_cell_uniform){
                 ARRAY<T_PARTICLES*,VECTOR<int,3> > particles_per_cell;
                 Read_Binary<RW>(*input_file,particles_per_cell);
-                ARRAY<ARRAY_COLLECTION*> initialization_array(particles_per_cell.array.Size());
+                ARRAY<PARTICLES<VECTOR<T,3> >*> initialization_array(particles_per_cell.array.Size());
                 for(int j=0;j<particles_per_cell.array.Size();j++){
-                    if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j)->array_collection;
+                    if(particles_per_cell.array(j)) initialization_array(j)=particles_per_cell.array(j);
                     else initialization_array(j)=0;}
-                ARRAY_VIEW<const ARRAY_COLLECTION* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());
-                particles_multiple(i)->array_collection->Initialize(initialization_array_view);
+                ARRAY_VIEW<const PARTICLES<VECTOR<T,3> >* const> initialization_array_view(initialization_array.Size(),initialization_array.Get_Array_Pointer());
+                particles_multiple(i)->Initialize(initialization_array_view);
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
             else if(particles_stored_per_cell_adaptive){
                 PHYSBAM_FATAL_ERROR();
@@ -400,10 +400,10 @@ template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<
 Apply_Id_Selection()
 {
     opengl_points->Clear_Selection();
-    if(use_ids && valid && opengl_points->points.m == particles->array_collection->Size()){
+    if(use_ids && valid && opengl_points->points.m == particles->Size()){
         ARRAY_VIEW<int>* ids=Get_Particles_Id_Array();
         if(!ids) return;
-        for(int i=0;i<particles->array_collection->Size();i++){
+        for(int i=0;i<particles->Size();i++){
             int dummy;if(selected_ids.Find((*ids)(i),dummy)) opengl_points->Select_Point(i);}}
 }
 //#####################################################################
@@ -413,7 +413,7 @@ template<class T,class T_PARTICLES,class RW> ARRAY_VIEW<int>* OPENGL_COMPONENT_P
 Get_Particles_Id_Array(int set_number) const
 {
     if(set_number<0) set_number=set;
-    ARRAY_VIEW<int>* ids=particles->array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID);
+    ARRAY_VIEW<int>* ids=particles->template Get_Array<int>(ATTRIBUTE_ID_ID);
     if(ids && ids->Size() && (*ids)(0)) return ids; // A hack to ignore ids if the first one equals zero
     return 0;
 }

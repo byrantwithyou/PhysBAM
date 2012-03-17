@@ -63,7 +63,7 @@ public:
     template<class T_MESH>
     void Set_Boundary_Only_Collisions(T_MESH& mesh)
     {ARRAY<bool>* old_node_on_boundary=mesh.node_on_boundary;mesh.node_on_boundary=0;
-    mesh.Initialize_Node_On_Boundary();for(int p=0;p<particles.array_collection->Size();p++) if((*mesh.node_on_boundary)(p)) check_collision.Append(p);
+    mesh.Initialize_Node_On_Boundary();for(int p=0;p<particles.Size();p++) if((*mesh.node_on_boundary)(p)) check_collision.Append(p);
     collision_force.Resize(check_collision.m);collision_force_derivative.Resize(check_collision.m);
     delete mesh.node_on_boundary;mesh.node_on_boundary=old_node_on_boundary;}
 

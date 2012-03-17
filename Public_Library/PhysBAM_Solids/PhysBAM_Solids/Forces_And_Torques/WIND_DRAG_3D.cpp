@@ -82,7 +82,7 @@ Update_Position_Based_State(const T time)
             optimization(t).one_third_area=world_space_simplex.Size();
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}}
     if(linear_normal_viscosity && triangulated_surface){ // compute vertex normals for fragment
-        vertex_normals.Resize(particles.array_collection->Size(),false,false);
+        vertex_normals.Resize(particles.Size(),false,false);
         for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()) vertex_normals(iterator.Data())=TV();
         for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const VECTOR<int,3>& nodes=simplicial_object.mesh.elements(t);

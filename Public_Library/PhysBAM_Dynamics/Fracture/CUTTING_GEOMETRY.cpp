@@ -201,7 +201,7 @@ Initialize_Original_Embedding(const T_EMBEDDING_OBJECT& original_embedding)
 {  
     // copy original tet volume to current and initialize accel structures
     current_embedding=T_EMBEDDING_OBJECT::Create();
-    current_embedding->particles.array_collection->Initialize(*original_embedding.particles.array_collection);
+    current_embedding->particles.Initialize(original_embedding.particles);
     current_embedding->mesh.Initialize_Mesh(original_embedding.mesh);
     current_embedding->mesh.Initialize_Incident_Elements();
     Initialize_Face_Mesh(current_embedding->mesh);
@@ -327,7 +327,7 @@ template<class TV,int d_input> void CUTTING_GEOMETRY<TV,d_input>::
 Cut_Material(T_EMBEDDING_OBJECT& next_embedding_input)
 {
     next_embedding=&next_embedding_input;
-    if(next_embedding->mesh.elements.m || next_embedding->particles.array_collection->Size()) PHYSBAM_FATAL_ERROR("Non empty inputted next embedding");
+    if(next_embedding->mesh.elements.m || next_embedding->particles.Size()) PHYSBAM_FATAL_ERROR("Non empty inputted next embedding");
     next_embedding->particles.Store_Velocity();
     dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(next_embedding->particles).Store_Mass();
     

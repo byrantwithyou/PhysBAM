@@ -20,28 +20,28 @@ template<class T>
 void Split_Along_Fracture_Plane(TETRAHEDRALIZED_VOLUME<T>& tv,const PLANE<T>& plane,ARRAY<int>& particle_replicated)
 {
     typedef VECTOR<T,3> TV;
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
-    if(particle_replicated.m != tv.particles.array_collection->Size()) particle_replicated.Resize(tv.particles.array_collection->Size());
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
+    if(particle_replicated.m != tv.particles.Size()) particle_replicated.Resize(tv.particles.Size());
     bool incident_elements_defined=tv.mesh.incident_elements!=0;if(!incident_elements_defined) tv.mesh.Initialize_Incident_Elements();
     ARRAY<bool> positive_side(tv.mesh.elements.m);int number_on_positive_side=0;
     int t;for(t=0;t<tv.mesh.elements.m;t++){int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l);
         TV x1=tv.particles.X(i),x2=tv.particles.X(j),x3=tv.particles.X(k),x4=tv.particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
         if(plane.Signed_Distance(centroid) >= 0){positive_side(t)=true;number_on_positive_side++;}}
-    int p;for(p=0;p<tv.particles.array_collection->Size();p++){
+    int p;for(p=0;p<tv.particles.Size();p++){
         bool seen_positive_side=false,seen_negative_side=false;
         for(t=0;t<(*tv.mesh.incident_elements)(p).m;t++){
             if(positive_side((*tv.mesh.incident_elements)(p)(t))) seen_positive_side=true;else seen_negative_side=true;}
         if(seen_positive_side && seen_negative_side) particle_replicated(p)=1;}
     int number_of_new_particles=0;
-    for(p=0;p<tv.particles.array_collection->Size();p++) if(particle_replicated(p)){ // assumes we're storing mass (this is not set here!), position, & velocity
-        int new_index=tv.particles.array_collection->Add_Element();particle_replicated(p)=new_index;number_of_new_particles++;
+    for(p=0;p<tv.particles.Size();p++) if(particle_replicated(p)){ // assumes we're storing mass (this is not set here!), position, & velocity
+        int new_index=tv.particles.Add_Element();particle_replicated(p)=new_index;number_of_new_particles++;
         tv.particles.X(new_index)=tv.particles.X(p);tv.particles.V(new_index)=tv.particles.V(p);}
     // loop through tets and change indices in negative_side to new_indices (from particle_replicated)
     for(t=0;t<tv.mesh.elements.m;t++) if(!positive_side(t)){ int i,j,k,l;tv.mesh.elements(t).Get(i,j,k,l); // replace indices with replicated_indices
         if(particle_replicated(i)) i=particle_replicated(i);if(particle_replicated(j)) j=particle_replicated(j);
         if(particle_replicated(k)) k=particle_replicated(k);if(particle_replicated(l)) l=particle_replicated(l);
         tv.mesh.elements(t).Set(i,j,k,l);}
-    tv.mesh.number_nodes=tv.particles.array_collection->Size();
+    tv.mesh.number_nodes=tv.particles.Size();
     if(incident_elements_defined){delete tv.mesh.incident_elements;tv.mesh.incident_elements=0;}
 }
 //#####################################################################
@@ -52,7 +52,7 @@ template<class T>
 int Split_Node(TETRAHEDRALIZED_VOLUME<T>& tv,const int particle_index,const VECTOR<T,3>& normal)
 {
     typedef VECTOR<T,3> TV;
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     bool incident_elements_defined=tv.mesh.incident_elements!=0;if(!incident_elements_defined) tv.mesh.Initialize_Incident_Elements();
     PLANE<T> plane(normal,tv.particles.X(particle_index));ARRAY<int> tets_incident_on_old_particle,tets_incident_on_new_particle;
     int t;for(t=0;t<(*tv.mesh.incident_elements)(particle_index).m;t++){
@@ -63,7 +63,7 @@ int Split_Node(TETRAHEDRALIZED_VOLUME<T>& tv,const int particle_index,const VECT
     int new_particle=0;
     if(tets_incident_on_old_particle.m != 0 && tets_incident_on_new_particle.m != 0){
         // new particle - assumes we're storing position, and velocity - user must fix mass outside this function call
-        new_particle=tv.particles.array_collection->Add_Element();tv.mesh.number_nodes=tv.particles.array_collection->Size();
+        new_particle=tv.particles.Add_Element();tv.mesh.number_nodes=tv.particles.Size();
         tv.particles.X(new_particle)=tv.particles.X(particle_index);tv.particles.V(new_particle)=tv.particles.V(particle_index);
         for(t=0;t<(*tv.mesh.incident_elements)(particle_index).m;t++){
             int this_incident_tet=(*tv.mesh.incident_elements)(particle_index)(t);int i,j,k,l;tv.mesh.elements(this_incident_tet).Get(i,j,k,l);
@@ -86,7 +86,7 @@ template<class T>
 int Split_Connected_Component(TETRAHEDRALIZED_VOLUME<T>& tv,const int node)
 {
     typedef VECTOR<T,3> TV;
-    if(tv.mesh.number_nodes!=tv.particles.array_collection->Size()) PHYSBAM_FATAL_ERROR();
+    if(tv.mesh.number_nodes!=tv.particles.Size()) PHYSBAM_FATAL_ERROR();
     bool incident_elements_defined=tv.mesh.incident_elements!=0;if(!incident_elements_defined) tv.mesh.Initialize_Incident_Elements();
     bool adjacent_elements_defined=tv.mesh.adjacent_elements!=0;if(!adjacent_elements_defined) tv.mesh.Initialize_Adjacent_Elements();
     ARRAY<bool> marked((*tv.mesh.incident_elements)(node).m);
@@ -95,7 +95,7 @@ int Split_Connected_Component(TETRAHEDRALIZED_VOLUME<T>& tv,const int node)
     int new_particle=0;
     if(number_marked != marked.m){
         // new particle -- assumes we're storing position, and velocity - user must fix mass outside this function call
-        new_particle=tv.particles.array_collection->Add_Element();tv.mesh.number_nodes=tv.particles.array_collection->Size();
+        new_particle=tv.particles.Add_Element();tv.mesh.number_nodes=tv.particles.Size();
         tv.particles.X(new_particle)=tv.particles.X(node);tv.particles.V(new_particle)=tv.particles.V(node);
         ARRAY<int> empty;tv.mesh.incident_elements->Append(empty);
         ARRAY<int> indices_to_remove(number_marked);int counter=0;

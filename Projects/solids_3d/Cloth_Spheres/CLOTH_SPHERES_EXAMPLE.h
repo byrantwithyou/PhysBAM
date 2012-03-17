@@ -85,13 +85,13 @@ virtual void Get_Initial_Data()
     tests.Create_Cloth_Panel(number_side_panels,side_length,aspect_ratio,
         RIGID_BODY_STATE<TV>(FRAME<TV>(TV(),ROTATION<TV>::From_Euler_Angles(0,0,0))));
     TRIANGULATED_SURFACE<T>& master_triangulated_surface=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_SURFACE<T>&>();
-    number_of_master_particles=particles.array_collection->Size();
+    number_of_master_particles=particles.Size();
 
     for(int i=2;i<=3;i++){
         EMBEDDING<TV>& embedding=*new EMBEDDING<TV>(particles);
-        int particle_offset=particles.array_collection->Size();
-        particles.array_collection->Add_Elements(number_of_master_particles);
-        for(int p=0;p<number_of_master_particles;p++) particles.array_collection->Copy_Element(*particles.array_collection,p,p+particle_offset);
+        int particle_offset=particles.Size();
+        particles.Add_Elements(number_of_master_particles);
+        for(int p=0;p<number_of_master_particles;p++) particles.Copy_Element(particles,p,p+particle_offset);
         embedding.material_surface_mesh.Initialize_Mesh_With_Particle_Offset(master_triangulated_surface.mesh,particle_offset);
         if(i==3) for(int t=0;t<embedding.material_surface_mesh.elements.m;t++){ // invert 2nd side of drifted surface
             VECTOR<int,3>& element=embedding.material_surface_mesh.elements(t);element=VECTOR<int,3>(element.y,element.x,element.z);}

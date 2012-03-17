@@ -142,7 +142,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
             T phi=seed_box.Signed_Distance(X);
             if(phi<=0){
                 particles_added++;
-                int id=sph_particles.array_collection->Add_Element();
+                int id=sph_particles.Add_Element();
                 sph_particles.X(id)=X;}}}
     else if(test_number==2){
         number_of_particles=10000;
@@ -150,11 +150,11 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
         fluids_parameters.sph_evolution->target_particles_per_unit_volume=number_of_particles*(T).5;
         for(int i=0;i<left_particles_number;i++){
             TV X=random.Get_Uniform_Vector(grid.Xmin(),TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.max_corner.y));
-            int id=sph_particles.array_collection->Add_Element();
+            int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}
         for(int i=0;i<right_particles_number;i++){
             TV X=random.Get_Uniform_Vector(TV((T).5*(grid.domain.max_corner.x-grid.domain.min_corner.x),grid.domain.min_corner.y),grid.Xmax());
-            int id=sph_particles.array_collection->Add_Element();
+            int id=sph_particles.Add_Element();
             sph_particles.X(id)=X;}}
     else if(test_number==3){
         int particles_added=0;
@@ -167,7 +167,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
             T phi=min(seed_sphere.Signed_Distance(X),seed_box.Signed_Distance(X));
             if(phi<=0){
                 particles_added++;
-                int id=sph_particles.array_collection->Add_Element();
+                int id=sph_particles.Add_Element();
                 sph_particles.X(id)=X;}}}
     else if(test_number==5);
     else if(test_number==6){
@@ -179,7 +179,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
             T phi=initial_seed_box.Signed_Distance(X);
             if(phi<=0){
                 particles_added++;
-                int id=sph_particles.array_collection->Add_Element();
+                int id=sph_particles.Add_Element();
                 sph_particles.X(id)=X;}}}
 }
 //#####################################################################
@@ -246,7 +246,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time)
         RANGE<TV> source_box((T).2,(T).3,(T).8,(T).9);
         int particles_per_second=2000;
         int particles_to_add=max(1,(int)((T)particles_per_second*dt));
-        for(int i=0;i<particles_to_add;i++) sph_particles.X(sph_particles.array_collection->Add_Element())=random.Get_Uniform_Vector(source_box);}
+        for(int i=0;i<particles_to_add;i++) sph_particles.X(sph_particles.Add_Element())=random.Get_Uniform_Vector(source_box);}
 }
 //#####################################################################
 // Function Set_Kinematic_Velocities

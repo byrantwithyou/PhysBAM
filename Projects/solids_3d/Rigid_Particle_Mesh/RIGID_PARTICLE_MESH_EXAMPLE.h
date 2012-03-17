@@ -61,7 +61,7 @@ void Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filena
     rigid_body.Frame()=frame;
     rigid_body.Set_Coefficient_Of_Restitution(0);
     rigid_body.Set_Name(rigid_body_name);
-    int gravity_particle=particles.array_collection->Add_Element();
+    int gravity_particle=particles.Add_Element();
     particles.mass(gravity_particle)=rigid_body.Mass();
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,gravity_particle,solid_body_collection.rigid_body_collection,rigid_body.particle_index,TV()));
 }
@@ -74,8 +74,8 @@ void Add_Point_Joint(const int joint_id,const int plank_id,const TV& plank_objec
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     // add deformable particles for each of the sphere and plank
-    int sphere_particle=particles.array_collection->Add_Element();
-    int plank_particle=particles.array_collection->Add_Element();
+    int sphere_particle=particles.Add_Element();
+    int plank_particle=particles.Add_Element();
     segment_mesh.elements.Append(VECTOR<int,2>(sphere_particle,plank_particle));
     
     // add bindings to their rigid body particles

@@ -132,7 +132,7 @@ Closest_Point_On_Curve(const TV& location,T thickness_over_two,int* closest_segm
 template<class TV> void SEGMENTED_CURVE<TV>::
 Rescale(const TV& scaling)
 {
-    for(int k=0;k<particles.array_collection->Size();k++) particles.X(k)*=scaling;
+    for(int k=0;k<particles.Size();k++) particles.X(k)*=scaling;
     if(segment_list) Update_Segment_List();if(bounding_box) Update_Bounding_Box();
 }
 //#####################################################################

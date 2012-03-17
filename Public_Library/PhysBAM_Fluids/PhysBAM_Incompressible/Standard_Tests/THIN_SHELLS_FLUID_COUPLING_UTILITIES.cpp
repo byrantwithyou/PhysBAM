@@ -34,7 +34,7 @@ Add_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_body_
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.Initialize_Straight_Mesh(number_of_vertices);
     for(int i=0;i<number_of_vertices;i++){
-        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==i+1);
+        particles.Add_Element();assert(particles.Size()==i+1);
         particles.X(i)=start_position+((T)i/(number_of_vertices-1))*(end_position-start_position);
         particles.V(i)=VECTOR<T,2>(0,0);}
     return index;
@@ -51,7 +51,7 @@ Add_Circle_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformabl
     GEOMETRY_PARTICLES<VECTOR<T,2> >& particles=segmented_curve.particles;
     mesh.Initialize_Straight_Mesh(number_of_vertices,true);
     for(int i=0;i<number_of_vertices;i++){
-        particles.array_collection->Add_Element();assert(particles.array_collection->Size()==i+1);
+        particles.Add_Element();assert(particles.Size()==i+1);
         T angle=i*(T)2*(T)pi/number_of_vertices;
         particles.X(i)=center+radius*VECTOR<T,2>(cos(angle+(T).5*(T)pi),sin(angle+(T).5*(T)pi));
         particles.V(i)=VECTOR<T,2>(0,0);}
@@ -72,13 +72,13 @@ Add_Grid_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_
     int segment_index=0;
     ARRAY<int,VECTOR<int,2> > base_index(grid.Domain_Indices());
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
-        int index=base_index(i,j)=particles.array_collection->Add_Element();
+        int index=base_index(i,j)=particles.Add_Element();
         particles.X(index)=grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);}
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         if(i<grid.counts.x){
             int last_index=base_index(i,j);
             for(int k=0;k<edge_subdivision-1;k++){
-                int index=particles.array_collection->Add_Element();
+                int index=particles.Add_Element();
                 particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(grid.dX.x,0)+grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);
                 mesh.elements(segment_index++).Set(last_index,index);
                 last_index=index;}
@@ -86,7 +86,7 @@ Add_Grid_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_
         if(j<grid.counts.y){
             int last_index=base_index(i,j);
             for(int k=0;k<edge_subdivision-1;k++){
-                int index=particles.array_collection->Add_Element();
+                int index=particles.Add_Element();
                 particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(0,grid.dX.y)+grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);
                 mesh.elements(segment_index++).Set(last_index,index);
                 last_index=index;}
@@ -106,7 +106,7 @@ Add_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,3> >& deformable_body_
     GEOMETRY_PARTICLES<VECTOR<T,3> >& particles=triangulated_surface.particles;
 
     mesh.Initialize_Herring_Bone_Mesh(cloth_grid.counts.x,cloth_grid.counts.y);
-    particles.array_collection->Add_Elements(mesh.number_nodes);
+    particles.Add_Elements(mesh.number_nodes);
     for(int i=0;i<cloth_grid.counts.x;i++) for(int j=0;j<cloth_grid.counts.y;j++){
         int node=i+cloth_grid.counts.x*(j-1);particles.X(node)=transform.Homogeneous_Times(VECTOR<T,3>(cloth_grid.X(i,j)));particles.V(node)=VECTOR<T,3>();}
 
@@ -137,9 +137,9 @@ Add_Deformable_Object_From_File(const STREAM_TYPE stream_type,DEFORMABLE_BODY_CO
     FILE_UTILITIES::Read_From_File(stream_type,filename,triangulated_surface);
     particles.Store_Velocity(true);particles.Store_Mass(true);
 
-    if(enslaved_halfplane){for(int i=0;i<particles.array_collection->Size();i++) if(enslaved_halfplane->Lazy_Inside(particles.X(i))) deformable_body_collection_enslaved_nodes.Append(i);}
+    if(enslaved_halfplane){for(int i=0;i<particles.Size();i++) if(enslaved_halfplane->Lazy_Inside(particles.X(i))) deformable_body_collection_enslaved_nodes.Append(i);}
 
-    for(int i=0;i<particles.array_collection->Size();i++){particles.X(i)=transform.Homogeneous_Times(particles.X(i));particles.V(i)=VECTOR<T,3>();}
+    for(int i=0;i<particles.Size();i++){particles.X(i)=transform.Homogeneous_Times(particles.X(i));particles.V(i)=VECTOR<T,3>();}
     triangulated_surface.Refresh_Auxiliary_Structures();
 
     return index;

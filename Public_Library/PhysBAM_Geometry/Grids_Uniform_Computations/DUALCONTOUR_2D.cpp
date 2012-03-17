@@ -96,7 +96,7 @@ template<class T> SEGMENTED_CURVE_2D<T>* DUALCONTOUR_2D<T>::
 Get_Segmented_Curve()
 {
     SEGMENTED_CURVE_2D<T>* curve=SEGMENTED_CURVE_2D<T>::Create();
-    curve->particles.array_collection->Add_Elements(geometry.m);
+    curve->particles.Add_Elements(geometry.m);
     curve->particles.X=geometry;
     curve->mesh.number_nodes=geometry.m;
     curve->mesh.elements.Exact_Resize(topology.m);
@@ -114,14 +114,14 @@ Get_Triangulated_Area(const int sign)
 {
     TRIANGULATED_AREA<T>* area=TRIANGULATED_AREA<T>::Create();
     GEOMETRY_PARTICLES<TV>& particles=area->particles;
-    particles.array_collection->Preallocate(grid.counts.x*grid.counts.y*4);
+    particles.Preallocate(grid.counts.x*grid.counts.y*4);
     TRIANGLE_MESH& mesh=area->mesh;
     int triangle_count=0;for(int i=1;i<grid.counts.x-1;i++) for(int j=1;j<grid.counts.y-1;j++) if(levelset.phi(i,j)*sign>=0) triangle_count+=4;
     mesh.elements.Exact_Resize(triangle_count);
     int current_triangle=0;
     GRID<TV> mac_grid=grid.Get_MAC_Grid();
     for(int i=1;i<grid.counts.x-1;i++) for(int j=1;j<grid.counts.y-1;j++) if(levelset.phi(i,j)*sign>=0){
-        int v0=particles.array_collection->Add_Element(),v1=particles.array_collection->Add_Element(),v2=particles.array_collection->Add_Element(),v3=particles.array_collection->Add_Element(),v4=particles.array_collection->Add_Element();
+        int v0=particles.Add_Element(),v1=particles.Add_Element(),v2=particles.Add_Element(),v3=particles.Add_Element(),v4=particles.Add_Element();
         particles.X(v0)=grid.X(i,j);
         particles.X(v1)=vertices(i-1,j-1)>=0?geometry(vertices(i-1,j-1)):mac_grid.X(i-1,j-1);
         particles.X(v2)=vertices(i,j-1)>=0?geometry(vertices(i,j-1)):mac_grid.X(i,j-1);
@@ -131,7 +131,7 @@ Get_Triangulated_Area(const int sign)
         mesh.elements(current_triangle++).Set(v3,v2,v0);
         mesh.elements(current_triangle++).Set(v4,v3,v0);
         mesh.elements(current_triangle++).Set(v1,v4,v0);}
-    mesh.number_nodes=particles.array_collection->Size();
+    mesh.number_nodes=particles.Size();
     return area;
 }
 //#####################################################################

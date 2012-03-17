@@ -87,17 +87,17 @@ Reinitialize(bool force)
         HASHTABLE<VECTOR<int,2>,typename SEGMENT_ADHESION<TV>::SPRING_STATE> springs;
         FILE_UTILITIES::Read_From_File<RW>(frame_filename,springs);
         segment_mesh.elements.Remove_All();
-        particles.array_collection->Delete_All_Elements();
+        particles.Delete_All_Elements();
         int pairs=0;
         for(HASHTABLE_ITERATOR<VECTOR<int,2>,const typename SEGMENT_ADHESION<TV>::SPRING_STATE> iterator(springs);iterator.Valid();iterator.Next()){
             const typename SEGMENT_ADHESION<TV>::SPRING_STATE& state=iterator.Data();
-            int i=particles.array_collection->Add_Element(),j=particles.array_collection->Add_Element();
+            int i=particles.Add_Element(),j=particles.Add_Element();
             particles.X(i)=(1-state.weights[0])*real_particles.X(state.nodes[0])+state.weights[0]*real_particles.X(state.nodes[1]);
             particles.X(j)=(1-state.weights[1])*real_particles.X(state.nodes[2])+state.weights[1]*real_particles.X(state.nodes[3]);
             segment_mesh.elements.Append(VECTOR<int,2>(i,j));
             pairs++;
         }
-        LOG::cout<<"pairs is "<<pairs<<" and number of particles is "<<particles.array_collection->Size()<<std::endl;
+        LOG::cout<<"pairs is "<<pairs<<" and number of particles is "<<particles.Size()<<std::endl;
     }
 }
 //#####################################################################

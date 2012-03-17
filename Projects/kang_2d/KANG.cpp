@@ -22,7 +22,7 @@ KANG(const STREAM_TYPE stream_type)
     omega(0),laplace_number(0),uleft(0),uright(0)
 {
     LOG::cout<<std::setprecision(16);
-    debug_particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     debug_particles.Store_Velocity(true);
     Store_Debug_Particles(&debug_particles);
 }
@@ -584,7 +584,7 @@ Write_Output_Files(const int frame) const
     BASE::Write_Output_Files(frame);
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
     FILE_UTILITIES::Write_To_File(this->stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
-    debug_particles.array_collection->Delete_All_Elements();
+    const_cast<GEOMETRY_PARTICLES<TV>&>(debug_particles).Delete_All_Elements();
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Begin_Callback
@@ -619,8 +619,8 @@ Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 {
     typedef typename TV::SCALAR T;
     GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)KANG<T>::Store_Debug_Particles();
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    int p=particles->array_collection->Add_Element();
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    int p=particles->Add_Element();
     particles->X(p)=X;
     (*color_attribute)(p)=color;
 }
@@ -667,7 +667,7 @@ Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
 {
     typedef typename TV::SCALAR T;
     GEOMETRY_PARTICLES<TV>* particles=(GEOMETRY_PARTICLES<TV>*)KANG<T>::Store_Debug_Particles();
-    ARRAY_VIEW<ATTR>* attribute=particles->array_collection->template Get_Array<ATTR>(id);
+    ARRAY_VIEW<ATTR>* attribute=particles->template Get_Array<ATTR>(id);
     attribute->Last()=attr;
 }
 //#####################################################################

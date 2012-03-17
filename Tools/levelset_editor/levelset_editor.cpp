@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_SUBSET.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_SUBSET.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>

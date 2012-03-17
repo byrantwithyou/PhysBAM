@@ -18,7 +18,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 #include <mpi.h>
 namespace PhysBAM{
@@ -121,7 +121,7 @@ for(int i=0;i<data.Size();i++) type.Unpack(&buffer(0),buffer.Size(),&data(i),1,p
 // Pack/Unpack for particles
 //#####################################################################
 template<class T,int d> inline int Pack_Size(const PARTICLES<VECTOR<T,d> >& data,const MPI::Comm& comm)
-{int size=data.array_collection->Pack_Size();
+{int size=data.Pack_Size();
 PHYSBAM_ASSERT(size==MPI::UNSIGNED_CHAR.Pack_size(size,comm)); // assert that we can implement pack ourselves for particles
 return size;}
 
@@ -130,10 +130,10 @@ Pack_Size(const T_PARTICLES& particles,const MPI::Comm& comm)
 {return Pack_Size(particles,comm);}
 
 template<class T_PARTICLES> void Pack(const T_PARTICLES& particles,int index,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
-{particles.array_collection->Pack(buffer,position,index);} // valid as long as the assertion in Pack_Size succeeds
+{particles.Pack(buffer,position,index);} // valid as long as the assertion in Pack_Size succeeds
 
 template<class T_PARTICLES> void Unpack(T_PARTICLES& particles,int index,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
-{particles.array_collection->Unpack(buffer,position,index);} // valid as long as the assertion in Pack_Size succeeds
+{particles.Unpack(buffer,position,index);} // valid as long as the assertion in Pack_Size succeeds
 //#####################################################################
 // Function Pack_Size
 //#####################################################################

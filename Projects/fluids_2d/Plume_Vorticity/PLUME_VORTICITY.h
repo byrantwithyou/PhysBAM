@@ -124,11 +124,11 @@ void Get_Body_Force(ARRAY<VECTOR_2D<T> ,VECTOR<int,2> >& force,const T time)
         if(time>(T)1/24 && random.Get_Uniform_Number((T)0,(T)1)<(T).01 && grid_vorticity(i,j).Magnitude_Squared()>1e-6 && fluids_parameters.density_container.density_2d(i,j)>(T)particle_vorticity_minimum_density){
             add_count++;
             if(grid_vorticity(i,j).z>=0){
-                int particle_id=vorticity_positive_particles.array_collection->Add_Element(); 
+                int particle_id=vorticity_positive_particles.Add_Element(); 
                 vorticity_positive_particles.X(particle_id)=fluids_parameters.grid.X(i,j)+random.Get_Uniform_Vector(VECTOR_2D<T>(-fluids_parameters.grid.dx,fluids_parameters.grid.dx),VECTOR_2D<T>(-fluids_parameters.grid.dy,fluids_parameters.grid.dy));
                 vorticity_positive_particles.vorticity(particle_id)=particle_vorticity_initial_amplification_factor*grid_vorticity(i,j);}
             else{
-                int particle_id=vorticity_negative_particles.array_collection->Add_Element(); 
+                int particle_id=vorticity_negative_particles.Add_Element(); 
                 vorticity_negative_particles.X(particle_id)=fluids_parameters.grid.X(i,j)+random.Get_Uniform_Vector(VECTOR_2D<T>(-fluids_parameters.grid.dx,fluids_parameters.grid.dx),VECTOR_2D<T>(-fluids_parameters.grid.dy,fluids_parameters.grid.dy));
                 vorticity_negative_particles.vorticity(particle_id)=particle_vorticity_initial_amplification_factor*grid_vorticity(i,j);}}}
     printf("Added %d particles\n",add_count);
@@ -142,10 +142,10 @@ void Postprocess_Frame(const int frame)
     T dt=1/(T)frame_rate;
     vorticity_positive_particles.X.Euler_Step(vorticity_positive_particles,fluids_parameters.grid,fluids_parameters.incompressible.V,dt);
     vorticity_negative_particles.X.Euler_Step(vorticity_negative_particles,fluids_parameters.grid,fluids_parameters.incompressible.V,dt);
-    int old_count=vorticity_positive_particles.array_collection->Size()+vorticity_negative_particles.array_collection->Size();
+    int old_count=vorticity_positive_particles.Size()+vorticity_negative_particles.Size();
     vorticity_positive_particles.Delete_Particles_Outside_Grid(fluids_parameters.grid,vorticity_positive_particles.X.array);
     vorticity_negative_particles.Delete_Particles_Outside_Grid(fluids_parameters.grid,vorticity_negative_particles.X.array);
-    int deleted_count=old_count-vorticity_positive_particles.array_collection->Size()-vorticity_negative_particles.array_collection->Size();
+    int deleted_count=old_count-vorticity_positive_particles.Size()-vorticity_negative_particles.Size();
     printf("Deleted %d particles\n",deleted_count);
 }
 //#####################################################################

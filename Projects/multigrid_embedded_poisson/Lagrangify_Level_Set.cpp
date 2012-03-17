@@ -123,10 +123,10 @@ int Lagrangify_Level_Set(
 
         embedded_surface.Update_Number_Nodes();
 
-        std::cout << "  # of particles (before closing) = " << embedded_surface.particles.array_collection->Size()     << std::endl;
+        std::cout << "  # of particles (before closing) = " << embedded_surface.particles.Size()     << std::endl;
         std::cout << "  # of elements  (before closing) = " << embedded_surface.mesh.elements.Size() << std::endl;
         Close_Mesh_Object(embedded_surface);
-        std::cout << "  # of particles  (after closing) = " << embedded_surface.particles.array_collection->Size()     << std::endl;
+        std::cout << "  # of particles  (after closing) = " << embedded_surface.particles.Size()     << std::endl;
         std::cout << "  # of elements   (after closing) = " << embedded_surface.mesh.elements.Size() << std::endl;
 
         std::cout << "[Dividing embedding cells...] " << timer.Elapsed() << " s" << std::endl;
@@ -247,11 +247,11 @@ public:
 
         {
             boost::lock_guard< boost::mutex > _embedded_surface_scoped_lock(embedded_surface_mutex);
-            const int particle_offset = embedded_surface.particles.array_collection->Size();
-            embedded_surface.particles.array_collection->Add_Elements(
-                cell_local_embedded_surface.particles.array_collection->Size()
+            const int particle_offset = embedded_surface.particles.Size();
+            embedded_surface.particles.Add_Elements(
+                cell_local_embedded_surface.particles.Size()
             );
-            for(int p = 1; p <= cell_local_embedded_surface.particles.array_collection->Size(); ++p)
+            for(int p = 1; p <= cell_local_embedded_surface.particles.Size(); ++p)
                 embedded_surface.particles.X(particle_offset + p) =
                     cell_local_embedded_surface.particles.X(p);
             for(int e = 1; e <= cell_local_embedded_surface.mesh.elements.Size(); ++e)

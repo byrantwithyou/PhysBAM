@@ -51,7 +51,7 @@ void Add_Edge_Springs_To_Quasistatic_Particles(const T stiffness=2e3,const T ove
         const T max_strain_per_time_step=.1,const bool use_rest_state_for_strain_rate=true,const T restlength_enlargement_fraction=0,const bool verbose=true)
 {
     for(int i=0;i<solids_parameters.deformable_body_parameters.list.deformable_objects.m;i++){
-    int number_quasistatic_particles=solids_parameters.deformable_body_parameters.list(i).tetrahedralized_volume->particles.array_collection->Size();
+    int number_quasistatic_particles=solids_parameters.deformable_body_parameters.list(i).tetrahedralized_volume->particles.Size();
     ARRAY<int> links_to_quasistatic_particles(2,number_quasistatic_particles);
     for(int p=0;p<number_quasistatic_particles;p++){
         links_to_quasistatic_particles(1,p)=p;//quasistatic particle
@@ -73,22 +73,22 @@ void Get_Initial_Data()
     //append new dynamic particles
     for(int i=0;i<solids_parameters.deformable_body_parameters.list.deformable_objects.m;i++){
         DEFORMABLE_PARTICLES<T,VECTOR_3D<T> >& particles=solids_parameters.deformable_body_parameters.list(i).tetrahedralized_volume->particles;particles.Update_Velocity();
-        particles.Increase_Array_Size(2*particles.array_collection->Size());
-        for(int p=1;p<particles.array_collection->Size();p++)
-        {int index=particles.array_collection->Add_Element();particles.X(index)=particles.X(p);particles.V(index)=particles.V(p);particles.mass(index)=particles.mass(p);}}
+        particles.Increase_Array_Size(2*particles.Size());
+        for(int p=1;p<particles.Size();p++)
+        {int index=particles.Add_Element();particles.X(index)=particles.X(p);particles.V(index)=particles.V(p);particles.mass(index)=particles.mass(p);}}
 }
 //#####################################################################
 // Set_External_Velocities
 //#####################################################################
 void Set_External_Velocities(ARRAY<VECTOR_3D<T> >& V,const T time){
-    int number_quasistatic_particles=solids_parameters.deformable_body_parameters.list(id_number).tetrahedralized_volume->particles.array_collection->Size()/2;
+    int number_quasistatic_particles=solids_parameters.deformable_body_parameters.list(id_number).tetrahedralized_volume->particles.Size()/2;
     for(int p=0;p<number_quasistatic_particles;p++) solids_parameters.deformable_body_parameters.list(id_number).tetrahedralized_volume->particles.V(p)=VECTOR_3D<T>(0,0,0);
 }
 //#####################################################################
 // Zero_Out_Enslaved_Velocity_Nodes
 //#####################################################################
 void Zero_Out_Enslaved_Velocity_Nodes(ARRAY<VECTOR_3D<T> >& V,const T time){
-    int number_quasistatic_particles=solids_parameters.deformable_body_parameters.list(id_number).tetrahedralized_volume->particles.array_collection->Size()/2;
+    int number_quasistatic_particles=solids_parameters.deformable_body_parameters.list(id_number).tetrahedralized_volume->particles.Size()/2;
     for(int p=0;p<number_quasistatic_particles;p++) solids_parameters.deformable_body_parameters.list(id_number).tetrahedralized_volume->particles.V(p)=VECTOR_3D<T>(0,0,0);
 }
 //#####################################################################
@@ -99,7 +99,7 @@ void Update_Time_Varying_Material_Properties(const T time){
     if(time>next_frame_time){
         current_frame++;
         for(int i=0;i<solids_parameters.deformable_body_parameters.list.deformable_objects.m;i++){
-            for(int p=0;p<solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.array_collection->Size()/2;p++)
+            for(int p=0;p<solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.Size()/2;p++)
         previous_positions(i)(p)=solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.X(p);
         previous_velocities(i)(p)=solids_parameters.deformable_body_parameters.list(1).tetrahedralized_volume->particles.V(p);}
     }

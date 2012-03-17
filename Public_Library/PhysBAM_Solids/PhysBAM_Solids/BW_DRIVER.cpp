@@ -148,8 +148,8 @@ Advance_Substep(const T dt,const T time)
     bw_collisions.Detect_Cloth_Body_Contact();
 
     // Form the right hand side
-    B_full.Resize(particles.array_collection->Size(),false,false);
-    rigid_B_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
+    B_full.Resize(particles.Size(),false,false);
+    rigid_B_full.Resize(rigid_body_particles.Size(),false,false);
     GENERALIZED_VELOCITY<TV> B(B_full,rigid_B_full,solid_body_collection);
     B_full.Fill(TV());rigid_B_full.Fill(TWIST<TV>());
     // Update Position Based State
@@ -162,10 +162,10 @@ Advance_Substep(const T dt,const T time)
     B_full*=(dt*solid_body_collection.deformable_body_collection.particles.one_over_mass);
 
     // TODO make sure the V we pass is delta V
-    F_full.Resize(particles.array_collection->Size(),false,false);rigid_F_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-    R_full.Resize(particles.array_collection->Size(),false,false);rigid_R_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-    S_full.Resize(particles.array_collection->Size(),false,false);rigid_S_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
-    V_full.Resize(particles.array_collection->Size(),false,false);rigid_V_full.Resize(rigid_body_particles.array_collection->Size(),false,false);
+    F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
+    R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
+    S_full.Resize(particles.Size(),false,false);rigid_S_full.Resize(rigid_body_particles.Size(),false,false);
+    V_full.Resize(particles.Size(),false,false);rigid_V_full.Resize(rigid_body_particles.Size(),false,false);
     GENERALIZED_VELOCITY<TV> V(V_full,rigid_V_full,solid_body_collection),F(F_full,rigid_F_full,solid_body_collection),R(R_full,rigid_R_full,solid_body_collection),
         S(S_full,rigid_S_full,solid_body_collection),AR(AR_full,rigid_AR_full,solid_body_collection);
 

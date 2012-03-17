@@ -55,13 +55,13 @@ public:
         vortex_particle_evolution.force_scaling=1e-2;
         VORTICITY_PARTICLES<T,VECTOR<T,3> >& particles=vortex_particle_evolution.vorticity_particles;
         // add two test particles
-        //int index=particles.array_collection->Add_Element();
+        //int index=particles.Add_Element();
         //particles.X(index)=VECTOR<T,3>((T).75,(T).4,(T).5);
         //particles.vorticity(index)=VECTOR<T,3>(.5,1,-.5);
-        //index=particles.array_collection->Add_Element();
+        //index=particles.Add_Element();
         //particles.X(index)=VECTOR<T,3>((T).25,(T).4,(T).5);
         //particles.vorticity(index)=VECTOR<T,3>(-.5,-1,-.5);
-        int index=particles.array_collection->Add_Element();
+        int index=particles.Add_Element();
         particles.X(index)=VECTOR<T,3>((T).5,(T).45,(T).5);
         particles.vorticity(index)=VECTOR<T,3>(0,1,0);
     }

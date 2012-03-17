@@ -66,7 +66,7 @@ void Initialize_Cloth(TRIANGLE_MESH*& triangle_mesh,PARTICLE_3D*& particles,TRIA
     triangulated_surface=new TRIANGULATED_SURFACE(*triangle_mesh,*particles);
     triangle_mesh->Initialize_Square_Mesh(m,n);
     particles->Update_Position_And_Velocity();particles->Store_Mass();
-    for(k=0;k<triangle_mesh->number_nodes;k++) particles->array_collection->Add_Element();
+    for(k=0;k<triangle_mesh->number_nodes;k++) particles->Add_Element();
     if(!restart_step_number){    
         for(int i=0;i<m;i++) for(int j=0;j<n;j++){
             int node=i+m*(j-1);
@@ -214,14 +214,14 @@ void Initialize_Scripted_Objects(ARRAY<RIGID_BODY<TV>*>& scripted_objects,ARRAY<
     bump_mesh.number_nodes=8;
     bump_particles.Store_Position();
     bump_particles.Set_Array_Buffer_Size(8);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(1)=VECTOR_3D(.1,-.3,.1);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(2)=VECTOR_3D(.9,-.3,.1);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(3)=VECTOR_3D(.9,-.3,.9);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(4)=VECTOR_3D(.1,-.3,.9);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(5)=VECTOR_3D(.4,.2,.4);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(6)=VECTOR_3D(.6,.2,.4);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(7)=VECTOR_3D(.6,.2,.6);
-    bump_particles.array_collection->Add_Element(); bump_particles.X(8)=VECTOR_3D(.4,.2,.6);
+    bump_particles.Add_Element(); bump_particles.X(1)=VECTOR_3D(.1,-.3,.1);
+    bump_particles.Add_Element(); bump_particles.X(2)=VECTOR_3D(.9,-.3,.1);
+    bump_particles.Add_Element(); bump_particles.X(3)=VECTOR_3D(.9,-.3,.9);
+    bump_particles.Add_Element(); bump_particles.X(4)=VECTOR_3D(.1,-.3,.9);
+    bump_particles.Add_Element(); bump_particles.X(5)=VECTOR_3D(.4,.2,.4);
+    bump_particles.Add_Element(); bump_particles.X(6)=VECTOR_3D(.6,.2,.4);
+    bump_particles.Add_Element(); bump_particles.X(7)=VECTOR_3D(.6,.2,.6);
+    bump_particles.Add_Element(); bump_particles.X(8)=VECTOR_3D(.4,.2,.6);
     scripted_objects(2)=new RIGID_TRIANGULATED_SOLID(bump_surf);
     scripted_objects_friction(2)=.2;
     // rotating sphere

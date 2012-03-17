@@ -33,11 +33,11 @@ public:
     virtual ~OPENGL_POINTS_3D();
 
     template<class T_PARTICLES> void Set_Points_From_Particles(const T_PARTICLES& particles,const bool keep_colors=true,const bool use_ids=true,const bool use_draw_mask=false)
-    {points.Resize(particles.array_collection->Size());
+    {points.Resize(particles.Size());
     //Store_Point_Ids(use_ids && particles.store_id);
     Store_Point_Colors(false);
     if(use_draw_mask) Store_Draw_Mask(true);
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         if(draw_mask) (*draw_mask)(i)=true;
         points(i)=particles.X(i);}}
 

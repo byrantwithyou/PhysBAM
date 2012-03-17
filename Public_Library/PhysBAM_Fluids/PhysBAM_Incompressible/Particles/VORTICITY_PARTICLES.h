@@ -18,7 +18,7 @@ class VORTICITY_PARTICLES:public CLONEABLE<VORTICITY_PARTICLES<TV>,GEOMETRY_PART
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<VORTICITY_PARTICLES<TV>,GEOMETRY_PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;using BASE::X;
+    using BASE::X;
 
     ARRAY_VIEW<typename TV::SPIN> vorticity;
     ARRAY_VIEW<T> radius;

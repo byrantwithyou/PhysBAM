@@ -103,7 +103,7 @@ public:
         fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))=fluids_parameters.particle_levelset_evolution->particle_levelset.template_removed_particles.Clone();
         int particle_count=40;
         for(int i=0;i<particle_count;i++){
-            int particle_index=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->array_collection->Add_Element();
+            int particle_index=fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->Add_Element();
             fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles(TV_INT(1,1))->X(particle_index)=TV((T).05,.05+(i/(T)particle_count)*0.9);
         }
         fluids_parameters.particle_levelset_evolution->particle_levelset.Update_Particle_Cells(fluids_parameters.particle_levelset_evolution->particle_levelset.removed_positive_particles);
@@ -538,7 +538,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             //RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y);
             RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,(T).75,(T)1.5);
 
-            first_coupled_rigid_body=rigid_body_collection.rigid_body_particle.array_collection->Size()+1;
+            first_coupled_rigid_body=rigid_body_collection.rigid_body_particle.Size()+1;
             RANDOM_NUMBERS<T> random;
             random.Set_Seed(1234);
 
@@ -601,7 +601,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             deformable_object_id=THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Deformable_Object(deformable_body_collection,100,TV((T).4,light_sphere_initial_height),TV((T).6,(T)light_sphere_initial_height));
             SEGMENTED_CURVE_2D<T>& segmented_curve=dynamic_cast<SEGMENTED_CURVE_2D<T>&>(*deformable_body_collection.deformable_geometry.structures(deformable_object_id));
             THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Set_Mass(segmented_curve,10);
-            left_fixed_index=1;right_fixed_index=segmented_curve.particles.array_collection->Size();
+            left_fixed_index=1;right_fixed_index=segmented_curve.particles.Size();
             break;}
         case 9:{
             RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("circle",(T).1,(T)0);
@@ -732,16 +732,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_id));
             break;}
         case 4:{
-            for(int i=first_coupled_rigid_body;i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(i));
+            for(int i=first_coupled_rigid_body;i<=rigid_body_collection.rigid_body_particle.Size();i++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(i));
             solids_tests.Add_Ground();
             break;}
         case 5:
         case 2:{
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
             solids_tests.Add_Ground();
             break;}
         case 6:{
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(p));
+            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(p));
             solids_tests.Add_Ground();
             break;}
         case 7:{
@@ -776,15 +776,15 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             break;}
         case 12:{
             // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()));
+            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
             break;}
         case 13:{
             // solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true,solid_gravity));
-            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()-1));
-            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()-1));
-            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.array_collection->Size()));
+            // Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
+            Add_Thin_Shell_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()-1));
+            Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
             
             // TRIANGULATED_AREA<T>& triangulated_area=deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             // triangulated_area.Initialize_Hierarchy();

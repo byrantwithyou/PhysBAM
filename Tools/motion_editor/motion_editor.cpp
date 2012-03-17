@@ -61,7 +61,7 @@ public:
     int Detect_Rigid_Intersection(int x,int y)
     {
         RAY<TV> ray=opengl_world.Ray_Through_Normalized_Image_Coordinate(opengl_world.Convert_Mouse_Coordinates(x,y));
-        for(int id(1);id<=rigid_body_collection->rigid_body_particle.array_collection->Size();id++) if(rigid_body_collection->Rigid_Body(id).Simplex_Intersection(ray,0)) return id;
+        for(int id(1);id<=rigid_body_collection->rigid_body_particle.Size();id++) if(rigid_body_collection->Rigid_Body(id).Simplex_Intersection(ray,0)) return id;
         return int(0);
     }
 

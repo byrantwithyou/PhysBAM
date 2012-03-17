@@ -34,19 +34,19 @@ public:
 
     void Set_Points_From_Particles(const GEOMETRY_PARTICLES<TV>& particles,bool keep_colors=true,const bool use_ids=true)
     {points=particles.X;
-    const ARRAY_VIEW<int>* id=use_ids?particles.array_collection->template Get_Array<int>(ATTRIBUTE_ID_ID):0;
+    const ARRAY_VIEW<int>* id=use_ids?particles.template Get_Array<int>(ATTRIBUTE_ID_ID):0;
     Store_Point_Ids(id!=0);
-    if(point_colors && (!keep_colors || point_colors->m!=particles.array_collection->Size()))
+    if(point_colors && (!keep_colors || point_colors->m!=particles.Size()))
         Store_Point_Colors(false);
 
-    if(ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
+    if(const ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR)){
         Store_Point_Colors(true);
         for(int i=0;i<point_colors->m;i++)
             (*point_colors)(i)=OPENGL_COLOR((*color_attribute)(i));}
 
     if(id) *point_ids=*id;
 
-    if(ARRAY_VIEW<T>* radius_attribute=particles.array_collection->template Get_Array<T>(ATTRIBUTE_ID_RADIUS)){
+    if(const ARRAY_VIEW<T>* radius_attribute=particles.template Get_Array<T>(ATTRIBUTE_ID_RADIUS)){
         Store_Point_Radii(true);
         for(int i=0;i<point_radii->m;i++)
             (*point_radii)(i)=(*radius_attribute)(i);}}

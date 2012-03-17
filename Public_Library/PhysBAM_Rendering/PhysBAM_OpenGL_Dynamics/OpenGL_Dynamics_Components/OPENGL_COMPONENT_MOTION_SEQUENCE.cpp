@@ -27,7 +27,7 @@ OPENGL_COMPONENT_MOTION_SEQUENCE(const std::string& filename_input,const bool fr
     if(FILE_UTILITIES::File_Exists(frame_filename)) FILE_UTILITIES::Read_From_File<RW>(frame_filename,motion);
     if(FILE_UTILITIES::File_Exists(segments_filename)) FILE_UTILITIES::Read_From_File<RW>(segments_filename,segment_mesh.elements);
     segment_mesh.number_nodes=motion.trajectories.m;
-    particles.array_collection->Add_Elements(motion.trajectories.m);
+    particles.Add_Elements(motion.trajectories.m);
 }
 //#####################################################################
 // Function ~OPENGL_COMPONENT_MOTION_SEQUENCE
@@ -94,7 +94,7 @@ Reinitialize(bool force)
     if(frame_dependent_data){
         if(FILE_UTILITIES::File_Exists(frame_filename)) FILE_UTILITIES::Read_From_File<RW>(frame_filename,motion);
         else return;}
-    if(particles.array_collection->Size() != motion.trajectories.m){particles.array_collection->Delete_All_Elements();particles.array_collection->Add_Elements(motion.trajectories.m);}
+    if(particles.Size() != motion.trajectories.m){particles.Delete_All_Elements();particles.Add_Elements(motion.trajectories.m);}
     for(int i=0;i<motion.trajectories.m;i++) particles.X(i)=motion.X(i,one_over_frame_rate*frame);
     frame_loaded=frame;valid=true;
 }

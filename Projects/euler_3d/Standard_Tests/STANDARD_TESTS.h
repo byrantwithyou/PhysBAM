@@ -944,7 +944,7 @@ void Post_Initialization() PHYSBAM_OVERRIDE
             DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& collision_structure=*deformable_objects_to_simulate(i);
             collision_structure.object.Initialize_Hierarchy();
             Add_To_Fluid_Simulation(collision_structure);}
-        for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+        for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
             if(rigid_body_collection.Is_Active(i) && rigid_body_collection.Rigid_Body(i).simplicial_object)
                 rigid_body_collection.Rigid_Body(i).simplicial_object->Update_Triangle_List();
         fluids_parameters.collision_bodies_affecting_fluid->Add_Bodies(rigid_body_collection.rigid_geometry_collection);}

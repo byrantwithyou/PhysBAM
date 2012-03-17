@@ -94,14 +94,14 @@ void Get_Body_Force(ARRAY<VECTOR<T,3> ,VECTOR<int,3> >& force,const T time,const
     vortex_particle_evolution.Euler_Step(V_ghost,dt,time);
     // delete particles that are outside the water
     VORTICITY_PARTICLES<T,VECTOR<T,3> >& vorticity_particles=vortex_particle_evolution.vorticity_particles;
-    for(int p=vorticity_particles.array_collection->Size();p>=1;p--) if(fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.Phi(vorticity_particles.X(p))>0)
+    for(int p=vorticity_particles.Size();p>=1;p--) if(fluids_parameters.particle_levelset_evolution.particle_levelset.levelset.Phi(vorticity_particles.X(p))>0)
         vorticity_particles.Delete_Particle(p);
     // seed particles
     VECTOR<T,3> cell_upper=(T).5*VECTOR<T,3>(grid.dx,grid.dy,grid.dz),cell_lower=-cell_upper;
     int i=1;
     for(int j=0;j<grid.n;j++) for(int ij=0;ij<grid.mn;ij++) if(fluids_parameters.particle_levelset_evolution.phi(i,j,ij)<0)
         if(random.Get_Uniform_Number((T)0,(T)1)<(T).0003){
-            int particle_id=vorticity_particles.array_collection->Add_Element(); 
+            int particle_id=vorticity_particles.Add_Element(); 
             vorticity_particles.X(particle_id)=grid.X(i,j,ij)+random.Get_Uniform_Vector(cell_lower,cell_upper);
             int sign=random.Get_Uniform_Integer(0,1);if(sign==0)sign=-1;
             vorticity_particles.vorticity(particle_id)=VECTOR<T,3>(0,(T)sign*vorticity_magnitude,0);

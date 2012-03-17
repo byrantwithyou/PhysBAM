@@ -428,16 +428,16 @@ Output_Iterators(const STREAM_TYPE stream_type,const char* output_directory,int 
     // This isn't so great - it means the iterator might actually be different from the one used.
     LOG::cout<<"OUTPUT ITERATORS"<<std::endl;
     GEOMETRY_PARTICLES<TV> particles;
-    particles.array_collection->template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    ARRAY_VIEW<VECTOR<T,3> >& color_attribute=*particles.array_collection->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    ARRAY_VIEW<VECTOR<T,3> >& color_attribute=*particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
 
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info,1);iterator.Valid();iterator.Next()){
-        int p=particles.array_collection->Add_Element();
+        int p=particles.Add_Element();
         particles.X(p)=iterator.Location();
         color_attribute(p)=VECTOR<T,3>(0,(T).5,0);}
 
     for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_UNCOUPLED<TV> iterator(iterator_info,0,!two_phase);iterator.Valid();iterator.Next_Fluid()){
-        int p=particles.array_collection->Add_Element();
+        int p=particles.Add_Element();
         particles.X(p)=iterator.Location();
         color_attribute(p)=VECTOR<T,3>((T).5,(T).5,1);}
 

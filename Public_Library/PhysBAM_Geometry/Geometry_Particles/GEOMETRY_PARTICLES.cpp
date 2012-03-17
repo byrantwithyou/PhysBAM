@@ -12,7 +12,7 @@ template<class TV> GEOMETRY_PARTICLES<TV>::
 GEOMETRY_PARTICLES()
     :X(0,0),V(0,0),store_velocity(false)
 {
-    array_collection->Add_Array(ATTRIBUTE_ID_X,&X);
+    Add_Array(ATTRIBUTE_ID_X,&X);
 }
 //#####################################################################
 // Destructor 

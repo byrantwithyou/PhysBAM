@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <fstream>
@@ -14,7 +14,7 @@ void Read_Particles(const STREAM_TYPE& stream_type,const std::string& file)
 {
     PARTICLES<TV> particles;
     FILE_UTILITIES::Read_From_File(stream_type,file,particles);
-    for(int i=0;i<particles.array_collection->Size();i++)
+    for(int i=0;i<particles.Size();i++)
         particles.Print(std::cout,i);
 }
 

@@ -431,7 +431,7 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
         joint=0;
     }
 
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++) if(rigid_body_collection.Is_Active(i)){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(i);
         if(rigid_body_collection.rigid_body_particle.kinematic(i)){FRAME<TV> frame;Set_Kinematic_Positions(frame,0,i);rigid_body.Frame()=frame;}}
 
@@ -546,7 +546,7 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 */  }
     PHYSBAM_FATAL_ERROR("pd is now done in the framework");
     if(traditional_pd){
-        precomputed_pd_torques.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size());precomputed_pd_torques.Fill(TV());
+        precomputed_pd_torques.Resize(solid_body_collection.rigid_body_collection.rigid_body_particle.Size());precomputed_pd_torques.Fill(TV());
         for(int i=0;i<arb->joint_mesh.joints.m;i++) if(arb->joint_mesh.joints(i)->joint_function){
             JOINT<TV>* joint=arb->joint_mesh.joints(i);JOINT_FUNCTION<TV>* jfunc=joint->joint_function;
             RIGID_BODY<TV>* parent=arb->Parent(joint->id_number),*child=arb->Child(joint->id_number);
@@ -571,7 +571,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
 
     TV total_linear_momentum,total_angular_momentum;
-    for(int i=0;i<rigid_body_particles.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_particles.Size();i++){
         LOG::cout<<i<<": "<<rigid_body_particles.angular_momentum(i)<<std::endl;
         total_linear_momentum+=rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear;
         total_angular_momentum+=TV::Cross_Product(rigid_body_particles.frame(i).t,rigid_body_particles.mass(i)*rigid_body_particles.twist(i).linear)+rigid_body_particles.angular_momentum(i);}

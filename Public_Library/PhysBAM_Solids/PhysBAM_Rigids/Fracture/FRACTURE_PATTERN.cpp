@@ -65,7 +65,7 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
             new_body->Diagonalize_Inertia_Tensor(inertia);
             new_body->Add_Structure(*new IMPLICIT_OBJECT_TRANSFORMED<TV,FRAME<TV> >(new_regions(i)->implicit_object,true,new FRAME<TV>(new_body->Frame().Inverse_Times(levelset_frame))));
             new_body->Add_Structure(*new_regions(i)->triangulated_surface);
-            for(int p=0;p<new_body->simplicial_object->particles.array_collection->Size();p++)
+            for(int p=0;p<new_body->simplicial_object->particles.Size();p++)
                 new_body->simplicial_object->particles.X(p)=new_body->Object_Space_Point(new_body->simplicial_object->particles.X(p));
             new_regions(i)->need_destroy_data=false;
             delete new_regions(i);

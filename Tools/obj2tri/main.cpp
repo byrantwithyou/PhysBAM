@@ -38,9 +38,9 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
 
     for(int t=0;t<triangles.m;t++)
         triangulated_surface->mesh.elements.Append(triangles(t));
-    triangulated_surface->particles.array_collection->Preallocate(vertices.m);
+    triangulated_surface->particles.Preallocate(vertices.m);
     for(int v=0;v<vertices.m;v++)
-        triangulated_surface->particles.X(triangulated_surface->particles.array_collection->Add_Element())=vertices(v);
+        triangulated_surface->particles.X(triangulated_surface->particles.Add_Element())=vertices(v);
     triangulated_surface->Update_Number_Nodes();
     FILE_UTILITIES::Write_To_File<RW>(output_filename,*triangulated_surface);
 }

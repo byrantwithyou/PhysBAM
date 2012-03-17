@@ -279,7 +279,7 @@ Compute_Total_Energy(const T time) const
     T total_energy=0;
     for(SEGMENT_ITERATOR iterator(force_segments);iterator.Valid();iterator.Next()){int s=iterator.Data();
         total_energy+=Potential_Energy(s,time);}
-    for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++){
         total_energy+=rigid_body_collection.Rigid_Body(i).Kinetic_Energy();
     }
     return total_energy;

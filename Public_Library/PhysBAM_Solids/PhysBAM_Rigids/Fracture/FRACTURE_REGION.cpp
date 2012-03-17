@@ -95,7 +95,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
         TRIANGULATED_SURFACE<T>* region_triangulated_surface;
         if(tessellate_region) region_triangulated_surface=TESSELLATION::Generate_Triangles(*region_implicit_object);
         else region_triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
-        int initial_number_of_particles=region_triangulated_surface->particles.array_collection->Size();
+        int initial_number_of_particles=region_triangulated_surface->particles.Size();
 
         particle_intersection_thickness=implicit_object->levelset.grid.dX.Min();
         MATRIX<T,3> o2bl_RS=body.levelset_RS.Inverse()*object_RS;
@@ -107,18 +107,18 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
         TV bo2o_T=object_RS.Solve_Linear_System(body.object_T-object_T);
 
         if(!use_particle_optimization){
-            for(int p=0;p<triangulated_surface->particles.array_collection->Size();p++){ // clamp our particles
+            for(int p=0;p<triangulated_surface->particles.Size();p++){ // clamp our particles
                 TV test_point=o2bl_RS*triangulated_surface->particles.X(p)+o2bl_T;
                 if((body.implicit_object->levelset.Extended_Phi(test_point)/phi_scale-particle_intersection_thickness)<=0 && 
                    region_implicit_object->levelset.grid.domain.Lazy_Inside(extra_levelset_frame.Inverse_Times(triangulated_surface->particles.X(p)))){
-                    int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
+                    int added_particle=region_triangulated_surface->particles.Add_Element();
                     region_triangulated_surface->particles.X(added_particle)=triangulated_surface->particles.X(p);}}
-            for(int p=0;p<body.triangulated_surface->particles.array_collection->Size();p++){ // clamp body particles
+            for(int p=0;p<body.triangulated_surface->particles.Size();p++){ // clamp body particles
                 TV test_point=bo2l_RS*body.triangulated_surface->particles.X(p)+bo2l_T;
                 if(implicit_object->levelset.Extended_Phi(test_point)-particle_intersection_thickness<=0){
                     TV point_to_add=bo2o_RS*body.triangulated_surface->particles.X(p)+bo2o_T;
                     if(region_implicit_object->levelset.grid.domain.Lazy_Inside(extra_levelset_frame.Inverse_Times(point_to_add))){
-                        int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
+                        int added_particle=region_triangulated_surface->particles.Add_Element();
                         region_triangulated_surface->particles.X(added_particle)=point_to_add;}}}}
         else{
             // Iterate over the new levelset's cells, and find the corresponding cell in both the levelsets. Grab all particles from those cells.
@@ -127,15 +127,15 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
                 if(region_implicit_object->levelset.phi(iterator.index)-particle_intersection_thickness<=0){
                     TV_INT my_cell_index=old_index+fragment_counts.min_corner-TV_INT::All_Ones_Vector();
                     for(int p=0;p<particle_partition->partition(my_cell_index).m;p++){
-                        int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
+                        int added_particle=region_triangulated_surface->particles.Add_Element();
                         region_triangulated_surface->particles.X(added_particle)=triangulated_surface->particles.X(particle_partition->partition(my_cell_index)(p));}
                     for(int p=0;p<body.particle_partition->partition(my_cell_index+offset).m;p++){
                         TV point_to_add=bo2o_RS*body.triangulated_surface->particles.X(body.particle_partition->partition(my_cell_index+offset)(p))+bo2o_T;
-                        int added_particle=region_triangulated_surface->particles.array_collection->Add_Element();
+                        int added_particle=region_triangulated_surface->particles.Add_Element();
                         region_triangulated_surface->particles.X(added_particle)=point_to_add;}}}}
 
-        int number_of_particles_to_swap=min(initial_number_of_particles,region_triangulated_surface->particles.array_collection->Size()-initial_number_of_particles);
-        ARRAY<int> particle_map(region_triangulated_surface->particles.array_collection->Size());
+        int number_of_particles_to_swap=min(initial_number_of_particles,region_triangulated_surface->particles.Size()-initial_number_of_particles);
+        ARRAY<int> particle_map(region_triangulated_surface->particles.Size());
         for(int i=0;i<particle_map.m;i++) particle_map(i)=i;
         for(int index_to_swap=0;index_to_swap<number_of_particles_to_swap;index_to_swap++)
             exchange(particle_map(index_to_swap),particle_map(particle_map.m-index_to_swap+1));

@@ -247,7 +247,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         LOG::cout<<"Triangulated Surface Filename="<<filename<<" trying to read "<<substituted_filename<<std::endl;
         TRIANGULATED_SURFACE<T>* surface;FILE_UTILITIES::Create_From_File<RW>(substituted_filename,surface);
         std::cout<<"    Contains "<<surface->mesh.number_nodes<<" nodes "<<surface->mesh.elements.m<<" triangles"<<std::endl;
-        surface->particles.array_collection->Resize(surface->mesh.number_nodes);
+        surface->particles.Resize(surface->mesh.number_nodes);
         surface->Rescale(scale);
         surface->normal_variance_threshold=smooth_normals_threshold;
         surface->avoid_normal_interpolation_across_sharp_edges=preserve_creases;

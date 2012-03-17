@@ -227,11 +227,11 @@ void Plastic_Mattress(int nx,int ny,int nz,const ROTATION<TV>& rot,const RANGE<T
 
     tetrahedralized_volume.Update_Bounding_Box();
     TV center(tetrahedralized_volume.bounding_box->Center());T bottom=tetrahedralized_volume.bounding_box->min_corner.y;
-    for(int i=0;i<particles.array_collection->Size();i++){
+    for(int i=0;i<particles.Size();i++){
         particles.V(i)=initial_velocity+TV::Cross_Product(initial_angular_velocity,particles.X(i)-center);
         particles.X(i)=center+initial_orientation.Rotate(particles.X(i)-center);
         particles.X(i).y+=initial_height-bottom;}
-    std::cout << "total vertices = " << particles.array_collection->Size() << std::endl;
+    std::cout << "total vertices = " << particles.Size() << std::endl;
     std::cout << "total tets = " << tetrahedralized_volume.mesh.elements.m << std::endl;
     SOLIDS_STANDARD_TESTS<TV>::Set_Mass_Of_Particles(tetrahedralized_volume,1000);
 

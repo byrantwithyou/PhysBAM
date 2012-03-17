@@ -415,8 +415,8 @@ void Ball_Hitting_Wall()
     TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
     TRIANGULATED_SURFACE<T>& simplicial_object=*TRIANGULATED_SURFACE<T>::Create();
-    GEOMETRY_PARTICLES<TV>& particles=simplicial_object.particles;particles.array_collection->Add_Elements(2*(dimensions.x*dimensions.z+dimensions.x*(dimensions.y-2)+(dimensions.z-2)*(dimensions.y-2)));
-    TRIANGLE_MESH& triangle_mesh=simplicial_object.mesh;triangle_mesh.number_nodes=particles.array_collection->Size();
+    GEOMETRY_PARTICLES<TV>& particles=simplicial_object.particles;particles.Add_Elements(2*(dimensions.x*dimensions.z+dimensions.x*(dimensions.y-2)+(dimensions.z-2)*(dimensions.y-2)));
+    TRIANGLE_MESH& triangle_mesh=simplicial_object.mesh;triangle_mesh.number_nodes=particles.Size();
     int particle_index=1;
     for(int side=0;side<=1;side++){
         // Construct top and bottom
@@ -543,8 +543,8 @@ void Raining_Spheres()
     TV_INT levelset_resolution(151,11,101);TV levelset_dx=edge_lengths/TV(levelset_resolution-1);int ghost_cells=2;
     RIGID_BODY<TV>* rigid_body=new RIGID_BODY<TV>(rigid_body_collection,true);
     TRIANGULATED_SURFACE<T>& simplicial_object=*TRIANGULATED_SURFACE<T>::Create();
-    GEOMETRY_PARTICLES<TV>& particles=simplicial_object.particles;particles.array_collection->Add_Elements(2*(dimensions.x*dimensions.z+dimensions.x*(dimensions.y-2)+(dimensions.z-2)*(dimensions.y-2)));
-    TRIANGLE_MESH& triangle_mesh=simplicial_object.mesh;triangle_mesh.number_nodes=particles.array_collection->Size();
+    GEOMETRY_PARTICLES<TV>& particles=simplicial_object.particles;particles.Add_Elements(2*(dimensions.x*dimensions.z+dimensions.x*(dimensions.y-2)+(dimensions.z-2)*(dimensions.y-2)));
+    TRIANGLE_MESH& triangle_mesh=simplicial_object.mesh;triangle_mesh.number_nodes=particles.Size();
     int particle_index=1;
     for(int side=0;side<=1;side++){
         // Construct top and bottom
@@ -737,14 +737,14 @@ void Create_Pattern(const int test_number)
 
     LEVELSET_MAKER_UNIFORM<T> levelset_maker;
     levelset_maker.Verbose_Mode();
-    for(int i=int(1);i<=rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=int(1);i<=rigid_body_collection.rigid_body_particle.Size();i++){
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(i);
         LEVELSET_IMPLICIT_OBJECT<TV>* fragment_implicit_object=LEVELSET_IMPLICIT_OBJECT<TV>::Create();
         TV_INT min_corner_index=grid.Clamped_Index(rigid_body.axis_aligned_bounding_box.min_corner)-TV_INT::All_Ones_Vector();grid.Clamp(min_corner_index);
         TV_INT max_corner_index=grid.Clamped_Index(rigid_body.axis_aligned_bounding_box.max_corner)+TV_INT::All_Ones_Vector();grid.Clamp(max_corner_index);
         RANGE<TV> clamped_domain=RANGE<TV>(grid.Node(min_corner_index),grid.Node(max_corner_index));
         TV_INT local_counts=max_corner_index-min_corner_index+TV_INT::All_Ones_Vector();
-        for(int p=0;p<rigid_body.simplicial_object->particles.array_collection->Size();p++)
+        for(int p=0;p<rigid_body.simplicial_object->particles.Size();p++)
             rigid_body.simplicial_object->particles.X(p)=rigid_body.World_Space_Point(rigid_body.simplicial_object->particles.X(p))-clamped_domain.Center();
         rigid_body.simplicial_object->Initialize_Hierarchy();
         rigid_body.simplicial_object->Update_Bounding_Box();
@@ -921,7 +921,7 @@ void Create_Box_Split_Pattern()
             local_phi(iterator.index)=RANGE<TV>(original_grid.Domain()).Signed_Distance(iterator.Location());
         TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
         for(NODE_ITERATOR iterator(original_grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next())
-            surface->particles.X(surface->particles.array_collection->Add_Element())=iterator.Location();
+            surface->particles.X(surface->particles.Add_Element())=iterator.Location();
         surface->Update_Number_Nodes();
         FRACTURE_REGION<T>* fr=new FRACTURE_REGION<T>(surface,lio,false);
         fr->fracture_offset=TV_INT(i==1?resolution-1+ghost_cells:ghost_cells,resolution/2-1+ghost_cells,resolution/2-1+ghost_cells);
@@ -962,14 +962,14 @@ void Create_Pyramid_Pattern(RANGE<TV> boundary,const int min_resolution,const in
             for(NODE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
                 if(plane.Signed_Distance(iterator.Location()+jitter)>0) phi(iterator.index)=abs(phi(iterator.index));}
 
-        surface->particles.X(surface->particles.array_collection->Add_Element())=center;
+        surface->particles.X(surface->particles.Add_Element())=center;
         for(int i=0;i<4;i++){
             TV A=pts(corners(m)(i)),B=pts(corners(m)(i%4+1)),C=center;
             for(int j=0;j<subdivision;j++){
                 for(int k=0;k<j;k++){
                     TV D=C+(B-C)*((T)k/j);
                     TV E=A+(D-A)*((T)j/subdivision);
-                    surface->particles.X(surface->particles.array_collection->Add_Element())=E;}}}
+                    surface->particles.X(surface->particles.Add_Element())=E;}}}
         surface->Update_Number_Nodes();
 
         TV_INT center_index=grid.Domain_Indices().Center();
@@ -1025,11 +1025,11 @@ void Create_Crossing_Planes_Pattern()
                 T z=flipped?center.z:side*original_half_edge_length.z;
                 for(int x_node=0;x_node<nodes_per_long_side;x_node++){
                     for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
-                        surface->particles.X(surface->particles.array_collection->Add_Element())=TV(x,y,z);
+                        surface->particles.X(surface->particles.Add_Element())=TV(x,y,z);
                     x+=x_step;z-=z_step;}}
             for(T x=x_coords(1);x<=x_coords(2);x+=(x_coords(2)-x_coords(1))/nodes_per_short_side)
                 for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
-                    surface->particles.X(surface->particles.array_collection->Add_Element())=TV(x,y,side*original_half_edge_length.z);
+                    surface->particles.X(surface->particles.Add_Element())=TV(x,y,side*original_half_edge_length.z);
             surface->Update_Number_Nodes();
             TV_INT center_index=grid.Domain_Indices().Center();
             Shrink_Levelset(grid,phi,5,center_index);
@@ -1066,11 +1066,11 @@ void Create_Crossing_Planes_Pattern()
                 T x=flipped?center.x:side*original_half_edge_length.x;
                 for(int z_node=0;z_node<nodes_per_long_side;z_node++){
                     for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
-                        surface->particles.X(surface->particles.array_collection->Add_Element())=TV(x,y,z);
+                        surface->particles.X(surface->particles.Add_Element())=TV(x,y,z);
                     z+=z_step;x-=x_step;}}
             for(T z=z_coords(1);z<=z_coords(2);z+=(z_coords(2)-z_coords(1))/nodes_per_short_side)
                 for(T y=-original_half_edge_length.y;y<=original_half_edge_length.y;y+=edge_lengths.y/nodes_per_static_side)
-                    surface->particles.X(surface->particles.array_collection->Add_Element())=TV(side*original_half_edge_length.x,y,z);
+                    surface->particles.X(surface->particles.Add_Element())=TV(side*original_half_edge_length.x,y,z);
             surface->Update_Number_Nodes();
             TV_INT center_index=grid.Domain_Indices().Center();
             Shrink_Levelset(grid,phi,5,center_index);

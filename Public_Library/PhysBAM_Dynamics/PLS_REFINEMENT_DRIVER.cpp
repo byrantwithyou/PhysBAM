@@ -261,14 +261,14 @@ Advance_To_Target_Time(const T target_time)
         LOG::Time("Update Particles");
         if(pls.use_removed_positive_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.fine_mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_positive_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_positive_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++){
+            for(int p=0;p<particles.Size();p++){
                 TV X=particles.X(p),V=interpolation.Clamped_To_Array_Face(example.fine_mac_grid,face_velocities_ghost,X);
                 if(-pls.levelset.Phi(X)>1.5*particles.radius(p)) V-=gravity_direction*(T).3; // buoyancy
                 particles.V(p)=V;}}
         if(pls.use_removed_negative_particles) for(typename GRID<TV>::NODE_ITERATOR iterator(example.fine_mac_grid);iterator.Valid();iterator.Next()) if(pls.removed_negative_particles(iterator.Node_Index())){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>& particles=*pls.removed_negative_particles(iterator.Node_Index());
-            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=dt*example.gravity*gravity_direction;
-            for(int p=0;p<particles.array_collection->Size();p++) particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(example.fine_mac_grid,example.incompressible.force,particles.X(p));} // ballistic
+            for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*example.gravity*gravity_direction;
+            for(int p=0;p<particles.Size();p++) particles.V(p)+=dt*interpolation.Clamped_To_Array_Face(example.fine_mac_grid,example.incompressible.force,particles.X(p));} // ballistic
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
 
         LOG::Time("Convection");

@@ -217,7 +217,7 @@ void Test_Example()
 {
     RECTANGULAR_RANDOM_PLACEMENT<TV> random_placement(RANGE<TV>(-20,20,1,100));
     Random_Scene_Generator("circle", 100, 1234, random_placement,solid_body_collection.rigid_body_collection,tests);
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++)
         solid_body_collection.rigid_body_collection.Rigid_Body(i).Set_Coefficient_Of_Restitution((T)0.5);
 
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("circle",(T)1,(T).1);
@@ -364,9 +364,9 @@ void Cluster()
     rigid_body_cluster_test->Frame()=FRAME<TV>(TV((T)15,0))*rigid_body_cluster->Frame();
     SEGMENTED_CURVE_2D<T>* segmented_curve=SEGMENTED_CURVE_2D<T>::Create();
     segmented_curve->mesh.elements=rigid_body_cluster->simplicial_object->mesh.elements;
-    segmented_curve->particles.array_collection->Add_Elements(rigid_body_cluster->simplicial_object->particles.array_collection->Size());
-    segmented_curve->mesh.number_nodes=segmented_curve->particles.array_collection->Size();
-    for(int i=0;i<segmented_curve->particles.array_collection->Size();i++){
+    segmented_curve->particles.Add_Elements(rigid_body_cluster->simplicial_object->particles.Size());
+    segmented_curve->mesh.number_nodes=segmented_curve->particles.Size();
+    for(int i=0;i<segmented_curve->particles.Size();i++){
         segmented_curve->particles.X(i)=rigid_body_cluster->simplicial_object->particles.X(i);
         LOG::cout<<"particles.X("<<i<<")"<<" is "<<segmented_curve->particles.X(i)<<std::endl;}
     rigid_body_cluster_test->Add_Structure(*segmented_curve);
@@ -390,7 +390,7 @@ void Cluster()
     referenced_rigid_particles->Append(rigid_body_cluster_test->particle_index);
     solid_body_collection.rigid_body_collection.Add_Force(new RIGID_GRAVITY<TV>(solid_body_collection.rigid_body_collection,referenced_rigid_particles));
 
-    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.array_collection->Size();i++){
+    for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
         LOG::cout<<"Rigid body index "<<i<<solid_body_collection.rigid_body_collection.Rigid_Body(i).name<<std::endl;
         LOG::cout<<"    FRAME  "<<solid_body_collection.rigid_body_collection.Rigid_Body(i).Frame()<<std::endl;
         LOG::cout<<"    MASS  "<<solid_body_collection.rigid_body_collection.rigid_body_particle.mass(i)<<std::endl;

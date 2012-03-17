@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
-#include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
+#include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 
@@ -26,7 +26,7 @@ class RIGID_GEOMETRY_PARTICLES:public CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,PAR
     typedef typename TV::SCALAR T;
     typedef CLONEABLE<RIGID_GEOMETRY_PARTICLES<TV>,PARTICLES<TV> > BASE;
 public:
-    using BASE::array_collection;
+    using BASE::Add_Array;using BASE::Size;using BASE::Delete_All_Elements;
 
     ARRAY<RIGID_GEOMETRY<TV>*> rigid_geometry;
     ARRAY_VIEW<FRAME<TV> > frame;

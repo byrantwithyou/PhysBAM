@@ -54,7 +54,7 @@ Incorporate_Removed_Negative_Particles()
     T max_dX_times_particle_power=grid.dX.Max()*particle_power;
     for(NODE_ITERATOR it(*sim_grid);it.Valid();it.Next())if(particle_array(it.Node_Index())){
         PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<T,3> >& particles=*particle_array(it.Node_Index());
-        for(int p=0;p<particles.array_collection->Size();p++){
+        for(int p=0;p<particles.Size();p++){
             T radius_x,radius_yz;VECTOR<T,3> major_axis;Get_Ellipsoid(particles,p,radius_x,radius_yz,major_axis);
             T one_over_radius_x_squared=(T)1/sqr(radius_x),one_over_radius_yz_squared=(T)1/sqr(radius_yz);
             RANGE<TV> box=particle_blender.Get_Bounding_Box(radius_x,radius_yz,particles.X(p),major_axis);

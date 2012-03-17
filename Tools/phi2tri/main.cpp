@@ -31,7 +31,7 @@ int main(int argc,char *argv[])
     TRIANGULATED_SURFACE<T>& triangulated_surface=*DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(implicit_surface.levelset);
 
     std::cout<<"Surface triangles : "<<triangulated_surface.mesh.elements.m<<std::endl;
-    std::cout<<"Surface particles : "<<triangulated_surface.particles.array_collection->Size()<<std::endl;
+    std::cout<<"Surface particles : "<<triangulated_surface.particles.Size()<<std::endl;
 
     FILE_UTILITIES::Write_To_File(stream_type,argv[2],triangulated_surface);
 

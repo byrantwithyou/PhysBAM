@@ -102,7 +102,7 @@ void Get_Initial_Data()
       default: LOG::cerr<<"Unknown test number "<<test_number<<std::endl;exit(1);}
 
     // correct number nodes
-    spring_segment_mesh.Set_Number_Nodes(particles.array_collection->Size());
+    spring_segment_mesh.Set_Number_Nodes(particles.Size());
     for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();
 
     // correct mass
@@ -138,10 +138,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // ------TEST
 /*    LOG::cout<<"Effective masses="<<std::endl;
-    for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
+    for(int p=0;p<particles.Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
 
     // try a different effective mass
-    ARRAY<TV> F(particles.array_collection->Size());
+    ARRAY<TV> F(particles.Size());
     for(int i=0;i<solid_body_collection.deformable_body_collection.binding_list.bindings.m;i++) F(solid_body_collection.deformable_body_collection.binding_list.bindings(i)->particle_index)=TV::All_Ones_Vector();
     solid_body_collection.deformable_body_collection.binding_list.Distribute_Force_To_Parents(1,F);
 
@@ -150,7 +150,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         particles.mass.one_over_effective_mass(binding.x)=particles.mass.one_over_mass(binding.x)=(T)1/particles.mass.array(binding.x);}
 
     LOG::cout<<"Effective masses="<<std::endl;
-    for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
+    for(int p=0;p<particles.Size();p++) LOG::cout<<"\teffective mass("<<p<<")="<<particles.mass.effective_mass(p)<<std::endl;
 
     // recompute damping
     ((IMPLICIT_ZERO_LENGTH_SPRINGS<T,TV>*)spring_force)->Set_Overdamping_Fraction(overdamping_fraction);
@@ -178,7 +178,7 @@ void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE
 
 /*    DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     LOG::cout<<"Frame "<<frame<<std::endl;
-      for(int p=0;p<particles.array_collection->Size();p++) LOG::cout<<"X("<<p<<")="<<particles.X(p)<<std::endl;*/
+      for(int p=0;p<particles.Size();p++) LOG::cout<<"X("<<p<<")="<<particles.X(p)<<std::endl;*/
 }
 //#####################################################################
 // Function Stability_Test
@@ -188,7 +188,7 @@ void Stability_Test()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    particles.array_collection->Add_Elements(2);
+    particles.Add_Elements(2);
     particles.mass.Fill((T)1);
     particles.X(1)=TV(-2,0,0);
     particles.X(2)=TV(2,0,0);
@@ -207,7 +207,7 @@ void Segments()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    particles.array_collection->Add_Elements(6);
+    particles.Add_Elements(6);
     particles.mass.Fill((T)1);
     particles.X(1)=TV(-3,2,0);
     particles.X(2)=TV(-2,1,0);
@@ -238,7 +238,7 @@ void Sphere()
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
     TRIANGULATED_SURFACE<T>& sphere1=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Surfaces/sphere.tri",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-1,(T)3,0))),true,true);
-    int sphere_particles=particles.array_collection->Size();
+    int sphere_particles=particles.Size();
     TRIANGULATED_SURFACE<T>& sphere2=tests.Create_Triangulated_Object(data_directory+"/Triangulated_Surfaces/sphere.tri",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(1,(T)3,0))),true,true);
     sphere1.Update_Number_Nodes();
     sphere2.Update_Number_Nodes();
@@ -329,7 +329,7 @@ void Embedded_Segments()
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    particles.array_collection->Add_Elements(7);
+    particles.Add_Elements(7);
 
     // segment particles
     particles.X(1)=TV(-2,2,0);

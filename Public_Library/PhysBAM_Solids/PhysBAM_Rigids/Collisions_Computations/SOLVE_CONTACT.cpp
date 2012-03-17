@@ -67,9 +67,9 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
         while(need_another_iteration && ++iteration<=parameters.contact_iterations){
             if(mpi_rigids){
                 mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-                mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-                mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.array_collection->Size(),false,false);
-                for(int p=0;p<rigid_body_collection.rigid_body_particle.array_collection->Size();p++) {
+                mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+                mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
+                for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) {
                     mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
                     mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
 
@@ -119,13 +119,13 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
         if(Solve_Projected_Gauss_Seidel(rigid_body_collection,collision_callbacks,pairs,rigid_body_collisions.pairs_processed_by_contact,rigid_body_collisions.desired_separation_distance,parameters.contact_proximity,dt,parameters.projected_gauss_seidel_tolerance,iteration_maximum))
         {
             /*LOG::cout << "----- end states -----" << std::endl;
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
             {
                 LOG::cout << "twist " << i << " " << rigid_body_collection.Rigid_Body(i).Twist() << std::endl;
             }*/
 
             LOG::SCOPE scope_reevolve("reevolving bodies");
-            for(int i=0;i<rigid_body_collection.rigid_body_particle.array_collection->Size();i++)
+            for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++)
             {
                 if(rigid_body_collection.Is_Active(i))
                 {

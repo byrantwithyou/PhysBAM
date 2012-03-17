@@ -126,11 +126,11 @@ void Get_Initial_Data()
     input_tetrahedralized_volume.Set_Density((T)1000);input_tetrahedralized_volume.Set_Mass_Of_Particles(false);
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=tests.Copy_And_Add_Structure(input_tetrahedralized_volume);
     tetrahedralized_volume.Update_Number_Nodes();
-    int number_of_original_particles=particles.array_collection->Size();
+    int number_of_original_particles=particles.Size();
 
     // determine simulation subset
     ARRAY<bool> particle_is_included(number_of_original_particles);
-    for(int p=0;p<particles.array_collection->Size();p++) if((particles.X(p)-TV(0,0,.18)).Magnitude()<(T).18) particle_is_included(p)=true;
+    for(int p=0;p<particles.Size();p++) if((particles.X(p)-TV(0,0,.18)).Magnitude()<(T).18) particle_is_included(p)=true;
 
     ARRAY<bool> particle_on_simulation_boundary(number_of_original_particles);ARRAY<int> map_to_old_elements;
     for(int t=0;t<tetrahedralized_volume.mesh.elements.m;t++){VECTOR<int,4>& element=tetrahedralized_volume.mesh.elements(t);
@@ -174,7 +174,7 @@ void Get_Initial_Data()
     EMBEDDING<TV>& embedding=*new EMBEDDING<TV>(particles);
     ARRAY<ARRAY<int> > embedding_parents;ARRAY<ARRAY<T> > embedding_weights;
     FILE_UTILITIES::Read_From_File(stream_type,model_directory+"/face_embedded_surface_bindings",embedding_parents,embedding_weights);
-    int particle_offset=particles.array_collection->Size();particles.array_collection->Add_Elements(embedding_parents.m);
+    int particle_offset=particles.Size();particles.Add_Elements(embedding_parents.m);
     tetrahedralized_volume.Update_Number_Nodes();
     for(int i=0;i<embedding_parents.m;i++){
         LINEAR_BINDING_DYNAMIC<TV>* binding=new LINEAR_BINDING_DYNAMIC<TV>(particles,particle_offset+i,embedding_parents(i).m);
@@ -353,7 +353,7 @@ void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE
     int previous_control_frame=1+(int)control_frame;
     T interpolation_fraction=control_frame-(int)control_frame;
     LOG::cout<<"Setting controls for time = "<<time<<std::endl;
-    int number_of_particles=solid_body_collection.deformable_object.particles.array_collection->Size();
+    int number_of_particles=solid_body_collection.deformable_object.particles.Size();
     ARRAY<TV> X_initial(number_of_particles),X_final(number_of_particles);effective_V.Resize(number_of_particles,false,false);
     Read_Controls(control_directory+"/",previous_control_frame);attachment_frame_controls->Set_Attachment_Positions(X_initial);control_parameters.Save_Controls();
     Read_Controls(control_directory+"/",previous_control_frame+1);attachment_frame_controls->Set_Attachment_Positions(X_final);control_parameters.Interpolate(interpolation_fraction);

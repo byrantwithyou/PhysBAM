@@ -64,7 +64,7 @@ public:
 
     void Free_Particle(T_PARTICLES* particle_class)
     {if(particle_class){
-        Free_Particle(particle_class->next);particle_class->next=0;particle_class->array_collection->Delete_All_Elements();
+        Free_Particle(particle_class->next);particle_class->next=0;particle_class->Delete_All_Elements();
 #ifdef USE_PTHREADS
         pthread_mutex_lock(&stack_lock);
 #endif
@@ -76,18 +76,18 @@ public:
 
     T_PARTICLES& Add_Particle(T_PARTICLES& particles,int& index)
     {T_PARTICLES* particles_link=&particles;
-    while(particles_link->array_collection->Size()==number_particles_per_cell){ // find the right link (allocate if necessary)
+    while(particles_link->Size()==number_particles_per_cell){ // find the right link (allocate if necessary)
         if(!particles_link->next) particles_link->next=Allocate_Particle();
         particles_link=particles_link->next;}
-    index=particles_link->array_collection->Add_Element();
+    index=particles_link->Add_Element();
     return *particles_link;}
 
 private:
     void Allocate_New_Batch()
-    {PHYSBAM_ASSERT(!template_particles.array_collection->Size()); // make sure our clones are empty
+    {PHYSBAM_ASSERT(!template_particles.Size()); // make sure our clones are empty
     LOG::cout<<"Particle Pool: Allocating another "<<allocation_batch_size<<" particles"<<std::endl;
     CLONE_ARRAY<T_PARTICLES>* batch=new CLONE_ARRAY<T_PARTICLES>(template_particles,allocation_batch_size);
-    for(int i=0;i<allocation_batch_size;i++) (*batch)(i).array_collection->Preallocate(number_particles_per_cell);
+    for(int i=0;i<allocation_batch_size;i++) (*batch)(i).Preallocate(number_particles_per_cell);
     allocated_batches.Append(batch);
 #ifdef USE_PTHREADS
     pthread_mutex_lock(&stack_lock);
