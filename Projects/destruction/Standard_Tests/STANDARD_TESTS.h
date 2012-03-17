@@ -27,7 +27,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>

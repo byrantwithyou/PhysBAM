@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>

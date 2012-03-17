@@ -8,7 +8,7 @@
 #define __QUANTITY__
 
 #include <PhysBAM_Tools/Math_Tools/cbrt.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <cfloat>
 #include <cmath>
 #include <iosfwd>

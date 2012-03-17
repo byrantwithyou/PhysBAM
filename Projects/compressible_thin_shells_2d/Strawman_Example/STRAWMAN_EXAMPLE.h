@@ -10,8 +10,8 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>

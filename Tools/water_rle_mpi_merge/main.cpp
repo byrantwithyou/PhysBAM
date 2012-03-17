@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <PhysBAM_Tools/Grids_RLE/RLE_GRID_ITERATOR_BLOCK_2D.h>

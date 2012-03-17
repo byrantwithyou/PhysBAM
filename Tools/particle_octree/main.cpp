@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
 #include <PhysBAM_Tools/Log/PROGRESS_INDICATOR.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/TIMER.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>

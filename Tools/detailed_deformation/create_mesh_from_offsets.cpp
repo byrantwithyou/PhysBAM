@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <cstring>

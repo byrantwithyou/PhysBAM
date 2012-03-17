@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <fstream>

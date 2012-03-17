@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>

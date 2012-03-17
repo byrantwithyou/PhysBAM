@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SIMPLEX_INTERACTIONS.h>
 using namespace PhysBAM;

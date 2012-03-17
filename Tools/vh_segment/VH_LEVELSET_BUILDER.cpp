@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Images/IMAGE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include "VH_LEVELSET_BUILDER.h"
 #include <Fl/Fl_Hold_Browser.h>
 using namespace PhysBAM;

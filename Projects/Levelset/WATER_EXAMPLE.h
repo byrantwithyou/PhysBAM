@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>

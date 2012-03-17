@@ -4,7 +4,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>

@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>

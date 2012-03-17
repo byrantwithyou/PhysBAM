@@ -1,6 +1,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <cmath>
 #include "ACCURACY_INFO.h"
 #include "BOUNDARY_CONDITIONS_BOX.h"

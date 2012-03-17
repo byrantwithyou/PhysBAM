@@ -5,7 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>

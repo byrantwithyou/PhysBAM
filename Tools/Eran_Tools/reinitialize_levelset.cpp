@@ -1,6 +1,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <iostream>
 #include <string>
 #include "../../Public_Library/Level_Sets/OCTREE_LEVELSET.h"

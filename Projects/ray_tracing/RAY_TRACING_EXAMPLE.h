@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 

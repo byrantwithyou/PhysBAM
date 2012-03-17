@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST_CONTAINER.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>

@@ -7,8 +7,8 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>

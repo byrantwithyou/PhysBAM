@@ -7,8 +7,8 @@
 #ifndef __CAPE_EXAMPLE__
 #define __CAPE_EXAMPLE__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include "../CLOTH_EXAMPLE.h"
 #include "CAPE_COLLISIONS.h"
 namespace PhysBAM{

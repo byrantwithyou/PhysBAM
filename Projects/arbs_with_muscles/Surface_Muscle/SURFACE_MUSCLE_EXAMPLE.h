@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Tools/Matrices/UPPER_TRIANGULAR_MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/FACE_3D.h>

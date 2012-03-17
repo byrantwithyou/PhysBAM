@@ -4,8 +4,8 @@
 //#####################################################################
 #ifdef COMPILE_WITH_BINTREE_SUPPORT
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Matlab/GNUPLOT_OUTPUT.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/GNUPLOT_OUTPUT.h>
 #include <PhysBAM_Tools/Grids_Dyadic/BINTREE_GRID.h>
 #include <PhysBAM_Tools/Grids_Dyadic_Arrays/GRID_ARRAYS_POLICY_DYADIC.h>
 using namespace PhysBAM;

@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Log/PROGRESS_INDICATOR.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
 #include "RAY_TRACING_EXAMPLE.h"
 namespace PhysBAM{

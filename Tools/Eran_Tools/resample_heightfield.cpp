@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Images/EXR_FILE.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <fstream>
 #include <iostream>
 

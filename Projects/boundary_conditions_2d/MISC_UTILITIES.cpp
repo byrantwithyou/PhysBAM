@@ -4,8 +4,8 @@
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_HAMILTON_JACOBI_ENO.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
-#include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <cmath>

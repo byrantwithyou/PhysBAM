@@ -8,8 +8,8 @@
 #ifndef __TANK_EXAMPLE__
 #define __TANK_EXAMPLE__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>

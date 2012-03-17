@@ -1,6 +1,6 @@
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <fstream>
 #include <iostream>
 #include "../../Personal_Libraries/Eran_Library/POLYGONAL_SURFACE.h"

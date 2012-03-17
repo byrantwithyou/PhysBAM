@@ -2,8 +2,8 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_2D.h>
 #include <PhysBAM_Tools/Images/BMP_FILE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include "../../Public_Library/Level_Sets/EXTRAPOLATION_2D.h"
 #include "BEZIER_SPLINE.h"

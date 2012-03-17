@@ -2,7 +2,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES.h>
 #include <PhysBAM_Tools/Point_Clouds/PARTICLES_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <fstream>
 #include <iostream>

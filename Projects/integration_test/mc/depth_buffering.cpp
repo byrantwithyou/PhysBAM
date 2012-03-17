@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>

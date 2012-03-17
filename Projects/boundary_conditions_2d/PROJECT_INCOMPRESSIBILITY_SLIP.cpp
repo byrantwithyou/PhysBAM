@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/MATRIX_SYSTEM.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Read_Write/Octave/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include "ACCURACY_INFO.h"
 #include "HEADER.h"
 #include "POISSON_PROJECTION_SYSTEM.h"

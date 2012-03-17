@@ -17,7 +17,7 @@
 #include <maya/MString.h>
 #include <maya/MTypeId.h>
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include "MAYA_PLUGIN_MACROS.h"
 #include "MAYA_SPLINE_PLUGIN_CREATOR.h"
 #include "MAYA_SPLINE_PLUGIN_SHAPE.h"

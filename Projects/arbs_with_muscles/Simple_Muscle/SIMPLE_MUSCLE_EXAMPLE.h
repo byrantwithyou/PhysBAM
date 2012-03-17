@@ -9,7 +9,7 @@
 #define __SIMPLE_MUSCLE_EXAMPLE__
 
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/EMBEDDED_TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
