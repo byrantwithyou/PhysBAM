@@ -30,6 +30,15 @@ static bool registered=Register_Segmented_Curve_2d();
 // Constructor
 //#####################################################################
 template<class T> SEGMENTED_CURVE_2D<T>::
+SEGMENTED_CURVE_2D()
+    :SEGMENTED_CURVE<TV>(*new SEGMENT_MESH,*new GEOMETRY_PARTICLES<TV>)
+{
+    PHYSBAM_ASSERT(registered);
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> SEGMENTED_CURVE_2D<T>::
 SEGMENTED_CURVE_2D(SEGMENT_MESH& segment_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :SEGMENTED_CURVE<TV>(segment_mesh_input,particles_input)
 {

@@ -20,6 +20,7 @@ public:
     using BASE::mesh;using BASE::particles;using BASE::segment_list;using BASE::bounding_box;using BASE::Update_Bounding_Box;using BASE::hierarchy;
     using BASE::Get_Element;using BASE::Closest_Point_On_Curve;using BASE::Total_Length;using BASE::Initialize_Hierarchy;
 
+    SEGMENTED_CURVE_2D();
     SEGMENTED_CURVE_2D(SEGMENT_MESH& segment_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
 
     bool Inside_Any_Simplex(const TV& point,int& segment_id,const T thickness_over_two=0) const
