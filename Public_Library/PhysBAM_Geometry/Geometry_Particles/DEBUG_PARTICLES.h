@@ -8,7 +8,7 @@
 #define __DEBUG_PARTICLES__
 
 #include <PhysBAM_Tools/Arrays/ATTRIBUTE_ID.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 namespace PhysBAM{
 template<class TV> class GEOMETRY_PARTICLES;
 

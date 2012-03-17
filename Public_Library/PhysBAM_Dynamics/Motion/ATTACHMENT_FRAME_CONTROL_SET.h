@@ -8,7 +8,7 @@
 #define __ATTACHMENT_FRAME_CONTROL_SET__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/TWIST.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 #include <PhysBAM_Dynamics/Motion/FACE_CONTROL_SET.h>

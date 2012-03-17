@@ -7,7 +7,7 @@
 #ifndef __QUATERNION__
 #define __QUATERNION__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
 
@@ -131,7 +131,6 @@ template<class T>
 inline QUATERNION<T> operator*(const T a,const QUATERNION<T>& q)
 {return QUATERNION<T>(q.s*a,q.v*a);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::ostream& operator<<(std::ostream& output,const QUATERNION<T>& q)
 {output<<"("<<q.s<<" "<<q.v<<")";return output;}
@@ -139,7 +138,6 @@ inline std::ostream& operator<<(std::ostream& output,const QUATERNION<T>& q)
 template<class T>
 inline std::istream& operator>>(std::istream& input,QUATERNION<T>& q)
 {FILE_UTILITIES::Ignore(input,'(');input>>q.s>>q.v;FILE_UTILITIES::Ignore(input,')');return input;}
-#endif
 
 }
 #endif

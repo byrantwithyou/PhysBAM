@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Dynamics/Motion/PHONEME_CORPUS.h>
 #if defined(__linux__) || defined(__CYGWIN__) || defined(__APPLE__)
 #include <dirent.h>

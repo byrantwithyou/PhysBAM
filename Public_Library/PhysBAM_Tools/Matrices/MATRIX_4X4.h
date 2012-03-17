@@ -8,7 +8,7 @@
 #define __MATRIX_4X4__
 
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
@@ -209,10 +209,8 @@ template<class T>
 inline MATRIX<T,4> operator*(const T a,const MATRIX<T,4>& A)
 {return MATRIX<T,4>(a*A.x[0],a*A.x[1],a*A.x[2],a*A.x[3],a*A.x[4],a*A.x[5],a*A.x[6],a*A.x[7],a*A.x[8],a*A.x[9],a*A.x[10],a*A.x[11],a*A.x[12],a*A.x[13],a*A.x[14],a*A.x[15]);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,4>& A)
 {FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<4;i++){for(int j=0;j<4;j++) input>>A.x[i+j*4];FILE_UTILITIES::Ignore(input,';');}FILE_UTILITIES::Ignore(input,']');return input;}
-#endif
 }
 #endif

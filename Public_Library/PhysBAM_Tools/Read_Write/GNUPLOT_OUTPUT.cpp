@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Read_Write/Matlab/GNUPLOT_OUTPUT.h>
+#include <PhysBAM_Tools/Read_Write/GNUPLOT_OUTPUT.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

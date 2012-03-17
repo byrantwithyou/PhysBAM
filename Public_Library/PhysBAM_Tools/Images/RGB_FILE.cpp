@@ -2,13 +2,12 @@
 // Copyright 2002-2005, Ronald Fedkiw, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Tools/Images/RGB_FILE.h>
 #include <PhysBAM_Tools/Images/RGB_HEADER.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <cstring>
 using namespace PhysBAM;
 
@@ -84,5 +83,4 @@ template void RGB_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float
 template class RGB_FILE<double>;
 template void RGB_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void RGB_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
-#endif
 #endif

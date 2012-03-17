@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Dynamics/Motion/BONE.h>
 #include <PhysBAM_Dynamics/Motion/MOTION_SEQUENCE.h>
 

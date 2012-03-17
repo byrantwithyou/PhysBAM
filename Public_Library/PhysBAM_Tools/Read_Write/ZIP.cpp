@@ -2,12 +2,11 @@
 // Copyright 2009-2010, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef COMPILE_WITHOUT_ZLIB_SUPPORT
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/ZIP.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE.h>
+#include <PhysBAM_Tools/Read_Write/ZIP.h>
 #include <cassert>
 #include <fstream>
 #include <iomanip>
@@ -505,5 +504,4 @@ Gzip_Out(const std::string& filename,std::ios::openmode mode)
 }
 //#####################################################################
 }
-#endif
 #endif

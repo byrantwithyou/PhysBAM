@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_BASE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 namespace PhysBAM{
 
@@ -334,10 +334,8 @@ template<class T>
 inline MATRIX<T,2> operator*(const UPPER_TRIANGULAR_MATRIX<T,2>& A,const MATRIX<T,2>& B)
 {return MATRIX<T,2>(A.x11*B.x[0]+A.x12*B.x[1],A.x22*B.x[1],A.x11*B.x[2]+A.x12*B.x[3],A.x22*B.x[3]);}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,2>& A)
 {FILE_UTILITIES::Ignore(input,'[');for(int i=0;i<2;i++){for(int j=0;j<2;j++)input>>A.x[i+j*2];FILE_UTILITIES::Ignore(input,';');}FILE_UTILITIES::Ignore(input,']');return input;}
-#endif
 }
 #endif

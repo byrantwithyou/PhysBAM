@@ -4,12 +4,11 @@
 //#####################################################################
 // Class GENERIC_PARSER
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Parsing/GENERIC_PARSER.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <fstream>
 using namespace PhysBAM;
 //#####################################################################
@@ -74,5 +73,4 @@ Preprocess_File(std::string raw_filename,const int frame)
 template class GENERIC_PARSER<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class GENERIC_PARSER<double>;
-#endif
 #endif

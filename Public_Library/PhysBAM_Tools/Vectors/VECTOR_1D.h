@@ -17,7 +17,7 @@
 #include <PhysBAM_Tools/Math_Tools/rint.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_0D.h>

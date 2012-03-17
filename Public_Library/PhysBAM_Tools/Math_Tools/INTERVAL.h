@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
 #include <PhysBAM_Tools/Math_Tools/ZERO.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <cfloat>
 namespace PhysBAM{

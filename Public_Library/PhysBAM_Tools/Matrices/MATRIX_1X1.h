@@ -7,7 +7,7 @@
 
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_BASE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_1D.h>
 namespace PhysBAM{
 
@@ -306,10 +306,8 @@ template<class T>
 inline MATRIX<T,1> exp(const MATRIX<T,1>& A)
 {return MATRIX<T,1>(exp(A.x11));}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,1>& A)
 {FILE_UTILITIES::Ignore(input,'[');input>>A.x11;FILE_UTILITIES::Ignore(input,']');return input;}
-#endif
 }
 #endif

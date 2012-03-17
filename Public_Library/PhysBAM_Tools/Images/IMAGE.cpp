@@ -4,7 +4,6 @@
 //#####################################################################
 // Class IMAGE
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Images/BMP_FILE.h>
 #include <PhysBAM_Tools/Images/EXR_FILE.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
@@ -14,7 +13,7 @@
 #include <PhysBAM_Tools/Images/RGB_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Read
@@ -96,5 +95,4 @@ template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,3> ,VEC
 template void IMAGE<double>::Read(const std::string&,ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&,const double,const double);
 template void IMAGE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&,const double,const double);
-#endif
 #endif

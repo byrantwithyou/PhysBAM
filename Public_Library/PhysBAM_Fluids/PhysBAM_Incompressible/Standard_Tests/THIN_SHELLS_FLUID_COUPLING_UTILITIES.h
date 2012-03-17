@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <string>

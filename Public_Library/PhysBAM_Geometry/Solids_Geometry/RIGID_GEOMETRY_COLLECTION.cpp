@@ -5,7 +5,7 @@
 // Class RIGID_GEOMETRY_COLLECTION
 //#####################################################################
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -154,7 +154,6 @@ template<class TV> void
 Wrap_Structure_Helper(STRUCTURE<TV>*& structure,const TV& center)
 {   // TODO(jontg): This shouldn't be necessary
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################
 // Function Find_Or_Read_Structure
 //#####################################################################
@@ -182,7 +181,6 @@ Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,c
     structure_ids.Append(id);
     return true;
 }
-#endif
 //#####################################################################
 // Function Destroy_Unreferenced_Geometry
 //#####################################################################

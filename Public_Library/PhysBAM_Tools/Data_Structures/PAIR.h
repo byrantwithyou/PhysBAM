@@ -8,7 +8,7 @@
 #define __PAIR__
 
 #include <PhysBAM_Tools/Math_Tools/choice.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <iostream>
 namespace PhysBAM{
 

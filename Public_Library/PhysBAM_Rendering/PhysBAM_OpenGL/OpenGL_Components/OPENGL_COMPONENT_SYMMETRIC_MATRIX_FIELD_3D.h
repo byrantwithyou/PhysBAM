@@ -7,7 +7,7 @@
 #ifndef __OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D__
 #define __OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SYMMETRIC_MATRIX_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT.h>
 namespace PhysBAM{

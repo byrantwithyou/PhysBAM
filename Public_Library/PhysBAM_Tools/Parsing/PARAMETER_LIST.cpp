@@ -4,13 +4,12 @@
 //#####################################################################
 // Class PARAMETER_LIST
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/ROTATION.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <cctype>
 #include <fstream>
@@ -379,4 +378,3 @@ Find_And_Remove_From_Commandline_Parameter_Map(const std::string& long_name,cons
 }
 //#####################################################################
 };
-#endif

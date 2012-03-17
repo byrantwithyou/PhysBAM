@@ -2,11 +2,10 @@
 // Copyright 2002-2006, Geoffrey Irving, Igor Neverov, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Images/BMP_FILE.h>
 #include <PhysBAM_Tools/Images/BMP_HEADER.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Read
@@ -64,5 +63,4 @@ template void BMP_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float
 template class BMP_FILE<double>;
 template void BMP_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void BMP_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
-#endif
 #endif

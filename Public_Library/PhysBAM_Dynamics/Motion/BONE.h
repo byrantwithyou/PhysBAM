@@ -5,7 +5,7 @@
 #ifndef __BONE__
 #define __BONE__
 #include <PhysBAM_Tools/Matrices/FRAME.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 
 namespace PhysBAM{
 

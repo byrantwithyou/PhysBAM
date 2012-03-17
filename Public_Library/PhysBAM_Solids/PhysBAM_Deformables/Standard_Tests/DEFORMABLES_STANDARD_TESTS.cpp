@@ -5,7 +5,7 @@
 // Class DEFORMABLES_STANDARD_TESTS
 //#####################################################################
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>

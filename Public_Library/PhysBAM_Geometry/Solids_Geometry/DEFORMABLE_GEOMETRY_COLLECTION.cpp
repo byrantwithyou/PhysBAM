@@ -5,12 +5,10 @@
 // Class DEFORMABLE_GEOMETRY_COLLECTION
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -29,7 +27,6 @@ template<class TV> DEFORMABLE_GEOMETRY_COLLECTION<TV>::
 {
     structures.Delete_Pointers_And_Clean_Memory();
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################
 // Function Read
 //#####################################################################
@@ -68,9 +65,7 @@ Read_Static_Variables(const STREAM_TYPE stream_type,const std::string& prefix,co
         for(int k=0;k<old_number_of_structures;k++) structures(k)->Read_Structure(input);
         for(int k=old_number_of_structures;k<m;k++) structures(k)=STRUCTURE<TV>::Create_Structure(input,particles);}
     else{
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         LOG::cout<<"Current number of structures ("<<structures.m<<") is greater than number in file ("<<m<<").";
-#endif
         PHYSBAM_FATAL_ERROR();}
     delete input_raw;
 }
@@ -105,7 +100,6 @@ Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,
 {
     FILE_UTILITIES::Write_To_File(stream_type,prefix+"/"+FILE_UTILITIES::Number_To_String(frame)+"/deformable_object_particles",particles);
 }
-#endif
 //#####################################################################
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,1> >;
 template class DEFORMABLE_GEOMETRY_COLLECTION<VECTOR<float,2> >;

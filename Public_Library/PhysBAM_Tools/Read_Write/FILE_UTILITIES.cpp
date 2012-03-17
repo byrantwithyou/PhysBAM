@@ -4,12 +4,11 @@
 //#####################################################################
 // Namespace FILE_UTILITIES
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/ZIP.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/ZIP.h>
 #include <cerrno>
 #include <climits>
 #include <cstdio>
@@ -282,4 +281,3 @@ void Ignore(std::istream& input,char c)
 
 }
 }
-#endif

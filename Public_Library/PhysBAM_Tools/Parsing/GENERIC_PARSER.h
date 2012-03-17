@@ -4,12 +4,11 @@
 //#####################################################################
 // Class GENERIC_PARSER
 //##################################################################### 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __GENERIC_PARSER__
 #define __GENERIC_PARSER__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <string>
 namespace PhysBAM{
 
@@ -36,5 +35,4 @@ private:
 //##################################################################### 
 };
 }
-#endif
 #endif

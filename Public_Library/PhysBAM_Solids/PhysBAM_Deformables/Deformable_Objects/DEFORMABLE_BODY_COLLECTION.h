@@ -8,11 +8,9 @@
 #define __DEFORMABLE_BODY_COLLECTION__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Utilities/Find_Type.h>
-#endif
+#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 

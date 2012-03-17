@@ -8,7 +8,7 @@
 #define __SOLIDS_DRIVER__    
 
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/DRIVER.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/SOLIDS_EXAMPLE.h>
 namespace PhysBAM{
 

@@ -2,14 +2,13 @@
 // Copyright 2009-2010, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef COMPILE_WITHOUT_ZLIB_SUPPORT
 #ifndef __ZIP__
 #define __ZIP__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -58,6 +57,5 @@ private:
 //#####################################################################
 };
 }
-#endif
 #endif
 #endif

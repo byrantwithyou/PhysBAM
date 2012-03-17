@@ -6,13 +6,12 @@
 //#####################################################################
 // A group of fields with the layout of a Windows rgb file header. Used by the class RGB_FILE.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __RGB_HEADER__
 #define __RGB_HEADER__
 
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <cstring>
 namespace PhysBAM{
 
@@ -59,5 +58,4 @@ struct RGB_HEADER
     Write_Binary_Array<RW>(output,name,80);Write_Binary<RW>(output,colormap);Write_Binary_Array<RW>(output,dummy2,404);}
 };
 }
-#endif
 #endif

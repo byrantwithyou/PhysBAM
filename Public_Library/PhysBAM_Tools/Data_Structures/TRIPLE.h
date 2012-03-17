@@ -7,7 +7,7 @@
 #ifndef __TRIPLE__
 #define __TRIPLE__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 template<class T1,class T2,class T3>
 class TRIPLE

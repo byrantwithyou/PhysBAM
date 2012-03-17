@@ -4,12 +4,11 @@
 //#####################################################################
 // Class PNG_FILE  
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Tools/Images/PNG_FILE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #ifdef USE_LIBPNG
 #include <png.h>
@@ -120,5 +119,4 @@ template void PNG_FILE<float>::Write(const std::string&,const ARRAY<VECTOR<float
 template class PNG_FILE<double>;
 template void PNG_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,3> ,VECTOR<int,2> >&);
 template void PNG_FILE<double>::Write(const std::string&,const ARRAY<VECTOR<double,4> ,VECTOR<int,2> >&);
-#endif
 #endif

@@ -9,7 +9,7 @@
 #ifndef __MT19937__
 #define __MT19937__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <iostream>
 namespace PhysBAM{

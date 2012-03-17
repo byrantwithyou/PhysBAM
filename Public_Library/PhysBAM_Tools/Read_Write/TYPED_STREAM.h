@@ -4,11 +4,10 @@
 //#####################################################################
 // Class TYPED_ISTREAM and TYPED_OSTREAM
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __TYPED_STREAM__
 #define __TYPED_STREAM__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <iostream>
 namespace PhysBAM{
@@ -68,5 +67,4 @@ template<class T,class HAS> struct HAS_UNTYPED_WRITE{enum {value=false};};
 template<class T> struct HAS_UNTYPED_WRITE<T,typename FIRST<void,typename T::HAS_UNTYPED_READ_WRITE>::TYPE>{enum {value=true};};
 //#####################################################################
 }
-#endif
 #endif

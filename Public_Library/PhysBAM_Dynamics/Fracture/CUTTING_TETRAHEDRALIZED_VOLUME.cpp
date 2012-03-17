@@ -17,7 +17,7 @@
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Adaptive_Geometry/Barycentric_Coordinates.h>
 #include <PhysBAM_Geometry/Adaptive_Geometry/Intersection_Coordinates.h>
 #include <PhysBAM_Geometry/Adaptive_Geometry/Intersects.h>

@@ -4,12 +4,11 @@
 //#####################################################################
 // Namespace FILE_UTILITIES
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __FILE_UTILITIES__
 #define __FILE_UTILITIES__
 
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Utilities/EXCEPTIONS.h>
 namespace PhysBAM{
 
@@ -274,5 +273,4 @@ void Ignore(std::istream& input,char c);
 //#####################################################################
 }
 }
-#endif
 #endif

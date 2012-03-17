@@ -7,7 +7,7 @@
 #ifndef __FRACTURE_PATTERN__
 #define __FRACTURE_PATTERN__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 
 namespace PhysBAM{

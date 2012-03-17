@@ -5,7 +5,7 @@
 #ifndef __PHONEME_SEGMENT__
 #define __PHONEME_SEGMENT__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
 #include <PhysBAM_Dynamics/Motion/PHONEME.h>
 #include <cstdio>

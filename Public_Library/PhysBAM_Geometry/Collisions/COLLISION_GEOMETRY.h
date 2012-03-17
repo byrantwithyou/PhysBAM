@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
@@ -105,10 +105,8 @@ public:
     virtual void Restore_State(const int state_index);
     virtual void Average_States(const int state1, const int state2, const int result_state,const T interpolation_distance);
     virtual void Delete_State(const int state_index);
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     virtual void Read_State(TYPED_ISTREAM& input,const int state_index);
     virtual void Write_State(TYPED_OSTREAM& output,const int state_index) const;
-#endif
 //#####################################################################
 };
 }

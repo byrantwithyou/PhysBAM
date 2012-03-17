@@ -4,13 +4,12 @@
 //#####################################################################
 // Class TEX_FILE
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __TEX_FILE__
 #define __TEX_FILE__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Images/VECTOR_IMAGE.h>
 #include <iostream>
 #include <string>
@@ -44,5 +43,4 @@ protected:
 //#####################################################################
 };
 }
-#endif
 #endif

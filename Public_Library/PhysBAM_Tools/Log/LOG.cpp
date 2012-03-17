@@ -7,9 +7,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Log/LOG_ENTRY.h>
 #include <PhysBAM_Tools/Log/LOG_SCOPE.h>
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
-#endif
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/TIMER.h>
 namespace PhysBAM{
 namespace LOG_NULL{
@@ -109,12 +107,10 @@ LOG_CLASS::LOG_CLASS(const bool suppress_cout_input,const bool suppress_cerr_inp
     :timer_singleton(TIMER::Singleton()),suppress_cout(suppress_cout_input),suppress_cerr(suppress_cerr_input),suppress_timing(suppress_timing_input),log_file(0),verbosity_level(verbosity_level_input),xml(true)
 {
     if(private_instance) delete private_instance;private_instance=this;
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
     if(cache_initial_output){
         log_file=FILE_UTILITIES::Temporary_File();
         if(!log_file) PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("Couldn't create temporary log file tmpfile=%s",log_file));
         log_file_temporary=true;}
-#endif
     timer_id=timer_singleton->Register_Timer();
     if(cout_buffer) delete cout_buffer;cout_buffer=new LOG_COUT_BUFFER;cout.rdbuf(cout_buffer);
     if(cerr_buffer) delete cerr_buffer;cerr_buffer=new LOG_CERR_BUFFER;cerr.rdbuf(cerr_buffer);

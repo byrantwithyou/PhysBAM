@@ -7,7 +7,7 @@
 #ifndef __ONE__
 #define __ONE__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 
 struct ONE

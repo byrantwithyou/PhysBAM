@@ -7,9 +7,7 @@
 #ifndef __VECTOR_FORWARD__
 #define __VECTOR_FORWARD__
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FORWARD.h>
-#endif
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{

@@ -8,7 +8,7 @@
 #define __ELEMENT_ID__
 
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
 

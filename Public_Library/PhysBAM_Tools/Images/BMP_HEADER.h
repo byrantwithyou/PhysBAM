@@ -6,13 +6,12 @@
 //#####################################################################
 // A group of fields with the layout of a Windows bitmap file header. Used by the class BMP_FILE.
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __BMP_HEADER__
 #define __BMP_HEADER__
 
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 
 struct BMP_HEADER{
@@ -87,5 +86,4 @@ inline std::ostream& operator<<(std::ostream& output,const BMP_HEADER& header)
     <<"number_of_important_colors "<<header.number_of_important_colors<<std::endl;
 return output;}
 }
-#endif
 #endif

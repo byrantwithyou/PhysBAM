@@ -7,7 +7,7 @@
 #ifndef __RAY_TRACER_DEBUG_DATA__
 #define __RAY_TRACER_DEBUG_DATA__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 namespace PhysBAM{
 

@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <cstring>
 using namespace PhysBAM;
 //#####################################################################
@@ -261,7 +261,6 @@ Find_And_Remove_Integer(const char *str,int& argc,char** argv)
     if(i+1<argc){value=atoi(argv[i+1]);for(;i<argc-2;i++)argv[i]=argv[i+2];argc--;argv[argc]=0;argc--;argv[argc]=0;return value;}
     return 0;
 }
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 //#####################################################################
 // Function Print_Usage
 //#####################################################################
@@ -287,5 +286,4 @@ Print_Arguments(int argc,char* argv[])
     s+="\nworking directory = "+FILE_UTILITIES::Get_Working_Directory()+"\n";
     return s;
 }
-#endif
 //#####################################################################

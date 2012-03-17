@@ -7,12 +7,11 @@
 // Functions for reading and writing which do the correct thing for objects, pointers, primitive types, etc. In general, use Read/Write_Binary (and Read/Write_Binary_Array) using T for the type
 // of the object you're reading/writing and RW the underlying floating point scalar type (float/double).
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __READ_WRITE_FUNCTIONS__
 #define __READ_WRITE_FUNCTIONS__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FORWARD.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/TYPED_STREAM.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FORWARD.h>
+#include <PhysBAM_Tools/Read_Write/TYPED_STREAM.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
 
@@ -286,6 +285,5 @@ Write_Binary_Array(std::ostream& output,const T* array,const int number_of_eleme
 {for(int i=0;i<number_of_elements;i++) Write_Binary<RW>(output,array[i]);}
 //#####################################################################
 }
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE.h>
-#endif
+#include <PhysBAM_Tools/Read_Write/READ_WRITE.h>
 #endif

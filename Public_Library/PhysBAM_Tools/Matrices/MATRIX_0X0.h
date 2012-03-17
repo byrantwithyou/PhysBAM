@@ -6,7 +6,7 @@
 #define __MATRIX_0X0__
 
 #include <PhysBAM_Tools/Matrices/MATRIX_BASE.h>
-#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_0D.h>
 #include <cfloat>
 namespace PhysBAM{
@@ -238,10 +238,8 @@ template<class T>
 inline MATRIX<T,0> exp(const MATRIX<T,0>& A)
 {return MATRIX<T,0>();}
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 template<class T>
 inline std::istream& operator>>(std::istream& input,MATRIX<T,0>& A)
 {FILE_UTILITIES::Ignore(input,'[');FILE_UTILITIES::Ignore(input,']');return input;}
-#endif
 }
 #endif

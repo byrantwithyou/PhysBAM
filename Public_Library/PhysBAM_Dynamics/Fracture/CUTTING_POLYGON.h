@@ -7,7 +7,7 @@
 #ifndef __CUTTING_POLYGON__
 #define __CUTTING_POLYGON__
 
-#include <PhysBAM_Tools/Read_Write/Utilities/READ_WRITE_FUNCTIONS.h>
+#include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 
 class CUTTING_POLYGON
