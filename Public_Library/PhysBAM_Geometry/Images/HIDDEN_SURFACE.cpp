@@ -60,13 +60,15 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
         ARRAY<int> inside_list(children.m),outside_list(children.m);
         for(int i=0;i<children.m;i++){
             int added=primitives.Divide_Primitive(node_map(children(i)),node_map(index));
-            if(added>=0) outside_list(i)=added;
-            else outside_list(i)=-1;
-            if(added!=node_map(children(i))) inside_list(i)=node_map(children(i));
-            else inside_list(i)=-1;
-
-            if(inside_list(i)>=0 && inside_list(i)>=0)
-                outside_list(i)=node_map.Append(outside_list(i));}
+            if(added<0){
+                outside_list(i)=-1;
+                inside_list(i)=children(i);}
+            else if(added==node_map(children(i))){
+                inside_list(i)=-1;
+                outside_list(i)=children(i);}
+            else{
+                inside_list(i)=children(i);
+                outside_list(i)=node_map.Append(added);}}
 
         new_graph.Initialize(node_map.m);
 
