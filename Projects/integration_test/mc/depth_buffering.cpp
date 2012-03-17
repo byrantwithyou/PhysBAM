@@ -6,12 +6,14 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Read_Write/Utilities/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
 #include <PhysBAM_Geometry/Images/HIDDEN_SURFACE.h>
 #include <PhysBAM_Geometry/Images/HIDDEN_SURFACE_PRIMITIVES.h>
 #include <PhysBAM_Geometry/Images/TEX_FILE.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
 #include <iostream>
 #include <vector>
@@ -35,19 +37,27 @@ int main(int argc, char* argv[])
 {
     PARSE_ARGS parse_args;
     parse_args.Add_String_Argument("-o","out.tex","output filename");
+    parse_args.Add_String_Argument("-i","","input filename");
     parse_args.Parse(argc,argv);
     std::string file=parse_args.Get_String_Value("-o");
-
-    LOG::cout<<std::setprecision(16);
-    RANDOM_NUMBERS<T> random;
-    int N=12;
-    ARRAY<TV> colors(N);
-    random.Fill_Uniform(colors,0,1);
+    std::string infile=parse_args.Get_String_Value("-i");
 
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
     HIDDEN_SURFACE<T> hs(hsp);
 
-#if 1
+    TRIANGULATED_SURFACE<T> ts;
+    FILE_UTILITIES::Read_From_File<float>(infile,ts);
+    ts.Update_Triangle_List();
+    for(int i=0;i<ts.triangle_list->m;i++)
+        hsp.Add((*ts.triangle_list)(i));
+
+    LOG::cout<<std::setprecision(16);
+    RANDOM_NUMBERS<T> random;
+    int N=ts.triangle_list->m;
+    ARRAY<TV> colors(N);
+    random.Fill_Uniform(colors,0,1);
+
+#if 0
     for(int i=0;i<N;i++){
         TV a,b,c;
         random.Fill_Uniform(a,0,1);
@@ -65,9 +75,9 @@ int main(int argc, char* argv[])
         vi=new EPS_FILE<T>(file);
     else vi=new TEX_FILE<T>(file);
 
-    TV2 mx_pt=TV2(1,1);
-    T margin=.05;
-    vi->Use_Fixed_Bounding_Box(RANGE<TV2>(TV2()-margin,mx_pt+margin));
+//    TV2 mx_pt=TV2(1,1);
+//    T margin=.05;
+//    vi->Use_Fixed_Bounding_Box(RANGE<TV2>(TV2()-margin,mx_pt+margin));
     vi->cur_format.fill_style=1;
     vi->cur_format.line_style=0;
 
