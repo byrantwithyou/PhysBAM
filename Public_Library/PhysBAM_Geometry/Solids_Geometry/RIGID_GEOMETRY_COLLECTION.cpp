@@ -168,10 +168,10 @@ Find_Or_Read_Structure(const STREAM_TYPE stream_type,ARRAY<int>& structure_ids,c
     else{ // read in for the first time
         STRUCTURE<TV>* structure=0;
         if(!stream_type.use_doubles)
-            structure=STRUCTURE<TV>::template Create_From_File<double>(filename);
+            structure=STRUCTURE<TV>::template Create_From_File<float>(filename);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
         else
-            structure=STRUCTURE<TV>::template Create_From_File<float>(filename);
+            structure=STRUCTURE<TV>::template Create_From_File<double>(filename);
 #endif
         if(scaling_factor!=1){
             Wrap_Structure_Helper(structure,center);
@@ -273,7 +273,7 @@ template<class TV> void RIGID_GEOMETRY_COLLECTION<TV>::
 Write(const STREAM_TYPE stream_type,const std::string& directory,const int frame) const
 {
     if(stream_type.use_doubles) structure_list.template Write<double>(directory,"rigid_body_structure_",frame);
-    else structure_list.template Write<double>(directory,"rigid_body_structure_",frame);
+    else structure_list.template Write<float>(directory,"rigid_body_structure_",frame);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/rigid_geometry_particles",directory.c_str(),frame),particles);
 
     // update names
