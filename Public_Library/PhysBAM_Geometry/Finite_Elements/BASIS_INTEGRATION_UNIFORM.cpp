@@ -166,7 +166,7 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
         integral+=poly.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).X(0)))*projected_elements(i).Normal()(dir);
 
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,inside),integral));
-    helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,!inside),-integral));
+    helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,!inside),cm1.Get_Index(index1,!inside),-integral));
 }
 //#####################################################################
 // Function Cut_Elements
