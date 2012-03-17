@@ -4,7 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Read_Write/Matlab/MATLAB_OUTPUT.h>
+#include <PhysBAM_Tools/Read_Write/MATLAB_OUTPUT.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

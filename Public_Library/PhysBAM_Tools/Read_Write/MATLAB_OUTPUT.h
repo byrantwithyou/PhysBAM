@@ -4,7 +4,6 @@
 //#####################################################################
 // Class MATLAB_OUTPUT 
 //#####################################################################
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
 #ifndef __MATLAB_OUTPUT__
 #define __MATLAB_OUTPUT__
 
@@ -35,5 +34,4 @@ public:
     template<class T,int d> void Write_Output_File(const std::string& file_name,const ARRAY_VIEW<VECTOR<T,d> >& X,const int stepnumber);
 };
 }
-#endif
 #endif
