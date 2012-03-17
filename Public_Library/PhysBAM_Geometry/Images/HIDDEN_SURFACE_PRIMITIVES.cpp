@@ -31,9 +31,6 @@ Init_Projection()
     projection(0).outer().Append(triangle.x3.Remove_Index(2));
     projection(0).outer().Append(triangle.x1.Remove_Index(2));
     boost::geometry::correct(projection);
-
-    printf("Initial projection areas: %g = %g\n", boost::geometry::area(projection),
-        TRIANGLE_2D<T>::Area(triangle.x1.Remove_Index(2), triangle.x2.Remove_Index(2), triangle.x3.Remove_Index(2)));
 }
 template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
 Projections_Intersect(int a,int b)
