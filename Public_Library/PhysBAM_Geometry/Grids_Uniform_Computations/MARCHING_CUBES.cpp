@@ -8,6 +8,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
 #define TRI(a,b,c,s) (((s)<<15) | ((c)<<10) | ((b)<<5) | (a))
@@ -188,15 +189,15 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
         int c=0;
         for(int i=0;i<bits.m;i++){
             TV_INT index=it.index+bits(i);
-            pts[i+12]=grid.Node(index);
+            pts[i+num_edges]=grid.Node(index);
             phis(i)=phi(index);
             c|=(phis(i)<0)<<i;}
-        for(int i=0;i<12;i++){
+        for(int i=0;i<num_edges;i++){
             int v0=MARCHING_CUBES_CASE<TV::m>::vertex_lookup[i][0];
             int v1=MARCHING_CUBES_CASE<TV::m>::vertex_lookup[i][1];
             if(((c>>v0)^(c>>v1))&1){
                 T t=phis(v0)/(phis(v0)-phis(v1));
-                pts[i]=pts[v0+12]+t*(pts[v1+12]-pts[v0+12]);}}
+                pts[i]=pts[v0+num_edges]+t*(pts[v1+num_edges]-pts[v0+num_edges]);}}
 
         const MARCHING_CUBES_CASE<TV::m> & cs=table(c);
 
@@ -211,9 +212,8 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
                     ht.Set(fi,index);
                     surface.particles.X(index)=pts[e];}}
             if(!cs.enclose_inside) exchange(face.x,face.y);
-            surface.mesh.elements.Append(face);
-        }
-    }
+            surface.mesh.elements.Append(face);}}
+
     surface.Update_Number_Nodes();
 }
 //#####################################################################
@@ -262,9 +262,11 @@ template const ARRAY<MARCHING_CUBES_CASE<2> >& MARCHING_CUBES<VECTOR<float,2> >:
 template const ARRAY<MARCHING_CUBES_CASE<3> >& MARCHING_CUBES<VECTOR<float,3> >::Case_Table();
 template void MARCHING_CUBES<VECTOR<float,3> >::Create_Surface(TRIANGULATED_SURFACE<float>&,GRID<VECTOR<float,3> > const&,ARRAY<float,VECTOR<int,3> > const&);
 template void MARCHING_CUBES<VECTOR<float,3> >::Get_Elements_For_Cell(ARRAY<TRIANGLE_3D<float>,int>&,ARRAY<TRIANGLE_3D<float>,int>&,int&,bool&,ARRAY<float,VECTOR<int,3> > const&,VECTOR<int,3> const&);
+template void MARCHING_CUBES<VECTOR<float,2> >::Create_Surface(SEGMENTED_CURVE_2D<float>&,GRID<VECTOR<float,2> > const&,ARRAY<float,VECTOR<int,2> > const&);
 #endif
 template void MARCHING_CUBES<VECTOR<double,2> >::Get_Elements_For_Cell(ARRAY<SEGMENT_2D<double>,int>&,ARRAY<SEGMENT_2D<double>,int>&,int&,bool&,ARRAY<double,VECTOR<int,2> > const&,VECTOR<int,2> const&);
 template const ARRAY<MARCHING_CUBES_CASE<2> >& MARCHING_CUBES<VECTOR<double,2> >::Case_Table();
 template const ARRAY<MARCHING_CUBES_CASE<3> >& MARCHING_CUBES<VECTOR<double,3> >::Case_Table();
 template void MARCHING_CUBES<VECTOR<double,3> >::Create_Surface(TRIANGULATED_SURFACE<double>&,GRID<VECTOR<double,3> > const&,ARRAY<double,VECTOR<int,3> > const&);
 template void MARCHING_CUBES<VECTOR<double,3> >::Get_Elements_For_Cell(ARRAY<TRIANGLE_3D<double>,int>&,ARRAY<TRIANGLE_3D<double>,int>&,int&,bool&,ARRAY<double,VECTOR<int,3> > const&,VECTOR<int,3> const&);
+template void MARCHING_CUBES<VECTOR<double,2> >::Create_Surface(SEGMENTED_CURVE_2D<double>&,GRID<VECTOR<double,2> > const&,ARRAY<double,VECTOR<int,2> > const&);
