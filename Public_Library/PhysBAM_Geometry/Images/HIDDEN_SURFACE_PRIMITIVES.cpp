@@ -39,10 +39,8 @@ template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
 Projections_Intersect(int a,int b)
 {
     typename SURFACE_PRIMITIVE<T>::MULTI_POLYGON in;
-    if(!boost::geometry::intersection(primitives(a).projection,primitives(b).projection,in))
-        return false;
-    if(boost::geometry::area(in)<1e-10) return false;
-    return true;
+    boost::geometry::intersection(primitives(a).projection,primitives(b).projection,in);
+    return boost::geometry::area(in)>1e-10;
 //    return boost::geometry::intersects(primitives(a).projection,primitives(b).projection);
 }
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
@@ -66,8 +64,7 @@ Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<
     primitives.Preallocate(primitives.m+1); // Don't resize on us later
 
     typename SURFACE_PRIMITIVE<T>::MULTI_POLYGON projected_intersection;
-    if(!boost::geometry::intersection(primitives(a).projection,primitives(b).projection,projected_intersection))
-        return;
+    boost::geometry::intersection(primitives(a).projection,primitives(b).projection,projected_intersection);
     if(boost::geometry::area(projected_intersection)<area_tol) return;
 
     int index[2]={a,b};
@@ -89,21 +86,28 @@ Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<
     typename SURFACE_PRIMITIVE<T>::MULTI_POLYGON tri,quad,int_tri,int_quad;
     tri.Resize(1);
     tri(0).outer().Append(X0);
-    tri(0).outer().Append(X1);
-    tri(0).outer().Append(X2);
+    tri(0).outer().Append(cut0);
+    tri(0).outer().Append(cut1);
     tri(0).outer().Append(X0);
+    boost::geometry::correct(tri);
     quad.Resize(1);
     quad(0).outer().Append(cut0);
     quad(0).outer().Append(X1);
     quad(0).outer().Append(X2);
     quad(0).outer().Append(cut1);
     quad(0).outer().Append(cut0);
-    bool has_tri=boost::geometry::intersection(tri,primitives(a).projection,int_tri);
-    bool has_quad=boost::geometry::intersection(quad,primitives(a).projection,int_quad);
+    boost::geometry::correct(quad);
+
+    boost::geometry::intersection(tri,primitives(a).projection,int_tri);
+    boost::geometry::intersection(quad,primitives(a).projection,int_quad);
     T area_tri=boost::geometry::area(int_tri);
     T area_quad=boost::geometry::area(int_quad);
+    T area_a=boost::geometry::area(primitives(a).projection);
+    T area_b=boost::geometry::area(primitives(b).projection);
+    if(area_tri<area_tol && area_quad<area_tol)
+        return;
 
-    if(!has_tri || (area_tri<area_tol && area_quad>area_tri)){
+    if(area_tri<area_tol){
         int_quad.Exchange(primitives(a).projection);
         TV2 pt;
         boost::geometry::centroid(primitives(a).projection,pt);
@@ -113,12 +117,12 @@ Handle_Intersection(int a,int b,ARRAY<ARRAY<int> >& adjacency_list,ARRAY<VECTOR<
     TV2 pt;
     boost::geometry::centroid(primitives(a).projection,pt);
     Add_Edge(edges,a,b,pt);
-    if(!has_quad || area_quad<area_tol) return;
+    if(area_quad<area_tol) return;
 
     int outside=Add(primitives(a).triangle,primitives(a).parent);
     int_quad.Exchange(primitives(outside).projection);
     boost::geometry::centroid(primitives(outside).projection,pt);
-    Add_Edge(edges,a,b,pt);
+    Add_Edge(edges,outside,b,pt);
 
     adjacency_list.Append(ARRAY<int>());
     ARRAY<int>& adj=adjacency_list(a);
@@ -167,8 +171,7 @@ template<class T> int HIDDEN_SURFACE_PRIMITIVES<T>::
 Divide_Primitive(int divide,int cutter)
 {
     typename SURFACE_PRIMITIVE<T>::MULTI_POLYGON in,out;
-    if(!boost::geometry::intersection(primitives(divide).projection,primitives(cutter).projection,in))
-        return divide;
+    boost::geometry::intersection(primitives(divide).projection,primitives(cutter).projection,in);
     boost::geometry::difference(primitives(divide).projection,primitives(cutter).projection,out);
     if(!out.Size()) return -1;
     int outside=Add(primitives(divide).triangle,primitives(divide).parent);
