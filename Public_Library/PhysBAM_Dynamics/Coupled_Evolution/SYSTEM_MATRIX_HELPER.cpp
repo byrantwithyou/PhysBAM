@@ -24,25 +24,33 @@ Add_Matrix(const SYSTEM_MATRIX_BASE<T>& base,bool trans,int dr,int dc)
 // Function Transpose_Add
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Transpose()
+Add_Transpose(INTERVAL<int> range)
 {
-    for(int i=start;i<data.m;i++) exchange(data(i).x,data(i).y);
+    for(int i=range.min_corner;i<range.max_corner;i++) data.Append(TRIPLE<int,int,T>(data(i).y,data(i).x,data(i).z));
 }
 //#####################################################################
 // Function Transpose_Add
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Scale(T s)
+Transpose(INTERVAL<int> range)
 {
-    for(int i=start;i<data.m;i++) data(i).z*=s;
+    for(int i=range.min_corner;i<range.max_corner;i++) exchange(data(i).x,data(i).y);
+}
+//#####################################################################
+// Function Transpose_Add
+//#####################################################################
+template<class T> void SYSTEM_MATRIX_HELPER<T>::
+Scale(T s,INTERVAL<int> range)
+{
+    for(int i=range.min_corner;i<range.max_corner;i++) data(i).z*=s;
 }
 //#####################################################################
 // Function Shift_Add
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Shift(int dr,int dc)
+Shift(int dr,int dc,INTERVAL<int> range)
 {
-    for(int i=start;i<data.m;i++){data(i).x+=dr;data(i).y+=dc;}
+    for(int i=range.min_corner;i<range.max_corner;i++){data(i).x+=dr;data(i).y+=dc;}
 }
 //#####################################################################
 // Function Compact

@@ -8,6 +8,7 @@
 #define __SYSTEM_MATRIX_HELPER__
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 
 namespace PhysBAM{
@@ -36,11 +37,27 @@ struct SYSTEM_MATRIX_HELPER:public NONCOPYABLE
     void New_Block()
     {start=data.m;compacted=false;}
 
+    INTERVAL<int> Get_Block() const
+    {return INTERVAL<int>(start,data.m);}
+
+    void Transpose()
+    {Transpose(Get_Block());}
+
+    void Add_Transpose()
+    {Add_Transpose(Get_Block());}
+
+    void Scale(T s)
+    {Scale(s,Get_Block());}
+
+    void Shift(int dr,int dc)
+    {Shift(dr,dc,Get_Block());}
+
     void Add_Matrix(const SYSTEM_MATRIX_BASE<T>& base,bool trans=false,int dr=0,int dc=0);
     void Add_Matrix(const SPARSE_MATRIX_FLAT_MXN<T>& M,bool trans=false,int dr=0,int dc=0);
-    void Transpose();
-    void Scale(T s);
-    void Shift(int dr,int dc);
+    void Transpose(INTERVAL<int> range);
+    void Add_Transpose(INTERVAL<int> range);
+    void Scale(T s,INTERVAL<int> range);
+    void Shift(int dr,int dc,INTERVAL<int> range);
     void Compact(int rows, T tol=0);
     void Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M, T tol=0);
     void Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M, T tol=0);
