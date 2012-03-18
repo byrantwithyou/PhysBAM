@@ -83,7 +83,7 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
 
         if(!elements.m){ // Uncut cell; emit the standard stencil
             for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next())
-                Add_Uncut_Stencil(helper,it.index*2+it.index+1,enclose_inside);
+                Add_Uncut_Stencil(helper,it.index*coarse_factor+it2.index+1,enclose_inside);
             continue;}
 
         RANGE<TV_INT> flat_range(double_coarse_range);

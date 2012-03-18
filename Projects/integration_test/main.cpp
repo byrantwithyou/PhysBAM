@@ -45,8 +45,8 @@ void Integration_Test(int argc,char* argv[])
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/s;
     (void)m;
 
-    GRID<TV> grid(TV_INT()+8,RANGE<TV>(TV(),TV()+1),true);
-    GRID<TV> coarse_grid(grid.counts/2,grid.domain,true);
+    GRID<TV> grid(TV_INT()+4,RANGE<TV>(TV(),TV()+1),true);
+    GRID<TV> coarse_grid(grid.counts,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
     SPHERE<TV> sphere(TV()+(T).5,(T).5);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())

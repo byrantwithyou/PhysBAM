@@ -40,6 +40,7 @@ template<class TV> BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>::
 template<class TV> void BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>::
 Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
 {
+    helper.New_Block();
     ARRAY<T_FACE> clipped_simplices;
     for(int e=0;e<boundary.object.mesh.elements.m;e++){
         T_FACE face=boundary.object.Get_Element(e);
@@ -52,8 +53,10 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
                 clipped_simplices.Remove_All();
                 face.Clip_To_Box(domain,clipped_simplices);
                 T integral=0;
-                for(int i=0;i<clipped_simplices.m;i++)
-                    integral+=stencil.stencils(i).polynomial.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(clipped_simplices(i).X(0)));
+                for(int i=0;i<clipped_simplices.m;i++){
+                    for(int j=0;j<TV::m;j++)
+                        clipped_simplices(i).X(j)-=TV(it.index)+(T).5*TV(stencil.center_offset);
+                    integral+=stencil.stencils(i).polynomial.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(clipped_simplices(i).X(0)));}
                 helper.data.Append(TRIPLE<int,int,T>(cm.Get_Index(it.index,0),e,integral));
                 helper.data.Append(TRIPLE<int,int,T>(cm.Get_Index(it.index,1),e,-integral));}}}
 }
