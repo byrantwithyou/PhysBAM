@@ -55,12 +55,15 @@ void Integration_Test(int argc,char* argv[])
     BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
     p_stencil.Set_Center();
     p_stencil.Set_Constant_Stencil();
+    p_stencil.Scale_Axes(grid.one_over_dX);
     p_stencil.Dice_Stencil();
     u_stencil.Set_Face(0);
     u_stencil.Set_Multilinear_Stencil();
+    u_stencil.Scale_Axes(grid.one_over_dX);
     u_stencil.Dice_Stencil();
     v_stencil.Set_Face(1);
     v_stencil.Set_Multilinear_Stencil();
+    v_stencil.Scale_Axes(grid.one_over_dX);
     v_stencil.Dice_Stencil();
     BASIS_STENCIL_UNIFORM<TV> udx_stencil(u_stencil),udy_stencil(u_stencil),vdx_stencil(v_stencil),vdy_stencil(v_stencil);
     udx_stencil.Differentiate(0);
@@ -85,14 +88,6 @@ void Integration_Test(int argc,char* argv[])
     RANGE<TV_INT> boundary_conditions;
     boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
     boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
-
-    LOG::cout<<"u ";u_stencil.Print();
-    LOG::cout<<"v ";v_stencil.Print();
-    LOG::cout<<"p ";p_stencil.Print();
-    LOG::cout<<"udx ";udx_stencil.Print();
-    LOG::cout<<"vdx ";vdx_stencil.Print();
-    LOG::cout<<"udy ";udy_stencil.Print();
-    LOG::cout<<"vdy ";vdy_stencil.Print();
 
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udx_stencil,udx_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
     helper.Scale(2*mu);
@@ -129,6 +124,8 @@ void Integration_Test(int argc,char* argv[])
     int start_uq=index_map_p.next_index+start_p;
     int start_vq=curve.mesh.elements.m+start_uq;
     int total=curve.mesh.elements.m+start_vq;
+
+    printf("u %i v %i p %i uq %i vq %i end %i\n", 0, start_v, start_p, start_uq, start_vq, total);
 
     helper.Shift(start_v,start_v,block_vv);
     helper.Shift(0,start_v,block_uv);

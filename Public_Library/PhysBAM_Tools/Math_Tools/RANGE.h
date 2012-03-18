@@ -135,7 +135,13 @@ public:
     RANGE<TV> operator*(const T a) const
     {return a>=0?RANGE<TV>(min_corner*a,max_corner*a):RANGE<TV>(max_corner*a,min_corner*a);}
 
+    RANGE<TV> operator*(const TV& a) const
+    {return RANGE<TV>(min_corner*a,max_corner*a);}
+
     RANGE<TV>& operator*=(const T a)
+    {return *this=*this*a;}
+
+    RANGE<TV>& operator*=(const TV& a)
     {return *this=*this*a;}
 
     RANGE<TV> operator/(const T a) const
@@ -220,10 +226,16 @@ public:
     {return RANGE<TV>(TV::Componentwise_Max(box1.min_corner,box2.min_corner),TV::Componentwise_Min(box1.max_corner,box2.max_corner));}
 
     void Scale_About_Center(const T factor)
-    {TV center=(T).5*(min_corner+max_corner),length_over_two=factor*(T).5*(max_corner-min_corner);min_corner=center-length_over_two;max_corner=center+length_over_two;}
+    {Scale_About_Point(Center(),factor);}
 
-    void Scale_About_Center(const TV factor)
-    {TV center=(T).5*(min_corner+max_corner),length_over_two=factor*(T).5*(max_corner-min_corner);min_corner=center-length_over_two;max_corner=center+length_over_two;}
+    void Scale_About_Center(const TV& factor)
+    {Scale_About_Point(Center(),factor);}
+
+    void Scale_About_Point(const TV& pt, const T factor)
+    {TV length_over_two=factor*(T).5*(max_corner-min_corner);min_corner=pt-length_over_two;max_corner=pt+length_over_two;}
+
+    void Scale_About_Point(const TV& pt, const TV& factor)
+    {TV length_over_two=factor*(T).5*(max_corner-min_corner);min_corner=pt-length_over_two;max_corner=pt+length_over_two;}
 
     void Scale_About_Center(const T x_factor,const T y_factor)
     {STATIC_ASSERT(d==2);Scale_About_Center(TV(x_factor,y_factor));}
