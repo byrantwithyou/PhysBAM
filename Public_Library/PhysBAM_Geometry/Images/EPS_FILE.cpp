@@ -108,7 +108,7 @@ Emit_Object(const TV &pt,T radius)
     Update_Effective_Formatting();
     Emit("newpath");
     Emit(pt);
-    stream<<radius<<" 0 360 arc closepath";
+    stream<<radius<<" 0 360 arc closepath ";
     Fill();
     Stroke();
     stream<<std::endl;
