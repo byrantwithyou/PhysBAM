@@ -243,8 +243,14 @@ public:
     void Scale_About_Center(const T x_factor,const T y_factor,const T z_factor)
     {STATIC_ASSERT(d==3);Scale_About_Center(TV(x_factor,y_factor,z_factor));}
 
+    RANGE<TV> operator+(const TV& shift) const
+    {return RANGE<TV>(min_corner+shift,max_corner+shift);}
+
+    RANGE<TV> operator-(const TV& shift) const
+    {return RANGE<TV>(min_corner-shift,max_corner-shift);}
+
     RANGE<TV> Translated(const TV& shift) const
-    {RANGE<TV> r(min_corner+shift,max_corner+shift);return r;}
+    {return *this+shift;}
 
     bool Lazy_Inside(const TV& location) const
     {return location.All_Greater_Equal(min_corner) && location.All_Less_Equal(max_corner);}
@@ -365,10 +371,6 @@ inline RANGE<TV> operator+(const TV& a,const RANGE<TV>& b)
 template<class TV>
 inline RANGE<TV> operator-(const TV& a,const RANGE<TV>& b)
 {return RANGE<TV>(a-b.max_corner,a-b.min_corner);}
-
-template<class TV>
-inline RANGE<TV> operator-(const RANGE<TV>& b,const TV& a)
-{return RANGE<TV>(b.min_corner-a,b.max_corner-a);}
 
 template<class TV> inline RANGE<TV> operator*(const typename TV::SCALAR a,const RANGE<TV>& box)
 {return box*a;}
