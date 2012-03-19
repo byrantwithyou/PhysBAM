@@ -45,14 +45,12 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
     for(int e=0;e<boundary.object.mesh.elements.m;e++){
         T_FACE face=boundary.object.Get_Element(e);
         RANGE<TV> box=face.Bounding_Box();
-        box.Scale_About_Point(grid.domain.min_corner,grid.one_over_dX);
-        LOG::cout<<box<<std::endl;
         for(int i=0;i<stencil.stencils.m;i++){
             const typename BASIS_STENCIL_UNIFORM<TV>::ENTRY& entry=stencil.stencils(i);
-            RANGE<TV_INT> cell_range(TV_INT(floor(box.min_corner-(T).5*TV(entry.region.max_corner))),TV_INT(ceil(box.max_corner-(T).5*TV(entry.region.min_corner))));
-            LOG::cout<<e<<"  "<<i<<"  "<<cell_range<<std::endl;
+            RANGE<TV> T_cell_range((box-grid.domain.min_corner)*grid.one_over_dX - (T).5*RANGE<TV>(entry.region + (stencil.center_offset+1)));
+            RANGE<TV_INT> cell_range(TV_INT(ceil(T_cell_range.min_corner+1e-14)),TV_INT(floor(T_cell_range.max_corner-1e-14))+1);
             for(UNIFORM_ARRAY_ITERATOR<TV::m> it(cell_range);it.Valid();it.Next()){
-                RANGE<TV> domain(TV(it.index)+(T).5*TV(entry.region.min_corner),TV(it.index)+(T).5*TV(entry.region.max_corner));
+                RANGE<TV> domain=RANGE<TV>(entry.region+(stencil.center_offset+1+2*it.index))*((T).5*grid.dX)+grid.domain.min_corner;
                 clipped_simplices.Remove_All();
                 face.Clip_To_Box(domain,clipped_simplices);
                 T integral=0;
@@ -64,8 +62,8 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
                 helper.data.Append(TRIPLE<int,int,T>(cm.Get_Index(it.index,1),e,-integral));}}}
 }
 template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<float,2> >;
-template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<float,3> >;
+//template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<float,3> >;
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<double,2> >;
-template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<double,3> >;
+//template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<double,3> >;
 #endif
