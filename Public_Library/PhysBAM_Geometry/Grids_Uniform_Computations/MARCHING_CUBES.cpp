@@ -251,7 +251,6 @@ Get_Elements_For_Cell(ARRAY<T_FACE>& surface,ARRAY<T_FACE>& boundary,int& direct
             for(int j=0;j<TV::m;j++){
                 int e=(elements[s][i]>>5*j)&31;
                 face.X(j)=pts[e];}
-            if(!cs.enclose_inside) exchange(face.X(0),face.X(1));
             list[s]->Append(face);}}
     direction=cs.proj_dir;
     enclose_inside=cs.enclose_inside;

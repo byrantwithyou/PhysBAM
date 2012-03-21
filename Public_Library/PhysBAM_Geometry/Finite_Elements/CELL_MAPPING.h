@@ -39,6 +39,17 @@ public:
         return ci;
     }
 
+    int Get_Index_Fixed(TV_INT index, bool is_neg) const
+    {
+        const ARRAY<int,TV_INT>& ar=cell_index[is_neg];
+        for(int j=0;j<TV::m;j++)
+            if(periodic(j)){
+                if(index(j)<ar.domain.min_corner(j)) index(j)+=ar.domain.Edge_Lengths()(j);
+                if(index(j)>=ar.domain.max_corner(j)) index(j)-=ar.domain.Edge_Lengths()(j);}
+
+        return ar(index);
+    }
+
     CELL_MAPPING(const GRID<TV>& grid_input)
         :grid(grid_input),next_index(0)
     {for(int i=0;i<2;i++){cell_index[i].Resize(grid.Domain_Indices());cell_index[i].Fill(-1);}}

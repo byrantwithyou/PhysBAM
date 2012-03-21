@@ -83,7 +83,7 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
 
         if(!elements.m){ // Uncut cell; emit the standard stencil
             for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next())
-                Add_Uncut_Stencil(helper,it.index*coarse_factor+it2.index+1,enclose_inside);
+                Add_Uncut_Stencil(helper,it.index*coarse_factor+it2.index,enclose_inside);
             continue;}
 
         RANGE<TV_INT> flat_range(double_coarse_range);
@@ -93,7 +93,10 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
         for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
             for(int i=0;i<overlap_polynomials.m;i++){
                 ARRAY<T_FACE> elements;
-                for(UNIFORM_ARRAY_ITERATOR<TV::m> it3(overlap_polynomials(i).range);it3.Valid();it3.Next()){
+                RANGE<TV_INT> range=overlap_polynomials(i).range;
+                range.min_corner(dir)=0;
+                range.max_corner(dir)=1;
+                for(UNIFORM_ARRAY_ITERATOR<TV::m> it3(range);it3.Valid();it3.Next()){
                     TV_INT index=it2.index*coarse_factor+it3.index+1;
                     index(dir)=0;
                     elements.Append_Elements(cut_elements(index));}
@@ -119,17 +122,19 @@ Add_Uncut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside
 template<class T> static T
 Volume(VECTOR<VECTOR<T,3>,3> X,int dir)
 {
+    int sign=dir?-1:1;
     exchange(X(0)(dir),X(0).x);
     exchange(X(1)(dir),X(1).x);
     exchange(X(2)(dir),X(2).x);
-    return (X(1).y*(X(2).z-X(0).z)+X(0).y*(X(1).z-X(2).z)+X(2).y*(X(0).z-X(1).z))*(X(0).x+X(1).x+X(2).x)/6;
+    return (X(1).y*(X(2).z-X(0).z)+X(0).y*(X(1).z-X(2).z)+X(2).y*(X(0).z-X(1).z))*(X(0).x+X(1).x+X(2).x)/6*sign;
 }
 template<class T> static T
 Volume(VECTOR<VECTOR<T,2>,2> X,int dir)
 {
+    int sign=dir?-1:1;
     exchange(X(0)(dir),X(0).x);
     exchange(X(1)(dir),X(1).x);
-    return (X(1).y-X(0).y)*(X(0).x+X(1).x)/6;
+    return (X(1).y-X(0).y)*(X(0).x+X(1).x)/2*sign;
 }
 //#####################################################################
 // Function Cut_Elements
