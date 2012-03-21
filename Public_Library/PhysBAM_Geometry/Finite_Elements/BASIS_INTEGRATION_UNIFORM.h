@@ -51,7 +51,7 @@ public:
             x+=me.x;
         }
     };
-    ARRAY<MATRIX_ENTRY> open_entries; // stencil with no boundary conditions
+    ARRAY<MATRIX_ENTRY> open_entries,raw_open_entries; // stencil with no boundary conditions
 
     struct OVERLAP_POLYNOMIALS
     {
@@ -68,10 +68,11 @@ public:
 
     void Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper);
     void Add_Uncut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside);
-    void Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,const TV_INT& cell,int dir,bool inside,const TV_INT& sub_cell,const OVERLAP_POLYNOMIALS& op);
+    void Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,const TV_INT& cell,int dir,bool inside,const TV_INT& sub_cell,int opi);
     void Cut_Elements(ARRAY<ARRAY<T_FACE>,TV_INT>& cut_elements,const ARRAY<T_FACE>& elements,const RANGE<TV_INT>& range,const RANGE<TV>& domain,int dir);
     void Compute_Overlap_Polynomials();
     void Compute_Open_Entries();
+    void Apply_Matrix_Entry(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside,MATRIX_ENTRY mei);
 };
 }
 #endif

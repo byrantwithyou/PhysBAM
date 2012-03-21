@@ -58,7 +58,8 @@ Compute_Open_Entries()
     for(int i=0;i<overlap_polynomials.m;i++){
         T integral=overlap_polynomials(i).polynomial.Definite_Integral(RANGE<TV>(overlap_polynomials(i).range)/2);
         MATRIX_ENTRY me={overlap_polynomials(i).index_offset0,overlap_polynomials(i).index_offset1,integral};
-        open_entries.Append(me);}
+        raw_open_entries.Append(me);}
+    open_entries=raw_open_entries;
     open_entries.Coalesce();
 }
 //#####################################################################
@@ -83,7 +84,7 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
 
         if(!elements.m){ // Uncut cell; emit the standard stencil
             for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next())
-                Add_Uncut_Stencil(helper,it.index*coarse_factor+it2.index,enclose_inside);
+                Add_Uncut_Stencil(helper,it.index*coarse_factor+it2.index,!enclose_inside);
             continue;}
 
         RANGE<TV_INT> flat_range(double_coarse_range);
@@ -100,7 +101,7 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
                     TV_INT index=it2.index*coarse_factor+it3.index+1;
                     index(dir)=0;
                     elements.Append_Elements(cut_elements(index));}
-                Add_Cut_Stencil(helper,elements,it.index*coarse_factor+it2.index,dir,enclose_inside,it2.index,overlap_polynomials(i));}}
+                Add_Cut_Stencil(helper,elements,it.index*coarse_factor+it2.index,dir,enclose_inside,it2.index,i);}}
         for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
             cut_elements(it2.index).Remove_All();}
 }
@@ -108,16 +109,23 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
 // Function Cut_Elements
 //#####################################################################
 template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
+Apply_Matrix_Entry(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside,MATRIX_ENTRY me)
+{
+    me.index0+=cell;
+    me.index1+=cell;
+    int i0=cm0.Get_Index(me.index0,inside);
+    int i1=cm1.Get_Index(me.index1,inside);
+    assert(i0>=0 && i1>=0);
+    helper.data.Append(TRIPLE<int,int,T>(i0,i1,me.x));
+}
+//#####################################################################
+// Function Cut_Elements
+//#####################################################################
+template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
 Add_Uncut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside)
 {
-    for(int i=0;i<open_entries.m;i++){
-        MATRIX_ENTRY me=open_entries(i);
-        me.index0+=cell;
-        me.index1+=cell;
-        int i0=cm0.Get_Index(me.index0,inside);
-        int i1=cm1.Get_Index(me.index1,inside);
-        assert(i0>=0 && i1>=0);
-        helper.data.Append(TRIPLE<int,int,T>(i0,i1,me.x));}
+    Add_Debug_Particle(grid.Center(cell),VECTOR<T,3>(1,0,0));
+    for(int i=0;i<open_entries.m;i++) Apply_Matrix_Entry(helper,cell,inside,open_entries(i));
 }
 template<class T> static T
 Volume(VECTOR<VECTOR<T,3>,3> X,int dir)
@@ -140,13 +148,14 @@ Volume(VECTOR<VECTOR<T,2>,2> X,int dir)
 // Function Cut_Elements
 //#####################################################################
 template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
-Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,const TV_INT& cell,int dir,bool inside,const TV_INT& sub_cell,const OVERLAP_POLYNOMIALS& op)
+Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,const TV_INT& cell,int dir,bool enclose_inside,const TV_INT& sub_cell,int opi)
 {
-    if(!elements.m) return Add_Uncut_Stencil(helper,cell,!inside);
+    if(!elements.m) return Apply_Matrix_Entry(helper,cell,!enclose_inside,raw_open_entries(opi));
     int coarse_factor=grid.counts.x/phi_grid.counts.x;
 
     T volume_inside=0;
     ARRAY<T_FACE> projected_elements(elements);
+    const OVERLAP_POLYNOMIALS& op=overlap_polynomials(opi);
     T mn=(T)op.range.min_corner(dir)/2,mx=(T)op.range.max_corner(dir)/2;
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++){
@@ -157,8 +166,8 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
     // Check for full or empty cell.
     T full_volume=(T)op.range.Size()/(1<<TV::m);
     T frac=volume_inside/full_volume;
-    if(1-frac<1e-14) return Add_Uncut_Stencil(helper,cell,inside);
-    Add_Uncut_Stencil(helper,cell,!inside);
+    if(1-frac<1e-14) return Apply_Matrix_Entry(helper,cell,enclose_inside,raw_open_entries(opi));
+    Apply_Matrix_Entry(helper,cell,!enclose_inside,raw_open_entries(opi));
     if(frac<1e-14) return;
 
     MULTIVARIATE_POLYNOMIAL<TV> poly(op.polynomial);
@@ -171,8 +180,8 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
         for(int j=0;j<TV::m;j++) projected_elements(i).X(j)*=grid.dX;
         integral+=poly.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).X(0)))*projected_elements(i).Normal()(dir);}
 
-    helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,inside),cm1.Get_Index(index1,inside),integral));
-    helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,!inside),cm1.Get_Index(index1,!inside),-integral));
+    helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,enclose_inside),cm1.Get_Index(index1,enclose_inside),integral));
+    helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,!enclose_inside),cm1.Get_Index(index1,!enclose_inside),-integral));
 }
 //#####################################################################
 // Function Cut_Elements
