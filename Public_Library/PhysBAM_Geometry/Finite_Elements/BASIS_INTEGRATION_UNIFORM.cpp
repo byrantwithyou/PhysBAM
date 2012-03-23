@@ -124,7 +124,6 @@ Apply_Matrix_Entry(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool insid
 template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
 Add_Uncut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const TV_INT& cell,bool inside)
 {
-    Add_Debug_Particle(grid.Center(cell),VECTOR<T,3>(1,0,0));
     for(int i=0;i<open_entries.m;i++) Apply_Matrix_Entry(helper,cell,inside,open_entries(i));
 }
 template<class T> static T
