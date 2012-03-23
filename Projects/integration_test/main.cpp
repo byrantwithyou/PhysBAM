@@ -123,25 +123,25 @@ void Integration_Test(int argc,char* argv[])
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    BASIS_STENCIL_UNIFORM<TV> p_stencil,u_stencil,v_stencil;
+    BASIS_STENCIL_UNIFORM<TV> p_stencil(grid.dX),u_stencil(grid.dX),v_stencil(grid.dX);
     p_stencil.Set_Center();
     p_stencil.Set_Constant_Stencil();
-    p_stencil.Dice_Stencil(grid.dX);
+    p_stencil.Dice_Stencil();
     u_stencil.Set_Face(0);
     u_stencil.Set_Multilinear_Stencil();
-    u_stencil.Dice_Stencil(grid.dX);
+    u_stencil.Dice_Stencil();
     v_stencil.Set_Face(1);
     v_stencil.Set_Multilinear_Stencil();
-    v_stencil.Dice_Stencil(grid.dX);
+    v_stencil.Dice_Stencil();
     BASIS_STENCIL_UNIFORM<TV> udx_stencil(u_stencil),udy_stencil(u_stencil),vdx_stencil(v_stencil),vdy_stencil(v_stencil);
     udx_stencil.Differentiate(0);
-    udx_stencil.Dice_Stencil(grid.dX);
+    udx_stencil.Dice_Stencil();
     udy_stencil.Differentiate(1);
-    udy_stencil.Dice_Stencil(grid.dX);
+    udy_stencil.Dice_Stencil();
     vdx_stencil.Differentiate(0);
-    vdx_stencil.Dice_Stencil(grid.dX);
+    vdx_stencil.Dice_Stencil();
     vdy_stencil.Differentiate(1);
-    vdy_stencil.Dice_Stencil(grid.dX);
+    vdy_stencil.Dice_Stencil();
 
     SEGMENTED_CURVE_2D<T> curve;
     MARCHING_CUBES<TV>::Create_Surface(curve,coarse_grid,phi);
@@ -229,9 +229,8 @@ void Integration_Test(int argc,char* argv[])
     for(int i=0;i<start_v;i++){null_u(i)=1;units(i)=m/s;}
     for(int i=start_v;i<start_p;i++){null_v(i)=1;units(i)=m/s;}
     for(int i=start_p;i<start_uq;i++){null_p(i)=1;units(i)=kg/(s*s);}
-    for(int i=start_uq;i<start_vq;i++){null_p(i)=-curve.Get_Element(i-start_uq).Normal().x;units(i)=kg*m/(s*s);}
-    for(int i=start_vq;i<total;i++){null_p(i)=-curve.Get_Element(i-start_vq).Normal().y;units(i)=kg*m/(s*s);}
-    for(int i=0;i<null_u.n;i++) null_u(i)=i%2;
+    for(int i=start_uq;i<start_vq;i++){null_p(i)=-curve.Get_Element(i-start_uq).Normal().x;units(i)=kg/(s*s);}
+    for(int i=start_vq;i<total;i++){null_p(i)=-curve.Get_Element(i-start_vq).Normal().y;units(i)=kg/(s*s);}
     null_u*=units;
     null_v*=units;
     null_p*=units;
@@ -239,10 +238,13 @@ void Integration_Test(int argc,char* argv[])
     matrix.Times(null_u,z_u);
     matrix.Times(null_v,z_v);
     matrix.Times(null_p,z_p);
+    z_u*=units;z_u/=kg*m*m/s/s/s;
+    z_v*=units;z_v/=kg*m*m/s/s/s;
+    z_p*=units;z_p/=kg*m*m/s/s/s;
 
-    LOG::cout<<(z_u*=units)<<std::endl;
-    LOG::cout<<(z_v*=units)<<std::endl;
-    LOG::cout<<(z_p*=units)<<std::endl;
+    LOG::cout<<z_u<<std::endl;
+    LOG::cout<<z_v<<std::endl;
+    LOG::cout<<z_p<<std::endl;
 
     for(int i=0;i<curve.mesh.elements.m;i++) Add_Debug_Particle(curve.particles.X(curve.mesh.elements(i).x),VECTOR<T,3>(1,0,0));
     for(int i=0;i<curve.mesh.elements.m;i++) Add_Debug_Particle(curve.particles.X(curve.mesh.elements(i).x)*.7+curve.particles.X(curve.mesh.elements(i).y)*.3,VECTOR<T,3>(0,1,0));
