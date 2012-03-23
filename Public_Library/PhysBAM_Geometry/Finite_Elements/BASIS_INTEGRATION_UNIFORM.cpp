@@ -56,7 +56,7 @@ template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
 Compute_Open_Entries()
 {
     for(int i=0;i<overlap_polynomials.m;i++){
-        T integral=overlap_polynomials(i).polynomial.Definite_Integral(RANGE<TV>(overlap_polynomials(i).range)/2);
+        T integral=overlap_polynomials(i).polynomial.Definite_Integral(RANGE<TV>(overlap_polynomials(i).range)*(grid.dX/2));
         MATRIX_ENTRY me={overlap_polynomials(i).index_offset0,overlap_polynomials(i).index_offset1,integral};
         raw_open_entries.Append(me);}
     open_entries=raw_open_entries;

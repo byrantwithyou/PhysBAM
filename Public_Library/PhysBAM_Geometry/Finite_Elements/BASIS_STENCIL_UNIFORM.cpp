@@ -62,8 +62,9 @@ Scale_Axes(TV scale)
 // Function Dice_Stencil
 //#####################################################################
 template<class TV> void BASIS_STENCIL_UNIFORM<TV>::
-Dice_Stencil()
+Dice_Stencil(TV dX)
 {
+    TV inv_dx=(T)1/dX;
     diced.Remove_All();
     const int big_shift=1<<30;
     const int half_big_shift=1<<29;
@@ -76,6 +77,7 @@ Dice_Stencil()
             DICED e={it.index,cut_range};
             e.polynomial=stencils(i).polynomial;
             e.polynomial.Shift(-TV(it.index)-TV(center_offset)/2);
+            e.polynomial.Scale_Variables(inv_dx);
             diced.Append(e);}}
 }
 //#####################################################################

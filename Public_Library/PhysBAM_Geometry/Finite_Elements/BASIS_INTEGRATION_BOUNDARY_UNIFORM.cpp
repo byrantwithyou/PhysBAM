@@ -45,19 +45,19 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
     for(int e=0;e<boundary.object.mesh.elements.m;e++){
         T_FACE face=boundary.object.Get_Element(e);
         RANGE<TV> box=face.Bounding_Box();
-        for(int i=0;i<stencil.stencils.m;i++){
-            const typename BASIS_STENCIL_UNIFORM<TV>::ENTRY& entry=stencil.stencils(i);
-            RANGE<TV> T_cell_range((box-grid.domain.min_corner)*grid.one_over_dX - (T).5*RANGE<TV>(entry.region + (stencil.center_offset+1)));
+        for(int i=0;i<stencil.diced.m;i++){
+            const typename BASIS_STENCIL_UNIFORM<TV>::DICED& entry=stencil.diced(i);
+            RANGE<TV> T_cell_range((box-grid.domain.min_corner)*grid.one_over_dX - (T).5*RANGE<TV>(entry.range+(TV_INT()+1)));
             RANGE<TV_INT> cell_range(TV_INT(ceil(T_cell_range.min_corner+1e-14)),TV_INT(floor(T_cell_range.max_corner-1e-14))+1);
             for(UNIFORM_ARRAY_ITERATOR<TV::m> it(cell_range);it.Valid();it.Next()){
-                RANGE<TV> domain=RANGE<TV>(entry.region+(stencil.center_offset+1+2*it.index))*((T).5*grid.dX)+grid.domain.min_corner;
+                RANGE<TV> domain=RANGE<TV>(entry.range+(1+2*it.index))*((T).5*grid.dX)+grid.domain.min_corner;
                 clipped_simplices.Remove_All();
                 face.Clip_To_Box(domain,clipped_simplices);
                 T integral=0;
                 for(int i=0;i<clipped_simplices.m;i++){
                     for(int j=0;j<TV::m;j++)
-                        clipped_simplices(i).X(j)-=(TV(it.index)+(T).5*TV(stencil.center_offset))*grid.dX;
-                    integral+=stencil.stencils(i).polynomial.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(clipped_simplices(i).X(0)));}
+                        clipped_simplices(i).X(j)-=grid.Center(it.index);
+                    integral+=entry.polynomial.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(clipped_simplices(i).X(0)));}
                 helper.data.Append(TRIPLE<int,int,T>(cm.Get_Index(it.index,0),e,integral));
                 helper.data.Append(TRIPLE<int,int,T>(cm.Get_Index(it.index,1),e,-integral));}}}
 }

@@ -14,7 +14,7 @@ namespace PhysBAM{
 template<class TV>
 struct BASIS_STENCIL_UNIFORM
 {
-    typedef VECTOR<int,TV::m> TV_INT;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
     TV_INT center_offset; // In units of dx/2
 
     struct ENTRY
@@ -49,7 +49,7 @@ struct BASIS_STENCIL_UNIFORM
     void Add_Symmetric_Entry(const ENTRY& e, int mask=-1); // 1=x, 2=y, 4=z
     void Exchange_Axes(int m,int n);
     void Scale_Axes(TV scale);
-    void Dice_Stencil();
+    void Dice_Stencil(TV dX);
     void Set_Constant_Stencil();
     void Set_Multilinear_Stencil();
     void Differentiate(int v);
