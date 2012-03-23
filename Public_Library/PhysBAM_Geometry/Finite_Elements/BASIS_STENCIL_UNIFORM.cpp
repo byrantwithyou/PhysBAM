@@ -10,7 +10,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> BASIS_STENCIL_UNIFORM<TV>::
-BASIS_STENCIL_UNIFORM()
+BASIS_STENCIL_UNIFORM(TV dx)
+    :dX(dx)
 {
 }
 //#####################################################################
@@ -62,9 +63,8 @@ Scale_Axes(TV scale)
 // Function Dice_Stencil
 //#####################################################################
 template<class TV> void BASIS_STENCIL_UNIFORM<TV>::
-Dice_Stencil(TV dX)
+Dice_Stencil()
 {
-    TV inv_dx=(T)1/dX;
     diced.Remove_All();
     const int big_shift=1<<30;
     const int half_big_shift=1<<29;
@@ -76,8 +76,7 @@ Dice_Stencil(TV dX)
             RANGE<TV_INT> cut_range=RANGE<TV_INT>::Intersect(offset_range.Translated(2*it.index),cell_box);
             DICED e={it.index,cut_range};
             e.polynomial=stencils(i).polynomial;
-            e.polynomial.Shift(-TV(it.index)-TV(center_offset)/2);
-            e.polynomial.Scale_Variables(inv_dx);
+            e.polynomial.Shift(-dX*(TV(it.index)+TV(center_offset)/2));
             diced.Append(e);}}
 }
 //#####################################################################
@@ -89,6 +88,7 @@ Set_Constant_Stencil()
     ENTRY e;
     e.region=RANGE<TV_INT>::Centered_Box();
     e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT(),1));
+    e.polynomial.Scale_Variables((T)1/dX);
     stencils.Append(e);
 }
 //#####################################################################
@@ -102,6 +102,7 @@ Set_Multilinear_Stencil()
     e.region.max_corner=TV_INT()+2;
     e.polynomial.terms.Append(MULTIVARIATE_MONOMIAL<TV>(TV_INT()+1,TV::m%2==0?1:-1));
     e.polynomial.Shift(TV()-1);
+    e.polynomial.Scale_Variables((T)1/dX);
     Add_Symmetric_Entry(e);
 }
 //#####################################################################
