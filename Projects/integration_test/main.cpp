@@ -163,42 +163,42 @@ void Integration_Test(int argc,char* argv[])
     boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
 
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udx_stencil,udx_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udx udx");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udx udx");
     helper.Scale(2*mu);
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udy_stencil,udy_stencil,index_map_u,index_map_u,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udy udy");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udy udy");
     helper.Scale(mu);
     helper.start=0;
     INTERVAL<int> block_uu=helper.Get_Block();
 
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdx_stencil,vdx_stencil,index_map_v,index_map_v,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"vdx vdx");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"vdx vdx");
     helper.Scale(2*mu);
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdy_stencil,vdy_stencil,index_map_v,index_map_v,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"vdy vdy");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"vdy vdy");
     helper.Scale(mu);
     helper.start=block_uu.max_corner;
     INTERVAL<int> block_vv=helper.Get_Block();
 
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udy_stencil,vdx_stencil,index_map_u,index_map_v,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udy vdx");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udy vdx");
     helper.Scale(mu);
     INTERVAL<int> block_uv=helper.Get_Block();
 
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,udx_stencil,p_stencil,index_map_u,index_map_p,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udx p");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"udx p");
     INTERVAL<int> block_up=helper.Get_Block();
 
     BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,vdy_stencil,p_stencil,index_map_v,index_map_p,phi).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"vdy p");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"vdy p");
     INTERVAL<int> block_vp=helper.Get_Block();
 
     BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>(grid,u_stencil,q_stencil,index_map_u).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"u q");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"u q");
     INTERVAL<int> block_uq=helper.Get_Block();
 
     BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>(grid,v_stencil,q_stencil,index_map_v).Compute_Matrix(helper);
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"v q");
+//    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"v q");
     INTERVAL<int> block_vq=helper.Get_Block();
 
     int start_v=index_map_u.next_index;
@@ -229,8 +229,8 @@ void Integration_Test(int argc,char* argv[])
     for(int i=0;i<start_v;i++){null_u(i)=1;units(i)=m/s;}
     for(int i=start_v;i<start_p;i++){null_v(i)=1;units(i)=m/s;}
     for(int i=start_p;i<start_uq;i++){null_p(i)=1;units(i)=kg/(s*s);}
-    for(int i=start_uq;i<start_vq;i++){null_p(i)=-curve.Get_Element(i-start_uq).Normal().x;units(i)=kg/(s*s);}
-    for(int i=start_vq;i<total;i++){null_p(i)=-curve.Get_Element(i-start_vq).Normal().y;units(i)=kg/(s*s);}
+    for(int i=start_uq;i<start_vq;i++){null_p(i)=curve.Get_Element(i-start_uq).Normal().x;units(i)=kg/(s*s);}
+    for(int i=start_vq;i<total;i++){null_p(i)=curve.Get_Element(i-start_vq).Normal().y;units(i)=kg/(s*s);}
     null_u*=units;
     null_v*=units;
     null_p*=units;
