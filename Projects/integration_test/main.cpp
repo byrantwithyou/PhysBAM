@@ -224,16 +224,25 @@ void Integration_Test(int argc,char* argv[])
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(total,total,matrix,1e-14);
 
+    VECTOR_ND<T> units(total);
     VECTOR_ND<T> null_u(total),null_v(total),null_p(total),z_u(total),z_v(total),z_p(total);
-    for(int i=0;i<start_v;i++) null_u(i)=1;
-    for(int i=start_v;i<start_p;i++) null_v(i)=1;
-    for(int i=start_p;i<start_uq;i++) null_p(i)=1;
-    for(int i=start_uq;i<start_vq;i++) null_p(i)=-curve.Get_Element(i-start_uq).Normal().x;
-    for(int i=start_vq;i<total;i++) null_p(i)=-curve.Get_Element(i-start_vq).Normal().y;
+    for(int i=0;i<start_v;i++){null_u(i)=1;units(i)=m/s;}
+    for(int i=start_v;i<start_p;i++){null_v(i)=1;units(i)=m/s;}
+    for(int i=start_p;i<start_uq;i++){null_p(i)=1;units(i)=kg/(s*s);}
+    for(int i=start_uq;i<start_vq;i++){null_p(i)=-curve.Get_Element(i-start_uq).Normal().x;units(i)=kg*m/(s*s);}
+    for(int i=start_vq;i<total;i++){null_p(i)=-curve.Get_Element(i-start_vq).Normal().y;units(i)=kg*m/(s*s);}
+    for(int i=0;i<null_u.n;i++) null_u(i)=i%2;
+    null_u*=units;
+    null_v*=units;
+    null_p*=units;
 
     matrix.Times(null_u,z_u);
     matrix.Times(null_v,z_v);
     matrix.Times(null_p,z_p);
+
+    LOG::cout<<(z_u*=units)<<std::endl;
+    LOG::cout<<(z_v*=units)<<std::endl;
+    LOG::cout<<(z_p*=units)<<std::endl;
 
     for(int i=0;i<curve.mesh.elements.m;i++) Add_Debug_Particle(curve.particles.X(curve.mesh.elements(i).x),VECTOR<T,3>(1,0,0));
     for(int i=0;i<curve.mesh.elements.m;i++) Add_Debug_Particle(curve.particles.X(curve.mesh.elements(i).x)*.7+curve.particles.X(curve.mesh.elements(i).y)*.3,VECTOR<T,3>(0,1,0));
