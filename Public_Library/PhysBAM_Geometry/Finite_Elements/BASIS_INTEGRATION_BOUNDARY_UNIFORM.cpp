@@ -64,8 +64,8 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
                 helper.data.Append(TRIPLE<int,int,T>(cm.Get_Index(index,1),e,-integral));}}}
 }
 template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<float,2> >;
-//template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<float,3> >;
+template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<float,3> >;
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<double,2> >;
-//template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<double,3> >;
+template class BASIS_INTEGRATION_BOUNDARY_UNIFORM<VECTOR<double,3> >;
 #endif
