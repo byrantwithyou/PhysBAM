@@ -78,17 +78,17 @@ Update()
         int idx=0;
 
         // u velocities
-        for(int i=cell_start.x;i<=cell_end.x+1;i++)for(int j=cell_start.y;j<=cell_end.y;j++)for(int k=cell_start.z;k<=cell_end.z;k++){
+        for(int i=cell_start.x;i<cell_end.x+1;i++)for(int j=cell_start.y;j<cell_end.y;j++)for(int k=cell_start.z;k<cell_end.z;k++){
             T vel=u(VECTOR<int,3>(i,j,k));
             if(vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(vel,0,0);vector_locations(idx)=grid.X_Face(i,j,k);}}
 
         // v velocities
-        for (int i=cell_start.x;i<=cell_end.x;i++) for (int j=cell_start.y;j<=cell_end.y+1;j++) for (int k=cell_start.z;k<=cell_end.z;k++){
+        for (int i=cell_start.x;i<cell_end.x;i++) for (int j=cell_start.y;j<cell_end.y+1;j++) for (int k=cell_start.z;k<cell_end.z;k++){
             T vel = v(VECTOR<int,3>(i,j,k));
             if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,vel,0);vector_locations(idx)=grid.Y_Face(i,j,k);}}
 
         // w velocities
-        for (int i=cell_start.x;i<=cell_end.x;i++) for (int j=cell_start.y;j<=cell_end.y;j++) for (int k=cell_start.z;k<=cell_end.z+1;k++){
+        for (int i=cell_start.x;i<cell_end.x;i++) for (int j=cell_start.y;j<cell_end.y;j++) for (int k=cell_start.z;k<cell_end.z+1;k++){
             T vel = w(VECTOR<int,3>(i,j,k));
             if (vel != 0){idx++;vector_field(idx)=VECTOR<T,3>(0,0,vel);vector_locations(idx)=grid.Z_Face(i,j,k);}}
 
@@ -108,7 +108,7 @@ Update()
         vector_locations.Resize(num_vectors);
 
         int idx=0;VECTOR<int,3> index;
-        for(index.x=cell_start.x;index.x<=cell_end.x;index.x+=inc)for(index.y=cell_start.y;index.y<=cell_end.y;index.y+=inc)for(index.z=cell_start.z;index.z<=cell_end.z;index.z+=inc){
+        for(index.x=cell_start.x;index.x<cell_end.x;index.x+=inc)for(index.y=cell_start.y;index.y<cell_end.y;index.y+=inc)for(index.z=cell_start.z;index.z<cell_end.z;index.z+=inc){
             idx++;
             vector_field(idx) = (T)0.5*VECTOR<T,3>(u(index)+u(index+VECTOR<int,3>(1,0,0)),
                                                     v(index)+v(index+VECTOR<int,3>(0,1,0)),

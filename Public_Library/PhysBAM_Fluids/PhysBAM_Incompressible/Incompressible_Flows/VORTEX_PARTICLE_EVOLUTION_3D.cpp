@@ -68,8 +68,8 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
             T radius=missing_vorticity_particles.radius(p);
             VECTOR<int,3> box_radius((int)(radius/grid.dX.x)+1,(int)(radius/grid.dX.y)+1,(int)(radius/grid.dX.z)+1);
             VECTOR<int,3> index=grid.Clamped_Index(missing_vorticity_particles.X(p));
-            VECTOR<int,3> lower=clamp_min(index-box_radius,VECTOR<int,3>(1,1,1)),upper=clamp_max(index+box_radius,grid.counts);
-            for(int i=lower.x;i<=upper.x;i++) for(int j=lower.y;j<=upper.y;j++) for(int ij=lower.z;ij<=upper.z;ij++){
+            VECTOR<int,3> lower=clamp_min(index-box_radius,VECTOR<int,3>(0,0,0)),upper=clamp_max(index+box_radius,grid.counts);
+            for(int i=lower.x;i<upper.x;i++) for(int j=lower.y;j<upper.y;j++) for(int ij=lower.z;ij<upper.z;ij++){
                 VECTOR<T,3> X_minus_Xp=grid.X(i,j,ij)-missing_vorticity_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
                 if(distance_squared>small_number&&distance_squared<=sqr(radius)) {
 //                    force(i,j,ij)-=(T)(force_scaling*Gaussian_Kernel(distance_squared)/sqrt(distance_squared))*VECTOR<T,3>::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}
@@ -81,13 +81,13 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
     
         // form grid vorticity from vortex particles
         scattered_interpolation.Transfer_To_Grid(vorticity_particles.X,vorticity_particles.vorticity,grid,grid_vorticity_particles);
-        if(remove_grid_vorticity_from_particle_vorticity) for(int i=0;i<=grid.counts.x+1;i++) for(int j=0;j<=grid.counts.y+1;j++) for(int ij=0;ij<=grid.counts.z+1;ij++) 
+        if(remove_grid_vorticity_from_particle_vorticity) for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++) 
             grid_vorticity_particles(i,j,ij)-=grid_vorticity(i,j,ij);
     
         // find vorticity magnitudes
         for(int i=grid_vorticity.domain.min_corner.x;i<grid_vorticity.domain.max_corner.x;i++)for(int j=grid_vorticity.domain.min_corner.y;j<grid_vorticity.domain.max_corner.y;j++)for(int ij=grid_vorticity.domain.min_corner.z;ij<grid_vorticity.domain.max_corner.z;ij++)
             grid_vorticity_magnitude(i,j,ij)=grid_vorticity(i,j,ij).Magnitude();
-        for(int i=0;i<=grid.counts.x+1;i++) for(int j=0;j<=grid.counts.y+1;j++) for(int ij=0;ij<=grid.counts.z+1;ij++)
+        for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
             grid_vorticity_particles_magnitude(i,j,ij)=grid_vorticity_particles(i,j,ij).Magnitude();
     
         // compute confinement force
@@ -123,7 +123,7 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
     LOG::Time("Advancing vorticity particles");
     
     ARRAY<VECTOR<T,3> ,VECTOR<int,3> > two_times_V_ghost(grid.Domain_Indices(2));
-    for(int i=-1;i<=grid.counts.x+2;i++) for(int j=-1;j<=grid.counts.y+2;j++) for(int ij=-1;ij<=grid.counts.z+2;ij++){
+    for(int i=-1;i<grid.counts.x+2;i++) for(int j=-1;j<grid.counts.y+2;j++) for(int ij=-1;ij<grid.counts.z+2;ij++){
         two_times_V_ghost(i,j,ij).x=face_velocities_ghost.Component(0)(i,j,ij)+face_velocities_ghost.Component(0)(i+1,j,ij);
         two_times_V_ghost(i,j,ij).y=face_velocities_ghost.Component(1)(i,j,ij)+face_velocities_ghost.Component(1)(i,j+1,ij);
         two_times_V_ghost(i,j,ij).z=face_velocities_ghost.Component(2)(i,j,ij)+face_velocities_ghost.Component(2)(i,j,ij+1);}
@@ -131,7 +131,7 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
     // vortex stretching/tilting term  - omega dot grad V
     ARRAY<MATRIX<T,3> ,VECTOR<int,3> > VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,MATRIX<T,3> > VX_interpolation;
     T one_over_four_dx=1/(4*grid.dX.x),one_over_four_dy=1/(4*grid.dX.y),one_over_four_dz=1/(4*grid.dX.z);
-    for(int i=0;i<=grid.counts.x+1;i++) for(int j=0;j<=grid.counts.y+1;j++) for(int ij=0;ij<=grid.counts.z+1;ij++)
+    for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
         VX(i,j,ij)=MATRIX<T,3>(one_over_four_dx*(two_times_V_ghost(i+1,j,ij)-two_times_V_ghost(i-1,j,ij)),
                                  one_over_four_dy*(two_times_V_ghost(i,j+1,ij)-two_times_V_ghost(i,j-1,ij)),
                                  one_over_four_dz*(two_times_V_ghost(i,j,ij+1)-two_times_V_ghost(i,j,ij-1)));

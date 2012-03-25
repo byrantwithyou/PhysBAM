@@ -126,11 +126,11 @@ Construct_Virtual_Nodes(EMBEDDED_OBJECT<TV,d>& embedded_object,ARRAY<int>& map_t
     // initialize virtual_node indices and update particles
     map_to_old_particles=IDENTITY_ARRAY<>(particles.Size());
     for(int p=0;p<virtual_nodes.replicas.m;p++){if(!virtual_nodes.replicas(p).m) continue;
-        int i=1;
+        int i=0;
         {VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
         if(!embedded_object.Node_Near_Material(virtual_node.corresponding_real_node)){i++; // reuse old virtual node
             virtual_node.index=virtual_node.corresponding_real_node;}}
-        for(;i<=virtual_nodes.replicas(p).m;i++){VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
+        for(;i<virtual_nodes.replicas(p).m;i++){VIRTUAL_NODE& virtual_node=virtual_nodes(virtual_nodes.replicas(p)(i));
             virtual_node.index=particles.Append(particles,virtual_node.corresponding_real_node); // duplicating particles produces more mass
             map_to_old_particles.Append(virtual_node.corresponding_real_node);}}
 

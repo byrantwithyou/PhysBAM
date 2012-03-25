@@ -52,13 +52,13 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         SPARSE_MATRIX_FLAT_NXN<T> global_A;
         global_A.n=global_rows;global_A.offsets.Resize(global_rows+1);
         {int current_row=1,current_index=1;global_A.offsets(0)=1;
-        for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++)
+        for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<partition_array(p).interior_indices.max_corner;i++)
             global_A.offsets(current_row++)=current_index+=A_array(p).offsets(i+1)-A_array(p).offsets(i);
         assert(current_row==global_rows+1 && global_A.offsets(current_row)==global_entries+1);}
         // assemble full linear system
         global_A.A.Resize(global_entries);
         VECTOR_ND<T> global_x(global_rows),global_b(global_rows);
-        for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<=partition_array(p).interior_indices.max_corner;i++){
+        for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<partition_array(p).interior_indices.max_corner;i++){
             int global_i=partition_array(p).Translate_Index(i);
             global_x(global_i)=x_array(p)(i);
             global_b(global_i)=b_array(p)(i);
@@ -71,9 +71,9 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         // take apart result
         for(int p=0;p<processors;p++){
             SPARSE_MATRIX_PARTITION& partition=partition_array(p);
-            for(int i=partition.interior_indices.min_corner;i<=partition.interior_indices.max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Interior_Index(i));
+            for(int i=partition.interior_indices.min_corner;i<partition.interior_indices.max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Interior_Index(i));
             for(int region=0;region<partition.number_of_sides;region++){
-                for(int i=partition.ghost_indices(region).min_corner;i<=partition.ghost_indices(region).max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Ghost_Index(i,region));}}
+                for(int i=partition.ghost_indices(region).min_corner;i<partition.ghost_indices(region).max_corner;i++) x_array(p)(i)=global_x(partition.Translate_Ghost_Index(i,region));}}
         // send result pieces
         ARRAY<MPI::Request> requests;
         for(int p=1;p<processors;p++)requests.Append(comm.Isend(&x_array(p)(0),x_array(p).n,MPI_UTILITIES::Datatype<T>(),p-1,tag));
@@ -264,7 +264,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank!=my_rank){
             temp_indices.Remove_All();
-            for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<=proc_column_index_boundaries(node_rank).y;column_index++)
+            for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<proc_column_index_boundaries(node_rank).y;column_index++)
                 if(column_needed(column_index)) temp_indices.Append(column_index);
             temp_indices.Compact();
             columns_to_receive(node_rank)=temp_indices;}}
@@ -307,7 +307,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
     for(int node_rank=0;node_rank<proc_column_index_boundaries.m;node_rank++){
         if(node_rank!=my_rank){
             temp_indices.Remove_All();
-            for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<=proc_column_index_boundaries(node_rank).y;column_index++)
+            for(int column_index=proc_column_index_boundaries(node_rank).x;column_index<proc_column_index_boundaries(node_rank).y;column_index++)
                 if(column_needed(column_index)) temp_indices.Append(column_index);
             temp_indices.Compact();
             columns_to_receive(node_rank)=temp_indices;}}

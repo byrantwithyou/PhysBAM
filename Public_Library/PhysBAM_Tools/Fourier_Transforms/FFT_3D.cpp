@@ -84,7 +84,7 @@ Transform(const ARRAY<T,VECTOR<int,3> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_
     data.Resize(2*grid.counts.x*grid.counts.y*grid.counts.z,false,false);
     int k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++){data(k++)=(float)u(i,j,ij);data(k++)=0;}
     NR_fourn(-1,dim,data);
-    k=0;for(int i=0;i<=grid.counts.x-1;i++) for(int j=0;j<=grid.counts.y-1;j++) {for(int ij=0;ij<=grid.counts.z/2;ij++){u_hat(i,j,ij).re=data(k++);u_hat(i,j,ij).im=data(k++);} k+=grid.counts.z-2;}
+    k=0;for(int i=0;i<grid.counts.x-1;i++) for(int j=0;j<grid.counts.y-1;j++) {for(int ij=0;ij<grid.counts.z/2;ij++){u_hat(i,j,ij).re=data(k++);u_hat(i,j,ij).im=data(k++);} k+=grid.counts.z-2;}
 }
 //#####################################################################
 // Function Inverse_Transform
@@ -95,10 +95,10 @@ Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<T,VECTOR<int,3>
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x*grid.counts.y*grid.counts.z,false,false);
     int k=0;
-    for(int i=0;i<=grid.counts.x-1;i++){int negi=(i==0)?0:grid.counts.x-i;
-        for(int j=0;j<=grid.counts.y-1;j++){int negj=(j==0)?0:grid.counts.y-j;
-            for(int ij=0;ij<=grid.counts.z/2;ij++){data(k++)=(float)u_hat(i,j,ij).re;data(k++)=(float)u_hat(i,j,ij).im;}
-            for(int ij=grid.counts.z/2+1;ij<=grid.counts.z-1;ij++){data(k++)=(float)u_hat(negi,negj,grid.counts.z-ij).re;data(k++)=-(float)u_hat(negi,negj,grid.counts.z-ij).im;}}}
+    for(int i=0;i<grid.counts.x-1;i++){int negi=(i==0)?0:grid.counts.x-i;
+        for(int j=0;j<grid.counts.y-1;j++){int negj=(j==0)?0:grid.counts.y-j;
+            for(int ij=0;ij<grid.counts.z/2;ij++){data(k++)=(float)u_hat(i,j,ij).re;data(k++)=(float)u_hat(i,j,ij).im;}
+            for(int ij=grid.counts.z/2+1;ij<grid.counts.z-1;ij++){data(k++)=(float)u_hat(negi,negj,grid.counts.z-ij).re;data(k++)=-(float)u_hat(negi,negj,grid.counts.z-ij).im;}}}
     NR_fourn(+1,dim,data);
     if(normalize) {T coefficient=T(1.)/(grid.counts.x*grid.counts.y*grid.counts.z);k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) {u(i,j,ij)=coefficient*data(k++);k++;}}
     else {k=0;for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) {u(i,j,ij)=data(k++);k++;}}
@@ -137,9 +137,9 @@ template<class T> void FFT_3D<T>::
 First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& ux_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& uy_hat,ARRAY<COMPLEX<T> ,VECTOR<int,3> >& uz_hat) const
 {
     VECTOR<T,3> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
-    for(int i=0;i<=grid.counts.x-1;i++){T k1=coefficients.x*(i<=grid.counts.x/2?i:i-grid.counts.x);
-        for(int j=0;j<=grid.counts.y-1;j++){T k2=coefficients.y*(j<=grid.counts.y/2?j:j-grid.counts.y);
-            for(int ij=0;ij<=grid.counts.z/2;ij++){T k3=coefficients.z*ij;
+    for(int i=0;i<grid.counts.x-1;i++){T k1=coefficients.x*(i<grid.counts.x/2?i:i-grid.counts.x);
+        for(int j=0;j<grid.counts.y-1;j++){T k2=coefficients.y*(j<grid.counts.y/2?j:j-grid.counts.y);
+            for(int ij=0;ij<grid.counts.z/2;ij++){T k3=coefficients.z*ij;
                 ux_hat(i,j,ij)=uy_hat(i,j,ij)=uz_hat(i,j,ij)=u_hat(i,j,ij).Rotated_Counter_Clockwise_90();
                 ux_hat(i,j,ij)*=k1;uy_hat(i,j,ij)*=k2;uz_hat(i,j,ij)*=k3;}}}
     Enforce_Real_Valued_Symmetry(ux_hat);Enforce_Real_Valued_Symmetry(uy_hat);Enforce_Real_Valued_Symmetry(uz_hat);
@@ -154,13 +154,13 @@ Make_Divergence_Free(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,ARRAY<COMPLEX<T> ,
     VECTOR<T,3> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
     // front face - i.e. z=0
     for(int i=0;i<grid.counts.x/2;i++) u_hat(i,0,0)=COMPLEX<T>(0,0); // u=0 on the bottom
-    for(int i=0;i<=grid.counts.x-1;i++){T k1=coefficients.x*(i<=grid.counts.x/2?i:i-grid.counts.x);
+    for(int i=0;i<grid.counts.x-1;i++){T k1=coefficients.x*(i<grid.counts.x/2?i:i-grid.counts.x);
         for(int j=0;j<grid.counts.y/2;j++){T k2=coefficients.y*j,one_over_k_squared=1/(sqr(k1)+sqr(k2));
             COMPLEX<T> correction=(k1*u_hat(i,j,0)+k2*v_hat(i,j,0))*one_over_k_squared;
             u_hat(i,j,0)-=correction*k1;v_hat(i,j,0)-=correction*k2;}}
     // volume
-    for(int i=0;i<=grid.counts.x-1;i++){T k1=coefficients.x*(i<=grid.counts.x/2?i:i-grid.counts.x);
-        for(int j=0;j<=grid.counts.y-1;j++){T k2=coefficients.y*(j<=grid.counts.y/2?j:j-grid.counts.y);
+    for(int i=0;i<grid.counts.x-1;i++){T k1=coefficients.x*(i<grid.counts.x/2?i:i-grid.counts.x);
+        for(int j=0;j<grid.counts.y-1;j++){T k2=coefficients.y*(j<grid.counts.y/2?j:j-grid.counts.y);
             for(int ij=0;ij<grid.counts.z/2;ij++){T k3=coefficients.z*ij,one_over_k_squared=1/(sqr(k1)+sqr(k2)+sqr(k3));
                 COMPLEX<T> correction=(k1*u_hat(i,j,ij)+k2*v_hat(i,j,ij)+k3*w_hat(i,j,ij))*one_over_k_squared;
                 u_hat(i,j,ij)-=correction*k1;v_hat(i,j,ij)-=correction*k2;w_hat(i,j,ij)-=correction*k3;}}}
@@ -177,12 +177,12 @@ Filter_High_Frequencies(ARRAY<COMPLEX<T> ,VECTOR<int,3> >& u_hat,T scale) const
     for(int i=0;i<grid.counts.x/2;i++){ // skip the (0,0) case
         T temp=scale*coefficient*i,damping=sinc(temp);
         u_hat(i,0,0)*=damping;}
-    for(int i=0;i<=grid.counts.x-1;i++){T i_frequency=T(i<=grid.counts.x/2 ? i:i-grid.counts.x);
+    for(int i=0;i<grid.counts.x-1;i++){T i_frequency=T(i<grid.counts.x/2 ? i:i-grid.counts.x);
         for(int j=0;j<grid.counts.y/2;j++){T j_frequency=(T)j;
             T temp=scale*coefficient*sqrt(sqr(i_frequency)+sqr(j_frequency)),damping=sinc(temp);
             u_hat(i,j,0)*=damping;}}
-    for(int i=0;i<=grid.counts.x-1;i++){T i_frequency=T(i<=grid.counts.x/2 ? i:i-grid.counts.x);
-        for(int j=0;j<=grid.counts.y-1;j++){T j_frequency=T(j<=grid.counts.y/2 ? j:j-grid.counts.y);
+    for(int i=0;i<grid.counts.x-1;i++){T i_frequency=T(i<grid.counts.x/2 ? i:i-grid.counts.x);
+        for(int j=0;j<grid.counts.y-1;j++){T j_frequency=T(j<grid.counts.y/2 ? j:j-grid.counts.y);
             for(int ij=0;ij<grid.counts.z/2;ij++){T ij_frequency=(T)ij;
                 T temp=scale*coefficient*sqrt(sqr(i_frequency)+sqr(j_frequency)+sqr(ij_frequency)),damping=sinc(temp);
                 u_hat(i,j,ij)*=damping;}}}

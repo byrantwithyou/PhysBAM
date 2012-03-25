@@ -75,11 +75,11 @@ public:
     // template<class RW> void Read(std::istream& input)
     // {Read_Binary<RW>(input,n,number_of_active_indices);
     // delete[] indices;delete[] x;indices=new int[number_of_active_indices+1];x=new T[number_of_active_indices+1];
-    // for(int i=0;i<=number_of_active_indices;i++){Read_Binary<RW>(input,indices[i]);Read_Binary<RW>(input,x[i]);}}
+    // for(int i=0;i<number_of_active_indices;i++){Read_Binary<RW>(input,indices[i]);Read_Binary<RW>(input,x[i]);}}
 
     // template<class RW> void Write(std::ostream& output) const
     // {Write_Binary<RW>(output,n,number_of_active_indices);
-    // for(int i=0;i<=number_of_active_indices;i++){Write_Binary<RW>(output,indices[i]);Write_Binary<RW>(output,x[i]);}}
+    // for(int i=0;i<number_of_active_indices;i++){Write_Binary<RW>(output,indices[i]);Write_Binary<RW>(output,x[i]);}}
 //#####################################################################
 };
 template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const SPARSE_VECTOR_ND<T>& v)

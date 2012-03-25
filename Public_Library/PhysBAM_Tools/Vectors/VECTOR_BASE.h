@@ -171,7 +171,7 @@ public:
     {T result=0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
     T Max_Abs(int start_index,int end_index) const
-    {T result=0;for(int i=start_index;i<=end_index;i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
+    {T result=0;for(int i=start_index;i<end_index;i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
     T Normalize()
     {Static_Assert_Not_Small();T magnitude=Magnitude();if(magnitude) Derived()*=1/magnitude;else{Set_Zero();(*this)(0)=(T)1;}return magnitude;}

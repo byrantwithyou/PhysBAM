@@ -85,7 +85,7 @@ Transform(const ARRAY<T,VECTOR<int,1> >& u,ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_
     data.Resize(2*grid.counts.x,false,false);
     for(int i=0,k=0;i<grid.counts.x;i++){data(k++)=(float)u(i);data(k++)=0;}
     NR_fourn(-1,dim,data);
-    for(int i=0,k=0;i<=grid.counts.x/2;i++){u_hat(i).re=data(k++);u_hat(i).im=data(k++);}
+    for(int i=0,k=0;i<grid.counts.x/2;i++){u_hat(i).re=data(k++);u_hat(i).im=data(k++);}
 }
 //#####################################################################
 // Function Inverse_Transform
@@ -96,8 +96,8 @@ Inverse_Transform(ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<T,VECTOR<int,1>
     ARRAY<int> dim(grid.counts);
     data.Resize(2*grid.counts.x,false,false);
     int k=0;
-    for(int i=0;i<=grid.counts.x/2;i++){data(k++)=(float)u_hat(i).re;data(k++)=(float)u_hat(i).im;}
-    for(int i=grid.counts.x/2+1;i<=grid.counts.x-1;i++){data(k++)=(float)u_hat(grid.counts.x-i).re;data(k++)=-(float)u_hat(grid.counts.x-i).im;}
+    for(int i=0;i<grid.counts.x/2;i++){data(k++)=(float)u_hat(i).re;data(k++)=(float)u_hat(i).im;}
+    for(int i=grid.counts.x/2+1;i<grid.counts.x-1;i++){data(k++)=(float)u_hat(grid.counts.x-i).re;data(k++)=-(float)u_hat(grid.counts.x-i).im;}
     NR_fourn(+1,dim,data);
     if(normalize){T coefficient=(T)1/grid.counts.x;k=0;for(int i=0,k=0;i<grid.counts.x;i++){u(i)=coefficient*data(k++);k++;}}
     else for(int i=0,k=0;i<grid.counts.x;i++){u(i)=data(k++);k++;}
@@ -122,7 +122,7 @@ template<class T> void FFT_1D<T>::
 First_Derivatives(const ARRAY<COMPLEX<T> ,VECTOR<int,1> >& u_hat,ARRAY<COMPLEX<T> ,VECTOR<int,1> >& ux_hat) const
 {
     VECTOR<T,1> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
-    for(int i=0;i<=grid.counts.x/2;i++){T k=coefficients.x*i;
+    for(int i=0;i<grid.counts.x/2;i++){T k=coefficients.x*i;
         ux_hat(i)=k*u_hat(i).Rotated_Counter_Clockwise_90();}
     Enforce_Real_Valued_Symmetry(ux_hat);
 }

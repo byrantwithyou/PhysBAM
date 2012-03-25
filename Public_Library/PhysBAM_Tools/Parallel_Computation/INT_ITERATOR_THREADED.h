@@ -34,7 +34,7 @@ public:
 #ifdef USE_PTHREADS
         int min_value=start_index,max_value=end_index;
         int local_start_index,local_end_index;
-        for(int i=min_value;i<=max_value;i+=row_jump){
+        for(int i=min_value;i<max_value;i+=row_jump){
             local_start_index=min(i,max_value);local_end_index=min(i+row_jump-1,max_value);
             INT_ITERATOR_TASK<TYPE>* task=new INT_ITERATOR_TASK<TYPE>(threaded_class,local_start_index,local_end_index);
             thread_queue->Queue(task);}
@@ -66,7 +66,7 @@ public:
             row_jump=(end_index-start_index+1)/number_of_intervals+1;
             int min_value=start_index,max_value=end_index;
             int local_start_index,local_end_index;
-            for(int i=min_value;i<=max_value;i+=row_jump){
+            for(int i=min_value;i<max_value;i+=row_jump){
                 local_start_index=min(i,max_value);local_end_index=min(i+row_jump-1,max_value);
                 intervals.Append(INTERVAL<int>(local_start_index,local_end_index));}}
         else intervals.Append(INTERVAL<int>(start_index,end_index));

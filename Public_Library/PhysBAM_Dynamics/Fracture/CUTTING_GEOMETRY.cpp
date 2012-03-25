@@ -138,7 +138,7 @@ namespace{
 
         const SEGMENT_MESH& cutting_mesh=cutting.cutting.mesh;
         ARRAY<int> tri_intersection_list;
-        for(int i=cutting.first_new_cut_element;i<=cutting_mesh.elements.m;i++) for(int j=0;j<2;j++){
+        for(int i=cutting.first_new_cut_element;i<cutting_mesh.elements.m;i++) for(int j=0;j<2;j++){
             int node=cutting_mesh.elements(i)(j);if((*cutting_mesh.incident_elements)(node).m==1){ // vertex has only the new cutting segment incident on it so add fake segment
                 // find intersections
                 ARRAY<int> intersecting_triangles;
@@ -269,7 +269,7 @@ namespace{
         cutting.simplex_stack_per_current_embedding_simplex.Clean_Memory();cutting.simplex_stack_per_current_embedding_simplex.Resize(cutting.current_embedding->mesh.elements.Size());
         // iterate over every new triangle
         ARRAY<int> intersection_list;
-        for(int cutting_simplex_index=cutting.first_new_cut_element;cutting_simplex_index<=cutting.cutting.mesh.elements.m;cutting_simplex_index++){
+        for(int cutting_simplex_index=cutting.first_new_cut_element;cutting_simplex_index<cutting.cutting.mesh.elements.m;cutting_simplex_index++){
             ARRAY<int> intersecting_embedding_simplices;
             // find intersections
             const VECTOR<int,d_cut+1>& cut_nodes=cutting.cutting.mesh.elements(cutting_simplex_index);

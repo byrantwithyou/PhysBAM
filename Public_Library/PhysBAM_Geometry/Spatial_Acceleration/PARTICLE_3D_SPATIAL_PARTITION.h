@@ -63,7 +63,7 @@ public:
     void Get_Particles_Within_Interaction_Radius(const int particle_index,ARRAY<int>& interacting_particle_indices,bool only_higher_indices=false)
     {VECTOR<int,3> voxel=Voxel(particle_index);
     interacting_particle_indices.Remove_All();
-    for(int i=voxel.x-1;i<=voxel.x+1;i++) for(int j=voxel.y-1;j<=voxel.y+1;j++) for(int k=voxel.z-1;k<=voxel.z+1;k++){
+    for(int i=voxel.x-1;i<voxel.x+1;i++) for(int j=voxel.y-1;j<voxel.y+1;j++) for(int k=voxel.z-1;k<voxel.z+1;k++){
         ARRAY<int>* occupancy_list=0;
         if(hashtable.Get(VECTOR<int,3>(i,j,k),occupancy_list)) for(int t=0;t<occupancy_list->m;t++){
             int index=(*occupancy_list)(t);
@@ -95,7 +95,7 @@ private:
     {VECTOR<int,3> voxel;if(!Next_Voxel_To_Process(voxel,main_list)) return false;
     assert(main_list->m > 0);   // should at least have one particle in it
     main_list_index=0;int index=0;
-    for(int i=voxel.x-1;i<=voxel.x+1;i++) for(int j=voxel.y-1;j<=voxel.y+1;j++) for(int k=voxel.z-1;k<=voxel.z+1;k++){
+    for(int i=voxel.x-1;i<voxel.x+1;i++) for(int j=voxel.y-1;j<voxel.y+1;j++) for(int k=voxel.z-1;k<voxel.z+1;k++){
         if(i==voxel.x&&j==voxel.y&&k==voxel.z) continue;
         ARRAY<int>* occupancy_list=0;
         if(hashtable.Get(VECTOR<int,3>(i,j,k),occupancy_list)){neighbor_lists[index]=occupancy_list;neighbor_lists_index[index]=1;index++;}}

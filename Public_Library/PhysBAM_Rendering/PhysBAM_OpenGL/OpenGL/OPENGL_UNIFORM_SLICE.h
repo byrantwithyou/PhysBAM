@@ -52,7 +52,7 @@ public:
     {
         grid=grid_input;
         mode=NO_SLICE;
-        axis=3;
+        axis=2;
         index=grid_input.counts.z/2;
         Update_Clip_Planes();
     }
@@ -62,8 +62,8 @@ public:
         mode=mode_input;
         if(Is_Slice_Mode()) {
             // keep current values of axis and slice number as long as they're in range
-            axis=clamp(axis,1,3);
-            index=clamp(index,1,Maximum_Slice_Index_In_Current_Mode());
+            axis=clamp(axis,0,2);
+            index=clamp(index,0,Maximum_Slice_Index_In_Current_Mode());
         }
         Update_Clip_Planes();
     }

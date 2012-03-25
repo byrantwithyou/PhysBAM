@@ -27,7 +27,7 @@ Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
 {
     RANGE<TV_INT> domain(grid.Domain_Indices());
     int min_value=domain.min_corner.x,max_value=domain.max_corner.x;
-    for(int i=min_value;i<=max_value;i+=row_jump){
+    for(int i=min_value;i<max_value;i+=row_jump){
         domain.min_corner.x=min(i,max_value);domain.max_corner.x=min(i+row_jump-1,max_value);
         ADVECTION_SEMI_LAGRANGIAN_TASK_NODE<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>* task=
             new ADVECTION_SEMI_LAGRANGIAN_TASK_NODE<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>(grid,Z,Z_ghost,V,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max,domain);
@@ -42,7 +42,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
 {
     RANGE<TV_INT> domain(grid.Domain_Indices());
     int min_value=domain.min_corner.x,max_value=domain.max_corner.x;
-    for(int i=min_value;i<=max_value;i+=row_jump){
+    for(int i=min_value;i<max_value;i+=row_jump){
         domain.min_corner.x=min(i,max_value);domain.max_corner.x=min(i+row_jump-1,max_value);
         ADVECTION_SEMI_LAGRANGIAN_TASK_CELL<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>* task=
             new ADVECTION_SEMI_LAGRANGIAN_TASK_CELL<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>(grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max,domain);
@@ -58,7 +58,7 @@ Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z
     for(int i=0;i<TV::dimension;i++){
         RANGE<TV_INT> domain(grid.Domain_Indices());
         int min_value=domain.min_corner(i),max_value=domain.max_corner(i)+1;
-        for(int j=min_value;j<=max_value;j+=row_jump){
+        for(int j=min_value;j<max_value;j+=row_jump){
             domain.min_corner(i)=j;domain.max_corner(i)=min(j+row_jump-1,max_value);
             ADVECTION_SEMI_LAGRANGIAN_TASK_FACE<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>* task=
                 new ADVECTION_SEMI_LAGRANGIAN_TASK_FACE<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>(grid,Z,Z_ghost,face_velocities,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max,domain,i);

@@ -23,8 +23,8 @@ Generate_Random_Turbulence(const GRID<VECTOR<T,2> >& grid,ARRAY<T,VECTOR<int,2> 
     ARRAY<COMPLEX<T> ,VECTOR<int,2> > u_hat(0,m-1,0,n/2),v_hat(0,m-1,0,n/2);
     
     T two_pi=(T)(2*pi);VECTOR<T,2> coefficients=two_pi/grid.domain.Edge_Lengths();
-    for(int i=0;i<=m-1;i++) for(int j=0;j<=n/2;j++){
-        T k1=coefficients.x*(i<=m/2 ? i:i-m),k2=coefficients.y*j,k=sqrt(sqr(k1)+sqr(k2));
+    for(int i=0;i<m-1;i++) for(int j=0;j<n/2;j++){
+        T k1=coefficients.x*(i<m/2 ? i:i-m),k2=coefficients.y*j,k=sqrt(sqr(k1)+sqr(k2));
         T area=two_pi*k; // circumference in 2D
         T energy=0;
         if(k > k_inertial) energy=constant*pow(epsilon,(T)two_thirds)*pow((T)k,-(T)five_thirds)/area;
@@ -58,8 +58,8 @@ Generate_Random_Turbulence(const GRID<VECTOR<T,3> >& grid,ARRAY<T,VECTOR<int,3> 
     ARRAY<COMPLEX<T> ,VECTOR<int,3> > u_hat(0,m-1,0,n-1,0,mn/2),v_hat(0,m-1,0,n-1,0,mn/2),w_hat(0,m-1,0,n-1,0,mn/2);
     
     T four_pi=(T)(4*pi);VECTOR<T,3> coefficients=(T)(2*pi)/grid.domain.Edge_Lengths();
-    for(int i=0;i<=m-1;i++) for(int j=0;j<=n-1;j++) for(int ij=0;ij<=mn/2;ij++){
-        T k1=coefficients.x*(i<=m/2 ? i:i-m),k2=coefficients.y*(j<=n/2 ? j:j-n),k3=coefficients.z*ij;
+    for(int i=0;i<m-1;i++) for(int j=0;j<n-1;j++) for(int ij=0;ij<mn/2;ij++){
+        T k1=coefficients.x*(i<m/2 ? i:i-m),k2=coefficients.y*(j<n/2 ? j:j-n),k3=coefficients.z*ij;
         T k=sqrt(sqr(k1)+sqr(k2)+sqr(k3));
         T area=four_pi*sqr(k);
         T energy=0;

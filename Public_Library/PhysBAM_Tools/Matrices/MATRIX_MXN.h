@@ -176,7 +176,7 @@ public:
     {MATRIX_MXN<T> result(u.n,v.n);for(int i=0;i<u.n;i++) for(int j=0;j<v.n;j++) result(i,j)=u(i)*v(j);return result;}
 
     MATRIX_MXN<T> Normal_Equations_Matrix() const
-    {MATRIX_MXN<T> result(n);for(int j=0;j<n;j++) for(int i=j;i<=n;i++){T a=0;for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);result(i,j)=result(j,i)=a;}return result;}
+    {MATRIX_MXN<T> result(n);for(int j=0;j<n;j++) for(int i=j;i<n;i++){T a=0;for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);result(i,j)=result(j,i)=a;}return result;}
 
     VECTOR_ND<T> Normal_Equations_Solve(const VECTOR_ND<T>& b) const
     {MATRIX_MXN<T> A_transpose_A(Normal_Equations_Matrix());VECTOR_ND<T> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}

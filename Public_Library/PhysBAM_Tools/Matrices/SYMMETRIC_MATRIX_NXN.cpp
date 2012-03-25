@@ -131,7 +131,7 @@ In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L)
 {
     L=MATRIX_MXN<T>(n);
     for(int j=0;j<n;j++){ // for each column
-        for(int k=0;k<j-1;k++) for(int i=j;i<=n;i++) Element_Lower(i,j)-=L(j,k)*L(i,k); // subtract off the known stuff in previous columns
+        for(int k=0;k<j-1;k++) for(int i=j;i<n;i++) Element_Lower(i,j)-=L(j,k)*L(i,k); // subtract off the known stuff in previous columns
         L(j,j)=sqrt(Element_Lower(j,j));
         T diagonal_inverse=1/L(j,j);
         for(int i=j+1;i<n;i++) L(i,j)=Element_Lower(i,j)*diagonal_inverse;} // update L

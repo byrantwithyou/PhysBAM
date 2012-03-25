@@ -364,7 +364,7 @@ Solve_Dot(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRA
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Subtract(VECTOR_ND<T>& vector,const T sum,int start_index,int end_index)
 {
-    for(int i=start_index;i<=end_index;i++) vector(i)-=sum;
+    for(int i=start_index;i<end_index;i++) vector(i)-=sum;
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Sum(VECTOR_ND<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid)
@@ -384,14 +384,14 @@ Threaded_Max(VECTOR_ND<T>& vector,ARRAY<T>& sum,int start_index,int end_index,in
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_One(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T sum,int start_index,int end_index)
 {
-    for(int i=start_index;i<=end_index;i++) x(i)-=sum;
+    for(int i=start_index;i<end_index;i++) x(i)-=sum;
     A.Times(start_index,end_index,p,temp);
-    for(int i=start_index;i<=end_index;i++) b(i)-=temp(i);
+    for(int i=start_index;i<end_index;i++) b(i)-=temp(i);
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_Two(VECTOR_ND<T>& z,T rho,T rho_old,int iteration,int start_index,int end_index)
 {
-    T beta=0;if(iteration==0){for(int i=start_index;i<=end_index;i++) p(i)=z(i);}else{beta=(T)(rho/rho_old);for(int i=start_index;i<=end_index;i++) p(i)=z(i)+beta*p(i);}
+    T beta=0;if(iteration==0){for(int i=start_index;i<end_index;i++) p(i)=z(i);}else{beta=(T)(rho/rho_old);for(int i=start_index;i<end_index;i++) p(i)=z(i)+beta*p(i);}
 }
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_Three(SPARSE_MATRIX_FLAT_NXN<T>& A,int start_index,int end_index)
@@ -401,7 +401,7 @@ Threaded_Part_Three(SPARSE_MATRIX_FLAT_NXN<T>& A,int start_index,int end_index)
 template<class TV> void PCG_SPARSE_THREADED<TV>::
 Threaded_Part_Four(VECTOR_ND<T>& x,VECTOR_ND<T>& b,T alpha,int start_index,int end_index)
 {
-    for(int i=start_index;i<=end_index;i++){x(i)+=alpha*p(i);b(i)-=alpha*temp(i);}
+    for(int i=start_index;i<end_index;i++){x(i)+=alpha*p(i);b(i)-=alpha*temp(i);}
 }
 //#####################################################################
 template class PCG_SPARSE_THREADED<VECTOR<float,1> >;

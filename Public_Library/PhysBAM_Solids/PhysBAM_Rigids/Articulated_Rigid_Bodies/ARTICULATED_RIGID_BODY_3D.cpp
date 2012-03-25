@@ -108,7 +108,7 @@ Compute_Position_Based_State(const T dt,const T time)
     for(int i=0;i<dynamic_rigid_body_particles.m;i++){int p=dynamic_rigid_body_particles(i);
         RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(p);SYMMETRIC_MATRIX<T,3> I_inverse=rigid_body.World_Space_Inertia_Tensor_Inverse();
         int id=rigid_body.particle_index;
-        for(int i=0;i<joints_on_rigid_body(id).m;i++) for(int j=i;j<=joints_on_rigid_body(id).m;j++){
+        for(int i=0;i<joints_on_rigid_body(id).m;i++) for(int j=i;j<joints_on_rigid_body(id).m;j++){
             int joint_index_1=joints_on_rigid_body(id)(i).x,joint_index_2=joints_on_rigid_body(id)(j).x;
 
             // joints that won't take part in global post stabilization are skipped

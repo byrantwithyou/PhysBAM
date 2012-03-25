@@ -87,7 +87,7 @@ Update_With_Breadth_First_Directed_Graph(const int root,const int node_to_propag
         Update_Child_From_Parents(node_to_propagate_from,breadth_first_directed_graph->Parents(node_to_propagate_from));
         ARRAY<bool> changed(breadth_first_directed_graph->Number_Of_Levels());
         int start_level=breadth_first_directed_graph->Level_Of_Node(node_to_propagate_from)+1;changed(start_level-1)=true;
-        for(int k=start_level;k<=breadth_first_directed_graph->Number_Of_Levels();k++){
+        for(int k=start_level;k<breadth_first_directed_graph->Number_Of_Levels();k++){
             int child=breadth_first_directed_graph->Nodes_In_Level(k)(1);ARRAY<int>& parents=breadth_first_directed_graph->Parents(child);
             bool parent_changed=false;for(int i=0;i<parents.m;i++) if(changed(Value(parents(i)))){parent_changed=true;break;} // TODO: this looks broken!
             if(parent_changed) Update_Child_From_Parents(child,parents);}}

@@ -160,7 +160,7 @@ public:
     {
         int frame=(int)(time*motion_frame_rate)+1;
         T alpha=time*motion_frame_rate-frame+1;
-        for(int i=start_particles;i<=number_particles;i++){
+        for(int i=start_particles;i<number_particles;i++){
             X(i)=TV();
             for(int j=0;j<body_motion.trajectories.m;j++){
                 FRAME<TV> transform=FRAME<TV>::Interpolation(body_motion.trajectories(j)(frame).targeted_transform,body_motion.trajectories(j)(frame+1).targeted_transform,alpha);

@@ -109,7 +109,7 @@ void Map_Inside(const RANGE<VECTOR<T,3> >& box,HELPER_T pointer) const
 {
     int i_min,j_min,ij_min,i_max,j_max,ij_max;
     grid.Cell(box.Minimum_Corner(),i_min,j_min,ij_min,0);grid.Cell(box.Maximum_Corner(),i_max,j_max,ij_max,0);
-    for(int i=i_min;i<=i_max;i++)for(int j=j_min;j<=j_max;j++)for(int ij=ij_min;ij<=ij_max;ij++) if(cells(i,j,ij)) pointer->Callback(box,*cells(i,j,ij));
+    for(int i=i_min;i<i_max;i++)for(int j=j_min;j<j_max;j++)for(int ij=ij_min;ij<ij_max;ij++) if(cells(i,j,ij)) pointer->Callback(box,*cells(i,j,ij));
 }
 //#####################################################################
 };

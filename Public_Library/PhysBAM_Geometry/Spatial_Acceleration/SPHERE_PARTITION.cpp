@@ -72,7 +72,7 @@ Set_Up_Grid(const int m,const int n,const int mn)
         int i_start=max(1,i_left-i_range),i_end=min(grid.counts.x-1,i_left+i_range),j_start=max(1,j_bottom-j_range),
              j_end=min(grid.counts.y-1,j_bottom+j_range),ij_start=max(1,ij_front-ij_range),ij_end=min(grid.counts.z-1,ij_front+ij_range);
         // map out the cells that get the sphere
-        for(int i=i_start;i<=i_end;i++) for(int j=j_start;j<=j_end;j++) for(int ij=ij_start;ij<=ij_end;ij++){
+        for(int i=i_start;i<i_end;i++) for(int j=j_start;j<j_end;j++) for(int ij=ij_start;ij<ij_end;ij++){
             if(!voxel_sphere_list(i,j,ij)) voxel_sphere_list(i,j,ij)=new ARRAY<int>();
             voxel_sphere_list(i,j,ij)->Append(k);}}
 }

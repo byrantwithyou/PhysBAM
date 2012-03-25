@@ -539,7 +539,7 @@ GLenum OPENGL_WORLD::Add_Clipping_Plane(const PLANE<float> &plane)
 //#####################################################################
 void OPENGL_WORLD::Set_Clipping_Plane(GLenum id,const PLANE<float> &plane)
 {
-    int index=id-GL_CLIP_PLANE0+1;
+    int index=id-GL_CLIP_PLANE0;
     PHYSBAM_ASSERT(clipping_planes(index));
     *clipping_planes(index)=plane;
 }
@@ -548,7 +548,7 @@ void OPENGL_WORLD::Set_Clipping_Plane(GLenum id,const PLANE<float> &plane)
 //#####################################################################
 void OPENGL_WORLD::Remove_Clipping_Plane(GLenum id)
 {
-    int index=id-GL_CLIP_PLANE0+1;
+    int index=id-GL_CLIP_PLANE0;
     PHYSBAM_ASSERT(clipping_planes(index));
     delete clipping_planes(index);clipping_planes(index)=0;
 }

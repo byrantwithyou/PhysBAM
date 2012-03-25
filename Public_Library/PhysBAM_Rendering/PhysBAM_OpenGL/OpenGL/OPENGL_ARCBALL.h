@@ -125,7 +125,7 @@ private:
     glMatrixMode(GL_PROJECTION);glPushMatrix();glLoadIdentity();
     glDepthMask(0);glDisable(GL_DEPTH_TEST);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-    for (i=0;i<=NSEGS;i++){pts[i].y*=(T)world->window->Width()/(T)world->window->Height();OpenGL_Vertex(sphere_center+(T)4.8*sphere.radius*pts[i],vertices);}
+    for (i=0;i<NSEGS;i++){pts[i].y*=(T)world->window->Width()/(T)world->window->Height();OpenGL_Vertex(sphere_center+(T)4.8*sphere.radius*pts[i],vertices);}
     OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices); 
     glPopMatrix();glMatrixMode(GL_MODELVIEW);glPopMatrix();
     glDepthMask(1);glEnable(GL_DEPTH_TEST);}
@@ -144,7 +144,7 @@ private:
     glDepthMask(0);glDisable(GL_DEPTH_TEST);
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
     TV camera=TV(world->Get_Camera_Position()-world->Get_Target_Position()).Normalized();
-    for (i=0;i<=NSEGS;i++){
+    for (i=0;i<NSEGS;i++){
         if(TV::Dot_Product(qDown.Rotate(pts[i]),camera)>-1e-8||TV::Dot_Product(qNow.Rotate(pts[i]),camera)>1e-8) OpenGL_Vertex(sphere_center+qNow.Rotate(radius*pts[i]),vertices);
         else{OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices);vertices.Resize(0);}}
     OpenGL_Draw_Arrays(GL_LINE_STRIP,3,vertices); 

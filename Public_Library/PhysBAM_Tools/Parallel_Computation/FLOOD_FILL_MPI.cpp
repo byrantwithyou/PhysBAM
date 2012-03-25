@@ -134,7 +134,7 @@ Synchronize_Colors()
     color_ranks.Resize(number_of_regions);
     for(int r=0;r<mpi_grid.number_of_processes;r++){
         int start=end+1;end+=global_color_counts(r+1);
-        for(int i=start;i<=end;i++)color_ranks(global_to_final_color_map(i)).Append_Unique(r);}
+        for(int i=start;i<end;i++)color_ranks(global_to_final_color_map(i)).Append_Unique(r);}
     for(int color=0;color<color_ranks.m;color++) assert(color_ranks(color).m>1 || mpi_grid.side_neighbor_ranks.Contains(mpi_grid.rank));
 
     // remap colors
@@ -233,7 +233,7 @@ Synchronize_Colors_Threaded()
     color_ranks.Resize(number_of_regions);
     for(int r=0;r<mpi_grid.number_of_processes;r++){
         int start=end+1;end+=global_color_counts(r+1);
-        for(int i=start;i<=end;i++)color_ranks(global_to_final_color_map(i)).Append_Unique(r);}
+        for(int i=start;i<end;i++)color_ranks(global_to_final_color_map(i)).Append_Unique(r);}
     for(int color=0;color<color_ranks.m;color++) assert(color_ranks(color).m>1 || mpi_grid.side_neighbor_ranks.Contains(mpi_grid.rank));
 
     // remap colors
@@ -303,8 +303,8 @@ Find_Global_Colors_Helper::Apply(const T_MPI_GRID& mpi_grid,const T_GRID& local_
         if(mpi_grid.side_neighbor_ranks(side)!=MPI::PROC_NULL){
             typename T_GRID::BOX_HORIZONTAL_INT face_region=boundary_regions(side);if(axis_side) face_region+=T_GRID::VECTOR_HORIZONTAL_INT::Axis_Vector(horizontal_axis);
             for(T_FACE face(local_grid,face_region);face;face++)if(!psi_N(face.Face())){int c1=face.cell1.Cell(),c2=face.cell2.Cell();
-                for(int i=0;i<=face.cell1.Long();i++)color_is_global(colors(c1+i))=true;
-                for(int i=0;i<=face.cell2.Long();i++)color_is_global(colors(c2+i))=true;}}}
+                for(int i=0;i<face.cell1.Long();i++)color_is_global(colors(c1+i))=true;
+                for(int i=0;i<face.cell2.Long();i++)color_is_global(colors(c2+i))=true;}}}
 }
 //#####################################################################
 // Function Translate_Local_Colors_To_Global_Colors

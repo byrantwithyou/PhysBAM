@@ -88,13 +88,13 @@ Display(const int in_color) const
             VECTOR<T,3> pos_start=grid.Node(i_start,j_start,k_start);
 
             glPushName(1);
-            for (i=i_start, x=pos_start.x; i<=i_end; i++, x+=grid.dX.x)
+            for (i=i_start, x=pos_start.x; i<i_end; i++, x+=grid.dX.x)
             {
                 glPushName(i);
-                for (j=j_start, y=pos_start.y; j<=j_end; j++, y+=grid.dX.y)
+                for (j=j_start, y=pos_start.y; j<j_end; j++, y+=grid.dX.y)
                 {
                     glPushName(j);
-                    for (k=k_start, z=pos_start.z; k<=k_end; k++, z+=grid.dX.z)
+                    for (k=k_start, z=pos_start.z; k<k_end; k++, z+=grid.dX.z)
                     {
                         VECTOR<T,3> min_corner(x,y,z);
                         glPushName(k);
@@ -190,27 +190,27 @@ Draw_Subgrid(const VECTOR<int,3> &node_start,const VECTOR<int,3> &node_end) cons
     int i,j,k;
     T x,y,z;
 
-    VECTOR<T,3> start_position=grid.Node(node_start),end_position=grid.Node(node_end);
+    VECTOR<T,3> start_position=grid.Node(node_start),end_position=grid.Node(node_end-1);
 
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
 
     if(node_start.z!=node_end.z)
-        for (i=node_start.x, x=start_position.x; i<=node_end.x; i++, x+=grid.dX.x)
-            for (j=node_start.y, y=start_position.y; j<=node_end.y; j++, y+=grid.dX.y)
+        for (i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
+            for (j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
             {
                 OpenGL_Line(VECTOR<T,3>(x,y,start_position.z),VECTOR<T,3>(x,y,end_position.z),vertices);
             }
 
     if(node_start.y!=node_end.y)
-        for (i=node_start.x, x=start_position.x; i<=node_end.x; i++, x+=grid.dX.x)
-            for (k=node_start.z, z=start_position.z; k<=node_end.z; k++, z+=grid.dX.z)
+        for (i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
+            for (k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
             {
                 OpenGL_Line(VECTOR<T,3>(x,start_position.y,z),VECTOR<T,3>(x,end_position.y,z),vertices);
             }
 
     if(node_start.x!=node_end.x)
-        for (j=node_start.y, y=start_position.y; j<=node_end.y; j++, y+=grid.dX.y)
-            for (k=node_start.z, z=start_position.z; k<=node_end.z; k++, z+=grid.dX.z)
+        for (j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
+            for (k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
             {
                 OpenGL_Line(VECTOR<T,3>(start_position.x,y,z),VECTOR<T,3>(end_position.x,y,z),vertices);
             }
@@ -232,13 +232,13 @@ Draw_Nodes_For_Selection(const VECTOR<int,3> &node_start,const VECTOR<int,3> &no
     glPushAttrib(GL_POINT_BIT);
     glPointSize(OPENGL_PREFERENCES::selection_point_size);
 
-    for(i=node_start.x, x=start_position.x; i<=node_end.x; i++, x+=grid.dX.x)
+    for(i=node_start.x, x=start_position.x; i<node_end.x; i++, x+=grid.dX.x)
     {
         glPushName(i);
-        for(j=node_start.y, y=start_position.y; j<=node_end.y; j++, y+=grid.dX.y)
+        for(j=node_start.y, y=start_position.y; j<node_end.y; j++, y+=grid.dX.y)
         {
             glPushName(j);
-            for(k=node_start.z, z=start_position.z; k<=node_end.z; k++, z+=grid.dX.z)
+            for(k=node_start.z, z=start_position.z; k<node_end.z; k++, z+=grid.dX.z)
             {
                 glPushName(k);
                 ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
