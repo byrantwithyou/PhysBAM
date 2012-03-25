@@ -124,7 +124,7 @@ void Integration_Test(int argc,char* argv[])
     T m=parse_args.Get_Double_Value("-m");
     T s=parse_args.Get_Double_Value("-s");
     T kg=parse_args.Get_Double_Value("-kg");
-    T mu=parse_args.Get_Double_Value("-viscosity")*kg/s;
+    T mu=parse_args.Get_Double_Value("-viscosity")*kg/(s*(d==3?m:1));
     (void)m;
 
     GRID<TV> grid(TV_INT()+4,RANGE<TV>(TV(),TV()+1)*m,true);
@@ -238,16 +238,18 @@ void Integration_Test(int argc,char* argv[])
         matrix.Times(null[i],z[i]);}
 
     for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
-        null_p(i)=units(i)=kg/(s*s);
+        null_p(i)=units(i)=kg/(s*s*(d==3?m:1));
     for(int i=0;i<d;i++)
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++){
-            units(j)=kg/(s*s);
+            units(j)=kg/(s*s*(d==3?m:1));
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
 
+    for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
+        null_p(i)=(i%7)*units(i);
 
     matrix.Times(null_p,z_p);
 
-    for(int i=0;i<d;i++) LOG::cout<<z[i]<<std::endl;
+    // for(int i=0;i<d;i++) LOG::cout<<z[i]<<std::endl;
     LOG::cout<<z_p<<std::endl;
 
     Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
