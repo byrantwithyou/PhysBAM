@@ -210,9 +210,10 @@ void Integration_Test(int argc,char* argv[])
     for(int i=1;i<d;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
     int finish=index_range_q[d-1].max_corner;
 
-    for(int i=0;i<d;i++) printf("%d [%i %i) ", "uvw"[i], index_range_u[i].min_corner, index_range_u[i].max_corner);
+    printf("\n");
+    for(int i=0;i<d;i++) printf("%c [%i %i) ", "uvw"[i], index_range_u[i].min_corner, index_range_u[i].max_corner);
     printf("p [%i %i) ", index_range_p.min_corner, index_range_p.max_corner);
-    for(int i=0;i<d;i++) printf("%dq [%i %i) ", "uvw"[i], index_range_q[i].min_corner, index_range_q[i].max_corner);
+    for(int i=0;i<d;i++) printf("%cq [%i %i) ", "uvw"[i], index_range_q[i].min_corner, index_range_q[i].max_corner);
     printf("\n");
 
     for(int i=0;i<d;i++)
