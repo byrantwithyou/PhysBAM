@@ -127,7 +127,7 @@ void Integration_Test(int argc,char* argv[])
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/s;
     (void)m;
 
-    GRID<TV> grid(TV_INT()+10,RANGE<TV>(TV(),TV()+1)*m,true);
+    GRID<TV> grid(TV_INT()+4,RANGE<TV>(TV(),TV()+1)*m,true);
     Global_Grid(&grid);
     GRID<TV> coarse_grid(grid.counts/2,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
@@ -241,8 +241,10 @@ void Integration_Test(int argc,char* argv[])
         null_p(i)=units(i)=kg/(s*s);
     for(int i=0;i<d;i++)
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++){
-            units(j)=m/s;
+            units(j)=kg/(s*s);
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
+
+
     matrix.Times(null_p,z_p);
 
     for(int i=0;i<d;i++) LOG::cout<<z[i]<<std::endl;
