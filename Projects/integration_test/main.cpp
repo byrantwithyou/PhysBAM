@@ -244,13 +244,22 @@ void Integration_Test(int argc,char* argv[])
             units(j)=kg/(s*s*(d==3?m:1));
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
 
+    for(int i=0;i<d;i++){
+        for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++)
+            null_p(j)=(j%7)*units(j);}
     for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
         null_p(i)=(i%7)*units(i);
-
+    for(int i=0;i<d;i++)
+        for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
+            null_p(j)=(j%7)*units(j);
+        
     matrix.Times(null_p,z_p);
 
     // for(int i=0;i<d;i++) LOG::cout<<z[i]<<std::endl;
     LOG::cout<<z_p<<std::endl;
+    // LOG::cout<<matrix<<std::endl;
+    // LOG::cout<<null_p<<std::endl;
+    // LOG::cout<<units<<std::endl;
 
     Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
     for(int i=0;i<d;i++){
