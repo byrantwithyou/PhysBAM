@@ -45,19 +45,22 @@ int main(int argc, char* argv[])
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
     HIDDEN_SURFACE<T> hs(hsp);
 
+    int N=50;
+#if 0
     TRIANGULATED_SURFACE<T> ts;
     FILE_UTILITIES::Read_From_File<float>(infile,ts);
     ts.Update_Triangle_List();
     for(int i=0;i<ts.triangle_list->m;i++)
         hsp.Add((*ts.triangle_list)(i));
+    N=ts.triangle_list->m;
+#endif
 
     LOG::cout<<std::setprecision(16);
     RANDOM_NUMBERS<T> random;
-    int N=ts.triangle_list->m;
     ARRAY<TV> colors(N);
     random.Fill_Uniform(colors,0,1);
 
-#if 0
+#if 1
     for(int i=0;i<N;i++){
         TV a,b,c;
         random.Fill_Uniform(a,0,1);
