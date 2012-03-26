@@ -184,8 +184,7 @@ void Integration_Test(int argc,char* argv[])
             helper.Scale(mu*(1+(i==j)));}
         block_uu[i][i]=helper.Get_Block();
         block_uu[i][i].min_corner=start;
-        helper.New_Block();
-    }
+        helper.New_Block();}
 
     // Off-diagonal viscosity blocks
     int start_off_diag=helper.start;
