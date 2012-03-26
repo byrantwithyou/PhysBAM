@@ -125,7 +125,6 @@ void Integration_Test(int argc,char* argv[])
     T s=parse_args.Get_Double_Value("-s");
     T kg=parse_args.Get_Double_Value("-kg");
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/(s*(d==3?m:1));
-    (void)m;
 
     GRID<TV> grid(TV_INT()+4,RANGE<TV>(TV(),TV()+1)*m,true);
     Global_Grid(&grid);
