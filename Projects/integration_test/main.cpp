@@ -183,7 +183,9 @@ void Integration_Test(int argc,char* argv[])
             BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],phi).Compute_Matrix(helper);
             helper.Scale(mu*(1+(i==j)));}
         block_uu[i][i]=helper.Get_Block();
-        block_uu[i][i].min_corner=start;}
+        block_uu[i][i].min_corner=start;
+        helper.New_Block();
+    }
 
     // Off-diagonal viscosity blocks
     int start_off_diag=helper.start;
@@ -245,22 +247,9 @@ void Integration_Test(int argc,char* argv[])
             units(j)=kg/(s*s*(d==3?m:1));
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
 
-    for(int i=0;i<d;i++){
-        for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++)
-            null_p(j)=(j%7)*units(j);}
-    for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
-        null_p(i)=(i%7)*units(i);
-    for(int i=0;i<d;i++)
-        for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
-            null_p(j)=(j%7)*units(j);
-        
     matrix.Times(null_p,z_p);
 
-    // for(int i=0;i<d;i++) LOG::cout<<z[i]<<std::endl;
     LOG::cout<<z_p<<std::endl;
-    // LOG::cout<<matrix<<std::endl;
-    // LOG::cout<<null_p<<std::endl;
-    // LOG::cout<<units<<std::endl;
 
     Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
     for(int i=0;i<d;i++){

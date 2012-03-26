@@ -50,7 +50,7 @@ Compute_Overlap_Polynomials()
                 overlap_polynomials.Append(op);}}
 }
 //#####################################################################
-// Function Compute_Matrix
+// Function Compute_Open_Entries
 //#####################################################################
 template<class TV> void BASIS_INTEGRATION_UNIFORM<TV>::
 Compute_Open_Entries()
