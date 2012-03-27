@@ -165,6 +165,7 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
     // Check for full or empty cell.
     T full_volume=(T)op.range.Size()/(1<<TV::m);
     T frac=volume_inside/full_volume;
+
     if(1-frac<1e-14) return Apply_Matrix_Entry(helper,cell,enclose_inside,raw_open_entries(opi));
     Apply_Matrix_Entry(helper,cell,!enclose_inside,raw_open_entries(opi));
     if(frac<1e-14) return;
@@ -177,7 +178,8 @@ Add_Cut_Stencil(SYSTEM_MATRIX_HELPER<T>& helper,const ARRAY<T_FACE>& elements,co
     T integral=0;
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++) projected_elements(i).X(j)*=grid.dX;
-        integral+=poly.Integrate_Over_Primitive(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).X(0)))*projected_elements(i).Normal()(dir);}
+        const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x1);
+        integral+=poly.Integrate_Over_Primitive(V)*T_FACE::Normal(V)(dir);}
 
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,enclose_inside),cm1.Get_Index(index1,enclose_inside),integral));
     helper.data.Append(TRIPLE<int,int,T>(cm0.Get_Index(index0,!enclose_inside),cm1.Get_Index(index1,!enclose_inside),-integral));
