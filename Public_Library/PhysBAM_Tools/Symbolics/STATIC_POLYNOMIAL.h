@@ -21,9 +21,7 @@ struct STATIC_POLYNOMIAL
     TV_INT size;
     STATIC_TENSOR<T,rank,d+1> terms;
 
-    ~STATIC_POLYNOMIAL();
-
-    void Set_Term(TV_INT& power,T x)
+    void Set_Term(const TV_INT& power,T x)
     {size=size.Componentwise_Max(power);terms(power)=x;}
 
     template<int d2>
@@ -38,25 +36,37 @@ struct STATIC_POLYNOMIAL
     STATIC_POLYNOMIAL<T,rank,(d+d2)> operator* (const STATIC_POLYNOMIAL<T,rank,d2>& p)
     {STATIC_POLYNOMIAL<T,rank,(d+d2)> r;r.Multiply(*this,p,false);return r;}
 
-    template<int d2,int d3> // Result must fit
+    void Compress_Size()
+    {
+        RANGE<TV_INT> range(TV_INT(),size+1);
+        size.Fill(0);
+        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+            if(terms(it.index))
+                size=size.Componentwise_Max(it.index);
+    }
+
+    template<int d2,int d3> // Result must fit; no aliasing
     void Multiply(const STATIC_POLYNOMIAL<T,rank,d2>& a, const STATIC_POLYNOMIAL<T,rank,d3>& b, bool need_clear=true)
     {
+        if(&a==this){
+            STATIC_POLYNOMIAL<T,rank,d3> copy(a);
+            if(&b==this) return Multiply(copy,copy);
+            return Multiply(copy,b);}
         if(&b==this){
-            if(&a==this){STATIC_POLYNOMIAL<T,rank,d3> copy(b);return Multiply(copy,copy);}
-            return Multiply(b,a);}
-        PHYSBAM_ASSERT((a.size+b.size).All_Less_Equal(TV_INT()+d));
+            STATIC_POLYNOMIAL<T,rank,d3> copy(b);
+            return Multiply(a,copy);}
+
+        size=a.size+b.size;
+        PHYSBAM_ASSERT(size.All_Less_Equal(TV_INT()+d));
         RANGE<TV_INT> range(TV_INT(),a.size+1),range2(TV_INT(),b.size+1);
         if(need_clear){
-            UNIFORM_ARRAY_ITERATOR<rank> it(range2);
-            it.Next();
-            for(;it.Valid();it.Next()) terms(it.index+a.size)=0;}
+            RANGE<TV_INT> range(TV_INT(),size+1);
+            for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()) terms(it.index)=0;}
         for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
-            TV_INT index=size-it.index;
-            T x=terms(index);
-            terms(index)=0;
+            T x=a.terms(it.index);
+            if(!x) continue;
             for(UNIFORM_ARRAY_ITERATOR<rank> it2(range2);it2.Valid();it2.Next())
-                terms(index+it2.index)+=a.terms(index)*b.terms(it2.index);}
-        size=a.size+b.size;
+                terms(it.index+it2.index)+=x*b.terms(it2.index);}
     }
 
     template<int d2> // Result must fit
@@ -219,7 +229,7 @@ struct STATIC_POLYNOMIAL
         RANGE<TV_INT> range(TV_INT(),size+1);
         for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
             T scale=1;
-            for(int v=0;v<TV::m;v++) scale*=table[v][it.index(v)];
+            for(int v=0;v<rank;v++) scale*=table[v][it.index(v)];
             barycentric.terms(TV_INT1(it.index.Sum()))=terms(it.index)*scale;}
         barycentric.size=size.Sum();
 
@@ -255,7 +265,7 @@ struct STATIC_POLYNOMIAL
         for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
             STATIC_POLYNOMIAL<T,2,0> monomial;
             monomial.Set_Term(TV_INT2(),copy.terms(it.index));
-            for(int v=0;v<TV::m;v++){
+            for(int v=0;v<rank;v++){
                 STATIC_POLYNOMIAL<T,2,d> variable;
                 int n=it.index(v);
                 for(int j=0;j<=n;j++)
@@ -286,12 +296,13 @@ std::ostream& operator<< (std::ostream& o, const STATIC_POLYNOMIAL<T,rank,d>& p)
     RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),p.size+1);
     for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
         T c=p.terms(it.index);
+        if(c==0) continue;
         if(c<0){o<<"-";c=-c;}
         else o<<(first?"":"+");
         if(c!=1 || it.index==VECTOR<int,rank>()) o<<c;
         first=false;
 
-        for(int j=0;j<d;j++)
+        for(int j=0;j<rank;j++)
             if(it.index(j)>0){
                 o<<"abcdefghijklmnopqrstuvwxyz"[j];
                 if(it.index(j)>1)
