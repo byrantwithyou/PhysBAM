@@ -24,18 +24,16 @@ public:
 
     VECTOR<LOWER,dim> x;
 
-private:
-    T& operator()(int* index)
+    T& operator()(const int* index)
     {assert((unsigned)*index<(unsigned)rank);return x[*index](index+1);}
 
-    const T& operator()(int* index) const
+    const T& operator()(const int* index) const
     {assert((unsigned)*index<(unsigned)rank);return x[*index](index+1);}
-public:
 
-    T& operator()(VECTOR<int,rank>& index)
+    T& operator()(const VECTOR<int,rank>& index)
     {return (*this)(&index(0));}
 
-    const T& operator()(VECTOR<int,rank>& index) const
+    const T& operator()(const VECTOR<int,rank>& index) const
     {return (*this)(&index(0));}
 
     template<int dim2>
@@ -68,18 +66,16 @@ public:
         :x(T())
     {}
 
-private:
-    T& operator()(int* index)
+    T& operator()(const int* index)
     {return x;}
 
-    const T& operator()(int* index) const
-    {return x;}
-public:
-
-    T& operator()(VECTOR<int,rank>& index)
+    const T& operator()(const int* index) const
     {return x;}
 
-    const T& operator()(VECTOR<int,rank>& index) const
+    T& operator()(const VECTOR<int,rank>& index)
+    {return x;}
+
+    const T& operator()(const VECTOR<int,rank>& index) const
     {return x;}
 
     template<int dim2>
