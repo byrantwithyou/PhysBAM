@@ -265,11 +265,17 @@ public:
     T Dot(const VECTOR& v) const
     {return x*v.x+y*v.y+z*v.z;}
 
+    VECTOR Componentwise_Min(const VECTOR& v) const
+    {return VECTOR(min(x,v.x),min(y,v.y),min(z,v.z));}
+
+    VECTOR Componentwise_Max(const VECTOR& v) const
+    {return VECTOR(max(x,v.x),max(y,v.y),max(z,v.z));}
+
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
-    {return VECTOR(min(v1.x,v2.x),min(v1.y,v2.y),min(v1.z,v2.z));}
+    {return v1.Componentwise_Min(v2);}
 
     static VECTOR Componentwise_Max(const VECTOR& v1,const VECTOR& v2)
-    {return VECTOR(max(v1.x,v2.x),max(v1.y,v2.y),max(v1.z,v2.z));}
+    {return v1.Componentwise_Max(v2);}
 
     VECTOR Projected_On_Unit_Direction(const VECTOR& direction) const
     {return Dot_Product(*this,direction)*direction;}

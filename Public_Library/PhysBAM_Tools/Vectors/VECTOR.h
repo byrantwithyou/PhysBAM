@@ -170,10 +170,16 @@ public:
     {bool equal=true;for(int i=1;i<d;i++) equal&=(array[i]==array[0]);return equal;}
 
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=min(v1.array[i],v2.array[i]);return r;}
+    {return v1.Componentwise_Min(v2);}
 
     static VECTOR Componentwise_Max(const VECTOR& v1,const VECTOR& v2)
-    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=max(v1.array[i],v2.array[i]);return r;}
+    {return v1.Componentwise_Max(v2);}
+
+    VECTOR Componentwise_Min(const VECTOR& v) const
+    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=min(array[i],v.array[i]);return r;}
+
+    VECTOR Componentwise_Max(const VECTOR& v) const
+    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=max(array[i],v.array[i]);return r;}
 
     VECTOR Projected_On_Unit_Direction(const VECTOR& direction) const
     {return Dot_Product(*this,direction)*direction;}

@@ -261,11 +261,17 @@ public:
     static T Dot_Product(const VECTOR& v1,const VECTOR& v2)
     {return v1.Dot(v2);}
 
+    VECTOR Componentwise_Min(const VECTOR& v) const
+    {return VECTOR(min(x,v.x),min(y,v.y));}
+
+    VECTOR Componentwise_Max(const VECTOR& v) const
+    {return VECTOR(max(x,v.x),max(y,v.y));}
+
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
-    {return VECTOR(min(v1.x,v2.x),min(v1.y,v2.y));}
+    {return v1.Componentwise_Min(v2);}
 
     static VECTOR Componentwise_Max(const VECTOR& v1,const VECTOR& v2)
-    {return VECTOR(max(v1.x,v2.x),max(v1.y,v2.y));}
+    {return v1.Componentwise_Max(v2);}
 
     bool All_Greater(const VECTOR& v) const
     {return x>v.x && y>v.y;}

@@ -236,6 +236,22 @@ public:
     void Write_Raw(std::ostream& output) const
     {int m=Size();for(int i=0;i<m;i++){output<<(*this)(i);if(i<m-1) output<<" ";}}
 
+    template<class T_VECTOR2>
+    bool All_Greater(const VECTOR_BASE<T,T_VECTOR2>& v) const
+    {Assert_Same_Size(*this,v);for(int i=0;i<Size();i++) if((*this)(i)<=v(i)) return false;return true;}
+
+    template<class T_VECTOR2>
+    bool All_Less(const VECTOR_BASE<T,T_VECTOR2>& v) const
+    {return v.All_Greater(*this);}
+
+    template<class T_VECTOR2>
+    bool All_Greater_Equal(const VECTOR_BASE<T,T_VECTOR2>& v) const
+    {Assert_Same_Size(*this,v);for(int i=0;i<Size();i++) if((*this)(i)<v(i)) return false;return true;}
+
+    template<class T_VECTOR2>
+    bool All_Less_Equal(const VECTOR_BASE<T,T_VECTOR2>& v) const
+    {return v.All_Greater_Equal(*this);}
+
 //#####################################################################
 };
 

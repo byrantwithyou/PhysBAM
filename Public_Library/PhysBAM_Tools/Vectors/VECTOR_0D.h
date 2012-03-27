@@ -149,6 +149,12 @@ public:
     static VECTOR All_Ones_Vector()
     {return VECTOR();}
 
+    VECTOR Componentwise_Min(const VECTOR& v) const
+    {return VECTOR();}
+
+    VECTOR Componentwise_Max(const VECTOR& v) const
+    {return VECTOR();}
+
     static VECTOR Componentwise_Min(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR();}
 
