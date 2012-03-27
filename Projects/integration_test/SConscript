@@ -2,9 +2,10 @@
 
 Import('env Automatic_Program')
 Automatic_Program(env,"integration_test",["main.cpp"])
-Automatic_Program(env,"mc/view_case",["mc/view_case.cpp"])
-Automatic_Program(env,"mc/view_case2",["mc/view_case2.cpp"])
-Automatic_Program(env,"mc/view_levelset",["mc/view_levelset.cpp"])
-Automatic_Program(env,"mc/primitive_integration",["mc/primitive_integration.cpp"])
-Automatic_Program(env,"mc/depth_buffering",["mc/depth_buffering.cpp"])
+Automatic_Program(env,"view_case",["mc/view_case.cpp"])
+Automatic_Program(env,"view_case2",["mc/view_case2.cpp"])
+Automatic_Program(env,"view_levelset",["mc/view_levelset.cpp"])
+Automatic_Program(env,"primitive_integration",["mc/primitive_integration.cpp"])
+Automatic_Program(env,"static_polynomial",["mc/static_polynomial.cpp"])
+Automatic_Program(env,"depth_buffering",["mc/depth_buffering.cpp"])
 
