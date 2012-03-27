@@ -32,3 +32,5 @@ template class UNIFORM_ARRAY_ITERATOR<0>;
 template class UNIFORM_ARRAY_ITERATOR<1>;
 template class UNIFORM_ARRAY_ITERATOR<2>;
 template class UNIFORM_ARRAY_ITERATOR<3>;
+template class UNIFORM_ARRAY_ITERATOR<4>;
+template class UNIFORM_ARRAY_ITERATOR<5>;
