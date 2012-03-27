@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
@@ -185,7 +184,7 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
     const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
     HASHTABLE<FACE_INDEX<TV::m>,int> ht;
 
-    for(UNIFORM_ARRAY_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
+    for(RANGE_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
         int c=0;
         for(int i=0;i<bits.m;i++){
             TV_INT index=it.index+bits(i);

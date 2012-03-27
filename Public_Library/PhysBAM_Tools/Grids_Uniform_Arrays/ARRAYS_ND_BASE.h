@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
@@ -47,14 +46,14 @@ public:
 protected:
     T_ARRAY& operator=(const ARRAY_BASE& source)
     {T_ARRAY& self=Derived();RANGE<TV_INT> domain_indices=self.Domain_Indices();const T_ARRAY& source_=source.Derived();assert(domain_indices==source_.Domain_Indices());
-    if(!T_ARRAY::Same_Array(self,source_)) for(UNIFORM_ARRAY_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.Index())=source_(iterator.Index());
+    if(!T_ARRAY::Same_Array(self,source_)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.Index())=source_(iterator.Index());
     return self;}
 
     template<class T_ARRAY1>
     T_ARRAY& operator=(const T_ARRAY1& source)
     {STATIC_ASSERT(CAN_ASSIGN<T,typename T_ARRAY1::ELEMENT>::value);
     T_ARRAY& self=Derived();RANGE<TV_INT> domain_indices=self.Domain_Indices();assert(domain_indices==source.Domain_Indices());
-    if(!T_ARRAY::Same_Array(self,source)) for(UNIFORM_ARRAY_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.Index())=source(iterator.Index());
+    if(!T_ARRAY::Same_Array(self,source)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.Index())=source(iterator.Index());
     return self;}
 };
 

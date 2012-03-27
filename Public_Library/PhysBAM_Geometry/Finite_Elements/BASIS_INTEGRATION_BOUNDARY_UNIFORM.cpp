@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
@@ -49,7 +48,7 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
             const typename BASIS_STENCIL_UNIFORM<TV>::DICED& entry=stencil.diced(i);
             RANGE<TV> T_cell_range((box-grid.domain.min_corner)*grid.one_over_dX - (T).5*RANGE<TV>(entry.range+(TV_INT()+1)));
             RANGE<TV_INT> cell_range(TV_INT(ceil(T_cell_range.min_corner+1e-14)),TV_INT(floor(T_cell_range.max_corner-1e-14))+1);
-            for(UNIFORM_ARRAY_ITERATOR<TV::m> it(cell_range);it.Valid();it.Next()){
+            for(RANGE_ITERATOR<TV::m> it(cell_range);it.Valid();it.Next()){
                 TV_INT index=it.index+entry.index_offset;
                 RANGE<TV> domain=RANGE<TV>(entry.range+(1+2*it.index))*((T).5*grid.dX)+grid.domain.min_corner;
                 clipped_simplices.Remove_All();

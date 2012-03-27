@@ -383,4 +383,5 @@ template<class TV>
 inline std::istream& operator>>(std::istream& input,RANGE<TV>& box)
 {FILE_UTILITIES::Ignore(input,'(');input>>box.min_corner>>box.max_corner;FILE_UTILITIES::Ignore(input,')');return input;}
 }
+#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #endif

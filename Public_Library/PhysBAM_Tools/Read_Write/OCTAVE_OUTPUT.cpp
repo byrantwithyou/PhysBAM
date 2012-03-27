@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
@@ -322,7 +321,7 @@ template<class T> template<class T2> void OCTAVE_OUTPUT<T>::
 Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.counts.y<<"\n# columns: "<<m.counts.x<<"\n";
-    for(UNIFORM_ARRAY_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
         out<<m(it.Index())<<" ";
         if(it.index(0)>=it.domain.max_corner(0)) out<<"\n";}
 }
@@ -334,7 +333,7 @@ Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# ndims: 3\n"<<m.counts.x<<" "<<m.counts.y<<" "<<d<<"\n";
     for(int i=0;i<d;i++)
-        for(UNIFORM_ARRAY_ITERATOR<2> it(m.domain);it.Valid();it.Next())
+        for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next())
             out<<m(it.Index())(i)<<std::endl;
 }
 //#####################################################################

@@ -4,7 +4,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
@@ -83,7 +82,7 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
         MARCHING_CUBES<TV>::Get_Elements_For_Cell(elements,elements,dir,enclose_inside,phi,it.index);
 
         if(!elements.m){ // Uncut cell; emit the standard stencil
-            for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next())
+            for(RANGE_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next())
                 Add_Uncut_Stencil(helper,it.index*coarse_factor+it2.index,!enclose_inside);
             continue;}
 
@@ -91,18 +90,18 @@ Compute_Matrix(SYSTEM_MATRIX_HELPER<T>& helper)
         flat_range.max_corner(dir)=1;
         Cut_Elements(cut_elements,elements,double_coarse_range,RANGE<TV>::Unit_Box(),dir);
 
-        for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
+        for(RANGE_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
             for(int i=0;i<overlap_polynomials.m;i++){
                 ARRAY<T_FACE> elements;
                 RANGE<TV_INT> range=overlap_polynomials(i).range;
                 range.min_corner(dir)=0;
                 range.max_corner(dir)=1;
-                for(UNIFORM_ARRAY_ITERATOR<TV::m> it3(range);it3.Valid();it3.Next()){
+                for(RANGE_ITERATOR<TV::m> it3(range);it3.Valid();it3.Next()){
                     TV_INT index=it2.index*coarse_factor+it3.index+1;
                     index(dir)=0;
                     elements.Append_Elements(cut_elements(index));}
                 Add_Cut_Stencil(helper,elements,it.index*coarse_factor+it2.index,dir,enclose_inside,it2.index,i);}}
-        for(UNIFORM_ARRAY_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
+        for(RANGE_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
             cut_elements(it2.index).Remove_All();}
 }
 //#####################################################################

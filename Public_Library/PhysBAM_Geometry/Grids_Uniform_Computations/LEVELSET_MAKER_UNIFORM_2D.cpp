@@ -28,7 +28,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
         box.Enlarge_To_Include_Point(grid.Cell(segment.x2,3));
         box=box.Intersect(box,grid.Domain_Indices(ghost_cells-1));
         if(box.Empty()) continue;
-        for(UNIFORM_ARRAY_ITERATOR<TV::m> it(box.Thickened(1));it.Valid();it.Next()){
+        for(RANGE_ITERATOR<TV::m> it(box.Thickened(1));it.Valid();it.Next()){
             TV X=grid.X(it.index);
             T dist=segment.Distance_From_Point_To_Segment(X);
             if(dist<abs(phi(it.index))+dx*1e-4 && dist<dx){
