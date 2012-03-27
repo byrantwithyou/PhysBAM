@@ -53,7 +53,7 @@ protected:
     T_ARRAY& operator=(const T_ARRAY1& source)
     {STATIC_ASSERT(CAN_ASSIGN<T,typename T_ARRAY1::ELEMENT>::value);
     T_ARRAY& self=Derived();RANGE<TV_INT> domain_indices=self.Domain_Indices();assert(domain_indices==source.Domain_Indices());
-    if(!T_ARRAY::Same_Array(self,source)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.Index())=source(iterator.Index());
+    if(!T_ARRAY::Same_Array(self,source)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.index)=source(iterator.index);
     return self;}
 };
 

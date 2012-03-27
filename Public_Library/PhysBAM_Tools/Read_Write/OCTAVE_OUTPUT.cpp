@@ -322,7 +322,7 @@ Write(const char* name,const ARRAY<T2,VECTOR<int,2> >& m)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<m.counts.y<<"\n# columns: "<<m.counts.x<<"\n";
     for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next()){
-        out<<m(it.Index())<<" ";
+        out<<m(it.index)<<" ";
         if(it.index(0)>=it.domain.max_corner(0)) out<<"\n";}
 }
 //#####################################################################
@@ -334,7 +334,7 @@ Write(const char* name,const ARRAY<VECTOR<T2,d>,VECTOR<int,2> >& m)
     out<<"# name: "<<name<<"\n# type: matrix\n# ndims: 3\n"<<m.counts.x<<" "<<m.counts.y<<" "<<d<<"\n";
     for(int i=0;i<d;i++)
         for(RANGE_ITERATOR<2> it(m.domain);it.Valid();it.Next())
-            out<<m(it.Index())(i)<<std::endl;
+            out<<m(it.index)(i)<<std::endl;
 }
 //#####################################################################
 // Function Write

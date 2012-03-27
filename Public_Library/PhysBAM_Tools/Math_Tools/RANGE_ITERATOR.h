@@ -12,6 +12,7 @@ namespace PhysBAM{
 template<int d>
 struct RANGE_ITERATOR
 {
+    typedef VECTOR<int,d> TV_INT;
     RANGE<TV_INT> domain;
     TV_INT index;
 
@@ -35,12 +36,13 @@ struct RANGE_ITERATOR
     }
 
     void Reset()
-    {index=domain.min_corner();if(!index.All_Less(max_corner)) index(d-1)=domain.max_corner(d-1);}
+    {index=domain.min_corner;if(!index.All_Less(domain.max_corner)) index(d-1)=domain.max_corner(d-1);}
 };
 
 template<>
 struct RANGE_ITERATOR<0>
 {
+    typedef VECTOR<int,0> TV_INT;
     RANGE<TV_INT> domain;
     TV_INT index;
     bool first;
