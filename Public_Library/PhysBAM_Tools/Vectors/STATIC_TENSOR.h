@@ -7,7 +7,6 @@
 #ifndef __STATIC_TENSOR__
 #define __STATIC_TENSOR__
 
-#include <PhysBAM_Tools/Symbolics/STATIC_SIZE.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
