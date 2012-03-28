@@ -12,6 +12,14 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
+template<class T,int rank,int d> struct STATIC_POLYNOMIAL;
+
+template<class T,int rank,int d>
+bool Same_Polynomial(const STATIC_POLYNOMIAL<T,rank,d>& a,const STATIC_POLYNOMIAL<T,rank,d>& b) {return &a==&b;}
+
+template<class T,int rank,int d,int d2>
+bool Same_Polynomial(const STATIC_POLYNOMIAL<T,rank,d>& a,const STATIC_POLYNOMIAL<T,rank,d2>& b) {return false;}
+
 template<class T,int rank,int d>
 struct STATIC_POLYNOMIAL
 {
@@ -47,11 +55,11 @@ struct STATIC_POLYNOMIAL
     template<int d2,int d3> // Result must fit; no aliasing
     void Multiply(const STATIC_POLYNOMIAL<T,rank,d2>& a, const STATIC_POLYNOMIAL<T,rank,d3>& b, bool need_clear=true)
     {
-        if(&a==this){
-            STATIC_POLYNOMIAL<T,rank,d3> copy(a);
-            if(&b==this) return Multiply(copy,copy);
+        if(Same_Polynomial(a,*this)){
+            STATIC_POLYNOMIAL<T,rank,d2> copy(a);
+            if(Same_Polynomial(b,*this)) return Multiply(copy,copy);
             return Multiply(copy,b);}
-        if(&b==this){
+        if(Same_Polynomial(b,*this)){
             STATIC_POLYNOMIAL<T,rank,d3> copy(b);
             return Multiply(a,copy);}
 
@@ -230,21 +238,21 @@ struct STATIC_POLYNOMIAL
         T table[rank][d+1];
         for(int v=0;v<rank;v++){
             table[v][0]=1;
-            for(int i=1;i<=size(v);i++) table[v][i]=table[v][i-1]*a(v);}
+            for(int i=1;i<=copy.size(v);i++) table[v][i]=table[v][i-1]*a(v);}
         
         typedef VECTOR<T,1> TV1;
         typedef VECTOR<int,1> TV_INT1;
         
         STATIC_POLYNOMIAL<T,1,d*rank> barycentric;
-        RANGE<TV_INT> range(TV_INT(),size+1);
+        RANGE<TV_INT> range(TV_INT(),copy.size+1);
         for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             T scale=1;
             for(int v=0;v<rank;v++) scale*=table[v][it.index(v)];
-            barycentric.terms(TV_INT1(it.index.Sum()))=terms(it.index)*scale;}
-        barycentric.size=size.Sum();
+            barycentric.terms(TV_INT1(it.index.Sum()))+=copy.terms(it.index)*scale;}
+        barycentric.size=TV_INT1(size.Sum());
 
         T integral=0;
-        for(int i=0;i<barycentric.size(0);i++)
+        for(int i=0;i<=barycentric.size(0);i++)
              integral+=barycentric.terms(TV_INT1(i))/(i+1);
 
         return integral*a.Magnitude();
@@ -273,7 +281,7 @@ struct STATIC_POLYNOMIAL
         STATIC_POLYNOMIAL<T,2,d*rank> barycentric;
         RANGE<TV_INT> range(TV_INT(),size+1);
         for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
-            STATIC_POLYNOMIAL<T,2,0> monomial;
+            STATIC_POLYNOMIAL<T,2,rank*d> monomial;
             monomial.Set_Term(TV_INT2(),copy.terms(it.index));
             for(int v=0;v<rank;v++){
                 STATIC_POLYNOMIAL<T,2,d> variable;
@@ -284,15 +292,15 @@ struct STATIC_POLYNOMIAL
                 monomial.Multiply(monomial,variable);}
             barycentric+=monomial;}
     
-        int max_factorial=barycentric.Max_Power_Sum()+2;
-        T factorial[20];
+        int max_factorial=barycentric.size.Sum()+2;
+        T factorial[2*rank*d+2];
         factorial[0]=(T)1;
         for(int i=1;i<=max_factorial;i++) factorial[i]=factorial[i-1]*i;        
 
         T integral=0;
-        for(int i=0;i<barycentric.terms.m;i++){
-            TV_INT2 power=barycentric.terms(i).power;
-            integral+=barycentric.terms(i).coeff*factorial[power(0)]*factorial[power(1)]/factorial[power(0)+power(1)+2];}
+        RANGE<TV_INT2> range2(TV_INT2(),barycentric.size+1);
+        for(RANGE_ITERATOR<2> it(range2);it.Valid();it.Next()){
+            integral+=barycentric.terms(it.index)*factorial[it.index(0)]*factorial[it.index(1)]/factorial[it.index(0)+it.index(1)+2];}
 
         return integral*TV::Cross_Product(a,b).Magnitude();
     }
