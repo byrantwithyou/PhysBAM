@@ -8,7 +8,6 @@
 #define __STATIC_POLYNOMIAL__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/UNIFORM_ARRAY_ITERATOR.h>
 #include <PhysBAM_Tools/Vectors/STATIC_TENSOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
@@ -26,11 +25,11 @@ struct STATIC_POLYNOMIAL
 
     template<int d2>
     STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> operator+ (const STATIC_POLYNOMIAL<T,rank,d2>& p)
-    {STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> r;r+=*this;r+=p;return r;}
+    {STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> r;r=*this;r+=p;return r;}
 
     template<int d2>
     STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> operator- (const STATIC_POLYNOMIAL<T,rank,d2>& p)
-    {STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> r;r+=*this;r-=p;return r;}
+    {STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> r;r=*this;r-=p;return r;}
 
     template<int d2>
     STATIC_POLYNOMIAL<T,rank,(d+d2)> operator* (const STATIC_POLYNOMIAL<T,rank,d2>& p)
@@ -40,7 +39,7 @@ struct STATIC_POLYNOMIAL
     {
         RANGE<TV_INT> range(TV_INT(),size+1);
         size.Fill(0);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             if(terms(it.index))
                 size=size.Componentwise_Max(it.index);
     }
@@ -61,11 +60,11 @@ struct STATIC_POLYNOMIAL
         RANGE<TV_INT> range(TV_INT(),a.size+1),range2(TV_INT(),b.size+1);
         if(need_clear){
             RANGE<TV_INT> range(TV_INT(),size+1);
-            for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()) terms(it.index)=0;}
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+            for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()) terms(it.index)=0;}
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             T x=a.terms(it.index);
             if(!x) continue;
-            for(UNIFORM_ARRAY_ITERATOR<rank> it2(range2);it2.Valid();it2.Next())
+            for(RANGE_ITERATOR<rank> it2(range2);it2.Valid();it2.Next())
                 terms(it.index+it2.index)+=x*b.terms(it2.index);}
     }
 
@@ -74,9 +73,20 @@ struct STATIC_POLYNOMIAL
     {
         PHYSBAM_ASSERT(a.size.All_Less_Equal(TV_INT()+d));
         RANGE<TV_INT> range(TV_INT(),a.size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             terms(it.index)+=a.terms(it.index);
         size=size.Componentwise_Max(a.size);
+        return *this;
+    }
+
+    template<int d2> // Result must fit
+    STATIC_POLYNOMIAL& operator=(const STATIC_POLYNOMIAL<T,rank,d2>& a)
+    {
+        PHYSBAM_ASSERT(a.size.All_Less_Equal(TV_INT()+d));
+        RANGE<TV_INT> range(TV_INT(),a.size+1);
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
+            terms(it.index)=a.terms(it.index);
+        size=a.size;
         return *this;
     }
 
@@ -85,7 +95,7 @@ struct STATIC_POLYNOMIAL
     {
         PHYSBAM_ASSERT(a.size.All_Less_Equal(TV_INT()+d));
         RANGE<TV_INT> range(TV_INT(),a.size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             terms(it.index)-=a.terms(it.index);
         size=size.Componentwise_Max(a.size);
         return *this;
@@ -94,11 +104,12 @@ struct STATIC_POLYNOMIAL
     STATIC_POLYNOMIAL Differentiate(int v) const
     {
         STATIC_POLYNOMIAL r;
-        RANGE<TV_INT> range(TV_INT::Axis_Vector(v),size);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        RANGE<TV_INT> range(TV_INT::Axis_Vector(v),size+1);
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             r.terms(it.index-TV_INT::Axis_Vector(v))=terms(it.index)*it.index(v);
         r.size=size;
         r.size(v)--;
+        if(r.size(v)<0) r.size(v)=0;
         return r;
     }
 
@@ -106,7 +117,7 @@ struct STATIC_POLYNOMIAL
     {
         STATIC_POLYNOMIAL<T,rank,d+1> r;
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             r.terms(it.index+TV_INT::Axis_Vector(v))=terms(it.index)/(it.index(v)+1);
         r.size=size;
         r.size(v)++;
@@ -116,27 +127,27 @@ struct STATIC_POLYNOMIAL
     void Negate_Variable(int v)
     {
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             if(it.index(v)&1)
                 terms(it.index)=-terms(it.index);
     }
 
-    void Scale_Variables(const TV& scale)
-    {for(int i=0;i<rank;i++) Scale_Variables(i,scale(i));}
+    void Scale(const TV& scale)
+    {for(int i=0;i<rank;i++) Scale_Variable(i,scale(i));}
 
-    void Scale_Variables(int v,T scale)
+    void Scale_Variable(int v,T scale)
     {
         T powers[d+1];
         powers[0]=1;
         for(int j=1;j<=size(v);j++)
             powers[j]=powers[j-1]*scale;
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             terms(it.index)*=powers[it.index(v)];
     }
 
     void Shift(const TV& scale)
-    {for(int i=0;i<rank;i++) Shift_Variables(i,scale(i));}
+    {for(int i=0;i<rank;i++) Shift_Variable(i,scale(i));}
 
     void Shift_Variable(int v,T shift)
     {
@@ -148,7 +159,7 @@ struct STATIC_POLYNOMIAL
             for(int j=1;j<i;j++)
                 table[i][j]=table[i-1][j-1]*shift+table[i-1][j];}
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             T x=terms(it.index);
             TV_INT index=it.index;
             for(int i=1;i<=it.index(v);i++){
@@ -158,9 +169,11 @@ struct STATIC_POLYNOMIAL
 
     void Exchange_Variables(int u,int v)
     {
+        if(u==v) return;
+        if(size(u)>size(v)) exchange(u,v);
         RANGE<TV_INT> range(TV_INT(),size+1);
         range.max_corner(u)=1;
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next())
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
             for(int j=0;j<it.index(v);j++){
                 TV_INT index=it.index;
                 index(u)=j;
@@ -181,7 +194,7 @@ struct STATIC_POLYNOMIAL
                 powers[1][i][j]=powers[1][i][j-1]*domain.max_corner(i);}}
         T s=0;
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             TV_INT index=it.index+1;
             T t=terms(it.index)/index.Product();
             for(int j=0;j<rank;j++)
@@ -199,16 +212,13 @@ struct STATIC_POLYNOMIAL
                 powers[i][j]=powers[i][j-1]*point(i);}
         T s=0;
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             T t=terms(it.index);
             for(int j=0;j<rank;j++)
                 t*=powers[j][it.index(j)];
             s+=t;}
         return s;
     }
-
-    // T Integrate_Over_Primitive(const VECTOR<TV,3>& vertices) const; // triangle
-    // T Integrate_Over_Primitive(const VECTOR<TV,2>& vertices) const; // interval
     
     T Integrate_Over_Primitive(const VECTOR<TV,2>& vertices) const
     {
@@ -227,7 +237,7 @@ struct STATIC_POLYNOMIAL
         
         STATIC_POLYNOMIAL<T,1,d*rank> barycentric;
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             T scale=1;
             for(int v=0;v<rank;v++) scale*=table[v][it.index(v)];
             barycentric.terms(TV_INT1(it.index.Sum()))=terms(it.index)*scale;}
@@ -262,7 +272,7 @@ struct STATIC_POLYNOMIAL
 
         STATIC_POLYNOMIAL<T,2,d*rank> barycentric;
         RANGE<TV_INT> range(TV_INT(),size+1);
-        for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+        for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
             STATIC_POLYNOMIAL<T,2,0> monomial;
             monomial.Set_Term(TV_INT2(),copy.terms(it.index));
             for(int v=0;v<rank;v++){
@@ -294,7 +304,7 @@ std::ostream& operator<< (std::ostream& o, const STATIC_POLYNOMIAL<T,rank,d>& p)
     bool first=true;
     o<<"(";
     RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),p.size+1);
-    for(UNIFORM_ARRAY_ITERATOR<rank> it(range);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
         T c=p.terms(it.index);
         if(c==0) continue;
         if(c<0){o<<"-";c=-c;}
