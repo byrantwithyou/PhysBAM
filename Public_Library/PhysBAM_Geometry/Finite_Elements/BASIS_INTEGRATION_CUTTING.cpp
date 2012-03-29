@@ -43,7 +43,7 @@ template<class T,int rank,int sdp1,int d> static T
 Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_POLYNOMIAL<T,rank,d>& poly)
 {
     T total=0;
-    RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),poly.size);
+    RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),poly.size+1);
     for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
         if(T coeff=poly.terms(it.index))
             total+=coeff*precompute(it.index);
@@ -227,7 +227,7 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0
                 vb->overlap.Append(op);}}
 
     for(int i=0;i<vb->overlap.m;i++){
-        RANGE<TV_INT> range(TV_INT(),vb->overlap(i).polynomial.size);
+        RANGE<TV_INT> range(TV_INT(),vb->overlap(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(vb->overlap(i).polynomial.terms(it.index))
                 monomials_needed(it.index)=true;}
@@ -250,7 +250,7 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,C
     ib->scale=scale;
     ib->helper=&helper;
     for(int i=0;i<ib->overlap.m;i++){
-        RANGE<TV_INT> range(TV_INT(),ib->overlap(i).polynomial.size);
+        RANGE<TV_INT> range(TV_INT(),ib->overlap(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(ib->overlap(i).polynomial.terms(it.index))
                 monomials_needed(it.index)=true;}
