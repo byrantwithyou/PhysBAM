@@ -76,9 +76,9 @@ Dice_Stencil()
         RANGE<TV_INT> offset_range=stencils(i).region.Translated(center_offset);
         RANGE<TV_INT> ra((big_shift+1-offset_range.max_corner)/2-half_big_shift,(big_shift+2-offset_range.min_corner)/2-half_big_shift);
         for(RANGE_ITERATOR<TV::m> it(ra);it.Valid();it.Next()){
-            RANGE<TV_INT> cut_range=RANGE<TV_INT>::Intersect(offset_range.Translated(2*it.index+1),cell_box);
+            RANGE<TV_INT> cut_range=RANGE<TV_INT>::Intersect(offset_range.Translated(2*it.index),cell_box);
             DICED e={it.index};
-            for(int b=0;b<(1<<TV::m);b++) if(cut_range.Lazy_Inside_Half_Open(counts(b))) e.subcell|=1<<b;
+            for(int b=0;b<(1<<TV::m);b++) if(cut_range.Lazy_Inside_Half_Open(counts(b)-1)) e.subcell|=1<<b;
             e.polynomial=stencils(i).polynomial;
             e.polynomial.Shift(-dX*(TV(it.index)+TV(center_offset)/2));
             diced.Append(e);}}
