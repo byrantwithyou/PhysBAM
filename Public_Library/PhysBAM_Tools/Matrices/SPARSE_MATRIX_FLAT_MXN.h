@@ -2,7 +2,7 @@
 // Copyright 2007, Jon Gretarsson, Avi Robinson-Mosher, Tamar Shinar, Jonathan Su.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class SPARSE_MATRIX_FLAT_NXN
+// Class SPARSE_MATRIX_FLAT_MXN
 //#####################################################################
 #ifndef __SPARSE_MATRIX_FLAT_MXN__
 #define __SPARSE_MATRIX_FLAT_MXN__
@@ -90,7 +90,7 @@ public:
     void Sort_Entries();
     void Get_Row(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q_i,int row);
     void Construct_Incomplete_LQ_Factorization(const int p_l=10,const int p_q=10,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
-    void Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY<T> >& l);    
+    void Fast_Sparse_Multiply(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,ARRAY<SPARSE_MATRIX_ENTRY<T> >& l);
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_MXN<T>& A);

@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -131,7 +132,7 @@ void Integration_Test(int argc,char* argv[])
     Global_Grid(&grid);
     GRID<TV> coarse_grid(grid.counts/2,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    SPHERE<TV> sphere(TV()+(T).5*m,(T).3*m);
+    SPHERE<TV> sphere(TV()+(T).5*m,(T).2*m);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
         phi(it.index)=sphere.Signed_Distance(it.Location());
 
@@ -175,7 +176,6 @@ void Integration_Test(int argc,char* argv[])
     boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
     boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
 
-//    INTERVAL<int> block_uu[d][d],block_p[d],block_q[d];
     SYSTEM_MATRIX_HELPER<T> helper_uu[d][d],helper_p[d],helper_q[d];
     BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi);
 
@@ -249,20 +249,27 @@ void Integration_Test(int argc,char* argv[])
 
     matrix.Times(null_p,z_p);
 
-    LOG::cout<<z_p<<std::endl;
+    LOG::cout<<"p mode "<<null_p<<std::endl;
+    LOG::cout<<"p residual "<<z_p<<std::endl;
+    LOG::cout<<"p residual max "<<z_p.Max()<<std::endl;
 
-    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
-    for(int i=0;i<d;i++){
-        char buff[100];
-        sprintf(buff, "null %c %%c", "uvw"[i]);
-        Dump_Frame(null[i],index_map_p,index_map_u,object,buff);
-        sprintf(buff, "error %c %%c", "uvw"[i]);
-        Dump_Frame(z[i],index_map_p,index_map_u,object,buff);}
+    // Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
+    // for(int i=0;i<d;i++){
+        // char buff[100];
+        // sprintf(buff, "null %c %%c", "uvw"[i]);
+        // Dump_Frame(null[i],index_map_p,index_map_u,object,buff);
+        // sprintf(buff, "error %c %%c", "uvw"[i]);
+        // Dump_Frame(z[i],index_map_p,index_map_u,object,buff);}
 
-    Dump_Frame(null_p,index_map_p,index_map_u,object,"null p %c");
-    Dump_Frame(z_p,index_map_p,index_map_u,object,"error p %c");
+    // Dump_Frame(null_p,index_map_p,index_map_u,object,"null p %c");
+    // Dump_Frame(z_p,index_map_p,index_map_u,object,"error p %c");
 
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
+    MATRIX_MXN<T> full_matrix(matrix.m,matrix.n);
+    for(int i=0;i<matrix.m;i++)
+        for(int j=0;j<matrix.n;j++)
+            if(matrix.Element_Present(i,j))
+                full_matrix(i,j)=matrix(i,j);
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",full_matrix);
 }
 
 int main(int argc,char* argv[])
