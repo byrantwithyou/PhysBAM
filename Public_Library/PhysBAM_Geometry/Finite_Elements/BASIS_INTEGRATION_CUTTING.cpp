@@ -119,7 +119,7 @@ Compute_Open_Entries()
         subcell_range.min_corner=subcell_range.max_corner-grid.dX/2;
 
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
-            if(monomials_needed(it.index)){
+            if(volume_monomials_needed(it.index)){
                 STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
                 monomial.Set_Term(it.index,1);
                 uncut_subcell[i](it.index)=monomial.Definite_Integral(subcell_range);}
@@ -232,9 +232,10 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0
         RANGE<TV_INT> range(TV_INT(),vb->overlap(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(vb->overlap(i).polynomial.terms(it.index)){
-                monomials_needed(it.index)=true;
+                volume_monomials_needed(it.index)=true;
+                cut_volume_monomials_needed(it.index)=true;
                 for(int v=0;v<TV::m;v++)
-                    monomials_needed(it.index+TV_INT::Axis_Vector(v))=true;
+                    cut_volume_monomials_needed(it.index+TV_INT::Axis_Vector(v))=true;
             }}
 
     return volume_blocks.Append(vb);
@@ -258,7 +259,7 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,C
         RANGE<TV_INT> range(TV_INT(),ib->overlap(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(ib->overlap(i).polynomial.terms(it.index))
-                monomials_needed(it.index)=true;}
+                surface_monomials_needed(it.index)=true;}
 
     return interface_blocks.Append(ib);
 }
@@ -317,10 +318,10 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
         Add_Uncut_Fine_Cell(cell,block,enclose_inside==filled);
         return;}
 
-    STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_integrals;
+    STATIC_TENSOR<T,TV::m,static_degree+2> precomputed_integrals;
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
-        if(monomials_needed(it.index)){
+        if(volume_monomials_needed(it.index)){
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
             T integral=0;
@@ -345,10 +346,10 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 vb->helper->data.Append(TRIPLE<int,int,T>(index_i0,index_i1,integral));
                 vb->helper->data.Append(TRIPLE<int,int,T>(index_o0,index_o1,-integral));}}}
 
-    STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals[subcell_elements];
+    STATIC_TENSOR<T,TV::m,static_degree> precomputed_interface_integrals[subcell_elements];
     bool has_element[subcell_elements]={};
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
-        if(monomials_needed(it.index)){
+        if(surface_monomials_needed(it.index)){
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface_elements.m;i++){
