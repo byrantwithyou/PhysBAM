@@ -55,7 +55,7 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
 template<class TV,int static_degree> void BASIS_INTEGRATION_CUTTING<TV,static_degree>::
 Compute()
 {
-    ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT> cut_sides(double_coarse_range),cut_interface(double_coarse_range),projected_elements(double_coarse_range);
+    ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT> cut_sides(double_coarse_range),cut_interface(double_coarse_range);
     ARRAY<T_FACE> sides,interface,array_one(1);
 
     Compute_Open_Entries();
@@ -77,8 +77,8 @@ Compute()
         flat_range.max_corner(dir)=1;
         for(int e=0;e<interface.m;e++){
             array_one(0)=interface(e);
-            Cut_Elements(cut_interface,array_one,double_coarse_range,RANGE<TV>::Unit_Box(),dir,e);}
-        Cut_Elements(cut_sides,sides,double_coarse_range,RANGE<TV>::Unit_Box(),-1,-1);
+            Cut_Elements(cut_interface,array_one,double_coarse_range,RANGE<TV>::Unit_Box(),-1,e);}
+        Cut_Elements(cut_sides,sides,double_coarse_range,RANGE<TV>::Unit_Box(),dir,-1);
 
         for(RANGE_ITERATOR<TV::m> it2(double_coarse_range);it2.Valid();it2.Next()){
             TV_INT side_index=it2.index;
@@ -95,6 +95,8 @@ Compute()
             interface_elements.Remove_All();}
         element_base+=interface.m;
 
+        for(RANGE_ITERATOR<TV::m> it2(double_coarse_range);it2.Valid();it2.Next())
+            cut_interface(it2.index).Remove_All();
         for(RANGE_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
             cut_sides(it2.index).Remove_All();}
 }
@@ -294,8 +296,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     T mn=subcell_range.min_corner(dir),mx=subcell_range.max_corner(dir);
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++){
-            projected_elements(i).x.X(j)=(projected_elements(i).x.X(j)*coarse_factor-TV(subcell_cell)+(T).5*TV(counts(block)))*grid.dX;
-            projected_elements(i).x.X(j)(dir)=clamp(projected_elements(i).x.X(j)(dir),mn,mx);}}
+            projected_elements(i).x.X(j)=(projected_elements(i).x.X(j)*coarse_factor-TV(subcell_cell)-(T).5)*grid.dX;
+            projected_elements(i).x.X(j)(dir)=clamp(projected_elements(i).x.X(j)(dir),mn,mx);}
 
     if(!interface_elements.m){
         T volume_inside=0;
