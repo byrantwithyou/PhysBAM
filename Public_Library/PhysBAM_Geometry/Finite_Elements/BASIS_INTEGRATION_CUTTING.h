@@ -107,7 +107,7 @@ public:
     template<int d>
     int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,T scale);
     void Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
-        const TV_INT& cell,int dir,bool enclose_inside,int block,int element_base);
+        const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base);
 };
 }
 #endif

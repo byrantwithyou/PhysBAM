@@ -91,7 +91,7 @@ Compute()
             for(int b=0;b<(1<<TV::m);b++){
                 TV_INT side_index=it2.index*2+counts(b);
                 side_index(dir)=0;
-                Add_Cut_Subcell(cut_sides(side_index),interface_elements,cell_index,dir,enclose_inside,b,element_base);}
+                Add_Cut_Subcell(cut_sides(side_index),interface_elements,cell_index,it2.index,dir,enclose_inside,b,element_base);}
             interface_elements.Remove_All();}
         element_base+=interface.m;
 
@@ -279,7 +279,7 @@ Volume(VECTOR<VECTOR<T,2>,2> X,int dir)
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_CUTTING<TV,static_degree>::
 Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
-    const TV_INT& cell,int dir,bool enclose_inside,int block,int element_base)
+    const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base)
 {
     if(!side_elements.m){
         Add_Uncut_Fine_Cell(cell,block,!enclose_inside);
@@ -287,14 +287,14 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
 
     const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
     RANGE<TV> subcell_range;
-    subcell_range.max_corner=grid.Center(cell)+TV(counts(block))*(grid.dX/2);
+    subcell_range.max_corner=TV(counts(block))*(grid.dX/2);
     subcell_range.min_corner=subcell_range.max_corner-(grid.dX/2);
 
     ARRAY<PAIR<T_FACE,int> > projected_elements(side_elements);
     T mn=subcell_range.min_corner(dir),mx=subcell_range.max_corner(dir);
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++){
-            projected_elements(i).x.X(j)=(projected_elements(i).x.X(j)*coarse_factor-TV(counts(block))-(T).5)*grid.dX;
+            projected_elements(i).x.X(j)=(projected_elements(i).x.X(j)*coarse_factor-TV(subcell_cell)+(T).5*TV(counts(block)))*grid.dX;
             projected_elements(i).x.X(j)(dir)=clamp(projected_elements(i).x.X(j)(dir),mn,mx);}}
 
     if(!interface_elements.m){
@@ -341,7 +341,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface_elements.m;i++){
                 VECTOR<TV,TV::m> V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.x1);
-                for(int j=0;j<TV::m;j++) V(j)-=grid.Center(cell);
+                for(int j=0;j<TV::m;j++) V(j)=(V(j)*coarse_factor-TV(counts(block))-(T).5)*grid.dX;
                 int e=interface_elements(i).y;
                 has_element[e]=true;
                 precomputed_interface_integrals[e](it.index)=monomial.Integrate_Over_Primitive(V);}}
