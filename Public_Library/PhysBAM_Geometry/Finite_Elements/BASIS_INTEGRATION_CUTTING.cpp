@@ -368,6 +368,14 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1,1>(SYSTEM
     CELL_MAPPING<VECTOR<float,3> >&,CELL_MAPPING<VECTOR<float,3> >&,float);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,CELL_MAPPING<VECTOR<float,3> >&,float);
+template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<float>&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,
+    CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,float);
+template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,1>(SYSTEM_MATRIX_HELPER<float>&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,
+    CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,float);
+template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MAPPING<VECTOR<float,2> >&,float);
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>;
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>;
@@ -379,4 +387,12 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1,1>(SYSTE
     CELL_MAPPING<VECTOR<double,3> >&,CELL_MAPPING<VECTOR<double,3> >&,double);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<double>&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MAPPING<VECTOR<double,3> >&,double);
+template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<double>&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,
+    CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,double);
+template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1,1>(SYSTEM_MATRIX_HELPER<double>&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,
+    CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,double);
+template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<double>&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,CELL_MAPPING<VECTOR<double,2> >&,double);
 #endif

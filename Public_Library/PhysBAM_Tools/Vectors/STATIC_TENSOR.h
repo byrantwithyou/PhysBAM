@@ -25,10 +25,10 @@ public:
     VECTOR<LOWER,dim> x;
 
     T& operator()(const int* index)
-    {assert((unsigned)*index<(unsigned)rank);return x[*index](index+1);}
+    {assert((unsigned)*index<(unsigned)dim);return x[*index](index+1);}
 
     const T& operator()(const int* index) const
-    {assert((unsigned)*index<(unsigned)rank);return x[*index](index+1);}
+    {assert((unsigned)*index<(unsigned)dim);return x[*index](index+1);}
 
     T& operator()(const VECTOR<int,rank>& index)
     {return (*this)(&index(0));}

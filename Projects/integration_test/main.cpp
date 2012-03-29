@@ -7,11 +7,13 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
+#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
+#include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
@@ -24,7 +26,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 
 using namespace PhysBAM;
 
@@ -196,6 +197,8 @@ void Integration_Test(int argc,char* argv[])
     for(int i=0;i<d;i++)
         bic.Add_Block(helper_q[i],*udx_stencil[i][i],*index_map_u[i],1);
 
+    bic.Compute();
+
     INTERVAL<int> index_range_u[d] = {INTERVAL<int>(0,index_map_u[0]->next_index)};
     for(int i=1;i<d;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
     INTERVAL<int> index_range_p(index_range_u[d-1].max_corner,index_range_u[d-1].max_corner+index_map_p.next_index);
@@ -264,7 +267,9 @@ void Integration_Test(int argc,char* argv[])
 
 int main(int argc,char* argv[])
 {
-    Integration_Test<VECTOR<double,3> >(argc,argv);
+    PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
+
+    Integration_Test<VECTOR<double,2> >(argc,argv);
 
     return 0;
 }
