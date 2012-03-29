@@ -87,12 +87,12 @@ Compute()
 
         for(RANGE_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
             TV_INT cell_index=it.index*coarse_factor+it2.index;
-            ARRAY<PAIR<T_FACE,int> >& interface_elements=cut_interface(it2.index);
             for(int b=0;b<(1<<TV::m);b++){
                 TV_INT side_index=it2.index*2+counts(b);
+                ARRAY<PAIR<T_FACE,int> >& interface_elements=cut_interface(side_index);
                 side_index(dir)=0;
-                Add_Cut_Subcell(cut_sides(side_index),interface_elements,cell_index,it2.index,dir,enclose_inside,b,element_base);}
-            interface_elements.Remove_All();}
+                Add_Cut_Subcell(cut_sides(side_index),interface_elements,cell_index,it2.index,dir,enclose_inside,b,element_base);
+                interface_elements.Remove_All();}}
         element_base+=interface.m;
 
         for(RANGE_ITERATOR<TV::m> it2(double_coarse_range);it2.Valid();it2.Next())
@@ -285,6 +285,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
 {
     if(!side_elements.m){
         Add_Uncut_Fine_Cell(cell,block,!enclose_inside);
+        assert(!interface_elements.m);
         return;}
 
     const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
