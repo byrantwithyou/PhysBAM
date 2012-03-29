@@ -353,13 +353,14 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 has_element[e]=true;
                 precomputed_interface_integrals[e](it.index)=monomial.Integrate_Over_Primitive(V);}}
 
+    int sign=enclose_inside?1:-1;
     for(int i=0;i<interface_blocks.m;i++){
         INTERFACE_BLOCK* ib=interface_blocks(i);
         for(int j=0;j<ib->overlap.m;j++){
             if(ib->overlap(j).subcell&(1<<block))
                 for(int k=0;k<subcell_elements;k++)
                     if(has_element[k]){
-                        T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*ib->scale;
+                        T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*ib->scale*sign;
                         TV_INT index=ib->overlap(j).index_offset+cell;
                         int index_i=ib->cm->Get_Index(index,enclose_inside);
                         int index_o=ib->cm->Get_Index(index,!enclose_inside);
