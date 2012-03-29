@@ -111,7 +111,6 @@ Compute_Open_Entries()
     T tol=0;
 
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
-    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
 
     for(int i=0;i<(1<<TV::m);i++){
         RANGE<TV> subcell_range;
@@ -321,8 +320,9 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(monomials_needed(it.index)){
-            STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
+            STATIC_POLYNOMIAL<T,TV::m,static_degree+1> monomial;
             monomial.Set_Term(it.index,1);
+            monomial=monomial.Integrate(dir);
             T integral=0;
             for(int i=0;i<projected_elements.m;i++){
                 const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x.x1);
@@ -335,7 +335,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
         VOLUME_BLOCK* vb=volume_blocks(i);
         for(int j=0;j<vb->overlap.m;j++){
             if(vb->overlap(j).subcell&(1<<block)){
-                T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial.Integrate(dir))*vb->scale;
+                T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial)*vb->scale;
                 TV_INT index0=vb->overlap(j).index_offset0+cell;
                 TV_INT index1=vb->overlap(j).index_offset1+cell;
                 int index_i0=vb->cm0->Get_Index(index0,enclose_inside);
