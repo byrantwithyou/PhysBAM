@@ -54,6 +54,7 @@ struct SYSTEM_MATRIX_HELPER:public NONCOPYABLE
 
     void Add_Matrix(const SYSTEM_MATRIX_BASE<T>& base,bool trans=false,int dr=0,int dc=0);
     void Add_Matrix(const SPARSE_MATRIX_FLAT_MXN<T>& M,bool trans=false,int dr=0,int dc=0);
+    void Add_Helper(const SYSTEM_MATRIX_HELPER<T>& helper);
     void Transpose(INTERVAL<int> range);
     void Add_Transpose(INTERVAL<int> range);
     void Scale(T s,INTERVAL<int> range);

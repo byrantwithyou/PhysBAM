@@ -21,6 +21,15 @@ Add_Matrix(const SYSTEM_MATRIX_BASE<T>& base,bool trans,int dr,int dc)
     if(dr || dc) Shift(dr,dc);
 }
 //#####################################################################
+// Function Add_Helper
+//#####################################################################
+template<class T> void SYSTEM_MATRIX_HELPER<T>::
+Add_Helper(const SYSTEM_MATRIX_HELPER<T>& helper)
+{
+    New_Block();
+    data.Append_Elements(helper.data);
+}
+//#####################################################################
 // Function Transpose_Add
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::

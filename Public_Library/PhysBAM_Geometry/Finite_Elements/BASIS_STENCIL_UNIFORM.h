@@ -8,10 +8,11 @@
 #define __BASIS_STENCIL_UNIFORM__
 
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 namespace PhysBAM{
 
-template<class TV>
+template<class T,int rank,int d> struct STATIC_POLYNOMIAL;
+
+template<class TV,int d>
 struct BASIS_STENCIL_UNIFORM
 {
     typedef VECTOR<int,TV::m> TV_INT;typedef typename TV::SCALAR T;
@@ -21,7 +22,7 @@ struct BASIS_STENCIL_UNIFORM
     struct ENTRY
     {
         RANGE<TV_INT> region; // In units of dx/2
-        MULTIVARIATE_POLYNOMIAL<TV> polynomial; // In units of dx
+        STATIC_POLYNOMIAL<T,TV::m,d> polynomial; // In units of dx
     };
 
     ARRAY<ENTRY> stencils;
@@ -29,8 +30,8 @@ struct BASIS_STENCIL_UNIFORM
     struct DICED
     {
         TV_INT index_offset;
-        RANGE<TV_INT> range; // Subset of [-1,1)
-        MULTIVARIATE_POLYNOMIAL<TV> polynomial;
+        int subcell; // flags indicating fine cells
+        STATIC_POLYNOMIAL<T,TV::m,d> polynomial;
     };
 
     ARRAY<DICED> diced;

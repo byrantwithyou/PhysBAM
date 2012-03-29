@@ -7,16 +7,15 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
+#include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_BOUNDARY_UNIFORM.h>
-#include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_CUTTING.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MAPPING.h>
@@ -25,6 +24,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
+#include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 
 using namespace PhysBAM;
 
@@ -139,17 +139,18 @@ void Integration_Test(int argc,char* argv[])
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    BASIS_STENCIL_UNIFORM<TV> p_stencil(grid.dX),*u_stencil[d],*udx_stencil[d][d];
+    BASIS_STENCIL_UNIFORM<TV,0> p_stencil(grid.dX);
+    BASIS_STENCIL_UNIFORM<TV,1> *u_stencil[d],*udx_stencil[d][d];
     p_stencil.Set_Center();
     p_stencil.Set_Constant_Stencil();
     p_stencil.Dice_Stencil();
     for(int i=0;i<d;i++){
-        u_stencil[i]=new BASIS_STENCIL_UNIFORM<TV>(grid.dX);
+        u_stencil[i]=new BASIS_STENCIL_UNIFORM<TV,1>(grid.dX);
         u_stencil[i]->Set_Face(i);
         u_stencil[i]->Set_Multilinear_Stencil();
         u_stencil[i]->Dice_Stencil();
         for(int j=0;j<d;j++){
-            udx_stencil[i][j]=new BASIS_STENCIL_UNIFORM<TV>(*u_stencil[i]);
+            udx_stencil[i][j]=new BASIS_STENCIL_UNIFORM<TV,1>(*u_stencil[i]);
             udx_stencil[i][j]->Differentiate(j);
             udx_stencil[i][j]->Dice_Stencil();}}
 
@@ -170,38 +171,30 @@ void Integration_Test(int argc,char* argv[])
 
     SYSTEM_MATRIX_HELPER<T> helper;
     RANGE<TV_INT> boundary_conditions;
-    boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
-    boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_UNIFORM<TV>::periodic);
+    boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
+    boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
 
-    INTERVAL<int> block_uu[d][d],block_p[d],block_q[d];
+//    INTERVAL<int> block_uu[d][d],block_p[d],block_q[d];
+    SYSTEM_MATRIX_HELPER<T> helper_uu[d][d],helper_p[d],helper_q[d];
+    BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi);
 
     // Diagonal blocks
-    for(int i=0;i<d;i++){
-        int start=helper.start;
-        for(int j=0;j<d;j++){
-            BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],phi).Compute_Matrix(helper);
-            helper.Scale(mu*(1+(i==j)));}
-        block_uu[i][i]=helper.Get_Block();
-        block_uu[i][i].min_corner=start;
-        helper.New_Block();}
-
-    // Off-diagonal viscosity blocks
-    int start_off_diag=helper.start;
     for(int i=0;i<d;i++)
-        for(int j=i+1;j<d;j++){
-            BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,*udx_stencil[i][j],*udx_stencil[j][i],*index_map_u[i],*index_map_u[j],phi).Compute_Matrix(helper);
-            helper.Scale(mu);
-            block_uu[i][j]=helper.Get_Block();}
+        for(int j=0;j<d;j++)
+            bic.Add_Block(helper_uu[i][i],*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],mu*(1+(i==j)));
+
+    // Off-diagonal blocks
+    for(int i=0;i<d;i++)
+        for(int j=i+1;j<d;j++)
+            bic.Add_Block(helper_uu[i][j],*udx_stencil[i][j],*udx_stencil[j][i],*index_map_u[i],*index_map_u[j],mu);
 
     // Pressure blocks
-    for(int i=0;i<d;i++){
-        BASIS_INTEGRATION_UNIFORM<TV>(boundary_conditions,grid,coarse_grid,*udx_stencil[i][i],p_stencil,*index_map_u[i],index_map_p,phi).Compute_Matrix(helper);
-        block_p[i]=helper.Get_Block();}
+    for(int i=0;i<d;i++)
+        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],index_map_p,1);
 
     // Traction blocks
-    for(int i=0;i<d;i++){
-        BASIS_INTEGRATION_BOUNDARY_UNIFORM<TV>(grid,*u_stencil[i],q_stencil,*index_map_u[i]).Compute_Matrix(helper);
-        block_q[i]=helper.Get_Block();}
+    for(int i=0;i<d;i++)
+        bic.Add_Block(helper_q[i],*udx_stencil[i][i],*index_map_u[i],1);
 
     INTERVAL<int> index_range_u[d] = {INTERVAL<int>(0,index_map_u[0]->next_index)};
     for(int i=1;i<d;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
@@ -217,14 +210,20 @@ void Integration_Test(int argc,char* argv[])
     printf("\n");
 
     for(int i=0;i<d;i++)
-        for(int j=0;j<d;j++)
-            helper.Shift(index_range_u[i].min_corner,index_range_u[j].min_corner,block_uu[i][j]);
-    for(int i=0;i<d;i++)
-        helper.Shift(index_range_u[i].min_corner,index_range_p.min_corner,block_p[i]);
-    for(int i=0;i<d;i++)
-        helper.Shift(index_range_u[i].min_corner,index_range_q[i].min_corner,block_q[i]);
+        for(int j=0;j<d;j++){
+            helper_uu[i][j].Shift(index_range_u[i].min_corner,index_range_u[j].min_corner);
+            helper.Add_Helper(helper_uu[i][j]);
+            if(i!=j) helper.Add_Transpose();}
 
-    helper.Add_Transpose(INTERVAL<int>(start_off_diag,helper.data.m));
+    for(int i=0;i<d;i++){
+        helper_p[i].Shift(index_range_u[i].min_corner,index_range_p.min_corner);
+        helper.Add_Helper(helper_p[i]);
+        helper.Add_Transpose();}
+
+    for(int i=0;i<d;i++){
+        helper_q[i].Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);
+        helper.Add_Helper(helper_q[i]);
+        helper.Add_Transpose();}
 
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(finish,finish,matrix,1e-14);
@@ -261,7 +260,7 @@ void Integration_Test(int argc,char* argv[])
     Dump_Frame(z_p,index_map_p,index_map_u,object,"error p %c");
 
     OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
-};
+}
 
 int main(int argc,char* argv[])
 {

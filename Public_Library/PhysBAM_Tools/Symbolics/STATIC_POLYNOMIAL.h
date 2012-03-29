@@ -32,15 +32,15 @@ struct STATIC_POLYNOMIAL
     {size=size.Componentwise_Max(power);terms(power)=x;}
 
     template<int d2>
-    STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> operator+ (const STATIC_POLYNOMIAL<T,rank,d2>& p)
+    STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> operator+ (const STATIC_POLYNOMIAL<T,rank,d2>& p) const
     {STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> r;r=*this;r+=p;return r;}
 
     template<int d2>
-    STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> operator- (const STATIC_POLYNOMIAL<T,rank,d2>& p)
+    STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> operator- (const STATIC_POLYNOMIAL<T,rank,d2>& p) const
     {STATIC_POLYNOMIAL<T,rank,(d>d2?d:d2)> r;r=*this;r-=p;return r;}
 
     template<int d2>
-    STATIC_POLYNOMIAL<T,rank,(d+d2)> operator* (const STATIC_POLYNOMIAL<T,rank,d2>& p)
+    STATIC_POLYNOMIAL<T,rank,(d+d2)> operator* (const STATIC_POLYNOMIAL<T,rank,d2>& p) const
     {STATIC_POLYNOMIAL<T,rank,(d+d2)> r;r.Multiply(*this,p,false);return r;}
 
     void Compress_Size()
