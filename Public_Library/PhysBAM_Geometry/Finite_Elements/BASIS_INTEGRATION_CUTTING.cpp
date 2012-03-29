@@ -288,7 +288,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
     RANGE<TV> subcell_range;
     subcell_range.max_corner=grid.Center(cell)+TV(counts(block))*(grid.dX/2);
-    subcell_range.max_corner=subcell_range.min_corner-(grid.dX/2);
+    subcell_range.min_corner=subcell_range.max_corner-(grid.dX/2);
 
     ARRAY<PAIR<T_FACE,int> > projected_elements(side_elements);
     T mn=subcell_range.min_corner(dir),mx=subcell_range.max_corner(dir);
