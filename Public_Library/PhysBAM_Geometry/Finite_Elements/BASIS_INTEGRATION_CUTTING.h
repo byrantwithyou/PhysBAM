@@ -34,7 +34,6 @@ public:
 
     RANGE<TV_INT> boundary_conditions;
     const ARRAY<T,TV_INT>& phi;
-    STATIC_TENSOR<bool,TV::m,static_degree+2> cut_volume_monomials_needed;
     STATIC_TENSOR<bool,TV::m,static_degree+1> volume_monomials_needed;
     STATIC_TENSOR<bool,TV::m,static_degree> surface_monomials_needed;
     int coarse_factor;
