@@ -117,7 +117,7 @@ Differentiate(int v)
 {
     int k=0;
     for(int i=0;i<stencils.m;i++){
-        stencils(i).polynomial.Differentiate(v);
+        stencils(i).polynomial=stencils(i).polynomial.Differentiate(v);
         stencils(i).polynomial.Compress_Size();
         if(stencils(i).polynomial.size!=TV_INT())
             stencils(k++)=stencils(i);}
