@@ -34,7 +34,7 @@ public:
 
     RANGE<TV_INT> boundary_conditions;
     const ARRAY<T,TV_INT>& phi;
-    STATIC_TENSOR<bool,TV::m,static_degree+1> monomials_needed;
+    STATIC_TENSOR<bool,TV::m,static_degree+2> monomials_needed;
     int coarse_factor;
     RANGE<TV_INT> double_coarse_range,coarse_range;
 
