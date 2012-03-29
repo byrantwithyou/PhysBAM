@@ -297,7 +297,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++){
             projected_elements(i).x.X(j)=(projected_elements(i).x.X(j)*coarse_factor-TV(subcell_cell)-(T).5)*grid.dX;
-            projected_elements(i).x.X(j)(dir)=clamp(projected_elements(i).x.X(j)(dir),mn,mx);}
+            projected_elements(i).x.X(j)(dir)=clamp(projected_elements(i).x.X(j)(dir),mn,mx);}}
 
     if(!interface_elements.m){
         T volume_inside=0;
