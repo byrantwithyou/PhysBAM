@@ -108,6 +108,7 @@ Compute_Open_Entries()
 {
     STATIC_TENSOR<T,TV::m,static_degree+1> uncut_subcell[1<<TV::m];
     const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
+    T tol=0;
 
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     for(int i=0;i<(1<<TV::m);i++){
@@ -119,8 +120,10 @@ Compute_Open_Entries()
             if(monomials_needed(it.index)){
                 STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
                 monomial.Set_Term(it.index,1);
-                uncut_subcell[i](it.index)=monomial.Definite_Integral(subcell_range);
                 LOG::cout<<"mono "<<monomial<<"  range "<<subcell_range<<"  int "<<monomial.Definite_Integral(subcell_range)<<std::endl;}}
+                uncut_subcell[i](it.index)=monomial.Definite_Integral(subcell_range);}
+        tol=max(tol,uncut_subcell[i](TV_INT()));}
+    tol*=1e-14;
 
     for(int k=0;k<volume_blocks.m;k++){
         VOLUME_BLOCK* vb=volume_blocks(k);
@@ -129,6 +132,7 @@ Compute_Open_Entries()
                 if(vb->overlap(i).subcell&(1<<b)){
                     T integral=Precomputed_Integral(uncut_subcell[b],vb->overlap(i).polynomial);
                     LOG::cout<<"poly "<<vb->overlap(i).polynomial<<"  integral "<<integral<<std::endl;
+                    if(fabs(integral)<tol) continue;
                     VOLUME_MATRIX_ENTRY me={vb->overlap(i).index_offset0,vb->overlap(i).index_offset1,integral};
                     vb->open_subcell_entries[b].Append(me);}}
 
@@ -285,12 +289,12 @@ template<class TV,int static_degree> void BASIS_INTEGRATION_CUTTING<TV,static_de
 Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
     const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base)
 {
+    const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
     if(!side_elements.m){
         Add_Uncut_Fine_Cell(cell,block,!enclose_inside);
         assert(!interface_elements.m);
         return;}
 
-    const VECTOR<TV_INT,(1<<TV::m)>& counts=GRID<TV>::Binary_Counts(TV_INT());
     RANGE<TV> subcell_range;
     subcell_range.max_corner=TV(counts(block))*(grid.dX/2);
     subcell_range.min_corner=subcell_range.max_corner-(grid.dX/2);

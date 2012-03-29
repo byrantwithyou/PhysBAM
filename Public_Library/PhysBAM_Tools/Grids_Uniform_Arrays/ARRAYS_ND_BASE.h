@@ -46,7 +46,7 @@ public:
 protected:
     T_ARRAY& operator=(const ARRAY_BASE& source)
     {T_ARRAY& self=Derived();RANGE<TV_INT> domain_indices=self.Domain_Indices();const T_ARRAY& source_=source.Derived();assert(domain_indices==source_.Domain_Indices());
-    if(!T_ARRAY::Same_Array(self,source_)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.Index())=source_(iterator.Index());
+    if(!T_ARRAY::Same_Array(self,source_)) for(RANGE_ITERATOR<dimension> iterator(domain_indices);iterator.Valid();iterator.Next()) self(iterator.index)=source_(iterator.index);
     return self;}
 
     template<class T_ARRAY1>
