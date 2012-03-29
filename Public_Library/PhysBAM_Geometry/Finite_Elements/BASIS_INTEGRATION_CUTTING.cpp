@@ -294,7 +294,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     T mn=subcell_range.min_corner(dir),mx=subcell_range.max_corner(dir);
     for(int i=0;i<projected_elements.m;i++){
         for(int j=0;j<TV::m;j++){
-            projected_elements(i).x.X(j)=projected_elements(i).x.X(j)*coarse_factor-TV(counts(block))-(T).5;
+            projected_elements(i).x.X(j)=(projected_elements(i).x.X(j)*coarse_factor-TV(counts(block))-(T).5)*grid.dX;
             projected_elements(i).x.X(j)(dir)=clamp(projected_elements(i).x.X(j)(dir),mn,mx);}}
 
     if(!interface_elements.m){
@@ -340,7 +340,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface_elements.m;i++){
-                const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.x1);
+                VECTOR<TV,TV::m> V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.x1);
+                for(int j=0;j<TV::m;j++) V(j)-=grid.Center(cell);
                 int e=interface_elements(i).y;
                 has_element[e]=true;
                 precomputed_interface_integrals[e](it.index)=monomial.Integrate_Over_Primitive(V);}}
