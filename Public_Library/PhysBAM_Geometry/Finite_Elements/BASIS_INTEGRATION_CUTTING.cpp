@@ -111,7 +111,6 @@ Compute_Open_Entries()
     T tol=0;
 
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
-
     for(int i=0;i<(1<<TV::m);i++){
         RANGE<TV> subcell_range;
         subcell_range.max_corner=TV(counts(i))*grid.dX/2;
@@ -230,11 +229,8 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0
     for(int i=0;i<vb->overlap.m;i++){
         RANGE<TV_INT> range(TV_INT(),vb->overlap(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
-            if(vb->overlap(i).polynomial.terms(it.index)){
-                monomials_needed(it.index)=true;
-                for(int v=0;v<TV::m;v++)
-                    monomials_needed(it.index+TV_INT::Axis_Vector(v))=true;
-            }}
+            if(vb->overlap(i).polynomial.terms(it.index))
+                monomials_needed(it.index)=true;}
 
     return volume_blocks.Append(vb);
 }
