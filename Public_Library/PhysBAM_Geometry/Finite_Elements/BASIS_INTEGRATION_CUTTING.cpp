@@ -312,7 +312,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
         Add_Uncut_Fine_Cell(cell,block,enclose_inside==filled);
         return;}
 
-    STATIC_TENSOR<T,TV::m,static_degree+2> precomputed_integrals;
+    STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_integrals;
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(volume_monomials_needed(it.index)){
@@ -341,7 +341,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 vb->helper->data.Append(TRIPLE<int,int,T>(index_i0,index_i1,integral));
                 vb->helper->data.Append(TRIPLE<int,int,T>(index_o0,index_o1,-integral));}}}
 
-    STATIC_TENSOR<T,TV::m,static_degree> precomputed_interface_integrals[subcell_elements];
+    STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals[subcell_elements];
     bool has_element[subcell_elements]={};
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(surface_monomials_needed(it.index)){
