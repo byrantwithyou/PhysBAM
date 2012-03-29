@@ -125,7 +125,6 @@ Compute_Open_Entries()
             if(monomials_needed(it.index)){
                 STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
                 monomial.Set_Term(it.index,1);
-                LOG::cout<<"mono "<<monomial<<"  range "<<subcell_range<<"  int "<<monomial.Definite_Integral(subcell_range)<<std::endl;
                 uncut_subcell[i](it.index)=monomial.Definite_Integral(subcell_range);}
         tol=max(tol,uncut_subcell[i](TV_INT()));}
     tol*=1e-14;
@@ -136,7 +135,6 @@ Compute_Open_Entries()
             for(int b=0;b<(1<<TV::m);b++)
                 if(vb->overlap(i).subcell&(1<<b)){
                     T integral=Precomputed_Integral(uncut_subcell[b],vb->overlap(i).polynomial);
-                    LOG::cout<<"poly "<<vb->overlap(i).polynomial<<"  integral "<<integral<<std::endl;
                     if(fabs(integral)<tol) continue;
                     VOLUME_MATRIX_ENTRY me={vb->overlap(i).index_offset0,vb->overlap(i).index_offset1,integral};
                     vb->open_subcell_entries[b].Append(me);}}
@@ -337,7 +335,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
         VOLUME_BLOCK* vb=volume_blocks(i);
         for(int j=0;j<vb->overlap.m;j++){
             if(vb->overlap(j).subcell&(1<<block)){
-                T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial)*vb->scale;
+                T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial.Integrate(dir))*vb->scale;
                 TV_INT index0=vb->overlap(j).index_offset0+cell;
                 TV_INT index1=vb->overlap(j).index_offset1+cell;
                 int index_i0=vb->cm0->Get_Index(index0,enclose_inside);
