@@ -111,6 +111,11 @@ Compute_Open_Entries()
     T tol=0;
 
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
+    LOG::cout<<"range "<<range<<std::endl;
+    for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
+        LOG::cout<<it.index<<monomials_needed(it.index)<<std::endl;
+
+
     for(int i=0;i<(1<<TV::m);i++){
         RANGE<TV> subcell_range;
         subcell_range.max_corner=TV(counts(i))*grid.dX/2;
@@ -120,7 +125,7 @@ Compute_Open_Entries()
             if(monomials_needed(it.index)){
                 STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
                 monomial.Set_Term(it.index,1);
-                LOG::cout<<"mono "<<monomial<<"  range "<<subcell_range<<"  int "<<monomial.Definite_Integral(subcell_range)<<std::endl;}}
+                LOG::cout<<"mono "<<monomial<<"  range "<<subcell_range<<"  int "<<monomial.Definite_Integral(subcell_range)<<std::endl;
                 uncut_subcell[i](it.index)=monomial.Definite_Integral(subcell_range);}
         tol=max(tol,uncut_subcell[i](TV_INT()));}
     tol*=1e-14;
