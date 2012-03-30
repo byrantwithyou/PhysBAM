@@ -246,7 +246,7 @@ void Integration_Test(int argc,char* argv[])
     for(int i=0;i<d;i++)
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++){
             units(j)=kg/(s*s*(d==3?m:1));
-            null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
+            null_p(j)=-object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
     
 
     matrix.Times(null_p,z_p);
