@@ -349,7 +349,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface_elements.m;i++){
                 VECTOR<TV,TV::m> V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.x1);
-                for(int j=0;j<TV::m;j++) V(j)=(V(j)*coarse_factor-TV(counts(block))-(T).5)*grid.dX;
+                for(int j=0;j<TV::m;j++) V(j)=(V(j)*coarse_factor-TV(subcell_cell)-(T).5)*grid.dX;
                 int e=interface_elements(i).y;
                 has_element[e]=true;
                 precomputed_interface_integrals[e](it.index)=monomial.Integrate_Over_Primitive(V);}}
