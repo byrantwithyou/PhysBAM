@@ -128,11 +128,11 @@ void Integration_Test(int argc,char* argv[])
     T kg=parse_args.Get_Double_Value("-kg");
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/(s*(d==3?m:1));
 
-    GRID<TV> grid(TV_INT()+4,RANGE<TV>(TV(),TV()+1)*m,true);
+    GRID<TV> grid(TV_INT()+20,RANGE<TV>(TV(),TV()+1)*m,true);
     Global_Grid(&grid);
     GRID<TV> coarse_grid(grid.counts/2,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    SPHERE<TV> sphere(TV()+(T).5*m,(T).2*m);
+    SPHERE<TV> sphere(TV()+(T).5*m,(T).31*m);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
         phi(it.index)=sphere.Signed_Distance(it.Location());
 
@@ -181,8 +181,9 @@ void Integration_Test(int argc,char* argv[])
 
     // Diagonal blocks
     for(int i=0;i<d;i++)
-        for(int j=0;j<d;j++)
-            bic.Add_Block(helper_uu[i][i],*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],mu*(1+(i==j)));
+        for(int j=0;j<d;j++){
+            LOG::cout<<"block "<<i<<j<<std::endl;
+            bic.Add_Block(helper_uu[i][i],*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],mu*(1+(i==j)));}
 
     // Off-diagonal blocks
     for(int i=0;i<d;i++)
@@ -246,30 +247,28 @@ void Integration_Test(int argc,char* argv[])
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++){
             units(j)=kg/(s*s*(d==3?m:1));
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
+    
 
     matrix.Times(null_p,z_p);
 
-    LOG::cout<<"p mode "<<null_p<<std::endl;
-    LOG::cout<<"p residual "<<z_p<<std::endl;
-    LOG::cout<<"p residual max "<<z_p.Max()<<std::endl;
+    for(int i=0;i<d;i++)
+        LOG::cout<<z[i]<<std::endl;
+    LOG::cout<<z_p<<std::endl;
 
-    // Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
-    // for(int i=0;i<d;i++){
-        // char buff[100];
-        // sprintf(buff, "null %c %%c", "uvw"[i]);
-        // Dump_Frame(null[i],index_map_p,index_map_u,object,buff);
-        // sprintf(buff, "error %c %%c", "uvw"[i]);
-        // Dump_Frame(z[i],index_map_p,index_map_u,object,buff);}
+    Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
+    for(int i=0;i<d;i++){
+        char buff[100];
+        sprintf(buff, "null %c %%c", "uvw"[i]);
+        Dump_Frame(null[i],index_map_p,index_map_u,object,buff);
+        sprintf(buff, "error %c %%c", "uvw"[i]);
+        Dump_Frame(z[i],index_map_p,index_map_u,object,buff);}
 
-    // Dump_Frame(null_p,index_map_p,index_map_u,object,"null p %c");
-    // Dump_Frame(z_p,index_map_p,index_map_u,object,"error p %c");
+    Dump_Frame(null_p,index_map_p,index_map_u,object,"null p %c");
+    Dump_Frame(z_p,index_map_p,index_map_u,object,"error p %c");
 
-    MATRIX_MXN<T> full_matrix(matrix.m,matrix.n);
-    for(int i=0;i<matrix.m;i++)
-        for(int j=0;j<matrix.n;j++)
-            if(matrix.Element_Present(i,j))
-                full_matrix(i,j)=matrix(i,j);
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",full_matrix);
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
+    LOG::cout<<units<<std::endl;
+    OCTAVE_OUTPUT<T>("unit.txt").Write("u",units);
 }
 
 int main(int argc,char* argv[])
