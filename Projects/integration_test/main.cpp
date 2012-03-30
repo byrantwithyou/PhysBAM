@@ -196,7 +196,7 @@ void Integration_Test(int argc,char* argv[])
 
     // Traction blocks
     for(int i=0;i<d;i++)
-        bic.Add_Block(helper_q[i],*udx_stencil[i][i],*index_map_u[i],1);
+        bic.Add_Block(helper_q[i],*u_stencil[i],*index_map_u[i],1);
 
     bic.Compute();
 
