@@ -332,7 +332,6 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
         for(int j=0;j<vb->overlap.m;j++){
             if(vb->overlap(j).subcell&(1<<block)){
                 T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial)*vb->scale;
-                LOG::cout<<"++poly "<<vb->overlap(j).polynomial<<" int "<<integral<<" scale "<<vb->scale<<std::endl;
                 TV_INT index0=vb->overlap(j).index_offset0+cell;
                 TV_INT index1=vb->overlap(j).index_offset1+cell;
                 int index_i0=vb->cm0->Get_Index(index0,enclose_inside);
@@ -363,7 +362,6 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 for(int k=0;k<subcell_elements;k++)
                     if(has_element[k]){
                         T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*ib->scale*sign;
-                        LOG::cout<<"poly "<<ib->overlap(j).polynomial<<" int "<<integral<<" scale "<<ib->scale<<std::endl;
                         TV_INT index=ib->overlap(j).index_offset+cell;
                         int index_i=ib->cm->Get_Index(index,enclose_inside);
                         int index_o=ib->cm->Get_Index(index,!enclose_inside);
