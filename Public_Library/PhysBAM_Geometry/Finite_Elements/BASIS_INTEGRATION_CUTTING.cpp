@@ -323,7 +323,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             for(int i=0;i<projected_elements.m;i++){
                 const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x.x1);
                 integral+=monomial.Integrate_Over_Primitive(V)*T_FACE::Normal(V)(dir);}
-            precomputed_integrals(it.index)=integral;}
+            precomputed_integrals(it.index)+=integral;}
 
     Add_Uncut_Fine_Cell(cell,block,!enclose_inside);
 
@@ -352,7 +352,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 for(int j=0;j<TV::m;j++) V(j)=(V(j)*coarse_factor-TV(subcell_cell)-(T).5)*grid.dX;
                 int e=interface_elements(i).y;
                 has_element[e]=true;
-                precomputed_interface_integrals[e](it.index)=monomial.Integrate_Over_Primitive(V);}}
+                precomputed_interface_integrals[e](it.index)+=monomial.Integrate_Over_Primitive(V);}}
 
     int sign=enclose_inside?1:-1;
     for(int i=0;i<interface_blocks.m;i++){
