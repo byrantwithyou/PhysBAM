@@ -8,9 +8,8 @@
 #define __BASIS_STENCIL_UNIFORM__
 
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
 namespace PhysBAM{
-
-template<class T,int rank,int d> struct STATIC_POLYNOMIAL;
 
 template<class TV,int d>
 struct BASIS_STENCIL_UNIFORM
