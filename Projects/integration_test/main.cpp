@@ -142,79 +142,10 @@ void Integration_Test(int argc,char* argv[])
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    BASIS_STENCIL_UNIFORM<TV,0> p_stencil(grid.dX);
-    BASIS_STENCIL_UNIFORM<TV,1> *u_stencil[d],*udx_stencil[d][d];
-    p_stencil.Set_Center();
-    p_stencil.Set_Constant_Stencil();
-    p_stencil.Dice_Stencil();
-    for(int i=0;i<d;i++){
-        u_stencil[i]=new BASIS_STENCIL_UNIFORM<TV,1>(grid.dX);
-        u_stencil[i]->Set_Face(i);
-        u_stencil[i]->Set_Multilinear_Stencil();
-        u_stencil[i]->Dice_Stencil();
-        for(int j=0;j<d;j++){
-            udx_stencil[i][j]=new BASIS_STENCIL_UNIFORM<TV,1>(*u_stencil[i]);
-            udx_stencil[i][j]->Differentiate(j);
-            udx_stencil[i][j]->Dice_Stencil();}}
-
-    typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT object;
-    MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi);
-    BASIS_STENCIL_BOUNDARY_UNIFORM<TV> q_stencil(object);
-
     for(int i=0;i<object.mesh.elements.m;i++){
         Add_Debug_Particle(object.Get_Element(i).X(0),VECTOR<T,3>(1,1,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,object.Get_Element(i).X(1)-object.Get_Element(i).X(0));}
     Flush_Frame<TV>();
-
-    CELL_MAPPING<TV> index_map_p(grid),*index_map_u[d];
-    index_map_p.periodic.Fill(true);
-    for(int i=0;i<d;i++){
-        index_map_u[i]=new CELL_MAPPING<TV>(grid);
-        index_map_u[i]->periodic.Fill(true);}
-
-    SYSTEM_MATRIX_HELPER<T> helper;
-    RANGE<TV_INT> boundary_conditions;
-    boundary_conditions.min_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
-    boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
-
-    SYSTEM_MATRIX_HELPER<T> helper_uu[d][d],helper_p[d],helper_q[d];
-    BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi);
-
-    // Diagonal blocks
-    for(int i=0;i<d;i++)
-        for(int j=0;j<d;j++){
-            bic.Add_Block(helper_uu[i][i],*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],VECTOR<T,2>(mu,mu)*(1+(i==j)));}
-
-    // Off-diagonal blocks
-    for(int i=0;i<d;i++)
-        for(int j=i+1;j<d;j++)
-            bic.Add_Block(helper_uu[i][j],*udx_stencil[i][j],*udx_stencil[j][i],*index_map_u[i],*index_map_u[j],VECTOR<T,2>(mu,mu));
-
-    // Pressure blocks
-    for(int i=0;i<d;i++)
-        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],index_map_p,VECTOR<T,2>(1,1));
-
-    // Traction blocks
-    for(int i=0;i<d;i++)
-        bic.Add_Block(helper_q[i],*u_stencil[i],*index_map_u[i],VECTOR<T,2>(1,1));
-
-    // Rhs traction blocks
-    SYSTEM_MATRIX_HELPER<T> helper_rhs_q[d],helper_rhs_p[d];
-    for(int i=0;i<d;i++)
-        bic.Add_Block(helper_rhs_q[i],*u_stencil[i],*index_map_u[i],-(T).5*VECTOR<T,2>(1,-1));
-
-    // Rhs pressure blocks
-    for(int i=0;i<d;i++)
-        bic.Add_Block(helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],index_map_p,VECTOR<T,2>(1,1));
-
-    bic.Compute();
-
-    INTERVAL<int> index_range_u[d] = {INTERVAL<int>(0,index_map_u[0]->next_index)};
-    for(int i=1;i<d;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
-    INTERVAL<int> index_range_p(index_range_u[d-1].max_corner,index_range_u[d-1].max_corner+index_map_p.next_index);
-    INTERVAL<int> index_range_q[d] = {INTERVAL<int>(index_range_p.max_corner,index_range_p.max_corner+object.mesh.elements.m)};
-    for(int i=1;i<d;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
-    int finish=index_range_q[d-1].max_corner;
 
     printf("\n");
     for(int i=0;i<d;i++) printf("%c [%i %i) ", "uvw"[i], index_range_u[i].min_corner, index_range_u[i].max_corner);
@@ -222,54 +153,12 @@ void Integration_Test(int argc,char* argv[])
     for(int i=0;i<d;i++) printf("%cq [%i %i) ", "uvw"[i], index_range_q[i].min_corner, index_range_q[i].max_corner);
     printf("\n");
 
-    for(int i=0;i<d;i++)
-        for(int j=0;j<d;j++){
-            helper_uu[i][j].Shift(index_range_u[i].min_corner,index_range_u[j].min_corner);
-            helper.Add_Helper(helper_uu[i][j]);
-            if(i!=j) helper.Add_Transpose();}
-
-    for(int i=0;i<d;i++){
-        helper_p[i].Shift(index_range_u[i].min_corner,index_range_p.min_corner);
-        helper.Add_Helper(helper_p[i]);
-        helper.Add_Transpose();}
-
-    for(int i=0;i<d;i++){
-        helper_q[i].Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);
-        helper.Add_Helper(helper_q[i]);
-        helper.Add_Transpose();}
-
-    for(int i=0;i<d;i++){
-        helper_rhs_p[i].Shift(index_range_u[i].min_corner,index_range_p.min_corner);
-        helper_rhs_q[i].Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);}
-
-    SPARSE_MATRIX_FLAT_MXN<T> matrix;
-    helper.Set_Matrix(finish,finish,matrix,1e-14);
-
     ARRAY<T,TV_INT> f_body[d][2];
     VECTOR_ND<T> f_interface[d];
     for(int i=0;i<d;i++) f_interface[i].Resize(object.mesh.elements.m);
     for(int i=0;i<d;i++) for(int s=0;s<2;s++) f_body[i][s].Resize(grid.Domain_Indices());
 
     // TODO: fill in f_interface and f_body 
-
-    VECTOR_ND<T> f(finish);
-    for(int i=0;i<d;i++)
-        for(int j=0;j<f_interface[i].n;j++)
-            f(j+index_range_q[i].min_corner)=f_interface[i](j);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int i=0;i<d;i++)
-            for(int s=0;s<2;s++){
-                int index=index_map_u[i]->Get_Index_Fixed(it.index, s);
-                if(index>=0)
-                    f(index)=f_body[i][s](it.index);}
-
-    VECTOR_ND<T> rhs(finish);
-    for(int i=0;i<d;i++)
-        for(int j=0;j<helper_rhs_q[i].data.m;j++)
-            rhs(helper_rhs_q[i].data(j).x)+=helper_rhs_q[i].data(j).z*f(helper_rhs_q[i].data(j).y);
-    for(int i=0;i<d;i++)
-        for(int j=0;j<helper_rhs_p[i].data.m;j++)
-            rhs(helper_rhs_p[i].data(j).x)+=helper_rhs_p[i].data(j).z*f(helper_rhs_p[i].data(j).y);
 
     VECTOR_ND<T> units(finish);
     VECTOR_ND<T> null[d],null_p(finish),z[d],z_p(finish);
