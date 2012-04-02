@@ -68,7 +68,7 @@ public:
         SYSTEM_MATRIX_HELPER<T>* helper;
         ARRAY<OVERLAP_VOLUME_POLYNOMIALS> overlap;
         ARRAY<VOLUME_MATRIX_ENTRY> open_entries,open_subcell_entries[1<<TV::m];
-        T scale;
+        VECTOR<T,2> scale;
     };
 
     ARRAY<VOLUME_BLOCK*> volume_blocks;
@@ -85,7 +85,7 @@ public:
         CELL_MAPPING<TV>* cm;
         SYSTEM_MATRIX_HELPER<T>* helper;
         ARRAY<OVERLAP_INTERFACE_POLYNOMIALS> overlap;
-        T scale;
+        VECTOR<T,2> scale;
     };
 
     ARRAY<INTERFACE_BLOCK*> interface_blocks;
@@ -103,9 +103,9 @@ public:
     void Apply_Matrix_Entry(VOLUME_BLOCK* vb,const TV_INT& cell,bool inside,VOLUME_MATRIX_ENTRY me);
     template<int d0,int d1>
     int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV,d1>& s1,
-        CELL_MAPPING<TV>& cm0,CELL_MAPPING<TV>& cm1,T scale);
+        CELL_MAPPING<TV>& cm0,CELL_MAPPING<TV>& cm1,const VECTOR<T,2>& scale);
     template<int d>
-    int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,T scale);
+    int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,const VECTOR<T,2>& scale);
     void Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
         const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base);
 };

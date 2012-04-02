@@ -150,10 +150,10 @@ Apply_Matrix_Entry(VOLUME_BLOCK* vb,const TV_INT& cell,bool inside,VOLUME_MATRIX
     int i0=vb->cm0->Get_Index(me.index0,inside);
     int i1=vb->cm1->Get_Index(me.index1,inside);
     assert(i0>=0 && i1>=0);
-    vb->helper->data.Append(TRIPLE<int,int,T>(i0,i1,me.x*vb->scale));
+    vb->helper->data.Append(TRIPLE<int,int,T>(i0,i1,me.x*vb->scale(inside)));
 }
 //#####################################################################
-// Function Add_Uncut_Cell
+// Function Add_Uncut_Coarse_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_CUTTING<TV,static_degree>::
 Add_Uncut_Coarse_Cell(const TV_INT& coarse_cell,int inside)
@@ -166,7 +166,7 @@ Add_Uncut_Coarse_Cell(const TV_INT& coarse_cell,int inside)
                 Apply_Matrix_Entry(vb,index,inside,vb->open_entries(j));}}
 }
 //#####################################################################
-// Function Add_Uncut_Cell
+// Function Add_Uncut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_CUTTING<TV,static_degree>::
 Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int inside)
@@ -211,7 +211,7 @@ Cut_Elements(ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT>& cut_elements,const ARRAY<T_
 //#####################################################################
 template<class TV,int static_degree> template<int d0,int d1> int BASIS_INTEGRATION_CUTTING<TV,static_degree>::
 Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV,d1>& s1,
-    CELL_MAPPING<TV>& cm0,CELL_MAPPING<TV>& cm1,T scale)
+    CELL_MAPPING<TV>& cm0,CELL_MAPPING<TV>& cm1,const VECTOR<T,2>& scale)
 {
     VOLUME_BLOCK* vb=new VOLUME_BLOCK;
     vb->cm0=&cm0;
@@ -238,7 +238,7 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0
 // Function Add_Block
 //#####################################################################
 template<class TV,int static_degree> template<int d> int BASIS_INTEGRATION_CUTTING<TV,static_degree>::
-Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,T scale)
+Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,const VECTOR<T,2>& scale)
 {
     INTERFACE_BLOCK* ib=new INTERFACE_BLOCK;
     ib->cm=&cm;
@@ -331,15 +331,15 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
         VOLUME_BLOCK* vb=volume_blocks(i);
         for(int j=0;j<vb->overlap.m;j++){
             if(vb->overlap(j).subcell&(1<<block)){
-                T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial)*vb->scale;
+                T integral=Precomputed_Integral(precomputed_integrals,vb->overlap(j).polynomial);
                 TV_INT index0=vb->overlap(j).index_offset0+cell;
                 TV_INT index1=vb->overlap(j).index_offset1+cell;
                 int index_i0=vb->cm0->Get_Index(index0,enclose_inside);
                 int index_o0=vb->cm0->Get_Index(index0,!enclose_inside);
                 int index_i1=vb->cm1->Get_Index(index1,enclose_inside);
                 int index_o1=vb->cm1->Get_Index(index1,!enclose_inside);
-                vb->helper->data.Append(TRIPLE<int,int,T>(index_i0,index_i1,integral));
-                vb->helper->data.Append(TRIPLE<int,int,T>(index_o0,index_o1,-integral));}}}
+                vb->helper->data.Append(TRIPLE<int,int,T>(index_i0,index_i1,integral*vb->scale(1)));
+                vb->helper->data.Append(TRIPLE<int,int,T>(index_o0,index_o1,-integral*vb->scale(0)));}}}
 
     STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals[subcell_elements];
     bool has_element[subcell_elements]={};
@@ -361,48 +361,48 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             if(ib->overlap(j).subcell&(1<<block))
                 for(int k=0;k<subcell_elements;k++)
                     if(has_element[k]){
-                        T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*ib->scale*sign;
+                        T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*sign;
                         TV_INT index=ib->overlap(j).index_offset+cell;
                         int index_i=ib->cm->Get_Index(index,enclose_inside);
                         int index_o=ib->cm->Get_Index(index,!enclose_inside);
-                        ib->helper->data.Append(TRIPLE<int,int,T>(index_i,element_base+k,integral));
-                        ib->helper->data.Append(TRIPLE<int,int,T>(index_o,element_base+k,-integral));}}}
+                        ib->helper->data.Append(TRIPLE<int,int,T>(index_i,element_base+k,integral*ib->scale(1)));
+                        ib->helper->data.Append(TRIPLE<int,int,T>(index_o,element_base+k,-integral*ib->scale(0)));}}}
 }
 template class BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>;
 template class BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>;
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,
-    CELL_MAPPING<VECTOR<float,3> >&,CELL_MAPPING<VECTOR<float,3> >&,float);
+    CELL_MAPPING<VECTOR<float,3> >&,CELL_MAPPING<VECTOR<float,3> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1,1>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,
-    CELL_MAPPING<VECTOR<float,3> >&,CELL_MAPPING<VECTOR<float,3> >&,float);
+    CELL_MAPPING<VECTOR<float,3> >&,CELL_MAPPING<VECTOR<float,3> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,CELL_MAPPING<VECTOR<float,3> >&,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,CELL_MAPPING<VECTOR<float,3> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,
-    CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,float);
+    CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,1>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,
-    CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,float);
+    CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MAPPING<VECTOR<float,2> >&,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>;
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>;
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<double>&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,
-    CELL_MAPPING<VECTOR<double,3> >&,CELL_MAPPING<VECTOR<double,3> >&,double);
+    CELL_MAPPING<VECTOR<double,3> >&,CELL_MAPPING<VECTOR<double,3> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1,1>(SYSTEM_MATRIX_HELPER<double>&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,
-    CELL_MAPPING<VECTOR<double,3> >&,CELL_MAPPING<VECTOR<double,3> >&,double);
+    CELL_MAPPING<VECTOR<double,3> >&,CELL_MAPPING<VECTOR<double,3> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<double>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MAPPING<VECTOR<double,3> >&,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MAPPING<VECTOR<double,3> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<double>&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,
-    CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,double);
+    CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1,1>(SYSTEM_MATRIX_HELPER<double>&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,
-    CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,double);
+    CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<double>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,CELL_MAPPING<VECTOR<double,2> >&,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,CELL_MAPPING<VECTOR<double,2> >&,const VECTOR<double,2>&);
 #endif
