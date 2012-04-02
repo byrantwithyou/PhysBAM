@@ -41,9 +41,7 @@ Display(const int in_color) const
                 VECTOR<T,3> orth_vect=vector_field(i).Orthogonal_Vector();
                 orth_vect*=.15*size;
                 OpenGL_Line(head,head+orth_vect-(T).15*(T)size*vector_field(i),vertices);
-                OpenGL_Line(head,head-orth_vect-(T).15*(T)size*vector_field(i),vertices);
-            }
-        }
+                OpenGL_Line(head,head-orth_vect-(T).15*(T)size*vector_field(i),vertices);}}
         OpenGL_Draw_Arrays(GL_LINES,3,vertices);
         if(draw_basepoint){
             float old_point_size;
