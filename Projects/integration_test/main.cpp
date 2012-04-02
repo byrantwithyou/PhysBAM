@@ -86,7 +86,7 @@ void Dump_Frame(const VECTOR_ND<T>& v,const CELL_MAPPING<TV>& index_map_p,CM* (i
     color_map.Initialize_Colors(1e-11,10,true,true,true);
 
     char buff[100];
-    for(int dir=0;dir<TV::m;dir++)
+    for(int dir=0;dir<2;dir++)
     {
         sprintf(buff, title, dir?'-':'+');
         ARRAY<T,FACE_INDEX<TV::m> > error(grid);
@@ -128,11 +128,12 @@ void Integration_Test(int argc,char* argv[])
     T kg=parse_args.Get_Double_Value("-kg");
     T mu=parse_args.Get_Double_Value("-viscosity")*kg/(s*(d==3?m:1));
 
-    GRID<TV> grid(TV_INT()+20,RANGE<TV>(TV(),TV()+1)*m,true);
+    TV_INT counts=TV_INT()+6;
+    GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*m,true);
     Global_Grid(&grid);
     GRID<TV> coarse_grid(grid.counts/2,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    SPHERE<TV> sphere(TV()+(T).5*m,(T).31*m);
+    SPHERE<TV> sphere(TV()+(T).43*m,(T).31*m);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
         phi(it.index)=sphere.Signed_Distance(it.Location());
 
@@ -182,21 +183,29 @@ void Integration_Test(int argc,char* argv[])
     // Diagonal blocks
     for(int i=0;i<d;i++)
         for(int j=0;j<d;j++){
-            LOG::cout<<"block "<<i<<j<<std::endl;
-            bic.Add_Block(helper_uu[i][i],*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],mu*(1+(i==j)));}
+            bic.Add_Block(helper_uu[i][i],*udx_stencil[i][j],*udx_stencil[i][j],*index_map_u[i],*index_map_u[i],VECTOR<T,2>(mu,mu)*(1+(i==j)));}
 
     // Off-diagonal blocks
     for(int i=0;i<d;i++)
         for(int j=i+1;j<d;j++)
-            bic.Add_Block(helper_uu[i][j],*udx_stencil[i][j],*udx_stencil[j][i],*index_map_u[i],*index_map_u[j],mu);
+            bic.Add_Block(helper_uu[i][j],*udx_stencil[i][j],*udx_stencil[j][i],*index_map_u[i],*index_map_u[j],VECTOR<T,2>(mu,mu));
 
     // Pressure blocks
     for(int i=0;i<d;i++)
-        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],index_map_p,1);
+        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],index_map_p,VECTOR<T,2>(1,1));
 
     // Traction blocks
     for(int i=0;i<d;i++)
-        bic.Add_Block(helper_q[i],*u_stencil[i],*index_map_u[i],1);
+        bic.Add_Block(helper_q[i],*u_stencil[i],*index_map_u[i],VECTOR<T,2>(1,1));
+
+    // Rhs traction blocks
+    SYSTEM_MATRIX_HELPER<T> helper_rhs_q[d],helper_rhs_p[d];
+    for(int i=0;i<d;i++)
+        bic.Add_Block(helper_rhs_q[i],*u_stencil[i],*index_map_u[i],-(T).5*VECTOR<T,2>(1,-1));
+
+    // Rhs pressure blocks
+    for(int i=0;i<d;i++)
+        bic.Add_Block(helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],index_map_p,VECTOR<T,2>(1,1));
 
     bic.Compute();
 
@@ -229,8 +238,38 @@ void Integration_Test(int argc,char* argv[])
         helper.Add_Helper(helper_q[i]);
         helper.Add_Transpose();}
 
+    for(int i=0;i<d;i++){
+        helper_rhs_p[i].Shift(index_range_u[i].min_corner,index_range_p.min_corner);
+        helper_rhs_q[i].Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);}
+
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     helper.Set_Matrix(finish,finish,matrix,1e-14);
+
+    ARRAY<T,TV_INT> f_body[d][2];
+    VECTOR_ND<T> f_interface[d];
+    for(int i=0;i<d;i++) f_interface[i].Resize(object.mesh.elements.m);
+    for(int i=0;i<d;i++) for(int s=0;s<2;s++) f_body[i][s].Resize(grid.Domain_Indices());
+
+    // TODO: fill in f_interface and f_body 
+
+    VECTOR_ND<T> f(finish);
+    for(int i=0;i<d;i++)
+        for(int j=0;j<f_interface[i].n;j++)
+            f(j+index_range_q[i].min_corner)=f_interface[i](j);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        for(int i=0;i<d;i++)
+            for(int s=0;s<2;s++){
+                int index=index_map_u[i]->Get_Index_Fixed(it.index, s);
+                if(index>=0)
+                    f(index)=f_body[i][s](it.index);}
+
+    VECTOR_ND<T> rhs(finish);
+    for(int i=0;i<d;i++)
+        for(int j=0;j<helper_rhs_q[i].data.m;j++)
+            rhs(helper_rhs_q[i].data(j).x)+=helper_rhs_q[i].data(j).z*f(helper_rhs_q[i].data(j).y);
+    for(int i=0;i<d;i++)
+        for(int j=0;j<helper_rhs_p[i].data.m;j++)
+            rhs(helper_rhs_p[i].data(j).x)+=helper_rhs_p[i].data(j).z*f(helper_rhs_p[i].data(j).y);
 
     VECTOR_ND<T> units(finish);
     VECTOR_ND<T> null[d],null_p(finish),z[d],z_p(finish);
@@ -247,13 +286,12 @@ void Integration_Test(int argc,char* argv[])
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++){
             units(j)=kg/(s*s*(d==3?m:1));
             null_p(j)=-object.Get_Element(j-index_range_q[i].min_corner).Normal()(i)*units(j);}
-    
 
     matrix.Times(null_p,z_p);
 
     for(int i=0;i<d;i++)
-        LOG::cout<<z[i]<<std::endl;
-    LOG::cout<<z_p<<std::endl;
+        LOG::cout<<z[i].Magnitude()<<std::endl;
+    LOG::cout<<z_p.Magnitude()<<std::endl;
 
     Dump_Frame(ARRAY<T,FACE_INDEX<d> >(grid),"finish setup");
     for(int i=0;i<d;i++){
@@ -267,7 +305,7 @@ void Integration_Test(int argc,char* argv[])
     Dump_Frame(z_p,index_map_p,index_map_u,object,"error p %c");
 
     OCTAVE_OUTPUT<T>("M.txt").Write("M",matrix);
-    LOG::cout<<units<<std::endl;
+//    LOG::cout<<units<<std::endl;
     OCTAVE_OUTPUT<T>("unit.txt").Write("u",units);
 }
 
@@ -275,7 +313,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    Integration_Test<VECTOR<double,2> >(argc,argv);
+    Integration_Test<VECTOR<double,3> >(argc,argv);
 
     return 0;
 }
