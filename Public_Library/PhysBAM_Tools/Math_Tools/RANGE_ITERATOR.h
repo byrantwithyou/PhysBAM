@@ -16,7 +16,7 @@ struct RANGE_ITERATOR
     RANGE<TV_INT> domain;
     TV_INT index;
 
-    RANGE_ITERATOR(const RANGE<TV_INT>& domain_input)
+    RANGE_ITERATOR(const RANGE<TV_INT>& domain_input) PHYSBAM_ALWAYS_INLINE
         :domain(domain_input)
     {Reset();}
 
@@ -26,7 +26,7 @@ struct RANGE_ITERATOR
     void Next() PHYSBAM_ALWAYS_INLINE
     {index(d-1)++;if(!Valid()) Next_Helper();}
 
-    void Next_Helper()
+    void Next_Helper() PHYSBAM_ALWAYS_INLINE
     {
         index(d-1)=domain.min_corner(d-1);
         for(int i=d-2;i>=0;i--){
@@ -35,7 +35,7 @@ struct RANGE_ITERATOR
         index(d-1)=domain.max_corner(d-1);
     }
 
-    void Reset()
+    void Reset() PHYSBAM_ALWAYS_INLINE
     {index=domain.min_corner;if(!index.All_Less(domain.max_corner)) index(d-1)=domain.max_corner(d-1);}
 };
 
@@ -47,7 +47,7 @@ struct RANGE_ITERATOR<0>
     TV_INT index;
     bool first;
 
-    RANGE_ITERATOR(const RANGE<TV_INT>& domain_input)
+    RANGE_ITERATOR(const RANGE<TV_INT>& domain_input) PHYSBAM_ALWAYS_INLINE
     {first=true;}
 
     bool Valid() const PHYSBAM_ALWAYS_INLINE
@@ -56,7 +56,7 @@ struct RANGE_ITERATOR<0>
     void Next() PHYSBAM_ALWAYS_INLINE
     {first=false;}
 
-    void Reset()
+    void Reset() PHYSBAM_ALWAYS_INLINE
     {first=true;}
 };
 }
