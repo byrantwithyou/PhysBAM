@@ -74,7 +74,7 @@ void Integration_Test(int argc,char* argv[])
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    // Setting the domain
+    // Domain
 
     switch(test){
         case 1:case 2:case 3:{
@@ -94,7 +94,7 @@ void Integration_Test(int argc,char* argv[])
 
     VECTOR_ND<T> exact_solution(ifs.system_size);
 
-    // Setting forces and exact solution
+    // Forces and exact solution
     
     switch(test){
         case 1:{ 
@@ -139,19 +139,21 @@ void Integration_Test(int argc,char* argv[])
     for(int i=0;i<d;i++) printf("%cq [%i %i) ", "uvw"[i], ifs.index_range_q[i].min_corner, ifs.index_range_q[i].max_corner);
     printf("\n");
 
-    // System solve
+    // Solve
 
     CONJUGATE_RESIDUAL<T> cr;
+    
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_q;
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_s;
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_t;
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_r;
-    bool converged=cr.Solve(ifs,ifs.solution,ifs.rhs,cr_q,cr_s,cr_t,cr_r,1e-7,0,1e4);
 
-    if(converged)
-        LOG::cout<<"Converged"<<std::endl;
-    else
-        LOG::cout<<"Not converged"<<std::endl;
+    cr_q.v.Resize(ifs.system_size);
+    cr_s.v.Resize(ifs.system_size);
+    cr_t.v.Resize(ifs.system_size);
+    cr_r.v.Resize(ifs.system_size);
+
+    cr.Solve(ifs,ifs.solution,ifs.rhs,cr_q,cr_s,cr_t,cr_r,1e-7,0,1e4);
 }
 
 int main(int argc,char* argv[])
