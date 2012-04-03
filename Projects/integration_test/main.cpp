@@ -8,6 +8,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
@@ -66,8 +67,15 @@ void Integration_Test(int argc,char* argv[])
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*m,true);
     GRID<TV> coarse_grid(grid.counts/cgf,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    
+
+    std::string output_directory="output";
+    FILE_UTILITIES::Create_Directory(output_directory);
+    FILE_UTILITIES::Create_Directory(output_directory+"/common");
+    LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
+    FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
+
     // Setting the domain
+
     switch(test){
         case 1:case 2:case 3:{
             for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
@@ -86,7 +94,8 @@ void Integration_Test(int argc,char* argv[])
 
     VECTOR_ND<T> exact_solution(ifs.system_size);
 
-    // Setting the forces
+    // Setting forces and exact solution
+    
     switch(test){
         case 1:{ 
             int dir=1;
@@ -124,17 +133,25 @@ void Integration_Test(int argc,char* argv[])
 
     ifs.Set_RHS(f_body,f_interface);
 
-    std::string output_directory="output";
-    FILE_UTILITIES::Create_Directory(output_directory);
-    FILE_UTILITIES::Create_Directory(output_directory+"/common");
-    LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
-    FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
-
     printf("\n");
     for(int i=0;i<d;i++) printf("%c [%i %i) ", "uvw"[i], ifs.index_range_u[i].min_corner, ifs.index_range_u[i].max_corner);
     printf("p [%i %i) ", ifs.index_range_p.min_corner, ifs.index_range_p.max_corner);
     for(int i=0;i<d;i++) printf("%cq [%i %i) ", "uvw"[i], ifs.index_range_q[i].min_corner, ifs.index_range_q[i].max_corner);
     printf("\n");
+
+    // System solve
+
+    CONJUGATE_RESIDUAL<T> cr;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_q;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_s;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_t;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_r;
+    bool converged=cr.Solve(ifs,ifs.solution,ifs.rhs,cr_q,cr_s,cr_t,cr_r,1e-7,0,1e4);
+
+    if(converged)
+        LOG::cout<<"Converged"<<std::endl;
+    else
+        LOG::cout<<"Not converged"<<std::endl;
 }
 
 int main(int argc,char* argv[])
