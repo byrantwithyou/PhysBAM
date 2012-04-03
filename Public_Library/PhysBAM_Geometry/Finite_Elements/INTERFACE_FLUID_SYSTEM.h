@@ -51,7 +51,7 @@ public:
 
 //#####################################################################
     void Set_Matrix(const VECTOR<T,2>& mu);
-    void Set_RHS(const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface);
+    void Set_RHS(VECTOR_T& rhs, const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface);
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;

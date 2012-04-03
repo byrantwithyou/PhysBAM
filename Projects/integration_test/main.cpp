@@ -48,7 +48,7 @@ void Integration_Test(int argc,char* argv[])
     parse_args.Add_Double_Argument("-sec",1,"second scale");
     parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
     parse_args.Add_Integer_Argument("-test",1,"test number");
-    parse_args.Add_Integer_Argument("-res",4,"resolution");
+    parse_args.Add_Integer_Argument("-resolution",4,"resolution");
     parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
     parse_args.Parse(argc,argv);
     T m=parse_args.Get_Double_Value("-m");
@@ -58,7 +58,7 @@ void Integration_Test(int argc,char* argv[])
     mu(0)=parse_args.Get_Double_Value("-mu_o")*kg/(sec*(d==3?m:1));
     mu(1)=parse_args.Get_Double_Value("-mu_i")*kg/(sec*(d==3?m:1));
     int test=parse_args.Get_Integer_Value("-test");
-    int res=parse_args.Get_Integer_Value("-res");
+    int res=parse_args.Get_Integer_Value("-resolution");
     int cgf=parse_args.Get_Integer_Value("-cgf");
 
     if(res%cgf){LOG::cerr<<"Resolution must be divisible by coarse grid factor."<<std::endl; exit(-1);}
@@ -131,8 +131,6 @@ void Integration_Test(int argc,char* argv[])
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
-    ifs.Set_RHS(f_body,f_interface);
-
     printf("\n");
     for(int i=0;i<d;i++) printf("%c [%i %i) ", "uvw"[i], ifs.index_range_u[i].min_corner, ifs.index_range_u[i].max_corner);
     printf("p [%i %i) ", ifs.index_range_p.min_corner, ifs.index_range_p.max_corner);
@@ -141,19 +139,21 @@ void Integration_Test(int argc,char* argv[])
 
     // Solve
 
-    CONJUGATE_RESIDUAL<T> cr;
-    
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_q;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_s;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_t;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > cr_r;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol,cr_q,cr_s,cr_t,cr_r;
 
+    ifs.Set_RHS(rhs,f_body,f_interface);
+    sol.v.Resize(ifs.system_size);
     cr_q.v.Resize(ifs.system_size);
     cr_s.v.Resize(ifs.system_size);
     cr_t.v.Resize(ifs.system_size);
     cr_r.v.Resize(ifs.system_size);
 
-    cr.Solve(ifs,ifs.solution,ifs.rhs,cr_q,cr_s,cr_t,cr_r,1e-7,0,1e4);
+    CONJUGATE_RESIDUAL<T> cr;
+    cr.Solve(ifs,sol,rhs,cr_q,cr_s,cr_t,cr_r,1e-7,0,1e4);
+
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs.matrix);
+    OCTAVE_OUTPUT<T>("rhs.txt").Write("rhs",rhs.v);
+    OCTAVE_OUTPUT<T>("sol.txt").Write("sol",sol.v);
 }
 
 int main(int argc,char* argv[])
