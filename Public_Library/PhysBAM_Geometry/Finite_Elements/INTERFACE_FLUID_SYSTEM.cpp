@@ -185,6 +185,27 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interf
         delete helper_rhs_p[i];}
 }
 //#####################################################################
+// Function Get_U_Part
+//#####################################################################
+template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
+Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& u_part,const int dir) const
+{
+    u_part.Resize(grid.counts);
+    for(int j=index_range_u[dir].min_corner;j<index_range_u[dir].max_corner;j++){
+        // bool sign=sign_map(j);
+        // TV_INT cell=cell_map(j);
+    }
+}
+//#####################################################################
+// Function Get_P_Part
+//#####################################################################
+template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
+Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p_part) const
+{
+    p_part.Resize(grid.counts);
+    
+}
+//#####################################################################
 // Function Multiply
 //#####################################################################
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
