@@ -108,14 +108,14 @@ void Integration_Test(int argc,char* argv[])
                         exact_solution(index)=(sqr(0.25*m)-sqr(x-0.5*m))/(m*sec);}}
             break;}
         case 3:{
-            f_interface.Fill(TV());
-            for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*((s?1:-1)*2*mu(1)/(m*sec)));
+            f_interface.Fill(TV::Axis_Vector(1)*((mu(0)-mu(1))*0.5/sec));
+            for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*((s?mu(1):-mu(0))*2/(m*sec)));
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
                 for(int s=0;s<2;s++){
                     int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,s);
                     if(index>=0){
                         T x=grid.Axis_X_Face(it.index,1).x;
-                        exact_solution(index)=(s?1:-1)*(sqr(0.25*m)-sqr(x-0.5*m))/(m*sec);}}
+                        exact_solution(index)=(s?(sqr(0.25*m)-sqr(x-0.5*m)):((x>0.5*m)?(-sqr(0.25*m)+sqr(x-m)):(-sqr(0.25*m)+sqr(x))))/(m*sec);}}
             break;}
         default:{
             LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
