@@ -44,18 +44,18 @@ void Integration_Test(int argc,char* argv[])
     parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
     parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
     parse_args.Add_Double_Argument("-m",1,"meter scale");
-    parse_args.Add_Double_Argument("-s",1,"second scale");
+    parse_args.Add_Double_Argument("-sec",1,"second scale");
     parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
     parse_args.Add_Integer_Argument("-test",1,"test number");
     parse_args.Add_Integer_Argument("-res",4,"resolution");
     parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
     parse_args.Parse(argc,argv);
     T m=parse_args.Get_Double_Value("-m");
-    T s=parse_args.Get_Double_Value("-s");
+    T sec=parse_args.Get_Double_Value("-sec");
     T kg=parse_args.Get_Double_Value("-kg");
     VECTOR<T,2> mu;
-    mu(0)=parse_args.Get_Double_Value("-mu_i")*kg/(s*(d==3?m:1));
-    mu(1)=parse_args.Get_Double_Value("-mu_o")*kg/(s*(d==3?m:1));
+    mu(0)=parse_args.Get_Double_Value("-mu_o")*kg/(sec*(d==3?m:1));
+    mu(1)=parse_args.Get_Double_Value("-mu_i")*kg/(sec*(d==3?m:1));
     int test=parse_args.Get_Integer_Value("-test");
     int res=parse_args.Get_Integer_Value("-res");
     int cgf=parse_args.Get_Integer_Value("-cgf");
@@ -69,16 +69,12 @@ void Integration_Test(int argc,char* argv[])
     
     // Setting the domain
     switch(test){
-        case 1:{
-            SPHERE<TV> sphere(TV()+(T).43*m,(T).31*m);
+        case 1:case 2:case 3:{
             for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
-                phi(it.index)=sphere.Signed_Distance(it.Location());
-            
+                phi(it.index)=-0.25*m+abs(it.Location().x-0.5*m);
             break;}
         default:{
-            LOG::cerr<<"Unknown test number."<<std::endl;
-            exit(-1);
-            break;}}
+            LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
     INTERFACE_FLUID_SYSTEM<TV> ifs(grid,coarse_grid,phi);
     ifs.Set_Matrix(mu);
@@ -90,13 +86,20 @@ void Integration_Test(int argc,char* argv[])
 
     // Setting the forces
     switch(test){
-        case 1:{
-            
+        case 1:{ 
+            for(int i=0; i<ifs.object.mesh.elements.m;i++) f_interface(i)=TV::Axis_Vector(1)*(((ifs.object.Get_Element(i).X(0).x>0.5*m)?1:-1)*(mu(0)+mu(1))/sec);
+            for(int s=0;s<2;s++) f_body[s].Fill(TV());
+            break;}
+        case 2:{
+            f_interface.Fill(TV::Axis_Vector(1)*(-mu(1)*0.5/sec));
+            for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*(s*2*mu(1)/(m*sec)));
+            break;}
+        case 3:{
+            f_interface.Fill(TV());
+            for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*((s?1:-1)*2*mu(1)/(m*sec)));
             break;}
         default:{
-            LOG::cerr<<"Unknown test number."<<std::endl;
-            exit(-1);
-            break;}}
+            LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
     ifs.Set_RHS(f_body,f_interface);
 

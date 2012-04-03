@@ -157,6 +157,7 @@ Set_RHS(const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface)
                 int index=index_map_u[i]->Get_Index_Fixed(it.index,s);
                 if(index>=0)
                     f(index)=f_body[s](it.index)(i);}}
+
     for(int i=0;i<TV::m;i++) delete index_map_u[i];
 
     rhs.v.Resize(system_size);
