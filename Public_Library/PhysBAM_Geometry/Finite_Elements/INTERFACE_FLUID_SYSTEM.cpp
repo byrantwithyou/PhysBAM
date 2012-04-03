@@ -54,7 +54,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
 
     MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi);
 
-    CELL_MAPPING<TV> index_map_p(grid);
+    CELL_MAPPING<TV> *index_map_u[TV::m],index_map_p(grid);
     index_map_p.periodic.Fill(true);
     for(int i=0;i<TV::m;i++){
         index_map_u[i]=new CELL_MAPPING<TV>(grid);
@@ -140,6 +140,23 @@ Set_Matrix(const VECTOR<T,2>& mu)
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
             null_p(j)=-object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
     null_p.Normalize();
+
+    cell_map.Resize(index_range_p.max_corner);
+    sign_map.Resize(index_range_p.max_corner);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        for(int s=0;s<2;s++){
+            int index;
+            for(int i=0;i<TV::m;i++){
+                index=index_map_u[i]->Get_Index_Fixed(it.index,s);
+                if(index>=0){
+                    cell_map(index)=it.index;
+                    sign_map(index)=s;}
+            index=index_map_p.Get_Index_Fixed(it.index,s);
+            if(index>=0){
+                cell_map(index)=it.index;
+                sign_map(index)=s;}}}
+
+    for(int i=0;i<TV::m;i++) delete index_map_u[i];
 }
 //#####################################################################
 // Function Set_RHS
@@ -151,15 +168,12 @@ Set_RHS(const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface)
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<f_interface.m;j++)
             f(j+index_range_q[i].min_corner)=f_interface(j)(i);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int i=0;i<TV::m;i++){
-            for(int s=0;s<2;s++){
-                int index=index_map_u[i]->Get_Index_Fixed(it.index,s);
-                if(index>=0)
-                    f(index)=f_body[s](it.index)(i);}}
-
-    for(int i=0;i<TV::m;i++) delete index_map_u[i];
-
+    for(int i=0;i<TV::m;i++)
+        for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++){
+            bool sign=sign_map(j);
+            TV_INT cell=cell_map(j);
+            f(j)=f_body[sign](cell)(i);}
+    
     rhs.v.Resize(system_size);
     for(int i=0;i<TV::m;i++){
         for(int j=0;j<helper_rhs_q[i]->data.m;j++)

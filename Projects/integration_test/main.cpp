@@ -89,36 +89,38 @@ void Integration_Test(int argc,char* argv[])
     // Setting the forces
     switch(test){
         case 1:{ 
-            for(int i=0; i<ifs.object.mesh.elements.m;i++) f_interface(i)=TV::Axis_Vector(1)*(((ifs.object.Get_Element(i).X(0).x>0.5*m)?1:-1)*(mu(0)+mu(1))/sec);
+            int dir=1;
+            for(int i=0; i<ifs.object.mesh.elements.m;i++) f_interface(i)=TV::Axis_Vector(dir)*(((ifs.object.Get_Element(i).X(0).x>0.5*m)?1:-1)*(mu(0)+mu(1))/sec);
             for(int s=0;s<2;s++) f_body[s].Fill(TV());
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-                for(int s=0;s<2;s++){
-                    int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,s);
-                    if(index>=0){
-                        T x=grid.Axis_X_Face(it.index,1).x;
-                        exact_solution(index)=(s?(x-0.5*m):((x>0.5*m)?(m-x):(-x)))/sec;}}
+            for(int i=ifs.index_range_u[dir].min_corner;i<ifs.index_range_u[dir].max_corner;i++){
+                bool sign=ifs.sign_map(i);
+                TV_INT cell=ifs.cell_map(i);
+                T x=grid.Axis_X_Face(cell,dir).x;
+                exact_solution(i)=(sign?(x-0.5*m):((x>0.5*m)?(m-x):(-x)))/sec;}
             break;}
         case 2:{
-            f_interface.Fill(TV::Axis_Vector(1)*(-mu(1)*0.5/sec));
-            for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*(s*2*mu(1)/(m*sec)));
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-                    int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,1);
-                    if(index>=0){
-                        T x=grid.Axis_X_Face(it.index,1).x;
-                        exact_solution(index)=(sqr(0.25*m)-sqr(x-0.5*m))/(m*sec);}}
+            int dir=1;
+            f_interface.Fill(TV::Axis_Vector(dir)*(-mu(1)*0.5/sec));
+            for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(dir)*(s*2*mu(1)/(m*sec)));
+            for(int i=ifs.index_range_u[dir].min_corner;i<ifs.index_range_u[dir].max_corner;i++){
+                bool sign=ifs.sign_map(i);
+                if(sign){
+                    TV_INT cell=ifs.cell_map(i);
+                    T x=grid.Axis_X_Face(cell,dir).x;
+                    exact_solution(i)=(sqr(0.25*m)-sqr(x-0.5*m))/(m*sec);}}
             break;}
         case 3:{
-            f_interface.Fill(TV::Axis_Vector(1)*((mu(0)-mu(1))*0.5/sec));
+            int dir=1;
+            f_interface.Fill(TV::Axis_Vector(dir)*((mu(0)-mu(1))*0.5/sec));
             for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*((s?mu(1):-mu(0))*2/(m*sec)));
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-                for(int s=0;s<2;s++){
-                    int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,s);
-                    if(index>=0){
-                        T x=grid.Axis_X_Face(it.index,1).x;
-                        exact_solution(index)=(s?(sqr(0.25*m)-sqr(x-0.5*m)):((x>0.5*m)?(-sqr(0.25*m)+sqr(x-m)):(-sqr(0.25*m)+sqr(x))))/(m*sec);}}
+            for(int i=ifs.index_range_u[dir].min_corner;i<ifs.index_range_u[dir].max_corner;i++){
+                bool sign=ifs.sign_map(i);
+                TV_INT cell=ifs.cell_map(i);
+                T x=grid.Axis_X_Face(cell,dir).x;
+                exact_solution(i)=(sign?(sqr(0.25*m)-sqr(x-0.5*m)):((x>0.5*m)?(-sqr(0.25*m)+sqr(x-m)):(-sqr(0.25*m)+sqr(x))))/(m*sec);}
             break;}
         default:{
-            LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
+        LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
     ifs.Set_RHS(f_body,f_interface);
 

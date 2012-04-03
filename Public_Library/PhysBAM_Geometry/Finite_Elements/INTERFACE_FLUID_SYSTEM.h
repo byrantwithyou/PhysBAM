@@ -34,6 +34,8 @@ public:
     const GRID<TV>& coarse_grid;
     const ARRAY<T,TV_INT>& phi;
     VECTOR_ND<T> null[TV::m],null_p;
+    ARRAY<TV_INT> cell_map;
+    ARRAY<bool> sign_map;
     bool run_self_tests;
     bool print_matrix;
     bool print_rhs;
@@ -43,7 +45,6 @@ public:
     VECTOR_T solution;
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT object;
     INTERVAL<int> index_range_u[TV::m],index_range_p,index_range_q[TV::m];
-    CELL_MAPPING<TV> *index_map_u[TV::m];
 
     INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,const GRID<TV>& coarse_grid_input,const ARRAY<T,TV_INT>& phi_input);
     virtual ~INTERFACE_FLUID_SYSTEM();
