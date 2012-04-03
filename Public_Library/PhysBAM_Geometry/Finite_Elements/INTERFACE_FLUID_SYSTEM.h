@@ -24,7 +24,12 @@ class INTERFACE_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
+
+    SYSTEM_MATRIX_HELPER<T> *helper_rhs_q[TV::m],*helper_rhs_p[TV::m];
+    CELL_MAPPING<TV> *index_map_u[TV::m];
+
 public:
+
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     const GRID<TV>& grid;
     const GRID<TV>& coarse_grid;
@@ -35,13 +40,18 @@ public:
     bool print_rhs;
     static int solve_id;
     int system_size;
+    VECTOR_T rhs;
+    VECTOR_T solution;
+    VECTOR_T exact_solution;
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT object;
+    INTERVAL<int> index_range_u[TV::m],index_range_p,index_range_q[TV::m];
 
     INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,const GRID<TV>& coarse_grid_input,const ARRAY<T,TV_INT>& phi_input);
     virtual ~INTERFACE_FLUID_SYSTEM();
 
 //#####################################################################
-    void Compute(const VECTOR<T,2>& mu,VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface);
+    void Set_Matrix(const VECTOR<T,2>& mu);
+    void Set_RHS(const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface);
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;
