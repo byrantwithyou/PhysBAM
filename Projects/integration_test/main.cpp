@@ -84,19 +84,38 @@ void Integration_Test(int argc,char* argv[])
     f_interface.Resize(ifs.object.mesh.elements.m);
     for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
 
+    VECTOR_ND<T> exact_solution(ifs.system_size);
+
     // Setting the forces
     switch(test){
         case 1:{ 
             for(int i=0; i<ifs.object.mesh.elements.m;i++) f_interface(i)=TV::Axis_Vector(1)*(((ifs.object.Get_Element(i).X(0).x>0.5*m)?1:-1)*(mu(0)+mu(1))/sec);
             for(int s=0;s<2;s++) f_body[s].Fill(TV());
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                for(int s=0;s<2;s++){
+                    int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,s);
+                    if(index>=0){
+                        T x=grid.Axis_X_Face(it.index,1).x;
+                        exact_solution(index)=(s?(x-0.5*m):((x>0.5*m)?(m-x):(-x)))/sec;}}
             break;}
         case 2:{
             f_interface.Fill(TV::Axis_Vector(1)*(-mu(1)*0.5/sec));
             for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*(s*2*mu(1)/(m*sec)));
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+                    int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,1);
+                    if(index>=0){
+                        T x=grid.Axis_X_Face(it.index,1).x;
+                        exact_solution(index)=(sqr(0.25*m)-sqr(x-0.5*m))/(m*sec);}}
             break;}
         case 3:{
             f_interface.Fill(TV());
             for(int s=0;s<2;s++) f_body[s].Fill(TV::Axis_Vector(1)*((s?1:-1)*2*mu(1)/(m*sec)));
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                for(int s=0;s<2;s++){
+                    int index=ifs.index_map_u[1]->Get_Index_Fixed(it.index,s);
+                    if(index>=0){
+                        T x=grid.Axis_X_Face(it.index,1).x;
+                        exact_solution(index)=(s?1:-1)*(sqr(0.25*m)-sqr(x-0.5*m))/(m*sec);}}
             break;}
         default:{
             LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
