@@ -42,6 +42,7 @@ void Integration_Test(int argc,char* argv[])
     typedef VECTOR<int,d> TV_INT;
 
     PARSE_ARGS parse_args;
+    parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
     parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
     parse_args.Add_Double_Argument("-m",1,"meter scale");
@@ -51,13 +52,17 @@ void Integration_Test(int argc,char* argv[])
     parse_args.Add_Integer_Argument("-resolution",4,"resolution");
     parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
     parse_args.Parse(argc,argv);
+    
+    int test_number;
+    if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
+    if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
+
     T m=parse_args.Get_Double_Value("-m");
     T sec=parse_args.Get_Double_Value("-sec");
     T kg=parse_args.Get_Double_Value("-kg");
     VECTOR<T,2> mu;
     mu(0)=parse_args.Get_Double_Value("-mu_o")*kg/(sec*(d==3?m:1));
     mu(1)=parse_args.Get_Double_Value("-mu_i")*kg/(sec*(d==3?m:1));
-    int test=parse_args.Get_Integer_Value("-test");
     int res=parse_args.Get_Integer_Value("-resolution");
     int cgf=parse_args.Get_Integer_Value("-cgf");
 
@@ -76,7 +81,7 @@ void Integration_Test(int argc,char* argv[])
 
     // Domain
 
-    switch(test){
+    switch(test_number){
         case 1:case 2:case 3:{
             for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
                 phi(it.index)=-0.25*m+abs(it.Location().x-0.5*m);
@@ -96,7 +101,7 @@ void Integration_Test(int argc,char* argv[])
 
     // Forces and exact solution
     
-    switch(test){
+    switch(test_number){
         case 1:{ 
             int dir=1;
             for(int i=0; i<ifs.object.mesh.elements.m;i++) f_interface(i)=TV::Axis_Vector(dir)*(((ifs.object.Get_Element(i).X(0).x>0.5*m)?1:-1)*(mu(0)+mu(1))/sec);
