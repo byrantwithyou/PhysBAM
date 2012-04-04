@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
@@ -20,8 +21,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_FLUID_SYSTEM<TV>::
-INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,const GRID<TV>& coarse_grid_input,const ARRAY<T,TV_INT>& phi_input)
-    :BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),phi(phi_input)
+INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input)
+    :BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),phi(coarse_grid_input,phi_input,0)
 {
 }
 //#####################################################################
@@ -30,6 +31,7 @@ INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,const GRID<TV>& coarse_grid_in
 template<class TV> INTERFACE_FLUID_SYSTEM<TV>::
 ~INTERFACE_FLUID_SYSTEM()
 {
+    for(int i=0;i<TV::m;i++) delete index_map_u[i];
 }
 //#####################################################################
 // Function Set_Matrix
@@ -52,10 +54,10 @@ Set_Matrix(const VECTOR<T,2>& mu)
             udx_stencil[i][j]->Differentiate(j);
             udx_stencil[i][j]->Dice_Stencil();}}
 
-    MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi);
+    MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi.phi);
 
-    CELL_MAPPING<TV> *index_map_u[TV::m],index_map_p(grid);
-    index_map_p.periodic.Fill(true);
+    index_map_p=new CELL_MAPPING<TV>(grid);
+    index_map_p->periodic.Fill(true);
     for(int i=0;i<TV::m;i++){
         index_map_u[i]=new CELL_MAPPING<TV>(grid);
         index_map_u[i]->periodic.Fill(true);}
@@ -66,7 +68,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
     boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
 
     SYSTEM_MATRIX_HELPER<T> helper_uu[TV::m][TV::m],helper_p[TV::m],helper_q[TV::m];
-    BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi);
+    BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi.phi);
 
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
@@ -80,7 +82,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
 
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
-        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],index_map_p,VECTOR<T,2>(1,1));
+        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(1,1));
 
     // Traction blocks
     for(int i=0;i<TV::m;i++)
@@ -94,13 +96,13 @@ Set_Matrix(const VECTOR<T,2>& mu)
     // Rhs pressure blocks
     for(int i=0;i<TV::m;i++){
         helper_rhs_p[i]=new SYSTEM_MATRIX_HELPER<T>;
-        bic.Add_Block(*helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],index_map_p,VECTOR<T,2>(1,1));}
+        bic.Add_Block(*helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(1,1));}
 
     bic.Compute();
 
     index_range_u[0]=INTERVAL<int>(0,index_map_u[0]->next_index);
     for(int i=1;i<TV::m;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
-    index_range_p=INTERVAL<int>(index_range_u[TV::m-1].max_corner,index_range_u[TV::m-1].max_corner+index_map_p.next_index);
+    index_range_p=INTERVAL<int>(index_range_u[TV::m-1].max_corner,index_range_u[TV::m-1].max_corner+index_map_p->next_index);
     index_range_q[0]=INTERVAL<int>(index_range_p.max_corner,index_range_p.max_corner+object.mesh.elements.m);
     for(int i=1;i<TV::m;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
     system_size=index_range_q[TV::m-1].max_corner;
@@ -151,12 +153,10 @@ Set_Matrix(const VECTOR<T,2>& mu)
                 if(index>=0){
                     cell_map(index)=it.index;
                     sign_map(index)=s;}
-            index=index_map_p.Get_Index_Fixed(it.index,s);
+            index=index_map_p->Get_Index_Fixed(it.index,s);
             if(index>=0){
                 cell_map(index)=it.index;
                 sign_map(index)=s;}}}
-
-    for(int i=0;i<TV::m;i++) delete index_map_u[i];
 }
 //#####################################################################
 // Function Set_RHS
@@ -185,25 +185,38 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interf
         delete helper_rhs_p[i];}
 }
 //#####################################################################
+// Function Resize_Vector
+//#####################################################################
+template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
+Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
+{
+    debug_cast<VECTOR_T&>(x).v.Resize(system_size);
+}
+//#####################################################################
 // Function Get_U_Part
 //#####################################################################
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
-Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& u_part,const int dir) const
+Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
 {
-    u_part.Resize(grid.counts);
-    for(int j=index_range_u[dir].min_corner;j<index_range_u[dir].max_corner;j++){
-        // bool sign=sign_map(j);
-        // TV_INT cell=cell_map(j);
-    }
+    u.Resize(grid);
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        int s=phi.Phi(it.Location())<0;
+        int index=index_map_u[it.Axis()]->Get_Index_Fixed(it.index,s);
+        assert(index>=0);
+        u(it.Full_Index())=x(index);}
 }
 //#####################################################################
 // Function Get_P_Part
 //#####################################################################
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
-Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p_part) const
+Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p) const
 {
-    p_part.Resize(grid.counts);
-    
+    p.Resize(grid.Domain_Indices());
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        int s=phi.Phi(it.Location())<0;
+        int index=index_map_p->Get_Index_Fixed(it.index,s);
+        assert(index>=0);
+        p(it.index)=x(index);}
 }
 //#####################################################################
 // Function Multiply
