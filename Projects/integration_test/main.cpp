@@ -1,5 +1,5 @@
 //#####################################################################
-// Copyright 2012.
+// Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
@@ -81,12 +81,12 @@ void Dump_Frame(const VECTOR_ND<T>& v,INTERFACE_FLUID_SYSTEM<TV>& ifs,const char
         sprintf(buff, title, inside?'-':'+');
         ARRAY<T,FACE_INDEX<TV::m> > error(ifs.grid);
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next()){
-            int index=ifs.index_map_u[it.Axis()]->Get_Shifted_Index_Fixed(it.index,inside);
+            int index=ifs.index_map_u[it.Axis()]->Get_Index_Fixed(it.index,inside);
             if(index>=0)
                 error(it.Full_Index())=v(index);}
 
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
-            int index=ifs.index_map_p->Get_Shifted_Index_Fixed(it.index,inside);
+            int index=ifs.index_map_p->Get_Index_Fixed(it.index,inside);
             if(index>=0)
                 Add_Debug_Particle(ifs.grid.Center(it.index),color_map(v(index)));}
 

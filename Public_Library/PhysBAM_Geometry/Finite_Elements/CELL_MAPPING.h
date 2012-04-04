@@ -23,7 +23,6 @@ public:
 
     ARRAY<int,TV_INT> cell_index[2];
     int next_index;
-    int shift;
 
     VECTOR<bool,TV::m> periodic;
 
@@ -51,11 +50,15 @@ public:
         return ar(index);
     }
 
-    int Get_Shifted_Index_Fixed(TV_INT index, bool is_neg) const
-    {return Get_Index_Fixed(index,is_neg)+shift;}
+    void Shift(const int shift)
+    {
+        for(int s=0;s<2;s++)
+            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),cell_index[s].Size()));it.Valid();it.Next())
+                if(cell_index[s](it.index)>=0) cell_index[s](it.index)+=shift;
+    }
 
     CELL_MAPPING(const GRID<TV>& grid_input)
-        :grid(grid_input),next_index(0),shift(0)
+        :grid(grid_input),next_index(0)
     {for(int i=0;i<2;i++){cell_index[i].Resize(grid.Domain_Indices());cell_index[i].Fill(-1);}}
 
     ~CELL_MAPPING(){}

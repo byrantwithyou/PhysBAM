@@ -107,8 +107,8 @@ Set_Matrix(const VECTOR<T,2>& mu)
     for(int i=1;i<TV::m;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
     system_size=index_range_q[TV::m-1].max_corner;
 
-    for(int i=0;i<TV::m;i++) index_map_u[i]->shift=index_range_u[i].min_corner;
-    index_map_p->shift=index_range_p.min_corner;
+    for(int i=0;i<TV::m;i++) index_map_u[i]->Shift(index_range_u[i].min_corner);
+    index_map_p->Shift(index_range_p.min_corner);
 
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++){
@@ -159,7 +159,7 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interf
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
         for(int i=0;i<TV::m;i++){
             for(int s=0;s<2;s++){
-                int index=index_map_u[i]->Get_Shifted_Index_Fixed(it.index,s);
+                int index=index_map_u[i]->Get_Index_Fixed(it.index,s);
                 if(index>=0)
                     f(index)=f_body[s](it.index)(i);}}
     
@@ -190,7 +190,7 @@ Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
     u.Resize(grid);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         int s=phi.Phi(it.Location())<0;
-        int index=index_map_u[it.Axis()]->Get_Shifted_Index_Fixed(it.index,s);
+        int index=index_map_u[it.Axis()]->Get_Index_Fixed(it.index,s);
         assert(index>=0);
         u(it.Full_Index())=x(index);}
 }
@@ -203,7 +203,7 @@ Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p) const
     p.Resize(grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int s=phi.Phi(it.Location())<0;
-        int index=index_map_p->Get_Shifted_Index_Fixed(it.index,s);
+        int index=index_map_p->Get_Index_Fixed(it.index,s);
         assert(index>=0);
         p(it.index)=x(index);}
 }
