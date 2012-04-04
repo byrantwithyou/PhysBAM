@@ -11,21 +11,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Registry/STRUCTURE_REGISTRY.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
-//#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace PhysBAM{
-static bool Register_Implicit_Object_Transformed(){
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,2>,FRAME<VECTOR<float,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<float,3>,FRAME<VECTOR<float,3> > > >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,2>,FRAME<VECTOR<double,2> > > >();
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<IMPLICIT_OBJECT_TRANSFORMED<VECTOR<double,3>,FRAME<VECTOR<double,3> > > >();
-#endif
-    return true;
-}
-bool registered_asdlfkjasdlfkjas=Register_Implicit_Object_Transformed();
-}
 using namespace PhysBAM;
 template<class TV,class TRANSFORM> IMPLICIT_OBJECT_TRANSFORMED<TV,TRANSFORM>::
 IMPLICIT_OBJECT_TRANSFORMED(IMPLICIT_OBJECT<TV>* object_space_implicit_object_input,bool owns_implicit_object_input,const TRANSFORM* transform_input)

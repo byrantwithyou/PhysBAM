@@ -13,19 +13,6 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 using namespace PhysBAM;
-//####################################################################
-// Register this class as read-write
-//####################################################################
-namespace PhysBAM{
-bool Register_Segmented_Curve_2d(){
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<SEGMENTED_CURVE_2D<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<SEGMENTED_CURVE_2D<double> >();
-#endif
-    return true;
-}
-static bool registered=Register_Segmented_Curve_2d();
-}
 //#####################################################################
 // Constructor
 //#####################################################################
@@ -33,7 +20,6 @@ template<class T> SEGMENTED_CURVE_2D<T>::
 SEGMENTED_CURVE_2D()
     :SEGMENTED_CURVE<TV>(*new SEGMENT_MESH,*new GEOMETRY_PARTICLES<TV>)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Constructor
@@ -42,7 +28,6 @@ template<class T> SEGMENTED_CURVE_2D<T>::
 SEGMENTED_CURVE_2D(SEGMENT_MESH& segment_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :SEGMENTED_CURVE<TV>(segment_mesh_input,particles_input)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Function Calculate_Signed_Distance

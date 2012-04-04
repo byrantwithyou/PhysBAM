@@ -16,30 +16,12 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> LEVELSET_IMPLICIT_OBJECT<TV>::default_velocity_interpolation;
 //#####################################################################
-// Register this file as read-write
-//#####################################################################
-namespace {
-bool Register_Levelset_Implicit_Object(){
-    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<float,1> > >();
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<float,2> > >();
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<float,3> > >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<double,1> > >();
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<double,2> > >();
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<LEVELSET_IMPLICIT_OBJECT<VECTOR<double,3> > >();
-#endif
-    return true;
-}
-static bool registered=Register_Levelset_Implicit_Object();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> LEVELSET_IMPLICIT_OBJECT<TV>::
 LEVELSET_IMPLICIT_OBJECT(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input)
     :levelset(grid_input,phi_input),V(0),velocity_interpolation(&default_velocity_interpolation),need_destroy_data(false)
 {
-    PHYSBAM_ASSERT(registered);
     Update_Box();Update_Minimum_Cell_Size();
 }
 //#####################################################################

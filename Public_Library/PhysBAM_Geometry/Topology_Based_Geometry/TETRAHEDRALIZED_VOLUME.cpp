@@ -23,19 +23,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TETRAHEDRALIZED_VOLUME_SPLIT.h>
 using namespace PhysBAM;
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace {
-bool Register_Tetrahedralized_Volume(){
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TETRAHEDRALIZED_VOLUME<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TETRAHEDRALIZED_VOLUME<double> >();
-#endif
-    return true;
-}
-static bool registered=Register_Tetrahedralized_Volume();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class T> TETRAHEDRALIZED_VOLUME<T>::
@@ -43,7 +30,6 @@ TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH& tetrahedron_mesh_input,GEOMETRY_PARTICL
     :MESH_OBJECT<TV,TETRAHEDRON_MESH>(tetrahedron_mesh_input,particles_input),tetrahedron_list(0),
     triangulated_surface(0),hierarchy(0),tetrahedron_volumes(0),nodal_volumes(0)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Destructor

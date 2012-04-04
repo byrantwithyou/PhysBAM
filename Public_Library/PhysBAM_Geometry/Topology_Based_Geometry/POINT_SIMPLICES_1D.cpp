@@ -6,26 +6,12 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 namespace PhysBAM{
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace{
-bool Register_Point_Simplices_1d(){
-    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<POINT_SIMPLICES_1D<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<POINT_SIMPLICES_1D<double> >();
-#endif
-    return true;
-}
-static bool registered=Register_Point_Simplices_1d();
-}
-//#####################################################################
 // Function Closest_Point_On_Boundary
 //#####################################################################
 template<class T> POINT_SIMPLICES_1D<T>::
 POINT_SIMPLICES_1D(POINT_SIMPLEX_MESH& point_simplex_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,1> >& particles_input)
     :MESH_OBJECT<TV,POINT_SIMPLEX_MESH>(point_simplex_mesh_input,particles_input),point_simplex_list(0),particle_partition(0),hierarchy(0),number_point_simplices(0)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Function Closest_Point_On_Boundary

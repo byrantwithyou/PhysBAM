@@ -9,28 +9,12 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/TRIANGLES_OF_MATERIAL.h>
 using namespace PhysBAM;
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace {
-bool Register_Triangles_Of_Material(){
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<float,2> > >();
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<float,3> > >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<double,2> > >();
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TRIANGLES_OF_MATERIAL<VECTOR<double,3> > >();
-#endif
-    return true;
-}
-static bool registered=Register_Triangles_Of_Material();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> TRIANGLES_OF_MATERIAL<TV>::
 TRIANGLES_OF_MATERIAL(T_EMBEDDED_OBJECT& embedded_object_input)
     :EMBEDDED_MATERIAL_SURFACE<TV,2>(embedded_object_input)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Function Perturb_Node_For_Collision_Freeness

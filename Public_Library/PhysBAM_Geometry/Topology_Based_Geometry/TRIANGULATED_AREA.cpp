@@ -18,19 +18,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_AREA_SPLIT.h>
 using namespace PhysBAM;
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace {
-bool Register_Triangulated_Area(){
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<TRIANGULATED_AREA<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<TRIANGULATED_AREA<double> >();
-#endif
-    return true;
-}
-static bool registered=Register_Triangulated_Area();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class T> TRIANGULATED_AREA<T>::
@@ -38,7 +25,6 @@ TRIANGULATED_AREA(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<T
     :MESH_OBJECT<TV,TRIANGLE_MESH>(triangle_mesh_input,particles_input),segmented_curve(0),hierarchy(0),triangle_area_fractions(0),triangle_areas(0),
     nodal_areas(0)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Destructor

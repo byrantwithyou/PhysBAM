@@ -22,28 +22,12 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/SEGMENTED_CURVE_REFRESH.h>
 namespace PhysBAM{
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace {
-bool Register_Segmented_Curve(){
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<SEGMENTED_CURVE<VECTOR<float,3> > >();
-    STRUCTURE_REGISTRY<VECTOR<float,1> >::Register<SEGMENTED_CURVE<VECTOR<float,1> > >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<SEGMENTED_CURVE<VECTOR<double,3> > >();
-    STRUCTURE_REGISTRY<VECTOR<double,1> >::Register<SEGMENTED_CURVE<VECTOR<double,1> > >();
-#endif
-    return true;
-}
-static bool registered=Register_Segmented_Curve();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> SEGMENTED_CURVE<TV>::
 SEGMENTED_CURVE(SEGMENT_MESH& segment_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :MESH_OBJECT<TV,SEGMENT_MESH>(segment_mesh_input,particles_input),hierarchy(0),segment_list(0),point_simplices_1d(0)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Destructor

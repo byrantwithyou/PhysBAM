@@ -11,26 +11,12 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Fracture/EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE.h>
 using namespace PhysBAM;
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace {
-bool Register_Embedded_Tetrahedralized_Volume_Boundary_Surface(){
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<double> >();
-#endif
-    return true;
-}
-static bool registered=Register_Embedded_Tetrahedralized_Volume_Boundary_Surface();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class T> EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<T>::
 EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE(EMBEDDED_TETRAHEDRALIZED_VOLUME<T>& embedded_object)
     :EMBEDDED_MATERIAL_SURFACE<TV,3>(embedded_object)
 {
-    PHYSBAM_ASSERT(registered);
 }
 //#####################################################################
 // Destructor

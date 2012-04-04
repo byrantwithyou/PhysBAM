@@ -11,6 +11,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING_DYNAMIC.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/PARTICLE_BINDING.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Create_Structure
@@ -43,25 +44,15 @@ Write(TYPED_OSTREAM& output) const
     Write_Binary(output,Name());
     Write_Helper(output);
 }
-//#####################################################################
-// Function Create_From_Name
-//#####################################################################
-template<class TV> BINDING<TV>* BINDING<TV>::
-Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
-{
-    BINDING* binding=BINDING_REGISTRY<TV>::Name_To_Factory(name)->Create(dynamic_cast<GEOMETRY_PARTICLES<TV>&>(particles));
-    if(!binding){LOG::cerr<<name<<" has no Create(GEOMETRY_PARTICLES<TV>& particles) function."<<std::endl;PHYSBAM_FATAL_ERROR();}
-    return binding;
-}
-//#####################################################################
-static int Initialize_Bindings()
+static bool Initialize_Bindings()
 {
 #define HELPER(T,d) \
     BINDING_REGISTRY<VECTOR<T,d> >::Register<PARTICLE_BINDING<VECTOR<T,d> > >(); \
     BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING<VECTOR<T,d>,2> >(); \
     BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING<VECTOR<T,d>,3> >(); \
     BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING<VECTOR<T,d>,4> >(); \
-    BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING_DYNAMIC<VECTOR<T,d> > >();
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<LINEAR_BINDING_DYNAMIC<VECTOR<T,d> > >(); \
+    BINDING_REGISTRY<VECTOR<T,d> >::Register<RIGID_BODY_BINDING<VECTOR<T,d> > >();
 
     HELPER(float,1)
     HELPER(float,2)
@@ -71,9 +62,21 @@ static int Initialize_Bindings()
     HELPER(double,2)
     HELPER(double,3)
 #endif
-    return 0;
+    return true;
 }
-int initialize_bindings=Initialize_Bindings();
+static bool initialize_bindings=Initialize_Bindings();
+//#####################################################################
+// Function Create_From_Name
+//#####################################################################
+template<class TV> BINDING<TV>* BINDING<TV>::
+Create_From_Name(const int name,DEFORMABLE_PARTICLES<TV>& particles)
+{
+    PHYSBAM_ASSERT(initialize_bindings);
+    BINDING* binding=BINDING_REGISTRY<TV>::Name_To_Factory(name)->Create(dynamic_cast<GEOMETRY_PARTICLES<TV>&>(particles));
+    if(!binding){LOG::cerr<<name<<" has no Create(GEOMETRY_PARTICLES<TV>& particles) function."<<std::endl;PHYSBAM_FATAL_ERROR();}
+    return binding;
+}
+//#####################################################################
 template class BINDING<VECTOR<float,1> >;
 template class BINDING<VECTOR<float,2> >;
 template class BINDING<VECTOR<float,3> >;

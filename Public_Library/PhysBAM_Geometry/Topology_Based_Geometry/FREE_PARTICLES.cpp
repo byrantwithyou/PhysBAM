@@ -10,21 +10,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 using namespace PhysBAM;
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace PhysBAM{
-static int Register_Free_Particles(){
-    STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<FREE_PARTICLES<VECTOR<float,2> > >();
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<FREE_PARTICLES<VECTOR<float,3> > >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,2> >::Register<FREE_PARTICLES<VECTOR<double,2> > >();
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<FREE_PARTICLES<VECTOR<double,3> > >();
-#endif
-    return 0;
-}
-int register_free_particles=Register_Free_Particles();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> FREE_PARTICLES<TV>::

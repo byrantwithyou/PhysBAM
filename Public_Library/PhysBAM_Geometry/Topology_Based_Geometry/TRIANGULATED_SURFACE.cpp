@@ -35,19 +35,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 using namespace PhysBAM;
 //#####################################################################
-// Register this class as read-write
-//#####################################################################
-namespace {
-bool Register_Triangulated_Surface(){
-    STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<TRIANGULATED_SURFACE<float> >();
-#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    STRUCTURE_REGISTRY<VECTOR<double,3> >::Register<TRIANGULATED_SURFACE<double> >();
-#endif
-    return true;
-}
-static bool registered=Register_Triangulated_Surface();
-}
-//#####################################################################
 // Constructor
 //#####################################################################
 template<class T> TRIANGULATED_SURFACE<T>::
@@ -57,7 +44,6 @@ TRIANGULATED_SURFACE()
     avoid_normal_interpolation_across_sharp_edges(false),normal_variance_threshold((T).1),
     vertex_normals(0),face_vertex_normals(0)
 {
-    PHYSBAM_ASSERT(registered);
     Use_Face_Normals();
     this->need_destroy_mesh=this->need_destroy_particles=true;
 }
@@ -71,7 +57,6 @@ TRIANGULATED_SURFACE(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& 
     avoid_normal_interpolation_across_sharp_edges(false),normal_variance_threshold((T).1),
     vertex_normals(0),face_vertex_normals(0)
 {
-    PHYSBAM_ASSERT(registered);
     Use_Face_Normals();
 }
 //#####################################################################
