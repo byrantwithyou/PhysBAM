@@ -516,7 +516,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 33:{
             TRIANGULATED_AREA<T>* ta=TRIANGULATED_AREA<T>::Create(particles);
             ta->particles.Add_Elements(7);
-            for(int i=0;i<7;i++) ta->particles.X(i)=TV((T).5*(i-4),(T).5*sqrt(3)*(i%2));
+            for(int i=0;i<7;i++) ta->particles.X(i)=TV((T).5*(i-3),(T).5*sqrt(3)*(i%2));
             for(int i=0;i<5;i++) ta->mesh.elements.Append(VECTOR<int,3>(i,i+1,i+2));
             ta->Update_Number_Nodes();
             ta->mesh.Make_Orientations_Consistent();
