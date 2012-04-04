@@ -31,6 +31,10 @@ using namespace PhysBAM;
 typedef float RW;
 std::string output_directory="output";
 
+//#################################################################################################################################################
+// Debug Particles ################################################################################################################################
+//#################################################################################################################################################
+
 template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
 {
     static DEBUG_PARTICLES<TV> debug_particles;
@@ -104,6 +108,10 @@ void Dump_Frame(const VECTOR_ND<T>& v,const CELL_MAPPING<TV>& index_map_p,CM* (i
         Dump_Frame(error,buff);}
 }
 
+//#################################################################################################################################################
+// Analytic Test ##################################################################################################################################
+//#################################################################################################################################################
+
 template<class TV>
 struct ANALYTIC_TEST
 {
@@ -152,8 +160,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ifs.Resize_Vector(kr_t);
     ifs.Resize_Vector(kr_r);
 
-    ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u;
-    ARRAY<T,TV_INT> exact_p,numer_p;
+    ARRAY<T,FACE_INDEX<TV::m> > numer_u,error_u;
+    ARRAY<T,TV_INT> numer_p,error_p;
 
     for(int i=0; i<ifs.object.mesh.elements.m;i++)
         f_interface(i)=at.interface(ifs.object.Get_Element(i).Center());
@@ -184,27 +192,49 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
 
-    T u_linf=0,u_l2=0;
-    int num_u=0;
+    error_u.Resize(grid);
+    error_p.Resize(grid.Domain_Indices());
+
+    TV avg_u;
+    TV_INT cnt_u;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        T a=numer_u(it.Full_Index()),b=at.u(it.Location())(it.Axis()),d=fabs(a-b);
-        num_u++;
-        u_linf=max(u_linf,d);
-        u_l2+=sqr(d);}
-    u_l2=sqrt(u_l2/num_u);
+        FACE_INDEX<TV::m> face(it.Full_Index()); 
+        error_u(face)=numer_u(face)-at.u(it.Location())(face.axis);
+        avg_u(face.axis)+=error_u(face);
+        cnt_u(face.axis)++;}
+    avg_u/=(TV)cnt_u;
 
-    T p_linf=0,p_l2=0;
-    int num_p=0;
+    TV error_u_linf,error_u_l2;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        FACE_INDEX<TV::m> face(it.Full_Index()); 
+        T d=error_u(face)-avg_u(face.axis);
+        error_u_linf(face.axis)=max(error_u_linf(face.axis),abs(d));
+        error_u_l2(face.axis)+=sqr(d);}
+    error_u_l2=sqrt(error_u_l2/(TV)cnt_u);
+
+    LOG::cout<<"U error:   linf="<<error_u_linf<<"   l2="<<error_u_l2<<std::endl;
+
+    T avg_p=0;
+    int cnt_p=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        T a=numer_p(it.index),b=at.p(it.Location()),d=fabs(a-b);
-        num_p++;
-        p_linf=max(p_linf,d);
-        p_l2+=sqr(d);}
-    p_l2=sqrt(p_l2/num_p);
+        error_p(it.index)=numer_p(it.index)-at.p(it.Location());
+        avg_p+=error_p(it.index);
+        cnt_p++;}
+    avg_p/=cnt_p;
 
-    LOG::cout<<"U: linf "<<u_linf<<"  l2 "<<u_l2<<std::endl;
-    LOG::cout<<"P: linf "<<p_linf<<"  l2 "<<p_l2<<std::endl;
+    T error_p_linf=0,error_p_l2=0;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        T d=error_p(it.index)-avg_p;
+        error_p_linf=max(error_p_linf,abs(d));
+        error_p_l2+=sqr(d);}
+    error_p_l2=sqrt(error_p_l2/cnt_p);
+
+    LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl;
 }
+
+//#################################################################################################################################################
+// Integration Test ###############################################################################################################################
+//#################################################################################################################################################
 
 template<class TV>
 void Integration_Test(int argc,char* argv[])
@@ -303,6 +333,10 @@ void Integration_Test(int argc,char* argv[])
 
     Analytic_Test(grid,coarse_grid,*test);
 }
+
+//#################################################################################################################################################
+// Main ###########################################################################################################################################
+//#################################################################################################################################################
 
 int main(int argc,char* argv[])
 {
