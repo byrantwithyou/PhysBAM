@@ -27,7 +27,6 @@ class INTERFACE_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
     SYSTEM_MATRIX_HELPER<T> *helper_rhs_q[TV::m],*helper_rhs_p[TV::m];
-    CELL_MAPPING<TV> *index_map_u[TV::m],*index_map_p;
 
 public:
 
@@ -35,7 +34,7 @@ public:
     const GRID<TV>& grid;
     const GRID<TV>& coarse_grid;
     LEVELSET_UNIFORM<GRID<TV> > phi;
-    VECTOR_ND<T> null[TV::m],null_p;
+    VECTOR_ND<T> null_u[TV::m],null_p;
     ARRAY<TV_INT> cell_map;
     ARRAY<bool> sign_map;
     bool run_self_tests;
@@ -45,6 +44,7 @@ public:
     int system_size;
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT object;
     INTERVAL<int> index_range_u[TV::m],index_range_p,index_range_q[TV::m];
+    CELL_MAPPING<TV> *index_map_u[TV::m],*index_map_p;
 
     INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input);
     virtual ~INTERFACE_FLUID_SYSTEM();

@@ -29,6 +29,81 @@
 using namespace PhysBAM;
 
 typedef float RW;
+std::string output_directory="output";
+
+template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
+{
+    static DEBUG_PARTICLES<TV> debug_particles;
+    return debug_particles;
+}
+
+template<class TV>
+GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
+{
+    static GRID<TV>* grid=0;
+    GRID<TV>* old_grid=grid;
+    if(grid_in) grid=grid_in;
+    return old_grid;
+}
+
+template<class T,int d>
+void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
+{
+    typedef VECTOR<T,d> TV;
+    static int frame=0;
+    char buff[100];
+    sprintf(buff, "%s/%i", output_directory.c_str(), frame);
+    FILE_UTILITIES::Create_Directory(buff);
+    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
+    if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
+    Get_Debug_Particles<TV>().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
+    frame++;
+}
+
+template<class TV>
+void Flush_Frame()
+{
+    Dump_Frame(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),"flush");
+}
+
+template<class T,class TV,class T_OBJECT,class CM>
+void Dump_Frame(const VECTOR_ND<T>& v,const CELL_MAPPING<TV>& index_map_p,CM* (index_map_u[TV::m]),const T_OBJECT& object,const char* title)
+{
+    static const int d=TV::m;
+    INTERVAL<int> index_range_u[d] = {INTERVAL<int>(0,index_map_u[0]->next_index)};
+    for(int i=1;i<d;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
+    INTERVAL<int> index_range_p(index_range_u[d-1].max_corner,index_range_u[d-1].max_corner+index_map_p.next_index);
+    INTERVAL<int> index_range_q[d] = {INTERVAL<int>(index_range_p.max_corner,index_range_p.max_corner+object.mesh.elements.m)};
+    for(int i=1;i<d;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
+    const GRID<TV>& grid=index_map_p.grid;
+
+    INTERPOLATED_COLOR_MAP<T> color_map;
+    color_map.Initialize_Colors(1e-11,10,true,true,true);
+
+    char buff[100];
+    for(int dir=0;dir<2;dir++)
+    {
+        sprintf(buff, title, dir?'-':'+');
+        ARRAY<T,FACE_INDEX<TV::m> > error(grid);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            int index=index_map_u[it.Axis()]->Get_Index_Fixed(it.index,dir);
+            if(index>=0)
+                error(it.Full_Index())=v(index+index_range_u[it.Axis()].min_corner);}
+
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+            int index=index_map_p.Get_Index_Fixed(it.index,dir);
+            if(index>=0)
+                Add_Debug_Particle(grid.Center(it.index),color_map(v(index_range_p.min_corner+index)));}
+
+        for(int i=0;i<object.mesh.elements.m;i++){
+            Add_Debug_Particle(object.Get_Element(i).Center(),VECTOR<T,3>(0,1,1));
+            TV N;
+            for(int j=0;j<d;j++) N(j)=v(index_range_q[j].min_corner+i);
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N);}
+
+        Dump_Frame(error,buff);}
+}
+
 template<class TV>
 struct ANALYTIC_TEST
 {
@@ -49,10 +124,15 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
         phi(it.index)=at.phi(it.Location());
     INTERFACE_FLUID_SYSTEM<TV> ifs(grid,coarse_grid,phi);
     ifs.Set_Matrix(at.mu);
+
+    for(int i=0;i<ifs.object.mesh.elements.m;i++){
+        Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(1,1,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,ifs.object.Get_Element(i).X(1)-ifs.object.Get_Element(i).X(0));}
+    Flush_Frame<TV>();
 
     printf("\n");
     for(int i=0;i<TV::m;i++) printf("%c [%i %i) ", "uvw"[i], ifs.index_range_u[i].min_corner, ifs.index_range_u[i].max_corner);
@@ -83,6 +163,16 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
             f_body[s](it.index)=at.body(it.Location(),s);}
 
     ifs.Set_RHS(rhs,f_body,f_interface);
+
+    Dump_Frame(ARRAY<T,FACE_INDEX<TV::m> >(grid),"finish setup");
+
+    for(int i=0;i<TV::m;i++){
+    char buff[100];
+    sprintf(buff, "null %c %%c", "uvw"[i]);
+        Dump_Frame(ifs.null_u[i],*ifs.index_map_p,ifs.index_map_u,ifs.object,buff);
+    }
+
+    Dump_Frame(ifs.null_p,*ifs.index_map_p,ifs.index_map_u,ifs.object,"null p %c");
 
     CONJUGATE_RESIDUAL<T> cr;
     cr.Solve(ifs,sol,rhs,kr_q,kr_s,kr_t,kr_r,1e-10,0,100000);
@@ -123,6 +213,8 @@ void Integration_Test(int argc,char* argv[])
     static const int d=TV::m;
     typedef VECTOR<int,d> TV_INT;
 
+    Get_Debug_Particles<TV>();
+
     PARSE_ARGS parse_args;
     parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
@@ -147,12 +239,12 @@ void Integration_Test(int argc,char* argv[])
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*(phi(X)<0?X.x-0.5*m:(X.x>0.5*m?m-X.x:-X.x))/s;}
+                {return TV::Axis_Vector(1)*((phi(X)<0)?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV();}
                 virtual TV interface(const TV& X)
-                {return TV::Axis_Vector(1)*sign(X.x>0.5*m)*mu.Sum()/s;}
+                {return TV::Axis_Vector(1)*((X.x>0.5*m)?1:-1)*mu.Sum()/s;}
             };
             test=new ANALYTIC_TEST_0;
             break;}
@@ -202,7 +294,8 @@ void Integration_Test(int argc,char* argv[])
     GRID<TV> coarse_grid(grid.counts/cgf,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
 
-    std::string output_directory="output";
+    Global_Grid(&grid);
+
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);

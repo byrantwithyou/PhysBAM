@@ -130,10 +130,10 @@ Set_Matrix(const VECTOR<T,2>& mu)
     helper.Set_Matrix(system_size,system_size,matrix,1e-14);
 
     for(int i=0;i<TV::m;i++){
-        null[i].Resize(system_size);
+        null_u[i].Resize(system_size);
         for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++)
-            null[i](j)=1;
-        null[i].Normalize();}
+            null_u[i](j)=1;
+        null_u[i].Normalize();}
 
     null_p.Resize(system_size);
     for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
@@ -251,7 +251,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     VECTOR_ND<T>& v=debug_cast<VECTOR_T&>(x).v;
     v-=v.Dot(null_p)*null_p;
     for(int i=0;i<TV::m;i++)
-        v-=v.Dot(null[i])*null[i];
+        v-=v.Dot(null_u[i])*null_u[i];
 }
 //#####################################################################
 // Function Set_Boundary_Conditions
