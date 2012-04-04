@@ -31,6 +31,15 @@ using namespace PhysBAM;
 typedef float RW;
 std::string output_directory="output";
 
+template<class TV>
+GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
+{
+    static GRID<TV>* grid=0;
+    GRID<TV>* old_grid=grid;
+    if(grid_in) grid=grid_in;
+    return old_grid;
+}
+
 //#################################################################################################################################################
 // Debug Particles ################################################################################################################################
 //#################################################################################################################################################
@@ -41,19 +50,9 @@ template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
     return debug_particles;
 }
 
-template<class TV>
-GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
+template<class T,class TV>
+void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
 {
-    static GRID<TV>* grid=0;
-    GRID<TV>* old_grid=grid;
-    if(grid_in) grid=grid_in;
-    return old_grid;
-}
-
-template<class T,int d>
-void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
-{
-    typedef VECTOR<T,d> TV;
     static int frame=0;
     char buff[100];
     sprintf(buff, "%s/%i", output_directory.c_str(), frame);
@@ -64,48 +63,40 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
     frame++;
 }
 
-template<class TV>
+template<class T,class TV>
 void Flush_Frame()
 {
-    Dump_Frame(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),"flush");
+    Dump_Frame<T,TV>(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),"flush");
 }
 
-template<class T,class TV,class T_OBJECT,class CM>
-void Dump_Frame(const VECTOR_ND<T>& v,const CELL_MAPPING<TV>& index_map_p,CM* (index_map_u[TV::m]),const T_OBJECT& object,const char* title)
+template<class T,class TV>
+void Dump_Frame(const VECTOR_ND<T>& v,INTERFACE_FLUID_SYSTEM<TV>& ifs,const char* title)
 {
-    static const int d=TV::m;
-    INTERVAL<int> index_range_u[d] = {INTERVAL<int>(0,index_map_u[0]->next_index)};
-    for(int i=1;i<d;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
-    INTERVAL<int> index_range_p(index_range_u[d-1].max_corner,index_range_u[d-1].max_corner+index_map_p.next_index);
-    INTERVAL<int> index_range_q[d] = {INTERVAL<int>(index_range_p.max_corner,index_range_p.max_corner+object.mesh.elements.m)};
-    for(int i=1;i<d;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
-    const GRID<TV>& grid=index_map_p.grid;
-
     INTERPOLATED_COLOR_MAP<T> color_map;
     color_map.Initialize_Colors(1e-11,10,true,true,true);
 
     char buff[100];
-    for(int dir=0;dir<2;dir++)
+    for(int inside=0;inside<2;inside++)
     {
-        sprintf(buff, title, dir?'-':'+');
-        ARRAY<T,FACE_INDEX<TV::m> > error(grid);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-            int index=index_map_u[it.Axis()]->Get_Index_Fixed(it.index,dir);
+        sprintf(buff, title, inside?'-':'+');
+        ARRAY<T,FACE_INDEX<TV::m> > error(ifs.grid);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next()){
+            int index=ifs.index_map_u[it.Axis()]->Get_Shifted_Index_Fixed(it.index,inside);
             if(index>=0)
-                error(it.Full_Index())=v(index+index_range_u[it.Axis()].min_corner);}
+                error(it.Full_Index())=v(index);}
 
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-            int index=index_map_p.Get_Index_Fixed(it.index,dir);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+            int index=ifs.index_map_p->Get_Shifted_Index_Fixed(it.index,inside);
             if(index>=0)
-                Add_Debug_Particle(grid.Center(it.index),color_map(v(index_range_p.min_corner+index)));}
+                Add_Debug_Particle(ifs.grid.Center(it.index),color_map(v(index)));}
 
-        for(int i=0;i<object.mesh.elements.m;i++){
-            Add_Debug_Particle(object.Get_Element(i).Center(),VECTOR<T,3>(0,1,1));
+        for(int i=0;i<ifs.object.mesh.elements.m;i++){
+            Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,1,1));
             TV N;
-            for(int j=0;j<d;j++) N(j)=v(index_range_q[j].min_corner+i);
+            for(int j=0;j<TV::m;j++) N(j)=v(ifs.index_range_q[j].min_corner+i);
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N);}
 
-        Dump_Frame(error,buff);}
+        Dump_Frame<T,TV>(error,buff);}
 }
 
 //#################################################################################################################################################
@@ -139,8 +130,11 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     for(int i=0;i<ifs.object.mesh.elements.m;i++){
         Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(1,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,ifs.object.Get_Element(i).X(1)-ifs.object.Get_Element(i).X(0));}
-    Flush_Frame<TV>();
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,ifs.object.Get_Element(i).X(1)-ifs.object.Get_Element(i).X(0));
+        Add_Debug_Particle(ifs.object.Get_Element(i).X(1),VECTOR<T,3>(1,1,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,ifs.object.Get_Element(i).X(0)-ifs.object.Get_Element(i).X(1));
+        Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,1,0));}
+    Flush_Frame<T,TV>();
 
     printf("\n");
     for(int i=0;i<TV::m;i++) printf("%c [%i %i) ", "uvw"[i], ifs.index_range_u[i].min_corner, ifs.index_range_u[i].max_corner);
@@ -172,15 +166,12 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     ifs.Set_RHS(rhs,f_body,f_interface);
 
-    Dump_Frame(ARRAY<T,FACE_INDEX<TV::m> >(grid),"finish setup");
-
     for(int i=0;i<TV::m;i++){
     char buff[100];
     sprintf(buff, "null %c %%c", "uvw"[i]);
-        Dump_Frame(ifs.null_u[i],*ifs.index_map_p,ifs.index_map_u,ifs.object,buff);
+    Dump_Frame(ifs.null_u[i],ifs,buff);
     }
-
-    Dump_Frame(ifs.null_p,*ifs.index_map_p,ifs.index_map_u,ifs.object,"null p %c");
+    Dump_Frame(ifs.null_p,ifs,"null p %c");
 
     CONJUGATE_RESIDUAL<T> cr;
     cr.Solve(ifs,sol,rhs,kr_q,kr_s,kr_t,kr_r,1e-10,0,100000);
@@ -199,6 +190,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     TV_INT cnt_u;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index()); 
+        if (abs(numer_u(face))<1e-10) numer_u(face)=0;
         error_u(face)=numer_u(face)-at.u(it.Location())(face.axis);
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
@@ -229,7 +221,10 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         error_p_l2+=sqr(d);}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
-    LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl;
+    LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
+    
+    LOG::cout<<"computed u"<<std::endl<<std::endl<<numer_u<<std::endl;
+    LOG::cout<<"error u"<<std::endl<<std::endl<<error_u<<std::endl;
 }
 
 //#################################################################################################################################################

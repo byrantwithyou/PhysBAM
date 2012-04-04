@@ -35,8 +35,6 @@ public:
     const GRID<TV>& coarse_grid;
     LEVELSET_UNIFORM<GRID<TV> > phi;
     VECTOR_ND<T> null_u[TV::m],null_p;
-    ARRAY<TV_INT> cell_map;
-    ARRAY<bool> sign_map;
     bool run_self_tests;
     bool print_matrix;
     bool print_rhs;
