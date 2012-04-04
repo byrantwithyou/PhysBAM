@@ -269,6 +269,20 @@ void Integration_Test(int argc,char* argv[])
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual TV u(const TV& X)
+                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual T p(const TV& X){return T();}
+                virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
+                virtual TV body(const TV& X,bool inside){return TV();}
+                virtual TV interface(const TV& X)
+                {return TV::Axis_Vector(1)*((X.x>0.5*m)?1:-1)*(2*mu(1)+mu(0))/s;}
+            };
+            test=new ANALYTIC_TEST_0;
+            break;}
+        case 1:{
+            struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual TV u(const TV& X)
                 {return TV::Axis_Vector(1)*((phi(X)<0)?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
@@ -276,10 +290,10 @@ void Integration_Test(int argc,char* argv[])
                 virtual TV interface(const TV& X)
                 {return TV::Axis_Vector(1)*((X.x>0.5*m)?1:-1)*mu.Sum()/s;}
             };
-            test=new ANALYTIC_TEST_0;
+            test=new ANALYTIC_TEST_1;
             break;}
-        case 1:{
-            struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
+        case 2:{
+            struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual TV u(const TV& X)
@@ -290,10 +304,10 @@ void Integration_Test(int argc,char* argv[])
                 virtual TV interface(const TV& X)
                 {return -(T)0.5*TV::Axis_Vector(1)*mu(1)/s;}
             };
-            test=new ANALYTIC_TEST_1;
+            test=new ANALYTIC_TEST_2;
             break;}
-        case 2:{
-            struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
+        case 3:{
+            struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual TV u(const TV& X)
@@ -304,7 +318,7 @@ void Integration_Test(int argc,char* argv[])
                 virtual TV interface(const TV& X)
                 {return (T)0.5*TV::Axis_Vector(1)*(mu(0)-mu(1))/s;}
             };
-            test=new ANALYTIC_TEST_2;
+            test=new ANALYTIC_TEST_3;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
