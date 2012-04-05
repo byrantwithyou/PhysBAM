@@ -147,12 +147,13 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     f_interface.Resize(ifs.object.mesh.elements.m);
     for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
 
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol,kr_q,kr_s,kr_t,kr_r;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol,kr_p,kr_ap,kr_ar,kr_r,kr_z;
     ifs.Resize_Vector(sol);
-    ifs.Resize_Vector(kr_q);
-    ifs.Resize_Vector(kr_s);
-    ifs.Resize_Vector(kr_t);
+    ifs.Resize_Vector(kr_p);
+    ifs.Resize_Vector(kr_ap);
+    ifs.Resize_Vector(kr_ar);
     ifs.Resize_Vector(kr_r);
+    ifs.Resize_Vector(kr_z);
 
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
@@ -167,18 +168,24 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ifs.Set_RHS(rhs,f_body,f_interface);
 
     for(int i=0;i<TV::m;i++){
-    char buff[100];
-    sprintf(buff, "null %c %%c", "uvw"[i]);
-    Dump_Frame(ifs.null_u[i],ifs,buff);
+        char buff[100];
+        sprintf(buff, "null %c %%c", "uvw"[i]);
+        Dump_Frame(ifs.null_u[i],ifs,buff);
     }
     Dump_Frame(ifs.null_p,ifs,"null p %c");
 
     CONJUGATE_RESIDUAL<T> cr;
-    cr.Solve(ifs,sol,rhs,kr_q,kr_s,kr_t,kr_r,1e-10,0,100000);
+    cr.print_residuals=true;
+    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,0,0,100000);
 
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_q,kr_s);
+    ifs.Multiply(sol,kr_r);
+    kr_r.v-=rhs.v;
+    LOG::cout<<"Residual: "<<ifs.Convergence_Norm(kr_r)<<std::endl;
+
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
     OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
+    OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
 
     ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
