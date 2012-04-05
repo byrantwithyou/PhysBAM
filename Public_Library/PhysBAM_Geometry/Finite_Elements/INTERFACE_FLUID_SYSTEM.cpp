@@ -94,57 +94,57 @@ Set_Matrix(const VECTOR<T,2>& mu)
         bic.Add_Block(*helper_rhs_q[i],*u_stencil[i],*index_map_u[i],-0.5,true);}
 
 // Rhs pressure blocks
-for(int i=0;i<TV::m;i++){
-    helper_rhs_p[i]=new SYSTEM_MATRIX_HELPER<T>;
-    bic.Add_Block(*helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(1,1));}
-
-bic.Compute();
-
-index_range_u[0]=INTERVAL<int>(0,index_map_u[0]->next_index);
-for(int i=1;i<TV::m;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
-index_range_p=INTERVAL<int>(index_range_u[TV::m-1].max_corner,index_range_u[TV::m-1].max_corner+index_map_p->next_index);
-index_range_q[0]=INTERVAL<int>(index_range_p.max_corner,index_range_p.max_corner+object.mesh.elements.m);
-for(int i=1;i<TV::m;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
-system_size=index_range_q[TV::m-1].max_corner;
-
-for(int i=0;i<TV::m;i++) index_map_u[i]->Shift(index_range_u[i].min_corner);
-index_map_p->Shift(index_range_p.min_corner);
-
-for(int i=0;i<TV::m;i++)
-    for(int j=0;j<TV::m;j++){
-        helper_uu[i][j].Shift(index_range_u[i].min_corner,index_range_u[j].min_corner);
-        helper.Add_Helper(helper_uu[i][j]);
-        if(i!=j) helper.Add_Transpose();}
-
-for(int i=0;i<TV::m;i++){
-    helper_p[i].Shift(index_range_u[i].min_corner,index_range_p.min_corner);
-    helper.Add_Helper(helper_p[i]);
-    helper.Add_Transpose();}
-
-for(int i=0;i<TV::m;i++){
-    helper_q[i].Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);
-    helper.Add_Helper(helper_q[i]);
-    helper.Add_Transpose();}
-
-for(int i=0;i<TV::m;i++){
-    helper_rhs_p[i]->Shift(index_range_u[i].min_corner,index_range_p.min_corner);
-    helper_rhs_q[i]->Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);}
-
-helper.Set_Matrix(system_size,system_size,matrix,1e-14);
-
-for(int i=0;i<TV::m;i++){
-    null_u[i].Resize(system_size);
-    for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++)
-        null_u[i](j)=1;
-    null_u[i].Normalize();}
-
-null_p.Resize(system_size);
-for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
-    null_p(i)=1;
-for(int i=0;i<TV::m;i++)
-    for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
-        null_p(j)=-object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
-null_p.Normalize();
+    for(int i=0;i<TV::m;i++){
+        helper_rhs_p[i]=new SYSTEM_MATRIX_HELPER<T>;
+        bic.Add_Block(*helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(1,1));}
+    
+    bic.Compute();
+    
+    index_range_u[0]=INTERVAL<int>(0,index_map_u[0]->next_index);
+    for(int i=1;i<TV::m;i++) index_range_u[i]=INTERVAL<int>(index_range_u[i-1].max_corner,index_range_u[i-1].max_corner+index_map_u[i]->next_index);
+    index_range_p=INTERVAL<int>(index_range_u[TV::m-1].max_corner,index_range_u[TV::m-1].max_corner+index_map_p->next_index);
+    index_range_q[0]=INTERVAL<int>(index_range_p.max_corner,index_range_p.max_corner+object.mesh.elements.m);
+    for(int i=1;i<TV::m;i++) index_range_q[i]=INTERVAL<int>(index_range_q[i-1].max_corner,index_range_q[i-1].max_corner+object.mesh.elements.m);
+    system_size=index_range_q[TV::m-1].max_corner;
+    
+    for(int i=0;i<TV::m;i++) index_map_u[i]->Shift(index_range_u[i].min_corner);
+    index_map_p->Shift(index_range_p.min_corner);
+    
+    for(int i=0;i<TV::m;i++)
+        for(int j=0;j<TV::m;j++){
+            helper_uu[i][j].Shift(index_range_u[i].min_corner,index_range_u[j].min_corner);
+            helper.Add_Helper(helper_uu[i][j]);
+            if(i!=j) helper.Add_Transpose();}
+    
+    for(int i=0;i<TV::m;i++){
+        helper_p[i].Shift(index_range_u[i].min_corner,index_range_p.min_corner);
+        helper.Add_Helper(helper_p[i]);
+        helper.Add_Transpose();}
+    
+    for(int i=0;i<TV::m;i++){
+        helper_q[i].Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);
+        helper.Add_Helper(helper_q[i]);
+        helper.Add_Transpose();}
+    
+    for(int i=0;i<TV::m;i++){
+        helper_rhs_p[i]->Shift(index_range_u[i].min_corner,index_range_p.min_corner);
+        helper_rhs_q[i]->Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);}
+    
+    helper.Set_Matrix(system_size,system_size,matrix,1e-14);
+    
+    for(int i=0;i<TV::m;i++){
+        null_u[i].Resize(system_size);
+        for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++)
+            null_u[i](j)=1;
+        null_u[i].Normalize();}
+    
+    null_p.Resize(system_size);
+    for(int i=index_range_p.min_corner;i<index_range_p.max_corner;i++)
+        null_p(i)=1;
+    for(int i=0;i<TV::m;i++)
+        for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
+            null_p(j)=-object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
+    null_p.Normalize();
 }
 //#####################################################################
 // Function Set_RHS
@@ -152,32 +152,27 @@ null_p.Normalize();
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface)
 {
-VECTOR_ND<T> f(system_size);
-for(int i=0;i<TV::m;i++)
-    for(int j=0;j<f_interface.m;j++)
-        f(j+index_range_q[i].min_corner)=f_interface(j)(i);
-for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-    for(int i=0;i<TV::m;i++){
-        for(int s=0;s<2;s++){
-            int index=index_map_u[i]->Get_Index_Fixed(it.index,s);
-            if(index>=0)
-                f(index)=f_body[s](it.index)(i);}}
-
-LOG::cout<<"f "<<f<<std::endl;
-
-rhs.v.Resize(system_size);
-for(int i=0;i<TV::m;i++){
-    for(int j=0;j<helper_rhs_q[i]->data.m;j++){
-        rhs.v(helper_rhs_q[i]->data(j).x)+=helper_rhs_q[i]->data(j).z*f(helper_rhs_q[i]->data(j).y);
-        LOG::cout<<"bla "<<j<<" "<<helper_rhs_q[i]->data(j).y<<" "<<helper_rhs_q[i]->data(j).z<<std::endl;}
-        delete helper_rhs_q[i];}
-
-    // for(int i=0;i<TV::m;i++){
-        // for(int j=0;j<helper_rhs_p[i]->data.m;j++)
-            // rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*f(helper_rhs_p[i]->data(j).y);
-        // delete helper_rhs_p[i];}
+    VECTOR_ND<T> f(system_size);
+    for(int i=0;i<TV::m;i++)
+        for(int j=0;j<f_interface.m;j++)
+            f(j+index_range_q[i].min_corner)=f_interface(j)(i);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        for(int i=0;i<TV::m;i++){
+            for(int s=0;s<2;s++){
+                int index=index_map_u[i]->Get_Index_Fixed(it.index,s);
+                if(index>=0)
+                    f(index)=f_body[s](it.index)(i);}}
     
-    LOG::cout<<"rhs "<<rhs.v<<std::endl;
+    rhs.v.Resize(system_size);
+    for(int i=0;i<TV::m;i++){
+        for(int j=0;j<helper_rhs_q[i]->data.m;j++)
+            rhs.v(helper_rhs_q[i]->data(j).x)+=helper_rhs_q[i]->data(j).z*f(helper_rhs_q[i]->data(j).y);
+        delete helper_rhs_q[i];}
+    
+    for(int i=0;i<TV::m;i++){
+    for(int j=0;j<helper_rhs_p[i]->data.m;j++)
+    rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*f(helper_rhs_p[i]->data(j).y);
+        delete helper_rhs_p[i];}
 }
 //#####################################################################
 // Function Resize_Vector
