@@ -85,7 +85,8 @@ public:
         CELL_MAPPING<TV>* cm;
         SYSTEM_MATRIX_HELPER<T>* helper;
         ARRAY<OVERLAP_INTERFACE_POLYNOMIALS> overlap;
-        VECTOR<T,2> scale;
+        T scale;
+        bool ignore_orientation;
     };
 
     ARRAY<INTERFACE_BLOCK*> interface_blocks;
@@ -105,7 +106,7 @@ public:
     int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV,d1>& s1,
         CELL_MAPPING<TV>& cm0,CELL_MAPPING<TV>& cm1,const VECTOR<T,2>& scale);
     template<int d>
-    int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,const VECTOR<T,2>& scale);
+    int Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,const T scale,const bool ignore_orientation);
     void Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
         const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base);
 };

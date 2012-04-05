@@ -238,7 +238,7 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0
 // Function Add_Block
 //#####################################################################
 template<class TV,int static_degree> template<int d> int BASIS_INTEGRATION_CUTTING<TV,static_degree>::
-Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,const VECTOR<T,2>& scale)
+Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MAPPING<TV>& cm,const T scale,const bool ignore_orientation)
 {
     INTERFACE_BLOCK* ib=new INTERFACE_BLOCK;
     ib->cm=&cm;
@@ -248,6 +248,7 @@ Add_Block(SYSTEM_MATRIX_HELPER<T>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,C
         ib->overlap(i).subcell=s.diced(i).subcell;
         ib->overlap(i).polynomial=s.diced(i).polynomial;}
     ib->scale=scale;
+    ib->ignore_orientation=ignore_orientation;
     ib->helper=&helper;
     for(int i=0;i<ib->overlap.m;i++){
         RANGE<TV_INT> range(TV_INT(),ib->overlap(i).polynomial.size+1);
@@ -353,20 +354,21 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 int e=interface_elements(i).y;
                 has_element[e]=true;
                 precomputed_interface_integrals[e](it.index)+=monomial.Integrate_Over_Primitive(V);}}
-
-    int sign=enclose_inside?1:-1;
+    
     for(int i=0;i<interface_blocks.m;i++){
         INTERFACE_BLOCK* ib=interface_blocks(i);
+        int sign1=(ib->ignore_orientation||enclose_inside)?1:-1;
+        int sign2=(ib->ignore_orientation)?1:-1;
         for(int j=0;j<ib->overlap.m;j++){
             if(ib->overlap(j).subcell&(1<<block))
                 for(int k=0;k<subcell_elements;k++)
                     if(has_element[k]){
-                        T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*sign;
+                        T integral=Precomputed_Integral(precomputed_interface_integrals[k],ib->overlap(j).polynomial)*sign1;
                         TV_INT index=ib->overlap(j).index_offset+cell;
                         int index_i=ib->cm->Get_Index(index,enclose_inside);
                         int index_o=ib->cm->Get_Index(index,!enclose_inside);
-                        ib->helper->data.Append(TRIPLE<int,int,T>(index_i,element_base+k,integral*ib->scale(1)));
-                        ib->helper->data.Append(TRIPLE<int,int,T>(index_o,element_base+k,-integral*ib->scale(0)));}}}
+                        ib->helper->data.Append(TRIPLE<int,int,T>(index_i,element_base+k,integral*ib->scale));
+                        ib->helper->data.Append(TRIPLE<int,int,T>(index_o,element_base+k,sign2*integral*ib->scale));}}}
 }
 template class BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>;
 template class BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>;
@@ -377,7 +379,7 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1,1>(SYSTEM
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,
     CELL_MAPPING<VECTOR<float,3> >&,CELL_MAPPING<VECTOR<float,3> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,3>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,CELL_MAPPING<VECTOR<float,3> >&,const VECTOR<float,2>&);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,CELL_MAPPING<VECTOR<float,3> >&,const float,const bool);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,
     CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
@@ -385,7 +387,7 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,1>(SYSTEM
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,
     CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MAPPING<VECTOR<float,2> >&,const float,const bool);
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>;
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>;
@@ -396,7 +398,7 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1,1>(SYSTE
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,
     CELL_MAPPING<VECTOR<double,3> >&,CELL_MAPPING<VECTOR<double,3> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<double>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MAPPING<VECTOR<double,3> >&,const VECTOR<double,2>&);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MAPPING<VECTOR<double,3> >&,const double,const bool);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<double>&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,
     CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,const VECTOR<double,2>&);
@@ -404,5 +406,5 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1,1>(SYSTE
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,
     CELL_MAPPING<VECTOR<double,2> >&,CELL_MAPPING<VECTOR<double,2> >&,const VECTOR<double,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<double>&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,CELL_MAPPING<VECTOR<double,2> >&,const VECTOR<double,2>&);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,CELL_MAPPING<VECTOR<double,2> >&,const double,const bool);
 #endif

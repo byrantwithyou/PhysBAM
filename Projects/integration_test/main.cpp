@@ -158,12 +158,14 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
-    for(int i=0; i<ifs.object.mesh.elements.m;i++)
+    for(int i=0; i<ifs.object.mesh.elements.m;i++){
         f_interface(i)=at.interface(ifs.object.Get_Element(i).Center());
+        LOG::cout<<"interface "<<f_interface(i)<<std::endl;}
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        for(int s=0;s<2;s++)
-            f_body[s](it.index)=at.body(it.Location(),s);}
+        for(int s=0;s<2;s++){
+            f_body[s](it.index)=at.body(it.Location(),s);
+            LOG::cout<<"body "<<f_body[s](it.index)<<std::endl;}}
 
     ifs.Set_RHS(rhs,f_body,f_interface);
 
@@ -281,7 +283,7 @@ void Integration_Test(int argc,char* argv[])
                 virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV();}
                 virtual TV interface(const TV& X)
-                {return TV::Axis_Vector(1)*((X.x>0.5*m)?1:-1)*(2*mu(1)+mu(0))/s;}
+                {return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)1:(T)(-1))*(2*mu(1)+mu(0))/s;}
             };
             test=new ANALYTIC_TEST_0;
             break;}
