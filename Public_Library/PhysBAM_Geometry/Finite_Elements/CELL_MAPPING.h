@@ -53,7 +53,7 @@ public:
     void Shift(const int shift)
     {
         for(int s=0;s<2;s++)
-            for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),cell_index[s].Size()));it.Valid();it.Next())
+            for(RANGE_ITERATOR<TV::m> it(cell_index[s].domain);it.Valid();it.Next())
                 if(cell_index[s](it.index)>=0) cell_index[s](it.index)+=shift;
     }
 

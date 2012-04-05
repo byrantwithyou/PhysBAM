@@ -154,8 +154,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ifs.Resize_Vector(kr_t);
     ifs.Resize_Vector(kr_r);
 
-    ARRAY<T,FACE_INDEX<TV::m> > numer_u,error_u;
-    ARRAY<T,TV_INT> numer_p,error_p;
+    ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
+    ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
     for(int i=0; i<ifs.object.mesh.elements.m;i++)
         f_interface(i)=at.interface(ifs.object.Get_Element(i).Center());
@@ -183,7 +183,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
 
+    exact_u.Resize(grid);
     error_u.Resize(grid);
+    exact_p.Resize(grid.Domain_Indices());
     error_p.Resize(grid.Domain_Indices());
 
     TV avg_u;
@@ -191,7 +193,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         if (abs(numer_u(face))<1e-10) numer_u(face)=0;
-        error_u(face)=numer_u(face)-at.u(it.Location())(face.axis);
+        exact_u(face)=at.u(it.Location())(face.axis);
+        error_u(face)=numer_u(face)-exact_u(face);
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
     avg_u/=(TV)cnt_u;
@@ -209,7 +212,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     T avg_p=0;
     int cnt_p=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        error_p(it.index)=numer_p(it.index)-at.p(it.Location());
+        exact_p(it.index)=at.p(it.Location());
+        error_p(it.index)=numer_p(it.index)-exact_p(it.index);
         avg_p+=error_p(it.index);
         cnt_p++;}
     avg_p/=cnt_p;
@@ -223,7 +227,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
     
-    LOG::cout<<"computed u"<<std::endl<<std::endl<<numer_u<<std::endl;
+    LOG::cout<<"exact u"<<std::endl<<std::endl<<exact_u<<std::endl;
+    LOG::cout<<"numer u"<<std::endl<<std::endl<<numer_u<<std::endl;
     LOG::cout<<"error u"<<std::endl<<std::endl<<error_u<<std::endl;
 }
 
