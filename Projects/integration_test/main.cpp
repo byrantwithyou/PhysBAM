@@ -81,7 +81,7 @@ void Dump_Interface(INTERFACE_FLUID_SYSTEM<TV>& ifs,bool arrows)
 }
 
 template<class T,class TV>
-void Dump_Frames(INTERFACE_FLUID_SYSTEM<TV>& ifs)
+void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs)
 {
     Dump_Interface<T,TV>(ifs,true);
     Flush_Frame<T,TV>("interface");
@@ -90,12 +90,12 @@ void Dump_Frames(INTERFACE_FLUID_SYSTEM<TV>& ifs)
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++){
             Dump_Interface<T,TV>(ifs,false);
-            sprintf(buff,"null %c %c","uvw"[i],s?'-':'+');
+            sprintf(buff,"dofs %c %c","uvw"[i],s?'-':'+');
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
                 if(it.Axis()==i){ 
                     if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,s)>=0){
                         if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
-                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                         else
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
                         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i));}}
@@ -104,17 +104,35 @@ void Dump_Frames(INTERFACE_FLUID_SYSTEM<TV>& ifs)
 
     for(int s=0;s<2;s++){
         Dump_Interface<T,TV>(ifs,false);
-        sprintf(buff,"null p %c",s?'-':'+');
+        sprintf(buff,"dofs p %c",s?'-':'+');
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
             if(ifs.index_map_p->Get_Index_Fixed(it.index,s)>=0){
                 if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
-                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                 else
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));}}
-        Flush_Frame<T,TV>(buff);
-    }
+        Flush_Frame<T,TV>(buff);}
 }
 
+template<class T,class TV>
+void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs, VECTOR_ND<T>& v, const char* title)
+{
+    char buff[100];
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            Dump_Interface<T,TV>(ifs,false);
+            sprintf(buff,"%s %c %c",title,"uvw"[i],s?'-':'+');
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
+                if(it.Axis()==i){ 
+                    int index=ifs.index_map_u[i]->Get_Index_Fixed(it.index,s);
+                    if(index>=0){
+                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
+                        else
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v(index));}}
+            Flush_Frame<T,TV>(buff);}
+}
 
 //#################################################################################################################################################
 // Analytic Test ##################################################################################################################################
@@ -176,8 +194,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     ifs.Set_RHS(rhs,f_body,f_interface);
 
-    Dump_Frames<T,TV>(ifs);
-
+    Dump_System<T,TV>(ifs);
+    
     CONJUGATE_RESIDUAL<T> cr;
     cr.print_residuals=true;
     cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,0,0,100000);
@@ -186,6 +204,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     kr_r.v-=rhs.v;
     LOG::cout<<"Residual: "<<ifs.Convergence_Norm(kr_r)<<std::endl;
 
+    Dump_Vector<T,TV>(ifs,sol.v,"solution");
+    
     OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
     OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
@@ -203,9 +223,10 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     TV_INT cnt_u;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index()); 
-        if (abs(numer_u(face))<1e-10) numer_u(face)=0;
         exact_u(face)=at.u(it.Location())(face.axis);
         error_u(face)=numer_u(face)-exact_u(face);
+        if (abs(numer_u(face))<1e-10) numer_u(face)=0;
+        if (abs(error_u(face))<1e-10) error_u(face)=0;
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
     avg_u/=(TV)cnt_u;
@@ -285,7 +306,7 @@ void Integration_Test(int argc,char* argv[])
                 virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV();}
                 virtual TV interface(const TV& X)
-                {return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)1:(T)(-1))*(2*mu(1)+mu(0))/s;}
+                {return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
             };
             test=new ANALYTIC_TEST_0;
             break;}

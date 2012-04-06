@@ -93,7 +93,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
         helper_rhs_q[i]=new SYSTEM_MATRIX_HELPER<T>;
         bic.Add_Block(*helper_rhs_q[i],*u_stencil[i],*index_map_u[i],-0.5,true);}
 
-// Rhs pressure blocks
+    // Rhs pressure blocks
     for(int i=0;i<TV::m;i++){
         helper_rhs_p[i]=new SYSTEM_MATRIX_HELPER<T>;
         bic.Add_Block(*helper_rhs_p[i],*u_stencil[i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(1,1));}
