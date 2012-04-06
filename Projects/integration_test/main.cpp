@@ -320,7 +320,7 @@ void Integration_Test(int argc,char* argv[])
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV();}
                 virtual TV interface(const TV& X)
-                {return TV::Axis_Vector(1)*((X.x>0.5*m)?1:-1)*mu.Sum()/s;}
+                {return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*mu.Sum()/s;}
             };
             test=new ANALYTIC_TEST_1;
             break;}

@@ -33,7 +33,8 @@ public:
     SPARSE_MATRIX_FLAT_MXN<T> matrix;
     const GRID<TV>& grid;
     const GRID<TV>& coarse_grid;
-    LEVELSET_UNIFORM<GRID<TV> > phi;
+    GRID<TV> phi_grid;
+    LEVELSET_UNIFORM<GRID<TV> >* phi;
     VECTOR_ND<T> null_u[TV::m],null_p;
     bool run_self_tests;
     bool print_matrix;

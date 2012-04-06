@@ -22,8 +22,9 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> INTERFACE_FLUID_SYSTEM<TV>::
 INTERFACE_FLUID_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input)
-    :BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),phi(coarse_grid_input,phi_input,0)
+    :BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),phi_grid(coarse_grid_input.Get_Regular_Grid().Get_MAC_Grid_At_Regular_Positions())
 {
+    phi=new LEVELSET_UNIFORM<GRID<TV> >(phi_grid,phi_input,0);
 }
 //#####################################################################
 // Destructor
@@ -32,6 +33,8 @@ template<class TV> INTERFACE_FLUID_SYSTEM<TV>::
 ~INTERFACE_FLUID_SYSTEM()
 {
     for(int i=0;i<TV::m;i++) delete index_map_u[i];
+    delete index_map_p;
+    delete phi;
 }
 //#####################################################################
 // Function Set_Matrix
@@ -54,7 +57,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
             udx_stencil[i][j]->Differentiate(j);
             udx_stencil[i][j]->Dice_Stencil();}}
 
-    MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi.phi);
+    MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi->phi);
 
     index_map_p=new CELL_MAPPING<TV>(grid);
     index_map_p->periodic.Fill(true);
@@ -68,7 +71,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
     boundary_conditions.max_corner.Fill(BASIS_INTEGRATION_CUTTING<TV,2>::periodic);
 
     SYSTEM_MATRIX_HELPER<T> helper_uu[TV::m][TV::m],helper_p[TV::m],helper_q[TV::m];
-    BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi.phi);
+    BASIS_INTEGRATION_CUTTING<TV,2> bic(boundary_conditions,grid,coarse_grid,phi->phi);
 
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
@@ -190,7 +193,7 @@ Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
 {
     u.Resize(grid);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        int s=phi.Phi(it.Location())<0;
+        int s=phi->Phi(it.Location())<0;
         int index=index_map_u[it.Axis()]->Get_Index_Fixed(it.index,s);
         assert(index>=0);
         u(it.Full_Index())=x(index);}
@@ -203,7 +206,7 @@ Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p) const
 {
     p.Resize(grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int s=phi.Phi(it.Location())<0;
+        int s=phi->Phi(it.Location())<0;
         int index=index_map_p->Get_Index_Fixed(it.index,s);
         assert(index>=0);
         p(it.index)=x(index);}
