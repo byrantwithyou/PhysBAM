@@ -64,40 +64,57 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
 }
 
 template<class T,class TV>
-void Flush_Frame()
+void Flush_Frame(const char* title)
 {
-    Dump_Frame<T,TV>(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),"flush");
+    Dump_Frame<T,TV>(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
 }
 
 template<class T,class TV>
-void Dump_Frame(const VECTOR_ND<T>& v,INTERFACE_FLUID_SYSTEM<TV>& ifs,const char* title)
+void Dump_Interface(INTERFACE_FLUID_SYSTEM<TV>& ifs,bool arrows)
 {
-    INTERPOLATED_COLOR_MAP<T> color_map;
-    color_map.Initialize_Colors(1e-11,10,true,true,true);
-
-    char buff[100];
-    for(int inside=0;inside<2;inside++)
-    {
-        sprintf(buff, title, inside?'-':'+');
-        ARRAY<T,FACE_INDEX<TV::m> > error(ifs.grid);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next()){
-            int index=ifs.index_map_u[it.Axis()]->Get_Index_Fixed(it.index,inside);
-            if(index>=0)
-                error(it.Full_Index())=v(index);}
-
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
-            int index=ifs.index_map_p->Get_Index_Fixed(it.index,inside);
-            if(index>=0)
-                Add_Debug_Particle(ifs.grid.Center(it.index),color_map(v(index)));}
-
-        for(int i=0;i<ifs.object.mesh.elements.m;i++){
-            Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,1,1));
-            TV N;
-            for(int j=0;j<TV::m;j++) N(j)=v(ifs.index_range_q[j].min_corner+i);
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,N);}
-
-        Dump_Frame<T,TV>(error,buff);}
+    for(int i=0;i<ifs.object.mesh.elements.m;i++){
+        Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(0,1,0));
+        if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(ifs.object.Get_Element(i).X(1)-ifs.object.Get_Element(i).X(0))/ifs.grid.dX);
+        Add_Debug_Particle(ifs.object.Get_Element(i).X(1),VECTOR<T,3>(0,1,0));
+        if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(ifs.object.Get_Element(i).X(0)-ifs.object.Get_Element(i).X(1))/ifs.grid.dX);
+        Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.35,1));}
 }
+
+template<class T,class TV>
+void Dump_Frames(INTERFACE_FLUID_SYSTEM<TV>& ifs)
+{
+    Dump_Interface<T,TV>(ifs,true);
+    Flush_Frame<T,TV>("interface");
+    
+    char buff[100];
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            Dump_Interface<T,TV>(ifs,false);
+            sprintf(buff,"null %c %c","uvw"[i],s?'-':'+');
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
+                if(it.Axis()==i){ 
+                    if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,s)>=0){
+                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
+                        else
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i));}}
+            Flush_Frame<T,TV>(buff);
+        }
+
+    for(int s=0;s<2;s++){
+        Dump_Interface<T,TV>(ifs,false);
+        sprintf(buff,"null p %c",s?'-':'+');
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+            if(ifs.index_map_p->Get_Index_Fixed(it.index,s)>=0){
+                if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,1));
+                else
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));}}
+        Flush_Frame<T,TV>(buff);
+    }
+}
+
 
 //#################################################################################################################################################
 // Analytic Test ##################################################################################################################################
@@ -128,14 +145,6 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     INTERFACE_FLUID_SYSTEM<TV> ifs(grid,coarse_grid,phi);
     ifs.Set_Matrix(at.mu);
 
-    for(int i=0;i<ifs.object.mesh.elements.m;i++){
-        Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(1,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,ifs.object.Get_Element(i).X(1)-ifs.object.Get_Element(i).X(0));
-        Add_Debug_Particle(ifs.object.Get_Element(i).X(1),VECTOR<T,3>(1,1,0));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,ifs.object.Get_Element(i).X(0)-ifs.object.Get_Element(i).X(1));
-        Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,1,0));}
-    Flush_Frame<T,TV>();
-
     printf("\n");
     for(int i=0;i<TV::m;i++) printf("%c [%i %i) ", "uvw"[i], ifs.index_range_u[i].min_corner, ifs.index_range_u[i].max_corner);
     printf("p [%i %i) ", ifs.index_range_p.min_corner, ifs.index_range_p.max_corner);
@@ -158,23 +167,16 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
-    for(int i=0; i<ifs.object.mesh.elements.m;i++){
+    for(int i=0; i<ifs.object.mesh.elements.m;i++)
         f_interface(i)=at.interface(ifs.object.Get_Element(i).Center());
-        LOG::cout<<"interface "<<f_interface(i)<<std::endl;}
 
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        for(int s=0;s<2;s++){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        for(int s=0;s<2;s++)
             f_body[s](it.index)=at.body(it.Location(),s);
-            LOG::cout<<"body "<<f_body[s](it.index)<<std::endl;}}
 
     ifs.Set_RHS(rhs,f_body,f_interface);
 
-    for(int i=0;i<TV::m;i++){
-        char buff[100];
-        sprintf(buff, "null %c %%c", "uvw"[i]);
-        Dump_Frame(ifs.null_u[i],ifs,buff);
-    }
-    Dump_Frame(ifs.null_p,ifs,"null p %c");
+    Dump_Frames<T,TV>(ifs);
 
     CONJUGATE_RESIDUAL<T> cr;
     cr.print_residuals=true;

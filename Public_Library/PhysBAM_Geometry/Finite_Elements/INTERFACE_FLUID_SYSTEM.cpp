@@ -170,8 +170,8 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interf
         delete helper_rhs_q[i];}
     
     for(int i=0;i<TV::m;i++){
-    for(int j=0;j<helper_rhs_p[i]->data.m;j++)
-    rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*f(helper_rhs_p[i]->data(j).y);
+        for(int j=0;j<helper_rhs_p[i]->data.m;j++)
+            rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*f(helper_rhs_p[i]->data(j).y);
         delete helper_rhs_p[i];}
 }
 //#####################################################################
