@@ -115,17 +115,22 @@ void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));}}
         Flush_Frame<T,TV>(buff);}
 
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+        if(at.phi(it.Location())<0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0.3,1));
+        else Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.9,0.2,0.2));}
+    Flush_Frame<T,TV>("analytic level set");
+
     for(int i=0;i<ifs.object.mesh.elements.m;i++){
         Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.1,0.5));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.interface(ifs.object.Get_Element(i).Center()));}
-    Flush_Frame<T,TV>("interfacial forces");
+    Flush_Frame<T,TV>("analytic interfacial forces");
     
     Dump_Interface<T,TV>(ifs,false);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
         int s=at.phi(it.Location())<0;
         Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.3,0.2,0));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.body(it.Location(),s));}
-    Flush_Frame<T,TV>("volumetric forces");
+    Flush_Frame<T,TV>("analytic volumetric forces");
 }
 
 template<class T,class TV>
@@ -140,12 +145,25 @@ void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs,VECTOR_ND<T>& v,const char* tit
                 if(it.Axis()==i){ 
                     int index=ifs.index_map_u[i]->Get_Index_Fixed(it.index,s);
                     if(index>=0){
-                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
-                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
-                        else
-                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
+                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
+                        else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
                         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v(index));}}
             Flush_Frame<T,TV>(buff);}
+
+    for(int s=0;s<2;s++){
+        Dump_Interface<T,TV>(ifs,false);
+        sprintf(buff,"%s p %c",title,s?'-':'+');
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+            int index=ifs.index_map_p->Get_Index_Fixed(it.index,s);
+            if(index>=0)
+                for(int j=0;j<TV::m;j++)
+                    for(int sign=0;sign<2;sign++) {
+                if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
+                else
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v(index)*(sign?1:-1));}}
+        Flush_Frame<T,TV>(buff);}
 }
 
 //#################################################################################################################################################
@@ -212,8 +230,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     Dump_System<T,TV>(ifs,at);
     
     CONJUGATE_RESIDUAL<T> cr;
-    // cr.print_residuals=true;
-    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,0,100000);
+    cr.print_residuals=true;
+    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,1000000,1000000);
 
     ifs.Multiply(sol,kr_r);
     kr_r.v-=rhs.v;
@@ -277,6 +295,10 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     // LOG::cout<<"exact u"<<std::endl<<std::endl<<exact_u<<std::endl;
     // LOG::cout<<"numer u"<<std::endl<<std::endl<<numer_u<<std::endl;
     // LOG::cout<<"error u"<<std::endl<<std::endl<<error_u<<std::endl;
+
+    // LOG::cout<<"exact p"<<std::endl<<std::endl<<exact_p<<std::endl;
+    // LOG::cout<<"numer p"<<std::endl<<std::endl<<numer_p<<std::endl;
+    // LOG::cout<<"error p"<<std::endl<<std::endl<<error_p<<std::endl;
 }
 
 //#################################################################################################################################################
@@ -374,7 +396,7 @@ void Integration_Test(int argc,char* argv[])
         case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2
             struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
             {
-                T ra,rb,ra2,rb2,rb2mra2;
+                T ra,rb,ra2,rb2,rb2mra2,r_avg;
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
@@ -383,6 +405,7 @@ void Integration_Test(int argc,char* argv[])
                     ra2=sqr(ra);
                     rb2=sqr(rb);
                     rb2mra2=rb2-ra2;
+                    r_avg=(ra+rb)/2;
                 }
                 virtual TV u(const TV& X)
                 {
@@ -401,7 +424,7 @@ void Integration_Test(int argc,char* argv[])
                 virtual T phi(const TV& X)
                 {
                     T r=VECTOR<T,2>(X.x-0.5*m,X.y-0.5*m).Magnitude();
-                    return (ra-rb)/2+abs(r-(ra+rb)/2);
+                    return (ra-rb)/2+abs(r-r_avg);
                 }
                 virtual TV body(const TV& X,bool inside)
                 {
@@ -421,6 +444,7 @@ void Integration_Test(int argc,char* argv[])
                     TV force;
                     force.x=z.x;
                     force.y=z.y;
+                    if(r<r_avg) force*=-1;
                     return force;
                 }
             };
