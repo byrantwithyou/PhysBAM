@@ -40,6 +40,8 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
     return old_grid;
 }
 
+template<class TV> struct ANALYTIC_TEST;
+
 //#################################################################################################################################################
 // Debug Particles ################################################################################################################################
 //#################################################################################################################################################
@@ -73,15 +75,15 @@ template<class T,class TV>
 void Dump_Interface(INTERFACE_FLUID_SYSTEM<TV>& ifs,bool arrows)
 {
     for(int i=0;i<ifs.object.mesh.elements.m;i++){
-        Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(0,1,0));
+        Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(0,0.5,0));
         if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(ifs.object.Get_Element(i).X(1)-ifs.object.Get_Element(i).X(0))/ifs.grid.dX);
-        Add_Debug_Particle(ifs.object.Get_Element(i).X(1),VECTOR<T,3>(0,1,0));
+        Add_Debug_Particle(ifs.object.Get_Element(i).X(1),VECTOR<T,3>(0,0.5,0));
         if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(ifs.object.Get_Element(i).X(0)-ifs.object.Get_Element(i).X(1))/ifs.grid.dX);
-        Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.35,1));}
+        Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.3,1));}
 }
 
 template<class T,class TV>
-void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs)
+void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
 {
     Dump_Interface<T,TV>(ifs,true);
     Flush_Frame<T,TV>("interface");
@@ -112,10 +114,22 @@ void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs)
                 else
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));}}
         Flush_Frame<T,TV>(buff);}
+
+    for(int i=0;i<ifs.object.mesh.elements.m;i++){
+        Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.interface(ifs.object.Get_Element(i).Center()));}
+    Flush_Frame<T,TV>("interfacial forces");
+    
+    Dump_Interface<T,TV>(ifs,false);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+        int s=at.phi(it.Location())<0;
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.3,0.2,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.body(it.Location(),s));}
+    Flush_Frame<T,TV>("volumetric forces");
 }
 
 template<class T,class TV>
-void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs, VECTOR_ND<T>& v, const char* title)
+void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs,VECTOR_ND<T>& v,const char* title)
 {
     char buff[100];
     for(int i=0;i<TV::m;i++)
@@ -195,11 +209,11 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     ifs.Set_RHS(rhs,f_body,f_interface);
 
-    Dump_System<T,TV>(ifs);
+    Dump_System<T,TV>(ifs,at);
     
     CONJUGATE_RESIDUAL<T> cr;
-    cr.print_residuals=true;
-    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,0,0,100000);
+    // cr.print_residuals=true;
+    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,0,100000);
 
     ifs.Multiply(sol,kr_r);
     kr_r.v-=rhs.v;
@@ -207,10 +221,10 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     Dump_Vector<T,TV>(ifs,sol.v,"solution");
     
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
-    OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
-    OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
-    OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
+    // OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
+    // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
+    // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
+    // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
 
     ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
@@ -260,9 +274,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
     
-    LOG::cout<<"exact u"<<std::endl<<std::endl<<exact_u<<std::endl;
-    LOG::cout<<"numer u"<<std::endl<<std::endl<<numer_u<<std::endl;
-    LOG::cout<<"error u"<<std::endl<<std::endl<<error_u<<std::endl;
+    // LOG::cout<<"exact u"<<std::endl<<std::endl<<exact_u<<std::endl;
+    // LOG::cout<<"numer u"<<std::endl<<std::endl<<numer_u<<std::endl;
+    // LOG::cout<<"error u"<<std::endl<<std::endl<<error_u<<std::endl;
 }
 
 //#################################################################################################################################################
