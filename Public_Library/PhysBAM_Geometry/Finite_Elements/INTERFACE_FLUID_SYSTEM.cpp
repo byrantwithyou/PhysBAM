@@ -155,27 +155,31 @@ Set_Matrix(const VECTOR<T,2>& mu)
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface)
 {
-    VECTOR_ND<T> f(system_size);
+    VECTOR_ND<T> F_interface(system_size);
+    VECTOR_ND<T>* F_body[TV::m];
+    for(int i=0;i<TV::m;i++) F_body[i]=new VECTOR_ND<T>(system_size);
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<f_interface.m;j++)
-            f(j+index_range_q[i].min_corner)=f_interface(j)(i);
+            F_interface(j+index_range_q[i].min_corner)=f_interface(j)(i);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int i=0;i<TV::m;i++){
-            for(int s=0;s<2;s++){
-                int index=index_map_u[i]->Get_Index_Fixed(it.index,s);
-                if(index>=0)
-                    f(index)=f_body[s](it.index)(i);}}
-    
+        for(int s=0;s<2;s++){
+            int index=index_map_p->Get_Index_Fixed(it.index,s);
+            if(index>=0)
+                for(int i=0;i<TV::m;i++)
+                    (*F_body[i])(index)=f_body[s](it.index)(i);}
+
     rhs.v.Resize(system_size);
     for(int i=0;i<TV::m;i++){
         for(int j=0;j<helper_rhs_q[i]->data.m;j++)
-            rhs.v(helper_rhs_q[i]->data(j).x)+=helper_rhs_q[i]->data(j).z*f(helper_rhs_q[i]->data(j).y);
+            rhs.v(helper_rhs_q[i]->data(j).x)+=helper_rhs_q[i]->data(j).z*F_interface(helper_rhs_q[i]->data(j).y);
         delete helper_rhs_q[i];}
     
     for(int i=0;i<TV::m;i++){
         for(int j=0;j<helper_rhs_p[i]->data.m;j++)
-            rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*f(helper_rhs_p[i]->data(j).y);
+            rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*(*F_body[i])(helper_rhs_p[i]->data(j).y);
         delete helper_rhs_p[i];}
+
+    for(int i=0;i<TV::m;i++) delete F_body[i];
 }
 //#####################################################################
 // Function Resize_Vector

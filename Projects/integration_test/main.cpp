@@ -97,7 +97,7 @@ void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs)
                         if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                         else
-                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
                         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i));}}
             Flush_Frame<T,TV>(buff);
         }
@@ -110,7 +110,7 @@ void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs)
                 if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                 else
-                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));}}
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));}}
         Flush_Frame<T,TV>(buff);}
 }
 
@@ -129,7 +129,7 @@ void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs, VECTOR_ND<T>& v, const char* t
                         if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                         else
-                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,0));
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
                         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v(index));}}
             Flush_Frame<T,TV>(buff);}
 }
@@ -145,6 +145,7 @@ struct ANALYTIC_TEST
     T kg,m,s;
     VECTOR<T,2> mu;
 
+    virtual void Initialize()=0;
     virtual TV u(const TV& X)=0;
     virtual T p(const TV& X)=0;
     virtual T phi(const TV& X)=0;
@@ -296,10 +297,11 @@ void Integration_Test(int argc,char* argv[])
     ANALYTIC_TEST<TV>* test=0;
 
     switch(test_number){
-        case 0:{
+        case 0:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1]
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){}
                 virtual TV u(const TV& X)
                 {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
@@ -310,10 +312,11 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_0;
             break;}
-        case 1:{
+        case 1:{ // Linear flow on [0,0.25],[0.25,0.75],[0.75,1]
             struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){}
                 virtual TV u(const TV& X)
                 {return TV::Axis_Vector(1)*((phi(X)<0)?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
@@ -324,33 +327,90 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_1;
             break;}
-        case 2:{
+        case 2:{ // Poiseuille flow on [0.25,0.75], 0 velocity outside
             struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){}
                 virtual TV u(const TV& X)
                 {return TV::Axis_Vector(1)*(phi(X)<0)*(sqr(0.25*m)-sqr(X.x-0.5*m))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*(inside*2*mu(1)/(m*s));}
                 virtual TV interface(const TV& X)
-                {return -(T)0.5*TV::Axis_Vector(1)*mu(1)/s;}
+                {return (T)0.5*TV::Axis_Vector(1)*mu(1)/s;}
             };
             test=new ANALYTIC_TEST_2;
             break;}
-        case 3:{
+        case 3:{ // Opposite Poiseuille flows on [0.25,0.75] and  [0,0.25],[0.75,1]
             struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){}
                 virtual TV u(const TV& X)
                 {T x=abs(X.x-(T)0.5*m)-(T)0.25*m;return -TV::Axis_Vector(1)*x*(0.5*m-abs(x))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*(inside?mu(1):-mu(0))*2/(m*s);}
                 virtual TV interface(const TV& X)
-                {return (T)0.5*TV::Axis_Vector(1)*(mu(0)-mu(1))/s;}
+                {return (T)0.5*TV::Axis_Vector(1)*(mu(1)-mu(0))/s;}
             };
             test=new ANALYTIC_TEST_3;
+            break;}
+        case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2
+            struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
+            {
+                T ra,rb,ra2,rb2,rb2mra2;
+                using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    ra=0.1666*m;
+                    rb=0.3333*m;
+                    ra2=sqr(ra);
+                    rb2=sqr(rb);
+                    rb2mra2=rb2-ra2;
+                }
+                virtual TV u(const TV& X)
+                {
+                    T x=X.x-0.5*m;
+                    T y=X.y-0.5*m;
+                    T r2=VECTOR<T,2>(x,y).Magnitude_Squared();
+                    TV velocity;
+                    if(r2<rb2){
+                        velocity.x=-y/s;
+                        velocity.y=x/s;}
+                    if(r2>ra2)
+                        velocity*=(rb2-r2)/(rb2mra2);
+                    return velocity;
+                }
+                virtual T p(const TV& X){return T();}
+                virtual T phi(const TV& X)
+                {
+                    T r=VECTOR<T,2>(X.x-0.5*m,X.y-0.5*m).Magnitude();
+                    return (ra-rb)/2+abs(r-(ra+rb)/2);
+                }
+                virtual TV body(const TV& X,bool inside)
+                {
+                    TV force;
+                    if(!inside) return force;
+                    force.x=-(X.y-0.5*m);
+                    force.y=X.x-0.5*m;
+                    force*=mu(1)*8/(rb2mra2)/s;
+                    return force;
+                }
+                virtual TV interface(const TV& X)
+                {
+                    VECTOR<T,2> z(X.x-0.5*m,X.y-0.5*m);
+                    T r=z.Normalize();
+                    z=z.Rotate_Counterclockwise_90();
+                    z*=mu(1)*2*sqr(r)/rb2mra2/s;
+                    TV force;
+                    force.x=z.x;
+                    force.y=z.y;
+                    return force;
+                }
+            };
+            test=new ANALYTIC_TEST_4;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
@@ -364,6 +424,8 @@ void Integration_Test(int argc,char* argv[])
     int cgf=parse_args.Get_Integer_Value("-cgf");
 
     if(res%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
+
+    test->Initialize();
 
     TV_INT counts=TV_INT()+res;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
