@@ -166,6 +166,18 @@ void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs,VECTOR_ND<T>& v,const char* tit
         Flush_Frame<T,TV>(buff);}
 }
 
+template<class T,class TV,class TV_INT>
+void Dump_u_p(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<T,TV_INT>& p,const char* title)
+{
+    INTERPOLATED_COLOR_MAP<T> color_map;
+    color_map.Initialize_Colors(1e-12,1,true,true,true);
+
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        Add_Debug_Particle(it.Location(),color_map(p(it.index)));
+
+    Dump_Frame<T,TV>(u,title);
+}
+
 //#################################################################################################################################################
 // Analytic Test ##################################################################################################################################
 //#################################################################################################################################################
@@ -230,7 +242,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     Dump_System<T,TV>(ifs,at);
     
     CONJUGATE_RESIDUAL<T> cr;
-    cr.print_residuals=true;
+//    cr.print_residuals=true;
     cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,1000000,1000000);
 
     ifs.Multiply(sol,kr_r);
@@ -258,8 +270,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         exact_u(face)=at.u(it.Location())(face.axis);
         error_u(face)=numer_u(face)-exact_u(face);
-        if (abs(numer_u(face))<1e-10) numer_u(face)=0;
-        if (abs(error_u(face))<1e-10) error_u(face)=0;
+        if(abs(numer_u(face))<1e-10) numer_u(face)=0;
+        if(abs(error_u(face))<1e-10) error_u(face)=0;
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
     avg_u/=(TV)cnt_u;
@@ -289,6 +301,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         error_p_linf=max(error_p_linf,abs(d));
         error_p_l2+=sqr(d);}
     error_p_l2=sqrt(error_p_l2/cnt_p);
+
+    Dump_u_p(ifs.grid,error_u,error_p,"error");
 
     LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
     
