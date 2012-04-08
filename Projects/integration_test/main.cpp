@@ -29,7 +29,7 @@
 using namespace PhysBAM;
 
 typedef float RW;
-std::string output_directory="output";
+std::string output_directory;
 
 template<class TV>
 GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
@@ -330,6 +330,7 @@ void Integration_Test(int argc,char* argv[])
 
     PARSE_ARGS parse_args;
     parse_args.Set_Extra_Arguments(-1,"<example number>");
+    parse_args.Add_String_Argument("-o","output","output directory");
     parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
     parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
     parse_args.Add_Double_Argument("-m",1,"meter scale");
@@ -467,6 +468,7 @@ void Integration_Test(int argc,char* argv[])
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
+    output_directory=parse_args.Get_String_Value("-o");
     test->m=parse_args.Get_Double_Value("-m");
     test->s=parse_args.Get_Double_Value("-sec");
     test->kg=parse_args.Get_Double_Value("-kg");
