@@ -350,7 +350,7 @@ template<class TV>
 void Integration_Test(int argc,char* argv[])
 {
     typedef typename TV::SCALAR T;
-    static const int d=TV::m;
+    enum WORKAROUND {d=TV::m};
     typedef VECTOR<int,d> TV_INT;
 
     Get_Debug_Particles<TV>();
