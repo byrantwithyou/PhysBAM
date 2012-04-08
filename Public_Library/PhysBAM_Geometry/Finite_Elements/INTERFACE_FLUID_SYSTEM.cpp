@@ -85,7 +85,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
 
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
-        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(1,1));
+        bic.Add_Block(helper_p[i],*udx_stencil[i][i],p_stencil,*index_map_u[i],*index_map_p,VECTOR<T,2>(-1,-1));
 
     // Traction blocks
     for(int i=0;i<TV::m;i++)
@@ -146,7 +146,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
         null_p(i)=1;
     for(int i=0;i<TV::m;i++)
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
-            null_p(j)=-object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
+            null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
     null_p.Normalize();
 }
 //#####################################################################

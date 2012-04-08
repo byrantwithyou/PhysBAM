@@ -72,7 +72,7 @@ void Flush_Frame(const char* title)
 }
 
 template<class T,class TV>
-void Dump_Interface(INTERFACE_FLUID_SYSTEM<TV>& ifs,bool arrows)
+void Dump_Interface(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const bool arrows)
 {
     for(int i=0;i<ifs.object.mesh.elements.m;i++){
         Add_Debug_Particle(ifs.object.Get_Element(i).X(0),VECTOR<T,3>(0,0.5,0));
@@ -83,7 +83,7 @@ void Dump_Interface(INTERFACE_FLUID_SYSTEM<TV>& ifs,bool arrows)
 }
 
 template<class T,class TV>
-void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
+void Dump_System(const INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
 {
     Dump_Interface<T,TV>(ifs,true);
     Flush_Frame<T,TV>("interface");
@@ -128,13 +128,13 @@ void Dump_System(INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
     Dump_Interface<T,TV>(ifs,false);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
         int s=at.phi(it.Location())<0;
-        Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.3,0.2,0));
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.25,0.25,0.25));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.body(it.Location(),s));}
     Flush_Frame<T,TV>("analytic volumetric forces");
 }
 
 template<class T,class TV>
-void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs,VECTOR_ND<T>& v,const char* title)
+void Dump_Vector(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,const char* title)
 {
     char buff[100];
     for(int i=0;i<TV::m;i++)
@@ -157,13 +157,36 @@ void Dump_Vector(INTERFACE_FLUID_SYSTEM<TV>& ifs,VECTOR_ND<T>& v,const char* tit
             int index=ifs.index_map_p->Get_Index_Fixed(it.index,s);
             if(index>=0)
                 for(int j=0;j<TV::m;j++)
-                    for(int sign=0;sign<2;sign++) {
+                    for(int sign=0;sign<2;sign++){
                 if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                 else
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v(index)*(sign?1:-1));}}
         Flush_Frame<T,TV>(buff);}
+}
+
+template<class T,class TV,class TV_INT>
+void Dump_u_p(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<T,TV_INT>& p,const char* title)
+{
+    char buff[100];
+    for(int i=0;i<TV::m;i++){
+        Dump_Interface<T,TV>(ifs,false);
+        sprintf(buff,"%s %c",title,"uvw"[i]);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
+            if(it.Axis()==i){ 
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.25,0.25,0.25));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*u(it.Full_Index()));}
+        Flush_Frame<T,TV>(buff);}
+
+    Dump_Interface<T,TV>(ifs,false);
+    sprintf(buff,"%s p",title);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+        for(int j=0;j<TV::m;j++)
+            for(int sign=0;sign<2;sign++){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.25,0.25,0.25));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*p(it.index)*(sign?1:-1));}}
+    Flush_Frame<T,TV>(buff);
 }
 
 template<class T,class TV,class TV_INT>
@@ -242,7 +265,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     Dump_System<T,TV>(ifs,at);
     
     CONJUGATE_RESIDUAL<T> cr;
-//    cr.print_residuals=true;
+    // cr.print_residuals=true;
     cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,1000000,1000000);
 
     ifs.Multiply(sol,kr_r);
@@ -255,6 +278,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
+    // OCTAVE_OUTPUT<T>("null_p.txt").Write("null_p",ifs.null_p);
+    // OCTAVE_OUTPUT<T>("null_u.txt").Write("null_u",ifs.null_u[0]);
+    // OCTAVE_OUTPUT<T>("null_v.txt").Write("null_v",ifs.null_u[1]);
 
     ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
@@ -302,7 +328,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         error_p_l2+=sqr(d);}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
-    Dump_u_p(ifs.grid,error_u,error_p,"error");
+    Dump_u_p(ifs,error_u,error_p,"error");
+    Dump_u_p(ifs.grid,error_u,error_p,"color mapped error");
 
     LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
     
@@ -348,7 +375,7 @@ void Integration_Test(int argc,char* argv[])
     ANALYTIC_TEST<TV>* test=0;
 
     switch(test_number){
-        case 0:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1]
+        case 0:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], no pressure
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -363,7 +390,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_0;
             break;}
-        case 1:{ // Linear flow on [0,0.25],[0.25,0.75],[0.75,1]
+        case 1:{ // Linear flow on [0,0.25],[0.25,0.75],[0.75,1], no pressure
             struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -378,7 +405,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_1;
             break;}
-        case 2:{ // Poiseuille flow on [0.25,0.75], 0 velocity outside
+        case 2:{ // Poiseuille flow on [0.25,0.75], 0 velocity outside, no pressure
             struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -393,7 +420,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_2;
             break;}
-        case 3:{ // Opposite Poiseuille flows on [0.25,0.75] and  [0,0.25],[0.75,1]
+        case 3:{ // Opposite Poiseuille flows on [0.25,0.75] and  [0,0.25],[0.75,1], no pressure
             struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -408,7 +435,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_3;
             break;}
-        case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2
+        case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2, not pressure
             struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
             {
                 T ra,rb,ra2,rb2,rb2mra2,r_avg;
@@ -464,6 +491,36 @@ void Integration_Test(int argc,char* argv[])
                 }
             };
             test=new ANALYTIC_TEST_4;
+            break;}
+        case 5:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], periodic pressure p(y)
+            struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){}
+                virtual TV u(const TV& X)
+                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual T p(const TV& X){return (phi(X)<0)*sin(2*M_PI*X.y/m)*kg/(sqr(s)*(d==3?m:1));}
+                virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
+                virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*2*M_PI*cos(2*M_PI*X.y/m)*kg/(sqr(s)*(d==3?sqr(m):m))*inside;}
+                virtual TV interface(const TV& X)
+                {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s-TV::Axis_Vector(0)*p(X))*((X.x>0.5*m)?(T)(-1):(T)1);}
+            };
+            test=new ANALYTIC_TEST_5;
+            break;}
+        case 6:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], linear pressure p(x) - TODO
+            struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){}
+                virtual TV u(const TV& X)
+                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual T p(const TV& X){return T();}
+                virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
+                virtual TV body(const TV& X,bool inside){return TV();}
+                virtual TV interface(const TV& X)
+                {return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
+            };
+            test=new ANALYTIC_TEST_6;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
