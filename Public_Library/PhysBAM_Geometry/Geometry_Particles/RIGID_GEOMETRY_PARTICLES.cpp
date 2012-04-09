@@ -24,7 +24,7 @@ template<class TV> RIGID_GEOMETRY_PARTICLES<TV>::
 template<class TV> void RIGID_GEOMETRY_PARTICLES<TV>::
 Resize(const int new_size)
 {
-    for(int p=new_size;p<Size();p++)
+    for(int p=new_size;p<rigid_geometry.Size();p++)
         if(rigid_geometry(p)) Remove_Geometry(p);
     rigid_geometry.Resize(new_size);
     BASE::Resize(new_size);
