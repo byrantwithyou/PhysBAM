@@ -282,7 +282,7 @@ Volume(VECTOR<VECTOR<T,2>,2> X,int dir)
     return (X(1).y-X(0).y)*(X(0).x+X(1).x)/2*sign;
 }
 //#####################################################################
-// Function Add_Cut_Stencil
+// Function Add_Cut_Subcell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_CUTTING<TV,static_degree>::
 Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
@@ -339,8 +339,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 int index_o0=vb->cm0->Get_Index(index0,!enclose_inside);
                 int index_i1=vb->cm1->Get_Index(index1,enclose_inside);
                 int index_o1=vb->cm1->Get_Index(index1,!enclose_inside);
-                vb->helper->data.Append(TRIPLE<int,int,T>(index_i0,index_i1,integral*vb->scale(1)));
-                vb->helper->data.Append(TRIPLE<int,int,T>(index_o0,index_o1,-integral*vb->scale(0)));}}}
+                vb->helper->data.Append(TRIPLE<int,int,T>(index_i0,index_i1,integral*vb->scale(enclose_inside)));
+                vb->helper->data.Append(TRIPLE<int,int,T>(index_o0,index_o1,-integral*vb->scale(!enclose_inside)));}}}
 
     STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals[subcell_elements];
     bool has_element[subcell_elements]={};

@@ -266,7 +266,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     
     CONJUGATE_RESIDUAL<T> cr;
     // cr.print_residuals=true;
-    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,1000000,1000000);
+    cr.restart_iterations=200;
+    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,0,1000000);
 
     ifs.Multiply(sol,kr_r);
     kr_r.v-=rhs.v;
@@ -296,8 +297,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         exact_u(face)=at.u(it.Location())(face.axis);
         error_u(face)=numer_u(face)-exact_u(face);
-        if(abs(numer_u(face))<1e-10) numer_u(face)=0;
-        if(abs(error_u(face))<1e-10) error_u(face)=0;
+        // if(abs(numer_u(face))<1e-10) numer_u(face)=0;
+        // if(abs(error_u(face))<1e-10) error_u(face)=0;
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
     avg_u/=(TV)cnt_u;
@@ -310,7 +311,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         error_u_l2(face.axis)+=sqr(d);}
     error_u_l2=sqrt(error_u_l2/(TV)cnt_u);
 
-    LOG::cout<<"U error:   linf="<<error_u_linf<<"   l2="<<error_u_l2<<std::endl;
+    LOG::cout<<ifs.grid.counts<<" U error:   linf="<<error_u_linf<<"   l2="<<error_u_l2<<std::endl;
 
     T avg_p=0;
     int cnt_p=0;
@@ -331,7 +332,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     Dump_u_p(ifs,error_u,error_p,"error");
     Dump_u_p(ifs.grid,error_u,error_p,"color mapped error");
 
-    LOG::cout<<"P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
+    LOG::cout<<ifs.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
     
     // LOG::cout<<"exact u"<<std::endl<<std::endl<<exact_u<<std::endl;
     // LOG::cout<<"numer u"<<std::endl<<std::endl<<numer_u<<std::endl;
