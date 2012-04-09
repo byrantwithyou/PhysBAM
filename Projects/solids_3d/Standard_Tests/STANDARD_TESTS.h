@@ -1256,6 +1256,7 @@ void Get_Initial_Data()
             tests.Add_Ground();
             break;}
         case 51:{
+            if(!parameter) parameter=2;
             for(int i=0;i<parameter;i++){
                 SPHERE<TV> sphere(TV(0,i*2.1+2,0),1);
                 TRIANGULATED_SURFACE<T>* surface=TESSELLATION::Generate_Triangles(sphere,4),*new_surface=0;
