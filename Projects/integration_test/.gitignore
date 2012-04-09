@@ -13,3 +13,9 @@ view_case2
 depth_buffering_debug
 static_polynomial
 static_polynomial_debug
+depth_buffering_profile
+integration_test_profile
+primitive_integration_profile
+view_case2_profile
+view_case_profile
+view_levelset_profile
