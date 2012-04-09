@@ -7,6 +7,7 @@
 #ifndef __COLLISION_AREA_PENALTY_FORCE__
 #define __COLLISION_AREA_PENALTY_FORCE__
 
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
