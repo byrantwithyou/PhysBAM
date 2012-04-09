@@ -67,10 +67,12 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
+#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TETRAHEDRON_HIERARCHY.h>
+#include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
@@ -363,6 +365,9 @@ void Parse_Options()
             solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         case 4:
             solids_parameters.cfl=(T)5;
+            break;
+        case 51:
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
             break;
         case 5:
         case 29:
@@ -1250,6 +1255,15 @@ void Get_Initial_Data()
                 tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)2.1*(i+1),0))),true,true,density);
             tests.Add_Ground();
             break;}
+        case 51:{
+            for(int i=0;i<parameter;i++){
+                SPHERE<TV> sphere(TV(0,i*2.1+2,0),1);
+                TRIANGULATED_SURFACE<T>* surface=TESSELLATION::Generate_Triangles(sphere,4),*new_surface=0;
+                TETRAHEDRALIZED_VOLUME<T>* new_volume=0;
+                ARRAY<int> surface_particle_map;
+                tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,64,1e-3,surface_particle_map,&new_surface,&new_volume,false);}
+            tests.Add_Ground();
+            break;}
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -1594,6 +1608,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 penalty_force->Add_Mesh(tetrahedralized_volume);}
             solid_body_collection.Add_Force(penalty_force);
             break;}
+        case 51:{
+            for(int i=0;i<parameter;i++){
+                TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
+                solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
+                solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
+            break;}
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
 
@@ -1602,6 +1622,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             case 1:
             case 49:
             case 50:
+            case 51:
             case 24:{
                 VECTOR<int,3> processes_per_dimension(2,1,1);
                 solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,processes_per_dimension);
