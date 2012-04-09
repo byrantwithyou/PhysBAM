@@ -54,7 +54,6 @@ external_libraries={
     'boostregex': {'libs':['boost_regex']},
     'zlib':       {'default':1,'libs':['z'],'cvs':1},
     'ffmpeg':     {'default':0,'flags':['USE_FFMPEG'],'libs':['libavformat','libavcodec','libavutil'],'filter':'VIDEO'},
-    'petsc':     {'default':1,'flags':['USE_PETSC'],'libs':['libpetsc'],'filter':'PETSC'},
     'boost_serialization':     {'default':0,'flags':['USE_BOOST_SERIALIZATION'],'libs':['libboost_serialization'],'filter':''},
     'libjpeg':    {'default':1,'flags':['USE_LIBJPEG'],'libs':['jpeg'],'filter':'(MOV_FILE)|(JPG_FILE)'},
     'libpng':     {'default':1,'flags':['USE_LIBPNG'],'libs':['png'],'filter':'PNG_FILE'},
