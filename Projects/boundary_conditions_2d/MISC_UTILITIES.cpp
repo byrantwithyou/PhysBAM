@@ -235,8 +235,8 @@ void Dump_Error_Image(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,
         image_grid.Cell(it.Location(),index,0);
         if(err>errors(index)) errors(index)=err;}
 
-    for(UNIFORM_ARRAY_ITERATOR<TV::m> it(errors.domain);it.Valid();it.Next())
-        if(T e=errors(it.Index())) color_errors(it.Index())=em(e);
+    for(RANGE_ITERATOR<TV::m> it(errors.domain);it.Valid();it.Next())
+        if(T e=errors(it.index)) color_errors(it.index)=em(e);
 
     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("error-image-%i.txt",id).c_str()).Write("EI",color_errors);
 }
