@@ -182,12 +182,9 @@ Initialize_Triangle_Mesh()
         VECTOR<int,4> sorted_nodes=elements(t).Sorted();
         for(int i=0;i<sorted_nodes.m;i++){VECTOR<int,3> triangle=sorted_nodes.Remove_Index(i);
             triangle_list.Set(triangle);}}
-    // triangle_mesh=new TRIANGLE_MESH();
-    // triangle_mesh->elements.Exact_Resize(triangle_list.Size());
-    // int triangle=0;
-    // for(HASHTABLE_ITERATOR<VECTOR<int,3> > iterator(triangle_list);iterator.Valid();iterator.Next())
-    //     triangle_mesh->elements(triangle++)=iterator.Key();
-    // triangle_mesh->number_nodes=number_nodes;
+    triangle_mesh=new TRIANGLE_MESH();
+    triangle_list.Get_Keys(triangle_mesh->elements);
+    triangle_mesh->number_nodes=number_nodes;
 }
 //#####################################################################
 // Function Initialize_Element_Edges
