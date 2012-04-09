@@ -266,8 +266,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     
     CONJUGATE_RESIDUAL<T> cr;
     // cr.print_residuals=true;
-    cr.restart_iterations=200;
-    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,0,1000000);
+    // cr.restart_iterations=10000;
+    cr.nullspace_tolerance=0;
+    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,0,5000000);
 
     ifs.Multiply(sol,kr_r);
     kr_r.v-=rhs.v;
@@ -275,13 +276,13 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     Dump_Vector<T,TV>(ifs,sol.v,"solution");
     
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
+    // OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
     // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
-    OCTAVE_OUTPUT<T>("null_p.txt").Write("null_p",ifs.null_p);
-    OCTAVE_OUTPUT<T>("null_u.txt").Write("null_u",ifs.null_u[0]);
-    OCTAVE_OUTPUT<T>("null_v.txt").Write("null_v",ifs.null_u[1]);
+    // OCTAVE_OUTPUT<T>("null_p.txt").Write("null_p",ifs.null_p);
+    // OCTAVE_OUTPUT<T>("null_u.txt").Write("null_u",ifs.null_u[0]);
+    // OCTAVE_OUTPUT<T>("null_v.txt").Write("null_v",ifs.null_u[1]);
 
     ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
@@ -376,7 +377,7 @@ void Integration_Test(int argc,char* argv[])
     ANALYTIC_TEST<TV>* test=0;
 
     switch(test_number){
-        case 0:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], no pressure
+        case 0:{ // Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], no pressure
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -391,7 +392,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_0;
             break;}
-        case 1:{ // Linear flow on [0,0.25],[0.25,0.75],[0.75,1], no pressure
+        case 1:{ // Linear flow [u,v]=[0,v(x)] on [0,0.25],[0.25,0.75],[0.75,1], no pressure
             struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -406,7 +407,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_1;
             break;}
-        case 2:{ // Poiseuille flow on [0.25,0.75], 0 velocity outside, no pressure
+        case 2:{ // Poiseuille flow (parabolic velocity profile) [u,v]=[u,v(x)] on [0.25,0.75], 0 velocity outside, no pressure
             struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -421,7 +422,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_2;
             break;}
-        case 3:{ // Opposite Poiseuille flows on [0.25,0.75] and  [0,0.25],[0.75,1], no pressure
+        case 3:{ // Opposite Poiseuille flows on [0.25,0.75] and [0,0.25],[0.75,1], no pressure
             struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -436,7 +437,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_3;
             break;}
-        case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2, not pressure
+        case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2, no pressure
             struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
             {
                 T ra,rb,ra2,rb2,rb2mra2,r_avg;
@@ -493,7 +494,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_4;
             break;}
-        case 5:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], periodic pressure p(y)
+        case 5:{ // Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], periodic pressure p(y)
             struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -508,7 +509,7 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_5;
             break;}
-        case 6:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], linear pressure p(x) inside
+        case 6:{ // Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], linear pressure p(x) inside
             struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
@@ -522,21 +523,6 @@ void Integration_Test(int argc,char* argv[])
                 {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s-TV::Axis_Vector(0)*(X.x-0.5*m)*kg/(sqr(s)*(d==3?sqr(m):m)))*((X.x>0.5*m)?(T)(-1):(T)1);}
             };
             test=new ANALYTIC_TEST_6;
-            break;}
-        case 7:{ // Linear flow on [0,1/3],[1/3,2/3],[2/3,1], linear pressure p(x) outside
-            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
-            {
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
-                virtual T p(const TV& X){return (phi(X)>=0)*((X.x>0.5*m)?(X.x-m):X.x)*kg/(sqr(s)*(d==3?sqr(m):m));}
-                virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
-                virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(0)*kg/(sqr(s)*(d==3?sqr(m):m))*(!inside);}
-                virtual TV interface(const TV& X)
-                {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s+TV::Axis_Vector(0)*((X.x>0.5*m)?(X.x-m):X.x)*kg/(sqr(s)*(d==3?sqr(m):m)))*((X.x>0.5*m)?(T)(-1):(T)1);}
-            };
-            test=new ANALYTIC_TEST_7;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
