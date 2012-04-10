@@ -22,9 +22,16 @@ template<class T> CONJUGATE_RESIDUAL<T>::
 // Function Solve
 //#####################################################################
 template<class T> bool CONJUGATE_RESIDUAL<T>::
-Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,KRYLOV_VECTOR_BASE<T>& p,KRYLOV_VECTOR_BASE<T>& ap,KRYLOV_VECTOR_BASE<T>& ar,
-    KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z,const T tolerance,const int min_iterations,const int max_iterations)
+Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,
+    const int min_iterations,const int max_iterations)
 {
+    Ensure_Size(av,x,5);
+    KRYLOV_VECTOR_BASE<T>& p=*av(0);
+    KRYLOV_VECTOR_BASE<T>& ap=*av(1);
+    KRYLOV_VECTOR_BASE<T>& ar=*av(2);
+    KRYLOV_VECTOR_BASE<T>& r=*av(3);
+    KRYLOV_VECTOR_BASE<T>& z=*av(4);
+
     // TODO: there used to a note here claiming this routine assumed x=0, but it seems to work fine in that case as long as x doesn't have a component in the nullspace
     static const T small_number=std::numeric_limits<T>::epsilon();
     system.Set_Boundary_Conditions(x);

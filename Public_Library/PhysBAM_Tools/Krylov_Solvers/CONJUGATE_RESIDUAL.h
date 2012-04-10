@@ -30,8 +30,8 @@ public:
     virtual ~CONJUGATE_RESIDUAL();
 
 //#####################################################################
-    bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,KRYLOV_VECTOR_BASE<T>& p,KRYLOV_VECTOR_BASE<T>& ap,KRYLOV_VECTOR_BASE<T>& ar,
-        KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z,const T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE;
+    virtual bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

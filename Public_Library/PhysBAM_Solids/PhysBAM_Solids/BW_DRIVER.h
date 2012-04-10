@@ -24,8 +24,9 @@ public:
 
     SOLIDS_EXAMPLE<TV>& example;
     int current_frame;
-    ARRAY<TV> V_full,F_full,R_full,B_full,S_full,AR_full;
-    ARRAY<TWIST<TV> > rigid_V_full,rigid_F_full,rigid_R_full,rigid_S_full,rigid_B_full,rigid_AR_full;
+    ARRAY<TV> B_full,V_full;
+    ARRAY<TWIST<TV> > rigid_B_full,rigid_V_full;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     BW_COLLISIONS<TV> bw_collisions;
 
     BW_DRIVER(SOLIDS_EXAMPLE<TV>& example_input);

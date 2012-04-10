@@ -15,20 +15,26 @@ using namespace PhysBAM;
 template<class TV> GENERALIZED_VELOCITY<TV>::
 GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,const SOLID_BODY_COLLECTION<TV>& solid_body_collection)
     :V(V_full,solid_body_collection.deformable_body_collection.dynamic_particles),rigid_V(rigid_V_full,solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles),
-    kinematic_and_static_rigid_V(rigid_V_full,solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies)
+    kinematic_and_static_rigid_V(rigid_V_full,solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies),deep_copy(false)
 {}
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> GENERALIZED_VELOCITY<TV>::
-GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY<int>& dynamic_particles,ARRAY_VIEW<TWIST<TV> > rigid_V_full,ARRAY<int>& dynamic_rigid_body_particles,
-    ARRAY<int>& static_and_kinematic_rigid_bodies)
+GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,const ARRAY<int>& dynamic_particles,ARRAY_VIEW<TWIST<TV> > rigid_V_full,
+    const ARRAY<int>& dynamic_rigid_body_particles,const ARRAY<int>& static_and_kinematic_rigid_bodies)
     :V(V_full,dynamic_particles),rigid_V(rigid_V_full,dynamic_rigid_body_particles),
-    kinematic_and_static_rigid_V(rigid_V_full,static_and_kinematic_rigid_bodies)
+    kinematic_and_static_rigid_V(rigid_V_full,static_and_kinematic_rigid_bodies),deep_copy(false)
 {}
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class TV> GENERALIZED_VELOCITY<TV>::
 ~GENERALIZED_VELOCITY()
 {
+    if(deep_copy){
+        delete [] V.array.Get_Array_Pointer();
+        delete [] rigid_V.array.Get_Array_Pointer();}
 }
 //#####################################################################
 // Operator +=
@@ -163,6 +169,17 @@ Exchange(GENERALIZED_VELOCITY<TV>& gv)
     V.array.Exchange(gv.V.array);
     rigid_V.array.Exchange(gv.rigid_V.array);
     kinematic_and_static_rigid_V.array.Exchange(gv.kinematic_and_static_rigid_V.array);
+}
+//#####################################################################
+// Function Clone_Default
+//#####################################################################
+template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* GENERALIZED_VELOCITY<TV>::
+Clone_Default() const
+{
+    GENERALIZED_VELOCITY<TV>* gv=new GENERALIZED_VELOCITY<TV>(ARRAY_VIEW<TV>(V.array.m,new TV[V.array.m]),V.indices,
+        ARRAY_VIEW<TWIST<TV> >(rigid_V.array.m,new TWIST<TV>[rigid_V.array.m]),rigid_V.indices,kinematic_and_static_rigid_V.indices);
+    gv->deep_copy=true;
+    return gv;
 }
 //#####################################################################
 template class GENERALIZED_VELOCITY<VECTOR<float,1> >;

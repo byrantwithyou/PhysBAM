@@ -75,15 +75,9 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
     ARTICULATED_RIGID_BODY<TV>& articulated_rigid_body=solid_body_collection.rigid_body_collection.articulated_rigid_body; // Needn't be a pointer
     rigid_body_collection.Update_Angular_Velocity(); // make sure omega = I^{-1} L
 
-    F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
-    R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
-    S_full.Resize(particles.Size(),false,false);rigid_S_full.Resize(rigid_body_particles.Size(),false,false);
     B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);
-    if(solids_parameters.implicit_solve_parameters.evolution_solver_type!=krylov_solver_cg){
-        AR_full.Resize(particles.Size(),false,false);rigid_AR_full.Resize(rigid_body_particles.Size(),false,false);}
 
     GENERALIZED_VELOCITY<TV> B_all(B_full,rigid_B_full,solid_body_collection);
-    GENERALIZED_VELOCITY<TV> F_all(F_full,rigid_F_full,solid_body_collection);
     GENERALIZED_VELOCITY<TV> V_all(particles.V,rigid_body_particles.twist,solid_body_collection);
 
     B_full.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());rigid_B_full.Fill(TWIST<TV>());
@@ -140,7 +134,7 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=rigid_body_collection.rigid_body_particle;
-    GENERALIZED_VELOCITY<TV> F_all(F_full,rigid_F_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
     rigid_deformable_collisions->rigid_body_collisions.Remove_Contact_Joints(); // TODO: Fix me.
 
     if(velocity_update && solids_parameters.use_post_cg_constraints){ // return rhs + dt Fd V^n+1 for friction processing
@@ -160,9 +154,9 @@ Finish_Backward_Euler_Step(KRYLOV_SYSTEM_BASE<T>& system,const T dt,const T curr
             system.Project(V_projected_all);*/}
         else{
             for(int i=0;i<solid_body_collection.deformable_body_collection.dynamic_particles.m;i++){int p=solid_body_collection.deformable_body_collection.dynamic_particles(i);
-                particles.V(p)=B_full(p)+dt*particles.one_over_mass(p)*F_full(p);}
+                particles.V(p)=B_full(p)+dt*particles.one_over_mass(p)*F.V.array(p);}
             for(int i=0;i<solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles(i);
-                rigid_body_particles.twist(p)=rigid_B_full(p)+world_space_rigid_mass_inverse(p)*rigid_F_full(p)*dt;}
+                rigid_body_particles.twist(p)=rigid_B_full(p)+world_space_rigid_mass_inverse(p)*F.rigid_V.array(p)*dt;}
 
             // No friction for these, so reproject them.
             solid_body_collection.rigid_body_collection.articulated_rigid_body.Poststabilization_Projection(rigid_body_particles.twist,true);
@@ -212,30 +206,37 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     solver->restart_iterations=solids_parameters.implicit_solve_parameters.cg_restart_iterations;
     system.project_nullspace_frequency=solids_parameters.implicit_solve_parameters.project_nullspace_frequency;
 
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),F(F_full,rigid_F_full,solid_body_collection),
-        R(R_full,rigid_R_full,solid_body_collection),S(S_full,rigid_S_full,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection),
-        AR(AR_full,rigid_AR_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection);
     GENERALIZED_MASS<TV> mass(solid_body_collection); // TODO: Doing duplicate computation of mass.
 
-    if(solids_parameters.implicit_solve_parameters.spectral_analysis){V=B;LANCZOS_ITERATION<T>::Print_Spectral_Information(system,V,F,S,(T)1e-2*solids_parameters.implicit_solve_parameters.cg_tolerance,solids_parameters.implicit_solve_parameters.lanczos_iterations);}
+    if(solids_parameters.implicit_solve_parameters.spectral_analysis){
+        V=B;
+        KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V,2);
+        LANCZOS_ITERATION<T>::Print_Spectral_Information(system,V,*krylov_vectors(0),*krylov_vectors(1),
+            (T)1e-2*solids_parameters.implicit_solve_parameters.cg_tolerance,
+            solids_parameters.implicit_solve_parameters.lanczos_iterations);}
 
     LOG::Time(solver_name);
     Diagnostics(dt,current_position_time,0,0,606,"Before solve");
     static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,S,R);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,S);
+        KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V,2);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*krylov_vectors(0),*krylov_vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*krylov_vectors(0));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",B);}
 
-    if(solids_parameters.implicit_solve_parameters.test_system) system.Test_System(S,R,F);
-    if(!solver->Solve(system,V,B,F,S,R,AR,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations) && solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure)
+    if(solids_parameters.implicit_solve_parameters.test_system){
+        KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V,3);
+        system.Test_System(*krylov_vectors(0),*krylov_vectors(1),*krylov_vectors(2));}
+    if(!solver->Solve(system,V,B,krylov_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations) && solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure)
         throw std::runtime_error("Backward Euler Failed");
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",V);
     Diagnostics(dt,current_position_time,0,0,607,"After solve");
     LOG::Stop_Time();
 
-    if(velocity_update && solids_parameters.use_post_cg_constraints) system.Force(V,F);
+    if(velocity_update && solids_parameters.use_post_cg_constraints)
+        system.Force(V,debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0)));
 
     Finish_Backward_Euler_Step(system,dt,current_position_time,velocity_update);
 }

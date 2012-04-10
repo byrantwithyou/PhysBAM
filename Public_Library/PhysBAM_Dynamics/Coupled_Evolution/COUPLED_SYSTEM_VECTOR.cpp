@@ -139,6 +139,19 @@ Raw_Get(int i)
     return viscous_force_coefficients(VISCOUS_FORCE_ID(i-l-f));
 }
 //#####################################################################
+// Function Clone_Default
+//#####################################################################
+template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* COUPLED_SYSTEM_VECTOR<TV>::
+Clone_Default() const
+{
+    COUPLED_SYSTEM_VECTOR<TV>* v=new COUPLED_SYSTEM_VECTOR<TV>;
+    v->pressure.Resize(pressure.n);
+    v->lambda.Resize(lambda.m);
+    v->force_coefficients.Resize(force_coefficients.m);
+    v->viscous_force_coefficients.Resize(viscous_force_coefficients.m);
+    return v;
+}
+//#####################################################################
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,1> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,2> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,3> >;

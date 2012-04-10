@@ -29,6 +29,7 @@ public:
     virtual int Raw_Size() const=0;
     virtual T& Raw_Get(int i)=0;
     const T& Raw_Get(int i) const;
+    virtual KRYLOV_VECTOR_BASE* Clone_Default() const=0;
 //#####################################################################
 };
 }

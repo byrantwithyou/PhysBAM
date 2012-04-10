@@ -63,7 +63,9 @@ INCOMPRESSIBLE_FINITE_VOLUME(STRAIN_MEASURE<TV,d>& strain_measure)
 //#####################################################################
 template<class TV,int d> INCOMPRESSIBLE_FINITE_VOLUME<TV,d>::
 ~INCOMPRESSIBLE_FINITE_VOLUME()
-{}
+{
+    cg_vectors.Delete_Pointers_And_Clean_Memory();
+}
 //#####################################################################
 // Function Create
 //#####################################################################
@@ -236,18 +238,15 @@ Make_Incompressible(const T dt,const bool correct_volume)
     system.Project(divergence);
     LOG::cout<<"divergence magnitude = "<<system.Magnitude(divergence)<<std::endl;
 
-    pressure_full.Resize(particles.Size(),false,false);cg_q_full.Resize(particles.Size(),false,false);cg_s_full.Resize(particles.Size(),false,false);cg_r_full.Resize(particles.Size(),false,false);
-    KRYLOV_VECTOR_T pressure(pressure_full,force_dynamic_particles_list),cg_q(cg_q_full,force_dynamic_particles_list),
-        cg_s(cg_s_full,force_dynamic_particles_list),cg_r(cg_r_full,force_dynamic_particles_list);
-    cg_t_full.Resize(particles.Size(),false,false);
-    KRYLOV_VECTOR_T cg_t(cg_t_full,force_dynamic_particles_list);
+    pressure_full.Resize(particles.Size(),false,false);
+    KRYLOV_VECTOR_T pressure(pressure_full,force_dynamic_particles_list);
     pressure.v.Fill((T)0);
 
     {CONJUGATE_RESIDUAL<T> cr;
     INDIRECT_ARRAY<ARRAY<T> > diagonal_preconditioner(diagonal_preconditioner_full,force_dynamic_particles_list);
     if(use_diagonal_preconditioner) divergence.v*=diagonal_preconditioner;
     T tolerance=max((T).01*system.Convergence_Norm(divergence),(T)1e-10);
-    bool converged=cr.Solve(system,pressure,divergence,cg_q,cg_s,cg_t,cg_r,tolerance,0,max_cg_iterations);
+    bool converged=cr.Solve(system,pressure,divergence,cg_vectors,tolerance,0,max_cg_iterations);
     if(use_diagonal_preconditioner) pressure.v*=diagonal_preconditioner;
     LOG::Stat("divergence magnitude",sqrt(cr.residual_magnitude_squared));
     LOG::Stat("nullspace measure",cr.nullspace_measure);

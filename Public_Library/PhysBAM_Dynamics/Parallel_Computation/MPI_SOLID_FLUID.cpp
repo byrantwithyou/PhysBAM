@@ -163,28 +163,29 @@ Reduce_Max(const T local_value) const
 // Function Parallel_Solve_Fluid_Part
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID<TV>::
-Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ap_array,
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ar_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& zaq_array,const int min_iterations,const int max_iterations,
-    const T tolerance,const bool recompute_preconditioner,ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions)
+Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+    const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner,
+    ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions)
 {
     CONJUGATE_RESIDUAL_SPARSE_MPI<TV> cr_mpi(*comm,fluid_comm,partitions);
     cr_mpi.nullspace_tolerance=(T)0;
     cr_mpi.restart_iterations=100;
     //cr_mpi.maximum_iterations=solids_parameters.cg_iterations;
-    cr_mpi.Parallel_Solve_Fluid_Part(fluid_system,x_array,b_array,p_array,ap_array,ar_array,r_array,z_array,zaq_array,min_iterations,max_iterations,tolerance,recompute_preconditioner);
+    cr_mpi.Parallel_Solve_Fluid_Part(fluid_system,x_array,b_array,vectors,min_iterations,max_iterations,tolerance,recompute_preconditioner);
 }
 //#####################################################################
 // Function Parallel_Solve_Solid_Part
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID<TV>::
-Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,GENERALIZED_VELOCITY<TV>& ap_array,
-    GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance)
+Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const int min_iterations,const int max_iterations,const T tolerance)
 {
     CONJUGATE_RESIDUAL_SPARSE_MPI<TV> cr_mpi(*comm,0,0);
     cr_mpi.nullspace_tolerance=(T)0;
     cr_mpi.restart_iterations=100;
     //cr_mpi.maximum_iterations=solids_parameters.cg_iterations;
-    cr_mpi.Parallel_Solve_Solid_Part(solid_system,x_array,b_array,p_array,ap_array,ar_array,r_array,z_array,zaq_array,min_iterations,max_iterations,tolerance);
+    cr_mpi.Parallel_Solve_Solid_Part(solid_system,x_array,b_array,vectors,min_iterations,max_iterations,tolerance);
 }
 //#####################################################################
 // Function Exchange_Coupled_Deformable_Particle_List
@@ -281,13 +282,10 @@ template<class TV> void MPI_SOLID_FLUID<TV>::Create_Fluid_Comm_For_Solid_Nodes()
 template<class TV> template<class T2> void MPI_SOLID_FLUID<TV>::Reduce_Add(const T2& input,T2& output) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR MPI_SOLID_FLUID<TV>::Reduce_Min(const T local_value) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID<TV>::Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array, \
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ap_array, \
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ar_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& z_array, \
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& zaq_array,const int min_iterations,const int max_iterations, const T tolerance,const bool recompute_preconditioner, \
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const int min_iterations,const int max_iterations, const T tolerance,const bool recompute_preconditioner, \
     ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_SOLID_FLUID<TV>::Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array, \
-    GENERALIZED_VELOCITY<TV>& p_array,GENERALIZED_VELOCITY<TV>& ap_array,GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array, \
-    GENERALIZED_VELOCITY<TV>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> void MPI_SOLID_FLUID<TV>::Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array, ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,\
+    const int min_iterations,const int max_iterations,const T tolerance){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID<TV>::Distribute_Lists_From_Solid_Node(GENERALIZED_VELOCITY<TV>& F) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID<TV>::Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int> >* results){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID<TV>::Aggregate_Lists_To_Solid_Node(GENERALIZED_VELOCITY<TV>& F){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

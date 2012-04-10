@@ -23,9 +23,16 @@ template<class T> SYMMQMR<T>::
 // Function Solve
 //#####################################################################
 template<class T> bool SYMMQMR<T>::
-Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,KRYLOV_VECTOR_BASE<T>& p,KRYLOV_VECTOR_BASE<T>& ap,KRYLOV_VECTOR_BASE<T>& d,
-    KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z,const T tolerance,const int min_iterations,const int max_iterations)
+Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
+    ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations)
 {
+    Ensure_Size(av,x,4+system.use_preconditioner);
+    KRYLOV_VECTOR_BASE<T>& p=*av(0);
+    KRYLOV_VECTOR_BASE<T>& ap=*av(1);
+    KRYLOV_VECTOR_BASE<T>& d=*av(2);
+    KRYLOV_VECTOR_BASE<T>& r=*av(3);
+    KRYLOV_VECTOR_BASE<T>& z=*av(3+system.use_preconditioner);
+
     static const T small_number=std::numeric_limits<T>::epsilon();
     system.Set_Boundary_Conditions(x);
 

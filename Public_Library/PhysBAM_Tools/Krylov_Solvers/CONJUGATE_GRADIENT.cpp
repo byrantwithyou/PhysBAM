@@ -20,9 +20,15 @@ template<class T> CONJUGATE_GRADIENT<T>::
 // Function Solve
 //#####################################################################
 template<class T> bool CONJUGATE_GRADIENT<T>::
-Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,KRYLOV_VECTOR_BASE<T>& q,KRYLOV_VECTOR_BASE<T>& s,KRYLOV_VECTOR_BASE<T>& r,
-    KRYLOV_VECTOR_BASE<T>& k,KRYLOV_VECTOR_BASE<T>& z,const T tolerance,const int min_iterations,const int max_iterations)
+Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,
+    const int min_iterations,const int max_iterations)
 {
+    Ensure_Size(av,x,3+system.use_preconditioner);
+    KRYLOV_VECTOR_BASE<T>& q=*av(0);
+    KRYLOV_VECTOR_BASE<T>& s=*av(1);
+    KRYLOV_VECTOR_BASE<T>& r=*av(2);
+    KRYLOV_VECTOR_BASE<T>& z=*av(2+system.use_preconditioner);
+
     // NOTE: you should never try to make copies of VECTOR_T's inside here as they could be indirect.
     static const T small_number=std::numeric_limits<T>::epsilon();
     system.Set_Boundary_Conditions(x);

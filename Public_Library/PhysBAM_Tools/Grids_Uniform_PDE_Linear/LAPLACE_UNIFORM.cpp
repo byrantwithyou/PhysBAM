@@ -12,6 +12,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
+#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Parallel_Computation/DOMAIN_ITERATOR_THREADED.h>
 #include <PhysBAM_Tools/Parallel_Computation/PCG_SPARSE_THREADED.h>
@@ -171,7 +172,8 @@ Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int
 {
     int number_of_unknowns=matrix_index_to_cell_index.m;
     A.Negate();b*=(T)-1;
-    VECTOR_ND<T> x(number_of_unknowns),q,s,r,k,z;
+    VECTOR_ND<T> x(number_of_unknowns),q;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     for(int i=0;i<number_of_unknowns;i++) x(i)=u(matrix_index_to_cell_index(i));
     Find_Tolerance(b); // needs to happen after b is completely set up
     if(pcg.show_results) LOG::cout << "solving " << number_of_unknowns << " cells to tolerance " << tolerance << std::endl;
@@ -183,11 +185,12 @@ Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int
         if(use_threaded_solve) threaded_iterator.template Run<const ARRAY<int,TV_INT>&,const ARRAY<INTERVAL<int> >&,const ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,T>(*pcg_threaded,&PCG_SPARSE_THREADED<TV>::Solve,*domain_index,interior_indices,ghost_indices,A,x,b,tolerance);
         //if(use_threaded_solve) pcg_threaded->Solve_In_Parts(threaded_iterator,domain_index,interior_indices,ghost_indices,A,x,b,tolerance);
         //if(use_threaded_solve) pcg_threaded->Solve_In_Parts(A,x,b,tolerance);
-        else pcg.Solve(A,x,b,q,s,r,k,z,tolerance);}
+        else pcg.Solve(A,x,b,vectors,tolerance);}
     else{
-        if(use_threaded_solve) DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_MPI<T_GRID>,TV>(grid.Domain_Indices(1),thread_queue,1,1,2,1).template Run<const ARRAY<int,TV_INT>&,ARRAY<INTERVAL<int> >&,ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,T,int,int>(*laplace_mpi,&LAPLACE_MPI<T_GRID>::Solve_Threaded,*domain_index,interior_indices,ghost_indices,A,x,b,q,s,r,k,z,tolerance,color,1);
-        else laplace_mpi->Solve(A,x,b,q,s,r,k,z,tolerance,color);}
+        if(use_threaded_solve) DOMAIN_ITERATOR_THREADED_ALPHA<LAPLACE_MPI<T_GRID>,TV>(grid.Domain_Indices(1),thread_queue,1,1,2,1).template Run<const ARRAY<int,TV_INT>&,ARRAY<INTERVAL<int> >&,ARRAY<ARRAY<INTERVAL<int> > >&,SPARSE_MATRIX_FLAT_NXN<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,ARRAY<KRYLOV_VECTOR_BASE<T>*>&,T,int,int>(*laplace_mpi,&LAPLACE_MPI<T_GRID>::Solve_Threaded,*domain_index,interior_indices,ghost_indices,A,x,b,vectors,tolerance,color,1);
+        else laplace_mpi->Solve(A,x,b,vectors,tolerance,color);}
     for(int i=0;i<number_of_unknowns;i++){TV_INT cell_index=matrix_index_to_cell_index(i);u(cell_index)=x(i);}
+    vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Compute_Matrix_Indices
@@ -266,6 +269,9 @@ Find_Solution_Regions()
     // correct flood fill for distributed grids
     if(mpi_grid)laplace_mpi->Synchronize_Solution_Regions();
 }
+//#####################################################################
+// Function Initialize_Grid
+//#####################################################################
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Initialize_Grid(const T_GRID& mac_grid_input)
 {
@@ -274,17 +280,26 @@ Initialize_Grid(const T_GRID& mac_grid_input)
     psi_N.Resize(grid,1);psi_D.Resize(grid.Domain_Indices(1));
     filled_region_colors.Resize(grid.Domain_Indices(1));
 }
+//#####################################################################
+// Function Set_Neumann_Outer_Boundaries
+//#####################################################################
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Set_Neumann_Outer_Boundaries()
 {
     for(FACE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION);iterator.Valid();iterator.Next()) psi_N.Component(iterator.Axis())(iterator.Face_Index())=true;
     pcg.Enforce_Compatibility();
 }
+//#####################################################################
+// Function Set_Dirichlet_Outer_Boundaries
+//#####################################################################
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Set_Dirichlet_Outer_Boundaries()
 {
     for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) psi_D(iterator.Cell_Index())=true;
 }
+//#####################################################################
+// Function Use_Psi_R
+//#####################################################################
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Use_Psi_R()
 {

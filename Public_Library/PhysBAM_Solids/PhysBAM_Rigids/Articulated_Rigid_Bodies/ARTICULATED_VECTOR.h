@@ -32,6 +32,7 @@ public:
     void Copy(const T c1,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2) PHYSBAM_OVERRIDE;
     int Raw_Size() const PHYSBAM_OVERRIDE;
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

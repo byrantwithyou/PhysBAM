@@ -115,7 +115,7 @@ public:
 #endif
     }
 
-    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>& q,VECTOR_ND<T>& s,VECTOR_ND<T>& r,VECTOR_ND<T>& k,VECTOR_ND<T>& z,const T tolerance=1e-7,const bool recompute_preconditioner=true)
+    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance=1e-7,const bool recompute_preconditioner=true)
     {
         PHYSBAM_FATAL_ERROR();
     }

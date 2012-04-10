@@ -47,21 +47,24 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
     typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> FLUID_BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::F_full;using BASE::rigid_F_full;using BASE::R_full;using BASE::rigid_R_full;using BASE::S_full;
-    using BASE::rigid_S_full;using BASE::B_full;using BASE::rigid_B_full;using BASE::repulsions;using BASE::rigids_evolution_callbacks;using BASE::rigid_body_collisions;
+    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::B_full;using BASE::rigid_B_full;
+    using BASE::repulsions;using BASE::rigids_evolution_callbacks;using BASE::rigid_body_collisions;
     using FLUID_BASE::p;using FLUID_BASE::poisson;using BASE::Prepare_Backward_Euler_System;
 
-    COUPLED_SYSTEM_VECTOR<TV> coupled_x,coupled_f,coupled_r,coupled_b,coupled_s,coupled_ar,coupled_z;
+    COUPLED_SYSTEM_VECTOR<TV> coupled_x,coupled_b;
+    ARRAY<TV> F_full;
+    ARRAY<TWIST<TV> > rigid_F_full;
 
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies;
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection;
-    ARRAY<TV> ar_full,z_full,zaq_full,leakproof_empty_V,temp_solid_full,second_temp_solid_full;
-    ARRAY<TWIST<TV> > rigid_ar_full,rigid_z_full,rigid_zaq_full,rigid_temp_solid_full,rigid_second_temp_solid_full,leakproof_empty_rigid_V;
+    ARRAY<TV> leakproof_empty_V,temp_solid_full,second_temp_solid_full;
+    ARRAY<TWIST<TV> > rigid_temp_solid_full,rigid_second_temp_solid_full,leakproof_empty_rigid_V;
     
     T divergence_scaling;
     bool disable_thinshell;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> coupled_vectors;
 
 public:
     UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& iterator_info;

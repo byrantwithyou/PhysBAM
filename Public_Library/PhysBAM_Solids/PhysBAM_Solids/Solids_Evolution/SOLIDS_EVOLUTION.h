@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
+#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Particles/PARTICLES_FORWARD.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
@@ -36,9 +37,9 @@ public:
     T time;
     SOLIDS_EVOLUTION_CALLBACKS<TV>* solids_evolution_callbacks;
 protected:
-    ARRAY<TV> F_full,R_full,B_full,S_full,AR_full;
-    ARRAY<TWIST<TV> > rigid_F_full,rigid_R_full,rigid_S_full,rigid_B_full,rigid_AR_full;
-
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> krylov_vectors;
+    ARRAY<TV> B_full;
+    ARRAY<TWIST<TV> > rigid_B_full;
 public:
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass;
     ARRAY<RIGID_BODY_MASS<TV,true> > world_space_rigid_mass_inverse;

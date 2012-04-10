@@ -33,7 +33,9 @@ BW_DRIVER(SOLIDS_EXAMPLE<TV>& example_input)
 //#####################################################################
 template<class TV> BW_DRIVER<TV>::
 ~BW_DRIVER()
-{}
+{
+    vectors.Delete_Pointers_And_Clean_Memory();
+}
 //#####################################################################
 // Function Execute_Main_Program
 //#####################################################################
@@ -160,31 +162,29 @@ Advance_Substep(const T dt,const T time)
     // Add velocity independent forces
     solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,time);
     B_full*=(dt*solid_body_collection.deformable_body_collection.particles.one_over_mass);
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,B,3);
 
     // TODO make sure the V we pass is delta V
-    F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
-    R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
-    S_full.Resize(particles.Size(),false,false);rigid_S_full.Resize(rigid_body_particles.Size(),false,false);
-    V_full.Resize(particles.Size(),false,false);rigid_V_full.Resize(rigid_body_particles.Size(),false,false);
-    GENERALIZED_VELOCITY<TV> V(V_full,rigid_V_full,solid_body_collection),F(F_full,rigid_F_full,solid_body_collection),R(R_full,rigid_R_full,solid_body_collection),
-        S(S_full,rigid_S_full,solid_body_collection),AR(AR_full,rigid_AR_full,solid_body_collection);
+    V_full.Resize(particles.Size(),false,false);
+    rigid_V_full.Resize(rigid_body_particles.Size(),false,false);
+    GENERALIZED_VELOCITY<TV> V(V_full,rigid_V_full,solid_body_collection);
 
     static int solve_id=-1;solve_id++;
     if(example.solids_parameters.implicit_solve_parameters.print_matrix){
         LOG::cout << "solve id " << solve_id << std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,S,R);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",B);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,S);}
-    if(example.solids_parameters.implicit_solve_parameters.test_system) system.Test_System(S,R,F);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*vectors(0));}
+    if(example.solids_parameters.implicit_solve_parameters.test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
 
     static CONJUGATE_GRADIENT<T> cg;
     KRYLOV_SOLVER<T>* solver=&cg;
     solver->print_residuals=solid_body_collection.print_residuals;
-    solver->Solve(system,V,B,F,S,R,AR,example.solids_parameters.implicit_solve_parameters.cg_tolerance,1,example.solids_parameters.implicit_solve_parameters.cg_iterations);
+    solver->Solve(system,V,B,vectors,example.solids_parameters.implicit_solve_parameters.cg_tolerance,1,example.solids_parameters.implicit_solve_parameters.cg_iterations);
 
     if(example.solids_parameters.implicit_solve_parameters.print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",V);
 
-    bw_collisions.Remove_Separating_Cloth_Body_Contacts(system,R,B,V,F);
+    bw_collisions.Remove_Separating_Cloth_Body_Contacts(system,*vectors(0),B,*vectors(1),*vectors(2));
 
     particles.V+=V_full; // TODO do rigid as well
     particles.X+=dt*particles.V; // TODO do rigid as well

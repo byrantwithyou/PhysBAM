@@ -12,14 +12,15 @@
 namespace PhysBAM{
 
 template<class T,class TV>
-class KRYLOV_VECTOR_WRAPPER: public KRYLOV_VECTOR_BASE<T>
+class KRYLOV_VECTOR_WRAPPER:public KRYLOV_VECTOR_BASE<T>
 {
 public:
     TV v;
+    bool deep_copy;
 
     KRYLOV_VECTOR_WRAPPER();
     KRYLOV_VECTOR_WRAPPER(TV vector);
-    template<class VECTOR,class INDICES> KRYLOV_VECTOR_WRAPPER(VECTOR& vector,INDICES& index);
+    template<class VECTOR,class INDICES> KRYLOV_VECTOR_WRAPPER(VECTOR& vector,const INDICES& index);
     virtual ~KRYLOV_VECTOR_WRAPPER();
 
     KRYLOV_VECTOR_BASE<T>& operator+=(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE;
@@ -29,6 +30,7 @@ public:
     void Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2) PHYSBAM_OVERRIDE;
     int Raw_Size() const PHYSBAM_OVERRIDE;
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 }

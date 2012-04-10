@@ -19,6 +19,7 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/QUASISTATIC_EVOLUTION.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -88,11 +89,7 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
     const ARRAY<int>& dynamic_particles=solid_body_collection.deformable_body_collection.dynamic_particles;
 
     dX_full.Resize(particles.Size()); // an initial guess might be passed in for dX, otherwise it's zero
-    B_full.Resize(particles.Size(),false,false);
-    R_full.Resize(particles.Size(),false,false);F_full.Resize(particles.Size(),false,false);S_full.Resize(particles.Size(),false,false);
-    KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<TV> > > dX(dX_full,dynamic_particles),B(B_full,dynamic_particles),
-        R(R_full,dynamic_particles),F(F_full,dynamic_particles),
-        S(S_full,dynamic_particles),*null=0;
+    KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<TV> > > dX(dX_full,dynamic_particles),B(B_full,dynamic_particles);
 
     B_full.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Fill(TV());
     if(!balance_external_forces_only) solid_body_collection.Add_Velocity_Independent_Forces(B_full,rigid_B_full,time);
@@ -104,7 +101,7 @@ One_Newton_Step_Toward_Steady_State(const T time,ARRAY<TV>& dX_full)
     CONJUGATE_GRADIENT<T> cg;cg.restart_iterations=solids_parameters.implicit_solve_parameters.cg_restart_iterations;
     cg.print_diagnostics=solid_body_collection.print_diagnostics;cg.print_residuals=solid_body_collection.print_residuals;
     cg.iterations_used=&solid_body_collection.iterations_used_diagnostic;
-    if(!cg.Solve(system,dX,B,F,S,R,*null,solids_parameters.implicit_solve_parameters.cg_tolerance,0,solids_parameters.implicit_solve_parameters.cg_iterations) && !solids_parameters.use_partially_converged_result)
+    if(!cg.Solve(system,dX,B,krylov_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,0,solids_parameters.implicit_solve_parameters.cg_iterations) && !solids_parameters.use_partially_converged_result)
         throw std::runtime_error("Quasistatic conjugate gradient failed");
 }
 //#####################################################################
@@ -129,7 +126,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
 
     // iterate to steady state
     T supnorm=0;int iteration;
-    dX_full.Resize(particles.Size(),false,false);R_full.Resize(particles.Size(),false,false);
+    dX_full.Resize(particles.Size(),false,false);
     for(iteration=0;iteration<solids_parameters.newton_iterations;iteration++){
         INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> dX_subset=dX_full.Subset(simulated_particles);
         dX_subset.Fill(TV()); // initial guess is zero
@@ -138,14 +135,15 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
         if(mpi_solids) mpi_solids->Exchange_Binding_Boundary_Data(particles.X);
         binding_list.Clamp_Particles_To_Embedded_Positions();
         if(mpi_solids) mpi_solids->Exchange_Force_Boundary_Data(particles.X);
-        solid_body_collection.Update_Position_Based_State(time+dt,true);solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
-        INDIRECT_ARRAY<ARRAY<TV>,ARRAY<int>&> R_subset=R_full.Subset(simulated_particles);
-        R_subset.Fill(TV());
-        solid_body_collection.Add_Velocity_Independent_Forces(R_full,rigid_R_full,time+dt);
-        example_forces_and_velocities.Add_External_Forces(R_full,time+dt);
-        binding_list.Distribute_Force_To_Parents(R_full);
-        example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(R_full,time+dt);
-        supnorm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(R_subset);
+        solid_body_collection.Update_Position_Based_State(time+dt,true);
+        solid_body_collection.deformable_body_collection.Update_Collision_Penalty_Forces_And_Derivatives();
+        GENERALIZED_VELOCITY<TV>& R=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
+        R.V.Fill(TV());
+        solid_body_collection.Add_Velocity_Independent_Forces(R.V.array,R.rigid_V.array,time+dt);
+        example_forces_and_velocities.Add_External_Forces(R.V.array,time+dt);
+        binding_list.Distribute_Force_To_Parents(R.V.array);
+        example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(R.V.array,time+dt);
+        supnorm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(R.V);
         if(mpi_solids) supnorm=mpi_solids->Reduce_Max(supnorm);
         if(solid_body_collection.print_residuals) LOG::cout<<"Newton iteration residual after "<<iteration+1<<" iterations = "<<supnorm<<std::endl;
         if(supnorm<=solids_parameters.newton_tolerance && solid_body_collection.print_diagnostics){

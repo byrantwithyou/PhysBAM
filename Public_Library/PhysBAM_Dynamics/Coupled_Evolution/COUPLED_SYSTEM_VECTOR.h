@@ -38,6 +38,7 @@ public:
     void Print() const;
     int Raw_Size() const PHYSBAM_OVERRIDE;
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
 };
 }
 #endif

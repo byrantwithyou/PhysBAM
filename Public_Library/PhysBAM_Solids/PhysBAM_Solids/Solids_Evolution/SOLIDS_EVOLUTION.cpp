@@ -50,7 +50,9 @@ SOLIDS_EVOLUTION(SOLIDS_PARAMETERS<TV>& solids_parameters_input,SOLID_BODY_COLLE
 template<class TV> SOLIDS_EVOLUTION<TV>::
 ~SOLIDS_EVOLUTION()
 {
-    delete rigid_body_collisions;delete rigid_deformable_collisions;
+    delete rigid_body_collisions;
+    delete rigid_deformable_collisions;
+    krylov_vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Euler_Step_Position

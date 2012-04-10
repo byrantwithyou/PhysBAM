@@ -20,7 +20,7 @@ public:
     typedef SOLIDS_EVOLUTION<TV> BASE;
     using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::Euler_Step_Position;
 private:
-    using BASE::F_full;using BASE::R_full;using BASE::S_full;using BASE::B_full;using BASE::rigid_F_full;using BASE::rigid_R_full;using BASE::rigid_B_full;using BASE::rigid_S_full;
+    using BASE::B_full;using BASE::rigid_B_full;using BASE::krylov_vectors;
     mutable ARRAY<TV> dV_full;
 public:
 

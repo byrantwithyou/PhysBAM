@@ -50,9 +50,9 @@ class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
     typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,T,&SPARSE_MATRIX_ENTRY<T>::a> T_PROJECTED_VALUE;
 protected:
     typedef NEWMARK_EVOLUTION<TV> BASE;
-    using BASE::solid_body_collection;using BASE::solids_parameters;using BASE::F_full;using BASE::rigid_F_full;using BASE::R_full;using BASE::rigid_R_full;using BASE::S_full;
-    using BASE::rigid_S_full;using BASE::B_full;using BASE::rigid_B_full;using BASE::repulsions;using BASE::rigid_deformable_collisions;using BASE::Initialize_World_Space_Masses;
-    using BASE::world_space_rigid_mass_inverse;using BASE::world_space_rigid_mass;using BASE::solids_evolution_callbacks;
+    using BASE::solid_body_collection;using BASE::solids_parameters;
+    using BASE::B_full;using BASE::rigid_B_full;using BASE::repulsions;using BASE::rigid_deformable_collisions;using BASE::Initialize_World_Space_Masses;
+    using BASE::world_space_rigid_mass_inverse;using BASE::world_space_rigid_mass;using BASE::solids_evolution_callbacks;using BASE::krylov_vectors;
     using BASE::X_save;using BASE::rigid_frame_save;using BASE::V_save;using BASE::rigid_velocity_save;using BASE::rigid_angular_momentum_save;
 
     static const int rows_per_rigid_body=TV::dimension+T_SPIN::dimension;
@@ -76,6 +76,7 @@ protected:
     ARRAY<T_INERTIA_TENSOR> rigid_body_fluid_inertia;
     ARRAY<TV> ar_full,z_full,zaq_full;ARRAY<TWIST<TV> > rigid_ar_full,rigid_z_full,rigid_zaq_full; // extra vectors for conjugate residual
     T_FACE_ARRAYS_SCALAR solid_projected_face_velocities_star;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> coupled_vectors;
 
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* Get_Poisson()
     {return (fluids_parameters.compressible ? fluids_parameters.euler->euler_projection.elliptic_solver : fluids_parameters.incompressible->projection.poisson_collidable);}

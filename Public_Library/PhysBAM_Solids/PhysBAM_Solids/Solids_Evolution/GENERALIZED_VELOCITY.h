@@ -19,7 +19,7 @@ template<class TV> class SOLID_BODY_COLLECTION;
 // Class GENERALIZED_VELOCITY
 //#####################################################################
 template<class TV>
-class GENERALIZED_VELOCITY: public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
+class GENERALIZED_VELOCITY:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
@@ -28,10 +28,11 @@ public:
     INDIRECT_ARRAY<ARRAY_VIEW<TV> > V;
     INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> > > rigid_V;
     INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> > > kinematic_and_static_rigid_V;  // TODO: Go away.
+    bool deep_copy;
 
     GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY_VIEW<TWIST<TV> > rigid_V_full,const SOLID_BODY_COLLECTION<TV>& solid_body_collection);
-    GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,ARRAY<int>& dynamic_particles,ARRAY_VIEW<TWIST<TV> > rigid_V_full,ARRAY<int>& dynamic_rigid_body_particles,
-        ARRAY<int>& static_and_kinematic_rigid_bodies);
+    GENERALIZED_VELOCITY(ARRAY_VIEW<TV> V_full,const ARRAY<int>& dynamic_particles,ARRAY_VIEW<TWIST<TV> > rigid_V_full,
+        const ARRAY<int>& dynamic_rigid_body_particles,const ARRAY<int>& static_and_kinematic_rigid_bodies);
     ~GENERALIZED_VELOCITY();
 
     BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE;
@@ -45,6 +46,7 @@ public:
     int Raw_Size() const PHYSBAM_OVERRIDE;
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
     void Exchange(GENERALIZED_VELOCITY<TV>& gv);
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
 };
 }
 #endif

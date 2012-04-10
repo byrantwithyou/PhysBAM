@@ -38,14 +38,10 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
 
     SPARSE_MATRIX_FLAT_NXN<T> P;
     P.Reset();
-    T_VECTOR x,b,q,s,r,k,z;
+    T_VECTOR x,b;
     x.v.Resize(faces.m);
     b.v.Resize(faces.m);
-    q.v.Resize(faces.m);
-    s.v.Resize(faces.m);
-    r.v.Resize(faces.m);
-    k.v.Resize(faces.m);
-    z.v.Resize(faces.m);
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     TV one_over_dX2=grid.one_over_dX*grid.one_over_dX;
     for(int i=0;i<faces.m;i++){
@@ -87,12 +83,13 @@ void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUND
 
     static int solve_id=0;solve_id++;
     if(verbose){
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,q,s);
+        KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     CONJUGATE_GRADIENT<T> cg;
     x=b;
-    cg.Solve(system,x,b,q,s,r,k,z,cg_tolerance,1,1000000);
+    cg.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
 
     if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);}
 

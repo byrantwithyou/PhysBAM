@@ -58,14 +58,12 @@ public:
     template<class T2> void Reduce_Add(const T2& input,T2& output) const;
     T Reduce_Min(const T local_value) const;
     T Reduce_Max(const T local_value) const;
-    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ap_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ar_array,
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& zaq_array,
-        const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner,ARRAY<MPI::Intracomm>* fluid_comm,
-        ARRAY<SPARSE_MATRIX_PARTITION>* partitions);
-    void Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,
-        GENERALIZED_VELOCITY<TV>& ap_array,GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,
-        const int min_iterations,const int max_iterations,const T tolerance);
+    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,
+        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+        const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner,
+        ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions);
+    void Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const int min_iterations,const int max_iterations,const T tolerance);
     void Distribute_Lists_From_Solid_Node(GENERALIZED_VELOCITY<TV>& F) const;
     void Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int> >* results);
     void Aggregate_Lists_To_Solid_Node(GENERALIZED_VELOCITY<TV>& F);

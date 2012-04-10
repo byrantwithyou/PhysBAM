@@ -140,22 +140,13 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     MPI_SOLIDS<TV>* mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
 
     if(solids){
-        F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
-        R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
-        S_full.Resize(particles.Size(),false,false);rigid_S_full.Resize(rigid_body_particles.Size(),false,false);
-        B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);
-        ar_full.Resize(particles.Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.Size(),false,false);
-        z_full.Resize(particles.Size(),false,false);rigid_z_full.Resize(rigid_body_particles.Size(),false,false);
-        zaq_full.Resize(particles.Size(),false,false);rigid_zaq_full.Resize(rigid_body_particles.Size(),false,false);}
+        B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);}
     else{
         if(fluids && solids_fluids_parameters.mpi_solid_fluid){ // Gather the fluid terms for the RHS of the solid here
-            F_full.Resize(particles.Size(),false,false);rigid_F_full.Resize(rigid_body_particles.Size(),false,false);
-            R_full.Resize(particles.Size(),false,false);rigid_R_full.Resize(rigid_body_particles.Size(),false,false);
             B_full.Resize(particles.Size(),false,false);rigid_B_full.Resize(rigid_body_particles.Size(),false,false);}}
 
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),F(F_full,rigid_F_full,solid_body_collection),
-        R(R_full,rigid_R_full,solid_body_collection),S(S_full,rigid_S_full,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection),
-        ar(ar_full,rigid_ar_full,solid_body_collection),z(z_full,rigid_z_full,solid_body_collection),zaq(zaq_full,rigid_zaq_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),
+        B(B_full,rigid_B_full,solid_body_collection);
     GENERALIZED_MASS<TV> mass(solid_body_collection);
 
     T_ARRAYS_INT cell_index_to_matrix_index;
@@ -347,6 +338,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     ARRAY<int> coupled_deformable_particle_indices;
     ARRAY<ARRAY<int> > coupled_deformable_particle_indices_array;
 
+#if 0
     if(solids_fluids_parameters.mpi_solid_fluid){
         if(fluids){
             RANGE<TV> grid_domain=fluids_parameters.grid->domain;
@@ -366,7 +358,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             for(int i=0;i<boundary_particles.m;i++) if(boundary_particles(i)) coupled_deformable_particle_indices.Append(i);
             solids_fluids_parameters.mpi_solid_fluid->Exchange_Coupled_Deformable_Particle_List(&coupled_deformable_particle_indices,0);
             fluid_system_mpi=new FLUID_SYSTEM_MPI<TV>(J_deformable,J_rigid,A_array,interior_regions,
-                solids_parameters.implicit_solve_parameters.cg_tolerance/Get_Poisson()->tolerance,solids_fluids_parameters.mpi_solid_fluid,F,R,coupled_deformable_particle_indices,preconditioned);
+                solids_parameters.implicit_solve_parameters.cg_tolerance/Get_Poisson()->tolerance,
+                solids_fluids_parameters.mpi_solid_fluid,F,R,coupled_deformable_particle_indices,preconditioned);
             fluid_system_mpi->Send_Generalized_Velocity_To_Solid(B);}
         else{
             coupled_deformable_particle_indices_array.Resize(solids_fluids_parameters.mpi_solid_fluid->fluid_ranks.n);
@@ -375,6 +368,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
                 coupled_deformable_particle_indices_array,*this,V.rigid_V.Size());
             // get fluid contribution to the solid RHS
             solid_system_mpi->Get_Generalized_Velocity_From_Fluid(B);}}
+#endif
 
     if(solids && Simulate_Fluids()){B.V*=(T)-1;B.rigid_V*=(T)-1;}
 
@@ -391,6 +385,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             const SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(i);
             for(int j=0;j<A.n;j++) x_array.v(i)(j)=p(matrix_index_to_cell_index_array(i)(j));}}
 
+#if 0
     if(solids_fluids_parameters.mpi_solid_fluid){
         LOG::Time("conjugate residual parallel");
         if(fluids){
@@ -406,9 +401,11 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             V.V*=(T)-1;V.rigid_V*=(T)-1;
             solid_system->Set_Global_Boundary_Conditions(V,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save,
                 solids_parameters.implicit_solve_parameters.test_system,solids_parameters.implicit_solve_parameters.print_matrix);
-            solids_fluids_parameters.mpi_solid_fluid->Parallel_Solve_Solid_Part(*solid_system_mpi,V,B,F,S,ar,R,z,zaq,1,solids_parameters.implicit_solve_parameters.cg_iterations,solids_parameters.implicit_solve_parameters.cg_tolerance);}
+            solids_fluids_parameters.mpi_solid_fluid->Parallel_Solve_Solid_Part(*solid_system_mpi,V,B,krylov_vectors,1,solids_parameters.implicit_solve_parameters.cg_iterations,solids_parameters.implicit_solve_parameters.cg_tolerance);}
         LOG::Stop_Time();}
-    else{
+    else
+#endif
+    {
         T fluid_tolerance=0;
         if(fluids_parameters.compressible || fluids_parameters.incompressible) fluid_tolerance=Get_Poisson()->tolerance;
 
@@ -456,17 +453,17 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             ar_full.Resize(particles.Size(),false,false);rigid_ar_full.Resize(rigid_body_particles.Size(),false,false);
             z_full.Resize(particles.Size(),false,false);rigid_z_full.Resize(rigid_body_particles.Size(),false,false);
             GENERALIZED_VELOCITY<TV> ar_V(ar_full,rigid_ar_full,solid_body_collection),z_V(z_full,rigid_z_full,solid_body_collection);
-            PRESSURE_VELOCITY_VECTOR<TV> V_coupled(V,x_array.v),F_coupled(F,p_array.v),R_coupled(R,r_array.v),S_coupled(S,ap_array.v),B_coupled(B,b_array),ar_coupled(ar_V,ar_array.v),
-                z_coupled(z_V,z_array.v);
+            PRESSURE_VELOCITY_VECTOR<TV> V_coupled(V,x_array.v),B_coupled(B,b_array);
             LOG::Time(solver_name);
             static int solve_id=-1;
             solve_id++;
             if(print_matrix_rhs_and_solution) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("bo-%i.txt",solve_id).c_str()).Write("bo",B_coupled);
-            if(!solver->Solve(solid_fluid_system,V_coupled,B_coupled,F_coupled,S_coupled,ar_coupled,R_coupled,z_coupled,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations))
+            if(!solver->Solve(solid_fluid_system,V_coupled,B_coupled,coupled_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations))
                 PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",0,1);
+            KRYLOV_SOLVER<T>::Ensure_Size(coupled_vectors,V_coupled,2);
             if(print_matrix_rhs_and_solution){
                 OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("xo-%i.txt",solve_id).c_str()).Write("xo",V_coupled);
-                OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("matrixo-%i.txt",solve_id).c_str()).Write("MO",solid_fluid_system,S_coupled,F_coupled);}}
+                OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("matrixo-%i.txt",solve_id).c_str()).Write("MO",solid_fluid_system,*coupled_vectors(0),*coupled_vectors(1));}}
         else{
             static CONJUGATE_GRADIENT<T> cg;
             static CONJUGATE_RESIDUAL<T> cr;
@@ -484,7 +481,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             solver->iterations_used=&solid_body_collection.iterations_used_diagnostic;
 
             LOG::Time(solver_name);
-            if(!solver->Solve(*solid_system,V,B,F,S,ar,R,z,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations) && solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure)
+            if(!solver->Solve(*solid_system,V,B,krylov_vectors,solids_parameters.implicit_solve_parameters.cg_tolerance,1,solids_parameters.implicit_solve_parameters.cg_iterations) && solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure)
                 throw std::runtime_error("Backward Euler Failed");}
         LOG::Stop_Time();
 
@@ -505,6 +502,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
             V.rigid_V(i).linear-=TV::Cross_Product(V.rigid_V(i).angular,rigid_body_updated_center_of_mass(i)-rigid_body.Frame().t);}}
 
     if(solids && velocity_update && solids_parameters.use_post_cg_constraints){ // save final force for friction calculation
+        KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V,2);
+        GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
         solid_system->Force(V,F);
         if(Simulate_Fluids()){ // TODO(jontg): Ask Craig if what is done here makes any sense...
             for(int i=0;i<F.V.Size();i++) F.V(i)*=dt*mass.one_over_mass(i);} // save final force for friction calculation

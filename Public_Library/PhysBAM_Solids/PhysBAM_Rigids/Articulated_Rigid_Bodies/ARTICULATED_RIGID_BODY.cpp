@@ -602,27 +602,24 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     ARTICULATED_SYSTEM<TV> system(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this));
     system.Initialize();
 
-    ARTICULATED_VECTOR<TV> rhs,x,q,s,r,k,z;
+    ARTICULATED_VECTOR<TV> rhs,x;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     Resize_System_Vector(rhs);
     Resize_System_Vector(x);
-    Resize_System_Vector(q);
-    Resize_System_Vector(s);
-    Resize_System_Vector(r);
-    Resize_System_Vector(k);
-    Resize_System_Vector(z);
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,3);
 
-    if(test_system) system.Test_System(r,k,z);
+    if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
     if(print_matrix){
         LOG::cout<<"arb solve id "<<solve_id<<std::endl;
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,q,s);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,q);}
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%i.txt",solve_id).c_str()).Write_Projection("P",system,*vectors(0));}
 
     {ARTICULATED_SYSTEM<TV> system(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this));
     system.break_loops=true;
     system.Initialize();
     if(print_matrix){
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,q,s);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,q);}}
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BM-%i.txt",solve_id).c_str()).Write("BM",system,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("BP-%i.txt",solve_id).c_str()).Write_Projection("BP",system,*vectors(0));}}
 
     if(correct_position){for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j)) rhs.v(j)=-Joint_Error(j)/dt;}
     else{system.Scatter(rigid_body_collection.rigid_body_particle.twist,rhs.v);rhs*=-(T)1;}
@@ -634,7 +631,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     KRYLOV_SOLVER<T>* solver=&cg;
     if(correct_position) solver=&cr;
 //    if(!correct_position) system.internal_x=&x;
-    solver->Solve(system,x,rhs,q,s,r,k,z,(T)1e-3,0,1000);
+    solver->Solve(system,x,rhs,vectors,(T)1e-3,0,1000);
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",x);
 
     system.intermediate_twists.Fill(TWIST<TV>());
@@ -642,6 +639,7 @@ Apply_Poststabilization_With_CG(T dt,bool correct_position,bool test_system,bool
     system.Inverse_Mass(system.intermediate_twists);
     rigid_body_collection.rigid_body_particle.twist+=system.intermediate_twists;
     rigid_body_collection.Update_Angular_Momentum();
+    vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Joint_Error

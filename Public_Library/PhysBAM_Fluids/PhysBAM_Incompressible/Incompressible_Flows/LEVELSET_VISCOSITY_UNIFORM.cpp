@@ -21,6 +21,7 @@ LEVELSET_VISCOSITY_UNIFORM(BOUNDARY_CONDITIONS_CALLBACKS<TV>* callback_input,con
 template<class TV> LEVELSET_VISCOSITY_UNIFORM<TV>::
 ~LEVELSET_VISCOSITY_UNIFORM()
 {
+    vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Apply_Full_Viscosity
@@ -38,8 +39,7 @@ Apply_Full_Viscosity(ARRAY<T,FACE_INDEX<d> >& u,bool fully_explicit,bool fully_i
     static int solve_id=-1;solve_id++;
     if(print_matrix){
         LOG::cout<<"viscosity solve id "<<solve_id<<std::endl;
-        if(fully_explicit){q.v.Resize(index_map.index_to_face.m);s.v.Resize(index_map.index_to_face.m);}
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,q,s);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     if(!fully_implicit) Apply_Explicit_Viscosity(u,axis);
@@ -67,7 +67,7 @@ Apply_Implicit_Viscosity(ARRAY<T,FACE_INDEX<d> >& u,int axis)
     x.v=b.v;
     CONJUGATE_GRADIENT<T> cg;
     cg.print_diagnostics=true;
-    bool result=cg.Solve(system,x,b,q,s,r,k,z,(T)1e-4,1,1000);
+    bool result=cg.Solve(system,x,b,vectors,(T)1e-4,1,1000);
     PHYSBAM_ASSERT(result);
 }
 //#####################################################################
@@ -89,12 +89,7 @@ Resize_Vectors(bool minimal)
 {
     x.v.Resize(index_map.index_to_face.m);
     b.v.Resize(index_map.index_to_face.m);
-    if(!minimal){
-        q.v.Resize(index_map.index_to_face.m);
-        s.v.Resize(index_map.index_to_face.m);
-        r.v.Resize(index_map.index_to_face.m);
-        k.v.Resize(index_map.index_to_face.m);
-        z.v.Resize(index_map.index_to_face.m);}
+    if(print_matrix) KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
 }
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<float,1> >;
 template class LEVELSET_VISCOSITY_UNIFORM<VECTOR<float,2> >;

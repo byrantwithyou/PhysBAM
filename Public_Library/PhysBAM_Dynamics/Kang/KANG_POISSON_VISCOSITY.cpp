@@ -129,14 +129,10 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
     SYSTEM_MATRIX_HELPER<T> helper;
     ARRAY<GRAD_HELPER<T> > grad_helper;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > p,rhs,q,s,r,k,z;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > p,rhs;
     p.v.Resize(num_cells);
     rhs.v.Resize(num_cells);
-    q.v.Resize(num_cells);
-    s.v.Resize(num_cells);
-    r.v.Resize(num_cells);
-    k.v.Resize(num_cells);
-    z.v.Resize(num_cells);
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     face_velocities_ghost.Resize(*fluids_parameters.grid,3,false);
     fluids_parameters.incompressible->boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,0,3);
@@ -204,7 +200,8 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     SYSTEM system(matrix);
     system.P=matrix.C;
 
-    if(test_system) system.Test_System(r,k,z);
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,p,3);
+    if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
 
     static int solve_id=-1;solve_id++;
     if(print_matrix){
@@ -219,7 +216,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     //KRYLOV_SOLVER<T>* solver=&cg;
     KRYLOV_SOLVER<T>* solver=&cr;
     solver->restart_iterations=fluids_parameters.cg_restart_iterations;
-    solver->Solve(system,p,rhs,q,s,r,k,z,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
+    solver->Solve(system,p,rhs,vectors,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",p.v);
 
     INTERPOLATED_COLOR_MAP<T> color_map;
@@ -238,6 +235,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
         if(grad_helper(i).i) dp-=p.v(grad_helper(i).i);
         if(grad_helper(i).j) dp+=p.v(grad_helper(i).j);
         face_velocities(it.Full_Index())-=grad_helper(i).x*dp;}
+    vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Apply_Viscosity
@@ -268,15 +266,13 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
             dual_cell_index(it.index)=++num_dual_cells;}
 
     SYSTEM_MATRIX_HELPER<T> helper;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > u,b,q,s,r,k,z;
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > u,b;
     u.v.Resize(num_dual_cells);
     b.v.Resize(num_dual_cells);
-    r.v.Resize(num_dual_cells); // used for density before solve
-    q.v.Resize(num_dual_cells);
-    if(implicit){
-        s.v.Resize(num_dual_cells);
-        k.v.Resize(num_dual_cells);
-        z.v.Resize(num_dual_cells);}
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+    KRYLOV_SOLVER<T>::Ensure_Size(vectors,u,3);
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >& r=debug_cast<KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >&>(*vectors(0));
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >& q=debug_cast<KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >&>(*vectors(1));
 
     T mu_n=fluids_parameters.viscosity,mu_p=fluids_parameters.outside_viscosity;
     T rho_n=fluids_parameters.density,rho_p=fluids_parameters.outside_density;
@@ -355,8 +351,8 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         SYMMQMR<T> qm;
         KRYLOV_SOLVER<T>* solver=&cg;
         solver->restart_iterations=fluids_parameters.cg_restart_iterations;
-        if(test_system) system.Test_System(r,k,z);
-        solver->Solve(system,u,b,q,s,r,k,z,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
+        if(test_system) system.Test_System(*vectors(0),*vectors(1),*vectors(2));
+        solver->Solve(system,u,b,vectors,fluids_parameters.incompressible_tolerance,0,fluids_parameters.incompressible_iterations);
     }
     else{
         matrix.Times(u.v,q.v);

@@ -460,6 +460,25 @@ public:
     }
 };
 
+template<class TYPE,class T_ITERATOR,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9,class T10>
+class ITERATOR_TASK_10:public THREAD_QUEUE::TASK
+{   
+public:
+    TYPE& my_class;
+    void (TYPE::*func)(T_ITERATOR&,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10);
+    T_ITERATOR iterator;
+    T1 arg1;T2 arg2;T3 arg3;T4 arg4;T5 arg5;T6 arg6;T7 arg7;T8 arg8;T9 arg9;T10 arg10;
+
+    ITERATOR_TASK_10(TYPE& class_input,void (TYPE::*func_input)(T_ITERATOR&,T1,T2,T3,T4,T5,T6,T7,T8,T9,T10),const T_ITERATOR& iterator_input,T1 arg1_input,T2 arg2_input,T3 arg3_input,T4 arg4_input,T5 arg5_input,T6 arg6_input,T7 arg7_input,T8 arg8_input,T9 arg9_input,T10 arg10_input)
+        :my_class(class_input),func(func_input),iterator(iterator_input),arg1(arg1_input),arg2(arg2_input),arg3(arg3_input),arg4(arg4_input),arg5(arg5_input),arg6(arg6_input),arg7(arg7_input),arg8(arg8_input),arg9(arg9_input),arg10(arg10_input)
+    {}
+    
+    void Run()
+    {
+        (my_class.*func)(iterator,arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10);
+    }
+};
+
 template<class TYPE,class T_ITERATOR,class T1,class T2,class T3,class T4,class T5,class T6,class T7,class T8,class T9,class T10,class T11>
 class ITERATOR_TASK_11:public THREAD_QUEUE::TASK
 {   

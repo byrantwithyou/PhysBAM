@@ -242,13 +242,12 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     f_interface.Resize(ifs.object.mesh.elements.m);
     for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
 
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol,kr_p,kr_ap,kr_ar,kr_r,kr_z;
+    CONJUGATE_RESIDUAL<T> cr;
+    KRYLOV_SOLVER<T>* solver=&cr;
+
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol;
     ifs.Resize_Vector(sol);
-    ifs.Resize_Vector(kr_p);
-    ifs.Resize_Vector(kr_ap);
-    ifs.Resize_Vector(kr_ar);
-    ifs.Resize_Vector(kr_r);
-    ifs.Resize_Vector(kr_z);
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
@@ -264,15 +263,14 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     Dump_System<T,TV>(ifs,at);
     
-    CONJUGATE_RESIDUAL<T> cr;
-    // cr.print_residuals=true;
-    // cr.restart_iterations=10000;
-    cr.nullspace_tolerance=0;
-    cr.Solve(ifs,sol,rhs,kr_p,kr_ap,kr_ar,kr_r,kr_z,1e-10,0,5000000);
+    // solver->print_residuals=true;
+    // solver->restart_iterations=10000;
+    solver->nullspace_tolerance=0;
+    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,5000000);
 
-    ifs.Multiply(sol,kr_r);
-    kr_r.v-=rhs.v;
-    LOG::cout<<"Residual: "<<ifs.Convergence_Norm(kr_r)<<std::endl;
+    ifs.Multiply(sol,*vectors(0));
+    *vectors(0)-=rhs;
+    LOG::cout<<"Residual: "<<ifs.Convergence_Norm(*vectors(0))<<std::endl;
 
     Dump_Vector<T,TV>(ifs,sol.v,"solution");
     

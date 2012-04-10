@@ -89,11 +89,7 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
     T_VECTOR x,b,q,s,r,k,z;
     x.v.Resize(index_to_cell.m);
     b.v.Resize(index_to_cell.m);
-    q.v.Resize(index_to_cell.m);
-    s.v.Resize(index_to_cell.m);
-    r.v.Resize(index_to_cell.m);
-    k.v.Resize(index_to_cell.m);
-    z.v.Resize(index_to_cell.m);
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     VECTOR_ND<T> temp(index_to_face.m);
     for(int i=0;i<index_to_face.m;i++) temp(i)=u(index_to_face(i));
@@ -112,15 +108,16 @@ void Project_Incompressibility_Slip(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >
 
     static int solve_id=0;solve_id++;
     if(verbose){
+        KRYLOV_SOLVER<T>::Ensure_Size(vectors,x,2);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-temp-%i.txt",solve_id).c_str()).Write("temp",temp);
-        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-M-%i.txt",solve_id).c_str()).Write("M",system,q,s);
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-M-%i.txt",solve_id).c_str()).Write("M",system,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-G-%i.txt",solve_id).c_str()).Write("G",system.gradient);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-ND-%i.txt",solve_id).c_str()).Write("ND",system.neg_divergence);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-bi-%i.txt",solve_id).c_str()).Write("bi",system.beta_inverse);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     CONJUGATE_RESIDUAL<T> solver;
-    solver.Solve(system,x,b,q,s,r,k,z,cg_tolerance,1,1000000);
+    solver.Solve(system,x,b,vectors,cg_tolerance,1,1000000);
 
     if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-x-%i.txt",solve_id).c_str()).Write("x",x);}
 

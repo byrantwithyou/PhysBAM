@@ -101,6 +101,7 @@ template<class TV> SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
     delete &boundary_condition_collection;
     delete fracture_pattern;
     delete &iterator_info;
+    coupled_vectors.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Initialize_Grid_Arrays
@@ -331,11 +332,8 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
         fluids_face_velocities,fluids_parameters.viscosity,fluids_parameters.particle_levelset_evolution && fluids_parameters.second_order_cut_cell_method,
         fluids_parameters.particle_levelset_evolution?&fluids_parameters.particle_levelset_evolution->Levelset(0):0);
 
-    coupled_system->Resize_Coupled_System_Vector(coupled_f);
-    coupled_system->Resize_Coupled_System_Vector(coupled_r);
-    coupled_system->Resize_Coupled_System_Vector(coupled_s);
-    coupled_system->Resize_Coupled_System_Vector(coupled_ar);
-    coupled_system->Resize_Coupled_System_Vector(coupled_z);
+    KRYLOV_SOLVER<T>::Ensure_Size(coupled_vectors,coupled_x,3);
+
     if(solids_fluids_parameters.mpi_solid_fluid) solids_fluids_parameters.mpi_solid_fluid->Distribute_Lists_From_Solid_Node(F);
     if(solids_fluids_parameters.mpi_solid_fluid) solids_fluids_parameters.mpi_solid_fluid->Distribute_Lists_From_Solid_Node(B);
     // TODO(kwatra): switch to using B instead of V once use_post_cg_constraints work
@@ -372,7 +370,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
     solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
 
     if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%i.txt",solve_id).c_str()).Write("b",coupled_b);    // TODO: this isn't actually valid for all the solver types
-    if(!solver->Solve(*coupled_system,coupled_x,coupled_b,coupled_f,coupled_s,coupled_r,coupled_ar,coupled_z,fluid_tolerance,1,max_iterations))
+    if(!solver->Solve(*coupled_system,coupled_x,coupled_b,coupled_vectors,fluid_tolerance,1,max_iterations))
         PHYSBAM_DEBUG_WRITE_SUBSTEP("FAILED CONVERGENCE",0,1);
     if(print_each_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("x-%i.txt",solve_id).c_str()).Write("x",coupled_x);
     LOG::cout<<"Residual L_inf norm="<<coupled_system->Residual_Linf_Norm(coupled_x,coupled_b)<<std::endl;

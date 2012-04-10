@@ -13,7 +13,8 @@ using namespace PhysBAM;
 // Function Solve  
 //#####################################################################
 template<class T> void PCG_SPARSE<T>::
-Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>& q,VECTOR_ND<T>& s,VECTOR_ND<T>& r,VECTOR_ND<T>& k,VECTOR_ND<T>& z,const T tolerance,const bool recompute_preconditioner)
+Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+    const T tolerance,const bool recompute_preconditioner)
 {
     int desired_iterations=A_matrix.n-enforce_compatibility;if(maximum_iterations) desired_iterations=maximum_iterations;
 
@@ -35,9 +36,9 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
             A_matrix.Construct_Incomplete_Cholesky_Factorization(modified_incomplete_cholesky,modified_incomplete_cholesky_coefficient,
                 preconditioner_zero_tolerance,preconditioner_zero_replacement);}
 
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&> kx(x),kb(b),kq(q),ks(s),kr(r),kk(k),kz(z);
-    PHYSBAM_ASSERT(&kx.v==&x && &kb.v==&b && &kq.v==&q && &ks.v==&s && &kr.v==&r && &kk.v==&k && &kz.v==&z);
-    solver->Solve(system,kx,kb,kq,ks,kr,kk,kz,tolerance,0,desired_iterations);
+    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&> kx(x),kb(b);
+    PHYSBAM_ASSERT(&kx.v==&x && &kb.v==&b);
+    solver->Solve(system,kx,kb,vectors,tolerance,0,desired_iterations);
 }
 //#####################################################################
 template class PCG_SPARSE<float>;

@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
+#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -18,6 +19,18 @@ KRYLOV_SOLVER()
 template<class T> KRYLOV_SOLVER<T>::
 ~KRYLOV_SOLVER()
 {
+}
+//#####################################################################
+// Function Ensure_Size
+//#####################################################################
+template<class T> void KRYLOV_SOLVER<T>::
+Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int size)
+{
+    if(size<=av.m) return;
+    int old=av.m;
+    av.Resize(size);
+    for(int i=old;i<av.m;i++)
+        av(i)=v.Clone_Default();
 }
 template class KRYLOV_SOLVER<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

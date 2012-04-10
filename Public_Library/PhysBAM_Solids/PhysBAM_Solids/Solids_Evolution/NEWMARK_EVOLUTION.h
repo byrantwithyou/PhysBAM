@@ -26,8 +26,7 @@ class NEWMARK_EVOLUTION:public SOLIDS_EVOLUTION<TV>
     typedef SOLIDS_EVOLUTION<TV> BASE;
     enum WORKAROUND {d=TV::m};
 protected:
-    using BASE::F_full;using BASE::R_full;using BASE::S_full;using BASE::B_full;using BASE::rigid_F_full;using BASE::rigid_R_full;using BASE::rigid_S_full;
-    using BASE::rigid_B_full;using BASE::rigid_AR_full;using BASE::AR_full;using BASE::Save_Position;using BASE::Restore_Position;
+    using BASE::B_full;using BASE::rigid_B_full;using BASE::Save_Position;using BASE::Restore_Position;using BASE::krylov_vectors;
     using BASE::rigid_deformable_collisions;using BASE::world_space_rigid_mass;using BASE::world_space_rigid_mass_inverse;using BASE::time;
 public:
     using BASE::solid_body_collection;using BASE::Euler_Step_Position;using BASE::Set_External_Velocities;

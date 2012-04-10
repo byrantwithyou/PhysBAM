@@ -9,6 +9,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class TV> KRYLOV_VECTOR_WRAPPER<T,TV>::
 KRYLOV_VECTOR_WRAPPER()
+    :deep_copy(false)
 {
 }
 //#####################################################################
@@ -16,23 +17,32 @@ KRYLOV_VECTOR_WRAPPER()
 //#####################################################################
 template<class T,class TV> KRYLOV_VECTOR_WRAPPER<T,TV>::
 KRYLOV_VECTOR_WRAPPER(TV vector)
-    :v(vector)
+    :v(vector),deep_copy(false)
 {
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T,class TV> template<class VECTOR,class INDICES> KRYLOV_VECTOR_WRAPPER<T,TV>::
-KRYLOV_VECTOR_WRAPPER(VECTOR& vector,INDICES& index)
-    :v(vector,index)
+KRYLOV_VECTOR_WRAPPER(VECTOR& vector,const INDICES& index)
+    :v(vector,index),deep_copy(false)
 {
 }
+//#####################################################################
+// Function Destroy_Helper
+//#####################################################################
+template<class T,class TV> void Destroy_Helper(KRYLOV_VECTOR_WRAPPER<T,TV>& v){}
+template<class T,class TV> void Destroy_Helper(KRYLOV_VECTOR_WRAPPER<T,TV&>& v){delete &v.v;}
+template<class T,class T2,class I> void Destroy_Helper(KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<T2>,I> >& v){delete &v.v.array;}
+template<class T,class T2,class I>
+void Destroy_Helper(KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> >& v){delete [] v.v.array.Get_Array_Pointer();}
 //#####################################################################
 // Destructor
 //#####################################################################
 template<class T,class TV> KRYLOV_VECTOR_WRAPPER<T,TV>::
 ~KRYLOV_VECTOR_WRAPPER()
 {
+    if(deep_copy) Destroy_Helper(*this);
 }
 //#####################################################################
 // Operator +=
@@ -103,6 +113,61 @@ Raw_Get(int i)
 {
     return Raw_Get_Helper(i,(T*)0,v);
 }
+//#####################################################################
+// Function Clone_Default_Helper
+//#####################################################################
+template<class T,class TV>
+static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,TV>& v)
+{
+    KRYLOV_VECTOR_WRAPPER<T,TV>* c=new KRYLOV_VECTOR_WRAPPER<T,TV>;
+    c->v.Resize(v.v.Size());
+    c->deep_copy=true;
+    return c;
+}
+template<class T,class T2>
+static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T2> > >& v)
+{
+    typedef ARRAY<VECTOR_ND<T2> > TV;
+    KRYLOV_VECTOR_WRAPPER<T,TV>* c=new KRYLOV_VECTOR_WRAPPER<T,TV>;
+    c->v.Resize(v.v.Size());
+    for(int i=0;i<c->v.m;i++)
+        c->v(i).Resize(v.v(i).Size());
+    c->deep_copy=true;
+    return c;
+}
+template<class T,class TV>
+static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,TV&>& v)
+{
+    KRYLOV_VECTOR_WRAPPER<T,TV&>* c=new KRYLOV_VECTOR_WRAPPER<T,TV&>(*new TV(v.v.Size()));
+    c->deep_copy=true;
+    return c;
+}
+template<class T,class T2,class I>
+static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<T2>,I> >& v)
+{
+    typedef INDIRECT_ARRAY<ARRAY<T2>,I> TV;
+    KRYLOV_VECTOR_WRAPPER<T,TV>* c=new KRYLOV_VECTOR_WRAPPER<T,TV>(*new ARRAY<T2>(v.v.array.m),v.v.indices);
+    c->deep_copy=true;
+    return c;
+}
+template<class T,class T2,class I>
+static KRYLOV_VECTOR_BASE<T>* Clone_Default_Helper(const KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> >& v)
+{
+    typedef INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> TV;
+    ARRAY_VIEW<T2> view(v.v.array.Size(),new T2[v.v.array.Size()]);
+    for(int i=0;i<view.Size();i++) view(i)=T2();
+    KRYLOV_VECTOR_WRAPPER<T,TV>* c=new KRYLOV_VECTOR_WRAPPER<T,TV>(view,v.v.indices);
+    c->deep_copy=true;
+    return c;
+}
+//#####################################################################
+// Function Clone_Default
+//#####################################################################
+template<class T,class TV> KRYLOV_VECTOR_BASE<T>* KRYLOV_VECTOR_WRAPPER<T,TV>::
+Clone_Default() const
+{
+    return Clone_Default_Helper(*this);
+}
 template class KRYLOV_VECTOR_WRAPPER<float,ARRAY<VECTOR_ND<float> > >;
 template class KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float> >;
 template KRYLOV_VECTOR_BASE<float>& KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::operator*=(float);
@@ -110,14 +175,13 @@ template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,2>,int>,A
 template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,2>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
 template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<float,3>,int>&,ARRAY<int> const&);
 template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<VECTOR<float,3>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
-template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<float,int>&,ARRAY<int> const&);
-template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<float,int>&,ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<float,int>&,const ARRAY<int>&);
 template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
-template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<float,2>,int>&,ARRAY<int>&);
-template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<float,2>,int>&,ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<float,2>,int>&,const ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<float,2>,int>&,const ARRAY<int>&);
 template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,2>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
-template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<float,3>,int>&,ARRAY<int>&);
-template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<float,3>,int>&,ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<float,3>,int>&,const ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<float,3>,int>&,const ARRAY<int>&);
 template KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<float,3>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
 template KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float>&>::KRYLOV_VECTOR_WRAPPER(VECTOR_ND<float>&);
 template KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float>&>::~KRYLOV_VECTOR_WRAPPER();
@@ -129,14 +193,13 @@ template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<VECTOR<double,2>,int>
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<VECTOR<double,2>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<VECTOR<double,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<double,3>,int>&,ARRAY<int> const&);
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<VECTOR<double,3>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
-template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<double,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<double,int>&,ARRAY<int> const&);
-template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<double,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<double,int>&,ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<double,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<double,int>&,const ARRAY<int>&);
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY<double,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
-template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<double,2>,int>&,ARRAY<int>&);
-template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<double,2>,int>&,ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<double,2>,int>&,const ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,2>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<double,2>,int>&,const ARRAY<int>&);
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,2>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
-template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<double,3>,int>&,ARRAY<int>&);
-template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<double,3>,int>&,ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY<VECTOR<double,3>,int>&,const ARRAY<int>&);
+template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::KRYLOV_VECTOR_WRAPPER(ARRAY_VIEW<VECTOR<double,3>,int>&,const ARRAY<int>&);
 template KRYLOV_VECTOR_WRAPPER<double,INDIRECT_ARRAY<ARRAY_VIEW<VECTOR<double,3>,int>,ARRAY<int>&> >::~KRYLOV_VECTOR_WRAPPER();
 template KRYLOV_VECTOR_WRAPPER<double,VECTOR_ND<double>&>::KRYLOV_VECTOR_WRAPPER(VECTOR_ND<double>&);
 template KRYLOV_VECTOR_WRAPPER<double,VECTOR_ND<double>&>::~KRYLOV_VECTOR_WRAPPER();

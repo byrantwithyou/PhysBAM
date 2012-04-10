@@ -6,6 +6,7 @@
 //#####################################################################
 #ifndef __KRYLOV_SOLVER__
 #define __KRYLOV_SOLVER__
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
@@ -26,14 +27,10 @@ public:
     KRYLOV_SOLVER();
     virtual ~KRYLOV_SOLVER();
 
-     // version without preconditioning
-    bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,KRYLOV_VECTOR_BASE<T>& p,KRYLOV_VECTOR_BASE<T>& ap,KRYLOV_VECTOR_BASE<T>& ar,
-        KRYLOV_VECTOR_BASE<T>& r,const T tolerance,const int min_iterations,const int max_iterations)
-    {KRYLOV_VECTOR_BASE<T>* z=0;PHYSBAM_ASSERT(!system.use_preconditioner);return Solve(system,x,b,p,ap,ar,r,*z,tolerance,min_iterations,max_iterations);}
-
 //#####################################################################
-    virtual bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,KRYLOV_VECTOR_BASE<T>& q,KRYLOV_VECTOR_BASE<T>& s,
-        KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& k,KRYLOV_VECTOR_BASE<T>& z,const T tolerance,const int min_iterations,const int max_iterations)=0;
+    static void Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int size);
+    virtual bool Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& b,
+        ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const T tolerance,const int min_iterations,const int max_iterations)=0;
 //#####################################################################
 };
 }

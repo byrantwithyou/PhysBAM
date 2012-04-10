@@ -86,7 +86,8 @@ private:
     ARRAY<T> rest_volumes_full,volumes_full;
     mutable ARRAY<T> saved_volumes_full;
     T total_rest_volume,total_volume;
-    ARRAY<T> pressure_full,divergence_full,cg_q_full,cg_s_full,cg_t_full,cg_r_full;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> cg_vectors;
+    ARRAY<T> pressure_full,divergence_full;
     ARRAY<T> diagonal_preconditioner_full;
     mutable ARRAY<TV> gradient_full;
     ARRAY<T_MATRIX> Bs_per_node;

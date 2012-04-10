@@ -13,6 +13,9 @@
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
@@ -20,6 +23,9 @@ POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,con
 {
     Initialize_Grid(grid_input);
 }
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,T_LEVELSET& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
     const bool enforce_compatibility_input)
@@ -29,6 +35,9 @@ POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,T_L
     levelset=&cell_centered_levelset;
     Initialize_Grid(grid_input);
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 ~POISSON_COLLIDABLE_UNIFORM()
 {
