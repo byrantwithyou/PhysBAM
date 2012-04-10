@@ -181,6 +181,28 @@ Clone_Default() const
     gv->deep_copy=true;
     return gv;
 }
+template<class AV>
+void Resize_Helper(AV& a,const AV& b)
+{
+    if(a.Size()==b.Size()) return;
+    if(a.Size()>b.Size()){a.m=b.m;return;}
+    AV t(b.m,new typename AV::ELEMENT[b.m]);
+    t.Fill(typename AV::ELEMENT());
+    a.Exchange(t);
+    delete [] t.Get_Array_Pointer();
+}
+//#####################################################################
+// Function Resize
+//#####################################################################
+template<class TV> void GENERALIZED_VELOCITY<TV>::
+Resize(const KRYLOV_VECTOR_BASE<T>& v)
+{
+    if(!deep_copy) return;
+    const GENERALIZED_VELOCITY<TV>& gv=debug_cast<const GENERALIZED_VELOCITY<TV>&>(v);
+    Resize_Helper(V.array,gv.V.array);
+    Resize_Helper(rigid_V.array,gv.rigid_V.array);
+    Resize_Helper(kinematic_and_static_rigid_V.array,gv.kinematic_and_static_rigid_V.array);
+}
 //#####################################################################
 template class GENERALIZED_VELOCITY<VECTOR<float,1> >;
 template class GENERALIZED_VELOCITY<VECTOR<float,2> >;

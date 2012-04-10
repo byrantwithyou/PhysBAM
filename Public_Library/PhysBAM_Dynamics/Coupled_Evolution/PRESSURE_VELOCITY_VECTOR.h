@@ -15,7 +15,7 @@ namespace PhysBAM{
 // Class PRESSURE_VELOCITY_VECTOR
 //#####################################################################
 template<class TV>
-class PRESSURE_VELOCITY_VECTOR: public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
+class PRESSURE_VELOCITY_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef KRYLOV_VECTOR_BASE<typename TV::SCALAR> BASE;
 public:
@@ -35,6 +35,7 @@ public:
     int Raw_Size() const PHYSBAM_OVERRIDE;
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
     KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
+    void Resize(const KRYLOV_VECTOR_BASE<T>& v) PHYSBAM_OVERRIDE;
 };
 }
 #endif

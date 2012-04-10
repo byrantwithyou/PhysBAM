@@ -26,6 +26,9 @@ template<class T> KRYLOV_SOLVER<T>::
 template<class T> void KRYLOV_SOLVER<T>::
 Ensure_Size(ARRAY<KRYLOV_VECTOR_BASE<T>*>& av,const KRYLOV_VECTOR_BASE<T>& v,int size)
 {
+    for(int i=0,m=min(size,av.m);i<m;i++)
+        av(i)->Resize(v);
+
     if(size<=av.m) return;
     int old=av.m;
     av.Resize(size);

@@ -100,6 +100,14 @@ Clone_Default() const
     c->v.Resize(v.m);
     return c;
 }
+//#####################################################################
+// Function Resize
+//#####################################################################
+template<class TV> void ARTICULATED_VECTOR<TV>::
+Resize(const KRYLOV_VECTOR_BASE<T>& w)
+{
+    v.Resize(debug_cast<const ARTICULATED_VECTOR<TV>&>(w).v.m);
+}
 template class ARTICULATED_VECTOR<VECTOR<float,1> >;
 template class ARTICULATED_VECTOR<VECTOR<float,2> >;
 template class ARTICULATED_VECTOR<VECTOR<float,3> >;

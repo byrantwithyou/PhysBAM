@@ -168,6 +168,56 @@ Clone_Default() const
 {
     return Clone_Default_Helper(*this);
 }
+//#####################################################################
+// Function Resize_Helper
+//#####################################################################
+template<class T,class TV>
+static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,TV>& v,const KRYLOV_VECTOR_WRAPPER<T,TV>& w)
+{
+    v.v.Resize(w.v.Size());
+}
+template<class T,class T2>
+static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T2> > >& v,const KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T2> > >& w)
+{
+    v.v.Resize(w.v.Size());
+    for(int i=0;i<w.v.m;i++)
+        v.v(i).Resize(w.v(i).Size());
+}
+template<class T,class TV>
+static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,TV&>& v,const KRYLOV_VECTOR_WRAPPER<T,TV&>& w)
+{
+    v.v.Resize(w.v.Size());
+}
+template<class T,class T2,class I>
+static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<T2>,I> >& v,
+    const KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY<T2>,I> >& w)
+{
+    v.v.array.Resize(w.v.array.Size());
+}
+template<class T,class T2,class I>
+static void Resize_Helper(KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> >& v,
+    const KRYLOV_VECTOR_WRAPPER<T,INDIRECT_ARRAY<ARRAY_VIEW<T2>,I> >& w)
+{
+    if(v.v.array.Size()==w.v.array.Size()) return;
+    if(v.v.array.Size()>w.v.array.Size()){
+        ARRAY_VIEW<T2> view(w.v.array.Size(),v.v.array.Get_Array_Pointer());
+        v.v.array.Exchange(view);
+        return;}
+
+    ARRAY_VIEW<T2> view(w.v.array.Size(),new T2[w.v.array.Size()]);
+    view.Fill(T2());
+    v.v.array.Exchange(view);
+    delete [] view.Get_Array_Pointer();
+}
+//#####################################################################
+// Function Resize
+//#####################################################################
+template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::
+Resize(const KRYLOV_VECTOR_BASE<T>& v)
+{
+    if(!deep_copy) return;
+    Resize_Helper(*this,debug_cast<const KRYLOV_VECTOR_WRAPPER<T,TV>&>(v));
+}
 template class KRYLOV_VECTOR_WRAPPER<float,ARRAY<VECTOR_ND<float> > >;
 template class KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float> >;
 template KRYLOV_VECTOR_BASE<float>& KRYLOV_VECTOR_WRAPPER<float,INDIRECT_ARRAY<ARRAY<float,int>,ARRAY<int>&> >::operator*=(float);

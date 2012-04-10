@@ -30,6 +30,7 @@ public:
     virtual T& Raw_Get(int i)=0;
     const T& Raw_Get(int i) const;
     virtual KRYLOV_VECTOR_BASE* Clone_Default() const=0;
+    virtual void Resize(const KRYLOV_VECTOR_BASE& v)=0;
 //#####################################################################
 };
 }

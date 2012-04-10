@@ -22,7 +22,6 @@ template<class TV> class GENERALIZED_VELOCITY;
 template<class TV> class GENERALIZED_MASS;
 template<class TV> class MATRIX_SOLID_INTERPOLATION;
 template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
-template<class TV> class SLIP_SYSTEM;
 template<class TV> class BACKWARD_EULER_SYSTEM;
 template<class TV> class FLUID_COLLECTION;
 template<class T_GRID> class EULER_PROJECTION_UNIFORM;

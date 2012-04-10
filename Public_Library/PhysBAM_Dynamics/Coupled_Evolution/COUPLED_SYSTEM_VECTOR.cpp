@@ -152,6 +152,18 @@ Clone_Default() const
     return v;
 }
 //#####################################################################
+// Function Resize
+//#####################################################################
+template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
+Resize(const KRYLOV_VECTOR_BASE<T>& v)
+{
+    const COUPLED_SYSTEM_VECTOR<TV>& cs=debug_cast<const COUPLED_SYSTEM_VECTOR<TV>&>(v);
+    pressure.Resize(cs.pressure.n);
+    lambda.Resize(cs.lambda.m);
+    force_coefficients.Resize(cs.force_coefficients.m);
+    viscous_force_coefficients.Resize(cs.viscous_force_coefficients.m);
+}
+//#####################################################################
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,1> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,2> >;
 template class COUPLED_SYSTEM_VECTOR<VECTOR<float,3> >;

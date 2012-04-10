@@ -117,8 +117,21 @@ Clone_Default() const
 {
     GENERALIZED_VELOCITY<TV>& gv=debug_cast<GENERALIZED_VELOCITY<TV>&>(*solid_velocity.Clone_Default());
     PRESSURE_VELOCITY_VECTOR<TV>* v=new PRESSURE_VELOCITY_VECTOR<TV>(gv,*new ARRAY<VECTOR_ND<T> >(pressure.m));
+    for(int i=0;i<v->pressure.m;i++) v->pressure(i).Resize(pressure(i).Size());
     v->deep_copy=true;
     return v;
+}
+//#####################################################################
+// Function Resize
+//#####################################################################
+template<class TV> void PRESSURE_VELOCITY_VECTOR<TV>::
+Resize(const KRYLOV_VECTOR_BASE<T>& v)
+{
+    if(!deep_copy) return;
+    const PRESSURE_VELOCITY_VECTOR<TV>& pv=debug_cast<const PRESSURE_VELOCITY_VECTOR<TV>&>(v);
+    solid_velocity.Resize(pv.solid_velocity);
+    pressure.Resize(pv.pressure.m);
+    for(int i=0;i<pressure.m;i++) pressure(i).Resize(pv.pressure(i).Size());
 }
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,1> >;
 template class PRESSURE_VELOCITY_VECTOR<VECTOR<float,2> >;

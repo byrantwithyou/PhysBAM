@@ -47,6 +47,7 @@ public:
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
     void Exchange(GENERALIZED_VELOCITY<TV>& gv);
     KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
+    void Resize(const KRYLOV_VECTOR_BASE<T>& v) PHYSBAM_OVERRIDE;
 };
 }
 #endif

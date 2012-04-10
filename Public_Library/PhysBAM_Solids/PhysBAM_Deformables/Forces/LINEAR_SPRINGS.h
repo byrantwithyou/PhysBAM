@@ -14,8 +14,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/DEFORMABLES_FORCES.h>
 namespace PhysBAM{
 
-template<class TV> class LINEAR_SPRINGS_SYSTEM_VECTOR;
-
 template<class TV>
 class LINEAR_SPRINGS:public DEFORMABLES_FORCES<TV>,public SPRINGS_TAG
 {
