@@ -82,7 +82,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
             if(theta<=0){Print_Diagnostics(iterations);return true;}
             vk_hat.Copy(1/theta, b_hat);
             vk.Copy(1/theta, vtemp);
-            r(1)=theta; r(2)=0; //added 7/21
+            r(0)=theta; r(1)=0; //added 7/21
             b_k = 0;
 
             //Make zero vectors:
@@ -104,22 +104,22 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         //Obtain epsilon, delta, givens rotation matrix, and gamma
         VECTOR<T,2> bl(0,b_k);
         VECTOR<T,2> et = G_pp*bl;
-        VECTOR<T,2> ta(et(2),a_k);
+        VECTOR<T,2> ta(et(1),a_k);
         VECTOR<T,2> ds = G_p*ta;
-        VECTOR<T,2> cs(ds(2),b_k1);
+        VECTOR<T,2> cs(ds(1),b_k1);
         T gamma = cs.Normalize();
-        MATRIX<T,2> G_k(cs(1),-cs(2),cs(2),cs(1)); //Givens matrix transposed
+        MATRIX<T,2> G_k(cs(0),-cs(1),cs(1),cs(0)); //Givens matrix transposed
         if(gamma < small_number){Print_Diagnostics(iterations);LOG::cout << "gamma variable close to zero"<<std::endl;return false;}
 
         //Obtain p, c, and r (residual)
         VECTOR<T,2> pr=G_k*r;
-        residual = abs(pr(2));
+        residual = abs(pr(1));
 
         vtemp.Copy((1/gamma),vk_hat);
-        c_k.Copy((-1/gamma)*et(1),c_pp,vtemp);
-        c_k.Copy((-1/gamma)*ds(1),c_p,c_k);
+        c_k.Copy((-1/gamma)*et(0),c_pp,vtemp);
+        c_k.Copy((-1/gamma)*ds(0),c_p,c_k);
 
-        x.Copy(pr(1), c_k, x);
+        x.Copy(pr(0), c_k, x);
 
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
@@ -138,7 +138,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         vk.Copy(1/b_k1, w); //added 7/21
         vk_hat.Copy(1/b_k1, w_hat); //modified 7/21
         b_k = b_k1;
-        r = VECTOR<T,2>(pr(2),0);
+        r = VECTOR<T,2>(pr(1),0);
     }
 
 #ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT //why do they test twice for the same condition?
