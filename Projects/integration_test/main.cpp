@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -242,9 +243,6 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     f_interface.Resize(ifs.object.mesh.elements.m);
     for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
 
-    CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
-
     KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol;
     ifs.Resize_Vector(sol);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
@@ -263,9 +261,13 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
 
     Dump_System<T,TV>(ifs,at);
     
-    // solver->print_residuals=true;
+    // CONJUGATE_RESIDUAL<T> cr;
+    // KRYLOV_SOLVER<T>* solver=&cr;
+    MINRES<T> mr;
+    KRYLOV_SOLVER<T>* solver=&mr;
     // solver->restart_iterations=10000;
-    solver->nullspace_tolerance=0;
+    // solver->nullspace_tolerance=0;
+    // solver->print_residuals=true;
     solver->Solve(ifs,sol,rhs,vectors,1e-10,0,5000000);
 
     ifs.Multiply(sol,*vectors(0));
