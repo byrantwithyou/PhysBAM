@@ -148,6 +148,8 @@ Set_Matrix(const VECTOR<T,2>& mu)
         for(int j=index_range_q[i].min_corner;j<index_range_q[i].max_corner;j++)
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
     null_p.Normalize();
+
+    Set_Jacobi_Preconditioner();
 }
 //#####################################################################
 // Function Set_RHS
@@ -180,6 +182,22 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interf
         delete helper_rhs_p[i];}
 
     for(int i=0;i<TV::m;i++) delete F_body[i];
+}
+//#####################################################################
+// Function Set_Jacobi_Preconditioner
+//#####################################################################
+template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
+Set_Jacobi_Preconditioner()
+{
+    J.Resize(system_size);
+    for(int i=0;i<index_range_u[TV::m-1].max_corner;i++)
+        J(i)=1/abs(matrix(i,i));
+    for(int i=index_range_u[TV::m-1].max_corner;i<system_size;i++){
+        T sum=0;
+        int index=matrix.offsets(i);
+        for(int j=index;j<matrix.offsets(i+1);j++)
+            sum+=sqr(matrix.A(j).a)*J(matrix.A(j).j);
+        J(i)=1/sum;}
 }
 //#####################################################################
 // Function Resize_Vector
@@ -264,6 +282,16 @@ template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 {
     Project(x);
+}
+//#####################################################################
+// Function Apply_Preconditioner
+//#####################################################################
+template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
+Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
+{
+    const VECTOR_ND<T>& rv=debug_cast<const VECTOR_T&>(r).v;
+    VECTOR_ND<T>& zv=debug_cast<VECTOR_T&>(z).v;
+    for(int i=0;i<system_size;i++) zv(i)=rv(i)*J(i);
 }
 template class INTERFACE_FLUID_SYSTEM<VECTOR<float,2> >;
 template class INTERFACE_FLUID_SYSTEM<VECTOR<float,3> >;

@@ -27,6 +27,9 @@ class INTERFACE_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
     SYSTEM_MATRIX_HELPER<T> *helper_rhs_q[TV::m],*helper_rhs_p[TV::m];
+    VECTOR_ND<T> J; // Jacobi preconditioner
+
+    void Set_Jacobi_Preconditioner();
 
 public:
 
@@ -60,6 +63,7 @@ public:
     void Project(KRYLOV_VECTOR_BASE<T>& x) const;
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const;
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
 //#####################################################################
 };
 }

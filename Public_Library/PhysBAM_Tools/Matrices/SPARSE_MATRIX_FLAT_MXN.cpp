@@ -307,7 +307,7 @@ Times_Diagonal_Times(const VECTOR_ND<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>
         }
         row_lengths(row)=column_indices.m;
     }
-
+    
     result.Set_Row_Lengths(row_lengths);
     result.n=columns;
 

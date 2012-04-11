@@ -222,7 +222,7 @@ struct ANALYTIC_TEST
 };
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
+void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,const bool use_preconditioner)
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
@@ -230,6 +230,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
         phi(it.index)=at.phi(it.Location());
     INTERFACE_FLUID_SYSTEM<TV> ifs(grid,coarse_grid,phi);
+    ifs.use_preconditioner=use_preconditioner;
     ifs.Set_Matrix(at.mu);
 
     printf("\n");
@@ -298,8 +299,6 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         exact_u(face)=at.u(it.Location())(face.axis);
         error_u(face)=numer_u(face)-exact_u(face);
-        // if(abs(numer_u(face))<1e-10) numer_u(face)=0;
-        // if(abs(error_u(face))<1e-10) error_u(face)=0;
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
     avg_u/=(TV)cnt_u;
@@ -334,14 +333,6 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at)
     Dump_u_p(ifs.grid,error_u,error_p,"color mapped error");
 
     LOG::cout<<ifs.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
-    
-    // LOG::cout<<"exact u"<<std::endl<<std::endl<<exact_u<<std::endl;
-    // LOG::cout<<"numer u"<<std::endl<<std::endl<<numer_u<<std::endl;
-    // LOG::cout<<"error u"<<std::endl<<std::endl<<error_u<<std::endl;
-
-    // LOG::cout<<"exact p"<<std::endl<<std::endl<<exact_p<<std::endl;
-    // LOG::cout<<"numer p"<<std::endl<<std::endl<<numer_p<<std::endl;
-    // LOG::cout<<"error p"<<std::endl<<std::endl<<error_p<<std::endl;
 }
 
 //#################################################################################################################################################
@@ -368,6 +359,7 @@ void Integration_Test(int argc,char* argv[])
     parse_args.Add_Integer_Argument("-test",1,"test number");
     parse_args.Add_Integer_Argument("-resolution",4,"resolution");
     parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
+    parse_args.Add_Option_Argument("-use_preconditioner","Use Jacobi preconditioner");
     parse_args.Parse(argc,argv);
 
     int test_number;
@@ -535,6 +527,7 @@ void Integration_Test(int argc,char* argv[])
     test->mu(1)=parse_args.Get_Double_Value("-mu_i")*test->kg/(test->s*(d==3?test->m:1));
     int res=parse_args.Get_Integer_Value("-resolution");
     int cgf=parse_args.Get_Integer_Value("-cgf");
+    bool use_preconditioner=parse_args.Get_Option_Value("-use_preconditioner");
 
     if(res%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
 
@@ -552,7 +545,7 @@ void Integration_Test(int argc,char* argv[])
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,coarse_grid,*test);
+    Analytic_Test(grid,coarse_grid,*test,use_preconditioner);
 }
 
 //#################################################################################################################################################
