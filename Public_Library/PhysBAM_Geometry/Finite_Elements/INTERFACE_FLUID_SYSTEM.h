@@ -39,6 +39,7 @@ public:
     GRID<TV> phi_grid;
     LEVELSET_UNIFORM<GRID<TV> >* phi;
     VECTOR_ND<T> null_u[TV::m],null_p;
+    ARRAY<T> zero_me;
     bool run_self_tests;
     bool print_matrix;
     bool print_rhs;

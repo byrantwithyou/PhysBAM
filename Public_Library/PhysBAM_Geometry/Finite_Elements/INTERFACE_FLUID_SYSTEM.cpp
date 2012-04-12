@@ -132,13 +132,15 @@ Set_Matrix(const VECTOR<T,2>& mu)
     for(int i=0;i<TV::m;i++){
         helper_rhs_p[i]->Shift(index_range_u[i].min_corner,index_range_p.min_corner);
         helper_rhs_q[i]->Shift(index_range_u[i].min_corner,index_range_q[i].min_corner);}
-    
-    helper.Set_Matrix(system_size,system_size,matrix,1e-14);
+
+    zero_me.Resize(index_range_p.min_corner);
+    zero_me.Fill(false);
+    helper.Set_Matrix(system_size,system_size,matrix,&zero_me,index_range_p.min_corner,1e-14);
     
     for(int i=0;i<TV::m;i++){
         null_u[i].Resize(system_size);
         for(int j=index_range_u[i].min_corner;j<index_range_u[i].max_corner;j++)
-            null_u[i](j)=1;
+            if(!zero_me(j)) null_u[i](j)=1;
         null_u[i].Normalize();}
     
     null_p.Resize(system_size);
@@ -149,7 +151,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
             null_p(j)=object.Get_Element(j-index_range_q[i].min_corner).Normal()(i);
     null_p.Normalize();
 
-    Set_Jacobi_Preconditioner();
+    if(BASE::use_preconditioner) Set_Jacobi_Preconditioner();
 }
 //#####################################################################
 // Function Set_RHS
@@ -190,9 +192,10 @@ template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Set_Jacobi_Preconditioner()
 {
     J.Resize(system_size);
-    for(int i=0;i<index_range_u[TV::m-1].max_corner;i++)
-        J(i)=1/abs(matrix(i,i));
-    for(int i=index_range_u[TV::m-1].max_corner;i<system_size;i++){
+    for(int i=0;i<index_range_p.min_corner;i++)
+        if(zero_me(i))J(i)=1;
+        else J(i)=1/abs(matrix(i,i));
+    for(int i=index_range_p.min_corner;i<system_size;i++){
         T sum=0;
         int index=matrix.offsets(i);
         for(int j=index;j<matrix.offsets(i+1);j++)
@@ -267,6 +270,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     v-=v.Dot(null_p)*null_p;
     for(int i=0;i<TV::m;i++)
         v-=v.Dot(null_u[i])*null_u[i];
+    for(int i=0;i<index_range_p.min_corner;i++) v(i)*=(T)(!zero_me(i));
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

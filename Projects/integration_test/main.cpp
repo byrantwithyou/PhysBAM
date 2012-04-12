@@ -95,13 +95,16 @@ void Dump_System(const INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
             Dump_Interface<T,TV>(ifs,false);
             sprintf(buff,"dofs %c %c","uvw"[i],s?'-':'+');
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
-                if(it.Axis()==i){ 
-                    if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,s)>=0){
-                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
+                if(it.Axis()==i){
+                    int index=ifs.index_map_u[i]->Get_Index_Fixed(it.index,s);
+                    if(index>=0){
+                        if(ifs.zero_me(index))
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                        else if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0)
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                         else
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
-                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i));}}
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i));}}                        
             Flush_Frame<T,TV>(buff);
         }
 
@@ -227,8 +230,11 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next())
-        phi(it.index)=at.phi(it.Location());
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next()){
+        T value=at.phi(it.Location());
+        T tol=grid.dX.Min()*1e-6;
+        if(abs(value)>tol) phi(it.index)=value;
+        else phi(it.index)=((value>0)?(tol):(-tol));}
     INTERFACE_FLUID_SYSTEM<TV> ifs(grid,coarse_grid,phi);
     ifs.use_preconditioner=use_preconditioner;
     ifs.Set_Matrix(at.mu);
@@ -269,15 +275,15 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     // solver->restart_iterations=10000;
     // solver->nullspace_tolerance=0;
     // solver->print_residuals=true;
-    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,5000000);
+    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
 
     ifs.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<ifs.Convergence_Norm(*vectors(0))<<std::endl;
 
     Dump_Vector<T,TV>(ifs,sol.v,"solution");
-    
-    // OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,kr_r,kr_z);
+
+    // OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,*vectors(0),*vectors(1));
     // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);

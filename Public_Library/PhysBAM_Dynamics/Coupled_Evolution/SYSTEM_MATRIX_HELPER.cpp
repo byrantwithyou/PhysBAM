@@ -65,7 +65,7 @@ Shift(int dr,int dc,INTERVAL<int> range)
 // Function Compact
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Compact(int rows, T tol)
+Compact(int rows,ARRAY<T>* zero_me,int bound,T tol)
 {
     ARRAY<std::map<int,T> > maps(rows);
     for(int i=0;i<data.m;i++)
@@ -74,7 +74,13 @@ Compact(int rows, T tol)
     int k=0;
     for(int i=0;i<maps.m;i++)
         for(typename std::map<int,T>::iterator it=maps(i).begin();it!=maps(i).end();it++)
-            if(abs(it->second)>=tol)
+            if((i==it->first)&&(i<bound)&&(abs(it->second)<tol))
+                (*zero_me)(i)=true;
+                
+    k=0;
+    for(int i=0;i<maps.m;i++)
+        for(typename std::map<int,T>::iterator it=maps(i).begin();it!=maps(i).end();it++)
+            if(!((i<bound)&&(*zero_me)(i))&&!((it->first<bound)&&(*zero_me)(it->first))&&(abs(it->second)>=tol))
                 data(k++)=TRIPLE<int,int,T>(i,it->first,it->second);
     data.Resize(k);
     compacted=true;
@@ -83,9 +89,9 @@ Compact(int rows, T tol)
 // Function Set_Matrix
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M, T tol)
+Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M,ARRAY<T>* zero_me,int bound,T tol)
 {
-    if(!compacted) Compact(m, tol);
+    if(!compacted&&zero_me) Compact(m,zero_me,bound,tol);
     M.Reset(n);
     M.m=m;
     M.A.Remove_All();
@@ -98,9 +104,9 @@ Set_Matrix(int m,int n,SPARSE_MATRIX_FLAT_MXN<T>& M, T tol)
 // Function Set_Matrix
 //#####################################################################
 template<class T> void SYSTEM_MATRIX_HELPER<T>::
-Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M, T tol)
+Set_Matrix(int n,SPARSE_MATRIX_FLAT_NXN<T>& M,ARRAY<T>* zero_me,int bound,T tol)
 {
-    if(!compacted) Compact(n, tol);
+    if(!compacted&&zero_me) Compact(n,zero_me,bound,tol);
     M.Reset();
     M.n=n;
     M.A.Remove_All();
