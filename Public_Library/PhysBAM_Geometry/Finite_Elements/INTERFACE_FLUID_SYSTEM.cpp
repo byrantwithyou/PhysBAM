@@ -197,8 +197,8 @@ Set_Jacobi_Preconditioner()
         else J(i)=1/abs(matrix(i,i));
     for(int i=index_range_p.min_corner;i<system_size;i++){
         T sum=0;
-        int index=matrix.offsets(i);
-        for(int j=index;j<matrix.offsets(i+1);j++)
+        int start=matrix.offsets(i),end=matrix.offsets(i+1);
+        for(int j=start;j<end;j++)
             sum+=sqr(matrix.A(j).a)*J(matrix.A(j).j);
         J(i)=1/sum;}
 }
