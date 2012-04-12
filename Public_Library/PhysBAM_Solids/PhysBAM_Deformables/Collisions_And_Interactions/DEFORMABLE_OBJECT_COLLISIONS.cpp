@@ -44,9 +44,13 @@ template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Initialize_Object_Collisions(const bool collide_with_interior,const T collision_tolerance_input,
     const bool use_spatial_partition_for_levelset_collisions,const bool disable_multiple_levelset_collisions_input,const T maximum_levelset_collision_projection_velocity_input)
 {
-    collision_tolerance=collision_tolerance_input;use_spatial_partition=use_spatial_partition_for_levelset_collisions;
-    disable_multiple_levelset_collisions=disable_multiple_levelset_collisions_input;maximum_levelset_collision_projection_velocity=maximum_levelset_collision_projection_velocity_input;
-    check_collision=CONSTANT_ARRAY<bool>(particles.Size(),false);particle_states.Resize(particles.Size());particle_to_collision_body_id.Resize(particles.Size());
+    collision_tolerance=collision_tolerance_input;
+    use_spatial_partition=use_spatial_partition_for_levelset_collisions;
+    disable_multiple_levelset_collisions=disable_multiple_levelset_collisions_input;
+    maximum_levelset_collision_projection_velocity=maximum_levelset_collision_projection_velocity_input;
+    check_collision=CONSTANT_ARRAY<bool>(particles.Size(),false);
+    particle_states.Resize(particles.Size());
+    particle_to_collision_body_id.Resize(particles.Size());
     Reset_Object_Collisions(); // in case collisions already exist
     for(int c=0;c<collision_structures.m;c++){
         if(TRIANGULATED_AREA<T>* triangulated_area=dynamic_cast<TRIANGULATED_AREA<T>*>(collision_structures(c)))
@@ -54,7 +58,8 @@ Initialize_Object_Collisions(const bool collide_with_interior,const T collision_
         else if(TRIANGULATED_SURFACE<T>* triangulated_surface=dynamic_cast<TRIANGULATED_SURFACE<T>*>(collision_structures(c)))
             Add_Collision_Mesh(triangulated_surface->mesh,true);
         else if(SEGMENTED_CURVE<TV>* segmented_curve=dynamic_cast<SEGMENTED_CURVE<TV>*>(collision_structures(c))){
-            SEGMENT_MESH& mesh=segmented_curve->mesh;for(int s=0;s<mesh.elements.m;s++){
+            SEGMENT_MESH& mesh=segmented_curve->mesh;
+            for(int s=0;s<mesh.elements.m;s++){
                 check_collision.Subset(mesh.elements(s)).Fill(true);}}
         else if(TETRAHEDRALIZED_VOLUME<T>* tetrahedralized_volume=dynamic_cast<TETRAHEDRALIZED_VOLUME<T>*>(collision_structures(c)))
             Add_Collision_Mesh(tetrahedralized_volume->mesh,collide_with_interior);
@@ -87,53 +92,75 @@ Compute_Candidate_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOM
     for(COLLISION_GEOMETRY_ID id(0);id<collision_body_list.Size();id++) collision_body_candidate_nodes(id).Remove_All();
     if(!bodies.m) return;
     if(use_spatial_partition){
-        ARRAY<COLLISION_GEOMETRY_ID> collision_body_indices;collision_body_indices.Preallocate(100);
-        for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
+        ARRAY<COLLISION_GEOMETRY_ID> collision_body_indices;
+        collision_body_indices.Preallocate(100);
+        for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
+            int p=deformable_body_collection.simulated_particles(i);
             if(check_collision(p)){
-                if(thickness_table && thickness_table->Contains(p)) collision_body_list.spatial_partition->collision_body_thickness=thickness_table->Get(p);
+                if(thickness_table && thickness_table->Contains(p))
+                    collision_body_list.spatial_partition->collision_body_thickness=thickness_table->Get(p);
                 collision_body_list.spatial_partition->Get_Potential_Collisions(particles.X(p),collision_body_indices);
-                for(int j=0;j<collision_body_indices.m;j++) collision_body_candidate_nodes(collision_body_list.bodies(collision_body_indices(j))->collision_geometry_id).Append(p);}}}
+                for(int j=0;j<collision_body_indices.m;j++)
+                    collision_body_candidate_nodes(collision_body_list.bodies(collision_body_indices(j))->collision_geometry_id).Append(p);}}}
     else{
         ARRAY<int> general_collision_body_candidate_nodes;
-        for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
-            if(check_collision(p)) general_collision_body_candidate_nodes.Append(p);}
-        for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++) if(bodies(i)) collision_body_candidate_nodes(i)=general_collision_body_candidate_nodes;}
+        for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
+            int p=deformable_body_collection.simulated_particles(i);
+            if(check_collision(p))
+                general_collision_body_candidate_nodes.Append(p);}
+        for(COLLISION_GEOMETRY_ID i(0);i<bodies.m;i++)
+            if(bodies(i))
+                collision_body_candidate_nodes(i)=general_collision_body_candidate_nodes;}
     if(use_structure_collide_collision_body) for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies.m;body_id++) if(bodies(body_id)){
         for(int i=collision_body_candidate_nodes(body_id).m-1;i>=0;i--){
             int p=collision_body_candidate_nodes(body_id)(i),structure=particle_to_structure(p);
-            if(structure && !structure_collide_collision_body(structure).Contains(body_id)) collision_body_candidate_nodes(body_id).Remove_Index_Lazy(i);}}
+            if(structure && !structure_collide_collision_body(structure).Contains(body_id))
+                collision_body_candidate_nodes(body_id).Remove_Index_Lazy(i);}}
 }
 //#####################################################################
 // Function Adjust_Nodes_For_Collision_Body_Collisions
 //#####################################################################
 // TODO: should be accelerated by using the hierarchy to eliminate tests on parts of the surface that aren't close to collision bodies.
 template<class TV> int DEFORMABLE_OBJECT_COLLISIONS<TV>::
-Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies)
+Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,
+    const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies)
 {
-    soft_bindings.Clamp_Particles_To_Embedded_Positions(true);soft_bindings.Clamp_Particles_To_Embedded_Velocities(true); // TODO: move this elsewhere
+    soft_bindings.Clamp_Particles_To_Embedded_Positions(true);
+    soft_bindings.Clamp_Particles_To_Embedded_Velocities(true); // TODO: move this elsewhere
     if(!bodies) bodies=&collision_body_list.bodies;
     if(!bodies->m) return 0;
     int interactions=0;
     Compute_Candidate_Nodes_For_Collision_Body_Collisions(*bodies);
 
     if(use_protectors){
-        ARRAY<bool> is_protected(check_collision.m);ARRAY<TV> X_save(particles.X),V_old(particles.V);
+        ARRAY<bool> is_protected(check_collision.m);
+        ARRAY<TV> X_save(particles.X),V_old(particles.V);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(*bodies)(body_id);
-            for(int j=collision_body_candidate_nodes(body_id).m-1;j>=0;j--){int node=collision_body_candidate_nodes(body_id)(j);
+            for(int j=collision_body_candidate_nodes(body_id).m-1;j>=0;j--){
+                int node=collision_body_candidate_nodes(body_id)(j);
                 if(protecting_bodies_of_nodes(node).Contains(body_id)){
                     if(!is_protected(node) && collision_body.Implicit_Geometry_Lazy_Inside_Extended_Levelset(X_save(node),(T)protection_thickness)){
-                        is_protected(node)=true;particles.X(node)=X_save(node);particles.V(node)=V_old(node);particle_states(node).enforce=false;}}
+                        is_protected(node)=true;
+                        particles.X(node)=X_save(node);
+                        particles.V(node)=V_old(node);
+                        particle_states(node).enforce=false;}}
                 else if(is_protected(node)) collision_body_candidate_nodes(body_id).Remove_Index_Lazy(j);}
-            interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(collision_body,X_old,particles,soft_bindings,collision_body_candidate_nodes(body_id),check_collision,
-                collision_tolerance,particle_states,particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);}
+            interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(collision_body,X_old,particles,soft_bindings,
+                collision_body_candidate_nodes(body_id),check_collision,collision_tolerance,particle_states,
+                particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);}
         ARRAY<int> collision_count(check_collision.m);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(*bodies)(body_id);
-            for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
+            for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){
+                int node=collision_body_candidate_nodes(body_id)(j);
                 if(particle_states(node).enforce && (!is_protected(node) || protecting_bodies_of_nodes(node).Contains(body_id))
                     && collision_body.Implicit_Geometry_Lazy_Inside(particles.X(node),(thickness_table?thickness_table->Get_Default(node,0):0)-(T)1e-5)){
-                    collision_count(node)++;if(collision_count(node)>1){particle_states(node).enforce=false;particles.X(node)=X_save(node);particles.V(node)=V_old(node);}}}}}
+                    collision_count(node)++;
+                    if(collision_count(node)>1){
+                        particle_states(node).enforce=false;
+                        particles.X(node)=X_save(node);
+                        particles.V(node)=V_old(node);}}}}}
     else if(disable_multiple_levelset_collisions){
         ARRAY<TV> X_save(particles.X),V_old(particles.V);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id))
@@ -143,12 +170,17 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id))
             for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
                 if(particle_states(node).enforce && (*bodies)(body_id)->Implicit_Geometry_Lazy_Inside(particles.X(node),(thickness_table?thickness_table->Get_Default(node,0):0)-(T)1e-5)){
-                    collision_count(node)++;if(collision_count(node)>1){particle_states(node).enforce=false;particles.X(node)=X_save(node);particles.V(node)=V_old(node);}}}}
+                    collision_count(node)++;
+                    if(collision_count(node)>1){
+                        particle_states(node).enforce=false;
+                        particles.X(node)=X_save(node);
+                        particles.V(node)=V_old(node);}}}}
     else for(COLLISION_GEOMETRY_ID body_id=bodies->m-1;body_id>=COLLISION_GEOMETRY_ID(0);body_id--)
         interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(*(*bodies)(body_id),X_old,particles,soft_bindings,collision_body_candidate_nodes(body_id),
             check_collision,collision_tolerance,particle_states,particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);
 
-    binding_list.Clamp_Particles_To_Embedded_Positions();binding_list.Clamp_Particles_To_Embedded_Velocities();
+    binding_list.Clamp_Particles_To_Embedded_Positions();
+    binding_list.Clamp_Particles_To_Embedded_Velocities();
     return interactions;
 }
 //#####################################################################
@@ -158,11 +190,16 @@ template<class TV> int DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Adjust_Existing_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,
     const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies)
 {
-    int interactions=0;T depth=0,one_over_dt=1/dt;ARRAY_VIEW<TV> &X=particles.X,&V=particles.V;
-    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);
+    int interactions=0;
+    T depth=0,one_over_dt=1/dt;
+    ARRAY_VIEW<TV> &X=particles.X,&V=particles.V;
+    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
+        int p=deformable_body_collection.simulated_particles(i);
         COLLISION_PARTICLE_STATE<TV>& collision=particle_states(p);
-        if(!collision.enforce) continue;interactions++;
-        COLLISION_BODY_HELPER<TV>::Adjust_Point_For_Collision(collision_body_list(particle_to_collision_body_id(p)),X_old(p),X(p),V(p),particles.mass(p),depth,dt,one_over_dt,maximum_levelset_collision_projection_velocity,collision,collision.friction);}
+        if(!collision.enforce) continue;
+        interactions++;
+        COLLISION_BODY_HELPER<TV>::Adjust_Point_For_Collision(collision_body_list(particle_to_collision_body_id(p)),X_old(p),X(p),V(p),particles.mass(p),
+            depth,dt,one_over_dt,maximum_levelset_collision_projection_velocity,collision,collision.friction);}
     return interactions;
 }
 //#####################################################################
@@ -172,7 +209,9 @@ template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Set_Collision_Velocities(ARRAY_VIEW<TV> V) // for external forces and velocities
 {
     enforced_particles.Remove_All();
-    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){int p=deformable_body_collection.simulated_particles(i);COLLISION_PARTICLE_STATE<TV>& collision=particle_states(p);
+    for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
+        int p=deformable_body_collection.simulated_particles(i);
+        COLLISION_PARTICLE_STATE<TV>& collision=particle_states(p);
         if(collision.enforce){
             T VN=TV::Dot_Product(V(p),collision.normal);
             V(p)+=(collision.VN-VN)*collision.normal;
@@ -201,12 +240,9 @@ template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Reset_Object_Collisions() // The unusual signature is not great
 {
     collisions_on=false;
-    if(particle_states.m){
-        typedef INDIRECT_ARRAY<ARRAY<COLLISION_PARTICLE_STATE<TV> >,ARRAY<int>&> ARRAY_TYPE;
-        typedef FIELD_PROJECTOR<COLLISION_PARTICLE_STATE<TV>,bool,&COLLISION_PARTICLE_STATE<TV>::enforce> T_FIELD_PROJECTOR;
-        INDIRECT_ARRAY<ARRAY<COLLISION_PARTICLE_STATE<TV> >,ARRAY<int>&> subset=particle_states.Subset(deformable_body_collection.simulated_particles);
-        PROJECTED_ARRAY<ARRAY_TYPE,T_FIELD_PROJECTOR> projected_array=subset.template Project<bool,&COLLISION_PARTICLE_STATE<TV>::enforce>();
-        projected_array.Fill(false);}
+    if(particle_states.m)
+        particle_states.Subset(deformable_body_collection.simulated_particles).
+            template Project<bool,&COLLISION_PARTICLE_STATE<TV>::enforce>().Fill(false);
 }
 //#####################################################################
 // Function Add_Collision_Mesh
@@ -216,7 +252,8 @@ Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 {
     if(collide_with_interior) for(int t=0;t<mesh.elements.m;t++){
         check_collision.Subset(mesh.elements(t)).Fill(true);}
-    else{bool boundary_nodes_defined=mesh.boundary_nodes!=0;if(!boundary_nodes_defined) mesh.Initialize_Boundary_Nodes();
+    else{bool boundary_nodes_defined=mesh.boundary_nodes!=0;
+        if(!boundary_nodes_defined) mesh.Initialize_Boundary_Nodes();
         const ARRAY<int>* boundary_nodes=mesh.boundary_nodes;
         for(int p=0;p<boundary_nodes->m;p++) check_collision((*boundary_nodes)(p))=true;
         if(!boundary_nodes_defined){delete mesh.boundary_nodes;mesh.boundary_nodes=0;}}
@@ -227,7 +264,8 @@ Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Update_Simulated_Particles()
 {
-    particle_to_structure.Resize(particles.Size(),false,false);particle_to_structure.Fill(0);
+    particle_to_structure.Resize(particles.Size(),false,false);
+    particle_to_structure.Fill(0);
     for(int s=0;s<deformable_object_structures.m;s++) deformable_object_structures(s)->Mark_Nodes_Referenced(particle_to_structure,s);
 }
 //#####################################################################
