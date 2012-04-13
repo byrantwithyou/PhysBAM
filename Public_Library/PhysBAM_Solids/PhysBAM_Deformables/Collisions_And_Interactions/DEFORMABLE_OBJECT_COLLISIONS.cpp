@@ -250,12 +250,10 @@ Reset_Object_Collisions() // The unusual signature is not great
 template<class TV> template<class T_MESH> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior)
 {
-    if(collide_with_interior) for(int t=0;t<mesh.elements.m;t++){
-        check_collision.Subset(mesh.elements(t)).Fill(true);}
+    if(collide_with_interior) check_collision.Subset(mesh.elements.Flattened()).Fill(true);
     else{bool boundary_nodes_defined=mesh.boundary_nodes!=0;
         if(!boundary_nodes_defined) mesh.Initialize_Boundary_Nodes();
-        const ARRAY<int>* boundary_nodes=mesh.boundary_nodes;
-        for(int p=0;p<boundary_nodes->m;p++) check_collision((*boundary_nodes)(p))=true;
+        check_collision.Subset(*mesh.boundary_nodes).Fill(true);
         if(!boundary_nodes_defined){delete mesh.boundary_nodes;mesh.boundary_nodes=0;}}
 }
 //#####################################################################
