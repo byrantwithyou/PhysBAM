@@ -23,6 +23,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COLLISION_HELPER.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
@@ -184,22 +185,8 @@ template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
 Apply_Impulse(const int particle,RIGID_BODY<TV>& rigid_body,const TV& impulse)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-
-    // adjust the particle
-    const TV particle_delta_V=particles.one_over_effective_mass(particle)*impulse;
-    particles.V(particle)+=particle_delta_V;
-    // apply impulse to parents if particle is soft bound
-    const int soft_binding_index=soft_bindings.Soft_Binding(particle);
-    if(soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index)){
-        const int parent=soft_bindings.bindings(soft_binding_index).y;
-        BINDING<TV>* hard_binding=soft_bindings.binding_list.Binding(parent);
-        if(hard_binding) hard_binding->Apply_Velocity_Change_To_Parents_Based_On_Embedding(particle_delta_V,0);
-        else particles.V(parent)=particles.V(particle);} // TODO: add delta instead of setting?
-
-    // adjust the rigid body
-    rigid_body.Apply_Impulse_To_Body(particles.X(particle),-impulse);
+    deformable_body_collection.binding_list.Apply_Impulse(particle,impulse);
+    rigid_body.Apply_Impulse_To_Body(deformable_body_collection.particles.X(particle),-impulse);
 }
 //#####################################################################
 // Function Apply_Displacement_To_Particle
@@ -242,41 +229,8 @@ Apply_Rigid_Deformable_Collision_Impulse(RIGID_BODY<TV>& rigid_body,const int pa
     const T coefficient_of_friction,const bool clamp_friction_magnitude,TV& impulse,bool allow_pull,bool apply_impulse)
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-
-    // TODO: can this be made more efficient for the case of a static/kinematic rigid body?
-
-    T relative_normal_velocity=TV::Dot_Product(relative_velocity,normal);
-    if(relative_normal_velocity>0 && !allow_pull) relative_normal_velocity=0;
-
-    if(!coefficient_of_friction || (allow_pull && relative_normal_velocity>=0)){ // frictionless case
-        T nT_impulse1_n=particles.one_over_mass(particle),nT_impulse2_n=0;
-        if(!rigid_body.Has_Infinite_Inertia()){
-            T_SPIN r2xn=TV::Cross_Product(location-rigid_body.Frame().t,normal);
-            nT_impulse2_n=1/rigid_body.Mass()+Dot_Product(r2xn,rigid_body.World_Space_Inertia_Tensor_Inverse()*r2xn);}
-        impulse=-(1+coefficient_of_restitution)*relative_normal_velocity/(nT_impulse1_n+nT_impulse2_n)*normal;}
-    else{ // friction case
-        T_SYMMETRIC_MATRIX impulse_factor=rigid_body.Impulse_Factor(location)+particles.one_over_mass(particle),impulse_factor_inverse=impulse_factor.Inverse();
-        // see if friction stops sliding
-        impulse=-impulse_factor_inverse*(coefficient_of_restitution*relative_normal_velocity*normal+relative_velocity); // sticking impulse
-        T normal_component=TV::Dot_Product(impulse,normal);
-        if((impulse-normal_component*normal).Magnitude()>coefficient_of_friction*normal_component){ // sticking impulse was not admissible
-            // friction does not stop sliding
-            TV relative_tangential_velocity=relative_velocity.Projected_Orthogonal_To_Unit_Direction(normal);
-            TV tangential_direction=relative_tangential_velocity;T relative_tangential_velocity_magnitude=tangential_direction.Normalize();
-            tangential_direction=tangential_direction.Projected_Orthogonal_To_Unit_Direction(normal); // used to combat error when the "robust" part of normalize is used
-            TV impulse_factor_times_direction=impulse_factor*(normal-coefficient_of_friction*tangential_direction);
-            assert(TV::Dot_Product(impulse_factor_times_direction,normal));
-            TV delta=-(1+coefficient_of_restitution)*relative_normal_velocity/TV::Dot_Product(impulse_factor_times_direction,normal)*impulse_factor_times_direction;
-            // clamp friction magnitude: should be (true) in the elastic collision case, (false) in the inelastic collision case
-            if(clamp_friction_magnitude){ // should only clamp friction magnitude in the elastic case!
-                TV new_relative_velocity=relative_velocity+delta;
-                TV new_normal_velocity=new_relative_velocity.Projected_On_Unit_Direction(normal);
-                TV new_tangential_velocity=new_relative_velocity-new_normal_velocity;T new_tangential_velocity_magnitude=new_tangential_velocity.Magnitude();
-                if(new_tangential_velocity_magnitude>relative_tangential_velocity_magnitude)
-                    delta=new_normal_velocity+(relative_tangential_velocity_magnitude/new_tangential_velocity_magnitude)*new_tangential_velocity-relative_velocity;}
-            impulse=impulse_factor_inverse*delta;}}
-
+    SYMMETRIC_MATRIX<T,TV::m> impulse_factor=rigid_body.Impulse_Factor(location)+deformable_body_collection.binding_list.Impulse_Factor(particle);
+    impulse=Compute_Collision_Impulse(normal,impulse_factor,relative_velocity,coefficient_of_restitution,coefficient_of_friction,0);
     if(apply_impulse) Apply_Impulse(particle,rigid_body,impulse);
 }
 //#####################################################################
