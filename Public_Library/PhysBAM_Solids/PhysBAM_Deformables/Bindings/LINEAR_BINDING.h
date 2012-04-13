@@ -108,6 +108,9 @@ public:
     ARRAY<T> Weights() const PHYSBAM_OVERRIDE
     {ARRAY<T> weights_array(d);for(int i=0;i<d;i++) weights_array(i)=weights[i];return weights_array;}
 
+    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
+    {return SYMMETRIC_MATRIX<T,TV::m>()+LINEAR_BINDING::One_Over_Effective_Mass();}
+
 private:
     void Read_Helper(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE
     {BINDING<TV>::Read_Helper(input);Read_Binary(input,parents,weights);}

@@ -67,6 +67,9 @@ public:
     {T result=0;for(int i=0;i<parents.m;i++) result+=sqr(weights(i))*particles.one_over_mass(parents(i));
     return result;}
 
+    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
+    {return SYMMETRIC_MATRIX<T,TV::m>()+LINEAR_BINDING_DYNAMIC::One_Over_Effective_Mass();}
+
     void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
     {for(int i=0;i<parents.m;i++) particles.V(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}
 

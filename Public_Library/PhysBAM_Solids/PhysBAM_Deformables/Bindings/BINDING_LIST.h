@@ -8,6 +8,9 @@
 #define __BINDING_LIST__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLES_PARTICLES_FORWARD.h>
@@ -53,6 +56,9 @@ public:
     TV V(const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Velocity();return particles.V(particle_index);}
 
+    TV X(const int particle_index) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position();return particles.X(particle_index);}
+
     void Apply_Impulse(const int particle_index,const TV& impulse)
     {if(BINDING<TV>* binding=Binding(particle_index)) binding->Apply_Impulse(impulse);else particles.V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
 
@@ -61,6 +67,10 @@ public:
 
     T One_Over_Effective_Mass(const int particle_index,const TV& direction) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->One_Over_Effective_Mass(direction);return particles.one_over_mass(particle_index);}
+
+    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor(const int particle_index) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Impulse_Factor();
+    return SYMMETRIC_MATRIX<T,TV::m>()+particles.one_over_mass(particle_index);}
 
     ARRAY<int> Parents(const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Parents();return ARRAY<int>();}

@@ -112,6 +112,9 @@ public:
     void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const PHYSBAM_OVERRIDE
     {/*if(particles.mass(particle_index)) PHYSBAM_NOT_IMPLEMENTED();*/}
 
+    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
+    {return Rigid_Body().Impulse_Factor(Rigid_Body().World_Space_Vector(object_space_position)+Rigid_Body().Frame().t);}
+
     ARRAY<int> Parents() const PHYSBAM_OVERRIDE
     {PHYSBAM_NOT_IMPLEMENTED();return ARRAY<int>();} // TODO: consider failing instead
 

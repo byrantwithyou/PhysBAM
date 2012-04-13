@@ -43,6 +43,8 @@ public:
     virtual T One_Over_Effective_Mass(const TV& direction) const // by default return the direction-independent effective mass
     {return One_Over_Effective_Mass();}
 
+    virtual SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const=0;
+
     void Clamp_To_Embedded_Position(ARRAY_VIEW<TV> X)
     {X(particle_index)=Embedded_Position(X);}
 
