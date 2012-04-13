@@ -28,6 +28,7 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COLLISION_HELPER.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGIDS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 namespace PhysBAM{
@@ -179,41 +180,11 @@ template<class TV> TWIST<TV> RIGID_BODY<TV>::
 Compute_Collision_Impulse(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const ROTATION<TV>& saved_rotation_1,const ROTATION<TV>& saved_rotation_2,const TV& location,const TV& normal,
     const TV& relative_velocity,const T coefficient_of_restitution,const T coefficient_of_friction,const bool clamp_friction_magnitude,const bool rolling_friction,const bool clamp_energy)
 {
-    TWIST<TV> impulse;
     if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia()) return TWIST<TV>();
-    if(!coefficient_of_friction){ // frictionless case
-        T nT_impulse1_n=0;
-        if(!body1.Has_Infinite_Inertia()){
-            T_SPIN r1xn=TV::Cross_Product(location-body1.Frame().t,normal);
-            nT_impulse1_n=1/body1.Mass()+Dot_Product(r1xn,body1.World_Space_Inertia_Tensor_Inverse()*r1xn);}
-        T nT_impulse2_n=0;
-        if(!body2.Has_Infinite_Inertia()){
-            T_SPIN r2xn=TV::Cross_Product(location-body2.Frame().t,normal);
-            nT_impulse2_n=1/body2.Mass()+Dot_Product(r2xn,body2.World_Space_Inertia_Tensor_Inverse()*r2xn);}
-        impulse.linear=-(1+coefficient_of_restitution)*TV::Dot_Product(relative_velocity,normal)*normal/(nT_impulse1_n+nT_impulse2_n);}
-    else{ // friction case
-        T relative_normal_velocity=min((T)0,TV::Dot_Product(relative_velocity,normal));
-        T_SYMMETRIC_MATRIX impulse_factor=Impulse_Factor(body1,body2,location),impulse_factor_inverse=impulse_factor.Inverse();
-        // see if friction stops sliding
-        TV sticking_impulse=impulse_factor_inverse*(-coefficient_of_restitution*relative_normal_velocity*normal-relative_velocity);
-        T normal_component=TV::Dot_Product(sticking_impulse,normal);
-        if((sticking_impulse-normal_component*normal).Magnitude()<=coefficient_of_friction*normal_component){
-            impulse.linear=sticking_impulse;
-            if(rolling_friction) impulse+=Apply_Rolling_Friction(body1,body2,location,normal,normal_component);}
-        // friction does not stop sliding
-        else{
-            TV relative_tangential_velocity=relative_velocity.Projected_Orthogonal_To_Unit_Direction(normal);
-            TV tangential_direction=relative_tangential_velocity;T relative_tangential_velocity_magnitude=tangential_direction.Normalize();
-            TV impulse_factor_times_direction=impulse_factor*(normal-coefficient_of_friction*tangential_direction);
-            PHYSBAM_ASSERT(TV::Dot_Product(impulse_factor_times_direction,normal));
-            TV delta=-(1+coefficient_of_restitution)*relative_normal_velocity/TV::Dot_Product(impulse_factor_times_direction,normal)*impulse_factor_times_direction;
-            if(clamp_friction_magnitude && coefficient_of_restitution){ // should only clamp friction magnitude in the elastic case!
-                TV new_relative_velocity=relative_velocity+delta;
-                TV new_normal_velocity=new_relative_velocity.Projected_On_Unit_Direction(normal);
-                TV new_tangential_velocity=new_relative_velocity-new_normal_velocity;T new_tangential_velocity_magnitude=new_tangential_velocity.Magnitude();
-                if(new_tangential_velocity_magnitude > relative_tangential_velocity_magnitude)
-                    delta=new_normal_velocity+(relative_tangential_velocity_magnitude/new_tangential_velocity_magnitude)*new_tangential_velocity-relative_velocity;}
-            impulse.linear=impulse_factor_inverse*delta;}}
+    TWIST<TV> impulse;
+    bool sticking_impulse;
+    impulse.linear=PhysBAM::Compute_Collision_Impulse(normal,Impulse_Factor(body1,body2,location),relative_velocity,coefficient_of_restitution,coefficient_of_friction,&sticking_impulse);
+    if(rolling_friction && sticking_impulse) impulse+=Apply_Rolling_Friction(body1,body2,location,normal,impulse.linear.Dot(normal));
     if(clamp_energy) Compute_Clamped_Impulse(body1,body2,location,impulse,saved_rotation_1,saved_rotation_2);
     return impulse;
 }
