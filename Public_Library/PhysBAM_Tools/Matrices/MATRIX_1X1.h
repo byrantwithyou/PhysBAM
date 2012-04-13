@@ -275,6 +275,52 @@ public:
 };
 
 template<class T>
+class DIAGONAL_MATRIX<T,1>:public MATRIX<T,1>
+{
+public:
+    DIAGONAL_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
+        :MATRIX<T,1>(mm,nn)
+    {
+    }
+
+    template<class T2>
+    DIAGONAL_MATRIX(const MATRIX<T2,1>& matrix_input)
+        :MATRIX<T,1>(matrix_input)
+    {}
+
+    DIAGONAL_MATRIX(const T y11)
+        :MATRIX<T,1>(y11)
+    {}
+
+    explicit DIAGONAL_MATRIX(const VECTOR<T,1>& v)
+        :MATRIX<T,1>(v.x)
+    {}
+};
+
+template<class T>
+class SYMMETRIC_MATRIX<T,1>:public MATRIX<T,1>
+{
+public:
+    SYMMETRIC_MATRIX(INITIAL_SIZE mm=INITIAL_SIZE(1),INITIAL_SIZE nn=INITIAL_SIZE(1))
+        :MATRIX<T,1>(mm,nn)
+    {
+    }
+
+    template<class T2>
+    SYMMETRIC_MATRIX(const MATRIX<T2,1>& matrix_input)
+        :MATRIX<T,1>(matrix_input)
+    {}
+
+    SYMMETRIC_MATRIX(const T y11)
+        :MATRIX<T,1>(y11)
+    {}
+
+    explicit SYMMETRIC_MATRIX(const VECTOR<T,1>& v)
+        :MATRIX<T,1>(v.x)
+    {}
+};
+
+template<class T>
 inline MATRIX<T,1> operator*(const T a,const MATRIX<T,1>& A)
 {return A*a;}
 
