@@ -23,7 +23,6 @@ class IMPLICIT_OBJECT_COMBINED:public IMPLICIT_OBJECT<TV>
     typedef typename TV::SCALAR T;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     enum WORKAROUND {d=TV::m};
 public:
     typedef IMPLICIT_OBJECT<TV> BASE;
@@ -111,7 +110,7 @@ public:
     TV Velocity(const TV& location) const PHYSBAM_OVERRIDE
     {return (1-alpha)*implicit_object1->Velocity(location)+alpha*implicit_object2->Velocity(location);}
 
-    T_SYMMETRIC_MATRIX Hessian(const TV& X) const PHYSBAM_OVERRIDE
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE
     {return (1-alpha)*implicit_object1->Hessian(X)+alpha*implicit_object2->Hessian(X);}
 
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE

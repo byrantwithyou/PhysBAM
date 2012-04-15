@@ -28,7 +28,6 @@ class FRACTURE_EVOLUTION_3D:public FRACTURE_EVOLUTION<VECTOR<T_input,3> >
     typedef typename EMBEDDING_POLICY<TV,3>::EMBEDDED_OBJECT T_EMBEDDED_OBJECT;
     typedef typename EMBEDDING_POLICY<TV,3>::EMBEDDING T_EMBEDDING;
     typedef typename EMBEDDING_POLICY<TV,3>::EMBEDDED_MATERIAL_SURFACE T_EMBEDDED_MATERIAL_SURFACE;
-    typedef typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX T_DIAGONAL_MATRIX;
 
 public:
     using FRACTURE_EVOLUTION<TV>::push_out;using FRACTURE_EVOLUTION<TV>::perturb_amount_for_collision_freeness;using FRACTURE_EVOLUTION<TV>::fractured_after_rebuild_topology;

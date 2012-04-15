@@ -29,7 +29,7 @@ template<class TV>
 class RIGID_DEFORMABLE_COLLISIONS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
-    typedef VECTOR<int,TV::dimension> ELEMENT;typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
+    typedef VECTOR<int,TV::dimension> ELEMENT;typedef typename MESH_POLICY<TV::dimension>::MESH T_MESH;
     typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 public:
     struct PRECOMPUTE_CONTACT_PROJECTION

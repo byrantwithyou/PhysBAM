@@ -22,7 +22,6 @@ class LEVELSET_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<TV>
     typedef typename TV::SCALAR T;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
     typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<T,d-1> T_PRINCIPAL_CURVATURES;
 public:
@@ -75,7 +74,7 @@ public:
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
     T Min_Phi() const PHYSBAM_OVERRIDE;
     TV Velocity(const TV& location) const PHYSBAM_OVERRIDE;
-    T_SYMMETRIC_MATRIX Hessian(const TV& X) const PHYSBAM_OVERRIDE;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE;
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE;
     void Rescale(const T scaling_factor) PHYSBAM_OVERRIDE;
     void Translate(const TV& translation) PHYSBAM_OVERRIDE;

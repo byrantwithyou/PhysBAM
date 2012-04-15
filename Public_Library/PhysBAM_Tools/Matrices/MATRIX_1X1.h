@@ -337,12 +337,24 @@ inline MATRIX<T,1> clamp(const MATRIX<T,1>& x,const MATRIX<T,1>& xmin,const MATR
 {return MATRIX<T,1>(clamp(x.x11,xmin.x11,xmax.x11));}
 
 template<class T>
+inline SYMMETRIC_MATRIX<T,1> clamp(const SYMMETRIC_MATRIX<T,1>& x,const SYMMETRIC_MATRIX<T,1>& xmin,const SYMMETRIC_MATRIX<T,1>& xmax)
+{return SYMMETRIC_MATRIX<T,1>(clamp(x.x11,xmin.x11,xmax.x11));}
+
+template<class T>
 inline MATRIX<T,1> clamp_min(const MATRIX<T,1>& x,const MATRIX<T,1>& xmin)
 {return MATRIX<T,1>(clamp_min(x.x11,xmin.x11));}
 
 template<class T>
 inline MATRIX<T,1> clamp_max(const MATRIX<T,1>& x,const MATRIX<T,1>& xmax)
 {return MATRIX<T,1>(clamp_max(x.x11,xmax.x11));}
+
+template<class T>
+inline SYMMETRIC_MATRIX<T,1> clamp_min(const SYMMETRIC_MATRIX<T,1>& x,const SYMMETRIC_MATRIX<T,1>& xmin)
+{return SYMMETRIC_MATRIX<T,1>(clamp_min(x.x11,xmin.x11));}
+
+template<class T>
+inline SYMMETRIC_MATRIX<T,1> clamp_max(const SYMMETRIC_MATRIX<T,1>& x,const SYMMETRIC_MATRIX<T,1>& xmax)
+{return SYMMETRIC_MATRIX<T,1>(clamp_max(x.x11,xmax.x11));}
 
 template<class T>
 inline MATRIX<T,1> log(const MATRIX<T,1>& A)

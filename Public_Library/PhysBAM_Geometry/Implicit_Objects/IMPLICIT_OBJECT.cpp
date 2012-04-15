@@ -187,7 +187,7 @@ template<class TV> bool IMPLICIT_OBJECT<TV>::Lazy_Outside_Extended_Levelset(cons
 template<class TV> bool IMPLICIT_OBJECT<TV>::Lazy_Outside_Extended_Levelset_And_Value(const TV& unclamped_X,T& phi_value,const T contour_value) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT<TV>::Min_Phi() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> TV IMPLICIT_OBJECT<TV>::Velocity(const TV& location) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> typename IMPLICIT_OBJECT<TV>::T_SYMMETRIC_MATRIX IMPLICIT_OBJECT<TV>::Hessian(const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> IMPLICIT_OBJECT<TV>::Hessian(const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename IMPLICIT_OBJECT<TV>::T_CURVATURES IMPLICIT_OBJECT<TV>::Principal_Curvatures(const TV& X) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT<TV>::Integration_Step(const T phi) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT<TV>::Minimum_Cell_Size() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();} 

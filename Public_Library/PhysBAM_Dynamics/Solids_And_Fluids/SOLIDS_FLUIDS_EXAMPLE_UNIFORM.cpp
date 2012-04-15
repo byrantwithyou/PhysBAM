@@ -143,7 +143,7 @@ Initialize_MPI()
         fluids_parameters.temperature_container.Set_Custom_Boundary(*new BOUNDARY_MPI<T_GRID>(fluids_parameters.mpi_grid,*fluids_parameters.temperature_container.boundary));}
     for(int i=0;i<fluids_parameters.number_of_regions;i++) fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).mpi_grid=fluids_parameters.mpi_grid;
     if(fluids_parameters.use_strain||fluids_parameters.use_multiphase_strain.Count_Matches(0)<fluids_parameters.number_of_regions)
-        fluids_parameters.strain_boundary=new BOUNDARY_MPI<T_GRID,SYMMETRIC_MATRIX>(fluids_parameters.mpi_grid,*fluids_parameters.strain_boundary);
+        fluids_parameters.strain_boundary=new BOUNDARY_MPI<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >(fluids_parameters.mpi_grid,*fluids_parameters.strain_boundary);
     if(fluids_parameters.incompressible){
         fluids_parameters.incompressible->mpi_grid=fluids_parameters.mpi_grid;
         fluids_parameters.incompressible->projection.elliptic_solver->mpi_grid=fluids_parameters.mpi_grid;}

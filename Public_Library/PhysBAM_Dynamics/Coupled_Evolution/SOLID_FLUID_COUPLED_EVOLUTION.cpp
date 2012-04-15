@@ -833,7 +833,7 @@ Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index
 
     J_deformable.Resize(colors);
 
-    nodal_fluid_mass.Resize(solid_body_collection.deformable_body_collection.dynamic_particles.m);nodal_fluid_mass.Fill(T_DIAGONAL_MATRIX());
+    nodal_fluid_mass.Resize(solid_body_collection.deformable_body_collection.dynamic_particles.m);nodal_fluid_mass.Fill(DIAGONAL_MATRIX<T,TV::m>());
     if(!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
         POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
         const GRID<TV>& grid=Get_Grid();
@@ -910,7 +910,7 @@ Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,cons
     if(fluids_parameters.fluid_affects_solid){
         rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles)=IDENTITY_ARRAY<int>(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);
         for(int i=0;i<colors;i++) row_counts(i).Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m*rows_per_rigid_body); // TODO: fix
-        rigid_body_fluid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_fluid_mass.Fill(T_DIAGONAL_MATRIX());
+        rigid_body_fluid_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_fluid_mass.Fill(DIAGONAL_MATRIX<T,TV::m>());
         rigid_body_updated_center_of_mass.Resize(solid_body_collection.rigid_body_collection.dynamic_rigid_body_particles.m);rigid_body_updated_center_of_mass.Fill(TV());
         J_rigid.Resize(colors);}
 

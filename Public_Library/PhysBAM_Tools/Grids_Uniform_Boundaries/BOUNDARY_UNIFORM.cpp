@@ -148,7 +148,7 @@ template class BOUNDARY_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,3> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,5> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,3> >,VECTOR<float,6> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,3> >,bool>;
-template class BOUNDARY_UNIFORM<GRID<VECTOR<float,1> >,MATRIX<float,1> >;
+template class BOUNDARY_UNIFORM<GRID<VECTOR<float,1> >,SYMMETRIC_MATRIX<float,1> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,2> >,SYMMETRIC_MATRIX<float,2> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<float,3> >,SYMMETRIC_MATRIX<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
@@ -167,7 +167,7 @@ template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,5> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,VECTOR<double,6> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,bool>;
-template class BOUNDARY_UNIFORM<GRID<VECTOR<double,1> >,MATRIX<double,1> >;
+template class BOUNDARY_UNIFORM<GRID<VECTOR<double,1> >,SYMMETRIC_MATRIX<double,1> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY_UNIFORM<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
 #endif

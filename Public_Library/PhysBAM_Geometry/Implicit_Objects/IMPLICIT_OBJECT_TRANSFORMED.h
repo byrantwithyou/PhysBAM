@@ -21,7 +21,6 @@ template<class TV,class TRANSFORM> class IMPLICIT_OBJECT_TRANSFORMED_HELPER
 {
     typedef typename TV::SCALAR T;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
 public:
 
     IMPLICIT_OBJECT_TRANSFORMED_HELPER(const TRANSFORM* transform_input)
@@ -69,8 +68,8 @@ public:
     {if(world_space_box==RANGE<TV>::Full_Box() || world_space_box==RANGE<TV>::Empty_Box()) return world_space_box;
     return T_ORIENTED_BOX(world_space_box,transform->Frame().Inverse()).Axis_Aligned_Bounding_Box();}
 
-    T_SYMMETRIC_MATRIX World_Space_Length_Hessian(const T_SYMMETRIC_MATRIX& object_space_hessian) const
-    {return T_SYMMETRIC_MATRIX::Conjugate(transform->Frame().r.Rotation_Matrix(),object_space_hessian);}
+    SYMMETRIC_MATRIX<T,TV::m> World_Space_Length_Hessian(const SYMMETRIC_MATRIX<T,TV::m>& object_space_hessian) const
+    {return SYMMETRIC_MATRIX<T,TV::m>::Conjugate(transform->Frame().r.Rotation_Matrix(),object_space_hessian);}
 
     static std::string Name_Helper()
     {return STRING_UTILITIES::string_sprintf("IMPLICIT_OBJECT_TRANSFORMED<VECTOR<T,%d>,%s>",TV::dimension,TRANSFORM::Static_Name().c_str());}
@@ -97,7 +96,6 @@ public:
 template<class TV> class IMPLICIT_OBJECT_TRANSFORMED_HELPER<TV,typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
 public:
 
     IMPLICIT_OBJECT_TRANSFORMED_HELPER(const TV& center_input,T scale_input)
@@ -151,7 +149,7 @@ public:
     {if(world_space_box==RANGE<TV>::Full_Box() || world_space_box==RANGE<TV>::Empty_Box()) return world_space_box;
     return RANGE<TV>(Object_Space_Point(world_space_box.min_corner),Object_Space_Point(world_space_box.max_corner));}
 
-    T_SYMMETRIC_MATRIX World_Space_Length_Hessian(const T_SYMMETRIC_MATRIX& object_space_hessian) const
+    SYMMETRIC_MATRIX<T,TV::m> World_Space_Length_Hessian(const SYMMETRIC_MATRIX<T,TV::m>& object_space_hessian) const
     {return scale*object_space_hessian;}
 
     static std::string Name_Helper()
@@ -168,7 +166,6 @@ template<class TV,class TRANSFORM>
 class IMPLICIT_OBJECT_TRANSFORMED:public IMPLICIT_OBJECT<TV>,public IMPLICIT_OBJECT_TRANSFORMED_HELPER<TV,TRANSFORM>
 {
     typedef typename TV::SCALAR T;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     enum WORKAROUND {d=TV::m};
 public:
     typedef int HAS_TYPED_READ_WRITE;
@@ -249,7 +246,7 @@ public:
     bool Lazy_Outside_Extended_Levelset_And_Value(const TV& location,T& phi_value,const T contour_value=0) const PHYSBAM_OVERRIDE;
     T Min_Phi() const PHYSBAM_OVERRIDE;
     TV Velocity(const TV& location) const PHYSBAM_OVERRIDE;
-    T_SYMMETRIC_MATRIX Hessian(const TV& X) const PHYSBAM_OVERRIDE;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE;
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE
     {
         VECTOR<T,d-1> curvatures=object_space_implicit_object->Principal_Curvatures(Object_Space_Point(X));

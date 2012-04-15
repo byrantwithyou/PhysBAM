@@ -46,7 +46,7 @@ public:
 template<class TV>
 class BACKWARD_EULER_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
+    typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
 
 public:
     typedef GENERALIZED_VELOCITY<TV> VECTOR_T;

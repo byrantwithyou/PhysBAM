@@ -23,7 +23,6 @@ class IMPLICIT_OBJECT_COMBINED_EULERIAN:public IMPLICIT_OBJECT<TV>
     typedef typename TV::SCALAR T;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     enum WORKAROUND {d=TV::m};
 public:
     typedef IMPLICIT_OBJECT<TV> BASE;
@@ -131,7 +130,7 @@ public:
     T Min_Phi() const PHYSBAM_OVERRIDE
     {PHYSBAM_NOT_IMPLEMENTED();}
 
-    T_SYMMETRIC_MATRIX Hessian(const TV& X) const PHYSBAM_OVERRIDE
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const PHYSBAM_OVERRIDE
     {PHYSBAM_NOT_IMPLEMENTED();}
 
     VECTOR<T,d-1> Principal_Curvatures(const TV& X) const PHYSBAM_OVERRIDE

@@ -981,13 +981,13 @@ template<class T_GRID> void MPI_GRID<T_GRID>::Sync_Common_Cell_Weights_To(ARRAY<
     template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS&,const int) const; \
     template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&,const int) const; \
     template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<T_REAL_GRID::VECTOR_T>::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<MATRIX<T,1> >::TYPE&,const int) const; \
+    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int) const; \
     template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int) const; \
     template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int) const; \
     template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS&) const; \
     template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
     template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<T_REAL_GRID::VECTOR_T>::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<MATRIX<T,1> >::TYPE&) const; \
+    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&) const; \
     template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&) const; \
     template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE& ) const; \
     template void MPI_GRID<T_GRID >::Union_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
@@ -997,8 +997,8 @@ template<class T_GRID> void MPI_GRID<T_GRID>::Sync_Common_Cell_Weights_To(ARRAY<
     INSTANTIATION_HELPER(T,P(T_GRID),P(T_GRID));                        \
     INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),1);INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),2); \
     INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),3);INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),4);INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),5); \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<MATRIX<T,1> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<MATRIX<T,1> >::TYPE&,const int,const bool) const; \
+    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int,const bool) const; \
+    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int,const bool) const; \
     template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,d+2> >::TYPE&) const; \
     template void MPI_GRID<T_GRID >::Copy_Common_Face_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&) const; \
     template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,d+2> >::TYPE&,const int) const; \

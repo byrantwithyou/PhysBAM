@@ -24,7 +24,6 @@ class COLLISION_PENALTY_FORCES:public DEFORMABLES_FORCES<TV_input>
 {
     typedef TV_input TV;typedef typename TV::SCALAR T;
     typedef DEFORMABLES_FORCES<TV_input> BASE;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
 public:
     using BASE::particles;
 
@@ -32,7 +31,7 @@ public:
     ARRAY<bool,COLLISION_GEOMETRY_ID> skip_collision_body;
     ARRAY<int> check_collision; // TODO: If Append is being called on this, why isn't this a ARRAY?
     ARRAY<TV> collision_force;
-    ARRAY<T_SYMMETRIC_MATRIX> collision_force_derivative;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > collision_force_derivative;
     T stiffness;
     T separation_parameter;
     T self_collision_reciprocity_factor;
@@ -97,7 +96,7 @@ public:
 
     void Update_Forces_And_Derivatives() // Currently works only with a single fragment
     {for(int p=0;p<check_collision.m;p++){
-        int index=check_collision(p);collision_force(p)=TV();collision_force_derivative(p)=T_SYMMETRIC_MATRIX();
+        int index=check_collision(p);collision_force(p)=TV();collision_force_derivative(p)=SYMMETRIC_MATRIX<T,TV::m>();
         for(COLLISION_GEOMETRY_ID r(0);r<collision_body_list->bodies.m;r++) if(collision_body_list->Is_Active(r)){
             COLLISION_GEOMETRY<TV>& collision_body=*collision_body_list->bodies(r);
             if(!skip_collision_body(r) && (perform_self_collision || collision_body.collision_geometry_id!=collision_body_list_id)){
@@ -106,10 +105,10 @@ public:
                 T scaled_stiffness=stiffness;if(collision_body_list_id==collision_body.collision_geometry_id) scaled_stiffness*=self_collision_reciprocity_factor;
                 if(phi_value<=0){
                     collision_force(p)+=stiffness*(-phi_value+separation_parameter)*normal;
-                    collision_force_derivative(p)-=scaled_stiffness*T_SYMMETRIC_MATRIX::Outer_Product(normal);}
+                    collision_force_derivative(p)-=scaled_stiffness*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(normal);}
                 else if(phi_value<collision_body.collision_thickness){
                     collision_force(p)+=stiffness*separation_parameter*exp(-phi_value/separation_parameter)*normal;
-                    collision_force_derivative(p)-=scaled_stiffness*exp(-phi_value/separation_parameter)*T_SYMMETRIC_MATRIX::Outer_Product(normal);}}}}}
+                    collision_force_derivative(p)-=scaled_stiffness*exp(-phi_value/separation_parameter)*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(normal);}}}}}
 
     // Currently works only with a single fragment
     void Add_Velocity_Independent_Forces(ARRAY_VIEW<TV> F,const T time) const PHYSBAM_OVERRIDE

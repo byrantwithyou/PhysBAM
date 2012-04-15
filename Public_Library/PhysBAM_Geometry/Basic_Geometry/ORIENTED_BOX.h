@@ -21,7 +21,6 @@ class ORIENTED_BOX
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND{d=TV::dimension};
-    typedef typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX T_DIAGONAL_MATRIX;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef TV VECTOR_T;
@@ -48,25 +47,25 @@ public:
     ORIENTED_BOX(const RANGE<TV>& box,const ROTATION<TV>& rotation)
     {
         corner=rotation.Rotate(box.min_corner);
-        edges=rotation.Rotation_Matrix()*T_DIAGONAL_MATRIX(box.Edge_Lengths());
+        edges=rotation.Rotation_Matrix()*DIAGONAL_MATRIX<T,TV::m>(box.Edge_Lengths());
     }
 
     ORIENTED_BOX(const RANGE<TV>& box,const ROTATION<TV>& rotation,const TV& corner_input)
         :corner(corner_input)
     {
-        edges=rotation.Rotation_Matrix()*T_DIAGONAL_MATRIX(box.Edge_Lengths());
+        edges=rotation.Rotation_Matrix()*DIAGONAL_MATRIX<T,TV::m>(box.Edge_Lengths());
     }
 
     ORIENTED_BOX(const RANGE<TV>& box,const FRAME<TV>& frame)
     {
         corner=frame*box.min_corner;
-        edges=frame.r.Rotation_Matrix()*T_DIAGONAL_MATRIX(box.Edge_Lengths());
+        edges=frame.r.Rotation_Matrix()*DIAGONAL_MATRIX<T,TV::m>(box.Edge_Lengths());
     }
 
     ORIENTED_BOX(const RANGE<TV>& box,const MATRIX<T,d+1>& transform)
     {
         corner=transform.Homogeneous_Times(box.Minimum_Corner());
-        edges=transform.Extract_Rotation()*T_DIAGONAL_MATRIX(box.Edge_Lengths());
+        edges=transform.Extract_Rotation()*DIAGONAL_MATRIX<T,TV::m>(box.Edge_Lengths());
     }
 
     TV Center() const
@@ -78,7 +77,7 @@ public:
 
     void Scale_About_Center(const TV factor)
     {TV center=Center(); // compute before modifying edges
-    edges*=T_DIAGONAL_MATRIX(factor);corner=center-(T).5*edges.Column_Sum();}
+    edges*=DIAGONAL_MATRIX<T,TV::m>(factor);corner=center-(T).5*edges.Column_Sum();}
 
     ORIENTED_BOX Scaled_About_Center(const T factor) const
     {ORIENTED_BOX box(*this);box.Scale_About_Center(factor);return box;}

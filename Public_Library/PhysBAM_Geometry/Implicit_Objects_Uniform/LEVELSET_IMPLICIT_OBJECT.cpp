@@ -237,7 +237,7 @@ Velocity(const TV& location) const
 //#####################################################################
 // Function Hessian
 //#####################################################################
-template<class TV> typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX LEVELSET_IMPLICIT_OBJECT<TV>::
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET_IMPLICIT_OBJECT<TV>::
 Hessian(const TV& X) const
 {
     return levelset.Hessian(X);

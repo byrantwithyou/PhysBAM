@@ -160,7 +160,7 @@ Velocity(const TV& location) const
 {
     return World_Space_Vector(object_space_implicit_object->Velocity(Object_Space_Point(location)));
 }
-template<class TV,class TRANSFORM> typename IMPLICIT_OBJECT_TRANSFORMED<TV,TRANSFORM>::T_SYMMETRIC_MATRIX IMPLICIT_OBJECT_TRANSFORMED<TV,TRANSFORM>::
+template<class TV,class TRANSFORM> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> IMPLICIT_OBJECT_TRANSFORMED<TV,TRANSFORM>::
 Hessian(const TV& X) const
 {
     return World_Space_Length_Hessian(object_space_implicit_object->Hessian(Object_Space_Point(X)));

@@ -18,7 +18,6 @@ class ROTATION_SPRINGS:public RIGIDS_FORCES<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename MATRIX_POLICY<T_SPIN>::DIAGONAL_MATRIX T_SPIN_MATRIX;
     enum WORKAROUND {d=TV::m};
     STATIC_ASSERT(d==3); // 2D not implemented yet
 public:
@@ -31,7 +30,7 @@ public:
     SEGMENT_MESH& mesh;
     ARRAY<VECTOR<FRAME<TV>,2> > object_to_joint_frames;
     ARRAY<T_SPIN> angle_limits;
-    ARRAY<T_SPIN_MATRIX> stiffness; // torque / strain (past angle limits)
+    ARRAY<DIAGONAL_MATRIX<T,T_SPIN::m> > stiffness; // torque / strain (past angle limits)
     ARRAY<T> damping; // torque / angular velocity
 private:
     struct STATE

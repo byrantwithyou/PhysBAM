@@ -750,7 +750,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         mrr[0]+=parent_rigid_body.World_Space_Inertia_Tensor();
 
         // determine how static bodies affect the system
-        typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX eigenvalues;MATRIX<T,TV::dimension> eigenvectors;
+        DIAGONAL_MATRIX<T,TV::m> eigenvalues;MATRIX<T,TV::dimension> eigenvectors;
         int equation_type=0; // indicate which type of system we will be solving below
         if(number_of_static_bodies==0) equation_type=0; // 0 dof specified by static bodies
         else if(number_of_static_bodies==1) equation_type=1;

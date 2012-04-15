@@ -28,8 +28,6 @@ class FRACTURE_OBJECT:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,d>::OBJECT T_SIMPLICIAL_OBJECT;
     typedef typename EMBEDDING_POLICY<TV,d>::EMBEDDED_OBJECT T_EMBEDDED_OBJECT;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
-    typedef typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX T_DIAGONAL_MATRIX;
     typedef typename MESH_POLICY<d>::MESH T_MESH;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -110,7 +108,7 @@ public:
 
 //#####################################################################
     virtual void Rebuild_Embedded_Object(ARRAY<int>& map_to_old_particles,ARRAY<int>& map_to_old_embedded_particles,ARRAY<int>& map_to_old_simplices,const bool verbose=true);
-    int Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_fracture_bias_direction);
+    int Fracture_Where_High_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m> >& sigma,ARRAY<TV>& spatial_fracture_bias_direction);
     TV Rest_Position_Of_Material_Surface_Particle(const int boundary_particle);
     void Set_Random_Fracture_Bias_Stress_Scaling_Constant(const T fracture_threshold,const int averaging_iterations); // TODO: this function is apparently deprecated
     virtual void Add_Cut_Based_On_Phi(const int element,const VECTOR<T,d+1>& tetrahedron_phi){};

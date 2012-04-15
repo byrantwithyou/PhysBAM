@@ -27,12 +27,12 @@ template<class T_GRID>
 class FLUID_STRAIN_UNIFORM:public FLUID_STRAIN<typename T_GRID::SCALAR>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX SYMMETRIC_MATRIX;
+    typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX>::TYPE T_ARRAYS_SYMMETRIC_MATRIX;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
-    typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX>::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
+    typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
     typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::PROJECTION T_PROJECTION;
 public:
     using FLUID_STRAIN<T>::viscosity_index;using FLUID_STRAIN<T>::strainrate_time;using FLUID_STRAIN<T>::elastic_modulus;
@@ -40,11 +40,11 @@ public:
 
     T_GRID grid;
     T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
-    BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX>* e_boundary;
-    ADVECTION<T_GRID,SYMMETRIC_MATRIX>* e_advection;
+    BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
+    ADVECTION<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >* e_advection;
     EXTERNAL_STRAIN_ADJUSTMENT<T>* external_strain_adjustment;
 private:               
-    BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX>& e_boundary_default;
+    BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_default;
     T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX& e_advection_default;
     mutable bool cfl_called;
 public:
@@ -55,10 +55,10 @@ public:
     void Initialize_Grid(const T_GRID& grid_input)
     {assert(grid_input.Is_MAC_Grid());grid=grid_input;e.Resize(grid.Domain_Indices());}
 
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX>& e_boundary_input)
+    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input)
     {e_boundary=&e_boundary_input;}
 
-    void Set_Custom_Advection(ADVECTION<T_GRID,SYMMETRIC_MATRIX>& e_advection_input)
+    void Set_Custom_Advection(ADVECTION<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >& e_advection_input)
     {e_advection=&e_advection_input;}
 
     void Set_External_Strain_Adjustment(EXTERNAL_STRAIN_ADJUSTMENT<T>& external_strain_adjustment_input)
@@ -85,15 +85,15 @@ class FLUID_STRAIN_UNIFORM<GRID<VECTOR<T,1> > >:public FLUID_STRAIN<T>
     typedef VECTOR<T,1> TV;
 public:
 //#####################################################################
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX SYMMETRIC_MATRIX;typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX>::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
+    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ARRAYS_SYMMETRIC_MATRIX;
 
     T_ARRAYS_SYMMETRIC_MATRIX e; // strain tensor
-    BOUNDARY_UNIFORM<GRID<TV>,SYMMETRIC_MATRIX>* e_boundary;
+    BOUNDARY_UNIFORM<GRID<TV>,SYMMETRIC_MATRIX<T,TV::m> >* e_boundary;
 
     FLUID_STRAIN_UNIFORM(const GRID<TV>& grid_input){PHYSBAM_NOT_IMPLEMENTED();}
     void Initialize_Grid(const GRID<TV>& grid_input){PHYSBAM_NOT_IMPLEMENTED();}
-    void Set_Custom_Boundary(BOUNDARY_UNIFORM<GRID<TV>,SYMMETRIC_MATRIX>& e_boundary_input){e_boundary=&e_boundary_input;}
+    void Set_Custom_Boundary(BOUNDARY_UNIFORM<GRID<TV>,SYMMETRIC_MATRIX<T,TV::m> >& e_boundary_input){e_boundary=&e_boundary_input;}
     void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
         const ARRAY<T,VECTOR<int,1> >& phi_ghost,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
     void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,

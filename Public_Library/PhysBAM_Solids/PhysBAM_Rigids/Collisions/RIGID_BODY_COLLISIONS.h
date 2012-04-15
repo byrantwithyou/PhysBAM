@@ -34,7 +34,6 @@ class RIGID_BODY_COLLISIONS:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
 
     typedef bool (*UPDATE_ANALYTIC_CONTACT_PAIR_T)(RIGID_BODY_COLLISIONS<TV>&,RIGIDS_COLLISION_CALLBACKS<TV>&,const int,const int,IMPLICIT_OBJECT<TV>*,IMPLICIT_OBJECT<TV>*,const bool,const int,const T,const T,const T,const bool);
 public:

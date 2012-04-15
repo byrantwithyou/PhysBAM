@@ -114,7 +114,7 @@ template<class T> static void Project_Onto_Simplex_Span(const TETRAHEDRALIZED_VO
 // Function Fracture_Where_High_Stress
 //#####################################################################
 template<class TV,int d> int FRACTURE_OBJECT<TV,d>::
-Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_fracture_bias_direction)
+Fracture_Where_High_Stress(ARRAY<SYMMETRIC_MATRIX<T,TV::m> >& sigma,ARRAY<TV>& spatial_fracture_bias_direction)
 {
     int initial_number_of_embedded_subelements=embedded_object.embedded_object.mesh.elements.m;
     if(number_of_smoothing_passes || (bias_stress && fracture_bias_propagation)) embedded_object.simplicial_object.mesh.Initialize_Adjacent_Elements();
@@ -144,7 +144,7 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
         if(embedded_object.Number_Of_Embedded_Cuts(t)!=0)continue;
         if(fracture_bias_stress_scaling(ref_t)!=1) sigma(t)*=fracture_bias_stress_scaling(ref_t);
         if(fracture_bias_magnitude(ref_t) && fracture_bias_direction(ref_t)!=VECTOR<T,d>())
-            sigma(t)+=fracture_bias_magnitude(ref_t)*T_SYMMETRIC_MATRIX::Outer_Product(spatial_fracture_bias_direction(t));
+            sigma(t)+=fracture_bias_magnitude(ref_t)*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(spatial_fracture_bias_direction(t));
         if(fracture_bias_propagation){ // bias stress based on cuts in adjacent elements
             for(int a=0;a<(*embedded_object.simplicial_object.mesh.adjacent_elements)(t).m;a++){
                 int adj_t=(*embedded_object.simplicial_object.mesh.adjacent_elements)(t)(a);
@@ -157,12 +157,12 @@ Fracture_Where_High_Stress(ARRAY<T_SYMMETRIC_MATRIX>& sigma,ARRAY<TV>& spatial_f
             T magnitude=propagation_direction(t).Magnitude();
             if(magnitude){
                 if(Fracture_Phi_Index(t)) propagation_direction(t)*=extra_levelset_propagation_direction_scaling;
-                propagation_direction(t)/=magnitude;sigma(t)+=fracture_bias_propagation*T_SYMMETRIC_MATRIX::Outer_Product(propagation_direction(t));}}}
+                propagation_direction(t)/=magnitude;sigma(t)+=fracture_bias_propagation*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(propagation_direction(t));}}}
 
     // make cuts
     assert(max_number_of_cuts<=d);int count=0;
     for(int t=0;t<embedded_object.simplicial_object.mesh.elements.m;t++){
-        T_DIAGONAL_MATRIX eigenvalues=sigma(t).Fast_Eigenvalues();
+        DIAGONAL_MATRIX<T,TV::m> eigenvalues=sigma(t).Fast_Eigenvalues();
         int number_of_cuts=embedded_object.Number_Of_Embedded_Cuts(t);
         if(number_of_cuts<max_number_of_cuts){ // room for more cuts
             int cut=number_of_cuts+1;

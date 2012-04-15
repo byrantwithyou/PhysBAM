@@ -517,7 +517,7 @@ Adjust_Strain_For_Object(T_LEVELSET& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& 
     for(CELL_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         T heaviside=LEVELSET_UTILITIES<T>::Heaviside(levelset_object.phi(cell),epsilon);
         e_ghost(cell)*=adhesion_coefficient+(1-adhesion_coefficient)*heaviside;
-        if(adhesion_normal_strain && heaviside!=1) e_ghost(cell)+=(1-heaviside)*adhesion_normal_strain*T_SYMMETRIC_MATRIX::Outer_Product(levelset_object.Normal(iterator.Location()));}
+        if(adhesion_normal_strain && heaviside!=1) e_ghost(cell)+=(1-heaviside)*adhesion_normal_strain*SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(levelset_object.Normal(iterator.Location()));}
 }
 //#####################################################################
 // Function Combustion

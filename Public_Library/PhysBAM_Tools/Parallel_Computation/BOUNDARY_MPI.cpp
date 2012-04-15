@@ -90,7 +90,7 @@ template class BOUNDARY_MPI<GRID<VECTOR<float,2> >,float>;
 template class BOUNDARY_MPI<GRID<VECTOR<float,3> >,VECTOR<float,3> >;
 template class BOUNDARY_MPI<GRID<VECTOR<float,3> >,VECTOR<float,5> >;
 template class BOUNDARY_MPI<GRID<VECTOR<float,3> >,float>;
-template class BOUNDARY_MPI<GRID<VECTOR<float,1> >,MATRIX<float,1,1> >;
+template class BOUNDARY_MPI<GRID<VECTOR<float,1> >,SYMMETRIC_MATRIX<float,1> >;
 template class BOUNDARY_MPI<GRID<VECTOR<float,2> >,SYMMETRIC_MATRIX<float,2> >;
 template class BOUNDARY_MPI<GRID<VECTOR<float,3> >,SYMMETRIC_MATRIX<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
@@ -103,7 +103,7 @@ template class BOUNDARY_MPI<GRID<VECTOR<double,2> >,double>;
 template class BOUNDARY_MPI<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
 template class BOUNDARY_MPI<GRID<VECTOR<double,3> >,VECTOR<double,5> >;
 template class BOUNDARY_MPI<GRID<VECTOR<double,3> >,double>;
-template class BOUNDARY_MPI<GRID<VECTOR<double,1> >,MATRIX<double,1,1> >;
+template class BOUNDARY_MPI<GRID<VECTOR<double,1> >,SYMMETRIC_MATRIX<double,1> >;
 template class BOUNDARY_MPI<GRID<VECTOR<double,2> >,SYMMETRIC_MATRIX<double,2> >;
 template class BOUNDARY_MPI<GRID<VECTOR<double,3> >,SYMMETRIC_MATRIX<double,3> >;
 #endif

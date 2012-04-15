@@ -407,7 +407,7 @@ Allgather(ARRAY<int>& data) const
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,3> >::TYPE&,const int,const bool) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,4> >::TYPE&,const int,const bool) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,5> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<MATRIX<T,1> >::TYPE&,const int,const bool) const; \
+    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int,const bool) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int,const bool) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int,const bool) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,const int) const; \
@@ -417,7 +417,7 @@ Allgather(ARRAY<int>& data) const
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,3> >::TYPE&,const int) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,4> >::TYPE&,const int) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,5> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<MATRIX<T,1> >::TYPE&,const int) const; \
+    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&) const; \
@@ -427,7 +427,7 @@ Allgather(ARRAY<int>& data) const
     template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,3> >::TYPE&) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,4> >::TYPE&) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,5> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<MATRIX<T,1> >::TYPE&) const; \
+    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&) const; \
     template void THREADED_UNIFORM_GRID<T_GRID>::Assert_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,const T) const; \

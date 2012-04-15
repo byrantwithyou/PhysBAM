@@ -19,7 +19,6 @@ class IMPLICIT_OBJECT:public STRUCTURE<TV>
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     typedef VECTOR<T,d-1> T_CURVATURES;
 public:
     typedef int HAS_TYPED_READ_WRITE;
@@ -67,7 +66,7 @@ public:
     virtual TV Closest_Point_On_Boundary(const TV& location,const T tolerance=0,const int max_iterations=1,T* distance=0) const;
     virtual TV Velocity(const TV& location) const;
     // the following only exist in 3d
-    virtual T_SYMMETRIC_MATRIX Hessian(const TV& X) const;
+    virtual SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
     virtual T_CURVATURES Principal_Curvatures(const TV& X) const;
     virtual T Integration_Step(const T phi) const;
     virtual T Minimum_Cell_Size() const;

@@ -45,7 +45,6 @@ class SOLID_FLUID_COUPLED_EVOLUTION:public NEWMARK_EVOLUTION<TV_input>
     typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_INERTIA_TENSOR;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_THIN_SHELL;typedef typename T_THIN_SHELL::MESH T_THIN_SHELL_MESH;
     typedef VECTOR<int,TV::dimension> T_THIN_SHELL_ELEMENT;typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_THIN_SHELL_SIMPLEX;
-    typedef typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX T_DIAGONAL_MATRIX;
     typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,int,&SPARSE_MATRIX_ENTRY<T>::j> T_PROJECTED_INDEX;
     typedef FIELD_PROJECTOR<SPARSE_MATRIX_ENTRY<T>,T,&SPARSE_MATRIX_ENTRY<T>::a> T_PROJECTED_VALUE;
 protected:
@@ -70,8 +69,8 @@ protected:
     FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters;
     FLUID_COLLECTION<TV>& fluid_collection;
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
-    ARRAY<T_DIAGONAL_MATRIX> nodal_fluid_mass;
-    ARRAY<T_DIAGONAL_MATRIX> rigid_body_fluid_mass;
+    ARRAY<DIAGONAL_MATRIX<T,TV::m> > nodal_fluid_mass;
+    ARRAY<DIAGONAL_MATRIX<T,TV::m> > rigid_body_fluid_mass;
     ARRAY<TV> rigid_body_updated_center_of_mass;
     ARRAY<T_INERTIA_TENSOR> rigid_body_fluid_inertia;
     ARRAY<TV> ar_full,z_full,zaq_full;ARRAY<TWIST<TV> > rigid_ar_full,rigid_z_full,rigid_zaq_full; // extra vectors for conjugate residual

@@ -779,7 +779,7 @@ Initialize_Rigid_Deformable_Contact_Projection(PRECOMPUTE_CONTACT_PROJECTION& pr
         rLr+=MATRIX<T,T_SPIN::dimension>::Outer_Product(precompute.rN(i),precompute.rN(i)*one_over_NT_K_N);}
 
     if(!has_infinite_inertia){
-        typename MATRIX_POLICY<T_SPIN>::SYMMETRIC_MATRIX inertia=precompute.rigid_body.World_Space_Inertia_Tensor();
+        SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia=precompute.rigid_body.World_Space_Inertia_Tensor();
         precompute.A.Set_Submatrix(0,0,L+precompute.rigid_body.Mass());
         precompute.A.Set_Submatrix(TV::dimension,0,rL);
         precompute.A.Set_Submatrix(0,TV::dimension,rL.Transposed());
@@ -878,11 +878,11 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
 
     if(particle_interactions.m==0 && rigid_body_interactions.m==0) return false;
 
-    ARRAY<T_SYMMETRIC_MATRIX> K_inverse(rigid_body_interactions.m);
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > K_inverse(rigid_body_interactions.m);
     for(int i=0;i<rigid_body_interactions.m;i++){
         RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
         if(!parent_other_rigid_body.Has_Infinite_Inertia() || rigid_body_collisions.use_static_body_masses) K_inverse(i)=parent_other_rigid_body.Impulse_Factor(rigid_body_collision_locations(i)).Inverse();
-        else K_inverse(i)=T_SYMMETRIC_MATRIX::Identity_Matrix();}
+        else K_inverse(i)=SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix();}
 
     TV velocity;T_SPIN angular_velocity;
     if(!parent_rigid_body.Has_Infinite_Inertia()){
@@ -895,7 +895,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             MATRIX<T,T_SPIN::dimension,TV::dimension> ri=MATRIX<T,T_SPIN::dimension,TV::dimension>::Cross_Product_Matrix(radius);
             mr[0]+=mass*ri;mrr[0]+=mass*ri.Times_Transpose(ri);}
 
-        T_SYMMETRIC_MATRIX K_inverse_sum[2]; // non static bodies
+        SYMMETRIC_MATRIX<T,TV::m> K_inverse_sum[2]; // non static bodies
 
         int number_of_static_bodies=0;TV centroid;
         for(int i=0;i<rigid_body_interactions.m;i++){
@@ -914,15 +914,15 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         mrr[0]+=parent_rigid_body.World_Space_Inertia_Tensor();
 
         // determine how static bodies affect the system
-        typename MATRIX_POLICY<TV>::DIAGONAL_MATRIX eigenvalues;MATRIX<T,TV::dimension> eigenvectors;
+        DIAGONAL_MATRIX<T,TV::m> eigenvalues;MATRIX<T,TV::dimension> eigenvectors;
         int equation_type=0; // indicate which type of system we will be solving below
         if(number_of_static_bodies==0) equation_type=0; // 0 dof specified by static bodies
         else if(number_of_static_bodies==1) equation_type=1;
         else{ // need to figure out if the static bodies are effectively coincident or colinear
-            T_SYMMETRIC_MATRIX R_R_transpose;
+            SYMMETRIC_MATRIX<T,TV::m> R_R_transpose;
             for(int i=0;i<rigid_body_interactions.m;i++){
                 RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(rigid_body_interactions(i)));
-                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=T_SYMMETRIC_MATRIX::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
+                if(parent_other_rigid_body.Has_Infinite_Inertia()) R_R_transpose+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(rigid_body_collision_locations(i)-parent_rigid_body.Frame().t-centroid);}
             R_R_transpose.Solve_Eigenproblem(eigenvalues,eigenvectors);
             int rank=TV::Componentwise_Greater_Equal(eigenvalues.To_Vector(),TV::All_Ones_Vector()*threshold).Number_True();
             if(rank==0) equation_type=1; // 3/6 dof (2/3 dof in 2d) specified by static bodies
@@ -1060,13 +1060,13 @@ Push_Out_From_Particle(const int particle)
         ms+=effective_mass*particle_distances(i);m+=effective_mass;}
 
     TV& particle_location=particles.X(particle);
-    ARRAY<T_SYMMETRIC_MATRIX> K_inverse(bodies.m);T_SYMMETRIC_MATRIX K_inverse_sum;
+    ARRAY<SYMMETRIC_MATRIX<T,TV::m> > K_inverse(bodies.m);SYMMETRIC_MATRIX<T,TV::m> K_inverse_sum;
     bool have_static_bodies=false;for(int i=0;i<bodies.m;i++) if(rigid_body_collection.Rigid_Body(bodies(i)).Has_Infinite_Inertia()){have_static_bodies=true;break;}
     for(int i=0;i<bodies.m;i++) if(rigid_body_collection.Rigid_Body(bodies(i)).Has_Infinite_Inertia()==have_static_bodies){ // process only the static bodies if we have any
         RIGID_BODY<TV>& other_rigid_body=rigid_body_collection.Rigid_Body(bodies(i));
         RIGID_BODY<TV>& parent_other_rigid_body=solid_body_collection.rigid_body_collection.rigid_body_cluster_bindings.Get_Parent(other_rigid_body);
         if(!parent_other_rigid_body.Has_Infinite_Inertia() || rigid_body_collisions.use_static_body_masses) K_inverse(i)=parent_other_rigid_body.Impulse_Factor(particle_location).Inverse();
-        else K_inverse(i)=T_SYMMETRIC_MATRIX::Identity_Matrix();
+        else K_inverse(i)=SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix();
         K_inverse_sum+=K_inverse(i);ms+=K_inverse(i)*rigid_body_distances(i);}
 
     TV velocity;

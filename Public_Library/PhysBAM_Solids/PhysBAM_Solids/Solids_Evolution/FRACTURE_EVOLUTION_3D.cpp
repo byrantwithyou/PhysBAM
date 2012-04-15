@@ -246,7 +246,7 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                     VECTOR<int,4> regions;
                     int number_of_regions=rigid_body->levelset_grain_boundaries->Regions_Intersecting_Element(t,regions);
                     if(number_of_regions==1)continue;
-                    T_DIAGONAL_MATRIX eigenvalues=sigma(deformable_tet).Fast_Eigenvalues();
+                    DIAGONAL_MATRIX<T,TV::m> eigenvalues=sigma(deformable_tet).Fast_Eigenvalues();
                     T threshold=fracture_object->fracture_threshold[number_of_cuts+1]*rigid_body->levelset_grain_boundaries->Element_Weakness_Multiplier(number_of_regions,regions);
                     T amt_over=eigenvalues.First()-threshold,amt_under=fracture_object->compressive_threshold[number_of_cuts+1]-eigenvalues.Last();
                     if((amt_over>0 && amt_over>amt_under) || amt_under>0)for(int i=0;i<number_of_regions-1;i++){
@@ -272,7 +272,7 @@ Rigid_Fracture_Where_High_Stress(const T small_number)
                     int number_of_cuts=fracture_object->embedded_object.Number_Of_Embedded_Cuts(deformable_tet);
                     VECTOR<int,4> regions;
                     int number_of_regions=rigid_body.grain_boundaries(grain_boundary)->Regions_Intersecting_Element(t,regions);
-                    T_DIAGONAL_MATRIX eigenvalues=sigma(deformable_tet).Fast_Eigenvalues();
+                    DIAGONAL_MATRIX<T,TV::m> eigenvalues=sigma(deformable_tet).Fast_Eigenvalues();
                     T threshold=fracture_object->fracture_threshold[min(number_of_cuts+1,3)]*rigid_body.grain_boundaries(grain_boundary)->Element_Weakness_Multiplier(t,number_of_regions,regions);
                     T amt_over=eigenvalues.First()-threshold;//amt_under=fracture_object->compressive_threshold[number_of_cuts+1]-eigenvalues.Last_Element();
                     for(int region=0;region<number_of_regions;region++){

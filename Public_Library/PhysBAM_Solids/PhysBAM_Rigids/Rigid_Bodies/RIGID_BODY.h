@@ -20,7 +20,6 @@ class RIGID_BODY:public RIGID_GEOMETRY<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::SPIN T_SPIN;
-    typedef typename MATRIX_POLICY<TV>::SYMMETRIC_MATRIX T_SYMMETRIC_MATRIX;
     typedef typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR T_INERTIA_TENSOR;
     typedef typename RIGID_BODY_POLICY<TV>::WORLD_SPACE_INERTIA_TENSOR T_WORLD_SPACE_INERTIA_TENSOR;
 public:
@@ -159,15 +158,15 @@ private:
     {return tensor.Conjugate_With_Cross_Product_Matrix(vector);}
 public:
 
-    T_SYMMETRIC_MATRIX Impulse_Factor(const TV& location) const
-    {if(Has_Infinite_Inertia()) return T_SYMMETRIC_MATRIX(); // return zero matrix
+    SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor(const TV& location) const
+    {if(Has_Infinite_Inertia()) return SYMMETRIC_MATRIX<T,TV::m>(); // return zero matrix
     return Conjugate_With_Cross_Product_Matrix(location-Frame().t,World_Space_Inertia_Tensor_Inverse())+1/Mass();}
 
-    T_SYMMETRIC_MATRIX Object_Space_Impulse_Factor(const TV& object_space_location) const
-    {if(Has_Infinite_Inertia()) return T_SYMMETRIC_MATRIX(); // return zero matrix
+    SYMMETRIC_MATRIX<T,TV::m> Object_Space_Impulse_Factor(const TV& object_space_location) const
+    {if(Has_Infinite_Inertia()) return SYMMETRIC_MATRIX<T,TV::m>(); // return zero matrix
     return Conjugate_With_Cross_Product_Matrix(object_space_location,Inertia_Tensor().Inverse())+1/Mass();}
 
-    static T_SYMMETRIC_MATRIX Impulse_Factor(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location)
+    static SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location)
     {assert(!body1.Has_Infinite_Inertia() || !body2.Has_Infinite_Inertia());
     return body1.Impulse_Factor(location)+body2.Impulse_Factor(location);}
 

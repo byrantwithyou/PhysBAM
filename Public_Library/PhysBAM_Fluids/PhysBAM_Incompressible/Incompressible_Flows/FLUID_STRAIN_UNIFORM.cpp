@@ -26,7 +26,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> FLUID_STRAIN_UNIFORM<T_GRID>::
 FLUID_STRAIN_UNIFORM(const T_GRID& grid_input)
-    :external_strain_adjustment(0),e_boundary_default(*new BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX>),e_advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX),cfl_called(false)
+    :external_strain_adjustment(0),e_boundary_default(*new BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> >),e_advection_default(*new T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX),cfl_called(false)
 {
     e_advection=&e_advection_default;
     e_boundary=&e_boundary_default;
@@ -57,10 +57,10 @@ Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T dens
         TV_INT cell=iterator.Cell_Index();MATRIX<T,TV::dimension> VX;
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT offset=TV_INT::Axis_Vector(axis);
             VX.Column(axis)=one_over_two_DX[axis]*(V(cell+offset)-V(cell-offset));} // TODO: maybe change this to do a better difference for the derivative in the same axis as the face
-        e(cell)=SYMMETRIC_MATRIX::Conjugate(MATRIX<T,TV::dimension>::Rotation_Matrix(dt*VX.Antisymmetric_Part_Cross_Product_Vector()),e(cell));
+        e(cell)=SYMMETRIC_MATRIX<T,TV::m>::Conjugate(MATRIX<T,TV::dimension>::Rotation_Matrix(dt*VX.Antisymmetric_Part_Cross_Product_Vector()),e(cell));
         e(cell)+=dt*VX.Symmetric_Part();
         if(plasticity_alpha){
-            SYMMETRIC_MATRIX e_prime=e_ghost(cell)-one_over_dimension*e_ghost(cell).Trace();T e_prime_norm=e_prime.Frobenius_Norm();
+            SYMMETRIC_MATRIX<T,TV::m> e_prime=e_ghost(cell)-one_over_dimension*e_ghost(cell).Trace();T e_prime_norm=e_prime.Frobenius_Norm();
             if(e_prime_norm>plasticity_gamma) e(cell)-=dt*plasticity_alpha*(e_prime_norm-plasticity_gamma)/e_prime_norm*e_prime;}}
     e_boundary->Apply_Boundary_Condition(grid,e,time+dt);
 
@@ -117,8 +117,8 @@ template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
 Extrapolate_Strain_Across_Interface(T_ARRAYS_SCALAR& phi_ghost,const T band_width)
 {
     T delta=band_width*grid.dX.Max();
-    for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(phi_ghost(cell)>=delta) e(cell)=SYMMETRIC_MATRIX();}
-    EXTRAPOLATION_UNIFORM<T_GRID,SYMMETRIC_MATRIX> extrapolate(grid,phi_ghost,e,3);extrapolate.Set_Band_Width(band_width);extrapolate.Extrapolate();
+    for(CELL_ITERATOR iterator(grid,0);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(phi_ghost(cell)>=delta) e(cell)=SYMMETRIC_MATRIX<T,TV::m>();}
+    EXTRAPOLATION_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> > extrapolate(grid,phi_ghost,e,3);extrapolate.Set_Band_Width(band_width);extrapolate.Extrapolate();
 }
 //#####################################################################
 // Function CFL
