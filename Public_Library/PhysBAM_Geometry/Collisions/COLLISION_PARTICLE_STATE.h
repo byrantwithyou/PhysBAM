@@ -15,12 +15,10 @@ public:
     bool enforce;
     TV normal;
     T VN;
-    TV VT_body;
-    T delta_VN;
     T friction;
 
     COLLISION_PARTICLE_STATE()
-        :enforce(false),VN(0),delta_VN(0),friction(0)
+        :enforce(false),VN(0),friction(0)
     {}
 
 //#####################################################################

@@ -224,7 +224,7 @@ Get_Surface_Triangle(const int tetrahedron_index,const TV& tetrahedron_weights,T
 // Function Adjust_Point_Face_Collision_Position_And_Velocity
 //#####################################################################
 template<class T> void TETRAHEDRON_COLLISION_BODY<T>::
-Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X,TV& V,SOFT_BINDINGS<TV>& soft_bindings,const T one_over_mass,const T dt,const TV& weights,TV& position_change)
+Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X,TV& V,SOFT_BINDINGS<TV>& soft_bindings,const T one_over_mass,const TV& weights,TV& position_change)
 {
     // compute desired point adjustment
     int i,j,k;triangulated_surface.mesh.elements(triangle_index).Get(i,j,k);
@@ -251,9 +251,9 @@ Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X
 // Function Adjust_Nodes_For_Collisions
 //#####################################################################
 template<class T> int TETRAHEDRON_COLLISION_BODY<T>::
-Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
-    const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
-    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
+Adjust_Nodes_For_Collisions(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
 {
     assert(!friction_table && !thickness_table);
     int interactions=0;ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
@@ -269,8 +269,7 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>&
         TV surface_weights;int surface_triangle=Get_Surface_Triangle(t,weights(k),surface_weights,true);
         if(surface_triangle>=0){
             interactions++;interaction_pair(k)(1)=surface_triangle;TV change;
-            // TODO: make this function take max_relative_velocity
-            Adjust_Point_Face_Collision_Position_And_Velocity(surface_triangle,X(p),V(p),soft_bindings,collision_particles.one_over_effective_mass(p),dt,surface_weights,change);
+            Adjust_Point_Face_Collision_Position_And_Velocity(surface_triangle,X(p),V(p),soft_bindings,collision_particles.one_over_effective_mass(p),surface_weights,change);
             position_change.Append(change);}
         else interaction_pair(k)(1)=-1;}
     int count=0;
@@ -279,6 +278,17 @@ Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>&
         if(t>=0) X(p)+=relaxation_factor*position_change(count++);}
     if(interactions) soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(particle_on_surface);
     return interactions;
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Push_Out
+//#####################################################################
+template<class T> int TETRAHEDRON_COLLISION_BODY<T>::
+Adjust_Nodes_For_Push_Out(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *thickness_table)
+{
+    // TODO: Implement
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 // Function Update_Bounding_Box

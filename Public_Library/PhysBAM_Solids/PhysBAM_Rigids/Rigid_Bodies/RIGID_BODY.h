@@ -226,7 +226,8 @@ public:
     static TWIST<TV> Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_rel_twist_at_location);
     static TWIST<TV> Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV>& body2,const TV& location,const TWIST<TV>& delta_rel_twist_at_location,
         const MATRIX_MXN<T>& angular_constraint_matrix,const MATRIX_MXN<T>& prismatic_constraint_matrix);
-    static void Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance,const bool half_impulse_for_accumulator);
+    static void Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance);
+    void Apply_Push_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_impulse=T_SPIN());
     T Volumetric_Density() const;
     void Diagonalize_Inertia_Tensor(const T_WORLD_SPACE_INERTIA_TENSOR& inertia_tensor_at_center_of_mass);
     template<class T2> void Initialize_From_Tetrahedralized_Volume_And_Triangulated_Surface(TETRAHEDRALIZED_VOLUME<T2>& tetrahedralized_volume,

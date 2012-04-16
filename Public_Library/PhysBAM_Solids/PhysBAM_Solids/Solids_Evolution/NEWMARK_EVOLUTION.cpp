@@ -412,8 +412,10 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
     Update_Positions_And_Apply_Contact_Forces(dt,time,false);
     Diagnostics(dt,time,1,2,20,"contact, prestabilization");
     if(solids_parameters.rigid_body_collision_parameters.use_push_out){
-        if(solids_parameters.rigid_body_collision_parameters.use_legacy_push_out) rigid_body_collisions->Process_Push_Out_Legacy(); 
-        else rigid_deformable_collisions->Process_Push_Out();
+        if(solids_parameters.use_rigid_deformable_contact) rigid_deformable_collisions->Process_Push_Out();
+        else{
+            solid_body_collection.deformable_body_collection.collisions.Process_Push_Out();
+            rigid_body_collisions->Process_Push_Out_Legacy();}
         Diagnostics(dt,time,1,2,21,"push out");}
 
     // This is necessary since the velocity update below needs to use soft bound positions, but modifying positions within the velocity update is prohibited.
@@ -691,7 +693,7 @@ Update_Positions_And_Apply_Contact_Forces(const T dt,const T time,const bool use
         if(solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions){
             int interactions=0;
             if(use_existing_contact)
-                interactions+=solid_body_collection.deformable_body_collection.collisions.Adjust_Existing_Nodes_For_Collision_Body_Collisions(solid_body_collection.deformable_body_collection.binding_list,solid_body_collection.deformable_body_collection.soft_bindings,X_save,dt,0);
+                interactions+=solid_body_collection.deformable_body_collection.collisions.Adjust_Existing_Nodes_For_Collision_Body_Collisions(0);
             else 
                 interactions+=solid_body_collection.deformable_body_collection.collisions.Adjust_Nodes_For_Collision_Body_Collisions(solid_body_collection.deformable_body_collection.binding_list,solid_body_collection.deformable_body_collection.soft_bindings,X_save,dt,0);
             if(interactions) LOG::Stat("collision body collisions",interactions);}}

@@ -603,9 +603,7 @@ Process_Push_Out_Legacy()
                                 collision_location=location;collision_normal=normal;collision_push_distance=push_distance;
                                 collision_body1=&body_parent1;collision_body2=&body_parent2;
                                 smallest_value=phi;smallest_index=i;}}
-                        RIGID_BODY<TV>::Apply_Push(*collision_body1,*collision_body2,collision_location,collision_normal,collision_push_distance,
-                            (mpi_rigids && (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) || 
-                                mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_2)))));
+                        RIGID_BODY<TV>::Apply_Push(*collision_body1,*collision_body2,collision_location,collision_normal,collision_push_distance);
                         rigid_body_collection.Rigid_Body(particle_intersections(smallest_index).particle_body).Update_Bounding_Box();
                         rigid_body_collection.Rigid_Body(particle_intersections(smallest_index).levelset_body).Update_Bounding_Box();
                         skip_collision_check.Set_Last_Moved(id_1);skip_collision_check.Set_Last_Moved(id_2);

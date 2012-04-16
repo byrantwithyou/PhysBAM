@@ -12,10 +12,16 @@
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
+#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
+#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
+#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
+#include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_3D.h>
+#include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COLLISION_BODY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/COLLISION_HELPER.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TETRAHEDRON_COLLISION_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -146,9 +152,8 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
                         particles.V(node)=V_old(node);
                         particle_states(node).enforce=false;}}
                 else if(is_protected(node)) collision_body_candidate_nodes(body_id).Remove_Index_Lazy(j);}
-            interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(collision_body,X_old,particles,soft_bindings,
-                collision_body_candidate_nodes(body_id),check_collision,collision_tolerance,particle_states,
-                particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);}
+            interactions+=Adjust_Nodes_For_Collisions(collision_body,particles,collision_body_candidate_nodes(body_id),check_collision,particle_states,
+                particle_to_collision_body_id,friction_table,thickness_table);}
         ARRAY<int> collision_count(check_collision.m);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(*bodies)(body_id);
@@ -164,8 +169,8 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
     else if(disable_multiple_levelset_collisions){
         ARRAY<TV> X_save(particles.X),V_old(particles.V);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id))
-            interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(*(*bodies)(body_id),X_old,particles,soft_bindings,collision_body_candidate_nodes(body_id),
-                check_collision,collision_tolerance,particle_states,particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);
+            interactions+=Adjust_Nodes_For_Collisions(*(*bodies)(body_id),particles,collision_body_candidate_nodes(body_id),
+                check_collision,particle_states,particle_to_collision_body_id,friction_table,thickness_table);
         ARRAY<int> collision_count(check_collision.m);
         for(COLLISION_GEOMETRY_ID body_id(0);body_id<bodies->m;body_id++) if((*bodies)(body_id))
             for(int j=0;j<collision_body_candidate_nodes(body_id).m;j++){int node=collision_body_candidate_nodes(body_id)(j);
@@ -176,8 +181,8 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
                         particles.X(node)=X_save(node);
                         particles.V(node)=V_old(node);}}}}
     else for(COLLISION_GEOMETRY_ID body_id=bodies->m-1;body_id>=COLLISION_GEOMETRY_ID(0);body_id--)
-        interactions+=COLLISION_BODY<TV>::Adjust_Nodes_For_Collisions(*(*bodies)(body_id),X_old,particles,soft_bindings,collision_body_candidate_nodes(body_id),
-            check_collision,collision_tolerance,particle_states,particle_to_collision_body_id,maximum_levelset_collision_projection_velocity,dt,friction_table,thickness_table);
+        interactions+=Adjust_Nodes_For_Collisions(*(*bodies)(body_id),particles,collision_body_candidate_nodes(body_id),
+            check_collision,particle_states,particle_to_collision_body_id,friction_table,thickness_table);
 
     binding_list.Clamp_Particles_To_Embedded_Positions();
     binding_list.Clamp_Particles_To_Embedded_Velocities();
@@ -187,19 +192,15 @@ Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_B
 // Function Adjust_Existing_Nodes_For_Collision_Body_Collisions
 //#####################################################################
 template<class TV> int DEFORMABLE_OBJECT_COLLISIONS<TV>::
-Adjust_Existing_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,
-    const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies)
+Adjust_Existing_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies)
 {
     int interactions=0;
-    T depth=0,one_over_dt=1/dt;
-    ARRAY_VIEW<TV> &X=particles.X,&V=particles.V;
     for(int i=0;i<deformable_body_collection.simulated_particles.m;i++){
         int p=deformable_body_collection.simulated_particles(i);
         COLLISION_PARTICLE_STATE<TV>& collision=particle_states(p);
         if(!collision.enforce) continue;
         interactions++;
-        COLLISION_BODY_HELPER<TV>::Adjust_Point_For_Collision(collision_body_list(particle_to_collision_body_id(p)),X_old(p),X(p),V(p),particles.mass(p),
-            depth,dt,one_over_dt,maximum_levelset_collision_projection_velocity,collision,collision.friction);}
+        Adjust_Point_For_Collision(dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>&>(collision_body_list(particle_to_collision_body_id(p))),p,collision,collision.friction);}
     return interactions;
 }
 //#####################################################################
@@ -214,8 +215,7 @@ Set_Collision_Velocities(ARRAY_VIEW<TV> V) // for external forces and velocities
         COLLISION_PARTICLE_STATE<TV>& collision=particle_states(p);
         if(collision.enforce){
             T VN=TV::Dot_Product(V(p),collision.normal);
-            V(p)+=(collision.VN-VN)*collision.normal;
-            collision.delta_VN=collision.VN-VN;}}
+            V(p)+=(collision.VN-VN)*collision.normal;}}
 // TODO: put this back for efficiency and test
 //            enforced_particles.Append(PAIR<int,COLLISION_PARTICLE_STATE<TV> >(p,collision));
 }
@@ -265,6 +265,158 @@ Update_Simulated_Particles()
     particle_to_structure.Resize(particles.Size(),false,false);
     particle_to_structure.Fill(0);
     for(int s=0;s<deformable_object_structures.m;s++) deformable_object_structures(s)->Mark_Nodes_Referenced(particle_to_structure,s);
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Collisions_Helper
+//#####################################################################
+template<class TV,class T> int
+Adjust_Nodes_For_Collisions_Helper(COLLISION_GEOMETRY<TV>& body,SOFT_BINDINGS<TV>& soft_bindings,DEFORMABLE_PARTICLES<TV>& collision_particles,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
+{ 
+    return 0;
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Collisions_Helper
+//#####################################################################
+template<class T> int
+Adjust_Nodes_For_Collisions_Helper(COLLISION_GEOMETRY<VECTOR<T,3> >& body,SOFT_BINDINGS<VECTOR<T,3> >& soft_bindings,DEFORMABLE_PARTICLES<VECTOR<T,3> >& collision_particles,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<VECTOR<T,3> > >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
+{
+    if(TETRAHEDRON_COLLISION_BODY<T>* tetrahedron_collision_body=dynamic_cast<TETRAHEDRON_COLLISION_BODY<T>*>(&body))
+        return tetrahedron_collision_body->Adjust_Nodes_For_Collisions(collision_particles,soft_bindings,nodes_to_check,particle_on_surface,
+            collision_particle_state,particle_to_collision_geometry_id,friction_table,thickness_table);
+    return 0;
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Collisions
+//#####################################################################
+template<class TV> int DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body, DEFORMABLE_PARTICLES<TV>& collision_particles,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
+{
+    if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_body=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body))
+        return Adjust_Nodes_For_Collisions(*rigid_collision_body,collision_particles,nodes_to_check,
+            collision_particle_state,particle_to_collision_geometry_id,friction_table,thickness_table);
+    return Adjust_Nodes_For_Collisions_Helper(body,deformable_body_collection.soft_bindings,collision_particles,nodes_to_check,particle_on_surface,collision_particle_state,
+        particle_to_collision_geometry_id,friction_table,thickness_table);
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Collisions
+//#####################################################################
+template<class TV> int DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Adjust_Nodes_For_Collisions(RIGID_COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTICLES<TV>& collision_particles,
+    const ARRAY<int>& nodes_to_check,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
+{
+    // TODO: Add some sort of push out
+    int interactions=0;
+
+    T depth; 
+    ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
+    for(int pp=0;pp<nodes_to_check.m;pp++){
+        int p=nodes_to_check(pp);
+        T thickness=thickness_table?thickness_table->Get_Default(p,0):0;
+        COLLISION_PARTICLE_STATE<TV>& collision=collision_particle_state(p);
+        if(body.Implicit_Geometry_Lazy_Inside_And_Value(X(p),depth,thickness)){
+            collision.enforce=true;
+            interactions++;
+            particle_to_collision_geometry_id(p)=body.collision_geometry_id;
+            Adjust_Point_For_Collision(body,p,collision,friction_table?friction_table->Get_Default(p,-1):-1);}}
+    return interactions;
+}
+//#####################################################################
+// Function Adjust_Point_For_Collision
+//#####################################################################
+template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Adjust_Point_For_Collision(RIGID_COLLISION_GEOMETRY<TV>& body,int p,COLLISION_PARTICLE_STATE<TV>& collision,T local_coefficient_of_friction)
+{
+    TV X=deformable_body_collection.binding_list.X(p),normal=body.Implicit_Geometry_Normal(X);
+    TV V_rel=deformable_body_collection.binding_list.V(p)-body.Pointwise_Object_Velocity(X);
+    if(local_coefficient_of_friction<0) local_coefficient_of_friction=body.rigid_geometry.coefficient_of_friction;
+    TV impulse=PhysBAM::Compute_Collision_Impulse(normal,deformable_body_collection.binding_list.Impulse_Factor(p),V_rel,(T)0,local_coefficient_of_friction,0); 
+    deformable_body_collection.binding_list.Apply_Impulse(p,impulse);
+    if(body.impulse_accumulator)
+        body.impulse_accumulator->Add_Impulse(X,-TWIST<TV>(impulse,TV::Cross_Product(X-body.rigid_geometry.Frame().t,impulse)));
+    // set collision state
+    collision.normal=body.Implicit_Geometry_Normal(X);
+    collision.VN=TV::Dot_Product(body.Pointwise_Object_Velocity(X)-deformable_body_collection.binding_list.V(p),collision.normal);
+    collision.friction=local_coefficient_of_friction;
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Push_Out_Helper
+//#####################################################################
+template<class TV,class T> void
+Adjust_Nodes_For_Push_Out_Helper(COLLISION_GEOMETRY<TV>& body,SOFT_BINDINGS<TV>& soft_bindings,DEFORMABLE_PARTICLES<TV>& collision_particles,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table)
+{ 
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Push_Out_Helper
+//#####################################################################
+template<class T> void
+Adjust_Nodes_For_Push_Out_Helper(COLLISION_GEOMETRY<VECTOR<T,3> >& body,SOFT_BINDINGS<VECTOR<T,3> >& soft_bindings,DEFORMABLE_PARTICLES<VECTOR<T,3> >& collision_particles,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<VECTOR<T,3> > >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table)
+{
+    if(TETRAHEDRON_COLLISION_BODY<T>* tetrahedron_collision_body=dynamic_cast<TETRAHEDRON_COLLISION_BODY<T>*>(&body))
+        tetrahedron_collision_body->Adjust_Nodes_For_Push_Out(collision_particles,soft_bindings,nodes_to_check,particle_on_surface,
+            collision_particle_state,particle_to_collision_geometry_id,thickness_table);
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Push_Out
+//#####################################################################
+template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Adjust_Nodes_For_Push_Out(COLLISION_GEOMETRY<TV>& body, DEFORMABLE_PARTICLES<TV>& collision_particles,const ARRAY<int>& nodes_to_check,
+    const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table)
+{
+    if(RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_body=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(&body))
+        return Adjust_Nodes_For_Push_Out(*rigid_collision_body,collision_particles,nodes_to_check,
+            collision_particle_state,particle_to_collision_geometry_id,thickness_table);
+    return Adjust_Nodes_For_Push_Out_Helper(body,deformable_body_collection.soft_bindings,collision_particles,nodes_to_check,particle_on_surface,collision_particle_state,
+        particle_to_collision_geometry_id,thickness_table);
+}
+//#####################################################################
+// Function Adjust_Nodes_For_Push_Out
+//#####################################################################
+template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Adjust_Nodes_For_Push_Out(RIGID_COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTICLES<TV>& collision_particles,
+    const ARRAY<int>& nodes_to_check,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+    ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table)
+{
+    T depth; 
+    ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
+    for(int pp=0;pp<nodes_to_check.m;pp++){
+        int p=nodes_to_check(pp);
+        T thickness=thickness_table?thickness_table->Get_Default(p,0):0;
+        if(body.Implicit_Geometry_Lazy_Inside_And_Value(X(p),depth,thickness)){
+            Adjust_Point_For_Push_Out(body,p,depth);}}
+}
+//#####################################################################
+// Function Adjust_Point_For_Collision
+//#####################################################################
+template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Adjust_Point_For_Push_Out(RIGID_COLLISION_GEOMETRY<TV>& body,int p,T depth)
+{
+    TV X=deformable_body_collection.binding_list.X(p),normal=body.Implicit_Geometry_Normal(X),dX=normal*depth;
+    if(depth>=0) return;
+    TV impulse=-depth/deformable_body_collection.binding_list.One_Over_Effective_Mass(p,normal)*normal;
+    deformable_body_collection.binding_list.Apply_Push(p,impulse);
+}
+//#####################################################################
+// Function Adjust_Point_For_Collision
+//#####################################################################
+template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
+Process_Push_Out()
+{
+    Compute_Candidate_Nodes_For_Collision_Body_Collisions(collision_body_list.bodies);
+    for(COLLISION_GEOMETRY_ID body_id=collision_body_list.bodies.m-1;body_id>=COLLISION_GEOMETRY_ID(0);body_id--)
+        Adjust_Nodes_For_Push_Out(*collision_body_list.bodies(body_id),particles,collision_body_candidate_nodes(body_id),
+            check_collision,particle_states,particle_to_collision_body_id,thickness_table);
 }
 //#####################################################################
 template class DEFORMABLE_OBJECT_COLLISIONS<VECTOR<float,1> >;

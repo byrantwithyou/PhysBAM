@@ -101,7 +101,6 @@ Get_Rigid_Bodies_Intersecting_Rigid_Body(const int particle_index,ARRAY<int>& ri
 template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
 Get_Particles_Intersecting_Rigid_Body(const RIGID_BODY<TV>& rigid_body,ARRAY<int>& particles,ARRAY<TV>& particle_distances) const
 {
-
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     particles.Remove_All();particle_distances.Remove_All();
     if(!solids_parameters.use_rigid_deformable_contact) return;

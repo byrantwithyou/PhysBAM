@@ -62,6 +62,9 @@ public:
     void Apply_Impulse(const int particle_index,const TV& impulse)
     {if(BINDING<TV>* binding=Binding(particle_index)) binding->Apply_Impulse(impulse);else particles.V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
 
+    void Apply_Push(const int particle_index,const TV& impulse)
+    {if(BINDING<TV>* binding=Binding(particle_index)) binding->Apply_Push(impulse);else particles.X(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
+
     T One_Over_Effective_Mass(const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->One_Over_Effective_Mass();return particles.one_over_mass(particle_index);}
 

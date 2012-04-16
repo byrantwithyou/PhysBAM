@@ -22,6 +22,7 @@ template<class TV> class RIGID_DEFORMABLE_COLLISIONS;
 template<class TV> class DEFORMABLE_BODY_COLLECTION;
 template<class TV> class SOFT_BINDINGS;
 template<class TV> class BINDING_LIST;
+template<class TV> class RIGID_COLLISION_GEOMETRY;
 
 template<class TV>
 class DEFORMABLE_OBJECT_COLLISIONS:public NONCOPYABLE
@@ -72,12 +73,27 @@ public:
     void Compute_Candidate_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>& bodies);
     int Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,
         const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies);
-    int Adjust_Existing_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,
-        const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies);
+    int Adjust_Existing_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies);
     void Set_Collision_Velocities(ARRAY_VIEW<TV> V); // for external forces and velocities
     void Zero_Out_Collision_Velocities(ARRAY_VIEW<TV> V); // for external forces and velocities
     void Reset_Object_Collisions();
     void Update_Simulated_Particles();
+    int Adjust_Nodes_For_Collisions(COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTICLES<TV>& collision_particles,
+        const ARRAY<int>& nodes_to_check,const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table);
+    int Adjust_Nodes_For_Collisions(RIGID_COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTICLES<TV>& collision_particles,
+        const ARRAY<int>& nodes_to_check,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table);
+    void Adjust_Point_For_Collision(RIGID_COLLISION_GEOMETRY<TV>& body,int p,COLLISION_PARTICLE_STATE<TV>& collision,
+        T local_coefficient_of_friction);
+    void Process_Push_Out();
+    void Adjust_Nodes_For_Push_Out(COLLISION_GEOMETRY<TV>& body, DEFORMABLE_PARTICLES<TV>& collision_particles,const ARRAY<int>& nodes_to_check,
+        const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table);
+    void Adjust_Nodes_For_Push_Out(RIGID_COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTICLES<TV>& collision_particles,
+        const ARRAY<int>& nodes_to_check,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table);
+    void Adjust_Point_For_Push_Out(RIGID_COLLISION_GEOMETRY<TV>& body,int p,T depth);
 private:
     template<class T_MESH> void Add_Collision_Mesh(T_MESH& mesh,const bool collide_with_interior);
 //#####################################################################

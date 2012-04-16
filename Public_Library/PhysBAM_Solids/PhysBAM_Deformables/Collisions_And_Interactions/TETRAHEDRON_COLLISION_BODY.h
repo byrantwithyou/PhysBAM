@@ -72,12 +72,15 @@ public:
     int Get_Surface_Triangle(const int tetrahedron_index,const TV& tetrahedron_weights,TV& surface_weights,const bool omit_outside_points=false,
         const bool omit_inside_points=false,bool* inside=0) const;
 private:
-    void Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X,TV& V,SOFT_BINDINGS<TV>& soft_bindings,const T one_over_mass,const T dt,const TV& weights,
+    void Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X,TV& V,SOFT_BINDINGS<TV>& soft_bindings,const T one_over_mass,const TV& weights,
         TV& position_change);
 public:
-    int Adjust_Nodes_For_Collisions(ARRAY_VIEW<const TV> X_old,DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
-        const ARRAY<bool>& particle_on_surface,const T collision_tolerance,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
-        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const T max_relative_velocity,const T dt,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table);
+    int Adjust_Nodes_For_Collisions(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
+        const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table);
+    int Adjust_Nodes_For_Push_Out(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BINDINGS<TV>& soft_bindings,const ARRAY<int>& nodes_to_check,
+        const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
+        ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *thickness_table);
     const RANGE<TV>& Axis_Aligned_Bounding_Box() const PHYSBAM_OVERRIDE;
     void Update_Bounding_Box() PHYSBAM_OVERRIDE;
     void Read_State(TYPED_ISTREAM& input,const int state_index) PHYSBAM_OVERRIDE;

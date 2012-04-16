@@ -64,6 +64,9 @@ public:
     void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
     {particles.V(parent)+=particles.one_over_mass(parent)*impulse;}
 
+    void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
+    {particles.X(parent)+=particles.one_over_mass(parent)*impulse;}
+
     void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle) PHYSBAM_OVERRIDE
     {if(!skip_particle || !(*skip_particle)(parent)) particles.X(parent)+=dX;}
 

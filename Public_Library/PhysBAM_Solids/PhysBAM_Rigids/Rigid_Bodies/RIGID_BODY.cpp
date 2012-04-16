@@ -355,19 +355,25 @@ Find_Impulse_And_Angular_Impulse(const RIGID_BODY<TV>& body1,const RIGID_BODY<TV
 // Function Apply_Push
 //#####################################################################
 template<class TV> void RIGID_BODY<TV>::
-Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance,const bool half_impulse_for_accumulator)
+Apply_Push_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular_impulse)
+{
+    if(Has_Infinite_Inertia()) return;
+    TV velocity=impulse/Mass();
+    T_SPIN angular_velocity=World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(location-Frame().t,impulse)+angular_impulse;
+    Frame().t+=velocity;
+    Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*Frame().r;Frame().r.Normalize();
+    Update_Angular_Velocity();
+}
+//#####################################################################
+// Function Apply_Push
+//#####################################################################
+template<class TV> void RIGID_BODY<TV>::
+Apply_Push(RIGID_BODY<TV>& body1,RIGID_BODY<TV>& body2,const TV& location,const TV& normal,const T distance)
 {
     if(body1.Has_Infinite_Inertia() && body2.Has_Infinite_Inertia()) return;
     TV impulse=Impulse_Factor(body1,body2,location).Inverse()*(distance*normal);
-    RIGID_BODY<TV>* body[]={&body1,&body2};
-    for(int i=0;i<2;i++) if(!body[i]->Has_Infinite_Inertia()){
-        T sign=(T)1-2*i;
-        TV velocity=impulse/(body[i]->Mass()*sign);
-        T_SPIN angular_velocity=body[i]->World_Space_Inertia_Tensor_Inverse()*TV::Cross_Product(location-body[i]->Frame().t,sign*impulse);
-        body[i]->Frame().t+=velocity;
-        body[i]->Frame().r=ROTATION<TV>::From_Rotation_Vector(angular_velocity)*body[i]->Frame().r;body[i]->Frame().r.Normalize();
-        body[i]->Update_Angular_Velocity();
-        if(body[i]->impulse_accumulator) body[i]->impulse_accumulator->Add_Impulse(location,(half_impulse_for_accumulator?(T).5:(T)1)*TWIST<TV>(velocity,angular_velocity));} //NOTE: These are not impulses but thats ok as we just want to keep track of the changes
+    body1.Apply_Push_To_Body(location,impulse);
+    body2.Apply_Push_To_Body(location,-impulse);
 }
 //#####################################################################
 // Function Volume

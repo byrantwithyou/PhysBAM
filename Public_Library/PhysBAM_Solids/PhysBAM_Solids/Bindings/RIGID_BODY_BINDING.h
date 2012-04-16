@@ -86,14 +86,10 @@ public:
     {RIGID_BODY<TV>& rigid_body=Rigid_Body();if(rigid_body.Has_Infinite_Inertia()) return 0;return rigid_body.Object_Space_Impulse_Factor(object_space_position).Fast_Eigenvalues().Max();}
 
     void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
-    {RIGID_BODY<TV>& rigid_body=Rigid_Body();
-    if(rigid_body.Has_Infinite_Inertia()) return;
-    TWIST<TV>& twist=rigid_body_collection->rigid_body_particle.twist(rigid_body_particle_index);
-    T& mass=rigid_body_collection->rigid_body_particle.mass(rigid_body_particle_index);
-    twist.linear+=impulse/mass;
-    rigid_body.Update_Angular_Momentum();
-    rigid_body.Angular_Momentum()+=TV::Cross_Product(rigid_body.World_Space_Vector(object_space_position),impulse);
-    rigid_body.Update_Angular_Velocity();}
+    {Rigid_Body().Apply_Impulse_To_Body(Embedded_Position(),impulse);}
+
+    void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
+    {Rigid_Body().Apply_Push_To_Body(Embedded_Position(),impulse);}
 
     void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle) PHYSBAM_OVERRIDE
     {PHYSBAM_NOT_IMPLEMENTED();}
