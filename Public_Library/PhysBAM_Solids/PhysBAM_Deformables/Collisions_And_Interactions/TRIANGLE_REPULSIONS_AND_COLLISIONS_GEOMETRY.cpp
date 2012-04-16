@@ -27,7 +27,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>::
 TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection)
-    :mpi_solids(0),deformable_body_collection(deformable_body_collection),mass_modifier(0)
+    :mpi_solids(0),deformable_body_collection(deformable_body_collection)
 {
     // set parameters
     Allow_Intersections(false);Set_Allow_Intersections_Tolerance();

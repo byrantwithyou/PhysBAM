@@ -57,7 +57,6 @@ public:
         virtual void Edge_Edge_Mass_Revert(const VECTOR<int,2*d-2>& nodes,ARRAY_VIEW<T>& one_over_mass)=0;
         virtual void Reorder_Pairs(ARRAY<VECTOR<int,2*d-2> >& edge_edge_pairs,ARRAY<VECTOR<int,d+1> >& point_face_pairs)=0;
     };
-    MASS_MODIFIER* mass_modifier;
 
     TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
     ~TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY();

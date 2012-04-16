@@ -148,11 +148,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
             //culled=mpi_solids->Reduce_Add_Global(culled);LOG::Stat("Pre-gather collision pairs culled",culled);
             LOG::Time("gathering interaction pairs");
             mpi_solids->Gather_Interaction_Pairs(point_face_pairs_external,edge_edge_pairs_external);} // move all collision pairs to root
-
-        if(geometry.mass_modifier){
-            PHYSBAM_FATAL_ERROR();
-            geometry.mass_modifier->Reorder_Pairs(edge_edge_pairs_internal,point_face_pairs_internal);}
-
+  
         int exited_early=1;
 
         // Make a copy of the particles
@@ -432,7 +428,6 @@ Point_Face_Collision(GAUSS_JACOBI_PF_DATA& pf_data,const VECTOR<int,d+1>& nodes,
     if(face.Point_Face_Collision(X(nodes[0]),V(nodes[0]),V.Subset(nodes.Remove_Index(0)),dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early)){
         if(exit_early) return true;
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
-        if(geometry.mass_modifier) geometry.mass_modifier->Point_Face_Mass(attempt_ratio,nodes,weights,one_over_m);
         if(use_gauss_jacobi){
             pf_data.old_speed=relative_speed;
             Update_Velocity_Helper((1+restitution_coefficient)*relative_speed,weights,normal,one_over_m,V_save.Subset(nodes),&pf_data);}
@@ -498,7 +493,6 @@ Point_Face_Final_Repulsion(GAUSS_JACOBI_PF_DATA& pf_data,const VECTOR<int,d+1>& 
     if(face2.Point_Face_Interaction(point,V(nodes[0]),V_face,collision_thickness,distance,normal,weights,relative_speed,true,exit_early)){
         collision_time=dt;if(exit_early) return true;
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
-        if(geometry.mass_modifier) geometry.mass_modifier->Point_Face_Mass(attempt_ratio,nodes,weights,one_over_m);
         if(!use_gauss_jacobi && relative_speed<0){
             final_point_face_collisions++;
             Update_Velocity_Helper((1+restitution_coefficient)*relative_speed,weights,normal,one_over_m,V.Subset(nodes));
@@ -606,7 +600,6 @@ Edge_Edge_Collision(GAUSS_JACOBI_EE_DATA& ee_data,const VECTOR<int,2*d-2>& nodes
     T relative_speed=0;TV normal;VECTOR<T,2> weights;
     if(edge1.Edge_Edge_Collision(edge2,V_edges,dt,collision_thickness,collision_time,normal,weights,relative_speed,geometry.small_number,exit_early)){if(exit_early) return true;
         VECTOR<T,2*d-2> one_over_m_edges(one_over_mass.Subset(nodes));
-        if(geometry.mass_modifier) geometry.mass_modifier->Edge_Edge_Mass(attempt_ratio,nodes,weights,one_over_m_edges);
         if(use_gauss_jacobi){
             ee_data.old_speed=relative_speed;
             Update_Velocity_Helper((1+restitution_coefficient)*relative_speed,weights,one_over_m_edges,normal,V_save_edges,&ee_data);}
@@ -640,7 +633,6 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_EE_DATA& ee_data,const VECTOR<int,2*d-2>&
     if(edge1_final.Edge_Edge_Interaction(edge2_final,V_edges,collision_thickness,distance,normal,weights,relative_speed,false,geometry.small_number,exit_early)){
         collision_time=dt;if(exit_early) return true;
         VECTOR<T,2*d-2> one_over_m_edges(one_over_mass.Subset(nodes));
-        if(geometry.mass_modifier) geometry.mass_modifier->Edge_Edge_Mass(attempt_ratio,nodes,weights,one_over_m_edges);
         if(!use_gauss_jacobi && relative_speed<0){
             final_edge_edge_collisions++;
             Update_Velocity_Helper((1+restitution_coefficient)*relative_speed,weights,one_over_m_edges,normal,V_edges);

@@ -538,7 +538,6 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
             
             if(scalar_impulse){
                 applied_impulses++;
-                if(0 && geometry.mass_modifier&&use_repulsions) geometry.mass_modifier->Point_Face_Mass((T)1.,pair.nodes,pair.weights,particles.one_over_mass);
                 T one_over_mass=one_over_effective_mass(p);
                 for(int i=0;i<face_nodes.m;i++) one_over_mass+=sqr(pair.weights[i])*one_over_effective_mass(face_nodes[i]);
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
@@ -549,8 +548,7 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
                     pf_normals(pair_index)=direction; // tangential for friction.
                 }
                 else
-                    Update_Velocity_Helper(impulse,pair.weights,one_over_effective_mass.Subset(pair.nodes),V.Subset(pair.nodes));
-                if(0 && geometry.mass_modifier&&use_repulsions) geometry.mass_modifier->Point_Face_Mass_Revert(pair.nodes,particles.one_over_mass);}}
+                    Update_Velocity_Helper(impulse,pair.weights,one_over_effective_mass.Subset(pair.nodes),V.Subset(pair.nodes));}}
 
         if(use_gauss_jacobi) Scale_And_Apply_Point_Face_Impulses(pairs);}
     if(inverted_pairs) LOG::Stat("inverted point face repulsion pairs",inverted_pairs);
@@ -618,7 +616,6 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
             TV direction;T scalar_impulse=Repulsion_Impulse(direction,dt,pair,relative_velocity,elastic_repulsion,friction);
             if(scalar_impulse){
                 applied_impulses++;
-                if(0 && geometry.mass_modifier && use_repulsions) geometry.mass_modifier->Edge_Edge_Mass((T)1.,pair.nodes,pair.weights,geometry.deformable_body_collection.particles.one_over_mass);
                 T one_over_mass=Edge_Edge_One_Over_Mass_Helper(w,one_over_effective_mass.Subset(nodes));
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
                 if(use_gauss_jacobi && !friction && !elastic_repulsion){
@@ -627,8 +624,7 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
                     ee_target_impulses(pair_index)=impulse;
                     ee_normals(pair_index)=direction.Normalized();} // something weird going on here (unnormalized directions)
                 else
-                    Edge_Edge_Update_Velocity_Helper(impulse,w,one_over_effective_mass.Subset(nodes),V.Subset(nodes));
-                if(0 && geometry.mass_modifier && use_repulsions) geometry.mass_modifier->Edge_Edge_Mass_Revert(pair.nodes,geometry.deformable_body_collection.particles.one_over_mass);}}
+                    Edge_Edge_Update_Velocity_Helper(impulse,w,one_over_effective_mass.Subset(nodes),V.Subset(nodes));}}
 
         if(use_gauss_jacobi) Scale_And_Apply_Edge_Edge_Impulses(pairs);
     }

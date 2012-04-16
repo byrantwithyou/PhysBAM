@@ -194,8 +194,7 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
     if(collisions_found<0) // failed to resolve collisions (should only happen when exit_early=true) - otherwise any collisions that were found have been resolved
         PHYSBAM_NOT_IMPLEMENTED("exit_early=true");
     else if(collisions_found>0){ // restore unmodified velocities
-        if(solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.mass_modifier) particles.V=V_save;
-        else for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
+        for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else if(repulsions_found){ // repulsions only, restore velocities for unmodified and apply velocity delta otherwise
         for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
