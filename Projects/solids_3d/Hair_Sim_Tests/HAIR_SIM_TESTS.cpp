@@ -198,7 +198,6 @@ Initialize_Bodies()
         LOG::cout<<"MONITOR glkeys=("<<std::endl;}
     
     solids_parameters.triangle_collision_parameters.temporary_enable_collisions=true;
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.mass_modifier=use_collisions_mass_modify?this:0;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
     solids_parameters.triangle_collision_parameters.total_collision_loops=1;
     //solids_parameters.maximum_levelset_collision_projection_velocity=1.;

@@ -61,7 +61,6 @@ Initialize_Bodies()
     solids_parameters.enforce_repulsions_in_cg=false;
     solids_parameters.triangle_collision_parameters.perform_self_collision=true;
     solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)1e-4;
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.mass_modifier=this;
     solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
     solids_parameters.triangle_collision_parameters.total_collision_loops=4;
     comparator=new COLLISION_PAIR_COMPARATOR(&solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry);
