@@ -336,7 +336,7 @@ Adjust_Point_For_Collision(RIGID_COLLISION_GEOMETRY<TV>& body,int p,COLLISION_PA
     TV X=deformable_body_collection.binding_list.X(p),normal=body.Implicit_Geometry_Normal(X);
     TV V_rel=deformable_body_collection.binding_list.V(p)-body.Pointwise_Object_Velocity(X);
     if(local_coefficient_of_friction<0) local_coefficient_of_friction=body.rigid_geometry.coefficient_of_friction;
-    TV impulse=PhysBAM::Compute_Collision_Impulse(normal,deformable_body_collection.binding_list.Impulse_Factor(p),V_rel,(T)0,local_coefficient_of_friction,0); 
+    TV impulse=PhysBAM::Compute_Collision_Impulse(normal,deformable_body_collection.binding_list.Impulse_Factor(p),V_rel,(T)0,local_coefficient_of_friction,0);
     deformable_body_collection.binding_list.Apply_Impulse(p,impulse);
     if(body.impulse_accumulator)
         body.impulse_accumulator->Add_Impulse(X,-TWIST<TV>(impulse,TV::Cross_Product(X-body.rigid_geometry.Frame().t,impulse)));
@@ -352,7 +352,7 @@ template<class TV,class T> void
 Adjust_Nodes_For_Push_Out_Helper(COLLISION_GEOMETRY<TV>& body,SOFT_BINDINGS<TV>& soft_bindings,DEFORMABLE_PARTICLES<TV>& collision_particles,const ARRAY<int>& nodes_to_check,
     const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
     ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table)
-{ 
+{
 }
 //#####################################################################
 // Function Adjust_Nodes_For_Push_Out_Helper
