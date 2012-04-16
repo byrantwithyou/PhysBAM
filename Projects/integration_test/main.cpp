@@ -13,6 +13,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -267,6 +268,10 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     ifs.Set_RHS(rhs,f_body,f_interface);
 
     Dump_System<T,TV>(ifs,at);
+
+    RANDOM_NUMBERS<T> random;
+    random.Fill_Uniform(sol.v,-(T)1,(T)1);
+    ifs.Project(sol);
     
     // CONJUGATE_RESIDUAL<T> cr;
     // KRYLOV_SOLVER<T>* solver=&cr;
@@ -522,6 +527,18 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_6;
             break;}
+        case 7:{ // No interface
+            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
+            {
+                virtual void Initialize(){}
+                virtual TV u(const TV& X){return TV();}
+                virtual T p(const TV& X){return 0;}
+                virtual T phi(const TV& X){return (-1);}
+                virtual TV body(const TV& X,bool inside){return TV();}
+                virtual TV interface(const TV& X){return TV();}
+            };
+            test=new ANALYTIC_TEST_7;
+            break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
@@ -562,7 +579,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    Integration_Test<VECTOR<double,2> >(argc,argv);
+    Integration_Test<VECTOR<double,3> >(argc,argv);
 
     return 0;
 }
