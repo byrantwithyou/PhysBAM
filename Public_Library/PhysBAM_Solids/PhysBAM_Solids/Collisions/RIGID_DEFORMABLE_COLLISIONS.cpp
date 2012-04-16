@@ -739,9 +739,9 @@ Initialize_All_Contact_Projections()
                 PRECOMPUTE_CONTACT_PROJECTION* precompute=0;
                 if(HASHTABLE<int>* particles=particles_contacting_rigid_body.Get_Pointer(rigid_body.particle_index)){
                     for(HASHTABLE<int>::ITERATOR iter(*particles);iter.Valid();iter.Next()){
-                        if(!soft_bindings.Particle_Is_Bound(/*iter.Key()*/p)){ // skip soft bound particles. TODO: fix.
+                        if(!soft_bindings.Particle_Is_Bound(iter.Key())){ // skip soft bound particles. TODO: fix.
                             if(!precompute) precompute=new PRECOMPUTE_CONTACT_PROJECTION(rigid_body,true);
-                            precompute->particles.Append(/*iter.Key()*/p);}}}
+                            precompute->particles.Append(iter.Key());}}}
                 if(precompute){
                     Initialize_Rigid_Deformable_Contact_Projection(*precompute,deformable_body_collection.particles.X);
                     precompute_contact_projections.Append(precompute);}}}}
