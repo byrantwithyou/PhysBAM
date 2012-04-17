@@ -351,27 +351,13 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 //#################################################################################################################################################
 
 template<class TV>
-void Integration_Test(int argc,char* argv[])
+void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<int,d> TV_INT;
 
     Get_Debug_Particles<TV>();
-
-    PARSE_ARGS parse_args;
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
-    parse_args.Add_String_Argument("-o","output","output directory");
-    parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
-    parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
-    parse_args.Add_Double_Argument("-m",1,"meter scale");
-    parse_args.Add_Double_Argument("-sec",1,"second scale");
-    parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
-    parse_args.Add_Integer_Argument("-test",1,"test number");
-    parse_args.Add_Integer_Argument("-resolution",4,"resolution");
-    parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
-    parse_args.Add_Option_Argument("-use_preconditioner","Use Jacobi preconditioner");
-    parse_args.Parse(argc,argv);
 
     int test_number;
     if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
@@ -603,7 +589,25 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    Integration_Test<VECTOR<double,2> >(argc,argv);
+    PARSE_ARGS parse_args;
+    parse_args.Set_Extra_Arguments(-1,"<example number>");
+    parse_args.Add_String_Argument("-o","output","output directory");
+    parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
+    parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
+    parse_args.Add_Double_Argument("-m",1,"meter scale");
+    parse_args.Add_Double_Argument("-sec",1,"second scale");
+    parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
+    parse_args.Add_Integer_Argument("-test",1,"test number");
+    parse_args.Add_Integer_Argument("-resolution",4,"resolution");
+    parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
+    parse_args.Add_Option_Argument("-use_preconditioner","Use Jacobi preconditioner");
+    parse_args.Add_Option_Argument("-3d","Use 3D");
+    parse_args.Parse(argc,argv);
+
+    if(parse_args.Get_Option_Value("-3d"))
+        Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);
+    else
+        Integration_Test<VECTOR<double,2> >(argc,argv,parse_args);
 
     return 0;
 }
