@@ -20,6 +20,55 @@ bool Same_Polynomial(const STATIC_POLYNOMIAL<T,rank,d>& a,const STATIC_POLYNOMIA
 template<class T,int rank,int d,int d2>
 bool Same_Polynomial(const STATIC_POLYNOMIAL<T,rank,d>& a,const STATIC_POLYNOMIAL<T,rank,d2>& b) {return false;}
 
+struct QUADRITURE_RULE_TRI
+{
+    bool use_center;
+    double center_weight;
+    int number3;
+    double location3[3];
+    double weight3[3];
+    int number6;
+    double location6a[1],location6b[1];
+    double weight6[1];
+};
+
+const QUADRITURE_RULE_TRI quadriture_rule_tri[9]={
+    {1,1,0},
+    {1,1,0},
+    {0,0,1,{0.5},{1./3}},
+    {1,-9./16,1,{0.2},{25./48}},
+    {0,0,2,{0.44594849091596488,0.0915762135097707435},{0.223381589678011466,0.109951743655321868}},
+    {1,0.225,2,{0.47014206410511511,0.10128650732345632},{0.132394152788506181,0.125939180544827152}},
+    {0,0,2,{0.219429982549781601,0.480137964112216},{0.1713331241529814,0.0807310895930310},1,{0.0193717243612407884},{0.141619015923968181},{0.04063455979366063}},
+    {1,0.197270749512171954,2,{0.0578921421877734927,1.10297642785225161},{0.0444948443100991969,0.754643787840106e-6},1,{0.0712675584422491723},{0.298212365719518663},{0.111540408937694457}},
+    {1,-0.28341838511138821,3,{0.0337718440544803428,0.270347889165403623,0.476665439382152374},{0.0170909126716008895,0.218829882330447478,0.0699069619326525813},
+     1,{0.0514643354866615260},{0.202706173746087101},{0.0609891857178808940}}
+};
+
+struct QUADRITURE_RULE_SEG
+{
+    bool use_center;
+    double center_weight;
+    int number;
+    double location[3];
+    double weight[3];
+};
+
+const QUADRITURE_RULE_SEG quadriture_rule_seg[12]={
+    {1,1,0},
+    {1,1,0},
+    {0,0,1,{0.211324865405187118},{0.5}},
+    {0,0,1,{0.211324865405187118},{0.5}},
+    {1,0.444444444444444444,1,{0.112701665379258311},{0.277777777777777778}},
+    {1,0.444444444444444444,1,{0.112701665379258311},{0.277777777777777778}},
+    {0,0,2,{0.0694318442029737124,0.330009478207571866},{0.173927422568726928,0.326072577431273072}},
+    {0,0,2,{0.0694318442029737124,0.330009478207571866},{0.173927422568726928,0.326072577431273072}},
+    {1,0.284444444444444444,3,{0.0469100770306680036,0.230765344947158454},{0.118463442528094544,0.239314335249683234}},
+    {1,0.284444444444444444,3,{0.0469100770306680036,0.230765344947158454},{0.118463442528094544,0.239314335249683234}},
+    {0,0,3,{0.0337652428984239861,0.169395306766867739,0.380690406958401558},{0.0856622461895851725,0.180380786524069303,0.233956967286345524}},
+    {0,0,3,{0.0337652428984239861,0.169395306766867739,0.380690406958401558},{0.0856622461895851725,0.180380786524069303,0.233956967286345524}}
+};
+
 template<class T,int rank,int d>
 struct STATIC_POLYNOMIAL
 {
@@ -303,6 +352,109 @@ struct STATIC_POLYNOMIAL
             integral+=barycentric.terms(it.index)*factorial[it.index(0)]*factorial[it.index(1)]/factorial[it.index(0)+it.index(1)+2];}
 
         return integral*TV::Cross_Product(a,b).Magnitude();
+    }
+
+    static T Eval(const TV& pt,const TV_INT& p)
+    {
+        T r=1;
+        for(int i=0;i<TV::m;i++)
+            for(int j=0;j<p(i);j++)
+                r*=pt(i);
+        return r;
+    }
+
+    static T Quadrature_Over_Primitive(const VECTOR<TV,2>& vertices,const TV_INT& p)
+    {
+        int o=p.Sum();
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
+        TV a=vertices(1)-vertices(0);
+        if(!o) return a.Magnitude();
+        T r=0;
+        
+        const QUADRITURE_RULE_SEG& rule=quadriture_rule_seg[o];
+        if(rule.use_center) r+=rule.center_weight*Eval(vertices.Sum()/2,p);
+        for(int i=0;i<rule.number;i++){
+            T s=0;
+            s+=Eval(vertices.x+rule.location[i]*a,p);
+            s+=Eval(vertices.y-rule.location[i]*a,p); 
+            r+=rule.weight[i]*s;}
+        return r*a.Magnitude();
+    }
+
+    T Quadrature_Over_Primitive(const VECTOR<TV,2>& vertices) const
+    {
+        int o=size.Sum();
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
+        TV a=vertices(1)-vertices(0);
+        if(!o) return terms(TV_INT())*a.Magnitude();
+        T r=0;
+        
+        const QUADRITURE_RULE_SEG& rule=quadriture_rule_seg[o];
+        if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/2);
+        for(int i=0;i<rule.number;i++){
+            T s=0;
+            s+=Value(vertices.x+rule.location[i]*a);
+            s+=Value(vertices.y-rule.location[i]*a); 
+            r+=rule.weight[i]*s;}
+        return r*a.Magnitude();
+    }
+
+    static T Quadrature_Over_Primitive(const VECTOR<TV,3>& vertices,const TV_INT& p)
+    {
+        int o=p.Sum();
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_tri)/sizeof(*quadriture_rule_tri));
+        TV a=vertices(1)-vertices(0);
+        TV b=vertices(2)-vertices(0);
+        if(!o) return TV::Cross_Product(a,b).Magnitude()/2;
+        T r=0;
+        
+        const QUADRITURE_RULE_TRI& rule=quadriture_rule_tri[o];
+        if(rule.use_center) r+=rule.center_weight*Eval(vertices.Sum()/3,p);
+        for(int i=0;i<rule.number3;i++){
+            T s=0;
+            s+=Eval(vertices.x+rule.location3[i]*(vertices.y-vertices.x)+rule.location3[i]*(vertices.z-vertices.x),p);
+            s+=Eval(vertices.y+rule.location3[i]*(vertices.z-vertices.y)+rule.location3[i]*(vertices.x-vertices.y),p);
+            s+=Eval(vertices.z+rule.location3[i]*(vertices.x-vertices.z)+rule.location3[i]*(vertices.y-vertices.z),p);
+            r+=rule.weight3[i]*s;}
+        for(int i=0;i<rule.number6;i++){
+            T s=0;
+            s+=Eval(vertices.x+rule.location6a[i]*(vertices.y-vertices.x)+rule.location6b[i]*(vertices.z-vertices.x),p);
+            s+=Eval(vertices.y+rule.location6a[i]*(vertices.z-vertices.y)+rule.location6b[i]*(vertices.x-vertices.y),p);
+            s+=Eval(vertices.z+rule.location6a[i]*(vertices.x-vertices.z)+rule.location6b[i]*(vertices.y-vertices.z),p);
+            s+=Eval(vertices.x+rule.location6b[i]*(vertices.y-vertices.x)+rule.location6a[i]*(vertices.z-vertices.x),p);
+            s+=Eval(vertices.y+rule.location6b[i]*(vertices.z-vertices.y)+rule.location6a[i]*(vertices.x-vertices.y),p);
+            s+=Eval(vertices.z+rule.location6b[i]*(vertices.x-vertices.z)+rule.location6a[i]*(vertices.y-vertices.z),p);
+            r+=rule.weight6[i]*s;}
+        return r*TV::Cross_Product(a,b).Magnitude()/2;
+    }
+
+    T Quadrature_Over_Primitive(const VECTOR<TV,3>& vertices) const
+    {
+        int o=size.Sum();
+        printf("%i\n", o);
+        PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
+        TV a=vertices(1)-vertices(0);
+        TV b=vertices(2)-vertices(0);
+        if(!o) return terms(TV_INT())*TV::Cross_Product(a,b).Magnitude()/2;
+        T r=0;
+        const QUADRITURE_RULE_TRI& rule=quadriture_rule_tri[o];
+        if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/3);
+        for(int i=0;i<rule.number3;i++){
+            T s=0;
+            s+=Value(vertices.x+rule.location3[i]*(vertices.y-vertices.x)+rule.location3[i]*(vertices.z-vertices.x));
+            s+=Value(vertices.y+rule.location3[i]*(vertices.z-vertices.y)+rule.location3[i]*(vertices.x-vertices.y));
+            s+=Value(vertices.z+rule.location3[i]*(vertices.x-vertices.z)+rule.location3[i]*(vertices.y-vertices.z));
+            r+=rule.weight3[i]*s;}
+        for(int i=0;i<rule.number6;i++){
+            T s=0;
+            s+=Value(vertices.x+rule.location6a[i]*(vertices.y-vertices.x)+rule.location6b[i]*(vertices.z-vertices.x));
+            s+=Value(vertices.y+rule.location6a[i]*(vertices.z-vertices.y)+rule.location6b[i]*(vertices.x-vertices.y));
+            s+=Value(vertices.z+rule.location6a[i]*(vertices.x-vertices.z)+rule.location6b[i]*(vertices.y-vertices.z));
+            s+=Value(vertices.x+rule.location6b[i]*(vertices.y-vertices.x)+rule.location6a[i]*(vertices.z-vertices.x));
+            s+=Value(vertices.y+rule.location6b[i]*(vertices.z-vertices.y)+rule.location6a[i]*(vertices.x-vertices.y));
+            s+=Value(vertices.z+rule.location6b[i]*(vertices.x-vertices.z)+rule.location6a[i]*(vertices.y-vertices.z));
+            r+=rule.weight6[i]*s;}
+        return r*TV::Cross_Product(a,b).Magnitude()/2;
     }
 };
 
