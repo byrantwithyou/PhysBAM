@@ -94,6 +94,7 @@ Set_Constant_Stencil()
     e.polynomial.Set_Term(TV_INT(),1);
     e.polynomial.Scale((T)1/dX);
     stencils.Append(e);
+    Update_Support();
 }
 //#####################################################################
 // Function Set_Multilinear_Stencil
@@ -108,6 +109,7 @@ Set_Multilinear_Stencil()
     e.polynomial.Shift(TV()-1);
     e.polynomial.Scale((T)1/dX);
     Add_Symmetric_Entry(e);
+    Update_Support();
 }
 //#####################################################################
 // Function Differentiate
@@ -122,6 +124,17 @@ Differentiate(int v)
         if(stencils(i).polynomial.size!=TV_INT())
             stencils(k++)=stencils(i);}
     stencils.Resize(k);
+    Update_Support();
+}
+//#####################################################################
+// Function Update_Support
+//#####################################################################
+template<class TV,int d> void BASIS_STENCIL_UNIFORM<TV,d>::
+Update_Support()
+{
+    support=RANGE<TV_INT>(TV_INT(),TV_INT());
+    for(int i=0;i<stencils.m;i++) support.Enlarge_To_Include_Box(stencils(i).region);
+    support=support.Translated(center_offset);
 }
 //#####################################################################
 // Function Print
