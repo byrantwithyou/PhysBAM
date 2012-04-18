@@ -162,6 +162,10 @@ public:
 
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
     {system.Project_Nullspace(x);}
+
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE
+    {system.Precondition(r,z);}
+
 //#####################################################################
 };
 //#####################################################################
@@ -174,7 +178,7 @@ Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const
     KRYLOV_VECTOR_BASE<T>* b=null.Clone_Default();
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
-    SQUARED_SYSTEM<T> ss(*this,use_preconditioner*0,preconditioner_commutes_with_projection*0);
+    SQUARED_SYSTEM<T> ss(*this,use_preconditioner,preconditioner_commutes_with_projection);
 
     RANDOM_NUMBERS<T> random;
     int n=b->Raw_Size();
