@@ -8,8 +8,8 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-#include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
+// #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+// #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -275,20 +275,20 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     
     // CONJUGATE_RESIDUAL<T> cr;
     // KRYLOV_SOLVER<T>* solver=&cr;
-    MINRES<T> mr;
-    KRYLOV_SOLVER<T>* solver=&mr;
+    // MINRES<T> mr;
+    // KRYLOV_SOLVER<T>* solver=&mr;
     // solver->restart_iterations=10000;
     // solver->nullspace_tolerance=0;
     // solver->print_residuals=true;
-    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
+    // solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
 
-    ifs.Multiply(sol,*vectors(0));
-    *vectors(0)-=rhs;
-    LOG::cout<<"Residual: "<<ifs.Convergence_Norm(*vectors(0))<<std::endl;
+    // ifs.Multiply(sol,*vectors(0));
+    // *vectors(0)-=rhs;
+    // LOG::cout<<"Residual: "<<ifs.Convergence_Norm(*vectors(0))<<std::endl;
 
-    Dump_Vector<T,TV>(ifs,sol.v,"solution");
+    // Dump_Vector<T,TV>(ifs,sol.v,"solution");
 
-    // OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,*vectors(0),*vectors(1));
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,sol,rhs);
     // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
@@ -296,7 +296,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     // OCTAVE_OUTPUT<T>("null_u.txt").Write("null_u",ifs.null_u[0]);
     // OCTAVE_OUTPUT<T>("null_v.txt").Write("null_v",ifs.null_u[1]);
 
-    ifs.Get_U_Part(sol.v,numer_u);
+/*    ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
 
     exact_u.Resize(grid);
@@ -343,7 +343,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     Dump_u_p(ifs,error_u,error_p,"error");
     Dump_u_p(ifs.grid,error_u,error_p,"color mapped error");
 
-    LOG::cout<<ifs.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
+    LOG::cout<<ifs.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;*/
 }
 
 //#################################################################################################################################################
@@ -539,6 +539,30 @@ void Integration_Test(int argc,char* argv[])
             };
             test=new ANALYTIC_TEST_7;
             break;}
+        case 8:{ // square level set
+            struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
+            {
+                virtual void Initialize(){}
+                virtual TV u(const TV& X){return TV();}
+                virtual T p(const TV& X){return 0;}
+                virtual T phi(const TV& X){return (X-0.5).Magnitude()-0.26;}
+                virtual TV body(const TV& X,bool inside){return TV();}
+                virtual TV interface(const TV& X){return TV();}
+            };
+            test=new ANALYTIC_TEST_8;
+            break;}
+        case 9:{ // square level set
+            struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
+            {
+                virtual void Initialize(){}
+                virtual TV u(const TV& X){return TV();}
+                virtual T p(const TV& X){return 0;}
+                virtual T phi(const TV& X){return (X-0.5).Max_Abs()-0.25125;}
+                virtual TV body(const TV& X,bool inside){return TV();}
+                virtual TV interface(const TV& X){return TV();}
+            };
+            test=new ANALYTIC_TEST_9;
+            break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
@@ -579,7 +603,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    Integration_Test<VECTOR<double,3> >(argc,argv);
+    Integration_Test<VECTOR<double,2> >(argc,argv);
 
     return 0;
 }
