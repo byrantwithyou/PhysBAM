@@ -88,7 +88,7 @@ Display(const int in_color) const
         if(colors) OPENGL_COLOR((*colors)(i)).Send_To_GL_Pipeline();
         else default_color.Send_To_GL_Pipeline();
 
-        if(sizes) OPENGL_SHAPES::Draw_Circle(particles.X(i),(*sizes)(i),20,true);
+        if(sizes && (*sizes)(i)) OPENGL_SHAPES::Draw_Circle(particles.X(i),(*sizes)(i)*scale_velocities,20,false);
         else{
             vertices.Resize(0);
             OpenGL_Vertex(particles.X(i),vertices);
