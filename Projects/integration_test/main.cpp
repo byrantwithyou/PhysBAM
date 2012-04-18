@@ -171,6 +171,39 @@ void Dump_Vector(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,con
         Flush_Frame<T,TV>(buff);}
 }
 
+template<class T,class TV>
+void Dump_Vector2(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,const char* title)
+{
+    char buff[100];
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            Dump_Interface<T,TV>(ifs,false);
+            sprintf(buff,"%s %c %c",title,"uvw"[i],s?'-':'+');
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
+                if(it.Axis()==i){ 
+                    int index=ifs.index_map_u[i]->Get_Index_Fixed(it.index,s);
+                    if(index>=0){
+                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
+                        else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v(index));}}
+            Flush_Frame<T,TV>(buff);}
+
+    for(int s=0;s<2;s++){
+        Dump_Interface<T,TV>(ifs,false);
+        sprintf(buff,"%s p %c",title,s?'-':'+');
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
+            int index=ifs.index_map_p->Get_Index_Fixed(it.index,s);
+            if(index>=0)
+                for(int j=0;j<TV::m;j++)
+                    for(int sign=0;sign<2;sign++){
+                if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
+                else
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v(index)*(sign?1:-1));}}
+        Flush_Frame<T,TV>(buff);}
+}
+
 template<class T,class TV,class TV_INT>
 void Dump_u_p(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<T,TV_INT>& p,const char* title)
 {
@@ -280,7 +313,13 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     // solver->restart_iterations=10000;
     // solver->nullspace_tolerance=0;
     // solver->print_residuals=true;
-    // solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
+    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
+    if(ifs.Nullspace_Check(rhs)){
+        OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
+        ifs.Multiply(rhs,*vectors(0));
+        LOG::cout<<"nullspace found: "<<sqrt(ifs.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+        rhs.v/=rhs.v.Max_Abs();
+        Dump_Vector(ifs,rhs.v,"extra null mode");}
 
     // ifs.Multiply(sol,*vectors(0));
     // *vectors(0)-=rhs;
