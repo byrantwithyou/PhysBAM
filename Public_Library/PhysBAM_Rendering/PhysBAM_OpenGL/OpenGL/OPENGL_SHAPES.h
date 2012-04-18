@@ -60,9 +60,9 @@ inline void Draw_Quad(VECTOR<double,3> corner,VECTOR<double,3> width,VECTOR<doub
 inline void Draw_Circle(const double radius,const int slices,const bool fill=true)
 {
     ARRAY<OPENGL_POLICY<double>::T_GL> vertices;
-        for(int i=0;i<slices;++i){
-            double t=2*pi*double(i)/slices; 
-            OpenGL_Vertex(VECTOR<double,3>(radius*cos(t),radius*sin(t),0),vertices);}
+    for(int i=0;i<slices;++i){
+        double t=2*pi*double(i)/slices; 
+        OpenGL_Vertex(VECTOR<double,3>(radius*cos(t),radius*sin(t),0),vertices);}
     OpenGL_Draw_Arrays(fill?GL_TRIANGLE_STRIP:GL_LINE_LOOP,2,vertices);
 }
 
@@ -70,9 +70,9 @@ template<class T>
 inline void Draw_Circle(const VECTOR<T,2>& center,const double radius,const int slices,const bool fill=true)
 {
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
-        for(int i=0;i<slices;++i){
-            T t=2*(T)pi*i/slices;
-            OpenGL_Vertex(VECTOR<T,3>(radius*cos(t)+center.x,radius*sin(t)+center.y,0),vertices);}
+    for(int i=0;i<=slices;++i){
+        T t=2*(T)pi*i/slices;
+        OpenGL_Vertex(VECTOR<T,2>(radius*cos(t)+center.x,radius*sin(t)+center.y),vertices);}
     OpenGL_Draw_Arrays(fill?GL_TRIANGLE_STRIP:GL_LINE_LOOP,2,vertices);
 }
 
