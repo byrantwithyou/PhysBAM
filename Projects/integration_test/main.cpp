@@ -54,8 +54,8 @@ template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
     return debug_particles;
 }
 
-template<class T,class TV>
-void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
+template<class T,int d>
+void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
 {
     static int frame=0;
     char buff[100];
@@ -63,14 +63,14 @@ void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
     FILE_UTILITIES::Create_Directory(buff);
     FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
     if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
-    Get_Debug_Particles<TV>().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
+    Get_Debug_Particles<VECTOR<T,d> >().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
     frame++;
 }
 
 template<class T,class TV>
 void Flush_Frame(const char* title)
 {
-    Dump_Frame<T,TV>(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
+    Dump_Frame(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
 }
 
 template<class T,class TV>
@@ -175,33 +175,25 @@ template<class T,class TV>
 void Dump_Vector2(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,const char* title)
 {
     char buff[100];
-    for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
-            Dump_Interface<T,TV>(ifs,false);
-            sprintf(buff,"%s %c %c",title,"uvw"[i],s?'-':'+');
-            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next())
-                if(it.Axis()==i){ 
-                    int index=ifs.index_map_u[i]->Get_Index_Fixed(it.index,s);
-                    if(index>=0){
-                        if(ifs.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
-                        else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
-                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v(index));}}
-            Flush_Frame<T,TV>(buff);}
-
     for(int s=0;s<2;s++){
-        Dump_Interface<T,TV>(ifs,false);
-        sprintf(buff,"%s p %c",title,s?'-':'+');
+        ARRAY<T,FACE_INDEX<TV::m> > u(ifs.grid);
+        sprintf(buff,"%s %c",title,s?'-':'+');
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(ifs.grid);it.Valid();it.Next()){
+            int index=ifs.index_map_u[it.Axis()]->Get_Index_Fixed(it.index,s);
+            if(index>=0) u(it.Full_Index())=v(index);}
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ifs.grid);it.Valid();it.Next()){
             int index=ifs.index_map_p->Get_Index_Fixed(it.index,s);
-            if(index>=0)
-                for(int j=0;j<TV::m;j++)
-                    for(int sign=0;sign<2;sign++){
-                if(ifs.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
-                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
-                else
-                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v(index)*(sign?1:-1));}}
-        Flush_Frame<T,TV>(buff);}
+            if(index>=0){
+                Add_Debug_Particle(it.Location(),v(index)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v(index));}}
+        for(int i=0;i<ifs.object.mesh.elements.m;i++){
+            Add_Debug_Particle(ifs.object.Get_Element(i).Center(),VECTOR<T,3>(1,1,1));
+            TV V;
+            for(int j=0;j<TV::m;j++)
+                V(j)=v(ifs.index_range_q[j].min_corner+i);
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,V);}
+
+        Dump_Frame(u,buff);}
 }
 
 template<class T,class TV,class TV_INT>
@@ -236,7 +228,7 @@ void Dump_u_p(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,const AR
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
         Add_Debug_Particle(it.Location(),color_map(p(it.index)));
 
-    Dump_Frame<T,TV>(u,title);
+    Dump_Frame(u,title);
 }
 
 //#################################################################################################################################################
@@ -319,7 +311,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
         ifs.Multiply(rhs,*vectors(0));
         LOG::cout<<"nullspace found: "<<sqrt(ifs.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
         rhs.v/=rhs.v.Max_Abs();
-        Dump_Vector(ifs,rhs.v,"extra null mode");}
+        Dump_Vector2(ifs,rhs.v,"extra null mode");}
 
     // ifs.Multiply(sol,*vectors(0));
     // *vectors(0)-=rhs;
@@ -396,7 +388,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<int,d> TV_INT;
 
-    Get_Debug_Particles<TV>();
+    Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
     int test_number;
     if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
