@@ -7,6 +7,7 @@
 #ifndef __KRYLOV_SYSTEM_BASE__
 #define __KRYLOV_SYSTEM_BASE__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 namespace PhysBAM{
 
@@ -37,6 +38,7 @@ public:
     virtual void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     const KRYLOV_VECTOR_BASE<T>& Precondition(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
     void Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE<T>& z) const;
+    bool Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const;
 protected:
     virtual void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
 //#####################################################################

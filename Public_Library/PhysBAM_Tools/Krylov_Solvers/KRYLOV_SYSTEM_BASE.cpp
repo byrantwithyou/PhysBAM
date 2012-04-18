@@ -2,6 +2,7 @@
 // Copyright 2008, Geoffrey Irving.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
@@ -10,15 +11,24 @@
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 using namespace PhysBAM;
+//#####################################################################
+// Constructor
+//#####################################################################
 template<class T> KRYLOV_SYSTEM_BASE<T>::
 KRYLOV_SYSTEM_BASE(const bool use_preconditioner,const bool preconditioner_commutes_with_projection)
     :use_preconditioner(use_preconditioner),preconditioner_commutes_with_projection(preconditioner_commutes_with_projection)
 {
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 template<class T> KRYLOV_SYSTEM_BASE<T>::
 ~KRYLOV_SYSTEM_BASE()
 {
 }
+//#####################################################################
+// Function Test_System
+//#####################################################################
 template<class T> void KRYLOV_SYSTEM_BASE<T>::
 Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE<T>& z) const
 {
@@ -86,16 +96,25 @@ Test_System(KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& y,KRYLOV_VECTOR_BASE
 
     LOG::cout<<"Krylov System Test Result: "<<(pass?"PASS":"FAIL")<<std::endl;
 }
+//#####################################################################
+// Function Apply_Preconditioner
+//#####################################################################
 template<class T> void KRYLOV_SYSTEM_BASE<T>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Project_Nullspace
+//#####################################################################
 template<class T> void KRYLOV_SYSTEM_BASE<T>::
 Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 {
     PHYSBAM_FUNCTION_IS_NOT_DEFINED();
 }
+//#####################################################################
+// Function Precondition
+//#####################################################################
 template<class T> const KRYLOV_VECTOR_BASE<T>& KRYLOV_SYSTEM_BASE<T>::
 Precondition(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
@@ -103,6 +122,88 @@ Precondition(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
     Apply_Preconditioner(r,z);
     if(!preconditioner_commutes_with_projection){Project(z);Project_Nullspace(z);}
     return z;
+}
+
+template<class T>
+struct SQUARED_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
+{
+public:
+    const KRYLOV_SYSTEM_BASE<T>& system;
+    mutable KRYLOV_VECTOR_BASE<T>* tmp;
+    mutable KRYLOV_VECTOR_BASE<T>* tmp2;
+
+    SQUARED_SYSTEM(const KRYLOV_SYSTEM_BASE<T>& system_input,const bool use_preconditioner,const bool preconditioner_commutes_with_projection)
+        :KRYLOV_SYSTEM_BASE<T>(use_preconditioner,preconditioner_commutes_with_projection),system(system_input),tmp(0),tmp2(0)
+    {}
+
+    virtual ~SQUARED_SYSTEM()
+    {delete tmp;delete tmp2;}
+
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const PHYSBAM_OVERRIDE
+    {
+        if(!tmp) tmp=x.Clone_Default();
+        if(!tmp2) tmp2=x.Clone_Default();
+        system.Multiply(x,*tmp);
+        const KRYLOV_VECTOR_BASE<T>& mr=system.Precondition(*tmp,*tmp2);
+        system.Multiply(mr,result);
+    }
+
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE
+    {return system.Inner_Product(x,y);}
+
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+    {return system.Convergence_Norm(x);}
+
+    void Project(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+    {system.Project(x);}
+
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+    {system.Set_Boundary_Conditions(x);}
+
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
+    {system.Project_Nullspace(x);}
+//#####################################################################
+};
+//#####################################################################
+// Function Nullspace_Check
+//#####################################################################
+template<class T> bool KRYLOV_SYSTEM_BASE<T>::
+Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const
+{
+    KRYLOV_VECTOR_BASE<T>* x=null.Clone_Default();
+    KRYLOV_VECTOR_BASE<T>* b=null.Clone_Default();
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
+
+    SQUARED_SYSTEM<T> ss(*this,use_preconditioner*0,preconditioner_commutes_with_projection*0);
+
+    RANDOM_NUMBERS<T> random;
+    int n=b->Raw_Size();
+    for(int i=0;i<n;i++)
+        b->Raw_Get(i)=random.Get_Uniform_Number(-1,1);
+    ss.Project(*b);
+    CONJUGATE_GRADIENT<T> cg;
+//    cg.print_diagnostics=false;
+
+    bool ns=false;
+    
+    try{
+        ns=!cg.Solve(ss,*x,*b,av,1e-10,0,100000);}
+    catch(...){ 
+        ns=true;}
+    
+    null=*x;
+    ss.Project(null);
+    T mx=0;
+    for(int i=0;i<n;i++)
+        mx=max(mx,b->Raw_Get(i));
+    if(mx) null*=1/mx;
+
+    if(T n2=Inner_Product(null,null))
+        null*=1/sqrt(n2);
+
+    delete x;
+    delete b;
+    return ns;
 }
 template class KRYLOV_SYSTEM_BASE<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
