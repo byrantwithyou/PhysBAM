@@ -27,7 +27,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SOLVE_CONTACT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SPHERE_PLANE_CONTACT_PAIR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SPHERE_SPHERE_CONTACT_PAIR.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Parallel_Computation/MPI_RIGIDS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
@@ -47,15 +46,13 @@ bool Solve_Projected_Gauss_Seidel(RIGID_BODY_COLLECTION<TV>& rigid_body_collecti
 template<class TV>
 void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COLLECTION<TV>& rigid_body_collection,
     RIGID_BODY_COLLISION_PARAMETERS<TV>& parameters,const bool correct_contact_energy,const bool use_saved_pairs,const typename TV::SCALAR dt,const typename TV::SCALAR time,
-    MPI_RIGIDS<TV>* mpi_rigids,ARRAY<TWIST<TV> >& mpi_rigid_velocity_save,ARRAY<typename TV::SPIN>& mpi_rigid_angular_momentum_save)
+    ARRAY<TWIST<TV> >& mpi_rigid_velocity_save,ARRAY<typename TV::SPIN>& mpi_rigid_angular_momentum_save)
 {
     typedef typename TV::SCALAR T;
 
     LOG::SCOPE scope("rigid body contact kernel");
 
     ARRAY<ARRAY<VECTOR<int,2> > >& contact_pairs_for_level=use_saved_pairs?rigid_body_collisions.saved_contact_pairs_for_level:rigid_body_collisions.precomputed_contact_pairs_for_level;
-
-    PHYSBAM_ASSERT(!parameters.use_projected_gauss_seidel || !mpi_rigids);
     if(!parameters.use_projected_gauss_seidel){
         LOG::SCOPE scope("guendelman-bridson-fedkiw contact");
 
@@ -65,14 +62,6 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
         ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body=&rigid_body_collisions.rigid_body_collection.articulated_rigid_body;
         rigid_body_collisions.skip_collision_check.Reset();bool need_another_iteration=true;int iteration=0;T epsilon_scale=1;
         while(need_another_iteration && ++iteration<=parameters.contact_iterations){
-            if(mpi_rigids){
-                mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-                mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-                mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-                for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) {
-                    mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
-                    mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
-
             need_another_iteration=false;
             if(parameters.use_epsilon_scaling) epsilon_scale=(T)iteration/parameters.contact_iterations;
             for(int level=0;level<rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
@@ -91,19 +80,13 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
                                 need_another_level_iteration=true;need_another_iteration=true;}}
                         else{
                             if(Update_Contact_Pair(rigid_body_collisions,collision_callbacks,analytic_contact_registry,id_1,id_2,correct_contact_energy,
-                                    rigid_body_collisions.contact_pair_iterations,epsilon_scale,dt,time,(mpi_rigids && 
-                                        (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) || mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_2)))))){
+                                    rigid_body_collisions.contact_pair_iterations,epsilon_scale,dt,time,false)){
                                 if(!use_saved_pairs) rigid_body_collisions.saved_contact_pairs_for_level(level).Append_Unique(pairs(i));
                                 need_another_level_iteration=true;need_another_iteration=true;}}}
                     if(articulated_rigid_body)
                         for(int i=0;i<articulated_rigid_body->contact_level_iterations;i++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++){
                             rigid_body_collisions.Apply_Prestabilization_To_Joint(dt,time,*articulated_rigid_body,articulated_rigid_body->process_list(level)(j),epsilon_scale);
-                            need_another_level_iteration=need_another_iteration=true;}}}
-
-            if(mpi_rigids){
-                int need_another_iteration_int=(int)need_another_iteration;
-                need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;
-                mpi_rigids->Exchange_All_Impulses(rigid_body_collection,mpi_rigid_velocity_save,mpi_rigid_angular_momentum_save,rigid_body_collisions,false,dt,time);}}
+                            need_another_level_iteration=need_another_iteration=true;}}}}
         if(rigid_body_collisions.prune_stacks_from_contact) rigid_body_collisions.Apply_Stacking_Contact();}
     else{
         LOG::SCOPE scope("projected-gauss-seidel contact");
@@ -397,7 +380,7 @@ void Push_Out(RIGIDS_COLLISION_CALLBACKS<TV>& collision_callbacks,RIGID_BODY_COL
 #define INSTANTIATION_HELPER(T,d) \
     template void Solve<VECTOR<T,d> >(RIGID_BODY_COLLISIONS<VECTOR<T,d> >& rigid_body_collisions,RIGIDS_COLLISION_CALLBACKS<VECTOR<T,d> >& collision_callbacks, \
         RIGID_BODY_COLLECTION<VECTOR<T,d> >& rigid_body_collection,RIGID_BODY_COLLISION_PARAMETERS<VECTOR<T,d> >& parameters,const bool correct_contact_energy,const bool use_saved_pairs, \
-        const T dt,const T time,MPI_RIGIDS<VECTOR<T,d> >* mpi_rigids,ARRAY<TWIST<VECTOR<T,d> > >& mpi_rigid_velocity_save,ARRAY<VECTOR<T,d>::SPIN>& mpi_rigid_angular_momentum_save); \
+        const T dt,const T time,ARRAY<TWIST<VECTOR<T,d> > >& mpi_rigid_velocity_save,ARRAY<VECTOR<T,d>::SPIN>& mpi_rigid_angular_momentum_save); \
     template bool Update_Analytic_Multibody_Contact<VECTOR<T,d> >(RIGID_BODY_COLLISIONS<VECTOR<T,d> >& rigid_body_collisions,RIGIDS_COLLISION_CALLBACKS<VECTOR<T,d> >& collision_callbacks, \
         HASHTABLE<VECTOR<std::string,2>,ANALYTICS<VECTOR<T,d> >::UPDATE_ANALYTIC_CONTACT_PAIR_T>& analytic_contact_registry, \
         const int id_1,const int id_2,MULTIBODY_LEVELSET_IMPLICIT_OBJECT<VECTOR<T,d> >& multibody,IMPLICIT_OBJECT<VECTOR<T,d> >& levelset,const bool correct_contact_energy, \

@@ -12,7 +12,6 @@
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 namespace PhysBAM{
 
-template<class TV> class RIGID_FRACTURE_QUASISTATICS_FORCES;
 template<class TV> class EXAMPLE_FORCES_AND_VELOCITIES;
 template<class TV> class DEFORMALBLE_OBJECT_COLLISIONS;
 template<class TV> class SOLIDS_PARAMETERS;

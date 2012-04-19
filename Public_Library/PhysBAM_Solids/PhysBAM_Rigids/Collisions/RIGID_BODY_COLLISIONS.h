@@ -15,9 +15,10 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
+#include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_PARTICLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Parallel_Computation/MPI_RIGIDS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_FORWARD.h>
 #include <string>
 namespace PhysBAM{
@@ -82,7 +83,6 @@ public:
 
     ARRAY<JOINT_ID> contact_joints;
     ARRAY<VECTOR<int,2> > saved_pairs;
-    MPI_RIGIDS<TV>* mpi_rigids;
     ARRAY<TWIST<TV> > mpi_rigid_velocity_save;
     ARRAY<T_SPIN> mpi_rigid_angular_momentum_save;
     ARRAY<FRAME<TV> > mpi_rigid_frame_save;

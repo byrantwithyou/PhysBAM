@@ -52,7 +52,7 @@ RIGID_BODY_COLLISIONS(RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input,RIG
     spatial_partition(new COLLISION_GEOMETRY_SPATIAL_PARTITION<COLLISION_GEOMETRY<TV>,ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>,COLLISION_GEOMETRY_ID>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies)),
     intersections(*new RIGID_BODY_INTERSECTIONS<TV>(rigid_body_collection)),contact_graph(*new RIGID_BODY_CONTACT_GRAPH<TV>(rigid_body_collection.rigid_body_particle)),
     store_collision_intersections_for_projection(false),use_static_body_masses(false),use_parent_normal(false),
-    rigid_body_cluster_bindings(rigid_body_collection.rigid_body_cluster_bindings),fracture_pattern(0),mpi_rigids(0)
+    rigid_body_cluster_bindings(rigid_body_collection.rigid_body_cluster_bindings),fracture_pattern(0)
 {
     Set_Collision_Pair_Iterations();
     Set_Contact_Level_Iterations();Set_Contact_Pair_Iterations();
@@ -473,8 +473,7 @@ Get_Contact_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& pairs)
             if(Either_Body_Collides_With_The_Other(p,j) &&
                 intersections.Bounding_Boxes_Intersect(p,j,parameters.collision_bounding_box_thickness+parameters.use_projected_gauss_seidel?parameters.contact_proximity:0)){ // this should *not* be ids, but should remain indices
                 int particle_body,levelset_body;
-                if((parameters.use_projected_gauss_seidel || intersections.Find_Any_Intersection(p,j,particle_body,levelset_body)) && (!mpi_rigids || mpi_rigids->Is_Real_Body(j) || mpi_rigids->Is_Real_Body(p)))
-                //if((true || parameters.use_projected_gauss_seidel || intersections.Find_Any_Intersection(p,j,particle_body,levelset_body)) && (!mpi_rigids || mpi_rigids->Is_Real_Body(j) || mpi_rigids->Is_Real_Body(p)))
+                if((parameters.use_projected_gauss_seidel || intersections.Find_Any_Intersection(p,j,particle_body,levelset_body)))
                     pairs.Append_Unique(VECTOR<int,2>(j,p));}}
         rigid_body_collection.Rigid_Body(p).Restore_State(saved_state);
         rigid_body_collection.Rigid_Body(p).Update_Bounding_Box();} // restore body to its saved position
@@ -560,12 +559,6 @@ Process_Push_Out_Legacy()
     bool need_another_iteration=true;int iteration=0;
     VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     while(need_another_iteration && ++iteration<=push_out_iterations){
-        if(mpi_rigids){
-            mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_frame_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++)
-                mpi_rigid_frame_save(p)=rigid_body_collection.rigid_body_particle.frame(p);}
-
         need_another_iteration=false;
         if(use_freezing_with_push_out)
             for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
@@ -613,12 +606,7 @@ Process_Push_Out_Legacy()
                             rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions(rigid_body_cluster_bindings.Get_Parent(rigid_body_collection.Rigid_Body(id_2)).particle_index);
                         need_more_iterations2=true;need_another_iteration=true;need_more_iterations=true;}}}
             if(use_freezing_with_push_out) for(int i=0;i<contact_graph.directed_graph.Nodes_In_Level(level).m;i++)
-                rigid_body_collection.Rigid_Body(contact_graph.directed_graph.Nodes_In_Level(level)(i)).is_temporarily_static=true;}
-
-        if(mpi_rigids){
-            int need_another_iteration_int=(int)need_another_iteration;
-            need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;
-            mpi_rigids->Exchange_All_Pushes(rigid_body_collection,mpi_rigid_frame_save,*this);}}
+                rigid_body_collection.Rigid_Body(contact_graph.directed_graph.Nodes_In_Level(level)(i)).is_temporarily_static=true;}}
     if(use_freezing_with_push_out) for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
         RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry=dynamic_cast<RIGID_COLLISION_GEOMETRY<TV>*>(rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies(i));
         if(rigid_collision_geometry){RIGID_BODY<TV>* rigid_body=dynamic_cast<RIGID_BODY<TV>*>(&rigid_collision_geometry->rigid_geometry);
@@ -1012,10 +1000,7 @@ Get_Bounding_Box_Collision_Pairs_Of_Body(ARRAY<VECTOR<int,2> >& pairs,int id,con
     for(int t=0;t<object_indices.m;t++){int j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(t));
         if(j<0 || !Either_Body_Collides_With_The_Other(id,j)) continue;
         if(!rigid_body_collection.Rigid_Body(j).Has_Infinite_Inertia()){
-            if(mpi_rigids){
-                if(j<id && mpi_rigids->Is_Real_Body(j))
-                    continue;}
-            else if(j<id) continue;} // to avoid processing the same pair of dynamic bodies twice
+            if(j<id) continue;} // to avoid processing the same pair of dynamic bodies twice
         if(!skip_collision_check.Skip_Pair(id,j)){
             if(intersections.Bounding_Boxes_Intersect(id,j,thickness)) pairs.Append(VECTOR<int,2>(id,j));
             else skip_collision_check.Set_Last_Checked(id,j);}}
@@ -1042,7 +1027,7 @@ Get_Bounding_Box_Collision_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& 
                     colliding_rigid_body_particles.Append(bindings.children(j));}
     for(int n=0;n<rigid_body_collection.dynamic_rigid_body_particles.m;n++){
         int p=rigid_body_collection.dynamic_rigid_body_particles(n);
-        if(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(p) && (!mpi_rigids || mpi_rigids->Is_Real_Body(p)))
+        if(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(p))
             colliding_rigid_body_particles.Append(p);}
     
     for(int n=0;n<colliding_rigid_body_particles.m;n++){int p=colliding_rigid_body_particles(n);
@@ -1097,34 +1082,18 @@ Add_Elastic_Collisions(const T dt,const T time)
     VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     ARRAY<VECTOR<int,2> > pairs;pairs.Preallocate(10);bool need_another_iteration=true;
     for(int i=0;i<parameters.collision_iterations && need_another_iteration;i++){
-        if(mpi_rigids){
-            mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-            mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) {
-                mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
-                mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
-
         need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations-1,i==0);
         for(int j=0;j<pairs.m;j++){
             int id_1=pairs(j)(0),id_2=pairs(j)(1);
-            if(Update_Collision_Pair(id_1,id_2,dt,time,(mpi_rigids && (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) || 
-                            mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_2)))))){
+            if(Update_Collision_Pair(id_1,id_2,dt,time,false)){
                 spatial_partition->Update_Body(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_1));
                 spatial_partition->Update_Body(rigid_body_collection.rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(id_2));
                 need_another_iteration=true;}}
 
-        if(mpi_rigids){
-            int need_another_iteration_int=(int)need_another_iteration;
-            need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;}
-
         // force it to the last iteration (so it picks up contact pairs one time at least)
         if(!need_another_iteration && i<parameters.collision_iterations-1){
             i=parameters.collision_iterations-2;
-            need_another_iteration=true;}
-
-        if(mpi_rigids)
-            mpi_rigids->Exchange_All_Impulses(rigid_body_collection,mpi_rigid_velocity_save,mpi_rigid_angular_momentum_save,*this,true,dt,time);}
+            need_another_iteration=true;}}
 }
 //#####################################################################
 // Function Process_Contact_Using_Graph
@@ -1134,7 +1103,7 @@ Process_Contact_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>* 
 {
     LOG::SCOPE scope("rigid body contact");
 
-    SOLVE_CONTACT::Solve(*this,collision_callbacks,rigid_body_collection,parameters,correct_contact_energy,use_saved_pairs,dt,time,mpi_rigids,mpi_rigid_velocity_save,mpi_rigid_angular_momentum_save);
+    SOLVE_CONTACT::Solve(*this,collision_callbacks,rigid_body_collection,parameters,correct_contact_energy,use_saved_pairs,dt,time,mpi_rigid_velocity_save,mpi_rigid_angular_momentum_save);
 }
 //#####################################################################
 // Function Shock_Propagation_Using_Graph
@@ -1147,14 +1116,6 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
     ARRAY<ARRAY<VECTOR<int,2> > >& contact_pairs_for_level=use_saved_pairs?saved_contact_pairs_for_level:precomputed_contact_pairs_for_level;
     VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     while(need_another_iteration && ++iteration<=shock_propagation_iterations){
-        if(mpi_rigids){
-            mpi_rigids->Clear_Impulse_Accumulators(rigid_body_collection);
-            mpi_rigid_velocity_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-            mpi_rigid_angular_momentum_save.Resize(rigid_body_collection.rigid_body_particle.Size(),false,false);
-            for(int p=0;p<rigid_body_collection.rigid_body_particle.Size();p++) {
-                mpi_rigid_velocity_save(p)=rigid_body_collection.rigid_body_particle.twist(p);
-                mpi_rigid_angular_momentum_save(p)=rigid_body_collection.rigid_body_particle.angular_momentum(p);}}
-        
         need_another_iteration=false;
         Clear_Temporarily_Static();
         for(int level=0;level<contact_graph.Number_Of_Levels();level++){
@@ -1165,9 +1126,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
                 for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                     if(skip_collision_check.Skip_Pair(id_1,id_2)) continue;
                     if(!parameters.use_projected_gauss_seidel || pairs_processed_by_contact.Contains(pairs(i).Sorted()))
-                        if(SOLVE_CONTACT::Update_Contact_Pair(*this,collision_callbacks,analytic_contact_registry,id_1,id_2,false,shock_propagation_pair_iterations,epsilon_scale,dt,time,
-                                (mpi_rigids && (mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_1)) ||
-                                    mpi_rigids->Is_Dynamic_Ghost_Body(rigid_body_collection.Rigid_Body(id_2)))))){
+                        if(SOLVE_CONTACT::Update_Contact_Pair(*this,collision_callbacks,analytic_contact_registry,id_1,id_2,false,shock_propagation_pair_iterations,epsilon_scale,dt,time,false)){
                             if(!use_saved_pairs) saved_contact_pairs_for_level(level).Append_Unique(pairs(i));need_another_level_iteration=true;need_another_iteration=true;}}
                 if(articulated_rigid_body && articulated_rigid_body->use_shock_propagation)
                     for(int i=0;i<articulated_rigid_body->shock_propagation_level_iterations;i++) for(int j=0;j<articulated_rigid_body->process_list(level).m;j++){
@@ -1179,12 +1138,7 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
                         parent.is_temporarily_static=old_temporarily_static_parent;child.is_temporarily_static=old_temporarily_static_child;
                         need_another_level_iteration=need_another_iteration=true;}}
             // note that the bodies involved in joints get frozen too, since both bodies in a joint must be at least this level or lower to get processed
-            Set_Level_Temporarily_Static(level);}
-
-        if(mpi_rigids){
-            int need_another_iteration_int=(int)need_another_iteration;
-            need_another_iteration=mpi_rigids->Reduce_Max(need_another_iteration_int)>0?true:false;
-            mpi_rigids->Exchange_All_Impulses(rigid_body_collection,mpi_rigid_velocity_save,mpi_rigid_angular_momentum_save,*this,false,dt,time);}}
+            Set_Level_Temporarily_Static(level);}}
 
     Clear_Temporarily_Static();
 
