@@ -137,7 +137,6 @@ Apply_Impulse_To_Body(const TV& location,const TV& impulse,const T_SPIN& angular
     Twist().linear+=impulse/Mass();
     Angular_Momentum()+=total_angular_impulse;
     Update_Angular_Velocity();
-    if(this->impulse_accumulator) this->impulse_accumulator->Add_Impulse(location,(half_impulse_for_accumulator?(T).5:(T)1)*TWIST<TV>(impulse,total_angular_impulse));
 }
 //#####################################################################
 // Function Apply_Impulse

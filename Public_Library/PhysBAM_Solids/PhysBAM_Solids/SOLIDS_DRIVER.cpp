@@ -164,7 +164,6 @@ Setup_Solids(const T time,const int substep)
             example.solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Build_Topological_Structure_Of_Hierarchies();}
         solids_parameters.triangle_collision_parameters.self_collision_free_time=time;}
 
-    if(solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies) example.solid_body_collection.rigid_body_collection.Reset_Impulse_Accumulators();
     solids_evolution_callbacks->Preprocess_Solids_Substep(time,substep);
     if(solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects) // TODO - ANDY - why is this needed??? TODO: move this to the right places inside solids evolution 
         example.solid_body_collection.collision_body_list.Update_Spatial_Partition(solids_parameters.deformable_object_collision_parameters.spatial_partition_voxel_size_heuristic,

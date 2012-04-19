@@ -11,7 +11,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_2D.h>
@@ -557,7 +556,6 @@ Process_Push_Out_Legacy()
     skip_collision_check.Reset();
     ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> > particle_intersections;particle_intersections.Preallocate(100);
     bool need_another_iteration=true;int iteration=0;
-    VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     while(need_another_iteration && ++iteration<=push_out_iterations){
         need_another_iteration=false;
         if(use_freezing_with_push_out)
@@ -1079,7 +1077,6 @@ Add_Elastic_Collisions(const T dt,const T time)
     LOG::SCOPE scope("rigid body collisions");
     skip_collision_check.Reset();pairs_processed_by_collisions.Remove_All();
     rigid_body_particle_intersections.Remove_All();
-    VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     ARRAY<VECTOR<int,2> > pairs;pairs.Preallocate(10);bool need_another_iteration=true;
     for(int i=0;i<parameters.collision_iterations && need_another_iteration;i++){
         need_another_iteration=false;Get_Bounding_Box_Collision_Pairs(dt,time,pairs,i==parameters.collision_iterations-1,i==0);
@@ -1114,7 +1111,6 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
     LOG::SCOPE scope("shock propagation");
     skip_collision_check.Reset();bool need_another_iteration=true;int iteration=0;T epsilon_scale=1;
     ARRAY<ARRAY<VECTOR<int,2> > >& contact_pairs_for_level=use_saved_pairs?saved_contact_pairs_for_level:precomputed_contact_pairs_for_level;
-    VECTOR<COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>*,2> stored_accumulator;
     while(need_another_iteration && ++iteration<=shock_propagation_iterations){
         need_another_iteration=false;
         Clear_Temporarily_Static();

@@ -41,7 +41,6 @@ public:
     T collision_thickness;
     bool add_to_spatial_partition;
     COLLISION_GEOMETRY_ID collision_geometry_id;
-    COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* impulse_accumulator;
     bool refine_nearby_fluid;
 
     ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* collision_geometries_for_rasterization;

@@ -276,19 +276,6 @@ void Get_Initial_Data()
             rigid_body->Frame()=FRAME<TV>(TV(10,2,0),rotation);
             break;}
         case 9:{ // cluster break
-#if 0
-            last_frame=132;
-            solids_parameters.fracture=true;
-            FRACTURE_EVOLUTION_CLUSTER_3D<TV>* fracture_evolution=new FRACTURE_EVOLUTION_CLUSTER_3D<TV>(solids_parameters);
-            solids_parameters.Set_Fracture_Evolution(fracture_evolution);
-            int cluster_id=Large_Cluster_Cube(FRAME<TV>(TV(0,2,0),rotation),(T)1,(T).5);
-            RIGID_BODY_CLUSTER_3D<T>*cluster=(RIGID_BODY_CLUSTER_3D<T>*)rigid_body_list(cluster_id);
-            cluster->impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*cluster);
-            cluster->perform_cluster_breaks=true;cluster->Initialize_Initial_Strain();
-            cluster->decay_rate=500;
-            cluster->Initialize_Allowable_Strain(0.0);
-            cluster->Allowable_Strain(0,1)=1e6;cluster->Allowable_Strain(1,2)=1e6;cluster->Allowable_Strain(2,3)=1e6;
-#endif
             break;}
         case 10:{ // prismatic twist joint
             rigid_body1->Frame().t=TV(2,4,0);
@@ -638,33 +625,6 @@ int Large_Cluster_Cube(FRAME<TV>shift_frame,T scale,const T friction)
 int Nested_Clusters_Test()
 {
     PHYSBAM_FATAL_ERROR("RIGID_BODY_CLUSTER_3D has been replaced by RIGID_BODY_CLUSTER_BINDING");
-#if 0
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-    // CLUSTER 1
-    int cluster_id=Large_Cluster_Cube(FRAME<TV>(TV(0,5,0)),(T)1,(T).5);
-    RIGID_BODY_CLUSTER_3D<T>*cluster=(RIGID_BODY_CLUSTER_3D<T>*)rigid_body_list(cluster_id);
-    cluster->impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*cluster);
-    cluster->perform_cluster_breaks=false;cluster->Initialize_Initial_Strain();
-    cluster->Initialize_Allowable_Strain(1e6);
-
-    // CLUSTER 2
-    ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(9);
-    int count=0;FRAME<TV> shift_frame(TV(0,1,0));
-    for(int i=0;i<8;i++){
-        bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-        bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child_cluster2::%d",bodies(i)));
-        solids_parameters.collision_body_list.Add_Body(bodies(i));}
-    bodies(9)=cluster;
-    for(int i=-1;i<=1;i+=2) for(int j=-1;j<=1;j+=2) for(int k=-1;k<=1;k+=2) bodies(++count)->Frame()=shift_frame*FRAME<TV>(TV((T)k,(T)j,(T)i));
-    tests.Add_Gravity();
-    cluster_id=rigid_body_collection.Add_Cluster_Body(&bodies);
-    rigid_body_collectionRigid_Body(cluster_id).Set_Name("combo_square2");
-    cluster=(RIGID_BODY_CLUSTER_3D<T>*)rigid_body_list(cluster_id);
-    cluster->impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*cluster);
-    cluster->perform_cluster_breaks=true;cluster->Initialize_Initial_Strain();
-    cluster->Initialize_Allowable_Strain((T)0);
-    return cluster_id;
-#endif
     return int();
 }
 //#####################################################################
@@ -673,68 +633,6 @@ int Nested_Clusters_Test()
 int Spring_Cluster_Test(FRAME<TV> shift_frame,bool fracture)
 {
     PHYSBAM_FATAL_ERROR("RIGID_BODY_CLUSTER_3D has been replaced by RIGID_BODY_CLUSTER_BINDING");
-#if 0
-    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
-    DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    BINDING_LIST<TV>& binding_list=solid_body_collection.deformable_body_collection.binding_list;
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-    RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
-
-    // CLUSTER 1
-    ARRAY<RIGID_BODY<TV>*>& bodies=*new ARRAY<RIGID_BODY<TV>*>(8);
-    int count=0;
-    for(int i=0;i<8;i++){
-        bodies(i)=&tests.Add_Rigid_Body("subdivided_box",1,(T).5);
-        bodies(i)->Set_Name(STRING_UTILITIES::string_sprintf("child_cluster2::%d",bodies(i)));
-        solids_parameters.collision_body_list.Add_Body(bodies(i));}
-    for(int i=-1;i<=1;i+=2) for(int j=-1;j<=1;j+=2) for(int k=-1;k<=1;k+=2) bodies(++count)->Frame()=shift_frame*FRAME<TV>(TV((T)k,(T)j,(T)i));
-    tests.Add_Gravity();
-
-    RIGID_BODY<TV>& box=tests.Add_Rigid_Body("subdivided_box",1,.5);
-    box.Frame().t=shift_frame*TV(0,3,0); // second block: slightly above first
-    box.is_static=true;
-
-    // Add spring
-    particles.Add_Elements(2);particles.mass(0)=particles.mass(1)=(T)1;
-    RIGID_BODY_BINDING<TV>* binding1=new RIGID_BODY_BINDING<TV>(particles,0,rigid_body_collection,box.particle_index,TV(0,-1,0));
-    RIGID_BODY_BINDING<TV>* binding2=new RIGID_BODY_BINDING<TV>(particles,1,rigid_body_collection,bodies(0)->particle_index,TV(0,1,0));
-    binding_list.Add_Binding(binding1);
-    binding_list.Add_Binding(binding2);
-    binding1->Clamp_To_Embedded_Position();
-    binding1->Clamp_To_Embedded_Velocity();
-    binding2->Clamp_To_Embedded_Position();
-    binding2->Clamp_To_Embedded_Velocity();
-
-    SEGMENTED_CURVE<TV>* curve=new SEGMENTED_CURVE<TV>(*new SEGMENT_MESH,particles);
-    curve->mesh.elements.Append(VECTOR<int,2>(1,2));
-    curve->mesh.Set_Number_Nodes(2);
-
-    deformable_body_collection.Add_Structure(curve);
-    binding_list.Clear_Hard_Bound_Particles(particles.mass);
-    particles.Compute_Auxiliary_Attributes(soft_bindings);
-    soft_bindings.Set_Mass_From_Effective_Mass();
-
-    LINEAR_SPRINGS<TV>* edge_springs=Create_Edge_Springs(deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE<TV>&>(0),100,(T)2);
-    ARRAY<T> foo(0);edge_springs->Set_Restlength(foo);edge_springs->Clamp_Restlength((T).1); // make it zero length
-    edge_springs->Set_Overdamping_Fraction(2);
-    solid_body_collection.Add_Force(edge_springs);
-
-    solid_body_collection.Update_Fragments();
-
-    cluster_id=rigid_body_collection.Add_Cluster_Body(&bodies);
-    rigid_body_collection.Rigid_Body(cluster_id).Set_Name("combo_square2");
-    RIGID_BODY_CLUSTER_3D<T>* cluster=(RIGID_BODY_CLUSTER_3D<T>*)rigid_body_list(cluster_id);
-    cluster->Fix_Bindings_For_Cluster(solid_body_collection.deformable_body_collection.binding_list.bindings,&rigid_body_collection,&solid_body_collection);
-
-    if(fracture){
-        cluster->impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*cluster);
-        cluster->perform_cluster_breaks=true;
-        cluster->force_cluster_break_checks=true; // have to do this since only collisions will "naturally" trigger a cluster break check
-        cluster->Initialize_Initial_Strain();
-        cluster->Initialize_Allowable_Strain((T)1e6);}
-
-    return cluster_id;
-#endif
     return int();
 }
 //#####################################################################

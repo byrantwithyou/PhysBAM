@@ -11,7 +11,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> JOINT<TV>::
 JOINT()
-    :joint_function(0),global_post_stabilization(true),primary_point_of_bend_joint(false),secondary_point_of_bend_joint(false),angular_damping(0),impulse_accumulator(0)
+    :joint_function(0),global_post_stabilization(true),primary_point_of_bend_joint(false),secondary_point_of_bend_joint(false),angular_damping(0)
 {
     for(int i=0;i<dof;i++) control_dof(i)=false;
 }

@@ -365,7 +365,6 @@ void One_Large_Cube(int& num_joints,int& num_rigid_bodies,VECTOR<T,3> shift,cons
     for(int i=0;i<8;i++) bodies->Append(solids_parameters.rigid_body_parameters.list(ids[i]));
     cluster1=solids_parameters.rigid_body_parameters.list.Add_Cluster_Body(bodies,solids_parameters.collision_body_list);
     arb->rigid_bodies_list(cluster1)->Set_Name("combo_square");
-    arb->rigid_bodies_list(cluster1)->impulse_accumulator=new RIGID_BODY_IMPULSE_ACCUMULATOR<TV,3>(*rigid_body);
     ((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->perform_cluster_breaks=true;
     ((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->Initialize_Initial_Strain();
     ARRAY<ARRAY<T> > strain;strain.Resize(((RIGID_BODY_CLUSTER_3D<T>*)arb->rigid_bodies_list(cluster1))->constituent_bodies.m);

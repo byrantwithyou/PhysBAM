@@ -31,7 +31,7 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> RIGID_GEOMETRY<TV>::
 RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bool create_collision_geometry,int index)
-    :implicit_object(0),simplicial_object(0),rigid_geometry_collection(rigid_geometry_collection_input),is_static(false),bounding_box_up_to_date(false),moving_simplex_hierarchy(0),impulse_accumulator(0)
+    :implicit_object(0),simplicial_object(0),rigid_geometry_collection(rigid_geometry_collection_input),is_static(false),bounding_box_up_to_date(false),moving_simplex_hierarchy(0)
 {
     if(index>=0) particle_index=index;
     else{

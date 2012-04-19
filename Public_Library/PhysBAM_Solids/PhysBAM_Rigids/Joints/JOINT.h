@@ -14,7 +14,6 @@
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_ID.h>
 namespace PhysBAM{
 
-template<class TV> class ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR;
 template<class TV> class JOINT_FUNCTION;
 template<class TV> class RIGID_BODY;
 template<class TV>
@@ -37,7 +36,6 @@ public:
     bool primary_point_of_bend_joint,secondary_point_of_bend_joint;
     T angular_damping;
     TWIST<TV> current_impulse;
-    ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR<TV>* impulse_accumulator;
     VECTOR<bool,dof> control_dof;
 
     JOINT();

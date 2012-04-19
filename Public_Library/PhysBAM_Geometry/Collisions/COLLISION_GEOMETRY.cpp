@@ -11,7 +11,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_PARTICLE_STATE.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>
@@ -26,7 +25,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> COLLISION_GEOMETRY<TV>::
 COLLISION_GEOMETRY()
-    :active(true),add_to_spatial_partition(true),collision_geometry_id(0),impulse_accumulator(0),collision_geometries_for_rasterization(0)
+    :active(true),add_to_spatial_partition(true),collision_geometry_id(0),collision_geometries_for_rasterization(0)
 {
     Set_Collision_Thickness();
 }
@@ -36,7 +35,6 @@ COLLISION_GEOMETRY()
 template<class TV> COLLISION_GEOMETRY<TV>::
 ~COLLISION_GEOMETRY()
 {
-    delete impulse_accumulator;
 }
 //#####################################################################
 // Function Get_Body_Penetration

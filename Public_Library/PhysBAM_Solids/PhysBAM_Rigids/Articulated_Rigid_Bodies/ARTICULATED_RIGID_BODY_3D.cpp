@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Optimization/LINEAR_PROGRAMMING.h>
 #include <PhysBAM_Tools/Optimization/QUADRATIC_PROGRAMMING.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_FUNCTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
@@ -464,7 +463,6 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
             TV impulse;joint_constraint_impulses.Get_Subvector(istart,impulse);
             TV angular_impulse;for(int ii=0;ii<joint_constrained_dimensions(i)-3;ii++){
                 TV u;joint_angular_constraint_matrix(i).Get_Column(ii,u);angular_impulse+=joint_constraint_impulses(istart+ii+2)*u;}
-            if(joint_mesh.joints(i)->impulse_accumulator) joint_mesh.joints(i)->impulse_accumulator->Add_Impulse(joint_locations(i),TWIST<TV>(impulse,angular_impulse));
             RIGID_BODY<TV>::Apply_Impulse(*Parent(joint_mesh.joints(i)->id_number),*Child(joint_mesh.joints(i)->id_number),joint_locations(i),impulse,angular_impulse);}}
 
     // the second flag will cause poststabilization to be applied to joints not processed by global post stabilization

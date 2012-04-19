@@ -338,8 +338,6 @@ Adjust_Point_For_Collision(RIGID_COLLISION_GEOMETRY<TV>& body,int p,COLLISION_PA
     if(local_coefficient_of_friction<0) local_coefficient_of_friction=body.rigid_geometry.coefficient_of_friction;
     TV impulse=PhysBAM::Compute_Collision_Impulse(normal,deformable_body_collection.binding_list.Impulse_Factor(p),V_rel,(T)0,local_coefficient_of_friction,0);
     deformable_body_collection.binding_list.Apply_Impulse(p,impulse);
-    if(body.impulse_accumulator)
-        body.impulse_accumulator->Add_Impulse(X,-TWIST<TV>(impulse,TV::Cross_Product(X-body.rigid_geometry.Frame().t,impulse)));
     // set collision state
     collision.normal=body.Implicit_Geometry_Normal(X);
     collision.VN=TV::Dot_Product(body.Pointwise_Object_Velocity(X)-deformable_body_collection.binding_list.V(p),collision.normal);

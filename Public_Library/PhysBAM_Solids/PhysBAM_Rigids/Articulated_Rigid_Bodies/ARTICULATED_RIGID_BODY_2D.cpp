@@ -6,7 +6,6 @@
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_FUNCTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_MESH.h>
@@ -84,9 +83,7 @@ Post_Stabilization_With_Actuation(const JOINT_ID joint_id)
         if(parent.Has_Infinite_Inertia() && child.Has_Infinite_Inertia()) return;
 
         VECTOR<T,1> angular_impulse=Compute_Target_PD_Angular_Impulse(joint_id);
-        if(use_pd_actuators){
-            if(joint.impulse_accumulator) joint.impulse_accumulator->Add_Impulse(TV(),TWIST<TV>(TV(),angular_impulse));
-            RIGID_BODY<TV>::Apply_Impulse(parent,child,TV(),TV(),angular_impulse);}
+        if(use_pd_actuators) RIGID_BODY<TV>::Apply_Impulse(parent,child,TV(),TV(),angular_impulse);
         else if(use_muscle_actuators && angular_impulse.Magnitude()>(T)1e-10){
             T min_activation_penalty=(T).1;
             int active_muscles=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id)).m;

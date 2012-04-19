@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/STRUCTURE_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_1D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_2D.h>
@@ -124,16 +123,6 @@ Add_Rigid_Body(const STREAM_TYPE stream_type,const bool thin_shell,const std::st
 
     int id=rigid_geometry_collection.Add_Rigid_Geometry(rigid_body,stream_type,basename,scaling_factor,read_simplicial_boundary,read_implicit_object,read_simplicial_interior,read_rgd_file);
     return id;
-}
-//#####################################################################
-// Function Reset_Impulse_Accumulators
-//#####################################################################
-template<class TV> void RIGID_BODY_COLLECTION<TV>::
-Reset_Impulse_Accumulators()
-{
-    for(int i=0;i<rigid_body_particle.Size();i++)
-        if(Is_Active(i) && rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Contains(i) && rigid_geometry_collection.collision_body_list->bodies(rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(i))->impulse_accumulator)
-            rigid_geometry_collection.collision_body_list->bodies(rigid_geometry_collection.collision_body_list->geometry_id_to_collision_geometry_id.Get(i))->impulse_accumulator->Reset();
 }
 //#####################################################################
 // Function Update_Angular_Velocity

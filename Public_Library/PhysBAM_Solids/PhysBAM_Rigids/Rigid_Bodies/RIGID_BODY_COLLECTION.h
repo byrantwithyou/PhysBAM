@@ -57,7 +57,6 @@ public:
     bool Is_Active(const int particle) const
     {return Exists(particle) && Rigid_Body(particle).particle_index>=0;}
 
-    void Reset_Impulse_Accumulators();
     RIGID_BODY<TV>& Rigid_Body(const int particle_index);
     const RIGID_BODY<TV>& Rigid_Body(const int particle_index) const;
     int Add_Rigid_Body(RIGID_BODY<TV>* rigid_body,const int simplicial_boundary_id,const int implicit_object_id,const int simplicial_interior_id);

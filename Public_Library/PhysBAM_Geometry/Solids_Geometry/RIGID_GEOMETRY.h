@@ -14,7 +14,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
-#include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY_STATE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
@@ -49,7 +48,6 @@ public:
     T_SIMPLEX_HIERARCHY* moving_simplex_hierarchy; // bounds moving simplices in world space, to accelerate crossover check
 
     ARRAY<STRUCTURE<TV>*> structures;
-    COLLISION_GEOMETRY_IMPULSE_ACCUMULATOR<TV>* impulse_accumulator;
 
     RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bool create_collision_geometry,int index=-1);
     virtual ~RIGID_GEOMETRY();
