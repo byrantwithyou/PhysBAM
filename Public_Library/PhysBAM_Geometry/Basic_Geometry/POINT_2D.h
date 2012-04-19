@@ -13,7 +13,6 @@
 #include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
-#include <PhysBAM_Geometry/Continuous_Collision_Detection/EDGE_EDGE_COLLISION.h>
 namespace PhysBAM{
 
 template<class T>
@@ -47,8 +46,20 @@ public:
     template<class T_ARRAY>
     bool Edge_Edge_Collision(const POINT_2D<T>& point,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V_edges,const T dt,const T collision_thickness,T& collision_time,
         VECTOR<T,2>& normal,VECTOR<T,2>& weights,T& relative_speed,bool allow_negative_weights,const T small_number=0,const bool exit_early=false) const
-    {return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Edge_Edge_Collision(*this,point,V_edges,dt,collision_thickness,collision_time,normal,weights,relative_speed,
-            allow_negative_weights,small_number,exit_early);}
+    {
+        VECTOR<T,2> x2_minus_x1=point-*this,v2_minus_v1=V_edges(1)-V_edges(0);
+        QUADRATIC<double> quadratic(v2_minus_v1.Magnitude_Squared(),2*VECTOR<T,2>::Dot_Product(x2_minus_x1,v2_minus_v1),x2_minus_x1.Magnitude_Squared()-sqr(collision_thickness));
+        quadratic.Compute_Roots_In_Interval(0,dt);
+        if(quadratic.roots==0)return false;
+        else if(quadratic.roots==-1){
+            LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;
+            collision_time=0;}
+        else if(quadratic.roots==1)collision_time=(T)quadratic.root1;
+        else collision_time=min((T)quadratic.root1,(T)quadratic.root2);
+        POINT_2D<T> new_point(*this+collision_time*V_edges(0));
+        T distance;
+        return new_point.Edge_Edge_Interaction(POINT_2D<T>(point+collision_time*V_edges(1)),V_edges,collision_thickness,distance,normal,weights,relative_speed,true,small_number,exit_early);
+    }
 
     template<class T_ARRAY>
     bool Edge_Edge_Collision(const POINT_2D<T>& point,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V_edges,const T dt,const T collision_thickness,T& collision_time,

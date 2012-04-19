@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <PhysBAM_Geometry/Continuous_Collision_Detection/POINT_FACE_COLLISION.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################

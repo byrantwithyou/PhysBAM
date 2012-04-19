@@ -7,10 +7,11 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
+#include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_3D.h>
-#include <PhysBAM_Geometry/Continuous_Collision_Detection/EDGE_EDGE_COLLISION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Closest_Point_On_Segment
@@ -159,7 +160,28 @@ template<class T> bool SEGMENT_3D<T>::
 Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T dt,const T collision_thickness,T& collision_time,TV& normal,
     VECTOR<T,2>& weights,T& relative_speed,const T small_number,const bool exit_early) const
 {
-    return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Edge_Edge_Collision(*this,segment,v1,v2,v3,v4,dt,collision_thickness,collision_time,normal,weights,relative_speed,small_number,exit_early);
+    // find cubic and compute the roots as possible collision times
+    VECTOR<T,3> ABo=x2-x1,ABv=dt*(v2-v1),ACo=segment.x2-segment.x1,ACv=dt*(v4-v3);
+    VECTOR<T,3> No=VECTOR<T,3>::Cross_Product(ABo,ACo),Nv=VECTOR<T,3>::Cross_Product(ABo,ACv)+VECTOR<T,3>::Cross_Product(ABv,ACo),Na=VECTOR<T,3>::Cross_Product(ABv,ACv);
+    VECTOR<T,3> APo=segment.x1-x1,APv=dt*(v3-v1);
+    
+    CUBIC<double> cubic((double)VECTOR<T,3>::Dot_Product(Na,APv),(double)VECTOR<T,3>::Dot_Product(Nv,APv)+VECTOR<T,3>::Dot_Product(Na,APo),
+                                       (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
+    double xmin=0,xmax=1.000001;
+    int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
+    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
+    if(!num_intervals) return false;
+
+    // find and check roots
+    T distance;
+    ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
+    for(int k=0;k<num_intervals;k++){
+        T collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
+        SEGMENT_3D<T> segment2(x1+collision_time*v1,x2+collision_time*v2);
+        if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,relative_speed,
+                false,small_number,exit_early)) return true;}
+
+    return false;
 }
 //#####################################################################
 // Function Interpolation_Fraction

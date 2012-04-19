@@ -13,7 +13,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Continuous_Collision_Detection/POINT_FACE_COLLISION.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
