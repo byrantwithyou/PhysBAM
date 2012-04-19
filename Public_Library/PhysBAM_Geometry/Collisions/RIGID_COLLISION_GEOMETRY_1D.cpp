@@ -34,7 +34,7 @@ Earliest_Simplex_Crossover(const VECTOR<T,1>& start_X,const VECTOR<T,1>& end_X,c
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
-            CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
+            POINT_SIMPLEX_1D<T>::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time<min_time){
             min_time=hit_time=current_hit_time;weight=current_weight;segment_id=segment_number;collision=true;}}
     return collision;
@@ -52,7 +52,7 @@ Latest_Simplex_Crossover(const VECTOR<T,1>& start_X,const VECTOR<T,1>& end_X,con
     for (int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
-            CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
+            POINT_SIMPLEX_1D<T>::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time>max_time){
             max_time=hit_time=current_hit_time;weight=current_weight;segment_id=segment_number;collision=true;returned_collision_type=collision_type;}}
     return collision;
@@ -69,7 +69,7 @@ Any_Simplex_Crossover(const VECTOR<T,1>& start_X,const VECTOR<T,1>& end_X,const 
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
-            CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
+            POINT_SIMPLEX_1D<T>::Robust_Point_Point_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight,relative_speed);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}
     return false;
 }

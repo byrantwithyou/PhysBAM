@@ -7,6 +7,8 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
+#include <PhysBAM_Tools/Nonlinear_Equations/ITERATIVE_SOLVER.h>
 #include <PhysBAM_Tools/Polynomials/CUBIC.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Continuous_Collision_Detection/POINT_FACE_COLLISION.h>
@@ -215,8 +217,16 @@ template<class T> POINT_SIMPLEX_COLLISION_TYPE TRIANGLE_3D<T>::
 Robust_Point_Triangle_Collision(const TRIANGLE_3D<T>& initial_triangle,const TRIANGLE_3D<T>& final_triangle,const VECTOR<T,3>& x,const VECTOR<T,3>& final_x,const T dt,
     const T collision_thickness,T& collision_time,VECTOR<T,3>& normal,VECTOR<T,3>& weights,T& relative_speed)
 {
-    return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,x,final_x,dt,collision_thickness,collision_time,
-        normal,weights,relative_speed);
+    if(final_triangle.Point_Inside_Triangle(final_x,collision_thickness)){
+        collision_time=dt;weights=final_triangle.Barycentric_Coordinates(final_x);normal=final_triangle.normal;
+        return POINT_SIMPLEX_COLLISION_ENDS_INSIDE;}
+    if(initial_triangle.Point_Inside_Triangle(x,collision_thickness)){
+        collision_time=0;weights=initial_triangle.Barycentric_Coordinates(x);normal=initial_triangle.normal;
+        return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;}
+    VECTOR<T,3> v1=(final_triangle.x1-initial_triangle.x1)/dt,v2=(final_triangle.x2-initial_triangle.x2)/dt,v3=(final_triangle.x3-initial_triangle.x3)/dt,v=(final_x-x)/dt;
+    if(initial_triangle.Point_Face_Collision(x,v,v1,v2,v3,dt,collision_thickness,collision_time,normal,weights,relative_speed,false))
+        return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;
+    return POINT_SIMPLEX_NO_COLLISION;
 }
 //#####################################################################
 // Function Point_Triangle_Collision
@@ -225,7 +235,27 @@ template<class T> bool TRIANGLE_3D<T>::
 Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV& v3,const T dt,const T collision_thickness,
     T& collision_time,TV& normal,TV& weights,T& relative_speed,const bool exit_early) const
 {
-    return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Point_Face_Collision(*this,x,v,v1,v2,v3,dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early);
+    // find cubic and compute the roots as possible collision times
+    VECTOR<T,3> ABo=x2-x1,ABv=dt*(v2-v1),ACo=x3-x1,ACv=dt*(v3-v1);
+    VECTOR<T,3> No=VECTOR<T,3>::Cross_Product(ABo,ACo),Nv=VECTOR<T,3>::Cross_Product(ABo,ACv)+VECTOR<T,3>::Cross_Product(ABv,ACo),Na=VECTOR<T,3>::Cross_Product(ABv,ACv);
+    VECTOR<T,3> APo=x-x1,APv=dt*(v-v1);
+
+    CUBIC<double> cubic((double)VECTOR<T,3>::Dot_Product(Na,APv),(double)VECTOR<T,3>::Dot_Product(Nv,APv)+VECTOR<T,3>::Dot_Product(Na,APo),
+                                       (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
+    double xmin=0,xmax=1.000001;
+    int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
+    cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
+    if(!num_intervals) return false;
+  
+    // find and check roots
+    T distance;
+    ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
+    for(int k=0;k<num_intervals;k++){
+        collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
+        TRIANGLE_3D<T> triangle(x1+collision_time*v1,x2+collision_time*v2,x3+collision_time*v3);
+        if(triangle.Point_Face_Interaction(x+collision_time*v,v,v1,v2,v3,collision_thickness,distance,normal,weights,relative_speed,true,exit_early)) return true;}
+
+    return false;
 }
 //#####################################################################
 // Function Clip_To_Box

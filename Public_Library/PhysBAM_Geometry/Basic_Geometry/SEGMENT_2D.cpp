@@ -227,8 +227,20 @@ template<class T> POINT_SIMPLEX_COLLISION_TYPE SEGMENT_2D<T>::
 Robust_Point_Segment_Collision(const SEGMENT_2D<T>& initial_segment,const SEGMENT_2D<T>& final_segment,const VECTOR<T,2> &x,const VECTOR<T,2> &final_x,const T dt, const T collision_thickness,
     T& collision_time,TV& normal,T& collision_alpha,T& relative_speed)
 {
-    return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Robust_Point_Segment_Collision(initial_segment,final_segment,x,final_x,dt,collision_thickness,collision_time,normal,collision_alpha,
-        relative_speed);
+    if(final_segment.Thickened_Oriented_Box(collision_thickness).Lazy_Inside(final_x)){
+        collision_time=dt;
+        collision_alpha=final_segment.Barycentric_Coordinates(final_x).y;
+        return POINT_SIMPLEX_COLLISION_ENDS_INSIDE;}
+    if(initial_segment.Thickened_Oriented_Box(collision_thickness).Lazy_Inside(x)){
+        collision_time=0;
+        collision_alpha=initial_segment.Barycentric_Coordinates(x).y;
+        return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;}
+    VECTOR<T,2> v1=(final_segment.x1-initial_segment.x1)/dt,v2=(final_segment.x2-initial_segment.x2)/dt,v=(final_x-x)/dt;
+    VECTOR<T,2> weights;
+    if(initial_segment.Point_Face_Collision(x,v,v1,v2,dt,collision_thickness,collision_time,normal,weights,relative_speed,false)){
+        collision_alpha=weights.y;
+        return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;}
+    return POINT_SIMPLEX_NO_COLLISION;
 }
 //#####################################################################
 // Function Point_Face_Collision
@@ -237,7 +249,26 @@ template<class T> bool SEGMENT_2D<T>::
 Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const T dt,const T collision_thickness,T& collision_time,TV& normal,VECTOR<T,2>& weights,T& relative_speed,
     const bool exit_early) const 
 {
-    return CONTINUOUS_COLLISION_DETECTION_COMPUTATIONS::Point_Face_Collision(*this,x,v,v1,v2,dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early);
+    VECTOR<double,2> v_minus_v1(v-v1),v2_minus_v1(v2-v1),x_minus_x1(x-x1),x2_minus_x1(x2-x1);
+    QUADRATIC<double> quadratic(VECTOR<double,2>::Cross_Product(v_minus_v1,v2_minus_v1).x,
+        VECTOR<double,2>::Cross_Product(x_minus_x1,v2_minus_v1).x+VECTOR<double,2>::Cross_Product(v_minus_v1,x2_minus_x1).x,
+        VECTOR<double,2>::Cross_Product(x_minus_x1,x2_minus_x1).x);
+
+    double collision_time_temp(0),relative_speed_temp(0),distance(0);VECTOR<double,2> normal_temp,weights_temp;
+    if(abs(1e3*quadratic.a)<abs(quadratic.b)){
+        collision_time_temp=-quadratic.c/quadratic.b;
+        if(collision_time_temp<0 || collision_time_temp>dt) return false;}
+    else{
+        quadratic.Compute_Roots_In_Interval(0,dt);
+        if(quadratic.roots==0)return false;
+        else if(quadratic.roots==-1){LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;collision_time_temp=0;}
+        else if(quadratic.roots==1)collision_time_temp=quadratic.root1;
+        else collision_time_temp=quadratic.root1;}
+    SEGMENT_2D<double> segment((VECTOR<double,2>)x1+collision_time_temp*(VECTOR<double,2>)v1,(VECTOR<double,2>)x2+collision_time_temp*(VECTOR<double,2>)v2);
+    bool interaction=segment.Point_Face_Interaction((VECTOR<double,2>)x+collision_time_temp*(VECTOR<double,2>)v,(VECTOR<double,2>)v,(VECTOR<double,2>)v1,(VECTOR<double,2>)v2,
+        (double)collision_thickness,distance,normal_temp,weights_temp,relative_speed_temp,true,exit_early);
+    collision_time=(T)collision_time_temp;relative_speed=(T)relative_speed_temp;normal=(VECTOR<T,2>)normal_temp;weights=(VECTOR<T,2>)weights_temp;
+    return interaction;
 }
 //#####################################################################
 // Function Clip_To_Box
