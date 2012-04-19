@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
+#include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/maxabs.h>
@@ -178,36 +179,32 @@ Nullspace_Check(KRYLOV_VECTOR_BASE<T>& null) const
     KRYLOV_VECTOR_BASE<T>* b=null.Clone_Default();
     ARRAY<KRYLOV_VECTOR_BASE<T>*> av;
 
-    SQUARED_SYSTEM<T> ss(*this,use_preconditioner,preconditioner_commutes_with_projection);
-
     RANDOM_NUMBERS<T> random;
-    int n=b->Raw_Size();
+    int n=null.Raw_Size();
     for(int i=0;i<n;i++)
-        b->Raw_Get(i)=random.Get_Uniform_Number(-1,1);
-    ss.Project(*b);
-    CONJUGATE_GRADIENT<T> cg;
+        null.Raw_Get(i)=random.Get_Uniform_Number(-1,1);
+    MINRES<T> mr;
 //    cg.print_diagnostics=false;
+    Project(null);
+    T mg=sqrt(Inner_Product(null,null));
+    null*=1/mg;
 
-    bool ns=false;
-    
-    try{
-        ns=!cg.Solve(ss,*x,*b,av,1e-10,0,100000);}
-    catch(...){ 
-        ns=true;}
-    
-    null=*x;
-    ss.Project(null);
-    T mx=0;
-    for(int i=0;i<n;i++)
-        mx=max(mx,b->Raw_Get(i));
-    if(mx) null*=1/mx;
-
-    if(T n2=Inner_Product(null,null))
-        null*=1/sqrt(n2);
-
+    T tol=1e-6;
+    for(int i=0;tol>1e-16;i++){
+        *x*=(T)0;
+        *b*=(T)0;
+        Multiply(null,*b);
+        mr.Solve(*this,*x,*b,av,tol,0,100000);
+        tol/=1e9;
+        null-=*x;
+        Project(null);
+        mg=sqrt(Inner_Product(null,null));
+        null*=1/mg;
+        if(mg<1e-6) return false;
+        LOG::cout<<(1-mg)<<std::endl;}
     delete x;
     delete b;
-    return ns;
+    return mg>1e-10;
 }
 template class KRYLOV_SYSTEM_BASE<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
