@@ -363,7 +363,7 @@ void Parse_Options()
         case 3:
         case 49:
         case 50:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
         case 4:
             solids_parameters.cfl=(T)5;
             break;
@@ -1605,13 +1605,10 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
             break;}
         case 50:{
-            COLLISION_AREA_PENALTY_FORCE<TV>* penalty_force=new COLLISION_AREA_PENALTY_FORCE<TV>(particles);
             for(int i=0;i<parameter;i++){
                 TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>(i);
                 solid_body_collection.Add_Force(new GRAVITY<TV>(deformable_body_collection.particles,solid_body_collection.rigid_body_collection,true,true));
-                solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));
-                penalty_force->Add_Mesh(tetrahedralized_volume);}
-            solid_body_collection.Add_Force(penalty_force);
+                solid_body_collection.Add_Force(Create_Finite_Volume(tetrahedralized_volume,new NEO_HOOKEAN<T,3>((T)2e5,(T).45,(T).01,(T).25),true,(T).1));}
             break;}
         case 51:{
             for(int i=0;i<parameter;i++){
