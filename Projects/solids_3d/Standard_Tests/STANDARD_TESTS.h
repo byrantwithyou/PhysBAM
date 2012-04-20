@@ -682,6 +682,7 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 void Get_Initial_Data()
 {
     bool automatically_add_to_collision_structures=true;
+    bool automatically_add_to_triangle_collisions=true;
     // deformable bodies
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
@@ -1259,6 +1260,7 @@ void Get_Initial_Data()
         case 51:{
             solids_parameters.use_rigid_deformable_contact=false;
             automatically_add_to_collision_structures=false;
+            automatically_add_to_triangle_collisions=false;
             if(!parameter) parameter=2;
             for(int i=0;i<parameter;i++){
                 SPHERE<TV> sphere(TV(0,i*2.1+2,0),1);
@@ -1266,7 +1268,8 @@ void Get_Initial_Data()
                 TETRAHEDRALIZED_VOLUME<T>* new_volume=0;
                 ARRAY<int> surface_particle_map;
                 tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,64,1e-3,surface_particle_map,&new_surface,&new_volume,false);
-                deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures.Last());}
+                deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures.Last());
+                solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures.Last());}
             tests.Add_Ground();
             break;}
         default:
@@ -1274,7 +1277,7 @@ void Get_Initial_Data()
 
     // add structures and rigid bodies to collisions
     if(automatically_add_to_collision_structures) deformable_body_collection.collisions.collision_structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
+    if(automatically_add_to_triangle_collisions) solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
     //solid_body_collection.deformable_body_collection.collisions.Use_Structure_Skip_Collision_Body();
     //solid_body_collection.deformable_body_collection.collisions.Use_Structure_Skip_Collision_Body();
 
