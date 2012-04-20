@@ -93,6 +93,8 @@ Use_Structure_Collide_Collision_Body(const bool value)
 template<class TV> void DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Compute_Candidate_Nodes_For_Collision_Body_Collisions(const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>& bodies)
 {
+    deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
+    deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
     collision_body_candidate_nodes.Resize(collision_body_list.Size(),false);
     for(COLLISION_GEOMETRY_ID id(0);id<collision_body_list.Size();id++) collision_body_candidate_nodes(id).Remove_All();
     if(!bodies.m) return;
@@ -130,6 +132,8 @@ template<class TV> int DEFORMABLE_OBJECT_COLLISIONS<TV>::
 Adjust_Nodes_For_Collision_Body_Collisions(BINDING_LIST<TV>& binding_list,SOFT_BINDINGS<TV>& soft_bindings,ARRAY_VIEW<const TV> X_old,const T dt,
     const ARRAY<COLLISION_GEOMETRY<TV>*,COLLISION_GEOMETRY_ID>* bodies)
 {
+    binding_list.Clamp_Particles_To_Embedded_Positions();
+    binding_list.Clamp_Particles_To_Embedded_Velocities();
     soft_bindings.Clamp_Particles_To_Embedded_Positions(true);
     soft_bindings.Clamp_Particles_To_Embedded_Velocities(true); // TODO: move this elsewhere
     if(!bodies) bodies=&collision_body_list.bodies;
@@ -314,12 +318,11 @@ Adjust_Nodes_For_Collisions(RIGID_COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTIC
     int interactions=0;
 
     T depth; 
-    ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
     for(int pp=0;pp<nodes_to_check.m;pp++){
         int p=nodes_to_check(pp);
         T thickness=thickness_table?thickness_table->Get_Default(p,0):0;
         COLLISION_PARTICLE_STATE<TV>& collision=collision_particle_state(p);
-        if(body.Implicit_Geometry_Lazy_Inside_And_Value(X(p),depth,thickness)){
+        if(body.Implicit_Geometry_Lazy_Inside_And_Value(deformable_body_collection.binding_list.X(p),depth,thickness)){
             collision.enforce=true;
             interactions++;
             particle_to_collision_geometry_id(p)=body.collision_geometry_id;
@@ -386,11 +389,10 @@ Adjust_Nodes_For_Push_Out(RIGID_COLLISION_GEOMETRY<TV>& body,DEFORMABLE_PARTICLE
     ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_geometry_id,const HASHTABLE<int,T> *thickness_table)
 {
     T depth; 
-    ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
     for(int pp=0;pp<nodes_to_check.m;pp++){
         int p=nodes_to_check(pp);
         T thickness=thickness_table?thickness_table->Get_Default(p,0):0;
-        if(body.Implicit_Geometry_Lazy_Inside_And_Value(X(p),depth,thickness)){
+        if(body.Implicit_Geometry_Lazy_Inside_And_Value(deformable_body_collection.binding_list.X(p),depth,thickness)){
             Adjust_Point_For_Push_Out(body,p,depth);}}
 }
 //#####################################################################
