@@ -266,7 +266,10 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const T d
     SEGMENT_2D<double> segment((VECTOR<double,2>)x1+collision_time_temp*(VECTOR<double,2>)v1,(VECTOR<double,2>)x2+collision_time_temp*(VECTOR<double,2>)v2);
     bool interaction=segment.Point_Face_Interaction((VECTOR<double,2>)x+collision_time_temp*(VECTOR<double,2>)v,(VECTOR<double,2>)v,(VECTOR<double,2>)v1,(VECTOR<double,2>)v2,
         (double)collision_thickness,distance,normal_temp,weights_temp,relative_speed_temp,true,exit_early);
-    collision_time=(T)collision_time_temp;relative_speed=(T)relative_speed_temp;normal=(VECTOR<T,2>)normal_temp;weights=(VECTOR<T,2>)weights_temp;
+    collision_time=(T)collision_time_temp;
+    relative_speed=(T)relative_speed_temp;
+    normal=(VECTOR<T,2>)normal_temp;
+    weights=(VECTOR<T,2>)weights_temp;
     return interaction;
 }
 //#####################################################################
