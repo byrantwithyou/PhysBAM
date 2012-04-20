@@ -20,17 +20,22 @@ template<class TV,class T,int d> TV PhysBAM::Compute_Collision_Impulse(const TV&
 
     // friction case
     // see if friction stops sliding
-    TV sticking_impulse=impulse_factor.Solve_Linear_System(-coefficient_of_restitution*relative_normal_velocity*normal-relative_velocity);
+    TV sticking_acceleration=-coefficient_of_restitution*relative_normal_velocity*normal-relative_velocity,sticking_impulse=impulse_factor.Solve_Linear_System(sticking_acceleration);
     T normal_component=sticking_impulse.Dot(normal);
     if((sticking_impulse-normal_component*normal).Magnitude()<=coefficient_of_friction*normal_component){
-        if(applied_sticking_impulse) *applied_sticking_impulse=true;
-        return sticking_impulse;}
+        if(sticking_impulse.Dot(relative_velocity+(T).5*sticking_acceleration)<=0){
+            if(applied_sticking_impulse) *applied_sticking_impulse=true;
+            return sticking_impulse;}}
 
     // friction does not stop sliding
     TV relative_tangential_velocity=relative_velocity-relative_normal_velocity*normal;
     TV tangential_direction=relative_tangential_velocity.Normalized();
     TV impulse_direction=normal-coefficient_of_friction*tangential_direction;
-    return -(1+coefficient_of_restitution)*relative_normal_velocity/normal.Dot(impulse_factor*impulse_direction)*impulse_direction;
+    TV impulse=-(1+coefficient_of_restitution)*relative_normal_velocity/normal.Dot(impulse_factor*impulse_direction)*impulse_direction;
+    T a=impulse.Dot(impulse_factor*impulse),b=impulse.Dot(relative_velocity);
+    if(a+2*b<=0) return impulse;
+    if(b>=0) return TV();
+    return (-2*b/a)*impulse;
 }
 template VECTOR<float,1> PhysBAM::Compute_Collision_Impulse<VECTOR<float,1>,float,1>(VECTOR<float,1> const&,SYMMETRIC_MATRIX<float,1> const&,VECTOR<float,1> const&,float,float,bool*);
 template VECTOR<float,2> PhysBAM::Compute_Collision_Impulse<VECTOR<float,2>,float,2>(VECTOR<float,2> const&,SYMMETRIC_MATRIX<float,2> const&,VECTOR<float,2> const&,float,float,bool*);
