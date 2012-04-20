@@ -31,7 +31,7 @@ public:
     {}
 
     void Clean_Memory()
-    {Clean_Memory();active_indices.Clean_Memory();subset_index_from_point_cloud_index.Clean_Memory();}
+    {active_indices.Clean_Memory();subset_index_from_point_cloud_index.Clean_Memory();}
 
     INDIRECT_ARRAY<ARRAY_VIEW<TV> > X()
     {return point_cloud.X.Subset(active_indices);}

@@ -127,7 +127,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     ARRAY_VIEW<TV> X(full_particles.X),X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,collisions_in_attempt=0,
         point_face_collisions=0,edge_edge_collisions=0;
-    ARRAY<ARRAY<int> > rigid_lists;ARRAY<int> list_index(full_particles.Size()); // index of the rigid list a local node belongs to
+    ARRAY<ARRAY<int> > rigid_lists;ARRAY<int> list_index(full_particles.Size());list_index.Fill(-1); // index of the rigid list a local node belongs to
 
     recently_modified_full.Resize(full_particles.Size(),false,false);recently_modified_full.Fill(true);
     ARRAY<TV> V_save;
@@ -161,7 +161,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         ee_normals.Resize(edge_edge_pairs_internal.Size());ee_normals.Fill(TV());
         pf_old_speeds.Resize(point_face_pairs_internal.Size());pf_old_speeds.Fill(T());
         ee_old_speeds.Resize(edge_edge_pairs_internal.Size());ee_old_speeds.Fill(T());
-        
+
         // point face first for stability
         point_face_collisions=0;edge_edge_collisions=0;collisions_in_attempt=0;
         if(mpi_solids && mpi_solids->rank==0){
@@ -326,7 +326,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
     int collisions=0,skipping_already_rigid=0;T collision_time;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_PF_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
-        if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
+        if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0)>=0 && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Point_Face_Final_Repulsion(pf_data,nodes,dt,POINT_FACE_REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,
@@ -526,7 +526,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
 
     for(int i=0;i<pairs.m;i++){const VECTOR<int,2*d-2>& nodes=pairs(i);
         GAUSS_JACOBI_EE_DATA ee_data(ee_target_impulses(i),ee_target_weights(i),ee_normals(i),ee_old_speeds(i));
-        if(rigid){VECTOR<int,2*d-2> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0) && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
+        if(rigid){VECTOR<int,2*d-2> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0)>=0 && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
@@ -671,7 +671,7 @@ Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const 
     else{ // combine with a pre-existing list
         for(int i=0;i<nodes.m;i++){
             int node=rigid_lists.Last()(i),current_list=list_index(node);
-            if(!current_list){rigid_lists(add_list).Append(node);list_index(node)=add_list;} // add to the add_list
+            if(current_list<0){rigid_lists(add_list).Append(node);list_index(node)=add_list;} // add to the add_list
             else if(current_list != add_list){ // not already in the add_list, but in another list - combine current_list with the add_list
                 int new_nodes=rigid_lists(current_list).m;rigid_lists(add_list).Resize(rigid_lists(add_list).m+new_nodes);
                 for(int j=0;j<new_nodes;j++){rigid_lists(add_list)(rigid_lists(add_list).m-new_nodes+j)=rigid_lists(current_list)(j);list_index(rigid_lists(current_list)(j))=add_list;}
