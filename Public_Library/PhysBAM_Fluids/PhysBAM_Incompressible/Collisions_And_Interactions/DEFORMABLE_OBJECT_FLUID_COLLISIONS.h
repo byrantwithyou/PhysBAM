@@ -22,7 +22,6 @@ class DEFORMABLE_OBJECT_FLUID_COLLISIONS:public COLLISION_GEOMETRY<TV>
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m>::OBJECT T_VOLUME_OBJECT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX T_SIMPLEX;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX T_VOLUME_SIMPLEX;
-    typedef typename IF<TV::m==2,T,typename IF<TV::m==1,ONE,VECTOR<T,3> >::TYPE>::TYPE T_WEIGHTS;
     typedef typename MESH_POLICY<TV::m-1>::MESH T_MESH;
 
 public:
@@ -101,15 +100,15 @@ public:
     bool Implicit_Geometry_Lazy_Inside(const TV& location,T contour_value=0) const PHYSBAM_OVERRIDE;
     T Implicit_Geometry_Extended_Value(const TV& location) const;
     TV Simplex_Closest_Point_On_Boundary(const TV& location,const T max_distance,const T thickness_over_2=(T)-1,int* simplex_id=0,T* distance=0) const PHYSBAM_OVERRIDE;
-    TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const PHYSBAM_OVERRIDE;
+    TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const PHYSBAM_OVERRIDE;
     int Number_Of_Simplices() const PHYSBAM_OVERRIDE;
     void Initialize_For_Thin_Shells_Fluid_Coupling();
     TV Pointwise_Object_Pseudo_Velocity(const int simplex_index,const TV& location,const int state1,const int state2) const PHYSBAM_OVERRIDE;
-    POINT_SIMPLEX_COLLISION_TYPE Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,const int simplex) const;
+    POINT_SIMPLEX_COLLISION_TYPE Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,const int simplex) const;
     T_SIMPLEX World_Space_Simplex(const int simplex_id,const bool use_saved_state=false) const PHYSBAM_OVERRIDE;
     T_SIMPLEX World_Space_Simplex(const int simplex_id,const GEOMETRY_PARTICLES<TV>& state) const;
-    bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id) const PHYSBAM_OVERRIDE;
-    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const PHYSBAM_OVERRIDE;
+    bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id) const PHYSBAM_OVERRIDE;
+    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const PHYSBAM_OVERRIDE;
     bool Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const PHYSBAM_OVERRIDE;
     void Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const PHYSBAM_OVERRIDE;
     void Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarchy,const int state1=0,const int state2=0) PHYSBAM_OVERRIDE;

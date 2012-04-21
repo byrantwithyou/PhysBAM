@@ -20,6 +20,7 @@ namespace PhysBAM{
 // Class GENERALIZED_MASS
 //#####################################################################
 template<class TV> class SOLIDS_EVOLUTION;
+template<class TV> class PRECOMPUTE_PROJECT;
 template<class TV>
 class GENERALIZED_MASS
 {
@@ -65,10 +66,10 @@ public:
             :mass(solid_body_collection),project_nullspace_counter(0)
         {}
         GENERALIZED_MASS<TV> mass;
-        ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_face_pairs;
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_pairs;
-        ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<TV> > point_face_precomputed;
-        ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<TV> > edge_edge_precomputed;
+        ARRAY<REPULSION_PAIR<TV> > point_face_pairs;
+        ARRAY<REPULSION_PAIR<TV> > edge_edge_pairs;
+        ARRAY<PRECOMPUTE_PROJECT<TV> > point_face_precomputed;
+        ARRAY<PRECOMPUTE_PROJECT<TV> > edge_edge_precomputed;
         mutable int project_nullspace_counter;
     };
     PROJECTION_DATA projection_data;

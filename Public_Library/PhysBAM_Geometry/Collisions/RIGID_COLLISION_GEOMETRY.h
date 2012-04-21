@@ -21,7 +21,6 @@ class RIGID_COLLISION_GEOMETRY_BASE:public COLLISION_GEOMETRY<TV>
 {
 private:
     typedef typename TV::SCALAR T;
-    typedef typename IF<TV::dimension==2,T,typename IF<TV::dimension==1,ONE,TV>::TYPE>::TYPE T_WEIGHTS;
     typedef COLLISION_GEOMETRY<TV> BASE;
 
 public:
@@ -53,7 +52,7 @@ public:
     bool Implicit_Geometry_Lazy_Inside_And_Value(const TV& location,T& phi,T contour_value=0) const PHYSBAM_OVERRIDE;
     bool Implicit_Geometry_Lazy_Inside_Extended_Levelset(const TV& location,T contour_value=0) const PHYSBAM_OVERRIDE;
 
-    TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const PHYSBAM_OVERRIDE;
+    TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const PHYSBAM_OVERRIDE;
     bool Simplex_Intersection(RAY<TV>& ray) const PHYSBAM_OVERRIDE;
     bool Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const PHYSBAM_OVERRIDE;
     bool Inside_Any_Simplex(const TV& location,int& simplex_id) const PHYSBAM_OVERRIDE;

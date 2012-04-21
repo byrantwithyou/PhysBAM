@@ -15,7 +15,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> TRIANGLE_REPULSIONS_POINT_FACE_VISITOR<TV>::
-TRIANGLE_REPULSIONS_POINT_FACE_VISITOR(ARRAY<POINT_FACE_REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& particle_structure,
+TRIANGLE_REPULSIONS_POINT_FACE_VISITOR(ARRAY<REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& particle_structure,
     const STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure,ARRAY_VIEW<const TV> X_other,const TRIANGLE_REPULSIONS<TV>& repulsions,int& pruned)
     :pairs(pairs),particle_active_indices(particle_structure.collision_particles.active_indices),faces(face_structure.Face_Mesh_Object()->mesh.elements),
     X_other(X_other),X_self_collision_free(repulsions.geometry.X_self_collision_free),repulsion_thickness(repulsions.repulsion_thickness),
@@ -37,7 +37,7 @@ Store(const int point_index,const int face_index)
 {
     const VECTOR<int,d>& face_nodes=faces(face_index);int p=particle_active_indices(point_index);
     if(face_nodes.Contains(p)) return;
-    POINT_FACE_REPULSION_PAIR<TV> pair;pair.nodes=face_nodes.Insert(p,0);
+    REPULSION_PAIR<TV> pair;pair.nodes=face_nodes.Insert(p,0);
     T total_repulsion_thickness=thickness_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     T_FACE face(X_other.Subset(face_nodes));
     if(!face.Point_Face_Interaction(X_other(pair.nodes[0]),total_repulsion_thickness,false,pair.distance)) pruned++;

@@ -13,7 +13,7 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLES_COLLISIONS_FORWARD.h>
 
 namespace PhysBAM{
-template<class TV> struct POINT_FACE_REPULSION_PAIR;
+template<class TV> struct REPULSION_PAIR;
 template<class TV> class STRUCTURE_INTERACTION_GEOMETRY;
 template<class TV>
 struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR
@@ -23,7 +23,7 @@ struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR
     typedef typename BASIC_SIMPLEX_POLICY<TV,d-1>::SIMPLEX T_FACE;
     typedef typename MESH_POLICY<d-1>::MESH T_MESH;
 
-    ARRAY<POINT_FACE_REPULSION_PAIR<TV> >& pairs;
+    ARRAY<REPULSION_PAIR<TV> >& pairs;
     ARRAY_VIEW<const int> particle_active_indices;
     ARRAY_VIEW<const VECTOR<int,d> > faces;
     ARRAY_VIEW<const TV> X_other,X_self_collision_free;
@@ -33,7 +33,7 @@ struct TRIANGLE_REPULSIONS_POINT_FACE_VISITOR
     const bool perform_attractions;
     const HASHTABLE<VECTOR<int,d+1> > &intersecting_point_face_pairs,&omit_point_face_repulsion_pairs;
 
-    TRIANGLE_REPULSIONS_POINT_FACE_VISITOR(ARRAY<POINT_FACE_REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& particle_structure,
+    TRIANGLE_REPULSIONS_POINT_FACE_VISITOR(ARRAY<REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& particle_structure,
         const STRUCTURE_INTERACTION_GEOMETRY<TV>& face_structure,ARRAY_VIEW<const TV> X_other,const TRIANGLE_REPULSIONS<TV>& repulsions,int& pruned);
 
     ~TRIANGLE_REPULSIONS_POINT_FACE_VISITOR();

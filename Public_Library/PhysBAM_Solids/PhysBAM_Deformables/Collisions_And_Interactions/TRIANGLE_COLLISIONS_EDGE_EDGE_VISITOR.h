@@ -22,15 +22,15 @@ struct TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR
     enum WORKAROUND {d=TV::m};
     typedef typename IF<d==2,int,VECTOR<int,2> >::TYPE T_EDGE;
 
-    ARRAY<VECTOR<int,2*d-2> > &pairs_internal,&pairs_external;
+    ARRAY<VECTOR<int,d+1> > &pairs_internal,&pairs_external;
     ARRAY_VIEW<const T_EDGE> edges1,edges2;
     ARRAY_VIEW<const TV> X,X_self_collision_free;
     const T collision_thickness;
     ARRAY_VIEW<const bool> edge1_box_modified,edge2_box_modified;
-    const HASHTABLE<VECTOR<int,2*d-2> >& intersecting_edge_edge_pairs;
+    const HASHTABLE<VECTOR<int,d+1> >& intersecting_edge_edge_pairs;
     MPI_SOLIDS<TV>* mpi_solids;
 
-    TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR(ARRAY<VECTOR<int,2*d-2> >& pairs_internal, ARRAY<VECTOR<int,2*d-2> >& pairs_external,
+    TRIANGLE_COLLISIONS_EDGE_EDGE_VISITOR(ARRAY<VECTOR<int,d+1> >& pairs_internal, ARRAY<VECTOR<int,d+1> >& pairs_external,
         const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure1,const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure2,
         const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geometry,const T collision_thickness,MPI_SOLIDS<TV>* mpi_solids);
 

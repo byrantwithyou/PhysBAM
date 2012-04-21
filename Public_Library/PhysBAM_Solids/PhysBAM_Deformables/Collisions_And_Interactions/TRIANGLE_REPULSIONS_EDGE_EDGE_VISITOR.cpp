@@ -16,7 +16,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<TV>::
-TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure1,
+TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure1,
     const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure2,ARRAY_VIEW<const TV> X_other,const TRIANGLE_REPULSIONS<TV>& repulsions,int& pruned)
     :pairs(pairs),edges1(edge_structure1.Edges()),edges2(edge_structure2.Edges()),
     X_other(X_other),X_self_collision_free(repulsions.geometry.X_self_collision_free),repulsion_thickness(repulsions.repulsion_thickness),
@@ -37,7 +37,8 @@ template<class TV> void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<TV>::
 Store_Helper(const int point1_index,const int point2_index,const VECTOR<T,2>&)
 {
     int p1=edges1(point1_index),p2=edges2(point2_index);
-    EDGE_EDGE_REPULSION_PAIR<TV> pair;pair.nodes=VECTOR<int,2>(p1,p2);
+    REPULSION_PAIR<TV> pair;
+    pair.nodes=VECTOR<int,2>(p1,p2);
     POINT_2D<T> point1(X_other(p1)),point2(X_other(p2));
     T total_repulsion_thickness=thickness_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     if(!point1.Edge_Edge_Interaction(point2,total_repulsion_thickness,pair.distance,pair.normal)) pruned++;
@@ -58,7 +59,7 @@ template<class TV> void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<TV>::
 Store_Helper_Helper(const int segment1_index,const int segment2_index)
 {
     const VECTOR<int,2> &segment1_nodes=edges1(segment1_index),&segment2_nodes=edges2(segment2_index);
-    EDGE_EDGE_REPULSION_PAIR<TV> pair;pair.nodes=VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]);
+    REPULSION_PAIR<TV> pair;pair.nodes=VECTOR<int,4>(segment1_nodes[0],segment1_nodes[1],segment2_nodes[0],segment2_nodes[1]);
     SEGMENT_3D<T> segment1(X_other.Subset(segment1_nodes)),segment2(X_other.Subset(segment2_nodes));
     T total_repulsion_thickness=thickness_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     if(!segment1.Edge_Edge_Interaction(segment2,total_repulsion_thickness,pair.distance,pair.normal,pair.weights,false)) pruned++;
@@ -84,31 +85,19 @@ Store_Helper_Helper(const int segment1_index,const int segment2_index)
     template void BOX_HIERARCHY<VECTOR<T,d> >::Intersection_List<BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<T,d> > >,T>(BOX_HIERARCHY<VECTOR<T,d> > const&, \
         BOX_VISITOR_MPI<TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<T,d> > >&,T) const;
 
-template void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,2> >::Store_Helper(int,int,VECTOR<float,2> const&);
-template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,2> >::TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<float,2> >,int>&,
-    STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,2> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,2> > const&,ARRAY_VIEW<VECTOR<float,2> const,int>,
-    TRIANGLE_REPULSIONS<VECTOR<float,2> > const&,int&);
-template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,2> >::~TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR();
 template void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,3> >::Store_Helper_Helper(int,int);
-template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,3> >::TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<float,3> >,int>&,
+template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,3> >::TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<REPULSION_PAIR<VECTOR<float,3> >,int>&,
     STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,3> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<float,3> > const&,ARRAY_VIEW<VECTOR<float,3> const,int>,
     TRIANGLE_REPULSIONS<VECTOR<float,3> > const&,int&);
 template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<float,3> >::~TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR();
 
-INSTANTIATION_HELPER(float,2);
 INSTANTIATION_HELPER(float,3);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,2> >::Store_Helper(int,int,VECTOR<double,2> const&);
-template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,2> >::TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<double,2> >,int>&,
-    STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,2> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,2> > const&,ARRAY_VIEW<VECTOR<double,2> const,int>,
-    TRIANGLE_REPULSIONS<VECTOR<double,2> > const&,int&);
-template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,2> >::~TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR();
 template void TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,3> >::Store_Helper_Helper(int,int);
-template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,3> >::TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<double,3> >,int>&,
+template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,3> >::TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<REPULSION_PAIR<VECTOR<double,3> >,int>&,
     STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,3> > const&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<double,3> > const&,ARRAY_VIEW<VECTOR<double,3> const,int>,
     TRIANGLE_REPULSIONS<VECTOR<double,3> > const&,int&);
 template TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR<VECTOR<double,3> >::~TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR();
 
-INSTANTIATION_HELPER(double,2);
 INSTANTIATION_HELPER(double,3);
 #endif

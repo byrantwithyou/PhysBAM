@@ -20,8 +20,7 @@ namespace PhysBAM{
 
 template<class TV> class MPI_SOLIDS;
 template<class TV> class COLLISION_PARTICLE_STATE;
-template<class TV> struct PRECOMPUTE_PROJECT_POINT_FACE;
-template<class TV> struct PRECOMPUTE_PROJECT_EDGE_EDGE;
+template<class TV> struct PRECOMPUTE_PROJECT;
 namespace{template<class TV,int d> class POISSON_SYSTEM;}
 
 template<class TV>
@@ -73,10 +72,10 @@ public:
         ARRAY<int> neumann_boundary_nodes;
         ARRAY<int> neumann_boundary_nodes_isolated;
         ARRAY<int> fixed_nodes;
-        ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_face_pairs;
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_pairs;
-        ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<TV> > point_face_precomputed;
-        ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<TV> > edge_edge_precomputed;
+        ARRAY<REPULSION_PAIR<TV> > point_face_pairs;
+        ARRAY<REPULSION_PAIR<TV> > edge_edge_pairs;
+        ARRAY<PRECOMPUTE_PROJECT<TV> > point_face_precomputed;
+        ARRAY<PRECOMPUTE_PROJECT<TV> > edge_edge_precomputed;
     };
     PROJECTION_DATA projection_data;
     ARRAY<ARRAY<int> > node_regions;

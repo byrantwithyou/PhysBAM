@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Parallel_Computation/MPI_SOLIDS.h>
 namespace PhysBAM{
-template<class TV> struct EDGE_EDGE_REPULSION_PAIR;
+template<class TV> struct REPULSION_PAIR;
 template<class TV> class STRUCTURE_INTERACTION_GEOMETRY;
 template<class TV> class TRIANGLE_REPULSIONS;
 template<class TV>
@@ -21,7 +21,7 @@ struct TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR
     enum WORKAROUND {d=TV::m};
     typedef typename IF<d==2,int,VECTOR<int,2> >::TYPE T_EDGE;
 
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> >& pairs;
+    ARRAY<REPULSION_PAIR<TV> >& pairs;
     ARRAY_VIEW<const T_EDGE> edges1,edges2;
     ARRAY_VIEW<const TV> X_other,X_self_collision_free;
     ARRAY_VIEW<const T> repulsion_thickness;
@@ -30,7 +30,7 @@ struct TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR
     const bool perform_attractions;
     const HASHTABLE<VECTOR<int,2*d-2> > &intersecting_edge_edge_pairs,&omit_edge_edge_repulsion_pairs;
 
-    TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure1,
+    TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR(ARRAY<REPULSION_PAIR<TV> >& pairs,const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure1,
         const STRUCTURE_INTERACTION_GEOMETRY<TV>& edge_structure2,ARRAY_VIEW<const TV> X_other,const TRIANGLE_REPULSIONS<TV>& repulsions,int& pruned);
 
     ~TRIANGLE_REPULSIONS_EDGE_EDGE_VISITOR();

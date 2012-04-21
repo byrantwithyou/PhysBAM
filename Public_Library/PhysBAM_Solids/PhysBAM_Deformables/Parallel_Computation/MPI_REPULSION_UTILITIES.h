@@ -12,13 +12,13 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UTILITIES.h>
 namespace PhysBAM{
 
-template<class TV> class POINT_FACE_REPULSION_PAIR;
-template<class TV> class EDGE_EDGE_REPULSION_PAIR;
+template<class TV> class REPULSION_PAIR;
+template<class TV> class REPULSION_PAIR;
 
 namespace MPI_UTILITIES{
 
-template<class T,int d> struct DATATYPE_HELPER<POINT_FACE_REPULSION_PAIR<VECTOR<T,d> > >{static MPI::Datatype Datatype();};
-template<class T,int d> struct DATATYPE_HELPER<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,d> > >{static MPI::Datatype Datatype();};
+template<class T,int d> struct DATATYPE_HELPER<REPULSION_PAIR<VECTOR<T,d> > >{static MPI::Datatype Datatype();};
+template<class T,int d> struct DATATYPE_HELPER<REPULSION_PAIR<VECTOR<T,d> > >{static MPI::Datatype Datatype();};
 
 }
 }

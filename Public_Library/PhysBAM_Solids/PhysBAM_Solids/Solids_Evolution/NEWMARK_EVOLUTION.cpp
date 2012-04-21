@@ -326,7 +326,8 @@ Make_Incompressible(const T dt,const bool correct_volume)
     for(int f=0;f<solid_body_collection.deformable_body_collection.deformables_forces.m;f++)
         if(INCOMPRESSIBLE_FINITE_VOLUME_BASE<TV>* fvm=dynamic_cast<INCOMPRESSIBLE_FINITE_VOLUME_BASE<TV>*>(&*solid_body_collection.deformable_body_collection.deformables_forces(f))){
             fvm->Set_Neumann_Boundary_Conditions(&solid_body_collection.deformable_body_collection.collisions.particle_states,repulsions);
-            fvm->Make_Incompressible(dt,correct_volume);}
+            fvm->Make_Incompressible(dt,correct_volume);
+            Diagnostics(dt,time,1,0,700,"make incompressible");}
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Position

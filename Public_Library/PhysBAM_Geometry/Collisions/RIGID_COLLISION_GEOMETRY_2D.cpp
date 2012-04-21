@@ -27,35 +27,35 @@ template<class T> RIGID_COLLISION_GEOMETRY<VECTOR<T,2> >::
 // Function Earliest_Simplex_Crossover
 //##################################################################### 
 template<class T> bool RIGID_COLLISION_GEOMETRY<VECTOR<T,2> >::
-Earliest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const T dt,T& hit_time,T& hit_alpha,int& segment_id) const
+Earliest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const T dt,T& hit_time,TV& weights,int& segment_id) const
 {
     const T collision_thickness_over_two=(T).5*collision_thickness;
-    T min_time=FLT_MAX;bool collision=false;T current_hit_time,current_hit_alpha,relative_speed;
+    T min_time=FLT_MAX;bool collision=false;T current_hit_time;VECTOR<T,TV::m+1> current_weights;
     TV normal;
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
-            SEGMENT_2D<T>::Robust_Point_Segment_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_hit_alpha,relative_speed);
+            SEGMENT_2D<T>::Robust_Point_Face_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weights);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time<min_time){
-            min_time=hit_time=current_hit_time;hit_alpha=current_hit_alpha;segment_id=segment_number;collision=true;}}
+            min_time=hit_time=current_hit_time;weights=current_weights.Remove_Index(0);segment_id=segment_number;collision=true;}}
     return collision;
 }
 //##################################################################### 
 // Function Latest_Simplex_Crossover
 //##################################################################### 
 template<class T> bool RIGID_COLLISION_GEOMETRY<VECTOR<T,2> >::
-Latest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const T dt,T& hit_time,T& hit_alpha,int& segment_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
+Latest_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const T dt,T& hit_time,TV& weights,int& segment_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
 {
     const T collision_thickness_over_two=(T).5*collision_thickness;
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;
-    T max_time=-FLT_MAX;bool collision=false;T current_hit_time,current_hit_alpha,relative_speed;
+    T max_time=-FLT_MAX;bool collision=false;T current_hit_time;VECTOR<T,TV::m+1> current_weights;
     TV normal;
     for (int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
-            SEGMENT_2D<T>::Robust_Point_Segment_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_hit_alpha,relative_speed);
+            SEGMENT_2D<T>::Robust_Point_Face_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weights);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time>max_time){
-            max_time=hit_time=current_hit_time;hit_alpha=current_hit_alpha;segment_id=segment_number;collision=true;returned_collision_type=collision_type;}}
+            max_time=hit_time=current_hit_time;weights=current_weights.Remove_Index(0);segment_id=segment_number;collision=true;returned_collision_type=collision_type;}}
     return collision;
 }
 //#####################################################################
@@ -65,12 +65,12 @@ template<class T> bool RIGID_COLLISION_GEOMETRY<VECTOR<T,2> >::
 Any_Simplex_Crossover(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const T dt) const
 {
     const T collision_thickness_over_two=(T).5*collision_thickness;
-    T current_hit_time,current_hit_alpha,relative_speed;
+    T current_hit_time;VECTOR<T,TV::m+1> current_weights;
     TV normal;
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         SEGMENT_2D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
-            SEGMENT_2D<T>::Robust_Point_Segment_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_hit_alpha,relative_speed);
+            SEGMENT_2D<T>::Robust_Point_Face_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weights);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}
     return false;
 }

@@ -42,7 +42,7 @@ template<class TV> COLLISION_GEOMETRY<TV>::
 template<class TV> bool COLLISION_GEOMETRY<TV>::
 Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,const T dt,T& hit_time,int& simplex_id,T& start_phi,T& end_phi,TV& end_body_normal,TV& body_velocity) const
 {
-    T temp_hit_time;TV closest_point;T_WEIGHTS weights;bool got_closest_simplex=false;
+    T temp_hit_time;TV closest_point;TV weights;bool got_closest_simplex=false;
     if(Earliest_Simplex_Crossover(start_X,end_X,dt,temp_hit_time,weights,simplex_id)){
         closest_point=Simplex_World_Space_Point_From_Barycentric_Coordinates(simplex_id,weights);
         got_closest_simplex=true;hit_time=temp_hit_time;}
@@ -106,7 +106,7 @@ template<class TV> bool COLLISION_GEOMETRY<TV>::Implicit_Geometry_Lazy_Inside_An
 template<class TV> bool COLLISION_GEOMETRY<TV>::Implicit_Geometry_Lazy_Inside_Extended_Levelset(const TV& location,T contour_value) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 
 // simplex interface
-template<class TV> TV COLLISION_GEOMETRY<TV>::Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class TV> TV COLLISION_GEOMETRY<TV>::Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> int COLLISION_GEOMETRY<TV>::Number_Of_Simplices() const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> bool COLLISION_GEOMETRY<TV>::Simplex_Intersection(RAY<TV>& ray) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> bool COLLISION_GEOMETRY<TV>::Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
@@ -118,9 +118,9 @@ template<class TV> TV COLLISION_GEOMETRY<TV>::Pointwise_Object_Pseudo_Velocity(c
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename COLLISION_GEOMETRY<TV>::T_SIMPLEX COLLISION_GEOMETRY<TV>::World_Space_Simplex(const int simplex_id,const bool use_saved_state) const
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> bool COLLISION_GEOMETRY<TV>::Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id) const
+template<class TV> bool COLLISION_GEOMETRY<TV>::Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id) const
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> bool COLLISION_GEOMETRY<TV>::Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id,
+template<class TV> bool COLLISION_GEOMETRY<TV>::Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id,
     POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> bool COLLISION_GEOMETRY<TV>::Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void COLLISION_GEOMETRY<TV>::Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const

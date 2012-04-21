@@ -24,7 +24,6 @@ class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<typename T
     typedef typename T_GRID::VECTOR_T TV;
     typedef typename TV::SCALAR T;
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_IMPLICIT_OBJECT T_LEVELSET_IMPLICIT_OBJECT;
-    typedef typename IF<TV::dimension==2,T,typename IF<TV::dimension==1,ONE,TV>::TYPE>::TYPE T_WEIGHTS;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_T;
     typedef typename T_ARRAYS_T::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
@@ -65,7 +64,7 @@ public:
     //      in the low accuracy case, the points inside the object are set to invalid in the driver, so this does not need to invalidate anything
     //      (i.e., it ignored crossovers)
     // If it isn't the case, we need to generalize COLLISION_GEOMETRY_COLLECTION::Latest_Crossover to work for this.
-    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const PHYSBAM_OVERRIDE
+    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const PHYSBAM_OVERRIDE
     {return false;}
 
     bool Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const PHYSBAM_OVERRIDE

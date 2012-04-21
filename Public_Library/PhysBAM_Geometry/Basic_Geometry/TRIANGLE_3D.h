@@ -145,12 +145,12 @@ public:
     return Point_From_Barycentric_Coordinates(edge_lengths/perimeter);}
 
     bool Point_Face_Interaction(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T interaction_distance,T& distance,
-        TV& interaction_normal,TV& weights,T& relative_speed,const bool allow_negative_weights,const bool exit_early) const
-    {return Point_Face_Interaction(x,v,V_face(0),V_face(1),V_face(2),interaction_distance,distance,interaction_normal,weights,relative_speed,allow_negative_weights,exit_early);}
+        TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool allow_negative_weights,const bool exit_early) const
+    {return Point_Face_Interaction(x,v,V_face(0),V_face(1),V_face(2),interaction_distance,distance,interaction_normal,weights,allow_negative_weights,exit_early);}
 
     bool Point_Face_Collision(const TV& x,const TV& v,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T dt,const T collision_thickness,T& collision_time,TV& normal,
-        TV& weights,T& relative_speed,const bool exit_early) const
-    {return Point_Face_Collision(x,v,V_face(0),V_face(1),V_face(2),dt,collision_thickness,collision_time,normal,weights,relative_speed,exit_early);}
+        VECTOR<T,TV::m+1>& weights,const bool exit_early) const
+    {return Point_Face_Collision(x,v,V_face(0),V_face(1),V_face(2),dt,collision_thickness,collision_time,normal,weights,exit_early);}
 
     RANGE<TV> Bounding_Box() const
     {return RANGE<TV>::Bounding_Box(x1,x2,x3);}
@@ -176,13 +176,13 @@ public:
     T Maximum_Angle() const;
     T Signed_Solid_Angle(const TV& center) const;
     bool Point_Face_Interaction(const TV& x,const T interaction_distance,const bool allow_negative_weights,T& distance) const;
-    void Point_Face_Interaction_Data(const TV& x,T& distance,TV& interaction_normal,TV& weights,const bool perform_attractions) const;    
+    void Point_Face_Interaction_Data(const TV& x,T& distance,TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool perform_attractions) const;    
     bool Point_Face_Interaction(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV& v3,const T interaction_distance,
-        T& distance,TV& interaction_normal,TV& weights,T& relative_speed,const bool allow_negative_weights,const bool exit_early) const;
-    static POINT_SIMPLEX_COLLISION_TYPE Robust_Point_Triangle_Collision(const TRIANGLE_3D<T>& initial_triangle,const TRIANGLE_3D<T>& final_triangle,const TV& x,
-        const TV& final_x,const T dt,const T collision_thickness,T& collision_time,TV& normal,TV& weights,T& relative_speed);
+        T& distance,TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool allow_negative_weights,const bool exit_early) const;
+    static POINT_SIMPLEX_COLLISION_TYPE Robust_Point_Face_Collision(const TRIANGLE_3D<T>& initial_triangle,const TRIANGLE_3D<T>& final_triangle,const TV& x,
+        const TV& final_x,const T dt,const T collision_thickness,T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights);
     bool Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV& v3,const T dt,const T collision_thickness,
-        T& collision_time,TV& normal,TV& weights,T& relative_speed,const bool exit_early) const;
+        T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights,const bool exit_early) const;
     void Clip_To_Box(const RANGE<TV>& box,ARRAY<TRIANGLE_3D<T> >& clipped_simplices) const;
     static void Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles);
     static void Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles,ARRAY<TRIANGLE_3D<T> >& positive_triangles,T tol=0);

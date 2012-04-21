@@ -75,6 +75,9 @@ public:
     static TV Point_From_Barycentric_Coordinates(const ONE,const TV& x1)
     {return x1;}
 
+    TV Point_From_Barycentric_Coordinates(const TV& weights)
+    {return x1;}
+
     template<class T_ARRAY>
     static typename ENABLE_IF<AND<IS_SAME<typename T_ARRAY::ELEMENT,TV>::value,T_ARRAY::m==1>::value,TV>::TYPE
     Point_From_Barycentric_Coordinates(const ONE,const T_ARRAY& X)
@@ -115,11 +118,12 @@ public:
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,direction,x1);}
 
-    static bool Point_Point_Collision(const POINT_SIMPLEX_1D<T>& initial_simplex,const VECTOR<T,1>& x,const VECTOR<T,1>& v,const VECTOR<T,1>& v1,const T dt,const T collision_thickness,
-        T& collision_time,VECTOR<T,1>& normal,ONE& weights,T& relative_speed,const bool exit_early)
+    static bool Point_Face_Collision(const POINT_SIMPLEX_1D<T>& initial_simplex,const VECTOR<T,1>& x,const VECTOR<T,1>& v,const VECTOR<T,1>& v1,const T dt,const T collision_thickness,
+        T& collision_time,VECTOR<T,1>& normal,VECTOR<T,2>& weights,const bool exit_early)
     {
-        T distance=x.x-initial_simplex.x1.x;
-        relative_speed=v.x-v1.x;
+        weights.x=-1;
+        weights.y=1;
+        T distance=x.x-initial_simplex.x1.x,relative_speed=-weights.x*v.x-weights.y*v1.x;
         if(distance*relative_speed>=0 || abs(distance)>abs(dt*relative_speed)) return false;
         collision_time=distance/relative_speed;
         if(distance>0) normal=VECTOR<T,1>(1);
@@ -127,8 +131,8 @@ public:
         return true;
     }
 
-    static POINT_SIMPLEX_COLLISION_TYPE Robust_Point_Point_Collision(const POINT_SIMPLEX_1D<T>& initial_simplex,const POINT_SIMPLEX_1D<T>& final_simplex,
-        const VECTOR<T,1>& x,const VECTOR<T,1>& final_x,const T dt,const T collision_thickness,T& collision_time,VECTOR<T,1>& normal,ONE& weights,T& relative_speed)
+    static POINT_SIMPLEX_COLLISION_TYPE Robust_Point_Face_Collision(const POINT_SIMPLEX_1D<T>& initial_simplex,const POINT_SIMPLEX_1D<T>& final_simplex,
+        const VECTOR<T,1>& x,const VECTOR<T,1>& final_x,const T dt,const T collision_thickness,T& collision_time,VECTOR<T,1>& normal,VECTOR<T,2>& weights)
     {
         if(final_simplex.Bounding_Box().Thickened(collision_thickness).Lazy_Inside(final_x)){
             collision_time=dt;
@@ -137,7 +141,7 @@ public:
             collision_time=0;
             return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;}
         VECTOR<T,1> v1=(final_simplex.x1-initial_simplex.x1)/dt,v=(final_x-x)/dt;
-        if(Point_Point_Collision(initial_simplex,x,v,v1,dt,collision_thickness,collision_time,normal,weights,relative_speed,false))
+        if(Point_Face_Collision(initial_simplex,x,v,v1,dt,collision_thickness,collision_time,normal,weights,false))
             return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;
         return POINT_SIMPLEX_NO_COLLISION;
     }

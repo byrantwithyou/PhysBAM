@@ -607,7 +607,7 @@ template<class TV,class T_ARRAY_PAIR> void Distribute_Repulsion_Pairs_Helper(con
 {
     typedef typename T_ARRAY_PAIR::ELEMENT T_PAIR;
     typedef typename T_PAIR::SCALAR T_DATA;
-    typedef typename IF<IS_SAME<T_PAIR,POINT_FACE_REPULSION_PAIR<VECTOR<T_DATA,T_PAIR::d> > >::value,VECTOR<PARTITION_ID,T_PAIR::d+1>,VECTOR<PARTITION_ID,T_PAIR::d*2-2> >::TYPE PROCESSOR_VECTOR;
+    typedef typename IF<IS_SAME<T_PAIR,REPULSION_PAIR<VECTOR<T_DATA,T_PAIR::d> > >::value,VECTOR<PARTITION_ID,T_PAIR::d+1>,VECTOR<PARTITION_ID,T_PAIR::d*2-2> >::TYPE PROCESSOR_VECTOR;
     STATIC_ASSERT(sizeof(int)==4);PHYSBAM_ASSERT(mpi_solids.particles_of_partition.Size()<=PARTITION_ID(32));
 
     LOG::SCOPE scope("Repulsion Pair Distribution","Repulsion Pair Distribution");
@@ -805,8 +805,8 @@ template<class TV> void MPI_SOLIDS<TV>::Barrier() const {PHYSBAM_NOT_IMPLEMENTED
     template void MPI_SOLIDS<P(V)>::Gather_Interaction_Pairs(ARRAY<VECTOR<T,d> >& point_triangle_pairs,ARRAY<VECTOR<T,e> >& edge_edge_pairs) const;
 
 #define INSTANTIATION_HELPER_ALL3(V,T,d,e) \
-    template void MPI_SOLIDS<P(V)>::Gather_Interaction_Pairs(ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,d> > >& point_triangle_pairs, \
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,e> > >& edge_edge_pairs) const;
+    template void MPI_SOLIDS<P(V)>::Gather_Interaction_Pairs(ARRAY<REPULSION_PAIR<VECTOR<T,d> > >& point_triangle_pairs, \
+        ARRAY<REPULSION_PAIR<VECTOR<T,e> > >& edge_edge_pairs) const;
 
 #define INSTANTIATION_HELPER_ALL_NEED1(V,T) \
     template int MPI_SOLIDS<P(V)>::Reduce_Add(const int) const; \
@@ -841,19 +841,15 @@ template<class TV> void MPI_SOLIDS<TV>::Barrier() const {PHYSBAM_NOT_IMPLEMENTED
     template MPI_PACKAGE* MPI_SOLIDS<P(V)>::Package(ARRAY_VIEW<VECTOR<T,3> >);
 
 #define INSTANTIATION_HELPER_1D_ONLY(T) \
-    template void MPI_SOLIDS<VECTOR<T,1> >::Gather_Interaction_Pairs(ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,1> > >& point_triangle_pairs, \
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> > >& edge_edge_pairs) const; \
-    template void MPI_SOLIDS<VECTOR<T,1> >::Distribute_Repulsion_Pairs(const ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,1> > >&,ARRAY<ARRAY<int>,PARTITION_ID>&, \
-        ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,1> > >&,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,1> > >&) const; \
-    template void MPI_SOLIDS<VECTOR<T,1> >::Distribute_Repulsion_Pairs(const ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> > >&,ARRAY<ARRAY<int>,PARTITION_ID>&, \
-        ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> > >&,ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> > >&) const;
+    template void MPI_SOLIDS<VECTOR<T,1> >::Gather_Interaction_Pairs(ARRAY<REPULSION_PAIR<VECTOR<T,1> > >& point_triangle_pairs, \
+        ARRAY<REPULSION_PAIR<VECTOR<T,1> > >& edge_edge_pairs) const; \
+    template void MPI_SOLIDS<VECTOR<T,1> >::Distribute_Repulsion_Pairs(const ARRAY<REPULSION_PAIR<VECTOR<T,1> > >&,ARRAY<ARRAY<int>,PARTITION_ID>&, \
+        ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<REPULSION_PAIR<VECTOR<T,1> > >&,ARRAY<REPULSION_PAIR<VECTOR<T,1> > >&) const;
 
 #define INSTANTIATION_HELPER_ALL(V,T) \
     template double MPI_SOLIDS<P(V)>::Debug_Reduce_Array_Sum(ARRAY_VIEW<const double>) const; \
-    template void MPI_SOLIDS<P(V)>::Distribute_Repulsion_Pairs(const ARRAY<POINT_FACE_REPULSION_PAIR<P(V)> >&,ARRAY<ARRAY<int>,PARTITION_ID>&, \
-        ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<POINT_FACE_REPULSION_PAIR<P(V)> >&,ARRAY<POINT_FACE_REPULSION_PAIR<P(V)> >&) const; \
-    template void MPI_SOLIDS<P(V)>::Distribute_Repulsion_Pairs(const ARRAY<EDGE_EDGE_REPULSION_PAIR<P(V)> >&,ARRAY<ARRAY<int>,PARTITION_ID>&, \
-        ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<EDGE_EDGE_REPULSION_PAIR<P(V)> >&,ARRAY<EDGE_EDGE_REPULSION_PAIR<P(V)> >&) const; \
+    template void MPI_SOLIDS<P(V)>::Distribute_Repulsion_Pairs(const ARRAY<REPULSION_PAIR<P(V)> >&,ARRAY<ARRAY<int>,PARTITION_ID>&, \
+        ARRAY<ARRAY<int>,PARTITION_ID>&,ARRAY<REPULSION_PAIR<P(V)> >&,ARRAY<REPULSION_PAIR<P(V)> >&) const; \
     template void MPI_SOLIDS<P(V)>::All_Gather_Intersecting_Pairs<P(V::dimension+1),P(V::dimension*2-2)>(HASHTABLE<VECTOR<int,P(V::dimension+1)>,void>&, \
         HASHTABLE<VECTOR<int,P(V::dimension*2-2)>,void>&); \
     template void MPI_SOLIDS<P(V)>::KD_Tree_Partition_Subset(DEFORMABLE_BODY_COLLECTION<P(V)>& deformable_body_collection_input,RIGID_GEOMETRY_COLLECTION<P(V)>& rigid_geometry_collection_input,const ARRAY<int,HAIR_ID>& nodes,ARRAY_VIEW<const P(V)> X); \

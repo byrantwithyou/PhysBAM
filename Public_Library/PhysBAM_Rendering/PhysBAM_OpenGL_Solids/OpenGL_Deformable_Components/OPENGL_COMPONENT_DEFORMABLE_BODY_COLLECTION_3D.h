@@ -45,8 +45,8 @@ public:
     ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> embedded_surface_objects;
     ARRAY<OPENGL_TRIANGULATED_SURFACE<T>*> hard_bound_boundary_surface_objects;
     bool has_embedded_objects,has_soft_bindings;
-    ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_triangle_interaction_pairs;
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_interaction_pairs;
+    ARRAY<REPULSION_PAIR<TV> > point_triangle_interaction_pairs;
+    ARRAY<REPULSION_PAIR<TV> > edge_edge_interaction_pairs;
     ARRAY<FORCE_DATA<TV> > force_data_list;
     OPENGL_COLOR_RAMP<T>* color_map_forces;
 

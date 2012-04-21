@@ -26,7 +26,6 @@ class GRID_BASED_COLLISION_GEOMETRY:public NONCOPYABLE
     typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_ARRAYS_BOOL::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_ARRAYS_BOOL_DIMENSION;
     typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;
-    typedef typename IF<TV::dimension==2,T,typename IF<TV::dimension==1,ONE,TV>::TYPE>::TYPE T_WEIGHTS;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
 public:
     COLLISION_GEOMETRY_COLLECTION<TV> collision_geometry_collection;
@@ -73,10 +72,10 @@ public:
     void Add_Bodies(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection);
     void Add_Body(RIGID_GEOMETRY<TV>& rigid_geometry);
     virtual void Rasterize_Objects();
-    bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,
+    bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,
         const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Latest_Crossover(const TV& start_X,const TV& end_X,const T dt,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,TV& initial_hit_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
-    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,
+    bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,
         POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     bool Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,const ARRAY<COLLISION_GEOMETRY_ID>* objects=0) const;
     void Update_Intersection_Acceleration_Structures(const bool use_swept_simplex_hierarchy,const int state1=0,const int state2=0);

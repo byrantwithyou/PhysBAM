@@ -21,11 +21,11 @@ using namespace PhysBAM;
 template<class T> void TRIANGLE_3D<T>::
 Change_Size(const T delta)
 {
-    VECTOR<T,3> edge_lengths((x3-x2).Magnitude(),(x1-x3).Magnitude(),(x2-x1).Magnitude());
+    TV edge_lengths((x3-x2).Magnitude(),(x1-x3).Magnitude(),(x2-x1).Magnitude());
     T perimeter=edge_lengths.Sum(),area=Area();
     if(!perimeter || !area) return; // don't know which direction to enlarge a degenerate triangle, so do nothing
     T scale=1+delta*(T).5*perimeter/area;
-    VECTOR<T,3> incenter=Point_From_Barycentric_Coordinates(edge_lengths/perimeter);
+    TV incenter=Point_From_Barycentric_Coordinates(edge_lengths/perimeter);
     x1=incenter+(x1-incenter)*scale;x2=incenter+(x2-incenter)*scale;x3=incenter+(x3-incenter)*scale;
 }
 //#####################################################################
@@ -40,7 +40,7 @@ Inside(const TV& point,const T thickness_over_two) const
 // Function Point_Inside_Triangle
 //#####################################################################
 template<class T> bool TRIANGLE_3D<T>::
-Point_Inside_Triangle(const VECTOR<T,3>& point,const T thickness_over_2) const
+Point_Inside_Triangle(const TV& point,const T thickness_over_2) const
 {
     return PLANE<T>::Boundary(point,thickness_over_2)&&Planar_Point_Inside_Triangle(point,thickness_over_2);
 }
@@ -48,22 +48,29 @@ Point_Inside_Triangle(const VECTOR<T,3>& point,const T thickness_over_2) const
 // Function Planar_Point_Inside_Triangle
 //#####################################################################
 template<class T> bool TRIANGLE_3D<T>::
-Planar_Point_Inside_Triangle(const VECTOR<T,3>& point,const T thickness_over_2) const
+Planar_Point_Inside_Triangle(const TV& point,const T thickness_over_2) const
 {
-    PLANE<T> edge_plane(VECTOR<T,3>::Cross_Product(x2-x1,normal).Normalized(),x1);if(edge_plane.Outside(point,thickness_over_2)) return false;
-    edge_plane.normal=VECTOR<T,3>::Cross_Product(x1-x3,normal).Normalized();if(edge_plane.Outside(point,thickness_over_2)) return false;
-    edge_plane.normal=VECTOR<T,3>::Cross_Product(x3-x2,normal).Normalized();edge_plane.x1=x2;if(edge_plane.Outside(point,thickness_over_2)) return false;
+    PLANE<T> edge_plane(TV::Cross_Product(x2-x1,normal).Normalized(),x1);
+    if(edge_plane.Outside(point,thickness_over_2)) return false;
+    edge_plane.normal=TV::Cross_Product(x1-x3,normal).Normalized();
+    if(edge_plane.Outside(point,thickness_over_2)) return false;
+    edge_plane.normal=TV::Cross_Product(x3-x2,normal).Normalized();
+    edge_plane.x1=x2;
+    if(edge_plane.Outside(point,thickness_over_2)) return false;
     return true;
 }
 //#####################################################################
 // Function Lazy_Planar_Point_Inside_Triangle
 //#####################################################################
 template<class T> bool TRIANGLE_3D<T>::
-Lazy_Planar_Point_Inside_Triangle(const VECTOR<T,3>& point) const
+Lazy_Planar_Point_Inside_Triangle(const TV& point) const
 {
-    VECTOR<T,3> edge_normal_1=VECTOR<T,3>::Cross_Product(x2-x1,normal),point_minus_x1=point-x1;if(VECTOR<T,3>::Dot_Product(edge_normal_1,point_minus_x1) > 0) return false;
-    VECTOR<T,3> edge_normal_2=VECTOR<T,3>::Cross_Product(x1-x3,normal);if(VECTOR<T,3>::Dot_Product(edge_normal_2,point_minus_x1) > 0) return false;
-    edge_normal_1+=edge_normal_2;if(VECTOR<T,3>::Dot_Product(edge_normal_1,point-x2) < 0) return false; // this equals x2-x3 (== -edge_normal_3)
+    TV edge_normal_1=TV::Cross_Product(x2-x1,normal),point_minus_x1=point-x1;
+    if(TV::Dot_Product(edge_normal_1,point_minus_x1) > 0) return false;
+    TV edge_normal_2=TV::Cross_Product(x1-x3,normal);
+    if(TV::Dot_Product(edge_normal_2,point_minus_x1) > 0) return false;
+    edge_normal_1+=edge_normal_2;
+    if(TV::Dot_Product(edge_normal_1,point-x2) < 0) return false; // this equals x2-x3 (== -edge_normal_3)
     return true;
 }
 //#####################################################################
@@ -87,11 +94,14 @@ Maximum_Edge_Length() const
 //#####################################################################
 // returns the region one is near in priority of 1=vertex, 2=edge, 3=face based on distance, region_id differentiates which point or edge
 template<class T> int TRIANGLE_3D<T>::
-Region(const VECTOR<T,3>& location,int& region_id,const T distance) const
+Region(const TV& location,int& region_id,const T distance) const
 {
-    SEGMENT_3D<T> segment(x1,x2);T d1=segment.Distance_From_Point_To_Segment(location);
-    segment.x1=x3;T d2=segment.Distance_From_Point_To_Segment(location);
-    segment.x2=x1;T d3=segment.Distance_From_Point_To_Segment(location);
+    SEGMENT_3D<T> segment(x1,x2);
+    T d1=segment.Distance_From_Point_To_Segment(location);
+    segment.x1=x3;
+    T d2=segment.Distance_From_Point_To_Segment(location);
+    segment.x2=x1;
+    T d3=segment.Distance_From_Point_To_Segment(location);
     if(d1 > distance && d2 > distance && d3 > distance) return 2; // face is closest
     else if(d1 <= distance){
         if(d2 <= distance){region_id=2;return 0;} // vertex 2
@@ -106,7 +116,7 @@ Region(const VECTOR<T,3>& location,int& region_id,const T distance) const
 // Function Closest_Point
 //#####################################################################
 template<class T> VECTOR<T,3> TRIANGLE_3D<T>::
-Closest_Point(const VECTOR<T,3>& location,VECTOR<T,3>& weights) const
+Closest_Point(const TV& location,TV& weights) const
 {
     weights=Barycentric_Coordinates(location);
     // project closest point to the triangle if it's not already inside it
@@ -114,33 +124,33 @@ Closest_Point(const VECTOR<T,3>& location,VECTOR<T,3>& weights) const
         T a23=SEGMENT_3D<T>::Interpolation_Fraction(location,x2,x3); // Check edge x2--x3
         if(a23<0){
             if(weights.z<0){ // Closest point is on edge x1--x2
-                T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x2),0,1);weights=VECTOR<T,3>(1-a12,a12,0);return weights.x*x1+weights.y*x2;}
-            else{weights=VECTOR<T,3>(0,1,0);return x2;}} // Closest point is x2
+                T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x2),0,1);weights=TV(1-a12,a12,0);return weights.x*x1+weights.y*x2;}
+            else{weights=TV(0,1,0);return x2;}} // Closest point is x2
         else if(a23>1){
             if(weights.y<0){ // Closest point is on edge x1--x3
-                T a13=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x3),0,1);weights=VECTOR<T,3>(1-a13,0,a13);return weights.x*x1+weights.z*x3;}
-            else{weights=VECTOR<T,3>(0,0,1);return x3;}} // Closest point is x3
-        else{weights=VECTOR<T,3>(0,1-a23,a23);return weights.y*x2+weights.z*x3;}} // Closest point is on edge x2--x3
+                T a13=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x3),0,1);weights=TV(1-a13,0,a13);return weights.x*x1+weights.z*x3;}
+            else{weights=TV(0,0,1);return x3;}} // Closest point is x3
+        else{weights=TV(0,1-a23,a23);return weights.y*x2+weights.z*x3;}} // Closest point is on edge x2--x3
     else if(weights.y<0){
         T a13=SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x3); // Check edge x1--x3
         if(a13<0){
             if(weights.z<0){ // Closest point is on edge x1--x2
-                T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x2),0,1);weights=VECTOR<T,3>(1-a12,a12,0);return weights.x*x1+weights.y*x2;}
-            else{weights=VECTOR<T,3>(1,0,0);return x1;}} // Closest point is x1
-        else if(a13>1){weights=VECTOR<T,3>(0,0,1);return x3;} // Closest point is x3
-        else{weights=VECTOR<T,3>(1-a13,0,a13);return weights.x*x1+weights.z*x3;}} // Closest point is on edge x1--x3
+                T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x2),0,1);weights=TV(1-a12,a12,0);return weights.x*x1+weights.y*x2;}
+            else{weights=TV(1,0,0);return x1;}} // Closest point is x1
+        else if(a13>1){weights=TV(0,0,1);return x3;} // Closest point is x3
+        else{weights=TV(1-a13,0,a13);return weights.x*x1+weights.z*x3;}} // Closest point is on edge x1--x3
     else if(weights.z<0){ // Closest point is on edge x1--x2
-        T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x2),0,1);weights=VECTOR<T,3>(1-a12,a12,0);return weights.x*x1+weights.y*x2;}
+        T a12=clamp<T>(SEGMENT_3D<T>::Interpolation_Fraction(location,x1,x2),0,1);weights=TV(1-a12,a12,0);return weights.x*x1+weights.y*x2;}
     return weights.x*x1+weights.y*x2+weights.z*x3; // Point is interior to the triangle
 }
 //#####################################################################
 // Function Distance_To_Triangle
 //#####################################################################
 template<class T> T TRIANGLE_3D<T>::
-Distance_To_Triangle(const VECTOR<T,3>& location) const
+Distance_To_Triangle(const TV& location) const
 {   
-    VECTOR<T,3> weights,projected_point;
-    projected_point=Closest_Point(location,weights);return (location-projected_point).Magnitude();
+    TV weights,projected_point=Closest_Point(location,weights);
+    return (location-projected_point).Magnitude();
 }
 //#####################################################################
 // Function Minimum_Angle
@@ -148,8 +158,8 @@ Distance_To_Triangle(const VECTOR<T,3>& location) const
 template<class T> T TRIANGLE_3D<T>::
 Minimum_Angle() const
 {
-    VECTOR<T,3> s1=(x1-x2).Normalized(),s2=(x2-x3).Normalized(),s3=(x3-x1).Normalized();
-    return acos(max(VECTOR<T,3>::Dot_Product(s1,-s2),VECTOR<T,3>::Dot_Product(-s1,s3),VECTOR<T,3>::Dot_Product(s2,-s3)));
+    TV s1=(x1-x2).Normalized(),s2=(x2-x3).Normalized(),s3=(x3-x1).Normalized();
+    return acos(max(TV::Dot_Product(s1,-s2),TV::Dot_Product(-s1,s3),TV::Dot_Product(s2,-s3)));
 }
 //#####################################################################
 // Function Maximum_Angle
@@ -157,24 +167,24 @@ Minimum_Angle() const
 template<class T> T TRIANGLE_3D<T>::
 Maximum_Angle() const
 {
-    VECTOR<T,3> s1=(x1-x2).Normalized(),s2=(x2-x3).Normalized(),s3=(x3-x1).Normalized();
-    return acos(min(VECTOR<T,3>::Dot_Product(s1,-s2),VECTOR<T,3>::Dot_Product(-s1,s3),VECTOR<T,3>::Dot_Product(s2,-s3)));
+    TV s1=(x1-x2).Normalized(),s2=(x2-x3).Normalized(),s3=(x3-x1).Normalized();
+    return acos(min(TV::Dot_Product(s1,-s2),TV::Dot_Product(-s1,s3),TV::Dot_Product(s2,-s3)));
 }
 //#####################################################################
 // Function Signed_Solid_Angle
 //#####################################################################
 // positive for normals that point away from the center - not reliable if center is too close to the triangle face
 template<class T> T TRIANGLE_3D<T>::
-Signed_Solid_Angle(const VECTOR<T,3>& center) const
+Signed_Solid_Angle(const TV& center) const
 {
-    VECTOR<T,3> r=(x1-center).Normalized(),u=x2-x1,v=x3-x1;u-=VECTOR<T,3>::Dot_Product(u,r)*r;v-=VECTOR<T,3>::Dot_Product(v,r)*r;
-    T solid_angle=-(T)pi+VECTOR<T,3>::Angle_Between(u,v);
-    r=(x2-center).Normalized();u=x1-x2,v=x3-x2;u-=VECTOR<T,3>::Dot_Product(u,r)*r;v-=VECTOR<T,3>::Dot_Product(v,r)*r;
-    solid_angle+=VECTOR<T,3>::Angle_Between(u,v);
-    r=(x3-center).Normalized();u=x1-x3,v=x2-x3;u-=VECTOR<T,3>::Dot_Product(u,r)*r;v-=VECTOR<T,3>::Dot_Product(v,r)*r;
-    solid_angle+=VECTOR<T,3>::Angle_Between(u,v);
+    TV r=(x1-center).Normalized(),u=x2-x1,v=x3-x1;u-=TV::Dot_Product(u,r)*r;v-=TV::Dot_Product(v,r)*r;
+    T solid_angle=-(T)pi+TV::Angle_Between(u,v);
+    r=(x2-center).Normalized();u=x1-x2,v=x3-x2;u-=TV::Dot_Product(u,r)*r;v-=TV::Dot_Product(v,r)*r;
+    solid_angle+=TV::Angle_Between(u,v);
+    r=(x3-center).Normalized();u=x1-x3,v=x2-x3;u-=TV::Dot_Product(u,r)*r;v-=TV::Dot_Product(v,r)*r;
+    solid_angle+=TV::Angle_Between(u,v);
     solid_angle=max(T(0),min((T)(2*pi),solid_angle));
-    if(VECTOR<T,3>::Dot_Product(r,normal) < 0) solid_angle*=(-1);
+    if(TV::Dot_Product(r,normal) < 0) solid_angle*=(-1);
     return solid_angle;
 }
 //#####################################################################
@@ -182,18 +192,18 @@ Signed_Solid_Angle(const VECTOR<T,3>& center) const
 //#####################################################################
 // outputs unsigned distance
 template<class T> bool TRIANGLE_3D<T>::
-Point_Face_Interaction(const VECTOR<T,3>& x,const T interaction_distance,const bool allow_negative_weights,T& distance) const                       
+Point_Face_Interaction(const TV& x,const T interaction_distance,const bool allow_negative_weights,T& distance) const                       
 {      
-    distance=VECTOR<T,3>::Dot_Product(x-x1,normal);
+    distance=TV::Dot_Product(x-x1,normal);
     return abs(distance)<=interaction_distance && Planar_Point_Inside_Triangle(x,allow_negative_weights?interaction_distance:0);
 }
 //#####################################################################
 // Function Point_Face_Interaction_Data
 //#####################################################################
 template<class T> void TRIANGLE_3D<T>::
-Point_Face_Interaction_Data(const VECTOR<T,3>& x,T& distance,VECTOR<T,3>& interaction_normal,VECTOR<T,3>& weights,const bool perform_attractions) const                       
+Point_Face_Interaction_Data(const TV& x,T& distance,TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool perform_attractions) const                       
 {
-    interaction_normal=normal;weights=Barycentric_Coordinates(x);
+    interaction_normal=normal;weights=Barycentric_Coordinates(x).Insert(-1,0);
     if(!perform_attractions && distance<0){distance*=-1;interaction_normal*=-1;} // distance > 0, interaction_normal points from the triangle to the point
 }
 //#####################################################################
@@ -201,29 +211,31 @@ Point_Face_Interaction_Data(const VECTOR<T,3>& x,T& distance,VECTOR<T,3>& intera
 //#####################################################################
 template<class T> bool TRIANGLE_3D<T>::
 Point_Face_Interaction(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV& v3,const T interaction_distance,T& distance,
-    VECTOR<T,3>& interaction_normal,VECTOR<T,3>& weights,T& relative_speed,const bool allow_negative_weights,const bool exit_early) const
+    TV& interaction_normal,VECTOR<T,TV::m+1>& weights,const bool allow_negative_weights,const bool exit_early) const
 {      
     if(!Point_Face_Interaction(x,interaction_distance,allow_negative_weights,distance)) return false;
-    if(!exit_early){
-        Point_Face_Interaction_Data(x,distance,interaction_normal,weights,false);
-        relative_speed=TV::Dot_Product(v-(weights.x*v1+weights.y*v2+weights.z*v3),interaction_normal);} // relative speed is in the normal direction
+    if(!exit_early) Point_Face_Interaction_Data(x,distance,interaction_normal,weights,false); // relative speed is in the normal direction
     return true;
 }
 //#####################################################################
 // Function Robust_Point_Triangle_Collision
 //#####################################################################
 template<class T> POINT_SIMPLEX_COLLISION_TYPE TRIANGLE_3D<T>::
-Robust_Point_Triangle_Collision(const TRIANGLE_3D<T>& initial_triangle,const TRIANGLE_3D<T>& final_triangle,const VECTOR<T,3>& x,const VECTOR<T,3>& final_x,const T dt,
-    const T collision_thickness,T& collision_time,VECTOR<T,3>& normal,VECTOR<T,3>& weights,T& relative_speed)
+Robust_Point_Face_Collision(const TRIANGLE_3D<T>& initial_triangle,const TRIANGLE_3D<T>& final_triangle,const TV& x,const TV& final_x,const T dt,
+    const T collision_thickness,T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights)
 {
     if(final_triangle.Point_Inside_Triangle(final_x,collision_thickness)){
-        collision_time=dt;weights=final_triangle.Barycentric_Coordinates(final_x);normal=final_triangle.normal;
+        collision_time=dt;
+        weights=final_triangle.Barycentric_Coordinates(final_x).Insert(-1,0);
+        normal=final_triangle.normal;
         return POINT_SIMPLEX_COLLISION_ENDS_INSIDE;}
     if(initial_triangle.Point_Inside_Triangle(x,collision_thickness)){
-        collision_time=0;weights=initial_triangle.Barycentric_Coordinates(x);normal=initial_triangle.normal;
+        collision_time=0;
+        weights=initial_triangle.Barycentric_Coordinates(x).Insert(-1,0);
+        normal=initial_triangle.normal;
         return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;}
-    VECTOR<T,3> v1=(final_triangle.x1-initial_triangle.x1)/dt,v2=(final_triangle.x2-initial_triangle.x2)/dt,v3=(final_triangle.x3-initial_triangle.x3)/dt,v=(final_x-x)/dt;
-    if(initial_triangle.Point_Face_Collision(x,v,v1,v2,v3,dt,collision_thickness,collision_time,normal,weights,relative_speed,false))
+    TV v1=(final_triangle.x1-initial_triangle.x1)/dt,v2=(final_triangle.x2-initial_triangle.x2)/dt,v3=(final_triangle.x3-initial_triangle.x3)/dt,v=(final_x-x)/dt;
+    if(initial_triangle.Point_Face_Collision(x,v,v1,v2,v3,dt,collision_thickness,collision_time,normal,weights,false))
         return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;
     return POINT_SIMPLEX_NO_COLLISION;
 }
@@ -232,15 +244,15 @@ Robust_Point_Triangle_Collision(const TRIANGLE_3D<T>& initial_triangle,const TRI
 //#####################################################################
 template<class T> bool TRIANGLE_3D<T>::
 Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV& v3,const T dt,const T collision_thickness,
-    T& collision_time,TV& normal,TV& weights,T& relative_speed,const bool exit_early) const
+    T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights,const bool exit_early) const
 {
     // find cubic and compute the roots as possible collision times
-    VECTOR<T,3> ABo=x2-x1,ABv=dt*(v2-v1),ACo=x3-x1,ACv=dt*(v3-v1);
-    VECTOR<T,3> No=VECTOR<T,3>::Cross_Product(ABo,ACo),Nv=VECTOR<T,3>::Cross_Product(ABo,ACv)+VECTOR<T,3>::Cross_Product(ABv,ACo),Na=VECTOR<T,3>::Cross_Product(ABv,ACv);
-    VECTOR<T,3> APo=x-x1,APv=dt*(v-v1);
+    TV ABo=x2-x1,ABv=dt*(v2-v1),ACo=x3-x1,ACv=dt*(v3-v1);
+    TV No=TV::Cross_Product(ABo,ACo),Nv=TV::Cross_Product(ABo,ACv)+TV::Cross_Product(ABv,ACo),Na=TV::Cross_Product(ABv,ACv);
+    TV APo=x-x1,APv=dt*(v-v1);
 
-    CUBIC<double> cubic((double)VECTOR<T,3>::Dot_Product(Na,APv),(double)VECTOR<T,3>::Dot_Product(Nv,APv)+VECTOR<T,3>::Dot_Product(Na,APo),
-                                       (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
+    CUBIC<double> cubic((double)TV::Dot_Product(Na,APv),(double)TV::Dot_Product(Nv,APv)+TV::Dot_Product(Na,APo),
+                                       (double)TV::Dot_Product(No,APv)+TV::Dot_Product(Nv,APo),(double)TV::Dot_Product(No,APo));
     double xmin=0,xmax=1.000001;
     int num_intervals=0;VECTOR<INTERVAL<double>,3> intervals;
     cubic.Compute_Intervals(xmin,xmax,num_intervals,intervals(0),intervals(1),intervals(2));
@@ -253,7 +265,7 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const TV&
     for(int k=0;k<num_intervals;k++){
         collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
         TRIANGLE_3D<T> triangle(x1+collision_time*v1,x2+collision_time*v2,x3+collision_time*v3);
-        if(triangle.Point_Face_Interaction(x+collision_time*v,v,v1,v2,v3,collision_thickness,distance,normal,weights,relative_speed,true,exit_early)) return true;}
+        if(triangle.Point_Face_Interaction(x+collision_time*v,v,v1,v2,v3,collision_thickness,distance,normal,weights,true,exit_early)) return true;}
 
     return false;
 }
@@ -281,8 +293,8 @@ Clip_To_Box(const RANGE<TV>& box,ARRAY<TRIANGLE_3D<T> >& clipped_simplices) cons
 template<class T> void TRIANGLE_3D<T>::
 Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles)
 {
-    VECTOR<T,3> phi_nodes;
-    VECTOR<VECTOR<T,3>,3> X_nodes;
+    TV phi_nodes;
+    VECTOR<TV,3> X_nodes;
     X_nodes(0)=triangle.x1;
     X_nodes(1)=triangle.x2;
     X_nodes(2)=triangle.x3;
@@ -299,11 +311,11 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
             single_node_sign=positive_count==1?1:-1;
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
             for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
-                VECTOR<VECTOR<T,3>,2> interface_locations;int index=(i+1)%3;
+                VECTOR<TV,2> interface_locations;int index=(i+1)%3;
                 VECTOR<int,2> other_locations;
                 for(int j=0;j<2;j++,index=(index+1)%3){
                     other_locations(j)=index;
-                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes(i),X_nodes(index),LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index)));}
+                    interface_locations(j)=LINEAR_INTERPOLATION<T,TV>::Linear(X_nodes(i),X_nodes(index),LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index)));}
                 if(positive_count==1){ // add two triangles to negative triangles
                     negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
                     negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));}
@@ -319,8 +331,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const TRIANGLE_3D<T>& triangle
 template<class T> void TRIANGLE_3D<T>::
 Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane,ARRAY<TRIANGLE_3D<T> >& negative_triangles,ARRAY<TRIANGLE_3D<T> >& positive_triangles,T tol)
 {
-    VECTOR<T,3> phi_nodes;
-    VECTOR<VECTOR<T,3>,3> X_nodes;
+    TV phi_nodes;
+    VECTOR<TV,3> X_nodes;
     X_nodes(0)=triangle.x1;
     X_nodes(1)=triangle.x2;
     X_nodes(2)=triangle.x3;
@@ -336,13 +348,13 @@ Cut_With_Hyperplane(const TRIANGLE_3D<T>& triangle,const PLANE<T>& cutting_plane
             single_node_sign=positive_count==1?1:-1;
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
             for(int i=0;i<3;i++)if(LEVELSET_UTILITIES<T>::Sign(phi_nodes(i))==single_node_sign){
-                VECTOR<VECTOR<T,3>,2> interface_locations;int index=(i+1)%3;
+                VECTOR<TV,2> interface_locations;int index=(i+1)%3;
                 VECTOR<T,2> theta;
                 VECTOR<int,2> other_locations;
                 for(int j=0;j<2;j++,index=(index+1)%3){
                     other_locations(j)=index;
                     theta(j)=LEVELSET_UTILITIES<T>::Theta(phi_nodes(i),phi_nodes(index));
-                    interface_locations(j)=LINEAR_INTERPOLATION<T,VECTOR<T,3> >::Linear(X_nodes(i),X_nodes(index),theta(j));}
+                    interface_locations(j)=LINEAR_INTERPOLATION<T,TV>::Linear(X_nodes(i),X_nodes(index),theta(j));}
                 if(positive_count==1){ // add 2 negative and 1 positive
                     if(1-theta(0)>tol) negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(0)),X_nodes(other_locations(1))));
                     if(1-theta(1)>tol) negative_triangles.Append(TRIANGLE_3D<T>(interface_locations(0),X_nodes(other_locations(1)),interface_locations(1)));

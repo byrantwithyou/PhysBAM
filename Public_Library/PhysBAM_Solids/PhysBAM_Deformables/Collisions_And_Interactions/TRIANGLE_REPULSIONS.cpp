@@ -95,9 +95,9 @@ template<> void TRIANGLE_REPULSIONS<VECTOR<double,1> >::Clamp_Repulsion_Thicknes
 //#####################################################################
 // Function Turn_Off_Repulsions_Based_On_Current_Proximity
 //#####################################################################
-static inline VECTOR<int,2> Flip_Edges(const VECTOR<int,2>& nodes)
+static inline VECTOR<int,3> Flip_Edges(const VECTOR<int,3>& nodes)
 {
-    return VECTOR<int,2>(nodes[1],nodes[0]);
+    PHYSBAM_FATAL_ERROR();
 }
 static inline VECTOR<int,4> Flip_Edges(const VECTOR<int,4>& nodes)
 {
@@ -123,7 +123,7 @@ Turn_Off_Repulsions_Based_On_Current_Proximity(const T extra_factor_on_distance)
     omit_point_face_repulsion_pairs.Remove_All();
     for(int k=0;k<point_face_interaction_pairs.m;k++) omit_point_face_repulsion_pairs.Insert(point_face_interaction_pairs(k).nodes);
     omit_edge_edge_repulsion_pairs.Remove_All();
-    for(int k=0;k<edge_edge_interaction_pairs.m;k++){const VECTOR<int,2*d-2>& nodes=edge_edge_interaction_pairs(k).nodes;
+    for(int k=0;k<edge_edge_interaction_pairs.m;k++){const VECTOR<int,d+1>& nodes=edge_edge_interaction_pairs(k).nodes;
         omit_edge_edge_repulsion_pairs.Insert(nodes); // add edge edge pairs in both orders since the hierarchy can change after this is called
         omit_edge_edge_repulsion_pairs.Insert(Flip_Edges(nodes));}
     // cleanup
@@ -173,12 +173,12 @@ Compute_Interaction_Pairs(ARRAY_VIEW<const TV> X_other)
 // Function Adjust_Velocity_For_Self_Repulsion
 //#####################################################################
 template<class T,class TV,class T_ARRAY> void
-Edge_Edge_Interaction_Data_Helper(ARRAY_VIEW<const VECTOR<T,2> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V_edges,const T& small_number)
+Edge_Edge_Interaction_Data_Helper(ARRAY_VIEW<const VECTOR<T,2> > X,REPULSION_PAIR<TV>& pair,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,3>&> V_edges,const T& small_number)
 {
-    pair.normal=(X(pair.nodes[0])-X(pair.nodes[1])).Normalized();
+    PHYSBAM_FATAL_ERROR();
 }
 template<class T,class TV,class T_ARRAY> void
-Edge_Edge_Interaction_Data_Helper(ARRAY_VIEW<const VECTOR<T,3> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T& small_number)
+Edge_Edge_Interaction_Data_Helper(ARRAY_VIEW<const VECTOR<T,3> > X,REPULSION_PAIR<TV>& pair,const INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V_edges,const T& small_number)
 {
     SEGMENT_3D<T> segment1(X.Subset(VECTOR<int,2>(pair.nodes[0],pair.nodes[1]))),segment2(X.Subset(VECTOR<int,2>(pair.nodes[2],pair.nodes[3])));
     segment1.Edge_Edge_Interaction_Data(segment2,V_edges,pair.distance,pair.normal,pair.weights,small_number);
@@ -190,11 +190,11 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
 
     LOG::SCOPE scope("repulsions","checking repulsions");
     ARRAY_VIEW<const TV> X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;ARRAY_VIEW<const TV> V(geometry.deformable_body_collection.particles.V);
-    ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_face_pairs(point_face_interaction_pairs);
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_pairs(edge_edge_interaction_pairs);
+    ARRAY<REPULSION_PAIR<TV> > point_face_pairs(point_face_interaction_pairs);
+    ARRAY<REPULSION_PAIR<TV> > edge_edge_pairs(edge_edge_interaction_pairs);
 
     for(int pair_index=0;pair_index<point_face_pairs.m;pair_index++){
-        POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);
+        REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);
         T_FACE face(X_self_collision_free.Subset(pair.nodes.Remove_Index(0)));
         face.Point_Face_Interaction_Data(X_self_collision_free(pair.nodes[0]),pair.distance,pair.normal,pair.weights,perform_attractions);
         modified_full.Subset(pair.nodes).Fill(true);}
@@ -204,10 +204,10 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
 
     for(int pair_index=0;pair_index<edge_edge_pairs.m;pair_index++){
-        EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
+        REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
         // Note: don't call this, all it does is mess up the normal and has already been called when the pairs are created
         //Edge_Edge_Interaction_Data_Helper(X_self_collision_free,pair,V.Subset(pair.nodes),geometry.small_number);
-        INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,2*TV::m-2>&> modified_subset=modified_full.Subset(pair.nodes);
+        INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,TV::m+1>&> modified_subset=modified_full.Subset(pair.nodes);
         modified_subset.Fill(true);}
 
     int repulsions=Apply_Repulsions_To_Velocities(dt,point_face_pairs,edge_edge_pairs,true,use_saved_pairs);
@@ -224,29 +224,15 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Adjust_Velocity_For_Self_
 //#####################################################################
 // Function Pair_Is_Separating
 //#####################################################################
-template<class TV> bool Pair_Is_Separating(POINT_FACE_REPULSION_PAIR<TV>& pair,ARRAY_VIEW<const TV> V)
+template<class TV> bool Pair_Is_Separating(REPULSION_PAIR<TV>& pair,ARRAY_VIEW<const TV> V)
 {
-    TV relative_velocity=V(pair.nodes(0));for(int i=0;i<TV::dimension;i++) relative_velocity-=V(pair.nodes(i+1))*pair.weights(i);
+    TV relative_velocity=-V.Subset(pair.nodes).Weighted_Sum(pair.weights);
     return TV::Dot_Product(relative_velocity,pair.normal)>=0;
-}
-template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >& pair,ARRAY_VIEW<const VECTOR<T,1> > V)
-{
-    return true;
-}
-template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >& pair,ARRAY_VIEW<const VECTOR<T,2> > V)
-{
-    VECTOR<T,2> relative_velocity=V(pair.nodes(0))-V(pair.nodes(1));
-    return VECTOR<T,2>::Dot_Product(relative_velocity,pair.normal)>=0;
-}
-template<class T> bool Pair_Is_Separating(EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >& pair,ARRAY_VIEW<const VECTOR<T,3> > V)
-{
-    VECTOR<T,3> relative_velocity=V(pair.nodes(0))*(1-pair.weights(0))+V(pair.nodes(1))*pair.weights(0)-V(pair.nodes(2))*(1-pair.weights(1))-V(pair.nodes(3))*pair.weights(1);
-    return VECTOR<T,3>::Dot_Product(relative_velocity,pair.normal)>=0;
 }
 //#####################################################################
 // Function Update_Repulsion_Pairs_Using_History
 //#####################################################################
-template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VECTOR<T,2> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const ARRAY<T>& repulsion_thickness,
+template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VECTOR<T,2> > X,REPULSION_PAIR<TV>& pair,const ARRAY<T>& repulsion_thickness,
     const T repulsion_thickness_detection_multiplier)
 {
     pair.normal=X(pair.nodes[0])-X(pair.nodes[1]);
@@ -254,7 +240,7 @@ template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VE
     T total_repulsion_thickness=repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness);
     return pair.distance<=total_repulsion_thickness;
 }
-template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VECTOR<T,3> > X,EDGE_EDGE_REPULSION_PAIR<TV>& pair,const ARRAY<T>& repulsion_thickness,
+template<class T,class TV> bool Edge_Edge_Interaction_Helper(ARRAY_VIEW<const VECTOR<T,3> > X,REPULSION_PAIR<TV>& pair,const ARRAY<T>& repulsion_thickness,
     const T repulsion_thickness_detection_multiplier)
 {
     SEGMENT_3D<T> segment(X.Subset(VECTOR<int,2>(pair.nodes[0],pair.nodes[1])));
@@ -266,7 +252,7 @@ Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_e
 {
     ARRAY_VIEW<const TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
     for(int pair_index=point_face_pairs.Size()-1;pair_index>=0;pair_index--){
-        POINT_FACE_REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
+        REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
         T_FACE face(X.Subset(face_nodes));
         if(!face.Point_Face_Interaction(X(pair.nodes(0)),repulsion_thickness_detection_multiplier*pair.Total_Repulsion_Thickness(repulsion_thickness),false,pair.distance) ||
             (prune_separating && Pair_Is_Separating(pair,V))){
@@ -277,7 +263,7 @@ Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_e
     geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
 
     for(int pair_index=edge_edge_pairs.Size()-1;pair_index>=0;pair_index--){
-        EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
+        REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
         if(!Edge_Edge_Interaction_Helper(X,pair,repulsion_thickness,repulsion_thickness_detection_multiplier) ||
             (prune_separating && Pair_Is_Separating(pair,V))){
             edge_edge_pairs.Remove_Index_Lazy(pair_index);}
@@ -467,6 +453,10 @@ template<> int TRIANGLE_REPULSIONS<VECTOR<float,1> >::Get_Edges_Near_Edges(STRUC
     ARRAY_VIEW<const VECTOR<T,1> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
 template<> int TRIANGLE_REPULSIONS<VECTOR<double,1> >::Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,1> >&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,1> >&,
     ARRAY_VIEW<const VECTOR<T,1> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
+template<> int TRIANGLE_REPULSIONS<VECTOR<float,2> >::Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,
+    ARRAY_VIEW<const VECTOR<T,2> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
+template<> int TRIANGLE_REPULSIONS<VECTOR<double,2> >::Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,STRUCTURE_INTERACTION_GEOMETRY<VECTOR<T,2> >&,
+    ARRAY_VIEW<const VECTOR<T,2> >,const bool){PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
 // Function Repulsion_Impulse
 //#####################################################################
@@ -505,14 +495,6 @@ Repulsion_Impulse(TV& direction,const T dt,const T_PAIR& pair,const TV& relative
 
     return scalar_impulse;
 }
-//#####################################################################
-// Function Adjust_Velocity_For_Point_Face_Repulsion
-//#####################################################################
-template<class TV,class T_ARRAY,class T_MASS_ARRAY> inline void Update_Velocity_Helper(const TV& impulse,const TV& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,TV::m+1>&> one_over_m,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,TV::m+1>&> V)
-{
-    V(0)+=one_over_m(0)*impulse;
-    for(int i=0;i<TV::m;i++) V(i+1)-=weights(i)*one_over_m(i+1)*impulse;
-}
 template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions)
 {
@@ -529,11 +511,11 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
         LOG::cout<<"Repulsion application step "<<attempts<<std::endl;
 
         for(int pair_index=0;pair_index<pairs.Size();pair_index++){
-            const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(pair_index);
+            const REPULSION_PAIR<TV>& pair=pairs(pair_index);
             int p=pair.nodes[0];VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
             if(pair.distance<0) inverted_pairs++;
 
-            TV relative_velocity=V(p)-V.Subset(face_nodes).Weighted_Sum(pair.weights);
+            TV relative_velocity=-V.Subset(pair.nodes).Weighted_Sum(pair.weights);
             TV direction;T scalar_impulse=Repulsion_Impulse(direction,dt,pair,relative_velocity,elastic_repulsion,friction);
             
             if(scalar_impulse){
@@ -542,13 +524,11 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
                 for(int i=0;i<face_nodes.m;i++) one_over_mass+=sqr(pair.weights[i])*one_over_effective_mass(face_nodes[i]);
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
                 if(use_gauss_jacobi && !friction && !elastic_repulsion){
-                    Update_Velocity_Helper(impulse,pair.weights,one_over_effective_mass.Subset(pair.nodes),impulse_velocities.Subset(pair.nodes));
+                    for(int i=0;i<TV::m+1;i++) impulse_velocities(pair.nodes(i))-=pair.weights(i)*one_over_effective_mass(pair.nodes(i))*impulse;
                     pf_old_speeds(pair_index)=TV::Dot_Product(relative_velocity,direction);
                     pf_target_impulses(pair_index)=impulse;
-                    pf_normals(pair_index)=direction; // tangential for friction.
-                }
-                else
-                    Update_Velocity_Helper(impulse,pair.weights,one_over_effective_mass.Subset(pair.nodes),V.Subset(pair.nodes));}}
+                    pf_normals(pair_index)=direction;} // tangential for friction.
+                else for(int i=0;i<TV::m+1;i++) V(pair.nodes(i))-=pair.weights(i)*one_over_effective_mass(pair.nodes(i))*impulse;}}
 
         if(use_gauss_jacobi) Scale_And_Apply_Point_Face_Impulses(pairs);}
     if(inverted_pairs) LOG::Stat("inverted point face repulsion pairs",inverted_pairs);
@@ -557,37 +537,6 @@ Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const b
 //#####################################################################
 // Function Adjust_Velocity_For_Edge_Edge_Repulsion
 //#####################################################################
-template<class T,class T_ARRAY,class T_MASS_ARRAY> inline void Edge_Edge_Update_Velocity_Helper(const VECTOR<T,3>& impulse,const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,4>&> one_over_effective_mass,
-    INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V)
-{
-    V(0)+=(1-weights[0])*one_over_effective_mass(0)*impulse;
-    V(1)+=weights[0]*one_over_effective_mass(1)*impulse;
-    V(2)-=(1-weights[1])*one_over_effective_mass(2)*impulse;
-    V(3)-=weights[1]*one_over_effective_mass(3)*impulse;
-}
-template<class T,class T_ARRAY,class T_MASS_ARRAY> inline void Edge_Edge_Update_Velocity_Helper(const VECTOR<T,2>& impulse,const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,2>&> one_over_effective_mass,
-    INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V)
-{
-    V(0)+=one_over_effective_mass(0)*impulse;
-    V(1)-=one_over_effective_mass(1)*impulse;
-}
-template<class T,class T_ARRAY> VECTOR<T,3> Edge_Edge_Relative_Velocity_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,4>&> V)
-{
-    return (1-weights[0])*V(0)+weights[0]*V(1)-(1-weights[1])*V(2)-weights[1]*V(3);
-}
-template<class T,class T_ARRAY> VECTOR<T,2> Edge_Edge_Relative_Velocity_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_ARRAY,VECTOR<int,2>&> V)
-{
-    return V(0)-V(1);
-}
-template<class T,class T_MASS_ARRAY> T Edge_Edge_One_Over_Mass_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,4>&> one_over_effective_mass)
-{
-    return sqr(1-weights[0])*one_over_effective_mass(0)+sqr(weights[0])*one_over_effective_mass(1)
-        +sqr(1-weights[1])*one_over_effective_mass(2)+sqr(weights[1])*one_over_effective_mass(3);
-}
-template<class T,class T_MASS_ARRAY> T Edge_Edge_One_Over_Mass_Helper(const VECTOR<T,2>& weights,INDIRECT_ARRAY<T_MASS_ARRAY,VECTOR<int,2>&> one_over_effective_mass)
-{
-    return one_over_effective_mass(0)+one_over_effective_mass(1);
-}
 template<class TV> template<class T_ARRAY,class S> void TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,2>&,const bool use_repulsions)
 {
@@ -608,23 +557,22 @@ Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,c
         ee_old_speeds.Resize(pairs.Size());ee_old_speeds.Fill(T());
 
         for(int pair_index=0;pair_index<pairs.Size();pair_index++){
-            const EDGE_EDGE_REPULSION_PAIR<TV>& pair=pairs(pair_index);
-            const VECTOR<int,2*d-2>& nodes=pair.nodes;const VECTOR<T,2>& w=pair.weights;
+            const REPULSION_PAIR<TV>& pair=pairs(pair_index);
+            const VECTOR<int,d+1>& nodes=pair.nodes;
             if(pair.distance<0) inverted_pairs++;
 
-            TV relative_velocity=Edge_Edge_Relative_Velocity_Helper(w,V.Subset(nodes));
+            TV relative_velocity=-V.Subset(nodes).Weighted_Sum(pair.weights);
             TV direction;T scalar_impulse=Repulsion_Impulse(direction,dt,pair,relative_velocity,elastic_repulsion,friction);
             if(scalar_impulse){
                 applied_impulses++;
-                T one_over_mass=Edge_Edge_One_Over_Mass_Helper(w,one_over_effective_mass.Subset(nodes));
+                T one_over_mass=one_over_effective_mass.Subset(nodes).Weighted_Sum(sqr(pair.weights));
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
                 if(use_gauss_jacobi && !friction && !elastic_repulsion){
-                    Edge_Edge_Update_Velocity_Helper(impulse,w,one_over_effective_mass.Subset(nodes),impulse_velocities.Subset(nodes));
+                    for(int i=0;i<TV::m+1;i++) impulse_velocities(nodes(i))-=pair.weights(i)*one_over_effective_mass(nodes(i))*impulse;
                     ee_old_speeds(pair_index)=TV::Dot_Product(relative_velocity,direction);
                     ee_target_impulses(pair_index)=impulse;
                     ee_normals(pair_index)=direction.Normalized();} // something weird going on here (unnormalized directions)
-                else
-                    Edge_Edge_Update_Velocity_Helper(impulse,w,one_over_effective_mass.Subset(nodes),V.Subset(nodes));}}
+                else for(int i=0;i<TV::m+1;i++) V(nodes(i))-=pair.weights(i)*one_over_effective_mass(nodes(i))*impulse;}}
 
         if(use_gauss_jacobi) Scale_And_Apply_Edge_Edge_Impulses(pairs);
     }
@@ -641,8 +589,8 @@ Adjust_Velocity_For_Edge_Edge_Repulsion(const T dt,const T_ARRAY& pairs,const bo
 // Function Project_All_Moving_Constraints
 //#####################################################################
 template<class TV> void TRIANGLE_REPULSIONS<TV>::
-Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_face_precomputed,
-    const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field)
+Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomputed,
+    const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field)
 {
     for(int i=0;i<point_face_precomputed.m;i++) point_face_precomputed(i).Project(field.Subset(point_face_precomputed(i).nodes));
     for(int i=0;i<edge_edge_precomputed.m;i++) edge_edge_precomputed(i).Project(field.Subset(edge_edge_precomputed(i).nodes));
@@ -653,9 +601,9 @@ Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<
 // Function Set_Collision_Pairs
 //#####################################################################
 template<class TV> template<class TV2> void TRIANGLE_REPULSIONS<TV>::
-Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_face_precomputed,
-    ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,3> > >& point_face_pairs,
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<TV2> >& edge_edge_pairs,const T repulsion_thickness_multiplier)
+Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomputed,
+    ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY<REPULSION_PAIR<VECTOR<T,3> > >& point_face_pairs,
+    ARRAY<REPULSION_PAIR<TV2> >& edge_edge_pairs,const T repulsion_thickness_multiplier)
 {
     STATIC_ASSERT((IS_SAME<VECTOR<T,3>,TV2>::value));
     point_face_pairs.Remove_All();
@@ -667,10 +615,10 @@ Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_f
     repulsion_thickness/=repulsion_thickness_multiplier;
     point_face_precomputed.Resize(point_face_pairs.m);
     edge_edge_precomputed.Resize(edge_edge_pairs.m);
-    for(int i=0;i<point_face_pairs.m;i++){const POINT_FACE_REPULSION_PAIR<VECTOR<T,3> >& pr=point_face_pairs(i);
-        point_face_precomputed(i).Precompute(geometry.deformable_body_collection.particles.mass.Subset(pr.nodes),pr.weights,pr.normal);}
-    for(int i=0;i<edge_edge_pairs.m;i++){const EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >& pr=edge_edge_pairs(i);
-        edge_edge_precomputed(i).Precompute(geometry.deformable_body_collection.particles.mass.Subset(pr.nodes),pr.weights,pr.normal);}
+    for(int i=0;i<point_face_pairs.m;i++){const REPULSION_PAIR<VECTOR<T,3> >& pr=point_face_pairs(i);
+        point_face_precomputed(i).Precompute(geometry.deformable_body_collection.particles.one_over_mass.Subset(pr.nodes),pr.weights,pr.normal);}
+    for(int i=0;i<edge_edge_pairs.m;i++){const REPULSION_PAIR<VECTOR<T,3> >& pr=edge_edge_pairs(i);
+        edge_edge_precomputed(i).Precompute(geometry.deformable_body_collection.particles.one_over_mass.Subset(pr.nodes),pr.weights,pr.normal);}
     internal_point_face_precomputed=point_face_precomputed;
     internal_edge_edge_precomputed=edge_edge_precomputed;
 }
@@ -683,11 +631,10 @@ Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
     // Go through the computed impulses, and compare them to the actual change in velocity seen.  Scale back impulses accordingly
     for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i)==TV()) continue;
-        const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(i);
-        const VECTOR<int,d+1>& nodes=pair.nodes;
+        const REPULSION_PAIR<TV>& pair=pairs(i);
         // Compute actual new relative_speed
-        int p=nodes[0];VECTOR<int,d> face_nodes=nodes.Remove_Index(0);
-        T relative_speed=TV::Dot_Product(impulse_velocities(p)-impulse_velocities.Subset(face_nodes).Weighted_Sum(pair.weights),pf_normals(i));
+        TV relative_velocity=-impulse_velocities.Subset(pair.nodes).Weighted_Sum(pair.weights);
+        T relative_speed=TV::Dot_Product(relative_velocity,pf_normals(i));
         if(relative_speed*pf_old_speeds(i)<0){
             T new_scale=-(relative_speed-pf_old_speeds(i))/pf_old_speeds(i);
             pf_target_impulses(i)/=new_scale;}} // TODO: should we be doing this, or storing a maximum scale factor at each node?
@@ -696,8 +643,8 @@ Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i)==TV()) continue;
-        const POINT_FACE_REPULSION_PAIR<TV>& pair=pairs(i);const VECTOR<int,d+1>& nodes=pair.nodes;
-        Update_Velocity_Helper(pf_target_impulses(i),pair.weights,one_over_effective_mass.Subset(nodes),V.Subset(nodes));}
+        const REPULSION_PAIR<TV>& pair=pairs(i);
+        for(int j=0;j<TV::m+1;j++) V(pair.nodes(j))-=pair.weights(j)*one_over_effective_mass(pair.nodes(j))*pf_target_impulses(i);}
 }
 //#####################################################################
 // Function Scale_And_Apply_Edge_Edge_Impulses
@@ -708,10 +655,10 @@ Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs)
     // Go through the computed impulses, and compare them to the actual change in velocity seen.  Scale back impulses accordingly
     for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i)==TV()) continue;
-        const VECTOR<int,2*d-2>& nodes=pairs(i).nodes;
+        const VECTOR<int,d+1>& nodes=pairs(i).nodes;
         // Compute actual new relative_speed
-        TV relative_velocity;
-        T relative_speed=TV::Dot_Product(Edge_Edge_Relative_Velocity_Helper(pairs(i).weights,impulse_velocities.Subset(nodes)),ee_normals(i));
+        TV relative_velocity=-impulse_velocities.Subset(nodes).Weighted_Sum(pairs(i).weights);
+        T relative_speed=TV::Dot_Product(relative_velocity,ee_normals(i));
         if(relative_speed*ee_old_speeds(i)<0){
             T new_scale=-(relative_speed-ee_old_speeds(i))/ee_old_speeds(i);
             ee_target_impulses(i)/=new_scale;}}
@@ -720,53 +667,34 @@ Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs)
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i)==TV()) continue;
-        const VECTOR<int,2*d-2>& nodes=pairs(i).nodes;
-        Edge_Edge_Update_Velocity_Helper(ee_target_impulses(i),pairs(i).weights,one_over_effective_mass.Subset(nodes),V.Subset(nodes));}
+        const VECTOR<int,d+1>& nodes=pairs(i).nodes;
+        for(int j=0;j<TV::m+1;j++) V(nodes(j))-=pairs(i).weights(j)*one_over_effective_mass(nodes(j))*ee_target_impulses(i);}
 }
 //#####################################################################
 // Precompute
 //#####################################################################
-template<class TV> void PRECOMPUTE_PROJECT_POINT_FACE<TV>::
-Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const TV& weights_input,const TV& normal_input)
+template<class TV> void PRECOMPUTE_PROJECT<TV>::
+Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,TV::m+1>&> one_over_mass,const VECTOR<T,TV::m+1>& weights_input,const TV& normal_input)
 {
     weights=weights_input;normal=normal_input;
-    T tau=1/(1/mass(0)+weights(0)*weights(0)/mass(1)+weights(1)*weights(1)/mass(2)+weights(2)*weights(2)/mass(3));
-    v_scaled_normals(0)=-tau/mass(0)*normal;
-    v_scaled_normals(1)=tau*weights(0)/mass(1)*normal;
-    v_scaled_normals(2)=tau*weights(1)/mass(2)*normal;
-    v_scaled_normals(3)=tau*weights(2)/mass(3)*normal;
-    nodes=mass.indices;
+    T tau=one_over_mass.Weighted_Sum(sqr(weights));
+    for(int i=0;i<TV::m+1;i++)
+        v_scaled_normals(i)=tau*weights(i)*one_over_mass(i)*normal;
+    nodes=one_over_mass.indices;
 }
-//#####################################################################
-// Precompute
-//#####################################################################
-template<class TV> void PRECOMPUTE_PROJECT_EDGE_EDGE<TV>::
-Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const VECTOR<T,2>& weights_input,const TV& normal_input)
-{
-    weights=weights_input;normal=normal_input;
-    T tau=1/(sqr(1-weights(0))/mass(0)+sqr(weights(0))/mass(1)+sqr(1-weights(1))/mass(2)+sqr(weights(1))/mass(3));
-    v_scaled_normals(0)=-tau/mass(0)*(1-weights(0))*normal;
-    v_scaled_normals(1)=-tau/mass(1)*weights(0)*normal;
-    v_scaled_normals(2)=tau/mass(2)*(1-weights(1))*normal;
-    v_scaled_normals(3)=tau/mass(3)*weights(1)*normal;
-    normal_13=normal;normal_12=weights(0)*normal;normal_34=-weights(1)*normal;
-    nodes=mass.indices;
-}
-//####################################################################
-template<> const VECTOR<float,2> EDGE_EDGE_REPULSION_PAIR<VECTOR<float,2> >::weights=VECTOR<float,2>();
+//####################################################################te
 template class TRIANGLE_REPULSIONS<VECTOR<float,1> >;
 template class TRIANGLE_REPULSIONS<VECTOR<float,2> >;
 template class TRIANGLE_REPULSIONS<VECTOR<float,3> >;
-template void TRIANGLE_REPULSIONS<VECTOR<float,3> >::Set_Collision_Pairs<VECTOR<float,3> >(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<float,3> >,int>&,
-    ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<float,3> >,int>&,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<float,3> >,int>&,
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<float,3> >,int>&,float);
+template void TRIANGLE_REPULSIONS<VECTOR<float,3> >::Set_Collision_Pairs<VECTOR<float,3> >(ARRAY<PRECOMPUTE_PROJECT<VECTOR<float,3> >,int>&,
+    ARRAY<PRECOMPUTE_PROJECT<VECTOR<float,3> >,int>&,ARRAY<REPULSION_PAIR<VECTOR<float,3> >,int>&,
+    ARRAY<REPULSION_PAIR<VECTOR<float,3> >,int>&,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template<> const VECTOR<double,2> EDGE_EDGE_REPULSION_PAIR<VECTOR<double,2> >::weights=VECTOR<double,2>();
 template class TRIANGLE_REPULSIONS<VECTOR<double,1> >;
 template class TRIANGLE_REPULSIONS<VECTOR<double,2> >;
 template class TRIANGLE_REPULSIONS<VECTOR<double,3> >;
-template void TRIANGLE_REPULSIONS<VECTOR<double,3> >::Set_Collision_Pairs<VECTOR<double,3> >(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<double,3> >,int>&,
-    ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<double,3> >,int>&,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<double,3> >,int>&,
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<double,3> >,int>&,double);
+template void TRIANGLE_REPULSIONS<VECTOR<double,3> >::Set_Collision_Pairs<VECTOR<double,3> >(ARRAY<PRECOMPUTE_PROJECT<VECTOR<double,3> >,int>&,
+    ARRAY<PRECOMPUTE_PROJECT<VECTOR<double,3> >,int>&,ARRAY<REPULSION_PAIR<VECTOR<double,3> >,int>&,
+    ARRAY<REPULSION_PAIR<VECTOR<double,3> >,int>&,double);
 #endif
 }

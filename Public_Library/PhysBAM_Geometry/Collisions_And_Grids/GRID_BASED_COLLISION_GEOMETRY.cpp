@@ -57,9 +57,9 @@ Rasterize_Objects()
 // Function Earliest_Simplex_Crossover
 //##################################################################### 
 template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
-Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
+Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
-    T min_time=FLT_MAX;bool collision=false;T current_hit_time;T_WEIGHTS current_weights;int current_simplex_id;
+    T min_time=FLT_MAX;bool collision=false;T current_hit_time;TV current_weights;int current_simplex_id;
     if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Earliest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id) && current_hit_time < min_time){
             min_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;}}
@@ -74,7 +74,7 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
 template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
 Latest_Crossover(const TV& start_X,const TV& end_X,const T dt,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,TV& initial_hit_point,const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
-    T hit_time;T_WEIGHTS weights;POINT_SIMPLEX_COLLISION_TYPE returned_collision_type;
+    T hit_time;TV weights;POINT_SIMPLEX_COLLISION_TYPE returned_collision_type;
     bool crossover=Latest_Simplex_Crossover(start_X,end_X,dt,hit_time,weights,body_id,simplex_id,returned_collision_type,objects);
     if(crossover){
         T_SIMPLEX initial_simplex=collision_geometry_collection(body_id).World_Space_Simplex(simplex_id);
@@ -85,11 +85,11 @@ Latest_Crossover(const TV& start_X,const TV& end_X,const T dt,COLLISION_GEOMETRY
 // Function Latest_Simplex_Crossover
 //##################################################################### 
 template<class T_GRID> bool GRID_BASED_COLLISION_GEOMETRY<T_GRID>::
-Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type,
+Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,COLLISION_GEOMETRY_ID& body_id,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type,
     const ARRAY<COLLISION_GEOMETRY_ID>* objects) const
 {
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;POINT_SIMPLEX_COLLISION_TYPE collision_type;
-    T max_time=-FLT_MAX;bool collision=false;T current_hit_time;T_WEIGHTS current_weights;int current_simplex_id;
+    T max_time=-FLT_MAX;bool collision=false;T current_hit_time;TV current_weights;int current_simplex_id;
     if(!objects){for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++) if(Is_Active(i) && collision_geometry_collection.bodies(i)->active && 
         collision_geometry_collection.bodies(i)->Latest_Simplex_Crossover(start_X,end_X,dt,current_hit_time,current_weights,current_simplex_id,collision_type) && current_hit_time > max_time){
             max_time=hit_time=current_hit_time;weights=current_weights;body_id=i;simplex_id=current_simplex_id;collision=true;

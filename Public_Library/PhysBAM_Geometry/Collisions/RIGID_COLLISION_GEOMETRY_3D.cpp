@@ -25,10 +25,10 @@ template<class T> RIGID_COLLISION_GEOMETRY<VECTOR<T,3> >::
 // Function Earliest_Simplex_Crossover
 //##################################################################### 
 template<class T> bool RIGID_COLLISION_GEOMETRY<VECTOR<T,3> >::
-Earliest_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,const T dt,T& hit_time,VECTOR<T,3>& weights,int& triangle_id) const
+Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& triangle_id) const
 {
     const T collision_thickness_over_two=(T).5*collision_thickness;
-    T min_time=FLT_MAX;bool collision=false;T current_hit_time,current_relative_speed;VECTOR<T,3> current_normal,current_weights;
+    T min_time=FLT_MAX;bool collision=false;T current_hit_time;TV current_normal;VECTOR<T,TV::m+1> current_weights;
     if(rigid_geometry.moving_simplex_hierarchy){
         ARRAY<int> triangles_to_check;
         if(start_X==end_X){rigid_geometry.moving_simplex_hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);}
@@ -36,30 +36,30 @@ Earliest_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,c
         for(int i=0;i<triangles_to_check.m;i++){
             int t=triangles_to_check(i);
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(0).x);
-            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
-                current_normal,current_weights,current_relative_speed);
+            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Face_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
+                current_normal,current_weights);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time < min_time){
-                min_time=hit_time=current_hit_time;weights=current_weights;triangle_id=t;collision=true;}}}
+                min_time=hit_time=current_hit_time;weights=current_weights.Remove_Index(0);triangle_id=t;collision=true;}}}
     else{
         LOG::cerr<<"Earliest_Simplex_Crossover: no moving triangle hierarchy"<<std::endl;
         for(int t=0;t<rigid_geometry.simplicial_object->mesh.elements.m;t++){   
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(0).x);
-            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
-                current_normal,current_weights,current_relative_speed);
+            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Face_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
+                current_normal,current_weights);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time < min_time){
-                min_time=hit_time=current_hit_time;weights=current_weights;triangle_id=t;collision=true;}}}
+                min_time=hit_time=current_hit_time;weights=current_weights.Remove_Index(0);triangle_id=t;collision=true;}}}
     return collision;
 }
 //##################################################################### 
 // Function Latest_Simplex_Crossover
 //##################################################################### 
 template<class T> bool RIGID_COLLISION_GEOMETRY<VECTOR<T,3> >::
-Latest_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,const T dt,T& hit_time,VECTOR<T,3>& weights,int& triangle_id,
+Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& triangle_id,
     POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
 {
     const T collision_thickness_over_two=(T).5*collision_thickness;
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;
-    T max_time=-FLT_MAX;bool collision=false;T current_hit_time,current_relative_speed;VECTOR<T,3> current_normal,current_weights;
+    T max_time=-FLT_MAX;bool collision=false;T current_hit_time;TV current_normal;VECTOR<T,TV::m+1> current_weights;
     if(rigid_geometry.moving_simplex_hierarchy){
         ARRAY<int> triangles_to_check;
         if(start_X==end_X){rigid_geometry.moving_simplex_hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);}
@@ -67,28 +67,28 @@ Latest_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,con
         for(int i=0;i<triangles_to_check.m;i++){
             int t=triangles_to_check(i);
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(0).x);
-            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
-                current_normal,current_weights,current_relative_speed);
+            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Face_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
+                current_normal,current_weights);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time > max_time){
-                max_time=hit_time=current_hit_time;weights=current_weights;triangle_id=t;collision=true;returned_collision_type=collision_type;}}}
+                max_time=hit_time=current_hit_time;weights=current_weights.Remove_Index(0);triangle_id=t;collision=true;returned_collision_type=collision_type;}}}
     else{
         LOG::cerr<<"Latest_Simplex_Crossover: no moving triangle hierarchy"<<std::endl;
         for(int t=0;t<rigid_geometry.simplicial_object->mesh.elements.m;t++){   
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(0).x);
-            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
-                current_normal,current_weights,current_relative_speed);
+            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Face_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,
+                current_normal,current_weights);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time > max_time){
-                max_time=hit_time=current_hit_time;weights=current_weights;triangle_id=t;collision=true;returned_collision_type=collision_type;}}}
+                max_time=hit_time=current_hit_time;weights=current_weights.Remove_Index(0);triangle_id=t;collision=true;returned_collision_type=collision_type;}}}
     return collision;
 }
 //##################################################################### 
 // Function Any_Simplex_Crossover
 //##################################################################### 
 template<class T> bool RIGID_COLLISION_GEOMETRY<VECTOR<T,3> >::
-Any_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,const T dt) const
+Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const
 {
     const T collision_thickness_over_two=(T).5*collision_thickness;
-    T hit_time,relative_speed;VECTOR<T,3> normal,weights;
+    T hit_time;TV normal;VECTOR<T,TV::m+1> weights;
     if(rigid_geometry.moving_simplex_hierarchy){
         ARRAY<int> triangles_to_check;
         if(start_X==end_X){rigid_geometry.moving_simplex_hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);}
@@ -96,15 +96,15 @@ Any_Simplex_Crossover(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,const 
         for(int i=0;i<triangles_to_check.m;i++){
             int t=triangles_to_check(i);
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(0).x);
-            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,hit_time,normal,
-                weights,relative_speed);
+            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Face_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,hit_time,normal,
+                weights);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}}
     else{
         LOG::cerr<<"Any_Simplex_Crossover: no moving triangle hierarchy"<<std::endl;
         for(int t=0;t<rigid_geometry.simplicial_object->mesh.elements.m;t++){   
             TRIANGLE_3D<T> initial_triangle=World_Space_Simplex(t),final_triangle=World_Space_Simplex(t,saved_states(0).x);
-            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Triangle_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,hit_time,normal,
-                weights,relative_speed);
+            POINT_SIMPLEX_COLLISION_TYPE collision_type=TRIANGLE_3D<T>::Robust_Point_Face_Collision(initial_triangle,final_triangle,start_X,end_X,dt,collision_thickness_over_two,hit_time,normal,
+                weights);
             if(collision_type!=POINT_SIMPLEX_NO_COLLISION) return true;}}
     return false;
 }

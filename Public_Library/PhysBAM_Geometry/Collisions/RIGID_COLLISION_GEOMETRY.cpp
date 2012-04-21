@@ -164,27 +164,13 @@ Implicit_Geometry_Lazy_Inside_Extended_Levelset(const TV& location,T contour_val
 //#####################################################################
 // Function Simplex_World_Space_Point_From_Barycentric_Coordinates
 //#####################################################################
-template<class T> VECTOR<T,1> Simplex_World_Space_Point_From_Barycentric_Coordinates_Helper(RIGID_GEOMETRY<VECTOR<T,1> >& rigid_geometry,const int point_simplex_id,const ONE&)
-{
-    const POINT_SIMPLEX_1D<T>& object_space_point_simplex=(*rigid_geometry.simplicial_object->point_simplex_list)(point_simplex_id);
-    return rigid_geometry.World_Space_Point(object_space_point_simplex.x1);
-}
-template<class T> VECTOR<T,2> Simplex_World_Space_Point_From_Barycentric_Coordinates_Helper(RIGID_GEOMETRY<VECTOR<T,2> >& rigid_geometry,const int segment_id,const T& alpha)
-{
-    const SEGMENT_2D<T>& object_space_segment=(*rigid_geometry.simplicial_object->segment_list)(segment_id);
-    return SEGMENT_2D<T>::Point_From_Barycentric_Coordinates(alpha,rigid_geometry.World_Space_Point(object_space_segment.x1),rigid_geometry.World_Space_Point(object_space_segment.x2));
-}
-template<class T> VECTOR<T,3> Simplex_World_Space_Point_From_Barycentric_Coordinates_Helper(RIGID_GEOMETRY<VECTOR<T,3> >& rigid_geometry,const int triangle_id,const VECTOR<T,3>& weights)
-{
-    return TRIANGLE_3D<T>::Point_From_Barycentric_Coordinates(weights,
-        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(0))),
-        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(1))),
-        rigid_geometry.World_Space_Point(rigid_geometry.simplicial_object->particles.X(rigid_geometry.simplicial_object->mesh.elements(triangle_id)(2))));
-}
 template<class TV> TV RIGID_COLLISION_GEOMETRY_BASE<TV>::
-Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const
+Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const
 {
-    return Simplex_World_Space_Point_From_Barycentric_Coordinates_Helper(rigid_geometry,simplex_id,weights);
+    typename BASIC_SIMPLEX_POLICY<TV,TV::m-1>::SIMPLEX simplex=rigid_geometry.World_Space_Simplex(simplex_id);
+    TV pt;
+    for(int i=0;i<TV::m;i++) pt+=weights(i)*simplex.X(i);
+    return pt; 
 }
 //#####################################################################
 // Function Simplex_Intersection

@@ -19,7 +19,7 @@ template<class TV> class MPI_SOLIDS;
 template<class TV> class TRIANGLE_COLLISION_PARAMETERS;
 
 template<class TV>
-struct POINT_FACE_REPULSION_PAIR
+struct REPULSION_PAIR
 {
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename TV::SCALAR T;
@@ -28,83 +28,11 @@ struct POINT_FACE_REPULSION_PAIR
 
     VECTOR<int,d+1> nodes; // point,node1,node2,(node3) (order implies side)
     T distance;
-    TV weights;
-    TV normal;
+    VECTOR<T,d+1> weights;
+    TV normal,collision_free_normal;
 
     static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,d+1>& nodes)
-    {return max(repulsion_thickness(nodes[0]),repulsion_thickness.Subset(nodes.Remove_Index(0)).Min());}
-
-    T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
-    {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
-
-    template<class RW> void Read(std::istream& input)
-    {Read_Binary<RW>(input,nodes,distance,weights,normal);}
-
-    template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,nodes,distance,weights,normal);}
-};
-
-template<class T>
-struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> >
-{
-    typedef T SCALAR;
-    enum WORKAROUND {d=1,count=1};
-    typedef VECTOR<T,1> TV;
-
-    VECTOR<int,1> nodes; // vertex nodes
-    TV weights;
-    T distance;
-
-    static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,1>& nodes)
-    {return repulsion_thickness(nodes[0]);}
-
-    T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
-    {return 0;}
-};
-
-template<class T>
-struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> >
-{
-    typedef int HAS_UNTYPED_READ_WRITE;
-    typedef T SCALAR;
-    enum WORKAROUND {d=2,count=2};
-    typedef VECTOR<T,2> TV;
-
-    VECTOR<int,2> nodes; // vertex nodes
-    TV collision_free_normal;
-    T distance;
-    static const VECTOR<T,2> weights;
-    TV normal;
-
-    static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,2>& nodes)
-    {return max(repulsion_thickness(nodes[0]),repulsion_thickness(nodes[1]));}
-
-    T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
-    {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
-
-    template<class RW> void Read(std::istream& input)
-    {Read_Binary<RW>(input,nodes,distance,normal);}
-
-    template<class RW> void Write(std::ostream& output) const
-    {Write_Binary<RW>(output,nodes,distance,normal);}
-};
-
-template<class T>
-struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >
-{
-    typedef int HAS_UNTYPED_READ_WRITE;
-    typedef T SCALAR;
-    enum WORKAROUND {d=3,count=4};
-    typedef VECTOR<T,3> TV;
-
-    VECTOR<int,4> nodes; // segment nodes
-    TV collision_free_normal;
-    T distance;
-    VECTOR<T,2> weights;
-    TV normal;
-
-    static T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness,const VECTOR<int,4>& nodes)
-    {return max(min(repulsion_thickness(nodes[0]),repulsion_thickness(nodes[1])),min(repulsion_thickness(nodes[2]),repulsion_thickness(nodes[3])));}
+    {return repulsion_thickness.Subset(nodes).Max();}
 
     T Total_Repulsion_Thickness(ARRAY_VIEW<const T> repulsion_thickness) const
     {return Total_Repulsion_Thickness(repulsion_thickness,nodes);}
@@ -117,36 +45,19 @@ struct EDGE_EDGE_REPULSION_PAIR<VECTOR<T,3> >
 };
 
 template<class TV>
-struct PRECOMPUTE_PROJECT_POINT_FACE
+struct PRECOMPUTE_PROJECT
 {
     typedef typename TV::SCALAR T;
 
-    VECTOR<TV,4> v_scaled_normals;
-    TV weights,normal;
-    VECTOR<int,4> nodes;
+    VECTOR<T,TV::m+1> weights;
+    TV normal;
+    VECTOR<int,TV::m+1> nodes;
+    VECTOR<TV,TV::m+1> v_scaled_normals;
 
-    void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> v) const
-    {T s=TV::Dot_Product(v(0)-weights(0)*v(1)-weights(1)*v(2)-weights(2)*v(3),normal);
-    for(int i=0;i<4;i++) v(i)+=s*v_scaled_normals(i);}
+    void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,TV::m+1>&> v) const
+    {T s=v.Weighted_Sum(weights).Dot(normal);for(int i=0;i<TV::m+1;i++) v(i)+=s*v_scaled_normals(i);}
 
-    void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const TV& weights_input,const TV& normal_input);
-};
-
-template<class TV>
-struct PRECOMPUTE_PROJECT_EDGE_EDGE
-{
-    typedef typename TV::SCALAR T;
-
-    VECTOR<TV,4> v_scaled_normals;
-    TV normal_13,normal_12,normal_34,normal;
-    VECTOR<int,4> nodes;
-    VECTOR<T,2-(TV::m==1)> weights;
-
-    void Project(INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> v) const
-    {T s=TV::Dot_Product(v(0)-v(2),normal_13)+TV::Dot_Product(v(1)-v(0),normal_12)+TV::Dot_Product(v(3)-v(2),normal_34);
-    for(int i=0;i<4;i++) v(i)+=s*v_scaled_normals(i);}
-
-    void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,4>&> mass,const VECTOR<T,2>& weights_input,const TV& normal_input);
+    void Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,TV::m+1>&> mass,const VECTOR<T,TV::m+1>& weights_input,const TV& normal_input);
 };
 
 template<class TV>
@@ -172,24 +83,24 @@ public:
     T hierarchy_repulsion_thickness_multiplier;
     T repulsion_thickness_detection_multiplier;
     HASHTABLE<VECTOR<int,d+1> > omit_point_face_repulsion_pairs;
-    HASHTABLE<VECTOR<int,2*d-2> > omit_edge_edge_repulsion_pairs;
+    HASHTABLE<VECTOR<int,d+1> > omit_edge_edge_repulsion_pairs;
     // repulsion interaction cache
-    ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_face_interaction_pairs;
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_interaction_pairs;
-    ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<TV> > internal_point_face_precomputed;
-    ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<TV> > internal_edge_edge_precomputed;
+    ARRAY<REPULSION_PAIR<TV> > point_face_interaction_pairs;
+    ARRAY<REPULSION_PAIR<TV> > edge_edge_interaction_pairs;
+    ARRAY<PRECOMPUTE_PROJECT<TV> > internal_point_face_precomputed;
+    ARRAY<PRECOMPUTE_PROJECT<TV> > internal_edge_edge_precomputed;
     // MPI data
     MPI_SOLIDS<TV>* mpi_solids;
     ARRAY<ARRAY<int>,PARTITION_ID> point_face_send_particles,point_face_receive_particles,edge_edge_send_particles,edge_edge_receive_particles;
-    ARRAY<POINT_FACE_REPULSION_PAIR<TV> > point_face_boundary_pairs,point_face_internal_pairs;
-    ARRAY<EDGE_EDGE_REPULSION_PAIR<TV> > edge_edge_boundary_pairs,edge_edge_internal_pairs;
+    ARRAY<REPULSION_PAIR<TV> > point_face_boundary_pairs,point_face_internal_pairs;
+    ARRAY<REPULSION_PAIR<TV> > edge_edge_boundary_pairs,edge_edge_internal_pairs;
     bool use_gauss_jacobi;
     ARRAY<TV> impulse_velocities;
     ARRAY<TV> pf_target_impulses;
     ARRAY<T> pf_old_speeds;
     ARRAY<TV> pf_normals;
     ARRAY<TV> ee_target_impulses;
-    ARRAY<VECTOR<T,2*d-2> > ee_target_weights;
+    ARRAY<VECTOR<T,d+1> > ee_target_weights;
     ARRAY<T> ee_old_speeds;
     ARRAY<TV> ee_normals;
 
@@ -243,19 +154,19 @@ public:
     void Set_Gauss_Jacobi(const bool use_gauss_jacobi_input=false)
     {use_gauss_jacobi=use_gauss_jacobi_input;}
 
-    static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,1> > >& point_face_precomputed,
-        const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,1> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,1> > field){}
+    static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,1> > >& point_face_precomputed,
+        const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,1> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,1> > field){}
 
-    static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,2> > >& point_face_precomputed,
-        const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,2> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,2> > field){}
+    static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,2> > >& point_face_precomputed,
+        const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,2> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,2> > field){}
 
-    void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,1> > >& point_face_precomputed,
-        ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,1> > >& edge_edge_precomputed,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,1> > >& point_face_pairs,
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,1> > >& edge_edge_pairs,const T repulsion_thickness_multiplier){}
+    void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,1> > >& point_face_precomputed,
+        ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,1> > >& edge_edge_precomputed,ARRAY<REPULSION_PAIR<VECTOR<T,1> > >& point_face_pairs,
+        ARRAY<REPULSION_PAIR<VECTOR<T,1> > >& edge_edge_pairs,const T repulsion_thickness_multiplier){}
 
-    void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,2> > >& point_face_precomputed,
-        ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,2> > >& edge_edge_precomputed,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,2> > >& point_face_pairs,
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<VECTOR<T,2> > >& edge_edge_pairs,const T repulsion_thickness_multiplier){}
+    void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,2> > >& point_face_precomputed,
+        ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,2> > >& edge_edge_precomputed,ARRAY<REPULSION_PAIR<VECTOR<T,2> > >& point_face_pairs,
+        ARRAY<REPULSION_PAIR<VECTOR<T,2> > >& edge_edge_pairs,const T repulsion_thickness_multiplier){}
 
 //#####################################################################
     void Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters);
@@ -272,12 +183,12 @@ public:
     template<class T_ARRAY1,class T_ARRAY2> int Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,
         T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,const bool use_repulsions);
     void Output_Interaction_Pairs(const STREAM_TYPE stream_type,const std::string& filename) const;
-    static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_face_precomputed,
-        const ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field);
+    static void Project_All_Moving_Constraints(const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomputed,
+        const ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY_VIEW<VECTOR<T,3> >& field);
     template<class TV2>
-    void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT_POINT_FACE<VECTOR<T,3> > >& point_face_precomputed,
-        ARRAY<PRECOMPUTE_PROJECT_EDGE_EDGE<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY<POINT_FACE_REPULSION_PAIR<VECTOR<T,3> > >& point_face_pairs,
-        ARRAY<EDGE_EDGE_REPULSION_PAIR<TV2> >& edge_edge_pairs,const T repulsion_thickness_multiplier);
+    void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomputed,
+        ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY<REPULSION_PAIR<VECTOR<T,3> > >& point_face_pairs,
+        ARRAY<REPULSION_PAIR<TV2> >& edge_edge_pairs,const T repulsion_thickness_multiplier);
     template<class T_ARRAY> void Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs);
     template<class T_ARRAY> void Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs);
 private:

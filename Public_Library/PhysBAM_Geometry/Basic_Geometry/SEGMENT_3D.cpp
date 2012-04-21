@@ -113,24 +113,28 @@ Shortest_Vector_Between_Segments(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weigh
 //#####################################################################
 // returns the distance, normal and weights
 template<class T> bool SEGMENT_3D<T>::
-Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const T interaction_distance,T& distance,VECTOR<T,3>& normal,VECTOR<T,2>& weights,bool allow_negative_weights) const
+Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const T interaction_distance,T& distance,VECTOR<T,3>& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights) const
 {
-    normal=Shortest_Vector_Between_Segments(segment,weights);distance=normal.Magnitude();
+    VECTOR<T,2> w;
+    normal=Shortest_Vector_Between_Segments(segment,w);
+    weights=VECTOR<T,TV::m+1>(-w.x,w.x-1,w.y,1-w.y);
+    distance=normal.Magnitude();
     if(!allow_negative_weights && (weights.Contains(0) || weights.Contains(1))) return false;
     return distance<=interaction_distance;
 }
 //#####################################################################
-// Function Edge_Edge_Interaction_Data
+// Function template<cl
 //#####################################################################
 // input the distance, normal and weights
 template<class T> void SEGMENT_3D<T>::
 Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T& distance,
-    TV& normal,const VECTOR<T,2>& weights,const T small_number,const bool verbose) const
+    TV& normal,const VECTOR<T,TV::m+1>& weights,const T small_number,const bool verbose) const
 {
     if(distance > small_number) normal/=distance;
     else{ // set normal based on relative velocity perpendicular to the two points
-        VECTOR<T,3> relative_velocity=(1-weights.x)*v1+weights.x*v2-((1-weights.y)*v3+weights.y*v4),u=x2-x1;
-        normal=relative_velocity-VECTOR<T,3>::Dot_Product(relative_velocity,u)/VECTOR<T,3>::Dot_Product(u,u)*u;T normal_magnitude=normal.Magnitude();
+        VECTOR<T,3> relative_velocity=-weights(0)*v1-weights(1)*v2-weights(2)*v3-weights(3)*v4,u=x2-x1;
+        normal=relative_velocity-VECTOR<T,3>::Dot_Product(relative_velocity,u)/VECTOR<T,3>::Dot_Product(u,u)*u;
+        T normal_magnitude=normal.Magnitude();
         if(normal_magnitude > small_number) normal/=normal_magnitude;
         else{ // relative velocity perpendicular to the segment is 0, pick any direction perpendicular to the segment
             if(abs(u.x) > abs(u.y) && abs(u.x) > abs(u.z)) normal=VECTOR<T,3>(0,1,1);
@@ -145,12 +149,10 @@ Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v
 //#####################################################################
 template<class T> bool SEGMENT_3D<T>::
 Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T interaction_distance,
-    T& distance,VECTOR<T,3>& normal,VECTOR<T,2>& weights,T& relative_speed,bool allow_negative_weights,const T small_number,const bool exit_early,const bool verbose) const
+    T& distance,VECTOR<T,3>& normal,VECTOR<T,TV::m+1>& weights,bool allow_negative_weights,const T small_number,const bool exit_early,const bool verbose) const
 {
     if(!Edge_Edge_Interaction(segment,interaction_distance,distance,normal,weights,allow_negative_weights)) return false;
-    if(!exit_early){
-        Edge_Edge_Interaction_Data(segment,v1,v2,v3,v4,distance,normal,weights,small_number,verbose);
-        relative_speed=VECTOR<T,3>::Dot_Product((1-weights.x)*v1+weights.x*v2-((1-weights.y)*v3+weights.y*v4),normal);} // relative speed is in the normal direction
+    if(!exit_early) Edge_Edge_Interaction_Data(segment,v1,v2,v3,v4,distance,normal,weights,small_number,verbose);
     return true;
 }
 //#####################################################################
@@ -158,7 +160,7 @@ Edge_Edge_Interaction(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,con
 //#####################################################################
 template<class T> bool SEGMENT_3D<T>::
 Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const TV& v3,const TV& v4,const T dt,const T collision_thickness,T& collision_time,TV& normal,
-    VECTOR<T,2>& weights,T& relative_speed,const T small_number,const bool exit_early) const
+    VECTOR<T,TV::m+1>& weights,const T small_number,const bool exit_early) const
 {
     // find cubic and compute the roots as possible collision times
     VECTOR<T,3> ABo=x2-x1,ABv=dt*(v2-v1),ACo=segment.x2-segment.x1,ACv=dt*(v4-v3);
@@ -178,7 +180,7 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
     for(int k=0;k<num_intervals;k++){
         T collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
         SEGMENT_3D<T> segment2(x1+collision_time*v1,x2+collision_time*v2);
-        if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,relative_speed,
+        if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,
                 false,small_number,exit_early)) return true;}
 
     return false;

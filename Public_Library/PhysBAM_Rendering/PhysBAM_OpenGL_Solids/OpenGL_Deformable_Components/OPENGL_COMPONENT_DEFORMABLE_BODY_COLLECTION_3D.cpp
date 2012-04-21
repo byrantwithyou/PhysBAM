@@ -201,7 +201,7 @@ Display(const int in_color) const
         if(interaction_pair_display_mode==0 || interaction_pair_display_mode==1){
             OpenGL_Begin(GL_LINES);
             for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
-                const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
+                const REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(.5f,1,.5f);
                 OpenGL_Line(X(0),TRIANGLE_3D<T>(X(1),X(2),X(3)).Surface(X(0)));
@@ -210,7 +210,7 @@ Display(const int in_color) const
             OpenGL_End();
             OpenGL_Begin(GL_TRIANGLES);
             for(int k=0;k<point_triangle_interaction_pairs.Size();k++){
-                const POINT_FACE_REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
+                const REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor4f(0,.6f,.8f,.5f);
                 OpenGL_Triangle(X(0),X(2),X(1));
@@ -222,7 +222,7 @@ Display(const int in_color) const
         if(interaction_pair_display_mode==0 || interaction_pair_display_mode==2){
             OpenGL_Begin(GL_LINES);
             for(int k=0;k<edge_edge_interaction_pairs.Size();k++){
-                const EDGE_EDGE_REPULSION_PAIR<TV>& pair=edge_edge_interaction_pairs(k);
+                const REPULSION_PAIR<TV>& pair=edge_edge_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(1,1,0);
                 VECTOR<T,2> weights;SEGMENT_3D<T>(X(0),X(1)).Shortest_Vector_Between_Segments(SEGMENT_3D<T>(X(2),X(3)),weights);

@@ -55,7 +55,10 @@ Store(const int segment1_local_index,const int segment2_local_index)
     // check for interaction
     T_SPRING_STATE state;
     SEGMENT_3D<T> segment1(adhesion.curve.particles.X.Subset(segment1_nodes)),segment2(adhesion.curve.particles.X.Subset(segment2_nodes));
-    if(!segment1.Edge_Edge_Interaction(segment2,adhesion.on_distance,state.distance,state.normal,state.weights,true)) return;
+    VECTOR<T,TV::m+1> tweights;
+    if(!segment1.Edge_Edge_Interaction(segment2,adhesion.on_distance,state.distance,state.normal,tweights,true)) return;
+    state.weights.x=-tweights(1);
+    state.weights.y=tweights(3);
 
     // TODO: this branch should be unnecessary, we should always be able to use segment_indices[0] as the reference.
     PHYSBAM_ASSERT(local || segment_indices[0]==segment1_index); // TODO: make this a assert()

@@ -30,8 +30,7 @@ class COLLISION_GEOMETRY:public NONCOPYABLE
 {
 private:
     typedef typename TV::SCALAR T;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
-    typedef typename IF<TV::dimension==2,T,typename IF<TV::dimension==1,ONE,TV>::TYPE>::TYPE T_WEIGHTS;
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;  
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
 public:
     typedef TV VECTOR_T;
@@ -78,7 +77,7 @@ public:
     virtual bool Implicit_Geometry_Lazy_Inside_Extended_Levelset(const TV& location,T contour_value=0) const;
 
     // simplex interface
-    virtual TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const;
+    virtual TV Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const;
     virtual int Number_Of_Simplices() const;
     virtual bool Simplex_Intersection(RAY<TV>& ray) const;
     virtual bool Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const;
@@ -86,8 +85,8 @@ public:
     virtual bool Inside(const TV& location,const T thickness_over_two) const;
     virtual TV Simplex_Closest_Point_On_Boundary(const TV& location,const T max_distance,const T thickness_over_2=0,int* simplex_id=0,T* distance=0) const;
     virtual T_SIMPLEX World_Space_Simplex(const int simplex_id,const bool use_saved_state=false) const;
-    virtual bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id) const;
-    virtual bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id,
+    virtual bool Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id) const;
+    virtual bool Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id,
         POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const;
     virtual bool Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const;
     virtual void Get_Simplex_Bounding_Boxes(ARRAY<RANGE<TV> >& bounding_boxes,const bool with_body_motion,const T extra_thickness,const T body_thickness_factor) const;

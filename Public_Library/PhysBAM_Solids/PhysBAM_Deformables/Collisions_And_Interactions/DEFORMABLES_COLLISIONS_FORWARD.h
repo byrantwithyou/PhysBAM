@@ -10,8 +10,7 @@
 #include <PhysBAM_Geometry/Collisions/COLLISIONS_GEOMETRY_FORWARD.h>
 namespace PhysBAM{
 
-template<class TV> struct POINT_FACE_REPULSION_PAIR;
-template<class TV> struct EDGE_EDGE_REPULSION_PAIR;
+template<class TV> struct REPULSION_PAIR;
 template<class TV> class SEGMENT_REPULSIONS_AND_COLLISIONS_GEOMETRY;
 template<class TV> class TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY;
 template<class TV> class SEGMENT_REPULSIONS;

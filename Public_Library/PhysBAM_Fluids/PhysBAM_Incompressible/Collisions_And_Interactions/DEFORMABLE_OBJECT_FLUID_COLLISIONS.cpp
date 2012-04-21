@@ -57,30 +57,18 @@ Pointwise_Object_Pseudo_Velocity(const int simplex_id,const TV& location,const i
     TV dX=T_SIMPLEX::Point_From_Barycentric_Coordinates(weights,(saved_states(state2).x->X-saved_states(state1).x->X).Subset(nodes));
     return dX/(saved_states(state2).y-saved_states(state1).y);
 }
-//##################################################################### 
+//#####################################################################
 // Function Simplex_Crossover
-//##################################################################### 
-template<class T> POINT_SIMPLEX_COLLISION_TYPE Simplex_Crossover_Helper(const VECTOR<T,1>& start_X,const VECTOR<T,1>& end_X,const T dt,T& hit_time,ONE& weights,
-    const T& collision_thickness,POINT_SIMPLEX_1D<T> initial_simplex,POINT_SIMPLEX_1D<T> final_simplex) {PHYSBAM_NOT_IMPLEMENTED();}
-template<class T> POINT_SIMPLEX_COLLISION_TYPE Simplex_Crossover_Helper(const VECTOR<T,2>& start_X,const VECTOR<T,2>& end_X,const T dt,T& hit_time,T& weights,
-    const T& collision_thickness,typename BASIC_GEOMETRY_POLICY<VECTOR<T,2> >::SEGMENT initial_simplex,typename BASIC_GEOMETRY_POLICY<VECTOR<T,2> >::SEGMENT final_simplex)
-{
-    typedef typename BASIC_GEOMETRY_POLICY<VECTOR<T,2> >::SEGMENT T_SIMPLEX;
-    VECTOR<T,2> normal;T relative_speed; // unused
-    return T_SIMPLEX::Robust_Point_Segment_Collision(initial_simplex,final_simplex,start_X,end_X,dt,collision_thickness,hit_time,normal,weights,relative_speed);
-}
-template<class T> POINT_SIMPLEX_COLLISION_TYPE Simplex_Crossover_Helper(const VECTOR<T,3>& start_X,const VECTOR<T,3>& end_X,const T dt,T& hit_time,VECTOR<T,3>& weights,
-    const T& collision_thickness,typename BASIC_GEOMETRY_POLICY<VECTOR<T,3> >::TRIANGLE initial_simplex,typename BASIC_GEOMETRY_POLICY<VECTOR<T,3> >::TRIANGLE final_simplex)
-{
-    typedef typename BASIC_GEOMETRY_POLICY<VECTOR<T,3> >::TRIANGLE T_SIMPLEX;
-    VECTOR<T,3> normal;T relative_speed; // unused
-    return T_SIMPLEX::Robust_Point_Triangle_Collision(initial_simplex,final_simplex,start_X,end_X,dt,collision_thickness,hit_time,normal,weights,relative_speed);
-}
+//#####################################################################
 template<class TV> POINT_SIMPLEX_COLLISION_TYPE DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
-Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,const int simplex) const 
+Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,const int simplex) const 
 {
     T_SIMPLEX initial_simplex=World_Space_Simplex(simplex),final_simplex=World_Space_Simplex(simplex,*saved_states(0).x);
-    return Simplex_Crossover_Helper(start_X,end_X,dt,hit_time,weights,collision_thickness,initial_simplex,final_simplex);
+    VECTOR<T,TV::m+1> tweights;
+    TV normal;
+    POINT_SIMPLEX_COLLISION_TYPE type=T_SIMPLEX::Robust_Point_Face_Collision(initial_simplex,final_simplex,start_X,end_X,dt,collision_thickness,hit_time,normal,tweights);
+    weights=tweights.Remove_Index(0);
+    return type;
 }
 //##################################################################### 
 // Function World_Space_Simplex
@@ -103,10 +91,10 @@ World_Space_Simplex(const int simplex_id,const GEOMETRY_PARTICLES<TV>& state) co
 // Function Earliest_Simplex_Crossover
 //##################################################################### 
 template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
-Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id) const
+Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id) const
 {
     if(!saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    T min_time=FLT_MAX;T current_hit_time;T_WEIGHTS current_weights;
+    T min_time=FLT_MAX;T current_hit_time;TV current_weights;
     if(object.hierarchy){
         ARRAY<int> triangles_to_check;
         if(start_X==end_X) object.hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);
@@ -127,11 +115,11 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
 // Function Latest_Simplex_Crossover
 //##################################################################### 
 template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
-Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,T_WEIGHTS& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
+Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_time,TV& weights,int& simplex_id,POINT_SIMPLEX_COLLISION_TYPE& returned_collision_type) const
 {   
     if(!saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;
-    T max_time=-FLT_MAX;T current_hit_time;T_WEIGHTS current_weights;
+    T max_time=-FLT_MAX;T current_hit_time;TV current_weights;
     if(object.hierarchy){
         ARRAY<int> triangles_to_check;
         if(start_X==end_X) object.hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);
@@ -155,7 +143,7 @@ template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Any_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt) const
 {
     if(!saved_states(0).x){LOG::cerr<<"No saved_state"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    T hit_time;T_WEIGHTS weights;
+    T hit_time;TV weights;
     if(object.hierarchy){
         ARRAY<int> triangles_to_check;
         if(start_X==end_X) object.hierarchy->Intersection_List(start_X,triangles_to_check,collision_thickness);
@@ -319,9 +307,9 @@ Simplex_Closest_Point_On_Boundary(const TV& location,const T max_distance,const 
 // Function Simplex_World_Space_Point_From_Barycentric_Coordinates
 //##################################################################### 
 template<class TV> TV DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
-Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const T_WEIGHTS& weights) const
+Simplex_World_Space_Point_From_Barycentric_Coordinates(const int simplex_id,const TV& weights) const
 {
-    return T_SIMPLEX::Point_From_Barycentric_Coordinates(weights,particles.X.Subset(object.mesh.elements(simplex_id)));
+    return particles.X.Subset(object.mesh.elements(simplex_id)).Weighted_Sum(weights);
 }
 //#####################################################################
 // Function Number_Of_Simplices
