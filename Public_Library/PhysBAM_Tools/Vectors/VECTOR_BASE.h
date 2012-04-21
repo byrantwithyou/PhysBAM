@@ -129,6 +129,11 @@ public:
     T Sum() const
     {Static_Assert_Not_Small();T result=0;for(int i=0;i<Size();i++) result+=(*this)(i);return result;}
 
+    template<class T_VECTOR2>
+    T Weighted_Sum(const T_VECTOR2& weights) const
+    {STATIC_ASSERT_SAME(typename T_VECTOR2::ELEMENT,typename T_VECTOR::SCALAR);assert(weights.Size()==Size());
+    T result((T()));int m=Size();for(int i=0;i<m;i++) result+=weights(i)*(*this)(i);return result;}
+
     T Average() const
     {Static_Assert_Not_Small();return Size()?Sum()/Size():T();}
 
