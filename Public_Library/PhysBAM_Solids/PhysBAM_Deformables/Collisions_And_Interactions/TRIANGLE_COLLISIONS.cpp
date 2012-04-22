@@ -405,7 +405,6 @@ Point_Face_Collision(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nodes,con
     ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
-    VECTOR<int,d> face_nodes=nodes.Remove_Index(0);
 
     TV normal;VECTOR<T,TV::m+1> weights;T_FACE face(X.Subset(nodes.Remove_Index(0)));
     if(face.Point_Face_Collision(X(nodes[0]),V(nodes[0]),V.Subset(nodes.Remove_Index(0)),dt,collision_thickness,collision_time,normal,weights,exit_early)){
@@ -548,20 +547,6 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
 //#####################################################################
 // Function Edge_Edge_Collision
 //#####################################################################
-namespace{
-template<class T,class TV> inline void Create_Final_Edges(const POINT_2D<T>& edge1_input,const POINT_2D<T>& edge2_input,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_edges,
-    const T dt,POINT_2D<T>& edge1_final,POINT_2D<T>& edge2_final)
-{
-    edge1_final=POINT_2D<T>(edge1_input+dt*V_edges(0));
-    edge2_final=POINT_2D<T>(edge2_input+dt*V_edges(1));
-}
-template<class T,class TV> inline void Create_Final_Edges(const SEGMENT_3D<T>& edge1_input,const SEGMENT_3D<T>& edge2_input,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> V_edges,
-    const T dt,SEGMENT_3D<T>& edge1_final,SEGMENT_3D<T>& edge2_final)
-{
-    edge1_final=SEGMENT_3D<T>(edge1_input.x1+dt*V_edges(0),edge1_input.x2+dt*V_edges(1));
-    edge2_final=SEGMENT_3D<T>(edge2_input.x1+dt*V_edges(2),edge2_input.x2+dt*V_edges(3));
-}
-}
 template<class TV> bool TRIANGLE_COLLISIONS<TV>::
 Edge_Edge_Collision(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,const T dt,T& collision_time,const T attempt_ratio,const bool exit_early)
 {
@@ -615,7 +600,9 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
     TV normal;VECTOR<T,TV::m+1> weights;
 
     // check to see if the final position is too close - see if the edge x3-x4 intersects the cylinder around x1-x2
-    T distance;T_EDGE edge1_final,edge2_final;Create_Final_Edges(edge1,edge2,V_edges,dt,edge1_final,edge2_final);
+    T distance;
+    T_EDGE edge1_final=SEGMENT_3D<T>(edge1.x1+dt*V_edges(0),edge1.x2+dt*V_edges(1));
+    T_EDGE edge2_final=SEGMENT_3D<T>(edge2.x1+dt*V_edges(2),edge2.x2+dt*V_edges(3));
     if(edge1_final.Edge_Edge_Interaction(edge2_final,V_edges,collision_thickness,distance,normal,weights,false,geometry.small_number,exit_early)){
         T relative_speed=-V_edges.Weighted_Sum(weights).Dot(normal);
         collision_time=dt;if(exit_early) return true;
@@ -730,109 +717,6 @@ Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
             full_particles.V(p)=one_over_dt*(new_position-X_self_collision_free(p));
             assert(geometry.modified_full(p));recently_modified_full(p)=true;}}
 }
-//#####################################################################
-// Function Stop_Nodes_Before_Self_Collision
-//#####################################################################
-// stops each node dead in its tracks when it hits something else
-template<class TV> void TRIANGLE_COLLISIONS<TV>::
-Stop_Nodes_Before_Self_Collision(const T dt)
-{
-    PHYSBAM_FATAL_ERROR(); // This should be fixed to use X instead of X_self_collision_free by adding the argument to the Point_collision and Edge_edge_collision
-    int attempts=0,point_face_collisions=0,edge_edge_collisions=0;T collision_time;bool full_stop=false;
-    ARRAY<bool> already_stopped_full(geometry.deformable_body_collection.particles.Size());   
-    ARRAY_VIEW<TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V);
-    ARRAY<bool>& modified_full=geometry.modified_full;
-    
-    modified_full.Resize(geometry.deformable_body_collection.particles.Size(),false,false);modified_full.Fill(false);
-    while(!attempts || point_face_collisions || edge_edge_collisions){
-        LOG::SCOPE scope("Stop Attempt","Stop Attempt");
-        if(++attempts > 3) full_stop=true;point_face_collisions=0;edge_edge_collisions=0;
-        T attempt_ratio=0; // we don't want to alter mass on subdivision case;
-
-        // update swept hierarchies
-        for(int k=0;k<geometry.structure_geometries.m;k++){ // set up swept hierarchies
-            STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(k);
-            if(d==3 && structure.triangulated_surface){
-                BOX_HIERARCHY<TV>& hierarchy=structure.Face_Hierarchy();
-                structure.triangulated_surface_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-                for(int kk=0;kk<structure.triangulated_surface->mesh.elements.m;kk++){
-                    const VECTOR<int,3>& nodes=structure.triangulated_surface->mesh.elements(kk);
-                    structure.triangulated_surface_modified(kk)=attempts==1 || modified_full.Subset(nodes).Contains(true);
-                    if(structure.triangulated_surface_modified(kk))
-                        hierarchy.box_hierarchy(kk)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(X.Subset(nodes)),
-                            RANGE<TV>::Bounding_Box(X(nodes[0])+dt*V(nodes[0]),X(nodes[1])+dt*V(nodes[1]),X(nodes[2])+dt*V(nodes[2])));}
-                hierarchy.Update_Modified_Nonleaf_Boxes(structure.triangulated_surface_modified);}
-            if(structure.segmented_curve){
-                SEGMENT_HIERARCHY<TV>& hierarchy=*structure.segmented_curve->hierarchy;
-                structure.segmented_curve_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-                for(int kk=0;kk<structure.segmented_curve->mesh.elements.m;kk++){
-                    const VECTOR<int,2>& nodes=structure.segmented_curve->mesh.elements(kk);
-                    structure.segmented_curve_modified(kk)=attempts==1 || modified_full.Subset(nodes).Contains(true);
-                    if(structure.segmented_curve_modified(kk))
-                        hierarchy.box_hierarchy(kk)=RANGE<TV>::Combine(RANGE<TV>::Bounding_Box(X.Subset(nodes)),RANGE<TV>::Bounding_Box(X(nodes[0])+dt*V(nodes[0]),X(nodes[1])+dt*V(nodes[1])));}
-                hierarchy.Update_Modified_Nonleaf_Boxes(structure.segmented_curve_modified);}
-            
-            {PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >& hierarchy=structure.particle_hierarchy;
-            structure.point_modified.Resize(hierarchy.box_hierarchy.m,false,false);
-            for(int kk=0;kk<hierarchy.leaves;kk++){
-                int p=structure.collision_particles.active_indices(kk);
-                structure.point_modified(kk)=attempts==1 || modified_full(p);
-                if(structure.point_modified(kk)) hierarchy.box_hierarchy(kk)=RANGE<TV>::Bounding_Box(X(p),X(p)+dt*V(p));}
-            hierarchy.Update_Modified_Nonleaf_Boxes(structure.point_modified);}}
-
-        // compute pairs
-        point_face_pairs_internal.Remove_All();edge_edge_pairs_internal.Remove_All();
-        for(int pair_i=0;pair_i<geometry.interacting_structure_pairs.m;pair_i++){VECTOR<int,2>& pair=geometry.interacting_structure_pairs(pair_i);
-            if(compute_point_face_collisions){
-                for(int i=0;i<2;i++){if(i==1 && pair[0]==pair[1]) break;
-                    STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[i]);
-                    STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1-i]);
-                    Get_Moving_Faces_Near_Moving_Points(structure_1,structure_2,point_face_pairs_internal,point_face_pairs_external,collision_thickness);}}
-            if(compute_edge_edge_collisions){
-                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1=*geometry.structure_geometries(pair[0]);
-                STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1]);
-                Get_Moving_Edges_Near_Moving_Edges(structure_1,structure_2,edge_edge_pairs_internal,edge_edge_pairs_external,collision_thickness);}}
-        LOG::Stat("point triangle collision pairs",point_face_pairs_internal.m);
-        LOG::Stat("edge edge collision pairs",edge_edge_pairs_internal.m);
-
-        for(int pair_index=0;pair_index<point_face_pairs_internal.m;pair_index++){
-            const VECTOR<int,d+1>& nodes=point_face_pairs_internal(pair_index);
-            if(already_stopped_full.Subset(nodes).Number_True()==d+1) continue;
-            // TODO: this should not be X self collision free
-            TV temporary_vector;VECTOR<T,d+1> temporary_weights;T temp_old_speed;
-            GAUSS_JACOBI_DATA temp_data(temporary_vector,temporary_weights,temporary_vector,temp_old_speed);
-            if(Point_Face_Collision(temp_data,nodes,dt,0,collision_time,attempt_ratio,true)){
-                point_face_collisions++;T scale=collision_time/dt;
-                if(full_stop || scale < (T).01){scale=0;
-                    INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> already_stopped_subset=already_stopped_full.Subset(nodes);
-                    already_stopped_subset.Fill(true);}
-                else scale*=(T).95;
-                V.Subset(nodes)*=scale;
-                INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> modified_subset=modified_full.Subset(nodes);
-                modified_subset.Fill(true);}}
-
-        for(int pair_index=0;pair_index<edge_edge_pairs_internal.m;pair_index++){
-            const VECTOR<int,d+1>& nodes=edge_edge_pairs_internal(pair_index);
-            if(already_stopped_full.Subset(nodes).Number_True()==d+1) continue;
-            TV temporary_vector;VECTOR<T,d+1> temporary_weights;T temp_old_speed;
-            GAUSS_JACOBI_DATA temp_data(temporary_vector,temporary_weights,temporary_vector,temp_old_speed);
-            if(Edge_Edge_Collision(temp_data,nodes,dt,collision_time,attempt_ratio,true)){
-                edge_edge_collisions++;T scale=collision_time/dt;
-                if(full_stop || scale < (T).1){scale=0;
-                    INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> already_stopped_subset=already_stopped_full.Subset(nodes);
-                    already_stopped_subset.Fill(true);}
-                else scale*=(T).9;
-                V.Subset(nodes)*=scale;
-                INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,d+1>&> modified_subset=modified_full.Subset(nodes);
-                modified_subset.Fill(true);}}
-        LOG::Stat("point triangle collisions",point_face_collisions);
-        LOG::Stat("edge edge collisions",edge_edge_collisions);}
-    if(point_face_collisions || edge_edge_collisions) LOG::Stat("attempts at stopping nodes",attempts);
-
-    geometry.deformable_body_collection.particles.Euler_Step_Position(dt);
-}
-template<> void TRIANGLE_COLLISIONS<VECTOR<float,1> >::Stop_Nodes_Before_Self_Collision(const T){PHYSBAM_NOT_IMPLEMENTED();}
-template<> void TRIANGLE_COLLISIONS<VECTOR<double,1> >::Stop_Nodes_Before_Self_Collision(const T){PHYSBAM_NOT_IMPLEMENTED();}
 //####################################################################
 template class TRIANGLE_COLLISIONS<VECTOR<float,1> >;
 template class TRIANGLE_COLLISIONS<VECTOR<float,2> >;

@@ -111,8 +111,6 @@ private:
     bool Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,const T dt,T& collision_time,const T attempt_ratio,const bool exit_early);
     template<int d2> void Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const VECTOR<int,d2>& nodes);
     void Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists);
-public: // subdivision stuff
-    void Stop_Nodes_Before_Self_Collision(const T dt);
 //#####################################################################
 };
 }
