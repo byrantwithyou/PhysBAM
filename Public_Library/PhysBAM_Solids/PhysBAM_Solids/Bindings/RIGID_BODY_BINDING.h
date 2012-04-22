@@ -88,6 +88,9 @@ public:
     void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
     {Rigid_Body().Apply_Impulse_To_Body(Embedded_Position(),impulse);}
 
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const PHYSBAM_OVERRIDE
+    {PHYSBAM_ASSERT(Rigid_Body().Has_Infinite_Inertia());}
+
     void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
     {Rigid_Body().Apply_Push_To_Body(Embedded_Position(),impulse);}
 

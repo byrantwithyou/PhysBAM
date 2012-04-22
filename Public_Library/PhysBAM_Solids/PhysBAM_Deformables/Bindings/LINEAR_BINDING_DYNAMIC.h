@@ -71,7 +71,10 @@ public:
     {return SYMMETRIC_MATRIX<T,TV::m>()+LINEAR_BINDING_DYNAMIC::One_Over_Effective_Mass();}
 
     void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
-    {for(int i=0;i<parents.m;i++) particles.V(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}
+    {LINEAR_BINDING_DYNAMIC::Apply_Impulse(impulse,particles.V);}
+
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const PHYSBAM_OVERRIDE
+    {for(int i=0;i<parents.m;i++) V(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}
 
     void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
     {for(int i=0;i<parents.m;i++) particles.X(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}

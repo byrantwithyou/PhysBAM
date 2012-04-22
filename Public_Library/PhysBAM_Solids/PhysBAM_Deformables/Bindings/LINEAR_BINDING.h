@@ -80,7 +80,10 @@ public:
     return result;}
 
     void Apply_Impulse(const TV& impulse) PHYSBAM_OVERRIDE
-    {for(int i=0;i<d;i++) particles.V(parents[i])+=particles.one_over_mass(parents[i])*weights[i]*impulse;}
+    {LINEAR_BINDING::Apply_Impulse(impulse,particles.V);}
+
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const PHYSBAM_OVERRIDE
+    {for(int i=0;i<d;i++) V(parents[i])+=particles.one_over_mass(parents[i])*weights[i]*impulse;}
 
     void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
     {for(int i=0;i<d;i++) particles.X(parents[i])+=particles.one_over_mass(parents[i])*weights[i]*impulse;}
