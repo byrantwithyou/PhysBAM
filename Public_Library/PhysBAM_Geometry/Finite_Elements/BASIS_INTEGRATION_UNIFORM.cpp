@@ -21,7 +21,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV,int static_degree> BASIS_INTEGRATION_UNIFORM<TV,static_degree>::
 BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_input,CELL_DOMAIN_INTERFACE<TV>& cdi_input)
-    :grid(grid_input),phi_grid(phi_grid_input),phi(phi_input),cdi(cdi_input),coarse_factor(grid.counts.x/phi_grid.counts.x),
+    :grid(grid_input),phi_grid(phi_grid_input),cdi(cdi_input),phi(phi_input),coarse_factor(grid.counts.x/phi_grid.counts.x),
     double_coarse_range(TV_INT(),TV_INT()+2*coarse_factor),coarse_range(TV_INT(),TV_INT()+coarse_factor)
 {
 }
@@ -288,7 +288,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             monomial=monomial.Integrate(dir);
             T integral=0;
             for(int i=0;i<projected_elements.m;i++){
-                const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x.x1);
+                const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x.X.x);
                 integral+=monomial.Integrate_Over_Primitive(V)*T_FACE::Normal(V)(dir);}
             precomputed_integrals(it.index)+=integral;}
 
@@ -311,7 +311,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface_elements.m;i++){
-                VECTOR<TV,TV::m> V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.x1);
+                VECTOR<TV,TV::m> V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.X.x);
                 for(int j=0;j<TV::m;j++) V(j)=(V(j)*coarse_factor-TV(subcell_cell)-(T).5)*grid.dX;
                 int e=interface_elements(i).y;
                 has_element[e]=true;
