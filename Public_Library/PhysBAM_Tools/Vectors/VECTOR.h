@@ -71,6 +71,27 @@ public:
         STATIC_ASSERT(d==8);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;array[4]=x5;array[5]=x6;array[6]=x7;array[7]=x8;
     }
 
+    template<class T_ARRAY>
+    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
+    {
+        assert(m==v.Size());
+        for(int i=0;i<d;i++) array[i]=v(i);
+    }
+ 
+    template<class T_VECTOR>
+    explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
+    {
+        Assert_Same_Size(*this,v);
+        for(int i=0;i<d;i++) array[i]=v(i);
+    }
+
+    template<class T_VECTOR>
+    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+    {
+        Assert_Same_Size(*this,v);
+        for(int i=0;i<d;i++) array[i]=v(i);
+    }
+
     template<class T2,int d2>
     explicit VECTOR(const VECTOR<T2,d2>& v)
     {
@@ -79,52 +100,39 @@ public:
         for(int i=d2;i<d;i++) array[i]=T();
     }
 
-    template<class T_VECTOR,class T_INDICES>
-    explicit VECTOR(const INDIRECT_ARRAY<T_VECTOR,T_INDICES>& v)
-    {
-        STATIC_ASSERT((IS_SAME<T,typename INDIRECT_ARRAY<T_VECTOR,T_INDICES>::ELEMENT>::value && INDIRECT_ARRAY<T_VECTOR,T_INDICES>::m==d));
-        for(int i=0;i<d;i++) array[i]=v(i);
-    }
-
     VECTOR(const VECTOR& v)
         :BASE()
     {
         for(int i=0;i<d;i++) array[i]=v.array[i];
     }
 
-    template<class T_VECTOR>
-    explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
-    {
-        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i);
-    }
-
-    template<class T_VECTOR> // TODO: This constructor should go away.
-    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v,typename ENABLE_IF<IS_SAME<typename VECTOR_TYPE<T_VECTOR>::TYPE,VECTOR>::value,UNUSABLE>::TYPE unusable=UNUSABLE())
-    {
-        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i);
-    }
-
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,d-n>& v2)
     {
-        for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<d;i++) (*this)(i)=v2(i-n);
-    }
-
-    template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,d>::value>::value,VECTOR&>::TYPE
-    operator=(const T_VECTOR& v)
-    {
-        for(int i=0;i<d;i++) array[i]=v(i);return *this;
+        for(int i=0;i<n;i++) (*this)(i)=v1(i);
+        for(int i=n;i<d;i++) (*this)(i)=v2(i-n);
     }
 
     VECTOR& operator=(const VECTOR& v)
     {
-        for(int i=0;i<d;i++) array[i]=v.array[i];return *this;
+        for(int i=0;i<d;i++) array[i]=v(i);
+        return *this;
     }
 
     template<class T_VECTOR>
     VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
     {
-        assert(d==v.Size());for(int i=0;i<d;i++) array[i]=v(i);return *this;
+        Assert_Same_Size(*this,v);
+        for(int i=0;i<d;i++) array[i]=v(i);
+        return *this;
+    }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
+    {
+        assert(m==v.Size());
+        for(int i=0;i<d;i++) array[i]=v(i);
+        return *this;
     }
 
     int Size() const

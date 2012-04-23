@@ -74,44 +74,41 @@ public:
         :x((T)vector_input.x),y(T())
     {}
 
-    template<class T_VECTOR>
-    explicit VECTOR(const T_VECTOR& v)
-        :x(v(0)),y(v(1))
-    {
-        STATIC_ASSERT((IS_SAME<T,typename T_VECTOR::ELEMENT>::value && T_VECTOR::m==2));
-    }
-
-    explicit VECTOR(const ARRAY<T>& v)
-        :x(v(0)),y(v(1))
-    {
-        assert(2==v.Size());
-    }
-
     template<class T_ARRAY>
     explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
+        :x(v(0)),y(v(1))
     {
-        const T_ARRAY& v_=v.Derived();
-        assert(2==v_.Size());
-        x=v_(0);y=v_(1); // doing this here instead of as initializers dodges a bug in 4.1.1
+        assert(m==v.Size());
     }
-
+ 
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
         :x(v(0)),y(v(1))
     {
-        assert(2==v.Size());
+        Assert_Same_Size(*this,v);
     }
 
-    VECTOR(const VECTOR_ND<T>& vector_input)
-        :x(vector_input(0)),y(vector_input(1))
+    template<class T_VECTOR>
+    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+        :x(v(0)),y(v(1))
     {
-        assert(vector_input.n==2);
+        Assert_Same_Size(*this,v);
     }
 
-    template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,2>::value>::value,VECTOR&>::TYPE
-    operator=(const T_VECTOR& v)
+    template<class T_VECTOR>
+    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
     {
-        x=v(0);y=v(1);return *this;
+        Assert_Same_Size(*this,v);
+        x=v(0);y=v(1);
+        return *this;
+    }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
+    {
+        assert(m==v.Size());
+        x=v(0);y=v(1);
+        return *this;
     }
 
     VECTOR& operator=(const VECTOR& v)

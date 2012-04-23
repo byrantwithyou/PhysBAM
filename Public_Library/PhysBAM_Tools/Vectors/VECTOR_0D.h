@@ -44,8 +44,46 @@ public:
     template<class T2> explicit VECTOR(const VECTOR<T2,0>& vector_input)
     {}
 
+    template<class T_ARRAY>
+    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
+    {
+        assert(m==v.Size());
+    }
+ 
+    template<class T_VECTOR>
+    explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
+    {
+        Assert_Same_Size(*this,v);
+    }
+
+    template<class T_VECTOR>
+    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+    {
+        Assert_Same_Size(*this,v);
+    }
+
+    VECTOR(const VECTOR& v1,const VECTOR& v2)
+    {
+    }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
+    {
+        Assert_Same_Size(*this,v);
+        return *this;
+    }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
+    {
+        assert(m==v.Size());
+        return *this;
+    }
+
     VECTOR& operator=(const VECTOR& v)
-    {return *this;}
+    {
+        return *this;
+    }
 
     const T& operator[](const int) const
     {PHYSBAM_FATAL_ERROR();}

@@ -66,51 +66,57 @@ public:
         :x((T)vector_input.x),y((T)vector_input.y),z((T)vector_input.z)
     {}
 
-    explicit VECTOR(const VECTOR<T,2>& vector_input)
-        :x(vector_input.x),y(vector_input.y),z(0)
-    {}
-
-    template<class T_VECTOR,class T_INDICES>
-    explicit VECTOR(const INDIRECT_ARRAY<T_VECTOR,T_INDICES>& v)
+    template<class T_ARRAY>
+    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
         :x(v(0)),y(v(1)),z(v(2))
     {
-        STATIC_ASSERT((IS_SAME<T,typename INDIRECT_ARRAY<T_VECTOR,T_INDICES>::ELEMENT>::value && INDIRECT_ARRAY<T_VECTOR,T_INDICES>::m==3));
+        assert(m==v.Size());
     }
-
-    explicit VECTOR(const ARRAY<T>& v)
-        :x(v(0)),y(v(1)),z(v(2))
-    {
-        assert(2==v.Size());
-    }
-
+ 
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
         :x(v(0)),y(v(1)),z(v(2))
     {
-        assert(2==v.Size());
+        Assert_Same_Size(*this,v);
     }
 
-    VECTOR(const VECTOR_ND<T>& vector_input)
-        :x(vector_input(0)),y(vector_input(1)),z(vector_input(2))
+    template<class T_VECTOR>
+    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+        :x(v(0)),y(v(1)),z(v(2))
     {
-        assert(vector_input.n==3);
+        Assert_Same_Size(*this,v);
     }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
+    {
+        Assert_Same_Size(*this,v);
+        x=v(0);y=v(1);z=v(2);
+        return *this;
+    }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
+    {
+        assert(m==v.Size());
+        x=v(0);y=v(1);z=v(2);
+        return *this;
+    }
+
+    VECTOR& operator=(const VECTOR& v)
+    {
+        x=v(0);y=v(1);z=v(2);
+        return *this;
+    }
+
+    explicit VECTOR(const VECTOR<T,2>& vector_input)
+        :x(vector_input.x),y(vector_input.y),z(0)
+    {}
 
     template<int n>
     VECTOR(const VECTOR<T,n>& v1,const VECTOR<T,3-n>& v2)
     {
         for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n;i<3;i++) (*this)(i)=v2(i-n);
-    }
-
-    template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,3>::value>::value,VECTOR&>::TYPE
-    operator=(const T_VECTOR& v)
-    {
-        x=v(0);y=v(1);z=v(2);return *this;
-    }
-
-    VECTOR& operator=(const VECTOR& v)
-    {
-        x=v(0);y=v(1);z=v(2);return *this;
     }
 
     int Size() const

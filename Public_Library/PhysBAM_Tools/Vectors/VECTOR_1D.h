@@ -71,17 +71,26 @@ public:
         :x(vector_input.x)
     {}
 
+
+    template<class T_ARRAY>
+    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
+        :x(v(0))
+    {
+        assert(m==v.Size());
+    }
+ 
     template<class T_VECTOR>
     explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
         :x(v(0))
     {
-        assert(1==v.Size());
+        Assert_Same_Size(*this,v);
     }
 
-    VECTOR(const VECTOR_ND<T>& vector_input)
-        :x(vector_input(0))
+    template<class T_VECTOR>
+    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+        :x(v(0))
     {
-        assert(vector_input.n==1);
+        Assert_Same_Size(*this,v);
     }
 
     template<int n>
@@ -90,15 +99,26 @@ public:
         for(int i=0;i<n;i++) (*this)(i)=v1(i);for(int i=n+1;i<2;i++) (*this)(i)=v2(i-n);
     }
 
-    template<class T_VECTOR> typename ENABLE_IF<AND<IS_SAME<T,typename T_VECTOR::ELEMENT>::value,INTS_EQUAL<T_VECTOR::m,1>::value>::value,VECTOR&>::TYPE
-    operator=(const T_VECTOR& v)
+    template<class T_VECTOR>
+    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
     {
-        x=v(0);return *this;
+        Assert_Same_Size(*this,v);
+        x=v(0);
+        return *this;
+    }
+
+    template<class T_VECTOR>
+    VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
+    {
+        assert(m==v.Size());
+        x=v(0);
+        return *this;
     }
 
     VECTOR& operator=(const VECTOR& v)
     {
-        x=v(0);return *this;
+        x=v(0);
+        return *this;
     }
 
     int Size() const
