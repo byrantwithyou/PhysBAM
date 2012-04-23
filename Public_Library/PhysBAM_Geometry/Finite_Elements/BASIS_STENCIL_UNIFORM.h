@@ -25,7 +25,6 @@ struct BASIS_STENCIL_UNIFORM
     };
 
     ARRAY<ENTRY> stencils;
-    RANGE<TV_INT> support;
 
     struct DICED
     {
@@ -55,9 +54,9 @@ struct BASIS_STENCIL_UNIFORM
     void Set_Constant_Stencil();
     void Set_Multilinear_Stencil();
     void Differentiate(int v);
-    void Update_Support();
-
     void Print() const;
+    
+    int Padding();
 };
 }
 #endif
