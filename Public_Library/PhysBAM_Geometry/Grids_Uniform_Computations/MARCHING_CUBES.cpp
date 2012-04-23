@@ -263,7 +263,6 @@ Get_Number_Of_Surface_Elements(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi)
     int count=0;
     VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
     VECTOR<T,num_corners> phis;
-    TV pts[num_pts];
     const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
     for(RANGE_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
         int c=0;
