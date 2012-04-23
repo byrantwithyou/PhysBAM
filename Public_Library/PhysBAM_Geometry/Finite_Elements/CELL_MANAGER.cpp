@@ -11,8 +11,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> CELL_DOMAIN_INTERFACE<TV>::
 CELL_DOMAIN_INTERFACE(const GRID<TV>& grid_input,int padding_input,int coarse_factor_input,int interface_elements_input,int periodic_bc_input):
-    grid(grid_input),padding(padding_input),size(grid.counts+2*padding),flat_size(size.Product()),coarse_factor(coarse_factor_input),
-    coarse_range(TV_INT()+coarse_factor),interface_elements(interface_elements_input),periodic_bc(periodic_bc_input)
+    grid(grid_input),size(grid.counts+2*padding),coarse_range(TV_INT()+coarse_factor),padding(padding_input),flat_size(size.Product()),
+    coarse_factor(coarse_factor_input),interface_elements(interface_elements_input),periodic_bc(periodic_bc_input)
 {
     a(TV::m-1)=1;
     for(int i=TV::m-2;i>=0;i--) a(i)=a(i+1)*size(i+1);
