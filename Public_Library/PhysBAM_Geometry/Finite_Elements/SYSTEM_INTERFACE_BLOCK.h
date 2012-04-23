@@ -42,7 +42,10 @@ public:
     MATRIX_MXN<T> data[2]; // inside and outside
 
     inline void Add_Entry(int interface_element,int flat_diff_index,int inside,T value)
-    {data[inside](interface_element,flat_diff_index)+=value*scale;}
+    {
+        data[inside](interface_element,flat_diff_index)+=value*scale;
+        cm->active_cells[inside](cdi->Get_Flat_Base(interface_element)+flat_diff(flat_diff_index))=true;
+    }
 
     template<int d>
     void Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER<TV>& cm_input,CELL_DOMAIN_INTERFACE<TV>& cdi,

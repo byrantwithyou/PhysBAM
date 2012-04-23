@@ -60,9 +60,10 @@ class CELL_MANAGER
 public:
 
     const CELL_DOMAIN_INTERFACE<TV>& cdi;
+    ARRAY<bool> active_cells[2];  // inside and outside
 
-    CELL_MANAGER(const CELL_DOMAIN_INTERFACE<TV>& cdi_input):
-        cdi(cdi_input){}
+    CELL_MANAGER(const CELL_DOMAIN_INTERFACE<TV>& cdi_input):cdi(cdi_input)
+    {for(int s=0;s<2;s++) active_cells[s].Resize(cdi.flat_size);}
 };
 }
 #endif
