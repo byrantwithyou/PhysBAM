@@ -4,6 +4,7 @@
 //#####################################################################
 // Classes SYSTEM_INTERFACE_BLOCK
 //#####################################################################
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK.h>
 using namespace PhysBAM;
 //#####################################################################

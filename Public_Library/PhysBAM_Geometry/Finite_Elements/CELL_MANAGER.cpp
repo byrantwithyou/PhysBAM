@@ -4,7 +4,6 @@
 //#####################################################################
 // Classes CELL_MANAGER
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -67,16 +66,19 @@ CELL_MANAGER(const CELL_DOMAIN_INTERFACE<TV>& cdi_input):cdi(cdi_input)
 template<class TV> void CELL_MANAGER<TV>::
 Compress_Indices()
 {
-    for(int s=0;s<2;s++){
-        HASHTABLE<int,int> ht;
-        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid,cdi.padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+    if(cdi.periodic_bc)
+        for(int s=0;s<2;s++){
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid);it.Valid();it.Next()){
                 int i=cdi.Flatten(it.index);
-                if(compressed[s](i)==-2){
-                    int r=cdi.Remap(i);
-                    if(!ht.Get(r,compressed[s](i))){
-                        ht.Insert(r,dofs[s]);
-                        compressed[s](i)=dofs[s];
-                        dofs[s]++;}}}}
+                if(compressed[s](i)==-2) compressed[s](i)=dofs[s]++;}
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid,cdi.padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
+                int i=cdi.Flatten(it.index);
+                if(compressed[s](i)==-2) compressed[s](i)=compressed[s](cdi.Remap(i));}}
+    else
+        for(int s=0;s<2;s++)
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi.grid,cdi.padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next()){
+                int i=cdi.Flatten(it.index);
+                if(compressed[s](i)==-2) compressed[s](i)=dofs[s]++;}
 }
 template class CELL_MANAGER<VECTOR<float,2> >;
 template class CELL_MANAGER<VECTOR<float,3> >;

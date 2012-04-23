@@ -4,6 +4,7 @@
 //#####################################################################
 // Classes SYSTEM_VOLUME_BLOCK
 //#####################################################################
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK.h>
 using namespace PhysBAM;
 //#####################################################################
