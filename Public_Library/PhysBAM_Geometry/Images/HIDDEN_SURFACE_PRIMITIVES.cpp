@@ -1,3 +1,4 @@
+#ifdef USE_BOOST_GEOMETRY
 //#####################################################################
 // Copyright 2012, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
@@ -182,20 +183,4 @@ Add(const TRIANGLE_3D<T> &t,int pa)
 }
 template class HIDDEN_SURFACE_PRIMITIVES<float>;
 template class HIDDEN_SURFACE_PRIMITIVES<double>;
-
-/*
-template<typename Multi, typename Point>
-struct point_on_border<multi_polygon_tag, Multi, Point>
-    : detail::point_on_border::point_on_multi
-        <
-            Multi,
-            Point,
-            detail::point_on_border::point_on_polygon
-                <
-                    typename boost::range_value<Multi>::type,
-                    Point
-                >
-        >
-{};
-
-*/
+#endif

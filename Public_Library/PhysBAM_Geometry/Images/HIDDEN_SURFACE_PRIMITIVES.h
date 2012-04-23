@@ -7,6 +7,7 @@
 #ifndef __HIDDEN_SURFACE_PRIMITIVES__
 #define __HIDDEN_SURFACE_PRIMITIVES__
 
+#ifdef USE_BOOST_GEOMETRY
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
@@ -107,4 +108,5 @@ public:
     void Add_Edge(HASHTABLE<VECTOR<int,2> >& edges,int a,int b,TV2 pt);
 };
 }
+#endif
 #endif

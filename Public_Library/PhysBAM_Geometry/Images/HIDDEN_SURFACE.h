@@ -7,6 +7,7 @@
 #ifndef __HIDDEN_SURFACE__
 #define __HIDDEN_SURFACE__
 
+#ifdef USE_BOOST_GEOMETRY
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Geometry/Images/HIDDEN_SURFACE_PRIMITIVES.h>
 
@@ -29,4 +30,5 @@ public:
 };
 
 }
+#endif
 #endif

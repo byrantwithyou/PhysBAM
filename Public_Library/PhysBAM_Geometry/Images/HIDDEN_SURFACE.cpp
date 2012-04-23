@@ -1,3 +1,4 @@
+#ifdef USE_BOOST_GEOMETRY
 //#####################################################################
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
@@ -126,4 +127,5 @@ Break_Component(DIRECTED_GRAPH<>& graph,ARRAY<int>& node_map)
 template class HIDDEN_SURFACE<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class HIDDEN_SURFACE<double>;
+#endif
 #endif

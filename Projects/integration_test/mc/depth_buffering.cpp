@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
     std::string file=parse_args.Get_String_Value("-o");
     std::string infile=parse_args.Get_String_Value("-i");
 
+#ifdef USE_BOOST_GEOMETRY
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
     HIDDEN_SURFACE<T> hs(hsp);
 
@@ -97,6 +98,9 @@ int main(int argc, char* argv[])
             vi->Draw_Object(pts,holes);}}
 
     delete vi;    
+#else
+    PHYSBAM_FATAL_ERROR();
+#endif
 
     return 0;
 }
