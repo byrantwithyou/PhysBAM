@@ -376,13 +376,13 @@ void Balloon()
     for(int i=0;i<triangulated_surface.mesh.elements.m;i++){
         const TRIANGLE_3D<T>& triangle=triangulated_surface.Get_Element(i);
         int node1,node2,node3;triangulated_surface.mesh.elements(i).Get(node1,node2,node3);
-        if(analytic_cut_sphere.Lazy_Inside(triangle.x1) || analytic_cut_sphere.Lazy_Inside(triangle.x2) || analytic_cut_sphere.Lazy_Inside(triangle.x3)){
-            if(analytic_cut_sphere.Lazy_Inside(triangle.x1) && analytic_cut_sphere.Lazy_Inside(triangle.x2) && analytic_cut_sphere.Lazy_Inside(triangle.x3))
+        if(analytic_cut_sphere.Lazy_Inside(triangle.X.x) || analytic_cut_sphere.Lazy_Inside(triangle.X.y) || analytic_cut_sphere.Lazy_Inside(triangle.X.z)){
+            if(analytic_cut_sphere.Lazy_Inside(triangle.X.x) && analytic_cut_sphere.Lazy_Inside(triangle.X.y) && analytic_cut_sphere.Lazy_Inside(triangle.X.z))
                 deletion_list.Append(i);
             else {
-                if(analytic_cut_sphere.Lazy_Inside(triangle.x1)) is_constrained(node1)=true;
-                if(analytic_cut_sphere.Lazy_Inside(triangle.x2)) is_constrained(node2)=true;
-                if(analytic_cut_sphere.Lazy_Inside(triangle.x3)) is_constrained(node3)=true;}}}
+                if(analytic_cut_sphere.Lazy_Inside(triangle.X.x)) is_constrained(node1)=true;
+                if(analytic_cut_sphere.Lazy_Inside(triangle.X.y)) is_constrained(node2)=true;
+                if(analytic_cut_sphere.Lazy_Inside(triangle.X.z)) is_constrained(node3)=true;}}}
 
     triangulated_surface.mesh.Delete_Elements(deletion_list);
     ARRAY<int> condensation_mapping;

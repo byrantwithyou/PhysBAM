@@ -305,7 +305,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     // solver->restart_iterations=10000;
     // solver->nullspace_tolerance=0;
     // solver->print_residuals=true;
-    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
+    //solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
     if(ifs.Nullspace_Check(rhs)){
         OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
         ifs.Multiply(rhs,*vectors(0));

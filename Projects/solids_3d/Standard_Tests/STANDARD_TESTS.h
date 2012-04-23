@@ -800,7 +800,7 @@ void Get_Initial_Data()
                 segmented_curve.mesh.elements.Append(VECTOR<int,2>(constrained_particle,suspended_particle));
                 suspended_particle=particles.Add_Element();
                 binding_list.Add_Binding(new LINEAR_BINDING<TV,4>(particles,suspended_particle,tetrahedralized_volume.mesh.elements(0),
-                    (T).25*VECTOR<T,4>::All_Ones_Vector()));
+                        VECTOR<T,4>((T).25*VECTOR<T,4>::All_Ones_Vector())));
                 particles.X(suspended_particle)=binding_list.bindings.Last()->Embedded_Position();}
             break;}
         case 19:{

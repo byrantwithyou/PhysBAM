@@ -798,12 +798,12 @@ void Balloon()
     for(int i=0;i<segmented_curve.mesh.elements.m;i++){
         const SEGMENT_2D<T>& segment=segmented_curve.Get_Element(i);
         int node1,node2;segmented_curve.mesh.elements(i).Get(node1,node2);
-        if(analytic_cut_sphere.Lazy_Inside(segment.x1) || analytic_cut_sphere.Lazy_Inside(segment.x2)){
-            if(analytic_cut_sphere.Lazy_Inside(segment.x1) && analytic_cut_sphere.Lazy_Inside(segment.x2))
+        if(analytic_cut_sphere.Lazy_Inside(segment.X.x) || analytic_cut_sphere.Lazy_Inside(segment.X.y)){
+            if(analytic_cut_sphere.Lazy_Inside(segment.X.x) && analytic_cut_sphere.Lazy_Inside(segment.X.y))
                 deletion_list.Append(i);
             else{
-                if(analytic_cut_sphere.Lazy_Inside(segment.x1)) is_constrained(node1)=true;
-                if(analytic_cut_sphere.Lazy_Inside(segment.x2)) is_constrained(node2)=true;}}}
+                if(analytic_cut_sphere.Lazy_Inside(segment.X.x)) is_constrained(node1)=true;
+                if(analytic_cut_sphere.Lazy_Inside(segment.X.y)) is_constrained(node2)=true;}}}
 
     segmented_curve.mesh.Delete_Elements(deletion_list);
     ARRAY<int> condensation_mapping;
