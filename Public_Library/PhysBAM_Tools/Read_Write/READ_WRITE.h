@@ -69,21 +69,5 @@ Write_Primitive(std::ostream& output,const T& d)
     if(big_endian){T d2=d;Swap_Endianity(d2);output.write((const char*)&d2,sizeof(T));} // convert to big endian if necessary
     else output.write((const char*)&d,sizeof(T));
 }
-//#####################################################################
-// PhysBAM data formats assume sizeof(bool)==1 but the Mac apparently has bool==int with sizeof(bool)==4, so need to specialize these
-//#####################################################################
-#ifdef __APPLE__
-
-template<class RW> struct IS_BINARY_IO_SAFE<bool,RW> {static const bool value=false;};
-
-template<>
-inline void Read_Primitive<bool>(std::istream& input,bool& d)
-{char c;input.read(&c,1);d=(bool)c;}
-
-template<>
-inline void Write_Primitive<bool>(std::ostream& output,const bool& d)
-{char c=(char)d;output.write(&c,1);}
-
-#endif
 }
 #endif
