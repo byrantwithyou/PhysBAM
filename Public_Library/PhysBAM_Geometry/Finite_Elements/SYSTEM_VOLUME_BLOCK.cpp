@@ -4,7 +4,6 @@
 //#####################################################################
 // Classes SYSTEM_VOLUME_BLOCK
 //#####################################################################
-#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -18,8 +17,8 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV
     cm0=&cm0_input;
     cm1=&cm1_input;
     cdi=&cdi_input;
-    RANGE<TV_INT> overlap_range(TV_INT(),TV_INT()+1);
-    HASHTABLE<int,int> ht;
+
+    ARRAY<int> flat_diffs;
     for(int i=0;i<s0.diced.m;i++)
         for(int j=0;j<s1.diced.m;j++){
             int overlap=s0.diced(i).subcell&s1.diced(j).subcell;
@@ -28,12 +27,16 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV
                 const typename BASIS_STENCIL_UNIFORM<TV,d1>::DICED& diced1=s1.diced(j);
                 OVERLAP_POLYNOMIAL op={diced0.index_offset,diced1.index_offset,overlap};
                 op.polynomial=diced0.polynomial*diced1.polynomial;
-                int fd=cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset);
-                if(!ht.Get(fd,op.flat_diff_index)){
-                    ht.Insert(fd,flat_diff.m);
-                    op.flat_diff_index=flat_diff.m;
-                    flat_diff.Append(fd);}
+                flat_diffs.Append(cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset));
                 overlap_polynomials.Append(op);}}
+
+    Sort(flat_diffs);
+    flat_diffs.Prune_Duplicates();
+
+    for(int i=0;i<overlap_polynomials.m;i++){
+        OVERLAP_POLYNOMIAL& op=overlap_polynomials(i);
+        op.flat_diff_index=flat_diffs.Binary_Search(cdi->Flatten_Diff(op.index_offset1-op.index_offset0));}
+
     for(int s=0;s<2;s++) data[s].Resize(cdi->flat_size,flat_diff.m);
 }
 //#####################################################################
