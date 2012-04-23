@@ -62,17 +62,13 @@ public:
         CELL_MANAGER<TV>& cm0_input,CELL_MANAGER<TV>& cm1_input,CELL_DOMAIN_INTERFACE<TV> &cdi,const VECTOR<T,2>& scale_input);
 
     inline void Add_Entry(const TV_INT& index,int flat_diff_index,int inside,T value)
-    {
-        int flat_index=cdi->Flatten(index);
-        data[inside](flat_index,flat_diff_index)+=value*scale(inside);
-        cm0->Set_Active(flat_index,inside);
-        cm1->Set_Active(flat_index+flat_diff(flat_diff_index),inside);
-    }
+    {data[inside](cdi->Flatten(index),flat_diff_index)+=value*scale(inside);}
     inline void Add_Open_Entry(const TV_INT& cell,int inside,OPEN_ENTRY& oe)
     {Add_Entry(oe.index0+cell,oe.flat_diff_index,inside,oe.x);}
 
     void Add_Open_Entries(const TV_INT& cell,int inside);
     void Add_Open_Subcell_Entries(const TV_INT& cell,int block,int inside);
+    void Mark_Active_Cells(T tol=0);
 };
 }
 #endif

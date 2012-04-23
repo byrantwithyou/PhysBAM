@@ -99,6 +99,9 @@ Compute()
             cut_interface(it2.index).Remove_All();
         for(RANGE_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
             cut_sides(it2.index).Remove_All();}
+
+    for(int i=0;i<volume_blocks.m;i++) volume_blocks(i)->Mark_Active_Cells();
+    for(int i=0;i<interface_blocks.m;i++) interface_blocks(i)->Mark_Active_Cells();
 }
 //#####################################################################
 // Function Compute_Open_Entries

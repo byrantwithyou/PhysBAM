@@ -31,7 +31,7 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV
                 flat_diffs.Append(cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset));
                 overlap_polynomials.Append(op);}}
 
-    Sort(flat_diffs);
+    flat_diffs.Sort();
     flat_diffs.Prune_Duplicates();
 
     for(int i=0;i<overlap_polynomials.m;i++){
@@ -55,6 +55,27 @@ template<class TV,int static_degree> void SYSTEM_VOLUME_BLOCK<TV,static_degree>:
 Add_Open_Subcell_Entries(const TV_INT& cell,int block,int inside)
 {
     for(int j=0;j<open_entries.m;j++) Add_Open_Entry(cell,block,open_subcell_entries[block](j));
+}
+//#####################################################################
+// Function Mark_Active_Cells
+//#####################################################################
+template<class TV,int static_degree> void SYSTEM_VOLUME_BLOCK<TV,static_degree>::
+Mark_Active_Cells(T tol)
+{
+    if(cdi->periodic_bc) // add ghost rows to material ones 
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi->grid,cdi->padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){
+            int i=cdi->Flatten(it.index);
+            int r=cdi->Remap(i);
+            for(int s=0;s<2;s++)
+                for(int k=0;k<data[s].n;k++){
+                    data[s](r,k)+=data[s](i,k);
+                    data[s](i,k)=0;}}
+    for(int s=0;s<2;s++)
+        for(int l=0;l<data[s].m;l++)
+            for(int k=0;k<data[s].n;k++)
+                if(abs(data[s](l,k))>tol){
+                    cm0->Set_Active(l,s);
+                    cm1->Set_Active(l+flat_diff(k),s);}
 }
 template class SYSTEM_VOLUME_BLOCK<VECTOR<float,2>,2>;
 template class SYSTEM_VOLUME_BLOCK<VECTOR<float,3>,2>;

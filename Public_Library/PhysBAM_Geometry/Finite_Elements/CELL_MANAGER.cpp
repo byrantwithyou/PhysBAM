@@ -18,7 +18,7 @@ CELL_DOMAIN_INTERFACE(const GRID<TV>& grid_input,int padding_input,int coarse_fa
     for(int i=TV::m-2;i>=0;i--) a(i)=a(i+1)*size(i+1);
     b=(TV_INT()+padding).Dot(a);
     flat_base.Resize(interface_elements_input);
-    Initialize_Remap();
+    Initialize();
 }
 //#####################################################################
 // Function Set_Flat_Base
@@ -29,10 +29,10 @@ Set_Flat_Base(int start,int end,const TV_INT& index)
     int flat=Flatten(index);for(int i=start;i<end;i++) flat_base(i)=flat;
 }
 //#####################################################################
-// Function Initialize_Remap
+// Function Initialize
 //#####################################################################
 template<class TV> void CELL_DOMAIN_INTERFACE<TV>::
-Initialize_Remap()
+Initialize()
 {
     remap.Resize(flat_size);
     if(periodic_bc){
@@ -47,6 +47,9 @@ Initialize_Remap()
                 for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
                     int r=Flatten(it.index+sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
                     if(r>=0) remap(Flatten(it.index))=remap(r);}}
+        inside.Resize(flat_size);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())
+            inside(Flatten(it.index))=true;
     }
     else for(int i=0;i<flat_size;i++) remap(i)=i;
 }

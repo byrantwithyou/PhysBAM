@@ -30,7 +30,7 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER<TV>& cm_input,CELL_
         for(RANGE_ITERATOR<TV::m> it(cdi->coarse_range);it.Valid();it.Next())
             flat_diffs.Append(cdi->Flatten_Diff(it.index+diced.index_offset));}
 
-    Sort(flat_diffs);
+    flat_diffs.Sort();
     flat_diffs.Prune_Duplicates();
 
     for(int i=0;i<overlap_polynomials.m;i++){
@@ -39,6 +39,18 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER<TV>& cm_input,CELL_
             op.flat_diff_index(it.index)=flat_diffs.Binary_Search(cdi->Flatten_Diff(it.index+op.index_offset));}
     
     for(int s=0;s<2;s++) data[s].Resize(cdi->interface_elements,flat_diff.m);
+}
+//#####################################################################
+// Function Mark_Active_Cells
+//#####################################################################
+template<class TV,int static_degree> void SYSTEM_INTERFACE_BLOCK<TV,static_degree>::
+Mark_Active_Cells(T tol)
+{
+    for(int s=0;s<2;s++)
+        for(int l=0;l<data[s].m;l++)
+            for(int k=0;k<data[s].n;k++)
+                if(abs(data[s](l,k))>tol)
+                    cm->Set_Active(cdi->Get_Flat_Base(l)+flat_diff(k),s);
 }
 template class SYSTEM_INTERFACE_BLOCK<VECTOR<float,2>,2>;
 template class SYSTEM_INTERFACE_BLOCK<VECTOR<float,3>,2>;

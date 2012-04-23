@@ -24,6 +24,7 @@ class CELL_DOMAIN_INTERFACE
     int b;
     ARRAY<int> flat_base; // flat index interface element reference cell (min corner cell of "coarse_factor"-wide block)
     ARRAY<int> remap; // maps ghost cells inside for periodic bc, identity for non-periodic bc
+    ARRAY<bool> inside; // padding away from the bdy
     
 public:
 
@@ -42,9 +43,10 @@ public:
     inline int Flatten_Diff(const TV_INT& index) const {return index.Dot(a);}
     inline int Get_Flat_Base(int e) const {return flat_base(e);}
     inline int Remap(int i) const {return remap(i);}
+    inline int Inside(int i) const {return inside(i);}
     
     void Set_Flat_Base(int start,int end,const TV_INT& index);
-    void Initialize_Remap();
+    void Initialize();
 };
 
 template<class TV>
