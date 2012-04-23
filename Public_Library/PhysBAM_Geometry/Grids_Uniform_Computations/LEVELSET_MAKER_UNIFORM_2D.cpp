@@ -24,15 +24,15 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
     ARRAY<bool,TV_INT> done(grid.Domain_Indices(ghost_cells+1));
     for(int i=0;i<curve.mesh.elements.m;i++){
         SEGMENT_2D<T> segment(curve.particles.X(curve.mesh.elements(i).x),curve.particles.X(curve.mesh.elements(i).y));
-        RANGE<TV_INT> box(grid.Cell(segment.x1,3));
-        box.Enlarge_To_Include_Point(grid.Cell(segment.x2,3));
+        RANGE<TV_INT> box(grid.Cell(segment.X.x,3));
+        box.Enlarge_To_Include_Point(grid.Cell(segment.X.y,3));
         box=box.Intersect(box,grid.Domain_Indices(ghost_cells-1));
         if(box.Empty()) continue;
         for(RANGE_ITERATOR<TV::m> it(box.Thickened(1));it.Valid();it.Next()){
             TV X=grid.X(it.index);
             T dist=segment.Distance_From_Point_To_Segment(X);
             if(dist<abs(phi(it.index))+dx*1e-4 && dist<dx){
-                bool new_sign=TV::Dot_Product(X-segment.x1,segment.Normal())<0;
+                bool new_sign=TV::Dot_Product(X-segment.X.x,segment.Normal())<0;
                 if(abs(dist-abs(phi(it.index)))<dx*1e-4 && new_sign != (phi(it.index)<0))
                     new_sign=curve.Inside(grid.X(it.index));
                 if(abs(dist)<abs(phi(it.index))) phi(it.index)=dist;

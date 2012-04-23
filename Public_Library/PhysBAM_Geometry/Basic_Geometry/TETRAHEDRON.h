@@ -18,7 +18,7 @@ class TETRAHEDRON
     typedef VECTOR<T,3> TV;
 public:
     VECTOR<TV,4> X;
-    TRIANGLE_3D<T> triangle1,triangle2,triangle3,triangle4; // includes the planes and the normals
+    VECTOR<TRIANGLE_3D<T>,4> triangle; // includes the planes and the normals
 
     TETRAHEDRON();
 

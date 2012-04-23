@@ -262,8 +262,7 @@ Quality_Of_Worst_Incident_Boundary_Triangle(const int node)
     TRIANGLE_3D<T> triangle;T worst_quality=1;
     for(int s=0;s<(*mesh.boundary_mesh->incident_elements)(node).m;s++){
         int t=(*mesh.boundary_mesh->incident_elements)(node)(s);
-        int i,j,k;mesh.boundary_mesh->elements(t).Get(i,j,k);
-        triangle.Specify_Three_Points(particles.X(i),particles.X(j),particles.X(k));
+        triangle.X=particles.X.Subset(mesh.boundary_mesh->elements(t));
         worst_quality=min(worst_quality,1/triangle.Aspect_Ratio()+1/triangle.Maximum_Angle());}
     return worst_quality;
 }

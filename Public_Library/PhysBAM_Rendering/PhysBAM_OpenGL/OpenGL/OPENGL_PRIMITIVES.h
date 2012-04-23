@@ -214,6 +214,10 @@ template<class T,int d>
 inline void OpenGL_Triangle(const VECTOR<T,d>& a, const VECTOR<T,d>& b, const VECTOR<T,d>& c,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
 {OpenGL_Vertex(a,vertices);OpenGL_Vertex(b,vertices);OpenGL_Vertex(c,vertices);}
 
+template<class T,int d>
+inline void OpenGL_Triangle(const VECTOR<VECTOR<T,d>,3>& a,ARRAY<typename OPENGL_POLICY<T>::T_GL>& vertices)
+{OpenGL_Vertex(a(0),vertices);OpenGL_Vertex(a(1),vertices);OpenGL_Vertex(a(2),vertices);}
+
 #ifndef USE_OPENGLES
 template<class T,int d>
 inline void OpenGL_Triangle(const VECTOR<T,d>& a, const VECTOR<T,d>& b, const VECTOR<T,d>& c)

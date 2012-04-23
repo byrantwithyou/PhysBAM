@@ -15,7 +15,8 @@ namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(const RANGE<VECTOR<T,2> >& box,const SEGMENT_2D<T>& segment,const T thickness_over_two)
 {
-    RAY<VECTOR<T,2> > ray(segment);return !box.Outside(segment.x1,thickness_over_two) || !box.Outside(segment.x2,thickness_over_two) || INTERSECTION::Intersects(ray,box,thickness_over_two);
+    RAY<VECTOR<T,2> > ray(segment);
+    return !box.Outside(segment.X.x,thickness_over_two) || !box.Outside(segment.X.y,thickness_over_two) || INTERSECTION::Intersects(ray,box,thickness_over_two);
 }
 //#####################################################################
 template bool Intersects(const RANGE<VECTOR<float,2> >&,const SEGMENT_2D<float>&,const float);

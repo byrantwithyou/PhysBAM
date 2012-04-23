@@ -22,7 +22,7 @@ Closest_Point_On_Boundary(const TV& location,const T max_depth,const T thickness
     T min_distance_squared=FLT_MAX;TV closest_point;
     for(int i=0;i<mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
-        TV new_point=point_simplex.x1;
+        TV new_point=point_simplex.X.x;
         T distance_squared=(new_point-location).Magnitude_Squared();
         if(distance_squared < min_distance_squared){
             min_distance_squared=distance_squared;closest_point=new_point;
@@ -50,7 +50,7 @@ Inside(const TV& location,T thickness_over_two) const
     for(int i=0;i<mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
         T direction=(T)(mesh.directions(i)?1:-1);
-        T robust_point_simplex_location=point_simplex.x1.x+direction*thickness_over_two;
+        T robust_point_simplex_location=point_simplex.X.x.x+direction*thickness_over_two;
         if(direction*(location.x-robust_point_simplex_location)>0) return false;}
     return true;
 }
@@ -70,7 +70,7 @@ Inside_Any_Simplex(const TV& point,int& point_simplex_id,const T thickness_over_
 {
     for(int i=0;i<mesh.elements.m;i++){
         POINT_SIMPLEX_1D<T> point_simplex=point_simplex_list?(*point_simplex_list)(i):Get_Element(i);
-        if(point_simplex.x1.x-thickness_over_two <= point.x && point_simplex.x1.x+thickness_over_two >= point.x) return true;}
+        if(point_simplex.X.x.x-thickness_over_two <= point.x && point_simplex.X.x.x+thickness_over_two >= point.x) return true;}
     return false;
 }
 //#####################################################################

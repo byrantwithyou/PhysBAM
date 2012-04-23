@@ -55,8 +55,8 @@ Get_Body_Penetration(const TV& start_X,const TV& end_X,const T contour_value,con
         T_SIMPLEX start_simplex=World_Space_Simplex(simplex_id,false);
         T_SIMPLEX end_simplex=World_Space_Simplex(simplex_id,true);
         end_body_normal=end_simplex.Normal();
-        end_phi=TV::Dot_Product(end_body_normal,end_X-end_simplex.x1);
-        start_phi=TV::Dot_Product(start_simplex.Normal(),start_X-start_simplex.x1);
+        end_phi=TV::Dot_Product(end_body_normal,end_X-end_simplex.X.x);
+        start_phi=TV::Dot_Product(start_simplex.Normal(),start_X-start_simplex.X.x);
         if(start_phi<0){end_body_normal*=-1;end_phi*=-1;start_phi*=-1;}
         body_velocity=Pointwise_Object_Velocity(simplex_id,closest_point);
         return true;}
@@ -73,7 +73,7 @@ Push_Out_Point(TV& X,const T collision_distance,T& distance) const
     if(distance<collision_distance){
         T_SIMPLEX simplex=World_Space_Simplex(simplex_id,false);
         TV normal=simplex.Normal();
-        T old_distance=TV::Dot_Product(X-simplex.x1,normal);
+        T old_distance=TV::Dot_Product(X-simplex.X.x,normal);
         X+=(sign(old_distance)*collision_distance-old_distance)*normal;
         return true;}
     return false;

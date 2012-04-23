@@ -19,14 +19,14 @@ using namespace PhysBAM;
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
 Closest_Point_On_Segment(const VECTOR<T,3>& point) const
 {                  
-    VECTOR<T,3> v=x2-x1;
+    VECTOR<T,3> v=X.y-X.x;
     T denominator=VECTOR<T,3>::Dot_Product(v,v);
-    if(denominator == 0) return x1; // x1 and x2 are a single point
+    if(denominator == 0) return X.x; // X.x and X.y are a single point
     else{
-        T t=VECTOR<T,3>::Dot_Product(point-x1,v)/denominator;
-        if(t <= 0) return x1;
-        else if(t >= 1) return x2;
-        else{v=x1+(x2-x1)*t;return v;}}
+        T t=VECTOR<T,3>::Dot_Product(point-X.x,v)/denominator;
+        if(t <= 0) return X.x;
+        else if(t >= 1) return X.y;
+        else{v=X.x+(X.y-X.x)*t;return v;}}
 }
 //#####################################################################
 // Function Distance_From_Point_To_Segment
@@ -43,12 +43,12 @@ Distance_From_Point_To_Segment(const VECTOR<T,3>& point) const
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
 Closest_Point_On_Line(const VECTOR<T,3>& point) const
 {                  
-    VECTOR<T,3> v=x2-x1;
+    VECTOR<T,3> v=X.y-X.x;
     T denominator=VECTOR<T,3>::Dot_Product(v,v);
-    if(denominator == 0) return x1; // x1 and x2 are a single point
+    if(denominator == 0) return X.x; // X.x and X.y are a single point
     else{
-        T t=VECTOR<T,3>::Dot_Product(point-x1,v)/denominator;
-        v=x1+(x2-x1)*t;return v;}
+        T t=VECTOR<T,3>::Dot_Product(point-X.x,v)/denominator;
+        v=X.x+(X.y-X.x)*t;return v;}
 }
 //#####################################################################
 // Function Distance_From_Point_To_Line
@@ -66,7 +66,7 @@ Distance_From_Point_To_Line(const VECTOR<T,3>& point) const
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
 Shortest_Vector_Between_Lines(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weights) const
 {
-    VECTOR<T,3> u=x2-x1,v=segment.x2-segment.x1,w=segment.x1-x1;
+    VECTOR<T,3> u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
     T u_magnitude_squared=u.Magnitude_Squared(),v_magnitude_squared=v.Magnitude_Squared(),u_dot_u=u_magnitude_squared,v_dot_v=v_magnitude_squared,u_dot_v=VECTOR<T,3>::Dot_Product(u,v),
         u_dot_w=VECTOR<T,3>::Dot_Product(u,w),v_dot_w=VECTOR<T,3>::Dot_Product(v,w);
     T denominator=u_dot_u*v_dot_v-sqr(u_dot_v),rhs1=v_dot_v*u_dot_w-u_dot_v*v_dot_w,rhs2=u_dot_v*u_dot_w-u_dot_u*v_dot_w;
@@ -80,7 +80,7 @@ Shortest_Vector_Between_Lines(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weights)
 template<class T> VECTOR<T,3> SEGMENT_3D<T>::
 Shortest_Vector_Between_Segments(const SEGMENT_3D<T>& segment,VECTOR<T,2>& weights) const
 {
-    VECTOR<T,3> u=x2-x1,v=segment.x2-segment.x1,w=segment.x1-x1;
+    VECTOR<T,3> u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
     T u_magnitude_squared=u.Magnitude_Squared(),v_magnitude_squared=v.Magnitude_Squared(),u_dot_u=u_magnitude_squared,v_dot_v=v_magnitude_squared,u_dot_v=VECTOR<T,3>::Dot_Product(u,v),
         u_dot_w=VECTOR<T,3>::Dot_Product(u,w),v_dot_w=VECTOR<T,3>::Dot_Product(v,w);
     T denominator=u_dot_u*v_dot_v-sqr(u_dot_v),rhs1=v_dot_v*u_dot_w-u_dot_v*v_dot_w,rhs2=u_dot_v*u_dot_w-u_dot_u*v_dot_w;
@@ -132,7 +132,7 @@ Edge_Edge_Interaction_Data(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v
 {
     if(distance > small_number) normal/=distance;
     else{ // set normal based on relative velocity perpendicular to the two points
-        VECTOR<T,3> relative_velocity=-weights(0)*v1-weights(1)*v2-weights(2)*v3-weights(3)*v4,u=x2-x1;
+        VECTOR<T,3> relative_velocity=-weights(0)*v1-weights(1)*v2-weights(2)*v3-weights(3)*v4,u=X.y-X.x;
         normal=relative_velocity-VECTOR<T,3>::Dot_Product(relative_velocity,u)/VECTOR<T,3>::Dot_Product(u,u)*u;
         T normal_magnitude=normal.Magnitude();
         if(normal_magnitude > small_number) normal/=normal_magnitude;
@@ -163,9 +163,9 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
     VECTOR<T,TV::m+1>& weights,const T small_number,const bool exit_early) const
 {
     // find cubic and compute the roots as possible collision times
-    VECTOR<T,3> ABo=x2-x1,ABv=dt*(v2-v1),ACo=segment.x2-segment.x1,ACv=dt*(v4-v3);
+    VECTOR<T,3> ABo=X.y-X.x,ABv=dt*(v2-v1),ACo=segment.X.y-segment.X.x,ACv=dt*(v4-v3);
     VECTOR<T,3> No=VECTOR<T,3>::Cross_Product(ABo,ACo),Nv=VECTOR<T,3>::Cross_Product(ABo,ACv)+VECTOR<T,3>::Cross_Product(ABv,ACo),Na=VECTOR<T,3>::Cross_Product(ABv,ACv);
-    VECTOR<T,3> APo=segment.x1-x1,APv=dt*(v3-v1);
+    VECTOR<T,3> APo=segment.X.x-X.x,APv=dt*(v3-v1);
     
     CUBIC<double> cubic((double)VECTOR<T,3>::Dot_Product(Na,APv),(double)VECTOR<T,3>::Dot_Product(Nv,APv)+VECTOR<T,3>::Dot_Product(Na,APo),
                                        (double)VECTOR<T,3>::Dot_Product(No,APv)+VECTOR<T,3>::Dot_Product(Nv,APo),(double)VECTOR<T,3>::Dot_Product(No,APo));
@@ -179,8 +179,8 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
     ITERATIVE_SOLVER<double> iterative_solver;iterative_solver.tolerance=1e-14;
     for(int k=0;k<num_intervals;k++){
         T collision_time=dt*(T)iterative_solver.Bisection_Secant_Root(cubic,intervals(k).min_corner,intervals(k).max_corner);
-        SEGMENT_3D<T> segment2(x1+collision_time*v1,x2+collision_time*v2);
-        if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,
+        SEGMENT_3D<T> segment2(X.x+collision_time*v1,X.y+collision_time*v2);
+        if(segment2.Edge_Edge_Interaction(SEGMENT_3D<T>(segment.X.x+collision_time*v3,segment.X.y+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,weights,
                 false,small_number,exit_early)) return true;}
 
     return false;
@@ -191,7 +191,7 @@ Edge_Edge_Collision(const SEGMENT_3D<T>& segment,const TV& v1,const TV& v2,const
 template<class T> T SEGMENT_3D<T>::
 Interpolation_Fraction(const VECTOR<T,3>& location) const
 {  
-    return SEGMENT_3D::Interpolation_Fraction(location,x1,x2);
+    return SEGMENT_3D::Interpolation_Fraction(location,X.x,X.y);
 }
 //#####################################################################
 // Function Barycentric_Coordinates
@@ -199,7 +199,7 @@ Interpolation_Fraction(const VECTOR<T,3>& location) const
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
 Barycentric_Coordinates(const VECTOR<T,3>& location) const
 {  
-    return SEGMENT_3D::Barycentric_Coordinates(location,x1,x2);
+    return SEGMENT_3D::Barycentric_Coordinates(location,X.x,X.y);
 }
 //#####################################################################
 // Function Clamped_Barycentric_Coordinates
@@ -207,7 +207,7 @@ Barycentric_Coordinates(const VECTOR<T,3>& location) const
 template<class T> VECTOR<T,2> SEGMENT_3D<T>::
 Clamped_Barycentric_Coordinates(const VECTOR<T,3>& location,const T tolerance) const
 {  
-    return SEGMENT_3D::Clamped_Barycentric_Coordinates(location,x1,x2);
+    return SEGMENT_3D::Clamped_Barycentric_Coordinates(location,X.x,X.y);
 }
 //#####################################################################
 // Function Interpolation_Fraction

@@ -53,8 +53,8 @@ Inside(const TV& location,T thickness_over_two) const
     T total_signed_angle=0;
     for(int i=0;i<mesh.elements.m;i++){
         SEGMENT_2D<T> segment=(segment_list)?(*segment_list)(i):Get_Element(i);
-        TV v1=segment.x1-location;
-        TV v2=segment.x2-location;
+        TV v1=segment.X.x-location;
+        TV v2=segment.X.y-location;
         VECTOR<T,1> cross=TV::Cross_Product(v1,v2);
         T signed_angle=TV::Angle_Between(v1,v2);
         if(cross.x<0) signed_angle*=-1;

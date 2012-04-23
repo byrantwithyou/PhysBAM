@@ -16,7 +16,7 @@ namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(const SEGMENT_2D<T>& segment1,const SEGMENT_2D<T>& segment2,const T thickness_over_two)
 {
-    RAY<VECTOR<T,2> > ray(segment2.x1,segment2.x2-segment2.x1);ray.semi_infinite=false;ray.t_max=(segment2.x2-segment2.x1).Magnitude();
+    RAY<VECTOR<T,2> > ray(segment2.X.x,segment2.X.y-segment2.X.x);ray.semi_infinite=false;ray.t_max=(segment2.X.y-segment2.X.x).Magnitude();
     return INTERSECTION::Intersects(ray,segment1,thickness_over_two);
 }
 //#####################################################################

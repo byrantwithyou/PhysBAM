@@ -115,8 +115,8 @@ Update_Springs(const bool search_hierarchy)
         const VECTOR<int,2> &segment1_nodes=curve.mesh.elements(i.Key()[0]),&segment2_nodes=curve.mesh.elements(i.Key()[1]);
         SPRING_STATE& state=i.Data();
         SEGMENT_3D<T> segment1(particles.X.Subset(segment1_nodes)),segment2(particles.X.Subset(segment2_nodes));
-        TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
-        TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
+        TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+        TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
         state.normal=X1-X2;
         state.distance=state.normal.Normalize();
         //if (off_distance>=state.distance){
@@ -144,8 +144,8 @@ Update_Springs(const bool search_hierarchy)
             const VECTOR<int,2> &segment1_nodes=curve.mesh.elements(external_spring_segments(i)[0]),&segment2_nodes=curve.mesh.elements(external_spring_segments(i)[1]);
             SPRING_STATE& state=external_springs(i);
             SEGMENT_3D<T> segment1(particles.X.Subset(segment1_nodes)),segment2(particles.X.Subset(segment2_nodes)); 
-            TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
-            TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
+            TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+            TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
             state.normal=X1-X2;
             state.distance=state.normal.Normalize();
             if(state.distance>off_distance){
@@ -215,8 +215,8 @@ Update_Springs(const bool search_hierarchy)
                     state.weights=segment_weights;
                     state.external=true;
                     state.nodes=segment1_nodes.Append_Elements(segment2_nodes);
-                    TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
-                    TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
+                    TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+                    TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
                     state.normal=X1-X2;
                     state.distance=state.normal.Normalize();
                     T harmonic_mass=Pseudo_Inverse((T).25*(one_over_effective_mass(state.nodes[0])+one_over_effective_mass(state.nodes[1])

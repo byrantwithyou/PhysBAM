@@ -103,7 +103,7 @@ template<class T> POINT_SIMPLEX_1D<T> RIGID_COLLISION_GEOMETRY<VECTOR<T,1> >::
 World_Space_Simplex(const int segment_id,const FRAME<TV>& state) const
 {
     POINT_SIMPLEX_1D<T>& object_space_point_simplex=(*rigid_geometry.simplicial_object->point_simplex_list)(segment_id);
-    return POINT_SIMPLEX_1D<T>(state*object_space_point_simplex.x1,object_space_point_simplex.direction);
+    return POINT_SIMPLEX_1D<T>(state*object_space_point_simplex.X.x,object_space_point_simplex.direction);
 }
 //#####################################################################
 // Function Update_Intersection_Acceleration_Structures

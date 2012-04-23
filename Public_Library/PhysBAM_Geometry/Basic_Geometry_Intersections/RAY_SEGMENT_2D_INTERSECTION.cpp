@@ -17,7 +17,7 @@ namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(RAY<VECTOR<T,2> >& ray,const SEGMENT_2D<T>& segment,const T thickness_over_two)
 {
-    VECTOR<T,2> from_start_to_start=segment.x1-ray.endpoint,segment_direction=segment.x2-segment.x1;T segment_length=segment_direction.Normalize();
+    VECTOR<T,2> from_start_to_start=segment.X.x-ray.endpoint,segment_direction=segment.X.y-segment.X.x;T segment_length=segment_direction.Normalize();
     T cross_product=VECTOR<T,2>::Cross_Product(ray.direction,segment_direction).x,abs_cross_product=abs(cross_product);
     if(segment.Inside(ray.endpoint,thickness_over_two)){
         ray.t_max=0;ray.intersection_location=RAY<VECTOR<T,2> >::START_POINT;
@@ -65,7 +65,7 @@ template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,2> >& ray,con
 //#####################################################################
 // Function Intersection_X_Segment
 //#####################################################################
-// Optimized intersection for segment(x1,y),(x2,y), must have x1<x2
+// Optimized intersection for segment(X.x,y),(x2,y), must have X.x<x2
 // Segment is lengthened at each end by thickness_over_two
 template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x1,const T x2,const T y,const T thickness_over_two)
 {

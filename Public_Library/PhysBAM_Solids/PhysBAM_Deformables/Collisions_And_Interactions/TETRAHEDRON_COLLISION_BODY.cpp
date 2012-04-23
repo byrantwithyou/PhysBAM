@@ -157,7 +157,7 @@ Implicit_Geometry_Normal(const TV& location,T& phi_value,const int aggregate,con
             TRIANGLE_3D<T> triangle(particles.X(i),particles.X(j),particles.X(k));
             TV tri_weights,closest_point=triangle.Closest_Point(location,tri_weights),normal=location-closest_point;
             if(location_particle_index>=0 && (location_particle_index==i || location_particle_index==j || location_particle_index==k || //TODO: fix for embedded
-                TV::Dot_Product((*triangulated_surface.vertex_normals)(location_particle_index),triangle.normal)>=self_collision_normal_angle_tolerance)) continue;
+                    TV::Dot_Product((*triangulated_surface.vertex_normals)(location_particle_index),triangle.Normal())>=self_collision_normal_angle_tolerance)) continue;
             T distance_squared=normal.Magnitude_Squared();
             if(distance_squared<closest_distance_squared){closest_distance_squared=distance_squared;closest_normal=normal;closest_triangle=tri;closest_tri_weights=tri_weights;}}
         if(closest_distance_squared==FLT_MAX){phi_value=FLT_MAX;return TV();}
@@ -234,7 +234,7 @@ Adjust_Point_Face_Collision_Position_And_Velocity(const int triangle_index,TV& X
 
     // apply point/face collision
     TV relative_velocity=V-(weights.x*particles.V(ei)+weights.y*particles.V(ej)+weights.z*particles.V(ek));
-    TV N=TRIANGLE_3D<T>::Normal(particles.X(ei),particles.X(ej),particles.X(ek));
+    TV N=PLANE<T>::Normal(particles.X(ei),particles.X(ej),particles.X(ek));
     T relative_speed=TV::Dot_Product(relative_velocity,N);
     if(relative_speed<0){
         T scalar_impulse=-relative_speed;TV impulse=-scalar_impulse*N;

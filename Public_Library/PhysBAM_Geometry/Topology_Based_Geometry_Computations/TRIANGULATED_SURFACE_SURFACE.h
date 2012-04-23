@@ -75,7 +75,7 @@ VECTOR<T,3> Oriented_Surface(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>
                 TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(nearby_triangles(k));
                 TV new_point=triangle.Closest_Point(location,weights);
                 T new_distance=(location-new_point).Magnitude_Squared();
-                if(new_distance<distance_temp&&TV::Dot_Product(normal,triangle.normal)>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=nearby_triangles(k);}}
+                if(new_distance<distance_temp && TV::Dot_Product(normal,triangle.Raw_Normal())>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=nearby_triangles(k);}}
             if(distance) *distance=sqrt(distance_temp);return point;}}
 
     // slow method
@@ -86,7 +86,7 @@ VECTOR<T,3> Oriented_Surface(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>
         TRIANGLE_3D<T>& triangle=(*ts.triangle_list)(k);
         TV new_point=triangle.Closest_Point(location,weights);
         T new_distance=(location-new_point).Magnitude_Squared();
-        if(new_distance<distance_temp&&TV::Dot_Product(normal,triangle.normal)>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=k;}}
+        if(new_distance<distance_temp&&TV::Dot_Product(normal,triangle.Raw_Normal())>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=k;}}
     if(distance) *distance=sqrt(distance_temp);return point;
 }
 

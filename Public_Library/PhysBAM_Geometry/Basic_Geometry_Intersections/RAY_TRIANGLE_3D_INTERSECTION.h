@@ -11,9 +11,9 @@
 namespace PhysBAM{
 namespace INTERSECTION{
 //#####################################################################
-template<class T> bool Intersects(RAY<VECTOR<T,3> >& ray,const TRIANGLE_3D<T>& plane,const T thickness_over_two=0);
-template<class T> bool Lazy_Intersects(RAY<VECTOR<T,3> >& ray,const TRIANGLE_3D<T>& plane,const T thickness_over_two=0);
-template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,3> >& ray,const TRIANGLE_3D<T>& plane,const T thickness_over_two=0);
+template<class T,class TV> bool Intersects(RAY<TV>& ray,const TRIANGLE_3D<T>& plane,const T thickness_over_two=0);
+template<class T,class TV> bool Lazy_Intersects(RAY<TV>& ray,const TRIANGLE_3D<T>& plane,const T thickness_over_two=0);
+template<class T,class TV> bool Closest_Non_Intersecting_Point(RAY<TV>& ray,const TRIANGLE_3D<T>& plane,const T thickness_over_two=0);
 //#####################################################################
 };
 };

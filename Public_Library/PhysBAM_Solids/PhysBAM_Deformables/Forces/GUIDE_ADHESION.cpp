@@ -68,8 +68,8 @@ Update_Springs(const bool search_hierarchy)
         const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(i.Key()[0]),&segment2_nodes=curve.mesh.elements(i.Key()[1]);
         SPRING_STATE& state=i.Data();
         SEGMENT_3D<T> segment1(guide_curve.particles.X.Subset(segment1_nodes)),segment2(curve.particles.X.Subset(segment2_nodes));
-        TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
-        TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
+        TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+        TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
         state.normal=X1-X2; 
         state.distance=state.normal.Normalize();
         if(state.distance>thickness){
@@ -87,7 +87,7 @@ Update_Springs(const bool search_hierarchy)
         for(int i=0;i<curve.mesh.elements.m;i++){
             const VECTOR<int,2> &segment_nodes=curve.mesh.elements(i);
             SEGMENT_3D<T> segment=curve.particles.X.Subset(segment_nodes);
-            RANGE<TV> box(segment.x1,segment.x2);
+            RANGE<TV> box(segment.X.x,segment.X.y);
             ARRAY<int> intersections;
             guide_curve.hierarchy->Intersection_List(box,intersections,2*thickness);
             SPRING_STATE state;
@@ -107,8 +107,8 @@ Update_Springs(const bool search_hierarchy)
             if(min_index==-1) continue;
             const VECTOR<int,2> &segment1_nodes=guide_curve.mesh.elements(min_index),&segment2_nodes=curve.mesh.elements(i);
             SEGMENT_3D<T> segment1(guide_curve.particles.X.Subset(segment1_nodes)),segment2(curve.particles.X.Subset(segment2_nodes));
-            TV X1=(1-state.weights[0])*segment1.x1+state.weights[0]*segment1.x2;
-            TV X2=(1-state.weights[1])*segment2.x1+state.weights[1]*segment2.x2;
+            TV X1=(1-state.weights[0])*segment1.X.x+state.weights[0]*segment1.X.y;
+            TV X2=(1-state.weights[1])*segment2.X.x+state.weights[1]*segment2.X.y;
             assert(particle_to_spring_id(segment1_nodes[0])==particle_to_spring_id(segment1_nodes[1]));
             assert(particle_to_spring_id(segment2_nodes[0])==particle_to_spring_id(segment2_nodes[1]));
             TV guide_root=guide_curve.particles.X(roots(particle_to_spring_id(segment1_nodes[0])));

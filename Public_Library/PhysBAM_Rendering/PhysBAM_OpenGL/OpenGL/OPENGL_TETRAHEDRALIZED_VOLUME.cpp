@@ -214,10 +214,10 @@ Highlight_Boundary_Normal_Vectors_Of_Current_Tetrahedron() const
     int t=current_tetrahedron,i,j,k,l;mesh->elements(t).Get(i,j,k,l);
     VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
     OPENGL_SHAPES::Draw_Dot((T)one_third*(xj+xl+xk),OPENGL_COLOR((float).7,0,0),5);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xj+xl+xk),TRIANGLE_3D<T>::Normal(xj,xl,xk),OPENGL_COLOR(1,0,1),2);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xk+xl),TRIANGLE_3D<T>::Normal(xi,xk,xl),OPENGL_COLOR(1,0,1),1);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xl+xj),TRIANGLE_3D<T>::Normal(xi,xl,xj),OPENGL_COLOR(1,0,1),1);
-    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xj+xk),TRIANGLE_3D<T>::Normal(xi,xj,xk),OPENGL_COLOR(1,0,1),1);
+    OPENGL_SHAPES::Draw_Vector((T)one_third*(xj+xl+xk),PLANE<T>::Normal(xj,xl,xk),OPENGL_COLOR(1,0,1),2);
+    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xk+xl),PLANE<T>::Normal(xi,xk,xl),OPENGL_COLOR(1,0,1),1);
+    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xl+xj),PLANE<T>::Normal(xi,xl,xj),OPENGL_COLOR(1,0,1),1);
+    OPENGL_SHAPES::Draw_Vector((T)one_third*(xi+xj+xk),PLANE<T>::Normal(xi,xj,xk),OPENGL_COLOR(1,0,1),1);
 }
 //#####################################################################
 // Function Highlight_Boundary_Nodes_Of_Current_Tetrahedron
@@ -261,15 +261,12 @@ Draw_Current_Tetrahedron() const
     int t=current_tetrahedron,i,j,k,l;mesh->elements(t).Get(i,j,k,l);
     VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
     TETRAHEDRON<T> tet(xi,xj,xk,xl);
-    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-    for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle1.normal,normals);
-    OpenGL_Triangle(tet.triangle1.x1,tet.triangle1.x2,tet.triangle1.x3,vertices);
-    for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle2.normal,normals);
-    OpenGL_Triangle(tet.triangle2.x1,tet.triangle2.x2,tet.triangle2.x3,vertices);
-    for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle3.normal,normals);
-    OpenGL_Triangle(tet.triangle3.x1,tet.triangle3.x2,tet.triangle3.x3,vertices);
-    for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle4.normal,normals);
-    OpenGL_Triangle(tet.triangle4.x1,tet.triangle4.x2,tet.triangle4.x3,vertices);
+    ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    ARRAY<GLfloat> normals;
+    for(int i=0;i<4;i++){
+        for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
+            OpenGL_Normal(tet.triangle(i).Normal(),normals);
+        OpenGL_Triangle(tet.triangle(i).X,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
 }
 //#####################################################################
@@ -294,18 +291,10 @@ Draw_Subset() const
         TETRAHEDRON<T> tet(xi,xj,xk,xl);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
         //Set_Color_From_Aspect_Ratio(tet.triangle1);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle1.normal,normals);
-        OpenGL_Triangle(tet.triangle1.x1,tet.triangle1.x2,tet.triangle1.x3,vertices);
-        //Set_Color_From_Aspect_Ratio(tet.triangle2);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle2.normal,normals);
-        OpenGL_Triangle(tet.triangle2.x1,tet.triangle2.x2,tet.triangle2.x3,vertices);
-        //Set_Color_From_Aspect_Ratio(tet.triangle3);
-        //OPENGL_MATERIAL::Plastic(OPENGL_COLOR(VECTOR<T,3>(T(1),T(.7),T(.7)))).Send_To_GL_Pipeline();
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle3.normal,normals);
-        OpenGL_Triangle(tet.triangle3.x1,tet.triangle3.x2,tet.triangle3.x3,vertices);
-        //Set_Color_From_Aspect_Ratio(tet.triangle4);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle4.normal,normals);
-        OpenGL_Triangle(tet.triangle4.x1,tet.triangle4.x2,tet.triangle4.x3,vertices);
+        for(int i=0;i<4;i++){
+            for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
+                OpenGL_Normal(tet.triangle(i).Normal(),normals);
+            OpenGL_Triangle(tet.triangle(i).X,vertices);}
         OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);}
     material.Send_To_GL_Pipeline();
 }
@@ -321,7 +310,7 @@ Draw_Subset_Triangles() const
         int i,j,k,tri;tri=subset_triangles(t);
         mesh->boundary_mesh->elements(tri).Get(i,j,k);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
+        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(PLANE<T>::Normal(xi,xj,xk),normals);
         OpenGL_Triangle(xi,xj,xk,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
     material.Send_To_GL_Pipeline();
@@ -357,18 +346,11 @@ Draw_In_Color_From_Spectrum() const
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
         TETRAHEDRON<T> tet(xi,xj,xk,xl);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-        Set_Color_From_Spectrum(t,spectrum,spectrum_max,spectrum_min);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle1.normal,normals);  
-        OpenGL_Triangle(tet.triangle1.x1,tet.triangle1.x2,tet.triangle1.x3,vertices);
-        Set_Color_From_Spectrum(t,spectrum,spectrum_max,spectrum_min);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle2.normal,normals);
-        OpenGL_Triangle(tet.triangle2.x1,tet.triangle2.x2,tet.triangle2.x3,vertices);
-        Set_Color_From_Spectrum(t,spectrum,spectrum_max,spectrum_min);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle3.normal,normals);
-        OpenGL_Triangle(tet.triangle3.x1,tet.triangle3.x2,tet.triangle3.x3,vertices);
-        Set_Color_From_Spectrum(t,spectrum,spectrum_max,spectrum_min);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle4.normal,normals);
-        OpenGL_Triangle(tet.triangle4.x1,tet.triangle4.x2,tet.triangle4.x3,vertices);
+        for(int i=0;i<4;i++){
+            Set_Color_From_Spectrum(t,spectrum,spectrum_max,spectrum_min);
+            for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
+                OpenGL_Normal(tet.triangle(i).Normal(),normals);
+            OpenGL_Triangle(tet.triangle(i).X,vertices);}
         OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);}
     material.Send_To_GL_Pipeline();
 }
@@ -386,14 +368,10 @@ Draw_In_Color_From_Color_Map() const
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
         TETRAHEDRON<T> tet(xi,xj,xk,xl);
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle1.normal,normals);
-        OpenGL_Triangle(tet.triangle1.x1,tet.triangle1.x2,tet.triangle1.x3,vertices);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle2.normal,normals);
-        OpenGL_Triangle(tet.triangle2.x1,tet.triangle2.x2,tet.triangle2.x3,vertices);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle3.normal,normals);
-        OpenGL_Triangle(tet.triangle3.x1,tet.triangle3.x2,tet.triangle3.x3,vertices);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle4.normal,normals);
-        OpenGL_Triangle(tet.triangle4.x1,tet.triangle4.x2,tet.triangle4.x3,vertices);
+        for(int i=0;i<4;i++){
+            for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
+                OpenGL_Normal(tet.triangle(i).Normal(),normals);
+            OpenGL_Triangle(tet.triangle(i).X,vertices);}
         OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);}
     glPopAttrib();
 }
@@ -421,7 +399,7 @@ Draw_Boundary_Triangles(const TETRAHEDRON_MESH& tetrahedron_mesh) const
         for(int t=0;t<tetrahedron_mesh.boundary_mesh->elements.m;t++){
             int i,j,k;tetrahedron_mesh.boundary_mesh->elements(t).Get(i,j,k);
             VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
-            for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
+            for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(PLANE<T>::Normal(xi,xj,xk),normals);
             OpenGL_Triangle(xi,xj,xk,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
 
@@ -440,7 +418,7 @@ Highlight_Current_Boundary_Triangle() const
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> normals;
     int i,j,k;mesh->boundary_mesh->elements(current_boundary_triangle).Get(i,j,k);
     VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
-    for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
+    for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(PLANE<T>::Normal(xi,xj,xk),normals);
     OpenGL_Triangle(xi,xj,xk,vertices);
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
     OPENGL_SHAPES::Draw_Dot((T)1./3*(xi+xj+xk),OPENGL_COLOR(1,1,1),8);
@@ -480,7 +458,7 @@ Initialize_Vertex_Normals()
     for(int t=0;t<mesh->boundary_mesh->elements.m;t++){
         int i,j,k;mesh->boundary_mesh->elements(t).Get(i,j,k);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(xi,xj,xk);
+        VECTOR<T,3> normal=PLANE<T>::Normal(xi,xj,xk);
         (*vertex_normals)(i)+=normal;(*vertex_normals)(j)+=normal;(*vertex_normals)(k)+=normal;}
     for(int p=0;p<particles->Size();p++)(*vertex_normals)(p).Normalize();
 }
@@ -522,14 +500,10 @@ Display_Subset()
         int i,j,k,l;mesh->elements(t).Get(i,j,k,l);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k),xl=particles->X(l);
         TETRAHEDRON<T> tet(xi,xj,xk,xl);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle1.normal,normals);
-        OpenGL_Triangle(tet.triangle1.x1,tet.triangle1.x2,tet.triangle1.x3,vertices);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle2.normal,normals);
-        OpenGL_Triangle(tet.triangle2.x1,tet.triangle2.x2,tet.triangle2.x3,vertices);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle3.normal,normals);
-        OpenGL_Triangle(tet.triangle3.x1,tet.triangle3.x2,tet.triangle3.x3,vertices);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(tet.triangle4.normal,normals);
-        OpenGL_Triangle(tet.triangle4.x1,tet.triangle4.x2,tet.triangle4.x3,vertices);}
+        for(int i=0;i<4;i++){
+            for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
+                OpenGL_Normal(tet.triangle(i).Normal(),normals);
+            OpenGL_Triangle(tet.triangle(i).X,vertices);}}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
     vertices.Resize(0);
     for(int t=0;t<mesh->boundary_mesh->elements.m;t++){

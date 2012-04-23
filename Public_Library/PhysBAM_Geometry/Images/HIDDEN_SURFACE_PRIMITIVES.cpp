@@ -26,10 +26,10 @@ template<class T> void SURFACE_PRIMITIVE<T>::
 Init_Projection()
 {
     projection.Resize(1);
-    projection(0).outer().Append(triangle.x1.Remove_Index(2));
-    projection(0).outer().Append(triangle.x2.Remove_Index(2));
-    projection(0).outer().Append(triangle.x3.Remove_Index(2));
-    projection(0).outer().Append(triangle.x1.Remove_Index(2));
+    projection(0).outer().Append(triangle.X.x.Remove_Index(2));
+    projection(0).outer().Append(triangle.X.y.Remove_Index(2));
+    projection(0).outer().Append(triangle.X.z.Remove_Index(2));
+    projection(0).outer().Append(triangle.X.x.Remove_Index(2));
     boost::geometry::correct(projection);
 }
 template<class T> bool HIDDEN_SURFACE_PRIMITIVES<T>::
@@ -48,8 +48,10 @@ Add_Edge(HASHTABLE<VECTOR<int,2> >& edges,int a,int b)
 template<class T> void HIDDEN_SURFACE_PRIMITIVES<T>::
 Add_Edge(HASHTABLE<VECTOR<int,2> >& edges,int a,int b,TV2 pt)
 {
-    T za=-(pt.Append(0)-primitives(a).triangle.x1).Dot(primitives(a).triangle.normal)/primitives(a).triangle.normal.z;
-    T zb=-(pt.Append(0)-primitives(b).triangle.x1).Dot(primitives(b).triangle.normal)/primitives(b).triangle.normal.z;
+    TV Na=primitives(a).triangle.Normal();
+    TV Nb=primitives(b).triangle.Normal();
+    T za=-(pt.Append(0)-primitives(a).triangle.X.x).Dot(Na)/Na.z;
+    T zb=-(pt.Append(0)-primitives(b).triangle.X.x).Dot(Nb)/Nb.z;
     if(za>zb) Add_Edge(edges,a,b);
     else Add_Edge(edges,b,a);
 }

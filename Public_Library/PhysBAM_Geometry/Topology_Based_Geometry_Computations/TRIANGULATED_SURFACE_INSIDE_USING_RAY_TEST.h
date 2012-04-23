@@ -32,16 +32,16 @@ Inside_Using_Ray_Test(const TRIANGULATED_SURFACE<T>& ts,RAY<VECTOR<T,3> >& ray,c
             if(region_id==0) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node1,node2);
             else if(region_id==1) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node2,node3);
             else neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node3,node1);
-            if(neighbor==-1){if(triangle.Lazy_Inside(ray.endpoint)) inside=true;}
+            if(neighbor==-1){if(triangle.Lazy_Inside_Plane(ray.endpoint)) inside=true;}
             else{
                 TRIANGLE_3D<T>& triangle2=(*ts.triangle_list)(neighbor);
                 int convex=0;
-                if(region_id==0){if(TV::Dot_Product(triangle2.normal,triangle.x3-triangle2.x1) >= 0) convex=1;}
-                else if(region_id==1){if(TV::Dot_Product(triangle2.normal,triangle.x1-triangle2.x1) >= 0) convex=1;}
-                else if(region_id==2){if(TV::Dot_Product(triangle2.normal,triangle.x2-triangle2.x1) >= 0) convex=1;}
-                if(convex){if(triangle.Lazy_Inside(ray.endpoint) && triangle2.Lazy_Inside(ray.endpoint)) inside=true;} // inside both - can use location or point
-                else{if(triangle.Lazy_Inside(ray.endpoint) || triangle2.Lazy_Inside(ray.endpoint)) inside=true;}}} // inside either - can use location or point
-        else{if(triangle.Lazy_Inside(ray.endpoint)) inside=true;}} // region=3 - face - can use location or point
+                if(region_id==0){if(TV::Dot_Product(triangle2.Normal(),triangle.X.z-triangle2.X.x) >= 0) convex=1;}
+                else if(region_id==1){if(TV::Dot_Product(triangle2.Normal(),triangle.X.x-triangle2.X.x) >= 0) convex=1;}
+                else if(region_id==2){if(TV::Dot_Product(triangle2.Normal(),triangle.X.y-triangle2.X.x) >= 0) convex=1;}
+                if(convex){if(triangle.Lazy_Inside_Plane(ray.endpoint) && triangle2.Lazy_Inside_Plane(ray.endpoint)) inside=true;} // inside both - can use location or point
+                else{if(triangle.Lazy_Inside_Plane(ray.endpoint) || triangle2.Lazy_Inside_Plane(ray.endpoint)) inside=true;}}} // inside either - can use location or point
+        else{if(triangle.Lazy_Inside_Plane(ray.endpoint)) inside=true;}} // region=3 - face - can use location or point
     return inside;
 }
 }

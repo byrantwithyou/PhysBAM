@@ -20,25 +20,25 @@ class SEGMENT_2D
 {
     typedef VECTOR<T,2> TV;
 public:
-    TV x1,x2;
+    VECTOR<TV,2> X;
 
     SEGMENT_2D()
-        :x1(0,0),x2(1,0)
+        :X(TV(),TV(1,0))
     {}
 
     SEGMENT_2D(const TV& x1_input,const TV& x2_input)
-        :x1(x1_input),x2(x2_input)
+        :X(x1_input,x2_input)
     {}
 
     template<class T_ARRAY>
     explicit SEGMENT_2D(const T_ARRAY& X_input)
-        :x1(X_input(0)),x2(X_input(1))
+        :X(X_input)
     {
         STATIC_ASSERT(T_ARRAY::m==2);
     }
 
     T Length() const
-    {return (x2-x1).Magnitude();}
+    {return (X.y-X.x).Magnitude();}
 
     T Size() const
     {return Length();}
@@ -52,13 +52,13 @@ public:
     {return Size(X);}
 
     TV Center() const
-    {return (T).5*(x1+x2);}
+    {return (T).5*(X.x+X.y);}
 
     static TV Normal(const TV& x1,const TV& x2) 
     {return (x2-x1).Normalized().Rotate_Clockwise_90();}
 
     TV Normal() const
-    {return SEGMENT_2D<T>::Normal(x1,x2);}
+    {return SEGMENT_2D<T>::Normal(X.x,X.y);}
 
     template<class T_ARRAY>
     static TV Normal(const T_ARRAY& X)
@@ -85,10 +85,10 @@ public:
     {STATIC_ASSERT(T_ARRAY::m==2);return Clamped_Barycentric_Coordinates(location,X(0),X(1));}
 
     TV Sum_Barycentric_Coordinates(const SEGMENT_2D<T>& embedded_segment) const
-    {return Barycentric_Coordinates(embedded_segment.x1)+Barycentric_Coordinates(embedded_segment.x2);}
+    {return Barycentric_Coordinates(embedded_segment.X.x)+Barycentric_Coordinates(embedded_segment.X.y);}
 
     TV Barycentric_Coordinates(const TV& location) const
-    {return Barycentric_Coordinates(location,x1,x2);}
+    {return Barycentric_Coordinates(location,X.x,X.y);}
 
     static TV Point_From_Barycentric_Coordinates(const T alpha,const TV& x1,const TV& x2)
     {return (x2-x1)*alpha+x1;}
@@ -98,10 +98,10 @@ public:
     {STATIC_ASSERT(T_ARRAY::m==2);return weights.x*X(0)+weights.y*X(1);}
 
     TV Point_From_Barycentric_Coordinates(const T alpha) const 
-    {return (x2-x1)*alpha+x1;}
+    {return (X.y-X.x)*alpha+X.x;}
 
     TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights)
-    {return weights.x*x1+weights.y*x2;}
+    {return weights.x*X.x+weights.y*X.y;}
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const T alpha,const T_ARRAY& X)
@@ -116,13 +116,7 @@ public:
     {return Point_Face_Interaction(x,v,V_face(0),V_face(1),interaction_distance,distance,interaction_normal,weights,allow_negative_weights,exit_early);}
 
     RANGE<TV> Bounding_Box() const
-    {return RANGE<TV>::Bounding_Box(x1,x2);}
-
-    const TV& X(const int i) const
-    {assert((unsigned)i<2);return i?x2:x1;}
-
-    TV& X(const int i)
-    {assert((unsigned)i<2);return i?x2:x1;}
+    {return RANGE<TV>::Bounding_Box(X.x,X.y);}
 
 //#####################################################################
     bool Segment_Line_Intersection(const TV& point_on_line,const TV& normal_of_line,T &interpolation_fraction) const;
@@ -154,7 +148,7 @@ public:
 };
 
 template<class T> std::ostream &operator<<(std::ostream &output,const SEGMENT_2D<T> &segment)
-{output << segment.x1 << ", " << segment.x2;return output;}
+{output << segment.x1 << ", " << segment.X.y;return output;}
 
 }
 #endif

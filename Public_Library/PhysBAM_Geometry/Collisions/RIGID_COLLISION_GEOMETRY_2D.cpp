@@ -109,7 +109,7 @@ template<class T> SEGMENT_2D<T> RIGID_COLLISION_GEOMETRY<VECTOR<T,2> >::
 World_Space_Simplex(const int segment_id,const FRAME<TV>& frame) const
 {
     SEGMENT_2D<T>& object_space_segment=(*rigid_geometry.simplicial_object->segment_list)(segment_id);
-    return SEGMENT_2D<T>(frame*object_space_segment.x1,frame*object_space_segment.x2);
+    return SEGMENT_2D<T>(frame*object_space_segment.X.x,frame*object_space_segment.X.y);
 }
 //##################################################################### 
 template class RIGID_COLLISION_GEOMETRY<VECTOR<float,2> >;

@@ -65,7 +65,8 @@ Update_Position_Based_State(const T time)
         optimization.Resize(simplicial_object.mesh.elements.m,false,false);
         if(deformable_simplicial_object) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const TV_INT& nodes=simplicial_object.mesh.elements(t);
-            optimization(t).center=particles.X.Subset(nodes).Sum()/TV::m;optimization(t).inward_normal=T_SIMPLEX::Normal(particles.X.Subset(nodes));
+            optimization(t).center=particles.X.Subset(nodes).Sum()/TV::m;
+            optimization(t).inward_normal=T_SIMPLEX::Normal(particles.X.Subset(nodes));
             optimization(t).area_over_m=T_SIMPLEX::Size(particles.X.Subset(nodes))/TV::m;
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}
         else for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){

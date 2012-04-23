@@ -4,7 +4,9 @@
 //#####################################################################
 // Class EDGE_EDGE_INITIAL_CULL_VISITOR
 //##################################################################### 
+#include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_3D.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/BOX_HIERARCHY_DEFINITION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/EDGE_EDGE_INITIAL_CULL_VISITOR.h>
@@ -31,9 +33,9 @@ Store(const int segment1_local_index,const int segment2_local_index)
     template void BOX_HIERARCHY<VECTOR<T,3> >::Intersection_List<EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<T,3> >,ZERO>(BOX_HIERARCHY<VECTOR<T,3> > const&, \
         EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<T,3> >&,ZERO) const;
 
-template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<float,2> >::Store(int,int);
+//template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<float,2> >::Store(int,int);
 INSTANTIATION_HELPER(float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<double,2> >::Store(int,int);
+//template void EDGE_EDGE_INITIAL_CULL_VISITOR<VECTOR<double,2> >::Store(int,int);
 INSTANTIATION_HELPER(double);
 #endif

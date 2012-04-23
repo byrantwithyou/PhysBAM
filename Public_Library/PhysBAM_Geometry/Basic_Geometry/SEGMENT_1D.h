@@ -20,34 +20,34 @@ class SEGMENT_1D
 {
     typedef VECTOR<T,1> TV;
 public:
-    VECTOR<T,1> x1,x2;
+    VECTOR<TV,2> X;
 
     SEGMENT_1D()
-        :x1((T)0),x2((T)1)
+        :X(TV(),TV(1))
     {}
 
     SEGMENT_1D(const VECTOR<T,1>& x1_input,const VECTOR<T,1>& x2_input)
-        :x1(x1_input),x2(x2_input)
+        :X(x1_input,x2_input)
     {}
 
     template<class T_ARRAY>
     explicit SEGMENT_1D(const T_ARRAY& X_input)
-        :x1(X_input(0)),x2(X_input(1))
+        :X(X_input)
     {
         STATIC_ASSERT(T_ARRAY::m==2);
     }
 
     T Length() const
-    {return (x2-x1).Magnitude();}
+    {return (X.y-X.x).Magnitude();}
 
     T Size() const
     {return Length();}
 
     VECTOR<T,2> Barycentric_Coordinates(const TV& location) const
-    {return Barycentric_Coordinates(location,x1,x2);}
+    {return Barycentric_Coordinates(location,X.x,X.y);}
 
     VECTOR<T,2> Sum_Barycentric_Coordinates(const SEGMENT_1D<T>& embedded_segment) const
-    {return Barycentric_Coordinates(embedded_segment.x1)+Barycentric_Coordinates(embedded_segment.x2);}
+    {return Barycentric_Coordinates(embedded_segment.X.x)+Barycentric_Coordinates(embedded_segment.X.y);}
 
     static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2)
     {T fraction=(location.x-x1.x)/(x2-x1).Magnitude();return VECTOR<T,2>((T)1-fraction,fraction);}
@@ -63,20 +63,20 @@ public:
     {return weights.x*x1+(1-weights.x)*x2;}
 
     TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights) const
-    {return Point_From_Barycentric_Coordinates(weights,x1,x2);}
+    {return Point_From_Barycentric_Coordinates(weights,X.x,X.y);}
 
     template<class T_ARRAY>
     static TV Point_From_Barycentric_Coordinates(const VECTOR<T,2>& weights,const T_ARRAY& X)
     {STATIC_ASSERT(T_ARRAY::m==2);return Point_From_Barycentric_Coordinates(weights,X(0),X(1));}
 
     VECTOR<T,1> Center() const
-    {return (T).5*(x1+x2);}
+    {return (T).5*(X.x+X.y);}
 
     RANGE<TV> Bounding_Box() const
-    {return RANGE<TV>::Bounding_Box(x1,x2);}
+    {return RANGE<TV>::Bounding_Box(X.x,X.y);}
 
     bool Inside(const TV& location,const T thickness_over_2=0)
-    {return x1.x<=location.x && location.x<=x2.x;}
+    {return X.x.x<=location.x && location.x<=X.y.x;}
 
 //#####################################################################
     static T Negative_Material(const ARRAY<TV>& X,const ARRAY<T>& phis,const VECTOR<int,2>& indices){PHYSBAM_NOT_IMPLEMENTED();}
@@ -86,7 +86,7 @@ public:
 };
 
 template<class T> std::ostream &operator<<(std::ostream &output,const SEGMENT_1D<T> &segment)
-{output << segment.x1 << ", " << segment.x2;return output;}
+{output << segment.X.x << ", " << segment.X.y;return output;}
 
 }
 #endif

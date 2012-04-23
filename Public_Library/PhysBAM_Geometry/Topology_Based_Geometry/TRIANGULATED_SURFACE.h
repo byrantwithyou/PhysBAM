@@ -54,8 +54,8 @@ public:
     {return TRIANGLE_3D<T>(particles.X.Subset(mesh.elements(aggregate_id)));}
     
     TV Face_Normal(const int index) const
-    {if(triangle_list) return (*triangle_list)(index).normal;
-    int i,j,k;mesh.elements(index).Get(i,j,k);return TRIANGLE_3D<T>::Normal(particles.X(i),particles.X(j),particles.X(k));}
+    {if(triangle_list) return (*triangle_list)(index).Normal();
+    return PLANE<T>::Normal(particles.X.Subset(mesh.elements(index)));}
     
     TV Centroid(const int triangle) const
     {int i,j,k;mesh.elements(triangle).Get(i,j,k);

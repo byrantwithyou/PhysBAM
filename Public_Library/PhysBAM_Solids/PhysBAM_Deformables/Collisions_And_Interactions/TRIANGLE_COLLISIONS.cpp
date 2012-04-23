@@ -389,11 +389,11 @@ template<> int TRIANGLE_COLLISIONS<VECTOR<double,1> >::Prune_Non_Intersecting_Pa
 namespace{
 template<class T,class TV> inline SEGMENT_2D<T> Create_Final_Face(const SEGMENT_2D<T>& face,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,2>&> V_face,const T dt)
 {
-    return SEGMENT_2D<T>(face.x1+dt*V_face(0),face.x2+dt*V_face(1));
+    return SEGMENT_2D<T>(face.X.x+dt*V_face(0),face.X.y+dt*V_face(1));
 }
 template<class T,class TV> inline TRIANGLE_3D<T> Create_Final_Face(const TRIANGLE_3D<T>& face,const INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> V_face,const T dt)
 {
-    return TRIANGLE_3D<T>(face.x1+dt*V_face(0),face.x2+dt*V_face(1),face.x3+dt*V_face(2));
+    return TRIANGLE_3D<T>(face.X.x+dt*V_face(0),face.X.y+dt*V_face(1),face.X.z+dt*V_face(2));
 }
 }
 template<class TV> bool TRIANGLE_COLLISIONS<TV>::
@@ -601,8 +601,8 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
 
     // check to see if the final position is too close - see if the edge x3-x4 intersects the cylinder around x1-x2
     T distance;
-    T_EDGE edge1_final=SEGMENT_3D<T>(edge1.x1+dt*V_edges(0),edge1.x2+dt*V_edges(1));
-    T_EDGE edge2_final=SEGMENT_3D<T>(edge2.x1+dt*V_edges(2),edge2.x2+dt*V_edges(3));
+    T_EDGE edge1_final=SEGMENT_3D<T>(edge1.X.x+dt*V_edges(0),edge1.X.y+dt*V_edges(1));
+    T_EDGE edge2_final=SEGMENT_3D<T>(edge2.X.x+dt*V_edges(2),edge2.X.y+dt*V_edges(3));
     if(edge1_final.Edge_Edge_Interaction(edge2_final,V_edges,collision_thickness,distance,normal,weights,false,geometry.small_number,exit_early)){
         T relative_speed=-V_edges.Weighted_Sum(weights).Dot(normal);
         collision_time=dt;if(exit_early) return true;

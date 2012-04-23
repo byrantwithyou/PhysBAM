@@ -521,7 +521,7 @@ Make_Orientations_Consistent_With_Implicit_Surface(const IMPLICIT_OBJECT<TV>& im
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         TV centroid=(T)one_third*(particles.X(i)+particles.X(j)+particles.X(k));
-        TV normal=TRIANGLE_3D<T>::Normal(particles.X(i),particles.X(j),particles.X(k));
+        TV normal=PLANE<T>::Normal(particles.X(i),particles.X(j),particles.X(k));
         if(TV::Dot_Product(normal,implicit_surface.Normal(centroid))<0)mesh.elements(t).Set(i,k,j);}
 }
 //#####################################################################

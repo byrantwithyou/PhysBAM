@@ -89,7 +89,7 @@ template<class T> static VECTOR<T,3>
 Embedded_Subelement_Normal(const EMBEDDED_OBJECT<VECTOR<T,3>,2>& embedded_object,const int emb_seg,const int current_triangle)
 {
     int i,j,k;embedded_object.simplicial_object.mesh.elements(current_triangle).Get(i,j,k);
-    VECTOR<T,3> triangle_normal=TRIANGLE_3D<T>::Normal_Direction(embedded_object.particles.X(i),embedded_object.particles.X(j),embedded_object.particles.X(k));
+    VECTOR<T,3> triangle_normal=PLANE<T>::Normal_Direction(embedded_object.particles.X(i),embedded_object.particles.X(j),embedded_object.particles.X(k));
     return VECTOR<T,3>::Cross_Product(triangle_normal,Embedded_Segment_Vector(embedded_object,emb_seg,current_triangle)).Normalized();
 }
 template<class T> static VECTOR<T,3>
@@ -97,7 +97,7 @@ Embedded_Subelement_Normal(const EMBEDDED_OBJECT<VECTOR<T,3>,3>& embedded_object
 {
     assert(embedded_object.Element_Containing_Subelement(emb_tri)==tetrahedron);
     int a,b,c;VECTOR<int,3>::Map(embedded_object.embedded_particles.subset_index_from_point_cloud_index,embedded_object.embedded_object.mesh.elements(emb_tri)).Get(a,b,c);
-    return TRIANGLE_3D<T>::Normal(embedded_object.Position_Of_Embedded_Particle(a),embedded_object.Position_Of_Embedded_Particle(b),embedded_object.Position_Of_Embedded_Particle(c));
+    return PLANE<T>::Normal(embedded_object.Position_Of_Embedded_Particle(a),embedded_object.Position_Of_Embedded_Particle(b),embedded_object.Position_Of_Embedded_Particle(c));
 }
 //#####################################################################
 // Function Project_Onto_Simplex_Span
@@ -105,7 +105,7 @@ Embedded_Subelement_Normal(const EMBEDDED_OBJECT<VECTOR<T,3>,3>& embedded_object
 template<class T> static void Project_Onto_Simplex_Span(const TRIANGULATED_SURFACE<T>& triangulated_surface,const int triangle,VECTOR<T,3>& fracture_normal)
 {
     int i,j,k;triangulated_surface.mesh.elements(triangle).Get(i,j,k);
-    VECTOR<T,3> triangle_normal=TRIANGLE_3D<T>::Normal(triangulated_surface.particles.X(i),triangulated_surface.particles.X(j),triangulated_surface.particles.X(k));
+    VECTOR<T,3> triangle_normal=PLANE<T>::Normal(triangulated_surface.particles.X(i),triangulated_surface.particles.X(j),triangulated_surface.particles.X(k));
     fracture_normal-=VECTOR<T,3>::Dot_Product(fracture_normal,triangle_normal)*triangle_normal;
 }
 template<class T> static void Project_Onto_Simplex_Span(const TRIANGULATED_AREA<T>&,const int,VECTOR<T,2>&){}

@@ -204,7 +204,7 @@ Display(const int in_color) const
                 const REPULSION_PAIR<TV>& pair=point_triangle_interaction_pairs(k);
                 INDIRECT_ARRAY<const ARRAY_VIEW<TV>,VECTOR<int,4>&> X(deformable_body_collection.particles.X,pair.nodes);
                 glColor3f(.5f,1,.5f);
-                OpenGL_Line(X(0),TRIANGLE_3D<T>(X(1),X(2),X(3)).Surface(X(0)));
+                OpenGL_Line(X(0),PLANE<T>(X(1),X(2),X(3)).Surface(X(0)));
                 glColor3f(0,1,1);
                 OpenGL_Line(X(0),X(1));OpenGL_Line(X(0),X(2));OpenGL_Line(X(0),X(3));}
             OpenGL_End();

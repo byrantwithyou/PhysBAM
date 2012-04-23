@@ -116,7 +116,7 @@ Draw_Boundary_Triangles(const HEXAHEDRON_MESH& hexahedron_mesh) const
     for(int t=0;t<mesh.elements.m;t++){
         int i,j,k;mesh.elements(t).Get(i,j,k);
         VECTOR<T,3> xi=particles->X(i),xj=particles->X(j),xk=particles->X(k);
-        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(TRIANGLE_3D<T>::Normal(xi,xj,xk),normals);
+        for(int plane_vertices=0;plane_vertices<3;plane_vertices++) OpenGL_Normal(PLANE<T>::Normal(xi,xj,xk),normals);
         OpenGL_Triangle(xi,xj,xk,vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
     if(use_inverted_material){

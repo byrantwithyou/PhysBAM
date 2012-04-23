@@ -134,7 +134,7 @@ Fill_Spring_State(int t,int isolated_node_number,int node1,int node2,int node3,i
     state.barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(X(node1),X(node2),X(node3),X(node4));
     state.direction=X(node1)-state.barycentric.x*X(node2)-state.barycentric.y*X(node3)-state.barycentric.z*X(node4);
     state.current_length=state.direction.Normalize();
-    TV normal=TRIANGLE_3D<T>::Normal(X(node2),X(node3),X(node4));
+    TV normal=PLANE<T>::Normal(X(node2),X(node3),X(node4));
     if(!state.current_length) state.direction=normal;
     else if(TV::Dot_Product(state.direction,normal)<0){
         state.direction=-state.direction;
@@ -313,7 +313,7 @@ template<class T> bool LINEAR_ALTITUDE_SPRINGS_3D<T>::
 Compute_Strain_Rate_And_Strain(int t,int isolated_node_number,int node1,int node2,int node3,int node4,T& strain_rate,T& strain) const
 {
     ARRAY_VIEW<const TV> X(particles.X),V(particles.V);
-    TV direction=TRIANGLE_3D<T>::Normal(X(node2),X(node3),X(node4));
+    TV direction=PLANE<T>::Normal(X(node2),X(node3),X(node4));
     T rl=parameters(t)(isolated_node_number).restlength;
     T dx;if(use_rest_state_for_strain_rate) dx=rl;else dx=TV::Dot_Product(direction,X(node1)-X(node2));
     if(use_springs_compressed_beyond_threshold){
@@ -402,7 +402,7 @@ Potential_Energy(const int t,const T time) const
         VECTOR<T,3> barycentric=TRIANGLE_3D<T>::Clamped_Barycentric_Coordinates(X(node1),X(node2),X(node3),X(node4));
         TV direction=X(node1)-barycentric.x*X(node2)-barycentric.y*X(node3)-barycentric.z*X(node4);
         T current_length=direction.Normalize();
-        TV normal=TRIANGLE_3D<T>::Normal(X(node2),X(node3),X(node4));
+        TV normal=PLANE<T>::Normal(X(node2),X(node3),X(node4));
         if(!current_length) direction=normal;
         else if(TV::Dot_Product(direction,normal)<0){
             direction=-direction;

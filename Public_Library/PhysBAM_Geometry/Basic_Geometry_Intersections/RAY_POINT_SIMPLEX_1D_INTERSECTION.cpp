@@ -16,15 +16,15 @@ namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(RAY<VECTOR<T,1> >& ray,const POINT_SIMPLEX_1D<T>& point,const T thickness_over_two)
 {
-    return Intersects(ray,RANGE<VECTOR<T,1> >(point.x1),thickness_over_two);
+    return Intersects(ray,RANGE<VECTOR<T,1> >(point.X.x),thickness_over_two);
 }
 //#####################################################################
 // Function Closest_Non_Intersecting_Point
 //#####################################################################
 template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,1> >& ray,const POINT_SIMPLEX_1D<T>& point,const T thickness_over_two)
 {
-    RANGE<VECTOR<T,1> > thickened_box=RANGE<VECTOR<T,1> >::Bounding_Box(point.x1-2*thickness_over_two,point.x1+2*thickness_over_two);
-    return Intersects(ray,RANGE<VECTOR<T,1> >(point.x1),thickness_over_two);
+    RANGE<VECTOR<T,1> > thickened_box=RANGE<VECTOR<T,1> >::Bounding_Box(point.X.x-2*thickness_over_two,point.X.x+2*thickness_over_two);
+    return Intersects(ray,RANGE<VECTOR<T,1> >(point.X.x),thickness_over_two);
 }
 //#####################################################################
 template bool Intersects(RAY<VECTOR<float,1> >&,const POINT_SIMPLEX_1D<float>&,const float);

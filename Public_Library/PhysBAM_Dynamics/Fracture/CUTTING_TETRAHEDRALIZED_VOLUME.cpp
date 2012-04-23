@@ -1810,7 +1810,7 @@ Get_Child_Cutting_Simplex_Local_Normal(const int simplex) const
 {
     assert(!cutting_simplices->Simplex_Is_Parent(simplex));
     const VECTOR<TV,3>& simplex_nodes_in_local_tet_space=cutting_simplices->simplices(simplex).weights;
-    return TRIANGLE_3D<T>::Normal(simplex_nodes_in_local_tet_space(0),simplex_nodes_in_local_tet_space(1),simplex_nodes_in_local_tet_space(2));
+    return PLANE<T>::Normal(simplex_nodes_in_local_tet_space(0),simplex_nodes_in_local_tet_space(1),simplex_nodes_in_local_tet_space(2));
 }
 //#####################################################################
 // Function Local_Planar_Coordinates_For_Intersection

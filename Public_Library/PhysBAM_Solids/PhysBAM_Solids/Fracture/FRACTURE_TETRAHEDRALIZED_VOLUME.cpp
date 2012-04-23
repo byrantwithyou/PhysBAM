@@ -94,8 +94,8 @@ Add_Next_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_p
         embedded_object.Add_Embedded_Particle_If_Not_Already_There(j,l,LEVELSET_UTILITIES<T>::Theta(phi2,phi4));
         VECTOR<T,3> xik=embedded_object.Position_Of_Embedded_Particle(i,k),xil=embedded_object.Position_Of_Embedded_Particle(i,l);
         VECTOR<T,3> xjk=embedded_object.Position_Of_Embedded_Particle(j,k),xjl=embedded_object.Position_Of_Embedded_Particle(j,l);
-        if(second_cut) Add_Second_Cut(tetrahedron,(TRIANGLE_3D<T>::Normal(xik,xjk,xjl)+TRIANGLE_3D<T>::Normal(xjl,xil,xik))/(T)2);
-        else Add_Third_Cut(tetrahedron,(TRIANGLE_3D<T>::Normal(xik,xjk,xjl)+TRIANGLE_3D<T>::Normal(xjl,xil,xik))/(T)2);}
+        if(second_cut) Add_Second_Cut(tetrahedron,(PLANE<T>::Normal(xik,xjk,xjl)+PLANE<T>::Normal(xjl,xil,xik))/(T)2);
+        else Add_Third_Cut(tetrahedron,(PLANE<T>::Normal(xik,xjk,xjl)+PLANE<T>::Normal(xjl,xil,xik))/(T)2);}
     else{ // count is 1 or 3
         if(positive_count==1)while(!(tetrahedron_phi(pi)>0)) permute_four(VECTOR<int,4>(1,2,3,4),++count).Get(pi,pj,pk,pl);
         else while(!(tetrahedron_phi(pi)<=0)) permute_four(VECTOR<int,4>(1,2,3,4),++count).Get(pi,pj,pk,pl);
@@ -104,8 +104,8 @@ Add_Next_Cut_Based_On_Phi(const int tetrahedron,const VECTOR<T,4>& tetrahedron_p
         embedded_object.Add_Embedded_Particle_If_Not_Already_There(i,k,LEVELSET_UTILITIES<T>::Theta(phi1,phi3));
         embedded_object.Add_Embedded_Particle_If_Not_Already_There(i,l,LEVELSET_UTILITIES<T>::Theta(phi1,phi4));
         VECTOR<T,3> xij=embedded_object.Position_Of_Embedded_Particle(i,j),xik=embedded_object.Position_Of_Embedded_Particle(i,k),xil=embedded_object.Position_Of_Embedded_Particle(i,l);
-        if(second_cut) Add_Second_Cut(tetrahedron,TRIANGLE_3D<T>::Normal(xij,xik,xil));
-        else Add_Third_Cut(tetrahedron,TRIANGLE_3D<T>::Normal(xij,xik,xil));}
+        if(second_cut) Add_Second_Cut(tetrahedron,PLANE<T>::Normal(xij,xik,xil));
+        else Add_Third_Cut(tetrahedron,PLANE<T>::Normal(xij,xik,xil));}
 }
 //#####################################################################
 // Function Add_Intersected_Points_To_Embedded_Tetrahedralized_Volume
@@ -228,20 +228,20 @@ Add_Best_Embedded_Triangle_With_Quad(const TV& fracture_normal,const int tetrahe
     if(embedded_object.Node_In_Simplex_Is_Material(i,tetrahedron)){assert(embedded_object.Node_In_Simplex_Is_Material(j,tetrahedron));
         if(!tetrahedron_phi || (*tetrahedron_phi)(pi)>0){
             T lambda=Interpolation_Fraction_For_Best_Normal(fracture_normal,tetrahedron,ik,li,i,j),
-                candidate=abs(TV::Dot_Product(fracture_normal,TRIANGLE_3D<T>::Normal(ik,li,LINEAR_INTERPOLATION<T,TV>::Linear(xi,xj,lambda))));
+                candidate=abs(TV::Dot_Product(fracture_normal,PLANE<T>::Normal(ik,li,LINEAR_INTERPOLATION<T,TV>::Linear(xi,xj,lambda))));
             if(candidate>best_matched){best_matched=candidate;best_matched_index=i;best_lambda=lambda;}}
         if(!tetrahedron_phi || (*tetrahedron_phi)(pj)>0){
             T lambda=Interpolation_Fraction_For_Best_Normal(fracture_normal,tetrahedron,jl,kj,j,i),
-                candidate=abs(TV::Dot_Product(fracture_normal,TRIANGLE_3D<T>::Normal(jl,kj,LINEAR_INTERPOLATION<T,TV>::Linear(xj,xi,lambda))));
+                candidate=abs(TV::Dot_Product(fracture_normal,PLANE<T>::Normal(jl,kj,LINEAR_INTERPOLATION<T,TV>::Linear(xj,xi,lambda))));
             if(candidate>best_matched){best_matched=candidate;best_matched_index=j;best_lambda=lambda;}}}
     else{assert(embedded_object.Node_In_Simplex_Is_Material(k,tetrahedron) && embedded_object.Node_In_Simplex_Is_Material(k,tetrahedron));
         if(!tetrahedron_phi || (*tetrahedron_phi)(pk)>0){
             T lambda=Interpolation_Fraction_For_Best_Normal(fracture_normal,tetrahedron,ik,kj,k,l),
-                candidate=abs(TV::Dot_Product(fracture_normal,TRIANGLE_3D<T>::Normal(ik,kj,LINEAR_INTERPOLATION<T,TV>::Linear(xk,xl,lambda))));
+                candidate=abs(TV::Dot_Product(fracture_normal,PLANE<T>::Normal(ik,kj,LINEAR_INTERPOLATION<T,TV>::Linear(xk,xl,lambda))));
             if(candidate>best_matched){best_matched=candidate;best_matched_index=k;best_lambda=lambda;}}
         if(!tetrahedron_phi || (*tetrahedron_phi)(pl)>0){
             T lambda=Interpolation_Fraction_For_Best_Normal(fracture_normal,tetrahedron,jl,li,l,k),
-                candidate=abs(TV::Dot_Product(fracture_normal,TRIANGLE_3D<T>::Normal(jl,li,LINEAR_INTERPOLATION<T,TV>::Linear(xl,xk,lambda))));
+                candidate=abs(TV::Dot_Product(fracture_normal,PLANE<T>::Normal(jl,li,LINEAR_INTERPOLATION<T,TV>::Linear(xl,xk,lambda))));
             if(candidate>best_matched){best_matched=candidate;best_matched_index=l;best_lambda=lambda;}}}
     if(best_matched_index==i){
         embedded_object.Add_Embedded_Particle_If_Not_Already_There(i,j,best_lambda);embedded_object.Add_Embedded_Triangle(i,j,i,k,i,l);return true;}
@@ -269,7 +269,7 @@ Interpolation_Fraction_For_Best_Normal(const TV& fracture_normal,const int tetra
     if(projected_normal.Magnitude_Squared()<(T)1e-8) return (T).5; // arbitrary since orthogonal -- and the dot product with fracture normal will be zero
     T denominator=TV::Dot_Product(xj-xi,projected_normal);
     if(abs(denominator)<(T)1e-8){
-        TV ni=TRIANGLE_3D<T>::Normal(xi,ik,il),nj=TRIANGLE_3D<T>::Normal(xj,ik,il);
+        TV ni=PLANE<T>::Normal(xi,ik,il),nj=PLANE<T>::Normal(xj,ik,il);
         T ni_dot_projected_normal=abs(TV::Dot_Product(ni,projected_normal));T nj_dot_projected_normal=abs(TV::Dot_Product(nj,projected_normal));
         if(ni_dot_projected_normal>nj_dot_projected_normal) return embedded_object.Clamp_Interpolation_Fraction((T)0);
         else return embedded_object.Clamp_Interpolation_Fraction((T)1);}
@@ -344,8 +344,8 @@ Add_Best_Embedded_Triangle_With_Quad_And_Triangle(const TV& fracture_normal,cons
         &xk=embedded_object.simplicial_object.particles.X(k),&xl=embedded_object.simplicial_object.particles.X(l);
     T lambda_k=Interpolation_Fraction_For_Best_Normal(fracture_normal,tetrahedron,ik,kj,k,l);
     T lambda_l=Interpolation_Fraction_For_Best_Normal(fracture_normal,tetrahedron,jl,li,l,k);
-    T quality_metric_k=abs(TV::Dot_Product(fracture_normal,TRIANGLE_3D<T>::Normal(ik,kj,LINEAR_INTERPOLATION<T,TV>::Linear(xk,xl,lambda_k))));
-    T quality_metric_l=abs(TV::Dot_Product(fracture_normal,TRIANGLE_3D<T>::Normal(jl,li,LINEAR_INTERPOLATION<T,TV>::Linear(xl,xk,lambda_l))));
+    T quality_metric_k=abs(TV::Dot_Product(fracture_normal,PLANE<T>::Normal(ik,kj,LINEAR_INTERPOLATION<T,TV>::Linear(xk,xl,lambda_k))));
+    T quality_metric_l=abs(TV::Dot_Product(fracture_normal,PLANE<T>::Normal(jl,li,LINEAR_INTERPOLATION<T,TV>::Linear(xl,xk,lambda_l))));
     if(quality_metric_k>quality_metric_l){
         embedded_object.Add_Embedded_Particle_If_Not_Already_There(k,l,lambda_k);embedded_object.Add_Embedded_Triangle(k,l,k,i,k,j);}
     else{embedded_object.Add_Embedded_Particle_If_Not_Already_There(l,k,lambda_l);embedded_object.Add_Embedded_Triangle(l,k,l,j,l,i);}

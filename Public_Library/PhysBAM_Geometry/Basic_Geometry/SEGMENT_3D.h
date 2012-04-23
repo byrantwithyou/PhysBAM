@@ -16,25 +16,25 @@ class SEGMENT_3D
 {
     typedef VECTOR<T,3> TV;
 public:
-    TV x1,x2;
+    VECTOR<TV,2> X;
 
     SEGMENT_3D()
-        :x1(0,0,0),x2(1,0,0)
+        :X(TV(),TV(1,0,0))
     {}
 
     SEGMENT_3D(const TV& x1_input,const TV& x2_input)
-        :x1(x1_input),x2(x2_input)
+        :X(x1_input,x2_input)
     {}
 
     template<class T_ARRAY>
     SEGMENT_3D(const T_ARRAY& X_input)
-        :x1(X_input(0)),x2(X_input(1))
+        :X(X_input(0),X_input(1))
     {
         STATIC_ASSERT(T_ARRAY::m==2);
     }
 
     T Length() const
-    {return (x2-x1).Magnitude();}
+    {return (X.y-X.x).Magnitude();}
 
     T Size() const
     {return Length();}

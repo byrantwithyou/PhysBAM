@@ -48,16 +48,16 @@ bool Outside(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>& location,const
             if(region_id==0) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node1,node2);
             else if(region_id==1) neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node2,node3);
             else neighbor=ts.mesh.Adjacent_Triangle(ray.aggregate_id,node3,node1);
-            if(neighbor==-1){if(triangle.Lazy_Outside(location)) outside=true;}
+            if(neighbor==-1){if(triangle.Lazy_Outside_Plane(location)) outside=true;}
             else{
                 TRIANGLE_3D<T>& triangle2=(*ts.triangle_list)(neighbor);
                 bool convex=false;
-                if(region_id==0){if(TV::Dot_Product(triangle2.normal,triangle.x3-triangle2.x1)>=0) convex=true;}
-                else if(region_id==1){if(TV::Dot_Product(triangle2.normal,triangle.x1-triangle2.x1)>=0) convex=true;}
-                else if(region_id==2){if(TV::Dot_Product(triangle2.normal,triangle.x2-triangle2.x1)>=0) convex=true;}
-                if(convex){if(triangle.Lazy_Outside(location) || triangle2.Lazy_Outside(location)) outside=true;} // outside either - can use location or point
-                else{if(triangle.Lazy_Outside(location) && triangle2.Lazy_Outside(location)) outside=true;}}} // outside both - can use location or point
-        else{if(triangle.Lazy_Outside(location)) outside=true;}} // region=3 - face - can use location or point
+                if(region_id==0){if(TV::Dot_Product(triangle2.Normal(),triangle.X.z-triangle2.X.x)>=0) convex=true;}
+                else if(region_id==1){if(TV::Dot_Product(triangle2.Normal(),triangle.X.x-triangle2.X.x)>=0) convex=true;}
+                else if(region_id==2){if(TV::Dot_Product(triangle2.Normal(),triangle.X.y-triangle2.X.x)>=0) convex=true;}
+                if(convex){if(triangle.Lazy_Outside_Plane(location) || triangle2.Lazy_Outside_Plane(location)) outside=true;} // outside either - can use location or point
+                else{if(triangle.Lazy_Outside_Plane(location) && triangle2.Lazy_Outside_Plane(location)) outside=true;}}} // outside both - can use location or point
+        else{if(triangle.Lazy_Outside_Plane(location)) outside=true;}} // region=3 - face - can use location or point
     return outside;
 }
 template<class T>

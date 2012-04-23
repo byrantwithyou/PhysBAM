@@ -17,7 +17,7 @@ namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D<T>& triangle,const T thickness_over_two)
 {
-    RAY<VECTOR<T,3> > ray(segment.x1,segment.x2-segment.x1);ray.semi_infinite=false;ray.t_max=(segment.x2-segment.x1).Magnitude();
+    RAY<VECTOR<T,3> > ray(segment.X.x,segment.X.y-segment.X.x);ray.semi_infinite=false;ray.t_max=(segment.X.y-segment.X.x).Magnitude();
     return INTERSECTION::Intersects(ray,triangle,thickness_over_two);
 }
 //#####################################################################
@@ -25,8 +25,8 @@ template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D
 //#####################################################################
 template<class T> bool Intersects(const SEGMENT_3D<T>& segment,const TRIANGLE_3D<T>& triangle,T& a,VECTOR<T,3>& weights,const T thickness_over_two)
 {
-    RAY<VECTOR<T,3> > ray(segment.x1,segment.x2-segment.x1);ray.semi_infinite=false;
-    T magnitude=(segment.x2-segment.x1).Magnitude();ray.t_max=magnitude;
+    RAY<VECTOR<T,3> > ray(segment.X.x,segment.X.y-segment.X.x);ray.semi_infinite=false;
+    T magnitude=(segment.X.y-segment.X.x).Magnitude();ray.t_max=magnitude;
     if(INTERSECTION::Intersects(ray,triangle,thickness_over_two)){a=ray.t_max/magnitude;weights=triangle.Barycentric_Coordinates(ray.Point(ray.t_max));return true;}
     return false;
 }

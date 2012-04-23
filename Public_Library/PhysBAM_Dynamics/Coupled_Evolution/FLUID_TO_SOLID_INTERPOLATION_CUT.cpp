@@ -58,9 +58,9 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
         CLIP_ENTRY ce;
         for(ce.i=0;ce.i<curve.mesh.elements.m;ce.i++){
             SEGMENT_2D<T> segment(X(curve.mesh.elements(ce.i).x),X(curve.mesh.elements(ce.i).y));
-            PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside_Half_Open(segment.x1) && index_map.grid.domain.Lazy_Inside_Half_Open(segment.x2));
-            RANGE<TV_INT> box(index_map.grid.Cell(segment.x1,3));
-            box.Enlarge_To_Include_Point(index_map.grid.Cell(segment.x2,3));
+            PHYSBAM_ASSERT(index_map.grid.domain.Lazy_Inside_Half_Open(segment.X.x) && index_map.grid.domain.Lazy_Inside_Half_Open(segment.X.y));
+            RANGE<TV_INT> box(index_map.grid.Cell(segment.X.x,3));
+            box.Enlarge_To_Include_Point(index_map.grid.Cell(segment.X.y,3));
             for(RANGE_ITERATOR<TV::m> it(box);it.Valid();it.Next())
                 if(segment.Clip_To_Box(index_map.grid.Cell_Domain(it.index),ce.a,ce.b))
                     cut_cells.Get_Or_Insert(it.index).clipped_segments.Append(ce);}
@@ -125,13 +125,13 @@ template<class T> struct FLUID_TO_SOLID_INTERPOLATION_CUT_DISPATCH<VECTOR<T,2> >
             cc.face=++last_face;
             for(int i=0;i<cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
                 SEGMENT_2D<T> segment(X(curve.mesh.elements(e.i).x),X(curve.mesh.elements(e.i).y));
-                TV n=(segment.x2-segment.x1).Rotate_Clockwise_90()*(e.b-e.a);
+                TV n=(segment.X.y-segment.X.x).Rotate_Clockwise_90()*(e.b-e.a);
                 for(int a=0;a<TV::m;a++)
                     for(int k=0;k<2;k++){
                         FACE_INDEX<TV::m> f(a,cell);
                         f.index(a)+=k;
                         this_.Cut_Face(f,n,segment);}}
-            TV N=(cc.segment.x2-cc.segment.x1).Normalized().Rotate_Clockwise_90();
+            TV N=(cc.segment.X.y-cc.segment.X.x).Normalized().Rotate_Clockwise_90();
             for(int i=0;i<cc.clipped_segments.m;i++){const CLIP_ENTRY& e=cc.clipped_segments(i);
                 T len=(e.b-e.a)*edge_length(e.i);
                 T alpha=(e.a+e.b)/2;
@@ -363,8 +363,8 @@ Face_Type(int f) const
     if(!b){
         if(!(*outside_fluid)(face_index.Second_Cell_Index())) return inside;
         return index_map.two_phase?outside:unused;}
-    TV dx=index_map.grid.Axis_X_Face(face_index)-a->segment.x1;
-    TV N=(a->segment.x2-a->segment.x1).Rotate_Clockwise_90();
+    TV dx=index_map.grid.Axis_X_Face(face_index)-a->segment.X.x;
+    TV N=(a->segment.X.y-a->segment.X.x).Rotate_Clockwise_90();
     if(TV::Dot_Product(dx,N)<=0) return inside;
     return index_map.two_phase?outside:unused;
 }
@@ -578,7 +578,7 @@ Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector)
 /*
     T mn=FLT_MAX,mx=-mn;
     for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
-        T x=fluid_velocity_vector(it.Data().face)/(it.Data().segment.x2-it.Data().segment.x1).Magnitude();
+        T x=fluid_velocity_vector(it.Data().face)/(it.Data().segment.X.y-it.Data().segment.X.x).Magnitude();
         if(x<mn) mn=x;
         if(x>mx) mx=x;}
     LOG::cout<<"RANGE: "<<mn<<" "<<mx<<std::endl;
@@ -588,7 +588,7 @@ Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector)
     color_map.Initialize_Colors(mn,mx,false,false,false);
 
     for(typename HASHTABLE<TV_INT,CUT_CELL>::ITERATOR it(cut_cells);it.Valid();it.Next()){
-        VECTOR<T,2> N=(it.Data().segment.x2-it.Data().segment.x1).Rotate_Clockwise_90();
+        VECTOR<T,2> N=(it.Data().segment.X.y-it.Data().segment.X.x).Rotate_Clockwise_90();
         VECTOR<T,2> V=fluid_velocity_vector(it.Data().face)*N.Normalized();
         T x=fluid_velocity_vector(it.Data().face);
         Add_Debug_Particle(it.Data().segment.Center(),color_map(x));

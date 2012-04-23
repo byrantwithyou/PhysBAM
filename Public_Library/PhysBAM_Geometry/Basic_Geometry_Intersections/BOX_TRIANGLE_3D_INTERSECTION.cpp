@@ -18,7 +18,7 @@ namespace INTERSECTION{
 template<class T> bool Intersects(const RANGE<VECTOR<T,3> >& box,const TRIANGLE_3D<T>& triangle,const T thickness_over_two)
 {
     typedef VECTOR<T,3> TV;
-    TV c=box.Center(),h=(T).5*box.Edge_Lengths()+thickness_over_two,x1=triangle.x1-c,x2=triangle.x2-c,x3=triangle.x3-c;
+    TV c=box.Center(),h=(T).5*box.Edge_Lengths()+thickness_over_two,x1=triangle.X.x-c,x2=triangle.X.y-c,x3=triangle.X.z-c;
     VECTOR<TV,3> cp(TV::Cross_Product(x1,x2),TV::Cross_Product(x2,x3),TV::Cross_Product(x3,x1));
     TV sum(cp.Sum()),minsum=TV::Componentwise_Min(sum,TV()),maxsum=TV::Componentwise_Max(sum,TV());
     VECTOR<TV,3> diff=abs(VECTOR<TV,3>(x1-x2,x2-x3,x3-x1));
@@ -27,7 +27,7 @@ template<class T> bool Intersects(const RANGE<VECTOR<T,3> >& box,const TRIANGLE_
         T r=h(k)*diff(i)(m)+h(m)*diff(i)(k);if(minsum(j)-cp(i)(j)>r || maxsum(j)-cp(i)(j)<-r) return false;}
 
     if(!box.Intersection(triangle.Bounding_Box(),thickness_over_two)) return false;
-    if(!Intersects(box,static_cast<const PLANE<T>&>(triangle),thickness_over_two)) return false;
+    if(!Intersects(box,PLANE<T>(triangle.Normal(),triangle.X.x),thickness_over_two)) return false;
 
     return true;
 }

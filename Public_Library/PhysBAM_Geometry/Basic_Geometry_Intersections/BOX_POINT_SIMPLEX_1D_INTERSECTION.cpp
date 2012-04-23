@@ -14,7 +14,7 @@ namespace INTERSECTION{
 //#####################################################################
 template<class T> bool Intersects(const RANGE<VECTOR<T,1> >& box,const POINT_SIMPLEX_1D<T>& point,const T thickness_over_two)
 {
-    return !box.Outside(point.x1,thickness_over_two);
+    return !box.Outside(point.X.x,thickness_over_two);
 }
 //#####################################################################
 // Function Halfspace_Intersection_Size

@@ -73,7 +73,7 @@ Update_Position_Based_State(const T time)
         if(triangulated_surface) for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             int i,j,k;simplicial_object.mesh.elements(t).Get(i,j,k);
             const TV &Xi=particles.X(i),&Xj=particles.X(j),&Xk=particles.X(k);
-            optimization(t).center=(T)one_third*(Xi+Xj+Xk);optimization(t).inward_normal=TRIANGLE_3D<T>::Normal_Direction(Xi,Xk,Xj);
+            optimization(t).center=(T)one_third*(Xi+Xj+Xk);optimization(t).inward_normal=PLANE<T>::Normal_Direction(Xi,Xk,Xj);
             optimization(t).one_third_area=(T)one_sixth*optimization(t).inward_normal.Normalize();
             if(use_spatially_varying_wind) optimization(t).wind_velocity=Spatially_Varying_Wind_Velocity(optimization(t).center);}
         else for(int t=0;t<rigid_body->simplicial_object->mesh.elements.m;t++){
@@ -86,7 +86,7 @@ Update_Position_Based_State(const T time)
         for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()) vertex_normals(iterator.Data())=TV();
         for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int t=iterator.Data();
             const VECTOR<int,3>& nodes=simplicial_object.mesh.elements(t);
-            vertex_normals.Subset(nodes)+=TRIANGLE_3D<T>::Normal_Direction(particles.X.Subset(nodes));}
+            vertex_normals.Subset(nodes)+=PLANE<T>::Normal_Direction(particles.X.Subset(nodes));}
         for(ELEMENT_ITERATOR iterator(force_particles);iterator.Valid();iterator.Next()) vertex_normals(iterator.Data()).Normalize();}
 }
 //#####################################################################

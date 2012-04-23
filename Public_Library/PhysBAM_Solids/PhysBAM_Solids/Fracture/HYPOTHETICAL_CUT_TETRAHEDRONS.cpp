@@ -128,7 +128,7 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        VECTOR<T,3> normal=PLANE<T>::Normal(Position(0),Position(1),Position(2));
         PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_il;
         plane.Segment_Plane_Intersection(particles.X(i),particles.X(l),interpolation_fraction_il);
@@ -137,7 +137,7 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        VECTOR<T,3> normal=PLANE<T>::Normal(Position(0),Position(1),Position(2));
         PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_jl;
         plane.Segment_Plane_Intersection(particles.X(j),particles.X(l),interpolation_fraction_jl);
@@ -146,7 +146,7 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(k,i,embedded_object.interpolation_fraction(ep4));
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        VECTOR<T,3> normal=PLANE<T>::Normal(Position(0),Position(1),Position(2));
         PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_jk;
         plane.Segment_Plane_Intersection(particles.X(j),particles.X(k),interpolation_fraction_jk);
@@ -155,7 +155,7 @@ Initialize_Quad_Cut(const int i,const int j)
         Add_Hypothetical_Node(i,l,embedded_object.interpolation_fraction(ep1));
         Add_Hypothetical_Node(l,j,embedded_object.interpolation_fraction(ep2));
         Add_Hypothetical_Node(k,j,embedded_object.interpolation_fraction(ep3));
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(Position(0),Position(1),Position(2));
+        VECTOR<T,3> normal=PLANE<T>::Normal(Position(0),Position(1),Position(2));
         PLANE<T> plane(normal,Position(0));
         T interpolation_fraction_ki;
         plane.Segment_Plane_Intersection(particles.X(k),particles.X(i),interpolation_fraction_ki);
@@ -239,7 +239,7 @@ Interpolation_Fraction_For_Best_Normal(const VECTOR<T,3>& ik,const VECTOR<T,3>& 
     if(projected_normal.Magnitude_Squared()<(T)1e-8) return (T).5; // arbitrary since orthogonal -- and the dot product with fracture normal will be zero
     T denominator=VECTOR<T,3>::Dot_Product(xj-xi,projected_normal);
     if(abs(denominator)<(T)1e-8){
-        VECTOR<T,3> ni=TRIANGLE_3D<T>::Normal(xi,ik,il),nj=TRIANGLE_3D<T>::Normal(xj,ik,il);
+        VECTOR<T,3> ni=PLANE<T>::Normal(xi,ik,il),nj=PLANE<T>::Normal(xj,ik,il);
         T ni_dot_projected_normal=abs(VECTOR<T,3>::Dot_Product(ni,projected_normal));T nj_dot_projected_normal=abs(VECTOR<T,3>::Dot_Product(nj,projected_normal));
         if(ni_dot_projected_normal > nj_dot_projected_normal) return embedded_object.Clamp_Interpolation_Fraction((T)0);            
         else return embedded_object.Clamp_Interpolation_Fraction((T)1);}

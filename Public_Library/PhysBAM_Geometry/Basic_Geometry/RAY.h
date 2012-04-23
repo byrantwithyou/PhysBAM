@@ -49,21 +49,21 @@ public:
     {if(!already_normalized) direction.Normalize();}
 
     RAY(const SEGMENT_1D<T>& segment)
-        :endpoint(segment.x1),direction(segment.x2-segment.x1),semi_infinite(false),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
+        :endpoint(segment.X.x),direction(segment.X.y-segment.X.x),semi_infinite(false),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
     {
         STATIC_ASSERT(TV::dimension==1);
         t_max=direction.Normalize();
     }
 
     RAY(const SEGMENT_2D<T>& segment)
-        :endpoint(segment.x1),direction(segment.x2-segment.x1),semi_infinite(false),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
+        :endpoint(segment.X.x),direction(segment.X.y-segment.X.x),semi_infinite(false),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
     {
         STATIC_ASSERT(TV::dimension==2);
         t_max=direction.Normalize();
     }
 
     RAY(const SEGMENT_3D<T>& segment)
-        :endpoint(segment.x1),direction(segment.x2-segment.x1),semi_infinite(false),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
+        :endpoint(segment.X.x),direction(segment.X.y-segment.X.x),semi_infinite(false),aggregate_id(0),intersection_location(LOCATION_UNKNOWN),computed_lazy_box_intersection_acceleration_data(false)
     {
         STATIC_ASSERT(TV::dimension==3);
         t_max=direction.Normalize();

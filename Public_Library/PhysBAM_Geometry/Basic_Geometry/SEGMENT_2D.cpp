@@ -21,9 +21,9 @@ using namespace PhysBAM;
 template<class T> bool SEGMENT_2D<T>::
 Segment_Line_Intersection(const TV& point_on_line,const TV& normal_of_line,T &interpolation_fraction) const
 {
-    T denominator=TV::Dot_Product(x2-x1,normal_of_line);
+    T denominator=TV::Dot_Product(X.y-X.x,normal_of_line);
     if(!denominator){interpolation_fraction=FLT_MAX;return false;} // parallel
-    interpolation_fraction=TV::Dot_Product(point_on_line-x1,normal_of_line)/denominator;
+    interpolation_fraction=TV::Dot_Product(point_on_line-X.x,normal_of_line)/denominator;
     return interpolation_fraction<=1 && interpolation_fraction>=0;
 }
 //#####################################################################
@@ -32,14 +32,14 @@ Segment_Line_Intersection(const TV& point_on_line,const TV& normal_of_line,T &in
 template<class T> VECTOR<T,2> SEGMENT_2D<T>::
 Closest_Point_On_Segment(const TV& point) const
 {                  
-    TV v=x2-x1;
+    TV v=X.y-X.x;
     T denominator=TV::Dot_Product(v,v);
-    if(denominator == 0) return x1; // x1 and x2 are a single point
+    if(denominator == 0) return X.x; // X.x and X.y are a single point
     else{
-        T t=TV::Dot_Product(point-x1,v)/denominator;
-        if(t <= 0) return x1;
-        else if(t >= 1) return x2;
-        else{v=x1+(x2-x1)*t;return v;}}
+        T t=TV::Dot_Product(point-X.x,v)/denominator;
+        if(t <= 0) return X.x;
+        else if(t >= 1) return X.y;
+        else{v=X.x+(X.y-X.x)*t;return v;}}
 }
 //#####################################################################
 // Function Distance_From_Point_To_Segment
@@ -56,12 +56,12 @@ Distance_From_Point_To_Segment(const TV& point) const
 template<class T> VECTOR<T,2> SEGMENT_2D<T>::
 Closest_Point_On_Line(const TV& point) const
 {                  
-    TV v=x2-x1;
+    TV v=X.y-X.x;
     T denominator=TV::Dot_Product(v,v);
-    if(denominator == 0) return x1; // x1 and x2 are a single point
+    if(denominator == 0) return X.x; // X.x and X.y are a single point
     else{
-        T t=TV::Dot_Product(point-x1,v)/denominator;
-        v=x1+(x2-x1)*t;return v;}
+        T t=TV::Dot_Product(point-X.x,v)/denominator;
+        v=X.x+(X.y-X.x)*t;return v;}
 }
 //#####################################################################
 // Function Distance_From_Point_To_Line
@@ -80,7 +80,7 @@ Distance_From_Point_To_Line(const TV& point) const
 template<class T> VECTOR<T,2> SEGMENT_2D<T>::
 Shortest_Vector_Between_Segments(const SEGMENT_2D<T>& segment,T& a,T& b) const
 {
-    TV u=x2-x1,v=segment.x2-segment.x1,w=segment.x1-x1;
+    TV u=X.y-X.x,v=segment.X.y-segment.X.x,w=segment.X.x-X.x;
     T u_magnitude=u.Magnitude(),v_magnitude=v.Magnitude();
     T u_dot_u=sqr(u_magnitude),v_dot_v=sqr(v_magnitude),u_dot_v=TV::Dot_Product(u,v),
                u_dot_w=TV::Dot_Product(u,w),v_dot_w=TV::Dot_Product(v,w);
@@ -90,15 +90,15 @@ Shortest_Vector_Between_Segments(const SEGMENT_2D<T>& segment,T& a,T& b) const
     if(rhs2 <= 0) b=0;else if(denominator < rhs2) b=1;else b=rhs2/denominator;
     if(a > 0 && a < 1){
         if(b == 0){a=u_dot_w/u_dot_u;if(a < 0) a=0;else if(a > 1) a=1;}
-        else if(b == 1){a=TV::Dot_Product(segment.x2-x1,u)/u_dot_u;if(a < 0) a=0;else if(a > 1) a=1;}}
+        else if(b == 1){a=TV::Dot_Product(segment.X.y-X.x,u)/u_dot_u;if(a < 0) a=0;else if(a > 1) a=1;}}
     else if(b > 0 && b < 1){
         if(a == 0){b=-v_dot_w/v_dot_v;if(b < 0) b=0;else if(b > 1) b=1;}
-        else if(a == 1){b=TV::Dot_Product(x2-segment.x1,v)/v_dot_v;if(b < 0) b=0;else if(b > 1) b=1;}}
+        else if(a == 1){b=TV::Dot_Product(X.y-segment.X.x,v)/v_dot_v;if(b < 0) b=0;else if(b > 1) b=1;}}
     else{
         T a_distance=(a == 0 ? -rhs1:rhs1-denominator)*u_magnitude,b_distance=(b == 0 ? -rhs2:rhs2-denominator)*v_magnitude;
         if(a_distance > b_distance){
-            if(a == 0) b=-v_dot_w/v_dot_v;else b=TV::Dot_Product(x2-segment.x1,v)/v_dot_v;if(b < 0) b=0;else if(b > 1) b=1;}
-        else{if(b == 0) a=u_dot_w/u_dot_u;else a=TV::Dot_Product(segment.x2-x1,u)/u_dot_u;if(a < 0) a=0;else if(a > 1) a=1;}}
+            if(a == 0) b=-v_dot_w/v_dot_v;else b=TV::Dot_Product(X.y-segment.X.x,v)/v_dot_v;if(b < 0) b=0;else if(b > 1) b=1;}
+        else{if(b == 0) a=u_dot_w/u_dot_u;else a=TV::Dot_Product(segment.X.y-X.x,u)/u_dot_u;if(a < 0) a=0;else if(a > 1) a=1;}}
     return a*u-w-b*v;
 }
 //#####################################################################
@@ -114,7 +114,7 @@ Segment_Segment_Interaction(const SEGMENT_2D<T>& segment,const TV& v1,const TV& 
     if(distance > small_number) normal/=distance;
     else{ // set normal based on relative velocity perpendicular to the two points
         TV relative_velocity=velocity1-velocity2;
-        TV u=x2-x1;
+        TV u=X.y-X.x;
         normal=relative_velocity-TV::Dot_Product(relative_velocity,u)/TV::Dot_Product(u,u)*u;
         T normal_magnitude=normal.Magnitude();
         if(normal_magnitude > small_number) normal/=normal_magnitude;
@@ -137,12 +137,12 @@ Segment_Segment_Collision(const SEGMENT_2D<T>& segment,const TV& v1,const TV& v2
                           const T collision_thickness,T& collision_time,TV& normal,T& a,T& b,const T small_number) const
 {
     // find cubic and compute the roots as possible collision times
-    TV ABo=x2-x1,ABv=dt*(v2-v1),ACo=segment.x2-segment.x1,ACv=dt*(v4-v3);
+    TV ABo=X.y-X.x,ABv=dt*(v2-v1),ACo=segment.X.y-segment.X.x,ACv=dt*(v4-v3);
     VECTOR<T,3> No_3D=TV::Cross_Product(ABo,ACo),
                              Nv_3D=TV::Cross_Product(ABo,ACv)+TV::Cross_Product(ABv,ACo),
                              Na_3D=TV::Cross_Product(ABv,ACv);
     TV No(No_3D.x,No_3D.y),Nv(Nv_3D.x,Nv_3D.y), Na(Na_3D.x,Na_3D.y);
-    TV APo=segment.x1-x1,APv=dt*(v3-v1);
+    TV APo=segment.X.x-X.x,APv=dt*(v3-v1);
     CUBIC<T> cubic(TV::Dot_Product(Na,APv),TV::Dot_Product(Nv,APv)+TV::Dot_Product(Na,APo),
                               TV::Dot_Product(No,APv)+TV::Dot_Product(Nv,APo),TV::Dot_Product(No,APo));
     cubic.Compute_Roots_In_Interval(0,1+1e-6);
@@ -151,8 +151,8 @@ Segment_Segment_Collision(const SEGMENT_2D<T>& segment,const TV& v1,const TV& v2
     T distance;
     for(int roots=0;roots<cubic.roots;roots++){
         if(roots == 1) collision_time=dt*cubic.root1;else if(roots == 2) collision_time=dt*cubic.root2;else collision_time=dt*cubic.root3;
-        SEGMENT_2D segment2(x1+collision_time*v1,x2+collision_time*v2);
-        if(segment2.Segment_Segment_Interaction(SEGMENT_2D(segment.x1+collision_time*v3,segment.x2+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,a,b,
+        SEGMENT_2D segment2(X.x+collision_time*v1,X.y+collision_time*v2);
+        if(segment2.Segment_Segment_Interaction(SEGMENT_2D(segment.X.x+collision_time*v3,segment.X.y+collision_time*v4),v1,v2,v3,v4,collision_thickness,distance,normal,a,b,
             small_number)) return 1;}
     return 0;
 }
@@ -164,9 +164,9 @@ template<class T> ORIENTED_BOX<VECTOR<T,2> > SEGMENT_2D<T>::
 Thickened_Oriented_Box(const T thickness_over_two) const 
 {
     // make norm and tangent direction of thickness_over_two length
-    TV segment_vector=x2-x1,segment_tangent=segment_vector.Normalized()*thickness_over_two,segment_normal(-segment_tangent.y,segment_tangent.x);
+    TV segment_vector=X.y-X.x,segment_tangent=segment_vector.Normalized()*thickness_over_two,segment_normal(-segment_tangent.y,segment_tangent.x);
     // Form box point and intersect
-    return ORIENTED_BOX<TV>(x1-segment_tangent-segment_normal,segment_vector+segment_tangent*2,segment_normal*2);
+    return ORIENTED_BOX<TV>(X.x-segment_tangent-segment_normal,segment_vector+segment_tangent*2,segment_normal*2);
 }
 //#####################################################################
 // Function Inside
@@ -193,7 +193,7 @@ Linear_Point_Inside_Segment(const TV& X,const T thickness_over_2) const
 template<class T> bool SEGMENT_2D<T>::
 Point_Face_Interaction(const TV& x,const T interaction_distance,const bool allow_negative_weights,T& distance) const
 {      
-    distance=TV::Dot_Product(x-x1,Normal());
+    distance=TV::Dot_Product(x-X.x,Normal());
     return abs(distance)<=interaction_distance && Linear_Point_Inside_Segment(x,allow_negative_weights?interaction_distance:0);
 }
 //#####################################################################
@@ -231,7 +231,7 @@ Robust_Point_Face_Collision(const SEGMENT_2D<T>& initial_segment,const SEGMENT_2
         collision_time=0;
         weights=initial_segment.Barycentric_Coordinates(x).Insert(-1,0);
         return POINT_SIMPLEX_COLLISION_ENDS_OUTSIDE;}
-    TV v1=(final_segment.x1-initial_segment.x1)/dt,v2=(final_segment.x2-initial_segment.x2)/dt,v=(final_x-x)/dt;
+    TV v1=(final_segment.X.x-initial_segment.X.x)/dt,v2=(final_segment.X.y-initial_segment.X.y)/dt,v=(final_x-x)/dt;
     VECTOR<T,3> tweights;
     if(initial_segment.Point_Face_Collision(x,v,v1,v2,dt,collision_thickness,collision_time,normal,tweights,false)){
         weights=tweights;
@@ -245,7 +245,7 @@ template<class T> bool SEGMENT_2D<T>::
 Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const T dt,const T collision_thickness,T& collision_time,TV& normal,VECTOR<T,TV::m+1>& weights,
     const bool exit_early) const 
 {
-    VECTOR<double,2> v_minus_v1(v-v1),v2_minus_v1(v2-v1),x_minus_x1(x-x1),x2_minus_x1(x2-x1);
+    VECTOR<double,2> v_minus_v1(v-v1),v2_minus_v1(v2-v1),x_minus_x1(x-X.x),x2_minus_x1(X.y-X.x);
     QUADRATIC<double> quadratic(VECTOR<double,2>::Cross_Product(v_minus_v1,v2_minus_v1).x,
         VECTOR<double,2>::Cross_Product(x_minus_x1,v2_minus_v1).x+VECTOR<double,2>::Cross_Product(v_minus_v1,x2_minus_x1).x,
         VECTOR<double,2>::Cross_Product(x_minus_x1,x2_minus_x1).x);
@@ -260,7 +260,7 @@ Point_Face_Collision(const TV& x,const TV& v,const TV& v1,const TV& v2,const T d
         else if(quadratic.roots==-1){LOG::cout<<"VERY SINGULAR ON QUADRATIC SOLVE"<<std::endl;collision_time_temp=0;}
         else if(quadratic.roots==1)collision_time_temp=quadratic.root1;
         else collision_time_temp=quadratic.root1;}
-    SEGMENT_2D<double> segment((VECTOR<double,2>)x1+collision_time_temp*(VECTOR<double,2>)v1,(VECTOR<double,2>)x2+collision_time_temp*(VECTOR<double,2>)v2);
+    SEGMENT_2D<double> segment((VECTOR<double,2>)X.x+collision_time_temp*(VECTOR<double,2>)v1,(VECTOR<double,2>)X.y+collision_time_temp*(VECTOR<double,2>)v2);
     bool interaction=segment.Point_Face_Interaction((VECTOR<double,2>)x+collision_time_temp*(VECTOR<double,2>)v,(VECTOR<double,2>)v,(VECTOR<double,2>)v1,(VECTOR<double,2>)v2,
         (double)collision_thickness,distance,normal_temp,weights_temp,true,exit_early);
     collision_time=(T)collision_time_temp; 
@@ -293,8 +293,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,c
 {
     TV phi_nodes;
     VECTOR<TV,2> X_nodes;
-    X_nodes(0)=segment.x1;
-    X_nodes(1)=segment.x2;
+    X_nodes(0)=segment.X.x;
+    X_nodes(1)=segment.X.y;
     for(int i=0;i<2;i++){phi_nodes[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
     int positive_count=0;
     for(int i=0;i<2;i++) if(phi_nodes[i]>0) positive_count++;
@@ -304,8 +304,8 @@ Cut_With_Hyperplane_And_Discard_Outside_Simplices(const SEGMENT_2D<T>& segment,c
         case 1:{
             // draw positive triangle. has correct positive/negative area based on whether triangle is backwards or not
             TV interface_location=LINEAR_INTERPOLATION<T,TV>::Linear(X_nodes[0],X_nodes[1],LEVELSET_UTILITIES<T>::Theta(phi_nodes[0],phi_nodes[1]));
-            if(phi_nodes[0]>0) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));
-            else negative_segments.Append(SEGMENT_2D<T>(segment.x1,interface_location));
+            if(phi_nodes[0]>0) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.X.y));
+            else negative_segments.Append(SEGMENT_2D<T>(segment.X.x,interface_location));
             break;}
         case 2: // in positive halfspace
             break;}
@@ -318,8 +318,8 @@ Cut_With_Hyperplane(const SEGMENT_2D<T>& segment,const LINE_2D<T>& cutting_plane
 {
     TV phi_nodes;
     VECTOR<TV,2> X_nodes;
-    X_nodes(0)=segment.x1;
-    X_nodes(1)=segment.x2;
+    X_nodes(0)=segment.X.x;
+    X_nodes(1)=segment.X.y;
     for(int i=0;i<2;i++){phi_nodes[i]=cutting_plane.Signed_Distance(X_nodes[i]);}
     int positive_count=0;
     for(int i=0;i<2;i++) if(phi_nodes[i]>0) positive_count++;
@@ -331,11 +331,11 @@ Cut_With_Hyperplane(const SEGMENT_2D<T>& segment,const LINE_2D<T>& cutting_plane
             T theta=LEVELSET_UTILITIES<T>::Theta(phi_nodes[0],phi_nodes[1]);
             TV interface_location=LINEAR_INTERPOLATION<T,TV>::Linear(X_nodes[0],X_nodes[1],theta);
             if(phi_nodes[0]>0){
-                if(1-theta>tol) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));
-                if(theta>tol) positive_segments.Append(SEGMENT_2D<T>(segment.x1,interface_location));}
+                if(1-theta>tol) negative_segments.Append(SEGMENT_2D<T>(interface_location,segment.X.y));
+                if(theta>tol) positive_segments.Append(SEGMENT_2D<T>(segment.X.x,interface_location));}
             else{
-                if(theta>tol) negative_segments.Append(SEGMENT_2D<T>(segment.x1,interface_location));
-                if(1-theta>tol) positive_segments.Append(SEGMENT_2D<T>(interface_location,segment.x2));}
+                if(theta>tol) negative_segments.Append(SEGMENT_2D<T>(segment.X.x,interface_location));
+                if(1-theta>tol) positive_segments.Append(SEGMENT_2D<T>(interface_location,segment.X.y));}
             break;}
         case 2: // in positive halfspace
             positive_segments.Append(segment);break;
@@ -362,8 +362,8 @@ Clip_To_Box_Helper(T z1,T z2,T& a,T& b)
 template<class T> bool SEGMENT_2D<T>::
 Clip_To_Box(const RANGE<TV>& box,T& a,T& b) const
 {
-    TV z1=(x1-box.min_corner)/box.Edge_Lengths();
-    TV z2=(x2-box.min_corner)/box.Edge_Lengths();
+    TV z1=(X.x-box.min_corner)/box.Edge_Lengths();
+    TV z2=(X.y-box.min_corner)/box.Edge_Lengths();
     a=0;
     b=1;
     return Clip_To_Box_Helper(z1.x,z2.x,a,b) && Clip_To_Box_Helper(z1.y,z2.y,a,b) && a<b;

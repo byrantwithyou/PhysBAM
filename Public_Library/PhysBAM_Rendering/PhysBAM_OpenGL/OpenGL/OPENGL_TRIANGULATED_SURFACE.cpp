@@ -141,7 +141,7 @@ Initialize_Vertex_Normals()
     vertex_normals->Fill(VECTOR<T,3>());
     for(int t=0;t<surface.mesh.elements.m;t++){
         int i,j,k;surface.mesh.elements(t).Get(i,j,k);
-        VECTOR<T,3> normal=TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
+        VECTOR<T,3> normal=PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k));
         (*vertex_normals)(i)+=normal;(*vertex_normals)(j)+=normal;(*vertex_normals)(k)+=normal;}
     for(int p=0;p<surface.particles.Size();p++)(*vertex_normals)(p).Normalize();
 }
@@ -482,7 +482,7 @@ Draw() const
             for(int t=0;t<elements.m;t++){
                 int i,j,k;elements(t).Get(i,j,k);
                 for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
-                    OpenGL_Normal(TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
+                    OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
                 OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);
             }
         OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
@@ -503,7 +503,7 @@ Draw() const
             for(int t=0;t<elements.m;t++){
                 int i,j,k;elements(t).Get(i,j,k);
                 for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
-                    OpenGL_Normal(TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
+                    OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
                 (*vertex_colors)(i).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(i),vertices);
                 (*vertex_colors)(j).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(j),vertices);
                 (*vertex_colors)(k).Send_To_GL_Pipeline();OpenGL_Vertex(surface.particles.X(k),vertices);
@@ -529,7 +529,7 @@ Draw_Subsets() const
         for(int t=0;t<subset.m;t++){
             int tri=subset(t),i,j,k;elements(tri).Get(i,j,k);
             for(int plane_vertices=0;plane_vertices<3;plane_vertices++)
-                OpenGL_Normal(TRIANGLE_3D<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
+                OpenGL_Normal(PLANE<T>::Normal(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k)),normals);
             OpenGL_Triangle(surface.particles.X(i),surface.particles.X(j),surface.particles.X(k),vertices);}
     OpenGL_Draw_Arrays_With_Normals(GL_TRIANGLES,3,vertices,normals);
 }

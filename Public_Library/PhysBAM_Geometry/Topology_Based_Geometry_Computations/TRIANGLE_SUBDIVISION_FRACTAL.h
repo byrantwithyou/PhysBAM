@@ -40,7 +40,7 @@ void Apply_Fractal_Subdivision(TRIANGLE_SUBDIVISION& ts,ARRAY_VIEW<const TV> bas
         TV normal;
         for(int i=0;i<adjacent_triangles.m;i++){
             int n1,n2,n3;ts.triangle_mesh.elements(adjacent_triangles(i)).Get(n1,n2,n3);
-            normal+=TRIANGLE_3D<T>::Normal(base_values(n1),base_values(n2),base_values(n3));}
+            normal+=PLANE<T>::Normal(base_values(n1),base_values(n2),base_values(n3));}
         normal.Normalize();
         //subdivided_values(start_index_for_new_nodes-1+k)=midpoint+normal*edge_magnitude*modulus;
         subdivided_values(ts.start_index_for_new_nodes-1+k)=midpoint+normal*modulus;

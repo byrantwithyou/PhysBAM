@@ -38,12 +38,19 @@ TETRAHEDRON(const TV& x1_input,const TV& x2_input,const TV& x3_input,const TV& x
 template<class T> void TETRAHEDRON<T>::
 Create_Triangles()
 {
-    if(TV::Dot_Product(TV::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0]) <= 0){
-        triangle1.Specify_Three_Points(X[0],X[1],X[2]);triangle2.Specify_Three_Points(X[0],X[3],X[1]);
-        triangle3.Specify_Three_Points(X[0],X[2],X[3]);triangle4.Specify_Three_Points(X[1],X[3],X[2]);}
-    else{
-        triangle1.Specify_Three_Points(X[0],X[2],X[1]);triangle2.Specify_Three_Points(X[0],X[1],X[3]);
-        triangle3.Specify_Three_Points(X[0],X[3],X[2]);triangle4.Specify_Three_Points(X[1],X[2],X[3]);}
+    int t=(TV::Dot_Product(TV::Cross_Product(X[1]-X[0],X[2]-X[0]),X[3]-X[0])<=0)+1,s=3-t;
+    triangle(0).X(0)=X(0);
+    triangle(0).X(s)=X(1);
+    triangle(0).X(t)=X(2);
+    triangle(1).X(0)=X(0);
+    triangle(1).X(s)=X(3);
+    triangle(1).X(t)=X(1);
+    triangle(2).X(0)=X(0);
+    triangle(2).X(s)=X(2);
+    triangle(2).X(t)=X(3);
+    triangle(3).X(0)=X(1);
+    triangle(3).X(s)=X(3);
+    triangle(3).X(t)=X(2);
 }
 //#####################################################################
 // Function Normal
@@ -51,11 +58,7 @@ Create_Triangles()
 template<class T> VECTOR<T,3> TETRAHEDRON<T>::
 Normal(const VECTOR<T,3>& location,const int aggregate) const
 {
-    assert(aggregate >= 1 && aggregate <= 4);
-    if(aggregate == 1) return triangle1.normal;
-    else if(aggregate == 2) return triangle2.normal;
-    else if(aggregate == 3) return triangle3.normal;
-    else return triangle4.normal;
+    return triangle(aggregate).Normal();
 }
 //#####################################################################
 // Function Inside
@@ -63,9 +66,10 @@ Normal(const VECTOR<T,3>& location,const int aggregate) const
 template<class T> bool TETRAHEDRON<T>::
 Inside(const VECTOR<T,3>& location,const T thickness_over_two) const
 {
-    if(triangle1.Inside(location,thickness_over_two) && triangle2.Inside(location,thickness_over_two) && triangle3.Inside(location,thickness_over_two) && triangle4.Inside(location,thickness_over_two)) 
-        return true;
-    else return false;
+    for(int i=0;i<4;i++)
+        if(!triangle(i).Inside_Plane(location,thickness_over_two))
+            return false;
+    return true;
 }
 //#####################################################################
 // Function Outside
@@ -73,8 +77,10 @@ Inside(const VECTOR<T,3>& location,const T thickness_over_two) const
 template<class T> bool TETRAHEDRON<T>::
 Outside(const VECTOR<T,3>& location,const T thickness_over_two) const
 {
-    return triangle1.Outside(location,thickness_over_two) || triangle2.Outside(location,thickness_over_two) || triangle3.Outside(location,thickness_over_two)
-        || triangle4.Outside(location,thickness_over_two);
+    for(int i=0;i<4;i++)
+        if(triangle(i).Outside_Plane(location,thickness_over_two))
+            return true;
+    return false;
 }
 //#####################################################################
 // Function Boundary
@@ -91,7 +97,7 @@ template<class T> TETRAHEDRON<T> TETRAHEDRON<T>::
 Thickened(const T thickness_over_two) const
 {
     assert(Signed_Volume()>0);
-    T m1=thickness_over_two/triangle4.Signed_Distance(X[0]),m2=thickness_over_two/triangle3.Signed_Distance(X[1]),m3=thickness_over_two/triangle2.Signed_Distance(X[2]),m4=thickness_over_two/triangle1.Signed_Distance(X[3]);
+    T m1=thickness_over_two/triangle(3).Signed_Distance(X[0]),m2=thickness_over_two/triangle(2).Signed_Distance(X[1]),m3=thickness_over_two/triangle(1).Signed_Distance(X[2]),m4=thickness_over_two/triangle(0).Signed_Distance(X[3]);
     return TETRAHEDRON<T>(Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>((T)1-m2-m3-(T)root_three*m4,m2,m3)),
                           Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,(T)1-m1-m3-(T)root_three*m4,m3)),Point_From_Barycentric_Coordinates(VECTOR<T,3>(m1,m2,(T)1-m1-m2-(T)root_three*m4)));
 }
@@ -110,25 +116,16 @@ template<class T> VECTOR<T,3> TETRAHEDRON<T>::
 Surface(const VECTOR<T,3>& location) const
 {      
     if(Inside(location)){
-        int triangle=0;T distance=VECTOR<T,3>::Dot_Product(triangle1.x1-location,triangle1.normal);
-        T distance_temp=VECTOR<T,3>::Dot_Product(triangle2.x1-location,triangle2.normal);
-        if(distance_temp < distance){triangle=1;distance=distance_temp;}
-        distance_temp=VECTOR<T,3>::Dot_Product(triangle3.x1-location,triangle3.normal);
-        if(distance_temp < distance){triangle=2;distance=distance_temp;}
-        distance_temp=VECTOR<T,3>::Dot_Product(triangle4.x1-location,triangle4.normal);
-        if(distance_temp < distance){triangle=3;distance=distance_temp;}
-        switch(triangle){
-            case 0:return location+distance*triangle1.normal;
-            case 1:return location+distance*triangle2.normal;
-            case 2:return location+distance*triangle3.normal;
-            case 3:return location+distance*triangle4.normal;
-            default:return VECTOR<T,3>(0,0,0);}} // should never be called!
+        int t=0;T distance=FLT_MAX;
+        for(int i=0;i<4;i++){
+            T d=triangle(i).Normal().Dot(triangle(i).X.x-location);
+            if(d<distance){t=i;distance=d;}}
+        return location+distance*triangle(t).Normal();}
     else{
         VECTOR<T,3> surface_point(location);
-        if(triangle1.Lazy_Outside(surface_point)) surface_point-=VECTOR<T,3>::Dot_Product(location-triangle1.x1,triangle1.normal)*triangle1.normal;
-        if(triangle2.Lazy_Outside(surface_point)) surface_point-=VECTOR<T,3>::Dot_Product(location-triangle2.x1,triangle2.normal)*triangle2.normal;
-        if(triangle3.Lazy_Outside(surface_point)) surface_point-=VECTOR<T,3>::Dot_Product(location-triangle3.x1,triangle3.normal)*triangle3.normal;
-        if(triangle4.Lazy_Outside(surface_point)) surface_point-=VECTOR<T,3>::Dot_Product(location-triangle4.x1,triangle4.normal)*triangle4.normal;
+        for(int i=0;i<4;i++)
+            if(triangle(i).Lazy_Outside_Plane(surface_point))
+                surface_point-=(location-triangle(i).X.x).Projected_On_Unit_Direction(triangle(i).Normal());
         return surface_point;}
 }
 //#####################################################################
@@ -179,7 +176,7 @@ Signed_Volume() const
 template<class T> T TETRAHEDRON<T>::
 Minimum_Angle() const
 {  
-    return min(triangle1.Minimum_Angle(),triangle2.Minimum_Angle(),triangle3.Minimum_Angle(),triangle4.Minimum_Angle());
+    return min(triangle(0).Minimum_Angle(),triangle(1).Minimum_Angle(),triangle(2).Minimum_Angle(),triangle(3).Minimum_Angle());
 }
 //#####################################################################
 // Function Maximum_Angle
@@ -187,7 +184,7 @@ Minimum_Angle() const
 template<class T> T TETRAHEDRON<T>::
 Maximum_Angle() const
 {  
-    return max(triangle1.Maximum_Angle(),triangle2.Maximum_Angle(),triangle3.Maximum_Angle(),triangle4.Maximum_Angle());
+    return max(triangle(0).Maximum_Angle(),triangle(1).Maximum_Angle(),triangle(2).Maximum_Angle(),triangle(3).Maximum_Angle());
 }
 //#####################################################################
 // Function Minimum_Altitude
@@ -195,7 +192,7 @@ Maximum_Angle() const
 template<class T> T TETRAHEDRON<T>::
 Minimum_Altitude() const
 {  
-    return min(abs(triangle1.Signed_Distance(X[3])),abs(triangle2.Signed_Distance(X[2])),abs(triangle3.Signed_Distance(X[1])),abs(triangle4.Signed_Distance(X[0])));
+    return min(abs(triangle(0).Signed_Distance(X[3])),abs(triangle(1).Signed_Distance(X[2])),abs(triangle(2).Signed_Distance(X[1])),abs(triangle(3).Signed_Distance(X[0])));
 }
 //#####################################################################
 // Function Aspect_Ratio
@@ -211,9 +208,9 @@ Aspect_Ratio() const
 template<class T> T TETRAHEDRON<T>::
 Minimum_Dihedral_Angle() const
 {  
-    return acos(-min(VECTOR<T,3>::Dot_Product(triangle1.normal,triangle2.normal),VECTOR<T,3>::Dot_Product(triangle1.normal,triangle3.normal),
-                               VECTOR<T,3>::Dot_Product(triangle1.normal,triangle4.normal),VECTOR<T,3>::Dot_Product(triangle2.normal,triangle3.normal),
-                               VECTOR<T,3>::Dot_Product(triangle2.normal,triangle4.normal),VECTOR<T,3>::Dot_Product(triangle3.normal,triangle4.normal))); 
+    return acos(-min(VECTOR<T,3>::Dot_Product(triangle(0).Normal(),triangle(1).Normal()),VECTOR<T,3>::Dot_Product(triangle(0).Normal(),triangle(2).Normal()),
+                               VECTOR<T,3>::Dot_Product(triangle(0).Normal(),triangle(3).Normal()),VECTOR<T,3>::Dot_Product(triangle(1).Normal(),triangle(2).Normal()),
+                               VECTOR<T,3>::Dot_Product(triangle(1).Normal(),triangle(3).Normal()),VECTOR<T,3>::Dot_Product(triangle(2).Normal(),triangle(3).Normal()))); 
 }
 //#####################################################################
 // Function Maximum_Dihedral_Angle
@@ -221,9 +218,9 @@ Minimum_Dihedral_Angle() const
 template<class T> T TETRAHEDRON<T>::
 Maximum_Dihedral_Angle() const
 {  
-    return acos(-max(VECTOR<T,3>::Dot_Product(triangle1.normal,triangle2.normal),VECTOR<T,3>::Dot_Product(triangle1.normal,triangle3.normal),
-                               VECTOR<T,3>::Dot_Product(triangle1.normal,triangle4.normal),VECTOR<T,3>::Dot_Product(triangle2.normal,triangle3.normal),
-                               VECTOR<T,3>::Dot_Product(triangle2.normal,triangle4.normal),VECTOR<T,3>::Dot_Product(triangle3.normal,triangle4.normal)));
+    return acos(-max(VECTOR<T,3>::Dot_Product(triangle(0).Normal(),triangle(1).Normal()),VECTOR<T,3>::Dot_Product(triangle(0).Normal(),triangle(2).Normal()),
+                               VECTOR<T,3>::Dot_Product(triangle(0).Normal(),triangle(3).Normal()),VECTOR<T,3>::Dot_Product(triangle(1).Normal(),triangle(2).Normal()),
+                               VECTOR<T,3>::Dot_Product(triangle(1).Normal(),triangle(3).Normal()),VECTOR<T,3>::Dot_Product(triangle(2).Normal(),triangle(3).Normal())));
 }
 //#####################################################################
 // Function Signed_Reciprocal_Aspect_Ratio
