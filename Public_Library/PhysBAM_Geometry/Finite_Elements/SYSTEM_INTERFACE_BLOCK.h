@@ -44,7 +44,7 @@ public:
     inline void Add_Entry(int interface_element,int flat_diff_index,int inside,T value)
     {
         data[inside](interface_element,flat_diff_index)+=value*scale;
-        cm->active_cells[inside](cdi->Get_Flat_Base(interface_element)+flat_diff(flat_diff_index))=true;
+        cm->Set_Active(cdi->Get_Flat_Base(interface_element)+flat_diff(flat_diff_index),inside);
     }
 
     template<int d>

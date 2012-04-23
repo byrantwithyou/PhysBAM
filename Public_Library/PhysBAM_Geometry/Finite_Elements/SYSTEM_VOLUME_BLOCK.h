@@ -65,8 +65,8 @@ public:
     {
         int flat_index=cdi->Flatten(index);
         data[inside](flat_index,flat_diff_index)+=value*scale(inside);
-        cm0->active_cells[inside](flat_index)=true;
-        cm1->active_cells[inside](flat_index+flat_diff(flat_diff_index))=true;
+        cm0->Set_Active(flat_index,inside);
+        cm1->Set_Active(flat_index+flat_diff(flat_diff_index),inside);
     }
     inline void Add_Open_Entry(const TV_INT& cell,int inside,OPEN_ENTRY& oe)
     {Add_Entry(oe.index0+cell,oe.flat_diff_index,inside,oe.x);}
