@@ -26,7 +26,11 @@ CELL_DOMAIN_INTERFACE(const GRID<TV>& grid_input,int padding_input,int coarse_fa
 template<class TV> void CELL_DOMAIN_INTERFACE<TV>::
 Set_Flat_Base(int start,int end,const TV_INT& index)
 {
-    int flat=Flatten(index);for(int i=start;i<end;i++) flat_base(i)=flat;
+    int flat=Flatten(index);
+    bool bdy=!(Is_Inside_Cell(flat)&&(Is_Inside_Cell(flat+Flatten_Diff(coarse_range-1))));
+    for(int i=start;i<end;i++){
+        flat_base(i)=flat;
+        bdy_element(i)=bdy;}
 }
 //#####################################################################
 // Function Initialize
@@ -47,9 +51,12 @@ Initialize()
                 for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
                     int r=Flatten(it.index+sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
                     if(r>=0) remap(Flatten(it.index))=remap(r);}}
-        inside.Resize(flat_size);
+        cell_location.Resize(flat_size);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())
-            inside(Flatten(it.index))=true;
+            cell_location(Flatten(it.index))=-1;
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next())
+            cell_location(Flatten(it.index))=1;
+        bdy_element.Resize(interface_elements);
     }
     else for(int i=0;i<flat_size;i++) remap(i)=i;
 }

@@ -61,6 +61,8 @@ public:
 
     void Build_Matrix(VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>& matrix)
     {
+        if(!cdi->periodic_bc) PHYSBAM_FATAL_ERROR();
+
         for(int s=0;s<2;s++){
             SPARSE_MATRIX_FLAT_MXN<T>& M=matrix(s);
             MATRIX_MXN<T>& d=data[s];
@@ -73,12 +75,15 @@ public:
             M.m=m;
             
             for(int row=0;row<m;row++){
+                ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
                 for(int j=0;j<d.n;j++){
                     int value=d(row,j);
                     if(value){
                         int column=comp_n(cdi->Get_Flat_Base(row)+flat_diff(j));
                         M.offsets(row+1)++;
-                        M.A.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}}
+                        entries.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}
+                if(cdi->Is_Boundary_Element(row)) entries.Sort();
+                M.A.Append_Elements(entries);}
 
             for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);}
     }

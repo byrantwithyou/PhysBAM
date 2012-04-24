@@ -24,7 +24,8 @@ class CELL_DOMAIN_INTERFACE
     int b;
     ARRAY<int> flat_base; // flat index interface element reference cell (min corner cell of "coarse_factor"-wide block)
     ARRAY<int> remap; // maps ghost cells inside for periodic bc, identity for non-periodic bc
-    ARRAY<bool> inside; // padding away from the bdy
+    ARRAY<int> cell_location;
+    ARRAY<bool> bdy_element;
     
 public:
 
@@ -43,7 +44,10 @@ public:
     inline int Flatten_Diff(const TV_INT& index) const {return index.Dot(a);}
     inline int Get_Flat_Base(int e) const {return flat_base(e);}
     inline int Remap(int i) const {return remap(i);}
-    inline int Inside(int i) const {return inside(i);}
+    inline int Is_Inside_Cell(int i) const {return cell_location(i)==-1;}
+    inline int Is_Outside_Cell(int i) const {return cell_location(i)==1;}
+    inline int Is_Boundary_Cell(int i) const {return cell_location(i)==0;}
+    inline int Is_Boundary_Element(int i) const {return bdy_element(i);}
     
     void Set_Flat_Base(int start,int end,const TV_INT& index);
     void Initialize();
@@ -64,7 +68,7 @@ public:
     CELL_MANAGER(const CELL_DOMAIN_INTERFACE<TV>& cdi_input);
     
     inline void Set_Active(int i,int s){compressed[s](i)=-2;compressed[s](cdi.Remap(i))=-2;}
-    inline void Get_Index(TV_INT index,int s){return compressed[s](cdi.Flatten(index));}
+    inline int Get_Index(TV_INT index,int s){return compressed[s](cdi.Flatten(index));}
     
     void Compress_Indices();
 };
