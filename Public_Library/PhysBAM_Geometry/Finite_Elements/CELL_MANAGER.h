@@ -64,6 +64,7 @@ public:
     CELL_MANAGER(const CELL_DOMAIN_INTERFACE<TV>& cdi_input);
     
     inline void Set_Active(int i,int s){compressed[s](i)=-2;compressed[s](cdi.Remap(i))=-2;}
+    inline void Get_Index(TV_INT index,int s){return compressed[s](cdi.Flatten(index));}
     
     void Compress_Indices();
 };

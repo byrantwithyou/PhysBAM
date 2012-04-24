@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
+#include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
@@ -55,6 +56,31 @@ public:
                 for(int k=0;k<data[s].n;k++)
                     if(abs(data[s](l,k))>tol)
                         cm->Set_Active(cdi->Get_Flat_Base(l)+flat_diff(k),s);
+                    else data[s](l,k)=0;
+    }
+
+    void Build_Matrix(VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>& matrix)
+    {
+        for(int s=0;s<2;s++){
+            SPARSE_MATRIX_FLAT_MXN<T>& M=matrix(s);
+            MATRIX_MXN<T>& d=data[s];
+            ARRAY<int>& comp_n=cm->compressed[s];
+            int m=d.m;
+            int n=cm->dofs[s];
+            
+            M.Reset(n);
+            M.offsets.Resize(m+1);
+            M.m=m;
+            
+            for(int row=0;row<m;row++){
+                for(int j=0;j<d.n;j++){
+                    int value=d(row,j);
+                    if(value){
+                        int column=comp_n(cdi->Get_Flat_Base(row)+flat_diff(j));
+                        M.offsets(row+1)++;
+                        M.A.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}}
+
+            for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);}
     }
 };
 }
