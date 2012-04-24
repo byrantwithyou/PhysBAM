@@ -8,14 +8,10 @@
 #define __BASIS_INTEGRATION_UNIFORM__
 
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Vectors/STATIC_TENSOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
-#include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 
 namespace PhysBAM{
 
@@ -46,20 +42,21 @@ public:
     ARRAY<VOLUME_BLOCK*> volume_blocks;
     ARRAY<INTERFACE_BLOCK*> interface_blocks;
 
-    BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,const ARRAY<T,TV_INT>& phi_input,CELL_DOMAIN_INTERFACE<TV>& cdi_input);
+    BASIS_INTEGRATION_UNIFORM(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,
+        const ARRAY<T,TV_INT>& phi_input,CELL_DOMAIN_INTERFACE<TV>& cdi_input);
     ~BASIS_INTEGRATION_UNIFORM();
 
-    void Compute();
+    void Compute_Entries();
     void Compute_Open_Entries();
     void Cut_Elements(ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT>& cut_elements,const ARRAY<T_FACE>& elements,
         const RANGE<TV_INT>& range,const RANGE<TV>& domain,int dir,int e);
     void Add_Uncut_Coarse_Cell(const TV_INT& coarse_cell,int inside);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int inside);
     template<int d0,int d1>
-    int Add_Block(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV,d1>& s1,
-        CELL_MANAGER<TV>& cm0,CELL_MANAGER<TV>& cm1,const VECTOR<T,2>& scale);
+    void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
+        const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const VECTOR<T,2>& scale);
     template<int d>
-    int Add_Block(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER<TV>& cm,
+    void Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
         T scale,bool ignore_orientation);
     void Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
         const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base);

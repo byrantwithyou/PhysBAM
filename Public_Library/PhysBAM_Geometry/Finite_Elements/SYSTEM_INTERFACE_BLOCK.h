@@ -8,12 +8,7 @@
 #ifndef __SYSTEM_INTERFACE_BLOCK__
 #define __SYSTEM_INTERFACE_BLOCK__
 
-#include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
+#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_HELPER.h>
 
 namespace PhysBAM{
 
@@ -22,6 +17,9 @@ class SYSTEM_INTERFACE_BLOCK
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+
+    CELL_DOMAIN_INTERFACE<TV>* cdi;
+    SYSTEM_INTERFACE_BLOCK_HELPER<TV> *helper;
 
 public:
 
@@ -35,19 +33,30 @@ public:
 
     T scale;
     bool ignore_orientation;
-    CELL_MANAGER<TV> *cm;
-    CELL_DOMAIN_INTERFACE<TV> *cdi;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
-    ARRAY<int> flat_diff;
-    MATRIX_MXN<T> data[2]; // inside and outside
-
-    inline void Add_Entry(int interface_element,int flat_diff_index,int inside,T value)
-    {data[inside](interface_element,flat_diff_index)+=value*scale;}
 
     template<int d>
-    void Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER<TV>& cm_input,CELL_DOMAIN_INTERFACE<TV>& cdi,
-        T scale_input,bool ignore_orientation_input);
-    void Mark_Active_Cells(T tol=0);
+    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER<TV> helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,T scale_input,bool ignore_orientation_input)
+    {
+        scale=scale_input;
+        ignore_orientation=ignore_orientation_input;
+        helper=&helper_input;
+        cdi=helper->cdi;
+        
+        overlap_polynomials.Resize(s.diced.m);
+        for(int i=0;i<overlap_polynomials.m;i++){
+            OVERLAP_POLYNOMIAL& op=overlap_polynomials(i);
+            const typename BASIS_STENCIL_UNIFORM<TV,d>::DICED& diced=s.diced(i);
+            op.index_offset=diced.index_offset;
+            op.subcell=diced.subcell;
+            op.polynomial=diced.polynomial;
+            op.flat_diff_index.Resize(cdi->coarse_range);
+            for(RANGE_ITERATOR<TV::m> it(cdi->coarse_range);it.Valid();it.Next())
+                op.flat_diff_index(it.index)=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(it.index+op.index_offset));}
+    }
+
+    inline void Add_Entry(int interface_element,int flat_diff_index,int inside,T value)
+    {helper->data[inside](interface_element,flat_diff_index)+=value*scale;}
 };
 }
 #endif

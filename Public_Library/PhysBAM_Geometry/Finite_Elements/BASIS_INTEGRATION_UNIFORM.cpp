@@ -5,16 +5,12 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -48,10 +44,10 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
     return total;
 }
 //#####################################################################
-// Function Compute
+// Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM<TV,static_degree>::
-Compute()
+Compute_Entries()
 {
     ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT> cut_sides(double_coarse_range),cut_interface(double_coarse_range);
     ARRAY<T_FACE> sides,interface,array_one(1);
@@ -99,9 +95,6 @@ Compute()
             cut_interface(it2.index).Remove_All();
         for(RANGE_ITERATOR<TV::m> it2(flat_range);it2.Valid();it2.Next())
             cut_sides(it2.index).Remove_All();}
-
-    for(int i=0;i<volume_blocks.m;i++) volume_blocks(i)->Mark_Active_Cells();
-    for(int i=0;i<interface_blocks.m;i++) interface_blocks(i)->Mark_Active_Cells();
 }
 //#####################################################################
 // Function Compute_Open_Entries
@@ -194,38 +187,36 @@ Cut_Elements(ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT>& cut_elements,const ARRAY<T_
         cut_elements(cell).Append(PAIR<T_FACE,int>(elements(i),e));
 }
 //#####################################################################
-// Function Add_Block
+// Function Add_Volume_Block
 //#####################################################################
-template<class TV,int static_degree> template<int d0,int d1> int BASIS_INTEGRATION_UNIFORM<TV,static_degree>::
-Add_Block(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV,d1>& s1,CELL_MANAGER<TV>& cm0,CELL_MANAGER<TV>& cm1,const VECTOR<T,2>& scale)
+template<class TV,int static_degree> template<int d0,int d1> void BASIS_INTEGRATION_UNIFORM<TV,static_degree>::
+Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
+    const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const VECTOR<T,2>& scale)
 {
     VOLUME_BLOCK* vb=new VOLUME_BLOCK;
-    vb->Initialize(s0,s1,cm0,cm1,cdi,scale);
+    vb->Initialize(helper,s0,s1,scale);
 
     for(int i=0;i<vb->overlap_polynomials.m;i++){
         RANGE<TV_INT> range(TV_INT(),vb->overlap_polynomials(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(vb->overlap_polynomials(i).polynomial.terms(it.index))
                 volume_monomials_needed(it.index)=true;}
-
-    return volume_blocks.Append(vb);
 }
 //#####################################################################
-// Function Add_Block
+// Function Add_Interface_Block
 //#####################################################################
-template<class TV,int static_degree> template<int d> int BASIS_INTEGRATION_UNIFORM<TV,static_degree>::
-Add_Block(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER<TV>& cm,const T scale,const bool ignore_orientation)
+template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM<TV,static_degree>::
+Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
+    T scale,bool ignore_orientation)
 {
     INTERFACE_BLOCK* ib=new INTERFACE_BLOCK;
-    ib->Initialize(s,cm,cdi,scale,ignore_orientation);
+    ib->Initialize(helper,s,scale,ignore_orientation);
 
     for(int i=0;i<ib->overlap_polynomials.m;i++){
         RANGE<TV_INT> range(TV_INT(),ib->overlap_polynomials(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(ib->overlap_polynomials(i).polynomial.terms(it.index))
                 surface_monomials_needed(it.index)=true;}
-
-    return interface_blocks.Append(ib);
 }
 //#####################################################################
 // Function Volume
@@ -333,44 +324,12 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                         ib->Add_Entry(element_base+k,op.flat_diff_index(subcell_cell),enclose_inside,integral);
                         ib->Add_Entry(element_base+k,op.flat_diff_index(subcell_cell),!enclose_inside,sign2*integral);}}}
 }
-template class BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>;
 template class BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>;
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Block<1,0>(
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,
-    CELL_MANAGER<VECTOR<float,3> >&,CELL_MANAGER<VECTOR<float,3> >&,const VECTOR<float,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Block<1,1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,
-    CELL_MANAGER<VECTOR<float,3> >&,CELL_MANAGER<VECTOR<float,3> >&,const VECTOR<float,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Block<1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,CELL_MANAGER<VECTOR<float,3> >&,
-    float,bool);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Block<1,0>(
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,
-    CELL_MANAGER<VECTOR<float,2> >&,CELL_MANAGER<VECTOR<float,2> >&,const VECTOR<float,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Block<1,1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,
-    CELL_MANAGER<VECTOR<float,2> >&,CELL_MANAGER<VECTOR<float,2> >&,const VECTOR<float,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Block<1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MANAGER<VECTOR<float,2> >&,
-    float,bool);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<float,3> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,VECTOR<float,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<float,3> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,VECTOR<float,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Interface_Block<1>(
+    SYSTEM_INTERFACE_BLOCK_HELPER<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,float,bool);
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
-template class BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>;
-template class BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>;
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Block<1,0>(
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,
-    CELL_MANAGER<VECTOR<double,3> >&,CELL_MANAGER<VECTOR<double,3> >&,const VECTOR<double,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Block<1,1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,
-    CELL_MANAGER<VECTOR<double,3> >&,CELL_MANAGER<VECTOR<double,3> >&,const VECTOR<double,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Block<1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,CELL_MANAGER<VECTOR<double,3> >&,
-    double,bool);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>::Add_Block<1,0>(
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,
-    CELL_MANAGER<VECTOR<double,2> >&,CELL_MANAGER<VECTOR<double,2> >&,const VECTOR<double,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>::Add_Block<1,1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,
-    CELL_MANAGER<VECTOR<double,2> >&,CELL_MANAGER<VECTOR<double,2> >&,const VECTOR<double,2>&);
-template int BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>::Add_Block<1>(
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,CELL_MANAGER<VECTOR<double,2> >&,double,bool);
 #endif
