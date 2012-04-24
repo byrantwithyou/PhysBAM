@@ -93,8 +93,6 @@ int main(int argc,char* argv[])
     else if(parse_args.Is_Value_Set("-use_ext_neo_smooth")) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(parse_args.Is_Value_Set("-use_corotated")) icm=new COROTATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(parse_args.Is_Value_Set("-use_corot_blend")) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(parse_args.Is_Value_Set("-use_ext_mooney")) icm=new MOONEY_RIVLIN_3D_EXTRAPOLATED<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,cutoff,efc*stiffness*stiffness_multiplier);
-
     else{
         NEO_HOOKEAN<T,3>* nh=new NEO_HOOKEAN<T,3>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
         icm=nh; std::cout << "Using regular Neo-Hookean" << std::endl;
