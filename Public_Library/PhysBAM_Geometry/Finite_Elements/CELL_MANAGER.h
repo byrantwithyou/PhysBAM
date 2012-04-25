@@ -62,8 +62,8 @@ class CELL_MANAGER
 public:
 
     const CELL_DOMAIN_INTERFACE<TV>& cdi;
-    ARRAY<int> compressed[2];  // inside and outside; [-1] - inactive; [-2] - active (temporary); [non-negative] - dof number (for active)
-    int dofs[2]; // inside and outside; number of dofs
+    VECTOR<ARRAY<int>,2> compressed;  // inside and outside; [-1] - inactive; [-2] - active (temporary); [non-negative] - dof number (for active)
+    VECTOR<int,2> dofs; // inside and outside; number of dofs
 
     CELL_MANAGER(const CELL_DOMAIN_INTERFACE<TV>& cdi_input);
     

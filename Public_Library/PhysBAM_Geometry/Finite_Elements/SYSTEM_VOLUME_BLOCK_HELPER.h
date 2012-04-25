@@ -26,7 +26,7 @@ class SYSTEM_VOLUME_BLOCK_HELPER
 
 public:
     
-    MATRIX_MXN<T> data[2];
+    VECTOR<MATRIX_MXN<T>,2> data;
     CELL_DOMAIN_INTERFACE<TV>* cdi;
     CELL_MANAGER<TV> *cm0,*cm1;
     ARRAY<int> flat_diff;
