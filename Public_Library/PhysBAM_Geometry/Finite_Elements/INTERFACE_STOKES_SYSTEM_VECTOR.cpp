@@ -152,6 +152,7 @@ Raw_Get(int i)
         for(int s=0;s<2;s++){
             if(i<q[k][s].m) return q[k][s](i);
             i-=q[k][s].m;}
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 // Function Clone_Default
