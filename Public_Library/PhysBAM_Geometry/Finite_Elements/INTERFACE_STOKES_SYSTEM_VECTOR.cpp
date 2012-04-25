@@ -241,11 +241,11 @@ Normalize()
 // Function Scale
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
-Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v) const
+Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v)
 {
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            u(i)[s]*=v.u(i)[s]);
+            u(i)[s]*=v.u(i)[s];
     for(int s=0;s<2;s++) p[s]*=v.p[s];
     for(int i=0;i<TV::m;i++) q(i)*=(v.q(i));
 }
