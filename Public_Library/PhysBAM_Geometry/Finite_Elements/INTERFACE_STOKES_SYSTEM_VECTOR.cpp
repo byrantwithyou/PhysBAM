@@ -28,10 +28,10 @@ template<class TV> INTERFACE_STOKES_SYSTEM_VECTOR<TV>& INTERFACE_STOKES_SYSTEM_V
 operator=(const INTERFACE_STOKES_SYSTEM_VECTOR& v)
 {
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             u(i)[s]=v.u(i)[s];
-            q(i)[s]=v.q(i)[s];}
     for(int s=0;s<2;s++) p[s]=v.p[s];
+    for(int i=0;i<TV::m;i++) q(i)=v.q(i);
     return *this;
 }
 //#####################################################################
@@ -42,10 +42,10 @@ operator+=(const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR&>(bv);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             u(i)[s]+=v.u(i)[s];
-            q(i)[s]+=v.q(i)[s];}
     for(int s=0;s<2;s++) p[s]+=v.p[s];
+    for(int i=0;i<TV::m;i++) q(i)+=v.q(i);
     return *this;
 }
 //#####################################################################
@@ -56,10 +56,10 @@ operator-=(const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR&>(bv);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             u(i)[s]-=v.u(i)[s];
-            q(i)[s]-=v.q(i)[s];}
     for(int s=0;s<2;s++) p[s]-=v.p[s];
+    for(int i=0;i<TV::m;i++) q(i)-=v.q(i);
     return *this;
 }
 //#####################################################################
@@ -69,10 +69,10 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_STOKES_SYS
 operator*=(const T a)
 {
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             u(i)[s]*=a;
-            q(i)[s]*=a;}
     for(int s=0;s<2;s++) p[s]*=a;;
+    for(int i=0;i<TV::m;i++) q(i)*=a;
     return *this;
 }
 //#####################################################################
@@ -83,10 +83,10 @@ Copy(const T c,const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR&>(bv);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             VECTOR_ND<T>::Copy(c,v.u(i)[s],u(i)[s]);
-            VECTOR_ND<T>::Copy(c,v.q(i)[s],q(i)[s]);}
     for(int s=0;s<2;s++) VECTOR_ND<T>::Copy(c,v.p[s],p[s]);
+    for(int i=0;i<TV::m;i++) VECTOR_ND<T>::Copy(c,v.q(i),q(i));
 }
 //#####################################################################
 // Function Copy
@@ -97,10 +97,10 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const INTERFACE_STOKES_SYSTEM_VECTOR& v1=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR&>(bv1);
     const INTERFACE_STOKES_SYSTEM_VECTOR& v2=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR&>(bv2);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             VECTOR_ND<T>::Copy(c1,v1.u(i)[s],v2.u(i)[s],u(i)[s]);
-            VECTOR_ND<T>::Copy(c1,v1.q(i)[s],v2.q(i)[s],q(i)[s]);}
     for(int s=0;s<2;s++) VECTOR_ND<T>::Copy(c1,v1.p[s],v2.p[s],p[s]);
+    for(int i=0;i<TV::m;i++) VECTOR_ND<T>::Copy(c1,v1.q(i),v2.q(i),q(i));
 }
 //#####################################################################
 // Function Print
@@ -117,9 +117,8 @@ Print() const
         for(int k=0;k<p[s].n;k++)
             LOG::cout<<p[s](k)<<" ";
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++)
-            for(int k=0;k<q(i)[s].n;k++)
-                LOG::cout<<q(i)[s](k)<<" ";
+        for(int k=0;k<q(i).n;k++)
+            LOG::cout<<q(i)(k)<<" ";
 }
 //#####################################################################
 // Function Raw_Size
@@ -130,8 +129,9 @@ Raw_Size() const
     int size=0;
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            size+=u(i)[s].n+q(i)[s].n;
+            size+=u(i)[s].n;
     for(int s=0;s<2;s++) size+=p[s].n;
+    for(int i=0;i<TV::m;i++) size+=q(i).n;
     return size;
 }
 //#####################################################################
@@ -147,10 +147,9 @@ Raw_Get(int i)
     for(int s=0;s<2;s++){
         if(i<p[s].n) return p[s](i);
         i-=p[s].n;}
-    for(int k=0;k<TV::m;k++)
-        for(int s=0;s<2;s++){
-            if(i<q(k)[s].n) return q(k)[s](i);
-            i-=q(k)[s].n;}
+    for(int k=0;k<TV::m;k++){
+        if(i<q(k).n) return q(k)(i);
+        i-=q(k).n;}
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
@@ -161,10 +160,10 @@ Clone_Default() const
 {
     INTERFACE_STOKES_SYSTEM_VECTOR<TV>* v=new INTERFACE_STOKES_SYSTEM_VECTOR<TV>;
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             v->u(i)[s].Resize(u(i)[s].n);
-            v->q(i)[s].Resize(q(i)[s].n);}
     for(int s=0;s<2;s++) v->p[s].Resize(p[s].n);
+    for(int i=0;i<TV::m;i++) v->q(i).Resize(q(i).n);
     return v;
 }
 //#####################################################################
@@ -175,10 +174,11 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& cs=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR<TV>&>(v);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
+        for(int s=0;s<2;s++)
             u(i)[s].Resize(cs.u(i)[s].n);
-            q(i)[s].Resize(cs.q(i)[s].n);}
     for(int s=0;s<2;s++) p[s].Resize(cs.p[s].n);
+    for(int i=0;i<TV::m;i++) q(i).Resize(cs.q(i).n);
+
 }
 //#####################################################################
 template class INTERFACE_STOKES_SYSTEM_VECTOR<VECTOR<float,1> >;
