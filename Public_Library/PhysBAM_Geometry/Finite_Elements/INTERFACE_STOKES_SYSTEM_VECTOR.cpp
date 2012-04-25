@@ -178,7 +178,76 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
             u(i)[s].Resize(cs.u(i)[s].n);
     for(int s=0;s<2;s++) p[s].Resize(cs.p[s].n);
     for(int i=0;i<TV::m;i++) q(i).Resize(cs.q(i).n);
-
+}
+//#####################################################################
+// Function Dot
+//#####################################################################
+template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Dot(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v) const
+{
+    T dot=0;
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            dot+=u(i)[s].Dot(v.u(i)[s]);
+    for(int s=0;s<2;s++) dot+=p[s].Dot(v.p[s]);
+    for(int i=0;i<TV::m;i++) dot+=q(i).Dot(v.q(i));
+    return dot;
+}
+//#####################################################################
+// Function Magnitude_Squared
+//#####################################################################
+template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Magnitude_Squared() const
+{
+    T ms=0;
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            ms+=u(i)[s].Magnitude_Squared();
+    for(int s=0;s<2;s++) ms+=p[s].Magnitude_Squared();
+    for(int i=0;i<TV::m;i++) ms+=q(i).Magnitude_Squared();
+    return ms;
+}
+//#####################################################################
+// Function Magnitude
+//#####################################################################
+template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Magnitude() const
+{
+    return sqrt(this->Magnitude_Squared());
+}
+//#####################################################################
+// Function Max_Abs
+//#####################################################################
+template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Max_Abs() const
+{
+    T max_abs=0;
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            max_abs=max(u(i)[s].Max_Abs(),max_abs);
+    for(int s=0;s<2;s++) max_abs=max(p[s].Max_Abs(),max_abs);
+    for(int i=0;i<TV::m;i++) max_abs=max(q(i).Max_Abs(),max_abs);
+    return max_abs;
+}
+//#####################################################################
+// Function Normalize
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Normalize()
+{
+    (*this)*=1/this->Magnitude();
+}
+//#####################################################################
+// Function Scale
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v) const
+{
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            u(i)[s]*=v.u(i)[s]);
+    for(int s=0;s<2;s++) p[s]*=v.p[s];
+    for(int i=0;i<TV::m;i++) q(i)*=(v.q(i));
 }
 //#####################################################################
 template class INTERFACE_STOKES_SYSTEM_VECTOR<VECTOR<float,1> >;

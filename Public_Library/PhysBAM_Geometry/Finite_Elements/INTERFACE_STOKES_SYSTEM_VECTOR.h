@@ -36,6 +36,13 @@ public:
     T& Raw_Get(int i) PHYSBAM_OVERRIDE;
     KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
     void Resize(const KRYLOV_VECTOR_BASE<T>& v) PHYSBAM_OVERRIDE;
+
+    T Dot(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v) const;
+    T Magnitude_Squared() const;
+    T Magnitude() const;
+    T Max_Abs() const;
+    void Normalize();
+    void Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v);
 };
 }
 #endif

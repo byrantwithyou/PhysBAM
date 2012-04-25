@@ -8,7 +8,6 @@
 #define __INTERFACE_STOKES_SYSTEM__
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
@@ -62,6 +61,8 @@ public:
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;
 
+    VECTOR_T J; // Jacobi preconditioner 
+
     const GRID<TV>& grid;
     const GRID<TV>& coarse_grid;
 
@@ -75,7 +76,7 @@ public:
     static int solve_id;
 
     typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT object;
-    VECTOR<CELL_MANAGER<TV>,TV::m> *cm_u;
+    VECTOR<CELL_MANAGER<TV>*,TV::m> cm_u;
     CELL_MANAGER<TV> *cm_p;
     CELL_DOMAIN_INTERFACE<TV> *cdi;
 
@@ -84,7 +85,7 @@ public:
 
 //#####################################################################
     void Set_Matrix(const VECTOR<T,2>& mu);
-    void Set_RHS(VECTOR_T& rhs, const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface);
+    void Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Get_U_Part(const VECTOR_T& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const;
     void Get_P_Part(const VECTOR_T& x,ARRAY<T,TV_INT>& p) const;
