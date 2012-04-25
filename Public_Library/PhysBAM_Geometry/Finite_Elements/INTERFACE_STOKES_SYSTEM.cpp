@@ -157,31 +157,29 @@ Set_Matrix(const VECTOR<T,2>& mu)
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
 Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface)
 {
-/*    VECTOR_ND<T> F_interface(system_size);
-    VECTOR_ND<T>* F_body[TV::m];
-    for(int i=0;i<TV::m;i++) F_body[i]=new VECTOR_ND<T>(system_size);
-    for(int i=0;i<TV::m;i++)
-        for(int j=0;j<f_interface.m;j++)
-            F_interface(j+index_range_q[i].min_corner)=f_interface(j)(i);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int s=0;s<2;s++){
-            int index=cm_p->Get_Index_Fixed(it.index,s);
-            if(index>=0)
-                for(int i=0;i<TV::m;i++)
-                    (*F_body[i])(index)=f_body[s](it.index)(i);}
-
-    rhs.v.Resize(system_size);
-    for(int i=0;i<TV::m;i++){
-        for(int j=0;j<helper_rhs_q[i]->data.m;j++)
-            rhs.v(helper_rhs_q[i]->data(j).x)+=helper_rhs_q[i]->data(j).z*F_interface(helper_rhs_q[i]->data(j).y);
-        delete helper_rhs_q[i];}
+    VECTOR<VECTOR_ND<T>,TV::m> F_interface;
+    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
     
     for(int i=0;i<TV::m;i++){
-        for(int j=0;j<helper_rhs_p[i]->data.m;j++)
-            rhs.v(helper_rhs_p[i]->data(j).x)+=helper_rhs_p[i]->data(j).z*(*F_body[i])(helper_rhs_p[i]->data(j).y);
-        delete helper_rhs_p[i];}
+        F_interface(i).Resize(object.mesh.elements.m);
+        for(int s=0;s<2;s++) F_body(i)[s].Resize(cm_p->dofs[s]);}
 
-        for(int i=0;i<TV::m;i++) delete F_body[i];*/
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<object.mesh.elements.m;k++)
+            F_interface(i)(k)=f_interface(k)(i);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        for(int s=0;s<2;s++){
+            int k=cm_p->Get_Index(it.index,s);
+            if(k>=0)
+                for(int i=0;i<TV::m;i++)
+                    F_body(i)[s](k)=f_body[s](it.index)(i);}
+
+    Resize_Vector(rhs); // assumes rhs was 0
+    
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            matrix_rhs_qu(i)[s].Transpose_Times(F_interface(i),rhs.u(i)[s]);
+            matrix_pu(i)[s].Transpose_Times_Subtract(F_body(i)[s],rhs.u(i)[s]);}
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner
