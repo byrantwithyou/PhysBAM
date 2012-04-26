@@ -40,13 +40,13 @@ public:
     {assert(particle<particles.Size());return binding_index_from_particle_index.m<=particle?-1:binding_index_from_particle_index(particle);}
 
     TV Embedded_Position(const int particle_index) const
-    {return bindings(binding_index_from_particle_index(particle_index))->Embedded_Position();}
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position();return particles.X(particle_index);}
 
     TV Embedded_Position(const int particle_index,ARRAY_VIEW<const TV> X_input) const
-    {return bindings(binding_index_from_particle_index(particle_index))->Embedded_Position(X_input);}
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position(X_input);return X_input(particle_index);}
 
     TV Embedded_Velocity(const int particle_index) const
-    {return bindings(binding_index_from_particle_index(particle_index))->Embedded_Velocity();}
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Velocity();return particles.V(particle_index);}
 
     BINDING<TV>* Binding(const int particle_index) const
     {if(binding_index_from_particle_index.m<=particle_index || binding_index_from_particle_index(particle_index)<0) return 0;
