@@ -662,59 +662,45 @@ Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const 
 //#####################################################################
 // Function Apply_Rigid_Body_Motions
 //#####################################################################
-namespace{
-template<class T> MATRIX<T,0,0> Inertia_Tensor(const ARRAY<int>& rigid_list,const ARRAY_VIEW<T>& mass,const ARRAY<VECTOR<T,1> >& X_self_collision_free,const VECTOR<T,1>& center_of_mass)
-{
-    MATRIX<T,0,0> I=MATRIX<T,0,0>();
-    for(int kk=0;kk<rigid_list.m;kk++){int p=rigid_list(kk);
-        VECTOR<T,1> radial_vector=X_self_collision_free(p)-center_of_mass;
-        I+=mass(p)*MATRIX<T,0>();}
-    return I;
-}
-template<class T> MATRIX<T,1,1> Inertia_Tensor(const ARRAY<int>& rigid_list,const ARRAY_VIEW<T>& mass,const ARRAY<VECTOR<T,2> >& X_self_collision_free,const VECTOR<T,2>& center_of_mass)
-{
-    MATRIX<T,1,1> I=MATRIX<T,1,1>();
-    for(int kk=0;kk<rigid_list.m;kk++){int p=rigid_list(kk);
-        VECTOR<T,2> radial_vector=X_self_collision_free(p)-center_of_mass;
-        I+=mass(p)*MATRIX<T,1>(radial_vector.Magnitude_Squared());}
-    return I;
-}
-template<class T> SYMMETRIC_MATRIX<T,3> Inertia_Tensor(const ARRAY<int>& rigid_list,const ARRAY_VIEW<T>& mass,const ARRAY<VECTOR<T,3> >& X_self_collision_free,const VECTOR<T,3>& center_of_mass)
-{
-    SYMMETRIC_MATRIX<T,3> I=SYMMETRIC_MATRIX<T,3>();
-    for(int kk=0;kk<rigid_list.m;kk++){int p=rigid_list(kk);
-        VECTOR<T,3> radial_vector=X_self_collision_free(p)-center_of_mass;
-        I+=mass(p)*(radial_vector.Magnitude_Squared()-SYMMETRIC_MATRIX<T,3>::Outer_Product(radial_vector));}
-    return I;
-}
-}
 template<class TV> void TRIANGLE_COLLISIONS<TV>::
 Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
 {
-    typedef typename TV::SPIN T_SPIN;
-
-    DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
+    DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
+    ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
     if(output_collision_results){
         LOG::cout<<"TOTAL RIGID GROUPS = "<<rigid_lists.m<<std::endl;
         for(int list=0;list<rigid_lists.m;list++) LOG::cout<<"LIST "<<list<<" = "<<rigid_lists(list).m<<" POINTS"<<std::endl<<rigid_lists(list);}
     
     T one_over_dt=1/dt;
     for(int list=0;list<rigid_lists.m;list++) if(rigid_lists(list).m){
-        TV average_velocity,center_of_mass;T total_mass=0;
-        for(int kk=0;kk<rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
-            total_mass+=full_particles.mass(p);center_of_mass+=full_particles.mass(p)*X_self_collision_free(p);
+        ARRAY<int> flat_indices;
+        geometry.deformable_body_collection.binding_list.Flatten_Indices(flat_indices,rigid_lists(list));
+        TV average_velocity,center_of_mass;
+        T total_mass=0;
+        for(int k=0;k<flat_indices.m;k++){int p=flat_indices(k);
+            total_mass+=full_particles.mass(p);
+            center_of_mass+=full_particles.mass(p)*X_self_collision_free(p);
             average_velocity+=full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p));}
-        T one_over_total_mass=1/total_mass;center_of_mass*=one_over_total_mass;average_velocity*=one_over_dt*one_over_total_mass;  
-        T_SPIN L=T_SPIN(); // moment of inertia & angular momentum
-        for(int kk=0;kk<rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
+        T one_over_total_mass=1/total_mass;
+        center_of_mass*=one_over_total_mass;
+        average_velocity*=one_over_dt*one_over_total_mass;  
+        typename TV::SPIN L; // moment of inertia & angular momentum
+        SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia;
+        for(int k=0;k<flat_indices.m;k++){int p=flat_indices(k);
             TV radial_vector=X_self_collision_free(p)-center_of_mass;
-            L+=TV::Cross_Product(radial_vector,full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p)));} // TODO: figure out why it could be bad to hoist mass out of Cross_Product
-        L*=one_over_dt;T_SPIN omega=Inverse(Inertia_Tensor(rigid_lists(list),full_particles.mass,X_self_collision_free,center_of_mass))*L; // TODO: use pseudoinverse
+            L+=TV::Cross_Product(radial_vector,full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p)));
+            inertia+=full_particles.mass(p)*MATRIX<T,TV::SPIN::m,TV::m>::Cross_Product_Matrix(radial_vector).Transposed().Cross_Product_Matrix_Times_With_Symmetric_Result(radial_vector);}
+        L*=one_over_dt;
+        typename TV::SPIN omega=inertia.Solve_Linear_System(L);
         ROTATION<TV> R=ROTATION<TV>::From_Rotation_Vector(dt*omega);
-        for(int kk=0;kk<rigid_lists(list).m;kk++){int p=rigid_lists(list)(kk);
+        for(int k=0;k<flat_indices.m;k++){int p=flat_indices(k);
             TV new_position=center_of_mass+dt*average_velocity+R.Rotate(X_self_collision_free(p)-center_of_mass);
             full_particles.V(p)=one_over_dt*(new_position-X_self_collision_free(p));
-            assert(geometry.modified_full(p));recently_modified_full(p)=true;}}
+            assert(geometry.modified_full(p));recently_modified_full(p)=true;}
+        for(int k=0;k<rigid_lists(list).m;k++){
+            int p=rigid_lists(list)(k);
+            full_particles.X(p)=geometry.deformable_body_collection.binding_list.Embedded_Position(p);
+            full_particles.V(p)=geometry.deformable_body_collection.binding_list.Embedded_Velocity(p);}}
 }
 //####################################################################
 template class TRIANGLE_COLLISIONS<VECTOR<float,1> >;
