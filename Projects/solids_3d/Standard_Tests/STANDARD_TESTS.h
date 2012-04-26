@@ -367,7 +367,7 @@ void Parse_Options()
             solids_parameters.cfl=(T)5;
             break;
         case 51:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             break;
         case 5:
         case 29:
