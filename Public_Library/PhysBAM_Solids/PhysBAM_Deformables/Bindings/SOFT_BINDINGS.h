@@ -29,7 +29,6 @@ public:
     ARRAY<int> bindings_using_forces_for_collisions;
     ARRAY<int> binding_index_from_particle_index;
     SEGMENT_MESH* binding_mesh;
-    bool use_gauss_seidel_for_impulse_based_collisions; // TODO: set per binding and add to I/O
     int last_read;
     mutable bool is_stale;
     mutable ARRAY<int>* frame_list;
@@ -78,8 +77,6 @@ public:
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const;
     void Set_Mass_From_Effective_Mass();
     void Remove_Soft_Bound_Particles(ARRAY<int>& particles) const;
-    int Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_surface); // TODO: names are needlessly collision specific
-    int Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& particle_on_surface); // same as above, but touches only velocities
     bool Need_Bindings_Mapped() const;
     void Map_Forces_From_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<const TWIST<TV> > wrench_full) const;
     void Clamp_Particles_To_Embedded_Positions(const bool bindings_using_impulses_for_collisions_only=false) const;

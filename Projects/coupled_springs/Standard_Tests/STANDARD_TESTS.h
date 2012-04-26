@@ -198,7 +198,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.use_rigid_deformable_contact=true;
     solids_parameters.rigid_body_collision_parameters.collision_bounding_box_thickness=(T)1e-3;
     solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
-    solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
     solids_parameters.verbose_dt=true;
     solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
     fully_implicit=parse_args->Is_Value_Set("-fully_implicit");

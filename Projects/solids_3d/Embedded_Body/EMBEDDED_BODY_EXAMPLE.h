@@ -249,7 +249,6 @@ void Get_Initial_Data()
     deformable_object.Add_Structure(&free_particles);
 
     // initialize binding mesh for boundary conditions
-    soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
     soft_bindings.Initialize_Binding_Mesh(true);binding_mesh.Initialize_Mesh(*soft_bindings.binding_mesh);
 
     // correct number nodes (one last time)

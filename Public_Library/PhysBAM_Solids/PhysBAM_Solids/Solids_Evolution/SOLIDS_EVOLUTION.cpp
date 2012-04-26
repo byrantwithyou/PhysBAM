@@ -197,9 +197,8 @@ Adjust_Velocity_For_Self_Repulsion_And_Self_Collisions(const T dt,const T time,i
     else if(repulsions_found){ // repulsions only, restore velocities for unmodified and apply velocity delta otherwise
         for(int p=0;p<particles.Size();p++) particles.V(p)=modified(p)?V_save(p)+particles.V(p)-V_averaged(p):V_save(p);}
     else{particles.V=V_save;return false;} // restore all the unmodified velocities
-
-    // propagate any changes from soft bound particles to parents
-    solid_body_collection.Adjust_Mesh_For_Self_Collision(time);
+    solid_body_collection.example_forces_and_velocities->Update_Time_Varying_Material_Properties(time);
+    solid_body_collection.Update_Position_Based_State(time,false);
 
     return true;
 }

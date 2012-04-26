@@ -118,7 +118,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
     // initialize rest of fracture
     TET_SIM_FRACTURE_EXAMPLE<T>::Initialize_Bodies();
-    solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
 }
 //##################################################################
 };

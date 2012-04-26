@@ -190,7 +190,6 @@ void Get_Initial_Data()
     if(subsamples==0) deformable_body_collection.collisions.collision_structures.Append(&tetrahedralized_volume);
     else deformable_body_collection.collisions.collision_structures.Append(&free_particles);
     solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append_Elements(deformable_body_collection.deformable_geometry.structures);
-    soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
 
     // correct number nodes
     for(int i=0;i<deformable_body_collection.deformable_geometry.structures.m;i++) deformable_body_collection.deformable_geometry.structures(i)->Update_Number_Nodes();

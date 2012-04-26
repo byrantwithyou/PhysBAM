@@ -28,13 +28,12 @@ public:
     DEFORMABLE_PARTICLES<TV>& particles;
     ARRAY<BINDING<TV>*> bindings;
     ARRAY<int> binding_index_from_particle_index;
-    DEFORMABLE_BODY_COLLECTION<TV>* deformable_body_collection;
+    DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection;
     int last_read;
     mutable bool is_stale;
     mutable ARRAY<int>* frame_list;
 
     BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
-    BINDING_LIST(DEFORMABLE_PARTICLES<TV>& particles); // use of this constructor disables some features
     virtual ~BINDING_LIST();
 
     int Binding_Index_From_Particle_Index(const int particle) const
@@ -140,8 +139,6 @@ public:
     void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full) const;
     void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full) const;
     void Distribute_Mass_To_Parents() const;
-    int Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_surface); // TODO: names are needlessly collision specific
-    int Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& particle_on_surface); // same as above, but touches only velocities
     void Read(TYPED_ISTREAM& input);
     void Write(TYPED_OSTREAM& output) const;
 //#####################################################################

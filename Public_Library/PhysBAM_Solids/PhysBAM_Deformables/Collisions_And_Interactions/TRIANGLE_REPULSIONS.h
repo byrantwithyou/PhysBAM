@@ -100,7 +100,6 @@ public:
     ARRAY<T> pf_old_speeds;
     ARRAY<TV> pf_normals;
     ARRAY<TV> ee_target_impulses;
-    ARRAY<VECTOR<T,d+1> > ee_target_weights;
     ARRAY<T> ee_old_speeds;
     ARRAY<TV> ee_normals;
 

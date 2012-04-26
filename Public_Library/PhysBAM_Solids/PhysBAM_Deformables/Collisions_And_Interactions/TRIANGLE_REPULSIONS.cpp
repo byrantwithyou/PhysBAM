@@ -295,7 +295,6 @@ Adjust_Velocity_For_Self_Repulsion_Using_History(const T dt,const bool use_repul
         repulsions+=Apply_Repulsions_To_Velocities(dt,point_face_interaction_pairs,edge_edge_interaction_pairs,use_repulsions,use_saved_pairs);}
 
     LOG::Stat("adjusting velocity for repulsions using history",repulsions);
-    if(repulsions) geometry.deformable_body_collection.Adjust_Mesh_For_Self_Repulsion();
     return repulsions;
 }
 template<> int TRIANGLE_REPULSIONS<VECTOR<float,1> >::Adjust_Velocity_For_Self_Repulsion_Using_History(const T,const bool,bool){PHYSBAM_NOT_IMPLEMENTED();}

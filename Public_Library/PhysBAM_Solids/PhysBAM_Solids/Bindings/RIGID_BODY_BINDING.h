@@ -118,7 +118,7 @@ public:
     {/*if(particles.mass(particle_index)) PHYSBAM_NOT_IMPLEMENTED();*/}
 
     SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
-    {return Rigid_Body().Impulse_Factor(Rigid_Body().World_Space_Vector(object_space_position)+Rigid_Body().Frame().t);}
+    {return Rigid_Body().Impulse_Factor(Rigid_Body().World_Space_Point(object_space_position));}
 
     void Parents(ARRAY<int>& parents) const PHYSBAM_OVERRIDE
     {PHYSBAM_NOT_IMPLEMENTED();}

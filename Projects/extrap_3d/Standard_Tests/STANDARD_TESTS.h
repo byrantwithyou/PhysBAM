@@ -341,7 +341,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     solids_parameters.use_rigid_deformable_contact=false;
-    solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions=true;
     solids_parameters.rigid_body_collision_parameters.use_push_out=true;
     solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
     solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;

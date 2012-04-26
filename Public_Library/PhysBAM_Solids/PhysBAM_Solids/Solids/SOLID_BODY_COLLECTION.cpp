@@ -32,7 +32,6 @@ SOLID_BODY_COLLECTION(EXAMPLE_FORCES_AND_VELOCITIES<TV>* example_forces_and_velo
     rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(example_forces_and_velocities_input,&collision_body_list)),
     example_forces_and_velocities(example_forces_and_velocities_input),print_energy(false),simulate(true),iterations_used_diagnostic(0)
 {
-    deformable_body_collection.binding_list.deformable_body_collection=&deformable_body_collection;
     Print_Diagnostics();
     Print_Residuals(false);
     Set_CFL_Number();
@@ -261,16 +260,6 @@ Disable_Spring_Elasticity()
 {
     for(int k=0;k<deformable_body_collection.deformables_forces.m;k++){DEFORMABLES_FORCES<TV>* force=deformable_body_collection.deformables_forces(k);
         if(dynamic_cast<SPRINGS_TAG*>(force)) force->use_velocity_independent_forces=false;}
-}
-//#####################################################################
-// Function Adjust_Mesh_For_Self_Collision
-//#####################################################################
-template<class TV> void SOLID_BODY_COLLECTION<TV>::
-Adjust_Mesh_For_Self_Collision(const T time)
-{
-    deformable_body_collection.Adjust_Mesh_For_Self_Collision();
-    example_forces_and_velocities->Update_Time_Varying_Material_Properties(time);
-    Update_Position_Based_State(time,false);
 }
 //#####################################################################
 // Function Compute_Linear_Momentum 

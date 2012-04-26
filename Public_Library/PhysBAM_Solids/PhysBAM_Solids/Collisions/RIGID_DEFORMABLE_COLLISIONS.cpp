@@ -242,19 +242,8 @@ Update_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int part
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-
-    // do not collide with hard bound particles or if both rigid body and particle have infinite inertia
-    if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(particle_index)>=0 || (rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX)) return false;
-
-    // sync soft bound particles before processing
-    const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
-    BINDING<TV>* hard_binding=0;int parent=-1;
-    const bool impulse_based_binding=soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index);
-    if(impulse_based_binding){
-        parent=soft_bindings.bindings(soft_binding_index).y;hard_binding=soft_bindings.binding_list.Binding(parent);
-        if(hard_binding){hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();}
-        if(soft_bindings.use_gauss_seidel_for_impulse_based_collisions){particles.X(particle_index)=particles.X(parent);particles.V(particle_index)=particles.V(parent);}}
+    // do not collide if both rigid body and particle have infinite inertia
+    if(rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX) return false;
 
     T depth;if(!rigid_body.Implicit_Geometry_Lazy_Inside_And_Value(particles.X(particle_index),depth,solids_parameters.rigid_body_collision_parameters.collision_body_thickness)) return false;
     particles_collided_with_rigid_body.Get_Or_Insert(rigid_body.particle_index).Set(particle_index);
@@ -421,27 +410,15 @@ Update_Rigid_Deformable_Contact_Pair(RIGID_BODY<TV>& rigid_body,const int partic
 {
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     ARRAY<TV>& X=X_save;
 
-    // do not collide with hard bound particles or if both rigid body and particle have infinite inertia
-    if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(particle_index)>=0 || (rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX)) return false;
+    // do not collide if both rigid body and particle have infinite inertia
+    if(rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX) return false;
 
     exchange(rigid_frame_save(rigid_body.particle_index),rigid_body.Frame());
     rigid_body.Update_Angular_Velocity();
     // NOTE: positions and normals are now at time n
-
-    // sync soft bound particles before processing
-    const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
-    BINDING<TV>* hard_binding=0;int parent=-1;
-    const bool impulse_based_binding=soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index);
-    if(impulse_based_binding){
-        parent=soft_bindings.bindings(soft_binding_index).y;hard_binding=soft_bindings.binding_list.Binding(parent);
-        // TODO: the first position clamp is probably not necessary if hard bindings were satisfied in X_save
-        if(hard_binding){hard_binding->Clamp_To_Embedded_Position(X);hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();}
-        if(soft_bindings.use_gauss_seidel_for_impulse_based_collisions){
-            X(particle_index)=X(parent);particles.X(particle_index)=particles.X(parent);particles.V(particle_index)=particles.V(parent);}}
 
     TV relative_velocity=particles.V(particle_index)-rigid_body.Pointwise_Object_Velocity(X(particle_index));
     TV normal=rigid_body.implicit_object->Extended_Normal(X(particle_index));
@@ -865,17 +842,6 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             particle_distances.Remove_Index_Lazy(i);
             i--;}}
 
-    // Sync soft bindings
-    for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);
-        const int soft_binding_index=solid_body_collection.deformable_body_collection.soft_bindings.Soft_Binding(p);
-        BINDING<TV>* hard_binding=0;int parent=-1;
-        const bool impulse_based_binding=soft_binding_index>=0 && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
-        if(impulse_based_binding){
-            parent=solid_body_collection.deformable_body_collection.soft_bindings.bindings(soft_binding_index).y;
-            hard_binding=solid_body_collection.deformable_body_collection.soft_bindings.binding_list.Binding(parent);
-            if(hard_binding) hard_binding->Clamp_To_Embedded_Position();
-            if(solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions) particles.X(p)=particles.X(parent);}}
-
     if(particle_interactions.m==0 && rigid_body_interactions.m==0) return false;
 
     ARRAY<SYMMETRIC_MATRIX<T,TV::m> > K_inverse(rigid_body_interactions.m);
@@ -1038,16 +1004,6 @@ Push_Out_From_Particle(const int particle)
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection=solid_body_collection.rigid_body_collection;
 
-    // Sync soft binding
-    const int soft_binding_index=solid_body_collection.deformable_body_collection.soft_bindings.Soft_Binding(particle);
-    BINDING<TV>* hard_binding=0;int parent=-1;
-    const bool impulse_based_binding=soft_binding_index>=0 && solid_body_collection.deformable_body_collection.soft_bindings.use_impulses_for_collisions(soft_binding_index);
-    if(impulse_based_binding){
-        parent=solid_body_collection.deformable_body_collection.soft_bindings.bindings(soft_binding_index).y;
-        hard_binding=solid_body_collection.deformable_body_collection.soft_bindings.binding_list.Binding(parent);
-        if(hard_binding) hard_binding->Clamp_To_Embedded_Position();
-        if(solid_body_collection.deformable_body_collection.soft_bindings.use_gauss_seidel_for_impulse_based_collisions) particles.X(particle)=particles.X(parent);}
-
     // TODO: Note that we have not synced the bindings for these.
     ARRAY<ELEMENT> elements;ARRAY<TV> weights;ARRAY<int> bodies;ARRAY<TV> particle_distances,rigid_body_distances;
     Get_Objects_Intersecting_Particle(particle,elements,weights,particle_distances,bodies,rigid_body_distances);
@@ -1106,19 +1062,8 @@ Pull_In_Rigid_Deformable_Collision_Pair(RIGID_BODY<TV>& rigid_body,const int par
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_body_collection.particles;
 
-    SOFT_BINDINGS<TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
-
-    // do not collide with hard bound particles or if both rigid body and particle have infinite inertia
-    if(solid_body_collection.deformable_body_collection.binding_list.Binding_Index_From_Particle_Index(particle_index)>=0 || (rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX)) return TV();
-
-    // sync soft bound particles before processing
-    const int soft_binding_index=soft_bindings.Soft_Binding(particle_index);
-    BINDING<TV>* hard_binding=0;int parent=-1;
-    const bool impulse_based_binding=soft_binding_index>=0 && soft_bindings.use_impulses_for_collisions(soft_binding_index);
-    if(impulse_based_binding){
-        parent=soft_bindings.bindings(soft_binding_index).y;hard_binding=soft_bindings.binding_list.Binding(parent);
-        if(hard_binding){hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();}
-        if(soft_bindings.use_gauss_seidel_for_impulse_based_collisions){particles.X(particle_index)=particles.X(parent);particles.V(particle_index)=particles.V(parent);}}
+    // do not collide if both rigid body and particle have infinite inertia
+    if(rigid_body.Has_Infinite_Inertia() && particles.mass(particle_index)==FLT_MAX) return TV();
 
     // TODO: just get depth
     T depth=rigid_body.Implicit_Geometry_Extended_Value(particles.X(particle_index));
@@ -1196,9 +1141,6 @@ Process_Push_Out()
         for(int i=0;i<solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies.m;i++){
             RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(solid_body_collection.rigid_body_collection.static_and_kinematic_rigid_bodies(i));
             if(Push_Out_From_Rigid_Body(rigid_body,particle_intersections,(T)1)) rigid_body_collisions.rigid_body_cluster_bindings.Clamp_Particles_To_Embedded_Positions();}
-
-    // TODO: handle soft bound particles
-    //if(interactions) soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(particle_on_surface);
 
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
     solid_body_collection.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities(); // TODO: necessary?

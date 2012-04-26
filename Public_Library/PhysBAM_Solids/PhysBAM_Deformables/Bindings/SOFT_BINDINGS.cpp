@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> SOFT_BINDINGS<TV>::
 SOFT_BINDINGS(BINDING_LIST<TV>& binding_list_input)
-    :binding_list(binding_list_input),particles(binding_list_input.particles),binding_mesh(0),use_gauss_seidel_for_impulse_based_collisions(false),last_read(-1),is_stale(true),frame_list(0)
+    :binding_list(binding_list_input),particles(binding_list_input.particles),binding_mesh(0),last_read(-1),is_stale(true),frame_list(0)
 {}
 //#####################################################################
 // Destructor
@@ -62,97 +62,6 @@ template<class TV> void SOFT_BINDINGS<TV>::
 Remove_Soft_Bound_Particles(ARRAY<int>& particles) const
 {
     for(int i=particles.m-1;i>=0;i--) if(Particle_Is_Bound(particles(i))) particles.Remove_Index_Lazy(i);
-}
-//#####################################################################
-// Function Adjust_Parents_For_Changes_In_Surface_Children
-//#####################################################################
-template<class TV> int SOFT_BINDINGS<TV>::
-Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_surface)
-{
-    PHYSBAM_ASSERT(binding_list.deformable_body_collection);
-
-    bool nothing_to_do=true;
-    if(bindings_using_impulses_for_collisions.m) nothing_to_do=false; // TODO: MPI
-    if(nothing_to_do) return 0;
-
-    int interactions=0;
-    HASHTABLE<int,TV> total_delta_X,total_delta_V;
-    HASHTABLE<int> self_collision,parents_changed;
-    HASHTABLE<int,int> number_of_children;
-
-    // figure out which embedded points are not where they should be or have differing velocities
-    for(int i=0;i<bindings_using_impulses_for_collisions.m;i++){
-        int p,parent;bindings(bindings_using_impulses_for_collisions(i)).Get(p,parent);
-        BINDING<TV>* hard_binding=binding_list.Binding(parent);
-        ARRAY<int> parents;if(hard_binding) hard_binding->Parents(parents);else parents.Append(parent);
-        if(particle_on_surface(p)){
-            if(hard_binding){hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();} // TODO: make this unnecessary
-            if(particles.X(p)!=particles.X(parent) || particles.V(p)!=particles.V(parent)){interactions++;
-                TV delta_X=particles.X(p)-particles.X(parent),delta_V=particles.V(p)-particles.V(parent);
-                for(int j=0;j<parents.m;j++) if(!particle_on_surface(parents(j))){
-                        self_collision.Set(parents(j));
-                        if(hard_binding) parents_changed.Set(parent);
-                        total_delta_X.Get_Or_Insert(parents(j))+=delta_X;total_delta_V.Get_Or_Insert(parents(j))+=delta_V;}}}
-        // TODO: consider only counting children that are on the surface
-        for(int j=0;j<parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;}
-
-    // adjust parents to match changes in children, skipping parents on the surface since they may also be self-colliding
-    for(typename HASHTABLE<int>::ITERATOR it(self_collision);it.Valid();it.Next()){int p=it.Key();
-        T one_over_number_of_children=(T)1/number_of_children.Get(p);
-        particles.X(p)+=total_delta_X.Get(p)*one_over_number_of_children;
-        particles.V(p)+=total_delta_V.Get(p)*one_over_number_of_children;}
-
-    // update affected hard bindings
-    // TODO: this can be simplified if we completely disallow modification of hard-bound particles
-    for(typename HASHTABLE<int>::ITERATOR it(parents_changed);it.Valid();it.Next()){int b=binding_list.binding_index_from_particle_index(it.Key());
-        binding_list.bindings(b)->Clamp_To_Embedded_Position();binding_list.bindings(b)->Clamp_To_Embedded_Velocity();}
-
-    return interactions;
-}
-//#####################################################################
-// Function Adjust_Parents_For_Changes_In_Surface_Children_Velocities
-//#####################################################################
-template<class TV> int SOFT_BINDINGS<TV>::
-Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& particle_on_surface)
-{
-    PHYSBAM_ASSERT(binding_list.deformable_body_collection);
-
-    bool nothing_to_do=true;
-    if(bindings_using_impulses_for_collisions.m) nothing_to_do=false; // TODO: MPI
-    if(nothing_to_do) return 0;
-
-    int interactions=0;
-    HASHTABLE<int,TV> total_delta_V;
-    HASHTABLE<int> self_collision,parents_changed;
-    HASHTABLE<int,int> number_of_children;
-
-    // figure out which embedded points are not where they should be or have differing velocities
-    for(int i=0;i<bindings_using_impulses_for_collisions.m;i++){
-        int p,parent;bindings(bindings_using_impulses_for_collisions(i)).Get(p,parent);
-        BINDING<TV>* hard_binding=binding_list.Binding(parent);
-        ARRAY<int> parents;if(hard_binding) hard_binding->Parents(parents);else parents.Append(parent);
-        if(particle_on_surface(p)){
-            if(hard_binding) hard_binding->Clamp_To_Embedded_Velocity(); // TODO: make this unnecessary
-            if(particles.V(p)!=particles.V(parent)){interactions++;
-                TV delta_V=particles.V(p)-particles.V(parent);
-                for(int j=0;j<parents.m;j++) if(!particle_on_surface(parents(j))){
-                        self_collision.Set(parents(j));
-                        if(hard_binding) parents_changed.Set(parent);
-                        total_delta_V.Get_Or_Insert(parents(j))+=delta_V;}}}
-        // TODO: consider only counting children that are on the surface
-        for(int j=0;j<parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;}
-
-    // adjust parents to match changes in children, skipping parents on the surface since they may also be self-colliding
-    for(typename HASHTABLE<int>::ITERATOR it(self_collision);it.Valid();it.Next()){int p=it.Key();
-        T one_over_number_of_children=(T)1/number_of_children.Get(p);
-        particles.V(p)+=total_delta_V.Get(p)*one_over_number_of_children;}
-
-    // update affected hard bindings
-    // TODO: this can be simplified if we completely disallow modification of hard-bound particles
-    for(typename HASHTABLE<int>::ITERATOR it(parents_changed);it.Valid();it.Next()){int b=binding_list.binding_index_from_particle_index(it.Key());
-        binding_list.bindings(b)->Clamp_To_Embedded_Velocity();}
-
-    return interactions;
 }
 //#####################################################################
 // Function Need_Bindings_Mapped

@@ -277,7 +277,6 @@ Adjust_Nodes_For_Collisions(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_B
     for(int pair=0;pair<interaction_pair.m;pair++){
         int p,t;interaction_pair(pair).Get(p,t);
         if(t>=0) X(p)+=relaxation_factor*position_change(count++);}
-    if(interactions) soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(particle_on_surface);
     return interactions;
 }
 //#####################################################################

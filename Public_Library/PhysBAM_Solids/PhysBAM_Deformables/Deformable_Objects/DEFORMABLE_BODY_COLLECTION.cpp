@@ -75,38 +75,6 @@ Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters)
     triangle_collisions.Initialize(triangle_collision_parameters);
 }
 //#####################################################################
-// Function Adjust_Mesh_For_Self_Collision
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Adjust_Mesh_For_Self_Collision()
-{
-    if(use_embedded_collisions || deformable_geometry.template Find_Structure<EMBEDDING<TV>*>()){
-        if(use_nonembedded_self_collision){
-            binding_list.Clamp_Particles_To_Embedded_Positions();binding_list.Clamp_Particles_To_Embedded_Velocities();
-            soft_bindings.Clamp_Particles_To_Embedded_Positions(true);soft_bindings.Clamp_Particles_To_Embedded_Velocities(true);}
-        else{
-            // TODO: handle self collision exclusively with soft bound particles
-            int interactions=binding_list.Adjust_Parents_For_Changes_In_Surface_Children(collisions.check_collision);
-            interactions+=soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children(collisions.check_collision);
-            LOG::cout<<"TOTAL EMBEDDED SELF COLLISIONS = "<<interactions<<" OUT OF "<<binding_list.bindings.m<<std::endl;}}
-}
-//#####################################################################
-// Function Adjust_Mesh_For_Self_Repulsion
-//#####################################################################
-template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::
-Adjust_Mesh_For_Self_Repulsion()
-{
-    if(use_embedded_collisions || deformable_geometry.template Find_Structure<EMBEDDING<TV>*>()){
-        if(use_nonembedded_self_collision){
-            binding_list.Clamp_Particles_To_Embedded_Velocities();
-            soft_bindings.Clamp_Particles_To_Embedded_Velocities(true);}
-        else{
-            // TODO: handle self collision exclusively with soft bound particles
-            binding_list.Adjust_Parents_For_Changes_In_Surface_Children_Velocities(collisions.check_collision);
-            // TODO: this is unnecessarily slow, since it checks for changes in positions
-            soft_bindings.Adjust_Parents_For_Changes_In_Surface_Children_Velocities(collisions.check_collision);}}
-}
-//#####################################################################
 // Function Update_Collision_Penalty_Forces_And_Derivatives
 //#####################################################################
 template<class TV> void DEFORMABLE_BODY_COLLECTION<TV>::

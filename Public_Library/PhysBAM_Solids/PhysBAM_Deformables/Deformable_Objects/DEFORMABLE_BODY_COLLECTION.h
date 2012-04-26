@@ -86,10 +86,7 @@ public:
     void Write(const STREAM_TYPE stream_type,const std::string& prefix,const int frame,const int static_frame,const bool include_static_variables,const bool write_from_every_process) const;
     int Add_Force(DEFORMABLES_FORCES<TV>* force);
     void Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collisions_parameters);
-    void Adjust_Mesh_For_Self_Collision();
-    void Adjust_Mesh_For_Self_Repulsion(); // same as Adjust_Mesh_For_Self_Collision, but assumes only velocities change
     void Update_Collision_Penalty_Forces_And_Derivatives();
-    //void Update_Stored_Repulsion_Connectivity(const TRIANGLE_REPULSIONS<TV>& repulsions);
     void Read_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame);
     void Write_Dynamic_Variables(const STREAM_TYPE stream_type,const std::string& prefix,const int frame) const;
     void Update_Simulated_Particles();

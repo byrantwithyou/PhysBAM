@@ -17,14 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> BINDING_LIST<TV>::
 BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection)
-    :particles(deformable_body_collection.particles),deformable_body_collection(&deformable_body_collection),last_read(-1),is_stale(true),frame_list(0)
-{}
-//#####################################################################
-// Constructor
-//#####################################################################
-template<class TV> BINDING_LIST<TV>::
-BINDING_LIST(DEFORMABLE_PARTICLES<TV>& particles)
-    :particles(particles),deformable_body_collection(0)
+    :particles(deformable_body_collection.particles),deformable_body_collection(deformable_body_collection),last_read(-1),is_stale(true),frame_list(0)
 {}
 //#####################################################################
 // Destructor
@@ -164,77 +157,6 @@ template<class TV> void BINDING_LIST<TV>::
 Distribute_Mass_To_Parents() const
 {
     for(int b=0;b<bindings.m;b++) bindings(b)->Distribute_Mass_To_Parents(particles.mass);
-}
-//#####################################################################
-// Function Adjust_Parents_For_Changes_In_Surface_Children
-//#####################################################################
-// TODO: get rid of this function by completely disallowing embedded particle modification
-template<class TV> int BINDING_LIST<TV>::
-Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_surface)
-{
-    int interactions=0;
-    HASHTABLE<int,TV> total_delta_X,total_delta_V;
-    HASHTABLE<int> self_collision;
-    HASHTABLE<int,int> number_of_children;
-
-    PHYSBAM_ASSERT(deformable_body_collection);
-
-    // figure out which embedded points are not where they should be or have differing velocities
-    for(int i=0;i<bindings.m;i++){
-        BINDING<TV>& binding=*bindings(i);
-        int p=binding.particle_index;
-        ARRAY<int> parents;
-        binding.Parents(parents);
-        if(particle_on_surface(p)){
-            TV Xp=binding.Embedded_Position(),Vp=binding.Embedded_Velocity();
-            if(particles.X(p)!=Xp || particles.V(p)!=Vp){interactions++;
-                TV delta_X=particles.X(p)-Xp,delta_V=particles.V(p)-Vp;
-                for(int j=0;j<parents.m;j++) if(!particle_on_surface(parents(j))){
-                        self_collision.Set(parents(j));total_delta_X.Get_Or_Insert(parents(j))+=delta_X;total_delta_V.Get_Or_Insert(parents(j))+=delta_V;}}}
-        for(int j=0;j<parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;} // TODO: consider only counting children that are on the surface
-
-    // adjust parents to match changes in children, skipping parents on the surface since they may also be self-colliding
-    for(typename HASHTABLE<int>::ITERATOR it(self_collision);it.Valid();it.Next()){int p=it.Key();
-        T one_over_number_of_children=(T)1/number_of_children.Get(p);
-        particles.X(p)+=total_delta_X.Get(p)*one_over_number_of_children;
-        particles.V(p)+=total_delta_V.Get(p)*one_over_number_of_children;}
-
-    return interactions; // self-collision/etc. may require bindings to drift, so do not resynchronize
-}
-//#####################################################################
-// Function Adjust_Parents_For_Changes_In_Surface_Children_Velocities
-//#####################################################################
-// TODO: get rid of this function by completely disallowing embedded particle modification
-template<class TV> int BINDING_LIST<TV>::
-Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& particle_on_surface)
-{
-    int interactions=0;
-    HASHTABLE<int,TV> total_delta_V;
-    HASHTABLE<int> self_collision;
-    HASHTABLE<int,int> number_of_children;
-
-    PHYSBAM_ASSERT(deformable_body_collection);
-
-    // figure out which embedded points are not where they should be or have differing velocities
-    for(int i=0;i<bindings.m;i++){
-        BINDING<TV>& binding=*bindings(i);
-        int p=binding.particle_index;
-        ARRAY<int> parents;
-        binding.Parents(parents);
-        if(particle_on_surface(p)){
-            TV Vp=binding.Embedded_Velocity();
-            if(particles.V(p)!=Vp){interactions++;
-                TV delta_V=particles.V(p)-Vp;
-                for(int j=0;j<parents.m;j++) if(!particle_on_surface(parents(j))){
-                        self_collision.Set(parents(j));total_delta_V.Get_Or_Insert(parents(j))+=delta_V;}}}
-        for(int j=0;j<parents.m;j++) number_of_children.Get_Or_Insert(parents(j))++;} // TODO: consider only counting children that are on the surface
-
-    // adjust parents to match changes in children, skipping parents on the surface since they may also be self-colliding
-    for(typename HASHTABLE<int>::ITERATOR it(self_collision);it.Valid();it.Next()){int p=it.Key();
-        T one_over_number_of_children=(T)1/number_of_children.Get(p);
-        particles.V(p)+=total_delta_V.Get(p)*one_over_number_of_children;}
-
-    return interactions; // self-collision/etc. may require bindings to drift, so do not resynchronize
 }
 //#####################################################################
 // Function Read
