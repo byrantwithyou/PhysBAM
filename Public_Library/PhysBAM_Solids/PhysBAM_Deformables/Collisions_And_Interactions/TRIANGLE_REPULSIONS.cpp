@@ -189,7 +189,9 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
     PHYSBAM_ASSERT(!mpi_solids); // Only per time step repulsions are supported in MPI
 
     LOG::SCOPE scope("repulsions","checking repulsions");
-    ARRAY_VIEW<const TV> X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;ARRAY_VIEW<const TV> V(geometry.deformable_body_collection.particles.V);
+    ARRAY_VIEW<const TV> X_self_collision_free(geometry.X_self_collision_free);
+    ARRAY<bool>& modified_full=geometry.modified_full;
+    ARRAY_VIEW<const TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY<REPULSION_PAIR<TV> > point_face_pairs(point_face_interaction_pairs);
     ARRAY<REPULSION_PAIR<TV> > edge_edge_pairs(edge_edge_interaction_pairs);
 
@@ -308,84 +310,102 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_interaction_pairs
     int repulsions=0;
 
     if(compute_point_face_friction){
-        Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_interaction_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
+        Adjust_Velocity_For_Repulsion(dt,point_face_interaction_pairs,use_repulsions,true,use_repulsions,pf_target_impulses,
+            pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         repulsions+=point_face_interaction_pairs.Size();
         if(output_repulsion_results) LOG::Stat("total point face friction",point_face_interaction_pairs.Size());}
     if(compute_edge_edge_friction){
-        Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_interaction_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
+        Adjust_Velocity_For_Repulsion(dt,edge_edge_interaction_pairs,use_repulsions,true,use_repulsions,ee_target_impulses,
+            ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         repulsions+=edge_edge_interaction_pairs.Size();
         if(output_repulsion_results) LOG::Stat("total edge edge friction",edge_edge_interaction_pairs.Size());}
     if(compute_point_face_inelastic_collision_repulsion){
-        Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_interaction_pairs,false,false,use_repulsions);
+        Adjust_Velocity_For_Repulsion(dt,point_face_interaction_pairs,false,false,use_repulsions,pf_target_impulses,
+            pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
         repulsions+=point_face_inelastic_collision_repulsion_attempts*point_face_interaction_pairs.Size();
         if(output_repulsion_results) LOG::Stat("total point face inelastic collision repulsion",point_face_inelastic_collision_repulsion_attempts*point_face_interaction_pairs.Size());}
     if(compute_edge_edge_inelastic_collision_repulsion){
-        Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_interaction_pairs,false,false,use_repulsions);
+        Adjust_Velocity_For_Repulsion(dt,edge_edge_interaction_pairs,false,false,use_repulsions,ee_target_impulses,
+            ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
         repulsions+=edge_edge_inelastic_collision_repulsion_attempts*edge_edge_interaction_pairs.Size();
         if(output_repulsion_results) LOG::Stat("total edge edge inelastic collision repulsion",edge_edge_inelastic_collision_repulsion_attempts*edge_edge_interaction_pairs.Size());}
     if(use_repulsions){
         if(compute_point_face_repulsion){
-            Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_interaction_pairs,true,false,use_repulsions);
+            Adjust_Velocity_For_Repulsion(dt,point_face_interaction_pairs,true,false,use_repulsions,pf_target_impulses,
+                pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
             repulsions+=point_face_interaction_pairs.Size();
             if(output_repulsion_results) LOG::Stat("total point face repulsion",point_face_interaction_pairs.Size());}
         if(compute_edge_edge_repulsion){
-            Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_interaction_pairs,true,false,use_repulsions);
+            Adjust_Velocity_For_Repulsion(dt,edge_edge_interaction_pairs,true,false,use_repulsions,ee_target_impulses,
+                ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
             repulsions+=edge_edge_interaction_pairs.Size();
             if(output_repulsion_results) LOG::Stat("total edge edge repulsion",edge_edge_interaction_pairs.Size());}}
     return repulsions;
 }
 template<class TV> template<class T_ARRAY1,class T_ARRAY2> int TRIANGLE_REPULSIONS<TV>::
-Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,
-    const bool use_repulsions)
+Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,
+    T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,const bool use_repulsions)
 {
     ARRAY_VIEW<TV> X(geometry.deformable_body_collection.particles.X),V(geometry.deformable_body_collection.particles.V),X_self_collision_free(geometry.X_self_collision_free);
     int repulsions=0;bool used=false;
     if(compute_point_face_friction){
         used=true;
-        Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_boundary_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
+        Adjust_Velocity_For_Repulsion(dt,point_face_boundary_pairs,use_repulsions,true,use_repulsions,pf_target_impulses,
+            pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
-        Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_internal_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
+        Adjust_Velocity_For_Repulsion(dt,point_face_internal_pairs,use_repulsions,true,use_repulsions,pf_target_impulses,
+            pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         int applied_repulsions=point_face_boundary_pairs.Size()+point_face_internal_pairs.Size();
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total point face friction",applied_repulsions);}
     if(compute_edge_edge_friction){
         if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);used=true;
-        Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_boundary_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
+        Adjust_Velocity_For_Repulsion(dt,edge_edge_boundary_pairs,use_repulsions,true,use_repulsions,ee_target_impulses,
+            ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
-        Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_internal_pairs,use_repulsions,true,use_repulsions); // if not using repulsions, only do friction for inelastic component
+        Adjust_Velocity_For_Repulsion(dt,edge_edge_internal_pairs,use_repulsions,true,use_repulsions,ee_target_impulses,
+            ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts); // if not using repulsions, only do friction for inelastic component
         int applied_repulsions=edge_edge_boundary_pairs.Size()+edge_edge_internal_pairs.Size();
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total edge edge friction",applied_repulsions);}
     if(compute_point_face_inelastic_collision_repulsion){
         if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);used=true;
-        Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_boundary_pairs,false,false,use_repulsions);
+        Adjust_Velocity_For_Repulsion(dt,point_face_boundary_pairs,false,false,use_repulsions,pf_target_impulses,
+            pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
-        Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_internal_pairs,false,false,use_repulsions);
+        Adjust_Velocity_For_Repulsion(dt,point_face_internal_pairs,false,false,use_repulsions,pf_target_impulses,
+            pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
         int applied_repulsions=point_face_inelastic_collision_repulsion_attempts*(point_face_boundary_pairs.Size()+point_face_internal_pairs.Size());
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total point face inelastic collision repulsion",applied_repulsions);}
     if(compute_edge_edge_inelastic_collision_repulsion){
         if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);used=true;
-        Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_boundary_pairs,false,false,use_repulsions);
+        Adjust_Velocity_For_Repulsion(dt,edge_edge_boundary_pairs,false,false,use_repulsions,ee_target_impulses,
+            ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
         mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
-        Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_internal_pairs,false,false,use_repulsions);
+        Adjust_Velocity_For_Repulsion(dt,edge_edge_internal_pairs,false,false,use_repulsions,ee_target_impulses,
+            ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
         int applied_repulsions=edge_edge_inelastic_collision_repulsion_attempts*(edge_edge_boundary_pairs.Size()+edge_edge_internal_pairs.Size());
         repulsions+=applied_repulsions;
         if(output_repulsion_results) LOG::Stat("total edge edge inelastic collision repulsion",applied_repulsions);}
     if(use_repulsions){
         if(compute_point_face_repulsion){
             if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);used=true;
-            Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_boundary_pairs,true,false,use_repulsions);
+            Adjust_Velocity_For_Repulsion(dt,point_face_boundary_pairs,true,false,use_repulsions,pf_target_impulses,
+                pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
             mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,point_face_send_particles,point_face_receive_particles);
-            Adjust_Velocity_For_Point_Face_Repulsion(dt,point_face_internal_pairs,true,false,use_repulsions);
+            Adjust_Velocity_For_Repulsion(dt,point_face_internal_pairs,true,false,use_repulsions,pf_target_impulses,
+                pf_old_speeds,pf_normals,point_face_inelastic_collision_repulsion_attempts);
             int applied_repulsions=point_face_boundary_pairs.Size()+point_face_internal_pairs.Size();
             repulsions+=applied_repulsions;
             if(output_repulsion_results) LOG::Stat("total point face repulsion",applied_repulsions);}
         if(compute_edge_edge_repulsion){
             if(used) mpi_solids->Gather_Repulsion_Inputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);used=true;
-            Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_boundary_pairs,true,false,use_repulsions);
+            Adjust_Velocity_For_Repulsion(dt,edge_edge_boundary_pairs,true,false,use_repulsions,ee_target_impulses,
+                ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
             mpi_solids->Scatter_Repulsion_Outputs(X_self_collision_free,X,V,edge_edge_send_particles,edge_edge_receive_particles);
-            Adjust_Velocity_For_Edge_Edge_Repulsion(dt,edge_edge_internal_pairs,true,false,use_repulsions);
+            Adjust_Velocity_For_Repulsion(dt,edge_edge_internal_pairs,true,false,use_repulsions,ee_target_impulses,
+                ee_old_speeds,ee_normals,edge_edge_inelastic_collision_repulsion_attempts);
             int applied_repulsions=edge_edge_boundary_pairs.Size()+edge_edge_internal_pairs.Size();
             repulsions+=applied_repulsions;
             if(output_repulsion_results) LOG::Stat("total edge edge repulsion",applied_repulsions);}}
@@ -472,8 +492,7 @@ Repulsion_Impulse(TV& direction,const T dt,const T_PAIR& pair,const TV& relative
         T repulsion_thickness_minus_distance=total_thickness-pair.distance;
         T final_relative_speed=spring_limiter_fraction_over_dt*repulsion_thickness_minus_distance;
         if(relative_speed>=final_relative_speed) return 0;
-        T ym_over_mass_times_length=youngs_modulus*VECTOR<T,T_PAIR::count>(
-            geometry.deformable_body_collection.particles.one_over_effective_mass.Subset(pair.nodes)).Average()/total_thickness;
+        T ym_over_mass_times_length=youngs_modulus*geometry.deformable_body_collection.particles.one_over_effective_mass.Subset(pair.nodes).Average()/total_thickness;
         T spring_impulse=dt*ym_over_mass_times_length*max((T)0,repulsion_thickness_minus_distance);
         if(friction) scalar_impulse=min(final_relative_speed-relative_speed,spring_impulse-min((T)0,relative_speed));
         else scalar_impulse=min(final_relative_speed-relative_speed,spring_impulse);}
@@ -487,102 +506,54 @@ Repulsion_Impulse(TV& direction,const T dt,const T_PAIR& pair,const TV& relative
     // compute friction if necessary and set direction
     if(friction){
         TV tangent=relative_velocity.Projected_Orthogonal_To_Unit_Direction(pair.normal);
-        T relative_tangent_velocity_magnitude=tangent.Magnitude(),friction_based_velocity_change=friction_coefficient*scalar_impulse;
-        scalar_impulse=-1;if(friction_based_velocity_change<relative_tangent_velocity_magnitude) scalar_impulse=-friction_based_velocity_change/relative_tangent_velocity_magnitude;
+        T relative_tangent_velocity_magnitude=tangent.Normalize(),friction_based_velocity_change=friction_coefficient*scalar_impulse;
+        scalar_impulse=-1;
+        if(friction_based_velocity_change<relative_tangent_velocity_magnitude)
+            scalar_impulse=-friction_based_velocity_change/relative_tangent_velocity_magnitude;
         direction=tangent;}
     else direction=pair.normal;
 
     return scalar_impulse;
 }
+//#####################################################################
+// Function Adjust_Velocity_For_Repulsion
+//#####################################################################
 template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
-Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions)
+Adjust_Velocity_For_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions,
+    ARRAY<TV>& target_impulses,ARRAY<T>& old_speeds,ARRAY<TV>& normals,int inelastic_collision_repulsion_attempts)
 {
     DEFORMABLE_PARTICLES<TV>& particles=geometry.deformable_body_collection.particles;
-    int attempts=0,total_attempts=1;if(!elastic_repulsion && !friction) total_attempts=point_face_inelastic_collision_repulsion_attempts;
+    int attempts=0,total_attempts=1;
+    if(!elastic_repulsion && !friction) total_attempts=inelastic_collision_repulsion_attempts;
     int inverted_pairs=0,applied_impulses=0;
     ARRAY_VIEW<TV> V(particles.V);
     ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
     while(++attempts<=total_attempts){
         impulse_velocities.Resize(particles.Size());impulse_velocities=V;
-        pf_target_impulses.Resize(pairs.Size());pf_target_impulses.Fill(TV());
-        pf_normals.Resize(pairs.Size());pf_normals.Fill(TV());
-        pf_old_speeds.Resize(pairs.Size());pf_old_speeds.Fill(T());
-        LOG::cout<<"Repulsion application step "<<attempts<<std::endl;
+        target_impulses.Resize(pairs.Size());target_impulses.Fill(TV());
+        normals.Resize(pairs.Size());normals.Fill(TV());
+        old_speeds.Resize(pairs.Size());old_speeds.Fill(T());
 
         for(int pair_index=0;pair_index<pairs.Size();pair_index++){
             const REPULSION_PAIR<TV>& pair=pairs(pair_index);
-            int p=pair.nodes[0];VECTOR<int,d> face_nodes=pair.nodes.Remove_Index(0);
             if(pair.distance<0) inverted_pairs++;
 
             TV relative_velocity=-V.Subset(pair.nodes).Weighted_Sum(pair.weights);
             TV direction;T scalar_impulse=Repulsion_Impulse(direction,dt,pair,relative_velocity,elastic_repulsion,friction);
-            
             if(scalar_impulse){
                 applied_impulses++;
-                T one_over_mass=one_over_effective_mass(p);
-                for(int i=0;i<face_nodes.m;i++) one_over_mass+=sqr(pair.weights[i])*one_over_effective_mass(face_nodes[i]);
+                T one_over_mass=geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(pair.nodes,pair.weights);
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
                 if(use_gauss_jacobi && !friction && !elastic_repulsion){
                     for(int i=0;i<TV::m+1;i++) impulse_velocities(pair.nodes(i))-=pair.weights(i)*one_over_effective_mass(pair.nodes(i))*impulse;
-                    pf_old_speeds(pair_index)=TV::Dot_Product(relative_velocity,direction);
-                    pf_target_impulses(pair_index)=impulse;
-                    pf_normals(pair_index)=direction;} // tangential for friction.
+                    old_speeds(pair_index)=TV::Dot_Product(relative_velocity,direction);
+                    target_impulses(pair_index)=impulse;
+                    normals(pair_index)=direction;} // tangential for friction.
                 else for(int i=0;i<TV::m+1;i++) V(pair.nodes(i))-=pair.weights(i)*one_over_effective_mass(pair.nodes(i))*impulse;}}
 
-        if(use_gauss_jacobi) Scale_And_Apply_Point_Face_Impulses(pairs);}
-    if(inverted_pairs) LOG::Stat("inverted point face repulsion pairs",inverted_pairs);
-    if(applied_impulses) LOG::Stat("applied point face repulsion impulses",applied_impulses);
-}
-//#####################################################################
-// Function Adjust_Velocity_For_Edge_Edge_Repulsion
-//#####################################################################
-template<class TV> template<class T_ARRAY,class S> void TRIANGLE_REPULSIONS<TV>::
-Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,2>&,const bool use_repulsions)
-{
-    Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(dt,pairs,elastic_repulsion,friction,VECTOR<T,3>(),use_repulsions);
-}
-template<class TV> template<class T_ARRAY,class S> void TRIANGLE_REPULSIONS<TV>::
-Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,3>&,const bool use_repulsions)
-{
-    DEFORMABLE_PARTICLES<TV>& particles=geometry.deformable_body_collection.particles;
-    int attempts=0,total_attempts=1;if(!elastic_repulsion && !friction) total_attempts=edge_edge_inelastic_collision_repulsion_attempts;
-    int inverted_pairs=0,applied_impulses=0;
-    ARRAY_VIEW<TV> V(particles.V);
-    ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
-    while(++attempts<=total_attempts){
-        impulse_velocities.Resize(particles.Size());impulse_velocities=V;
-        ee_target_impulses.Resize(pairs.Size());ee_target_impulses.Fill(TV());
-        ee_normals.Resize(pairs.Size());ee_normals.Fill(TV());
-        ee_old_speeds.Resize(pairs.Size());ee_old_speeds.Fill(T());
-
-        for(int pair_index=0;pair_index<pairs.Size();pair_index++){
-            const REPULSION_PAIR<TV>& pair=pairs(pair_index);
-            const VECTOR<int,d+1>& nodes=pair.nodes;
-            if(pair.distance<0) inverted_pairs++;
-
-            TV relative_velocity=-V.Subset(nodes).Weighted_Sum(pair.weights);
-            TV direction;T scalar_impulse=Repulsion_Impulse(direction,dt,pair,relative_velocity,elastic_repulsion,friction);
-            if(scalar_impulse){
-                applied_impulses++;
-                T one_over_mass=one_over_effective_mass.Subset(nodes).Weighted_Sum(sqr(pair.weights));
-                TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
-                if(use_gauss_jacobi && !friction && !elastic_repulsion){
-                    for(int i=0;i<TV::m+1;i++) impulse_velocities(nodes(i))-=pair.weights(i)*one_over_effective_mass(nodes(i))*impulse;
-                    ee_old_speeds(pair_index)=TV::Dot_Product(relative_velocity,direction);
-                    ee_target_impulses(pair_index)=impulse;
-                    ee_normals(pair_index)=direction.Normalized();} // something weird going on here (unnormalized directions)
-                else for(int i=0;i<TV::m+1;i++) V(nodes(i))-=pair.weights(i)*one_over_effective_mass(nodes(i))*impulse;}}
-
-        if(use_gauss_jacobi) Scale_And_Apply_Edge_Edge_Impulses(pairs);
-    }
-
-    if(inverted_pairs) LOG::Stat("inverted edge edge repulsion pairs",inverted_pairs);
-    if(applied_impulses) LOG::Stat("applied edge edge repulsion impulses",applied_impulses);
-}
-template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
-Adjust_Velocity_For_Edge_Edge_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions)
-{
-    Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(dt,pairs,elastic_repulsion,friction,TV(),use_repulsions);
+        if(use_gauss_jacobi) Scale_And_Apply_Impulses(pairs,target_impulses,old_speeds,normals);}
+    if(inverted_pairs) LOG::Stat("inverted repulsion pairs",inverted_pairs);
+    if(applied_impulses) LOG::Stat("applied repulsion impulses",applied_impulses);
 }
 //#####################################################################
 // Function Project_All_Moving_Constraints
@@ -625,49 +596,25 @@ Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomp
 // Function Scale_And_Apply_Point_Face_Impulses
 //#####################################################################
 template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
-Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs)
+Scale_And_Apply_Impulses(const T_ARRAY& pairs,ARRAY<TV>& target_impulses,ARRAY<T>& old_speeds,ARRAY<TV>& normals)
 {
     // Go through the computed impulses, and compare them to the actual change in velocity seen.  Scale back impulses accordingly
-    for(int i=0;i<pf_target_impulses.m;i++){
-        if(pf_target_impulses(i)==TV()) continue;
+    for(int i=0;i<target_impulses.m;i++){
+        if(target_impulses(i)==TV()) continue;
         const REPULSION_PAIR<TV>& pair=pairs(i);
         // Compute actual new relative_speed
         TV relative_velocity=-impulse_velocities.Subset(pair.nodes).Weighted_Sum(pair.weights);
-        T relative_speed=TV::Dot_Product(relative_velocity,pf_normals(i));
-        if(relative_speed*pf_old_speeds(i)<0){
-            T new_scale=-(relative_speed-pf_old_speeds(i))/pf_old_speeds(i);
-            pf_target_impulses(i)/=new_scale;}} // TODO: should we be doing this, or storing a maximum scale factor at each node?
+        T relative_speed=TV::Dot_Product(relative_velocity,normals(i));
+        if(relative_speed*old_speeds(i)<0){
+            T new_scale=-(relative_speed-old_speeds(i))/old_speeds(i);
+            target_impulses(i)/=new_scale;}} // TODO: should we be doing this, or storing a maximum scale factor at each node?
     // Apply the newly scaled impulses
     ARRAY_VIEW<T>& one_over_effective_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
-    for(int i=0;i<pf_target_impulses.m;i++){
-        if(pf_target_impulses(i)==TV()) continue;
+    for(int i=0;i<target_impulses.m;i++){
+        if(target_impulses(i)==TV()) continue;
         const REPULSION_PAIR<TV>& pair=pairs(i);
-        for(int j=0;j<TV::m+1;j++) V(pair.nodes(j))-=pair.weights(j)*one_over_effective_mass(pair.nodes(j))*pf_target_impulses(i);}
-}
-//#####################################################################
-// Function Scale_And_Apply_Edge_Edge_Impulses
-//#####################################################################
-template<class TV> template<class T_ARRAY> void TRIANGLE_REPULSIONS<TV>::
-Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs)
-{
-    // Go through the computed impulses, and compare them to the actual change in velocity seen.  Scale back impulses accordingly
-    for(int i=0;i<ee_target_impulses.m;i++){
-        if(ee_target_impulses(i)==TV()) continue;
-        const VECTOR<int,d+1>& nodes=pairs(i).nodes;
-        // Compute actual new relative_speed
-        TV relative_velocity=-impulse_velocities.Subset(nodes).Weighted_Sum(pairs(i).weights);
-        T relative_speed=TV::Dot_Product(relative_velocity,ee_normals(i));
-        if(relative_speed*ee_old_speeds(i)<0){
-            T new_scale=-(relative_speed-ee_old_speeds(i))/ee_old_speeds(i);
-            ee_target_impulses(i)/=new_scale;}}
-    // Apply the newly scaled impulses
-    ARRAY_VIEW<T>& one_over_effective_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
-    ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
-    for(int i=0;i<ee_target_impulses.m;i++){
-        if(ee_target_impulses(i)==TV()) continue;
-        const VECTOR<int,d+1>& nodes=pairs(i).nodes;
-        for(int j=0;j<TV::m+1;j++) V(nodes(j))-=pairs(i).weights(j)*one_over_effective_mass(nodes(j))*ee_target_impulses(i);}
+        for(int j=0;j<TV::m+1;j++) V(pair.nodes(j))-=pair.weights(j)*one_over_effective_mass(pair.nodes(j))*target_impulses(i);}
 }
 //#####################################################################
 // Precompute
@@ -675,6 +622,7 @@ Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs)
 template<class TV> void PRECOMPUTE_PROJECT<TV>::
 Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,TV::m+1>&> one_over_mass,const VECTOR<T,TV::m+1>& weights_input,const TV& normal_input)
 {
+    // TODO: handle bindings
     weights=weights_input;normal=normal_input;
     T tau=one_over_mass.Weighted_Sum(sqr(weights));
     for(int i=0;i<TV::m+1;i++)

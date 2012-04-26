@@ -188,17 +188,14 @@ public:
     void Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomputed,
         ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& edge_edge_precomputed,ARRAY<REPULSION_PAIR<VECTOR<T,3> > >& point_face_pairs,
         ARRAY<REPULSION_PAIR<TV2> >& edge_edge_pairs,const T repulsion_thickness_multiplier);
-    template<class T_ARRAY> void Scale_And_Apply_Point_Face_Impulses(const T_ARRAY& pairs);
-    template<class T_ARRAY> void Scale_And_Apply_Edge_Edge_Impulses(const T_ARRAY& pairs);
+    template<class T_ARRAY> void Scale_And_Apply_Impulses(const T_ARRAY& pairs,ARRAY<TV>& pf_target_impulses,ARRAY<T>& pf_old_speeds,ARRAY<TV>& pf_normals);
 private:
     int Get_Faces_Near_Points(STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1,STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2,ARRAY_VIEW<const TV> X_other,const bool use_processor_cull);
     int Get_Edges_Near_Edges(STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1,STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2,ARRAY_VIEW<const TV> X_other,const bool use_processor_cull);
     template<class T_PAIR> T Repulsion_Impulse(TV& direction,const T dt,const T_PAIR& pair,const TV& relative_velocity,const bool elastic_repulsion,const bool friction)
         PHYSBAM_ALWAYS_INLINE PHYSBAM_FLATTEN;
-    template<class T_ARRAY> void Adjust_Velocity_For_Point_Face_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,bool use_repulsions);
-    template<class T_ARRAY,class S> void Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,2>&,bool use_repulsions);
-    template<class T_ARRAY,class S> void Adjust_Velocity_For_Edge_Edge_Repulsion_Helper(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const VECTOR<S,3>&,bool use_repulsions);
-    template<class T_ARRAY> void Adjust_Velocity_For_Edge_Edge_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,bool use_repulsions);
+    template<class T_ARRAY> void Adjust_Velocity_For_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic_repulsion,const bool friction,const bool use_repulsions,
+        ARRAY<TV>& target_impulses,ARRAY<T>& old_speeds,ARRAY<TV>& normals,int inelastic_collision_repulsion_attempts);
 //#####################################################################
 };
 }
