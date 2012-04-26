@@ -67,6 +67,10 @@ public:
     {if(BINDING<TV>* binding=Binding(particle_index)){binding->Apply_Impulse(impulse,V);V(particle_index)=binding->Embedded_Position();}
     else V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
 
+    void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V) const
+    {if(BINDING<TV>* binding=Binding(particle_index)){binding->Apply_Impulse(impulse,V,rigid_V);V(particle_index)=binding->Embedded_Position();}
+    else V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
+
     void Apply_Push(const int particle_index,const TV& impulse)
     {if(BINDING<TV>* binding=Binding(particle_index)) binding->Apply_Push(impulse);else particles.X(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
 
@@ -79,6 +83,37 @@ public:
     SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor(const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Impulse_Factor();
     return SYMMETRIC_MATRIX<T,TV::m>()+particles.one_over_mass(particle_index);}
+
+    template<class T_INDEX>
+    void Flatten_Indices(ARRAY<int>& flat_indices,const T_INDEX& indices) const
+    {for(int i=0;i<indices.Size();i++) Parents(flat_indices,indices(i));flat_indices.Prune_Duplicates();}
+
+    template<class T_INDEX,class T_WEIGHT>
+    void Flatten_Weights(ARRAY<int>& flat_indices,ARRAY<T>& flat_weights,const T_INDEX& indices,const T_WEIGHT& weights) const
+    {
+        assert(indices.Size()==weights.Size());
+        ARRAY<int> tmp_indices;
+        ARRAY<T> tmp_weights;
+        HASHTABLE<int,T> total_weight;
+        for(int i=0;i<indices.Size();i++){
+            tmp_indices.Remove_All();
+            tmp_weights.Remove_All();
+            Parents(tmp_indices,indices(i));
+            Weights(tmp_weights,indices(i));
+            for(int j=0;j<tmp_weights.m;j++)
+                total_weight.Get_Or_Insert(tmp_indices(j))+=tmp_weights(j)*weights(i);}
+        total_weight.Get_Keys(flat_indices);
+        total_weight.Get_Data(flat_weights);
+    }
+
+    template<class T_INDEX,class T_WEIGHT>
+    T One_Over_Effective_Mass(const T_INDEX& indices,const T_WEIGHT& weights) const
+    {
+        ARRAY<int> flat_indices;
+        ARRAY<T> flat_weights;
+        Flatten_Weights(flat_indices,flat_weights,indices,weights);
+        return particles.one_over_mass.Subset(flat_indices).Weighted_Sum(flat_weights*flat_weights);
+    }
 
     void Parents(ARRAY<int>& parents,const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Parents(parents);parents.Append(particle_index);}

@@ -67,6 +67,9 @@ public:
     void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const PHYSBAM_OVERRIDE
     {V(parent)+=particles.one_over_mass(parent)*impulse;}
 
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V) const PHYSBAM_OVERRIDE
+    {PARTICLE_BINDING::Apply_Impulse(impulse,particles.V);}
+
     void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
     {particles.X(parent)+=particles.one_over_mass(parent)*impulse;}
 

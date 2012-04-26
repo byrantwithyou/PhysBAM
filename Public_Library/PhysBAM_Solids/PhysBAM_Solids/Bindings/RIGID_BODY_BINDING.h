@@ -91,6 +91,12 @@ public:
     void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V) const PHYSBAM_OVERRIDE
     {PHYSBAM_ASSERT(Rigid_Body().Has_Infinite_Inertia());}
 
+    void Apply_Impulse(const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V) const PHYSBAM_OVERRIDE
+    {RIGID_BODY<TV>& rigid_body=Rigid_Body();
+    if(rigid_body.Has_Infinite_Inertia()) return;
+    rigid_V(rigid_body.particle_index).linear+=impulse/rigid_body.Mass();
+    rigid_V(rigid_body.particle_index).angular+=rigid_body.World_Space_Inertia_Tensor_Inverse_Times(TV::Cross_Product(Rigid_Body().World_Space_Vector(object_space_position),impulse));}
+
     void Apply_Push(const TV& impulse) PHYSBAM_OVERRIDE
     {Rigid_Body().Apply_Push_To_Body(Embedded_Position(),impulse);}
 
