@@ -173,6 +173,12 @@ public:
     {STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,TK>::value);
     for(typename T_ARRAY::INDEX i(0);i<array.Size();i++) Set(array(i));}
 
+    template<class T_KEY,class T_ARRAY>
+    void Set_All(const T_KEY& key,const T_ARRAY& array)
+    {STATIC_ASSERT(IS_SAME<typename T_ARRAY::ELEMENT,T>::value);
+    STATIC_ASSERT(IS_SAME<typename T_KEY::ELEMENT,TK>::value);
+    for(typename T_ARRAY::INDEX i(0);i<array.Size();i++) Set(key(i),array(i));}
+
     bool Delete_If_Present(const TK& v)
     {for(int h=Hash_Index(v);table(h).state!=ENTRY_FREE;h=Next_Index(h)) // reduce as still are using entries for deletions
         if(table(h).state==ENTRY_ACTIVE && table(h).key==v){table(h).state=ENTRY_DELETED;number_of_entries--;next_resize--;return true;}
