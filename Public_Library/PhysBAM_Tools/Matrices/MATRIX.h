@@ -159,6 +159,9 @@ public:
     MATRIX<T,1,n> Cross_Product_Matrix_Times(const VECTOR<T,2>& v) const
     {STATIC_ASSERT(m==2);return MATRIX<T,1,2>::Cross_Product_Matrix(v)*(*this);}
 
+    SYMMETRIC_MATRIX<T,1> Cross_Product_Matrix_Times_With_Symmetric_Result(const VECTOR<T,2>& v) const
+    {STATIC_ASSERT(m==2 && n==1);return SYMMETRIC_MATRIX<T,1>(MATRIX<T,1,2>::Cross_Product_Matrix(v)*(*this));}
+
     MATRIX<T,2,n> Cross_Product_Matrix_Transpose_Times(const VECTOR<T,2>& v) const
     {STATIC_ASSERT(m==1);return MATRIX<T,1,2>::Cross_Product_Matrix(v).Transpose_Times(*this);}
 
@@ -180,8 +183,11 @@ public:
     MATRIX<T,1,n> Cross_Product_Matrix_Transpose_Times(const VECTOR<T,1>& v) const
     {STATIC_ASSERT(m==0);return MATRIX<T,1,n>();}
 
+    SYMMETRIC_MATRIX<T,0> Cross_Product_Matrix_Times_With_Symmetric_Result(const VECTOR<T,1>& v) const
+    {STATIC_ASSERT((m==1 && n==0));return SYMMETRIC_MATRIX<T,0>();}
+
     static MATRIX<T,0,1> Cross_Product_Matrix(const VECTOR<T,1>& v)
-    {STATIC_ASSERT(m==0 && n==1);return MATRIX<T,0,1>();}
+    {STATIC_ASSERT((m==0 && n==1));return MATRIX<T,0,1>();}
 
     MATRIX Permute_Columns(const VECTOR<int,n>& p) const
     {MATRIX x;for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}
