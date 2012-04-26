@@ -541,7 +541,8 @@ Create_Initial_Mesh(const T bcc_lattice_cell_size,const bool use_adaptive_refine
             else PHYSBAM_NOT_IMPLEMENTED();
         dependent_nodes=new ARRAY<ARRAY<int> >(mesh.number_nodes);
         for(int b=0;b<binding_list.bindings.m;b++){
-            ARRAY<int> parents=binding_list.bindings(b)->Parents();
+            ARRAY<int> parents;
+            binding_list.bindings(b)->Parents(parents);
             for(int p=0;p<parents.m;p++) (*dependent_nodes)(parents(p)).Append(binding_list.bindings(b)->particle_index);}
         binding_list.Update_Binding_Index_From_Particle_Index();}
     else{

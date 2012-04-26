@@ -261,7 +261,8 @@ Adjust_Nodes_For_Collisions(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_B
     ARRAY<VECTOR<int,2> > interaction_pair;ARRAY<TV> weights,position_change;
     for(int pp=0;pp<nodes_to_check.m;pp++){int p=nodes_to_check(pp);
         ARRAY<int> particles_to_ignore;
-        particles_to_ignore.Append(p);particles_to_ignore.Append_Elements(soft_bindings.Parents(p));
+        particles_to_ignore.Append(p);
+        soft_bindings.Parents(particles_to_ignore,p);
         TV w;int t=Get_Tetrahedron_Near_Point(X(p),w,particles_to_ignore);
         if(t>=0){interaction_pair.Append(VECTOR<int,2>(p,t));weights.Append(w);}}
     for(int k=0;k<interaction_pair.m;k++){

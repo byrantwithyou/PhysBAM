@@ -32,7 +32,8 @@ Create(TYPED_ISTREAM& input,DEFORMABLE_PARTICLES<TV>& particles)
 template<class TV> void BINDING<TV>::
 Add_Dependencies(SEGMENT_MESH& dependency_mesh) const
 {
-    const ARRAY<int> parents=Parents();
+    ARRAY<int> parents;
+    Parents(parents);
     for(int i=0;i<parents.m;i++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents(i),particle_index));
 }
 //#####################################################################

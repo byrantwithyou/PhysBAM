@@ -147,7 +147,7 @@ Get_Point_Surface_Element_Pairs_Helper(const RIGID_DEFORMABLE_COLLISIONS<VECTOR<
     const ARRAY<TETRAHEDRON_COLLISION_BODY<T>*>& tetrahedron_candidates=rigid_deformable_collisions.particle_tetrahedron_candidates.Get(particle_index);
     DEFORMABLE_PARTICLES<TV>& particles=rigid_deformable_collisions.solid_body_collection.deformable_body_collection.particles;
     ARRAY<int> particles_to_ignore;particles_to_ignore.Append(particle_index);
-    particles_to_ignore.Append_Elements(rigid_deformable_collisions.solid_body_collection.deformable_body_collection.soft_bindings.Parents(particle_index));
+    rigid_deformable_collisions.solid_body_collection.deformable_body_collection.soft_bindings.Parents(particles_to_ignore,particle_index);
     for(int i=0;i<tetrahedron_candidates.m;i++){TETRAHEDRON_COLLISION_BODY<T>& collision_body=*tetrahedron_candidates(i);
         TV w;int t=collision_body.Get_Tetrahedron_Near_Point(particles.X(particle_index),w,particles_to_ignore);if(t<0) continue;
         TV surface_weights;int surface_triangle=collision_body.Get_Surface_Triangle(t,w,surface_weights,true);if(surface_triangle<0) continue;
@@ -856,7 +856,8 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             parent=solid_body_collection.deformable_body_collection.soft_bindings.bindings(soft_binding_index).y;
             hard_binding=solid_body_collection.deformable_body_collection.soft_bindings.binding_list.Binding(parent);
             if(hard_binding){
-                ARRAY<int> parents=hard_binding->Parents();
+                ARRAY<int> parents;
+                hard_binding->Parents(parents);
                 for(int i=0;i<parents.m;i++) if(affected_particles.Contains(parents(i))) discard=true;
                 affected_particles.Set_All(parents);}}
         if(discard){

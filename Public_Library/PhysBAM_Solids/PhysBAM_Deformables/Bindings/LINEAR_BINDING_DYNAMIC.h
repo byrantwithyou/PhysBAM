@@ -96,11 +96,11 @@ public:
     void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const PHYSBAM_OVERRIDE
     {for(int i=0;i<parents.m;i++) mass_full(parents(i))+=weights(i)*particles.mass(particle_index);}
 
-    ARRAY<int> Parents() const PHYSBAM_OVERRIDE
-    {return parents;}
+    void Parents(ARRAY<int>& p) const PHYSBAM_OVERRIDE
+    {p.Append_Elements(parents);}
 
-    ARRAY<T> Weights() const PHYSBAM_OVERRIDE
-    {return weights;}
+    void Weights(ARRAY<T>& w) const PHYSBAM_OVERRIDE
+    {w.Append_Elements(weights);}
 
 private:
     void Read_Helper(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE

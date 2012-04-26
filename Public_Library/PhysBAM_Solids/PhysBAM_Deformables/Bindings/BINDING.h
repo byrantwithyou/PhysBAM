@@ -78,8 +78,8 @@ public:
     virtual void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,const TV& force) const=0;
     virtual void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full,const TV& force) const=0;
     virtual void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const=0;
-    virtual ARRAY<int> Parents() const=0;
-    virtual ARRAY<T> Weights() const=0;
+    virtual void Parents(ARRAY<int>& parents) const=0;
+    virtual void Weights(ARRAY<T>& weights) const=0;
     virtual void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const;
     // read/write
     virtual int Name() const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return Static_Name();}

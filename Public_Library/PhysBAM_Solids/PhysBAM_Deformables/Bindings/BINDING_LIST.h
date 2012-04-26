@@ -80,11 +80,11 @@ public:
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Impulse_Factor();
     return SYMMETRIC_MATRIX<T,TV::m>()+particles.one_over_mass(particle_index);}
 
-    ARRAY<int> Parents(const int particle_index) const
-    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Parents();return ARRAY<int>();}
+    void Parents(ARRAY<int>& parents,const int particle_index) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Parents(parents);parents.Append(particle_index);}
 
-    ARRAY<int> Dynamic_Parents(const int particle_index) const
-    {ARRAY<int> parents(Parents(particle_index));if(!parents.m) parents.Append(particle_index);return parents;}
+    void Weights(ARRAY<T>& weights,const int particle_index) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Weights(weights);weights.Append(1);}
 
     template<class T_ARRAY>
     void Clear_Hard_Bound_Particles(T_ARRAY& array) const

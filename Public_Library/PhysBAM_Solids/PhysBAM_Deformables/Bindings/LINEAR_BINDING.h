@@ -105,11 +105,11 @@ public:
     void Distribute_Mass_To_Parents(ARRAY_VIEW<T> mass_full) const PHYSBAM_OVERRIDE
     {for(int i=0;i<d;i++) mass_full(parents[i])+=weights[i]*particles.mass(particle_index);}
 
-    ARRAY<int> Parents() const PHYSBAM_OVERRIDE
-    {ARRAY<int> parents_array(d);for(int i=0;i<d;i++) parents_array(i)=parents[i];return parents_array;}
+    void Parents(ARRAY<int>& p) const PHYSBAM_OVERRIDE
+    {p.Append_Elements(parents);}
 
-    ARRAY<T> Weights() const PHYSBAM_OVERRIDE
-    {ARRAY<T> weights_array(d);for(int i=0;i<d;i++) weights_array(i)=weights[i];return weights_array;}
+    void Weights(ARRAY<T>& w) const PHYSBAM_OVERRIDE
+    {w.Append_Elements(weights);}
 
     SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
     {return SYMMETRIC_MATRIX<T,TV::m>()+LINEAR_BINDING::One_Over_Effective_Mass();}

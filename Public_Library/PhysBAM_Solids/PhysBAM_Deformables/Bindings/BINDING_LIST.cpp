@@ -80,8 +80,12 @@ Compute_Dependency_Closure_Based_On_Embedding(SEGMENT_MESH& dependency_mesh) con
 {
     ARRAY<VECTOR<int,2> > dependencies;dependency_mesh.elements.Exchange(dependencies);dependency_mesh.Refresh_Auxiliary_Structures();
     for(int i=0;i<dependencies.m;i++){VECTOR<int,2>& dependency=dependencies(i);
-        ARRAY<int> parents1(Dynamic_Parents(dependency.x)),parents2(Dynamic_Parents(dependency.y));
-        for(int i=0;i<parents1.m;i++) for(int j=0;j<parents2.m;j++) dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents1(i),parents2(j)));}
+        ARRAY<int> parents1,parents2;
+        Parents(parents1,dependency.x);
+        Parents(parents2,dependency.y);
+        for(int i=0;i<parents1.m;i++)
+            for(int j=0;j<parents2.m;j++)
+                dependency_mesh.Add_Element_If_Not_Already_There(VECTOR<int,2>(parents1(i),parents2(j)));}
 }
 //#####################################################################
 // Function Compute_Particle_Closure_Based_On_Embedding
@@ -92,7 +96,10 @@ Compute_Particle_Closure_Based_On_Embedding(ARRAY<int>& particle_set) const
     ARRAY<bool> particle_is_present(particles.Size());
     particle_is_present.Subset(particle_set).Fill(true);
     for(int b=0;b<bindings.m;b++){BINDING<TV>& binding=*bindings(b);
-        if(!particle_is_present.Subset(binding.Parents()).Contains(false) && !particle_is_present(binding.particle_index)) particle_set.Append(binding.particle_index);}
+        ARRAY<int> parents;
+        binding.Parents(parents);
+        if(!particle_is_present.Subset(parents).Contains(false) && !particle_is_present(binding.particle_index))
+            particle_set.Append(binding.particle_index);}
 }
 //#####################################################################
 // Function Clamp_Particles_To_Embedded_Positions
@@ -176,7 +183,8 @@ Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_su
     for(int i=0;i<bindings.m;i++){
         BINDING<TV>& binding=*bindings(i);
         int p=binding.particle_index;
-        const ARRAY<int>& parents=binding.Parents();
+        ARRAY<int> parents;
+        binding.Parents(parents);
         if(particle_on_surface(p)){
             TV Xp=binding.Embedded_Position(),Vp=binding.Embedded_Velocity();
             if(particles.X(p)!=Xp || particles.V(p)!=Vp){interactions++;
@@ -211,7 +219,8 @@ Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& par
     for(int i=0;i<bindings.m;i++){
         BINDING<TV>& binding=*bindings(i);
         int p=binding.particle_index;
-        const ARRAY<int>& parents=binding.Parents();
+        ARRAY<int> parents;
+        binding.Parents(parents);
         if(particle_on_surface(p)){
             TV Vp=binding.Embedded_Velocity();
             if(particles.V(p)!=Vp){interactions++;

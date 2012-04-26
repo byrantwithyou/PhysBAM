@@ -68,11 +68,10 @@ public:
     BINDING<TV>* Hard_Binding(const int particle_index) const
     {return Particle_Is_Bound(particle_index)?binding_list.Binding(Parent(particle_index)):0;}
 
-    ARRAY<int> Parents(const int particle_index) const
-    {if(!Particle_Is_Bound(particle_index)) return ARRAY<int>();
+    void Parents(ARRAY<int>& parents,const int particle_index) const
+    {if(!Particle_Is_Bound(particle_index)) return;
     int parent=bindings(binding_index_from_particle_index(particle_index)).y;
-    ARRAY<int> parents=binding_list.Parents(parent);parents.Append(parent);
-    return parents;}
+    binding_list.Parents(parents,parent);}
 
 //#####################################################################
     void Initialize_Binding_Mesh(const bool exclude_particles_using_impulses_for_collisions=false);

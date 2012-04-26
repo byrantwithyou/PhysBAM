@@ -114,11 +114,11 @@ public:
     SYMMETRIC_MATRIX<T,TV::m> Impulse_Factor() const PHYSBAM_OVERRIDE
     {return Rigid_Body().Impulse_Factor(Rigid_Body().World_Space_Vector(object_space_position)+Rigid_Body().Frame().t);}
 
-    ARRAY<int> Parents() const PHYSBAM_OVERRIDE
-    {PHYSBAM_NOT_IMPLEMENTED();return ARRAY<int>();} // TODO: consider failing instead
+    void Parents(ARRAY<int>& parents) const PHYSBAM_OVERRIDE
+    {PHYSBAM_NOT_IMPLEMENTED();}
 
-    ARRAY<T> Weights() const PHYSBAM_OVERRIDE
-    {PHYSBAM_NOT_IMPLEMENTED();return ARRAY<T>();} // TODO: consider failing instead
+    void Weights(ARRAY<T>& weights) const PHYSBAM_OVERRIDE
+    {PHYSBAM_NOT_IMPLEMENTED();}
 
 private:
     void Read_Helper(TYPED_ISTREAM& input) PHYSBAM_OVERRIDE

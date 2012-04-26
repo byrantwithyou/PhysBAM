@@ -84,7 +84,7 @@ Adjust_Parents_For_Changes_In_Surface_Children(const ARRAY<bool>& particle_on_su
     for(int i=0;i<bindings_using_impulses_for_collisions.m;i++){
         int p,parent;bindings(bindings_using_impulses_for_collisions(i)).Get(p,parent);
         BINDING<TV>* hard_binding=binding_list.Binding(parent);
-        ARRAY<int> parents;if(hard_binding) parents=hard_binding->Parents();else parents.Append(parent);
+        ARRAY<int> parents;if(hard_binding) hard_binding->Parents(parents);else parents.Append(parent);
         if(particle_on_surface(p)){
             if(hard_binding){hard_binding->Clamp_To_Embedded_Position();hard_binding->Clamp_To_Embedded_Velocity();} // TODO: make this unnecessary
             if(particles.X(p)!=particles.X(parent) || particles.V(p)!=particles.V(parent)){interactions++;
@@ -130,7 +130,7 @@ Adjust_Parents_For_Changes_In_Surface_Children_Velocities(const ARRAY<bool>& par
     for(int i=0;i<bindings_using_impulses_for_collisions.m;i++){
         int p,parent;bindings(bindings_using_impulses_for_collisions(i)).Get(p,parent);
         BINDING<TV>* hard_binding=binding_list.Binding(parent);
-        ARRAY<int> parents;if(hard_binding) parents=hard_binding->Parents();else parents.Append(parent);
+        ARRAY<int> parents;if(hard_binding) hard_binding->Parents(parents);else parents.Append(parent);
         if(particle_on_surface(p)){
             if(hard_binding) hard_binding->Clamp_To_Embedded_Velocity(); // TODO: make this unnecessary
             if(particles.V(p)!=particles.V(parent)){interactions++;
