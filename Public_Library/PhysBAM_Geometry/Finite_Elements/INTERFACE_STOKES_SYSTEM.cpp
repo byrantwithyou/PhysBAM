@@ -93,7 +93,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
             biu.Add_Volume_Block(helper_uu(i)(j),*udx_stencil(i)(j),*udx_stencil(j)(i),mu);
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
-        biu.Add_Volume_Block(helper_pu(i),*udx_stencil(i)(i),p_stencil,VECTOR<T,2>(-1,-1));
+        biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),VECTOR<T,2>(-1,-1));
     // Traction blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Interface_Block(helper_qu(i),*u_stencil(i),1,false);

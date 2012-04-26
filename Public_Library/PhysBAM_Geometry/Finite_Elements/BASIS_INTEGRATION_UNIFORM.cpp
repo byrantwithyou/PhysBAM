@@ -325,11 +325,32 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                         ib->Add_Entry(element_base+k,op.flat_diff_index(subcell_cell),!enclose_inside,sign2*integral);}}}
 }
 template class BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>;
+template class BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>;
 template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>::Add_Interface_Block<1>(
     SYSTEM_INTERFACE_BLOCK_HELPER<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,float,bool);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<float,2> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<float,2> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Interface_Block<1>(
+    SYSTEM_INTERFACE_BLOCK_HELPER<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,float,bool);
 #ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
+template class BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>;
+template class BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>;
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<double,3> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,VECTOR<double,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<double,3> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,VECTOR<double,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Interface_Block<1>(
+    SYSTEM_INTERFACE_BLOCK_HELPER<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,double,bool);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<double,2> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,VECTOR<double,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<double,2> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,VECTOR<double,2> const&);
+template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>::Add_Interface_Block<1>(
+    SYSTEM_INTERFACE_BLOCK_HELPER<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,double,bool);
 #endif
