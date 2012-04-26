@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_0X0.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/ROTATION.h>
@@ -19,6 +20,7 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISIONS.h>
@@ -255,18 +257,15 @@ Scale_And_Apply_Impulses()
             T new_scale=-(relative_speed-ee_old_speeds(i))/ee_old_speeds(i);
             ee_target_impulses(i)/=new_scale;}}
     // Apply the newly scaled impulses
-    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     for(int i=0;i<pf_target_impulses.m;i++){
         if(pf_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=point_face_pairs_internal(i);
-        VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
-        for(int j=0;j<d+1;j++) V(nodes(j))-=pf_target_weights(i)(j)*one_over_m(j)*pf_target_impulses(i);}
+        for(int j=0;j<d+1;j++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(j),-pf_target_weights(i)(j)*pf_target_impulses(i));}
     for(int i=0;i<ee_target_impulses.m;i++){
         if(ee_target_impulses(i) == TV()) continue;
         const VECTOR<int,d+1>& nodes=edge_edge_pairs_internal(i);
-        VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
-        for(int j=0;j<d+1;j++) V(nodes(j))-=ee_target_weights(i)(j)*one_over_m(j)*ee_target_impulses(i);}
+        for(int j=0;j<d+1;j++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(j),-ee_target_weights(i)(j)*ee_target_impulses(i));}
 }
 template<> void TRIANGLE_COLLISIONS<VECTOR<float,1> >::Scale_And_Apply_Impulses(){PHYSBAM_NOT_IMPLEMENTED();}
 template<> void TRIANGLE_COLLISIONS<VECTOR<double,1> >::Scale_And_Apply_Impulses(){PHYSBAM_NOT_IMPLEMENTED();}
@@ -402,7 +401,7 @@ Point_Face_Collision(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nodes,con
     bool return_type=false;
 
     ARRAY_VIEW<TV> X(geometry.X_self_collision_free); // TODO: this should be a parameter as we usually want X_self_collision_free but not in Stop_All_Nodes
-    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
+    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
 
@@ -412,14 +411,14 @@ Point_Face_Collision(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nodes,con
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
         if(use_gauss_jacobi){
             pf_data.old_speed=-V.Subset(nodes).Weighted_Sum(weights).Dot(normal);
-            TV impulse=-(1+restitution_coefficient)*pf_data.old_speed/one_over_m.Weighted_Sum(sqr(weights))*normal;
+            TV impulse=-(1+restitution_coefficient)*pf_data.old_speed/geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(nodes,weights)*normal;
             for(int i=0;i<TV::m+1;i++) V_save(nodes(i))-=weights(i)*one_over_m(i)*impulse;
             pf_data.target_impulse=impulse;
             pf_data.target_weight=weights;
             pf_data.target_normal=normal;}
         else{
             TV impulse=-(1+restitution_coefficient)*pf_data.old_speed/one_over_m.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m(i)*impulse;}
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);}
         return_type=true;}
 
     if(!use_gauss_jacobi) return_type|=Point_Face_Final_Repulsion(pf_data,nodes,dt,repulsion_thickness,collision_time,attempt_ratio,exit_early);
@@ -435,7 +434,7 @@ template<class TV> void TRIANGLE_COLLISIONS<TV>::
 Point_Face_Pull_In(const VECTOR<int,d+1>& nodes,ARRAY_VIEW<TV> V,const T dt,const T repulsion_thickness)
 {
     ARRAY_VIEW<TV> X(geometry.X_self_collision_free);
-    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
+    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     VECTOR<int,d> face_nodes=nodes.Remove_Index(0);
     T_FACE face(X.Subset(face_nodes));
     TV normal;
@@ -474,7 +473,7 @@ Point_Face_Final_Repulsion(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nod
     bool return_type=false;
 
     ARRAY_VIEW<TV> X(geometry.X_self_collision_free); // TODO: this should be a parameter as we usually want X_self_collision_free but not in Stop_All_Nodes
-    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
+    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
     VECTOR<int,d> face_nodes=nodes.Remove_Index(0);INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d>&> V_face(V,face_nodes);
@@ -489,8 +488,8 @@ Point_Face_Final_Repulsion(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nod
         T relative_speed=-V.Subset(nodes).Weighted_Sum(weights).Dot(normal);
         if(!use_gauss_jacobi && relative_speed<0){
             final_point_face_collisions++;
-            TV impulse=-(1+restitution_coefficient)*relative_speed/one_over_m.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m(i)*impulse;
+            TV impulse=-(1+restitution_coefficient)*relative_speed/geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(nodes,weights)*normal;
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);
             face2=Create_Final_Face(face,V_face,dt);point=X(nodes[0])+dt*V(nodes[0]); // update point and face and see if repulsion is still necessary
             if(!face2.Point_Face_Interaction(point,V(nodes[0]),V_face,collision_thickness,distance,normal,weights,false,exit_early)) return true;}
         final_point_face_repulsions++;
@@ -507,7 +506,7 @@ Point_Face_Final_Repulsion(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nod
             pf_data.target_normal=normal;}
         else{
             TV impulse=-scalar_impulse/one_over_m.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m(i)*impulse;}
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);}
         return_type=true;}
 
     return return_type;
@@ -551,7 +550,7 @@ template<class TV> bool TRIANGLE_COLLISIONS<TV>::
 Edge_Edge_Collision(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,const T dt,T& collision_time,const T attempt_ratio,const bool exit_early)
 {
     ARRAY_VIEW<TV> X(geometry.X_self_collision_free); // TODO: this should be a parameter as we usually want X_self_collision_free but not in Stop_All_Nodes
-    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
+    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d+1>&> V_edges(V,nodes);
@@ -565,14 +564,14 @@ Edge_Edge_Collision(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,cons
         VECTOR<T,d+1> one_over_m(one_over_mass.Subset(nodes));
         if(use_gauss_jacobi){
             ee_data.old_speed=relative_speed;
-            TV impulse=-(1+restitution_coefficient)*relative_speed/one_over_m.Weighted_Sum(sqr(weights))*normal;
+            TV impulse=-(1+restitution_coefficient)*relative_speed/geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(nodes,weights)*normal;
             for(int i=0;i<TV::m+1;i++) V_save(nodes(i))-=weights(i)*one_over_m(i)*impulse;
             ee_data.target_impulse=impulse;
             ee_data.target_weight=weights;
             ee_data.target_normal=normal;}
         else{
             TV impulse=-(1+restitution_coefficient)*relative_speed/one_over_m.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m(i)*impulse;}
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);}
         return_type=true;}
 
     if(!use_gauss_jacobi) return_type|=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,exit_early);
@@ -589,7 +588,7 @@ template<class TV> bool TRIANGLE_COLLISIONS<TV>::
 Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,const T dt,T& collision_time,const T attempt_ratio,const bool exit_early)
 {
     ARRAY_VIEW<TV> X(geometry.X_self_collision_free); // TODO: this should be a parameter as we usually want X_self_collision_free but not in Stop_All_Nodes
-    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_mass;
+    ARRAY_VIEW<T>& one_over_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     ARRAY_VIEW<TV> V_save(impulse_velocities);
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d+1>&> V_edges(V,nodes);
@@ -609,8 +608,8 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
         VECTOR<T,d+1> one_over_m_edges(one_over_mass.Subset(nodes));
         if(!use_gauss_jacobi && relative_speed<0){
             final_edge_edge_collisions++;
-            TV impulse=-(1+restitution_coefficient)*relative_speed/one_over_m_edges.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m_edges(i)*impulse;
+            TV impulse=-(1+restitution_coefficient)*relative_speed/geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(nodes,weights)*normal;
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);
             if(!edge1_final.Edge_Edge_Interaction(edge2_final,V_edges,collision_thickness,distance,normal,weights,false,geometry.small_number)) return true;}
         final_edge_edge_repulsions++;
         T final_relative_speed=final_repulsion_limiter_fraction*(total_repulsion_thickness-distance)/dt;
@@ -626,7 +625,7 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
             ee_data.target_normal=normal;}
         else{
             TV impulse=-scalar_impulse/one_over_m_edges.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m_edges(i)*impulse;}
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);}
         return_type=true;}
     return return_type;
 }

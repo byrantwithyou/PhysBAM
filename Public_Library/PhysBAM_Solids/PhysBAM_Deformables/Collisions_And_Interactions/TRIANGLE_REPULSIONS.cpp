@@ -545,11 +545,11 @@ Adjust_Velocity_For_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic
                 T one_over_mass=geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(pair.nodes,pair.weights);
                 TV impulse=Pseudo_Divide(scalar_impulse*direction,one_over_mass);
                 if(use_gauss_jacobi && !friction && !elastic_repulsion){
-                    for(int i=0;i<TV::m+1;i++) impulse_velocities(pair.nodes(i))-=pair.weights(i)*one_over_effective_mass(pair.nodes(i))*impulse;
+                    for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(pair.nodes(i),-pair.weights(i)*impulse,impulse_velocities);
                     old_speeds(pair_index)=TV::Dot_Product(relative_velocity,direction);
                     target_impulses(pair_index)=impulse;
                     normals(pair_index)=direction;} // tangential for friction.
-                else for(int i=0;i<TV::m+1;i++) V(pair.nodes(i))-=pair.weights(i)*one_over_effective_mass(pair.nodes(i))*impulse;}}
+                else for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(pair.nodes(i),-pair.weights(i)*impulse);}}
 
         if(use_gauss_jacobi) Scale_And_Apply_Impulses(pairs,target_impulses,old_speeds,normals);}
     if(inverted_pairs) LOG::Stat("inverted repulsion pairs",inverted_pairs);
@@ -609,12 +609,11 @@ Scale_And_Apply_Impulses(const T_ARRAY& pairs,ARRAY<TV>& target_impulses,ARRAY<T
             T new_scale=-(relative_speed-old_speeds(i))/old_speeds(i);
             target_impulses(i)/=new_scale;}} // TODO: should we be doing this, or storing a maximum scale factor at each node?
     // Apply the newly scaled impulses
-    ARRAY_VIEW<T>& one_over_effective_mass=geometry.deformable_body_collection.particles.one_over_effective_mass;
     ARRAY_VIEW<TV> V(geometry.deformable_body_collection.particles.V);
     for(int i=0;i<target_impulses.m;i++){
         if(target_impulses(i)==TV()) continue;
         const REPULSION_PAIR<TV>& pair=pairs(i);
-        for(int j=0;j<TV::m+1;j++) V(pair.nodes(j))-=pair.weights(j)*one_over_effective_mass(pair.nodes(j))*target_impulses(i);}
+        for(int j=0;j<TV::m+1;j++) geometry.deformable_body_collection.binding_list.Apply_Impulse(pair.nodes(j),-pair.weights(j)*target_impulses(i));}
 }
 //#####################################################################
 // Precompute
