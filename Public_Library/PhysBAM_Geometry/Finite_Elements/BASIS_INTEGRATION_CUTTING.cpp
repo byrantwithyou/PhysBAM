@@ -308,7 +308,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     if(!interface_elements.m){
         T volume_inside=0;
         for(int i=0;i<projected_elements.m;i++)
-            volume_inside+=Volume(reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x.X(0)),dir);
+            volume_inside+=Volume(projected_elements(i).x.X,dir);
         bool filled=volume_inside>subcell_range.Size()/2;
         Add_Uncut_Fine_Cell(cell,block,enclose_inside==filled);
         return;}
@@ -322,7 +322,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             monomial=monomial.Integrate(dir);
             T integral=0;
             for(int i=0;i<projected_elements.m;i++){
-                const VECTOR<TV,TV::m>& V=reinterpret_cast<const VECTOR<TV,TV::m>&>(projected_elements(i).x.X.x);
+                const VECTOR<TV,TV::m>& V=projected_elements(i).x.X;
                 integral+=monomial.Integrate_Over_Primitive(V)*T_FACE(V).Normal()(dir);}
             precomputed_integrals(it.index)+=integral;}
 
@@ -349,7 +349,7 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface_elements.m;i++){
-                VECTOR<TV,TV::m> V=reinterpret_cast<const VECTOR<TV,TV::m>&>(interface_elements(i).x.X.x);
+                VECTOR<TV,TV::m> V=interface_elements(i).x.X;
                 for(int j=0;j<TV::m;j++) V(j)=(V(j)*coarse_factor-TV(subcell_cell)-(T).5)*grid.dX;
                 int e=interface_elements(i).y;
                 has_element[e]=true;
