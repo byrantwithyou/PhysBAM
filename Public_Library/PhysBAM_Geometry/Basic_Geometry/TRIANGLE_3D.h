@@ -61,6 +61,9 @@ public:
     T Aspect_Ratio() const
     {return Aspect_Ratio(X.x,X.y,X.z);}
 
+    PLANE<T> Plane() const
+    {return PLANE<T>(Normal(),X.x);}
+
     static T Aspect_Ratio(const TV& x1_input,const TV& x2_input,const TV& x3_input)
     {TV u=x1_input-x2_input,v=x2_input-x3_input,w=x3_input-x1_input;
     T u2=TV::Dot_Product(u,u),v2=TV::Dot_Product(v,v),w2=TV::Dot_Product(w,w);
@@ -149,6 +152,7 @@ public:
     void Change_Size(const T delta);
     bool Inside(const TV& point,const T thickness_over_two=0) const;
     bool Point_Inside_Triangle(const TV& point,const T thickness_over_2=0) const;
+    bool Planar_Point_Inside_Triangle(const TV& point,const T thickness_over_2=0) const;
     bool Lazy_Planar_Point_Inside_Triangle(const TV& point) const;
     T Minimum_Edge_Length() const;
     T Maximum_Edge_Length() const;

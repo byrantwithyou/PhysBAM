@@ -65,7 +65,7 @@ template<class T> bool Closest_Non_Intersecting_Point(RAY<VECTOR<T,2> >& ray,con
 //#####################################################################
 // Function Intersection_X_Segment
 //#####################################################################
-// Optimized intersection for segment(X.x,y),(x2,y), must have X.x<x2
+// Optimized intersection for segment(X.x,y),(X.y,y), must have X.x<X.y
 // Segment is lengthened at each end by thickness_over_two
 template<class T> bool Intersection_X_Segment(RAY<VECTOR<T,2> >& ray,const T x1,const T x2,const T y,const T thickness_over_two)
 {

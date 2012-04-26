@@ -148,7 +148,7 @@ public:
 };
 
 template<class T> std::ostream &operator<<(std::ostream &output,const SEGMENT_2D<T> &segment)
-{output << segment.x1 << ", " << segment.X.y;return output;}
+{output << segment.X.x << ", " << segment.X.y;return output;}
 
 }
 #endif

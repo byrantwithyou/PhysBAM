@@ -42,8 +42,15 @@ Inside(const TV& point,const T thickness_over_two) const
 template<class T> bool TRIANGLE_3D<T>::
 Point_Inside_Triangle(const TV& point,const T thickness_over_2) const
 {
+    return Plane().Boundary(point,thickness_over_2) && Planar_Point_Inside_Triangle(point,thickness_over_2);
+}
+//#####################################################################
+// Function Planar_Point_Inside_Triangle
+//#####################################################################
+template<class T> bool TRIANGLE_3D<T>::
+Planar_Point_Inside_Triangle(const TV& point,const T thickness_over_2) const
+{
     TV normal=Normal();
-    if(abs(TV::Dot_Product(normal,point-X.x))>=thickness_over_2) return false;
     PLANE<T> edge_plane(TV::Cross_Product(X.y-X.x,normal).Normalized(),X.x);
     if(edge_plane.Outside(point,thickness_over_2)) return false;
     edge_plane.normal=TV::Cross_Product(X.x-X.z,normal).Normalized();
@@ -188,8 +195,9 @@ Signed_Solid_Angle(const TV& center) const
 // outputs unsigned distance
 template<class T> bool TRIANGLE_3D<T>::
 Point_Face_Interaction(const TV& x,const T interaction_distance,const bool allow_negative_weights,T& distance) const                       
-{      
-    return Point_Inside_Triangle(x,allow_negative_weights?interaction_distance:0);
+{
+    distance=Signed_Distance(x);
+    return abs(distance)<=interaction_distance && Planar_Point_Inside_Triangle(x,allow_negative_weights?interaction_distance:0);
 }
 //#####################################################################
 // Function Point_Face_Interaction_Data
