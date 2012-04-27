@@ -195,6 +195,7 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER<TV>& helper,const BASIS_STENCIL_UNIF
 {
     VOLUME_BLOCK* vb=new VOLUME_BLOCK;
     vb->Initialize(helper,s0,s1,scale);
+    volume_blocks.Append(vb);
 
     for(int i=0;i<vb->overlap_polynomials.m;i++){
         RANGE<TV_INT> range(TV_INT(),vb->overlap_polynomials(i).polynomial.size+1);
@@ -211,7 +212,8 @@ Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER<TV>& helper,const BASIS_STENCI
 {
     INTERFACE_BLOCK* ib=new INTERFACE_BLOCK;
     ib->Initialize(helper,s,scale,ignore_orientation);
-
+    interface_blocks.Append(ib);
+        
     for(int i=0;i<ib->overlap_polynomials.m;i++){
         RANGE<TV_INT> range(TV_INT(),ib->overlap_polynomials(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
