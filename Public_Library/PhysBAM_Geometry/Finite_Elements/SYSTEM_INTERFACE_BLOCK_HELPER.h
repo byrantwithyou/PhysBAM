@@ -37,7 +37,7 @@ public:
     {
         cm=&cm_input;
         cdi=&cdi_input;
-        
+
         for(int i=0;i<s.diced.m;i++){
             const typename BASIS_STENCIL_UNIFORM<TV,d>::DICED& diced=s.diced(i);
             for(RANGE_ITERATOR<TV::m> it(cdi->coarse_range);it.Valid();it.Next())
@@ -49,7 +49,7 @@ public:
         for(int s=0;s<2;s++) data[s].Resize(cdi->interface_elements,flat_diff.m);
     }
     
-    void Mark_Active_Cells(T tol)
+    void Mark_Active_Cells(T tol=0)
     {
         for(int s=0;s<2;s++)
             for(int l=0;l<data[s].m;l++)

@@ -53,7 +53,7 @@ public:
         for(int s=0;s<2;s++) data[s].Resize(cdi->flat_size,flat_diff.m);
     }
     
-    void Mark_Active_Cells(T tol)
+    void Mark_Active_Cells(T tol=0)
     {
         if(cdi->periodic_bc) // add ghost rows to material ones 
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(cdi->grid,cdi->padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next()){

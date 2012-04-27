@@ -31,7 +31,6 @@ public:
         
         bool operator< (const OPEN_ENTRY& me) const
         {
-            assert(flat_diff_index==me.flat_diff_index);
             if(index0!=me.index0) return LEXICOGRAPHIC_COMPARE()(index0,me.index0);
             return LEXICOGRAPHIC_COMPARE()(index1,me.index1);
         }
