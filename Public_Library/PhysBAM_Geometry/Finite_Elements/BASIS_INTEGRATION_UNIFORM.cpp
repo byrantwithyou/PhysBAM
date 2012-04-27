@@ -88,7 +88,7 @@ Compute_Entries()
                 side_index(dir)=0;
                 Add_Cut_Subcell(cut_sides(side_index),interface_elements,cell_index,it2.index,dir,enclose_inside,b,element_base);
                 interface_elements.Remove_All();}}
-        cdi.Set_Flat_Base(element_base,interface.m,base_index);
+        cdi.Set_Flat_Base(element_base,element_base+interface.m,base_index);
         element_base+=interface.m;
 
         for(RANGE_ITERATOR<TV::m> it2(double_coarse_range);it2.Valid();it2.Next())
