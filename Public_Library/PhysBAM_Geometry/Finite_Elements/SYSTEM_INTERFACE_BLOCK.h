@@ -8,12 +8,13 @@
 #ifndef __SYSTEM_INTERFACE_BLOCK__
 #define __SYSTEM_INTERFACE_BLOCK__
 
+#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_HELPER.h>
 
 namespace PhysBAM{
 
 template<class TV,int static_degree>
-class SYSTEM_INTERFACE_BLOCK
+class SYSTEM_INTERFACE_BLOCK:NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -36,7 +37,7 @@ public:
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
-    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER<TV> helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,T scale_input,bool ignore_orientation_input)
+    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,T scale_input,bool ignore_orientation_input)
     {
         scale=scale_input;
         ignore_orientation=ignore_orientation_input;

@@ -8,12 +8,13 @@
 #ifndef __SYSTEM_VOLUME_BLOCK__
 #define __SYSTEM_VOLUME_BLOCK__
 
+#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER.h>
 
 namespace PhysBAM{
 
 template<class TV,int static_degree>
-class SYSTEM_VOLUME_BLOCK
+class SYSTEM_VOLUME_BLOCK:NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -79,7 +80,7 @@ public:
     {for(int j=0;j<open_entries.m;j++) Add_Open_Entry(cell,inside,open_entries(j));}
 
     void Add_Open_Subcell_Entries(const TV_INT& cell,int block,int inside)
-    {for(int j=0;j<open_entries.m;j++) Add_Open_Entry(cell,block,open_subcell_entries[block](j));}
+    {for(int j=0;j<open_subcell_entries[block].m;j++) Add_Open_Entry(cell,inside,open_subcell_entries[block](j));}
 };
 }
 #endif

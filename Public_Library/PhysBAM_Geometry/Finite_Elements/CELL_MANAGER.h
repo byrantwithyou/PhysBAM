@@ -11,12 +11,13 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM{
 
 template<class TV>
-class CELL_DOMAIN_INTERFACE
+class CELL_DOMAIN_INTERFACE:NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -56,7 +57,7 @@ public:
 };
 
 template<class TV>
-class CELL_MANAGER
+class CELL_MANAGER:NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;

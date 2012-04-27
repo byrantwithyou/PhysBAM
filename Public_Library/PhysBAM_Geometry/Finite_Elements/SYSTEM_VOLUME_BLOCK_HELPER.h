@@ -12,6 +12,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
@@ -19,7 +20,7 @@
 namespace PhysBAM{
 
 template<class TV>
-class SYSTEM_VOLUME_BLOCK_HELPER
+class SYSTEM_VOLUME_BLOCK_HELPER:NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;

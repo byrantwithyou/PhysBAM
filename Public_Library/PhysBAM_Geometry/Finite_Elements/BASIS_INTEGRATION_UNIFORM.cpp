@@ -143,9 +143,9 @@ template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM<TV,static_de
 Add_Uncut_Coarse_Cell(const TV_INT& coarse_cell,int inside)
 {
     for(RANGE_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
-        TV_INT index=coarse_cell*coarse_factor+it2.index;
+        TV_INT cell=coarse_cell*coarse_factor+it2.index;
         for(int i=0;i<volume_blocks.m;i++)
-            volume_blocks(i)->Add_Open_Entries(index,inside);}
+            volume_blocks(i)->Add_Open_Entries(cell,inside);}
 }
 //#####################################################################
 // Function Add_Uncut_Fine_Cell
