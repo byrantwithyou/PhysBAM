@@ -5,10 +5,12 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_HELPER.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER.h>
@@ -18,8 +20,9 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_STOKES_SYSTEM<TV>::
-INTERFACE_STOKES_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input)
-    :BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),phi_grid(coarse_grid_input.Get_Regular_Grid().Get_MAC_Grid_At_Regular_Positions())
+INTERFACE_STOKES_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input):
+    BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),periodic_bc(periodic_bc_input),
+    phi_grid(coarse_grid_input.Get_Regular_Grid().Get_MAC_Grid_At_Regular_Positions())
 {
     phi=new LEVELSET_UNIFORM<GRID<TV> >(phi_grid,phi_input,0);
 }
@@ -60,9 +63,18 @@ Set_Matrix(const VECTOR<T,2>& mu)
     
     // GATHER CELL DOMAIN & INTERFACE INFO 
 
-    int padding=p_stencil.Padding();
-    for(int i=0;i<TV::m;i++) padding=max(padding,u_stencil(i)->Padding());
-
+    int padding;
+    if(periodic_bc){
+        padding=0;
+        for(int i=0;i<TV::m;i++)
+            for(int j=i;j<TV::m;j++)
+                padding=max(u_stencil(i)->Overlap_Padding(*u_stencil(j)),padding);
+        for(int i=0;i<TV::m;i++)
+            padding=max(p_stencil.Overlap_Padding(*u_stencil(i)),padding);}
+    else{
+        padding=p_stencil.Padding();
+        for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
+    
     MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi->phi);
     cdi=new CELL_DOMAIN_INTERFACE<TV>(grid,padding,coarse_grid.counts.x/grid.counts.x,object.mesh.elements.m,true); 
 
@@ -105,6 +117,13 @@ Set_Matrix(const VECTOR<T,2>& mu)
 
     // BUILD SYSTEM MATRIX BLOCKS
 
+    for(int i=0;i<TV::m;i++){
+        for(int j=i;j<TV::m;j++)
+            helper_uu(i)(j).Mark_Active_Cells();
+        helper_pu(i).Mark_Active_Cells();
+        helper_qu(i).Mark_Active_Cells();
+        helper_rhs_qu(i).Mark_Active_Cells();}
+    
     cm_p->Compress_Indices();
     for(int i=0;i<TV::m;i++) cm_u(i)->Compress_Indices();
 

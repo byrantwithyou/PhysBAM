@@ -65,7 +65,8 @@ public:
 
     const GRID<TV>& grid;
     const GRID<TV>& coarse_grid;
-
+    const bool periodic_bc;
+    
     LEVELSET_UNIFORM<GRID<TV> >* phi;
     GRID<TV> phi_grid;
 
@@ -80,7 +81,7 @@ public:
     CELL_MANAGER<TV> *cm_p;
     CELL_DOMAIN_INTERFACE<TV> *cdi;
 
-    INTERFACE_STOKES_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input);
+    INTERFACE_STOKES_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input=true);
     virtual ~INTERFACE_STOKES_SYSTEM();
 
 //#####################################################################
