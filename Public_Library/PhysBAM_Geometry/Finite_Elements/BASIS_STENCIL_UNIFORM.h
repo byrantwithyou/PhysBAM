@@ -56,7 +56,9 @@ struct BASIS_STENCIL_UNIFORM
     void Differentiate(int v);
     void Print() const;
     
-    int Padding();
+    int Padding() const;
+    template<int d1>
+    int Overlap_Padding(const BASIS_STENCIL_UNIFORM<TV,d1>& s1) const;
 };
 }
 #endif
