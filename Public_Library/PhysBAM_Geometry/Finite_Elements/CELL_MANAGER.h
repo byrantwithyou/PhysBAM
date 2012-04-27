@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 
 namespace PhysBAM{
@@ -30,13 +31,14 @@ class CELL_DOMAIN_INTERFACE
 public:
 
     const GRID<TV>& grid;
-    const TV_INT size;
-    const TV_INT coarse_range;
     const int padding;
+    const TV_INT size;
     const int flat_size;
     const int coarse_factor;
     const int interface_elements;
     const bool periodic_bc;
+    const TV_INT coarse_counts;
+    const RANGE<TV_INT> coarse_range;
     
     CELL_DOMAIN_INTERFACE(const GRID<TV>& grid_input,int padding_input,int coarse_factor_input,int interface_elements_input,int periodic_bc_input);
 

@@ -11,8 +11,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> CELL_DOMAIN_INTERFACE<TV>::
 CELL_DOMAIN_INTERFACE(const GRID<TV>& grid_input,int padding_input,int coarse_factor_input,int interface_elements_input,int periodic_bc_input):
-    grid(grid_input),size(grid.counts+2*padding),coarse_range(TV_INT()+coarse_factor),padding(padding_input),flat_size(size.Product()),
-    coarse_factor(coarse_factor_input),interface_elements(interface_elements_input),periodic_bc(periodic_bc_input)
+    grid(grid_input),padding(padding_input),size(grid.counts+2*padding),flat_size(size.Product()),coarse_factor(coarse_factor_input),
+    interface_elements(interface_elements_input),periodic_bc(periodic_bc_input),coarse_counts(TV_INT()+coarse_factor),coarse_range(TV_INT(),coarse_counts)
 {
     a(TV::m-1)=1;
     for(int i=TV::m-2;i>=0;i--) a(i)=a(i+1)*size(i+1);
@@ -27,7 +27,7 @@ template<class TV> void CELL_DOMAIN_INTERFACE<TV>::
 Set_Flat_Base(int start,int end,const TV_INT& index)
 {
     int flat=Flatten(index);
-    bool bdy=!(Is_Inside_Cell(flat)&&(Is_Inside_Cell(flat+Flatten_Diff(coarse_range-1))));
+    bool bdy=!(Is_Inside_Cell(flat)&&(Is_Inside_Cell(flat+Flatten_Diff(coarse_counts-1))));
     for(int i=start;i<end;i++){
         flat_base(i)=flat;
         bdy_element(i)=bdy;}
@@ -47,10 +47,10 @@ Initialize()
         for(int axis=0;axis<TV::m;axis++)
             for(int s=0;s<2;s++){
                 int side=axis*2+s;
-                int sign=s?1:-1;
+                int sign=s?-1:1;
                 for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
-                    int r=Flatten(it.index+sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
-                    if(r>=0) remap(Flatten(it.index))=remap(r);}}
+                    int t=remap(Flatten(it.index+sign*grid.counts(axis)*TV_INT::Axis_Vector(axis)));
+                    if(t>=0) remap(Flatten(it.index))=t;}}
         cell_location.Resize(flat_size);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())
             cell_location(Flatten(it.index))=-1;
