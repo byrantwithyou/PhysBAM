@@ -76,7 +76,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
     
     MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi->phi);
-    cdi=new CELL_DOMAIN_INTERFACE<TV>(grid,padding,coarse_grid.counts.x/grid.counts.x,object.mesh.elements.m,true); 
+    cdi=new CELL_DOMAIN_INTERFACE<TV>(grid,padding,grid.counts.x/coarse_grid.counts.x,object.mesh.elements.m,true); 
 
     cm_p=new CELL_MANAGER<TV>(*cdi);
     for(int i=0;i<TV::m;i++) cm_u(i)=new CELL_MANAGER<TV>(*cdi);
