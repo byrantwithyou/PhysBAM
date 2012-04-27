@@ -135,7 +135,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
 
     zero_me.Resize(index_range_p.min_corner);
     zero_me.Fill(false);
-    helper.Set_Matrix(system_size,system_size,matrix,&zero_me,index_range_p.min_corner,1e-14);
+    helper.Set_Matrix(system_size,system_size,matrix,&zero_me,index_range_p.min_corner,0);
     
     for(int i=0;i<TV::m;i++){
         null_u[i].Resize(system_size);
