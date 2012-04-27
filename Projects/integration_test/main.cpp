@@ -8,8 +8,8 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
-// #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-// #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
+#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
+#include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -298,20 +298,20 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     random.Fill_Uniform(sol.v,-(T)1,(T)1);
     ifs.Project(sol);
     
-    // CONJUGATE_RESIDUAL<T> cr;
-    // KRYLOV_SOLVER<T>* solver=&cr;
+    CONJUGATE_RESIDUAL<T> cr;
+    KRYLOV_SOLVER<T>* solver=&cr;
     // MINRES<T> mr;
     // KRYLOV_SOLVER<T>* solver=&mr;
     // solver->restart_iterations=10000;
     // solver->nullspace_tolerance=0;
     // solver->print_residuals=true;
-    //solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
-    if(ifs.Nullspace_Check(rhs)){
-        OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
-        ifs.Multiply(rhs,*vectors(0));
-        LOG::cout<<"nullspace found: "<<sqrt(ifs.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
-        rhs.v/=rhs.v.Max_Abs();
-        Dump_Vector2(ifs,rhs.v,"extra null mode");}
+    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1);
+    // if(ifs.Nullspace_Check(rhs)){
+        // OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
+        // ifs.Multiply(rhs,*vectors(0));
+        // LOG::cout<<"nullspace found: "<<sqrt(ifs.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+        // rhs.v/=rhs.v.Max_Abs();
+        // Dump_Vector2(ifs,rhs.v,"extra null mode");}
 
     // ifs.Multiply(sol,*vectors(0));
     // *vectors(0)-=rhs;
@@ -319,7 +319,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 
     // Dump_Vector<T,TV>(ifs,sol.v,"solution");
 
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,sol,rhs);
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",ifs,*vectors(0),*vectors(1));
     // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);

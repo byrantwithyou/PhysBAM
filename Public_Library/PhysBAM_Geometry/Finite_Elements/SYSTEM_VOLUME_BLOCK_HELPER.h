@@ -95,7 +95,7 @@ public:
                 if(row>=0){
                     ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
                     for(int j=0;j<d.n;j++){
-                        int value=d(i,j);
+                        T value=d(i,j);
                         if(value){
                             int column=comp_n(i+flat_diff(j));
                             M.offsets(row+1)++;

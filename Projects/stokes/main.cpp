@@ -307,7 +307,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 
     // Dump_Vector<T,TV>(iss,sol,"solution");
 
-    // OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
     // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
     // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
     // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);

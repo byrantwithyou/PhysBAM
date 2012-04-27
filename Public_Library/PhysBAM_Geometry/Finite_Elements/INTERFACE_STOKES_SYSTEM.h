@@ -21,7 +21,8 @@ template<class TV> class GRID;
 template<class TV>
 class INTERFACE_STOKES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef INTERFACE_STOKES_SYSTEM_VECTOR<TV> VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
