@@ -78,7 +78,7 @@ public:
             for(int row=0;row<m;row++){
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
                 for(int j=0;j<d.n;j++){
-                    int value=d(row,j);
+                    T value=d(row,j);
                     if(value){
                         int column=comp_n(cdi->Get_Flat_Base(row)+flat_diff(j));
                         M.offsets(row+1)++;
