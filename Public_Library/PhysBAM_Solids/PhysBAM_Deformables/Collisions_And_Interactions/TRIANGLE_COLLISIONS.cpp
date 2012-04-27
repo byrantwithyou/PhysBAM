@@ -71,7 +71,7 @@ Initialize(TRIANGLE_COLLISION_PARAMETERS<TV>& triangle_collision_parameters)
 template<class TV> void TRIANGLE_COLLISIONS<TV>::
 Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self_collision_free,ARRAY_VIEW<bool> recently_modified,const T detection_thickness)
 {
-        // Update swept hierarchies
+    // Update swept hierarchies
     LOG::SCOPE scope("updating swept hierarchies","updating swept hierarchies");
     for(int structure_index=0;structure_index<geometry.structure_geometries.m;structure_index++){
         STRUCTURE_INTERACTION_GEOMETRY<TV>& structure=*geometry.structure_geometries(structure_index);
@@ -325,6 +325,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
 {
     final_point_face_repulsions=final_point_face_collisions=0;
     ARRAY<bool>& modified_full=geometry.modified_full;
+    ARRAY<int> tmp;
     int collisions=0,skipping_already_rigid=0;T collision_time;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
@@ -336,8 +337,13 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
         else collided=Point_Face_Collision(pf_data,nodes,dt,REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,exit_early||rigid);
         if(collided){
             collisions++;
-            modified_full.Subset(nodes).Fill(true);
-            recently_modified_full.Subset(nodes).Fill(true);
+            for(int j=0;j<nodes.m;j++){
+                modified_full(nodes(j))=true;
+                recently_modified_full(nodes(j))=true;
+                tmp.Remove_All();
+                geometry.deformable_body_collection.binding_list.Parents(tmp,nodes(j));
+                modified_full.Subset(tmp).Fill(true);
+                recently_modified_full.Subset(tmp).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
             if(rigid) Add_To_Rigid_Lists(rigid_lists,list_index,nodes);}}
     if(output_collision_results && !final_repulsion_only){
@@ -524,6 +530,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
     ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,skipping_already_rigid=0;T collision_time;
 
+    ARRAY<int> tmp;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_DATA ee_data(ee_target_impulses(i),ee_target_weights(i),ee_normals(i),ee_old_speeds(i));
         if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0)>=0 && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
@@ -532,8 +539,13 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
         else collided=Edge_Edge_Collision(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
         if(collided){collisions++;
-            modified_full.Subset(nodes).Fill(true);
-            recently_modified_full.Subset(nodes).Fill(true);
+            for(int j=0;j<nodes.m;j++){
+                modified_full(nodes(j))=true;
+                recently_modified_full(nodes(j))=true;
+                tmp.Remove_All();
+                geometry.deformable_body_collection.binding_list.Parents(tmp,nodes(j));
+                modified_full.Subset(tmp).Fill(true);
+                recently_modified_full.Subset(tmp).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - edge collision"<<std::endl;return collisions;}
             if(rigid) Add_To_Rigid_Lists(rigid_lists,list_index,nodes);}}
     if(output_collision_results && !final_repulsion_only){

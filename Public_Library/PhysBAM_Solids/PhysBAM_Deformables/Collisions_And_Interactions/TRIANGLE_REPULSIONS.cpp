@@ -586,9 +586,9 @@ Set_Collision_Pairs(ARRAY<PRECOMPUTE_PROJECT<VECTOR<T,3> > >& point_face_precomp
     point_face_precomputed.Resize(point_face_pairs.m);
     edge_edge_precomputed.Resize(edge_edge_pairs.m);
     for(int i=0;i<point_face_pairs.m;i++){const REPULSION_PAIR<VECTOR<T,3> >& pr=point_face_pairs(i);
-        point_face_precomputed(i).Precompute(geometry.deformable_body_collection.particles.one_over_mass.Subset(pr.nodes),pr.weights,pr.normal);}
+        point_face_precomputed(i).Precompute(geometry.deformable_body_collection.particles.one_over_effective_mass.Subset(pr.nodes),pr.weights,pr.normal);}
     for(int i=0;i<edge_edge_pairs.m;i++){const REPULSION_PAIR<VECTOR<T,3> >& pr=edge_edge_pairs(i);
-        edge_edge_precomputed(i).Precompute(geometry.deformable_body_collection.particles.one_over_mass.Subset(pr.nodes),pr.weights,pr.normal);}
+        edge_edge_precomputed(i).Precompute(geometry.deformable_body_collection.particles.one_over_effective_mass.Subset(pr.nodes),pr.weights,pr.normal);}
     internal_point_face_precomputed=point_face_precomputed;
     internal_edge_edge_precomputed=edge_edge_precomputed;
 }
