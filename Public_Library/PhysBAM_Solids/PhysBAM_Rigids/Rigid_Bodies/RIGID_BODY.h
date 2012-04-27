@@ -118,6 +118,9 @@ public:
     const T_SPIN& Angular_Momentum() const PHYSBAM_ALWAYS_INLINE
     {return rigid_body_collection.rigid_body_particle.angular_momentum(particle_index);}
 
+    TV Momentum() const
+    {return Mass()*Twist().linear;}
+
     T& Mass() PHYSBAM_ALWAYS_INLINE
     {return rigid_body_collection.rigid_body_particle.mass(particle_index);}
 

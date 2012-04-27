@@ -290,6 +290,18 @@ Compute_Energy(const T time,T& kinetic_energy,T& potential_energy) const
         kinetic_energy+=rigid_body_collection.Rigid_Body(p).Kinetic_Energy();}
 }
 //#####################################################################
+// Function Compute_Energy
+//#####################################################################
+template<class TV> TV SOLID_BODY_COLLECTION<TV>::
+Compute_Momentum() const
+{
+    TV momentum=deformable_body_collection.particles.V.Subset(deformable_body_collection.dynamic_particles).
+        Weighted_Sum(deformable_body_collection.particles.mass.Subset(deformable_body_collection.dynamic_particles));
+    for(int i=0;i<rigid_body_collection.dynamic_rigid_body_particles.m;i++){int p=rigid_body_collection.dynamic_rigid_body_particles(i);
+        momentum+=rigid_body_collection.Rigid_Body(p).Momentum();}
+    return momentum;
+}
+//#####################################################################
 // Function Print_Energy
 //#####################################################################
 template<class TV> void SOLID_BODY_COLLECTION<TV>::
@@ -298,7 +310,8 @@ Print_Energy(const T time,const int step) const
     if(print_energy){
         T potential_energy=0,kinetic_energy=0;
         Compute_Energy(time,kinetic_energy,potential_energy);
-        LOG::cout<<"total energy = "<<(potential_energy+kinetic_energy)<<"    (KE = "<<kinetic_energy<<"   PE = "<<potential_energy<<")  Step "<<step<<std::endl;}
+        LOG::cout<<"total energy = "<<(potential_energy+kinetic_energy)<<"    (KE = "<<kinetic_energy<<"   PE = "<<potential_energy<<")  Step "<<step<<std::endl;
+        LOG::cout<<"total momentum = "<<Compute_Momentum()<<"  Step "<<step<<std::endl;}
 }
 //#####################################################################
 // Function Read
