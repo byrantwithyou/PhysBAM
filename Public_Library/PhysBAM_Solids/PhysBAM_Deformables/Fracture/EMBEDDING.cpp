@@ -11,7 +11,6 @@
 using namespace PhysBAM;
 namespace PhysBAM{
 bool Register_Solids_Structures(){
-    LOG::cout<<__FUNCTION__<<std::endl;
     STRUCTURE_REGISTRY<VECTOR<float,2> >::Register<EMBEDDING<VECTOR<float,2> > >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME<float> >();
     STRUCTURE_REGISTRY<VECTOR<float,3> >::Register<EMBEDDED_TETRAHEDRALIZED_VOLUME_BOUNDARY_SURFACE<float> >();
