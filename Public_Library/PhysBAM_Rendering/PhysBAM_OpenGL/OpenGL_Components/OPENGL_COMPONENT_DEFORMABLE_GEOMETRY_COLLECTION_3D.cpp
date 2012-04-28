@@ -199,6 +199,7 @@ Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
     if(draw_input) active_list.Fill(true);
+    Update_Velocity_Field();
     Reinitialize();
 }
 //#####################################################################
@@ -300,6 +301,7 @@ template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_
 Cycle_Display_Mode()
 {
     display_mode=(display_mode+1)%4;
+    Update_Velocity_Field();
 }
 //#####################################################################
 // Function Cycle_Cutaway_Mode
@@ -317,6 +319,7 @@ Show_Only_First()
 {
     active_list.Fill(false);
     active_list(0)=true;
+    Update_Velocity_Field();
 }
 //#####################################################################
 // Function Decrease_Cutaway_Fraction
@@ -429,6 +432,7 @@ Toggle_Use_Active_List()
     if(active_list.m<1) return;
     use_active_list=!use_active_list;if(!use_active_list) active_list.Fill(true);
     else{active_list.Fill(false);incremented_active_object=1;active_list(incremented_active_object)=true;}
+    Update_Velocity_Field();
 }
 //#####################################################################
 // Function Select_Segment
@@ -459,8 +463,9 @@ Increment_Active_Object()
 {
     if(active_list.m<1 || !use_active_list) return;
     active_list(incremented_active_object)=false;incremented_active_object++;
-    if(incremented_active_object>active_list.m) incremented_active_object=1;
+    if(incremented_active_object>active_list.m) incremented_active_object=0;
     active_list(incremented_active_object)=true;
+    Update_Velocity_Field();
 }
 //#####################################################################
 // Function Get_Selection
@@ -499,7 +504,9 @@ Highlight_Selection(OPENGL_SELECTION *selection)
 {
     if(selection->type!=OPENGL_SELECTION::COMPONENT_DEFORMABLE_COLLECTION_3D) return;
     OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>* real_selection=(OPENGL_SELECTION_COMPONENT_DEFORMABLE_COLLECTION_3D<T>*)selection;
-    if(selection->hide) active_list(real_selection->body_index)=false;
+    if(selection->hide){
+        active_list(real_selection->body_index)=false;
+        Update_Velocity_Field();}
     else real_selection->subobject->Highlight_Selection(real_selection->body_selection);
 }
 //#####################################################################
@@ -540,7 +547,8 @@ Toggle_Active_Value_Response()
         sstream>>index;
         if(index>=0) {
             if(active_list.m<=index) active_list.Resize(index+1,true,true,start_val);
-            active_list(index)=!active_list(index);}}
+            active_list(index)=!active_list(index);
+            Update_Velocity_Field();}}
 }
 //#####################################################################
 // Function Highlight_Particle_Response
@@ -602,9 +610,32 @@ Decrease_Vector_Size()
 template<class T,class RW> void OPENGL_COMPONENT_DEFORMABLE_GEOMETRY_COLLECTION_3D<T,RW>::
 Update_Velocity_Field()
 {
-    if(draw_velocity_vectors){
-        positions=deformable_geometry->particles.X;
-        velocity_vectors=deformable_geometry->particles.V;}
+    if(!draw_velocity_vectors) return;
+    bool display_triangulated_surface_objects,display_tetrahedralized_volume_objects,display_hexahedralized_volume_objects,display_free_particles_objects;
+    Set_Display_Modes_For_Geometry_Collection(display_triangulated_surface_objects,display_tetrahedralized_volume_objects,display_hexahedralized_volume_objects,
+        display_free_particles_objects);
+
+    velocity_vectors.Resize(deformable_geometry->particles.V.m);
+    velocity_vectors.Fill(TV());
+    for(int i=0;i<segmented_curve_objects.m;i++){
+        if(!active_list(i)) continue;
+        if(segmented_curve_objects(i))
+            velocity_vectors.Subset(segmented_curve_objects(i)->curve.mesh.elements.Flattened())=
+                deformable_geometry->particles.V.Subset(segmented_curve_objects(i)->curve.mesh.elements.Flattened());
+        if(triangulated_surface_objects(i) && display_triangulated_surface_objects)
+            velocity_vectors.Subset(triangulated_surface_objects(i)->surface.mesh.elements.Flattened())=
+                deformable_geometry->particles.V.Subset(triangulated_surface_objects(i)->surface.mesh.elements.Flattened());
+        if(tetrahedralized_volume_objects(i) && display_tetrahedralized_volume_objects)
+            velocity_vectors.Subset(tetrahedralized_volume_objects(i)->mesh->elements.Flattened())=
+                deformable_geometry->particles.V.Subset(tetrahedralized_volume_objects(i)->mesh->elements.Flattened());
+        if(hexahedralized_volume_objects(i) && display_hexahedralized_volume_objects)
+            velocity_vectors.Subset(hexahedralized_volume_objects(i)->hexahedron_mesh->elements.Flattened())=
+                deformable_geometry->particles.V.Subset(hexahedralized_volume_objects(i)->hexahedron_mesh->elements.Flattened());
+        if(free_particles_objects(i) && display_free_particles_objects)
+            velocity_vectors.Subset(free_particles_objects(i)->points.indices)=
+                deformable_geometry->particles.V.Subset(free_particles_objects(i)->points.indices);}
+
+    positions=deformable_geometry->particles.X;
 }
 //#####################################################################
 // Function Cycle_Relative_Velocity_Mode
