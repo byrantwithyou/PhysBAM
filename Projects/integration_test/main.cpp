@@ -292,20 +292,16 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 
     ifs.Set_RHS(rhs,f_body,f_interface);
 
-    Dump_System<T,TV>(ifs,at);
+    // Dump_System<T,TV>(ifs,at);
 
-    RANDOM_NUMBERS<T> random;
-    random.Fill_Uniform(sol.v,-(T)1,(T)1);
-    ifs.Project(sol);
-    
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cr;
+
     // MINRES<T> mr;
     // KRYLOV_SOLVER<T>* solver=&mr;
-    // solver->restart_iterations=10000;
-    // solver->nullspace_tolerance=0;
-    // solver->print_residuals=true;
-    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1);
+
+    solver->print_residuals=true;
+    solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
     // if(ifs.Nullspace_Check(rhs)){
         // OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
         // ifs.Multiply(rhs,*vectors(0));
@@ -313,9 +309,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
         // rhs.v/=rhs.v.Max_Abs();
         // Dump_Vector2(ifs,rhs.v,"extra null mode");}
 
-    // ifs.Multiply(sol,*vectors(0));
-    // *vectors(0)-=rhs;
-    // LOG::cout<<"Residual: "<<ifs.Convergence_Norm(*vectors(0))<<std::endl;
+    ifs.Multiply(sol,*vectors(0));
+    *vectors(0)-=rhs;
+    LOG::cout<<"Residual: "<<ifs.Convergence_Norm(*vectors(0))<<std::endl;
 
     // Dump_Vector<T,TV>(ifs,sol.v,"solution");
 
@@ -327,7 +323,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     // OCTAVE_OUTPUT<T>("null_u.txt").Write("null_u",ifs.null_u[0]);
     // OCTAVE_OUTPUT<T>("null_v.txt").Write("null_v",ifs.null_u[1]);
 
-/*    ifs.Get_U_Part(sol.v,numer_u);
+    ifs.Get_U_Part(sol.v,numer_u);
     ifs.Get_P_Part(sol.v,numer_p);
 
     exact_u.Resize(grid);
@@ -371,10 +367,10 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
         error_p_l2+=sqr(d);}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
-    Dump_u_p(ifs,error_u,error_p,"error");
-    Dump_u_p(ifs.grid,error_u,error_p,"color mapped error");
+    // Dump_u_p(ifs,error_u,error_p,"error");
+    //Dump_u_p(ifs.grid,error_u,error_p,"color mapped error");
 
-    LOG::cout<<ifs.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;*/
+    LOG::cout<<ifs.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
 }
 
 //#################################################################################################################################################

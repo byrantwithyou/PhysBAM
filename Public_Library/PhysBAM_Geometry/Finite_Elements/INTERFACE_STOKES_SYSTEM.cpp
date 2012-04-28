@@ -314,10 +314,10 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
-    // VECTOR_T& v=debug_cast<VECTOR_T&>(x);
-    // v-=null_p*v.Dot(null_p);
-    // for(int i=0;i<TV::m;i++)
-        // v-=null_u(i)*v.Dot(null_u(i));
+    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
+    v.Copy(-v.Dot(null_p),null_p,v);
+    for(int i=0;i<TV::m;i++)
+        v.Copy(-v.Dot(null_u(i)),null_u(i),v);
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

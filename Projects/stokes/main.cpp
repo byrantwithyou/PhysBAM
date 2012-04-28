@@ -282,7 +282,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 
     iss.Set_RHS(rhs,f_body,f_interface);
 
-    Dump_System<T,TV>(iss,at);
+    // Dump_System<T,TV>(iss,at);
 
     CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&cr;
@@ -290,8 +290,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     // MINRES<T> mr;
     // KRYLOV_SOLVER<T>* solver=&mr;
 
-    // solver->print_residuals=true;
-
+    solver->print_residuals=true;
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,1000000);
     
     /*if(iss.Nullspace_Check(rhs)){
@@ -359,8 +358,8 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
         error_p_l2+=sqr(d);}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
-    Dump_u_p(iss,error_u,error_p,"error");
-    Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
+    // Dump_u_p(iss,error_u,error_p,"error");
+    // Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
 
     LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
 }
@@ -544,7 +543,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_7;
             break;}
-        case 8:{ // square level set
+        case 8:{ // Circle level set
             struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
             {
                 virtual void Initialize(){}
@@ -556,7 +555,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_8;
             break;}
-        case 9:{ // square level set
+        case 9:{ // Square level set
             struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
             {
                 virtual void Initialize(){}
