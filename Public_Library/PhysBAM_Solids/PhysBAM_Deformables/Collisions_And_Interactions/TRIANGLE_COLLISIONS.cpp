@@ -6,6 +6,7 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
+#include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
@@ -129,9 +130,11 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     ARRAY_VIEW<TV> X(full_particles.X),X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,collisions_in_attempt=0,
         point_face_collisions=0,edge_edge_collisions=0;
-    ARRAY<ARRAY<int> > rigid_lists;ARRAY<int> list_index(full_particles.Size());list_index.Fill(-1); // index of the rigid list a local node belongs to
+    SPARSE_UNION_FIND<> union_find(full_particles.Size());
+    ARRAY<bool> is_rigid(full_particles.Size());
 
-    recently_modified_full.Resize(full_particles.Size(),false,false);recently_modified_full.Fill(true);
+    recently_modified_full.Resize(full_particles.Size(),false,false);
+    recently_modified_full.Fill(true);
     ARRAY<TV> V_save;
     ARRAY<TV> X_save;
     // input velocities are average V.  Also want original velocities?  Delta may be sufficient.
@@ -167,24 +170,24 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         // point face first for stability
         point_face_collisions=0;edge_edge_collisions=0;collisions_in_attempt=0;
         if(mpi_solids && mpi_solids->rank==0){
-            point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,rigid_lists,list_index,point_face_pairs_external,attempt_ratio,false,exit_early);
+            point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,is_rigid,point_face_pairs_external,attempt_ratio,false,exit_early);
             PHYSBAM_ASSERT(!exit_early);}
         if(mpi_solids){
             LOG::Time("broadcast");
             mpi_solids->Broadcast_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);}
-        point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,rigid_lists,list_index,point_face_pairs_internal,attempt_ratio,false,exit_early);
+        point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,is_rigid,point_face_pairs_internal,attempt_ratio,false,exit_early);
         if(exit_early && point_face_collisions) goto EXIT_EARLY_AND_COMMUNICATE;
         if(mpi_solids){
             LOG::Time("gather");
             mpi_solids->Gather_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);}
         // edge edge pairs
         if(mpi_solids && mpi_solids->rank==0){
-            edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,rigid_lists,list_index,edge_edge_pairs_external,attempt_ratio,false,exit_early);
+            edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,is_rigid,edge_edge_pairs_external,attempt_ratio,false,exit_early);
             PHYSBAM_ASSERT(!exit_early);}
         if(mpi_solids){
             LOG::Time("broadcast");
             mpi_solids->Broadcast_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);}
-        edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,rigid_lists,list_index,edge_edge_pairs_internal,attempt_ratio,false,exit_early);
+        edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,is_rigid,edge_edge_pairs_internal,attempt_ratio,false,exit_early);
         if(exit_early && edge_edge_collisions) goto EXIT_EARLY_AND_COMMUNICATE;
         collisions_in_attempt=edge_edge_collisions+point_face_collisions;
         if(mpi_solids) mpi_solids->Gather_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);
@@ -202,13 +205,13 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
             pf_target_weights.Fill(VECTOR<T,d+1>());ee_target_weights.Fill(VECTOR<T,d+1>());
             pf_normals.Fill(TV());ee_normals.Fill(TV());
             pf_old_speeds.Fill(T());ee_old_speeds.Fill(T());
-            Adjust_Velocity_For_Point_Face_Collision(dt,rigid,rigid_lists,list_index,point_face_pairs_internal,attempt_ratio,true,exit_early);
-            Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,rigid_lists,list_index,edge_edge_pairs_internal,attempt_ratio,true,exit_early);
+            Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,is_rigid,point_face_pairs_internal,attempt_ratio,true,exit_early);
+            Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,is_rigid,edge_edge_pairs_internal,attempt_ratio,true,exit_early);
             
             Scale_And_Apply_Impulses();}
 
         // Apply rigid motions
-        if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,rigid_lists);
+        if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,union_find,is_rigid);
         // Update positions
         if(collisions_in_attempt){
             for(int p=0;p<full_particles.Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);}
@@ -320,7 +323,7 @@ template<> void TRIANGLE_COLLISIONS<VECTOR<double,2> >::Get_Moving_Edges_Near_Mo
 // Function Adjust_Velocity_For_Point_Face_Collision
 //#####################################################################
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
-Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const ARRAY<VECTOR<int,d+1> >& pairs,
+Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,ARRAY<bool>& is_rigid,const ARRAY<VECTOR<int,d+1> >& pairs,
     const T attempt_ratio,const bool final_repulsion_only,const bool exit_early)
 {
     final_point_face_repulsions=final_point_face_collisions=0;
@@ -329,7 +332,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
     int collisions=0,skipping_already_rigid=0;T collision_time;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
-        if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0)>=0 && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
+        if(rigid){if(is_rigid.Subset(nodes).Contains(true)){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Point_Face_Final_Repulsion(pf_data,nodes,dt,REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,
@@ -345,7 +348,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,ARRAY<ARRAY
                 modified_full.Subset(tmp).Fill(true);
                 recently_modified_full.Subset(tmp).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
-            if(rigid) Add_To_Rigid_Lists(rigid_lists,list_index,nodes);}}
+            if(rigid){union_find.Union(nodes);is_rigid.Subset(nodes).Fill(true);}}}
     if(output_collision_results && !final_repulsion_only){
         if(final_point_face_repulsions) LOG::Stat("final point face repulsions",final_point_face_repulsions);
         if(final_point_face_collisions) LOG::Stat("final point face collisions",final_point_face_collisions);
@@ -523,7 +526,7 @@ template<> bool TRIANGLE_COLLISIONS<VECTOR<double,1> >::Point_Face_Final_Repulsi
 // Function Adjust_Velocity_For_Edge_Edge_Collision
 //#####################################################################
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
-Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const ARRAY<VECTOR<int,d+1> >& pairs,
+Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,ARRAY<bool>& is_rigid,const ARRAY<VECTOR<int,d+1> >& pairs,
     const T attempt_ratio,const bool final_repulsion_only,const bool exit_early)
 {
     final_edge_edge_repulsions=final_edge_edge_collisions=0;
@@ -533,7 +536,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
     ARRAY<int> tmp;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_DATA ee_data(ee_target_impulses(i),ee_target_weights(i),ee_normals(i),ee_old_speeds(i));
-        if(rigid){VECTOR<int,d+1> node_rigid_indices(list_index.Subset(nodes));if(node_rigid_indices(0)>=0 && node_rigid_indices.Elements_Equal()){skipping_already_rigid++;continue;}}
+        if(rigid){if(is_rigid.Subset(nodes).Contains(true)){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
@@ -547,7 +550,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,ARRAY<ARRAY<
                 modified_full.Subset(tmp).Fill(true);
                 recently_modified_full.Subset(tmp).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - edge collision"<<std::endl;return collisions;}
-            if(rigid) Add_To_Rigid_Lists(rigid_lists,list_index,nodes);}}
+            if(rigid){union_find.Union(nodes);is_rigid.Subset(nodes).Fill(true);}}}
     if(output_collision_results && !final_repulsion_only){
         if(final_edge_edge_repulsions) LOG::Stat("final edge edge repulsions",final_edge_edge_repulsions);
         if(final_edge_edge_collisions) LOG::Stat("final edge edge collisions",final_edge_edge_collisions);
@@ -646,47 +649,30 @@ template<> bool TRIANGLE_COLLISIONS<VECTOR<double,1> >::Edge_Edge_Final_Repulsio
 template<> bool TRIANGLE_COLLISIONS<VECTOR<float,2> >::Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA&,const VECTOR<int,3>&,const T,T&,const T,const bool){PHYSBAM_NOT_IMPLEMENTED();}
 template<> bool TRIANGLE_COLLISIONS<VECTOR<double,2> >::Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA&,const VECTOR<int,3>&,const T,T&,const T,const bool){PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################
-// Function Add_To_Rigid_Lists
-//#####################################################################
-template<class TV> template<int d2> void TRIANGLE_COLLISIONS<TV>::
-Add_To_Rigid_Lists(ARRAY<ARRAY<int> >& rigid_lists,ARRAY<int>& list_index,const VECTOR<int,d2>& nodes)
-{
-    // TODO: make this into union find...
-
-    // make a new list and add the new nodes
-    rigid_lists.Resize(rigid_lists.m+1);rigid_lists.Last()=nodes;
-
-    // figure out which list it should be combined with
-    int add_list=rigid_lists.m;for(int i=0;i<nodes.m;i++){int j=list_index(rigid_lists.Last()(i));if(j>=0) add_list=min(add_list,j);}
-
-    // set up a new list or combine with another
-    if(add_list == rigid_lists.m) for(int i=0;i<nodes.m;i++) list_index(rigid_lists.Last()(i))=rigid_lists.m; // label as a new list
-    else{ // combine with a pre-existing list
-        for(int i=0;i<nodes.m;i++){
-            int node=rigid_lists.Last()(i),current_list=list_index(node);
-            if(current_list<0){rigid_lists(add_list).Append(node);list_index(node)=add_list;} // add to the add_list
-            else if(current_list != add_list){ // not already in the add_list, but in another list - combine current_list with the add_list
-                int new_nodes=rigid_lists(current_list).m;rigid_lists(add_list).Resize(rigid_lists(add_list).m+new_nodes);
-                for(int j=0;j<new_nodes;j++){rigid_lists(add_list)(rigid_lists(add_list).m-new_nodes+j)=rigid_lists(current_list)(j);list_index(rigid_lists(current_list)(j))=add_list;}
-                rigid_lists(current_list).Resize(0);}} // kill off the current list
-        rigid_lists.Resize(rigid_lists.m-1);} // remove the new list since we combined it with another
-}
-//#####################################################################
 // Function Apply_Rigid_Body_Motions
 //#####################################################################
 template<class TV> void TRIANGLE_COLLISIONS<TV>::
-Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
+Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find,const ARRAY<bool>& is_rigid)
 {
+    HASHTABLE<int,ARRAY<int> > lists;
+    for(typename HASHTABLE<int,int>::ITERATOR it(union_find.parents);it.Valid();it.Next())
+            lists.Get_Or_Insert(it.Data()).Append(it.Key());
+
+        SPARSE_UNION_FIND<> union_find2;
+        union_find2.Union(3,5);
+
+    for(typename HASHTABLE<int,ARRAY<int> >::ITERATOR it(lists);it.Valid();it.Next())
+        it.Data().Append(it.Key());
+
     DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
     ARRAY<TV>& X_self_collision_free=geometry.X_self_collision_free;
-    if(output_collision_results){
-        LOG::cout<<"TOTAL RIGID GROUPS = "<<rigid_lists.m<<std::endl;
-        for(int list=0;list<rigid_lists.m;list++) LOG::cout<<"LIST "<<list<<" = "<<rigid_lists(list).m<<" POINTS"<<std::endl<<rigid_lists(list);}
+    if(output_collision_results) LOG::cout<<"TOTAL RIGID GROUPS = "<<lists<<std::endl;
     
     T one_over_dt=1/dt;
-    for(int list=0;list<rigid_lists.m;list++) if(rigid_lists(list).m){
+    for(typename HASHTABLE<int,ARRAY<int> >::ITERATOR it(lists);it.Valid();it.Next()){
+        const ARRAY<int>& list=it.Data();
         ARRAY<int> flat_indices;
-        geometry.deformable_body_collection.binding_list.Flatten_Indices(flat_indices,rigid_lists(list));
+        geometry.deformable_body_collection.binding_list.Flatten_Indices(flat_indices,list);
         TV average_velocity,center_of_mass;
         T total_mass=0;
         for(int k=0;k<flat_indices.m;k++){int p=flat_indices(k);
@@ -709,8 +695,8 @@ Apply_Rigid_Body_Motions(const T dt,ARRAY<ARRAY<int> >& rigid_lists)
             TV new_position=center_of_mass+dt*average_velocity+R.Rotate(X_self_collision_free(p)-center_of_mass);
             full_particles.V(p)=one_over_dt*(new_position-X_self_collision_free(p));
             assert(geometry.modified_full(p));recently_modified_full(p)=true;}
-        for(int k=0;k<rigid_lists(list).m;k++){
-            int p=rigid_lists(list)(k);
+        for(int k=0;k<list.m;k++){
+            int p=list(k);
             full_particles.X(p)=geometry.deformable_body_collection.binding_list.Embedded_Position(p);
             full_particles.V(p)=geometry.deformable_body_collection.binding_list.Embedded_Velocity(p);}}
 }
