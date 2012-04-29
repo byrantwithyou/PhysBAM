@@ -240,7 +240,7 @@ struct ANALYTIC_TEST
 };
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,const bool use_preconditioner)
+void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
@@ -287,8 +287,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     MINRES<T> mr;
     KRYLOV_SOLVER<T>* solver=&mr;
 
-    solver->print_residuals=true;
-    solver->Solve(iss,sol,rhs,vectors,1e-10,0,1000000);
+    solver->Solve(iss,sol,rhs,vectors,1e-10,0,max_iter);
     
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
@@ -340,18 +339,19 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 
     LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
 
-    Dump_System<T,TV>(iss,at);
-    Dump_Vector<T,TV>(iss,sol,"solution");
-    Dump_u_p(iss,error_u,error_p,"error");
-    Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
-    if(iss.Nullspace_Check(rhs)){
-        OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
-        iss.Multiply(rhs,*vectors(0));
-        LOG::cout<<"nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
-        rhs*=1/rhs.Max_Abs();
-        Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}
-
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
+    if(debug_particles){
+        Dump_System<T,TV>(iss,at);
+        Dump_Vector<T,TV>(iss,sol,"solution");
+        Dump_u_p(iss,error_u,error_p,"error");
+        Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
+        if(null&&iss.Nullspace_Check(rhs)){
+            OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
+            iss.Multiply(rhs,*vectors(0));
+            LOG::cout<<"nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+            rhs*=1/rhs.Max_Abs();
+            Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}}
+        
+    if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
 }
 
 //#################################################################################################################################################
@@ -568,7 +568,11 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     test->mu(1)=parse_args.Get_Double_Value("-mu_i")*test->kg/(test->s*(d==3?test->m:1));
     int res=parse_args.Get_Integer_Value("-resolution");
     int cgf=parse_args.Get_Integer_Value("-cgf");
+    int max_iter=parse_args.Get_Integer_Value("-max_iter");
     bool use_preconditioner=parse_args.Get_Option_Value("-use_preconditioner");
+    bool null=parse_args.Get_Option_Value("-null");
+    bool dump_matrix=parse_args.Get_Option_Value("-dump_matrix");
+    bool debug_particles=parse_args.Get_Option_Value("-debug_particles");
 
     if(res%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
 
@@ -586,7 +590,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,coarse_grid,*test,use_preconditioner);
+    Analytic_Test(grid,coarse_grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
 }
 
 //#################################################################################################################################################
@@ -608,8 +612,12 @@ int main(int argc,char* argv[])
     parse_args.Add_Integer_Argument("-test",1,"test number");
     parse_args.Add_Integer_Argument("-resolution",4,"resolution");
     parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
-    parse_args.Add_Option_Argument("-use_preconditioner","Use Jacobi preconditioner");
-    parse_args.Add_Option_Argument("-3d","Use 3D");
+    parse_args.Add_Integer_Argument("-max_iter",1000000,"max number of interations");
+    parse_args.Add_Option_Argument("-use_preconditioner","use Jacobi preconditioner");
+    parse_args.Add_Option_Argument("-3d","use 3D");
+    parse_args.Add_Option_Argument("-null","find extra null modes of the matrix");
+    parse_args.Add_Option_Argument("-dump_matrix","dump system matrix");
+    parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
     parse_args.Parse(argc,argv);
 
     if(parse_args.Get_Option_Value("-3d"))
