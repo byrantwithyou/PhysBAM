@@ -119,6 +119,7 @@ Print() const
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<q(i).n;k++)
             LOG::cout<<q(i)(k)<<" ";
+    LOG::cout<<std::endl;
 }
 //#####################################################################
 // Function Raw_Size

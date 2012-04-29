@@ -58,6 +58,7 @@ public:
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_pu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_qu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_rhs_qu;
+    VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_rhs_pu;
 
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;

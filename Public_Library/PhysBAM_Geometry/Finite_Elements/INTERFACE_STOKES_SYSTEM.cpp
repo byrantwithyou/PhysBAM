@@ -85,7 +85,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
     
     BASIS_INTEGRATION_UNIFORM<TV,2> biu(grid,coarse_grid,phi->phi,*cdi);
     VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER<TV>,TV::m>,TV::m> helper_uu;
-    VECTOR<SYSTEM_VOLUME_BLOCK_HELPER<TV>,TV::m> helper_pu;
+    VECTOR<SYSTEM_VOLUME_BLOCK_HELPER<TV>,TV::m> helper_pu,helper_rhs_pu;
     VECTOR<SYSTEM_INTERFACE_BLOCK_HELPER<TV>,TV::m> helper_qu,helper_rhs_qu;
 
     for(int i=0;i<TV::m;i++){
@@ -93,12 +93,13 @@ Set_Matrix(const VECTOR<T,2>& mu)
             helper_uu(i)(j).Initialize(*u_stencil(i),*u_stencil(j),*cm_u(i),*cm_u(j),*cdi);
         helper_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
         helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
-        helper_rhs_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);}
+        helper_rhs_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
+        helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);}
 
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
-        for(int j=0;j<TV::m;j++){
-            biu.Add_Volume_Block(helper_uu(i)(i),*udx_stencil(i)(j),*udx_stencil(i)(j),mu*(1+(i==j)));}
+        for(int j=0;j<TV::m;j++)
+            biu.Add_Volume_Block(helper_uu(i)(i),*udx_stencil(i)(j),*udx_stencil(i)(j),mu*(1+(i==j)));
     // Off-diagonal blocks
     for(int i=0;i<TV::m;i++)
         for(int j=i+1;j<TV::m;j++)
@@ -109,9 +110,12 @@ Set_Matrix(const VECTOR<T,2>& mu)
     // Traction blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Interface_Block(helper_qu(i),*u_stencil(i),1,false);
+    // RHS pressure blocks
+    for(int i=0;i<TV::m;i++)
+        biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),VECTOR<T,2>(1,1));
     // RHS traction blocks
-    for(int i=0;i<TV::m;i++){
-        biu.Add_Interface_Block(helper_rhs_qu(i),*u_stencil(i),-0.5,true);}
+    for(int i=0;i<TV::m;i++)
+        biu.Add_Interface_Block(helper_rhs_qu(i),*u_stencil(i),-0.5,true);
 
     biu.Compute_Entries();
 
@@ -122,7 +126,8 @@ Set_Matrix(const VECTOR<T,2>& mu)
             helper_uu(i)(j).Mark_Active_Cells();
         helper_pu(i).Mark_Active_Cells();
         helper_qu(i).Mark_Active_Cells();
-        helper_rhs_qu(i).Mark_Active_Cells();}
+        helper_rhs_qu(i).Mark_Active_Cells();
+        helper_rhs_pu(i).Mark_Active_Cells();}
     
     cm_p->Compress_Indices();
     for(int i=0;i<TV::m;i++) cm_u(i)->Compress_Indices();
@@ -137,6 +142,9 @@ Set_Matrix(const VECTOR<T,2>& mu)
     // QU Block
     for(int i=0;i<TV::m;i++)
         helper_qu(i).Build_Matrix(matrix_qu(i));
+    // RHS PU Block 
+    for(int i=0;i<TV::m;i++)
+        helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
     // RHS QU Block 
     for(int i=0;i<TV::m;i++)
         helper_rhs_qu(i).Build_Matrix(matrix_rhs_qu(i));
@@ -194,11 +202,11 @@ Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f
                     F_body(i)[s](k)=f_body[s](it.index)(i);}
 
     Resize_Vector(rhs); // assumes rhs was 0
-    
+
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++){
             matrix_rhs_qu(i)[s].Transpose_Times(F_interface(i),rhs.u(i)[s]);
-            matrix_pu(i)[s].Transpose_Times_Subtract(F_body(i)[s],rhs.u(i)[s]);}
+            matrix_rhs_pu(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);}
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner
