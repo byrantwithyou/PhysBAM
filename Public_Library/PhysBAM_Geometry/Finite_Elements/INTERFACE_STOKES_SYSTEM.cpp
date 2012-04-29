@@ -348,7 +348,7 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
-    debug_cast<VECTOR_T&>(z).Scale(debug_cast<const VECTOR_T&>(r));
+    debug_cast<VECTOR_T&>(z).Scale(debug_cast<const VECTOR_T&>(r),debug_cast<const VECTOR_T&>(J));
 }
 template class INTERFACE_STOKES_SYSTEM<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM<VECTOR<float,3> >;
