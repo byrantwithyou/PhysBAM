@@ -17,7 +17,6 @@ template<class TV,int static_degree>
 class SYSTEM_VOLUME_BLOCK:NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;
 
     CELL_DOMAIN_INTERFACE<TV>* cdi;
     SYSTEM_VOLUME_BLOCK_HELPER<TV> *helper;
@@ -26,14 +25,14 @@ public:
     
     struct OPEN_ENTRY
     {
-        TV_INT index0, index1;
+        int flat_index_offset;
+        int flat_index_diff;
         T x;
-        int flat_diff_index;
         
         bool operator< (const OPEN_ENTRY& me) const
         {
-            if(index0!=me.index0) return LEXICOGRAPHIC_COMPARE()(index0,me.index0);
-            return LEXICOGRAPHIC_COMPARE()(index1,me.index1);
+            if(flat_index_offset!=me.flat_index_offset) return flat_index_offset<me.flat_index_offset; 
+            return flat_index_diff<me.flat_index_diff; 
         }
         
         void Merge(const OPEN_ENTRY& me){x+=me.x;}
@@ -41,10 +40,10 @@ public:
     
     struct OVERLAP_POLYNOMIAL
     {
-        TV_INT index_offset0,index_offset1;
+        int flat_index_offset;
+        int flat_index_diff;
         int subcell; // flags indicating fine cells
         STATIC_POLYNOMIAL<T,TV::m,static_degree> polynomial;
-        int flat_diff_index;
     };
 
     VECTOR<T,2> scale;
@@ -65,22 +64,24 @@ public:
                 if(overlap){
                     const typename BASIS_STENCIL_UNIFORM<TV,d0>::DICED& diced0=s0.diced(i);
                     const typename BASIS_STENCIL_UNIFORM<TV,d1>::DICED& diced1=s1.diced(j);
-                    OVERLAP_POLYNOMIAL op={diced0.index_offset,diced1.index_offset,overlap};
+                    OVERLAP_POLYNOMIAL op;
+                    op.flat_index_offset=cdi->Flatten_Diff(diced0.index_offset);
+                    op.flat_index_diff=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset));
+                    op.subcell=overlap;
                     op.polynomial=diced0.polynomial*diced1.polynomial;
-                    op.flat_diff_index=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(op.index_offset1-op.index_offset0));
                     overlap_polynomials.Append(op);}}
     }
 
-    inline void Add_Entry(const TV_INT& index,int flat_diff_index,int inside,T value)
-    {helper->data[inside](cdi->Flatten(index),flat_diff_index)+=value*scale(inside);}
-    inline void Add_Open_Entry(const TV_INT& cell,int inside,OPEN_ENTRY& oe)
-    {Add_Entry(oe.index0+cell,oe.flat_diff_index,inside,oe.x);}
+    inline void Add_Entry(int flat_index,int flat_index_diff,int inside,T value)
+    {helper->data[inside](flat_index,flat_index_diff)+=value*scale(inside);}
+    inline void Add_Open_Entry(int flat_index,int inside,OPEN_ENTRY& oe)
+    {Add_Entry(flat_index+oe.flat_index_offset,oe.flat_index_diff,inside,oe.x);}
 
-    void Add_Open_Entries(const TV_INT& cell,int inside)
-    {for(int j=0;j<open_entries.m;j++) Add_Open_Entry(cell,inside,open_entries(j));}
+    void Add_Open_Entries(int flat_index,int inside)
+    {for(int j=0;j<open_entries.m;j++) Add_Open_Entry(flat_index,inside,open_entries(j));}
 
-    void Add_Open_Subcell_Entries(const TV_INT& cell,int block,int inside)
-    {for(int j=0;j<open_subcell_entries[block].m;j++) Add_Open_Entry(cell,inside,open_subcell_entries[block](j));}
+    void Add_Open_Subcell_Entries(int flat_index,int block,int inside)
+    {for(int j=0;j<open_subcell_entries[block].m;j++) Add_Open_Entry(flat_index,inside,open_subcell_entries[block](j));}
 };
 }
 #endif

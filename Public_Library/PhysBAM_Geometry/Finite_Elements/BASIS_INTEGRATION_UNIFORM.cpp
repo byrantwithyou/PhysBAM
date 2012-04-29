@@ -128,7 +128,7 @@ Compute_Open_Entries()
                 if(op.subcell&(1<<b)){
                     T integral=Precomputed_Integral(uncut_subcell[b],op.polynomial);
                     if(fabs(integral)<tol) continue;
-                    OPEN_ENTRY me={op.index_offset0,op.index_offset1,integral,op.flat_diff_index};
+                    OPEN_ENTRY me={op.flat_index_offset,op.flat_index_diff,integral};
                     vb->open_subcell_entries[b].Append(me);}}
 
         for(int b=0;b<(1<<TV::m);b++){
@@ -145,7 +145,7 @@ Add_Uncut_Coarse_Cell(const TV_INT& coarse_cell,int inside)
     for(RANGE_ITERATOR<TV::m> it2(coarse_range);it2.Valid();it2.Next()){
         TV_INT cell=coarse_cell*coarse_factor+it2.index;
         for(int i=0;i<volume_blocks.m;i++)
-            volume_blocks(i)->Add_Open_Entries(cell,inside);}
+            volume_blocks(i)->Add_Open_Entries(cdi.Flatten(cell),inside);}
 }
 //#####################################################################
 // Function Add_Uncut_Fine_Cell
@@ -154,7 +154,7 @@ template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM<TV,static_de
 Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int inside)
 {
     for(int i=0;i<volume_blocks.m;i++)
-        volume_blocks(i)->Add_Open_Subcell_Entries(cell,block,inside);
+        volume_blocks(i)->Add_Open_Subcell_Entries(cdi.Flatten(cell),block,inside);
 }
 //#####################################################################
 // Function Cut_Elements
@@ -296,9 +296,9 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             typename VOLUME_BLOCK::OVERLAP_POLYNOMIAL& op=vb->overlap_polynomials(j);
             if(op.subcell&(1<<block)){
                 T integral=Precomputed_Integral(precomputed_integrals,op.polynomial);
-                TV_INT index0=op.index_offset0+cell;
-                vb->Add_Entry(index0,op.flat_diff_index,enclose_inside,integral);
-                vb->Add_Entry(index0,op.flat_diff_index,!enclose_inside,-integral);}}}
+                int flat_index=cdi.Flatten(cell)+op.flat_index_offset;
+                vb->Add_Entry(flat_index,op.flat_index_diff,enclose_inside,integral);
+                vb->Add_Entry(flat_index,op.flat_index_diff,!enclose_inside,-integral);}}}
 
     STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals[subcell_elements];
     bool has_element[subcell_elements]={};
@@ -323,8 +323,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 for(int k=0;k<subcell_elements;k++)
                     if(has_element[k]){
                         T integral=Precomputed_Integral(precomputed_interface_integrals[k],op.polynomial)*sign1;
-                        ib->Add_Entry(element_base+k,op.flat_diff_index(subcell_cell),enclose_inside,integral);
-                        ib->Add_Entry(element_base+k,op.flat_diff_index(subcell_cell),!enclose_inside,sign2*integral);}}}
+                        ib->Add_Entry(element_base+k,op.flat_index_diff(subcell_cell),enclose_inside,integral);
+                        ib->Add_Entry(element_base+k,op.flat_index_diff(subcell_cell),!enclose_inside,sign2*integral);}}}
 }
 template class BASIS_INTEGRATION_UNIFORM<VECTOR<float,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>;

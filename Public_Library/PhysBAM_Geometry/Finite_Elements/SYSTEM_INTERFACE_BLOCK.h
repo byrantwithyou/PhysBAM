@@ -26,10 +26,10 @@ public:
 
     struct OVERLAP_POLYNOMIAL
     {
-        TV_INT index_offset;
+        int flat_index_offset;
+        ARRAY<int,TV_INT> flat_index_diff;
         int subcell; // flags indicating fine cells
         STATIC_POLYNOMIAL<T,TV::m,static_degree> polynomial;
-        ARRAY<int,TV_INT> flat_diff_index;
     };
 
     T scale;
@@ -48,16 +48,16 @@ public:
         for(int i=0;i<overlap_polynomials.m;i++){
             OVERLAP_POLYNOMIAL& op=overlap_polynomials(i);
             const typename BASIS_STENCIL_UNIFORM<TV,d>::DICED& diced=s.diced(i);
-            op.index_offset=diced.index_offset;
-            op.subcell=diced.subcell;
-            op.polynomial=diced.polynomial;
-            op.flat_diff_index.Resize(cdi->coarse_range);
+            op.flat_index_offset=cdi->Flatten_Diff(diced.index_offset);
+            op.flat_index_diff.Resize(cdi->coarse_range);
             for(RANGE_ITERATOR<TV::m> it(cdi->coarse_range);it.Valid();it.Next())
-                op.flat_diff_index(it.index)=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(it.index+op.index_offset));}
+                op.flat_index_diff(it.index)=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(it.index)+op.flat_index_offset);
+            op.subcell=diced.subcell;
+            op.polynomial=diced.polynomial;}
     }
 
-    inline void Add_Entry(int interface_element,int flat_diff_index,int inside,T value)
-    {helper->data[inside](interface_element,flat_diff_index)+=value*scale;}
+    inline void Add_Entry(int interface_element,int flat_index_diff,int inside,T value)
+    {helper->data[inside](interface_element,flat_index_diff)+=value*scale;}
 };
 }
 #endif
