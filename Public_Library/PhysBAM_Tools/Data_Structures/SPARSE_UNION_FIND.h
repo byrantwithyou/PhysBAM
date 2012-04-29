@@ -89,7 +89,7 @@ private:
     {ID k,j=i;while(parents.Get(j,k)) j=k;return j;}
 
     void Path_Compress(const ID i,const ID root) const
-    {ID j=i;while(j>=0 && j!=root){ID &ref_parent=parents.Get_Or_Insert(j),parent=ref_parent;ref_parent=root;j=parent;}}
+    {ID j=i;while(ID *k=parents.Get_Pointer(j)){j=*k;*k=root;}if(j!=root) parents.Set(j,root);}
 
 //#####################################################################
 };
