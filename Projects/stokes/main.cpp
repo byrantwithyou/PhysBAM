@@ -129,7 +129,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM<TV>& iss,ANALYTIC_TEST<TV>& at)
 }
 
 template<class T,class TV>
-void Dump_Vector(const INTERFACE_STOKES_SYSTEM<TV>& iss,const INTERFACE_STOKES_SYSTEM<TV>& v,const char* title)
+void Dump_Vector(const INTERFACE_STOKES_SYSTEM<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const char* title)
 {
     char buff[100];
     for(int i=0;i<TV::m;i++)
@@ -138,51 +138,50 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM<TV>& iss,const INTERFACE_STOKES_S
             sprintf(buff,"%s %c %c",title,"uvw"[i],s?'-':'+');
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next())
                 if(it.Axis()==i){ 
-                    int index=iss.index_map_u[i]->Get_Index_Fixed(it.index,s);
-                    if(index>=0){
-                        if(iss.index_map_u[i]->Get_Index_Fixed(it.index,1-s)>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
+                    int k=iss.cm_u(i)->Get_Index(it.index,s);
+                    if(k>=0){
+                        if(iss.cm_u(i)->Get_Index(it.index,1-s)>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                         else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
-                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v(index));}}
+                        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(i)*v.u(i)[s](k));}}
             Flush_Frame<T,TV>(buff);}
 
     for(int s=0;s<2;s++){
         Dump_Interface<T,TV>(iss,false);
         sprintf(buff,"%s p %c",title,s?'-':'+');
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
-            int index=iss.index_map_p->Get_Index_Fixed(it.index,s);
-            if(index>=0)
+            int k=iss.cm_p->Get_Index(it.index,s);
+            if(k>=0)
                 for(int j=0;j<TV::m;j++)
                     for(int sign=0;sign<2;sign++){
-                if(iss.index_map_p->Get_Index_Fixed(it.index,1-s)>=0)
+                if(iss.cm_p->Get_Index(it.index,1-s)>=0)
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                 else
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v(index)*(sign?1:-1));}}
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v.p[s](k)*(sign?1:-1));}}
         Flush_Frame<T,TV>(buff);}
 }
 
 template<class T,class TV>
-void Dump_Vector2(const INTERFACE_STOKES_SYSTEM<TV>& iss,const INTERFACE_STOKES_SYSTEM<TV>& v,const char* title)
+void Dump_Vector2(const INTERFACE_STOKES_SYSTEM<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const char* title)
 {
     char buff[100];
     for(int s=0;s<2;s++){
         ARRAY<T,FACE_INDEX<TV::m> > u(iss.grid);
         sprintf(buff,"%s %c",title,s?'-':'+');
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
-            int index=iss.index_map_u[it.Axis()]->Get_Index_Fixed(it.index,s);
-            if(index>=0) u(it.Full_Index())=v(index);}
+            int i=it.Axis();
+            int k=iss.cm_u(i)->Get_Index(it.index,s);
+            if(k>=0) u(it.Full_Index())=v.u(i)[s](k);}
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
-            int index=iss.index_map_p->Get_Index_Fixed(it.index,s);
-            if(index>=0){
-                Add_Debug_Particle(it.Location(),v(index)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v(index));}}
+            int k=iss.cm_p->Get_Index(it.index,s);
+            if(k>=0){
+                Add_Debug_Particle(it.Location(),v.p[s](k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v.p[s](k));}}
         for(int i=0;i<iss.object.mesh.elements.m;i++){
             Add_Debug_Particle(iss.object.Get_Element(i).Center(),VECTOR<T,3>(1,1,1));
             TV V;
-            for(int j=0;j<TV::m;j++)
-                V(j)=v(iss.index_range_q[j].min_corner+i);
+            for(int j=0;j<TV::m;j++) V(j)=v.q(j)(i);
             Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,V);}
-
         Dump_Frame(u,buff);}
 }
 
@@ -267,7 +266,6 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
 
     INTERFACE_STOKES_SYSTEM_VECTOR<TV> rhs,sol;
-    iss.Resize_Vector(sol);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
@@ -281,38 +279,20 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
             f_body[s](it.index)=at.body(it.Location(),s);
 
     iss.Set_RHS(rhs,f_body,f_interface);
+    iss.Resize_Vector(sol);
 
-    // Dump_System<T,TV>(iss,at);
+    // CONJUGATE_RESIDUAL<T> cr;
+    // KRYLOV_SOLVER<T>* solver=&cr;
 
-    CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
-
-    // MINRES<T> mr;
-    // KRYLOV_SOLVER<T>* solver=&mr;
+    MINRES<T> mr;
+    KRYLOV_SOLVER<T>* solver=&mr;
 
     solver->print_residuals=true;
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,1000000);
     
-    /*if(iss.Nullspace_Check(rhs)){
-        OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
-        iss.Multiply(rhs,*vectors(0));
-        LOG::cout<<"nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
-        rhs.v/=rhs.v.Max_Abs();
-        Dump_Vector2(iss,rhs.v,"extra null mode");}*/
-
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
-
-    // Dump_Vector<T,TV>(iss,sol,"solution");
-
-    OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
-    // OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);
-    // OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
-    // OCTAVE_OUTPUT<T>("r.txt").Write("r",kr_r);
-    // OCTAVE_OUTPUT<T>("null_p.txt").Write("null_p",iss.null_p);
-    // OCTAVE_OUTPUT<T>("null_u.txt").Write("null_u",iss.null_u[0]);
-    // OCTAVE_OUTPUT<T>("null_v.txt").Write("null_v",iss.null_u[1]);
 
     iss.Get_U_Part(sol,numer_u);
     iss.Get_P_Part(sol,numer_p);
@@ -358,10 +338,20 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
         error_p_l2+=sqr(d);}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
-    // Dump_u_p(iss,error_u,error_p,"error");
-    // Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
-
     LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
+
+    Dump_System<T,TV>(iss,at);
+    Dump_Vector<T,TV>(iss,sol,"solution");
+    Dump_u_p(iss,error_u,error_p,"error");
+    Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
+    if(iss.Nullspace_Check(rhs)){
+        OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
+        iss.Multiply(rhs,*vectors(0));
+        LOG::cout<<"nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+        rhs*=1/rhs.Max_Abs();
+        Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}
+
+    OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
 }
 
 //#################################################################################################################################################

@@ -294,20 +294,20 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
 
     // Dump_System<T,TV>(ifs,at);
 
-    CONJUGATE_RESIDUAL<T> cr;
-    KRYLOV_SOLVER<T>* solver=&cr;
+    // CONJUGATE_RESIDUAL<T> cr;
+    // KRYLOV_SOLVER<T>* solver=&cr;
 
-    // MINRES<T> mr;
-    // KRYLOV_SOLVER<T>* solver=&mr;
+    MINRES<T> mr;
+    KRYLOV_SOLVER<T>* solver=&mr;
 
     solver->print_residuals=true;
     solver->Solve(ifs,sol,rhs,vectors,1e-10,0,1000000);
-    // if(ifs.Nullspace_Check(rhs)){
-        // OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
-        // ifs.Multiply(rhs,*vectors(0));
-        // LOG::cout<<"nullspace found: "<<sqrt(ifs.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
-        // rhs.v/=rhs.v.Max_Abs();
-        // Dump_Vector2(ifs,rhs.v,"extra null mode");}
+    if(ifs.Nullspace_Check(rhs)){
+        OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
+        ifs.Multiply(rhs,*vectors(0));
+        LOG::cout<<"nullspace found: "<<sqrt(ifs.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+        rhs.v/=rhs.v.Max_Abs();
+        Dump_Vector2(ifs,rhs.v,"extra null mode");}
 
     ifs.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
