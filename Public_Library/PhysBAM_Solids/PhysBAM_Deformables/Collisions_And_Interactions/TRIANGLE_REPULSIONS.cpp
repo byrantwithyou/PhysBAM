@@ -622,10 +622,11 @@ template<class TV> void PRECOMPUTE_PROJECT<TV>::
 Precompute(const INDIRECT_ARRAY<ARRAY_VIEW<T>,VECTOR<int,TV::m+1>&> one_over_mass,const VECTOR<T,TV::m+1>& weights_input,const TV& normal_input)
 {
     // TODO: handle bindings
-    weights=weights_input;normal=normal_input;
+    weights=weights_input;
+    normal=normal_input;
     T tau=one_over_mass.Weighted_Sum(sqr(weights));
     for(int i=0;i<TV::m+1;i++)
-        v_scaled_normals(i)=tau*weights(i)*one_over_mass(i)*normal;
+        v_scaled_normals(i)=-weights(i)/tau*one_over_mass(i)*normal;
     nodes=one_over_mass.indices;
 }
 //####################################################################te
