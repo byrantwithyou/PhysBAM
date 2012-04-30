@@ -186,10 +186,13 @@ Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f
 {
     VECTOR<VECTOR_ND<T>,TV::m> F_interface;
     VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
+    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> U;
     
     for(int i=0;i<TV::m;i++){
         F_interface(i).Resize(object.mesh.elements.m);
-        for(int s=0;s<2;s++) F_body(i)[s].Resize(cm_p->dofs[s]);}
+        for(int s=0;s<2;s++){
+            F_body(i)[s].Resize(cm_p->dofs[s]);
+            U(i)[s].Resize(cm_u(i)->dofs[s]);}}
 
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<object.mesh.elements.m;k++)
@@ -201,12 +204,20 @@ Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f
                 for(int i=0;i<TV::m;i++)
                     F_body(i)[s](k)=f_body[s](it.index)(i);}
 
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        FACE_INDEX<TV::m> face(it.Full_Index()); 
+        for(int s=0;s<2;s++){
+            int k=cm_u(face.axis)->Get_Index(it.index,s);
+            if(k>=0) U(face.axis)[s](k)=u[s](face);}}
+
     Resize_Vector(rhs); // assumes rhs was 0
 
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++){
-            matrix_f_qu(i)[s].Transpose_Times(F_interface(i),rhs.u(i)[s]);
-            matrix_f_pu(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);}
+            matrix_f_qu(i)[s].Transpose_Times_Add(F_interface(i),rhs.u(i)[s]);
+            matrix_f_pu(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);
+            matrix_qu(i)[s].Times_Add(U(i)[s],rhs.q(i));
+            matrix_pu(i)[s].Times_Add(U(i)[s],rhs.p[s]);}
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner
