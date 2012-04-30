@@ -144,10 +144,10 @@ Set_Matrix(const VECTOR<T,2>& mu)
         helper_qu(i).Build_Matrix(matrix_qu(i));
     // RHS PU Block 
     for(int i=0;i<TV::m;i++)
-        helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
+        helper_rhs_pu(i).Build_Matrix(matrix_f_pu(i));
     // RHS QU Block 
     for(int i=0;i<TV::m;i++)
-        helper_rhs_qu(i).Build_Matrix(matrix_rhs_qu(i));
+        helper_rhs_qu(i).Build_Matrix(matrix_f_qu(i));
 
     // FILL IN THE NULL MODES
 
@@ -182,7 +182,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
-Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface)
+Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u)
 {
     VECTOR<VECTOR_ND<T>,TV::m> F_interface;
     VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
@@ -205,8 +205,8 @@ Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f
 
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++){
-            matrix_rhs_qu(i)[s].Transpose_Times(F_interface(i),rhs.u(i)[s]);
-            matrix_rhs_pu(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);}
+            matrix_f_qu(i)[s].Transpose_Times(F_interface(i),rhs.u(i)[s]);
+            matrix_f_pu(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);}
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner

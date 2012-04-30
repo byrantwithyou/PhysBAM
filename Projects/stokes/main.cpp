@@ -232,11 +232,13 @@ struct ANALYTIC_TEST
     VECTOR<T,2> mu;
 
     virtual void Initialize()=0;
-    virtual TV u(const TV& X)=0;
+    virtual TV u(const TV& X,bool inside)=0;
     virtual T p(const TV& X)=0;
     virtual T phi(const TV& X)=0;
     virtual TV body(const TV& X,bool inside)=0;
     virtual TV interface(const TV& X)=0;
+
+    TV u(const TV& X){return u(X,phi(X)<0);}
 };
 
 template<class TV>
@@ -260,38 +262,44 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,in
     printf("q [%i] ",iss.object.mesh.elements.m);
     printf("\n");
 
-    VECTOR<ARRAY<TV,TV_INT>,2> f_body;
-    ARRAY<TV> f_interface;
-    f_interface.Resize(iss.object.mesh.elements.m);
-    for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
-
     INTERFACE_STOKES_SYSTEM_VECTOR<TV> rhs,sol;
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-
-    ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
-    ARRAY<T,TV_INT> exact_p,numer_p,error_p;
-
-    for(int i=0; i<iss.object.mesh.elements.m;i++)
-        f_interface(i)=at.interface(iss.object.Get_Element(i).Center());
-
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+    {
+        VECTOR<ARRAY<TV,TV_INT>,2> f_body;
+        ARRAY<TV> f_interface;
+        VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2> u;
+        
+        f_interface.Resize(iss.object.mesh.elements.m);
+        for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
+        for(int s=0;s<2;s++) u[s].Resize(grid);
+        
+        for(int i=0; i<iss.object.mesh.elements.m;i++)
+            f_interface(i)=at.interface(iss.object.Get_Element(i).Center());
+        
         for(int s=0;s<2;s++)
-            f_body[s](it.index)=at.body(it.Location(),s);
-
-    iss.Set_RHS(rhs,f_body,f_interface);
-    iss.Resize_Vector(sol);
-
-    // CONJUGATE_RESIDUAL<T> cr;
-    // KRYLOV_SOLVER<T>* solver=&cr;
+            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+                f_body[s](it.index)=at.body(it.Location(),s);
+        
+        for(int s=0;s<2;s++)
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+                FACE_INDEX<TV::m> face(it.Full_Index()); 
+                u[s](face)=at.u(it.Location(),s)(face.axis);}
+        
+        iss.Set_RHS(rhs,f_body,f_interface,u);
+        iss.Resize_Vector(sol);
+    }
 
     MINRES<T> mr;
     KRYLOV_SOLVER<T>* solver=&mr;
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,max_iter);
     
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
+
+    ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
+    ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
     iss.Get_U_Part(sol,numer_u);
     iss.Get_P_Part(sol,numer_p);
@@ -379,8 +387,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual TV u(const TV& X,bool inside)
+                {return TV::Axis_Vector(1)*(inside?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV();}
@@ -394,8 +402,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*((phi(X)<0)?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual TV u(const TV& X,bool inside)
+                {return TV::Axis_Vector(1)*(inside?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV();}
@@ -409,8 +417,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*(phi(X)<0)*(sqr(0.25*m)-sqr(X.x-0.5*m))/(m*s);}
+                virtual TV u(const TV& X,bool inside)
+                {return TV::Axis_Vector(1)*inside*(sqr(0.25*m)-sqr(X.x-0.5*m))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*(inside*2*mu(1)/(m*s));}
@@ -424,8 +432,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {T x=abs(X.x-(T)0.5*m)-(T)0.25*m;return -TV::Axis_Vector(1)*x*(0.5*m-abs(x))/(m*s);}
+                virtual TV u(const TV& X,bool inside)
+                {return TV::Axis_Vector(1)*(inside?(sqr(0.25*m)-sqr(X.x-0.5*m)):((X.x>0.5*m)?(sqr(0.25*m)-sqr(X.x-m)):(sqr(0.25*m)-sqr(X.x))))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*(inside?mu(1):-mu(0))*2/(m*s);}
@@ -437,7 +445,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         case 4:{ // Circular flow: linear growth for r<R1, 0 for r>R2, blend for R1<r<R2, no pressure
             struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
             {
-                T ra,rb,ra2,rb2,rb2mra2,r_avg;
+                T ra,rb,ra2,rb2,rb2mra2,r_avg,r_avg2;
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
@@ -447,18 +455,21 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     rb2=sqr(rb);
                     rb2mra2=rb2-ra2;
                     r_avg=(ra+rb)/2;
+                    r_avg2=sqr(r_avg);
                 }
-                virtual TV u(const TV& X)
+                virtual TV u(const TV& X,bool inside)
                 {
                     T x=X.x-0.5*m;
                     T y=X.y-0.5*m;
                     T r2=VECTOR<T,2>(x,y).Magnitude_Squared();
                     TV velocity;
-                    if(r2<rb2){
+                    if(inside){
+                        velocity.x=-y/s;
+                        velocity.y=x/s;
+                        velocity*=(rb2-r2)/(rb2mra2);}
+                    else if(r2<r_avg2){
                         velocity.x=-y/s;
                         velocity.y=x/s;}
-                    if(r2>ra2)
-                        velocity*=(rb2-r2)/(rb2mra2);
                     return velocity;
                 }
                 virtual T p(const TV& X){return T();}
@@ -496,8 +507,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual TV u(const TV& X,bool inside)
+                {return TV::Axis_Vector(1)*(inside?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return (phi(X)<0)*sin(2*M_PI*X.y/m)*kg/(sqr(s)*(d==3?m:1));}
                 virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*2*M_PI*cos(2*M_PI*X.y/m)*kg/(sqr(s)*(d==3?sqr(m):m))*inside;}
@@ -511,8 +522,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
-                virtual TV u(const TV& X)
-                {return TV::Axis_Vector(1)*((phi(X)<0)?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual TV u(const TV& X,bool inside)
+                {return TV::Axis_Vector(1)*(inside?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return (phi(X)<0)*(X.x-0.5*m)*kg/(sqr(s)*(d==3?sqr(m):m));}
                 virtual T phi(const TV& X){return -m/(T)6+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(0)*kg/(sqr(s)*(d==3?sqr(m):m))*inside;}
@@ -525,37 +536,13 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
             {
                 virtual void Initialize(){}
-                virtual TV u(const TV& X){return TV();}
+                virtual TV u(const TV& X,bool inside){return TV();}
                 virtual T p(const TV& X){return 0;}
                 virtual T phi(const TV& X){return (-1);}
                 virtual TV body(const TV& X,bool inside){return TV();}
                 virtual TV interface(const TV& X){return TV();}
             };
             test=new ANALYTIC_TEST_7;
-            break;}
-        case 8:{ // Circle level set
-            struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
-            {
-                virtual void Initialize(){}
-                virtual TV u(const TV& X){return TV();}
-                virtual T p(const TV& X){return 0;}
-                virtual T phi(const TV& X){return (X-0.5).Magnitude()-0.26;}
-                virtual TV body(const TV& X,bool inside){return TV();}
-                virtual TV interface(const TV& X){return TV();}
-            };
-            test=new ANALYTIC_TEST_8;
-            break;}
-        case 9:{ // Square level set
-            struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
-            {
-                virtual void Initialize(){}
-                virtual TV u(const TV& X){return TV();}
-                virtual T p(const TV& X){return 0;}
-                virtual T phi(const TV& X){return (X-0.5).Max_Abs()-0.25125;}
-                virtual TV body(const TV& X,bool inside){return TV();}
-                virtual TV interface(const TV& X){return TV();}
-            };
-            test=new ANALYTIC_TEST_9;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
