@@ -150,14 +150,9 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM<TV>& iss,const INTERFACE_STOKES_S
         sprintf(buff,"%s p %c",title,s?'-':'+');
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
             int k=iss.cm_p->Get_Index(it.index,s);
-            if(k>=0)
-                for(int j=0;j<TV::m;j++)
-                    for(int sign=0;sign<2;sign++){
-                if(iss.cm_p->Get_Index(it.index,1-s)>=0)
-                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
-                else
-                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*v.p[s](k)*(sign?1:-1));}}
+            if(k>=0){
+                Add_Debug_Particle(it.Location(),v.p[s](k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v.p[s](k));}}
         Flush_Frame<T,TV>(buff);}
 }
 
@@ -201,10 +196,8 @@ void Dump_u_p(const INTERFACE_STOKES_SYSTEM<TV>& iss,const ARRAY<T,FACE_INDEX<TV
     Dump_Interface<T,TV>(iss,false);
     sprintf(buff,"%s p",title);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
-        for(int j=0;j<TV::m;j++)
-            for(int sign=0;sign<2;sign++){
-                Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.25,0.25,0.25));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(j)*p(it.index)*(sign?1:-1));}}
+        Add_Debug_Particle(it.Location(),p(it.index)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p(it.index));}
     Flush_Frame<T,TV>(buff);
 }
 
@@ -301,8 +294,20 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,in
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
-    iss.Get_U_Part(sol,numer_u);
-    iss.Get_P_Part(sol,numer_p);
+    numer_u.Resize(iss.grid);
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        int i=it.Axis();
+        int s=at.phi(it.Location())<0;
+        int k=iss.cm_u(it.Axis())->Get_Index(it.index,s);
+        assert(k>=0);
+        numer_u(it.Full_Index())=sol.u(i)[s](k);}
+
+    numer_p.Resize(iss.grid.Domain_Indices());
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        int s=at.phi(it.Location())<0;
+        int k=iss.cm_p->Get_Index(it.index,s);
+        assert(k>=0);
+        numer_p(it.index)=sol.p[s](k);}
 
     exact_u.Resize(grid);
     error_u.Resize(grid);
@@ -322,9 +327,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,in
     TV error_u_linf,error_u_l2;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index()); 
-        T d=error_u(face)-avg_u(face.axis);
-        error_u_linf(face.axis)=max(error_u_linf(face.axis),abs(d));
-        error_u_l2(face.axis)+=sqr(d);}
+        error_u(face)-=avg_u(face.axis);
+        error_u_linf(face.axis)=max(error_u_linf(face.axis),abs(error_u(face)));
+        error_u_l2(face.axis)+=sqr(error_u(face));}
     error_u_l2=sqrt(error_u_l2/(TV)cnt_u);
 
     LOG::cout<<iss.grid.counts<<" U error:   linf="<<error_u_linf<<"   l2="<<error_u_l2<<std::endl;
@@ -340,9 +345,9 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,in
 
     T error_p_linf=0,error_p_l2=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        T d=error_p(it.index)-avg_p;
-        error_p_linf=max(error_p_linf,abs(d));
-        error_p_l2+=sqr(d);}
+        error_p(it.index)-=avg_p;
+        error_p_linf=max(error_p_linf,abs(error_p(it.index)));
+        error_p_l2+=sqr(error_p(it.index));}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
     LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
@@ -543,6 +548,83 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV interface(const TV& X){return TV();}
             };
             test=new ANALYTIC_TEST_7;
+            break;}
+        case 8:{ // Linear divergence field for r<R, 0 for r>R
+            struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){r=m/3.0;}
+                virtual TV u(const TV& X,bool inside){return (X-0.5*m)*inside;}
+                virtual T p(const TV& X){return 0;}
+                virtual T phi(const TV& X){return (X-0.5*m).Magnitude()-r;}
+                virtual TV body(const TV& X,bool inside){return TV();}
+                virtual TV interface(const TV& X){return -(X-0.5*m).Normalized()*2*mu(1);}
+            };
+            test=new ANALYTIC_TEST_8;
+            break;}
+        case 9:{ // Linear divergence field for r<R + quadratic pressure, 0 for r>R
+            struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){r=m/3.0;}
+                virtual TV u(const TV& X,bool inside){return (X-0.5*m)*inside;}
+                virtual T p(const TV& X){return (phi(X)<0)*(X-0.5*m).Magnitude_Squared();}
+                virtual T phi(const TV& X){return (X-0.5*m).Magnitude()-r;}
+                virtual TV body(const TV& X,bool inside){return (X-0.5*m)*2*inside;}
+                virtual TV interface(const TV& X){return (X-0.5*m).Normalized()*((X-0.5*m).Magnitude_Squared()-2*mu(1));}
+            };
+            test=new ANALYTIC_TEST_9;
+            break;}
+        case 10:{
+            struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
+            {
+                T r,m2,m4,u_term,p_term;
+                using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){r=m/3.0;m2=sqr(m);m4=sqr(m2);u_term=0;p_term=1;}
+                virtual TV u(const TV& X,bool inside){TV x=X-0.5*m; return x*u_term*exp(-x.Magnitude_Squared()/m2)*inside;}
+                virtual T p(const TV& X){return (phi(X)<0)*p_term*sin((X-0.5*m).Magnitude_Squared()/m2);}
+                virtual T phi(const TV& X){return (X-0.5*m).Magnitude()-r;}
+                virtual TV body(const TV& X,bool inside)
+                {
+                    TV x=X-0.5*m;
+                    T x2=x.Magnitude_Squared();
+                    T x2m2=x2/m2;
+                    return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((2*TV::m+4)*m2-4*x2)*exp(-x2m2)/m4)*inside;
+                }
+                virtual TV interface(const TV& X)
+                {
+                    TV x=X-0.5*m;
+                    T x2m2=x.Magnitude_Squared()/m2;
+                    return (p_term*sin(x2m2)+u_term*2*mu(1)*exp(-x2m2)*(2*x2m2-1))*x.Normalized();  
+                }
+            };
+            test=new ANALYTIC_TEST_10;
+            break;}
+        case 11:{
+            struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){r=1.0/3.0;}
+                virtual TV u(const TV& X,bool inside){TV x=X-0.5; return x*exp(x.Magnitude_Squared())*inside;}
+                virtual T p(const TV& X){return 0;}
+                virtual T phi(const TV& X){return (X-0.5).Magnitude()-r;}
+                virtual TV body(const TV& X,bool inside)
+                {
+                    TV x=X-0.5;
+                    T x2=x.Magnitude_Squared();
+                    return x*(-1)*4*(2+x2)*exp(x2)*inside;
+                }
+                virtual TV interface(const TV& X)
+                {
+                    TV x=X-0.5;
+                    T x2=x.Magnitude_Squared();
+                    return x.Normalized()*(-1)*2*exp(x2)*(2*x2+1);  
+                }
+            };
+            test=new ANALYTIC_TEST_11;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

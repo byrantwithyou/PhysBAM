@@ -90,8 +90,6 @@ public:
     void Set_Matrix(const VECTOR<T,2>& mu);
     void Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
-    void Get_U_Part(const VECTOR_T& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const;
-    void Get_P_Part(const VECTOR_T& x,ARRAY<T,TV_INT>& p) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;

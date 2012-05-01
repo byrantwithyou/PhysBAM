@@ -261,33 +261,6 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
     debug_cast<VECTOR_T&>(x).Resize(null_p);
 }
 //#####################################################################
-// Function Get_U_Part
-//#####################################################################
-template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
-Get_U_Part(const VECTOR_T& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
-{
-    u.Resize(grid);
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        int i=it.Axis();
-        int s=phi->Phi(it.Location())<0;
-        int k=cm_u(it.Axis())->Get_Index(it.index,s);
-        assert(k>=0);
-        u(it.Full_Index())=x.u(i)[s](k);}
-}
-//#####################################################################
-// Function Get_P_Part
-//#####################################################################
-template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
-Get_P_Part(const VECTOR_T& x,ARRAY<T,TV_INT>& p) const
-{
-    p.Resize(grid.Domain_Indices());
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int s=phi->Phi(it.Location())<0;
-        int k=cm_p->Get_Index(it.index,s);
-        assert(k>=0);
-        p(it.index)=x.p[s](k);}
-}
-//#####################################################################
 // Function Multiply
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
