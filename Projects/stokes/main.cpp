@@ -582,7 +582,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 T r,m2,m4,u_term,p_term;
                 using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){r=m/3.0;m2=sqr(m);m4=sqr(m2);u_term=0;p_term=1;}
+                virtual void Initialize(){r=m/3.0;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
                 virtual TV u(const TV& X,bool inside){TV x=X-0.5*m; return x*u_term*exp(-x.Magnitude_Squared()/m2)*inside;}
                 virtual T p(const TV& X){return (phi(X)<0)*p_term*sin((X-0.5*m).Magnitude_Squared()/m2);}
                 virtual T phi(const TV& X){return (X-0.5*m).Magnitude()-r;}
@@ -591,7 +591,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     TV x=X-0.5*m;
                     T x2=x.Magnitude_Squared();
                     T x2m2=x2/m2;
-                    return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((2*TV::m+4)*m2-4*x2)*exp(-x2m2)/m4)*inside;
+                    return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((TV::m+2)*m2-2*x2)*4*exp(-x2m2)/m4)*inside;
                 }
                 virtual TV interface(const TV& X)
                 {
@@ -615,7 +615,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     TV x=X-0.5;
                     T x2=x.Magnitude_Squared();
-                    return x*(-1)*4*(2+x2)*exp(x2)*inside;
+                    return x*(-1)*4*(2+x2)*exp(x2)*2*inside;
                 }
                 virtual TV interface(const TV& X)
                 {
