@@ -43,6 +43,7 @@ public:
     T Max_Abs() const;
     void Normalize();
     void Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& c);
+    void Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& c);
 };
 }
 #endif

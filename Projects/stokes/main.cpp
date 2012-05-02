@@ -91,7 +91,9 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM<TV>& iss,ANALYTIC_TEST<TV>& at)
                 if(it.Axis()==i){
                     int index=iss.cm_u(i)->Get_Index(it.index,s);
                     if(index>=0){
-                        if(iss.cm_u(i)->Get_Index(it.index,1-s)>=0)
+                        if(iss.active_dofs.u(i)[s](index)==0)
+                            Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                        else if(iss.cm_u(i)->Get_Index(it.index,1-s)>=0)
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                         else
                             Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));
@@ -103,8 +105,11 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM<TV>& iss,ANALYTIC_TEST<TV>& at)
         Dump_Interface<T,TV>(iss,false);
         sprintf(buff,"dofs p %c",s?'-':'+');
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
-            if(iss.cm_p->Get_Index(it.index,s)>=0){
-                if(iss.cm_p->Get_Index(it.index,1-s)>=0)
+            int index=iss.cm_p->Get_Index(it.index,s);
+            if(index>=0){
+                if(iss.active_dofs.p[s](index)==0)
+                    Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                else if(iss.cm_p->Get_Index(it.index,1-s)>=0)
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));
                 else
                     Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0.5,0));}}
@@ -601,30 +606,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 }
             };
             test=new ANALYTIC_TEST_10;
-            break;}
-        case 11:{
-            struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
-            {
-                T r;
-                using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){r=1.0/3.0;}
-                virtual TV u(const TV& X,bool inside){TV x=X-0.5; return x*exp(x.Magnitude_Squared())*inside;}
-                virtual T p(const TV& X){return 0;}
-                virtual T phi(const TV& X){return (X-0.5).Magnitude()-r;}
-                virtual TV body(const TV& X,bool inside)
-                {
-                    TV x=X-0.5;
-                    T x2=x.Magnitude_Squared();
-                    return x*(-1)*4*(2+x2)*exp(x2)*2*inside;
-                }
-                virtual TV interface(const TV& X)
-                {
-                    TV x=X-0.5;
-                    T x2=x.Magnitude_Squared();
-                    return x.Normalized()*(-1)*2*exp(x2)*(2*x2+1);  
-                }
-            };
-            test=new ANALYTIC_TEST_11;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

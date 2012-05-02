@@ -151,28 +151,32 @@ Set_Matrix(const VECTOR<T,2>& mu)
 
     // FILL IN THE NULL MODES
 
+    Resize_Vector(active_dofs);
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            null_p.u(i)[s].Resize(cm_u(i)->dofs[s]);
+            active_dofs.u(i)[s].Fill(1);
     for(int s=0;s<2;s++)
-        null_p.p[s].Resize(cm_p->dofs[s]);
+        active_dofs.p[s].Fill(1);
     for(int i=0;i<TV::m;i++)
-        null_p.q(i).Resize(object.mesh.elements.m);
+        active_dofs.q(i).Fill(1);
 
+    if(BASE::use_preconditioner) Set_Jacobi_Preconditioner();
+
+    Resize_Vector(null_p);
     for(int s=0;s<2;s++)
         null_p.p[s].Fill(1);
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<object.mesh.elements.m;j++)
             null_p.q(i)(j)=object.Get_Element(j).Normal()(i);
+    null_p.Scale(active_dofs);
     null_p.Normalize();
 
     for(int i=0;i<TV::m;i++){
         Resize_Vector(null_u(i));
         for(int s=0;s<2;s++) null_u(i).u(i)[s].Fill(1);
+        null_u(i).Scale(active_dofs);
         null_u(i).Normalize();}
     
-    if(BASE::use_preconditioner) Set_Jacobi_Preconditioner();
-
     for(int i=0;i<TV::m;i++){
         delete u_stencil(i);
         for(int j=0;j<TV::m;j++)
@@ -230,7 +234,10 @@ Set_Jacobi_Preconditioner()
         for(int s=0;s<2;s++){
             int u_dofs=cm_u(i)->dofs[s];
             SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)[s];
-            for(int k=0;k<u_dofs;k++) J.u(i)[s](k)=1/abs(m_uu(k,k));}
+            for(int k=0;k<u_dofs;k++){
+                T d=abs(m_uu(k,k));
+                if(d<1e-12) {active_dofs.u(i)[s](k)=0;LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
+                else J.u(i)[s](k)=1/abs(m_uu(k,k));}}
     for(int s=0;s<2;s++){
         for(int k=0;k<cm_p->dofs[s];k++){
             T sum=0;
@@ -240,7 +247,8 @@ Set_Jacobi_Preconditioner()
                 int end=m_pu.offsets(k+1);
                 for(int j=start;j<end;j++)
                     sum+=sqr(m_pu.A(j).a)*J.u(i)[s](m_pu.A(j).j);}
-            J.p[s](k)=1/sum;}}
+            if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
+            else J.p[s](k)=1/sum;}}
     for(int i=0;i<TV::m;i++)
         for(int k=0;k<object.mesh.elements.m;k++){
             T sum=0;
@@ -250,7 +258,8 @@ Set_Jacobi_Preconditioner()
                 int end=m_qu.offsets(k+1);
                 for(int j=start;j<end;j++)
                     sum+=sqr(m_qu.A(j).a)*J.u(i)[s](m_qu.A(j).j);}
-            J.q(i)(k)=1/sum;}
+            if(sum<1e-12) {active_dofs.q(i)(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
+            else J.q(i)(k)=1/sum;}
 }
 //#####################################################################
 // Function Resize_Vector
@@ -258,7 +267,14 @@ Set_Jacobi_Preconditioner()
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
 Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
 {
-    debug_cast<VECTOR_T&>(x).Resize(null_p);
+    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            v.u(i)[s].Resize(cm_u(i)->dofs[s]);
+    for(int s=0;s<2;s++)
+        v.p[s].Resize(cm_p->dofs[s]);
+    for(int i=0;i<TV::m;i++)
+        v.q(i).Resize(object.mesh.elements.m);
 }
 //#####################################################################
 // Function Multiply
@@ -310,6 +326,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     v.Copy(-v.Dot(null_p),null_p,v);
     for(int i=0;i<TV::m;i++)
         v.Copy(-v.Dot(null_u(i)),null_u(i),v);
+    v.Scale(active_dofs);
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

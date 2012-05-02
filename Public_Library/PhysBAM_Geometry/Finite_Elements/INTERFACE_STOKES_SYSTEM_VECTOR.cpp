@@ -256,6 +256,23 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const INTERFACE_STOKES_SYSTEM_
             q(i)(k)=v.q(i)(k)*c.q(i)(k);
 }
 //#####################################################################
+// Function Scale
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR<TV>::
+Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& c)
+{
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            for(int k=0;k<u(i)[s].n;k++)
+                u(i)[s](k)*=c.u(i)[s](k);
+    for(int s=0;s<2;s++)
+        for(int k=0;k<p[s].n;k++)
+            p[s](k)*=c.p[s](k);
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<q(i).n;k++)
+            q(i)(k)*=c.q(i)(k);
+}
+//#####################################################################
 template class INTERFACE_STOKES_SYSTEM_VECTOR<VECTOR<float,1> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR<VECTOR<float,3> >;

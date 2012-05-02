@@ -26,6 +26,7 @@ class INTERFACE_STOKES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef INTERFACE_STOKES_SYSTEM_VECTOR<TV> VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
+    VECTOR_T J; // Jacobi preconditioner 
     void Set_Jacobi_Preconditioner();
 
 public:
@@ -62,8 +63,7 @@ public:
 
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;
-
-    VECTOR_T J; // Jacobi preconditioner 
+    VECTOR_T active_dofs;
 
     const GRID<TV>& grid;
     const GRID<TV>& coarse_grid;
