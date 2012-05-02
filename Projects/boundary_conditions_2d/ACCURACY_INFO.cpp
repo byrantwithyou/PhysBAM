@@ -64,8 +64,8 @@ Print_Locations(const GRID<TV>& grid) const
     LOG::cout<<std::endl;
 }
 
-template class ACCURACY_INFO<1>;
-template class ACCURACY_INFO<2>;
+template struct ACCURACY_INFO<1>;
+template struct ACCURACY_INFO<2>;
 template void ACCURACY_INFO<1>::Print<double>(char const*,ARRAY<double,FACE_INDEX<1> >&) const;
 template void ACCURACY_INFO<1>::Print<double>(char const*,ARRAY<double,VECTOR<int,1> >&) const;
 template void ACCURACY_INFO<1>::Print_Locations<VECTOR<double,1> >(GRID<VECTOR<double,1> > const&) const;

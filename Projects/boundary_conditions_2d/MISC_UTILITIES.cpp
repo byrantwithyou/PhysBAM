@@ -241,7 +241,7 @@ void Dump_Error_Image(const SIM_COMMON<TV>& sim,const ARRAY<typename TV::SCALAR,
     OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("error-image-%i.txt",id).c_str()).Write("EI",color_errors);
 }
 
-template class ERROR_COLOR_MAP<double>;
+template struct ERROR_COLOR_MAP<double>;
 template void Add_Advection<VECTOR<double,1> >(OBJECTS_COMMON<VECTOR<double,1> > const&,PARAMETERS_COMMON<double> const&,ARRAY<double,FACE_INDEX<1> >&,bool);
 template void Add_Advection<VECTOR<double,2> >(OBJECTS_COMMON<VECTOR<double,2> > const&,PARAMETERS_COMMON<double> const&,ARRAY<double,FACE_INDEX<2> >&,bool);
 template void Add_Debug_Particle<VECTOR<double,1> >(VECTOR<double,1> const&,VECTOR<VECTOR<double,1>::SCALAR,3> const&);

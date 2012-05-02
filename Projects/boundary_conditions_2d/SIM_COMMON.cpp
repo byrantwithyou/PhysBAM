@@ -67,5 +67,5 @@ Init_3()
     obj.ai.Print_Locations(obj.grid);
 }
 
-template class SIM_COMMON<VECTOR<double,1> >;
-template class SIM_COMMON<VECTOR<double,2> >;
+template struct SIM_COMMON<VECTOR<double,1> >;
+template struct SIM_COMMON<VECTOR<double,2> >;

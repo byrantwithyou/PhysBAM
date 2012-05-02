@@ -21,7 +21,7 @@ int main(int argc,char* argv[])
     typedef float T;
     typedef VECTOR<T,2> TV;
     typedef float RW;
-    STREAM_TYPE stream_type(RW());
+    STREAM_TYPE stream_type((RW()));
 
     PARSE_ARGS parse_args;
     parse_args.Add_String_Argument("-in","input_directory");

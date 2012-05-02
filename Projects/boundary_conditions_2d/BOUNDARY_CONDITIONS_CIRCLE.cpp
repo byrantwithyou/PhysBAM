@@ -80,4 +80,4 @@ Analytic_Velocity(const TV& X,T time) const
     return X.Orthogonal_Vector()*0;
 }
 
-template class BOUNDARY_CONDITIONS_CIRCLE<VECTOR<double,2> >;
+template struct BOUNDARY_CONDITIONS_CIRCLE<VECTOR<double,2> >;

@@ -7,7 +7,7 @@
 
 using namespace PhysBAM;
 
-template<class TV> class BOUNDARY_CONDITIONS;
+template<class TV> struct BOUNDARY_CONDITIONS;
 
 template<class TV>
 struct OBJECTS_COMMON

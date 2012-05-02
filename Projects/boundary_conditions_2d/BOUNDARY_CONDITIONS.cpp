@@ -65,5 +65,5 @@ Update_Parameters(PARAMETERS_COMMON<T>& param)
 {
 }
 
-template class BOUNDARY_CONDITIONS<VECTOR<double,1> >;
-template class BOUNDARY_CONDITIONS<VECTOR<double,2> >;
+template struct BOUNDARY_CONDITIONS<VECTOR<double,1> >;
+template struct BOUNDARY_CONDITIONS<VECTOR<double,2> >;

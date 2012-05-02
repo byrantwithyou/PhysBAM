@@ -32,7 +32,7 @@ class WATER_TESTS:public PLS_REFINEMENT_EXAMPLE<TV>
 
 public:
     using BASE::stream_type;using BASE::coarse_mac_grid;using BASE::fine_mac_grid;using BASE::coarse_face_velocities;using BASE::fine_face_velocities;using BASE::fine_mpi_grid;using BASE::coarse_mpi_grid;
-    using BASE::incompressible;using BASE::projection;using BASE::incompressible;using BASE::domain_boundary;using BASE::use_collidable_advection;using BASE::collision_bodies_affecting_fluid;
+    using BASE::incompressible;using BASE::projection;using BASE::domain_boundary;using BASE::use_collidable_advection;using BASE::collision_bodies_affecting_fluid;
     using BASE::particle_levelset_evolution;using BASE::output_directory;using BASE::write_substeps_level;using BASE::last_frame;using BASE::rigid_geometry_collection;using BASE::split_dir;using BASE::write_debug_data;
     using BASE::coarse_phi;using BASE::restart;using BASE::boundary;using BASE::advection_scalar;using BASE::non_mpi_boundary;using BASE::phi_boundary;using BASE::gravity;using BASE::cfl;
     

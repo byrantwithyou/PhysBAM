@@ -30,7 +30,6 @@ class TANK_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> >
 public:
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::solids_parameters;using BASE::data_directory;using BASE::stream_type;
     using BASE::test_number;using BASE::parse_args;using BASE::fluids_parameters;using BASE::solid_body_collection;using BASE::Set_External_Velocities; // silence -Woverloaded-virtual
-    using BASE::parse_args;
 
     ARTICULATED_RIGID_BODY<TV>* arb;
     SOLIDS_STANDARD_TESTS<TV> tests;

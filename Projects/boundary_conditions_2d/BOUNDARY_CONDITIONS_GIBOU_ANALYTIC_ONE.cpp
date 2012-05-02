@@ -72,4 +72,4 @@ Update_Parameters(PARAMETERS_COMMON<T>& param)
     param.mu=tan(param.time)*param.rho/2;
 }
 
-template class BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE<VECTOR<double,2> >;
+template struct BOUNDARY_CONDITIONS_GIBOU_ANALYTIC_ONE<VECTOR<double,2> >;

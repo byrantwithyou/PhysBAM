@@ -17,5 +17,5 @@ template<class TV> OBJECTS_COMMON<TV>::
     delete bc;
 }
 
-template class OBJECTS_COMMON<VECTOR<double,1> >;
-template class OBJECTS_COMMON<VECTOR<double,2> >;
+template struct OBJECTS_COMMON<VECTOR<double,1> >;
+template struct OBJECTS_COMMON<VECTOR<double,2> >;

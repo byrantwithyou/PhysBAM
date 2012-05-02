@@ -35,7 +35,7 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_REFINEMENT_EXAMPLE<TV>
 public:
     using BASE::coarse_mac_grid;using BASE::fine_mac_grid;using BASE::coarse_face_velocities;using BASE::fine_face_velocities;using BASE::coarse_mpi_grid;using BASE::fine_mpi_grid;
     using BASE::incompressible;using BASE::projection; using BASE::output_directory;using BASE::write_substeps_level;using BASE::last_frame;using BASE::domain_boundary;using BASE::cfl;using BASE::split_dir;
-    using BASE::sub_scale;using BASE::use_coarse_forces;using BASE::use_interpolated_vorticity;using BASE::kolmogorov;using BASE::domain_boundary;using BASE::restart;using BASE::rigid_geometry_collection;using BASE::thread_queue;using BASE::boundary_scalar;using BASE::density;
+    using BASE::sub_scale;using BASE::use_coarse_forces;using BASE::use_interpolated_vorticity;using BASE::kolmogorov;using BASE::restart;using BASE::rigid_geometry_collection;using BASE::thread_queue;using BASE::boundary_scalar;using BASE::density;
 
     int scale;
     T sub_scale_face_inverse; //tmp data to make more efficient operations    

@@ -158,4 +158,4 @@ Analytic_Velocity(const TV& X,T time) const
     return TV();
 }
 
-template class BOUNDARY_CONDITIONS_BOX<VECTOR<double,2> >;
+template struct BOUNDARY_CONDITIONS_BOX<VECTOR<double,2> >;

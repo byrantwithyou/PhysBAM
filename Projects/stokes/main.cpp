@@ -607,6 +607,30 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_10;
             break;}
+        case 11:{
+            struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){r=1.0/3.0;}
+                virtual TV u(const TV& X,bool inside){TV x=X-0.5; return x*exp(x.Magnitude_Squared())*inside;}
+                virtual T p(const TV& X){return 0;}
+                virtual T phi(const TV& X){return (X-0.5).Magnitude()-r;}
+                virtual TV body(const TV& X,bool inside)
+                {
+                    TV x=X-0.5;
+                    T x2=x.Magnitude_Squared();
+                    return x*(-1)*4*(2+x2)*exp(x2)*inside;
+                }
+                virtual TV interface(const TV& X)
+                {
+                    TV x=X-0.5;
+                    T x2=x.Magnitude_Squared();
+                    return x.Normalized()*(-1)*2*exp(x2)*(2*x2+1);  
+                }
+            };
+            test=new ANALYTIC_TEST_11;
+            break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 

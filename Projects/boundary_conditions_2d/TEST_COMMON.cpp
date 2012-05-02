@@ -49,5 +49,5 @@ Init_3()
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",sim.obj.grid);
 }
 
-template class TEST_COMMON<VECTOR<double,1> >;
-template class TEST_COMMON<VECTOR<double,2> >;
+template struct TEST_COMMON<VECTOR<double,1> >;
+template struct TEST_COMMON<VECTOR<double,2> >;

@@ -1078,7 +1078,7 @@ void Make_Wrapping_Objects()
 {
     // Okay, this isn't going to do what we want it to, but we might use it later if we add in the wrapping surfaces so I'm leaving it here
     std::string next,object_name,wrap_type,bone_name;
-    float x,y,z,radius,radiust,height,scale_factor;
+    float x,y,z,radius,radiust,height;
     int id;
     TV translation,rotation,radius_vector;
     RIGID_BODY<TV>* rigid_body=0;
@@ -1198,9 +1198,9 @@ static void Load_Splines(const std::string& filename,ARRAY<PAIR<std::string,BSPL
 //#####################################################################
 static void Print_Splines(ARRAY<PAIR<std::string,BSPLINE_QUATERNION<T>* > >*& motion_splines)
 {
-    for(int i=0;i<motion_splines.m;i++){
-        std::cout<<"Joint: "<<motion_splines(i).x<<std::endl;
-        motion_splines(i).y->Print_Control_Points_And_Times();}
+    for(int i=0;i<motion_splines->m;i++){
+        std::cout<<"Joint: "<<(*motion_splines)(i).x<<std::endl;
+        (*motion_splines)(i).y->Print_Control_Points_And_Times();}
 }
 //#####################################################################
 // Function Read_Frame_Track_From_Spline

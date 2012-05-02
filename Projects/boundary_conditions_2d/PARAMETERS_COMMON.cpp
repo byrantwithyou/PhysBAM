@@ -35,4 +35,4 @@ Init_2(PARSE_ARGS& parse_args)
     cg_tolerance=parse_args.Get_Double_Value("-cg_tol");
 }
 
-template class PARAMETERS_COMMON<double>;
+template struct PARAMETERS_COMMON<double>;

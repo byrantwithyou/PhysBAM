@@ -26,7 +26,7 @@ class WATER_TESTS:public PLS_EXAMPLE<TV>
     RANGE<TV> source;
 
 public:
-    using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::incompressible;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;
+    using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
 
     WATER_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)

@@ -121,7 +121,7 @@ List_Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
             STRING_UTILITIES::Parse_Integer_List(range,integer_list);
             id_list.Resize(integer_list.Size());
             for(int i=0;i<integer_list.m;i++) id_list(i)=int(integer_list(i));}
-        else if(type=="Rigid_Body_List") for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)) id_list.Append(i);
+        else if(type=="Rigid_Body_List"){for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) if(rigid_body_collection.Is_Active(i)) id_list.Append(i);}
         else PHYSBAM_FATAL_ERROR("A Range is Required for a Rigid_Body_Instance.");
 
         if(type=="Rigid_Body_List" && parents.m){
