@@ -374,7 +374,7 @@ Face_Type(int f) const
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
 Compute_Beta()
 {
-    static VECTOR<T,3> colors[5]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,1,0),VECTOR<T,3>(0,1,0),VECTOR<T,3>(0,0,1),VECTOR<T,3>(1,0,1)};
+//    static VECTOR<T,3> colors[5]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,1,0),VECTOR<T,3>(0,1,0),VECTOR<T,3>(0,0,1),VECTOR<T,3>(1,0,1)};
     T dx=index_map.grid.dX(1),full_volume=dx*dx,imi=Inverse(full_volume*density),imo=index_map.two_phase?Inverse(full_volume*outside_density):FLT_MAX;
     VECTOR_ND<T>& beta_inverse=(*fluid_mass)->one_over_fluid_mass_at_faces;
     T in_length=0,length=index_map.grid.Face_Size(1);

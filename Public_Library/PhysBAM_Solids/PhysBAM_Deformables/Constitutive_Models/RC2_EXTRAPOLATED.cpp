@@ -508,7 +508,7 @@ Test_Model() const
         f=f.Sorted().Reversed();
         if(rand.Get_Uniform_Integer(0,1)==1) f(2)=-f(2);
         LOG::cout<<f<<std::endl;
-        Test(DIAGONAL_MATRIX<T,TV::m>(f),1);
+        this->Test(DIAGONAL_MATRIX<T,TV::m>(f),1);
 
         int simplex=0;
         if(f.Product()>extrapolation_cutoff) continue;

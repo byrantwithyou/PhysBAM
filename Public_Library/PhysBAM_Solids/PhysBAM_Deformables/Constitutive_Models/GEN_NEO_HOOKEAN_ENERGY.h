@@ -6,6 +6,7 @@
 //#####################################################################
 #ifndef __GEN_NEO_HOOKEAN_ENERGY__
 #define __GEN_NEO_HOOKEAN_ENERGY__
+#include <PhysBAM_Tools/Math_Tools/cube.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/GENERAL_ENERGY.h>
 
 namespace PhysBAM{

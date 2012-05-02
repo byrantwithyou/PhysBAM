@@ -261,7 +261,7 @@ template<class T_GRID> bool LEVELSET_MULTIPLE<T_GRID>::
 Is_Projected_At_Nodes()
 {
     for(T_CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
-        bool inside=0;
+        int inside=0;
         for(int i=0;i<levelsets.m;i++) if(Phi(i,iterator.Cell_Index())<=0) inside++;
         if(inside!=1) return false;}
     return true;

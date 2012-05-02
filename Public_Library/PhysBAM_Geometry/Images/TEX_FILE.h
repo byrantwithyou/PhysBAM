@@ -19,7 +19,7 @@ template<class T>
 class TEX_FILE:public VECTOR_IMAGE<T>
 {
 public:
-    using VECTOR_IMAGE<T>::stream;VECTOR_IMAGE<T>::output_box;VECTOR_IMAGE<T>::bounding_box;VECTOR_IMAGE<T>::cur_format;
+    using VECTOR_IMAGE<T>::stream;using VECTOR_IMAGE<T>::output_box;using VECTOR_IMAGE<T>::bounding_box;using VECTOR_IMAGE<T>::cur_format;
     typedef VECTOR<T,2> TV;
     int unit_offset,frame_offset;
     VECTOR<T,3> effective_line_color,effective_fill_color;

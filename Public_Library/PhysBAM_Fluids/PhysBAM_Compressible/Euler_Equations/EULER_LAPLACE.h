@@ -46,10 +46,10 @@ public:
 
     T_LAPLACE::Find_A(domain,A_array,b_array,filled_region_cell_count,cell_index_to_matrix_index);
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){INDEX cell_index=iterator.Cell_Index();
-        int color=filled_region_colors(cell_index);
+        int color=this->filled_region_colors(cell_index);
         if(color!=-2 && (filled_region_touches_dirichlet(color)||solve_neumann_regions)){
             int matrix_index=cell_index_to_matrix_index(cell_index);
-            SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(filled_region_colors(cell_index));
+            SPARSE_MATRIX_FLAT_NXN<T>& A=A_array(this->filled_region_colors(cell_index));
             A(matrix_index,matrix_index)-=one_over_rho_c_squared(cell_index)/(dt*dt);}}
     }
 

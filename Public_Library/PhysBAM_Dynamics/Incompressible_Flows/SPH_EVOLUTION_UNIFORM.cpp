@@ -497,9 +497,9 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
         if(fluids_parameters.mpi_grid->Neighbor(axis,axis_side)){
             for(NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT block=iterator.Node_Index();
-                if(particles(block)) for(int p=0;p<particles(block)->Size();p++)
+                if(particles(block)) for(int p=0;p<particles(block)->Size();p++){
                     if(axis_side==0) particles(block)->X(p)[axis]=max(grid.domain.Minimum_Corner()[axis]+tolerance,particles(block)->X(p)[axis]);
-                    else particles(block)->X(p)[axis]=min(grid.domain.Maximum_Corner()[axis]-tolerance,particles(block)->X(p)[axis]);}}}
+                    else particles(block)->X(p)[axis]=min(grid.domain.Maximum_Corner()[axis]-tolerance,particles(block)->X(p)[axis]);}}}}
 }
 //#####################################################################
 #define P(...) __VA_ARGS__

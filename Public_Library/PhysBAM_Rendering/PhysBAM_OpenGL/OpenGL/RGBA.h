@@ -16,7 +16,7 @@ public:
     T r,g,b,a;
 
     RGBA()
-        :r(0),r(0),r(0),r(0)
+        :r(0),g(0),b(0),a(0)
     {}
 
     RGBA(const T r_input,const T g_input,const T b_input,const T a_input)

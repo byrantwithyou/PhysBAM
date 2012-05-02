@@ -409,7 +409,7 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
     PHYSBAM_DEBUG_WRITE_SUBSTEP("After complete fluid state update (sf coupled evolution)",0,1);
 
     if(!leakproof_solve && (!solids_fluids_parameters.mpi_solid_fluid || solids_fluids_parameters.mpi_solid_fluid->Solid_Node())){
-        Finish_Backward_Euler_Step(*coupled_system,dt,current_position_time,velocity_update);}
+        this->Finish_Backward_Euler_Step(*coupled_system,dt,current_position_time,velocity_update);}
     PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
 
     coupled_system->Mark_Valid_Faces(solved_faces);

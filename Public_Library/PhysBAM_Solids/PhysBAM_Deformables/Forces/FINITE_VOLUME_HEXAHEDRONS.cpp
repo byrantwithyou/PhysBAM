@@ -162,7 +162,7 @@ Initialize_CFL(ARRAY_VIEW<FREQUENCY_DATA> frequency)
     ARRAY<FREQUENCY_DATA> fragment_particle_frequency(frequency.Size());
     for(ELEMENT_ITERATOR iterator(force_elements);iterator.Valid();iterator.Next()){int e=iterator.Data();
         const VECTOR<int,8>& nodes=strain_measure.mesh.elements(e);
-        T one_over_altitude_squared_and_density=(T)1/(minimum_altitude_squared*use_uniform_density?density:(*density_list)(e));
+        T one_over_altitude_squared_and_density=(T)1/(minimum_altitude_squared*(use_uniform_density?density:(*density_list)(e)));
         T elastic_squared=constitutive_model.Maximum_Elastic_Stiffness(e)*one_over_altitude_squared_and_density*one_over_cfl_number_squared;
         T damping=constitutive_model.Maximum_Damping_Stiffness(e)*one_over_altitude_squared_and_density*one_over_cfl_number;
         for(int j=0;j<nodes.m;j++){FREQUENCY_DATA& data=fragment_particle_frequency(nodes[j]);

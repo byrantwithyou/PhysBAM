@@ -20,7 +20,7 @@ namespace PhysBAM{
 // Class GENERALIZED_MASS
 //#####################################################################
 template<class TV> class SOLIDS_EVOLUTION;
-template<class TV> class PRECOMPUTE_PROJECT;
+template<class TV> struct PRECOMPUTE_PROJECT;
 template<class TV>
 class GENERALIZED_MASS
 {

@@ -19,6 +19,7 @@ class STRUCTURE_LIST:public DYNAMIC_LIST<STRUCTURE<TV>,ID>
     typedef DYNAMIC_LIST<STRUCTURE<TV>,ID> BASE;
 public:
     using BASE::Size;using BASE::Needs_Write;using BASE::Active_Element;using BASE::Read;using BASE::Write;
+    using BASE::Element_Index;using BASE::Set_Active_Element;using BASE::Is_Active;
     mutable ARRAY<std::string> names;
 
     STRUCTURE_LIST()

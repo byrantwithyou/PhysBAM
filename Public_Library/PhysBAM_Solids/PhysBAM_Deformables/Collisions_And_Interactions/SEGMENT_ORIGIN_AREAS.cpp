@@ -193,126 +193,6 @@ template<class T,class TV> void Area_From_Points(VOL_DATA<T,2,3>& data,const TV&
     data.H[1][0]=data.H[2][1]=M.Transposed();
 }
 
-template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL_DATA<T,2,4>& data,TV const & X0,TV const (&LA)[4])
-{
-    TV A=LA[0],B=LA[1],C=LA[2],D=LA[3];
-    if(A==B && C==D) return;
-    int index[4]={0,1,2,3};
-    T sign=1,tol=(T)1e-10;
-
-    // Enforce consistency with: AD BC + AB CD - AC BD = 0
-    T AB=TV::Cross_Product(A-X0,B-X0).x;
-    T CD=TV::Cross_Product(C-X0,D-X0).x;
-    T AC=TV::Cross_Product(A-X0,C-X0).x;
-    T BD=TV::Cross_Product(B-X0,D-X0).x;
-    T AD=TV::Cross_Product(A-X0,D-X0).x;
-    T BC=TV::Cross_Product(B-X0,C-X0).x;
-    int sab=AB<-tol?-1:AB>tol;
-    int scd=CD<-tol?-1:CD>tol;
-    int sac=AC<-tol?-1:AC>tol;
-    int sbd=BD<-tol?-1:BD>tol;
-    int sad=AD<-tol?-1:AD>tol;
-    int sbc=BC<-tol?-1:BC>tol;
-    bool bins[3]={false,false,false};
-    bins[sad*sbc+1]=true;
-    bins[sab*scd+1]=true;
-    bins[-sac*sbd+1]=true;
-
-    // Inconsistent; force each term to zero
-    if(bins[0] != bins[2]){
-        if(sad && sbc){
-            if(fabs(AD)<fabs(BC)) sad=0;
-            else sbc=0;}
-        if(sab && scd){
-            if(fabs(AB)<fabs(CD)) sab=0;
-            else scd=0;}
-        if(sac && sbd){
-            if(fabs(AC)<fabs(BD)) sac=0;
-            else sbd=0;}}
-
-    if(sab<0){
-        exchange(A,B);
-        exchange(index[0],index[1]);
-        sign=-sign;
-        exchange(sac,sbc);
-        exchange(sbd,sad);
-        sab=-sab;}
-    if(scd<0){
-        exchange(C,D);
-        exchange(index[2],index[3]);
-        sign=-sign;
-        exchange(sac,sad);
-        exchange(sbd,sbc);
-        scd=-scd;}
-
-    if(A==B || sac<0 || (sac==0 && sbd<0)){
-        exchange(A,C);
-        exchange(B,D);
-        exchange(index[0],index[2]);
-        exchange(index[1],index[3]);
-        exchange(sab,scd);
-        exchange(sad,sbc);
-        sad=-sad;
-        sbc=-sbc;
-        sac=-sac;
-        sbd=-sbd;}
-
-    VOL_DATA<T,2,4> tdata;
-    Clear(tdata);
-
-    if(C==D){
-        if(sbc>0 || sbd>0 || sac<0 || sad<0) return;
-        if(TV::Cross_Product(A-C,B-C).x>-tol) Case_CCAA(tdata,X0,A,B,C,D); // CCAA
-        else Case_CCBB(tdata,X0,A,B,C,D); // CCBB
-
-        data.V=sign*tdata.V;
-        for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
-        for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];}
-
-    // NOTE: (DxA) (CxB) + (CxD) (AxB) + (AxC) (DxB) = 0
-    // (after subtracing off X0 from each of A,B,C,D)
-
-    if(sbc>=0) return; // CCCC
-    if(TV::Cross_Product(A-C,B-C).x>-tol){
-        if(sbd>=0){
-            if(TV::Cross_Product(C-B,D-B).x>tol){ // CAAC
-                exchange(A,B);exchange(index[0],index[1]);sign=-sign;
-                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
-                Case_ACAC(tdata,X0,A,B,C,D);}
-            else{ // CBAC
-                exchange(A,B);
-                exchange(index[0],index[1]);sign=-sign;
-                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
-                Case_BCAC(tdata,X0,A,B,C,D);}}
-        else{
-            if(TV::Cross_Product(A-D,B-D).x>-tol) Case_CCAA(tdata,X0,A,B,C,D); // CCAA
-            else Case_CCAB(tdata,X0,A,B,C,D);}} // CCAB
-    else{
-        if(sbd>0){
-            if(TV::Cross_Product(C-B,D-B).x>-tol){ // CABC
-                exchange(A,B);
-                exchange(index[0],index[1]);sign=-sign;
-                exchange(A,C);exchange(B,D);
-                exchange(index[0],index[2]);exchange(index[1],index[3]);
-                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
-                Case_BCAC(tdata,X0,A,B,C,D);}
-            else{ // CBBC
-                exchange(A,B);
-                exchange(index[0],index[1]);sign=-sign;
-                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
-                Case_BCBC(tdata,X0,A,B,C,D);}}
-        else{
-            if(TV::Cross_Product(A-D,B-D).x>-tol){ // CCBA
-                exchange(C,D);
-                exchange(index[2],index[3]);sign=-sign;
-                Case_CCAB(tdata,X0,A,B,C,D);}
-            else Case_CCBB(tdata,X0,A,B,C,D);}} // CCBB
-
-    data.V=sign*tdata.V;
-    for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
-    for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
-}
-
 //template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,2>& V,const DATA<T,2,m>& data_m,const DATA<T,2,n>& data_n,const int index_m[m],
 //    const int index_n[n])
 template<class T,int m,int n> void Combine_Data(VOL_DATA<T,2,4>& data,const VOL_DATA<T,2,2>& V,const DATA<T,2,m>& data_m,const DATA<T,2,n>& data_n,const int* index_m,
@@ -616,6 +496,127 @@ template<class T,class TV> void Case_ACAC(VOL_DATA<T,2,4>& data,const TV& X0,con
     Triangle_Area(V,B,A,C,D);
     Add_Data(data,V,bacd,_0123);}
 #endif // #if 0|1
+}
+
+
+template<class T,class TV> void PhysBAM::ORIGIN_AREAS::Volume_From_Simplices(VOL_DATA<T,2,4>& data,TV const & X0,TV const (&LA)[4])
+{
+    TV A=LA[0],B=LA[1],C=LA[2],D=LA[3];
+    if(A==B && C==D) return;
+    int index[4]={0,1,2,3};
+    T sign=1,tol=(T)1e-10;
+
+    // Enforce consistency with: AD BC + AB CD - AC BD = 0
+    T AB=TV::Cross_Product(A-X0,B-X0).x;
+    T CD=TV::Cross_Product(C-X0,D-X0).x;
+    T AC=TV::Cross_Product(A-X0,C-X0).x;
+    T BD=TV::Cross_Product(B-X0,D-X0).x;
+    T AD=TV::Cross_Product(A-X0,D-X0).x;
+    T BC=TV::Cross_Product(B-X0,C-X0).x;
+    int sab=AB<-tol?-1:AB>tol;
+    int scd=CD<-tol?-1:CD>tol;
+    int sac=AC<-tol?-1:AC>tol;
+    int sbd=BD<-tol?-1:BD>tol;
+    int sad=AD<-tol?-1:AD>tol;
+    int sbc=BC<-tol?-1:BC>tol;
+    bool bins[3]={false,false,false};
+    bins[sad*sbc+1]=true;
+    bins[sab*scd+1]=true;
+    bins[-sac*sbd+1]=true;
+
+    // Inconsistent; force each term to zero
+    if(bins[0] != bins[2]){
+        if(sad && sbc){
+            if(fabs(AD)<fabs(BC)) sad=0;
+            else sbc=0;}
+        if(sab && scd){
+            if(fabs(AB)<fabs(CD)) sab=0;
+            else scd=0;}
+        if(sac && sbd){
+            if(fabs(AC)<fabs(BD)) sac=0;
+            else sbd=0;}}
+
+    if(sab<0){
+        exchange(A,B);
+        exchange(index[0],index[1]);
+        sign=-sign;
+        exchange(sac,sbc);
+        exchange(sbd,sad);
+        sab=-sab;}
+    if(scd<0){
+        exchange(C,D);
+        exchange(index[2],index[3]);
+        sign=-sign;
+        exchange(sac,sad);
+        exchange(sbd,sbc);
+        scd=-scd;}
+
+    if(A==B || sac<0 || (sac==0 && sbd<0)){
+        exchange(A,C);
+        exchange(B,D);
+        exchange(index[0],index[2]);
+        exchange(index[1],index[3]);
+        exchange(sab,scd);
+        exchange(sad,sbc);
+        sad=-sad;
+        sbc=-sbc;
+        sac=-sac;
+        sbd=-sbd;}
+
+    VOL_DATA<T,2,4> tdata;
+    Clear(tdata);
+
+    if(C==D){
+        if(sbc>0 || sbd>0 || sac<0 || sad<0) return;
+        if(TV::Cross_Product(A-C,B-C).x>-tol) Case_CCAA(tdata,X0,A,B,C,D); // CCAA
+        else Case_CCBB(tdata,X0,A,B,C,D); // CCBB
+
+        data.V=sign*tdata.V;
+        for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
+        for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];}
+
+    // NOTE: (DxA) (CxB) + (CxD) (AxB) + (AxC) (DxB) = 0
+    // (after subtracing off X0 from each of A,B,C,D)
+
+    if(sbc>=0) return; // CCCC
+    if(TV::Cross_Product(A-C,B-C).x>-tol){
+        if(sbd>=0){
+            if(TV::Cross_Product(C-B,D-B).x>tol){ // CAAC
+                exchange(A,B);exchange(index[0],index[1]);sign=-sign;
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_ACAC(tdata,X0,A,B,C,D);}
+            else{ // CBAC
+                exchange(A,B);
+                exchange(index[0],index[1]);sign=-sign;
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_BCAC(tdata,X0,A,B,C,D);}}
+        else{
+            if(TV::Cross_Product(A-D,B-D).x>-tol) Case_CCAA(tdata,X0,A,B,C,D); // CCAA
+            else Case_CCAB(tdata,X0,A,B,C,D);}} // CCAB
+    else{
+        if(sbd>0){
+            if(TV::Cross_Product(C-B,D-B).x>-tol){ // CABC
+                exchange(A,B);
+                exchange(index[0],index[1]);sign=-sign;
+                exchange(A,C);exchange(B,D);
+                exchange(index[0],index[2]);exchange(index[1],index[3]);
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_BCAC(tdata,X0,A,B,C,D);}
+            else{ // CBBC
+                exchange(A,B);
+                exchange(index[0],index[1]);sign=-sign;
+                if(TV::Cross_Product(A-X0,B-X0).x<0) sign=-sign;
+                Case_BCBC(tdata,X0,A,B,C,D);}}
+        else{
+            if(TV::Cross_Product(A-D,B-D).x>-tol){ // CCBA
+                exchange(C,D);
+                exchange(index[2],index[3]);sign=-sign;
+                Case_CCAB(tdata,X0,A,B,C,D);}
+            else Case_CCBB(tdata,X0,A,B,C,D);}} // CCBB
+
+    data.V=sign*tdata.V;
+    for(int i=0;i<4;i++) data.G[index[i]]=sign*tdata.G[i];
+    for(int i=0;i<4;i++) for(int k=0;k<4;k++) data.H[index[i]][index[k]]=sign*tdata.H[i][k];
 }
 
 template void PhysBAM::ORIGIN_AREAS::Clear<float,3,6>(VOL_DATA<float,3,6>&);

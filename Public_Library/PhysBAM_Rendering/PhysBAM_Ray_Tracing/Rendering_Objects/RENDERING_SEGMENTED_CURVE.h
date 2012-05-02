@@ -20,7 +20,7 @@ class RENDERING_SEGMENTED_CURVE:public RENDERING_OBJECT<T>
     typedef VECTOR<T,3> TV;
 public:
     using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::World_Space_Vector;using RENDERING_OBJECT<T>::World_Space_Point;
-    using RENDERING_OBJECT<T>::World_Space_Bounding_Box;RENDERING_OBJECT<T>::Object_Space_Ray;RENDERING_OBJECT<T>::Object_Space_Point;
+    using RENDERING_OBJECT<T>::World_Space_Bounding_Box;using RENDERING_OBJECT<T>::Object_Space_Ray;using RENDERING_OBJECT<T>::Object_Space_Point;
     using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection; // silence -Woverloaded-virtual
 
     SEGMENTED_CURVE<TV>& segmented_curve;

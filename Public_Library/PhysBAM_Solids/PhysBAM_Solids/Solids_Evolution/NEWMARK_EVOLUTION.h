@@ -31,7 +31,7 @@ protected:
 public:
     using BASE::solid_body_collection;using BASE::Euler_Step_Position;using BASE::Set_External_Velocities;
     using BASE::Clamp_Velocities;using BASE::solids_evolution_callbacks;using BASE::rigid_body_collisions;using BASE::Initialize_World_Space_Masses;
-    using BASE::solids_parameters;using BASE::kinematic_evolution;
+    using BASE::solids_parameters;using BASE::kinematic_evolution;using BASE::Zero_Out_Enslaved_Velocity_Nodes;
 
     RIGIDS_NEWMARK_COLLISION_CALLBACKS<TV>& rigids_evolution_callbacks;
     TRIANGLE_REPULSIONS<TV>* repulsions;

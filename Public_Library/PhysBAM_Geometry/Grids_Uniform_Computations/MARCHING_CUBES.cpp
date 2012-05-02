@@ -12,12 +12,14 @@
 using namespace PhysBAM;
 #define TRI(a,b,c,s) (((s)<<15) | ((c)<<10) | ((b)<<5) | (a))
 #define TRI_ORIENT_MAP(x,f) (x?((x&0x8000) | (f[(x>>10)&31]<<10) | (f[x&31]<<5) | f[(x>>5)&31]):0)
+namespace PhysBAM{
 template<> int MARCHING_CUBES_CASE<2>::edge_lookup[4][4]={{-1,0,2,-1},{0,-1,-1,3},{2,-1,-1,1},{-1,3,1,-1}};
 template<> int MARCHING_CUBES_CASE<2>::vertex_lookup[4][2]={{0,1},{2,3},{0,2},{1,3}};
 template<> int MARCHING_CUBES_CASE<2>::permute_map[2][8]={{2,3,0,1,4,6,5,7},{0,1,3,2,5,4,7,6}};
 template<> int MARCHING_CUBES_CASE<3>::edge_lookup[8][8]={};
 template<> int MARCHING_CUBES_CASE<3>::vertex_lookup[12][2]={};
 template<> int MARCHING_CUBES_CASE<3>::permute_map[6][20]={};
+}
 //#####################################################################
 // Function Case_Table
 //#####################################################################

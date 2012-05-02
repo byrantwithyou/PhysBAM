@@ -22,7 +22,7 @@ class CONJUGATE_RESIDUAL:public KRYLOV_SOLVER<T>
     typedef KRYLOV_SOLVER<T> BASE;
 public:
     using BASE::restart_iterations;using BASE::residual_magnitude_squared;using BASE::iterations_used;using BASE::print_diagnostics;using BASE::print_residuals;
-    using BASE::nullspace_measure;using BASE::nullspace_tolerance;using BASE::Solve;
+    using BASE::nullspace_measure;using BASE::nullspace_tolerance;using BASE::Solve;using BASE::Ensure_Size;
 
     CONJUGATE_RESIDUAL()
     {}

@@ -10,7 +10,7 @@
 
 namespace PhysBAM{
 
-template<class T_GRID> class LEVELSET_ADVECTION_POLICY;
+template<class T_GRID> struct LEVELSET_ADVECTION_POLICY;
 
 template<class T_GRID> class LEVELSET_ADVECTION_1D;
 template<class T_GRID> class LEVELSET_ADVECTION_2D;

@@ -39,6 +39,8 @@ class VECTOR<T,2>:public VECTOR_BASE<T,VECTOR<T,2> >
 {
     struct UNUSABLE{};
 public:
+    typedef VECTOR_BASE<T,VECTOR<T,2> > BASE;
+    using BASE::Assert_Same_Size;
     template<class T2> struct REBIND{typedef VECTOR<T2,2> TYPE;};
     typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
     typedef T ELEMENT;

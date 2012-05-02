@@ -105,10 +105,6 @@ public:
     void Conjugate_With_Diagonal_Matrix(VECTOR_ND<T>& x);
 //#####################################################################
 };
-template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_NXN<T>& A)
-{for(int i=0;i<A.n;i++){
-    for(int j=0;j<A.n;j++)output_stream<<(A.Element_Present(i,j)?A(i,j):0)<<" ";
-    output_stream<<std::endl;}
-return output_stream;}
+template<class T> std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_NXN<T>& A);
 }
 #endif

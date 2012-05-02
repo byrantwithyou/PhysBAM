@@ -9,8 +9,10 @@
 #include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 using namespace PhysBAM;
+namespace PhysBAM{
 template<> const float EXPANSION_ARITHMETIC<float>::splitter=4097.f;
 template<> const double EXPANSION_ARITHMETIC<double>::splitter=134217729.l;
+}
 #define INEXACT volatile
 //#####################################################################
 // Primitive operation helpers

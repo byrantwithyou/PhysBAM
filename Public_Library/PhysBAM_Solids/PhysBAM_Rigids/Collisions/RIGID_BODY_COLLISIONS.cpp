@@ -470,7 +470,7 @@ Get_Contact_Pairs(const T dt,const T time,ARRAY<VECTOR<int,2> >& pairs)
             int j=rigid_body_collection.rigid_geometry_collection.collision_body_list->collision_geometry_id_to_geometry_id.Get(object_indices(k));
             if(j<0) continue;
             if(Either_Body_Collides_With_The_Other(p,j) &&
-                intersections.Bounding_Boxes_Intersect(p,j,parameters.collision_bounding_box_thickness+parameters.use_projected_gauss_seidel?parameters.contact_proximity:0)){ // this should *not* be ids, but should remain indices
+                intersections.Bounding_Boxes_Intersect(p,j,parameters.collision_bounding_box_thickness+(parameters.use_projected_gauss_seidel?parameters.contact_proximity:0))){ // this should *not* be ids, but should remain indices
                 int particle_body,levelset_body;
                 if((parameters.use_projected_gauss_seidel || intersections.Find_Any_Intersection(p,j,particle_body,levelset_body)))
                     pairs.Append_Unique(VECTOR<int,2>(j,p));}}

@@ -108,7 +108,7 @@ Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
 Print() const
 {
-    *(int*)0=0; // :-)
+    PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
 // Function Test_Matrix

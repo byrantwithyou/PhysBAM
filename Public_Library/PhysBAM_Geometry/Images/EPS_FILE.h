@@ -19,7 +19,7 @@ template<class T>
 class EPS_FILE:public VECTOR_IMAGE<T>
 {
 public:
-    using VECTOR_IMAGE<T>::stream;VECTOR_IMAGE<T>::output_box;VECTOR_IMAGE<T>::bounding_box;VECTOR_IMAGE<T>::cur_format;
+    using VECTOR_IMAGE<T>::stream;using VECTOR_IMAGE<T>::output_box;using VECTOR_IMAGE<T>::bounding_box;using VECTOR_IMAGE<T>::cur_format;
     typedef VECTOR<T,2> TV;
     int head_offset;
 

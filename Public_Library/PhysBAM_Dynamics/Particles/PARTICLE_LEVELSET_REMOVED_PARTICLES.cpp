@@ -13,7 +13,7 @@ template<class TV> PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>::
 PARTICLE_LEVELSET_REMOVED_PARTICLES()
     :V(0,0),next(0)
 {
-    Add_Array(ATTRIBUTE_ID_V,&V);
+    this->Add_Array(ATTRIBUTE_ID_V,&V);
 }
 //#####################################################################
 // Constructor

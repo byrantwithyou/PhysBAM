@@ -245,7 +245,7 @@ World_Space_Simplex_Bounding_Box(const int id) const
 #if defined(_MSC_VER) && _MSC_VER<=1500
 template<class TV> typename RIGID_GEOMETRY<TV>::WORLD_SPACE_SIMPLEX_RESULT RIGID_GEOMETRY<TV>::
 #else
-template<class TV> typename BASIC_SIMPLEX_POLICY<TV,(TV::dimension-1)>::SIMPLEX RIGID_GEOMETRY<TV>::
+template<class TV> typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX RIGID_GEOMETRY<TV>::
 #endif
 World_Space_Simplex(const int id) const
 {

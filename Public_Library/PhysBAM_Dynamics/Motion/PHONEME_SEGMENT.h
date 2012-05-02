@@ -41,7 +41,7 @@ public:
     {if(owns_data)delete phoneme_sample;}
 
     void Set_Sample(PHONEME<T>& phoneme_sample_input,const bool owns_data_input=false)
-    {phoneme_sample=&phoneme_sample_input;owns_data=owns_data_input;time_scaling=time_segment.Size()/phoneme_sample->time_length;if(time_scaling<0){*((int*)0)=1; }}
+    {phoneme_sample=&phoneme_sample_input;owns_data=owns_data_input;time_scaling=time_segment.Size()/phoneme_sample->time_length;if(time_scaling<0) PHYSBAM_FATAL_ERROR();}
 
     T World_Time_To_Sample_Time(T time)
     {T offset=time-peak;return offset*time_scaling+phoneme_sample->time_length/2;}

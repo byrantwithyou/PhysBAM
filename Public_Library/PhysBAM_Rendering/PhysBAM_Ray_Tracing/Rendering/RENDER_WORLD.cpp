@@ -262,7 +262,8 @@ Cast_Photon(RENDERING_RAY<T>& incoming_ray,const RENDERING_RAY<T>& parent_ray,co
     if(parent_ray.recursion_depth>=photon_depth_limit-1)return;
     incoming_ray.recursion_depth=parent_ray.recursion_depth+1;
     incoming_ray.ray_type=RENDERING_RAY<T>::PHOTON_RAY;
-    RENDERING_OBJECT<T>* scattering_medium_object;RENDERING_OBJECT<T>* object;
+    RENDERING_OBJECT<T>* scattering_medium_object;
+    RENDERING_OBJECT<T>* object;
     RENDERING_RAY<T> working_ray=incoming_ray;
     TV current_power=power;
     T fixed_step_size=(T).01;

@@ -16,6 +16,7 @@ template<class T,int d>
 class ISOTROPIC_CONSTITUTIVE_MODEL:public CONSTITUTIVE_MODEL<T,d>
 {
 public:
+    using CONSTITUTIVE_MODEL<T,d>::Isotropic_Stress_Derivative;
     ISOTROPIC_CONSTITUTIVE_MODEL();
     virtual ~ISOTROPIC_CONSTITUTIVE_MODEL();
 
