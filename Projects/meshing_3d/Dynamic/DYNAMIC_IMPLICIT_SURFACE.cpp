@@ -37,7 +37,7 @@ DYNAMIC_TEMPLATE(DYNAMIC_IF);
 template<class T> void DYNAMIC_IF<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==3);
-    DYNAMIC_OP<T> *P=A(1)->S?A(2):A(3);
+    DYNAMIC_OP<T> *P=A(0)->S?A(1):A(2);
     S=P->S;
     D=P->D;
     H=P->H;
@@ -47,17 +47,17 @@ DYNAMIC_TEMPLATE(DYNAMIC_ABS);
 template<class T> void DYNAMIC_ABS<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==1);
-    if(A(1)->S>=0){S=A(1)->S;D=A(1)->D;H=A(1)->H;}
-    else{S=-A(1)->S;D=-A(1)->D;H=-A(1)->H;}
+    if(A(0)->S>=0){S=A(0)->S;D=A(0)->D;H=A(0)->H;}
+    else{S=-A(0)->S;D=-A(0)->D;H=-A(0)->H;}
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_ADD);
 template<class T> void DYNAMIC_ADD<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m>=1);
-    S=A(1)->S;
-    D=A(1)->D;
-    H=A(1)->H;
+    S=A(0)->S;
+    D=A(0)->D;
+    H=A(0)->H;
     for(int j=2;j<=A.m;j++){S+=A(j)->S;D+=A(j)->D;H+=A(j)->H;}
 }
 
@@ -66,13 +66,13 @@ template<class T> void DYNAMIC_SUB<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m>=1);
     if(A.m==1){
-        S=-A(1)->S;
-        D=-A(1)->D;
-        H=-A(1)->H;}
+        S=-A(0)->S;
+        D=-A(0)->D;
+        H=-A(0)->H;}
     else{
-        S=A(1)->S;
-        D=A(1)->D;
-        H=A(1)->H;
+        S=A(0)->S;
+        D=A(0)->D;
+        H=A(0)->H;
         for(int j=2;j<=A.m;j++){S-=A(j)->S;D-=A(j)->D;H-=A(j)->H;}}
 }
 
@@ -80,9 +80,9 @@ DYNAMIC_TEMPLATE(DYNAMIC_MUL);
 template<class T> void DYNAMIC_MUL<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m>=1);
-    S=A(1)->S;
-    D=A(1)->D;
-    H=A(1)->H;
+    S=A(0)->S;
+    D=A(0)->D;
+    H=A(0)->H;
     for(int j=2;j<=A.m;j++){
         H=A(j)->S*H+S*A(j)->H+MATRIX<T,3>::Outer_Product(A(j)->D,D)+MATRIX<T,3>::Outer_Product(D,A(j)->D);
         D=S*A(j)->D+A(j)->S*D;
@@ -93,9 +93,9 @@ DYNAMIC_TEMPLATE(DYNAMIC_DIV);
 template<class T> void DYNAMIC_DIV<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m>=1);
-    S=A(1)->S;
-    D=A(1)->D;
-    H=A(1)->H;
+    S=A(0)->S;
+    D=A(0)->D;
+    H=A(0)->H;
     for(int j=2;j<=A.m;j++){
         T SI=1/A(j)->S;
         TV DI=-SI*SI*A(j)->D;
@@ -109,83 +109,83 @@ DYNAMIC_TEMPLATE(DYNAMIC_RECIP);
 template<class T> void DYNAMIC_RECIP<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==1);
-    S=1/A(1)->S;
-    D=-S*S*A(1)->D;
-    H=-S*S*A(1)->H-2*S*MATRIX<T,3>::Outer_Product(D,A(1)->D);
+    S=1/A(0)->S;
+    D=-S*S*A(0)->D;
+    H=-S*S*A(0)->H-2*S*MATRIX<T,3>::Outer_Product(D,A(0)->D);
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_SQRT);
 template<class T> void DYNAMIC_SQRT<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==1);
-    if(A(1)->S<=0){S=0;D=TV();H=MATRIX<T,3>();}
+    if(A(0)->S<=0){S=0;D=TV();H=MATRIX<T,3>();}
     else{
-        S=sqrt(A(1)->S);
-        D=A(1)->D/(2*S);
-        H=A(1)->H/(2*S)-MATRIX<T,3>::Outer_Product(D,A(1)->D);}
+        S=sqrt(A(0)->S);
+        D=A(0)->D/(2*S);
+        H=A(0)->H/(2*S)-MATRIX<T,3>::Outer_Product(D,A(0)->D);}
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_LT);
 template<class T> void DYNAMIC_LT<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=A(1)->S<A(2)->S;
+    S=A(0)->S<A(1)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_GT);
 template<class T> void DYNAMIC_GT<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=A(1)->S>A(2)->S;
+    S=A(0)->S>A(1)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_LE);
 template<class T> void DYNAMIC_LE<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=A(1)->S<=A(2)->S;
+    S=A(0)->S<=A(1)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_GE);
 template<class T> void DYNAMIC_GE<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=A(1)->S>=A(2)->S;
+    S=A(0)->S>=A(1)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_NE);
 template<class T> void DYNAMIC_NE<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=A(1)->S!=A(2)->S;
+    S=A(0)->S!=A(1)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_EQ);
 template<class T> void DYNAMIC_EQ<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=A(1)->S==A(2)->S;
+    S=A(0)->S==A(1)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_NOT);
 template<class T> void DYNAMIC_NOT<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=!A(1)->S;
+    S=!A(0)->S;
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_AND);
 template<class T> void DYNAMIC_AND<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=(A(1)->S&&A(2)->S);
+    S=(A(0)->S&&A(1)->S);
 }
 
 DYNAMIC_TEMPLATE(DYNAMIC_OR);
 template<class T> void DYNAMIC_OR<T>::Compute(const TV& X)
 {
     PHYSBAM_ASSERT(A.m==2);
-    S=(A(1)->S||A(2)->S);
+    S=(A(0)->S||A(1)->S);
 }
 //#####################################################################
 // Destructor
