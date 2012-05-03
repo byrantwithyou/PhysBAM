@@ -328,11 +328,20 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNIO
 {
     final_point_face_repulsions=final_point_face_collisions=0;
     ARRAY<bool>& modified_full=geometry.modified_full;
-    ARRAY<int> tmp;
+    ARRAY<int> parent_list;
     int collisions=0,skipping_already_rigid=0;T collision_time;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_DATA pf_data(pf_target_impulses(i),pf_target_weights(i),pf_normals(i),pf_old_speeds(i));
-        if(rigid){if(is_rigid.Subset(nodes).Contains(true)){skipping_already_rigid++;continue;}}
+        parent_list.Remove_All();
+        for(int j=0;j<nodes.m;j++)
+            geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(j));
+        if(rigid){
+            int root=union_find.Find(parent_list(0));
+            bool ok=true;
+            for(int j=1;j<parent_list.m;j++)
+                if(union_find.Find(parent_list(j))!=root)
+                    ok=false;
+            if(ok){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Point_Face_Final_Repulsion(pf_data,nodes,dt,REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,
@@ -342,13 +351,13 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNIO
             collisions++;
             for(int j=0;j<nodes.m;j++){
                 modified_full(nodes(j))=true;
-                recently_modified_full(nodes(j))=true;
-                tmp.Remove_All();
-                geometry.deformable_body_collection.binding_list.Parents(tmp,nodes(j));
-                modified_full.Subset(tmp).Fill(true);
-                recently_modified_full.Subset(tmp).Fill(true);}
+                recently_modified_full(nodes(j))=true;}
+            modified_full.Subset(parent_list).Fill(true);
+            recently_modified_full.Subset(parent_list).Fill(true);
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
-            if(rigid){union_find.Union(nodes);is_rigid.Subset(nodes).Fill(true);}}}
+            if(rigid){
+                union_find.Union(parent_list);
+                is_rigid.Subset(parent_list).Fill(true);}}}
     if(output_collision_results && !final_repulsion_only){
         if(final_point_face_repulsions) LOG::Stat("final point face repulsions",final_point_face_repulsions);
         if(final_point_face_collisions) LOG::Stat("final point face collisions",final_point_face_collisions);
@@ -533,10 +542,19 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION
     ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,skipping_already_rigid=0;T collision_time;
 
-    ARRAY<int> tmp;
+    ARRAY<int> parent_list;
     for(int i=0;i<pairs.m;i++){const VECTOR<int,d+1>& nodes=pairs(i);
         GAUSS_JACOBI_DATA ee_data(ee_target_impulses(i),ee_target_weights(i),ee_normals(i),ee_old_speeds(i));
-        if(rigid){if(is_rigid.Subset(nodes).Contains(true)){skipping_already_rigid++;continue;}}
+        parent_list.Remove_All();
+        for(int j=0;j<nodes.m;j++)
+            geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(j));
+        if(rigid){
+            int root=union_find.Find(parent_list(0));
+            bool ok=true;
+            for(int j=1;j<parent_list.m;j++)
+                if(union_find.Find(parent_list(j))!=root)
+                    ok=false;
+            if(ok){skipping_already_rigid++;continue;}}
         bool collided;
         if(final_repulsion_only)
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
@@ -545,12 +563,17 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION
             for(int j=0;j<nodes.m;j++){
                 modified_full(nodes(j))=true;
                 recently_modified_full(nodes(j))=true;
-                tmp.Remove_All();
-                geometry.deformable_body_collection.binding_list.Parents(tmp,nodes(j));
-                modified_full.Subset(tmp).Fill(true);
-                recently_modified_full.Subset(tmp).Fill(true);}
+                parent_list.Remove_All();
+                geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(j));
+                modified_full.Subset(parent_list).Fill(true);
+                recently_modified_full.Subset(parent_list).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - edge collision"<<std::endl;return collisions;}
-            if(rigid){union_find.Union(nodes);is_rigid.Subset(nodes).Fill(true);}}}
+            if(rigid){
+                ARRAY<int> parent_list;
+                for(int i=0;i<nodes.m;i++)
+                    geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(i));
+                union_find.Union(parent_list);
+                is_rigid.Subset(parent_list).Fill(true);}}}
     if(output_collision_results && !final_repulsion_only){
         if(final_edge_edge_repulsions) LOG::Stat("final edge edge repulsions",final_edge_edge_repulsions);
         if(final_edge_edge_collisions) LOG::Stat("final edge edge collisions",final_edge_edge_collisions);
@@ -681,7 +704,7 @@ Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find,const 
             average_velocity+=full_particles.mass(p)*(full_particles.X(p)-X_self_collision_free(p));}
         T one_over_total_mass=1/total_mass;
         center_of_mass*=one_over_total_mass;
-        average_velocity*=one_over_dt*one_over_total_mass;  
+        average_velocity*=one_over_dt*one_over_total_mass;
         typename TV::SPIN L; // moment of inertia & angular momentum
         SYMMETRIC_MATRIX<T,TV::SPIN::m> inertia;
         for(int k=0;k<flat_indices.m;k++){int p=flat_indices(k);
