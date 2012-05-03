@@ -214,7 +214,9 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,union_find,is_rigid);
         // Update positions
         if(collisions_in_attempt){
-            for(int p=0;p<full_particles.Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);}
+            for(int p=0;p<full_particles.Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);
+            geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
+            geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();}
 
         exited_early=0;
         EXIT_EARLY_AND_COMMUNICATE:;
@@ -679,10 +681,7 @@ Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find,const 
 {
     HASHTABLE<int,ARRAY<int> > lists;
     for(typename HASHTABLE<int,int>::ITERATOR it(union_find.parents);it.Valid();it.Next())
-            lists.Get_Or_Insert(it.Data()).Append(it.Key());
-
-        SPARSE_UNION_FIND<> union_find2;
-        union_find2.Union(3,5);
+        lists.Get_Or_Insert(union_find.Find(it.Data())).Append(it.Key());
 
     for(typename HASHTABLE<int,ARRAY<int> >::ITERATOR it(lists);it.Valid();it.Next())
         it.Data().Append(it.Key());
