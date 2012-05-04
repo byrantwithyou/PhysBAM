@@ -14,7 +14,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_SMOOTH.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED2.h>
@@ -73,8 +72,6 @@ int main(int argc,char* argv[])
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
     if(parse_args.Is_Value_Set("-use_ext_neo")) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
     else if(parse_args.Is_Value_Set("-use_ext_neo2")) icm=new NEO_HOOKEAN_EXTRAPOLATED2<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,20);
-    else if(parse_args.Is_Value_Set("-use_ext_neo_ref")) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.4,.6,20);
-    else if(parse_args.Is_Value_Set("-use_ext_neo_hyper")) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(parse_args.Is_Value_Set("-use_ext_neo_smooth")) icm=new NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,.1);
     else if(parse_args.Is_Value_Set("-use_corotated")) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(parse_args.Is_Value_Set("-use_corot_blend")) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);

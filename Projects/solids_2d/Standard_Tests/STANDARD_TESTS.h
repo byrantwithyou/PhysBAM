@@ -56,8 +56,6 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_COROTATED_BLEND.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN_EXTRAPOLATED_REFINED.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/COLLISION_AREA_PENALTY_FORCE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
@@ -784,10 +782,8 @@ void Add_Constitutive_Model(TRIANGULATED_AREA<T>& triangulated_area,T stiffness,
 {
     ISOTROPIC_CONSTITUTIVE_MODEL<T,2>* icm=0;
     if(use_extended_neohookean) icm=new NEO_HOOKEAN_EXTRAPOLATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,(T).4,20*stiffness*stiffness_multiplier);
-    else if(use_extended_neohookean_refined) icm=new NEO_HOOKEAN_EXTRAPOLATED_REFINED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier,(T).4,(T).6,20*stiffness*stiffness_multiplier);
     else if(use_corotated) icm=new COROTATED<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else if(use_corot_blend) icm=new NEO_HOOKEAN_COROTATED_BLEND<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
-    else if(use_extended_neohookean_hyperbola) icm=new NEO_HOOKEAN_EXTRAPOLATED_HYPERBOLA<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     else icm=new NEO_HOOKEAN<T,2>(stiffness*stiffness_multiplier,poissons_ratio,damping*damping_multiplier);
     solid_body_collection.Add_Force(Create_Finite_Volume(triangulated_area,icm));
 }

@@ -14,7 +14,6 @@
 #include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/VOLUME_COLLISIONS.h>
 #include <cassert>
@@ -39,58 +38,6 @@ bool Inside_Trapezoid(TV a,TV b,const TV& p)
 }
 
 RANDOM_NUMBERS<double> rn;
-
-bool Test()
-{
-    typedef double T;
-    typedef VECTOR<double,2> TV;
-    VECTOR<TV,4> a;
-    rn.Fill_Uniform(a(0),0,1);
-    rn.Fill_Uniform(a(1),0,1);
-    rn.Fill_Uniform(a(2),0,1);
-    rn.Fill_Uniform(a(3),0,1);
-
-    T e=1e-5;
-    VECTOR<TV,4> da;
-    rn.Fill_Uniform(da(0),-e,e);
-    rn.Fill_Uniform(da(1),-e,e);
-    rn.Fill_Uniform(da(2),-e,e);
-    rn.Fill_Uniform(da(3),-e,e);
-
-    trap_cases.Remove_All();
-//    fprintf(stderr, "1 1 1 setrgbcolor newpath 0 0 moveto 1000 0 lineto 1000 1000 lineto 0 1000 lineto closepath fill\n");
-    VECTOR<TV,4> G1;
-    VECTOR<VECTOR<MATRIX<T,2>,4>,4> H1;
-    T A1 = Trapezoid_Intersection_Area(a(0),a(1),a(2),a(3),G1,H1);
-    ARRAY<int> tmp_cases=trap_cases;
-
-    trap_cases.Remove_All();
-    VECTOR<TV,4> G2;
-    VECTOR<VECTOR<MATRIX<T,2>,4>,4> H2;
-    T A2 = Trapezoid_Intersection_Area(a(0)+da(0),a(1)+da(1),a(2)+da(2),a(3)+da(3),G2,H2);
-
-    VECTOR<T,8>& Va=(VECTOR<T,8>&)da;
-    VECTOR<T,8>& V1=(VECTOR<T,8>&)G1;
-    VECTOR<T,8>& V2=(VECTOR<T,8>&)G2;
-
-    T G=Va.Dot_Product(Va,(V1+V2)/(T)2);
-    T aa=G/e;
-    T bb=(A2-A1)/e;
-    if((!aa != !bb) || fabs((aa-bb)/bb)>1e-5) if(tmp_cases==trap_cases){printf("ZG %g %g %g   ", aa, bb, fabs((aa-bb)/bb));LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
-
-    MATRIX<T,8> M1,M2;
-    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M1(i,j)=H1(i/2)(j/2)(i%2,j%2);
-    for(int i=0;i<8;i++) for(int j=0;j<8;j++) M2(i,j)=H2(i/2)(j/2)(i%2,j%2);
-
-    VECTOR<T,8> dG1=(M1+M2)/(T)2*Va;
-    VECTOR<T,8> dG2=V2-V1;
-    T cc=dG2.Magnitude()/e;
-    T dd=dG1.Magnitude()/e;
-    T ee=(dG2-dG1).Magnitude()/e;
-    if((!cc != !dd) || ee/cc>1e-5) if(tmp_cases==trap_cases){printf("ZH %g %g %g      ", cc, dd, ee/cc);LOG::cout<<tmp_cases<<"   "<<trap_cases<<std::endl;}
-
-    return true;
-}
 
 bool Tri_Test()
 {
@@ -508,9 +455,6 @@ int main(int argc,char *argv[])
 
     for(int k=0;k<100000;k++)
         Tri_Test();
-
-//    for(int k=0;k<1000000;k++)
-//        Test();
 
 //    for(int i=0;i<100;i++) Test_Triangle_Intersection<TV>();
 
