@@ -99,17 +99,17 @@ private:
     void Scale_And_Apply_Impulses();
     void Get_Moving_Faces_Near_Moving_Points(STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1,STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2,ARRAY<VECTOR<int,d+1> >& pairs_internal,ARRAY<VECTOR<int,d+1> >& pairs_external,const T detection_thickness);
     void Get_Moving_Edges_Near_Moving_Edges(STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_1,STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2,ARRAY<VECTOR<int,d+1> >& pairs_internal,ARRAY<VECTOR<int,d+1> >& pairs_external,const T detection_thickness);
-    int Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,ARRAY<bool>& is_rigid,const ARRAY<VECTOR<int,d+1> >& pairs,
+    int Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,const ARRAY<VECTOR<int,d+1> >& pairs,
         const T attempt_ratio,const bool final_repulsion_only,const bool exit_early);
     bool Point_Face_Collision(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nodes,const T dt,const T repulsion_thickness,T& collision_time,const T attempt_ratio,const bool exit_early);
     void Point_Face_Pull_In(const VECTOR<int,d+1>& nodes,ARRAY_VIEW<TV> V,const T dt,const T repulsion_thickness);
     bool Point_Face_Final_Repulsion(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nodes,const T dt,const T repulsion_thickness,T& collision_time,const T attempt_ratio,const bool exit_early);
-    int Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,ARRAY<bool>& is_rigid,const ARRAY<VECTOR<int,d+1> >& pairs,
+    int Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,const ARRAY<VECTOR<int,d+1> >& pairs,
         const T attempt_ratio,const bool final_repulsion_only,const bool exit_early);
     int Prune_Non_Intersecting_Pairs(const T dt,ARRAY<VECTOR<int,d+1> >& point_face_pairs,ARRAY<VECTOR<int,d+1> >& edge_edge_pairs,const T attempt_ratio);
     bool Edge_Edge_Collision(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,const T dt,T& collision_time,const T attempt_ratio,const bool exit_early);
     bool Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,const T dt,T& collision_time,const T attempt_ratio,const bool exit_early);
-    void Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find,const ARRAY<bool>& is_rigid);
+    void Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find);
 //#####################################################################
 };
 }

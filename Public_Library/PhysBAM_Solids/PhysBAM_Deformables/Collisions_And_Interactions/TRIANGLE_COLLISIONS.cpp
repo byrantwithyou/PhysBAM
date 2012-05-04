@@ -131,13 +131,12 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     int collisions=0,collisions_in_attempt=0,
         point_face_collisions=0,edge_edge_collisions=0;
     SPARSE_UNION_FIND<> union_find(full_particles.Size());
-    ARRAY<bool> is_rigid(full_particles.Size());
 
     recently_modified_full.Resize(full_particles.Size(),false,false);
     recently_modified_full.Fill(true);
-    ARRAY<TV> V_save;
     ARRAY<TV> X_save;
     // input velocities are average V.  Also want original velocities?  Delta may be sufficient.
+    geometry.deformable_body_collection.binding_list.Update_Neighbor_Bindings();
 
     int attempts=0;bool rigid=false;
     while(!attempts || (!exit_early && collisions_in_attempt)){
@@ -170,24 +169,24 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
         // point face first for stability
         point_face_collisions=0;edge_edge_collisions=0;collisions_in_attempt=0;
         if(mpi_solids && mpi_solids->rank==0){
-            point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,is_rigid,point_face_pairs_external,attempt_ratio,false,exit_early);
+            point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,point_face_pairs_external,attempt_ratio,false,exit_early);
             PHYSBAM_ASSERT(!exit_early);}
         if(mpi_solids){
             LOG::Time("broadcast");
             mpi_solids->Broadcast_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);}
-        point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,is_rigid,point_face_pairs_internal,attempt_ratio,false,exit_early);
+        point_face_collisions+=Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,point_face_pairs_internal,attempt_ratio,false,exit_early);
         if(exit_early && point_face_collisions) goto EXIT_EARLY_AND_COMMUNICATE;
         if(mpi_solids){
             LOG::Time("gather");
             mpi_solids->Gather_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);}
         // edge edge pairs
         if(mpi_solids && mpi_solids->rank==0){
-            edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,is_rigid,edge_edge_pairs_external,attempt_ratio,false,exit_early);
+            edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,edge_edge_pairs_external,attempt_ratio,false,exit_early);
             PHYSBAM_ASSERT(!exit_early);}
         if(mpi_solids){
             LOG::Time("broadcast");
             mpi_solids->Broadcast_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);}
-        edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,is_rigid,edge_edge_pairs_internal,attempt_ratio,false,exit_early);
+        edge_edge_collisions+=Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,edge_edge_pairs_internal,attempt_ratio,false,exit_early);
         if(exit_early && edge_edge_collisions) goto EXIT_EARLY_AND_COMMUNICATE;
         collisions_in_attempt=edge_edge_collisions+point_face_collisions;
         if(mpi_solids) mpi_solids->Gather_Collision_Modified_Data(modified_full,recently_modified_full,full_particles.X,full_particles.V);
@@ -205,13 +204,13 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
             pf_target_weights.Fill(VECTOR<T,d+1>());ee_target_weights.Fill(VECTOR<T,d+1>());
             pf_normals.Fill(TV());ee_normals.Fill(TV());
             pf_old_speeds.Fill(T());ee_old_speeds.Fill(T());
-            Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,is_rigid,point_face_pairs_internal,attempt_ratio,true,exit_early);
-            Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,is_rigid,edge_edge_pairs_internal,attempt_ratio,true,exit_early);
+            Adjust_Velocity_For_Point_Face_Collision(dt,rigid,union_find,point_face_pairs_internal,attempt_ratio,true,exit_early);
+            Adjust_Velocity_For_Edge_Edge_Collision(dt,rigid,union_find,edge_edge_pairs_internal,attempt_ratio,true,exit_early);
             
             Scale_And_Apply_Impulses();}
 
         // Apply rigid motions
-        if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,union_find,is_rigid);
+        if(rigid && collisions_in_attempt && (!mpi_solids || mpi_solids->rank==0)) Apply_Rigid_Body_Motions(dt,union_find);
         // Update positions
         if(collisions_in_attempt){
             for(int p=0;p<full_particles.Size();p++) if(modified_full(p)) full_particles.X(p)=X_self_collision_free(p)+dt*full_particles.V(p);
@@ -325,7 +324,7 @@ template<> void TRIANGLE_COLLISIONS<VECTOR<double,2> >::Get_Moving_Edges_Near_Mo
 // Function Adjust_Velocity_For_Point_Face_Collision
 //#####################################################################
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
-Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,ARRAY<bool>& is_rigid,const ARRAY<VECTOR<int,d+1> >& pairs,
+Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,const ARRAY<VECTOR<int,d+1> >& pairs,
     const T attempt_ratio,const bool final_repulsion_only,const bool exit_early)
 {
     final_point_face_repulsions=final_point_face_collisions=0;
@@ -358,8 +357,7 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNIO
             recently_modified_full.Subset(parent_list).Fill(true);
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
             if(rigid){
-                union_find.Union(parent_list);
-                is_rigid.Subset(parent_list).Fill(true);}}}
+                union_find.Union(parent_list);}}}
     if(output_collision_results && !final_repulsion_only){
         if(final_point_face_repulsions) LOG::Stat("final point face repulsions",final_point_face_repulsions);
         if(final_point_face_collisions) LOG::Stat("final point face collisions",final_point_face_collisions);
@@ -432,7 +430,7 @@ Point_Face_Collision(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nodes,con
         if(use_gauss_jacobi){
             pf_data.old_speed=-V.Subset(nodes).Weighted_Sum(weights).Dot(normal);
             TV impulse=-(1+restitution_coefficient)*pf_data.old_speed/geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(nodes,weights)*normal;
-            for(int i=0;i<TV::m+1;i++) V_save(nodes(i))-=weights(i)*one_over_m(i)*impulse;
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);
             pf_data.target_impulse=impulse;
             pf_data.target_weight=weights;
             pf_data.target_normal=normal;}
@@ -480,7 +478,7 @@ Point_Face_Pull_In(const VECTOR<int,d+1>& nodes,ARRAY_VIEW<TV> V,const T dt,cons
         //T remove_relative_velocity=(distance-repulsion_thickness)/dt;
         //T scalar_impulse=remove_relative_velocity*one_over_m.Average();
         TV impulse=-scalar_impulse/one_over_m.Weighted_Sum(sqr(weights))*normal;
-        for(int i=0;i<TV::m+1;i++) V(nodes(i))-=weights(i)*one_over_m(i)*impulse;}    
+        for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse);}
 }
 template<> void TRIANGLE_COLLISIONS<VECTOR<float,1> >::Point_Face_Pull_In(const VECTOR<int,2>&,ARRAY_VIEW<VECTOR<float,1> >,const float,const float){PHYSBAM_NOT_IMPLEMENTED();}
 template<> void TRIANGLE_COLLISIONS<VECTOR<double,1> >::Point_Face_Pull_In(const VECTOR<int,2>&,ARRAY_VIEW<VECTOR<double,1> >,const double,const double){PHYSBAM_NOT_IMPLEMENTED();}
@@ -520,7 +518,7 @@ Point_Face_Final_Repulsion(GAUSS_JACOBI_DATA& pf_data,const VECTOR<int,d+1>& nod
         if(use_gauss_jacobi){
             pf_data.old_speed=relative_speed;
             TV impulse=-scalar_impulse/one_over_m.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V_save(nodes(i))-=weights(i)*one_over_m(i)*impulse;
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse,V_save);
             pf_data.target_impulse=impulse;
             pf_data.target_weight=weights;
             pf_data.target_normal=normal;}
@@ -537,7 +535,7 @@ template<> bool TRIANGLE_COLLISIONS<VECTOR<double,1> >::Point_Face_Final_Repulsi
 // Function Adjust_Velocity_For_Edge_Edge_Collision
 //#####################################################################
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
-Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,ARRAY<bool>& is_rigid,const ARRAY<VECTOR<int,d+1> >& pairs,
+Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION_FIND<>& union_find,const ARRAY<VECTOR<int,d+1> >& pairs,
     const T attempt_ratio,const bool final_repulsion_only,const bool exit_early)
 {
     final_edge_edge_repulsions=final_edge_edge_collisions=0;
@@ -574,8 +572,7 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION
                 ARRAY<int> parent_list;
                 for(int i=0;i<nodes.m;i++)
                     geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(i));
-                union_find.Union(parent_list);
-                is_rigid.Subset(parent_list).Fill(true);}}}
+                union_find.Union(parent_list);}}}
     if(output_collision_results && !final_repulsion_only){
         if(final_edge_edge_repulsions) LOG::Stat("final edge edge repulsions",final_edge_edge_repulsions);
         if(final_edge_edge_collisions) LOG::Stat("final edge edge collisions",final_edge_edge_collisions);
@@ -605,7 +602,7 @@ Edge_Edge_Collision(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,cons
         if(use_gauss_jacobi){
             ee_data.old_speed=relative_speed;
             TV impulse=-(1+restitution_coefficient)*relative_speed/geometry.deformable_body_collection.binding_list.One_Over_Effective_Mass(nodes,weights)*normal;
-            for(int i=0;i<TV::m+1;i++) V_save(nodes(i))-=weights(i)*one_over_m(i)*impulse;
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse,V_save);
             ee_data.target_impulse=impulse;
             ee_data.target_weight=weights;
             ee_data.target_normal=normal;}
@@ -659,7 +656,7 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
         if(use_gauss_jacobi){
             ee_data.old_speed=relative_speed;
             TV impulse=-scalar_impulse/one_over_m_edges.Weighted_Sum(sqr(weights))*normal;
-            for(int i=0;i<TV::m+1;i++) V_save(nodes(i))-=weights(i)*one_over_m_edges(i)*impulse;
+            for(int i=0;i<TV::m+1;i++) geometry.deformable_body_collection.binding_list.Apply_Impulse(nodes(i),-weights(i)*impulse,V_save);
             ee_data.target_impulse=impulse;
             ee_data.target_weight=weights;
             ee_data.target_normal=normal;}
@@ -677,7 +674,7 @@ template<> bool TRIANGLE_COLLISIONS<VECTOR<double,2> >::Edge_Edge_Final_Repulsio
 // Function Apply_Rigid_Body_Motions
 //#####################################################################
 template<class TV> void TRIANGLE_COLLISIONS<TV>::
-Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find,const ARRAY<bool>& is_rigid)
+Apply_Rigid_Body_Motions(const T dt,const SPARSE_UNION_FIND<>& union_find)
 {
     HASHTABLE<int,ARRAY<int> > lists;
     for(typename HASHTABLE<int,int>::ITERATOR it(union_find.parents);it.Valid();it.Next())

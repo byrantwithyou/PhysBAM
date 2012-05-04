@@ -13,6 +13,7 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/HEXAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/INTERSECTING_PAIRS_VISITOR.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/STRUCTURE_INTERACTION_GEOMETRY.h>
@@ -100,10 +101,10 @@ Allow_Intersections(const bool allow_intersections_input)
 //#####################################################################
 // Function Check_For_Intersection
 //#####################################################################
-template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
+template<class T,class TV> bool Check_For_Intersection_Helper(const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geo,const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
     ARRAY_VIEW<const VECTOR<T,1> > X,const bool grow_thickness_to_find_first_self_intersection,const T threshold)
 {PHYSBAM_NOT_IMPLEMENTED();}
-template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
+template<class T,class TV> bool Check_For_Intersection_Helper(const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geo,const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
     ARRAY_VIEW<const VECTOR<T,2> > X,const bool grow_thickness_to_find_first_self_intersection,const T threshold)
 {
     SEGMENTED_CURVE_2D<T>* segmented_curve1=structure_geometries(pair[0])->segmented_curve;
@@ -114,7 +115,7 @@ template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCT
         else if(grow_thickness_to_find_first_self_intersection) segmented_curve1->Find_First_Segment_Segment_Intersection(segmented_curve2->mesh,X,threshold,10);}
     return false;
 }
-template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
+template<class T,class TV> bool Check_For_Intersection_Helper(const TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<TV>& geo,const ARRAY<STRUCTURE_INTERACTION_GEOMETRY<TV>*>& structure_geometries,const VECTOR<int,2>& pair,
     ARRAY_VIEW<const VECTOR<T,3> > X,const bool grow_thickness_to_find_first_self_intersection,const T threshold)
 {
     ARRAY<VECTOR<int,2> > intersecting_segment_triangle_pairs;
@@ -126,7 +127,10 @@ template<class T,class TV> bool Check_For_Intersection_Helper(const ARRAY<STRUCT
                 LOG::cout<<"intersections found, pair = "<<pair<<", threshold = "<<threshold<<std::endl;
                 for(int k=0;k<intersecting_segment_triangle_pairs.m;k++){
                     int s,t;intersecting_segment_triangle_pairs(k).Get(s,t);
-                    LOG::cout<<"segment "<<s<<", triangle "<<t<<", segment nodes = "<<segmented_curve->mesh.elements(s)<<", triangle nodes = "<<triangulated_surface->mesh.elements(t)<<std::endl;}
+                    ARRAY<int> tmp;
+                    geo.deformable_body_collection.binding_list.Flatten_Indices(tmp,segmented_curve->mesh.elements(s));
+                    geo.deformable_body_collection.binding_list.Flatten_Indices(tmp,triangulated_surface->mesh.elements(t));
+                    LOG::cout<<"segment "<<s<<", triangle "<<t<<", segment nodes = "<<segmented_curve->mesh.elements(s)<<", triangle nodes = "<<triangulated_surface->mesh.elements(t)<<"    real = "<<tmp<<std::endl;}
                 return true;}
             else if(grow_thickness_to_find_first_self_intersection) triangulated_surface->Find_First_Segment_Triangle_Intersection(segmented_curve->mesh,X,threshold,10);}}
     return false;
@@ -139,7 +143,7 @@ Check_For_Intersection(const bool grow_thickness_to_find_first_self_intersection
     ARRAY_VIEW<const TV> X(deformable_body_collection.particles.X);
     T threshold=small_number;if(thickness) threshold=thickness;
     for(int k=0;k<interacting_structure_pairs.m;k++){const VECTOR<int,2>& pair=interacting_structure_pairs(k);
-        if(Check_For_Intersection_Helper(structure_geometries,pair,X,grow_thickness_to_find_first_self_intersection,threshold)){
+        if(Check_For_Intersection_Helper(*this,structure_geometries,pair,X,grow_thickness_to_find_first_self_intersection,threshold)){
             if(interaction_pair) *interaction_pair=pair;
             return true;}}
     return false;
@@ -152,7 +156,7 @@ Check_For_Intersection(const bool grow_thickness_to_find_first_self_intersection
     ARRAY_VIEW<const TV> X(deformable_body_collection.particles.X);
     T threshold=small_number;if(thickness) threshold=thickness;
     for(int k=0;k<interacting_structure_pairs.m;k++){const VECTOR<int,2>& pair=interacting_structure_pairs(k);
-        if(Check_For_Intersection_Helper(structure_geometries,pair,X,grow_thickness_to_find_first_self_intersection,threshold)){
+        if(Check_For_Intersection_Helper(*this,structure_geometries,pair,X,grow_thickness_to_find_first_self_intersection,threshold)){
             interaction_pairs.Append(pair);}}
     return interaction_pairs.Size()>0;
 }

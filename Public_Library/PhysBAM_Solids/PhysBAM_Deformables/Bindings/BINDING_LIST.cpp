@@ -179,6 +179,67 @@ Write(TYPED_OSTREAM& output) const
     for(int k=0;k<bindings.m;k++) bindings(k)->Write(output);
 }
 //#####################################################################
+// Function Update_Neighbor_Bindings
+//#####################################################################
+template<class TV> void BINDING_LIST<TV>::
+Update_Neighbor_Bindings()
+{
+    ARRAY<ARRAY<int> > children(particles.number);
+    ARRAY<int> parents;
+    for(int k=0;k<bindings.m;k++){
+        parents.Remove_All();
+        bindings(k)->Parents(parents);
+        for(int i=0;i<parents.m;i++)
+            children(parents(i)).Append(bindings(k)->particle_index);}
+
+    neighbor_bindings.Resize(bindings.m);
+    for(int k=0;k<bindings.m;k++){
+        parents.Remove_All();
+        bindings(k)->Parents(parents);
+        for(int i=0;i<parents.m;i++)
+            neighbor_bindings(k).Append_Elements(children(parents(i)));
+        neighbor_bindings(k).Prune_Duplicates();}
+}
+//#####################################################################
+// Function Apply_Impulse
+//#####################################################################
+template<class TV> void BINDING_LIST<TV>::
+Apply_Impulse(const int particle_index,const TV& impulse,bool update_neighbors)
+{
+    if(BINDING<TV>* binding=Binding(particle_index)){
+        binding->Apply_Impulse(impulse);
+        if(update_neighbors)
+            for(int i=0;i<neighbor_bindings(binding->particle_index).m;i++)
+                particles.V(neighbor_bindings(binding->particle_index)(i))=V(neighbor_bindings(binding->particle_index)(i));}
+    else particles.V(particle_index)+=particles.one_over_mass(particle_index)*impulse;
+}
+//#####################################################################
+// Function Apply_Impulse
+//#####################################################################
+template<class TV> void BINDING_LIST<TV>::
+Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V_input,bool update_neighbors) const
+{
+    if(BINDING<TV>* binding=Binding(particle_index)){
+        binding->Apply_Impulse(impulse,V_input);
+        if(update_neighbors)
+            for(int i=0;i<neighbor_bindings(binding->particle_index).m;i++)
+                V_input(neighbor_bindings(binding->particle_index)(i))=V(neighbor_bindings(binding->particle_index)(i),V_input);}
+    else V_input(particle_index)+=particles.one_over_mass(particle_index)*impulse;
+}
+//#####################################################################
+// Function Apply_Impulse
+//#####################################################################
+template<class TV> void BINDING_LIST<TV>::
+Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V_input,ARRAY_VIEW<TWIST<TV> > rigid_V,bool update_neighbors) const
+{
+    if(BINDING<TV>* binding=Binding(particle_index)){
+        binding->Apply_Impulse(impulse,V_input,rigid_V);
+        if(update_neighbors)
+            for(int i=0;i<neighbor_bindings(binding->particle_index).m;i++)
+                V_input(neighbor_bindings(binding->particle_index)(i))=V(neighbor_bindings(binding->particle_index)(i),V_input,rigid_V);}
+    else V_input(particle_index)+=particles.one_over_mass(particle_index)*impulse;
+}
+//#####################################################################
 template class BINDING_LIST<VECTOR<float,1> >;
 template class BINDING_LIST<VECTOR<float,2> >;
 template class BINDING_LIST<VECTOR<float,3> >;

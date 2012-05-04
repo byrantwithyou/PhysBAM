@@ -279,6 +279,8 @@ Update_Repulsion_Pairs_Using_History(T_ARRAY1& point_face_pairs,T_ARRAY2& edge_e
 template<class TV> int TRIANGLE_REPULSIONS<TV>::
 Adjust_Velocity_For_Self_Repulsion_Using_History(const T dt,const bool use_repulsions,bool use_saved_pairs)
 {
+    geometry.deformable_body_collection.binding_list.Update_Neighbor_Bindings();
+
    // TODO: MPI
     LOG::SCOPE scope("history repulsions","checking history repulsions");
     if(use_repulsions) geometry.deformable_body_collection.soft_bindings.Clamp_Particles_To_Embedded_Positions(true); // otherwise assume we're in the velocity update, and positions are correct
@@ -342,6 +344,9 @@ Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_interaction_pairs
             if(output_repulsion_results) LOG::Stat("total edge edge repulsion",edge_edge_interaction_pairs.Size());}}
     return repulsions;
 }
+//#####################################################################
+// Function Apply_Repulsions_To_Velocities
+//#####################################################################
 template<class TV> template<class T_ARRAY1,class T_ARRAY2> int TRIANGLE_REPULSIONS<TV>::
 Apply_Repulsions_To_Velocities(const T dt,T_ARRAY1& point_face_boundary_pairs,T_ARRAY2& edge_edge_boundary_pairs,
     T_ARRAY1& point_face_internal_pairs,T_ARRAY2& edge_edge_internal_pairs,const bool use_repulsions)

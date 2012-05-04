@@ -32,6 +32,7 @@ public:
     int last_read;
     mutable bool is_stale;
     mutable ARRAY<int>* frame_list;
+    ARRAY<ARRAY<int> > neighbor_bindings;
 
     BINDING_LIST(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
     virtual ~BINDING_LIST();
@@ -40,13 +41,13 @@ public:
     {assert(particle<particles.Size());return binding_index_from_particle_index.m<=particle?-1:binding_index_from_particle_index(particle);}
 
     TV Embedded_Position(const int particle_index) const
-    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position();return particles.X(particle_index);}
+    {return X(particle_index);}
 
     TV Embedded_Position(const int particle_index,ARRAY_VIEW<const TV> X_input) const
-    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position(X_input);return X_input(particle_index);}
+    {return X(particle_index,X_input);}
 
     TV Embedded_Velocity(const int particle_index) const
-    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Velocity();return particles.V(particle_index);}
+    {return V(particle_index);}
 
     BINDING<TV>* Binding(const int particle_index) const
     {if(binding_index_from_particle_index.m<=particle_index || binding_index_from_particle_index(particle_index)<0) return 0;
@@ -55,20 +56,17 @@ public:
     TV V(const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Velocity();return particles.V(particle_index);}
 
+    TV V(const int particle_index,ARRAY_VIEW<const TV> V_input) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Velocity(V_input);return V_input(particle_index);}
+
+    TV V(const int particle_index,ARRAY_VIEW<const TV> V_input,ARRAY_VIEW<TWIST<TV> > rigid_V) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Velocity(V_input,rigid_V);return V_input(particle_index);}
+
     TV X(const int particle_index) const
     {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position();return particles.X(particle_index);}
 
-    void Apply_Impulse(const int particle_index,const TV& impulse)
-    {if(BINDING<TV>* binding=Binding(particle_index)){binding->Apply_Impulse(impulse);particles.V(particle_index)=binding->Embedded_Position();}
-    else particles.V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
-
-    void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V) const
-    {if(BINDING<TV>* binding=Binding(particle_index)){binding->Apply_Impulse(impulse,V);V(particle_index)=binding->Embedded_Position();}
-    else V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
-
-    void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V) const
-    {if(BINDING<TV>* binding=Binding(particle_index)){binding->Apply_Impulse(impulse,V,rigid_V);V(particle_index)=binding->Embedded_Position();}
-    else V(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
+    TV X(const int particle_index,ARRAY_VIEW<const TV> X_input) const
+    {if(BINDING<TV>* binding=Binding(particle_index)) return binding->Embedded_Position(X_input);return X_input(particle_index);}
 
     void Apply_Push(const int particle_index,const TV& impulse)
     {if(BINDING<TV>* binding=Binding(particle_index)) binding->Apply_Push(impulse);else particles.X(particle_index)+=particles.one_over_mass(particle_index)*impulse;}
@@ -128,6 +126,7 @@ public:
     void Clean_Memory();
     int Add_Binding(BINDING<TV>* binding);
     void Update_Binding_Index_From_Particle_Index();
+    void Update_Neighbor_Bindings();
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const;
     void Compute_Dependency_Closure_Based_On_Embedding(SEGMENT_MESH& dependency_mesh) const;
     void Compute_Particle_Closure_Based_On_Embedding(ARRAY<int>& particle_set) const;
@@ -139,6 +138,9 @@ public:
     void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full) const;
     void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,ARRAY_VIEW<TWIST<TV> > wrench_full) const;
     void Distribute_Mass_To_Parents() const;
+    void Apply_Impulse(const int particle_index,const TV& impulse,bool update_neighbors=true);
+    void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V_input,bool update_neighbors=true) const;
+    void Apply_Impulse(const int particle_index,const TV& impulse,ARRAY_VIEW<TV> V,ARRAY_VIEW<TWIST<TV> > rigid_V,bool update_neighbors=true) const;
     void Read(TYPED_ISTREAM& input);
     void Write(TYPED_OSTREAM& output) const;
 //#####################################################################
