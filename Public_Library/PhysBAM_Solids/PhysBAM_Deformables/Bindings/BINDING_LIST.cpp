@@ -192,13 +192,13 @@ Update_Neighbor_Bindings()
         for(int i=0;i<parents.m;i++)
             children(parents(i)).Append(bindings(k)->particle_index);}
 
-    neighbor_bindings.Resize(bindings.m);
+    neighbor_bindings.Resize(particles.number);
     for(int k=0;k<bindings.m;k++){
         parents.Remove_All();
         bindings(k)->Parents(parents);
         for(int i=0;i<parents.m;i++)
-            neighbor_bindings(k).Append_Elements(children(parents(i)));
-        neighbor_bindings(k).Prune_Duplicates();}
+            neighbor_bindings(bindings(k)->particle_index).Append_Elements(children(parents(i)));
+        neighbor_bindings(bindings(k)->particle_index).Prune_Duplicates();}
 }
 //#####################################################################
 // Function Apply_Impulse
