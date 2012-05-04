@@ -8,7 +8,6 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SEGMENT_ORIGIN_AREAS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/SIMPLEX_INTERACTIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRAPEZOID_INTERSECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_INTERSECTION.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -23,23 +22,13 @@ Triangle_Intersection_Area(const TRIANGLE_2D<T>& a,const TRIANGLE_2D<T>& b,VECTO
         for(int j=0;j<3;j++){
             int jn=(j+1)%3;
             VECTOR<int,4> I(i,in,j+3,jn+3);
-#if 1
             ORIGIN_AREAS::VOL_DATA<T,2,4> data;
             TV const X[]={a.X(i),a.X(in),b.X(j),b.X(jn)};
             ORIGIN_AREAS::Volume_From_Simplices(data,TV(),X);
             A+=data.V;
 
             for(int k=0;k<4;k++) G(I(k))+=(const TV&)data.G[k];
-            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=data.H[k][m];
-#else // #if 0|1
-            VECTOR<TV,4> tG;
-            VECTOR<VECTOR<MATRIX<T,2>,4>,4> tH;
-            A+=Trapezoid_Intersection_Area(a.X(i),a.X(in),b.X(j),b.X(jn),tG,tH);
-            for(int k=0;k<4;k++) G(I(k))+=tG(k);
-            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=tH(k)(m);
-#endif // #if 0|1
-        }
-    }
+            for(int k=0;k<4;k++) for(int m=0;m<4;m++) H(I(k))(I(m))+=data.H[k][m];}}
     return A;
 }
 //#####################################################################
