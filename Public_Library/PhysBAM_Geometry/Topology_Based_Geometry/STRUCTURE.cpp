@@ -15,8 +15,8 @@ template<class TV> STRUCTURE<TV>& Representative(const std::string& name);
 // Constructor
 //#####################################################################
 template<class TV> STRUCTURE<TV>::
-STRUCTURE():
-    update_every_frame(false)
+STRUCTURE()
+    :update_every_frame(false)
 {}
 //#####################################################################
 // Destructor

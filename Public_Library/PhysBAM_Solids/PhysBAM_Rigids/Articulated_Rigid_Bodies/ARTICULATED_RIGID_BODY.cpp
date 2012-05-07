@@ -279,7 +279,7 @@ Compute_Constraint_Correcting_Impulse(T_CONSTRAINT_FUNCTION& constraint_error_fu
             f_of_j_2_norm=constraint_error_function.Convergence_Norm_Squared(f_of_j_2),f_of_b_norm=constraint_error_function.Convergence_Norm_Squared(f_of_b);
 
         int line_search_iterations=0;
-        while(constraint_error_function.Magnitude(b-a)>line_search_interval_tolerance && line_search_iterations++<=max_line_search_iterations){
+        while(constraint_error_function.Magnitude(b-a)>line_search_interval_tolerance && line_search_iterations++<max_line_search_iterations){
             // Throw out [a,j_1] if f(j_2) or f(b) is smallest
             if((f_of_j_2_norm<f_of_j_1_norm && f_of_j_2_norm<f_of_a_norm) || (f_of_b_norm<f_of_j_1_norm && f_of_b_norm<f_of_a_norm)){
                 a=j_1;j_1=j_2;j_2=a+tau*(b-a);

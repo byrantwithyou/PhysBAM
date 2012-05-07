@@ -33,14 +33,15 @@ public:
     int local_advection_spatial_order;
     bool local_semi_lagrangian_advection;
 
-    FAST_LEVELSET_ADVECTION(T_FAST_LEVELSET* fast_levelset):
-        BASE(fast_levelset)
+    FAST_LEVELSET_ADVECTION(T_FAST_LEVELSET* fast_levelset)
+        :BASE(fast_levelset)
     {
         Use_Level_Set_Advection_Method();
-    };
+    }
 
-    FAST_LEVELSET_ADVECTION():
-        BASE(0) {};
+    FAST_LEVELSET_ADVECTION()
+        :BASE(0)
+    {}
             
     void Use_Local_WENO_For_Advection()
     {local_advection_spatial_order=5;local_semi_lagrangian_advection=false;}

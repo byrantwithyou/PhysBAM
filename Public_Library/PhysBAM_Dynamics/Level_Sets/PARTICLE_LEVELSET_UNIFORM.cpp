@@ -779,7 +779,7 @@ Reseed_Add_Particles_Threaded_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_L
             cell_particles->quantized_collision_distance(index)=(unsigned short)(local_random.Get_Number()*USHRT_MAX);
             cell_particles->X(index)=local_random.Get_Uniform_Vector(block_bounding_box);
             cell_particles->radius(index)=1;//Default value
-            if(!Attract_Individual_Particle_To_Interface_And_Adjust_Radius(particles,*cell_particles,phi_min,phi_max,block,index,particle_type,time,true,local_random,list_to_process,mutexes,domain_index) && ++attempts<=5) k--;}}
+            if(!Attract_Individual_Particle_To_Interface_And_Adjust_Radius(particles,*cell_particles,phi_min,phi_max,block,index,particle_type,time,true,local_random,list_to_process,mutexes,domain_index) && attempts++<5) k--;}}
 }
 //#####################################################################
 // Function Identify_Escaped_Particles

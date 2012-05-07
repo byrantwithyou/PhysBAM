@@ -41,9 +41,9 @@ public:
 
     ADVECTION_MACCORMACK_UNIFORM<T_GRID,SCALAR,ADVECTION<T_GRID,SCALAR> >* advection_maccormack;
 
-    LEVELSET_ADVECTION_UNIFORM(T_LEVELSET* _levelset):
-        BASE(_levelset),advection_maccormack(0)
-    {};
+    LEVELSET_ADVECTION_UNIFORM(T_LEVELSET* _levelset)
+        :BASE(_levelset),advection_maccormack(0)
+    {}
 
     void Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask);
     SCALAR Approximate_Negative_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;

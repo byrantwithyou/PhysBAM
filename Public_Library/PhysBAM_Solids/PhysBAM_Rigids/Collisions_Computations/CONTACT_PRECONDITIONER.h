@@ -41,8 +41,8 @@ public:
     //bool has_infinite_inertia;
 
     PRECONDITIONER_RIGID_BODY() {}
-    PRECONDITIONER_RIGID_BODY(RIGID_BODY<TV>& body):
-        frame(body.Frame()),/*twist(body.Twist()),*/mass(body.Mass()),inertia_tensor(body.Inertia_Tensor())/*,has_infinite_inertia(body.Has_Infinite_Inertia())*/ {};
+    PRECONDITIONER_RIGID_BODY(RIGID_BODY<TV>& body)
+        :frame(body.Frame()),/*twist(body.Twist()),*/mass(body.Mass()),inertia_tensor(body.Inertia_Tensor())/*,has_infinite_inertia(body.Has_Infinite_Inertia())*/ {};
 
     VECTOR<T,0> World_Space_Inertia_Tensor_Times(const ROTATION<VECTOR<T,1> > orientation,const VECTOR<T,0> angular_velocity) const
     {return VECTOR<T,0>();}

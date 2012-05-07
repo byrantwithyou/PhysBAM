@@ -61,13 +61,13 @@ void Solve(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisions,RIGIDS_COLLISION_CAL
 
         ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body=&rigid_body_collisions.rigid_body_collection.articulated_rigid_body;
         rigid_body_collisions.skip_collision_check.Reset();bool need_another_iteration=true;int iteration=0;T epsilon_scale=1;
-        while(need_another_iteration && ++iteration<=parameters.contact_iterations){
+        while(need_another_iteration && iteration++<parameters.contact_iterations){
             need_another_iteration=false;
             if(parameters.use_epsilon_scaling) epsilon_scale=(T)iteration/parameters.contact_iterations;
             for(int level=0;level<rigid_body_collisions.contact_graph.Number_Of_Levels();level++){
                 ARRAY<VECTOR<int,2> >& pairs=contact_pairs_for_level(level);
                 bool need_another_level_iteration=true;int level_iteration=0;
-                while(need_another_level_iteration && ++level_iteration<=rigid_body_collisions.contact_level_iterations){need_another_level_iteration=false;
+                while(need_another_level_iteration && level_iteration++<rigid_body_collisions.contact_level_iterations){need_another_level_iteration=false;
                     if(parameters.use_epsilon_scaling_for_level) epsilon_scale=(T)iteration*level_iteration/(parameters.contact_iterations*rigid_body_collisions.contact_level_iterations);
                     for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                         if(rigid_body_collisions.skip_collision_check.Skip_Pair(id_1,id_2)) continue;

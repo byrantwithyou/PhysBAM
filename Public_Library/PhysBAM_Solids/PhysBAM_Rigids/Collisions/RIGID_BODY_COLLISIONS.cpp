@@ -556,7 +556,7 @@ Process_Push_Out_Legacy()
     skip_collision_check.Reset();
     ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> > particle_intersections;particle_intersections.Preallocate(100);
     bool need_another_iteration=true;int iteration=0;
-    while(need_another_iteration && ++iteration<=push_out_iterations){
+    while(need_another_iteration && iteration++<push_out_iterations){
         need_another_iteration=false;
         if(use_freezing_with_push_out)
             for(COLLISION_GEOMETRY_ID i(0);i<rigid_body_collection.rigid_geometry_collection.collision_body_list->bodies.Size();i++){
@@ -566,7 +566,7 @@ Process_Push_Out_Legacy()
         for(int level=0;level<contact_graph.Number_Of_Levels();level++){
             ARRAY<VECTOR<int,2> > pairs=precomputed_contact_pairs_for_level(level);
             int iterations=0;bool need_more_iterations=true;T move_fraction=1;
-            while(need_more_iterations && ++iterations<=push_out_level_iterations){need_more_iterations=false;
+            while(need_more_iterations && iterations++<push_out_level_iterations){need_more_iterations=false;
                 if(use_gradual_push_out) move_fraction=(T)iterations/push_out_level_iterations;
                 for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                     if(parameters.use_projected_gauss_seidel && !pairs_processed_by_contact.Contains(pairs(i).Sorted()))
@@ -633,17 +633,17 @@ Process_Push_Out(const bool perform_collision_body_collisions,const T residual_p
     particle_intersections.Preallocate(100);
 
     bool need_another_iteration=true;int iteration=0;
-    while(need_another_iteration && ++iteration<=push_out_iterations){need_another_iteration=false;
+    while(need_another_iteration && iteration++<push_out_iterations){need_another_iteration=false;
         if(!kinematic_rigid_bodies_only){
             if(use_freezing_with_push_out) Clear_Temporarily_Static();
             for(int level=0;level<contact_graph.Number_Of_Levels();level++){
                 const ARRAY<int>& rigid_bodies_in_level=contact_graph.directed_graph.Nodes_In_Level(level);
                 int level_iteration=0;bool need_more_level_iterations=true;T move_fraction=1;
-                while(need_more_level_iterations && ++level_iteration<=push_out_level_iterations){need_more_level_iterations=false;
+                while(need_more_level_iterations && level_iteration++<push_out_level_iterations){need_more_level_iterations=false;
                     if(use_gradual_push_out) move_fraction=(T)level_iteration/push_out_level_iterations;
                     for(int i=0;i<rigid_bodies_in_level.m;i++){
                         bool need_more_pair_iterations=true;int pair_iteration=0;
-                        while(need_more_pair_iterations && ++pair_iteration<=push_out_pair_iterations){
+                        while(need_more_pair_iterations && pair_iteration++<push_out_pair_iterations){
                             need_more_pair_iterations=false;
                             if(Push_Out_From_Rigid_Body(rigid_body_collection.Rigid_Body(rigid_bodies_in_level(i)),particle_intersections,move_fraction,residual_push_out_depth)){
                                 need_more_pair_iterations=need_more_level_iterations=need_another_iteration=true;
@@ -1111,13 +1111,13 @@ Shock_Propagation_Using_Graph(const T dt,const T time,ARTICULATED_RIGID_BODY<TV>
     LOG::SCOPE scope("shock propagation");
     skip_collision_check.Reset();bool need_another_iteration=true;int iteration=0;T epsilon_scale=1;
     ARRAY<ARRAY<VECTOR<int,2> > >& contact_pairs_for_level=use_saved_pairs?saved_contact_pairs_for_level:precomputed_contact_pairs_for_level;
-    while(need_another_iteration && ++iteration<=shock_propagation_iterations){
+    while(need_another_iteration && iteration++<shock_propagation_iterations){
         need_another_iteration=false;
         Clear_Temporarily_Static();
         for(int level=0;level<contact_graph.Number_Of_Levels();level++){
             ARRAY<VECTOR<int,2> >& pairs=contact_pairs_for_level(level);
             bool need_another_level_iteration=true;int level_iteration=0;
-            while(need_another_level_iteration && ++level_iteration<=shock_propagation_level_iterations){need_another_level_iteration=false;
+            while(need_another_level_iteration && level_iteration++<shock_propagation_level_iterations){need_another_level_iteration=false;
                 if(parameters.use_epsilon_scaling_for_level) epsilon_scale=(T)level_iteration/shock_propagation_level_iterations;
                 for(int i=0;i<pairs.m;i++){int id_1=pairs(i)(0),id_2=pairs(i)(1);
                     if(skip_collision_check.Skip_Pair(id_1,id_2)) continue;

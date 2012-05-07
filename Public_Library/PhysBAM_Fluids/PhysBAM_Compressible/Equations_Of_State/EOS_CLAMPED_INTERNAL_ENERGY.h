@@ -25,8 +25,8 @@ private:
     T1 a1,a2,a3;
 
 public:
-    EOS_CLAMPED_INTERNAL_ENERGY(const EOS<T1>& base_eos_input,T1 e_min_input,T1 epsilon_input):
-    base_eos(base_eos_input),e_min(e_min_input),epsilon(epsilon_input)
+    EOS_CLAMPED_INTERNAL_ENERGY(const EOS<T1>& base_eos_input,T1 e_min_input,T1 epsilon_input)
+        :base_eos(base_eos_input),e_min(e_min_input),epsilon(epsilon_input)
     {
         Compute_Coefficients();
     }

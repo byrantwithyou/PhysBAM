@@ -17,8 +17,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_COROTATED_BLEND<T,d>::
-NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient):
-    neo_base(youngs_modulus,poissons_ratio,Rayleigh_coefficient),
+NEO_HOOKEAN_COROTATED_BLEND(const T youngs_modulus,const T poissons_ratio,const T Rayleigh_coefficient)
+    :neo_base(youngs_modulus,poissons_ratio,Rayleigh_coefficient),
     cor_base(2*youngs_modulus,poissons_ratio,Rayleigh_coefficient),
     J_min((T)0.3),J_max((T)0.7)
 {
@@ -44,12 +44,12 @@ Energy_Density(const DIAGONAL_MATRIX<T,d>& F,const int simplex) const
 {
     T J = F.Determinant();
 
-    if      (J>=J_max) return neo_base.Energy_Density(F,simplex); // Neo Hookean
-    else if (J<=J_min) return cor_base.Energy_Density(F,simplex); // Corotated
+    if(J>=J_max) return neo_base.Energy_Density(F,simplex); // Neo Hookean
+    else if(J<=J_min) return cor_base.Energy_Density(F,simplex); // Corotated
     else
     {
         T t = blend.H(F);
-        return t*neo_base.Energy_Density(F,simplex) + (1-t)*cor_base.Energy_Density(F,simplex);
+        return t*neo_base.Energy_Density(F,simplex)+(1-t)*cor_base.Energy_Density(F,simplex);
     }
 }
 //#####################################################################
@@ -60,13 +60,13 @@ P_From_Strain(const DIAGONAL_MATRIX<T,d>& F,const T scale,const int simplex) con
 {
     T J = F.Determinant();
 
-    if      (J>=J_max) return neo_base.P_From_Strain(F,scale,simplex); // Neo Hookean
-    else if (J<=J_min) return cor_base.P_From_Strain(F,scale,simplex); // Corotated
+    if(J>=J_max) return neo_base.P_From_Strain(F,scale,simplex); // Neo Hookean
+    else if(J<=J_min) return cor_base.P_From_Strain(F,scale,simplex); // Corotated
     else
     {
         T t = blend.H(F);
         return scale*(
-            neo_base.P_From_Strain(F,1,simplex)*t + cor_base.P_From_Strain(F,1,simplex)*(1-t) +
+            neo_base.P_From_Strain(F,1,simplex)*t+cor_base.P_From_Strain(F,1,simplex)*(1-t)+
             blend.DH(F)*(neo_base.Energy_Density(F,simplex) - cor_base.Energy_Density(F,simplex))
         );
     }
@@ -79,8 +79,8 @@ Isotropic_Stress_Derivative(const DIAGONAL_MATRIX<T,d>& F,DIAGONALIZED_ISOTROPIC
 {
     T J = F.Determinant();
 
-    if      (J>=J_max) neo_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Neo Hookean
-    else if (J<=J_min) cor_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Corotated
+    if(J>=J_max) neo_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Neo Hookean
+    else if(J<=J_min) cor_base.Isotropic_Stress_Derivative(F,dP_dF,triangle); // Corotated
     else
     {
         T t   = blend.H(F);
@@ -117,11 +117,11 @@ Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERI
     const T neo_minus_cor,
     const T t) const
 {
-    dP_dF.x1111 = neo_dP_dF.x1111*t + cor_dP_dF.x1111*(1-t) + neo_minus_cor*DDt.x1111 + 2*(neo_P.x11-cor_P.x11)*Dt.x11;
-    dP_dF.x2222 = neo_dP_dF.x2222*t + cor_dP_dF.x2222*(1-t) + neo_minus_cor*DDt.x2222 + 2*(neo_P.x22-cor_P.x22)*Dt.x22;
-    dP_dF.x2211 = neo_dP_dF.x2211*t + cor_dP_dF.x2211*(1-t) + neo_minus_cor*DDt.x2211 + (neo_P.x22-cor_P.x22)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x22;
-    dP_dF.x2112 = neo_dP_dF.x2112*t + cor_dP_dF.x2112*(1-t) + neo_minus_cor*DDt.x2112;
-    dP_dF.x2121 = neo_dP_dF.x2121*t + cor_dP_dF.x2121*(1-t) + neo_minus_cor*DDt.x2121;
+    dP_dF.x1111 = neo_dP_dF.x1111*t+cor_dP_dF.x1111*(1-t)+neo_minus_cor*DDt.x1111+2*(neo_P.x11-cor_P.x11)*Dt.x11;
+    dP_dF.x2222 = neo_dP_dF.x2222*t+cor_dP_dF.x2222*(1-t)+neo_minus_cor*DDt.x2222+2*(neo_P.x22-cor_P.x22)*Dt.x22;
+    dP_dF.x2211 = neo_dP_dF.x2211*t+cor_dP_dF.x2211*(1-t)+neo_minus_cor*DDt.x2211+(neo_P.x22-cor_P.x22)*Dt.x11+(neo_P.x11-cor_P.x11)*Dt.x22;
+    dP_dF.x2112 = neo_dP_dF.x2112*t+cor_dP_dF.x2112*(1-t)+neo_minus_cor*DDt.x2112;
+    dP_dF.x2121 = neo_dP_dF.x2121*t+cor_dP_dF.x2121*(1-t)+neo_minus_cor*DDt.x2121;
 }
 //#####################################################################
 // Function Isotropic_Stress_Derivative_Helper
@@ -137,21 +137,21 @@ Isotropic_Stress_Derivative_Transition_Helper(DIAGONALIZED_ISOTROPIC_STRESS_DERI
     const T neo_minus_cor,
     const T t) const
 {
-    dP_dF.x1111 = neo_dP_dF.x1111*t + cor_dP_dF.x1111*(1-t) + neo_minus_cor*DDt.x1111 + 2*(neo_P.x11-cor_P.x11)*Dt.x11;
-    dP_dF.x2222 = neo_dP_dF.x2222*t + cor_dP_dF.x2222*(1-t) + neo_minus_cor*DDt.x2222 + 2*(neo_P.x22-cor_P.x22)*Dt.x22;
-    dP_dF.x3333 = neo_dP_dF.x3333*t + cor_dP_dF.x3333*(1-t) + neo_minus_cor*DDt.x3333 + 2*(neo_P.x33-cor_P.x33)*Dt.x33;
+    dP_dF.x1111 = neo_dP_dF.x1111*t+cor_dP_dF.x1111*(1-t)+neo_minus_cor*DDt.x1111+2*(neo_P.x11-cor_P.x11)*Dt.x11;
+    dP_dF.x2222 = neo_dP_dF.x2222*t+cor_dP_dF.x2222*(1-t)+neo_minus_cor*DDt.x2222+2*(neo_P.x22-cor_P.x22)*Dt.x22;
+    dP_dF.x3333 = neo_dP_dF.x3333*t+cor_dP_dF.x3333*(1-t)+neo_minus_cor*DDt.x3333+2*(neo_P.x33-cor_P.x33)*Dt.x33;
 
-    dP_dF.x2211 = neo_dP_dF.x2211*t + cor_dP_dF.x2211*(1-t) + neo_minus_cor*DDt.x2211 + (neo_P.x22-cor_P.x22)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x22;
-    dP_dF.x3322 = neo_dP_dF.x3322*t + cor_dP_dF.x3322*(1-t) + neo_minus_cor*DDt.x3322 + (neo_P.x33-cor_P.x33)*Dt.x22 + (neo_P.x22-cor_P.x22)*Dt.x33;
-    dP_dF.x3311 = neo_dP_dF.x3311*t + cor_dP_dF.x3311*(1-t) + neo_minus_cor*DDt.x3311 + (neo_P.x33-cor_P.x33)*Dt.x11 + (neo_P.x11-cor_P.x11)*Dt.x33;
+    dP_dF.x2211 = neo_dP_dF.x2211*t+cor_dP_dF.x2211*(1-t)+neo_minus_cor*DDt.x2211+(neo_P.x22-cor_P.x22)*Dt.x11+(neo_P.x11-cor_P.x11)*Dt.x22;
+    dP_dF.x3322 = neo_dP_dF.x3322*t+cor_dP_dF.x3322*(1-t)+neo_minus_cor*DDt.x3322+(neo_P.x33-cor_P.x33)*Dt.x22+(neo_P.x22-cor_P.x22)*Dt.x33;
+    dP_dF.x3311 = neo_dP_dF.x3311*t+cor_dP_dF.x3311*(1-t)+neo_minus_cor*DDt.x3311+(neo_P.x33-cor_P.x33)*Dt.x11+(neo_P.x11-cor_P.x11)*Dt.x33;
 
-    dP_dF.x2112 = neo_dP_dF.x2112*t + cor_dP_dF.x2112*(1-t) + neo_minus_cor*DDt.x2112;
-    dP_dF.x3113 = neo_dP_dF.x3113*t + cor_dP_dF.x3113*(1-t) + neo_minus_cor*DDt.x3113;
-    dP_dF.x3223 = neo_dP_dF.x3223*t + cor_dP_dF.x3223*(1-t) + neo_minus_cor*DDt.x3223;
+    dP_dF.x2112 = neo_dP_dF.x2112*t+cor_dP_dF.x2112*(1-t)+neo_minus_cor*DDt.x2112;
+    dP_dF.x3113 = neo_dP_dF.x3113*t+cor_dP_dF.x3113*(1-t)+neo_minus_cor*DDt.x3113;
+    dP_dF.x3223 = neo_dP_dF.x3223*t+cor_dP_dF.x3223*(1-t)+neo_minus_cor*DDt.x3223;
 
-    dP_dF.x2121 = neo_dP_dF.x2121*t + cor_dP_dF.x2121*(1-t) + neo_minus_cor*DDt.x2121;
-    dP_dF.x3131 = neo_dP_dF.x3131*t + cor_dP_dF.x3131*(1-t) + neo_minus_cor*DDt.x3131;
-    dP_dF.x3232 = neo_dP_dF.x3232*t + cor_dP_dF.x3232*(1-t) + neo_minus_cor*DDt.x3232;
+    dP_dF.x2121 = neo_dP_dF.x2121*t+cor_dP_dF.x2121*(1-t)+neo_minus_cor*DDt.x2121;
+    dP_dF.x3131 = neo_dP_dF.x3131*t+cor_dP_dF.x3131*(1-t)+neo_minus_cor*DDt.x3131;
+    dP_dF.x3232 = neo_dP_dF.x3232*t+cor_dP_dF.x3232*(1-t)+neo_minus_cor*DDt.x3232;
 }
 //#####################################################################
 // Function P_From_Strain_Rate

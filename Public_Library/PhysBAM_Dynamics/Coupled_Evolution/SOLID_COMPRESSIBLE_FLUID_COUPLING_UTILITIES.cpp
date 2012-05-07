@@ -35,8 +35,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>::
-SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES(EULER_UNIFORM<T_GRID>& euler_input,MPI_UNIFORM_GRID<T_GRID>* mpi_grid_input):
-    euler(euler_input),mpi_grid(mpi_grid_input),collision_bodies_affecting_fluid(0),thinshell(true),use_fast_marching(false),use_higher_order_solid_extrapolation(true),
+SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES(EULER_UNIFORM<T_GRID>& euler_input,MPI_UNIFORM_GRID<T_GRID>* mpi_grid_input)
+    :euler(euler_input),mpi_grid(mpi_grid_input),collision_bodies_affecting_fluid(0),thinshell(true),use_fast_marching(false),use_higher_order_solid_extrapolation(true),
     fluid_affects_solid(false),number_of_cells_to_extrapolate(7),solid_state(TV_DIMENSION()),euler_fluid_forces(0)
 {}
 //#####################################################################

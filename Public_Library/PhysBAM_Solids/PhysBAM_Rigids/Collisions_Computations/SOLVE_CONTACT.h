@@ -57,12 +57,12 @@ public:
     T normal_diagonal;
     VECTOR<T,d-1> tangent_diagonal;
     
-    CONTACT():
-        id(0,0)
+    CONTACT()
+        :id(0,0)
     {}
 
-    CONTACT(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,TV& _location,TV& _normal,T _distance,T dt):
-        location(_location),normal(_normal),distance(_distance),coefficient_of_friction(RIGID_BODY<TV>::Coefficient_Of_Friction(body_1,body_2))
+    CONTACT(RIGID_BODY<TV>& body_1,RIGID_BODY<TV>& body_2,TV& _location,TV& _normal,T _distance,T dt)
+        :location(_location),normal(_normal),distance(_distance),coefficient_of_friction(RIGID_BODY<TV>::Coefficient_Of_Friction(body_1,body_2))
     {
         id(0)=body_1.particle_index;
         id(1)=body_2.particle_index;

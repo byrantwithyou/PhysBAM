@@ -533,7 +533,7 @@ Adjust_Velocity_For_Repulsion(const T dt,const T_ARRAY& pairs,const bool elastic
     int inverted_pairs=0,applied_impulses=0;
     ARRAY_VIEW<TV> V(particles.V);
     ARRAY_VIEW<const T> one_over_effective_mass(particles.one_over_effective_mass);
-    while(++attempts<=total_attempts){
+    while(attempts++<total_attempts){
         impulse_velocities.Resize(particles.Size());impulse_velocities=V;
         target_impulses.Resize(pairs.Size());target_impulses.Fill(TV());
         normals.Resize(pairs.Size());normals.Fill(TV());

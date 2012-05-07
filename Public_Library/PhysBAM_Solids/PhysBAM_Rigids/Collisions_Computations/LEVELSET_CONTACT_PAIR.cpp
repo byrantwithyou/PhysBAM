@@ -38,7 +38,7 @@ bool Update_Levelset_Contact_Pair(RIGID_BODY_COLLISIONS<TV>& rigid_body_collisio
     ARRAY<RIGID_BODY_PARTICLE_INTERSECTION<TV> > particle_intersections;
     particle_intersections.Preallocate(100);
     bool need_another_iteration=true;int iteration=0;bool objects_moved=false;
-    while(need_another_iteration && ++iteration<=max_iterations){need_another_iteration=false;
+    while(need_another_iteration && iteration++<max_iterations){need_another_iteration=false;
         particle_intersections.Remove_All();
         // bodies in x_{n+1} positions
         PARTICLES_IN_IMPLICIT_OBJECT::Append_All_Intersections(rigid_body_collection.Rigid_Body(id_1),rigid_body_collection.Rigid_Body(id_2),particle_intersections,thickness,

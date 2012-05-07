@@ -36,8 +36,8 @@ public:
     T_GRID& grid;
     T_BOUNDARY& boundary;
 
-    RUNGEKUTTA_BOUNDARY_CONDITION_HELPER(RUNGEKUTTA<TV>& _instance, T_GRID& _grid, T_BOUNDARY& _boundary):
-        instance(_instance),grid(_grid),boundary(_boundary) {};
+    RUNGEKUTTA_BOUNDARY_CONDITION_HELPER(RUNGEKUTTA<TV>& instance_input, T_GRID& grid_input, T_BOUNDARY& boundary_input)
+        :instance(instance_input),grid(grid_input),boundary(boundary_input) {};
     ~RUNGEKUTTA_BOUNDARY_CONDITION_HELPER() {};
     void operator()(ARRAY_VIEW<T> u_view, const T time)
     {

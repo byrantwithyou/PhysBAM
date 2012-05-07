@@ -21,7 +21,7 @@ private:
 
     TRANSITION_T base;
 
-    inline void DDH_Helper (const DIAGONAL_MATRIX<T,2>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& d2HdS2) const
+    void DDH_Helper(const DIAGONAL_MATRIX<T,2>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,2>& d2HdS2) const
     {
         T J   = S.Determinant();
         T HJ  = base.Hx(J);
@@ -35,7 +35,7 @@ private:
         d2HdS2.x2121 = 0;
     }
 
-    inline void DDH_Helper (const DIAGONAL_MATRIX<T,3>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& d2HdS2) const
+    void DDH_Helper(const DIAGONAL_MATRIX<T,3>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,3>& d2HdS2) const
     {
         T J   = S.Determinant();
         T HJ  = base.Hx(J);
@@ -60,32 +60,25 @@ private:
 
 public:
 
-    inline DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION () {}
+    DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION() {}
 
-    inline DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION (const T input_J_min, const T input_J_max):
-        base(input_J_min,input_J_max) {}
+    DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION(const T input_J_min, const T input_J_max)
+        :base(input_J_min,input_J_max)
+    {}
 
-    inline ~DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION () {}
+    ~DIAGONAL_MATRIX_DETERMINANT_HEAVISIDE_TRANSITION() {}
     
-    inline void Initialize (const T input_J_min, const T input_J_max)
-    {
-        return base.Initialize(input_J_min,input_J_max);
-    }
+    void Initialize(const T input_J_min, const T input_J_max)
+    {return base.Initialize(input_J_min,input_J_max);}
 
-    inline T H (const DIAGONAL_MATRIX<T,d>& S) const
-    {
-        return base.H(S.Determinant());
-    }
+    T H(const DIAGONAL_MATRIX<T,d>& S) const
+    {return base.H(S.Determinant());}
 
-    inline DIAGONAL_MATRIX<T,d> DH (const DIAGONAL_MATRIX<T,d>& S) const
-    {
-        return base.Hx(S.Determinant())*S.Cofactor_Matrix();
-    }
+    DIAGONAL_MATRIX<T,d> DH(const DIAGONAL_MATRIX<T,d>& S) const
+    {return base.Hx(S.Determinant())*S.Cofactor_Matrix();}
 
-    inline void DDH (const DIAGONAL_MATRIX<T,d>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& d2HdS2) const
-    {
-        return DDH_Helper(S,d2HdS2);
-    }
+    void DDH(const DIAGONAL_MATRIX<T,d>& S,DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE<T,d>& d2HdS2) const
+    {return DDH_Helper(S,d2HdS2);}
 };
 }
 

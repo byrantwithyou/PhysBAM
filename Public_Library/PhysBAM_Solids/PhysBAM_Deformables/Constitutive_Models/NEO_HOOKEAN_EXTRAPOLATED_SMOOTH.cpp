@@ -17,8 +17,8 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T,int d> NEO_HOOKEAN_EXTRAPOLATED_SMOOTH<T,d>::
-NEO_HOOKEAN_EXTRAPOLATED_SMOOTH(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input):
-    youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
+NEO_HOOKEAN_EXTRAPOLATED_SMOOTH(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient,const T extrapolation_cutoff_input)
+    :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input),
     extrapolation_cutoff(extrapolation_cutoff_input),
     panic_threshold((T)1e-6)
 {

@@ -100,7 +100,6 @@ Set_Global_Boundary_Conditions(VECTOR_T& V,ARRAY<TV>& X_save,ARRAY<FRAME<TV> >& 
                 solids_evolution.rigid_deformable_collisions->Set_Collision_Velocities(V.V.array,V.rigid_V.array,X_save,rigid_frame_save,rigid_velocity_save,rigid_angular_momentum_save,V_save);
             if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,false,false);}}
 }
-
 //#####################################################################
 // Function Project
 //#####################################################################

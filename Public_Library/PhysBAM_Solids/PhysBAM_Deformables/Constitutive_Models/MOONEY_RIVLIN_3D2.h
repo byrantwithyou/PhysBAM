@@ -29,8 +29,8 @@ public:
     T youngs_modulus,poissons_ratio;
 
     
-    MOONEY_RIVLIN_3D2(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient):
-    youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input)
+    MOONEY_RIVLIN_3D2(const T youngs_modulus_input,const T poissons_ratio_input,const T Rayleigh_coefficient)
+        :youngs_modulus(youngs_modulus_input),poissons_ratio(poissons_ratio_input)
     {
         failure_threshold = (T).25;
         assert(poissons_ratio>-1&&poissons_ratio<.5);
