@@ -11,17 +11,22 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_HELPER.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_STOKES_SYSTEM<TV>::
-INTERFACE_STOKES_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input):
-    BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),periodic_bc(periodic_bc_input),
+INTERFACE_STOKES_SYSTEM(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input)
+    :BASE(false,false),grid(grid_input),coarse_grid(coarse_grid_input),periodic_bc(periodic_bc_input),
     phi_grid(coarse_grid_input.Get_Regular_Grid().Get_MAC_Grid_At_Regular_Positions())
 {
     phi=new LEVELSET_UNIFORM<GRID<TV> >(phi_grid,phi_input,0);
@@ -76,7 +81,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
     
     MARCHING_CUBES<TV>::Create_Surface(object,coarse_grid,phi->phi);
-    cdi=new CELL_DOMAIN_INTERFACE<TV>(grid,padding,grid.counts.x/coarse_grid.counts.x,object.mesh.elements.m,true); 
+    cdi=new CELL_DOMAIN_INTERFACE<TV>(grid,padding,grid.counts.x/coarse_grid.counts.x,object.mesh.elements.m,periodic_bc); 
 
     cm_p=new CELL_MANAGER<TV>(*cdi);
     for(int i=0;i<TV::m;i++) cm_u(i)=new CELL_MANAGER<TV>(*cdi);
@@ -353,7 +358,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 }
 template class INTERFACE_STOKES_SYSTEM<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM<VECTOR<float,3> >;
-#ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INTERFACE_STOKES_SYSTEM<VECTOR<double,2> >;
 template class INTERFACE_STOKES_SYSTEM<VECTOR<double,3> >;
 #endif

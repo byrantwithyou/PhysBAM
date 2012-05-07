@@ -388,7 +388,7 @@ template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1,1>(SYSTEM
     CELL_MAPPING<VECTOR<float,2> >&,CELL_MAPPING<VECTOR<float,2> >&,const VECTOR<float,2>&);
 template int BASIS_INTEGRATION_CUTTING<VECTOR<float,2>,2>::Add_Block<1>(SYSTEM_MATRIX_HELPER<float>&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,CELL_MAPPING<VECTOR<float,2> >&,const float,const bool);
-#ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,2>,2>;
 template class BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>;
 template int BASIS_INTEGRATION_CUTTING<VECTOR<double,3>,2>::Add_Block<1,0>(SYSTEM_MATRIX_HELPER<double>&,

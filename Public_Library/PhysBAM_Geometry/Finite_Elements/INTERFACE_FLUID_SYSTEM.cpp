@@ -299,7 +299,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
 }
 template class INTERFACE_FLUID_SYSTEM<VECTOR<float,2> >;
 template class INTERFACE_FLUID_SYSTEM<VECTOR<float,3> >;
-#ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class INTERFACE_FLUID_SYSTEM<VECTOR<double,2> >;
 template class INTERFACE_FLUID_SYSTEM<VECTOR<double,3> >;
 #endif

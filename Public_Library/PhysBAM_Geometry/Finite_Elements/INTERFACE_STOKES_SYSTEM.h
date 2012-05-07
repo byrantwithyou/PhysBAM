@@ -6,18 +6,19 @@
 //#####################################################################
 #ifndef __INTERFACE_STOKES_SYSTEM__
 #define __INTERFACE_STOKES_SYSTEM__
+#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
 namespace PhysBAM{
 
 template<class TV> class GRID;
+template<class T_GRID> class LEVELSET_UNIFORM;
+template<class TV> class CELL_MANAGER;
+template<class TV> class CELL_DOMAIN_INTERFACE;
+
 template<class TV>
 class INTERFACE_STOKES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {

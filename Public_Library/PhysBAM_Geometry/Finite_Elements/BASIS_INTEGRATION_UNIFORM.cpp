@@ -10,6 +10,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -340,7 +341,7 @@ template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Volume_Block<1,1
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM<VECTOR<float,2>,2>::Add_Interface_Block<1>(
     SYSTEM_INTERFACE_BLOCK_HELPER<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,float,bool);
-#ifndef COMPILATE_WITHOUT_DOUBLE_SUPPORT
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM<VECTOR<double,2>,2>;
 template void BASIS_INTEGRATION_UNIFORM<VECTOR<double,3>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER<VECTOR<double,3> >&,
