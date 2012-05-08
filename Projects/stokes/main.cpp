@@ -449,7 +449,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){}
                 virtual TV u(const TV& X,bool inside)
-                {return TV::Axis_Vector(1)*(inside?(sqr(0.25*m)-sqr(X.x-0.5*m)):((X.x>0.5*m)?(sqr(0.25*m)-sqr(X.x-m)):(sqr(0.25*m)-sqr(X.x))))/(m*s);}
+                {return TV::Axis_Vector(1)*(inside?(sqr(0.25*m)-sqr(X.x-0.5*m)):((X.x>0.5*m)?(sqr(X.x-m)-sqr(0.25*m)):(sqr(X.x)-sqr(0.25*m))))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual T phi(const TV& X){return -0.25*m+abs(X.x-0.5*m);}
                 virtual TV body(const TV& X,bool inside){return TV::Axis_Vector(1)*(inside?mu(1):-mu(0))*2/(m*s);}
