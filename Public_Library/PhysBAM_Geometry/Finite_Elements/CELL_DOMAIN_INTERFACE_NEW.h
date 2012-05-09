@@ -24,24 +24,22 @@ class CELL_DOMAIN_INTERFACE_NEW:public NONCOPYABLE
 
     TV_INT a;
     int b;
-    ARRAY<int> cell_location;
-    
+
+    ARRAY<int> cell_location; // [1] - outside, [0] - boundary (inside, within padding from boundary), [-1] - inside (strictly)
+
 public:
 
-    ARRAY<bool> bdy_element;
-    ARRAY<int> remap; // maps ghost cells inside for periodic bc, identity for non-periodic bc
-    ARRAY<int> flat_base; // flat index interface element reference cell (min corner cell of "coarse_factor"-wide block)
     const GRID<TV>& grid;
     const int padding;
     const TV_INT size;
     const int flat_size;
-    const int coarse_factor;
-    const int interface_elements;
+    const int interface_dofs;
     const bool periodic_bc;
-    int flat_coarse_offset;
-    const RANGE<TV_INT> coarse_range;
+
+    ARRAY<int> remap; // maps ghost cells inside for periodic bc, identity for non-periodic bc
+    ARRAY<int> flat_base; // maps cut cell index to its flattened grid index
     
-    CELL_DOMAIN_INTERFACE_NEW(const GRID<TV>& grid_input,int padding_input,int coarse_factor_input,int interface_elements_input,bool periodic_bc_input);
+    CELL_DOMAIN_INTERFACE_NEW(const GRID<TV>& grid_input,int padding_input,int interface_dofs_input,bool periodic_bc_input);
 
     int Flatten(const TV_INT& index) const
     {return index.Dot(a)+b;}
@@ -49,17 +47,16 @@ public:
     int Flatten_Diff(const TV_INT& index) const
     {return index.Dot(a);}
 
-    bool Is_Inside_Cell(int i) const
-    {return cell_location(i)==-1;}
-
     bool Is_Outside_Cell(int i) const
     {return cell_location(i)==1;}
 
     bool Is_Boundary_Cell(int i) const
     {return cell_location(i)==0;}
 
-    void Set_Flat_Base(int start,int end,const TV_INT& index);
-    void Initialize();
+    bool Is_Boundary_Cut_Cell(int i) const
+    {return Is_Boundary_Cell(flat_base(i));}
+
+    void Set_Flat_Base(int i,const TV_INT& index);
 };
 }
 #endif

@@ -81,7 +81,6 @@ public:
     VECTOR<CELL_MANAGER_NEW<TV>*,TV::m> cm_u;
     CELL_MANAGER_NEW<TV> *cm_p;
     CELL_DOMAIN_INTERFACE_NEW<TV> *cdi;
-    int cut_cells;
 
     INTERFACE_STOKES_SYSTEM_NEW(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input=true);
     virtual ~INTERFACE_STOKES_SYSTEM_NEW();

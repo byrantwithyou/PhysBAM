@@ -89,7 +89,7 @@ Compute_Entries()
                 side_index(dir)=0;
                 Add_Cut_Subcell(cut_sides(side_index),interface_elements,cell_index,it2.index,dir,enclose_inside,b,element_base);
                 interface_elements.Remove_All();}}
-        cdi.Set_Flat_Base(element_base,element_base+interface.m,base_index);
+        cdi.Set_Flat_Base(element_base,base_index);
         element_base+=interface.m;
 
         for(RANGE_ITERATOR<TV::m> it2(double_coarse_range);it2.Valid();it2.Next())
@@ -129,7 +129,7 @@ Compute_Open_Entries()
                 if(op.subcell&(1<<b)){
                     T integral=Precomputed_Integral(uncut_subcell[b],op.polynomial);
                     if(fabs(integral)<tol) continue;
-                    OPEN_ENTRY me={op.flat_index_offset,op.flat_index_diff,integral};
+                    OPEN_ENTRY me={op.flat_index_offset,op.flat_index_diff_ref,integral};
                     vb->open_subcell_entries[b].Append(me);}}
 
         for(int b=0;b<(1<<TV::m);b++){
@@ -298,8 +298,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
             if(op.subcell&(1<<block)){
                 T integral=Precomputed_Integral(precomputed_integrals,op.polynomial);
                 int flat_index=cdi.Flatten(cell)+op.flat_index_offset;
-                vb->Add_Entry(flat_index,op.flat_index_diff,enclose_inside,integral);
-                vb->Add_Entry(flat_index,op.flat_index_diff,!enclose_inside,-integral);}}}
+                vb->Add_Entry(flat_index,op.flat_index_diff_ref,enclose_inside,integral);
+                vb->Add_Entry(flat_index,op.flat_index_diff_ref,!enclose_inside,-integral);}}}
 
     STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals[subcell_elements];
     bool has_element[subcell_elements]={};
@@ -324,8 +324,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
                 for(int k=0;k<subcell_elements;k++)
                     if(has_element[k]){
                         T integral=Precomputed_Integral(precomputed_interface_integrals[k],op.polynomial)*sign1;
-                        ib->Add_Entry(element_base+k,op.flat_index_diff(subcell_cell),enclose_inside,integral);
-                        ib->Add_Entry(element_base+k,op.flat_index_diff(subcell_cell),!enclose_inside,sign2*integral);}}}
+                        ib->Add_Entry(element_base+k,op.flat_index_diff_ref,enclose_inside,integral);
+                        ib->Add_Entry(element_base+k,op.flat_index_diff_ref,!enclose_inside,sign2*integral);}}}
 }
 template class BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>;

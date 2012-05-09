@@ -10,35 +10,14 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> CELL_DOMAIN_INTERFACE_NEW<TV>::
-CELL_DOMAIN_INTERFACE_NEW(const GRID<TV>& grid_input,int padding_input,int coarse_factor_input,int interface_elements_input,bool periodic_bc_input)
-    :grid(grid_input),padding(padding_input),size(grid.counts+2*padding),flat_size(size.Product()),coarse_factor(coarse_factor_input),
-    interface_elements(interface_elements_input),periodic_bc(periodic_bc_input),coarse_range(TV_INT(),TV_INT()+coarse_factor)
+CELL_DOMAIN_INTERFACE_NEW(const GRID<TV>& grid_input,int padding_input,int interface_dofs_input,bool periodic_bc_input)
+    :grid(grid_input),padding(padding_input),size(grid.counts+2*padding),flat_size(size.Product()),
+    interface_dofs(interface_dofs_input),periodic_bc(periodic_bc_input)
 {
     a(TV::m-1)=1;
     for(int i=TV::m-2;i>=0;i--) a(i)=a(i+1)*size(i+1);
     b=(TV_INT()+padding).Dot(a);
-    flat_coarse_offset=Flatten_Diff(TV_INT()+coarse_factor-1);
-    flat_base.Resize(interface_elements_input);
-    Initialize();
-}
-//#####################################################################
-// Function Set_Flat_Base
-//#####################################################################
-template<class TV> void CELL_DOMAIN_INTERFACE_NEW<TV>::
-Set_Flat_Base(int start,int end,const TV_INT& index)
-{
-    int flat=Flatten(index);
-    bool bdy=!(Is_Inside_Cell(flat) && Is_Inside_Cell(flat+flat_coarse_offset));
-    for(int i=start;i<end;i++){
-        flat_base(i)=flat;
-        bdy_element(i)=bdy;}
-}
-//#####################################################################
-// Function Initialize
-//#####################################################################
-template<class TV> void CELL_DOMAIN_INTERFACE_NEW<TV>::
-Initialize()
-{
+
     remap=IDENTITY_ARRAY<>(flat_size);
 
     if(periodic_bc){
@@ -56,7 +35,16 @@ Initialize()
         cell_location(Flatten(it.index))=-1;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,-1);it.Valid();it.Next())
         cell_location(Flatten(it.index))=1;
-    bdy_element.Resize(interface_elements);
+
+    flat_base.Resize(interface_dofs);
+}
+//#####################################################################
+// Function Set_Flat_Base
+//#####################################################################
+template<class TV> void CELL_DOMAIN_INTERFACE_NEW<TV>::
+Set_Flat_Base(int i,const TV_INT& index)
+{
+    flat_base(i)=Flatten(index);
 }
 template class CELL_DOMAIN_INTERFACE_NEW<VECTOR<float,2> >;
 template class CELL_DOMAIN_INTERFACE_NEW<VECTOR<float,3> >;

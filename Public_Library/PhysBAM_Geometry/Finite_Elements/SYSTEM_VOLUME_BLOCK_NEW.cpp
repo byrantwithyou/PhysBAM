@@ -24,7 +24,7 @@ Initialize(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_
                 const typename BASIS_STENCIL_UNIFORM<TV,d1>::DICED& diced1=s1.diced(j);
                 OVERLAP_POLYNOMIAL op;
                 op.flat_index_offset=cdi->Flatten_Diff(diced0.index_offset);
-                op.flat_index_diff=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset));
+                op.flat_index_diff_ref=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset));
                 op.subcell=overlap;
                 op.polynomial=diced0.polynomial*diced1.polynomial;
                 overlap_polynomials.Append(op);}}

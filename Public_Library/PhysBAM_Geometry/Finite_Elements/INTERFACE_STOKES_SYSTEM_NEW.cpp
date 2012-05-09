@@ -49,17 +49,6 @@ INTERFACE_STOKES_SYSTEM_NEW(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_inpu
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
         T& phi_value=phi(it.index);
         if(fabs(phi_value)<panic_threshold) phi_value=phi_value<0?-panic_threshold:panic_threshold;}
-
-    // GET THE NUMBER OF THE CUT CELLS
-
-    cut_cells=0;
-    int all_positive=(1<<(1<<TV::m))-1;
-    const VECTOR<TV_INT,(1<<TV::m)>& phi_offsets=GRID<TV>::Binary_Counts(TV_INT(),2);
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        TV_INT phi_base=it.index*2;
-        int signs=0;
-        for(int b=0;b<(1<<TV::m);b++) signs|=(phi(phi_base+phi_offsets(b))<0)<<b;
-        if(!(signs==0||signs==all_positive)) cut_cells++;}
 }
 //#####################################################################
 // Destructor
@@ -108,8 +97,17 @@ Set_Matrix(const VECTOR<T,2>& mu)
     else{
         padding=p_stencil.Padding();
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
+
+    int cut_cells=0;
+    int all_positive=(1<<(1<<TV::m))-1;
+    const VECTOR<TV_INT,(1<<TV::m)>& phi_offsets=GRID<TV>::Binary_Counts(TV_INT(),2);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        TV_INT phi_base=it.index*2;
+        int signs=0;
+        for(int b=0;b<(1<<TV::m);b++) signs|=(phi(phi_base+phi_offsets(b))<0)<<b;
+        if(!(signs==0||signs==all_positive)) cut_cells++;}
     
-    // cdi=new CELL_DOMAIN_INTERFACE_NEW<TV>(grid,padding,cut_cells,periodic_bc); 
+    cdi=new CELL_DOMAIN_INTERFACE_NEW<TV>(grid,padding,cut_cells,periodic_bc); 
 
     cm_p=new CELL_MANAGER_NEW<TV>(*cdi);
     for(int i=0;i<TV::m;i++) cm_u(i)=new CELL_MANAGER_NEW<TV>(*cdi);
@@ -277,7 +275,7 @@ Set_Jacobi_Preconditioner()
             if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
             else J.p[s](k)=1/sum;}}
     for(int i=0;i<TV::m;i++)
-        for(int k=0;k<cut_cells;k++){
+        for(int k=0;k<cdi->interface_dofs;k++){
             T sum=0;
             for(int j=0;j<TV::m;j++)
                 for(int s=0;s<2;s++){
@@ -302,7 +300,7 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
     for(int s=0;s<2;s++)
         v.p[s].Resize(cm_p->dofs[s]);
     for(int i=0;i<TV::m;i++)
-        v.q(i).Resize(cut_cells);
+        v.q(i).Resize(cdi->interface_dofs);
 }
 //#####################################################################
 // Function Multiply

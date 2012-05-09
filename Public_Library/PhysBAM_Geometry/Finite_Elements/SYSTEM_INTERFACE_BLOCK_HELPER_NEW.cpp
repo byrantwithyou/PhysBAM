@@ -22,15 +22,12 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_NEW<TV>& cm_input,C
     cm=&cm_input;
     cdi=&cdi_input;
 
-    for(int i=0;i<s.diced.m;i++){
-        const typename BASIS_STENCIL_UNIFORM<TV,d>::DICED& diced=s.diced(i);
-        for(RANGE_ITERATOR<TV::m> it(cdi->coarse_range);it.Valid();it.Next())
-            flat_diff.Append(cdi->Flatten_Diff(it.index+diced.index_offset));}
+    for(int i=0;i<s.diced.m;i++) flat_diff.Append(cdi->Flatten_Diff(s.diced(i).index_offset));
 
     flat_diff.Sort();
     flat_diff.Prune_Duplicates();
 
-    for(int s=0;s<2;s++) data[s].Resize(cdi->interface_elements,flat_diff.m);
+    for(int s=0;s<2;s++) data[s].Resize(cdi->interface_dofs,flat_diff.m);
 }
 //#####################################################################
 // Function Mark_Active_Cells
@@ -72,7 +69,7 @@ Build_Matrix(VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>& matrix)
                     int column=comp_n(cdi->flat_base(row)+flat_diff(j));
                     M.offsets(row+1)++;
                     entries.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}
-            if(cdi->bdy_element(row)) entries.Sort();
+            if(cdi->Is_Boundary_Cut_Cell(row)) entries.Sort();
             M.A.Append_Elements(entries);}
 
         for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);}
