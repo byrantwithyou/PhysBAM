@@ -246,17 +246,13 @@ struct ANALYTIC_TEST
 };
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
 
-    ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(coarse_grid);it.Valid();it.Next()){
-        T value=at.phi(it.Location());
-        T tol=grid.dX.Min()*1e-6;
-        if(abs(value)>tol) phi(it.index)=value;
-        else phi(it.index)=((value>0)?(tol):(-tol));}
-    INTERFACE_STOKES_SYSTEM_NEW<TV> iss(grid,coarse_grid,phi);
+    ARRAY<T,TV_INT> phi(grid.Node_Indices());
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()) phi(it.index)=at.phi(it.Location());
+    INTERFACE_STOKES_SYSTEM_NEW<TV> iss(grid,phi);
     iss.use_preconditioner=use_preconditioner;
     iss.Set_Matrix(at.mu);
 
@@ -647,21 +643,16 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     test->mu(0)=parse_args.Get_Double_Value("-mu_o")*test->kg/(test->s*(d==3?test->m:1));
     test->mu(1)=parse_args.Get_Double_Value("-mu_i")*test->kg/(test->s*(d==3?test->m:1));
     int res=parse_args.Get_Integer_Value("-resolution");
-    int cgf=parse_args.Get_Integer_Value("-cgf");
     int max_iter=parse_args.Get_Integer_Value("-max_iter");
     bool use_preconditioner=parse_args.Get_Option_Value("-use_preconditioner");
     bool null=parse_args.Get_Option_Value("-null");
     bool dump_matrix=parse_args.Get_Option_Value("-dump_matrix");
     bool debug_particles=parse_args.Get_Option_Value("-debug_particles");
 
-    if(res%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
-
     test->Initialize();
 
     TV_INT counts=TV_INT()+res;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
-    GRID<TV> coarse_grid(grid.counts/cgf,grid.domain,true);
-    ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
 
     Global_Grid(&grid);
 
@@ -670,7 +661,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,coarse_grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
 }
 
 //#################################################################################################################################################
@@ -691,7 +682,6 @@ int main(int argc,char* argv[])
     parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
     parse_args.Add_Integer_Argument("-test",1,"test number");
     parse_args.Add_Integer_Argument("-resolution",4,"resolution");
-    parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
     parse_args.Add_Integer_Argument("-max_iter",1000000,"max number of interations");
     parse_args.Add_Option_Argument("-use_preconditioner","use Jacobi preconditioner");
     parse_args.Add_Option_Argument("-3d","use 3D");
