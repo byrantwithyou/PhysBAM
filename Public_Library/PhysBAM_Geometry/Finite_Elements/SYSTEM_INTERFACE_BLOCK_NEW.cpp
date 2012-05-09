@@ -13,9 +13,9 @@ using namespace PhysBAM;
 // Function Initialize
 //#####################################################################
 template<class TV,int static_degree> template<int d> void SYSTEM_INTERFACE_BLOCK_NEW<TV,static_degree>::
-Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int dir_input,T scale_input)
+Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int orientation_input,T scale_input)
 {
-    dir=dir_input;
+    orientation=orientation_input;
     scale=scale_input;
     helper=&helper_input;
     cdi=helper->cdi;

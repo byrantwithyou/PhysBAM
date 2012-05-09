@@ -36,8 +36,6 @@ public:
 
     const ARRAY<T,TV_INT>& phi;
     STATIC_TENSOR<bool,TV::m,static_degree+1> volume_monomials_needed,surface_monomials_needed;
-    int coarse_factor;
-    RANGE<TV_INT> double_coarse_range,coarse_range;
 
     ARRAY<VOLUME_BLOCK*> volume_blocks;
     ARRAY<INTERFACE_BLOCK*> interface_blocks;
@@ -48,18 +46,16 @@ public:
 
     void Compute_Entries();
     void Compute_Open_Entries();
-    void Cut_Elements(ARRAY<ARRAY<PAIR<T_FACE,int> >,TV_INT>& cut_elements,const ARRAY<T_FACE>& elements,
-        const RANGE<TV_INT>& range,const RANGE<TV>& domain,int dir,int e);
-    void Add_Uncut_Coarse_Cell(const TV_INT& coarse_cell,int inside);
-    void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int inside);
+    void Add_Uncut_Cell(const TV_INT& cell,int enclose_inside);
+    void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int enclose_inside);
+    void Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
+        int direction,bool enclose_inside,int cut_cell_index,VECTOR<TV,TV::m>& orientation);
     template<int d0,int d1>
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const VECTOR<T,2>& scale);
     template<int d>
     void Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
         T scale,bool ignore_orientation);
-    void Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T_FACE,int> >& interface_elements,
-        const TV_INT& cell,const TV_INT& subcell_cell,int dir,bool enclose_inside,int block,int element_base);
 };
 }
 #endif

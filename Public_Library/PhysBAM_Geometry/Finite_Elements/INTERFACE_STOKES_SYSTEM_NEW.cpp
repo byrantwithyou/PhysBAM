@@ -99,13 +99,14 @@ Set_Matrix(const VECTOR<T,2>& mu)
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
 
     int cut_cells=0;
-    int all_positive=(1<<(1<<TV::m))-1;
-    const VECTOR<TV_INT,(1<<TV::m)>& phi_offsets=GRID<TV>::Binary_Counts(TV_INT(),2);
+    const VECTOR<TV_INT,(1<<TV::m)>& phi_double_offsets=GRID<TV>::Binary_Counts(TV_INT(),2);
+    const int all_negative=(1<<(1<<TV::m))-1;
+    const int all_positive=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        TV_INT phi_base=it.index*2;
         int signs=0;
-        for(int b=0;b<(1<<TV::m);b++) signs|=(phi(phi_base+phi_offsets(b))<0)<<b;
-        if(!(signs==0||signs==all_positive)) cut_cells++;}
+        TV_INT phi_base=it.index*2;
+        for(int b=0;b<(1<<TV::m);b++) signs|=(phi(phi_base+phi_double_offsets(b))<0)<<b;
+        if(!(signs==all_positive||signs==all_negative)) cut_cells++;}
     
     cdi=new CELL_DOMAIN_INTERFACE_NEW<TV>(grid,padding,cut_cells,periodic_bc); 
 
