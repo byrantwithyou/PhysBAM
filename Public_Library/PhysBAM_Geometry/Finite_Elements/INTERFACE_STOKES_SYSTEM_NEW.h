@@ -33,13 +33,13 @@ class INTERFACE_STOKES_SYSTEM_NEW:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 public:
 
     //   #----# #----# #----#   #----#   #----# #----# #----# 
-    //   | UU | | UV | | UW |   | UP |   | UQ | |    | |    |
+    //   | UU | | UV | | UW |   | UP |   | UN | | UT | | US |
     //   #----# #----# #----#   #----#   #----# #----# #----#
     //   #----# #----# #----#   #----#   #----# #----# #----# 
-    //   | VU | | VV | | VW |   | VP |   |    | | VR | |    |
+    //   | VU | | VV | | VW |   | VP |   | VN | | VT | | VS |
     //   #----# #----# #----#   #----#   #----# #----# #----#
     //   #----# #----# #----#   #----#   #----# #----# #----# 
-    //   | WU | | WV | | WW |   | WP |   |    | |    | | WS |
+    //   | WU | | WV | | WW |   | WP |   | WN | | WT | | WS |
     //   #----# #----# #----#   #----#   #----# #----# #----#
     //
     //   #----# #----# #----#   #---------------------------# 
@@ -47,19 +47,18 @@ public:
     //   #----# #----# #----#   |                           |
     //                          |                           |
     //   #----# #----# #----#   |                           |
-    //   | QU | |    | |    |   |                           |
+    //   | NU | | NV | | NW |   |                           |
     //   #----# #----# #----#   |                           |
     //   #----# #----# #----#   |                           |
-    //   |    | | RV | |    |   |                           |
+    //   | TV | | TV | | TW |   |                           |
     //   #----# #----# #----#   |                           |
     //   #----# #----# #----#   |                           |
-    //   |    | |    | | SW |   |                           |
+    //   | SU | | SV | | SW |   |                           |
     //   #----# #----# #----#   #---------------------------# 
     
     VECTOR<VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>,TV::m> matrix_uu;
+    VECTOR<VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>,TV::m> matrix_qu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_pu;
-    VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_qu;
-    VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_f_qu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_f_pu;
 
     VECTOR<VECTOR_T,TV::m> null_u;
@@ -67,11 +66,10 @@ public:
     VECTOR_T active_dofs;
 
     const GRID<TV>& grid;
-    const GRID<TV>& coarse_grid;
     const bool periodic_bc;
-    
-    LEVELSET_UNIFORM<GRID<TV> >* phi;
+
     GRID<TV> phi_grid;
+    ARRAY<T,TV_INT> phi;
 
     bool run_self_tests;
     bool print_matrix;
@@ -83,8 +81,9 @@ public:
     VECTOR<CELL_MANAGER_NEW<TV>*,TV::m> cm_u;
     CELL_MANAGER_NEW<TV> *cm_p;
     CELL_DOMAIN_INTERFACE_NEW<TV> *cdi;
+    int cut_cells;
 
-    INTERFACE_STOKES_SYSTEM_NEW(const GRID<TV>& grid_input,GRID<TV>& coarse_grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input=true);
+    INTERFACE_STOKES_SYSTEM_NEW(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,bool periodic_bc_input=true);
     virtual ~INTERFACE_STOKES_SYSTEM_NEW();
 
 //#####################################################################
