@@ -56,7 +56,7 @@ public:
     static void Initialize_Neighbor_Cases(ARRAY<MARCHING_CUBES_CASE<TV::m> >& table, int c);
     static void Get_Elements_For_Cell(ARRAY<T_FACE>& surface,ARRAY<T_FACE>& boundary,int& direction,bool& enclose_inside,
         const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
-    static int Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
+    static void Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
 //#####################################################################
 };
 }
