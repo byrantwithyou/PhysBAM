@@ -4,6 +4,7 @@
 //#####################################################################
 // Class SOLIDS_EVOLUTION
 //#####################################################################
+#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
@@ -214,8 +215,9 @@ Postprocess_Frame(const int frame)
         articulated_rigid_body.muscle_list->muscles(i)->Update_Segments();}
     if(solids_parameters.triangle_collision_parameters.perform_self_collision && solids_parameters.triangle_collision_parameters.check_mesh_for_self_intersection
         && (!solid_body_collection.deformable_body_collection.mpi_solids || solid_body_collection.deformable_body_collection.mpi_solids->rank==0)){
-        if(solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Check_For_Intersection(false,solids_parameters.triangle_collision_parameters.collisions_small_number))
-            throw std::runtime_error("Intersections Found");}
+        if(solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.Check_For_Intersection(false,solids_parameters.triangle_collision_parameters.collisions_small_number)){
+            PHYSBAM_DEBUG_WRITE_SUBSTEP("Intersections Found",0,0);
+            throw std::runtime_error("Intersections Found");}}
 }
 //#####################################################################
 // Function Set_External_Positions
