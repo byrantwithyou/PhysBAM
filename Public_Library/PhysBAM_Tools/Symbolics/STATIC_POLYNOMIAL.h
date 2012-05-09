@@ -375,8 +375,8 @@ struct STATIC_POLYNOMIAL
         if(rule.use_center) r+=rule.center_weight*Eval(vertices.Sum()/2,p);
         for(int i=0;i<rule.number;i++){
             T s=0;
-            s+=Eval(vertices.x+rule.location[i]*a,p);
-            s+=Eval(vertices.y-rule.location[i]*a,p); 
+            s+=Eval(vertices.x+(T)rule.location[i]*a,p);
+            s+=Eval(vertices.y-(T)rule.location[i]*a,p); 
             r+=rule.weight[i]*s;}
         return r*a.Magnitude();
     }
@@ -393,8 +393,8 @@ struct STATIC_POLYNOMIAL
         if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/2);
         for(int i=0;i<rule.number;i++){
             T s=0;
-            s+=Value(vertices.x+rule.location[i]*a);
-            s+=Value(vertices.y-rule.location[i]*a); 
+            s+=Value(vertices.x+(T)rule.location[i]*a);
+            s+=Value(vertices.y-(T)rule.location[i]*a); 
             r+=rule.weight[i]*s;}
         return r*a.Magnitude();
     }
@@ -412,18 +412,18 @@ struct STATIC_POLYNOMIAL
         if(rule.use_center) r+=rule.center_weight*Eval(vertices.Sum()/3,p);
         for(int i=0;i<rule.number3;i++){
             T s=0;
-            s+=Eval(vertices.x+rule.location3[i]*(vertices.y-vertices.x)+rule.location3[i]*(vertices.z-vertices.x),p);
-            s+=Eval(vertices.y+rule.location3[i]*(vertices.z-vertices.y)+rule.location3[i]*(vertices.x-vertices.y),p);
-            s+=Eval(vertices.z+rule.location3[i]*(vertices.x-vertices.z)+rule.location3[i]*(vertices.y-vertices.z),p);
+            s+=Eval(vertices.x+(T)rule.location3[i]*(vertices.y-vertices.x)+(T)rule.location3[i]*(vertices.z-vertices.x),p);
+            s+=Eval(vertices.y+(T)rule.location3[i]*(vertices.z-vertices.y)+(T)rule.location3[i]*(vertices.x-vertices.y),p);
+            s+=Eval(vertices.z+(T)rule.location3[i]*(vertices.x-vertices.z)+(T)rule.location3[i]*(vertices.y-vertices.z),p);
             r+=rule.weight3[i]*s;}
         for(int i=0;i<rule.number6;i++){
             T s=0;
-            s+=Eval(vertices.x+rule.location6a[i]*(vertices.y-vertices.x)+rule.location6b[i]*(vertices.z-vertices.x),p);
-            s+=Eval(vertices.y+rule.location6a[i]*(vertices.z-vertices.y)+rule.location6b[i]*(vertices.x-vertices.y),p);
-            s+=Eval(vertices.z+rule.location6a[i]*(vertices.x-vertices.z)+rule.location6b[i]*(vertices.y-vertices.z),p);
-            s+=Eval(vertices.x+rule.location6b[i]*(vertices.y-vertices.x)+rule.location6a[i]*(vertices.z-vertices.x),p);
-            s+=Eval(vertices.y+rule.location6b[i]*(vertices.z-vertices.y)+rule.location6a[i]*(vertices.x-vertices.y),p);
-            s+=Eval(vertices.z+rule.location6b[i]*(vertices.x-vertices.z)+rule.location6a[i]*(vertices.y-vertices.z),p);
+            s+=Eval(vertices.x+(T)rule.location6a[i]*(vertices.y-vertices.x)+(T)rule.location6b[i]*(vertices.z-vertices.x),p);
+            s+=Eval(vertices.y+(T)rule.location6a[i]*(vertices.z-vertices.y)+(T)rule.location6b[i]*(vertices.x-vertices.y),p);
+            s+=Eval(vertices.z+(T)rule.location6a[i]*(vertices.x-vertices.z)+(T)rule.location6b[i]*(vertices.y-vertices.z),p);
+            s+=Eval(vertices.x+(T)rule.location6b[i]*(vertices.y-vertices.x)+(T)rule.location6a[i]*(vertices.z-vertices.x),p);
+            s+=Eval(vertices.y+(T)rule.location6b[i]*(vertices.z-vertices.y)+(T)rule.location6a[i]*(vertices.x-vertices.y),p);
+            s+=Eval(vertices.z+(T)rule.location6b[i]*(vertices.x-vertices.z)+(T)rule.location6a[i]*(vertices.y-vertices.z),p);
             r+=rule.weight6[i]*s;}
         return r*TV::Cross_Product(a,b).Magnitude()/2;
     }
@@ -441,18 +441,18 @@ struct STATIC_POLYNOMIAL
         if(rule.use_center) r+=rule.center_weight*Value(vertices.Sum()/3);
         for(int i=0;i<rule.number3;i++){
             T s=0;
-            s+=Value(vertices.x+rule.location3[i]*(vertices.y-vertices.x)+rule.location3[i]*(vertices.z-vertices.x));
-            s+=Value(vertices.y+rule.location3[i]*(vertices.z-vertices.y)+rule.location3[i]*(vertices.x-vertices.y));
-            s+=Value(vertices.z+rule.location3[i]*(vertices.x-vertices.z)+rule.location3[i]*(vertices.y-vertices.z));
+            s+=Value(vertices.x+(T)rule.location3[i]*(vertices.y-vertices.x)+(T)rule.location3[i]*(vertices.z-vertices.x));
+            s+=Value(vertices.y+(T)rule.location3[i]*(vertices.z-vertices.y)+(T)rule.location3[i]*(vertices.x-vertices.y));
+            s+=Value(vertices.z+(T)rule.location3[i]*(vertices.x-vertices.z)+(T)rule.location3[i]*(vertices.y-vertices.z));
             r+=rule.weight3[i]*s;}
         for(int i=0;i<rule.number6;i++){
             T s=0;
-            s+=Value(vertices.x+rule.location6a[i]*(vertices.y-vertices.x)+rule.location6b[i]*(vertices.z-vertices.x));
-            s+=Value(vertices.y+rule.location6a[i]*(vertices.z-vertices.y)+rule.location6b[i]*(vertices.x-vertices.y));
-            s+=Value(vertices.z+rule.location6a[i]*(vertices.x-vertices.z)+rule.location6b[i]*(vertices.y-vertices.z));
-            s+=Value(vertices.x+rule.location6b[i]*(vertices.y-vertices.x)+rule.location6a[i]*(vertices.z-vertices.x));
-            s+=Value(vertices.y+rule.location6b[i]*(vertices.z-vertices.y)+rule.location6a[i]*(vertices.x-vertices.y));
-            s+=Value(vertices.z+rule.location6b[i]*(vertices.x-vertices.z)+rule.location6a[i]*(vertices.y-vertices.z));
+            s+=Value(vertices.x+(T)rule.location6a[i]*(vertices.y-vertices.x)+(T)rule.location6b[i]*(vertices.z-vertices.x));
+            s+=Value(vertices.y+(T)rule.location6a[i]*(vertices.z-vertices.y)+(T)rule.location6b[i]*(vertices.x-vertices.y));
+            s+=Value(vertices.z+(T)rule.location6a[i]*(vertices.x-vertices.z)+(T)rule.location6b[i]*(vertices.y-vertices.z));
+            s+=Value(vertices.x+(T)rule.location6b[i]*(vertices.y-vertices.x)+(T)rule.location6a[i]*(vertices.z-vertices.x));
+            s+=Value(vertices.y+(T)rule.location6b[i]*(vertices.z-vertices.y)+(T)rule.location6a[i]*(vertices.x-vertices.y));
+            s+=Value(vertices.z+(T)rule.location6b[i]*(vertices.x-vertices.z)+(T)rule.location6a[i]*(vertices.y-vertices.z));
             r+=rule.weight6[i]*s;}
         return r*TV::Cross_Product(a,b).Magnitude()/2;
     }
