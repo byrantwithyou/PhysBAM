@@ -316,8 +316,8 @@ Add_Cut_Subcell(const ARRAY<PAIR<T_FACE,int> >& side_elements,const ARRAY<PAIR<T
     
     for(int i=0;i<interface_blocks.m;i++){
         INTERFACE_BLOCK* ib=interface_blocks(i);
-        int sign1=(ib->ignore_orientation||enclose_inside)?1:-1;
-        int sign2=(ib->ignore_orientation)?1:-1;
+        int sign1=(false||enclose_inside)?1:-1;
+        int sign2=(false)?1:-1;
         for(int j=0;j<ib->overlap_polynomials.m;j++){
             typename INTERFACE_BLOCK::OVERLAP_POLYNOMIAL& op=ib->overlap_polynomials(j);
             if(op.subcell&(1<<block))

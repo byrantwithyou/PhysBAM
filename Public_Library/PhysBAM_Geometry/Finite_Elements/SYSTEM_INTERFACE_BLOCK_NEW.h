@@ -33,12 +33,13 @@ public:
         STATIC_POLYNOMIAL<T,TV::m,static_degree> polynomial;
     };
 
+    
     T scale;
-    bool ignore_orientation;
+    int dir; // [0] - normal, [1] - tangential, [2] - second tangential (in 3D) 
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
-    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,T scale_input,bool ignore_orientation_input);
+    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int dir_input,T scale_input);
 
     void Add_Entry(int interface_element,int flat_index_diff_ref,int inside,T value)
     {helper->data[inside](interface_element,flat_index_diff_ref)+=value*scale;}

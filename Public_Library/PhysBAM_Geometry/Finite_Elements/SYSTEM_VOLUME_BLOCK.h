@@ -26,13 +26,13 @@ public:
     struct OPEN_ENTRY
     {
         int flat_index_offset;
-        int flat_index_diff;
+        int flat_index_diff_ref;
         T x;
         
         bool operator< (const OPEN_ENTRY& me) const
         {
             if(flat_index_offset!=me.flat_index_offset) return flat_index_offset<me.flat_index_offset; 
-            return flat_index_diff<me.flat_index_diff; 
+            return flat_index_diff_ref<me.flat_index_diff_ref; 
         }
         
         void Merge(const OPEN_ENTRY& me){x+=me.x;}
@@ -41,7 +41,7 @@ public:
     struct OVERLAP_POLYNOMIAL
     {
         int flat_index_offset;
-        int flat_index_diff;
+        int flat_index_diff_ref;
         int subcell; // flags indicating fine cells
         STATIC_POLYNOMIAL<T,TV::m,static_degree> polynomial;
     };
@@ -50,11 +50,11 @@ public:
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
     ARRAY<OPEN_ENTRY> open_entries,open_subcell_entries[1<<TV::m];
 
-    void Add_Entry(int flat_index,int flat_index_diff,int inside,T value)
-    {helper->data[inside](flat_index,flat_index_diff)+=value*scale(inside);}
+    void Add_Entry(int flat_index,int flat_index_diff_ref,int inside,T value)
+    {helper->data[inside](flat_index,flat_index_diff_ref)+=value*scale(inside);}
 
     void Add_Open_Entry(int flat_index,int inside,OPEN_ENTRY& oe)
-    {Add_Entry(flat_index+oe.flat_index_offset,oe.flat_index_diff,inside,oe.x);}
+    {Add_Entry(flat_index+oe.flat_index_offset,oe.flat_index_diff_ref,inside,oe.x);}
 
     template<int d0,int d1>
     void Initialize(SYSTEM_VOLUME_BLOCK_HELPER<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,

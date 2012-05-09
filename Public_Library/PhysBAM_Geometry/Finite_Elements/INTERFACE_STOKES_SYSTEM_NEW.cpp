@@ -140,7 +140,8 @@ Set_Matrix(const VECTOR<T,2>& mu)
     // Traction blocks
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++)
-            biu.Add_Interface_Block(helper_qu(i)(j),*u_stencil(j),1,false);
+            biu.Add_Interface_Block(helper_qu(i)(j),*u_stencil(j),i,1);
+
     // RHS pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),VECTOR<T,2>(1,1));

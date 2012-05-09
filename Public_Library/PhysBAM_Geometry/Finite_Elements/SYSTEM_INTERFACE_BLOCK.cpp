@@ -22,9 +22,9 @@ Initialize(SYSTEM_INTERFACE_BLOCK_HELPER<TV>& helper_input,const BASIS_STENCIL_U
         OVERLAP_POLYNOMIAL& op=overlap_polynomials(i);
         const typename BASIS_STENCIL_UNIFORM<TV,d>::DICED& diced=s.diced(i);
         op.flat_index_offset=cdi->Flatten_Diff(diced.index_offset);
-        op.flat_index_diff.Resize(cdi->coarse_range);
+        op.flat_index_diff_ref.Resize(cdi->coarse_range);
         for(RANGE_ITERATOR<TV::m> it(cdi->coarse_range);it.Valid();it.Next())
-            op.flat_index_diff(it.index)=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(it.index)+op.flat_index_offset);
+            op.flat_index_diff_ref(it.index)=helper->flat_diff.Binary_Search(cdi->Flatten_Diff(it.index)+op.flat_index_offset);
         op.subcell=diced.subcell;
         op.polynomial=diced.polynomial;}
 }
