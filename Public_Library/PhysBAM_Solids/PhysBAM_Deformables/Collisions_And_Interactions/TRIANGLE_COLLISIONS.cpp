@@ -350,14 +350,15 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNIO
         else collided=Point_Face_Collision(pf_data,nodes,dt,REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes),collision_time,attempt_ratio,exit_early||rigid);
         if(collided){
             collisions++;
-            for(int j=0;j<nodes.m;j++){
-                modified_full(nodes(j))=true;
-                recently_modified_full(nodes(j))=true;}
+            modified_full.Subset(nodes).Fill(true);
+            recently_modified_full.Subset(nodes).Fill(true);
             modified_full.Subset(parent_list).Fill(true);
             recently_modified_full.Subset(parent_list).Fill(true);
+            for(int k=0;k<nodes.m;k++){
+                modified_full.Subset(geometry.deformable_body_collection.binding_list.neighbor_bindings(nodes(k))).Fill(true);
+                recently_modified_full.Subset(geometry.deformable_body_collection.binding_list.neighbor_bindings(nodes(k))).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - point face collision"<<std::endl;return collisions;}
-            if(rigid){
-                union_find.Union(parent_list);}}}
+            if(rigid) union_find.Union(parent_list);}}
     if(output_collision_results && !final_repulsion_only){
         if(final_point_face_repulsions) LOG::Stat("final point face repulsions",final_point_face_repulsions);
         if(final_point_face_collisions) LOG::Stat("final point face collisions",final_point_face_collisions);
@@ -560,19 +561,15 @@ Adjust_Velocity_For_Edge_Edge_Collision(const T dt,const bool rigid,SPARSE_UNION
             collided=Edge_Edge_Final_Repulsion(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
         else collided=Edge_Edge_Collision(ee_data,nodes,dt,collision_time,attempt_ratio,(exit_early||rigid));
         if(collided){collisions++;
-            for(int j=0;j<nodes.m;j++){
-                modified_full(nodes(j))=true;
-                recently_modified_full(nodes(j))=true;
-                parent_list.Remove_All();
-                geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(j));
-                modified_full.Subset(parent_list).Fill(true);
-                recently_modified_full.Subset(parent_list).Fill(true);}
+            modified_full.Subset(nodes).Fill(true);
+            recently_modified_full.Subset(nodes).Fill(true);
+            modified_full.Subset(parent_list).Fill(true);
+            recently_modified_full.Subset(parent_list).Fill(true);
+            for(int k=0;k<nodes.m;k++){
+                modified_full.Subset(geometry.deformable_body_collection.binding_list.neighbor_bindings(nodes(k))).Fill(true);
+                recently_modified_full.Subset(geometry.deformable_body_collection.binding_list.neighbor_bindings(nodes(k))).Fill(true);}
             if(exit_early){if(output_collision_results) LOG::cout<<"exiting collision checking early - edge collision"<<std::endl;return collisions;}
-            if(rigid){
-                ARRAY<int> parent_list;
-                for(int i=0;i<nodes.m;i++)
-                    geometry.deformable_body_collection.binding_list.Parents(parent_list,nodes(i));
-                union_find.Union(parent_list);}}}
+            if(rigid) union_find.Union(parent_list);}}
     if(output_collision_results && !final_repulsion_only){
         if(final_edge_edge_repulsions) LOG::Stat("final edge edge repulsions",final_edge_edge_repulsions);
         if(final_edge_edge_collisions) LOG::Stat("final edge edge collisions",final_edge_edge_collisions);
