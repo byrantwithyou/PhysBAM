@@ -256,37 +256,38 @@ Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f
 template<class TV> void INTERFACE_STOKES_SYSTEM_NEW<TV>::
 Set_Jacobi_Preconditioner()
 {
-    // Resize_Vector(J);
-    // for(int i=0;i<TV::m;i++)
-        // for(int s=0;s<2;s++){
-            // int u_dofs=cm_u(i)->dofs[s];
-            // SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)[s];
-            // for(int k=0;k<u_dofs;k++){
-                // T d=abs(m_uu(k,k));
-                // if(d<1e-12) {active_dofs.u(i)[s](k)=0;LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
-                // else J.u(i)[s](k)=1/abs(m_uu(k,k));}}
-    // for(int s=0;s<2;s++){
-        // for(int k=0;k<cm_p->dofs[s];k++){
-            // T sum=0;
-            // for(int i=0;i<TV::m;i++){
-                // SPARSE_MATRIX_FLAT_MXN<T>& m_pu=matrix_pu(i)[s];
-                // int start=m_pu.offsets(k);
-                // int end=m_pu.offsets(k+1);
-                // for(int j=start;j<end;j++)
-                    // sum+=sqr(m_pu.A(j).a)*J.u(i)[s](m_pu.A(j).j);}
-            // if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
-            // else J.p[s](k)=1/sum;}}
-    // for(int i=0;i<TV::m;i++)
-        // for(int k=0;k<object.mesh.elements.m;k++){
-            // T sum=0;
-            // for(int s=0;s<2;s++){
-                // SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(i)[s];
-                // int start=m_qu.offsets(k);
-                // int end=m_qu.offsets(k+1);
-                // for(int j=start;j<end;j++)
-                    // sum+=sqr(m_qu.A(j).a)*J.u(i)[s](m_qu.A(j).j);}
-            // if(sum<1e-12) {active_dofs.q(i)(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
-            // else J.q(i)(k)=1/sum;}
+    Resize_Vector(J);
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            int u_dofs=cm_u(i)->dofs[s];
+            SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)[s];
+            for(int k=0;k<u_dofs;k++){
+                T d=abs(m_uu(k,k));
+                if(d<1e-12) {active_dofs.u(i)[s](k)=0;LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
+                else J.u(i)[s](k)=1/abs(m_uu(k,k));}}
+    for(int s=0;s<2;s++){
+        for(int k=0;k<cm_p->dofs[s];k++){
+            T sum=0;
+            for(int i=0;i<TV::m;i++){
+                SPARSE_MATRIX_FLAT_MXN<T>& m_pu=matrix_pu(i)[s];
+                int start=m_pu.offsets(k);
+                int end=m_pu.offsets(k+1);
+                for(int e=start;e<end;e++)
+                    sum+=sqr(m_pu.A(e).a)*J.u(i)[s](m_pu.A(e).j);}
+            if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
+            else J.p[s](k)=1/sum;}}
+    for(int i=0;i<TV::m;i++)
+        for(int k=0;k<cut_cells;k++){
+            T sum=0;
+            for(int j=0;j<TV::m;j++)
+                for(int s=0;s<2;s++){
+                    SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(i)(j)[s];
+                    int start=m_qu.offsets(k);
+                    int end=m_qu.offsets(k+1);
+                    for(int e=start;e<end;e++)
+                        sum+=sqr(m_qu.A(e).a)*J.u(i)[s](m_qu.A(e).j);}
+            if(sum<1e-12) {active_dofs.q(i)(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
+            else J.q(i)(k)=1/sum;}
 }
 //#####################################################################
 // Function Resize_Vector
