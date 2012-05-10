@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
+#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
@@ -18,6 +19,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
@@ -119,6 +121,40 @@ Update_Swept_Hierachies_And_Compute_Pairs(ARRAY_VIEW<TV> X,ARRAY_VIEW<TV> X_self
             STRUCTURE_INTERACTION_GEOMETRY<TV>& structure_2=*geometry.structure_geometries(pair[1]);
             Get_Moving_Edges_Near_Moving_Edges(structure_1,structure_2,edge_edge_pairs_internal,edge_edge_pairs_external,detection_thickness);}}
 }
+template<class TV,class T,int n,int d>
+void Test(ARRAY_VIEW<VECTOR<T,d> > X,ARRAY_VIEW<TV> V,VECTOR<int,n> ind,T dt,T collision_thickness,T small_number,ARRAY_VIEW<TV> X2)
+{
+}
+template<class TV,class T,int n>
+void Test(ARRAY_VIEW<VECTOR<T,3> > X,ARRAY_VIEW<TV> V,VECTOR<int,n> ind,T dt,T collision_thickness,T small_number,ARRAY_VIEW<TV> X2)
+{
+    SEGMENT_3D<T> e(X(ind[0]),X(ind[1]));
+    SEGMENT_3D<T> e0(X(ind[2]),X(ind[3]));
+    SEGMENT_3D<T> e1(X(ind[3]),X(ind[4]));
+    SEGMENT_3D<T> e2(X(ind[2]),X(ind[4]));
+    VECTOR<int,3> tri_ind(ind[2],ind[3],ind[4]);
+    TRIANGLE_3D<T> tri(X.Subset(tri_ind));
+
+    T collision_time;
+    TV normal;
+    VECTOR<T,TV::m+1> weights;
+    bool ee0=e.Edge_Edge_Collision(e0,V.Subset(ind.Remove_Index(4)),dt,collision_thickness,collision_time,normal,weights,small_number,false);
+    bool ee1=e.Edge_Edge_Collision(e0,V.Subset(ind.Remove_Index(2)),dt,collision_thickness,collision_time,normal,weights,small_number,false);
+    bool ee2=e.Edge_Edge_Collision(e0,V.Subset(ind.Remove_Index(3)),dt,collision_thickness,collision_time,normal,weights,small_number,false);
+    bool pf0=tri.Point_Face_Collision(X(ind[0]),V(ind[0]),V.Subset(tri_ind),dt,collision_thickness,collision_time,normal,weights,false);
+    bool pf1=tri.Point_Face_Collision(X(ind[1]),V(ind[1]),V.Subset(tri_ind),dt,collision_thickness,collision_time,normal,weights,false);
+
+    bool int0=INTERSECTION::Intersects(e,tri,small_number);
+    SEGMENT_3D<T> ex(X(ind[0])+dt*V(ind[0]),X(ind[1])+dt*V(ind[1]));
+    ARRAY<TV> BB(X+dt*V);
+    TRIANGLE_3D<T> trix(BB.Subset(tri_ind));
+    bool int1=INTERSECTION::Intersects(ex,trix,small_number);
+    SEGMENT_3D<T> ey(X2(ind[0]),X2(ind[1]));
+    TRIANGLE_3D<T> triy(X2.Subset(tri_ind));
+    bool int2=INTERSECTION::Intersects(ey,triy,small_number);
+
+    LOG::cout<<"TEST: "<<ind<<" : "<<VECTOR<bool,5>(pf1,pf0,ee1,ee2,ee0)<<"  int "<<int0<<" "<<int1<<" "<<int2<<std::endl;
+}
 //#####################################################################
 // Function Adjust_Velocity_For_Self_Collisions
 //#####################################################################
@@ -126,6 +162,8 @@ template<class TV> int TRIANGLE_COLLISIONS<TV>::
 Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_early)
 {
     LOG::SCOPE scope("collisions","checking collisions");
+    geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
+    geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();
     DEFORMABLE_PARTICLES<TV>& full_particles=geometry.deformable_body_collection.particles;
     ARRAY_VIEW<TV> X(full_particles.X),X_self_collision_free(geometry.X_self_collision_free);ARRAY<bool>& modified_full=geometry.modified_full;
     int collisions=0,collisions_in_attempt=0,
@@ -231,6 +269,7 @@ Adjust_Velocity_For_Self_Collisions(const T dt,const T time,const bool exit_earl
     }
     if(exit_early && collisions_in_attempt) collisions*=-1; // flag indicating that the collisions were not resolved
 
+//    Test(X_self_collision_free,full_particles.V,VECTOR<int,5>(550,893,1433,1726,1434),dt,collision_thickness,geometry.small_number,full_particles.X);
     return collisions;
 }
 template<> int TRIANGLE_COLLISIONS<VECTOR<float,1> >::Adjust_Velocity_For_Self_Collisions(const T,const T time,const bool){PHYSBAM_NOT_IMPLEMENTED();}
@@ -369,16 +408,6 @@ Adjust_Velocity_For_Point_Face_Collision(const T dt,const bool rigid,SPARSE_UNIO
 //#####################################################################
 // Function Prune_Non_Intersecting_Pairs
 //#####################################################################
-template<class T,class T_ARRAY> T Create_Edges(const T_ARRAY& X,const VECTOR<int,3>& nodes,const ARRAY<T>& repulsion_thickness,POINT_2D<T>& point1,POINT_2D<T>& point2)
-{
-    PHYSBAM_FATAL_ERROR();
-}
-template<class T,class T_ARRAY> T Create_Edges(const T_ARRAY& X,const VECTOR<int,4>& nodes,const ARRAY<T>& repulsion_thickness,SEGMENT_3D<T>& segment1,SEGMENT_3D<T>& segment2)
-{
-    segment1=SEGMENT_3D<T>(X(nodes[0]),X(nodes[1]));
-    segment2=SEGMENT_3D<T>(X(nodes[2]),X(nodes[3]));
-    return REPULSION_PAIR<typename T_ARRAY::ELEMENT>::Total_Repulsion_Thickness(repulsion_thickness,nodes);
-}
 template<class TV> int TRIANGLE_COLLISIONS<TV>::
 Prune_Non_Intersecting_Pairs(const T dt,ARRAY<VECTOR<int,d+1> >& point_face_pairs,ARRAY<VECTOR<int,d+1> >& edge_edge_pairs,const T attempt_ratio)
 {
@@ -590,7 +619,7 @@ Edge_Edge_Collision(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& nodes,cons
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d+1>&> V_edges(V,nodes);
 
     bool return_type=false;
-    T_EDGE edge1,edge2;Create_Edges(X,nodes,repulsion_thickness,edge1,edge2);
+    T_EDGE edge1=SEGMENT_3D<T>(X(nodes[0]),X(nodes[1])),edge2=SEGMENT_3D<T>(X(nodes[2]),X(nodes[3]));
 
     TV normal;VECTOR<T,TV::m+1> weights;
     if(edge1.Edge_Edge_Collision(edge2,V_edges,dt,collision_thickness,collision_time,normal,weights,geometry.small_number,exit_early)){if(exit_early) return true;
@@ -629,7 +658,8 @@ Edge_Edge_Final_Repulsion(GAUSS_JACOBI_DATA& ee_data,const VECTOR<int,d+1>& node
     INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,d+1>&> V_save_edges(V_save,nodes);
 
     bool return_type=false;
-    T_EDGE edge1,edge2;T total_repulsion_thickness=Create_Edges(X,nodes,repulsion_thickness,edge1,edge2);
+    T_EDGE edge1=SEGMENT_3D<T>(X(nodes[0]),X(nodes[1])),edge2=SEGMENT_3D<T>(X(nodes[2]),X(nodes[3]));
+    T total_repulsion_thickness=REPULSION_PAIR<TV>::Total_Repulsion_Thickness(repulsion_thickness,nodes);
     TV normal;VECTOR<T,TV::m+1> weights;
 
     // check to see if the final position is too close - see if the edge x3-x4 intersects the cylinder around x1-x2

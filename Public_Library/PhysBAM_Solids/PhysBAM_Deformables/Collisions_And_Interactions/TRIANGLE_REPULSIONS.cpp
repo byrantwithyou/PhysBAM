@@ -195,11 +195,18 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
     ARRAY<REPULSION_PAIR<TV> > point_face_pairs(point_face_interaction_pairs);
     ARRAY<REPULSION_PAIR<TV> > edge_edge_pairs(edge_edge_interaction_pairs);
 
+    ARRAY<int> parent_list;
     for(int pair_index=0;pair_index<point_face_pairs.m;pair_index++){
         REPULSION_PAIR<TV>& pair=point_face_pairs(pair_index);
         T_FACE face(X_self_collision_free.Subset(pair.nodes.Remove_Index(0)));
         face.Point_Face_Interaction_Data(X_self_collision_free(pair.nodes[0]),pair.distance,pair.normal,pair.weights,perform_attractions);
-        modified_full.Subset(pair.nodes).Fill(true);}
+        parent_list.Remove_All();
+        for(int j=0;j<pair.nodes.m;j++)
+            geometry.deformable_body_collection.binding_list.Parents(parent_list,pair.nodes(j));
+        modified_full.Subset(pair.nodes).Fill(true);
+        modified_full.Subset(parent_list).Fill(true);
+        for(int k=0;k<pair.nodes.m;k++)
+            modified_full.Subset(geometry.deformable_body_collection.binding_list.neighbor_bindings(pair.nodes(k))).Fill(true);}
 
     // TODO: do we need update binding here?
     // TODO: MPI check fragments in super fragment for whether this fragment is in the processor?
@@ -209,12 +216,21 @@ Adjust_Velocity_For_Self_Repulsion(const T dt,bool use_saved_pairs)
         REPULSION_PAIR<TV>& pair=edge_edge_pairs(pair_index);
         // Note: don't call this, all it does is mess up the normal and has already been called when the pairs are created
         //Edge_Edge_Interaction_Data_Helper(X_self_collision_free,pair,V.Subset(pair.nodes),geometry.small_number);
-        INDIRECT_ARRAY<ARRAY<bool>,VECTOR<int,TV::m+1>&> modified_subset=modified_full.Subset(pair.nodes);
-        modified_subset.Fill(true);}
+        parent_list.Remove_All();
+        for(int j=0;j<pair.nodes.m;j++)
+            geometry.deformable_body_collection.binding_list.Parents(parent_list,pair.nodes(j));
+        modified_full.Subset(pair.nodes).Fill(true);
+        modified_full.Subset(parent_list).Fill(true);
+        for(int k=0;k<pair.nodes.m;k++)
+            modified_full.Subset(geometry.deformable_body_collection.binding_list.neighbor_bindings(pair.nodes(k))).Fill(true);}
 
     int repulsions=Apply_Repulsions_To_Velocities(dt,point_face_pairs,edge_edge_pairs,true,use_saved_pairs);
     LOG::Stat("adjusting velocity for repulsions",repulsions);
-    if(repulsions) for(int p=0;p<geometry.deformable_body_collection.particles.Size();p++) if(modified_full(p)) geometry.deformable_body_collection.particles.X(p)=X_self_collision_free(p)+dt*V(p);
+    if(repulsions){
+        for(int p=0;p<geometry.deformable_body_collection.particles.Size();p++) if(modified_full(p)) geometry.deformable_body_collection.particles.X(p)=X_self_collision_free(p)+dt*V(p);
+        geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Positions();
+        geometry.deformable_body_collection.binding_list.Clamp_Particles_To_Embedded_Velocities();}
+
 // TODO: this is broken
 //    for(int i=0;i<geometry.deformable_body_collection.rigid_body_particles.Size();i++){
 //        geometry.deformable_body_collection.rigid_body_particles.Frame(i)=geometry.rigid_body_particle_state_collision_free(i).frame;
