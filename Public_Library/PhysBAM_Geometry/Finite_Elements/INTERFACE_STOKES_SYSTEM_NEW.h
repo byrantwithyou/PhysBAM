@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_NEW.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 
 namespace PhysBAM{
@@ -24,7 +24,7 @@ class INTERFACE_STOKES_SYSTEM_NEW:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
-    typedef INTERFACE_STOKES_SYSTEM_VECTOR<TV> VECTOR_T;
+    typedef INTERFACE_STOKES_SYSTEM_VECTOR_NEW<TV> VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
     VECTOR_T J; // Jacobi preconditioner 
@@ -57,7 +57,7 @@ public:
     //   #----# #----# #----#   #---------------------------# 
     
     VECTOR<VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>,TV::m> matrix_uu;
-    VECTOR<VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>,TV::m> matrix_qu;
+    VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_qu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_pu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_f_pu;
     VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> rhs_interface;

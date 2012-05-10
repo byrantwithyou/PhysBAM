@@ -36,14 +36,16 @@ public:
     
     T scale;
     int axis;
-    int orientation; // [0] - tangential, [1] - tangential, [2] - normal 
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
-    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int axis_input,int orientation_input,T scale_input);
+    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int axis_input,T scale_input);
 
-    void Add_Entry(int interface_element,int flat_index_diff_ref,int inside,T value)
-    {helper->data[inside](interface_element,flat_index_diff_ref)+=value*scale;}
+    void Add_Entry(int interface_dof,int orientation,int flat_index_diff_ref,int inside,T value)
+    {helper->data[inside](orientation*cdi->interface_dofs+interface_dof,flat_index_diff_ref)+=value*scale;}
+
+    int Flat_Diff(int i)
+    {return helper->flat_diff(i);}
 };
 }
 #endif

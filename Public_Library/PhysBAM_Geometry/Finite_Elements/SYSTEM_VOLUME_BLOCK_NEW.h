@@ -22,7 +22,7 @@ class SYSTEM_VOLUME_BLOCK_NEW:public NONCOPYABLE
     SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV> *helper;
 
 public:
-    
+
     struct OPEN_ENTRY
     {
         int flat_index_offset;

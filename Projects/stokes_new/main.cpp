@@ -140,7 +140,7 @@ void Dump_System(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,ANALYTIC_TEST<TV>& a
 }
 
 template<class T,class TV>
-void Dump_Vector(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const char* title)
+void Dump_Vector(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR_NEW<TV>& v,const char* title)
 {
     char buff[100];
     for(int i=0;i<TV::m;i++)
@@ -168,7 +168,7 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,const INTERFACE_STOK
 }
 
 template<class T,class TV>
-void Dump_Vector2(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const char* title)
+void Dump_Vector2(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR_NEW<TV>& v,const char* title)
 {
     char buff[100];
     for(int s=0;s<2;s++){
@@ -183,11 +183,11 @@ void Dump_Vector2(const INTERFACE_STOKES_SYSTEM_NEW<TV>& iss,const INTERFACE_STO
             if(k>=0){
                 Add_Debug_Particle(it.Location(),v.p[s](k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
                 Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v.p[s](k));}}
-        for(int i=0;i<iss.object.mesh.elements.m;i++){
-            Add_Debug_Particle(iss.object.Get_Element(i).Center(),VECTOR<T,3>(1,1,1));
-            TV V;
-            for(int j=0;j<TV::m;j++) V(j)=v.q(j)(i);
-            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,V);}
+        // for(int i=0;i<iss.object.mesh.elements.m;i++){
+            // Add_Debug_Particle(iss.object.Get_Element(i).Center(),VECTOR<T,3>(1,1,1));
+            // TV V;
+            // for(int j=0;j<TV::m;j++) V(j)=v.q(j)(i);
+            // Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,V);}
         Dump_Frame(u,buff);}
 }
 
@@ -257,7 +257,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     {
         ARRAY<TV> f_interface;
         f_interface.Resize(iss.cut_cells);
-        for(int i=0; i<iss.cut_cells;i++)
+        for(int i=0;i<iss.cut_cells;i++)
             f_interface(i)=at.interface(iss.object.Get_Element(i).Center());
         iss.Set_Matrix(at.mu,f_interface);
     }
@@ -265,10 +265,10 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     printf("\n");
     for(int i=0;i<TV::m;i++) for(int s=0;s<2;s++) printf("%c%c [%i] ","uvw"[i],"+-"[s],iss.cm_u(i)->dofs[s]);
     for(int s=0;s<2;s++) printf("p%c [%i] ","+-"[s],iss.cm_p->dofs[s]);
-    printf("q [%i] ",iss.object.mesh.elements.m);
+    printf("q [%i] ",iss.cut_cells);
     printf("\n");
 
-    INTERFACE_STOKES_SYSTEM_VECTOR<TV> rhs,sol;
+    INTERFACE_STOKES_SYSTEM_VECTOR_NEW<TV> rhs,sol;
     {
         VECTOR<ARRAY<TV,TV_INT>,2> f_body;
         VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2> u;

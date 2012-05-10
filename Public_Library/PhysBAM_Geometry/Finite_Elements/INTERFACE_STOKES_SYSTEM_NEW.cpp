@@ -112,12 +112,12 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
     BASIS_INTEGRATION_UNIFORM_NEW<TV,2> biu(grid,phi_grid,phi,*cdi);
     VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>,TV::m>,TV::m> helper_uu;
     VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>,TV::m> helper_pu,helper_rhs_pu;
-    VECTOR<VECTOR<SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>,TV::m>,TV::m> helper_qu;
+    VECTOR<SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>,TV::m> helper_qu;
 
     for(int i=0;i<TV::m;i++){
-        for(int j=i;j<TV::m;j++){
+        for(int j=i;j<TV::m;j++)
             helper_uu(i)(j).Initialize(*u_stencil(i),*u_stencil(j),*cm_u(i),*cm_u(j),*cdi);
-            helper_qu(i)(j).Initialize(*u_stencil(j),*cm_u(j),*cdi);}
+        helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
         helper_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
         helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);}
     
@@ -134,8 +134,7 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
         biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),VECTOR<T,2>(-1,-1));
     // Traction blocks
     for(int i=0;i<TV::m;i++)
-        for(int j=0;j<TV::m;j++)
-            biu.Add_Interface_Block(helper_qu(i)(j),*u_stencil(j),j,i,1);
+        biu.Add_Interface_Block(helper_qu(i),*u_stencil(i),i,1);
     // RHS pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),VECTOR<T,2>(1,1));
@@ -148,9 +147,9 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
     // BUILD SYSTEM MATRIX BLOCKS
 
     for(int i=0;i<TV::m;i++){
-        for(int j=i;j<TV::m;j++){
+        for(int j=i;j<TV::m;j++)
             helper_uu(i)(j).Mark_Active_Cells();
-            helper_qu(i)(j).Mark_Active_Cells();}
+        helper_qu(i).Mark_Active_Cells();
         helper_pu(i).Mark_Active_Cells();
         helper_rhs_pu(i).Mark_Active_Cells();}
     
@@ -166,8 +165,7 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
         helper_pu(i).Build_Matrix(matrix_pu(i));
     // QU Block
     for(int i=0;i<TV::m;i++)
-        for(int j=i;j<TV::m;j++)
-            helper_qu(i)(j).Build_Matrix(matrix_qu(i)(j));
+        helper_qu(i).Build_Matrix(matrix_qu(i));
     // RHS PU Block 
     for(int i=0;i<TV::m;i++)
         helper_rhs_pu(i).Build_Matrix(matrix_f_pu(i));
@@ -180,15 +178,17 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
             active_dofs.u(i)[s].Fill(1);
     for(int s=0;s<2;s++)
         active_dofs.p[s].Fill(1);
-    for(int i=0;i<TV::m;i++)
-        active_dofs.q(i).Fill(1);
+    active_dofs.q.Fill(1);
 
     if(BASE::use_preconditioner) Set_Jacobi_Preconditioner();
 
     Resize_Vector(null_p);
     for(int s=0;s<2;s++){
         null_p.p[s].Fill(1);
-        null_p.q(0).Fill(-1);}
+        int start=cdi->interface_dofs*(TV::m-1);
+        int end=cdi->interface_dofs*TV::m;
+        for(int k=start;k<end;k++)
+            null_p.q(k)=-1;}
     null_p.Scale(active_dofs);
     null_p.Normalize();
 
@@ -270,18 +270,17 @@ Set_Jacobi_Preconditioner()
                     sum+=sqr(m_pu.A(e).a)*J.u(i)[s](m_pu.A(e).j);}
             if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
             else J.p[s](k)=1/sum;}}
-    for(int i=0;i<TV::m;i++)
-        for(int k=0;k<cdi->interface_dofs;k++){
-            T sum=0;
-            for(int j=0;j<TV::m;j++)
-                for(int s=0;s<2;s++){
-                    SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(i)(j)[s];
-                    int start=m_qu.offsets(k);
-                    int end=m_qu.offsets(k+1);
-                    for(int e=start;e<end;e++)
-                        sum+=sqr(m_qu.A(e).a)*J.u(i)[s](m_qu.A(e).j);}
-            if(sum<1e-12) {active_dofs.q(i)(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
-            else J.q(i)(k)=1/sum;}
+    for(int k=0;k<J.q.n;k++){
+        T sum=0;
+        for(int i=0;i<TV::m;i++)
+            for(int s=0;s<2;s++){
+                SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(i)[s];
+                int start=m_qu.offsets(k);
+                int end=m_qu.offsets(k+1);
+                for(int j=start;j<end;j++)
+                    sum+=sqr(m_qu.A(j).a)*J.u(i)[s](m_qu.A(j).j);}
+        if(sum<1e-12) {active_dofs.q(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
+        else J.q(k)=1/sum;}
 }
 //#####################################################################
 // Function Resize_Vector
@@ -295,8 +294,7 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
             v.u(i)[s].Resize(cm_u(i)->dofs[s]);
     for(int s=0;s<2;s++)
         v.p[s].Resize(cm_p->dofs[s]);
-    for(int i=0;i<TV::m;i++)
-        v.q(i).Resize(cdi->interface_dofs);
+    v.q.Resize(cdi->interface_dofs*TV::m);
 }
 //#####################################################################
 // Function Multiply
@@ -309,19 +307,18 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++){
             matrix_pu(i)[s].Transpose_Times(xc.p[s],rc.u(i)[s]);
+            matrix_qu(i)[s].Transpose_Times_Add(xc.q,rc.u(i)[s]);
             for(int j=0;j<TV::m;j++){
                 if(j>=i) matrix_uu(i)(j)[s].Times_Add(xc.u(j)[s],rc.u(i)[s]);
-                else matrix_uu(j)(i)[s].Transpose_Times_Add(xc.u(j)[s],rc.u(i)[s]);
-                matrix_qu(i)(j)[s].Transpose_Times_Add(xc.q(i),rc.u(j)[s]);}}
+                else matrix_uu(j)(i)[s].Transpose_Times_Add(xc.u(j)[s],rc.u(i)[s]);}}
     for(int s=0;s<2;s++){
         rc.p[s].Fill(0);
         for(int i=0;i<TV::m;i++)
             matrix_pu(i)[s].Times_Add(xc.u(i)[s],rc.p[s]);}
-    for(int i=0;i<TV::m;i++){
-        rc.q(i).Fill(0);
-        for(int j=0;j<TV::m;j++)
-            for(int s=0;s<2;s++)
-                matrix_qu(i)(j)[s].Times_Add(xc.u(j)[s],rc.q(i));}
+    rc.q.Fill(0);
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            matrix_qu(i)[s].Times_Add(xc.u(i)[s],rc.q);
 }
 //#####################################################################
 // Function Inner_Product

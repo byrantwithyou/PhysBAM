@@ -48,6 +48,19 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
 // Function Precomputed_Integral
 //#####################################################################
 template<class T,int dim,int rank,int sdp1,int d> static T
+Precomputed_Integral(const STATIC_TENSOR<VECTOR<T,dim>,rank,sdp1>& precompute,int i,const STATIC_POLYNOMIAL<T,rank,d>& poly)
+{
+    T total=0;
+    RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),poly.size+1);
+    for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
+        if(T coeff=poly.terms(it.index))
+            total+=coeff*precompute(it.index)(i);
+    return total;
+}
+//#####################################################################
+// Function Precomputed_Integral
+//#####################################################################
+template<class T,int dim,int rank,int sdp1,int d> static T
 Precomputed_Integral(const STATIC_TENSOR<MATRIX<T,dim>,rank,sdp1>& precompute,int i,int j,const STATIC_POLYNOMIAL<T,rank,d>& poly)
 {
     T total=0;
@@ -293,9 +306,15 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_
         for(int j=0;j<ib->overlap_polynomials.m;j++){
             typename INTERFACE_BLOCK::OVERLAP_POLYNOMIAL& op=ib->overlap_polynomials(j);
             if(op.subcell&(1<<block)){
-                T integral=Precomputed_Integral(precomputed_interface_integrals,ib->axis,ib->orientation,op.polynomial);
-                ib->Add_Entry(cut_cell_index,op.flat_index_diff_ref,false,integral);
-                ib->Add_Entry(cut_cell_index,op.flat_index_diff_ref,true,-integral);}}}
+                for(int orientation=0;orientation<TV::m;orientation++){
+                    T integral=Precomputed_Integral(precomputed_interface_integrals,ib->axis,orientation,op.polynomial);
+                    ib->Add_Entry(cut_cell_index,orientation,op.flat_index_diff_ref,false,integral);
+                    ib->Add_Entry(cut_cell_index,orientation,op.flat_index_diff_ref,true,-integral);}
+                T rhs_integral=0.5*Precomputed_Integral(precomputed_rhs_interface_integrals,ib->axis,op.polynomial);
+                int flat_index=cdi.flat_base(cut_cell_index)+ib->Flat_Diff(op.flat_index_diff_ref);
+                for(int s=0;s<2;s++) rhs_interface(ib->axis)[s](flat_index)=rhs_integral;}}}
+
+    element_base+=interface.m;
 }
 //#####################################################################
 // Function Add_Volume_Block
@@ -319,10 +338,10 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
 Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    int axis,int orientation,T scale)
+    int axis,T scale)
 {
     INTERFACE_BLOCK* ib=new INTERFACE_BLOCK;
-    ib->Initialize(helper,s,axis,orientation,scale);
+    ib->Initialize(helper,s,axis,scale);
     interface_blocks.Append(ib);
         
     for(int i=0;i<ib->overlap_polynomials.m;i++){
@@ -338,13 +357,13 @@ template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>::Add_Volume_Block
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,int,int,float);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,int,float);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,int,int,float);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,int,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>;
@@ -353,11 +372,11 @@ template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>::Add_Volume_Bloc
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<double,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,VECTOR<double,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,int,int,double);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,int,double);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,VECTOR<double,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,VECTOR<double,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,int,int,double);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,int,double);
 #endif

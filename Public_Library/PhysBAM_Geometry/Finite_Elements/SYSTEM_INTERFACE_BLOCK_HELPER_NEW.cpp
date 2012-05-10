@@ -27,7 +27,7 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_NEW<TV>& cm_input,C
     flat_diff.Sort();
     flat_diff.Prune_Duplicates();
 
-    for(int s=0;s<2;s++) data[s].Resize(cdi->interface_dofs,flat_diff.m);
+    for(int s=0;s<2;s++) data[s].Resize(cdi->interface_dofs*TV::m,flat_diff.m);
 }
 //#####################################################################
 // Function Mark_Active_Cells

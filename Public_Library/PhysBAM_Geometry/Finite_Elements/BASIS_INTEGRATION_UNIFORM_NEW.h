@@ -56,7 +56,7 @@ public:
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const VECTOR<T,2>& scale);
     template<int d>
     void Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        int axis,int orientation,T scale);
+        int axis,T scale);
 };
 }
 #endif
