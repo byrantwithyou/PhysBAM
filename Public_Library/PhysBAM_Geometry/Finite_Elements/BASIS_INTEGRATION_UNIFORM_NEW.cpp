@@ -82,7 +82,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<T_FACE>,8>& interface,con
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
-Compute_Entries()
+Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface)
 {
     VECTOR<ARRAY<T_FACE>,(1<<TV::m)> sides,interface;
     VECTOR<bool,(1<<TV::m)> enclose_inside;
@@ -97,7 +97,7 @@ Compute_Entries()
     const int all_outside=0;
 
     int cut_cell_index=-1;
-
+    int element_base=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int cell_corners=0;
         TV_INT phi_base=it.index*2;
@@ -116,7 +116,8 @@ Compute_Entries()
 
         for(int b=0;b<(1<<TV::m);b++)
             if(!interface(b).m) Add_Uncut_Fine_Cell(it.index,b,!enclose_inside(b));
-            else Add_Cut_Fine_Cell(it.index,b,interface(b),sides(b),direction(b),enclose_inside(b),cut_cell_index,base_orientation);}
+            else Add_Cut_Fine_Cell(it.index,b,interface(b),sides(b),direction(b),enclose_inside(b),
+                cut_cell_index,base_orientation,f_interface,rhs_interface,element_base);}
 }
 //#####################################################################
 // Function Compute_Open_Entries
@@ -230,7 +231,8 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,bool enclose_inside
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
-    int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation)
+    int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation,
+    const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface,int& element_base)
 {
     assert(sides.m);
     assert(interface.m);
@@ -276,12 +278,15 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_
         Compute_Consistent_Orientation_Helper(interface(i),enclose_inside,base_orientation,orientations(i));
 
     STATIC_TENSOR<MATRIX<T,TV::m>,TV::m,static_degree+1> precomputed_interface_integrals;
+    STATIC_TENSOR<TV,TV::m,static_degree+1> precomputed_rhs_interface_integrals;
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(surface_monomials_needed(it.index)){
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
-            for(int i=0;i<interface.m;i++)
-                precomputed_interface_integrals(it.index)+=orientations(i)*monomial.Quadrature_Over_Primitive(interface(i).X);}
+            for(int i=0;i<interface.m;i++){
+                T monomial_integral=monomial.Quadrature_Over_Primitive(interface(i).X);
+                precomputed_interface_integrals(it.index)+=orientations(i)*monomial_integral;
+                precomputed_rhs_interface_integrals(it.index)+=f_interface(element_base+i)*monomial_integral;}}
     
     for(int i=0;i<interface_blocks.m;i++){
         INTERFACE_BLOCK* ib=interface_blocks(i);

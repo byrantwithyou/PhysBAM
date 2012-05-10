@@ -254,7 +254,13 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()) phi(it.index)=at.phi(it.Location());
     INTERFACE_STOKES_SYSTEM_NEW<TV> iss(grid,phi);
     iss.use_preconditioner=use_preconditioner;
-    iss.Set_Matrix(at.mu);
+    {
+        ARRAY<TV> f_interface;
+        f_interface.Resize(iss.cut_cells);
+        for(int i=0; i<iss.cut_cells;i++)
+            f_interface(i)=at.interface(iss.object.Get_Element(i).Center());
+        iss.Set_Matrix(at.mu,f_interface);
+    }
 
     printf("\n");
     for(int i=0;i<TV::m;i++) for(int s=0;s<2;s++) printf("%c%c [%i] ","uvw"[i],"+-"[s],iss.cm_u(i)->dofs[s]);
@@ -265,15 +271,10 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     INTERFACE_STOKES_SYSTEM_VECTOR<TV> rhs,sol;
     {
         VECTOR<ARRAY<TV,TV_INT>,2> f_body;
-        ARRAY<TV> f_interface;
         VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2> u;
         
-        f_interface.Resize(iss.object.mesh.elements.m);
         for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
         for(int s=0;s<2;s++) u[s].Resize(grid);
-        
-        for(int i=0; i<iss.object.mesh.elements.m;i++)
-            f_interface(i)=at.interface(iss.object.Get_Element(i).Center());
         
         for(int s=0;s<2;s++)
             for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
@@ -284,7 +285,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
                 FACE_INDEX<TV::m> face(it.Full_Index()); 
                 u[s](face)=at.u(it.Location(),s)(face.axis);}
         
-        iss.Set_RHS(rhs,f_body,f_interface,u);
+        iss.Set_RHS(rhs,f_body,u);
         iss.Resize_Vector(sol);
     }
 

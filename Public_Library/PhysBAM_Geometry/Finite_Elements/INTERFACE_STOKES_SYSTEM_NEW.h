@@ -60,6 +60,7 @@ public:
     VECTOR<VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>,TV::m> matrix_qu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_pu;
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_f_pu;
+    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> rhs_interface;
 
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;
@@ -70,7 +71,8 @@ public:
 
     GRID<TV> phi_grid;
     ARRAY<T,TV_INT> phi;
-
+    int cut_cells;
+    
     bool run_self_tests;
     bool print_matrix;
     bool print_rhs;
@@ -86,8 +88,8 @@ public:
     virtual ~INTERFACE_STOKES_SYSTEM_NEW();
 
 //#####################################################################
-    void Set_Matrix(const VECTOR<T,2>& mu);
-    void Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u);
+    void Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface);
+    void Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

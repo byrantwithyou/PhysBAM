@@ -49,6 +49,10 @@ INTERFACE_STOKES_SYSTEM_NEW(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_inpu
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
         T& phi_value=phi(it.index);
         if(fabs(phi_value)<panic_threshold) phi_value=phi_value<0?-panic_threshold:panic_threshold;}
+
+    // MARCHING CUBES
+    
+    cut_cells=MARCHING_CUBES<TV>::Create_Double_Fine_Surface(object,grid,phi_grid,phi);
 }
 //#####################################################################
 // Destructor
@@ -64,7 +68,7 @@ template<class TV> INTERFACE_STOKES_SYSTEM_NEW<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_NEW<TV>::
-Set_Matrix(const VECTOR<T,2>& mu)
+Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
 {
     // SET UP STENCILS
 
@@ -98,7 +102,6 @@ Set_Matrix(const VECTOR<T,2>& mu)
         padding=p_stencil.Padding();
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
 
-    int cut_cells=MARCHING_CUBES<TV>::Create_Double_Fine_Surface(object,grid,phi_grid,phi);
     cdi=new CELL_DOMAIN_INTERFACE_NEW<TV>(grid,padding,cut_cells,periodic_bc); 
 
     cm_p=new CELL_MANAGER_NEW<TV>(*cdi);
@@ -133,12 +136,14 @@ Set_Matrix(const VECTOR<T,2>& mu)
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++)
             biu.Add_Interface_Block(helper_qu(i)(j),*u_stencil(j),j,i,1);
-
     // RHS pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),VECTOR<T,2>(1,1));
 
-    biu.Compute_Entries();
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            rhs_interface(i)[s].Resize(cut_cells);
+    biu.Compute_Entries(f_interface,rhs_interface);
 
     // BUILD SYSTEM MATRIX BLOCKS
 
@@ -202,7 +207,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_NEW<TV>::
-Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u)
+Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u)
 {
     // VECTOR<VECTOR_ND<T>,TV::m> F_interface;
     // VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
