@@ -25,10 +25,10 @@ CELL_DOMAIN_INTERFACE_NEW(const GRID<TV>& grid_input,int padding_input,int inter
             for(int s=0;s<2;s++){
                 int side=axis*2+s;
                 int sign=s?-1:1;
-                int s=Flatten_Diff(sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
+                int diff=Flatten_Diff(sign*grid.counts(axis)*TV_INT::Axis_Vector(axis));
                 for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,padding,GRID<TV>::GHOST_REGION,side);it.Valid();it.Next()){
                     int f=Flatten(it.index);
-                    remap(f)=remap(f+s);}}}
+                    remap(f)=remap(f+diff);}}}
 
     cell_location.Resize(flat_size);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,-padding,GRID<TV>::WHOLE_REGION);it.Valid();it.Next())

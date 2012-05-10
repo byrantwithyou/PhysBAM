@@ -16,7 +16,7 @@ namespace PhysBAM{
 
 template<class TV> class CELL_DOMAIN_INTERFACE;
 template<class TV> class CELL_MANAGER;
-template<class TV,int d> class BASIS_STENCIL_UNIFORM;
+template<class TV,int d> struct BASIS_STENCIL_UNIFORM;
 template<class T> class SPARSE_MATRIX_FLAT_MXN;
 
 template<class TV>
