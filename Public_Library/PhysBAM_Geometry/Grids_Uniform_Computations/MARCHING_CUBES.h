@@ -57,6 +57,7 @@ public:
     static void Get_Elements_For_Cell(ARRAY<T_FACE>& surface,ARRAY<T_FACE>& boundary,int& direction,bool& enclose_inside,
         const ARRAY<T,TV_INT>& phi,const TV_INT& cell);
     static void Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi);
+    static void Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi);
 //#####################################################################
 };
 }
