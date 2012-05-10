@@ -220,11 +220,11 @@ Get_Elements_For_Cell(ARRAY<T_FACE>& surface,ARRAY<T_FACE>& boundary,int& direct
 template<class TV> int MARCHING_CUBES<TV>::
 Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi)
 {
-    VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
-    VECTOR<T,num_corners> phis;
-    TV pts[num_pts];
     const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
+    const VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
+    VECTOR<T,num_corners> phis;
     HASHTABLE<FACE_INDEX<TV::m>,int> ht;
+    TV pts[num_pts];
 
     int cut_cells=0;
     for(RANGE_ITERATOR<TV::m> it(phi.domain.To_Closed());it.Valid();it.Next()){
@@ -266,16 +266,23 @@ Create_Surface(T_SURFACE& surface,const GRID<TV>& grid,const ARRAY<T,TV_INT>& ph
 template<class TV> int MARCHING_CUBES<TV>::
 Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi)
 {
-    VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
+    const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
+    const VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
+    const VECTOR<TV_INT,num_corners> double_bits=GRID<TV>::Binary_Counts(TV_INT(),2);
+    const int all_negative=(1<<(1<<TV::m))-1;
+    const int all_positive=0;
+    HASHTABLE<FACE_INDEX<TV::m>,int> ht;
     VECTOR<T,num_corners> phis;
     TV pts[num_pts];
-    const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
-    HASHTABLE<FACE_INDEX<TV::m>,int> ht;
 
     int cut_cells=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV_INT base=it.index*2;
-        bool cut_cell=false;
+        int cell_corners=0;
+        for(int b=0;b<(1<<TV::m);b++) cell_corners|=(phi(base+double_bits(b))<0)<<b;
+        if((cell_corners==all_negative)||(cell_corners==all_positive)) continue;
+        
+        cut_cells++;
         for(int b=0;b<(1<<TV::m);b++){
             TV_INT cell=base+bits(b);
             int c=0;
@@ -291,8 +298,7 @@ Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV
                     T t=phis(v0)/(phis(v0)-phis(v1));
                     pts[i]=pts[v0+num_edges]+t*(pts[v1+num_edges]-pts[v0+num_edges]);}}
 
-            const MARCHING_CUBES_CASE<TV::m> & cs=table(c);
-            if(cs.surface[0]) cut_cell=true;
+            const MARCHING_CUBES_CASE<TV::m>& cs=table(c);
 
             for(int i=0;i<MARCHING_CUBES_CASE<TV::m>::max_surface && cs.surface[i];i++){
                 TV_INT face;
@@ -305,8 +311,7 @@ Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV
                         ht.Set(fi,index);
                         surface.particles.X(index)=pts[e];}}
                 if(!cs.enclose_inside) exchange(face.x,face.y);
-                surface.mesh.elements.Append(face);}}
-        if(cut_cell) cut_cells++;}
+                surface.mesh.elements.Append(face);}}}
 
     surface.Update_Number_Nodes();
     return cut_cells;

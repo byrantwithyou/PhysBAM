@@ -98,16 +98,7 @@ Set_Matrix(const VECTOR<T,2>& mu)
         padding=p_stencil.Padding();
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
 
-    int cut_cells=0;
-    const VECTOR<TV_INT,(1<<TV::m)>& phi_double_offsets=GRID<TV>::Binary_Counts(TV_INT(),2);
-    const int all_negative=(1<<(1<<TV::m))-1;
-    const int all_positive=0;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        int signs=0;
-        TV_INT phi_base=it.index*2;
-        for(int b=0;b<(1<<TV::m);b++) signs|=(phi(phi_base+phi_double_offsets(b))<0)<<b;
-        if(!(signs==all_positive||signs==all_negative)) cut_cells++;}
-    
+    int cut_cells=MARCHING_CUBES<TV>::Create_Double_Fine_Surface(object,grid,phi_grid,phi);
     cdi=new CELL_DOMAIN_INTERFACE_NEW<TV>(grid,padding,cut_cells,periodic_bc); 
 
     cm_p=new CELL_MANAGER_NEW<TV>(*cdi);
@@ -206,8 +197,6 @@ Set_Matrix(const VECTOR<T,2>& mu)
         delete u_stencil(i);
         for(int j=0;j<TV::m;j++)
             delete udx_stencil(i)(j);}
-
-    MARCHING_CUBES<TV>::Create_Surface(object,phi_grid,phi);
 }
 //#####################################################################
 // Function Set_RHS

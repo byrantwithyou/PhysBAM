@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
+#include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
@@ -44,6 +45,27 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
     return total;
 }
 //#####################################################################
+// Function Compute_Averaged_Orientation
+//#####################################################################
+template<class T,class T_FACE> static void
+Compute_Averaged_Orientation_Helper(VECTOR<ARRAY<T_FACE>,4>& interface,VECTOR<bool,4>& enclose_inside,MATRIX<T,2>& base_orientation)
+{
+}
+//#####################################################################
+// Function Compute_Averaged_Orientation
+//#####################################################################
+template<class T, class T_FACE> static void
+Compute_Averaged_Orientation_Helper(VECTOR<ARRAY<T_FACE>,8>& interface,VECTOR<bool,8>& enclose_inside,MATRIX<T,3>& base_orientation)
+{
+    VECTOR<T,3> normal,tangent;
+    for(int b=0;b<8;b++)
+        for(int i=0;i<interface(b).m;i++)
+            normal+=interface(b)(i).Raw_Normal()*(enclose_inside(b)?1:-1);
+    normal.Normalize();
+    tangent=normal.Unit_Orthogonal_Vector();
+    base_orientation=MATRIX<T,3>(VECTOR<T,3>::Cross_Product(tangent,normal),tangent,normal);
+}
+//#####################################################################
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
@@ -52,7 +74,7 @@ Compute_Entries()
     VECTOR<ARRAY<T_FACE>,(1<<TV::m)> sides,interface;
     VECTOR<bool,(1<<TV::m)> enclose_inside;
     VECTOR<int,(1<<TV::m)> direction;
-    VECTOR<TV,TV::m> orientation;
+    MATRIX<T,TV::m> base_orientation;
 
     Compute_Open_Entries();
 
@@ -77,11 +99,11 @@ Compute_Entries()
             interface(b).Remove_All();
             MARCHING_CUBES<TV>::Get_Elements_For_Cell(interface(b),sides(b),direction(b),enclose_inside(b),phi,phi_base+phi_offsets(b));}
 
-        // TODO: Compute weighted normal and set tangent directions here
+        Compute_Averaged_Orientation_Helper(interface,enclose_inside,base_orientation);
 
         for(int b=0;b<(1<<TV::m);b++)
             if(!interface(b).m) Add_Uncut_Fine_Cell(it.index,b,!enclose_inside(b));
-            else Add_Cut_Fine_Cell(it.index,b,interface(b),sides(b),direction(b),enclose_inside(b),cut_cell_index,orientation);}
+            else Add_Cut_Fine_Cell(it.index,b,interface(b),sides(b),direction(b),enclose_inside(b),cut_cell_index,base_orientation);}
 }
 //#####################################################################
 // Function Compute_Open_Entries
@@ -169,7 +191,7 @@ Volume(VECTOR<VECTOR<T,2>,2> X,int direction)
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
-    int direction,bool enclose_inside,int cut_cell_index,VECTOR<TV,TV::m>& orientation)
+    int direction,bool enclose_inside,int cut_cell_index,MATRIX<T,TV::m>& base_orientation)
 {
     assert(sides.m);
     assert(interface.m);
