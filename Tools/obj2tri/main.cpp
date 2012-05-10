@@ -29,6 +29,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,const 
         else if(buffer[0]=='f'){
             VECTOR<int,3> f;
             sscanf(buffer+2,"%d %d %d",&f.x,&f.y,&f.z);
+            f-=1;
             triangles.Append(f);}
     }while(!input->eof());
     delete input;
@@ -60,8 +61,8 @@ int main(int argc,char *argv[])
 
     parse_args.Parse(argc, argv);
 
-    std::string input_filename=parse_args.Extra_Arg(1);
-    std::string output_filename=parse_args.Extra_Arg(2);
+    std::string input_filename=parse_args.Extra_Arg(0);
+    std::string output_filename=parse_args.Extra_Arg(1);
 
     if(parse_args.Get_Option_Value("-float")) type_double=false;
     if(parse_args.Get_Option_Value("-double")) type_double=true;
