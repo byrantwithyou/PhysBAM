@@ -45,17 +45,30 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
     return total;
 }
 //#####################################################################
-// Function Compute_Averaged_Orientation
+// Function Precomputed_Integral
+//#####################################################################
+template<class T,int dim,int rank,int sdp1,int d> static T
+Precomputed_Integral(const STATIC_TENSOR<MATRIX<T,dim>,rank,sdp1>& precompute,int i,int j,const STATIC_POLYNOMIAL<T,rank,d>& poly)
+{
+    T total=0;
+    RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),poly.size+1);
+    for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
+        if(T coeff=poly.terms(it.index))
+            total+=coeff*precompute(it.index)(i,j);
+    return total;
+}
+//#####################################################################
+// Function Compute_Averaged_Orientation_Helper
 //#####################################################################
 template<class T,class T_FACE> static void
-Compute_Averaged_Orientation_Helper(VECTOR<ARRAY<T_FACE>,4>& interface,VECTOR<bool,4>& enclose_inside,MATRIX<T,2>& base_orientation)
+Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<T_FACE>,4>& interface,const VECTOR<bool,4>& enclose_inside,MATRIX<T,2>& base_orientation)
 {
 }
 //#####################################################################
-// Function Compute_Averaged_Orientation
+// Function Compute_Averaged_Orientation_Helper
 //#####################################################################
 template<class T, class T_FACE> static void
-Compute_Averaged_Orientation_Helper(VECTOR<ARRAY<T_FACE>,8>& interface,VECTOR<bool,8>& enclose_inside,MATRIX<T,3>& base_orientation)
+Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<T_FACE>,8>& interface,const VECTOR<bool,8>& enclose_inside,MATRIX<T,3>& base_orientation)
 {
     VECTOR<T,3> normal,tangent;
     for(int b=0;b<8;b++)
@@ -187,11 +200,37 @@ Volume(VECTOR<VECTOR<T,2>,2> X,int direction)
     return (X(1).y-X(0).y)*(X(0).x+X(1).x)/2*sign;
 }
 //#####################################################################
+// Function Compute_Consistent_Orientation_Helper
+//#####################################################################
+template<class T, class T_FACE> static void
+Compute_Consistent_Orientation_Helper(const T_FACE& segment,bool enclose_inside,
+    const MATRIX<T,2>& base_orientation,MATRIX<T,2>& orientation)
+{
+    VECTOR<T,2> tangent=(segment.X(1)-segment.X(0)).Normalized()*(enclose_inside?1:-1);
+    orientation=MATRIX<T,2>(tangent,tangent.Rotate_Clockwise_90());
+}
+//#####################################################################
+// Function Compute_Consistent_Orientation_Helper
+//#####################################################################
+template<class T, class T_FACE> static void
+Compute_Consistent_Orientation_Helper(const T_FACE& triangle,bool enclose_inside,
+    const MATRIX<T,3>& base_orientation,MATRIX<T,3>& orientation)
+{
+    typedef VECTOR<T,3> TV;
+    typedef MATRIX<T,3> TM;
+
+    TV b=TV(0,0,1);
+    TV n=base_orientation.Transposed()*triangle.Normal()*(enclose_inside?1:-1);
+    TV u=TV::Cross_Product(b,n).Normalized();
+    
+    orientation=base_orientation*TM(b,u,TV::Cross_Product(b,u)).Transposed()*TM(n,u,TV::Cross_Product(n,u));
+}
+//#####################################################################
 // Function Add_Cut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
-    int direction,bool enclose_inside,int cut_cell_index,MATRIX<T,TV::m>& base_orientation)
+    int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation)
 {
     assert(sides.m);
     assert(interface.m);
@@ -231,25 +270,27 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_
 
     Add_Uncut_Fine_Cell(cell,block,!enclose_inside);
 
-    STATIC_TENSOR<T,TV::m,static_degree+1> precomputed_interface_integrals;
+    ARRAY<MATRIX<T,TV::m> > orientations;
+    orientations.Resize(interface.m);
+    for(int i=0;i<interface.m;i++)
+        Compute_Consistent_Orientation_Helper(interface(i),enclose_inside,base_orientation,orientations(i));
+
+    STATIC_TENSOR<MATRIX<T,TV::m>,TV::m,static_degree+1> precomputed_interface_integrals;
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(surface_monomials_needed(it.index)){
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
-            for(int i=0;i<interface.m;i++){
-                const VECTOR<TV,TV::m> V=interface(i).X;
-                precomputed_interface_integrals(it.index)+=monomial.Quadrature_Over_Primitive(V);}}
+            for(int i=0;i<interface.m;i++)
+                precomputed_interface_integrals(it.index)+=orientations(i)*monomial.Quadrature_Over_Primitive(interface(i).X);}
     
-    int sign=enclose_inside?1:-1;
-
     for(int i=0;i<interface_blocks.m;i++){
         INTERFACE_BLOCK* ib=interface_blocks(i);
         for(int j=0;j<ib->overlap_polynomials.m;j++){
             typename INTERFACE_BLOCK::OVERLAP_POLYNOMIAL& op=ib->overlap_polynomials(j);
             if(op.subcell&(1<<block)){
-                T integral=Precomputed_Integral(precomputed_interface_integrals,op.polynomial)*sign;
-                ib->Add_Entry(cut_cell_index,op.flat_index_diff_ref,enclose_inside,integral);
-                ib->Add_Entry(cut_cell_index,op.flat_index_diff_ref,!enclose_inside,-integral);}}}
+                T integral=Precomputed_Integral(precomputed_interface_integrals,ib->axis,ib->orientation,op.polynomial);
+                ib->Add_Entry(cut_cell_index,op.flat_index_diff_ref,false,integral);
+                ib->Add_Entry(cut_cell_index,op.flat_index_diff_ref,true,-integral);}}}
 }
 //#####################################################################
 // Function Add_Volume_Block
@@ -273,10 +314,10 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
 Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    T scale,bool ignore_orientation)
+    int axis,int orientation,T scale)
 {
     INTERFACE_BLOCK* ib=new INTERFACE_BLOCK;
-    ib->Initialize(helper,s,scale,ignore_orientation);
+    ib->Initialize(helper,s,axis,orientation,scale);
     interface_blocks.Append(ib);
         
     for(int i=0;i<ib->overlap_polynomials.m;i++){
@@ -292,13 +333,13 @@ template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>::Add_Volume_Block
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,3>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,float,bool);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,int,int,float);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,VECTOR<float,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<float,2>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,float,bool);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,int,int,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>;
@@ -307,11 +348,11 @@ template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>::Add_Volume_Bloc
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<double,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,VECTOR<double,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,3>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,double,bool);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,int,int,double);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,VECTOR<double,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_NEW<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,VECTOR<double,2> const&);
 template void BASIS_INTEGRATION_UNIFORM_NEW<VECTOR<double,2>,2>::Add_Interface_Block<1>(
-    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,double,bool);
+    SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,int,int,double);
 #endif

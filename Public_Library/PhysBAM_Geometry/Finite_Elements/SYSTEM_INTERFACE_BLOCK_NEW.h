@@ -35,11 +35,12 @@ public:
 
     
     T scale;
-    int orientation; // [0] - normal, [1] - tangential, [2] - second tangential (in 3D) 
+    int axis;
+    int orientation; // [0] - tangential, [1] - tangential, [2] - normal 
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
-    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int orientation_input,T scale_input);
+    void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int axis_input,int orientation_input,T scale_input);
 
     void Add_Entry(int interface_element,int flat_index_diff_ref,int inside,T value)
     {helper->data[inside](interface_element,flat_index_diff_ref)+=value*scale;}

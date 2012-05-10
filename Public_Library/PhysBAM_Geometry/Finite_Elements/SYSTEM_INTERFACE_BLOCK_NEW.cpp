@@ -13,8 +13,9 @@ using namespace PhysBAM;
 // Function Initialize
 //#####################################################################
 template<class TV,int static_degree> template<int d> void SYSTEM_INTERFACE_BLOCK_NEW<TV,static_degree>::
-Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int orientation_input,T scale_input)
+Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int axis_input,int orientation_input,T scale_input)
 {
+    axis=axis_input;
     orientation=orientation_input;
     scale=scale_input;
     helper=&helper_input;
@@ -29,9 +30,9 @@ Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENC
         op.subcell=diced.subcell;
         op.polynomial=diced.polynomial;}
 }
-template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<float,2>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,int,float);
-template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<float,3>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,int,float);
+template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<float,2>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,int,int,float);
+template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<float,3>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<float,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,int,int,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<double,2>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,int,double);
-template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<double,3>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,int,double);
+template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<double,2>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,2> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,int,int,double);
+template void SYSTEM_INTERFACE_BLOCK_NEW<VECTOR<double,3>,2>::Initialize<1>(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<VECTOR<double,3> >&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,int,int,double);
 #endif

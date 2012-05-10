@@ -49,13 +49,13 @@ public:
     void Add_Uncut_Cell(const TV_INT& cell,int enclose_inside);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int enclose_inside);
     void Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
-        int direction,bool enclose_inside,int cut_cell_index,MATRIX<T,TV::m>& base_orientation);
+        int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation);
     template<int d0,int d1>
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const VECTOR<T,2>& scale);
     template<int d>
     void Add_Interface_Block(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        T scale,bool ignore_orientation);
+        int axis,int orientation,T scale);
 };
 }
 #endif
