@@ -129,7 +129,7 @@ Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m
 
         for(int b=0;b<(1<<TV::m);b++)
             if(!interface(b).m) Add_Uncut_Fine_Cell(it.index,b,!enclose_inside(b));
-            else Add_Cut_Fine_Cell(it.index,b,interface(b),sides(b),direction(b),enclose_inside(b),
+            else Add_Cut_Fine_Cell(it.index,b,TV(bits((1<<TV::m)-1-b)),interface(b),sides(b),direction(b),enclose_inside(b),
                 cut_cell_index,base_orientation,f_interface,rhs_interface,element_base);}
 }
 //#####################################################################
@@ -243,7 +243,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,bool enclose_inside
 // Function Add_Cut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
-Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
+Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
     int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation,
     const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface,int& element_base)
 {
@@ -252,11 +252,11 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_
 
     for(int i=0;i<interface.m;i++)
         for(int j=0;j<TV::m;j++)
-            interface(i).X(j)=(interface(i).X(j)-(T).5)*grid.dX;
+            interface(i).X(j)=(interface(i).X(j)-block_offset)*((T).5*grid.dX);
 
     for(int i=0;i<sides.m;i++)
         for(int j=0;j<TV::m;j++)
-            sides(i).X(j)=(sides(i).X(j)-(T).5)*grid.dX;
+            sides(i).X(j)=(sides(i).X(j)-block_offset)*((T).5*grid.dX);
             
     sides.Append_Elements(interface);
 

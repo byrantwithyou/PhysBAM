@@ -48,7 +48,7 @@ public:
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int enclose_inside);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int enclose_inside);
-    void Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
+    void Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
         int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation,
         const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface,int& element_base);
     template<int d0,int d1>
