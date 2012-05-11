@@ -139,10 +139,11 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),VECTOR<T,2>(1,1));
 
+    rhs_interface=new VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>;
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            rhs_interface(i)[s].Resize(cut_cells);
-    biu.Compute_Entries(f_interface,rhs_interface);
+            (*rhs_interface)(i)[s].Resize(cdi->flat_size);
+    biu.Compute_Entries(f_interface,*rhs_interface);
 
     // BUILD SYSTEM MATRIX BLOCKS
 
@@ -166,9 +167,11 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
     // QU Block
     for(int i=0;i<TV::m;i++)
         helper_qu(i).Build_Matrix(matrix_qu(i));
+
     // RHS PU Block 
+    matrix_f_pu=new VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>; 
     for(int i=0;i<TV::m;i++)
-        helper_rhs_pu(i).Build_Matrix(matrix_f_pu(i));
+        helper_rhs_pu(i).Build_Matrix((*matrix_f_pu)(i));
 
     // FILL IN THE NULL MODES
 
@@ -209,40 +212,43 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
 template<class TV> void INTERFACE_STOKES_SYSTEM_NEW<TV>::
 Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u)
 {
-    // VECTOR<VECTOR_ND<T>,TV::m> F_interface;
-    // VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
-    // VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> U;
+    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
+    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> U;
     
-    // for(int i=0;i<TV::m;i++){
-        // F_interface(i).Resize(object.mesh.elements.m);
-        // for(int s=0;s<2;s++){
-            // F_body(i)[s].Resize(cm_p->dofs[s]);
-            // U(i)[s].Resize(cm_u(i)->dofs[s]);}}
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            F_body(i)[s].Resize(cm_p->dofs[s]);
+            U(i)[s].Resize(cm_u(i)->dofs[s]);}
 
-    // for(int i=0;i<TV::m;i++)
-        // for(int k=0;k<object.mesh.elements.m;k++)
-            // F_interface(i)(k)=f_interface(k)(i);
-    // for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        // for(int s=0;s<2;s++){
-            // int k=cm_p->Get_Index(it.index,s);
-            // if(k>=0)
-                // for(int i=0;i<TV::m;i++)
-                    // F_body(i)[s](k)=f_body[s](it.index)(i);}
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        for(int s=0;s<2;s++){
+            int k=cm_p->Get_Index(it.index,s);
+            if(k>=0)
+                for(int i=0;i<TV::m;i++)
+                    F_body(i)[s](k)=f_body[s](it.index)(i);}
 
-    // for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        // FACE_INDEX<TV::m> face(it.Full_Index()); 
-        // for(int s=0;s<2;s++){
-            // int k=cm_u(face.axis)->Get_Index(it.index,s);
-            // if(k>=0) U(face.axis)[s](k)=u[s](face);}}
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        FACE_INDEX<TV::m> face(it.Full_Index()); 
+        for(int s=0;s<2;s++){
+            int k=cm_u(face.axis)->Get_Index(it.index,s);
+            if(k>=0) U(face.axis)[s](k)=u[s](face);}}
 
-    // Resize_Vector(rhs); // assumes rhs was 0
+    Resize_Vector(rhs); // assumes rhs was 0
 
-    // for(int i=0;i<TV::m;i++)
-        // for(int s=0;s<2;s++){
-            // matrix_f_qu(i)[s].Transpose_Times_Add(F_interface(i),rhs.u(i)[s]);
-            // matrix_f_pu(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);
-            // matrix_qu(i)[s].Times_Add(U(i)[s],rhs.q(i));
-            // matrix_pu(i)[s].Times_Add(U(i)[s],rhs.p[s]);}
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            for(int j=0;j<cdi->flat_size;j++){
+                int k=cm_u(i)->Get_Index(j,s);
+                if(k>=0) rhs.u(i)[s](k)+=(*rhs_interface)(i)[s](j);}
+    
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            (*matrix_f_pu)(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);
+            matrix_qu(i)[s].Times_Add(U(i)[s],rhs.q);
+            matrix_pu(i)[s].Times_Add(U(i)[s],rhs.p[s]);}
+
+    delete rhs_interface;
+    delete matrix_f_pu;
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner

@@ -38,6 +38,9 @@ public:
     int Get_Index(TV_INT index,int s)
     {return compressed[s](cdi.Flatten(index));}
 
+    int Get_Index(int flat_index,int s)
+    {return compressed[s](flat_index);}
+
     void Compress_Indices();
 };
 }
