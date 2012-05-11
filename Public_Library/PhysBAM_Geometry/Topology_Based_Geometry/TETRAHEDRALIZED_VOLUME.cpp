@@ -525,6 +525,7 @@ template<class T> int TETRAHEDRALIZED_VOLUME<T>::
 Find(const TV& location,const T thickness_over_two,ARRAY<int>& scratch) const
 {
     if(!tetrahedron_list || !hierarchy) PHYSBAM_FATAL_ERROR();
+    scratch.Remove_All();
     hierarchy->Intersection_List(location,scratch,thickness_over_two);
     for(int p=0;p<scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,0)) return t;}
     for(int p=0;p<scratch.m;p++){int t=scratch(p);if(!(*tetrahedron_list)(t).Outside(location,thickness_over_two)) return t;}

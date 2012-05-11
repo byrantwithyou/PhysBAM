@@ -441,6 +441,7 @@ Find_Intersected_Segments_Triangles(SEGMENTED_CURVE<TV>& segments,TRIANGULATED_S
         SEGMENT_3D<T> segment(segments.particles.X.Subset(segments.mesh.elements(i)));
         RANGE<TV> box(segment.X.x);
         box.Enlarge_To_Include_Point(segment.X.y);
+        candidates.Remove_All();
         surface.hierarchy->Intersection_List(box,candidates,thickness_over_two);
         for(int j=0;j<candidates.m;j++)
             if(INTERSECTION::Intersects(segment,surface.Get_Element(candidates(j)),segment_weight,triangle_weight,thickness_over_two)){
