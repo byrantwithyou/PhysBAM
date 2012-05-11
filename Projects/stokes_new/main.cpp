@@ -299,7 +299,13 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
 
-/*    ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
+    for(int i=0;i<TV::m;i++){
+        iss.Multiply(iss.null_u(i),*vectors(0));
+        LOG::cout<<"null u["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
+    iss.Multiply(iss.null_p,*vectors(0));
+    LOG::cout<<"null p "<<" "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
+
+    ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
     numer_u.Resize(iss.grid);
@@ -358,13 +364,13 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         error_p_l2+=sqr(error_p(it.index));}
     error_p_l2=sqrt(error_p_l2/cnt_p);
 
-    LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;*/
+    LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
 
     if(debug_particles){
         Dump_System<T,TV>(iss,at);
         Dump_Vector<T,TV>(iss,sol,"solution");
-        // Dump_u_p(iss,error_u,error_p,"error");
-        // Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
+        Dump_u_p(iss,error_u,error_p,"error");
+        Dump_u_p(iss.grid,error_u,error_p,"color mapped error");
         if(null&&iss.Nullspace_Check(rhs)){
             OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
             iss.Multiply(rhs,*vectors(0));

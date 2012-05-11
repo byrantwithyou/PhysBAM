@@ -302,6 +302,12 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,in
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
 
+    for(int i=0;i<TV::m;i++){
+        iss.Multiply(iss.null_u(i),*vectors(0));
+        LOG::cout<<"null u["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
+    iss.Multiply(iss.null_p,*vectors(0));
+    LOG::cout<<"null p "<<" "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
+
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
