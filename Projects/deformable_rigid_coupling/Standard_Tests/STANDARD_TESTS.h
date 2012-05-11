@@ -1249,7 +1249,7 @@ void Row_Of_Spheres()
     rigid_body->Set_Mass(1000);
     rigid_body->Set_Name("r 1");
 
-    tetrahedralized_volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(2,0,0))),true,true,1000);
+    tetrahedralized_volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(2,0,0))),true,true,1000);
     fvm=Create_Incompressible_Finite_Volume(*tetrahedralized_volume);
     fvm->mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     solid_body_collection.Add_Force(fvm);
@@ -1260,7 +1260,7 @@ void Row_Of_Spheres()
     rigid_body->Set_Mass(1000);
     rigid_body->Set_Name("r 3");
 
-    tetrahedralized_volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(6,0,0))),true,true,1000);
+    tetrahedralized_volume=&tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(6,0,0))),true,true,1000);
     fvm=Create_Incompressible_Finite_Volume(*tetrahedralized_volume);
     fvm->mpi_solids=solid_body_collection.deformable_body_collection.mpi_solids;
     solid_body_collection.Add_Force(fvm);
@@ -1636,7 +1636,7 @@ void Sphere_Fall()
     // deformable bodies
     DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection=solid_body_collection.deformable_body_collection;
 
-    TETRAHEDRALIZED_VOLUME<T>& object=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
+    TETRAHEDRALIZED_VOLUME<T>& object=tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere_coarse.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true,true,1000);
     object.mesh.Initialize_Segment_Mesh();
     SEGMENTED_CURVE<TV>* segmented_curve=SEGMENTED_CURVE<TV>::Create(deformable_body_collection.particles);
     segmented_curve->mesh.elements=object.mesh.segment_mesh->elements;

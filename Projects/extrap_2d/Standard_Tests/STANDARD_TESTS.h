@@ -595,7 +595,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             solid_body_collection.Add_Force(new GRAVITY<TV>(particles,rigid_body_collection,true,true));
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
-            if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Fill_Uniform(particles.X,-1,1);}
+            if(test_number==13){RANDOM_NUMBERS<T> rand;rand.Set_Seed(12345);rand.Fill_Uniform(particles.X,-1,1);}
             break;}
         case 22:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
@@ -627,7 +627,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 18:{
             TRIANGULATED_AREA<T>& triangulated_area=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<TRIANGULATED_AREA<T>&>();
             Add_Constitutive_Model(triangulated_area,(T)1e4,poissons_ratio,(T).01);
-            RANDOM_NUMBERS<T> rand;
+            RANDOM_NUMBERS<T> rand;rand.Set_Seed(12345);
             rand.Fill_Uniform(particles.X,0,0);
             break;}
         case 19:{
