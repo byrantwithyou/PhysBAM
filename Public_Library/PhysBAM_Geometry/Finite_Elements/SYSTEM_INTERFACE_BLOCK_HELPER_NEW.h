@@ -27,7 +27,7 @@ class SYSTEM_INTERFACE_BLOCK_HELPER_NEW:public NONCOPYABLE
 
 public:
     
-    VECTOR<MATRIX_MXN<T>,2> data;
+    VECTOR<VECTOR<MATRIX_MXN<T>,2>,TV::m> data;
     CELL_DOMAIN_INTERFACE_NEW<TV> *cdi;        
     CELL_MANAGER_NEW<TV> *cm;
     ARRAY<int> flat_diff;

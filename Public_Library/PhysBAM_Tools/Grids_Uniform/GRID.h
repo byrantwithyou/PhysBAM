@@ -292,16 +292,16 @@ public:
     RANGE<TV> Face_Domain(const int axis,const TV_INT& index,const T thickness_over_two=0) const
     {TV dimensions=(T).5*dX;dimensions[axis]=thickness_over_two;RANGE<TV> domain(Face(axis,index));domain.Change_Size(dimensions);return domain;}
 
-    static const VECTOR<TV_INT,8>& Binary_Counts(const VECTOR<int,3>&,int a=1)
-    {static const VECTOR<TV_INT,8> array(TV_INT(0,0,0),TV_INT(a,0,0),TV_INT(0,a,0),TV_INT(a,a,0),TV_INT(0,0,a),TV_INT(a,0,a),TV_INT(0,a,a),TV_INT(a,a,a));return array;}
+    static const VECTOR<TV_INT,8>& Binary_Counts(const VECTOR<int,3>&)
+    {static const VECTOR<TV_INT,8> array(TV_INT(0,0,0),TV_INT(1,0,0),TV_INT(0,1,0),TV_INT(1,1,0),TV_INT(0,0,1),TV_INT(1,0,1),TV_INT(0,1,1),TV_INT(1,1,1));return array;}
 
-    static const VECTOR<TV_INT,4>& Binary_Counts(const VECTOR<int,2>&,int a=1)
-    {static const VECTOR<TV_INT,4> array(TV_INT(0,0),TV_INT(a,0),TV_INT(0,a),TV_INT(a,a));return array;}
+    static const VECTOR<TV_INT,4>& Binary_Counts(const VECTOR<int,2>&)
+    {static const VECTOR<TV_INT,4> array(TV_INT(0,0),TV_INT(1,0),TV_INT(0,1),TV_INT(1,1));return array;}
 
-    static const VECTOR<TV_INT,2>& Binary_Counts(const VECTOR<int,1>&,int a=1)
-    {static const VECTOR<TV_INT,2> array(TV_INT(0),TV_INT(a));return array;}
+    static const VECTOR<TV_INT,2>& Binary_Counts(const VECTOR<int,1>&)
+    {static const VECTOR<TV_INT,2> array(TV_INT(0),TV_INT(1));return array;}
 
-    static const VECTOR<TV_INT,1>& Binary_Counts(const VECTOR<int,0>&,int a=1)
+    static const VECTOR<TV_INT,1>& Binary_Counts(const VECTOR<int,0>&)
     {static const VECTOR<TV_INT,1> array;return array;}
 
     static TV_INT Node_Cell_Index(const TV_INT& node,const int cell)

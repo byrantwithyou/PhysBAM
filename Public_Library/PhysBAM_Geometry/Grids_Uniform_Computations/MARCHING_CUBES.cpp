@@ -268,7 +268,6 @@ Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV
 {
     const ARRAY<MARCHING_CUBES_CASE<TV::m> >& table=Case_Table();
     const VECTOR<TV_INT,num_corners> bits=GRID<TV>::Binary_Counts(TV_INT());
-    const VECTOR<TV_INT,num_corners> double_bits=GRID<TV>::Binary_Counts(TV_INT(),2);
     const int all_negative=(1<<(1<<TV::m))-1;
     const int all_positive=0;
     HASHTABLE<FACE_INDEX<TV::m>,int> ht;
@@ -279,7 +278,7 @@ Create_Double_Fine_Surface(T_SURFACE& surface,const GRID<TV>& grid,const GRID<TV
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV_INT base=it.index*2;
         int cell_corners=0;
-        for(int b=0;b<(1<<TV::m);b++) cell_corners|=(phi(base+double_bits(b))<0)<<b;
+        for(int b=0;b<(1<<TV::m);b++) cell_corners|=(phi(base+bits(b)*2)<0)<<b;
         if((cell_corners==all_negative)||(cell_corners==all_positive)) continue;
         
         cut_cells++;

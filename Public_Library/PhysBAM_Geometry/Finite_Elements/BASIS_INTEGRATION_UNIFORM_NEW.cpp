@@ -104,8 +104,7 @@ Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m
 
     Compute_Open_Entries();
 
-    const VECTOR<TV_INT,(1<<TV::m)>& phi_offsets=GRID<TV>::Binary_Counts(TV_INT());
-    const VECTOR<TV_INT,(1<<TV::m)>& phi_double_offsets=GRID<TV>::Binary_Counts(TV_INT(),2);
+    const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     const int all_inside=(1<<(1<<TV::m))-1;
     const int all_outside=0;
 
@@ -114,16 +113,17 @@ Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int cell_corners=0;
         TV_INT phi_base=it.index*2;
-        for(int b=0;b<(1<<TV::m);b++) cell_corners|=(phi(phi_base+phi_double_offsets(b))<0)<<b;
-        if(cell_corners==all_inside){Add_Uncut_Cell(it.index,false);continue;}
-        if(cell_corners==all_outside){Add_Uncut_Cell(it.index,true);continue;}
+        for(int b=0;b<(1<<TV::m);b++) cell_corners|=(phi(phi_base+bits(b)*2)<0)<<b;
+        if(cell_corners==all_inside){Add_Uncut_Cell(it.index,true);continue;}
+        if(cell_corners==all_outside){Add_Uncut_Cell(it.index,false);continue;}
 
         cut_cell_index++;
+        cdi.flat_base(cut_cell_index)=cdi.Flatten(it.index);
 
         for(int b=0;b<(1<<TV::m);b++){
             sides(b).Remove_All();
             interface(b).Remove_All();
-            MARCHING_CUBES<TV>::Get_Elements_For_Cell(interface(b),sides(b),direction(b),enclose_inside(b),phi,phi_base+phi_offsets(b));}
+            MARCHING_CUBES<TV>::Get_Elements_For_Cell(interface(b),sides(b),direction(b),enclose_inside(b),phi,phi_base+bits(b));}
 
         Compute_Averaged_Orientation_Helper(interface,enclose_inside,base_orientation);
 
@@ -176,19 +176,19 @@ Compute_Open_Entries()
 // Function Add_Uncut_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
-Add_Uncut_Cell(const TV_INT& cell,int enclose_inside)
+Add_Uncut_Cell(const TV_INT& cell,int inside)
 {
     for(int i=0;i<volume_blocks.m;i++)
-        volume_blocks(i)->Add_Open_Entries(cdi.Flatten(cell),enclose_inside);
+        volume_blocks(i)->Add_Open_Entries(cdi.Flatten(cell),inside);
 }
 //#####################################################################
 // Function Add_Uncut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
-Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int enclose_inside)
+Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int inside)
 {
     for(int i=0;i<volume_blocks.m;i++)
-        volume_blocks(i)->Add_Open_Subcell_Entries(cdi.Flatten(cell),block,enclose_inside);
+        volume_blocks(i)->Add_Open_Subcell_Entries(cdi.Flatten(cell),block,inside);
 }
 //#####################################################################
 // Function Volume
@@ -297,10 +297,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,ARRAY<T_FACE>& interface,ARRAY<T_
             STATIC_POLYNOMIAL<T,TV::m,static_degree> monomial;
             monomial.Set_Term(it.index,1);
             for(int i=0;i<interface.m;i++){
-                T monomial_integral=monomial.Quadrature_Over_Primitive(interface(i).X);
+                    T monomial_integral=monomial.Quadrature_Over_Primitive(interface(i).X);
                 precomputed_interface_integrals(it.index)+=orientations(i)*monomial_integral;
                 precomputed_rhs_interface_integrals(it.index)+=f_interface(element_base+i)*monomial_integral;}}
-    
+
     for(int i=0;i<interface_blocks.m;i++){
         INTERFACE_BLOCK* ib=interface_blocks(i);
         for(int j=0;j<ib->overlap_polynomials.m;j++){

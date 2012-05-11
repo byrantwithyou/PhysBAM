@@ -431,7 +431,6 @@ struct STATIC_POLYNOMIAL
     T Quadrature_Over_Primitive(const VECTOR<TV,3>& vertices) const
     {
         int o=size.Sum();
-        printf("%i\n", o);
         PHYSBAM_ASSERT((unsigned)o<sizeof(quadriture_rule_seg)/sizeof(*quadriture_rule_seg));
         TV a=vertices(1)-vertices(0);
         TV b=vertices(2)-vertices(0);

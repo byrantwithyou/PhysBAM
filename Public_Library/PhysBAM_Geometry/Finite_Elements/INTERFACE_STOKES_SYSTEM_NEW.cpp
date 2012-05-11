@@ -120,7 +120,7 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
         helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
         helper_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
         helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);}
-    
+
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++)
@@ -143,10 +143,11 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
             (*rhs_interface)(i)[s].Resize(cdi->flat_size);
+
     biu.Compute_Entries(f_interface,*rhs_interface);
 
     // BUILD SYSTEM MATRIX BLOCKS
-
+    
     for(int i=0;i<TV::m;i++){
         for(int j=i;j<TV::m;j++)
             helper_uu(i)(j).Mark_Active_Cells();

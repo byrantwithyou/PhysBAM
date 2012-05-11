@@ -27,7 +27,9 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_NEW<TV>& cm_input,C
     flat_diff.Sort();
     flat_diff.Prune_Duplicates();
 
-    for(int s=0;s<2;s++) data[s].Resize(cdi->interface_dofs*TV::m,flat_diff.m);
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++)
+            data(i)[s].Resize(cdi->interface_dofs*TV::m,flat_diff.m);
 }
 //#####################################################################
 // Function Mark_Active_Cells
@@ -35,12 +37,14 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_NEW<TV>& cm_input,C
 template<class TV> void SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>::
 Mark_Active_Cells(T tol)
 {
-    for(int s=0;s<2;s++)
-        for(int l=0;l<data[s].m;l++)
-            for(int k=0;k<data[s].n;k++)
-                if(abs(data[s](l,k))>tol)
-                    cm->Set_Active(cdi->flat_base(l)+flat_diff(k),s);
-                else data[s](l,k)=0;
+    for(int i=0;i<TV::m;i++)
+        for(int s=0;s<2;s++){
+            MATRIX_MXN<T>& d=data(i)[s];
+            for(int l=0;l<d.m;l++)
+                for(int k=0;k<d.n;k++)
+                    if(abs(d(l,k))>tol)
+                        cm->Set_Active(cdi->flat_base(l)+flat_diff(k),s);
+                    else d(l,k)=0;}
 }
 //#####################################################################
 // Function Build_Matrix
@@ -52,25 +56,26 @@ Build_Matrix(VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>& matrix)
 
     for(int s=0;s<2;s++){
         SPARSE_MATRIX_FLAT_MXN<T>& M=matrix(s);
-        MATRIX_MXN<T>& d=data[s];
         ARRAY<int>& comp_n=cm->compressed[s];
-        int m=d.m;
+        int m=cdi->interface_dofs*TV::m;
         int n=cm->dofs[s];
-
         M.Reset(n);
         M.offsets.Resize(m+1);
         M.m=m;
 
-        for(int row=0;row<m;row++){
-            ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
-            for(int j=0;j<d.n;j++){
-                T value=d(row,j);
-                if(value){
-                    int column=comp_n(cdi->flat_base(row)+flat_diff(j));
-                    M.offsets(row+1)++;
-                    entries.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}
-            if(cdi->Is_Boundary_Cut_Cell(row)) entries.Sort();
-            M.A.Append_Elements(entries);}
+        int row=0;
+        for(int orientation=0;orientation<TV::m;orientation++){
+            MATRIX_MXN<T>& d=data(orientation)[s];
+            for(int i=0;i<cdi->interface_dofs;i++,row++){
+                ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
+                for(int j=0;j<d.n;j++){
+                    T value=d(i,j);
+                    if(value){
+                        int column=comp_n(cdi->flat_base(i)+flat_diff(j));
+                        M.offsets(row+1)++;
+                        entries.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}
+                if(cdi->Is_Boundary_Cut_Cell(i)) entries.Sort();
+                M.A.Append_Elements(entries);}}
 
         for(int i=0;i<M.offsets.m-1;i++) M.offsets(i+1)+=M.offsets(i);}
 }

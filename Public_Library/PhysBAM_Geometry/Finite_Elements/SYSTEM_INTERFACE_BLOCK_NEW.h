@@ -42,7 +42,7 @@ public:
     void Initialize(SYSTEM_INTERFACE_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,int axis_input,T scale_input);
 
     void Add_Entry(int interface_dof,int orientation,int flat_index_diff_ref,int inside,T value)
-    {helper->data[inside](orientation*cdi->interface_dofs+interface_dof,flat_index_diff_ref)+=value*scale;}
+    {helper->data(orientation)[inside](interface_dof,flat_index_diff_ref)+=value*scale;}
 
     int Flat_Diff(int i)
     {return helper->flat_diff(i);}
