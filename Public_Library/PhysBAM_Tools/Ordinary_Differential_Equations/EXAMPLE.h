@@ -45,6 +45,8 @@ public:
     T max_dt;
     int substeps_delay_frame;
     int substeps_delay_level;
+    bool use_test_output;
+    std::string test_output_prefix;
 
     EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~EXAMPLE();

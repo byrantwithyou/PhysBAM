@@ -8,7 +8,12 @@
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGID_BODY_PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLIDS_PARAMETERS.h>
@@ -60,6 +65,19 @@ Log_Parameters() const
 template<class TV> void SOLIDS_EXAMPLE<TV>::
 Write_Output_Files(const int frame) const
 {
+    if(this->use_test_output){
+        std::string file=STRING_UTILITIES::string_sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        OCTAVE_OUTPUT<T> oo(file.c_str());
+        if(solid_body_collection.deformable_body_collection.particles.X.m){
+            oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
+            oo.Write("db_V",solid_body_collection.deformable_body_collection.particles.V.Flattened());}
+        if(solid_body_collection.rigid_body_collection.rigid_body_particle.frame.m){
+            RIGID_BODY_PARTICLES<TV>& particle=solid_body_collection.rigid_body_collection.rigid_body_particle;
+            ARRAY_VIEW<T> f(particle.frame.m*(sizeof(FRAME<TV>)/sizeof(T)),(T*)particle.frame.Get_Array_Pointer());
+            oo.Write("rb_frame",f);
+            ARRAY_VIEW<T> t(particle.twist.m*TWIST<TV>::m,(T*)particle.twist.Get_Array_Pointer());
+            oo.Write("rb_twist",t);}}
+
     FILE_UTILITIES::Create_Directory(output_directory);
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);

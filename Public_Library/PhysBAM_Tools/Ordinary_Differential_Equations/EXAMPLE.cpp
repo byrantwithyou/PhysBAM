@@ -15,7 +15,8 @@ template<class TV> EXAMPLE<TV>::
 EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(120),frame_rate(24),frame_title(""),write_substeps_level(-1),write_first_frame(true),write_last_frame(true),write_time(true),
     output_directory("output"),data_directory("../../Public_Data"),auto_restart(false),restart(false),restart_frame(0),write_output_files(true),write_frame_title(true),
-    abort_when_dt_below(0),parse_args(0),mpi_world(0),want_mpi_world(false),need_finish_logging(false),test_number(0),fixed_dt(0),max_dt(0),substeps_delay_frame(-1),substeps_delay_level(-1)
+    abort_when_dt_below(0),parse_args(0),mpi_world(0),want_mpi_world(false),need_finish_logging(false),test_number(0),fixed_dt(0),max_dt(0),substeps_delay_frame(-1),substeps_delay_level(-1),
+    use_test_output(false)
 {
 }
 //#####################################################################
@@ -104,6 +105,7 @@ Register_Options()
     parse_args->Add_Double_Argument("-dt",0,"fix the time step size to this value.");
     parse_args->Add_Double_Argument("-max_dt",0,"fix the time step size to be no larger than this value.");
     if(mpi_world) parse_args->Add_Option_Argument("-all_verbose","all mpi processes write to stdout (not just the first)");
+    parse_args->Add_String_Argument("-test_output_prefix","","prefix to use for test output");
 }
 //#####################################################################
 // Function Parse_Options
@@ -144,6 +146,9 @@ Override_Options()
         if(!restart && !auto_restart) FILE_UTILITIES::Create_Directory(output_directory);
         FILE_UTILITIES::Create_Directory(output_directory+"/common");
         LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",restart);}
+    if(parse_args->Is_Value_Set("-test_output_prefix")){
+        use_test_output=true;
+        test_output_prefix=parse_args->Get_String_Value("-test_output_prefix");}
 }
 //#####################################################################
 // Function Parse_Late_Options

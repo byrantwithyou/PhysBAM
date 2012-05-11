@@ -14,6 +14,7 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY.h>
@@ -24,6 +25,8 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
+#include <PhysBAM_Solids/PhysBAM_Deformables/Particles/DEFORMABLE_PARTICLES.h>
+#include <PhysBAM_Solids/PhysBAM_Rigids/Particles/RIGID_BODY_PARTICLES.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_EVOLUTION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids/SOLID_BODY_COLLECTION.h>
@@ -298,6 +301,24 @@ Read_Output_Files_Fluids(const int frame)
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Write_Output_Files(const int frame) const
 {
+    if(this->use_test_output){
+        std::string file=STRING_UTILITIES::string_sprintf("%s/%s-%03d.txt",output_directory.c_str(),this->test_output_prefix.c_str(),frame);
+        OCTAVE_OUTPUT<T> oo(file.c_str());
+        if(solid_body_collection.deformable_body_collection.particles.X.m){
+            oo.Write("db_X",solid_body_collection.deformable_body_collection.particles.X.Flattened());
+            oo.Write("db_V",solid_body_collection.deformable_body_collection.particles.V.Flattened());}
+        if(solid_body_collection.rigid_body_collection.rigid_body_particle.frame.m){
+            RIGID_BODY_PARTICLES<TV>& particle=solid_body_collection.rigid_body_collection.rigid_body_particle;
+            ARRAY_VIEW<T> f(particle.frame.m*(sizeof(FRAME<TV>)/sizeof(T)),(T*)particle.frame.Get_Array_Pointer());
+            oo.Write("rb_frame",f);
+            ARRAY_VIEW<T> t(particle.twist.m*TWIST<TV>::m,(T*)particle.twist.Get_Array_Pointer());
+            oo.Write("rb_twist",t);}
+        if(fluids_parameters.incompressible){
+            const ARRAY<T,FACE_INDEX<TV::m> >& u=fluid_collection.incompressible_fluid_collection.face_velocities;
+            ARRAY_VIEW<T> a(u.buffer_size,u.base_pointer);
+            oo.Write("if_u",a);}
+        if(fluids_parameters.euler) oo.Write("cf_U",fluids_parameters.euler->U.array.Flattened());}
+
     FILE_UTILITIES::Create_Directory(output_directory);
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     FILE_UTILITIES::Create_Directory(output_directory+"/"+f);
