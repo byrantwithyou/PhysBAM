@@ -237,7 +237,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,bool enclose_inside
     TV n=base_orientation.Transposed()*triangle.Normal()*(enclose_inside?1:-1);
     TV u=TV::Cross_Product(b,n).Normalized();
     
-    orientation=base_orientation*TM(b,u,TV::Cross_Product(b,u)).Transposed()*TM(n,u,TV::Cross_Product(n,u));
+    orientation=base_orientation*TM(n,u,TV::Cross_Product(n,u))*TM(b,u,TV::Cross_Product(b,u)).Transposed();
 }
 //#####################################################################
 // Function Add_Cut_Fine_Cell
