@@ -79,6 +79,7 @@ Prepare_Backward_Euler_System(BACKWARD_EULER_SYSTEM<TV>& system,const T dt,const
 
     GENERALIZED_VELOCITY<TV> B_all(B_full,rigid_B_full,solid_body_collection);
     GENERALIZED_VELOCITY<TV> V_all(particles.V,rigid_body_particles.twist,solid_body_collection);
+    KRYLOV_SOLVER<T>::Ensure_Size(krylov_vectors,V_all,1); // Ensure Finish_Backward_Euler_Step can run successfully
 
     B_full.Subset(solid_body_collection.deformable_body_collection.simulated_particles).Fill(TV());rigid_B_full.Fill(TWIST<TV>());
     solid_body_collection.example_forces_and_velocities->Add_External_Forces(B_full,current_velocity_time+dt);
