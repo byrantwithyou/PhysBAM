@@ -310,7 +310,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<T_FA
                     T integral=Precomputed_Integral(precomputed_interface_integrals,ib->axis,orientation,op.polynomial);
                     ib->Add_Entry(cut_cell_index,orientation,op.flat_index_diff_ref,false,integral);
                     ib->Add_Entry(cut_cell_index,orientation,op.flat_index_diff_ref,true,-integral);}
-                T rhs_integral=0.5*Precomputed_Integral(precomputed_rhs_interface_integrals,ib->axis,op.polynomial);
+                T rhs_integral=(T)(-0.5)*Precomputed_Integral(precomputed_rhs_interface_integrals,ib->axis,op.polynomial);
                 int flat_index=cdi.flat_base(cut_cell_index)+ib->Flat_Diff(op.flat_index_diff_ref);
                 for(int s=0;s<2;s++) rhs_interface(ib->axis)[s](flat_index)+=rhs_integral;}}}
 
