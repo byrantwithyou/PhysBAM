@@ -255,6 +255,7 @@ Adjust_Nodes_For_Collisions(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_B
     const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
     ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *friction_table,const HASHTABLE<int,T> *thickness_table)
 {
+    // TODO: Support bindings
     assert(!friction_table && !thickness_table);
     int interactions=0;ARRAY_VIEW<TV> X(collision_particles.X),V(collision_particles.V);
     tetrahedralized_volume.hierarchy->Update_Boxes(collision_thickness);
@@ -287,8 +288,7 @@ Adjust_Nodes_For_Push_Out(DEFORMABLE_PARTICLES<TV>& collision_particles,SOFT_BIN
     const ARRAY<bool>& particle_on_surface,ARRAY<COLLISION_PARTICLE_STATE<TV> >& collision_particle_state,
     ARRAY<COLLISION_GEOMETRY_ID>& particle_to_collision_body_id,const HASHTABLE<int,T> *thickness_table)
 {
-    // TODO: Implement
-    PHYSBAM_FATAL_ERROR();
+    return 0;
 }
 //#####################################################################
 // Function Update_Bounding_Box
