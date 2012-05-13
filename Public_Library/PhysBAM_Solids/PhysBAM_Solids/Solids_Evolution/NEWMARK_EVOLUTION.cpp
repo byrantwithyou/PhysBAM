@@ -380,7 +380,9 @@ Advance_One_Time_Step_Position(const T dt,const T time, const bool solids)
         
     Make_Incompressible(dt,true); // adjust velocity to fix volume
     solids_evolution_callbacks->Filter_Velocities(dt,time+dt,false); // use time+dt since these velocities are used to step to time+dt
-    if(repulsions) repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,true,false);
+    if(repulsions){
+        repulsions->Adjust_Velocity_For_Self_Repulsion_Using_History(dt,true,false);
+        Diagnostics(dt,time,1,2,8,"Repulsions");}
     Compute_Momentum_Differences();
 
     // add collision impulses to time n velocities and save
