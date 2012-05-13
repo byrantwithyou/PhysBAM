@@ -299,9 +299,8 @@ Solve(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T dt,const T cu
     fluids_parameters.callbacks->Substitute_Coupling_Matrices(*coupled_system,dt,current_velocity_time,current_position_time,velocity_update,leakproof_solve);
     BACKWARD_EULER_SYSTEM<TV>* solid_system=Setup_Solids(dt,current_velocity_time,current_position_time,velocity_update,leakproof_solve);
     coupled_system->solid_system=solid_system;
-    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection),
-        F(F_full,rigid_F_full,solid_body_collection);
-
+    GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection),B(B_full,rigid_B_full,solid_body_collection);
+    GENERALIZED_VELOCITY<TV>& F=debug_cast<GENERALIZED_VELOCITY<TV>&>(*krylov_vectors(0));
     if(!leakproof_solve)
         if(solids_fluids_parameters.mpi_solid_fluid)
             solids_fluids_parameters.mpi_solid_fluid->Exchange_Solid_Positions_And_Velocities(solid_body_collection); // TODO: only need to exchange velocities
