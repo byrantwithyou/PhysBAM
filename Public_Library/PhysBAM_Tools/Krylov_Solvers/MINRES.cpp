@@ -68,9 +68,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         bool restart=!iterations || (restart_iterations && iterations%restart_iterations==0); //This is definitely not clear
 
         if(restart){
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
             if(print_residuals) LOG::cout<<"restarting Minres"<<std::endl;
-#endif
             //Include initial settings here, avoid definitions.
             G_pp= MATRIX<T,2>::Identity_Matrix();
             G_p = MATRIX<T,2>::Identity_Matrix();
@@ -122,9 +120,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         x.Copy(pr(0), c_k, x);
 
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT
         if(print_residuals) LOG::cout<< residual <<std::endl;
-#endif
         if(residual <= tolerance || b_k1 < small_number){Print_Diagnostics(iterations);return true;}
         if(iterations == max_iterations){Print_Diagnostics(iterations);break;}
 
@@ -141,9 +137,7 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
         r = VECTOR<T,2>(pr(1),0);
     }
 
-#ifndef COMPILE_WITHOUT_READ_WRITE_SUPPORT //why do they test twice for the same condition?
     if(print_diagnostics) LOG::cout<<"Minres not converged after "<<max_iterations<<" iterations, error = "<<residual<<std::endl;
-#endif
     return false;
 }
 //#####################################################################
