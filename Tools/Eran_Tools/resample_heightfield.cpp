@@ -15,7 +15,7 @@ using namespace PhysBAM;
 template<class T,class T2>
 void Resample(PARSE_ARGS &parse_args)
 {
-    std::string input_filename_pattern=parse_args.Extra_Arg(1);
+    std::string input_filename_pattern=parse_args.Extra_Arg(0);
     std::string output_filename_pattern;
     if (parse_args.Is_Value_Set("-o")) output_filename_pattern=parse_args.Get_String_Value("-o");
     else output_filename_pattern="resampled_"+input_filename_pattern;

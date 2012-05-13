@@ -42,7 +42,7 @@ int main(int argc,char** argv)
     binary=parse_args.Get_Option_Value("-g");
 
     if (parse_args.Num_Extra_Args() != 1) parse_args.Print_Usage(true);
-    else filename = parse_args.Extra_Arg(1);
+    else filename = parse_args.Extra_Arg(0);
     physbam_bone_name=filename;
     if(parse_args.Is_Value_Set("-b")) physbam_bone_name=parse_args.Get_String_Value("-b");
 

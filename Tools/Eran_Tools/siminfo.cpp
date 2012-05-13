@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
     plot_angular_velocity = parse_args.Get_Option_Value("-pw");
     frame_rate = parse_args.Get_Double_Value("-r");
 
-    if(parse_args.Num_Extra_Args()) input_directory=parse_args.Extra_Arg(1);
+    if(parse_args.Num_Extra_Args()) input_directory=parse_args.Extra_Arg(0);
     else input_directory=".";
 
     bool type_double = false;   // float by default

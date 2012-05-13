@@ -62,8 +62,8 @@ int main(int argc,char *argv[])
     args.Set_Extra_Arguments(2,"<tri filename> <new filename>");
     args.Parse(argc,argv);
     std::cout<<"num extra "<<args.Num_Extra_Args()<<std::endl;
-    std::string tri_filename = args.Extra_Arg(1);
-    std::string new_filename = args.Extra_Arg(2);
+    std::string tri_filename = args.Extra_Arg(0);
+    std::string new_filename = args.Extra_Arg(1);
     FillNeck<float>(tri_filename,new_filename);
     return 0;
 }

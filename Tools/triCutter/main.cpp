@@ -203,9 +203,9 @@ int main(int argc,char *argv[])
     args.Set_Extra_Arguments(3,"<tri filename> <new filename> <old color filename>");
     args.Parse(argc,argv);
     std::cout<<"num extra "<<args.Num_Extra_Args()<<std::endl;
-    std::string tri_filename = args.Extra_Arg(1);
-    std::string new_filename = args.Extra_Arg(2);
-    std::string vertex_color_filename = args.Extra_Arg(3);
+    std::string tri_filename = args.Extra_Arg(0);
+    std::string new_filename = args.Extra_Arg(1);
+    std::string vertex_color_filename = args.Extra_Arg(2);
     MakeCuts<float>(tri_filename,new_filename,vertex_color_filename);
     return 0;
 }

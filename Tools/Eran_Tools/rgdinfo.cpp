@@ -59,7 +59,7 @@ int main(int argc,char *argv[])
 
     parse_args.Parse(argc,argv);
 
-    std::string filename=parse_args.Extra_Arg(1);
+    std::string filename=parse_args.Extra_Arg(0);
 
 #if 0
     if (!Is_Rgd_File(filename)){

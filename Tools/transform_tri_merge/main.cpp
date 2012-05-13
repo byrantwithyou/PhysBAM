@@ -25,7 +25,7 @@ void Do_It()
 
     TRIANGULATED_SURFACE<T>* merged_surface=TRIANGULATED_SURFACE<T>::Create();
 
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(1),false);
+    std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(0),false);
     *input>>num_surfaces;
     for(int i=0;i<num_surfaces;i++){
         *input>>surface_name>>scaling_factor>>input_frame;

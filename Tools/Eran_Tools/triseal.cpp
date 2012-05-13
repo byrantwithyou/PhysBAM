@@ -37,7 +37,7 @@ int main(int argc,char *argv[])
     parse_args.Parse(argc,argv);
     
     if(parse_args.Num_Extra_Args()<1) parse_args.Print_Usage(true);
-    else input_filename=parse_args.Extra_Arg(1);
+    else input_filename=parse_args.Extra_Arg(0);
 
     if(parse_args.Is_Value_Set("-o")) output_filename=parse_args.Get_String_Value("-o");
     else output_filename=FILE_UTILITIES::Get_Basename(input_filename)+"_sealed."+FILE_UTILITIES::Get_File_Extension(input_filename);

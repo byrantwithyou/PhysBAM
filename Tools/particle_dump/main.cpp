@@ -33,7 +33,7 @@ int main(int argc,char *argv[])
     parse_args.Parse(argc, argv);
     if(parse_args.Is_Value_Set(("-d"))) dim=parse_args.Get_Integer_Value("-d");
 
-    std::string filename=parse_args.Extra_Arg(1);
+    std::string filename=parse_args.Extra_Arg(0);
 
     if(parse_args.Get_Option_Value("-float")) type_double=false;
     if(parse_args.Get_Option_Value("-double")) type_double=true;

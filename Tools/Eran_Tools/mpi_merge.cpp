@@ -110,9 +110,9 @@ int main(int argc, char *argv[])
 
     verbose = parse_args.Get_Option_Value("-v");
 
-    master_grid_filename = parse_args.Extra_Arg(1);
-    domain_filename_pattern = parse_args.Extra_Arg(2);
-    array_filename_pattern = parse_args.Extra_Arg(3);
+    master_grid_filename = parse_args.Extra_Arg(0);
+    domain_filename_pattern = parse_args.Extra_Arg(1);
+    array_filename_pattern = parse_args.Extra_Arg(2);
     output_filename = parse_args.Get_String_Value("-o");
 
     number_of_nodes = parse_args.Get_Integer_Value("-np");

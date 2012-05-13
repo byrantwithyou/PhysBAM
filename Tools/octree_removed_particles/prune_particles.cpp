@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    std::string filename=parse_args.Extra_Arg(1);
+    std::string filename=parse_args.Extra_Arg(0);
     std::string output_filename=filename+"_pruned";
     if(parse_args.Is_Value_Set("-o")) output_filename=parse_args.Get_String_Value("-o");
 

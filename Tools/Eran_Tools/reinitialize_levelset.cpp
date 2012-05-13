@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     parse_args.Set_Extra_Arguments(1, "<filename>");
     parse_args.Parse(argc, argv);
     if(parse_args.Num_Extra_Args()<1) return -1;
-    else filename=parse_args.Extra_Arg(1);
+    else filename=parse_args.Extra_Arg(0);
 
     if(parse_args.Is_Value_Set("-o"))
         output_filename=parse_args.Get_String_Value("-o");

@@ -103,11 +103,11 @@ int main(int argc, char* argv[])
     }
 
     bool merge=!parse_args.Get_Option_Value("-no_merge");
-    std::string input_directory(parse_args.Extra_Arg(1));
+    std::string input_directory(parse_args.Extra_Arg(0));
     std::string output_directory=input_directory;
     if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
 
-    int frame=atoi(parse_args.Extra_Arg(2).c_str());
+    int frame=atoi(parse_args.Extra_Arg(1).c_str());
     std::string particle_filename=STRING_UTILITIES::string_sprintf("%s/removed_negative_particles.%d",input_directory.c_str(),frame);
     std::string octree_levelset_filename=STRING_UTILITIES::string_sprintf("%s/octree_levelset.%d",input_directory.c_str(),frame);
     std::string octree_grid_filename=STRING_UTILITIES::string_sprintf("%s/octree_grid.%d",input_directory.c_str(),frame);

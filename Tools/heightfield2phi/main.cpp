@@ -221,7 +221,7 @@ int main(int argc,char *argv[])
     parse_args.Parse(argc,argv);
 
     std::string input_file,output_base;
-    input_file=parse_args.Extra_Arg(1);
+    input_file=parse_args.Extra_Arg(0);
     if(parse_args.Is_Value_Set("-o")) output_base=parse_args.Get_String_Value("-o");
     else output_base=Get_Basename(input_file);
 

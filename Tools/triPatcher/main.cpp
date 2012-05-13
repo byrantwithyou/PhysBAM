@@ -95,11 +95,11 @@ int main(int argc,char *argv[])
     args.Set_Extra_Arguments(5,"<old filename> <old color filename> <new filename> <new color filename> <condensation mapping file>");
     args.Parse(argc,argv);
     std::cout<<"num extra "<<args.Num_Extra_Args()<<std::endl;
-    std::string old_filename = args.Extra_Arg(1);
-    std::string old_color_filename = args.Extra_Arg(2);
-    std::string new_filename = args.Extra_Arg(3);
-    std::string new_color_filename = args.Extra_Arg(4);
-    std::string condensation_mapping_filename = args.Extra_Arg(5);
+    std::string old_filename = args.Extra_Arg(0);
+    std::string old_color_filename = args.Extra_Arg(1);
+    std::string new_filename = args.Extra_Arg(2);
+    std::string new_color_filename = args.Extra_Arg(3);
+    std::string condensation_mapping_filename = args.Extra_Arg(4);
     PatchTogether<float>(old_filename,old_color_filename,new_filename,new_color_filename,condensation_mapping_filename);
     return 0;
 }

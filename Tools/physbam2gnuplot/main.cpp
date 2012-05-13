@@ -69,7 +69,7 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(const PARSE_ARGS& parse_
     bool convert_machnumber=parse_args.Is_Value_Set("-machnumber"); 
     bool convert_log=parse_args.Is_Value_Set("-log"); 
 
-    std::string input_directory=parse_args.Extra_Arg(1),output_directory=input_directory;
+    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
     if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
     FILE_UTILITIES::Create_Directory(output_directory);
 

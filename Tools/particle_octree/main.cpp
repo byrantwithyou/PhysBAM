@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
     double particle_power=parse_args.Get_Double_Value("-p");
     double object_expansion=parse_args.Get_Double_Value("-e");
     std::string output_directory=parse_args.Get_String_Value("-o");
-    std::string input_directory(parse_args.Extra_Arg(1));
-    int frame=atoi(parse_args.Extra_Arg(2).c_str());
+    std::string input_directory(parse_args.Extra_Arg(0));
+    int frame=atoi(parse_args.Extra_Arg(1).c_str());
     std::string particle_filename=STRING_UTILITIES::string_sprintf("%s/removed_negative_particles.%d",input_directory.c_str(),frame);
     std::string negative_particle_filename=STRING_UTILITIES::string_sprintf("%s/negative_particles.%d",input_directory.c_str(),frame);
     std::string levelset_filename=STRING_UTILITIES::string_sprintf("%s/levelset.%d",input_directory.c_str(),frame);

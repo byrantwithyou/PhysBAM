@@ -62,8 +62,8 @@ int main(int argc,char *argv[])
         return 1;
     }
 
-    std::string grid_filename=parse_args.Extra_Arg(1);
-    std::string phi_filename=parse_args.Extra_Arg(2);
+    std::string grid_filename=parse_args.Extra_Arg(0);
+    std::string phi_filename=parse_args.Extra_Arg(1);
     std::string output_filename=parse_args.Get_String_Value("-o");
     bool write_substeps=parse_args.Get_Option_Value("-substeps");
 

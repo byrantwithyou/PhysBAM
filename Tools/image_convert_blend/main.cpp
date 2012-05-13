@@ -13,9 +13,9 @@ int main(int argc,char* argv[])
     args.Add_Double_Argument("-ratio",0.5,"-ratio","blend ratio");
     args.Set_Extra_Arguments(3,"<image in1> <image in2> <image out>","images to read and write");
     args.Parse(argc,argv);
-    std::string file_input1=args.Extra_Arg(1);
-    std::string file_input2=args.Extra_Arg(2);
-    std::string file_output=args.Extra_Arg(3);
+    std::string file_input1=args.Extra_Arg(0);
+    std::string file_input2=args.Extra_Arg(1);
+    std::string file_output=args.Extra_Arg(2);
     double gamma=args.Get_Double_Value("-gamma");
     double ratio=args.Get_Double_Value("-ratio");
 

@@ -41,7 +41,7 @@ int main(int argc,char *argv[])
     std::string filename;
 
     if (parse_args.Num_Extra_Args() < 1) return 1;
-    else filename=parse_args.Extra_Arg(1);
+    else filename=parse_args.Extra_Arg(0);
 
     if(parse_args.Get_Option_Value("-removed")){
         std::cout << "Removed particle" << std::endl;

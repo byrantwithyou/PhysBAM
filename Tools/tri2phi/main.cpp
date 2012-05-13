@@ -230,7 +230,7 @@ int main(int argc,char *argv[])
     parse_args.Parse(argc, argv);
 
     if(parse_args.Is_Value_Set("-b")) boundary_cells=parse_args.Get_Integer_Value("-b");
-    std::string input_filename=parse_args.Extra_Arg(1);
+    std::string input_filename=parse_args.Extra_Arg(0);
 
     if(parse_args.Get_Option_Value("-float")) type_double=false;
     if(parse_args.Get_Option_Value("-double")) type_double=true;

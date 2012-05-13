@@ -216,7 +216,7 @@ int main(int argc, char* argv[])
     parse_args.Set_Extra_Arguments(1,"<frame number>");
     parse_args.Parse(argc,argv);
 
-    int frame=atoi(parse_args.Extra_Arg(1).c_str());
+    int frame=atoi(parse_args.Extra_Arg(0).c_str());
     PROCESSOR<float>(parse_args).Process<float>(frame);
     LOG::cout<<std::endl;
     return 0;

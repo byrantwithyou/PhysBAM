@@ -77,7 +77,7 @@ int main(int argc,char* argv[])
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
     parse_args.Parse(argc,argv);
 
-    std::string input_directory=parse_args.Extra_Arg(1),output_directory=input_directory;
+    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
     if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
     FILE_UTILITIES::Create_Directory(output_directory);
 

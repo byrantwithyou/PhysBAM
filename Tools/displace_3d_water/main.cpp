@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
         return 1;
     }
     std::string output_directory=parse_args.Get_String_Value("-o");
-    int frame=atoi(parse_args.Extra_Arg(1).c_str());
+    int frame=atoi(parse_args.Extra_Arg(0).c_str());
 
 
     std::cout<<"Reading levelset: "<<std::endl;

@@ -211,9 +211,9 @@ int main(int argc, char *argv[])
 
     verbose=parse_args.Get_Option_Value("-v");
 
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(1));
+    std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(0));
     if(!(*input)) {
-        std::cerr << "Cannot open " << parse_args.Extra_Arg(1) << std::endl;
+        std::cerr << "Cannot open " << parse_args.Extra_Arg(0) << std::endl;
         return 1;
     }
 

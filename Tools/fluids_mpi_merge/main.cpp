@@ -339,7 +339,7 @@ Merge_Particles(const std::string& filename)
 template<class T> void
 Do_Merge(PARSE_ARGS& parse_args)
 {
-    std::string input_directory=parse_args.Extra_Arg(1),output_directory=input_directory;
+    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
     if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
 
     int first_frame,last_frame;

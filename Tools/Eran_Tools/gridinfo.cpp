@@ -37,7 +37,7 @@ int main(int argc, char *argv[])
 
     parse_args.Parse(argc, argv);
 
-    filename=parse_args.Extra_Arg(1);
+    filename=parse_args.Extra_Arg(0);
 
     // By default detection dimension from file extension
     if (parse_args.Get_Option_Value("-double")) type_double = true;

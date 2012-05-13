@@ -48,8 +48,8 @@ int main(int argc,char* argv[])
     args.Add_Double_Argument("-bloom_multiply",1,"-bloom_multiply","bloom multiply"); 
     args.Set_Extra_Arguments(2,"<image in> <image out>","images to read and write");
     args.Parse(argc,argv);
-    std::string file_input=args.Extra_Arg(1);
-    std::string file_output=args.Extra_Arg(2);
+    std::string file_input=args.Extra_Arg(0);
+    std::string file_output=args.Extra_Arg(1);
     double gamma=args.Get_Double_Value("-gamma");
     ARRAY<VECTOR<float,3>,VECTOR<int,2> > image;
     LOG::Time("Reading Image");

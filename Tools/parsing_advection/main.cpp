@@ -86,7 +86,7 @@ Write_Output(PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
 
-    std::string input_directory=parse_args.Extra_Arg(1);
+    std::string input_directory=parse_args.Extra_Arg(0);
     int frame=parse_args.Get_Integer_Value("-frame");
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<T>(input_directory+"/common/grid",grid);
     if(parse_args.Is_Value_Set("-m")) Print_Mass(input_directory,grid,frame);

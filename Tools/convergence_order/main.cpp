@@ -20,8 +20,8 @@ Write_Output(PARSE_ARGS& parse_args)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
 
-    std::string input_directory1=parse_args.Extra_Arg(1);
-    std::string input_directory2=parse_args.Extra_Arg(2);
+    std::string input_directory1=parse_args.Extra_Arg(0);
+    std::string input_directory2=parse_args.Extra_Arg(1);
     int frame=parse_args.Get_Integer_Value("-frame");
     int frame_rate=parse_args.Get_Integer_Value("-frame_rate");
     if(frame==0) FILE_UTILITIES::Read_From_Text_File(input_directory1+"/common/last_frame",frame);

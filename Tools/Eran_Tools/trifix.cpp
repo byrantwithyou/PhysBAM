@@ -15,7 +15,7 @@ void Do_It()
 {
     std::string output_filename=parse_args.Get_String_Value("-o");
 
-    TRIANGULATED_SURFACE<T> *surface=0;FILE_UTILITIES::Create_From_File<T>(parse_args.Extra_Arg(1),surface);
+    TRIANGULATED_SURFACE<T> *surface=0;FILE_UTILITIES::Create_From_File<T>(parse_args.Extra_Arg(0),surface);
     surface->triangle_mesh.number_nodes=surface->particles.number;
     std::cout << "Writing " << output_filename << std::endl;
     FILE_UTILITIES::Write_To_File<T>(output_filename,*surface);

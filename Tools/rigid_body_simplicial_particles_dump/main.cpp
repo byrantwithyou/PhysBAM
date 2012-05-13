@@ -63,7 +63,7 @@ int main(int argc,char *argv[])
         output_file_stream.open(output_file.c_str());
         output_stream=&output_file_stream;}
 
-    std::string basedir=parse_args.Extra_Arg(1);
+    std::string basedir=parse_args.Extra_Arg(0);
 
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
         if(use_double) PHYSBAM_FATAL_ERROR("No double support");

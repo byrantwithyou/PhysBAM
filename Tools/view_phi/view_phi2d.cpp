@@ -74,7 +74,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
 
     if (parse_args.Num_Extra_Args() != 1) parse_args.Print_Usage(true);
-    else levelset_filename = parse_args.Extra_Arg(1);
+    else levelset_filename = parse_args.Extra_Arg(0);
 
     if (!strstr(levelset_filename.c_str(), "%d")) animation_enabled = false;
 }
