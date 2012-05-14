@@ -10,6 +10,7 @@ using namespace PhysBAM;
 template<class TV,class T,int d> TV PhysBAM::Compute_Collision_Impulse(const TV& normal,const SYMMETRIC_MATRIX<T,d>& impulse_factor,
     const TV& relative_velocity,const T coefficient_of_restitution,const T coefficient_of_friction,bool* applied_sticking_impulse)
 {
+    if(!impulse_factor.Determinant()) return TV();
     T relative_normal_velocity=TV::Dot_Product(relative_velocity,normal);
     if(relative_normal_velocity>=0) return TV();
 
