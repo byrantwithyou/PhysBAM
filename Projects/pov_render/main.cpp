@@ -69,8 +69,8 @@ void Apply_Options(TRIANGULATED_SURFACE<T>* ts, const HASHTABLE<std::string,std:
 template<class T,int d>
 void Emit_Vector(std::ofstream& fout,const VECTOR<T,d>& v, const char* str="")
 {
-    fout<<"< "<<v(1);
-    for(int i=2;i<=d;i++) fout<<" , "<<v(i);
+    fout<<"< "<<v(0);
+    for(int i=1;i<d;i++) fout<<" , "<<v(i);
     fout<<" > "<<str;
 }
 
@@ -94,12 +94,12 @@ void Emit_Smooth_Surface(std::ofstream& fout,TRIANGULATED_SURFACE<T>* ts, const 
         if(ts->face_vertex_normals) N=(*ts->face_vertex_normals)(i);
         else N=VECTOR<TV,3>(ts->vertex_normals->Subset(ts->mesh.elements(i)));
 
+        Emit_Vector(fout,X(0),",");
+        Emit_Vector(fout,N(0),",");
         Emit_Vector(fout,X(1),",");
         Emit_Vector(fout,N(1),",");
         Emit_Vector(fout,X(2),",");
-        Emit_Vector(fout,N(2),",");
-        Emit_Vector(fout,X(3),",");
-        Emit_Vector(fout,N(3),"");
+        Emit_Vector(fout,N(2),"");
 
         if(coords.m)
         {
