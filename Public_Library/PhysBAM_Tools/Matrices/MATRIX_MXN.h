@@ -7,6 +7,7 @@
 #ifndef __MATRIX_MXN__
 #define __MATRIX_MXN__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_BASE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
@@ -21,80 +22,65 @@ public:
     using BASE::Times_Transpose;using BASE::Transpose_Times;
     typedef T SCALAR;
     int m,n; // size of the m by n matrix
-    T *x; // pointer to the one dimensional data
+    ARRAY<T> x; // one dimensional data
 
     MATRIX_MXN()
-        :m(0),n(0),x(0)
+        :m(0),n(0)
     {}
 
     MATRIX_MXN(const int m_input,const int n_input)
-        :m(m_input),n(n_input)
+        :m(m_input),n(n_input),x(m*n)
     {
-        x=new T[m*n];
-        for(int k=0;k<m*n;k++) x[k]=0;
     }
 
     explicit MATRIX_MXN(const int n_input)
-        :m(n_input),n(n_input)
+        :m(n_input),n(n_input),x(m*n)
     {
-        x=new T[m*n];
-        for(int k=0;k<m*n;k++) x[k]=0;
     }
 
     MATRIX_MXN(const INITIAL_SIZE m_input,const INITIAL_SIZE n_input)
-        :m(Value(m_input)),n(Value(n_input))
+        :m(Value(m_input)),n(Value(n_input)),x(m*n)
     {
-        x=new T[m*n];
-        for(int k=0;k<m*n;k++) x[k]=0;
     }
 
     explicit MATRIX_MXN(const INITIAL_SIZE n_input)
-        :m(Value(n_input)),n(Value(n_input))
+        :m(Value(n_input)),n(Value(n_input)),x(m*n)
     {
-        x=new T[m*n];
-        for(int k=0;k<m*n;k++) x[k]=0;
     }
 
     MATRIX_MXN(const MATRIX_MXN<T>& A)
-        :m(A.m),n(A.n)
+        :m(A.m),n(A.n),x(A.x)
     {
-        x=new T[m*n];
-        for(int k=0;k<m*n;k++) x[k]=A.x[k];
     }
 
     template<class T2>
     explicit MATRIX_MXN(const MATRIX_MXN<T2>& A)
-        :m(A.m),n(A.n)
+        :m(A.m),n(A.n),x(A.x)
     {
-        x=new T[m*n];
-        for(int k=0;k<m*n;k++) x[k]=(T)A.x[k];
     }
 
     template<class T_MATRIX>
     explicit MATRIX_MXN(const MATRIX_BASE<T,T_MATRIX>& A)
-        :m(A.Rows()),n(A.Columns())
-    {x=new T[m*n];for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);}
+        :m(A.Rows()),n(A.Columns()),x(m*n)
+    {for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);}
 
     template<int d>
     explicit MATRIX_MXN(const DIAGONAL_MATRIX<T,d>& A)
-        :m(d),n(d)
-    {x=new T[m*n];for(int k=0;k<m*n;k++) x[k]=0;for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);}
+        :m(d),n(d),x(A.x),x(m*n)
+    {for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);}
 
     template<int d>
     explicit MATRIX_MXN(const SYMMETRIC_MATRIX<T,d>& A)
-        :m(A.Rows()),n(A.Columns())
-    {x=new T[m*n];for(int j=0;j<n;j++) for(int i=0;i<=j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);}
+        :m(A.Rows()),n(A.Columns()),x(m*n)
+    {for(int j=0;j<n;j++) for(int i=0;i<=j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);}
 
     template<int d>
     explicit MATRIX_MXN(const UPPER_TRIANGULAR_MATRIX<T,d>& A)
-        :m(A.Rows()),n(A.Columns())
-    {x=new T[m*n];
-    for(int j=0;j<n;j++){
-        for(int i=0;i<j;i++) (*this)(i,j)=A(i,j);
-        for(int i=j+1;i<m;i++) (*this)(i,j)=0;}}
+        :m(A.Rows()),n(A.Columns()),x(m*n)
+    {for(int j=0;j<n;j++) for(int i=0;i<j;i++) (*this)(i,j)=A(i,j);}
 
     ~MATRIX_MXN()
-    {delete[] x;}
+    {}
 
     int Rows() const
     {return m;}
@@ -104,46 +90,43 @@ public:
 
     void Resize(const int m_new,const int n_new)
     {if(m_new==m && n_new==n) return;
-    T* x_new=new T[m_new*n_new];for(int t=0;t<m_new*n_new;t++) x_new[t]=(T)0;
-    int m1=min(m,m_new),n1=min(n,n_new);for(int i=0;i<m1;i++) for(int j=0;j<n1;j++) x_new[j*m_new+i]=(*this)(i,j);
-    delete[] x;x=x_new;m=m_new;n=n_new;}
+    if(n_new==n){x.Resize(m_new*n);m=m_new;return;}
+    ARRAY<T> x_new(m_new*n_new);
+    int m1=min(m,m_new),n1=min(n,n_new);for(int i=0;i<m1;i++) for(int j=0;j<n1;j++) x_new(j*m_new+i)=(*this)(i,j);
+    x.Exchange(x_new);m=m_new;n=n_new;}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x[j*m+i];}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(j*m+i);}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x[j*m+i];}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(j*m+i);}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<(unsigned)m && (unsigned)j<(unsigned)n;}
 
     bool operator==(const MATRIX_MXN& A) const
     {if(m!=A.m || n!=A.n) return false;
-    for(int i=0;i<m*n;i++) if(x[i]!=A.x[i]) return false;return true;}
+    for(int i=0;i<m*n;i++) if(x(i)!=A.x(i)) return false;return true;}
 
     bool operator!=(const MATRIX_MXN& A) const
     {return !(*this==A);}
 
     MATRIX_MXN<T>& operator=(const MATRIX_MXN<T>& A)
-    {if(&A==this) return *this;
-    if(!x || m*n!=A.m*A.n){delete[] x;x=new T[A.m*A.n];};
-    m=A.m;n=A.n;for(int k=0;k<m*n;k++) x[k]=A.x[k];return *this;}
+    {if(&A!=this){x=A.x;m=A.m;n=A.n;}return *this;}
 
     template<class T_MATRIX>
     MATRIX_MXN<T>& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
     {if((void*)&A==(void*)this) return *this;
-    if(!x || m*n!=A.Rows()*A.Columns()){delete[] x;x=new T[A.Rows()*A.Columns()];}
+    x.Resize(A.Rows()*A.Columns());
     m=A.Rows();n=A.Columns();for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);return *this;}
 
     template<int d>
     MATRIX_MXN<T>& operator=(const DIAGONAL_MATRIX<T,d>& A)
-    {if(!x || m*n!=A.Rows()*A.Columns()){delete[] x;x=new T[d*d];}
-    m=n=d;for(int k=0;k<m*n;k++) x[k]=0;for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);return *this;}
+    {x.Resize(A.Rows()*A.Columns());m=n=d;for(int k=0;k<m*n;k++) x(k)=0;for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);return *this;}
 
     template<int d>
     MATRIX_MXN<T>& operator=(const SYMMETRIC_MATRIX<T,d>& A)
-    {if(!x || m*n!=A.Rows()*A.Columns()){delete[] x;x=new T[d*d];}
-    m=n=d;for(int j=0;j<n;j++) for(int i=0;i<j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);return *this;}
+    {x.Resize(A.Rows()*A.Columns());m=n=d;for(int j=0;j<n;j++) for(int i=0;i<j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);return *this;}
 
     T Trace() const
     {assert(m==n);T trace=0;for(int i=0;i<n;i++) trace+=(*this)(i,i);return trace;}
@@ -194,6 +177,9 @@ public:
     
     void Right_Givens_Rotation(const int i,const int j,const T c,const T s)
     {assert(0<=i && i<j && j<n);for(int k=0;k<m;k++){T x=(*this)(k,i);(*this)(k,i)=c*(*this)(k,i)-s*(*this)(k,j);(*this)(k,j)=s*x+c*(*this)(k,j);}}
+
+    void Append_Row()
+    {x.Resize(++m*n);}
 
 //#####################################################################
     void Jacobi_Singular_Value_Decomposition(ARRAY<VECTOR<int,2> >& left_givens_pairs,ARRAY<VECTOR<T,2> >& left_givens_coefficients,
