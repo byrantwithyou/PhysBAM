@@ -703,7 +703,7 @@ void Get_Initial_Data()
             break;}
         case 3:{
             EMBEDDED_MATERIAL_SURFACE<TV,3>& embedding=tests.Create_Embedded_Tetrahedralized_Volume(SPHERE<TV>(TV(),(T).9),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true);
-            embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection);
+            embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);
             automatically_add_to_triangle_collisions=false;
 //            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             embedding.Update_Number_Nodes();
@@ -711,7 +711,7 @@ void Get_Initial_Data()
             break;}
         case 4:{
             EMBEDDED_MATERIAL_SURFACE<TV,3>& embedding=tests.Create_Embedded_Tetrahedralized_Volume(TORUS<T>(TV(),TV(0,0,1),(T).3,(T).6),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true);
-            embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection);
+            embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection,false);
 //            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             embedding.Update_Number_Nodes();
             tests.Initialize_Tetrahedron_Collisions(1,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);

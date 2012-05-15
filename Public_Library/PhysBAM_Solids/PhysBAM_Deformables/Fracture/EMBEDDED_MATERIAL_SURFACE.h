@@ -59,7 +59,7 @@ public:
     static typename EMBEDDING_POLICY<TV,d>::EMBEDDING* Create(GEOMETRY_PARTICLES<TV>& new_particles);
     STRUCTURE<TV>* Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& particles,ARRAY<int>* particle_indices=0) const PHYSBAM_OVERRIDE;
     virtual void Create_Material_Surface(const bool verbose=true);
-    void Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection);
+    void Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,bool add_soft_bindings);
     virtual void Perturb_Nodes_For_Collision_Freeness(const T perturb_amount)=0;
 private:
     virtual void Construct_Material_Surface_Mesh()=0;

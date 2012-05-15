@@ -92,7 +92,7 @@ Create_Material_Surface(const bool verbose)
 // Function Update_Binding_List_And_Particles_From_Embedding
 //#####################################################################
 template<class TV,int d> void EMBEDDED_MATERIAL_SURFACE<TV,d>::
-Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection)
+Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_body_collection,bool add_soft_bindings)
 {
     BINDING_LIST<TV>& binding_list=deformable_body_collection.binding_list;
     SOFT_BINDINGS<TV>& soft_bindings=deformable_body_collection.soft_bindings;
@@ -105,18 +105,19 @@ Update_Binding_List_From_Embedding(DEFORMABLE_BODY_COLLECTION<TV>& deformable_bo
     else free_particles->nodes.Remove_All();
     for(int p=0;p<embedded_particles.active_indices.m;p++) binding_list.Add_Binding(new LINEAR_BINDING<TV,2>(dynamic_cast<DEFORMABLE_PARTICLES<TV>&>(particles),embedded_particles.active_indices(p),
         parent_particles(p),VECTOR<T,2>((T)1-interpolation_fraction(p),interpolation_fraction(p))));
-    ARRAY<bool> used(deformable_body_collection.particles.Size());
-    used.Subset(material_surface_mesh.elements.Flattened()).Fill(true);
-    int j=-1;
-    for(int p=0;p<embedded_particles.active_indices.m;p++){
-        if(used(embedded_particles.active_indices(p))){
-            if(++j>=soft_particles.m) soft_particles.Append(deformable_body_collection.particles.Add_Element());
-            soft_bindings.Add_Binding(VECTOR<int,2>(soft_particles(j),embedded_particles.active_indices(p)),true);
-            free_particles->nodes.Append(soft_particles(j));}}
-    number_of_soft_bound_particles=embedded_particles.active_indices.m;
-    soft_bindings.Clamp_Particles_To_Embedded_Positions();soft_bindings.Clamp_Particles_To_Embedded_Velocities();
-    soft_bindings.particles.Compute_Auxiliary_Attributes(soft_bindings);
-    soft_bindings.Set_Mass_From_Effective_Mass();
+    if(add_soft_bindings){
+        ARRAY<bool> used(deformable_body_collection.particles.Size());
+        used.Subset(material_surface_mesh.elements.Flattened()).Fill(true);
+        int j=-1;
+        for(int p=0;p<embedded_particles.active_indices.m;p++){
+            if(used(embedded_particles.active_indices(p))){
+                if(++j>=soft_particles.m) soft_particles.Append(deformable_body_collection.particles.Add_Element());
+                soft_bindings.Add_Binding(VECTOR<int,2>(soft_particles(j),embedded_particles.active_indices(p)),true);
+                free_particles->nodes.Append(soft_particles(j));}}
+        number_of_soft_bound_particles=embedded_particles.active_indices.m;
+        soft_bindings.Clamp_Particles_To_Embedded_Positions();soft_bindings.Clamp_Particles_To_Embedded_Velocities();
+        soft_bindings.particles.Compute_Auxiliary_Attributes(soft_bindings);
+        soft_bindings.Set_Mass_From_Effective_Mass();}
 }
 //#####################################################################
 template class EMBEDDED_MATERIAL_SURFACE<VECTOR<float,2>,2>;
