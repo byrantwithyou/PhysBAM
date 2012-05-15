@@ -66,7 +66,7 @@ public:
 
     template<int d>
     explicit MATRIX_MXN(const DIAGONAL_MATRIX<T,d>& A)
-        :m(d),n(d),x(A.x),x(m*n)
+        :m(d),n(d),x(m*n)
     {for(int i=0;i<d;i++) (*this)(i,i)=A(i,i);}
 
     template<int d>
