@@ -289,6 +289,7 @@ template<class TV> void RIGID_DEFORMABLE_COLLISIONS<TV>::
 Add_Elastic_Collisions(const T dt,const T time,ARRAY<FRAME<TV> >& rigid_frame_save,ARRAY<typename TV::SPIN>& rigid_angular_momentum_difference,
     ARRAY<TV>& rigid_velocity_difference,ARRAY<TWIST<TV> >& rigid_velocity_save,ARRAY<typename TV::SPIN> &rigid_angular_momentum_save,ARRAY<TV>& X_save,ARRAY<TV>& V_save)
 {
+    solid_body_collection.deformable_body_collection.binding_list.Update_Neighbor_Bindings();
     rigid_body_collisions.rigid_body_particle_intersections.Remove_All();
     particles_collided_with_rigid_body.Remove_All();
     Get_Rigid_And_Tetrahedron_Collision_Bodies();

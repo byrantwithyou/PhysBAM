@@ -361,11 +361,11 @@ void Parse_Options()
         case 2:
         case 3:
         case 49:
-        case 50:
-            solids_parameters.triangle_collision_parameters.perform_self_collision=true;
+            solids_parameters.triangle_collision_parameters.perform_self_collision=false;
         case 4:
             solids_parameters.cfl=(T)5;
             break;
+        case 50:
         case 51:
             solids_parameters.triangle_collision_parameters.perform_self_collision=true;
             break;
@@ -704,14 +704,15 @@ void Get_Initial_Data()
         case 3:{
             EMBEDDED_MATERIAL_SURFACE<TV,3>& embedding=tests.Create_Embedded_Tetrahedralized_Volume(SPHERE<TV>(TV(),(T).9),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true);
             embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection);
-            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
+            automatically_add_to_triangle_collisions=false;
+//            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             embedding.Update_Number_Nodes();
             tests.Add_Ground();
             break;}
         case 4:{
             EMBEDDED_MATERIAL_SURFACE<TV,3>& embedding=tests.Create_Embedded_Tetrahedralized_Volume(TORUS<T>(TV(),TV(0,0,1),(T).3,(T).6),RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,(T)3,0))),true);
             embedding.Update_Binding_List_From_Embedding(solid_body_collection.deformable_body_collection);
-            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
+//            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             embedding.Update_Number_Nodes();
             tests.Initialize_Tetrahedron_Collisions(1,embedding.embedded_object.simplicial_object,solids_parameters.triangle_collision_parameters,&embedding.material_surface);
             tests.Add_Ground();
@@ -948,7 +949,7 @@ void Get_Initial_Data()
             deformable_body_collection.deformable_geometry.Add_Structure(&embedding);
             Bind_Redgreen_Segment_Midpoints(redgreen);
             // create soft bindings for all embedded particles
-            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
+//            tests.Substitute_Soft_Bindings_For_Embedded_Nodes(embedding.material_surface,soft_bindings);
             tests.Add_Ground();
             RIGID_BODY<TV>& rigid_sphere=tests.Add_Rigid_Body("sphere",(T).5,(T).5);
             rigid_sphere.is_static=true;
