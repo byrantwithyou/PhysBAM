@@ -294,6 +294,8 @@ void Register_Options()
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
     parse_args->Add_String_Argument("-model","","use this mesh");
+    parse_args->Add_Double_Argument("-repulsion_threshold",1e-2,"","threshold for repulsions");
+    parse_args->Add_Double_Argument("-collision_threshold",1e-6,"","threshold for collisions");
 }
 //#####################################################################
 // Function Parse_Options
@@ -358,6 +360,9 @@ void Parse_Options()
     solids_parameters.use_projections_in_position_update=parse_args->Get_Option_Value("-extra_cg");
     solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
     substitute_springs=parse_args->Get_Option_Value("-substitute_springs");
+    solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)parse_args->Get_Double_Value("-repulsion_threshold");
+    solids_parameters.triangle_collision_parameters.collisions_collision_thickness=(T)parse_args->Get_Double_Value("-collision_threshold");
+    solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold=(T)parse_args->Get_Double_Value("-repulsion_threshold");
 
     switch(test_number){
         case 1:
