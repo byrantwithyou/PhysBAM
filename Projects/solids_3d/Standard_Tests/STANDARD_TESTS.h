@@ -189,6 +189,7 @@ public:
     bool use_axial;
     bool substitute_springs;
     bool test_forces;
+    std::string model_mesh;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),number_side_panels(40),aspect_ratio((T)1.7),side_length((T)1.0),
@@ -292,6 +293,7 @@ void Register_Options()
     parse_args->Add_Option_Argument("-substitute_springs","instead of finite volume, use springs");
     parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
     parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
+    parse_args->Add_String_Argument("-model","","use this mesh");
 }
 //#####################################################################
 // Function Parse_Options
@@ -330,6 +332,7 @@ void Parse_Options()
     axial_bending_stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen_axial_bending");
     use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
     test_forces=parse_args->Is_Value_Set("-test_forces");
+    model_mesh=parse_args->Get_String_Value("-model");
 
     print_matrix=parse_args->Is_Value_Set("-print_matrix");
     
@@ -340,7 +343,7 @@ void Parse_Options()
     solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
     solids_parameters.use_rigid_deformable_contact=true;
     solids_parameters.rigid_body_collision_parameters.use_push_out=true;
-    solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
+    solids_parameters.triangle_collision_parameters.use_gauss_jacobi=false;
     solids_parameters.triangle_collision_parameters.repulsions_limiter_fraction=1;
     solids_parameters.triangle_collision_parameters.collisions_final_repulsion_limiter_fraction=.1;
 
@@ -1263,11 +1266,20 @@ void Get_Initial_Data()
             automatically_add_to_triangle_collisions=false;
             if(!parameter) parameter=2;
             for(int i=0;i<parameter;i++){
-                SPHERE<TV> sphere(TV(0,i*2.1+2,0),1);
-                TRIANGULATED_SURFACE<T>* surface=TESSELLATION::Generate_Triangles(sphere,4),*new_surface=0;
+                TRIANGULATED_SURFACE<T>* surface=0,*new_surface=0;
+                if(model_mesh!=""){
+                    surface=TRIANGULATED_SURFACE<T>::Create();
+                    FILE_UTILITIES::Read_From_File<float>(model_mesh,*surface);
+                    surface->Update_Bounding_Box();
+                    surface->particles.X-=surface->bounding_box->Center();
+                    surface->particles.X/=surface->bounding_box->Edge_Lengths().y;
+                    surface->particles.X+=TV(0,i*(T)1.2+(T).6,0);}
+                else{
+                    SPHERE<TV> sphere(TV(0,i*2.1+2,0),1);
+                    surface=TESSELLATION::Generate_Triangles(sphere,4);}
                 TETRAHEDRALIZED_VOLUME<T>* new_volume=0;
                 ARRAY<int> surface_particle_map;
-                tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,64,1e-3,surface_particle_map,&new_surface,&new_volume,false);
+                tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,512,1e-3,surface_particle_map,&new_surface,&new_volume,false);
                 deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures.Last());
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures.Last());}
             tests.Add_Ground();
