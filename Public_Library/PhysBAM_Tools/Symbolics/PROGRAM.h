@@ -37,13 +37,14 @@ struct PROGRAM
 {
     int extra_out;
     int num_tmp;
+    int num_labels;
     ARRAY<T> constants;
     ARRAY<INSTRUCTION> code;
     ARRAY<std::string> var_in,var_out;
     HASHTABLE<std::string,int> dict;
 
     PROGRAM()
-        :extra_out(0),num_tmp(0)
+        :extra_out(0),num_tmp(0),num_labels(0)
     {
         constants.Append(0);
         constants.Append(1);

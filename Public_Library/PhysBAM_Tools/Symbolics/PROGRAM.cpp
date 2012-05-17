@@ -260,23 +260,21 @@ Parse_Command(const char*& str)
         str+=len;
         int cur=Parse_Command(str);
         if(op=="if"){
-            INSTRUCTION in0={op_br_z,0,cur,-1};
-            int index0=code.Append(in0);
+            INSTRUCTION in0={op_br_z,num_labels++,cur,-1};
+            code.Append(in0);
             cur=num_tmp++;
             printf("true %s\n", str);
             INSTRUCTION in1={op_copy,cur,Parse_Command(str),-1};
             code.Append(in1);
-            INSTRUCTION in2={op_jmp,0,-1,-1};
-            int index1=code.Append(in2);
-            INSTRUCTION in3={op_label,index0,-1,-1};
-            printf("fix %i\n", code(index0).dest);
-            code(index0).dest=code.Append(in3);
-            printf("fix %i\n", code(index0).dest);
+            INSTRUCTION in2={op_jmp,num_labels++,-1,-1};
+            code.Append(in2);
+            INSTRUCTION in3={op_label,in0.dest,-1,-1};
+            code.Append(in3);
             printf("false %s\n", str);
             INSTRUCTION in4={op_copy,cur,Parse_Command(str),-1};
             code.Append(in4);
-            INSTRUCTION in5={op_label,index1,-1,-1};
-            code(index1).dest=code.Append(in5);
+            INSTRUCTION in5={op_label,in2.dest,-1,-1};
+            code.Append(in5);
             if(Parse_Command(str)!=-1){
                 LOG::cout<<"Three arguments expected for 'if'"<<std::endl;
                 PHYSBAM_FATAL_ERROR();}}
@@ -376,8 +374,15 @@ template<class T> void PROGRAM<T>::
 Finalize()
 {
     int off_in=num_tmp,off_out=off_in+var_in.m,off_const=off_out+var_out.m+extra_out;
+    ARRAY<int> labels(num_labels);
+    int ip2=0;
     for(int ip=0;ip<code.m;ip++){
         INSTRUCTION& o=code(ip);
+        if(o.type==op_nop) continue;
+        if(o.type==op_label){
+            labels(o.dest)=ip2;
+            continue;}
+
         if(op_flags_table[o.type]&flag_reg_dest){
             if((o.dest&mem_mask)==mem_in) o.dest=(o.dest&~mem_mask)+off_in;
             else if((o.dest&mem_mask)==mem_out) o.dest=(o.dest&~mem_mask)+off_out;
@@ -389,7 +394,13 @@ Finalize()
         if(op_flags_table[o.type]&flag_reg_src1){
             if((o.src1&mem_mask)==mem_in) o.src1=(o.src1&~mem_mask)+off_in;
             else if((o.src1&mem_mask)==mem_out) o.src1=(o.src1&~mem_mask)+off_out;
-            else if((o.src1&mem_mask)==mem_const) o.src1=(o.src1&~mem_mask)+off_const;}}
+            else if((o.src1&mem_mask)==mem_const) o.src1=(o.src1&~mem_mask)+off_const;}
+        code(ip2++)=o;}
+    code.Resize(ip2);
+    for(int ip=0;ip<code.m;ip++){
+        INSTRUCTION& o=code(ip);
+        if(o.type==op_br_z || o.type==op_br_nz || o.type==op_jmp)
+            o.dest=labels(o.dest);}
 }
 template struct PROGRAM<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
