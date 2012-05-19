@@ -28,7 +28,6 @@ const int last_tri_bit=1<<30;
 struct EDGE {int v0,v1,c0,c1;void Flip(){exchange(c0,c1);exchange(v0,v1);}};
 EDGE center_edges[6][4]; // c0,c1 are vertex to take color from
 struct DOMINANT_PAIR {EDGE a,b;int dc;} dominant_pair[6][2];
-EDGE normal_edges[6][6]; // c0,c1 are vertex to take color from
 const int permute_rx[19]={1,3,0,2,10,11,8,9,4,5,6,7,12,13,16,17,15,14,18};
 const int permute_ry[19]={8,10,9,11,6,4,7,5,2,0,3,1,17,16,14,15,12,13,18};
 const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
