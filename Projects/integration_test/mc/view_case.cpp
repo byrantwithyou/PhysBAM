@@ -111,12 +111,12 @@ int main(int argc, char* argv[])
     (void) cs;
     (void) edge_radius;
 
-    cube_edge(0, 4, edge_width, case_number, edge_radius);
-    cube_edge(0, 6, edge_width, case_number, edge_radius);
-    cube_edge(1, 4, edge_width, case_number, edge_radius);
-    cube_edge(1, 5, edge_width, case_number, edge_radius);
+    cube_edge(0, 0, edge_width, case_number, edge_radius);
+    cube_edge(0, 2, edge_width, case_number, edge_radius);
+    cube_edge(1, 0, edge_width, case_number, edge_radius);
+    cube_edge(1, 1, edge_width, case_number, edge_radius);
 
-    for(int v=4;v<8;v++){
+    for(int v=0;v<4;v++){
         vi->cur_format.fill_color=TV((case_number>=0 && case_number&(1<<v)),0,0);
         vi->cur_format.line_style=0;
         vi->cur_format.fill_style=1;
@@ -124,9 +124,8 @@ int main(int argc, char* argv[])
         vi->cur_format.line_style=1;
         vi->cur_format.fill_style=0;}
 
+
     cube_edge(2, 0, edge_width, case_number, edge_radius);
-    cube_edge(2, 1, edge_width, case_number, edge_radius);
-    cube_edge(2, 2, edge_width, case_number, edge_radius);
 
     std::multimap<float, PAIR<int,TV> > tris;
 
@@ -144,15 +143,17 @@ int main(int argc, char* argv[])
     for(std::map<float, PAIR<int,TV> >::iterator it=tris.begin(); it!=tris.end(); it++)
         tri(points[it->second.x&31], points[(it->second.x>>5)&31], points[(it->second.x>>10)&31], TV(), it->second.y, tri_edge_width, .5, .1);
 
+    cube_edge(2, 1, edge_width, case_number, edge_radius);
+    cube_edge(2, 2, edge_width, case_number, edge_radius);
     cube_edge(2, 3, edge_width, case_number, edge_radius);
-    cube_edge(0, 0, edge_width, case_number, edge_radius);
-    cube_edge(0, 2, edge_width, case_number, edge_radius);
-    cube_edge(1, 0, edge_width, case_number, edge_radius);
-    cube_edge(1, 1, edge_width, case_number, edge_radius);
+    cube_edge(0, 4, edge_width, case_number, edge_radius);
+    cube_edge(0, 6, edge_width, case_number, edge_radius);
+    cube_edge(1, 4, edge_width, case_number, edge_radius);
+    cube_edge(1, 5, edge_width, case_number, edge_radius);
 
     vi->cur_format.fill_style=1;
     vi->cur_format.line_style=0;
-    for(int v=0;v<4;v++){
+    for(int v=4;v<8;v++){
         vi->cur_format.fill_color=TV(case_number>=0 && case_number&(1<<v),0,0);
         vi->Draw_Object(to2d(corners[v]),corner_radius);}
     vi->cur_format.fill_style=0;
