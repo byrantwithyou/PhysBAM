@@ -15,6 +15,7 @@ ARRAY<int> side_case_table;
 ARRAY<VECTOR<short,8> > side_triangle_table;
 const int comparison_bit=1<<31;
 const int last_tri_bit=1<<30;
+const int pts_bit=1<<29;
 /* Triangle encoding
  * 0 e 000000000 xxx yyy aaaaa bbbbb ccccc   (triangle)
  * 1 0 aaa bbb ccc ddd ssssss ssssss ssssss (comparison)
@@ -141,7 +142,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
         if(edges[i].v1<12) adj[edges[i].v1][0]=i;}
 
     long long pt_mask_helper=0;
-    int pt_mask=1<<30;
+    int pt_mask=pts_bit;
     for(int i=0;i<num_edges;i++){
         if(edges[i].v0>=12)
             pt_mask_helper|=1LL<<(12*((edges[i].v0-12)/2)+edges[i].v1);
@@ -150,10 +151,10 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
 
     for(int f=0;f<6;f++)
         for(int i=0;i<4;i++)
-            if(pt_mask_helper|(1LL<<((f/2)*12+face_edges[f][i])))
+            if(pt_mask_helper&(1LL<<((f/2)*12+face_edges[f][i])))
                 pt_mask|=1<<(4*f+i);
     int mask_tri_index=-1;
-    if(pt_mask!=(1<<30))
+    if(pt_mask!=pts_bit)
         mask_tri_index=interface_triangle_table.Append(pt_mask);
 
     int face_graph[64][2];
@@ -337,14 +338,14 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     for(int a=0,k=0;a<3;a++){
         int mask=1<<a;
         for(int v=0;v<8;v++)
-            if(!(v&mask))
+            if(!(v&mask)){
                 if(colors(v)!=colors(v|mask)){
                     T theta=phi(v)/(phi(v)+phi(v|mask));
                     pts[k]=(1-theta)*TV(bits(v))+theta*TV(bits(v|mask));}
-                k++;}
+                k++;}}
 
     int pt_mask=interface_triangle_table(tri);
-    if(pt_mask&(1<<30)){
+    if(pt_mask&pts_bit){
         tri++;
         int num_center_points=0;
         for(int f=0;f<6;f++){
@@ -363,8 +364,12 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     do{
         pat=interface_triangle_table(tri++);
         TRIANGLE_3D<T> triangle(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f],pts[pat&0x1f]);
-        surface.Append(TRIPLE<TRIANGLE_3D<T>,int,int>(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]));
-    } while(pat&last_tri_bit);
+        TRIPLE<TRIANGLE_3D<T>,int,int> triple(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
+        if(triple.y>triple.z){
+            exchange(triple.y,triple.z);
+            exchange(triple.x.X(1),triple.x.X(2));}
+        surface.Append(triple);
+    } while(!(pat&last_tri_bit));
 }
 template<class T> void
 Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const int* re_color,
