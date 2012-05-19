@@ -186,10 +186,10 @@ elif env['PLATFORM'].startswith('win32'):
     env.Append(CXXFLAGS=' /WX',LINKFLAGS=' /wd422')
 else: # assume g++...
     # machine flags
-    if env['ARCH']=='pentium4': machine_flags=' -march=pentium4 -msse2 -m32 -Wa,--32'
-    elif env['ARCH']=='pentium3': machine_flags=' -march=pentium3 -msse'
-    elif env['ARCH']=='athlon': machine_flags=' -march=athlon-xp -msse'
-    elif env['ARCH']=='nocona': machine_flags=' -march=nocona -msse3'
+    if env['ARCH']=='pentium4': machine_flags=' -march=pentium4 -msse2 -mfpmath=sse -m32 -Wa,--32'
+    elif env['ARCH']=='pentium3': machine_flags=' -march=pentium3 -msse -mfpmath=sse'
+    elif env['ARCH']=='athlon': machine_flags=' -march=athlon-xp -msse -mfpmath=sse'
+    elif env['ARCH']=='nocona': machine_flags=' -march=nocona -msse3 -mfpmath=sse'
     elif env['ARCH']=='opteron': machine_flags=' -march=opteron -msse3'
     elif env['ARCH']=='powerpc': machine_flags=' -msse3'
     else: machine_flags=''

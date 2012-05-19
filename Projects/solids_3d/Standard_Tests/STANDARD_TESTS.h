@@ -362,7 +362,6 @@ void Parse_Options()
     substitute_springs=parse_args->Get_Option_Value("-substitute_springs");
     solids_parameters.triangle_collision_parameters.collisions_repulsion_thickness=(T)parse_args->Get_Double_Value("-repulsion_threshold");
     solids_parameters.triangle_collision_parameters.collisions_collision_thickness=(T)parse_args->Get_Double_Value("-collision_threshold");
-    solids_parameters.triangle_collision_parameters.collisions_small_number=(T)parse_args->Get_Double_Value("-collision_threshold")*(T)1e-2;
     solids_parameters.triangle_collision_parameters.repulsion_pair_attractions_threshold=(T)parse_args->Get_Double_Value("-repulsion_threshold");
 
     switch(test_number){
@@ -1285,7 +1284,7 @@ void Get_Initial_Data()
                     surface=TESSELLATION::Generate_Triangles(sphere,4);}
                 TETRAHEDRALIZED_VOLUME<T>* new_volume=0;
                 ARRAY<int> surface_particle_map;
-                tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,512*64,1e-3,surface_particle_map,&new_surface,&new_volume,false);
+                tests.Create_Regular_Embedded_Surface(binding_list,soft_bindings,*surface,density,512,1e-3,surface_particle_map,&new_surface,&new_volume,false);
                 deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures.Last());
                 solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures.Last());}
             tests.Add_Ground();
