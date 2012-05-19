@@ -24,7 +24,7 @@ const int last_tri_bit=1<<30;
  * 0 0 1 0000 x aaaa bbbb cccc dddd eeee ffff
  * 
  */
-// start, end, inside color, outside color (c1<c0)
+// start, end, inside color, outside color (c0<c1)
 struct EDGE {int v0,v1,c0,c1;void Flip(){exchange(c0,c1);exchange(v0,v1);}};
 EDGE center_edges[6][4]; // c0,c1 are vertex to take color from
 struct DOMINANT_PAIR {EDGE a,b;int dc;} dominant_pair[6][2];
@@ -61,7 +61,7 @@ void Add_Center_Edges(int* colors,EDGE* edges,int& num_edges,int axis,int s)
         const EDGE& e=center_edges[2*axis+s][i];
         EDGE ec={e.v0,e.v1,colors[e.c0],colors[e.c1]};
         if(ec.c0==ec.c1) continue;
-        if(ec.c0<ec.c1) ec.Flip();
+        if(ec.c0>ec.c1) ec.Flip();
         edges[num_edges++]=ec;}
 }
 void Add_Dominat_Pair(int* colors,EDGE* edges,int& num_edges,int axis,int s,int dc)
@@ -70,8 +70,8 @@ void Add_Dominat_Pair(int* colors,EDGE* edges,int& num_edges,int axis,int s,int 
         const DOMINANT_PAIR& d=dominant_pair[2*axis+s][i];
         if(colors[d.dc]!=dc) continue;
         EDGE a={d.a.v0,d.a.v1,colors[d.a.c0],colors[d.a.c1]},b={d.b.v0,d.b.v1,colors[d.b.c0],colors[d.b.c1]};
-        if(a.c0<a.c1) a.Flip();
-        if(b.c0<b.c1) b.Flip();
+        if(a.c0>a.c1) a.Flip();
+        if(b.c0>b.c1) b.Flip();
         edges[num_edges++]=a;
         edges[num_edges++]=b;}
 }
@@ -88,12 +88,12 @@ void Add_Face_Edges(int* colors,EDGE* edges,int& num_edges,int a,int b,int s,int
             return;}
         Add_Center_Edges(colors,edges,num_edges,axis,s);
         num_edges--;
-        if(edges[num_edges-1].v0==edges[num_edges].v1) edges[num_edges-1].v0=edges[num_edges].v1;
-        else edges[num_edges-1].v1=edges[num_edges].v0;
+        if(edges[num_edges-1].v0==edges[num_edges].v1) edges[num_edges-1].v0=edges[num_edges].v0;
+        else edges[num_edges-1].v1=edges[num_edges].v1;
         return;}
     if(!(have&=have-1)){
         if(col[0]==col[3]) Add_Dominat_Pair(colors,edges,num_edges,axis,s,col[0]);
-        else if(col[1]==col[2]) Add_Dominat_Pair(colors,edges,num_edges,axis,s,col[0]);
+        else if(col[1]==col[2]) Add_Dominat_Pair(colors,edges,num_edges,axis,s,col[1]);
         else Add_Center_Edges(colors,edges,num_edges,axis,s);
         return;}
     Add_Center_Edges(colors,edges,num_edges,axis,s);
@@ -104,9 +104,10 @@ bool Merge_Edges(EDGE& e0,EDGE& e1)
     if(e0.c1==e1.c0){e0.c1=e1.c1;return true;}
     return false;
 }
-void Insert_Face_Graph_Edge(int (*face_graph)[6][2],EDGE* edges,int e)
+void Insert_Face_Graph_Edge(int (*face_graph)[2],EDGE* edges,int e)
 {
-    int* fg=face_graph[edges[e].v0][edges[e].v1];
+    if(edges[e].v0>edges[e].v1) edges[e].Flip();
+    int* fg=face_graph[(1<<edges[e].v0)|(1<<edges[e].v1)];
     if(fg[0]==-1){fg[0]=e;return;}
     if(fg[1]!=-1){
         EDGE& e0=edges[fg[0]],&e1=edges[fg[1]];
@@ -156,8 +157,8 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     if(pt_mask!=(1<<30))
         mask_tri_index=interface_triangle_table.Append(pt_mask);
 
-    int face_graph[6][6][2];
-    for(int i=0;i<6;i++) for(int j=0;j<2;j++) for(int k=0;k<2;k++) face_graph[i][j][k]=-1;
+    int face_graph[64][2];
+    for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
     for(int i=0;i<12;i++){
         if(adj[i][0]==-1) continue;
         EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
@@ -185,14 +186,15 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
         for(int i=0;i<6;i++)
             for(int j=0;j<6;j++)
                 for(int m=0;m<2;m++){
-                    int* fgij=face_graph[i][j],fg0=fgij[m];
+                    int* fgij=face_graph[(1<<i)|(1<<j)],fg0=fgij[m];
                     if(fg0>=0){
                         make_center=true;
-                        for(int k=0;k<6;k++)
+                        for(int k=i+1;k<6;k++)
                             for(int n=0;n<2;n++){
-                                int* fgjk=face_graph[j][k],fg1=fgjk[n];
-                                if(fg1>=0)
-                                    if(edges[fg0].c0==edges[fg1].c0 && edges[fg0].c1==edges[fg1].c1){
+                                int* fgjk=face_graph[(1<<j)|(1<<k)],fg1=fgjk[n];
+                                if(fg1>=0){
+                                    if(((1<<edges[fg0].c0)|(1<<edges[fg0].c1))==((1<<edges[fg1].c0)|(1<<edges[fg1].c1))){
+                                        if(edges[fg1].v0!=j) edges[fg1].Flip();
                                         interface_triangle_table.Append((edges[fg0].c0<<18)|(edges[fg0].c1<<15)|(i<<10)|(j<<5)|k);
                                         edges[fg0].v1=k;
                                         Insert_Face_Graph_Edge(face_graph,edges,fg0);
@@ -200,14 +202,14 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                                         if(m==0 && fgij[1]>=0) exchange(fgij[0],fgij[1]);
                                         fgjk[n]=-1;
                                         if(m==0 && fgjk[1]>=0) exchange(fgjk[0],fgjk[1]);
-                                        progress=true;}}}}}
+                                        progress=true;}}}}}}
 
     if(make_center){
         interface_triangle_table(mask_tri_index)=pt_mask|(1<<24);
         for(int i=0;i<6;i++)
             for(int j=0;j<6;j++){
-                PHYSBAM_ASSERT(face_graph[i][j][1]==-1);
-                int fg=face_graph[i][j][0];
+                PHYSBAM_ASSERT(face_graph[(1<<i)|(1<<j)][1]==-1);
+                int fg=face_graph[(1<<i)|(1<<j)][0];
                 if(fg==-1) continue;
                 interface_triangle_table.Append((edges[fg].c0<<18)|(edges[fg].c1<<15)|(i<<10)|(j<<5)|18);}}
 
@@ -226,8 +228,9 @@ void Emit_Interface_Triangles(int* colors)
                 int mask_a=1<<a,mask_b=1<<b,mask_s=s<<(3-a-b);
                 int c0=colors[mask_s],c1=colors[mask_s|mask_a],c2=colors[mask_s|mask_b],c3=colors[mask_s|mask_a|mask_b];
                 if(c0==c3 && c1==c2 && c0!=c1){
-                    amb[(amb[0]!=-1)*2]=c0;
-                    amb[(amb[0]!=-1)*2+1]=c1;}}
+                    int b=(amb[0]!=-1)*2;
+                    amb[b]=c0;
+                    amb[b+1]=c1;}}
     if(amb[0]==-1) return Emit_Interface_Triangles(colors,0);
     int test_index=interface_triangle_table.m;
     interface_triangle_table.Append(0);
@@ -255,7 +258,8 @@ void Enumerate_Interface_Cases_3D(int* colors, int i, int mc, int cs)
 {
     if(i==8){
         interface_case_table(cs)=interface_triangle_table.m;
-        if(cs) Emit_Interface_Triangles(colors);}
+        if(cs) Emit_Interface_Triangles(colors);
+        return;}
 
     for(int c=0;c<=mc;c++){
         colors[i]=c;
@@ -266,7 +270,7 @@ void Enumerate_Interface_Cases_3D(int* colors, int i, int mc, int cs)
 }
 void Initialize_Case_Table_3D()
 {
-    EDGE e={13,7,5,7};
+    EDGE e={7,13,5,7};
     for(int i=0;i<4;i++){
         center_edges[1][i]=e;
         center_edges[4][i]=Rotate_Y(center_edges[1][i]);
@@ -295,6 +299,7 @@ void Initialize_Case_Table_3D()
                     face_edges[f0][face_count[f0]++]=edge;
                     face_edges[f1][face_count[f1]++]=edge;}
 
+    interface_case_table.Resize(40320);
     int colors[8]={0};
     Enumerate_Interface_Cases_3D(colors, 1, 0, 0);
 
@@ -303,7 +308,7 @@ void Initialize_Case_Table_3D()
 }
 template<class T> void
 Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,const VECTOR<int,8>& re_color,
-    const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const HASHTABLE<int,int>& color_map)
+    const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const HASHTABLE<int,int>& color_map,const int* color_list)
 {
     typedef VECTOR<T,3> TV;
     int cs=0;
@@ -341,6 +346,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
 
     int pt_mask=interface_triangle_table(tri);
     if(pt_mask&(1<<30)){
+        tri++;
         int num_center_points=0;
         for(int f=0;f<6;f++){
             int bits=(pt_mask>>(f*4))&0xf;
@@ -358,7 +364,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     do{
         pat=interface_triangle_table(tri++);
         TRIANGLE_3D<T> triangle(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f],pts[pat&0x1f]);
-        surface.Append(TRIPLE<TRIANGLE_3D<T>,int,int>(triangle,colors((pat>>18)&0x7),colors((pat>>15)&0x7)));
+        surface.Append(TRIPLE<TRIANGLE_3D<T>,int,int>(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]));
     } while(pat&last_tri_bit);
 }
 template<class T> void
@@ -385,12 +391,14 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
     int next_color=0;
     HASHTABLE<int,int> color_map;
     VECTOR<int,num_corners> re_color;
+    int color_list[8];
     for(int i=0;i<num_corners;i++)
         if(!color_map.Get(colors(i),re_color(i))){
             re_color(i)=next_color;
+            color_list[next_color]=colors(i);
             color_map.Set(colors(i),next_color++);}
 
-    Get_Interface_Elements_For_Cell(surface,re_color,colors,phi,color_map);
+    Get_Interface_Elements_For_Cell(surface,re_color,colors,phi,color_map,color_list);
     Get_Boundary_Elements_For_Cell(boundary,re_color.array,colors.array,phi.array,0,color_map);
 
     next_color=0;
