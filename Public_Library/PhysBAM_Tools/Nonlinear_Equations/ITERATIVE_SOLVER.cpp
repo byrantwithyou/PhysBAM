@@ -231,6 +231,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 template<class T> void ITERATIVE_SOLVER<T>::
 Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations)
 {
+#if 0
     typedef PARAMETER_SPACE<T> TV;
     iterations=0;
     TV& grad=x.Zero_Clone();
@@ -267,6 +268,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
     delete &grad_old;
     delete &s;
     delete &tmp;
+#endif
 }
 //####################################################################################
 #if defined(_MSC_VER) && _MSC_VER<=1500

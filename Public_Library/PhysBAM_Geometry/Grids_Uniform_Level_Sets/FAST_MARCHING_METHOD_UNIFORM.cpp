@@ -260,7 +260,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
     if(levelset.collision_body_list){
         COLLISION_GEOMETRY_ID body_id;
         for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())){TV_INT index=iterator.Cell_Index();
-            T value[T_GRID::dimension]={0}; // the phi value to use in the given direction
+            T value[3]={0}; // the phi value to use in the given direction
             int number_of_axis=0; // the number of axis that we want to use later
             int missing_axis=3; // used in number_of_axis==2 case only, so it gives you which axis is missing (==3 for 2d)
             bool really_clamp_phi_with_collision_bodies=levelset.clamp_phi_with_collision_bodies&&phi_ghost(index)<=0;
@@ -308,7 +308,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
             phi_new(index)*=LEVELSET_UTILITIES<T>::Sign(phi_ghost(index));}}
     else{
         for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())){TV_INT index=iterator.Cell_Index();
-            T value[T_GRID::dimension]={0}; // the phi value to use in the given direction
+            T value[3]={0}; // the phi value to use in the given direction
             int number_of_axis=0; // the number of axis that we want to use later
             int missing_axis=3; // used in number_of_axis==2 case only, so it gives you which axis is missing (==3 for 2d)
             TV location=iterator.Location();

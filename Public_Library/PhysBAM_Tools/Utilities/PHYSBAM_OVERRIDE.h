@@ -19,7 +19,7 @@
 #  define PHYSBAM_NORETURN(declaration) declaration __attribute__ ((noreturn))
 #  ifdef NDEBUG
 #    define PHYSBAM_ALWAYS_INLINE __attribute__ ((always_inline))
-#    define PHYSBAM_FLATTEN __attribute__ ((flatten))
+#    define PHYSBAM_FLATTEN //__attribute__ ((flatten))
 #  else
 #    define PHYSBAM_ALWAYS_INLINE
 #    define PHYSBAM_FLATTEN
