@@ -112,7 +112,7 @@ public:
     }
 
     explicit VECTOR(const VECTOR<T,2>& vector_input)
-        :x(vector_input.x),y(vector_input.y),z(0)
+        :x(vector_input.x),y(vector_input.y),z(T())
     {}
 
     template<int n>
