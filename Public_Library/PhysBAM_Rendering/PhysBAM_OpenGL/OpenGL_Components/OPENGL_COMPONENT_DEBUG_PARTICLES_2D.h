@@ -59,6 +59,7 @@ private:
 
 public:
     GEOMETRY_PARTICLES<TV>& particles;
+    ARRAY<DEBUG_OBJECT<TV> >& debug_objects;
     OPENGL_DEBUG_PARTICLES_2D<T>& opengl_particles;
 
 private:

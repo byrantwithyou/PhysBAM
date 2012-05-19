@@ -13,6 +13,22 @@ namespace PhysBAM{
 template<class TV> class GEOMETRY_PARTICLES;
 
 template<class TV>
+struct DEBUG_OBJECT
+{
+    typedef typename TV::SCALAR T;
+    enum TYPE {segment=2,triangle=3} type;
+    VECTOR<TV,3> X;
+    VECTOR<T,3> color,bgcolor;
+    bool draw_vertices;
+
+    template<class RW> void Read(std::istream& input)
+    {Read_Binary<RW>(input,X,type,color,bgcolor,draw_vertices);}
+
+    template<class RW> void Write(std::ostream& output) const
+    {Write_Binary<RW>(output,X,type,color,bgcolor,draw_vertices);}
+};
+
+template<class TV>
 class DEBUG_PARTICLES
 {
 public:
@@ -21,11 +37,14 @@ public:
     ~DEBUG_PARTICLES();
 
     GEOMETRY_PARTICLES<TV>& debug_particles;
+    ARRAY<DEBUG_OBJECT<TV> > debug_objects;
 
-    static GEOMETRY_PARTICLES<TV>* Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
+    static DEBUG_PARTICLES<TV>* Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle=0);
     void Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const;
 };
 template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
 template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
+template<class TV> void Add_Debug_Object(const VECTOR<TV,2>& object,const VECTOR<typename TV::SCALAR,3>& color);
+template<class TV> void Add_Debug_Object(const VECTOR<TV,3>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor);
 }
 #endif

@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_INDEXED_COLOR_MAP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_DEBUG_PARTICLES_2D.h>
@@ -16,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T,class RW> OPENGL_COMPONENT_DEBUG_PARTICLES_2D<T,RW>::
 OPENGL_COMPONENT_DEBUG_PARTICLES_2D(const std::string &filename_input)
-    :OPENGL_COMPONENT("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(particles)),
+    :OPENGL_COMPONENT("Particles 2D"),particles(*new GEOMETRY_PARTICLES<TV>),debug_objects(*new ARRAY<DEBUG_OBJECT<TV> >),opengl_particles(*new OPENGL_DEBUG_PARTICLES_2D<T>(particles)),
     filename(filename_input),frame_loaded(-1),set(0),set_loaded(-1),valid(false),draw_multiple_particle_sets(false)
 {
     is_animation=FILE_UTILITIES::Is_Animated(filename);

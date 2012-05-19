@@ -14,7 +14,7 @@ DEBUG_PARTICLES()
 {
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
     debug_particles.Store_Velocity(true);
-    Store_Debug_Particles(&debug_particles);
+    Store_Debug_Particles(this);
 }
 //#####################################################################
 // Destructor
@@ -27,11 +27,11 @@ template<class TV> DEBUG_PARTICLES<TV>::
 //#####################################################################
 // Function Store_Debug_Particles
 //#####################################################################
-template<class TV> GEOMETRY_PARTICLES<TV>* DEBUG_PARTICLES<TV>::
-Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle)
+template<class TV> DEBUG_PARTICLES<TV>* DEBUG_PARTICLES<TV>::
+Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle)
 {
-    static GEOMETRY_PARTICLES<TV>* stored_particles=0;
-    GEOMETRY_PARTICLES<TV>* tmp=stored_particles;
+    static DEBUG_PARTICLES<TV>* stored_particles=0;
+    DEBUG_PARTICLES<TV>* tmp=stored_particles;
     if(particle) stored_particles=particle;
     return tmp;
 }
@@ -42,8 +42,9 @@ template<class TV> void DEBUG_PARTICLES<TV>::
 Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const
 {
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles);
+    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects);
     debug_particles.Delete_All_Elements();
+    const_cast<DEBUG_PARTICLES<TV>&>(*this).debug_objects.Remove_All();
 }
 //#####################################################################
 // Function Add_Debug_Particle
@@ -52,10 +53,10 @@ template<class TV> void PhysBAM::
 Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color)
 {
     typedef typename TV::SCALAR T;
-    GEOMETRY_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
-    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
-    int p=particles->Add_Element();
-    particles->X(p)=X;
+    DEBUG_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
+    ARRAY_VIEW<VECTOR<T,3> >* color_attribute=particles->debug_particles.template Get_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
+    int p=particles->debug_particles.Add_Element();
+    particles->debug_particles.X(p)=X;
     (*color_attribute)(p)=color;
 }
 //#####################################################################
@@ -65,9 +66,29 @@ template<class TV,class ATTR> void PhysBAM::
 Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr)
 {
     typedef typename TV::SCALAR T;
-    GEOMETRY_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
-    ARRAY_VIEW<ATTR>* attribute=particles->template Get_Array<ATTR>(id);
+    DEBUG_PARTICLES<TV>* particles=DEBUG_PARTICLES<TV>::Store_Debug_Particles();
+    ARRAY_VIEW<ATTR>* attribute=particles->debug_particles.template Get_Array<ATTR>(id);
     attribute->Last()=attr;
+}
+template<class TV> void PhysBAM::
+Add_Debug_Object(const VECTOR<TV,2>& object,const VECTOR<typename TV::SCALAR,3>& color)
+{
+    DEBUG_OBJECT<TV> obj;
+    obj.type=DEBUG_OBJECT<TV>::segment;
+    obj.X=VECTOR<TV,3>(object);
+    obj.color=color;
+    obj.bgcolor=color;
+    DEBUG_PARTICLES<TV>::Store_Debug_Particles()->debug_objects.Append(obj);
+}
+template<class TV> void PhysBAM::
+Add_Debug_Object(const VECTOR<TV,3>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor)
+{
+    DEBUG_OBJECT<TV> obj;
+    obj.type=DEBUG_OBJECT<TV>::triangle;
+    obj.X=object;
+    obj.color=color;
+    obj.bgcolor=bgcolor;
+    DEBUG_PARTICLES<TV>::Store_Debug_Particles()->debug_objects.Append(obj);
 }
 template class DEBUG_PARTICLES<VECTOR<float,1> >;
 template class DEBUG_PARTICLES<VECTOR<float,2> >;
@@ -81,6 +102,8 @@ template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,3>,float>(ATTRI
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,1>,VECTOR<float,1> >(ATTRIBUTE_ID,VECTOR<float,1> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float,2> >(ATTRIBUTE_ID,VECTOR<float,2> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
+template void PhysBAM::Add_Debug_Object<VECTOR<float,3> >(const VECTOR<VECTOR<float,3>,2>&,const VECTOR<float,3>&);
+template void PhysBAM::Add_Debug_Object<VECTOR<float,3> >(const VECTOR<VECTOR<float,3>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEBUG_PARTICLES<VECTOR<double,1> >;
 template class DEBUG_PARTICLES<VECTOR<double,2> >;
@@ -94,4 +117,7 @@ template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,3>,double>(ATT
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,1>,VECTOR<double,1> >(ATTRIBUTE_ID,VECTOR<double,1> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<double,2> >(ATTRIBUTE_ID,VECTOR<double,2> const&);
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
+template void PhysBAM::Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,2>&,const VECTOR<double,3>&);
+template void PhysBAM::Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
 #endif
+
