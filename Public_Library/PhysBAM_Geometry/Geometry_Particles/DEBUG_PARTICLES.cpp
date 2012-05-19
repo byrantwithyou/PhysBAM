@@ -44,7 +44,7 @@ Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_director
     FILE_UTILITIES::Create_Directory(STRING_UTILITIES::string_sprintf("%s/%i",output_directory.c_str(),frame));
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%i/debug_particles",output_directory.c_str(),frame),debug_particles,debug_objects);
     debug_particles.Delete_All_Elements();
-    const_cast<DEBUG_PARTICLES<TV>&>(*this).debug_objects.Remove_All();
+    debug_objects.Remove_All();
 }
 //#####################################################################
 // Function Add_Debug_Particle

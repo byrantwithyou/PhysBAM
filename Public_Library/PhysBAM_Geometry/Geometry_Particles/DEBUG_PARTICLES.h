@@ -37,7 +37,7 @@ public:
     ~DEBUG_PARTICLES();
 
     GEOMETRY_PARTICLES<TV>& debug_particles;
-    ARRAY<DEBUG_OBJECT<TV> > debug_objects;
+    mutable ARRAY<DEBUG_OBJECT<TV> > debug_objects;
 
     static DEBUG_PARTICLES<TV>* Store_Debug_Particles(DEBUG_PARTICLES<TV>* particle=0);
     void Write_Debug_Particles(STREAM_TYPE stream_type,const std::string& output_directory,int frame) const;

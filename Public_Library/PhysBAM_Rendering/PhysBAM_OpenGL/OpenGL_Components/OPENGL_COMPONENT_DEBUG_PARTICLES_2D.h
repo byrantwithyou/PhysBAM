@@ -8,6 +8,7 @@
 #define __OPENGL_COMPONENT_DEBUG_PARTICLES_2D__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
