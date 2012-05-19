@@ -48,38 +48,45 @@ int call_init_instructions=Init_Instructions();
 // Function Execute
 //#####################################################################
 template<class T> void PROGRAM<T>::
+Execute_Op(ARRAY<T>& reg,int& ip) const
+{
+    const INSTRUCTION& o=code(ip);
+    switch(o.type){
+        case op_nop: case op_label: break;
+        case op_copy: reg(o.dest)=reg(o.src0);break;
+        case op_add: reg(o.dest)=reg(o.src0)+reg(o.src1);break;
+        case op_sub: reg(o.dest)=reg(o.src0)-reg(o.src1);break;
+        case op_mul: reg(o.dest)=reg(o.src0)*reg(o.src1);break;
+        case op_div: reg(o.dest)=reg(o.src0)/reg(o.src1);break;
+        case op_neg: reg(o.dest)=-reg(o.src0);break;
+        case op_inv: reg(o.dest)=1/reg(o.src0);break;
+        case op_sqrt: reg(o.dest)=sqrt(reg(o.src0));break;
+        case op_exp: reg(o.dest)=exp(reg(o.src0));break;
+        case op_ln: reg(o.dest)=log(reg(o.src0));break;
+        case op_pow: reg(o.dest)=pow(reg(o.src0),reg(o.src1));break;
+        case op_lt: reg(o.dest)=reg(o.src0)<reg(o.src1);break;
+        case op_le: reg(o.dest)=reg(o.src0)<=reg(o.src1);break;
+        case op_gt: reg(o.dest)=reg(o.src0)>reg(o.src1);break;
+        case op_ge: reg(o.dest)=reg(o.src0)>=reg(o.src1);break;
+        case op_eq: reg(o.dest)=reg(o.src0)==reg(o.src1);break;
+        case op_ne: reg(o.dest)=reg(o.src0)!=reg(o.src1);break;
+        case op_not: reg(o.dest)=!reg(o.src0);break;
+        case op_or: reg(o.dest)=reg(o.src0)||reg(o.src1);break;
+        case op_and: reg(o.dest)=reg(o.src0)&&reg(o.src1);break;
+        case op_br_z: if(!reg(o.src0)) ip=o.dest-1;break;
+        case op_br_nz: if(reg(o.src0)) ip=o.dest-1;break;
+        case op_jmp: ip=o.dest-1;break;
+        default: PHYSBAM_FATAL_ERROR("Missing instruction");
+    }
+}
+//#####################################################################
+// Function Execute
+//#####################################################################
+template<class T> void PROGRAM<T>::
 Execute(ARRAY<T>& reg) const
 {
-    for(int ip=0;ip<code.m;ip++){
-        const INSTRUCTION& o=code(ip);
-        switch(o.type){
-            case op_nop: case op_label: break;
-            case op_copy: reg(o.dest)=reg(o.src0);break;
-            case op_add: reg(o.dest)=reg(o.src0)+reg(o.src1);break;
-            case op_sub: reg(o.dest)=reg(o.src0)-reg(o.src1);break;
-            case op_mul: reg(o.dest)=reg(o.src0)*reg(o.src1);break;
-            case op_div: reg(o.dest)=reg(o.src0)/reg(o.src1);break;
-            case op_neg: reg(o.dest)=-reg(o.src0);break;
-            case op_inv: reg(o.dest)=1/reg(o.src0);break;
-            case op_sqrt: reg(o.dest)=sqrt(reg(o.src0));break;
-            case op_exp: reg(o.dest)=exp(reg(o.src0));break;
-            case op_ln: reg(o.dest)=log(reg(o.src0));break;
-            case op_pow: reg(o.dest)=pow(reg(o.src0),reg(o.src1));break;
-            case op_lt: reg(o.dest)=reg(o.src0)<reg(o.src1);break;
-            case op_le: reg(o.dest)=reg(o.src0)<=reg(o.src1);break;
-            case op_gt: reg(o.dest)=reg(o.src0)>reg(o.src1);break;
-            case op_ge: reg(o.dest)=reg(o.src0)>=reg(o.src1);break;
-            case op_eq: reg(o.dest)=reg(o.src0)==reg(o.src1);break;
-            case op_ne: reg(o.dest)=reg(o.src0)!=reg(o.src1);break;
-            case op_not: reg(o.dest)=!reg(o.src0);break;
-            case op_or: reg(o.dest)=reg(o.src0)||reg(o.src1);break;
-            case op_and: reg(o.dest)=reg(o.src0)&&reg(o.src1);break;
-            case op_br_z: if(!reg(o.src0)) ip=o.dest-1;break;
-            case op_br_nz: if(reg(o.src0)) ip=o.dest-1;break;
-            case op_jmp: ip=o.dest-1;break;
-            default: PHYSBAM_FATAL_ERROR("Missing instruction");
-        }
-    }
+    for(int ip=0;ip<code.m;ip++)
+        Execute_Op(reg,ip);
 }
 //#####################################################################
 // Function Diff
@@ -401,6 +408,14 @@ Finalize()
         INSTRUCTION& o=code(ip);
         if(o.type==op_br_z || o.type==op_br_nz || o.type==op_jmp)
             o.dest=labels(o.dest);}
+}
+//#####################################################################
+// Function Optimize
+//#####################################################################
+template<class T> void PROGRAM<T>::
+Optimize()
+{
+    
 }
 template struct PROGRAM<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT

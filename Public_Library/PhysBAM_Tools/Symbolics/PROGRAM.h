@@ -52,10 +52,12 @@ struct PROGRAM
     void Execute(ARRAY<T>& reg) const;
     void Execute(PROGRAM_CONTEXT<T>& context) const
     {Execute(context.reg);}
+    void Execute_Op(ARRAY<T>& reg,int& ip) const;
     int Diff(int diff_out,int diff_in);
     void Parse(const char* str);
     int Parse_Command(const char*& str);
     void Print() const;
+    void Optimize();
     void Finalize();
 };
 template<class T>
