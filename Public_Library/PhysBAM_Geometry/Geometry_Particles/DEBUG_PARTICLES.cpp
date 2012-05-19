@@ -78,6 +78,7 @@ Add_Debug_Object(const VECTOR<TV,2>& object,const VECTOR<typename TV::SCALAR,3>&
     obj.X=VECTOR<TV,3>(object);
     obj.color=color;
     obj.bgcolor=color;
+    obj.draw_vertices=false;
     DEBUG_PARTICLES<TV>::Store_Debug_Particles()->debug_objects.Append(obj);
 }
 template<class TV> void PhysBAM::
@@ -88,6 +89,7 @@ Add_Debug_Object(const VECTOR<TV,3>& object,const VECTOR<typename TV::SCALAR,3>&
     obj.X=object;
     obj.color=color;
     obj.bgcolor=bgcolor;
+    obj.draw_vertices=false;
     DEBUG_PARTICLES<TV>::Store_Debug_Particles()->debug_objects.Append(obj);
 }
 template class DEBUG_PARTICLES<VECTOR<float,1> >;
