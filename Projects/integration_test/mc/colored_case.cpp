@@ -82,7 +82,7 @@ int main(int argc, char* argv[])
                     int w=v|mask;
                     Add_Debug_Object(VECTOR<TV,2>(TV(v&1,v/2&1,v/4&1),TV(w&1,w/2&1,w/4&1)),(T).4*TV(1,1,1));
                     k++;}}
-        Dump_Frame("Surface");
+        Dump_Frame(colors.c_str());
         for(int i=0;i<8;i++)
             colors[i]=rand()%8+'a';}
     
