@@ -64,10 +64,9 @@ int main(int argc, char* argv[])
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
-    ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> > surface;
-    ARRAY<PAIR<TRIANGLE_3D<T>,int> > boundary;
-
     for(int r=0;r<n;r++){
+        ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> > surface;
+        ARRAY<PAIR<TRIANGLE_3D<T>,int> > boundary;
         VECTOR<int,8> color_vector;
         for(int i=0;i<8;i++) color_vector(i)=colors[i];
         MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface,boundary,color_vector,VECTOR<T,8>()+1);
