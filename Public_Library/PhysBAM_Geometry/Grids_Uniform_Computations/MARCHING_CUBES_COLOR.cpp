@@ -195,8 +195,9 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                                 if(fg1>=0){
                                     if(((1<<edges[fg0].c0)|(1<<edges[fg0].c1))==((1<<edges[fg1].c0)|(1<<edges[fg1].c1))){
                                         if(edges[fg1].v0!=j) edges[fg1].Flip();
-                                        interface_triangle_table.Append((edges[fg0].c0<<18)|(edges[fg0].c1<<15)|((i+12)<<10)|((j+12)<<5)|(k+12));
-                                        edges[fg0].v1=k;
+                                        interface_triangle_table.Append((edges[fg1].c0<<18)|(edges[fg1].c1<<15)|((i+12)<<10)|((j+12)<<5)|(k+12));
+                                        if(edges[fg0].v1==j) edges[fg0].v1=k;
+                                        else edges[fg0].v0=k;
                                         Insert_Face_Graph_Edge(face_graph,edges,fg0);
                                         fgij[m]=-1;
                                         if(m==0 && fgij[1]>=0) exchange(fgij[0],fgij[1]);
