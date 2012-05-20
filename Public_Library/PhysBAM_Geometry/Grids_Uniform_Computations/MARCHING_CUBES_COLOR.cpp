@@ -34,6 +34,7 @@ const int permute_ry[19]={8,10,9,11,6,4,7,5,2,0,3,1,17,16,14,15,12,13,18};
 const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
 int face_edges[6][4];
+const bool greedy=false;
 
 inline EDGE Rotate_X(const EDGE& ep)
 {
@@ -123,6 +124,13 @@ void Insert_Face_Graph_Edge(int (*face_graph)[2],EDGE* edges,int e)
     if(!Merge_Edges(e0,edges[e])){fg[1]=e;return;}
     if(e0.c0==e0.c1) fg[0]=-1;
 }
+void Emit_Loop_Triangles(int* vertices,int n,int c0,int c1)
+{
+    for(int i=0;i<n-2;i++){
+        interface_triangle_table.Append((c0<<18)|(c1<<15)|(vertices[2*i]<<10)|(vertices[2*i+1]<<5)|vertices[2*i+2]);
+        vertices[n+i]=vertices[2*i];}
+}
+
 //#####################################################################
 // Function Emit_Interface_Triangles
 //#####################################################################
@@ -159,25 +167,61 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
 
     int face_graph[64][2];
     for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
-    for(int i=0;i<12;i++){
-        if(adj[i][0]==-1) continue;
-        EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-        PHYSBAM_ASSERT(in.c0==out.c0 && in.c0==out.c0);
-        if(in.v0==out.v1){
-            adj[in.v0][0]=-1;
-            adj[in.v0][1]=-1;
+
+    if(greedy){
+        for(int i=0;i<12;i++){
+            if(adj[i][0]==-1) continue;
+            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
+            PHYSBAM_ASSERT(in.c0==out.c0 && in.c0==out.c0);
+            if(in.v0==out.v1){
+                adj[in.v0][0]=-1;
+                adj[in.v0][1]=-1;
+                adj[i][0]=-1;
+                adj[i][1]=-1;
+                continue;}
+            interface_triangle_table.Append((in.c0<<18)|(in.c1<<15)|(in.v0<<10)|(in.v1<<5)|out.v1);
+            in.v1=out.v1;
+            if(in.v1<12) adj[in.v1][0]=adj[i][0];
+            else if(in.v0>=12){
+                in.v0-=12;
+                in.v1-=12;
+                Insert_Face_Graph_Edge(face_graph,edges,adj[i][0]);}
             adj[i][0]=-1;
-            adj[i][1]=-1;
-            continue;}
-        interface_triangle_table.Append((in.c0<<18)|(in.c1<<15)|(in.v0<<10)|(in.v1<<5)|out.v1);
-        in.v1=out.v1;
-        if(in.v1<12) adj[in.v1][0]=adj[i][0];
-        else if(in.v0>=12){
-            in.v0-=12;
-            in.v1-=12;
-            Insert_Face_Graph_Edge(face_graph,edges,adj[i][0]);}
-        adj[i][0]=-1;
-        adj[i][1]=-1;}
+            adj[i][1]=-1;}}
+    else{
+        int vertices[30];
+        for(int i=0;i<12;i++){
+            if(adj[i][0]==-1) continue;
+            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
+            PHYSBAM_ASSERT(in.c0==out.c0 && in.c0==out.c0);
+            vertices[10]=i;
+            int L=9,R=11;
+            for(int w=i;;L--){
+                int e=adj[w][0];
+                adj[w][0]=-1;
+                assert(edges[e].v1==w);
+                w=edges[e].v0;
+                vertices[L]=w;
+                assert(w>=0);
+                if(w==i || w>=12) break;}
+            if(vertices[L]==i){
+                Emit_Loop_Triangles(vertices+L,10-L+1,in.c0,in.c1);
+                continue;}
+            for(int v=i;;R++){
+                int e=adj[v][1];
+                adj[v][0]=-1;
+                assert(edges[e].v0==v);
+                v=edges[e].v1;
+                vertices[R]=v;
+                assert(v>=0);
+                if(v>=12) break;}
+            int M=(L+R)/2;
+            interface_triangle_table.Append((in.c0<<18)|(in.c1<<15)|(vertices[L]<<10)|(vertices[M]<<5)|vertices[R]);
+            out.v0=vertices[L]-12;
+            out.v1=vertices[R]-12;
+            Insert_Face_Graph_Edge(face_graph,edges,adj[i][1]);
+            Emit_Loop_Triangles(vertices+M,R-M+1,in.c0,in.c1);
+            Emit_Loop_Triangles(vertices+L,M-L+1,in.c0,in.c1);}}
 
     bool progress=true,make_center=false;
     while(progress){
@@ -359,7 +403,8 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
             if(pt_mask&(1<<24)){
                 num_center_points++;
                 pts[18]+=pts[12+f];}}
-        pts[18]/=num_center_points;}
+        if(pt_mask&(1<<24))
+            pts[18]/=num_center_points;}
 
     int pat;
     do{
