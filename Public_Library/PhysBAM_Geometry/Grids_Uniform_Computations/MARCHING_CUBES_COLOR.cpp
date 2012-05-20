@@ -35,7 +35,7 @@ const int permute_ry[19]={8,10,9,11,6,4,7,5,2,0,3,1,17,16,14,15,12,13,18};
 const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
 int face_edges[6][4];
-const int greedy=1;
+const int greedy=2;
 
 inline EDGE Rotate_X(const EDGE& ep)
 {
@@ -287,6 +287,9 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                     interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[i]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);
                 }}}}
 
+    int face_graph_copy[64][2];
+    for(int i=0;i<64;i++) for(int s=0;s<2;s++) face_graph_copy[i][s]=face_graph[i][s];
+
     bool progress=true,make_center=false;
     while(progress){
         progress=false;
@@ -317,8 +320,8 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
         interface_triangle_table(mask_tri_index)=pt_mask|(1<<24);
         for(int i=0;i<6;i++)
             for(int j=0;j<6;j++){
-                PHYSBAM_ASSERT(face_graph[(1<<i)|(1<<j)][1]==-1);
-                int fg=face_graph[(1<<i)|(1<<j)][0];
+                PHYSBAM_ASSERT(face_graph_copy[(1<<i)|(1<<j)][1]==-1);
+                int fg=face_graph_copy[(1<<i)|(1<<j)][0];
                 if(fg==-1) continue;
                 interface_triangle_table.Append((edges[fg].c0<<18)|(edges[fg].c1<<15)|((i+12)<<10)|((j+12)<<5)|18);}}
 
@@ -457,7 +460,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     if(pt_mask&pts_bit){
         tri++;
         int num_center_points=0;
-        if(0)
+        if(0){
             for(int f=0;f<6;f++){
                 int bits=(pt_mask>>(f*4))&0xf;
                 if(!bits) continue;
@@ -468,7 +471,9 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
                 if(pt_mask&(1<<24)){
                     num_center_points++;
                     pts[18]+=pts[12+f];}}
-        else
+            if(pt_mask&(1<<24))
+                pts[18]/=num_center_points;}
+        else{
             for(int a=0;a<3;a++){
                 T total[2]={0};
                 pts[12+2*a]=TV();
@@ -479,15 +484,11 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
                 pts[12+2*a]/=total[0];
             pts[12+2*a+1]/=total[1];}
 
-        T total=0;
-        for(int v=0;v<8;v++){
-            total+=1/phi(v);
-            pts[18]+=TV(bits(v))/phi(v);}
-        pts[18]/=total;
-
-        if(0)
-        if(pt_mask&(1<<24))
-            pts[18]/=num_center_points;}
+            T total=0;
+            for(int v=0;v<8;v++){
+                total+=1/phi(v);
+                pts[18]+=TV(bits(v))/phi(v);}
+            pts[18]/=total;}}
 
     int pat;
     do{
