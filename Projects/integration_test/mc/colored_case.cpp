@@ -87,12 +87,15 @@ int main(int argc, char* argv[])
                     bool touch=false;
                     for(int r=0;r<3;r++)
                         for(int s=0;s<2;s++)
-                            if(surface(i).x.X(r)==seg.X(s))
+                            if((surface(i).x.X(r)-seg.X(s)).Magnitude()<1e-4)
                                 touch=true;
                     if(touch) continue;
-                    if(INTERSECTION::Intersects(seg,surface(i).x,(T)0)){
-                        show=true;
-                        break;}
+                    T a;
+                    TV weights;
+                    if(INTERSECTION::Intersects(seg,surface(i).x,a,weights,(T)0)){
+                        printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
+                        if(weights.Min()>1e-4 && a>1e-4 && 1-a>1e-4)
+                            show=true;}
                 }
         if(1)
         if(!show){
