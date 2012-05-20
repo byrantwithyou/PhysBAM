@@ -7,8 +7,10 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 using namespace PhysBAM;
@@ -39,6 +41,7 @@ void Dump_Frame(const char* title)
 
 int main(int argc, char* argv[])
 {
+    srand(time(0));
     Get_Debug_Particles<TV>();
     PARSE_ARGS parse_args;
     parse_args.Add_String_Argument("-o","output","output directory");
@@ -64,12 +67,40 @@ int main(int argc, char* argv[])
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
+    VECTOR<T,8> phi;
+    RANDOM_NUMBERS<T> random;
+
     for(int r=0;r<n;r++){
         ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> > surface;
         ARRAY<PAIR<TRIANGLE_3D<T>,int> > boundary;
         VECTOR<int,8> color_vector;
         for(int i=0;i<8;i++) color_vector(i)=colors[i];
-        MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface,boundary,color_vector,VECTOR<T,8>()+1);
+        random.Fill_Uniform(phi,0,1);
+        MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface,boundary,color_vector,phi);
+
+        bool show=false;
+        if(1)
+        for(int i=0;i<surface.m;i++)
+            for(int j=0;j<surface.m;j++)
+                for(int k=0;k<3;k++){
+                    SEGMENT_3D<T> seg(surface(j).x.X(k),surface(j).x.X((k+1)%3));
+                    bool touch=false;
+                    for(int r=0;r<3;r++)
+                        for(int s=0;s<2;s++)
+                            if(surface(i).x.X(r)==seg.X(s))
+                                touch=true;
+                    if(touch) continue;
+                    if(INTERSECTION::Intersects(seg,surface(i).x,(T)0)){
+                        show=true;
+                        break;}
+                }
+        if(1)
+        if(!show){
+            r--;
+            for(int i=0;i<8;i++)
+                colors[i]=rand()%8+'a';
+            continue;}
+
         for(int i=0;i<surface.m;i++)
             Add_Debug_Object(surface(i).x.X,color_map(surface(i).z),color_map(surface(i).y));
         for(int i=0;i<8;i++){
