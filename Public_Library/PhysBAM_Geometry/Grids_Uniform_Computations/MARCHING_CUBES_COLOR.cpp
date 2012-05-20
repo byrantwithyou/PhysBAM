@@ -393,6 +393,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     if(pt_mask&pts_bit){
         tri++;
         int num_center_points=0;
+        if(0)
         for(int f=0;f<6;f++){
             int bits=(pt_mask>>(f*4))&0xf;
             if(!bits) continue;
@@ -403,6 +404,24 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
             if(pt_mask&(1<<24)){
                 num_center_points++;
                 pts[18]+=pts[12+f];}}
+
+        for(int a=0;a<3;a++){
+            T total[2]={0};
+            pts[12+2*a]=TV();
+            pts[12+2*a+1]=TV();
+            for(int v=0;v<8;v++){
+                total[(v>>a)&1]+=1/phi(v);
+                pts[12+2*a+((v>>a)&1)]+=TV(bits(v))/phi(v);}
+            pts[12+2*a]/=total[0];
+            pts[12+2*a+1]/=total[1];}
+
+        T total=0;
+        for(int v=0;v<8;v++){
+            total+=1/phi(v);
+            pts[18]+=TV(bits(v))/phi(v);}
+        pts[18]/=total;
+
+        if(0)
         if(pt_mask&(1<<24))
             pts[18]/=num_center_points;}
 
