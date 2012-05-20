@@ -229,7 +229,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max)
 // Function Conjugate_Gradient
 //#####################################################################
 template<class T> void ITERATIVE_SOLVER<T>::
-Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations)
+Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations)
 {
     typedef PARAMETER_SPACE<T> TV;
     iterations=0;
@@ -254,7 +254,7 @@ Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<
                     beta=tmp.Dot(grad)/d_dot_y;}}
 
             s.Op(beta,s,-1,grad);
-            PARAMETRIC_LINE<T,T(TV)> line(F,x,s,tmp);
+            PARAMETRIC_LINE<T,T(TV&)> line(F,x,s,tmp);
             LINE_SEARCH<T> ls;
             T alpha;
             ls.Line_Search_Quadratic_Golden_Section(line,0,10/sqrt(grad_dot_grad),alpha,100,(T)1e-6,(T)1e-10*0);

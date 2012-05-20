@@ -35,7 +35,7 @@ public:
     T Golden_Parabolic_Minimum(NONLINEAR_FUNCTION<T(T)>& F,T a,T b);
     void Steepest_Decent(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max);
     void Conjugate_Gradient(NONLINEAR_FUNCTION<T(T,T)>& F,T& x,T& y,const T alpha_max);
-    void Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations);
+    void Conjugate_Gradient(NONLINEAR_FUNCTION<T(PARAMETER_SPACE<T>&)>& F,PARAMETER_SPACE<T>& x,const T alpha_max,const int restart_iterations);
 //#####################################################################
 };   
 }
