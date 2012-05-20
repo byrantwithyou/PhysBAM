@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
@@ -34,7 +35,7 @@ const int permute_ry[19]={8,10,9,11,6,4,7,5,2,0,3,1,17,16,14,15,12,13,18};
 const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
 int face_edges[6][4];
-const bool greedy=false;
+const int greedy=1;
 
 inline EDGE Rotate_X(const EDGE& ep)
 {
@@ -168,11 +169,11 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     int face_graph[64][2];
     for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
 
-    if(greedy){
+    if(greedy==0){
         for(int i=0;i<12;i++){
             if(adj[i][0]==-1) continue;
             EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-            PHYSBAM_ASSERT(in.c0==out.c0 && in.c0==out.c0);
+            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
             if(in.v0==out.v1){
                 adj[in.v0][0]=-1;
                 adj[in.v0][1]=-1;
@@ -188,12 +189,12 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                 Insert_Face_Graph_Edge(face_graph,edges,adj[i][0]);}
             adj[i][0]=-1;
             adj[i][1]=-1;}}
-    else{
+    else if(greedy==1){
         int vertices[30];
         for(int i=0;i<12;i++){
             if(adj[i][0]==-1) continue;
             EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-            PHYSBAM_ASSERT(in.c0==out.c0 && in.c0==out.c0);
+            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
             vertices[10]=i;
             int L=9,R=11;
             for(int w=i;;L--){
@@ -222,6 +223,69 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
             Insert_Face_Graph_Edge(face_graph,edges,adj[i][1]);
             Emit_Loop_Triangles(vertices+M,R-M+1,in.c0,in.c1);
             Emit_Loop_Triangles(vertices+L,M-L+1,in.c0,in.c1);}}
+    else{
+        struct CURVE
+        {
+            int vertices[30];
+            int c0,c1;
+            int L,R;
+        };
+        int degree[6];
+        CURVE curves[20];
+        int curve_cnt=0;
+        for(int i=0;i<12;i++){
+            if(adj[i][0]==-1) continue;
+            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
+            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
+            curves[curve_cnt].vertices[10]=i;
+            curves[curve_cnt].L=9;
+            curves[curve_cnt].R=11;
+            for(int w=i;;curves[curve_cnt].L--){
+                int e=adj[w][0];
+                adj[w][0]=-1;
+                assert(edges[e].v1==w);
+                w=edges[e].v0;
+                curves[curve_cnt].vertices[curves[curve_cnt].L]=w;
+                assert(w>=0);
+                if(w==i || w>=12) break;}
+            if(curves[curve_cnt].vertices[curves[curve_cnt].L]==i){
+                Emit_Loop_Triangles(curves[curve_cnt].vertices+curves[curve_cnt].L,10-curves[curve_cnt].L+1,in.c0,in.c1);
+                continue;}
+            for(int v=i;;curves[curve_cnt].R++){
+                int e=adj[v][1];
+                adj[v][0]=-1;
+                assert(edges[e].v0==v);
+                v=edges[e].v1;
+                curves[curve_cnt].vertices[curves[curve_cnt].R]=v;
+                assert(v>=0);
+                if(v>=12) break;}
+            curves[curve_cnt].c0=in.c0;
+            curves[curve_cnt].c1=in.c1;
+            out.v0=curves[curve_cnt].vertices[curves[curve_cnt].L]-12;
+            out.v1=curves[curve_cnt].vertices[curves[curve_cnt].R]-12;
+            Insert_Face_Graph_Edge(face_graph,edges,adj[i][1]);
+            degree[curves[curve_cnt].vertices[curves[curve_cnt].L]-12]=max(degree[curves[curve_cnt].vertices[curves[curve_cnt].L]-12],curves[curve_cnt].R-curves[curve_cnt].L);
+            degree[curves[curve_cnt].vertices[curves[curve_cnt].R]-12]=max(degree[curves[curve_cnt].vertices[curves[curve_cnt].R]-12],curves[curve_cnt].R-curves[curve_cnt].L);
+            curve_cnt++;}
+        
+        for(int c=0;c<curve_cnt;c++){
+            CURVE& curve=curves[c];
+            int M=(curve.L+curve.R)/2;
+            int i;
+            for(i=curve.L+2;i<=M;i++){
+                interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i-1]<<5)|curve.vertices[i]);
+                interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.R]<<10)|(curve.vertices[curve.R-(i-curve.L)]<<5)|curve.vertices[curve.R-(i-curve.L)+1]);}
+            i--;
+            if((i-curve.L)==(curve.R-i))
+                interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[curve.R]);
+            else{
+                if((degree[curve.vertices[curve.L]-12]>degree[curve.vertices[curve.R]-12])||((degree[curve.vertices[curve.L]-12]==degree[curve.vertices[curve.R]-12])&&(curve.vertices[curve.L]>curve.vertices[curve.R]))){
+                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[i+1]);
+                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);}
+                else{
+                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[curve.R]);
+                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[i]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);
+                }}}}
 
     bool progress=true,make_center=false;
     while(progress){
@@ -394,25 +458,25 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
         tri++;
         int num_center_points=0;
         if(0)
-        for(int f=0;f<6;f++){
-            int bits=(pt_mask>>(f*4))&0xf;
-            if(!bits) continue;
-            for(int i=0;i<4;i++)
-                if(bits&(1<<i))
-                    pts[12+f]+=pts[face_edges[f][i]];
-            pts[12+f]/=(3+(bits==0xf));
-            if(pt_mask&(1<<24)){
-                num_center_points++;
-                pts[18]+=pts[12+f];}}
-
-        for(int a=0;a<3;a++){
-            T total[2]={0};
-            pts[12+2*a]=TV();
-            pts[12+2*a+1]=TV();
-            for(int v=0;v<8;v++){
-                total[(v>>a)&1]+=1/phi(v);
-                pts[12+2*a+((v>>a)&1)]+=TV(bits(v))/phi(v);}
-            pts[12+2*a]/=total[0];
+            for(int f=0;f<6;f++){
+                int bits=(pt_mask>>(f*4))&0xf;
+                if(!bits) continue;
+                for(int i=0;i<4;i++)
+                    if(bits&(1<<i))
+                        pts[12+f]+=pts[face_edges[f][i]];
+                pts[12+f]/=(3+(bits==0xf));
+                if(pt_mask&(1<<24)){
+                    num_center_points++;
+                    pts[18]+=pts[12+f];}}
+        else
+            for(int a=0;a<3;a++){
+                T total[2]={0};
+                pts[12+2*a]=TV();
+                pts[12+2*a+1]=TV();
+                for(int v=0;v<8;v++){
+                    total[(v>>a)&1]+=1/phi(v);
+                    pts[12+2*a+((v>>a)&1)]+=TV(bits(v))/phi(v);}
+                pts[12+2*a]/=total[0];
             pts[12+2*a+1]/=total[1];}
 
         T total=0;
