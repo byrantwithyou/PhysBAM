@@ -15,7 +15,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 using namespace PhysBAM;
 
-typedef float T;
+typedef double T;
 typedef float RW;
 typedef VECTOR<T,3> TV;
 
@@ -70,16 +70,17 @@ int main(int argc, char* argv[])
     VECTOR<T,8> phi;
     RANDOM_NUMBERS<T> random;
 
-    for(int r=0;r<n;r++){
+    for(int r=0,rr=0;r<n;r++,rr++){
+        if(rr>0 && rr%1000==0) printf("====================================================== %i ======================================================\n",rr);
         ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> > surface;
         ARRAY<PAIR<TRIANGLE_3D<T>,int> > boundary;
         VECTOR<int,8> color_vector;
         for(int i=0;i<8;i++) color_vector(i)=colors[i];
-        random.Fill_Uniform(phi,0,1);
+        random.Fill_Uniform(phi,0.01,1);
         MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface,boundary,color_vector,phi);
 
         bool show=false;
-        if(1)
+        if(0)
         for(int i=0;i<surface.m;i++)
             for(int j=0;j<surface.m;j++)
                 for(int k=0;k<3;k++){
@@ -87,25 +88,29 @@ int main(int argc, char* argv[])
                     bool touch=false;
                     for(int r=0;r<3;r++)
                         for(int s=0;s<2;s++)
-                            if((surface(i).x.X(r)-seg.X(s)).Magnitude()<1e-4)
+                            if((surface(i).x.X(r)-seg.X(s)).Magnitude()<1e-12)
                                 touch=true;
                     if(touch) continue;
                     T a;
                     TV weights;
                     if(INTERSECTION::Intersects(seg,surface(i).x,a,weights,(T)0)){
-                        printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
-                        if(weights.Min()>1e-4 && a>1e-4 && 1-a>1e-4)
-                            show=true;}
+//                        printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
+                        if(weights.Min()>1e-12 && a>1e-12 && 1-a>1e-12){
+                            printf("weights: %g %g %g   %g\n", weights.x, weights.y, weights.z, a);
+                            show=true;}}
                 }
-        if(1)
-        if(!show){
-            r--;
-            for(int i=0;i<8;i++)
-                colors[i]=rand()%8+'a';
-            continue;}
+        if(0){
+            if(!show){
+                r--;
+                for(int i=0;i<8;i++)
+                    colors[i]=rand()%8+'a';
+                continue;}
+            else printf("FOUND: %i (%i)\n", r, rr);}
 
         for(int i=0;i<surface.m;i++)
             Add_Debug_Object(surface(i).x.X,color_map(surface(i).z),color_map(surface(i).y));
+        for(int i=0;i<boundary.m;i++)
+            Add_Debug_Object(boundary(i).x.X,color_map(boundary(i).y)*(T).2+(T).8,color_map(boundary(i).y));
         for(int i=0;i<8;i++){
             TV X(i&1,i/2&1,i/4&1);
             Add_Debug_Particle(X,color_map(colors[i]));}
