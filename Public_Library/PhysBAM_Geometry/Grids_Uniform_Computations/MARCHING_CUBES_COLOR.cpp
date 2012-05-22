@@ -136,7 +136,25 @@ void Emit_Loop_Triangles(int* vertices,int n,int c0,int c1)
         interface_triangle_table.Append((c0<<18)|(c1<<15)|(vertices[2*i]<<10)|(vertices[2*i+1]<<5)|vertices[2*i+2]);
         vertices[n+i]=vertices[2*i];}
 }
+#if 0
+int edge_to_face_mask[12]={0x14,0x18,0x24,0x28,0x11,0x12,0x21,0x22,0x05,0x06,0x09,0x0a};
 
+// 0 = no intersection, 1 = can intersect, 2 = coplanar
+int Add_Face_Edges(int a,int b,int c,int d)
+{
+    // Share an endpoint
+    if(a>b) exchange(a,b);
+    if(c>d) exchange(c,d);
+    if(a>c){exchange(a,c);exchange(b,d);}
+    if(b==c && b==d) return 0;
+
+    // Edge on cube face
+    if((edge_to_face_mask[a]&edge_to_face_mask[b]) || (edge_to_face_mask[c]&edge_to_face_mask[d])) return 0;
+
+    
+    return 88;
+}
+#endif
 //#####################################################################
 // Function Emit_Interface_Triangles
 //#####################################################################
@@ -569,7 +587,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     int pat;
     do{
         pat=interface_triangle_table(tri++);
-        TRIANGLE_3D<T> triangle(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f],pts[pat&0x1f]);
+        TRIANGLE_3D<T> triangle(pts[(pat>>10)&0x1f],pts[pat&0x1f],pts[(pat>>5)&0x1f]);
         TRIPLE<TRIANGLE_3D<T>,int,int> triple(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
         if(triple.y>triple.z){
             exchange(triple.y,triple.z);
@@ -655,8 +673,8 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,c
     int pat;
     do{
         pat=interface_segment_table(seg++);
-        SEGMENT_2D<T> triangle(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f]);
-        TRIPLE<SEGMENT_2D<T>,int,int> triple(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
+        SEGMENT_2D<T> segment(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f]);
+        TRIPLE<SEGMENT_2D<T>,int,int> triple(segment,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
         if(triple.y>triple.z){
             exchange(triple.y,triple.z);
             exchange(triple.x.X(0),triple.x.X(1));}
@@ -672,12 +690,12 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<SEGMENT_2D<T>,int> >& boundary,const i
 {
     typedef VECTOR<T,2> TV;
     if(colors[0]==colors[1]){
-        boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(1-s,s),TV(s,s)),colors[0]));
+        boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(1-s,s)),colors[0]));
         return;}
 
     T theta=phi[0]/(phi[0]+phi[1]);
-    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(1-s,s),TV(theta,s)),colors[1-s]));
-    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(theta,s),TV(s,s)),colors[s]));
+    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(theta,s),TV(1-s,s)),colors[1-s]));
+    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(theta,s)),colors[s]));
 }
 }
 //#####################################################################

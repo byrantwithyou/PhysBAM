@@ -108,7 +108,7 @@ int main(int argc, char* argv[])
             else printf("FOUND: %i (%i)\n", r, rr);}
 
         for(int i=0;i<surface.m;i++)
-            Add_Debug_Object(surface(i).x.X,color_map(surface(i).z),color_map(surface(i).y));
+            Add_Debug_Object(surface(i).x.X,color_map(surface(i).y),color_map(surface(i).z));
         for(int i=0;i<boundary.m;i++)
             Add_Debug_Object(boundary(i).x.X,color_map(boundary(i).y)*(T).2+(T).8,color_map(boundary(i).y));
         for(int i=0;i<8;i++){
