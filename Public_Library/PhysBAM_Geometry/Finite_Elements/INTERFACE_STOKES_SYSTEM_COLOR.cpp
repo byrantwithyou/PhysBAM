@@ -46,8 +46,14 @@ INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_va
             TV_INT b(m); b+=TV_INT::Axis_Vector(axis);
             const T& phi_value_a=phi_value(a);
             const T& phi_value_b=phi_value(b);
-            phi_value(m)=(T).5*abs(phi_value_a-phi_value_b);
-            phi_color(m)=(phi_value_a<phi_value_b)?phi_color(a):phi_color(b);}
+            const int& phi_color_a=phi_color(a);
+            const int& phi_color_b=phi_color(b);
+            if(phi_color_a!=phi_color_b){
+                phi_value(m)=(T).5*abs(phi_value_a-phi_value_b);
+                phi_color(m)=(phi_value_a<phi_value_b)?phi_color_b:phi_color_a;}
+            else{
+                phi_value(m)=(T).5*abs(phi_value_a+phi_value_b);
+                phi_color(m)=phi_color_a;}}
         counts(axis)=phi_grid.counts(axis)+1;
         scale(axis)=1;}
     
@@ -147,13 +153,13 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),ones);
 
-    rhs_surface_forces=new VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>;
+    rhs_surface=new VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>;
     for(int i=0;i<TV::m;i++){
-        (*rhs_surface_forces)(i).Resize(cdi->colors);
+        (*rhs_surface)(i).Resize(cdi->colors);
         for(int c=0;c<cdi->colors;c++)
-            (*rhs_surface_forces)(i)(c).Resize(cdi->flat_size);}
+            (*rhs_surface)(i)(c).Resize(cdi->flat_size);}
 
-    biu.Compute_Entries(rhs_surface_forces);
+    biu.Compute_Entries(rhs_surface);
         
     // BUILD SYSTEM MATRIX BLOCKS
     
@@ -184,21 +190,21 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
 
     // FILL IN THE NULL MODES
 
-/*    Resize_Vector(active_dofs);
+    Resize_Vector(active_dofs);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++)
-            active_dofs.u(i)[s].Fill(1);
-    for(int s=0;s<2;s++)
-        active_dofs.p[s].Fill(1);
+        for(int c=0;c<cdi->colors;c++)
+            active_dofs.u(i)(c).Fill(1);
+    for(int c=0;c<cdi->colors;c++)
+        active_dofs.p(c).Fill(1);
     active_dofs.q.Fill(1);
 
     if(BASE::use_preconditioner) Set_Jacobi_Preconditioner();
 
     Resize_Vector(null_p);
-    for(int s=0;s<2;s++){
-        null_p.p[s].Fill(1);
-        int start=cdi->interface_dofs*(TV::m-1);
-        int end=cdi->interface_dofs*TV::m;
+    for(int c=0;c<cdi->colors;c++){
+        null_p.p(c).Fill(1);
+        int start=cdi->constraint_base_tangent*(TV::m-1);
+        int end=cdi->constraint_base_tangent*(TV::m-1)+cdi->constraint_base_normal;
         for(int k=start;k<end;k++)
             null_p.q(k)=-1;}
     null_p.Scale(active_dofs);
@@ -206,55 +212,57 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
 
     for(int i=0;i<TV::m;i++){
         Resize_Vector(null_u(i));
-        for(int s=0;s<2;s++) null_u(i).u(i)[s].Fill(1);
+        for(int c=0;c<cdi->colors;c++) null_u(i).u(i)(c).Fill(1);
         null_u(i).Scale(active_dofs);
         null_u(i).Normalize();}
     
     for(int i=0;i<TV::m;i++){
         delete u_stencil(i);
         for(int j=0;j<TV::m;j++)
-        delete udx_stencil(i)(j);}*/
+        delete udx_stencil(i)(j);}
 }
 //#####################################################################
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> > f_body,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u)
+Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> > f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u)
 {
-    /*VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> U;
+    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
+    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> U;
     
-    for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
-            F_body(i)[s].Resize(cm_p->dofs[s]);
-            U(i)[s].Resize(cm_u(i)->dofs[s]);}
+    for(int i=0;i<TV::m;i++){
+        F_volume(i).Resize(cdi->colors);
+        U(i).Resize(cdi->colors);
+        for(int c=0;c<cdi->colors;c++){
+            F_volume(i)(c).Resize(cm_p->dofs(c));
+            U(i)(c).Resize(cm_u(i)->dofs(c));}}
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int s=0;s<2;s++){
-            int k=cm_p->Get_Index(it.index,s);
+        for(int c=0;c<cdi->colors;c++){
+            int k=cm_p->Get_Index(it.index,c);
             if(k>=0)
                 for(int i=0;i<TV::m;i++)
-                    F_body(i)[s](k)=f_body[s](it.index)(i);}
+                    F_volume(i)(c)(k)=f_volume(c)(it.index)(i);}
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         FACE_INDEX<TV::m> face(it.Full_Index()); 
-        for(int s=0;s<2;s++){
-            int k=cm_u(face.axis)->Get_Index(it.index,s);
-            if(k>=0) U(face.axis)[s](k)=u[s](face);}}
+        for(int c=0;c<cdi->colors;c++){
+            int k=cm_u(face.axis)->Get_Index(it.index,c);
+            if(k>=0) U(face.axis)(c)(k)=u(c)(face);}}
 
     Resize_Vector(rhs); // assumes rhs was 0
 
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++)
+        for(int c=0;c<cdi->colors;c++)
             for(int j=0;j<cdi->flat_size;j++){
-                int k=cm_u(i)->Get_Index(j,s);
-                if(k>=0) rhs.u(i)[s](k)+=(*rhs_interface)(i)[s](j);}
+                int k=cm_u(i)->Get_Index(j,c);
+                if(k>=0) rhs.u(i)(c)(k)+=(*rhs_surface)(i)(c)(j);}
     
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
-            (*matrix_rhs_pu)(i)[s].Transpose_Times_Add(F_body(i)[s],rhs.u(i)[s]);
-            matrix_qu(i)[s].Times_Add(U(i)[s],rhs.q);
-            matrix_pu(i)[s].Times_Add(U(i)[s],rhs.p[s]);}*/
+        for(int c=0;c<cdi->colors;c++){
+            (*matrix_rhs_pu)(i)(c).Transpose_Times_Add(F_volume(i)(c),rhs.u(i)(c));
+            matrix_qu(i)(c).Times_Add(U(i)(c),rhs.q);
+            matrix_pu(i)(c).Times_Add(U(i)(c),rhs.p(c));}
 
     delete matrix_rhs_pu;
 }
@@ -264,37 +272,37 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> > f_body,const ARRAY<ARRAY<T,
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Set_Jacobi_Preconditioner()
 {
-/*    Resize_Vector(J);
+    Resize_Vector(J);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
-            int u_dofs=cm_u(i)->dofs[s];
-            SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)[s];
+        for(int c=0;c<cdi->colors;c++){
+            int u_dofs=cm_u(i)->dofs(c);
+            SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)(c);
             for(int k=0;k<u_dofs;k++){
                 T d=abs(m_uu(k,k));
-                if(d<1e-12) {active_dofs.u(i)[s](k)=0;LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
-                else J.u(i)[s](k)=1/abs(m_uu(k,k));}}
-    for(int s=0;s<2;s++){
-        for(int k=0;k<cm_p->dofs[s];k++){
+                if(d<1e-13) {active_dofs.u(i)(c)(k)=0;LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
+                else J.u(i)(c)(k)=1/abs(m_uu(k,k));}}
+    for(int c=0;c<cdi->colors;c++){
+        for(int k=0;k<cm_p->dofs(c);k++){
             T sum=0;
             for(int i=0;i<TV::m;i++){
-                SPARSE_MATRIX_FLAT_MXN<T>& m_pu=matrix_pu(i)[s];
+                SPARSE_MATRIX_FLAT_MXN<T>& m_pu=matrix_pu(i)(c);
                 int start=m_pu.offsets(k);
                 int end=m_pu.offsets(k+1);
                 for(int e=start;e<end;e++)
-                    sum+=sqr(m_pu.A(e).a)*J.u(i)[s](m_pu.A(e).j);}
-            if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
-            else J.p[s](k)=1/sum;}}
+                    sum+=sqr(m_pu.A(e).a)*J.u(i)(c)(m_pu.A(e).j);}
+            if(sum<1e-13) {active_dofs.p(c)(k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
+            else J.p(c)(k)=1/sum;}}
     for(int k=0;k<J.q.n;k++){
         T sum=0;
         for(int i=0;i<TV::m;i++)
-            for(int s=0;s<2;s++){
-                SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(i)[s];
+            for(int c=0;c<cdi->colors;c++){
+                SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(i)(c);
                 int start=m_qu.offsets(k);
                 int end=m_qu.offsets(k+1);
                 for(int j=start;j<end;j++)
-                    sum+=sqr(m_qu.A(j).a)*J.u(i)[s](m_qu.A(j).j);}
-        if(sum<1e-12) {active_dofs.q(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
-        else J.q(k)=1/sum;}*/
+                    sum+=sqr(m_qu.A(j).a)*J.u(i)(c)(m_qu.A(j).j);}
+        if(sum<1e-13) {active_dofs.q(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
+        else J.q(k)=1/sum;}
 }
 //#####################################################################
 // Function Resize_Vector
@@ -303,6 +311,7 @@ template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
 {
     VECTOR_T& v=debug_cast<VECTOR_T&>(x);
+    v.colors=cdi->colors;
     for(int i=0;i<TV::m;i++){
         v.u(i).Resize(cdi->colors);
         for(int c=0;c<cdi->colors;c++)
@@ -318,23 +327,23 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
-/*    const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
+    const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
     VECTOR_T& rc=debug_cast<VECTOR_T&>(result);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++){
-            matrix_pu(i)[s].Transpose_Times(xc.p[s],rc.u(i)[s]);
-            matrix_qu(i)[s].Transpose_Times_Add(xc.q,rc.u(i)[s]);
+        for(int c=0;c<cdi->colors;c++){
+            matrix_pu(i)(c).Transpose_Times(xc.p(c),rc.u(i)(c));
+            matrix_qu(i)(c).Transpose_Times_Add(xc.q,rc.u(i)(c));
             for(int j=0;j<TV::m;j++){
-                if(j>=i) matrix_uu(i)(j)[s].Times_Add(xc.u(j)[s],rc.u(i)[s]);
-                else matrix_uu(j)(i)[s].Transpose_Times_Add(xc.u(j)[s],rc.u(i)[s]);}}
-    for(int s=0;s<2;s++){
-        rc.p[s].Fill(0);
+                if(j>=i) matrix_uu(i)(j)(c).Times_Add(xc.u(j)(c),rc.u(i)(c));
+                else matrix_uu(j)(i)(c).Transpose_Times_Add(xc.u(j)(c),rc.u(i)(c));}}
+    for(int c=0;c<cdi->colors;c++){
+        rc.p(c).Fill(0);
         for(int i=0;i<TV::m;i++)
-            matrix_pu(i)[s].Times_Add(xc.u(i)[s],rc.p[s]);}
+            matrix_pu(i)(c).Times_Add(xc.u(i)(c),rc.p(c));}
     rc.q.Fill(0);
     for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++)
-        matrix_qu(i)[s].Times_Add(xc.u(i)[s],rc.q);*/
+        for(int c=0;c<cdi->colors;c++)
+        matrix_qu(i)(c).Times_Add(xc.u(i)(c),rc.q);
 }
 //#####################################################################
 // Function Inner_Product
