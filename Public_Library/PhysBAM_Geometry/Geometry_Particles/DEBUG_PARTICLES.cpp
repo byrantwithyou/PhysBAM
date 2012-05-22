@@ -106,6 +106,8 @@ template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,2>,VECTOR<float
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<float,3>,VECTOR<float,3> >(ATTRIBUTE_ID,VECTOR<float,3> const&);
 template void PhysBAM::Add_Debug_Object<VECTOR<float,3> >(const VECTOR<VECTOR<float,3>,2>&,const VECTOR<float,3>&);
 template void PhysBAM::Add_Debug_Object<VECTOR<float,3> >(const VECTOR<VECTOR<float,3>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
+template void PhysBAM::Add_Debug_Object<VECTOR<float,2> >(const VECTOR<VECTOR<float,2>,2>&,const VECTOR<float,3>&);
+template void PhysBAM::Add_Debug_Object<VECTOR<float,2> >(const VECTOR<VECTOR<float,2>,3>&,const VECTOR<float,3>&,const VECTOR<float,3>&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class DEBUG_PARTICLES<VECTOR<double,1> >;
 template class DEBUG_PARTICLES<VECTOR<double,2> >;
@@ -121,5 +123,7 @@ template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,2>,VECTOR<doub
 template void PhysBAM::Debug_Particle_Set_Attribute<VECTOR<double,3>,VECTOR<double,3> >(ATTRIBUTE_ID,VECTOR<double,3> const&);
 template void PhysBAM::Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,2>&,const VECTOR<double,3>&);
 template void PhysBAM::Add_Debug_Object<VECTOR<double,3> >(const VECTOR<VECTOR<double,3>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
+template void PhysBAM::Add_Debug_Object<VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,2>&,const VECTOR<double,3>&);
+template void PhysBAM::Add_Debug_Object<VECTOR<double,2> >(const VECTOR<VECTOR<double,2>,3>&,const VECTOR<double,3>&,const VECTOR<double,3>&);
 #endif
 
