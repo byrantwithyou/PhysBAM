@@ -39,6 +39,7 @@ public:
     int constraint_base_normal;
     int constraint_base_tangent;
     VECTOR<int*,TV::m> constraint_base;
+    int total_number_of_surface_constraints;
     
     ARRAY<int> remap; // maps ghost cells inside in case of wrapping, identity otherwise
     ARRAY<int> flat_base_normal;
@@ -63,8 +64,8 @@ public:
     {return Is_Boundary_Cell((*flat_base(orientation))(i));}
 
     void Set_Flat_Base_And_Resize(int extra_constraints_normal,int extra_constraints_tangent,const TV_INT& index);
-
-    void Update_Constraint_Base();
+    void Update_Constraint_Count();
+    void Update_Total_Constraint_Count();
 };
 }
 #endif

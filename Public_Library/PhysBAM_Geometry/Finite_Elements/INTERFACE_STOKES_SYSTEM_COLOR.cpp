@@ -302,13 +302,15 @@ Set_Jacobi_Preconditioner()
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
 {
-/*    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
-    for(int i=0;i<TV::m;i++)
-        for(int s=0;s<2;s++)
-            v.u(i)[s].Resize(cm_u(i)->dofs[s]);
-    for(int s=0;s<2;s++)
-        v.p[s].Resize(cm_p->dofs[s]);
-        v.q.Resize(cdi->interface_dofs*TV::m);*/
+    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
+    for(int i=0;i<TV::m;i++){
+        v.u(i).Resize(cdi->colors);
+        for(int c=0;c<cdi->colors;c++)
+            v.u(i)(c).Resize(cm_u(i)->dofs(c));}
+    v.p.Resize(cdi->colors);
+    for(int c=0;c<cdi->colors;c++)
+        v.p(c).Resize(cm_p->dofs(c));
+    v.q.Resize(cdi->total_number_of_surface_constraints);
 }
 //#####################################################################
 // Function Multiply

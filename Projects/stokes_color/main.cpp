@@ -139,6 +139,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     ARRAY<T,TV_INT> exact_p,numer_p,error_p;
 
     numer_u.Resize(iss.grid);
+    exact_u.Resize(iss.grid);
+    error_u.Resize(iss.grid);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         int i=it.Axis();
         int c=at.phi_color(it.Location());
@@ -147,16 +149,13 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         numer_u(it.Full_Index())=sol.u(i)(c)(k);}
 
     numer_p.Resize(iss.grid.Domain_Indices());
+    exact_p.Resize(iss.grid.Domain_Indices());
+    error_p.Resize(iss.grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
         int k=iss.cm_p->Get_Index(it.index,c);
         assert(k>=0);
         numer_p(it.index)=sol.p(c)(k);}
-
-    exact_u.Resize(grid);
-    error_u.Resize(grid);
-    exact_p.Resize(grid.Domain_Indices());
-    error_p.Resize(grid.Domain_Indices());
 
     TV avg_u;
     TV_INT cnt_u;

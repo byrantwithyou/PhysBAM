@@ -57,9 +57,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
     for(int c=0;c<cdi->colors;c++){
         SPARSE_MATRIX_FLAT_MXN<T>& M=matrix(c);
         ARRAY<int>& comp_n=cm->compressed(c);
-        int m=0;
-        for(int orientation=0;orientation<TV::m;orientation++)
-            m+=(*(cdi->constraint_base(orientation)));
+        int m=cdi->total_number_of_surface_constraints;
         int n=cm->dofs(c);
         M.Reset(n);
         M.offsets.Resize(m+1);

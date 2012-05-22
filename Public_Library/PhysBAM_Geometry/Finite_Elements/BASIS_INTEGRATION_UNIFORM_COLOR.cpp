@@ -48,32 +48,6 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
     return total;
 }
 //#####################################################################
-// Function Precomputed_Integral
-//#####################################################################
-template<class T,int dim,int rank,int sdp1,int d> static T
-Precomputed_Integral(const STATIC_TENSOR<VECTOR<T,dim>,rank,sdp1>& precompute,int i,const STATIC_POLYNOMIAL<T,rank,d>& poly)
-{
-    T total=0;
-    RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),poly.size+1);
-    for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
-        if(T coeff=poly.terms(it.index))
-            total+=coeff*precompute(it.index)(i);
-    return total;
-}
-//#####################################################################
-// Function Precomputed_Integral
-//#####################################################################
-template<class T,int dim,int rank,int sdp1,int d> static T
-Precomputed_Integral(const STATIC_TENSOR<MATRIX<T,dim>,rank,sdp1>& precompute,int i,int j,const STATIC_POLYNOMIAL<T,rank,d>& poly)
-{
-    T total=0;
-    RANGE<VECTOR<int,rank> > range(VECTOR<int,rank>(),poly.size+1);
-    for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next())
-        if(T coeff=poly.terms(it.index))
-            total+=coeff*precompute(it.index)(i,j);
-    return total;
-}
-//#####################################################################
 // Function Compute_Averaged_Orientation_Helper
 //#####################################################################
 template<class T,class T_FACE> static void
@@ -177,9 +151,9 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
                     int color=phi_color(cell_base+bits(s));
                     if(color>=0) Add_Uncut_Fine_Cell(it.index,s,color);}
                 else Add_Cut_Fine_Cell(it.index,s,TV(bits((1<<TV::m)-1-s)),surface(s),sides(s),
-                    base_orientation,f_surface,map_color_pairs,map_constraints,ht_color_pairs);}}
-    
-    cdi.Update_Constraint_Base();
+                    base_orientation,f_surface,map_color_pairs,map_constraints,ht_color_pairs);}
+        cdi.Update_Constraint_Count();}
+    cdi.Update_Total_Constraint_Count();
 }
 //#####################################################################
 // Function Compute_Open_Entries

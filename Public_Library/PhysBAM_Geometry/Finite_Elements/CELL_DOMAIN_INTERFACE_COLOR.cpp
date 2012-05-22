@@ -59,13 +59,23 @@ Set_Flat_Base_And_Resize(int extra_constraints_normal,int extra_constraints_tang
     for(int i=constraint_base_tangent;i<constraints_tangent;i++) flat_base_tangent(i)=flat_index;
 }
 //#####################################################################
-// Function Update_Constraint_Base
+// Function Update_Constraint_Count
 //#####################################################################
 template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
-Update_Constraint_Base()
+Update_Constraint_Count()
 {
     constraint_base_normal=flat_base_normal.m;
     constraint_base_tangent=flat_base_tangent.m;
+}
+//#####################################################################
+// Function Update_Total_Constraint_Count
+//#####################################################################
+template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
+Update_Total_Constraint_Count()
+{
+    total_number_of_surface_constraints=0;
+    for(int orientation=0;orientation<TV::m;orientation++)
+        total_number_of_surface_constraints+=(*constraint_base(orientation));
 }
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,3> >;
