@@ -467,26 +467,26 @@ void Initialize_Case_Table_2D()
 #define ST(c) interface_case_table_2d(c)=interface_segment_table.m
 #define EMIT(v0,v1,c0,c1) interface_segment_table.Append((c0<<18)|(c1<<15)|(v0<<10)|(v1<<5))
 #define LA interface_segment_table.Last()|=last_tri_bit
-    ST(1);EMIT(5,7,0,1);LA;
-    ST(4);EMIT(6,5,0,1);LA;
-    ST(5);EMIT(6,7,0,1);LA;
-    ST(6);EMIT(6,8,0,1);EMIT(8,7,0,2);EMIT(5,8,1,2);LA;
-    ST(12);EMIT(7,4,0,1);LA;
-    ST(13);EMIT(5,4,0,1);LA;
-    ST(14);EMIT(8,4,0,1);EMIT(5,8,0,2);EMIT(8,7,1,2);LA;
+    ST(1);EMIT(1,3,0,1);LA;
+    ST(4);EMIT(2,1,0,1);LA;
+    ST(5);EMIT(2,3,0,1);LA;
+    ST(6);EMIT(2,4,0,1);EMIT(4,3,0,2);EMIT(1,4,1,2);LA;
+    ST(12);EMIT(3,0,0,1);LA;
+    ST(13);EMIT(1,0,0,1);LA;
+    ST(14);EMIT(4,0,0,1);EMIT(1,4,0,2);EMIT(4,3,1,2);LA;
     interface_case_table_2d(16)=interface_segment_table.m;
     int test_index=interface_segment_table.Append(0);
-    int hint=0+8*1;
-    EMIT(4,6,1,0);EMIT(5,7,1,0);LA;
+    int hint=0+4*1;
+    EMIT(0,2,1,0);EMIT(1,3,1,0);LA;
     int skip=interface_segment_table.m-test_index;
-    EMIT(4,7,1,0);EMIT(6,5,0,1);LA;
+    EMIT(0,3,1,0);EMIT(2,1,0,1);LA;
     interface_segment_table(test_index)=comparison_bit|(hint<<24)|(skip<<12);
-    ST(17);EMIT(4,6,1,0);LA;
-    ST(18);EMIT(4,6,1,0);EMIT(5,7,1,2);LA;
-    ST(20);EMIT(4,7,1,0);EMIT(6,5,0,2);LA;
-    ST(21);EMIT(6,8,0,2);EMIT(8,4,0,1);EMIT(5,8,2,1);LA;
-    ST(22);EMIT(6,8,0,2);EMIT(8,4,0,1);EMIT(8,7,1,2);LA;
-    ST(23);EMIT(6,8,0,2);EMIT(8,4,0,1);EMIT(5,8,2,3);EMIT(8,7,1,3);LA;
+    ST(17);EMIT(0,2,1,0);LA;
+    ST(18);EMIT(0,2,1,0);EMIT(1,3,1,2);LA;
+    ST(20);EMIT(0,3,1,0);EMIT(2,1,0,2);LA;
+    ST(21);EMIT(2,4,0,2);EMIT(4,0,0,1);EMIT(1,4,2,1);LA;
+    ST(22);EMIT(2,4,0,2);EMIT(4,0,0,1);EMIT(4,3,1,2);LA;
+    ST(23);EMIT(2,4,0,2);EMIT(4,0,0,1);EMIT(1,4,2,3);EMIT(4,3,1,3);LA;
 #undef ST
 #undef EMIT
 #undef LA
@@ -649,7 +649,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,c
         T total=0;
         for(int v=0;v<4;v++){
             total+=1/phi[v];
-            pts[4]+=pts[v]/phi[v];}
+            pts[4]+=corners[v]/phi[v];}
         pts[4]/=total;}
 
     int pat;
@@ -672,12 +672,12 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<SEGMENT_2D<T>,int> >& boundary,const i
 {
     typedef VECTOR<T,2> TV;
     if(colors[0]==colors[1]){
-        boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(1-s,s)),colors[0]));
+        boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(1-s,s),TV(s,s)),colors[0]));
         return;}
 
     T theta=phi[0]/(phi[0]+phi[1]);
-    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(theta,s),TV(1-s,s)),colors[s]));
-    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(theta,s)),colors[s]));
+    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(1-s,s),TV(theta,s)),colors[1-s]));
+    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(theta,s),TV(s,s)),colors[s]));
 }
 }
 //#####################################################################
