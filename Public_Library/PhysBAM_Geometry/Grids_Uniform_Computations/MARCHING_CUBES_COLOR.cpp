@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 using namespace PhysBAM;
@@ -15,6 +16,8 @@ ARRAY<int> interface_case_table;
 ARRAY<int> interface_triangle_table;
 ARRAY<int> boundary_case_table;
 ARRAY<int> boundary_triangle_table;
+ARRAY<int> interface_case_table_2d;
+ARRAY<int> interface_segment_table;
 const int comparison_bit=1<<31;
 const int last_tri_bit=1<<30;
 const int pts_bit=1<<29;
@@ -385,22 +388,22 @@ void Enumerate_Interface_Cases_3D(int* colors, int i, int mc, int cs)
 //#####################################################################
 // Function Enumerate_Interface_Cases_3D
 //#####################################################################
-void Enumerate_Boundary_Cases_3D(int* colors, int i, int mc, int cs)
+void Enumerate_Boundary_Cases_3D()
 {
 #define ST(c) boundary_case_table(c)=boundary_triangle_table.m
-#define EMIT(v0,v1,v2,c) boundary_triangle_table.Append((colors[c]<<18)|((v0)<<10)|((v1)<<5)|(v2))
+#define EMIT(v0,v1,v2,c) boundary_triangle_table.Append((c<<18)|((v0)<<10)|((v1)<<5)|(v2))
 #define LA boundary_triangle_table.Last()|=last_tri_bit
     ST(0);EMIT(0,2,3,0);EMIT(0,3,1,0);LA;
     ST(1);EMIT(0,2,1,0);EMIT(2,7,1,0);EMIT(2,5,7,0);EMIT(5,3,7,1);LA;
     ST(4);EMIT(0,3,1,0);EMIT(0,5,3,0);EMIT(0,6,5,0);EMIT(2,5,6,1);LA;
     ST(5);EMIT(1,0,6,0);EMIT(1,6,7,0);EMIT(6,2,7,1);EMIT(2,3,7,1);LA;
-    ST(6);EMIT(0,7,1,0);EMIT(0,6,7,0);EMIT(6,2,5,1);EMIT(6,5,8,1);EMIT(5,7,8,2);EMIT(5,3,7,2);LA;
+    ST(6);EMIT(0,6,8,0);EMIT(8,7,1,0);EMIT(0,8,1,0);EMIT(6,2,5,1);EMIT(6,5,8,1);EMIT(5,7,8,2);EMIT(5,3,7,2);LA;
     ST(12);EMIT(0,2,3,0);EMIT(7,0,3,0);EMIT(4,0,7,0);EMIT(1,4,7,1);LA;
     ST(13);EMIT(0,2,5,0);EMIT(0,5,4,0);EMIT(5,1,4,1);EMIT(5,3,1,1);LA;
-    ST(14);EMIT(0,2,5,0);EMIT(0,5,4,0);EMIT(8,1,4,1);EMIT(8,7,1,1);EMIT(5,7,8,2);EMIT(5,3,7,2);LA;
+    ST(14);EMIT(4,0,8,0);EMIT(0,2,8,0);EMIT(2,5,8,0);EMIT(8,1,4,1);EMIT(8,7,1,1);EMIT(5,7,8,2);EMIT(5,3,7,2);LA;
     boundary_case_table(16)=boundary_triangle_table.m;
     int test_index=boundary_triangle_table.Append(0);
-    int hint=colors[0]+8*colors[1];
+    int hint=0+8*1;
     EMIT(4,0,6,0);EMIT(2,4,6,1);EMIT(1,4,2,1);EMIT(7,1,2,1);EMIT(5,7,2,1);EMIT(5,3,7,0);LA;
     int skip=boundary_triangle_table.m-test_index;
     EMIT(4,7,1,1);EMIT(4,0,7,0);EMIT(0,3,7,0);EMIT(0,5,3,0);EMIT(0,6,5,0);EMIT(6,2,5,1);LA;
@@ -408,9 +411,12 @@ void Enumerate_Boundary_Cases_3D(int* colors, int i, int mc, int cs)
     ST(17);EMIT(1,2,3,1);EMIT(1,6,2,1);EMIT(1,4,6,1);EMIT(0,6,4,0);LA;
     ST(18);EMIT(4,0,6,0);EMIT(2,4,6,1);EMIT(1,4,2,1);EMIT(7,1,2,1);EMIT(5,7,2,1);EMIT(5,3,7,2);LA;
     ST(20);EMIT(4,7,1,1);EMIT(4,0,7,0);EMIT(0,3,7,0);EMIT(0,5,3,0);EMIT(0,6,5,0);EMIT(6,2,5,2);LA;
-    ST(21);EMIT(0,6,8,0);EMIT(0,8,4,0);EMIT(6,2,5,2);EMIT(6,5,8,2);EMIT(5,1,4,1);EMIT(5,3,1,1);LA;
-    ST(22);EMIT(0,6,8,0);EMIT(0,8,4,0);EMIT(8,1,4,1);EMIT(8,7,1,1);EMIT(2,7,6,2);EMIT(2,3,7,2);LA;
+    ST(21);EMIT(0,6,8,0);EMIT(0,8,4,0);EMIT(6,2,5,2);EMIT(6,5,8,2);EMIT(1,4,8,1);EMIT(3,1,8,1);EMIT(5,3,8,1);LA;
+    ST(22);EMIT(0,6,8,0);EMIT(0,8,4,0);EMIT(8,1,4,1);EMIT(8,7,1,1);EMIT(3,7,8,2);EMIT(2,8,6,2);EMIT(2,3,8,2);LA;
     ST(23);EMIT(0,6,8,0);EMIT(0,8,4,0);EMIT(6,2,5,2);EMIT(6,5,8,2);EMIT(8,1,4,1);EMIT(8,7,1,1);EMIT(5,7,8,3);EMIT(5,3,7,3);LA;
+#undef ST
+#undef EMIT
+#undef LA
 }
 //#####################################################################
 // Function Initialize_Case_Table_3D
@@ -450,7 +456,40 @@ void Initialize_Case_Table_3D()
     boundary_case_table.Resize(24);
     int colors[8]={0};
     Enumerate_Interface_Cases_3D(colors, 1, 0, 0);
-    Enumerate_Boundary_Cases_3D(colors, 1, 0, 0);
+    Enumerate_Boundary_Cases_3D();
+}
+//#####################################################################
+// Function Initialize_Case_Table_2D
+//#####################################################################
+void Initialize_Case_Table_2D()
+{
+    interface_case_table_2d.Resize(24);
+#define ST(c) interface_case_table_2d(c)=interface_segment_table.m
+#define EMIT(v0,v1,c0,c1) interface_segment_table.Append((c0<<18)|(c1<<15)|(v0<<10)|(v1<<5))
+#define LA interface_segment_table.Last()|=last_tri_bit
+    ST(1);EMIT(5,7,0,1);LA;
+    ST(4);EMIT(6,5,0,1);LA;
+    ST(5);EMIT(6,7,0,1);LA;
+    ST(6);EMIT(6,8,0,1);EMIT(8,7,0,2);EMIT(5,8,1,2);LA;
+    ST(12);EMIT(7,4,0,1);LA;
+    ST(13);EMIT(5,4,0,1);LA;
+    ST(14);EMIT(8,4,0,1);EMIT(5,8,0,2);EMIT(8,7,1,2);LA;
+    interface_case_table_2d(16)=interface_segment_table.m;
+    int test_index=interface_segment_table.Append(0);
+    int hint=0+8*1;
+    EMIT(4,6,1,0);EMIT(5,7,1,0);LA;
+    int skip=interface_segment_table.m-test_index;
+    EMIT(4,7,1,0);EMIT(6,5,0,1);LA;
+    interface_segment_table(test_index)=comparison_bit|(hint<<24)|(skip<<12);
+    ST(17);EMIT(4,6,1,0);LA;
+    ST(18);EMIT(4,6,1,0);EMIT(5,7,1,2);LA;
+    ST(20);EMIT(4,7,1,0);EMIT(6,5,0,2);LA;
+    ST(21);EMIT(6,8,0,2);EMIT(8,4,0,1);EMIT(5,8,2,1);LA;
+    ST(22);EMIT(6,8,0,2);EMIT(8,4,0,1);EMIT(8,7,1,2);LA;
+    ST(23);EMIT(6,8,0,2);EMIT(8,4,0,1);EMIT(5,8,2,3);EMIT(8,7,1,3);LA;
+#undef ST
+#undef EMIT
+#undef LA
 }
 //#####################################################################
 // Function Get_Interface_Elements_For_Cell
@@ -579,6 +618,67 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const 
         boundary.Append(pair);
     } while(!(pat&last_tri_bit));
 }
+//#####################################################################
+// Function Get_Interface_Elements_For_Cell
+//#####################################################################
+template<class T> void
+Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,const VECTOR<int,4>& re_color,
+    const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const HASHTABLE<int,int>& color_map,const int* color_list)
+{
+    typedef VECTOR<T,2> TV;
+    int cs=0;
+    for(int i=0;i<4;i++)
+        cs=cs*(i+1)+re_color(i);
+    if(!cs) return;
+
+    int seg=interface_case_table_2d(cs);
+    if(interface_segment_table(seg)&comparison_bit){
+        int pat=interface_segment_table(seg);
+        int amb0=(pat>>24)&7,amb1=(pat>>27)&7;
+        if(color_list[amb1]<color_list[amb0]) seg+=(pat>>12)&0x3f;
+        else seg++;}
+
+    TV corners[4]={TV(0,0),TV(1,0),TV(0,1),TV(1,1)};
+    TV pts[5];
+    int num=0;
+    if(colors[0]!=colors[1]){T theta=phi[0]/(phi[0]+phi[1]);pts[0]=(1-theta)*corners[0]+theta*corners[1];num++;}
+    if(colors[2]!=colors[3]){T theta=phi[2]/(phi[2]+phi[3]);pts[1]=(1-theta)*corners[2]+theta*corners[3];num++;}
+    if(colors[0]!=colors[2]){T theta=phi[0]/(phi[0]+phi[2]);pts[2]=(1-theta)*corners[0]+theta*corners[2];num++;}
+    if(colors[1]!=colors[3]){T theta=phi[1]/(phi[1]+phi[3]);pts[3]=(1-theta)*corners[1]+theta*corners[3];num++;}
+    if(num>=3){
+        T total=0;
+        for(int v=0;v<4;v++){
+            total+=1/phi[v];
+            pts[4]+=pts[v]/phi[v];}
+        pts[4]/=total;}
+
+    int pat;
+    do{
+        pat=interface_segment_table(seg++);
+        SEGMENT_2D<T> triangle(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f]);
+        TRIPLE<SEGMENT_2D<T>,int,int> triple(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
+        if(triple.y>triple.z){
+            exchange(triple.y,triple.z);
+            exchange(triple.x.X(0),triple.x.X(1));}
+        surface.Append(triple);
+    } while(!(pat&last_tri_bit));
+}
+//#####################################################################
+// Function Get_Boundary_Elements_For_Cell
+//#####################################################################
+template<class T> void
+Get_Boundary_Elements_For_Cell(ARRAY<PAIR<SEGMENT_2D<T>,int> >& boundary,const int* re_color,
+    const int* colors,const T* phi,int s,const HASHTABLE<int,int>& color_map,const int* color_list)
+{
+    typedef VECTOR<T,2> TV;
+    if(colors[0]==colors[1]){
+        boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(1-s,s)),colors[0]));
+        return;}
+
+    T theta=phi[0]/(phi[0]+phi[1]);
+    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(theta,s),TV(1-s,s)),colors[s]));
+    boundary.Append(PAIR<SEGMENT_2D<T>,int>(SEGMENT_2D<T>(TV(s,s),TV(theta,s)),colors[s]));
+}
 }
 //#####################################################################
 // Function Initialize_Case_Table
@@ -587,6 +687,7 @@ template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Initialize_Case_Table()
 {
     if(TV::m==3) Initialize_Case_Table_3D();
+    if(TV::m==2) Initialize_Case_Table_2D();
 }
 //#####################################################################
 // Function Get_Elements_For_Cell
@@ -618,7 +719,9 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
             color_map.Set(colors(i+num_corners/2),next_color++);}
     Get_Boundary_Elements_For_Cell(boundary,re_color2,colors.array+num_corners/2,phi.array+num_corners/2,1,color_map,color_list);
 }
+template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+template class MARCHING_CUBES_COLOR<VECTOR<double,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<double,3> >;
 #endif
