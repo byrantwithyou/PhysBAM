@@ -4,14 +4,16 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_DEBUG_PARTICLES_2D.h>
+#include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_MATERIAL.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SHAPES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T> OPENGL_DEBUG_PARTICLES_2D<T>::
-OPENGL_DEBUG_PARTICLES_2D(GEOMETRY_PARTICLES<TV>& particle_input,const OPENGL_COLOR& color_input)
-    :particles(particle_input),default_color(color_input),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),draw_velocities(false),draw_arrows(true),scale_velocities((T).025)
+OPENGL_DEBUG_PARTICLES_2D(GEOMETRY_PARTICLES<TV>& particle_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR& color_input)
+    :particles(particle_input),debug_objects(debug_objects_input),default_color(color_input),velocity_color(OPENGL_COLOR(1,(T).078,(T).576)),
+    draw_velocities(false),draw_arrows(true),scale_velocities((T).025)
 {}
 //#####################################################################
 // Destructor
@@ -42,7 +44,46 @@ Bounding_Box() const
 template<class T> void OPENGL_DEBUG_PARTICLES_2D<T>::
 Display(const int in_color) const
 {
+    for(int i=0;i<debug_objects.m;i++)
+        if(debug_objects(i).draw_vertices)
+            for(int i=0;i<debug_objects(i).type;i++)
+                OPENGL_SHAPES::Draw_Dot(debug_objects(i).X(i),OPENGL_COLOR(1,0,1),5);
+
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
+    glPushAttrib(GL_LIGHTING_BIT | GL_CURRENT_BIT);
+    glDisable(GL_LIGHTING);
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,1);
+    glDisable(GL_CULL_FACE);
+
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    Send_Transform_To_GL_Pipeline();
+
+    for(int i=0;i<debug_objects.m;i++)
+        if(debug_objects(i).type==DEBUG_OBJECT<TV>::triangle){
+            vertices.Remove_All();
+            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).color)).Send_To_GL_Pipeline(GL_FRONT);
+            OPENGL_MATERIAL::Plastic(OPENGL_COLOR(debug_objects(i).bgcolor)).Send_To_GL_Pipeline(GL_BACK);
+            OpenGL_Triangle(debug_objects(i).X(0),debug_objects(i).X(1),debug_objects(i).X(2),vertices);
+            OpenGL_Draw_Arrays(GL_TRIANGLES,2,vertices);}
+    vertices.Remove_All();
+
+    for(int i=0;i<debug_objects.m;i++)
+        if(debug_objects(i).type==DEBUG_OBJECT<TV>::segment)
+            OPENGL_SHAPES::Draw_Segment(debug_objects(i).X(0),debug_objects(i).X(1),OPENGL_COLOR(debug_objects(i).color),2);
+
+    glPopAttrib();
+
+
+    GLint mode=0;
+#ifndef USE_OPENGLES
+    glGetIntegerv(GL_RENDER_MODE,&mode);
+#endif
+
+    glLightModeli(GL_LIGHT_MODEL_TWO_SIDE,0);
+    glEnable(GL_CULL_FACE);
+    glPopMatrix();
+
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     Send_Transform_To_GL_Pipeline();
@@ -51,7 +92,6 @@ Display(const int in_color) const
     glPointSize(5);
     glDisable(GL_LIGHTING);
 
-    GLint mode=0;
 #ifndef USE_OPENGLES
     glGetIntegerv(GL_RENDER_MODE,&mode);
 #endif

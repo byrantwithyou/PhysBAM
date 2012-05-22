@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_OBJECT.h>
@@ -23,13 +24,14 @@ class OPENGL_DEBUG_PARTICLES_2D:public OPENGL_OBJECT
     typedef VECTOR<T,2> TV;
 public:
     GEOMETRY_PARTICLES<TV>& particles;
+    ARRAY<DEBUG_OBJECT<TV> >& debug_objects;
     OPENGL_COLOR default_color;
     OPENGL_COLOR velocity_color;
     bool draw_velocities;
     bool draw_arrows;
     T scale_velocities;
 
-    OPENGL_DEBUG_PARTICLES_2D(GEOMETRY_PARTICLES<TV>& particles_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
+    OPENGL_DEBUG_PARTICLES_2D(GEOMETRY_PARTICLES<TV>& particles_input,ARRAY<DEBUG_OBJECT<TV> >& debug_objects_input,const OPENGL_COLOR &color_input = OPENGL_COLOR::White());
     ~OPENGL_DEBUG_PARTICLES_2D();
 
     bool Use_Bounding_Box() const PHYSBAM_OVERRIDE;
