@@ -117,7 +117,7 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
             if(material_subcell(s)) MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface(s),sides(s),subcell_phi_colors,subcell_phi_values);}
 
         HASHTABLE<VECTOR<int,2>,int> ht_color_pairs;
-        ARRAY<VECTOR<int,2> > map_color_pairs;
+        ARRAY<VECTOR<int,2> > color_pairs;
         
         for(int b=0;b<TV::m;b++){
             const ARRAY<TRIPLE<T_FACE,int,int> >& block_surface=surface(b);
@@ -126,25 +126,26 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
                 if(surface_element.z>=0){
                     VECTOR<int,2> color_pair(surface_element.y,surface_element.z);
                     if(!ht_color_pairs.Contains(color_pair)){
-                        ht_color_pairs.Insert(color_pair,map_color_pairs.m);
-                        map_color_pairs.Append(color_pair);}}}}
+                        ht_color_pairs.Insert(color_pair,color_pairs.m);
+                        color_pairs.Append(color_pair);}}}}
 
-        ARRAY<MATRIX<T,TV::m> > base_orientation(map_color_pairs.m);
+        ARRAY<MATRIX<T,TV::m> > base_orientation(color_pairs.m);
         Compute_Averaged_Orientation_Helper(surface,ht_color_pairs,base_orientation);
 
-        ARRAY<int> map_constraints(map_color_pairs.m);
+        ARRAY<int> constraint_offsets(color_pairs.m);
         int full_constraints=0;
         int slip_constraints=0;
-        for(int i=0;i<map_color_pairs.m;i++)
-            if(map_color_pairs(i).x==-2||map_color_pairs(i).x>=0){
-                map_constraints(i)=full_constraints;
+        for(int i=0;i<color_pairs.m;i++)
+            if(color_pairs(i).x==-2||color_pairs(i).x>=0){
+                constraint_offsets(i)=full_constraints;
                 full_constraints++;}
-        for(int i=0;i<map_color_pairs.m;i++)
-            if(map_color_pairs(i).x==-3){
-                map_constraints(i)=slip_constraints+full_constraints;
+        for(int i=0;i<color_pairs.m;i++)
+            if(color_pairs(i).x==-3){
+                constraint_offsets(i)=slip_constraints+full_constraints;
                 slip_constraints++;}
         
         cdi.Set_Flat_Base_And_Resize(full_constraints+slip_constraints,full_constraints,it.index);
+        for(int i=0;i<surface_blocks.m;i++) surface_blocks(i)->Resize();
 
         for(int s=0;s<(1<<TV::m);s++)
             if(material_subcell(s)){
@@ -152,7 +153,7 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
                     int color=phi_color(cell_base+bits(s));
                     if(color>=0) Add_Uncut_Fine_Cell(it.index,s,color);}
                 else Add_Cut_Fine_Cell(it.index,s,TV(bits((1<<TV::m)-1-s)),surface(s),sides(s),
-                    base_orientation,f_surface,map_color_pairs,map_constraints,ht_color_pairs);}
+                    base_orientation,f_surface,constraint_offsets,ht_color_pairs);}
         cdi.Update_Constraint_Count();}
     cdi.Update_Total_Constraint_Count();
 }
@@ -243,8 +244,8 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
-    const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface,const ARRAY<VECTOR<int,2> >& map_color_pairs,
-    const ARRAY<int>& map_constraints,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
+    const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface,const ARRAY<int>& constraint_offsets,
+    const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
     assert(sides.m);
     assert(surface.m);
@@ -312,18 +313,18 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
                     int color_pair_index=-1;
                     if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index)){
                         T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                        int k=map_constraints(color_pair_index);
+                        int constraint_offset=constraint_offsets(color_pair_index);
                         
                         if(surface_element.y==-2||surface_element.y>=0)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
                                 T value=integral*orientations(k)(sb->axis,orientation);
-                                if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_tangent+k,orientation,op.flat_index_diff_ref,surface_element.y,value);
-                                if(surface_element.z>=0) sb->Add_Entry(cdi.constraint_base_tangent+k,orientation,op.flat_index_diff_ref,surface_element.z,-value);}
+                                if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.y,value);
+                                if(surface_element.z>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.z,-value);}
 
                         if(surface_element.y!=-1){
                             T value=integral*orientations(k)(sb->axis,TV::m-1);
-                            if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_normal+k,TV::m-1,op.flat_index_diff_ref,surface_element.y,value);
-                            if(surface_element.z>=0) sb->Add_Entry(cdi.constraint_base_normal+k,TV::m-1,op.flat_index_diff_ref,surface_element.z,-value);}
+                            if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.y,value);
+                            if(surface_element.z>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.z,-value);}
 
                         if(surface_element.y>=0||surface_element.y==-1){
                             int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
