@@ -270,8 +270,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
             for(int i=0;i<surface.m;i++){
                 const TRIPLE<T_FACE,int,int>& V=surface(i);
                 int integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
-                if(V.y>=0) integrals(V.y)+=integral;
-                if(V.z>=0) integrals(V.z)-=integral;}
+                if(V.y>=0) integrals(V.y)-=integral;
+                if(V.z>=0) integrals(V.z)+=integral;}
             for(int c=0;c<cdi.colors;c++) precomputed_integrals(c)(it.index)+=integrals(c);}
 
     for(int i=0;i<volume_blocks.m;i++){
