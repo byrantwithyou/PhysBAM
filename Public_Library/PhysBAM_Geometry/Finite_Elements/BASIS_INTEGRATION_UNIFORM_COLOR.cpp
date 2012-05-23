@@ -68,7 +68,8 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,
             const TRIPLE<T_FACE,int,int>& surface_element=block_surface(i);
             int color_pair_index=-1;
             if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index))
-                normal(color_pair_index)+=surface_element.x.Raw_Normal();}}
+                normal(color_pair_index)+=surface_element.x.Raw_Normal();
+            else assert((surface_element.y<0)&&(surface_element.z<0));}}
     
     for(int i=0;i<normal.m;i++){
         normal(i).Normalize();
@@ -122,7 +123,7 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
             const ARRAY<TRIPLE<T_FACE,int,int> >& block_surface=surface(b);
             for(int i=0;i<block_surface.m;i++){
                 const TRIPLE<T_FACE,int,int>& surface_element=block_surface(i);
-                if(surface_element.y>=0||surface_element.z>=0){
+                if(surface_element.z>=0){
                     VECTOR<int,2> color_pair(surface_element.y,surface_element.z);
                     if(!ht_color_pairs.Contains(color_pair)){
                         ht_color_pairs.Insert(color_pair,map_color_pairs.m);
@@ -256,7 +257,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
         for(int j=0;j<TV::m;j++)
             sides(i).x.X(j)=(sides(i).x.X(j)-block_offset)*((T).5*grid.dX);
             
-    ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_integrals(cdi.colors);
+    ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_volume_integrals(cdi.colors);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(volume_monomials_needed(it.index)){
@@ -272,7 +273,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
                 int integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
                 if(V.y>=0) integrals(V.y)-=integral;
                 if(V.z>=0) integrals(V.z)+=integral;}
-            for(int c=0;c<cdi.colors;c++) precomputed_integrals(c)(it.index)+=integrals(c);}
+            for(int c=0;c<cdi.colors;c++) precomputed_volume_integrals(c)(it.index)+=integrals(c);}
 
     for(int i=0;i<volume_blocks.m;i++){
         VOLUME_BLOCK* vb=volume_blocks(i);
@@ -280,7 +281,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
             typename VOLUME_BLOCK::OVERLAP_POLYNOMIAL& op=vb->overlap_polynomials(j);
             if(op.subcell&(1<<block))
                 for(int c=0;c<cdi.colors;c++){
-                    T integral=Precomputed_Integral(precomputed_integrals(c),op.polynomial);
+                    T integral=Precomputed_Integral(precomputed_volume_integrals(c),op.polynomial);
                     int flat_index=cdi.Flatten(cell)+op.flat_index_offset;
                     vb->Add_Entry(flat_index,op.flat_index_diff_ref,c,integral);}}}
 
@@ -290,7 +291,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
         TRIPLE<T_FACE,int,int>& surface_element=surface(i);
         int color_pair_index=-1;
         if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index))
-            Compute_Consistent_Orientation_Helper(surface(i).x,orientations(i),base_orientation(color_pair_index));}
+            Compute_Consistent_Orientation_Helper(surface(i).x,orientations(i),base_orientation(color_pair_index));
+        else assert((surface_element.y<0)&&(surface_element.z<0));}
 
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_surface_integrals(surface.m);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
@@ -329,7 +331,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
                             if(surface_element.y>=0) value*=-0.5;
                             if(surface_element.y>=0) (*f_surface)(sb->axis)(surface_element.y)(flat_index)+=value;
                             if(surface_element.z>=0) (*f_surface)(sb->axis)(surface_element.z)(flat_index)+=value;
-                        }}}}}
+                        }}
+                    else assert((surface_element.y<0)&&(surface_element.z<0));}}}
 }
 //#####################################################################
 // Function Add_Volume_Block
