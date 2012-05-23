@@ -304,7 +304,6 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
 
     for(int i=0;i<surface_blocks.m;i++){
         SURFACE_BLOCK* sb=surface_blocks(i);
-        sb->Resize();
         for(int j=0;j<sb->overlap_polynomials.m;j++){
             typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
             if(op.subcell&(1<<block))
