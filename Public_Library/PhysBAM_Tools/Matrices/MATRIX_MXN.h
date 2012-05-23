@@ -62,7 +62,7 @@ public:
     template<class T_MATRIX>
     explicit MATRIX_MXN(const MATRIX_BASE<T,T_MATRIX>& A)
         :m(A.Rows()),n(A.Columns()),x(m*n)
-    {for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);}
+    {for(int i=0;i<m;i++) for(int j=0;j<n;j++) (*this)(i,j)=A(i,j);}
 
     template<int d>
     explicit MATRIX_MXN(const DIAGONAL_MATRIX<T,d>& A)
@@ -72,12 +72,12 @@ public:
     template<int d>
     explicit MATRIX_MXN(const SYMMETRIC_MATRIX<T,d>& A)
         :m(A.Rows()),n(A.Columns()),x(m*n)
-    {for(int j=0;j<n;j++) for(int i=0;i<=j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);}
+    {for(int i=0;i<m;i++) for(int j=0;j<=i;j++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(i,j);}
 
     template<int d>
     explicit MATRIX_MXN(const UPPER_TRIANGULAR_MATRIX<T,d>& A)
         :m(A.Rows()),n(A.Columns()),x(m*n)
-    {for(int j=0;j<n;j++) for(int i=0;i<j;i++) (*this)(i,j)=A(i,j);}
+    {for(int i=0;i<m;i++) for(int j=i;j<n;j++) (*this)(i,j)=A(i,j);}
 
     ~MATRIX_MXN()
     {}
@@ -92,14 +92,14 @@ public:
     {if(m_new==m && n_new==n) return;
     if(n_new==n){x.Resize(m_new*n);m=m_new;return;}
     ARRAY<T> x_new(m_new*n_new);
-    int m1=min(m,m_new),n1=min(n,n_new);for(int i=0;i<m1;i++) for(int j=0;j<n1;j++) x_new(j*m_new+i)=(*this)(i,j);
+    int m1=min(m,m_new),n1=min(n,n_new);for(int i=0;i<m1;i++) for(int j=0;j<n1;j++) x_new(i*n_new+j)=(*this)(i,j);
     x.Exchange(x_new);m=m_new;n=n_new;}
 
     T& operator()(const int i,const int j)
-    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(j*m+i);}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(i*n+j);}
 
     const T& operator()(const int i,const int j) const
-    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(j*m+i);}
+    {assert((unsigned)i<(unsigned)m);assert((unsigned)j<(unsigned)n);return x(i*n+j);}
 
     bool Valid_Index(const int i,const int j) const
     {return (unsigned)i<(unsigned)m && (unsigned)j<(unsigned)n;}
@@ -118,7 +118,7 @@ public:
     MATRIX_MXN<T>& operator=(const MATRIX_BASE<T,T_MATRIX>& A)
     {if((void*)&A==(void*)this) return *this;
     x.Resize(A.Rows()*A.Columns());
-    m=A.Rows();n=A.Columns();for(int j=0;j<n;j++) for(int i=0;i<m;i++) (*this)(i,j)=A(i,j);return *this;}
+    m=A.Rows();n=A.Columns();for(int i=0;i<m;i++) for(int j=0;j<n;j++) (*this)(i,j)=A(i,j);return *this;}
 
     template<int d>
     MATRIX_MXN<T>& operator=(const DIAGONAL_MATRIX<T,d>& A)
@@ -126,7 +126,7 @@ public:
 
     template<int d>
     MATRIX_MXN<T>& operator=(const SYMMETRIC_MATRIX<T,d>& A)
-    {x.Resize(A.Rows()*A.Columns());m=n=d;for(int j=0;j<n;j++) for(int i=0;i<j;i++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(j,i);return *this;}
+    {x.Resize(A.Rows()*A.Columns());m=n=d;for(int i=0;i<m;i++) for(int j=0;j<=i;j++) (*this)(i,j)=(*this)(j,i)=A.Element_Lower(i,j);return *this;}
 
     T Trace() const
     {assert(m==n);T trace=0;for(int i=0;i<n;i++) trace+=(*this)(i,i);return trace;}
