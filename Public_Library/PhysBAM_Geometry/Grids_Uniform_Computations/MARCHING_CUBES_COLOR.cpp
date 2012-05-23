@@ -39,6 +39,7 @@ const int permute_rx[19]={1,3,0,2,10,11,8,9,4,5,6,7,12,13,16,17,15,14,18};
 const int permute_ry[19]={8,10,9,11,6,4,7,5,2,0,3,1,17,16,14,15,12,13,18};
 const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
+const int permute_flip[19]={0,1,2,3,5,4,7,6,9,8,11,10,13,12,14,15,16,17,18};
 int face_edges[6][4];
 const int greedy=2;
 
@@ -136,25 +137,131 @@ void Emit_Loop_Triangles(int* vertices,int n,int c0,int c1)
         interface_triangle_table.Append((c0<<18)|(c1<<15)|(vertices[2*i]<<10)|(vertices[2*i+1]<<5)|vertices[2*i+2]);
         vertices[n+i]=vertices[2*i];}
 }
-#if 0
-int edge_to_face_mask[12]={0x14,0x18,0x24,0x28,0x11,0x12,0x21,0x22,0x05,0x06,0x09,0x0a};
+ARRAY<char> edges_intersect;
 
 // 0 = no intersection, 1 = can intersect, 2 = coplanar
-int Add_Face_Edges(int a,int b,int c,int d)
+}
+int Edges_Intersect(int a,int b,int c,int d)
 {
+    return edges_intersect(((a*19+b)*19+c)*19+d);
+}
+namespace{
+int cube_location_labels[27]={-1,0,-1,4,16,5,-1,1,-1,8,14,9,12,18,13,10,15,11,-1,2,-1,6,17,7,-1,3,-1};
+int depth=0;
+void Set_Edges_Ok_Helper(int a,int b,int c,int d,int z)
+{
+    char& x=edges_intersect(((a*19+b)*19+c)*19+d);
+    if(x!=1) return;
+    depth++;
+    x=z;
+//    printf("%*s%i %i %i %i\n", depth, "", a,b,c,d);
+    Set_Edges_Ok_Helper(a,b,d,c,z);
+    Set_Edges_Ok_Helper(c,d,a,b,z);
+    Set_Edges_Ok_Helper(permute_flip[a],permute_flip[b],permute_flip[c],permute_flip[d],z);
+    Set_Edges_Ok_Helper(permute_rx[a],permute_rx[b],permute_rx[c],permute_rx[d],z);
+    Set_Edges_Ok_Helper(permute_ry[a],permute_ry[b],permute_ry[c],permute_ry[d],z);
+    depth--;
+}
+void Set_Edges_Ok(int a,int b,int c,int d)
+{
+    int aa=cube_location_labels[a],bb=cube_location_labels[b],cc=cube_location_labels[c],dd=cube_location_labels[d];
+    if(aa==-1 || bb==-1 || cc==-1 || dd==-1) return;
+//    printf("%*s%i %i %i %i\n", depth, "", aa,bb,cc,dd);
+    VECTOR<int,3> A(a%3-b%3,(a/3)%3-(b/3)%3,(a/9)%3-(b/9)%3),C(c%3-d%3,(c/3)%3-(d/3)%3,(c/9)%3-(d/9)%3);
+    Set_Edges_Ok_Helper(aa,bb,cc,dd,A.Cross(C)==VECTOR<int,3>()?2:0);
+}
+}
+void Initialize_Edges_Intersect()
+{
+    // Initially everything intersects
+    edges_intersect.Resize(19*19*19*19,true,false,1);
+
+    printf("ei a %i\n", Edges_Intersect(16,18,16,18));
     // Share an endpoint
-    if(a>b) exchange(a,b);
-    if(c>d) exchange(c,d);
-    if(a>c){exchange(a,c);exchange(b,d);}
-    if(b==c && b==d) return 0;
+    for(int a=0;a<27;a++)
+        if(cube_location_labels[a]>=0)
+            for(int b=0;b<27;b++)
+                if(cube_location_labels[b]>=0)
+                    for(int c=b;c<27;c++)
+                        if(cube_location_labels[c]>=0)
+                            Set_Edges_Ok_Helper(cube_location_labels[a],cube_location_labels[b],cube_location_labels[a],cube_location_labels[c],b==c?2:0);
+    printf("ei b %i\n", Edges_Intersect(16,18,16,18));
 
     // Edge on cube face
-    if((edge_to_face_mask[a]&edge_to_face_mask[b]) || (edge_to_face_mask[c]&edge_to_face_mask[d])) return 0;
+    for(int a=0;a<9;a++)
+        if(cube_location_labels[a]>=0)
+            for(int b=a+1;b<9;b++)
+                if(cube_location_labels[b]>=0)
+                    for(int c=0;c<27;c++)
+                        if(cube_location_labels[c]>=0)
+                            for(int d=c+1;d<27;d++)
+                                if(cube_location_labels[d]>=0)
+                                    Set_Edges_Ok(a,b,c,d);
+    printf("ei c %i\n", Edges_Intersect(16,18,16,18));
 
-    
-    return 88;
+    // Plane tests
+    for(int a0=0;a0<3;a0++)
+        for(int a1=a0;a1<3;a1++)
+            if(a0!=1 || a1!=1)
+                for(int b0=0;b0<3;b0++)
+                    for(int b1=b0;b1<3;b1++)
+                        if(b0!=1 || b1!=1)
+                            for(int c0=0;c0<3;c0++)
+                                for(int c1=c0;c1<3;c1++)
+                                    if(c0!=1 || c1!=1)
+                                        for(int d0=0;d0<3;d0++)
+                                            for(int d1=d0;d1<3;d1++)
+                                                if(d0!=1 || d1!=1)
+                                                    for(int a2=0;a2<3;a2++)
+                                                        for(int b2=0;b2<3;b2++)
+                                                            for(int c2=0;c2<3;c2++)
+                                                                for(int d2=0;d2<3;d2++)
+                                                                    Set_Edges_Ok((a0*3+a1)*3+a2,(b0*3+b1)*3+b2,(c1*3+c0)*3+c2,(d1*3+d0)*3+d2);
+
+    printf("ei e %i\n", Edges_Intersect(16,18,16,18));
+    depth+=10;
+    // Surface criterion
+    for(int a0=0;a0<3;a0++)
+        for(int a1=0;a1<3;a1++)
+            if(a0==1 || a1==1)
+                for(int b0=0;b0<3;b0++)
+                    for(int b1=0;b1<3;b1++)
+                        if(b0==1 || b1==1)
+                            for(int c0=0;c0<3;c0++)
+                                for(int c1=0;c1<3;c1++)
+                                    if(c0==1 || c1==1)
+                                        for(int d0=0;d0<3;d0++)
+                                            for(int d1=0;d1<3;d1++)
+                                                if(d0==1 || d1==1){
+                                                    Set_Edges_Ok((a0*3+a1)*3+0,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+2);
+                                                    Set_Edges_Ok((a0*3+a1)*3+0,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+1);
+                                                    Set_Edges_Ok((a0*3+a1)*3+1,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+1);}
+    depth-=10;
+
+    printf("ei f %i\n", Edges_Intersect(16,18,16,18));
+    // Projection criterion
+    for(int a0=0;a0<3;a0++)
+        for(int a1=0;a1<3;a1++)
+            for(int b0=0;b0<3;b0++)
+                for(int b1=0;b1<3;b1++)
+                    for(int c0=0;c0<3;c0++)
+                        for(int d0=0;d0<3;d0++)
+                            Set_Edges_Ok((a0*3+a1)*3+0,(c0*3+0)*3+1,(b0*3+b1)*3+2,(d0*3+0)*3+1);
+
+
+    printf("ei h %i\n", Edges_Intersect(16,18,16,18));
+    // Triangle criterion
+    int tri0[5]={(1*3+1)*3+0,(1*3+1)*3+1,(1*3+1)*3+2,(1*3+0)*3+0,(1*3+2)*3+0};
+    int tri1[5]={(1*3+0)*3+0,(1*3+0)*3+1,(1*3+0)*3+2,(1*3+1)*3+0,(1*3+2)*3+0};
+    for(int i=0;i<5;i++)
+        for(int j=0;j<5;j++)
+            for(int k=0;k<5;k++){
+                Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+0);
+                Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+2);
+                Set_Edges_Ok(tri1[i],tri1[j],tri1[k],(0*3+1)*3+0);}
+    printf("ei i %i\n", Edges_Intersect(16,18,16,18));
 }
-#endif
+namespace{
 //#####################################################################
 // Function Emit_Interface_Triangles
 //#####################################################################
@@ -350,6 +457,22 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
 
     PHYSBAM_ASSERT(table_size!=interface_triangle_table.m);
     interface_triangle_table.Last()|=last_tri_bit;
+#if 0
+    HASHTABLE<VECTOR<int,2> > ed;
+    for(int i=table_size;i<interface_triangle_table.m;i++){
+        int pat=interface_triangle_table(i);
+        if(pat&pts_bit) continue;
+        int a=(pat>>10)&0x1f,b=pat&0x1f,c=(pat>>5)&0x1f;
+        ed.Set(VECTOR<int,2>(a,b).Sorted());
+        ed.Set(VECTOR<int,2>(a,c).Sorted());
+        ed.Set(VECTOR<int,2>(b,c).Sorted());}
+
+    for(HASHTABLE<VECTOR<int,2> >::ITERATOR it(ed);it.Valid();it.Next())
+        for(HASHTABLE<VECTOR<int,2> >::ITERATOR it2(it);it2.Valid();it2.Next())
+            if(Edges_Intersect(it.Key().x,it.Key().y,it2.Key().x,it2.Key().y)==1)
+                printf("col (%i %i %i %i %i %i %i %i) -> (%i %i) (%i %i)\n",
+                    colors[0], colors[1], colors[2], colors[3], colors[4], colors[5], colors[6], colors[7], it.Key().x,it.Key().y,it2.Key().x,it2.Key().y);
+#endif
 }
 //#####################################################################
 // Function Emit_Interface_Triangles
@@ -473,6 +596,7 @@ void Initialize_Case_Table_3D()
     interface_case_table.Resize(40320);
     boundary_case_table.Resize(24);
     int colors[8]={0};
+    Initialize_Edges_Intersect();
     Enumerate_Interface_Cases_3D(colors, 1, 0, 0);
     Enumerate_Boundary_Cases_3D();
 }
