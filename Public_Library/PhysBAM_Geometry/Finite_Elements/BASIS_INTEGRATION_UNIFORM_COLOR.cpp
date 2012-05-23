@@ -119,8 +119,8 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
         HASHTABLE<VECTOR<int,2>,int> ht_color_pairs;
         ARRAY<VECTOR<int,2> > color_pairs;
         
-        for(int b=0;b<TV::m;b++){
-            const ARRAY<TRIPLE<T_FACE,int,int> >& block_surface=surface(b);
+        for(int s=0;s<(1<<TV::m);s++){
+            const ARRAY<TRIPLE<T_FACE,int,int> >& block_surface=surface(s);
             for(int i=0;i<block_surface.m;i++){
                 const TRIPLE<T_FACE,int,int>& surface_element=block_surface(i);
                 if(surface_element.z>=0){
