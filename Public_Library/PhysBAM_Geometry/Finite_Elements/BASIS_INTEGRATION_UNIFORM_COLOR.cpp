@@ -271,7 +271,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
                 if(V.y>=0) integrals(V.y)+=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);}
             for(int i=0;i<surface.m;i++){
                 const TRIPLE<T_FACE,int,int>& V=surface(i);
-                int integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
+                T integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
                 if(V.y>=0) integrals(V.y)-=integral;
                 if(V.z>=0) integrals(V.z)+=integral;}
             for(int c=0;c<cdi.colors;c++) precomputed_volume_integrals(c)(it.index)+=integrals(c);}
@@ -330,8 +330,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
                             T value=integral*sb->abc->f_surface(surface_element.x.Center()+grid.Center(cell),surface_element.y,surface_element.z)(sb->axis);
                             if(surface_element.y>=0) value*=-0.5;
                             if(surface_element.y>=0) (*f_surface)(sb->axis)(surface_element.y)(flat_index)+=value;
-                            if(surface_element.z>=0) (*f_surface)(sb->axis)(surface_element.z)(flat_index)+=value;
-                        }}
+                            if(surface_element.z>=0) (*f_surface)(sb->axis)(surface_element.z)(flat_index)+=value;}}
                     else assert((surface_element.y<0)&&(surface_element.z<0));}}}
 }
 //#####################################################################
