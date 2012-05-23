@@ -228,7 +228,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     ANALYTIC_TEST<TV>* test=0;
 
     switch(test_number){
-        case 0:{
+        case 0:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], no pressure
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
@@ -241,6 +241,202 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV f_surface(const TV& X,int color1,int color2){return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
             };
             test=new ANALYTIC_TEST_0;
+            break;}
+        case 1:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,0.25],[0.25,0.75],[0.75,1], no pressure
+            struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual T phi_value(const TV& X){return abs(-0.25*m+abs(X.x-0.5*m));}
+                virtual int phi_color(const TV& X){return (-0.25*m+abs(X.x-0.5*m))<0;}
+                virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual T p(const TV& X){return T();}
+                virtual TV f_volume(const TV& X,int color){return TV();}
+                virtual TV f_surface(const TV& X,int color1,int color2){return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*mu.Sum()/s;}
+            };
+            test=new ANALYTIC_TEST_1;
+            break;}
+        case 2:{ // Two colors, periodic. Poiseuille flow (parabolic velocity profile) [u,v]=[u,v(x)] on [0.25,0.75], 0 velocity outside, no pressure
+            struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual T phi_value(const TV& X){return abs(-0.25*m+abs(X.x-0.5*m));}
+                virtual int phi_color(const TV& X){return (-0.25*m+abs(X.x-0.5*m))<0;}
+                virtual TV u(const TV& X,int color)
+                {return TV::Axis_Vector(1)*color*(sqr(0.25*m)-sqr(X.x-0.5*m))/(m*s);}
+                virtual T p(const TV& X){return T();}
+                virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(1)*(color*2*mu(1)/(m*s));}
+                virtual TV f_surface(const TV& X,int color1,int color2){return (T)0.5*TV::Axis_Vector(1)*mu(1)/s;}
+            };
+            test=new ANALYTIC_TEST_2;
+            break;}
+        case 3:{ // Two colors, periodic. Opposite Poiseuille flows on [0.25,0.75] and [0,0.25],[0.75,1], no pressure
+            struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual T phi_value(const TV& X){return abs(-0.25*m+abs(X.x-0.5*m));}
+                virtual int phi_color(const TV& X){return (-0.25*m+abs(X.x-0.5*m))<0;}
+                virtual TV u(const TV& X,int color)
+                {return TV::Axis_Vector(1)*(color?(sqr(0.25*m)-sqr(X.x-0.5*m)):((X.x>0.5*m)?(sqr(X.x-m)-sqr(0.25*m)):(sqr(X.x)-sqr(0.25*m))))/(m*s);}
+                virtual T p(const TV& X){return T();}
+                virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(1)*(color?mu(1):-mu(0))*2/(m*s);}
+                virtual TV f_surface(const TV& X,int color1,int color2){return (T)0.5*TV::Axis_Vector(1)*(mu(1)-mu(0))/s;}
+            };
+            test=new ANALYTIC_TEST_3;
+            break;}
+        case 4:{ // Two colors, periodic. Circular flow: linear growth for r<ra, 0 for r>rb, blend for ra<r<rb, no pressure
+            struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
+            {
+                T ra,rb,ra2,rb2,rb2mra2,r_avg,r_avg2;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);
+                    ra=0.1666*m;rb=0.3333*m;ra2=sqr(ra);rb2=sqr(rb);
+                    rb2mra2=rb2-ra2;r_avg=(ra+rb)/2;r_avg2=sqr(r_avg);
+                }
+                virtual T phi_value(const TV& X){return abs((ra-rb)/2+abs(VECTOR<T,2>(X.x-0.5*m,X.y-0.5*m).Magnitude()-r_avg));}
+                virtual int phi_color(const TV& X){return ((ra-rb)/2+abs(VECTOR<T,2>(X.x-0.5*m,X.y-0.5*m).Magnitude()-r_avg))<0;}
+                virtual TV u(const TV& X,int color)
+                {
+                    T x=X.x-0.5*m,y=X.y-0.5*m;
+                    T r2=VECTOR<T,2>(x,y).Magnitude_Squared();
+                    TV velocity;
+                    if(color){
+                        velocity.x=-y/s;
+                        velocity.y=x/s;
+                        velocity*=(rb2-r2)/(rb2mra2);}
+                    else if(r2<r_avg2){
+                        velocity.x=-y/s;
+                        velocity.y=x/s;}
+                    return velocity;
+                }
+                virtual T p(const TV& X){return T();}
+                virtual TV f_volume(const TV& X,int color)
+                {
+                    TV force;
+                    if(!color) return force;
+                    force.x=-(X.y-0.5*m);
+                    force.y=X.x-0.5*m;
+                    force*=mu(1)*8/(rb2mra2)/s;
+                    return force;
+                }
+                virtual TV f_surface(const TV& X,int color1,int color2)
+                {
+                    VECTOR<T,2> z(X.x-0.5*m,X.y-0.5*m);
+                    T r=z.Normalize();
+                    z=z.Rotate_Counterclockwise_90();
+                    z*=mu(1)*2*sqr(r)/rb2mra2/s;
+                    TV force;
+                    force.x=z.x;
+                    force.y=z.y;
+                    if(r<r_avg) force*=-1;
+                    return force;
+                }
+            };
+            test=new ANALYTIC_TEST_4;
+            break;}
+        case 5:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], periodic pressure p(y)
+            struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
+                virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
+                virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual T p(const TV& X){return phi_color(X)*sin(2*M_PI*X.y/m)*kg/(sqr(s)*(TV::m==3?m:1));}
+                virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(1)*2*M_PI*cos(2*M_PI*X.y/m)*kg/(sqr(s)*(TV::m==3?sqr(m):m))*color;}
+                virtual TV f_surface(const TV& X,int color1,int color2)
+                {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s-TV::Axis_Vector(0)*sin(2*M_PI*X.y/m)*kg/(sqr(s)*(TV::m==3?m:1)))*((X.x>0.5*m)?(T)(-1):(T)1);}
+            };
+            test=new ANALYTIC_TEST_5;
+            break;}
+        case 6:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], linear pressure p(x) color
+            struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual T phi_value(const TV& X){return abs(-m/(T)6+abs(X.x-0.5*m));}
+                virtual int phi_color(const TV& X){return (-m/(T)6+abs(X.x-0.5*m))<0;}
+                virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
+                virtual T p(const TV& X){return phi_color(X)*(X.x-0.5*m)*kg/(sqr(s)*(TV::m==3?sqr(m):m));}
+                virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(0)*kg/(sqr(s)*(TV::m==3?sqr(m):m))*color;}
+                virtual TV f_surface(const TV& X,int color1,int color2)
+                {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s-TV::Axis_Vector(0)*(X.x-0.5*m)*kg/(sqr(s)*(TV::m==3?sqr(m):m)))*((X.x>0.5*m)?(T)(-1):(T)1);}
+            };
+            test=new ANALYTIC_TEST_6;
+            break;}
+        case 7:{ // One color, periodic. No inteface, no forces
+            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual T phi_value(const TV& X){return 1;}
+                virtual int phi_color(const TV& X){return 0;}
+                virtual TV u(const TV& X,int color){return TV();}
+                virtual T p(const TV& X){return 0;}
+                virtual TV f_volume(const TV& X,int color){return TV();}
+                virtual TV f_surface(const TV& X,int color1,int color2){return TV();}
+            };
+            test=new ANALYTIC_TEST_7;
+            break;}
+        case 8:{ // Two colors, periodic. Linear divergence field for r<R, 0 for r>R, no pressure
+            struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
+                virtual TV u(const TV& X,int color){return (X-0.5*m)*color;}
+                virtual T p(const TV& X){return 0;}
+                virtual TV f_volume(const TV& X,int color){return TV();}
+                virtual TV f_surface(const TV& X,int color1,int color2){return -(X-0.5*m).Normalized()*2*mu(1);}
+            };
+            test=new ANALYTIC_TEST_8;
+            break;}
+        case 9:{ // Two colors, periodic. Linear divergence field for r<R + quadratic pressure, 0 for r>R
+            struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
+                virtual TV u(const TV& X,int color){return (X-0.5*m)*color;}
+                virtual T p(const TV& X){return phi_color(X)*(X-0.5*m).Magnitude_Squared();}
+                virtual TV f_volume(const TV& X,int color){return (X-0.5*m)*2*color;}
+                virtual TV f_surface(const TV& X,int color1,int color2){return (X-0.5*m).Normalized()*((X-0.5*m).Magnitude_Squared()-2*mu(1));}
+            };
+            test=new ANALYTIC_TEST_9;
+            break;}
+        case 10:{ // Two colors, periodic. Exponential divergence velocity field and radial sine pressure field for r<R, 0 for r>R
+            struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
+            {
+                T r,m2,m4,u_term,p_term;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
+                virtual TV u(const TV& X,int color){TV x=X-0.5*m; return x*u_term*exp(-x.Magnitude_Squared()/m2)*color;}
+                virtual T p(const TV& X){return phi_color(X)*p_term*sin((X-0.5*m).Magnitude_Squared()/m2);}
+                virtual TV f_volume(const TV& X,int color)
+                {
+                    TV x=X-0.5*m;
+                    T x2=x.Magnitude_Squared();
+                    T x2m2=x2/m2;
+                    return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((TV::m+2)*m2-2*x2)*4*exp(-x2m2)/m4)*color;
+                }
+                virtual TV f_surface(const TV& X,int color1,int color2)
+                {
+                    TV x=X-0.5*m;
+                    T x2m2=x.Magnitude_Squared()/m2;
+                    return (p_term*sin(x2m2)+u_term*2*mu(1)*exp(-x2m2)*(2*x2m2-1))*x.Normalized();  
+                }
+            };
+            test=new ANALYTIC_TEST_10;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

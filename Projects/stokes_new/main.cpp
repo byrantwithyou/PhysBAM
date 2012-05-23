@@ -568,7 +568,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 T r;
                 using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){r=m/3.0;}
+                virtual void Initialize(){r=m/M_PI;}
                 virtual TV u(const TV& X,bool inside){return (X-0.5*m)*inside;}
                 virtual T p(const TV& X){return 0;}
                 virtual T phi(const TV& X){return (X-0.5*m).Magnitude()-r;}
