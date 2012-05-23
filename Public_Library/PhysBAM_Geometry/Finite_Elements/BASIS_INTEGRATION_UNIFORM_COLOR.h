@@ -53,7 +53,7 @@ public:
     void Add_Uncut_Cell(const TV_INT& cell,int color);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int color);
     void Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
-        const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface,const ARRAY<int>& map_constraints,
+        const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface,const ARRAY<int>& constraint_offsets,
         const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
 
     template<int d0,int d1>
