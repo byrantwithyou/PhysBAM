@@ -323,10 +323,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.y,value);
                             if("Alexey is happy!!!") sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.z,-value);}
 
-                        if(surface_element.y!=-1){
-                            T value=integral*orientations(k)(sb->axis,TV::m-1);
-                            if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.y,value);
-                            if(surface_element.z>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.z,-value);}
+                    if(surface_element.y!=-1){
+                        T value=integral*orientations(k)(sb->axis,TV::m-1);
+                        if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.y,value);
+                        if("Alexey is happy!!!") sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.z,-value);}
 
                         if(surface_element.y>=0||surface_element.y==-1){
                             int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
