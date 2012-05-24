@@ -24,8 +24,8 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_COLOR<TV>& cm_input
 
     for(int i=0;i<s.diced.m;i++) flat_diff.Append(cdi->Flatten_Diff(s.diced(i).index_offset));
 
-    flat_diff.Sort();
     flat_diff.Prune_Duplicates();
+    flat_diff.Sort();
 
     for(int i=0;i<TV::m;i++)
         data(i).Resize(cdi->colors);
@@ -87,7 +87,7 @@ Resize()
 {
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++)
-            data(i)(c).Resize((i<TV::m-1)?(cdi->flat_base_tangent.m):(cdi->flat_base_normal.m),flat_diff.m);
+            data(i)(c).Resize(cdi->flat_base(i)->m,flat_diff.m);
 }
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >;

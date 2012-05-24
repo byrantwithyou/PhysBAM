@@ -29,8 +29,8 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV
             if(s0.diced(i).subcell&s1.diced(j).subcell)
                 flat_diff.Append(cdi->Flatten_Diff(s1.diced(j).index_offset-s0.diced(i).index_offset));
 
-    flat_diff.Sort();
     flat_diff.Prune_Duplicates();
+    flat_diff.Sort();
     
     data.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++) data(c).Resize(cdi->flat_size,flat_diff.m);

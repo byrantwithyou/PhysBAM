@@ -187,36 +187,36 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
 
     // FILL IN THE NULL MODES
 
-    Resize_Vector(active_dofs);
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<cdi->colors;c++)
-            active_dofs.u(i)(c).Fill(1);
-    for(int c=0;c<cdi->colors;c++)
-        active_dofs.p(c).Fill(1);
-    active_dofs.q.Fill(1);
-
-    if(BASE::use_preconditioner) Set_Jacobi_Preconditioner();
+    if(this->use_preconditioner) Set_Jacobi_Preconditioner();
 
     Resize_Vector(null_p);
     for(int c=0;c<cdi->colors;c++){
         null_p.p(c).Fill(1);
         int start=cdi->constraint_base_tangent*(TV::m-1);
-        int end=cdi->constraint_base_tangent*(TV::m-1)+cdi->constraint_base_normal;
+        int end=start+cdi->constraint_base_normal;
         for(int k=start;k<end;k++)
             null_p.q(k)=-1;}
-    null_p.Scale(active_dofs);
+    for(int c=0;c<cdi->colors;c++)
+        for(int k=0;k<inactive_p(c).m;k++)
+            null_p.p(c)(inactive_p(c)(k))=0;
+    for(int k=0;k<inactive_q.m;k++)
+        null_p.q(inactive_q(k))=0;
     null_p.Normalize();
 
     for(int i=0;i<TV::m;i++){
         Resize_Vector(null_u(i));
-        for(int c=0;c<cdi->colors;c++) null_u(i).u(i)(c).Fill(1);
-        null_u(i).Scale(active_dofs);
+        for(int c=0;c<cdi->colors;c++){
+            VECTOR_ND<T>& u=null_u(i).u(i)(c);
+            const ARRAY<int>& inactive=inactive_u(i)(c);
+            u.Fill(1);
+            for(int k=0;k<inactive.m;k++)
+                u(inactive(k))=0;}
         null_u(i).Normalize();}
-    
+
     for(int i=0;i<TV::m;i++){
         delete u_stencil(i);
         for(int j=0;j<TV::m;j++)
-        delete udx_stencil(i)(j);}
+            delete udx_stencil(i)(j);}
 }
 //#####################################################################
 // Function Set_RHS
@@ -271,14 +271,18 @@ template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Set_Jacobi_Preconditioner()
 {
     Resize_Vector(J);
-    for(int i=0;i<TV::m;i++)
+    for(int i=0;i<TV::m;i++){
+        inactive_u(i).Resize(cdi->colors);
         for(int c=0;c<cdi->colors;c++){
             int u_dofs=cm_u(i)->dofs(c);
             SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)(c);
             for(int k=0;k<u_dofs;k++){
                 T d=abs(m_uu(k,k));
-                if(d<1e-13) {active_dofs.u(i)(c)(k)=0;LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
-                else J.u(i)(c)(k)=1/abs(m_uu(k,k));}}
+                if(d<1e-13){
+                    inactive_u(i)(c).Append(k);
+                    LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
+                else J.u(i)(c)(k)=1/abs(m_uu(k,k));}}}
+    inactive_p.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++){
         for(int k=0;k<cm_p->dofs(c);k++){
             T sum=0;
@@ -288,7 +292,9 @@ Set_Jacobi_Preconditioner()
                 int end=m_pu.offsets(k+1);
                 for(int e=start;e<end;e++)
                     sum+=sqr(m_pu.A(e).a)*J.u(i)(c)(m_pu.A(e).j);}
-            if(sum<1e-13) {active_dofs.p(c)(k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
+            if(sum<1e-13){
+                inactive_p(c).Append(k);
+                LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
             else J.p(c)(k)=1/sum;}}
     for(int k=0;k<J.q.n;k++){
         T sum=0;
@@ -299,7 +305,9 @@ Set_Jacobi_Preconditioner()
                 int end=m_qu.offsets(k+1);
                 for(int j=start;j<end;j++)
                     sum+=sqr(m_qu.A(j).a)*J.u(i)(c)(m_qu.A(j).j);}
-        if(sum<1e-13) {active_dofs.q(k)=0;LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
+        if(sum<1e-13){
+            inactive_q.Append(k);
+            LOG::cout<<"WARNING: small row sum in the QU block."<<std::endl;}
         else J.q(k)=1/sum;}
 }
 //#####################################################################
@@ -365,11 +373,25 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
+    // TODO: This needs to change for N/D BC.
     VECTOR_T& v=debug_cast<VECTOR_T&>(x);
     v.Copy(-v.Dot(null_p),null_p,v);
     for(int i=0;i<TV::m;i++)
         v.Copy(-v.Dot(null_u(i)),null_u(i),v);
-    v.Scale(active_dofs);
+
+    for(int i=0;i<TV::m;i++)
+        for(int c=0;c<cdi->colors;c++){
+            VECTOR_ND<T>& u=v.u(i)(c);
+            const ARRAY<int>& inactive=inactive_u(i)(c);
+            for(int k=0;k<inactive.m;k++)
+                u(inactive(k))=0;}
+
+    for(int c=0;c<cdi->colors;c++)
+        for(int k=0;k<inactive_p(c).m;k++)
+            v.p(c)(inactive_p(c)(k))=0;
+
+    for(int k=0;k<inactive_q.m;k++)
+        v.q(inactive_q(k))=0;
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

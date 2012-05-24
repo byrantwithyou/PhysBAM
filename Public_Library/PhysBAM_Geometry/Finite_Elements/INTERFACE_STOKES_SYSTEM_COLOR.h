@@ -66,7 +66,9 @@ public:
 
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;
-    VECTOR_T active_dofs;
+    VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;
+    ARRAY<ARRAY<int> > inactive_p;
+    ARRAY<int> inactive_q;
 
     const GRID<TV>& grid;
 
