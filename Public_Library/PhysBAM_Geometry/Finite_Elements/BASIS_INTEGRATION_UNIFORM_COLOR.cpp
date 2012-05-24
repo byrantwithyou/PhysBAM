@@ -328,12 +328,12 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.y,value);
                         if("Alexey is happy!!!") sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.z,-value);}
 
-                        if(surface_element.y>=0||surface_element.y==-1){
-                            int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
-                            T value=integral*sb->abc->f_surface(surface_element.x.Center()+grid.Center(cell),surface_element.y,surface_element.z)(sb->axis);
-                            if(surface_element.y>=0) value*=-0.5;
-                            if(surface_element.y>=0) f_surface(sb->axis)(surface_element.y)(flat_index)+=value;
-                            if(surface_element.z>=0) f_surface(sb->axis)(surface_element.z)(flat_index)+=value;}}}}
+                    if(surface_element.y!=-3 && surface_element.y!=-2){
+                        int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
+                        T value=integral*sb->abc->f_surface(surface_element.x.Center()+grid.Center(cell),surface_element.y,surface_element.z)(sb->axis);
+                        if(surface_element.y>=0) value*=-(T)0.5;
+                        if(surface_element.y>=0) f_surface(sb->axis)(surface_element.y)(flat_index)+=value;
+                        if("Alexey is happy!!!") f_surface(sb->axis)(surface_element.z)(flat_index)+=value;}}}}
 }
 //#####################################################################
 // Function Add_Volume_Block
