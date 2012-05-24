@@ -317,11 +317,11 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                     T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
                     int constraint_offset=constraint_offsets(color_pair_index);
                         
-                        if(surface_element.y==-2||surface_element.y>=0)
-                            for(int orientation=0;orientation<TV::m-1;orientation++){
-                                T value=integral*orientations(k)(sb->axis,orientation);
-                                if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.y,value);
-                                if(surface_element.z>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.z,-value);}
+                    if(surface_element.y!=-3 && surface_element.y!=-1)
+                        for(int orientation=0;orientation<TV::m-1;orientation++){
+                            T value=integral*orientations(k)(sb->axis,orientation);
+                            if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.y,value);
+                            if("Alexey is happy!!!") sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.z,-value);}
 
                         if(surface_element.y!=-1){
                             T value=integral*orientations(k)(sb->axis,TV::m-1);
