@@ -125,9 +125,8 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
                 const TRIPLE<T_FACE,int,int>& surface_element=subcell_surface(i);
                 if(surface_element.z>=0){
                     VECTOR<int,2> color_pair(surface_element.y,surface_element.z);
-                    if(!ht_color_pairs.Contains(color_pair)){
-                        ht_color_pairs.Insert(color_pair,color_pairs.m);
-                        color_pairs.Append(color_pair);}}}}
+                    if(!ht_color_pairs.Contains(color_pair))
+                        ht_color_pairs.Insert(color_pair,color_pairs.Append(color_pair));}}}
 
         ARRAY<MATRIX<T,TV::m> > base_orientation(color_pairs.m);
         Compute_Averaged_Orientation_Helper(surface,ht_color_pairs,base_orientation);
@@ -232,11 +231,11 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
     typedef VECTOR<T,3> TV;
     typedef MATRIX<T,3> TM;
 
-    TV b=TV(0,0,1);
-    TV n=base_orientation.Transposed()*triangle.Normal();
+    TV b(0,0,1);
+    TV n=base_orientation.Transpose_Times(triangle.Normal());
     TV u=TV::Cross_Product(b,n).Normalized();
-    
-    orientation=base_orientation*TM(n,u,TV::Cross_Product(n,u))*TM(b,u,TV::Cross_Product(b,u)).Transposed();
+
+    orientation=base_orientation*TM(n,u,TV::Cross_Product(n,u)).Times_Transpose(TM(b,u,TV::Cross_Product(b,u)));
 }
 //#####################################################################
 // Function Add_Cut_Fine_Cell
