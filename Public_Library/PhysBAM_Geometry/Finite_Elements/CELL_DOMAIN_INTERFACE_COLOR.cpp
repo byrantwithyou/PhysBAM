@@ -51,12 +51,10 @@ Set_Flat_Base_And_Resize(int extra_constraints_normal,int extra_constraints_tang
     int flat_index=Flatten(index);
 
     int constraints_normal=constraint_base_normal+extra_constraints_normal;
-    flat_base_normal.Resize(constraints_normal);
-    for(int i=constraint_base_normal;i<constraints_normal;i++) flat_base_normal(i)=flat_index;
+    flat_base_normal.Resize(constraints_normal,true,true,flat_index);
 
     int constraints_tangent=constraint_base_tangent+extra_constraints_tangent;
-    flat_base_tangent.Resize(constraints_tangent);
-    for(int i=constraint_base_tangent;i<constraints_tangent;i++) flat_base_tangent(i)=flat_index;
+    flat_base_tangent.Resize(constraints_tangent,true,true,flat_index);
 }
 //#####################################################################
 // Function Update_Constraint_Count
