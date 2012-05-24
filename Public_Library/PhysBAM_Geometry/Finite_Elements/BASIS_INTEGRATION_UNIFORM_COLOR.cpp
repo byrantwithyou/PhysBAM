@@ -62,15 +62,16 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,
 {
     ARRAY<VECTOR<T,3> > normal(base_orientation.m);
     VECTOR<T,3> tangent;
-    for(int b=0;b<8;b++){
-        const ARRAY<TRIPLE<T_FACE,int,int> >& block_surface=surface(b);
-        for(int i=0;i<surface(b).m;i++){
-            const TRIPLE<T_FACE,int,int>& surface_element=block_surface(i);
+    for(int s=0;s<8;s++){
+        const ARRAY<TRIPLE<T_FACE,int,int> >& subcell_surface=surface(s);
+        for(int i=0;i<subcell_surface.m;i++){
+            const TRIPLE<T_FACE,int,int>& surface_element=subcell_surface(i);
+            if(surface_element.z<0) continue;
             int color_pair_index=-1;
-            if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index))
-                normal(color_pair_index)+=surface_element.x.Raw_Normal();
-            else assert((surface_element.y<0)&&(surface_element.z<0));}}
-    
+            bool found=ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index);
+            PHYSBAM_ASSERT(found);
+            normal(color_pair_index)+=surface_element.x.Raw_Normal();}}
+
     for(int i=0;i<normal.m;i++){
         normal(i).Normalize();
         tangent=normal(i).Unit_Orthogonal_Vector();
@@ -241,7 +242,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 // Function Add_Cut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
+Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
     const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface,const ARRAY<int>& constraint_offsets,
     const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
@@ -250,11 +251,11 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
 
     for(int i=0;i<surface.m;i++)
         for(int j=0;j<TV::m;j++)
-            surface(i).x.X(j)=(surface(i).x.X(j)-block_offset)*((T).5*grid.dX);
+            surface(i).x.X(j)=(surface(i).x.X(j)-subcell_offset)*((T).5*grid.dX);
 
     for(int i=0;i<sides.m;i++)
         for(int j=0;j<TV::m;j++)
-            sides(i).x.X(j)=(sides(i).x.X(j)-block_offset)*((T).5*grid.dX);
+            sides(i).x.X(j)=(sides(i).x.X(j)-subcell_offset)*((T).5*grid.dX);
             
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_volume_integrals(cdi.colors);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
@@ -278,7 +279,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
         VOLUME_BLOCK* vb=volume_blocks(i);
         for(int j=0;j<vb->overlap_polynomials.m;j++){
             typename VOLUME_BLOCK::OVERLAP_POLYNOMIAL& op=vb->overlap_polynomials(j);
-            if(op.subcell&(1<<block))
+            if(op.subcell&(1<<subcell))
                 for(int c=0;c<cdi.colors;c++){
                     T integral=Precomputed_Integral(precomputed_volume_integrals(c),op.polynomial);
                     int flat_index=cdi.Flatten(cell)+op.flat_index_offset;
@@ -304,7 +305,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
         SURFACE_BLOCK* sb=surface_blocks(i);
         for(int j=0;j<sb->overlap_polynomials.m;j++){
             typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
-            if(op.subcell&(1<<block))
+            if(op.subcell&(1<<subcell))
                 for(int k=0;k<surface.m;k++){
                     TRIPLE<T_FACE,int,int>& surface_element=surface(k);
                     int color_pair_index=-1;
