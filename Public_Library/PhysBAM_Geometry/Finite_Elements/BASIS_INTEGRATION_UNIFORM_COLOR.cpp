@@ -259,12 +259,13 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
             
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_volume_integrals(cdi.colors);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
+    ARRAY<T> integrals(cdi.colors);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(volume_monomials_needed(it.index)){
             STATIC_POLYNOMIAL<T,TV::m,static_degree+1> monomial;
             monomial.Set_Term(it.index,1);
             monomial=monomial.Integrate(TV::m-1);
-            ARRAY<T> integrals(cdi.colors);
+            integrals.Fill(0);
             for(int i=0;i<sides.m;i++){
                 const PAIR<T_FACE,int>& V=sides(i);
                 if(V.y>=0) integrals(V.y)+=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);}
@@ -288,11 +289,12 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
     ARRAY<MATRIX<T,TV::m> > orientations;
     orientations.Resize(surface.m);
     for(int i=0;i<surface.m;i++){
-        TRIPLE<T_FACE,int,int>& surface_element=surface(i);
+        const TRIPLE<T_FACE,int,int>& surface_element=surface(i);
+        if(surface_element.z<0) continue;
         int color_pair_index=-1;
-        if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index))
-            Compute_Consistent_Orientation_Helper(surface(i).x,orientations(i),base_orientation(color_pair_index));
-        else assert((surface_element.y<0)&&(surface_element.z<0));}
+        bool found=ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index);
+        PHYSBAM_ASSERT(found);
+        Compute_Consistent_Orientation_Helper(surface(i).x,orientations(i),base_orientation(color_pair_index));}
 
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_surface_integrals(surface.m);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
