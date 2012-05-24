@@ -312,9 +312,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                     const TRIPLE<T_FACE,int,int>& surface_element=surface(k);
                     if(surface_element.z<0) continue;
                     int color_pair_index=-1;
-                    if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index)){
-                        T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                        int constraint_offset=constraint_offsets(color_pair_index);
+                    bool found=ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index);
+                    PHYSBAM_ASSERT(found);
+                    T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
+                    int constraint_offset=constraint_offsets(color_pair_index);
                         
                         if(surface_element.y==-2||surface_element.y>=0)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
@@ -332,8 +333,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             T value=integral*sb->abc->f_surface(surface_element.x.Center()+grid.Center(cell),surface_element.y,surface_element.z)(sb->axis);
                             if(surface_element.y>=0) value*=-0.5;
                             if(surface_element.y>=0) f_surface(sb->axis)(surface_element.y)(flat_index)+=value;
-                            if(surface_element.z>=0) f_surface(sb->axis)(surface_element.z)(flat_index)+=value;}}
-                    else assert((surface_element.y<0)&&(surface_element.z<0));}}}
+                            if(surface_element.z>=0) f_surface(sb->axis)(surface_element.z)(flat_index)+=value;}}}}
 }
 //#####################################################################
 // Function Add_Volume_Block
