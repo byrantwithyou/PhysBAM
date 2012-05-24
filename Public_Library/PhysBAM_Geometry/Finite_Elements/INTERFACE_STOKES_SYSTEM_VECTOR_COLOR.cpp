@@ -27,10 +27,8 @@ template<class TV> INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 template<class TV> INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 operator=(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v)
 {
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<colors;c++)
-            u(i)(c)=v.u(i)(c);
-    for(int c=0;c<colors;c++) p(c)=v.p(c);
+    u=v.u;
+    p=v.p;
     q=v.q;
     return *this;
 }
@@ -41,10 +39,8 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_STOKES_SYS
 operator+=(const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv);
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<colors;c++)
-            u(i)(c)+=v.u(i)(c);
-    for(int c=0;c<colors;c++) p(c)+=v.p(c);
+    u+=v.u;
+    p+=v.p;
     q+=v.q;
     return *this;
 }
@@ -55,10 +51,8 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_STOKES_SYS
 operator-=(const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv);
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<colors;c++)
-            u(i)(c)-=v.u(i)(c);
-    for(int c=0;c<colors;c++) p(c)-=v.p(c);
+    u-=v.u;
+    p-=v.p;
     q-=v.q;
     return *this;
 }
@@ -203,13 +197,7 @@ Dot(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v) const
 template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 Magnitude_Squared() const
 {
-    T ms=0;
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<colors;c++)
-            ms+=u(i)(c).Magnitude_Squared();
-    for(int c=0;c<colors;c++) ms+=p(c).Magnitude_Squared();
-    ms+=q.Magnitude_Squared();
-    return ms;
+    return Dot(*this);
 }
 //#####################################################################
 // Function Magnitude
