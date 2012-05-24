@@ -19,7 +19,7 @@ struct ANALYTIC_BOUNDARY_CONDITIONS_COLOR: public NONCOPYABLE
     
     ANALYTIC_BOUNDARY_CONDITIONS_COLOR():kg(1),m(1),s(1){}
 
-    virtual TV f_surface(const TV& X,int color0,int color1)=0;
+    virtual TV f_surface(const TV& X,int color1,int color2)=0;
 };
 }
 #endif

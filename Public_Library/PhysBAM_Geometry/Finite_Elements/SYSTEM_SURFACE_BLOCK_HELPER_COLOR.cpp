@@ -42,7 +42,7 @@ Mark_Active_Cells(T tol)
             for(int l=0;l<d.m;l++)
                 for(int k=0;k<d.n;k++)
                     if(abs(d(l,k))>tol)
-                        cm->Set_Active((*(cdi->flat_base(i)))(l)+flat_diff(k),c);
+                        cm->Set_Active((*cdi->flat_base(i))(l)+flat_diff(k),c);
                     else d(l,k)=0;}
 }
 //#####################################################################
@@ -66,12 +66,12 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
         int row=0;
         for(int orientation=0;orientation<TV::m;orientation++){
             MATRIX_MXN<T>& d=data(orientation)(c);
-            for(int i=0;i<(*(cdi->constraint_base(orientation)));i++,row++){
+            for(int i=0;i<*cdi->constraint_base(orientation);i++,row++){
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
                 for(int j=0;j<d.n;j++){
                     T value=d(i,j);
                     if(value){
-                        int column=comp_n((*(cdi->flat_base(orientation)))(i)+flat_diff(j));
+                        int column=comp_n((*cdi->flat_base(orientation))(i)+flat_diff(j));
                         M.offsets(row+1)++;
                         entries.Append(SPARSE_MATRIX_ENTRY<T>(column,value));}}
                 if(cdi->Is_Boundary_Constraint(i,orientation)) entries.Sort();

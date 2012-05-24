@@ -2,6 +2,7 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
@@ -42,8 +43,8 @@ INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_va
         counts(axis)=grid.counts(axis);
         for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),counts));it.Valid();it.Next()){
             TV_INT a=scale*it.index;
-            TV_INT m(a); m+=TV_INT::Axis_Vector(axis);
-            TV_INT b(m); b+=TV_INT::Axis_Vector(axis);
+            TV_INT m(a);m+=TV_INT::Axis_Vector(axis);
+            TV_INT b(m);b+=TV_INT::Axis_Vector(axis);
             const T& phi_value_a=phi_value(a);
             const T& phi_value_b=phi_value(b);
             const int& phi_color_a=phi_color(a);
@@ -131,9 +132,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
         helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
         helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);}
 
-    ARRAY<T> double_mu(mu),ones(mu.m),minus_ones(mu.m);
-    for(int i=0;i<double_mu.m;i++) double_mu(i)*=2;
-    ones.Fill(1); minus_ones.Fill(-1);
+    ARRAY<T> double_mu(mu*(T)2),ones(CONSTANT_ARRAY<T>(mu.m,(T)1)),minus_ones(CONSTANT_ARRAY<T>(mu.m,-(T)1));
 
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
@@ -153,11 +152,10 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),ones);
 
-    rhs_surface=new VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>;
     for(int i=0;i<TV::m;i++){
-        (*rhs_surface)(i).Resize(cdi->colors);
+        rhs_surface(i).Resize(cdi->colors);
         for(int c=0;c<cdi->colors;c++)
-            (*rhs_surface)(i)(c).Resize(cdi->flat_size);}
+            rhs_surface(i)(c).Resize(cdi->flat_size);}
 
     biu.Compute_Entries(rhs_surface);
         
@@ -184,9 +182,8 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
     for(int i=0;i<TV::m;i++)
         helper_qu(i).Build_Matrix(matrix_qu(i));
     // RHS PU Block 
-    matrix_rhs_pu=new VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m>;
     for(int i=0;i<TV::m;i++)
-        helper_rhs_pu(i).Build_Matrix((*matrix_rhs_pu)(i));
+        helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
 
     // FILL IN THE NULL MODES
 
@@ -256,15 +253,16 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> > f_volume,const ARRAY<ARRAY<
         for(int c=0;c<cdi->colors;c++)
             for(int j=0;j<cdi->flat_size;j++){
                 int k=cm_u(i)->Get_Index(j,c);
-                if(k>=0) rhs.u(i)(c)(k)+=(*rhs_surface)(i)(c)(j);}
+                if(k>=0) rhs.u(i)(c)(k)+=rhs_surface(i)(c)(j);}
     
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++){
-            (*matrix_rhs_pu)(i)(c).Transpose_Times_Add(F_volume(i)(c),rhs.u(i)(c));
+            matrix_rhs_pu(i)(c).Transpose_Times_Add(F_volume(i)(c),rhs.u(i)(c));
             matrix_qu(i)(c).Times_Add(U(i)(c),rhs.q);
             matrix_pu(i)(c).Times_Add(U(i)(c),rhs.p(c));}
 
-    delete matrix_rhs_pu;
+    for(int i=0;i<TV::m;i++) matrix_rhs_pu(i).Clean_Memory();
+    for(int i=0;i<TV::m;i++) rhs_surface(i).Clean_Memory();
 }
 //#####################################################################
 // Function Set_Jacobi_Preconditioner

@@ -30,7 +30,6 @@ class INTERFACE_STOKES_SYSTEM_COLOR:public KRYLOV_SYSTEM_BASE<typename TV::SCALA
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
     VECTOR_T J; // Jacobi preconditioner 
-    void Set_Jacobi_Preconditioner();
 
 public:
 
@@ -62,8 +61,8 @@ public:
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_pu;
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_qu;
 
-    VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m>* matrix_rhs_pu;
-    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* rhs_surface;
+    VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu;
+    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> rhs_surface;
 
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;
@@ -99,6 +98,8 @@ public:
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const;
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
+private:
+    void Set_Jacobi_Preconditioner();
 //#####################################################################
 };
 }

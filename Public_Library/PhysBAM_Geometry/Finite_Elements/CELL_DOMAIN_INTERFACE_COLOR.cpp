@@ -75,7 +75,7 @@ Update_Total_Constraint_Count()
 {
     total_number_of_surface_constraints=0;
     for(int orientation=0;orientation<TV::m;orientation++)
-        total_number_of_surface_constraints+=(*constraint_base(orientation));
+        total_number_of_surface_constraints+=*constraint_base(orientation);
 }
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,3> >;

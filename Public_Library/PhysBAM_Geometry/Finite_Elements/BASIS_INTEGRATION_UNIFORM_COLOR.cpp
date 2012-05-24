@@ -80,7 +80,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface)
+Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
@@ -244,7 +244,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
-    const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface,const ARRAY<int>& constraint_offsets,
+    const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface,const ARRAY<int>& constraint_offsets,
     const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
     assert(sides.m);
@@ -329,8 +329,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIP
                             int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
                             T value=integral*sb->abc->f_surface(surface_element.x.Center()+grid.Center(cell),surface_element.y,surface_element.z)(sb->axis);
                             if(surface_element.y>=0) value*=-0.5;
-                            if(surface_element.y>=0) (*f_surface)(sb->axis)(surface_element.y)(flat_index)+=value;
-                            if(surface_element.z>=0) (*f_surface)(sb->axis)(surface_element.z)(flat_index)+=value;}}
+                            if(surface_element.y>=0) f_surface(sb->axis)(surface_element.y)(flat_index)+=value;
+                            if(surface_element.z>=0) f_surface(sb->axis)(surface_element.z)(flat_index)+=value;}}
                     else assert((surface_element.y<0)&&(surface_element.z<0));}}}
 }
 //#####################################################################

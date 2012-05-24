@@ -25,12 +25,9 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d0>& s0,const BASIS_STENCIL_UNIFORM<TV
     cdi=&cdi_input;
 
     for(int i=0;i<s0.diced.m;i++)
-        for(int j=0;j<s1.diced.m;j++){
-            int overlap=s0.diced(i).subcell&s1.diced(j).subcell;
-            if(overlap){
-                const typename BASIS_STENCIL_UNIFORM<TV,d0>::DICED& diced0=s0.diced(i);
-                const typename BASIS_STENCIL_UNIFORM<TV,d1>::DICED& diced1=s1.diced(j);
-                flat_diff.Append(cdi->Flatten_Diff(diced1.index_offset-diced0.index_offset));}}
+        for(int j=0;j<s1.diced.m;j++)
+            if(s0.diced(i).subcell&s1.diced(j).subcell)
+                flat_diff.Append(cdi->Flatten_Diff(s1.diced(j).index_offset-s0.diced(i).index_offset));
 
     flat_diff.Sort();
     flat_diff.Prune_Duplicates();

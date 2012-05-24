@@ -48,12 +48,12 @@ public:
         const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
     ~BASIS_INTEGRATION_UNIFORM_COLOR();
 
-    void Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface);
+    void Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface);
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int color);
-    void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int color);
-    void Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
-        const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>* f_surface,const ARRAY<int>& constraint_offsets,
+    void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
+    void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
+        const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface,const ARRAY<int>& constraint_offsets,
         const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
 
     template<int d0,int d1>

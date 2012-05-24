@@ -18,7 +18,6 @@ class SYSTEM_VOLUME_BLOCK_COLOR:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 
-    CELL_DOMAIN_INTERFACE_COLOR<TV>* cdi;
     SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV> *helper;
 
 public:
@@ -29,13 +28,13 @@ public:
         int flat_index_diff_ref;
         T x;
         
-        bool operator< (const OPEN_ENTRY& me) const
+        bool operator< (const OPEN_ENTRY& oe) const
         {
-            if(flat_index_offset!=me.flat_index_offset) return flat_index_offset<me.flat_index_offset; 
-            return flat_index_diff_ref<me.flat_index_diff_ref; 
+            if(flat_index_offset!=oe.flat_index_offset) return flat_index_offset<oe.flat_index_offset; 
+            return flat_index_diff_ref<oe.flat_index_diff_ref; 
         }
         
-        void Merge(const OPEN_ENTRY& me){x+=me.x;}
+        void Merge(const OPEN_ENTRY& oe){x+=oe.x;}
     };
     
     struct OVERLAP_POLYNOMIAL
@@ -60,7 +59,7 @@ public:
     void Initialize(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const ARRAY<T>& scale_input);
     void Add_Open_Entries(int flat_index,int color);
-    void Add_Open_Subcell_Entries(int flat_index,int block,int color);
+    void Add_Open_Subcell_Entries(int flat_index,int subcell,int color);
 };
 }
 #endif

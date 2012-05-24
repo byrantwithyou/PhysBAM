@@ -19,13 +19,12 @@ Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENC
     axis=axis_input;
     scale=scale_input;
     helper=&helper_input;
-    cdi=helper->cdi;
 
     overlap_polynomials.Resize(s.diced.m);
     for(int i=0;i<overlap_polynomials.m;i++){
         OVERLAP_POLYNOMIAL& op=overlap_polynomials(i);
         const typename BASIS_STENCIL_UNIFORM<TV,d>::DICED& diced=s.diced(i);
-        op.flat_index_offset=cdi->Flatten_Diff(diced.index_offset);
+        op.flat_index_offset=helper->cdi->Flatten_Diff(diced.index_offset);
         op.flat_index_diff_ref=helper->flat_diff.Binary_Search(op.flat_index_offset);
         op.subcell=diced.subcell;
         op.polynomial=diced.polynomial;}

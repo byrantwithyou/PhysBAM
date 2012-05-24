@@ -28,7 +28,7 @@ class SYSTEM_SURFACE_BLOCK_HELPER_COLOR:public NONCOPYABLE
 public:
     
     VECTOR<ARRAY<MATRIX_MXN<T> >,TV::m> data;
-    CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;        
+    CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
     CELL_MANAGER_COLOR<TV> *cm;
     ARRAY<int> flat_diff;
     

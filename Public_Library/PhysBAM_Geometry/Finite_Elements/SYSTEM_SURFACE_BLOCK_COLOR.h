@@ -21,7 +21,6 @@ class SYSTEM_SURFACE_BLOCK_COLOR:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    CELL_DOMAIN_INTERFACE_COLOR<TV>* cdi;
     SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV> *helper;
 
 public:
@@ -43,8 +42,8 @@ public:
     void Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
         ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,int axis_input,T scale_input);
 
-    void Add_Entry(int interface_dof,int orientation,int flat_index_diff_ref,int color,T value)
-    {helper->data(orientation)(color)(interface_dof,flat_index_diff_ref)+=value*scale;}
+    void Add_Entry(int constraint_index,int orientation,int flat_index_diff_ref,int color,T value)
+    {helper->data(orientation)(color)(constraint_index,flat_index_diff_ref)+=value*scale;}
 
     int Flat_Diff(int i)
     {return helper->flat_diff(i);}
