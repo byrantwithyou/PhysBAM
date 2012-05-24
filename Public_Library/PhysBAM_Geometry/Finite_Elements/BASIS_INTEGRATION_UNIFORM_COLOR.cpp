@@ -309,7 +309,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
             typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
             if(op.subcell&(1<<subcell))
                 for(int k=0;k<surface.m;k++){
-                    TRIPLE<T_FACE,int,int>& surface_element=surface(k);
+                    const TRIPLE<T_FACE,int,int>& surface_element=surface(k);
+                    if(surface_element.z<0) continue;
                     int color_pair_index=-1;
                     if(ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index)){
                         T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
