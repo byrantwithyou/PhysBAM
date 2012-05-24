@@ -120,9 +120,9 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
         ARRAY<VECTOR<int,2> > color_pairs;
         
         for(int s=0;s<(1<<TV::m);s++){
-            const ARRAY<TRIPLE<T_FACE,int,int> >& block_surface=surface(s);
-            for(int i=0;i<block_surface.m;i++){
-                const TRIPLE<T_FACE,int,int>& surface_element=block_surface(i);
+            const ARRAY<TRIPLE<T_FACE,int,int> >& subcell_surface=surface(s);
+            for(int i=0;i<subcell_surface.m;i++){
+                const TRIPLE<T_FACE,int,int>& surface_element=subcell_surface(i);
                 if(surface_element.z>=0){
                     VECTOR<int,2> color_pair(surface_element.y,surface_element.z);
                     if(!ht_color_pairs.Contains(color_pair)){
@@ -136,14 +136,12 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
         int full_constraints=0;
         int slip_constraints=0;
         for(int i=0;i<color_pairs.m;i++)
-            if(color_pairs(i).x==-2||color_pairs(i).x>=0){
-                constraint_offsets(i)=full_constraints;
-                full_constraints++;}
+            if(color_pairs(i).x==-2||color_pairs(i).x>=0)
+                constraint_offsets(i)=full_constraints++;
         for(int i=0;i<color_pairs.m;i++)
-            if(color_pairs(i).x==-3){
-                constraint_offsets(i)=slip_constraints+full_constraints;
-                slip_constraints++;}
-        
+            if(color_pairs(i).x==-3)
+                constraint_offsets(i)=slip_constraints+full_constraints++;
+
         cdi.Set_Flat_Base_And_Resize(full_constraints+slip_constraints,full_constraints,it.index);
         for(int i=0;i<surface_blocks.m;i++) surface_blocks(i)->Resize();
 
@@ -151,7 +149,8 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
             if(material_subcell(s)){
                 if(!surface(s).m){
                     int color=phi_color(cell_base+bits(s));
-                    if(color>=0) Add_Uncut_Fine_Cell(it.index,s,color);}
+                    assert(color>=0);
+                    Add_Uncut_Fine_Cell(it.index,s,color);}
                 else Add_Cut_Fine_Cell(it.index,s,TV(bits((1<<TV::m)-1-s)),surface(s),sides(s),
                     base_orientation,f_surface,constraint_offsets,ht_color_pairs);}
         cdi.Update_Constraint_Count();}
@@ -210,10 +209,10 @@ Add_Uncut_Cell(const TV_INT& cell,int color)
 // Function Add_Uncut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int color)
+Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color)
 {
     for(int i=0;i<volume_blocks.m;i++)
-        volume_blocks(i)->Add_Open_Subcell_Entries(cdi.Flatten(cell),block,color);
+        volume_blocks(i)->Add_Open_Subcell_Entries(cdi.Flatten(cell),subcell,color);
 }
 //#####################################################################
 // Function Compute_Consistent_Orientation_Helper
