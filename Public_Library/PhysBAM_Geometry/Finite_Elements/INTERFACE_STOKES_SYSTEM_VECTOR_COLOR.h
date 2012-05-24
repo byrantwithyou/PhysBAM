@@ -45,7 +45,6 @@ public:
     T Max_Abs() const;
     void Normalize();
     void Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& s);
-    void Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& s);
 };
 }
 #endif

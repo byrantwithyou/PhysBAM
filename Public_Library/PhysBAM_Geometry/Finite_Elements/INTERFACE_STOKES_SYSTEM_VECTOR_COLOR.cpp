@@ -246,22 +246,6 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_S
         q(k)=v.q(k)*s.q(k);
 }
 //#####################################################################
-// Function Scale
-//#####################################################################
-template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
-Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& s)
-{
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<colors;c++)
-            for(int k=0;k<u(i)(c).n;k++)
-                u(i)(c)(k)*=s.u(i)(c)(k);
-    for(int c=0;c<colors;c++)
-        for(int k=0;k<p(c).n;k++)
-            p(c)(k)*=s.p(c)(k);
-    for(int k=0;k<q.n;k++)
-        q(k)*=s.q(k);
-}
-//#####################################################################
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,1> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,2> >;
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,3> >;
