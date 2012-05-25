@@ -155,6 +155,9 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
 
     // FILL IN THE NULL MODES
 
+    for(int i=0;i<TV::m;i++) inactive_u(i).Resize(cdi->colors);
+    inactive_p.Resize(cdi->colors);
+
     if(this->use_preconditioner) Set_Jacobi_Preconditioner();
 
     Resize_Vector(null_p);
@@ -239,8 +242,7 @@ template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Set_Jacobi_Preconditioner()
 {
     Resize_Vector(J);
-    for(int i=0;i<TV::m;i++){
-        inactive_u(i).Resize(cdi->colors);
+    for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++){
             int u_dofs=cm_u(i)->dofs(c);
             SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(i)(i)(c);
@@ -249,8 +251,7 @@ Set_Jacobi_Preconditioner()
                 if(d<1e-13){
                     inactive_u(i)(c).Append(k);
                     LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
-                else J.u(i)(c)(k)=1/abs(m_uu(k,k));}}}
-    inactive_p.Resize(cdi->colors);
+                else J.u(i)(c)(k)=1/abs(m_uu(k,k));}}
     for(int c=0;c<cdi->colors;c++){
         for(int k=0;k<cm_p->dofs(c);k++){
             T sum=0;

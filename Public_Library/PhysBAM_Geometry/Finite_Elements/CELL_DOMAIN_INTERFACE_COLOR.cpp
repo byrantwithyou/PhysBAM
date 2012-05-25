@@ -69,13 +69,6 @@ Update_Constraint_Count()
 {
     constraint_base_n=flat_base_n.m;
     constraint_base_t=flat_base_t.m;
-}
-//#####################################################################
-// Function Update_Constraint_Count_Scalar
-//#####################################################################
-template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
-Update_Constraint_Count_Scalar()
-{
     constraint_base_scalar=flat_base_scalar.m;
 }
 //#####################################################################

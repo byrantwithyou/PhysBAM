@@ -356,7 +356,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         PHYSBAM_ASSERT(found);
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                        assert(V.z==SLIP && "Do you really want slip constraints for a scalar variable?");
+                        assert(V.z!=SLIP && "Do you really want slip constraints for a scalar variable?");
                         
                         if(V.y!=NEUMANN){
                             if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,integral);

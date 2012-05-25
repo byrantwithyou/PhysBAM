@@ -72,7 +72,6 @@ public:
     void Set_Flat_Base_And_Resize(int extra_constraints_n,int extra_constraints_t,const TV_INT& index);
     void Set_Flat_Base_And_Resize_Scalar(int extra_constraints_scalar,const TV_INT& index);
     void Update_Constraint_Count();
-    void Update_Constraint_Count_Scalar();
     void Update_Total_Constraint_Count();
 
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,

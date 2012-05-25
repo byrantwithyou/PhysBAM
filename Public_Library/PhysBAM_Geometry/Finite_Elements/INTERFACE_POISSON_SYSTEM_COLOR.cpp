@@ -103,6 +103,8 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLO
 
     // FILL IN THE NULL MODES
 
+    inactive_u.Resize(cdi->colors);
+
     if(this->use_preconditioner) Set_Jacobi_Preconditioner();
 
     Resize_Vector(null_u);
