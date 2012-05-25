@@ -11,6 +11,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 using namespace PhysBAM;
+//#define ENABLE_TIMING
 namespace{
 ARRAY<int> interface_case_table;
 ARRAY<int> interface_triangle_table;
@@ -41,7 +42,14 @@ const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
 const int permute_flip[19]={0,1,2,3,5,4,7,6,9,8,11,10,13,12,14,15,16,17,18};
 int face_edges[6][4];
-const int greedy=2;
+#ifdef ENABLE_TIMING
+#define rdtscll(val) do { \
+     unsigned int __a,__d; \
+     asm volatile("rdtsc" : "=a" (__a), "=d" (__d)); \
+     (val) = ((unsigned long long)__a) | (((unsigned long long)__d)<<32); \
+} while(0)
+inline unsigned long long rdtsc(){unsigned long long x;rdtscll(x);return x;}
+#endif
 
 inline EDGE Rotate_X(const EDGE& ep)
 {
@@ -130,12 +138,6 @@ void Insert_Face_Graph_Edge(int (*face_graph)[2],EDGE* edges,int e)
     EDGE& e0=edges[fg[0]];
     if(!Merge_Edges(e0,edges[e])){fg[1]=e;return;}
     if(e0.c0==e0.c1) fg[0]=-1;
-}
-void Emit_Loop_Triangles(int* vertices,int n,int c0,int c1)
-{
-    for(int i=0;i<n-2;i++){
-        interface_triangle_table.Append((c0<<18)|(c1<<15)|(vertices[2*i]<<10)|(vertices[2*i+1]<<5)|vertices[2*i+2]);
-        vertices[n+i]=vertices[2*i];}
 }
 ARRAY<char> edges_intersect;
 
@@ -356,152 +358,35 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     int face_graph[64][2];
     for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
 
-    if(greedy==0){
-        for(int i=0;i<12;i++){
-            if(adj[i][0]==-1) continue;
-            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
-            if(in.v0==out.v1){
-                adj[in.v0][0]=-1;
-                adj[in.v0][1]=-1;
-                adj[i][0]=-1;
-                adj[i][1]=-1;
-                continue;}
-            Add_Edge(in.v0,in.v1,out.v1,in.c0,in.c1);
-            in.v1=out.v1;
-            if(in.v1<12) adj[in.v1][0]=adj[i][0];
-            else if(in.v0>=12){
-                in.v0-=12;
-                in.v1-=12;
-                Insert_Face_Graph_Edge(face_graph,edges,adj[i][0]);}
-            adj[i][0]=-1;
-            adj[i][1]=-1;}}
-    else if(greedy==2){
-        int cur_edges[100][2],num_cur_edges=0,num_face_edges=0;
-        EDGE face_edges[20];
-        int face_mask=0;
-        for(int i=0;i<12;i++){
-            EDGE& in=edges[adj[i][0]];
-            if(in.v0<12) continue;
-            int c=i;
-            while(edges[adj[c][1]].v1<12) c=edges[adj[c][1]].v1;
-            face_edges[num_face_edges].v0=in.v0-12;
-            face_edges[num_face_edges].v1=edges[adj[c][1]].v1-12;
-            face_edges[num_face_edges].c0=in.c0;
-            face_edges[num_face_edges++].c1=in.c1;
-            face_mask|=(1<<in.v0)|(1<<edges[adj[c][1]].v1);}
-        for(int i=12;i<18;i++)
-            if(face_mask&(1<<i))
-                for(int j=i+1;j<18;j++)
-                    if(face_mask&(1<<j)){
-                        cur_edges[num_cur_edges][0]=i;
-                        cur_edges[num_cur_edges++][1]=j;}
+    int cur_edges[100][2],num_cur_edges=0,num_face_edges=0;
+    EDGE face_edges[20];
+    int face_mask=0;
+    for(int i=0;i<12;i++){
+        EDGE& in=edges[adj[i][0]];
+        if(in.v0<12) continue;
+        int c=i;
+        while(edges[adj[c][1]].v1<12) c=edges[adj[c][1]].v1;
+        face_edges[num_face_edges].v0=in.v0-12;
+        face_edges[num_face_edges].v1=edges[adj[c][1]].v1-12;
+        face_edges[num_face_edges].c0=in.c0;
+        face_edges[num_face_edges++].c1=in.c1;
+        face_mask|=(1<<in.v0)|(1<<edges[adj[c][1]].v1);}
+    for(int i=12;i<18;i++)
+        if(face_mask&(1<<i))
+            for(int j=i+1;j<18;j++)
+                if(face_mask&(1<<j)){
+                    cur_edges[num_cur_edges][0]=i;
+                    cur_edges[num_cur_edges++][1]=j;}
 
-        bool add_tri=Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
-        if(!add_tri){
-            interface_triangle_table.Append(pt_mask|(1<<24));
-            for(int i=0;i<num_edges;i++)
-                Add_Edge(edges[i].v0,edges[i].v1,18,edges[i].c0,edges[i].c1);}
-        else
-            for(int i=0;i<num_face_edges;i++){
-                edges[i]=face_edges[i];
-                Insert_Face_Graph_Edge(face_graph,edges,i);}}
-    else if(greedy==1){
-        int vertices[30];
-        for(int i=0;i<12;i++){
-            if(adj[i][0]==-1) continue;
-            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
-            vertices[10]=i;
-            int L=9,R=11;
-            for(int w=i;;L--){
-                int e=adj[w][0];
-                adj[w][0]=-1;
-                assert(edges[e].v1==w);
-                w=edges[e].v0;
-                vertices[L]=w;
-                assert(w>=0);
-                if(w==i || w>=12) break;}
-            if(vertices[L]==i){
-                Emit_Loop_Triangles(vertices+L,10-L+1,in.c0,in.c1);
-                continue;}
-            for(int v=i;;R++){
-                int e=adj[v][1];
-                adj[v][0]=-1;
-                assert(edges[e].v0==v);
-                v=edges[e].v1;
-                vertices[R]=v;
-                assert(v>=0);
-                if(v>=12) break;}
-            int M=(L+R)/2;
-            Add_Edge(vertices[L],vertices[M],vertices[R],in.c0,in.c1);
-            out.v0=vertices[L]-12;
-            out.v1=vertices[R]-12;
-            Insert_Face_Graph_Edge(face_graph,edges,adj[i][1]);
-            Emit_Loop_Triangles(vertices+M,R-M+1,in.c0,in.c1);
-            Emit_Loop_Triangles(vertices+L,M-L+1,in.c0,in.c1);}}
-    else{
-        struct CURVE
-        {
-            int vertices[30];
-            int c0,c1;
-            int L,R;
-        };
-        int degree[6];
-        CURVE curves[20];
-        int curve_cnt=0;
-        for(int i=0;i<12;i++){
-            if(adj[i][0]==-1) continue;
-            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
-            curves[curve_cnt].vertices[10]=i;
-            curves[curve_cnt].L=9;
-            curves[curve_cnt].R=11;
-            for(int w=i;;curves[curve_cnt].L--){
-                int e=adj[w][0];
-                adj[w][0]=-1;
-                assert(edges[e].v1==w);
-                w=edges[e].v0;
-                curves[curve_cnt].vertices[curves[curve_cnt].L]=w;
-                assert(w>=0);
-                if(w==i || w>=12) break;}
-            if(curves[curve_cnt].vertices[curves[curve_cnt].L]==i){
-                Emit_Loop_Triangles(curves[curve_cnt].vertices+curves[curve_cnt].L,10-curves[curve_cnt].L+1,in.c0,in.c1);
-                continue;}
-            for(int v=i;;curves[curve_cnt].R++){
-                int e=adj[v][1];
-                adj[v][0]=-1;
-                assert(edges[e].v0==v);
-                v=edges[e].v1;
-                curves[curve_cnt].vertices[curves[curve_cnt].R]=v;
-                assert(v>=0);
-                if(v>=12) break;}
-            curves[curve_cnt].c0=in.c0;
-            curves[curve_cnt].c1=in.c1;
-            out.v0=curves[curve_cnt].vertices[curves[curve_cnt].L]-12;
-            out.v1=curves[curve_cnt].vertices[curves[curve_cnt].R]-12;
-            Insert_Face_Graph_Edge(face_graph,edges,adj[i][1]);
-            degree[curves[curve_cnt].vertices[curves[curve_cnt].L]-12]=max(degree[curves[curve_cnt].vertices[curves[curve_cnt].L]-12],curves[curve_cnt].R-curves[curve_cnt].L);
-            degree[curves[curve_cnt].vertices[curves[curve_cnt].R]-12]=max(degree[curves[curve_cnt].vertices[curves[curve_cnt].R]-12],curves[curve_cnt].R-curves[curve_cnt].L);
-            curve_cnt++;}
-        
-        for(int c=0;c<curve_cnt;c++){
-            CURVE& curve=curves[c];
-            int M=(curve.L+curve.R)/2;
-            int i;
-            for(i=curve.L+2;i<=M;i++){
-                interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i-1]<<5)|curve.vertices[i]);
-                interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.R]<<10)|(curve.vertices[curve.R-(i-curve.L)]<<5)|curve.vertices[curve.R-(i-curve.L)+1]);}
-            i--;
-            if((i-curve.L)==(curve.R-i))
-                interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[curve.R]);
-            else{
-                if((degree[curve.vertices[curve.L]-12]>degree[curve.vertices[curve.R]-12])||((degree[curve.vertices[curve.L]-12]==degree[curve.vertices[curve.R]-12])&&(curve.vertices[curve.L]>curve.vertices[curve.R]))){
-                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[i+1]);
-                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);}
-                else{
-                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[curve.R]);
-                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[i]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);}}}}
+    bool add_tri=Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
+    if(!add_tri){
+        interface_triangle_table.Append(pt_mask|(1<<24));
+        for(int i=0;i<num_edges;i++)
+            Add_Edge(edges[i].v0,edges[i].v1,18,edges[i].c0,edges[i].c1);}
+    else
+        for(int i=0;i<num_face_edges;i++){
+            edges[i]=face_edges[i];
+            Insert_Face_Graph_Edge(face_graph,edges,i);}
 
     int start_face_graph_tri=interface_triangle_table.m;
     EDGE face_graph_edge[12];
@@ -672,6 +557,7 @@ void Initialize_Case_Table_3D()
     Initialize_Edges_Intersect();
     Enumerate_Interface_Cases_3D(colors, 1, 0, 0);
     Enumerate_Boundary_Cases_3D();
+    edges_intersect.Clean_Memory();
 }
 //#####################################################################
 // Function Initialize_Case_Table_2D
@@ -901,8 +787,15 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<SEGMENT_2D<T>,int> >& boundary,const i
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Initialize_Case_Table()
 {
+#ifdef ENABLE_TIMING
+    unsigned long long t0=rdtsc();
+#endif
     if(TV::m==3) Initialize_Case_Table_3D();
     if(TV::m==2) Initialize_Case_Table_2D();
+#ifdef ENABLE_TIMING
+    unsigned long long t1=rdtsc();
+    printf("setup: %.2f\n", (t1-t0)/3059.107);
+#endif
 }
 //#####################################################################
 // Function Get_Elements_For_Cell
@@ -911,6 +804,9 @@ template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& boundary,
     const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi)
 {
+#ifdef ENABLE_TIMING
+    unsigned long long t0=rdtsc();
+#endif
     int next_color=0;
     HASHTABLE<int,int> color_map;
     VECTOR<int,num_corners> re_color;
@@ -933,6 +829,10 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
             color_list[next_color]=colors(i+num_corners/2);
             color_map.Set(colors(i+num_corners/2),next_color++);}
     Get_Boundary_Elements_For_Cell(boundary,re_color2,colors.array+num_corners/2,phi.array+num_corners/2,1,color_map,color_list);
+#ifdef ENABLE_TIMING
+    unsigned long long t5=rdtsc();
+    printf("query: %.2f\n", (t5-t0)/3059.107);
+#endif
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
