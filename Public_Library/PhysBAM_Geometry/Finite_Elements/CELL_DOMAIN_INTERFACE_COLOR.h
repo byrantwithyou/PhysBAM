@@ -8,9 +8,16 @@
 #define __CELL_DOMAIN_INTERFACE_COLOR__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Data_Structures/PAIR.h>
+#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
+#include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
+#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 
 namespace PhysBAM{
 
@@ -28,6 +35,10 @@ class CELL_DOMAIN_INTERFACE_COLOR:public NONCOPYABLE
     ARRAY<int> cell_location; // [1] - outside, [0] - boundary (inside, within padding from boundary), [-1] - inside (strictly)
 
 public:
+
+    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
+    typedef TRIPLE<T_FACE,int,int> SURFACE_ELEMENT;
+    typedef PAIR<T_FACE,int> SIDES_ELEMENT;
 
     struct BOUNDARY_CONDITIONS
     {
@@ -53,6 +64,8 @@ public:
 
     int constraint_base_scalar;
     ARRAY<int> flat_base_scalar;
+
+    ARRAY<SURFACE_ELEMENT> surface_mesh;
     
     CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input);
 

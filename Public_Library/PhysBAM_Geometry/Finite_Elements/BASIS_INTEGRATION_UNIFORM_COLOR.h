@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/STATIC_TENSOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_COLOR.h>
@@ -28,8 +27,10 @@ public:
     typedef SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree> VOLUME_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree> SURFACE_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_SCALAR_COLOR<TV,static_degree> SURFACE_BLOCK_SCALAR;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SIDES_ELEMENT SIDES_ELEMENT;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_CONDITIONS BC;
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
     typedef typename VOLUME_BLOCK::OPEN_ENTRY OPEN_ENTRY;
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -56,7 +57,7 @@ public:
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int color);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
-    void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
+    void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<SURFACE_ELEMENT>& surface,ARRAY<SIDES_ELEMENT>& sides,
         const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
     template<int d0,int d1>
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,

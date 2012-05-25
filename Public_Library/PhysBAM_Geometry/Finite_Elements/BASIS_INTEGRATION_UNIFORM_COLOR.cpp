@@ -4,14 +4,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
@@ -50,22 +45,22 @@ Precomputed_Integral(const STATIC_TENSOR<T,rank,sdp1>& precompute,const STATIC_P
 //#####################################################################
 // Function Compute_Averaged_Orientation_Helper
 //#####################################################################
-template<class T,class T_FACE> static void
-Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,4>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,2> >& base_orientation)
+template<class T,class SURFACE_ELEMENT> static void
+Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<SURFACE_ELEMENT>,4>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,2> >& base_orientation)
 {
 }
 //#####################################################################
 // Function Compute_Averaged_Orientation_Helper
 //#####################################################################
-template<class T, class T_FACE> static void
-Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,8>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,3> >& base_orientation)
+template<class T, class SURFACE_ELEMENT> static void
+Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<SURFACE_ELEMENT>,8>& surface,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs,ARRAY<MATRIX<T,3> >& base_orientation)
 {
     ARRAY<VECTOR<T,3> > normal(base_orientation.m);
     VECTOR<T,3> tangent;
     for(int s=0;s<8;s++){
-        const ARRAY<TRIPLE<T_FACE,int,int> >& subcell_surface=surface(s);
+        const ARRAY<SURFACE_ELEMENT>& subcell_surface=surface(s);
         for(int i=0;i<subcell_surface.m;i++){
-            const TRIPLE<T_FACE,int,int>& V=subcell_surface(i);
+            const SURFACE_ELEMENT& V=subcell_surface(i);
             if(V.z<0) continue;
             int color_pair_index=-1;
             bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -86,8 +81,8 @@ Compute_Entries()
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
-    VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,(1<<TV::m)> surface;
-    VECTOR<ARRAY<PAIR<T_FACE,int> >,(1<<TV::m)> sides;
+    VECTOR<ARRAY<SURFACE_ELEMENT>,(1<<TV::m)> surface;
+    VECTOR<ARRAY<SIDES_ELEMENT>,(1<<TV::m)> sides;
 
     Compute_Open_Entries();
 
@@ -124,9 +119,9 @@ Compute_Entries()
         ARRAY<VECTOR<int,2> > color_pairs;
         
         for(int s=0;s<(1<<TV::m);s++){
-            const ARRAY<TRIPLE<T_FACE,int,int> >& subcell_surface=surface(s);
+            const ARRAY<SURFACE_ELEMENT>& subcell_surface=surface(s);
             for(int i=0;i<subcell_surface.m;i++){
-                const TRIPLE<T_FACE,int,int>& V=subcell_surface(i);
+                const SURFACE_ELEMENT& V=subcell_surface(i);
                 if(V.y>=0){
                     VECTOR<int,2> color_pair(V.y,V.z);
                     if(!ht_color_pairs.Contains(color_pair))
@@ -251,16 +246,20 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 // Function Add_Cut_Fine_Cell
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
+Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<SURFACE_ELEMENT>& surface,ARRAY<SIDES_ELEMENT>& sides,
     const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,
     const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
     assert(sides.m);
     assert(surface.m);
 
-    for(int i=0;i<surface.m;i++)
-        for(int j=0;j<TV::m;j++)
-            surface(i).x.X(j)=(surface(i).x.X(j)-subcell_offset)*((T).5*grid.dX);
+    TV cell_center(grid.Center(cell));
+    
+    for(int i=0;i<surface.m;i++){
+        for(int j=0;j<TV::m;j++) surface(i).x.X(j)=(surface(i).x.X(j)-subcell_offset)*((T).5*grid.dX);
+        SURFACE_ELEMENT element(surface(i));
+        for(int j=0;j<TV::m;j++) element.x.X(j)+=cell_center;
+        cdi.surface_mesh.Append(element);}
 
     for(int i=0;i<sides.m;i++)
         for(int j=0;j<TV::m;j++)
@@ -276,10 +275,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
             monomial=monomial.Integrate(TV::m-1);
             integrals.Fill(0);
             for(int i=0;i<sides.m;i++){
-                const PAIR<T_FACE,int>& V=sides(i);
+                const SIDES_ELEMENT& V=sides(i);
                 if(V.y>=0) integrals(V.y)+=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);}
             for(int i=0;i<surface.m;i++){
-                const TRIPLE<T_FACE,int,int>& V=surface(i);
+                const SURFACE_ELEMENT& V=surface(i);
                 if(V.z<0) continue;
                 T integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
                 if(V.y>=0) integrals(V.y)-=integral;
@@ -306,7 +305,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
     if(surface_blocks.m){
         ARRAY<MATRIX<T,TV::m> > orientations(surface.m);
         for(int i=0;i<surface.m;i++){
-            const TRIPLE<T_FACE,int,int>& V=surface(i);
+            const SURFACE_ELEMENT& V=surface(i);
             if(V.z<0) continue;
             int color_pair_index=-1;
             bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -319,7 +318,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
                 if(op.subcell&(1<<subcell))
                     for(int k=0;k<surface.m;k++){
-                        const TRIPLE<T_FACE,int,int>& V=surface(k);
+                        const SURFACE_ELEMENT& V=surface(k);
                         if(V.z<0) continue;
                         int color_pair_index=-1;
                         bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -352,7 +351,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 typename SURFACE_BLOCK_SCALAR::OVERLAP_POLYNOMIAL& op=sbs->overlap_polynomials(j);
                 if(op.subcell&(1<<subcell))
                     for(int k=0;k<surface.m;k++){
-                        const TRIPLE<T_FACE,int,int>& V=surface(k);
+                        const SURFACE_ELEMENT& V=surface(k);
                         if(V.z<0) continue;
                         int color_pair_index=-1;
                         bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
@@ -367,7 +366,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         
                         if(V.y!=BC::DIRICHLET){
                             int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
-                            T value=integral*sbs->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z);
+                            T value=integral*sbs->abc->f_surface(V.x.Center()+cell_center,V.y,V.z);
                             if(V.y>=0) value*=-(T)0.5;
                             if(V.y>=0) (*sbs->f_surface)(V.y)(flat_index)+=value;
                             if("$#*!") (*sbs->f_surface)(V.z)(flat_index)+=value;}}}}}
