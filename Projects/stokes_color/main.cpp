@@ -16,7 +16,6 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Finite_Elements/ANALYTIC_BOUNDARY_CONDITIONS_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
@@ -90,8 +89,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
     for(int c=0;c<iss.cdi->colors;c++) printf("p%d [%i]\t",c,iss.cm_p->dofs(c));printf("\n");
-    printf("qn [%i]\t",iss.cdi->constraint_base_normal);
-    printf("qt [%i] ",iss.cdi->constraint_base_tangent);
+    printf("qn [%i]\t",iss.cdi->constraint_base_n);
+    printf("qt [%i] ",iss.cdi->constraint_base_t);
     printf("\n");
 
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;

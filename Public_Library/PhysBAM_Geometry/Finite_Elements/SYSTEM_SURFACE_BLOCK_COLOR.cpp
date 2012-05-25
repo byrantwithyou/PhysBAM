@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
 using namespace PhysBAM;
@@ -13,13 +12,15 @@ using namespace PhysBAM;
 // Function Initialize
 //#####################################################################
 template<class TV,int static_degree> template<int d> void SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree>::
-Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,int axis_input,T scale_input)
+Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,
+    ARRAY<VECTOR_ND<T> >& f_surface_input,int axis_input,T scale_input)
 {
     abc=abc_input;
     axis=axis_input;
     scale=scale_input;
     helper=&helper_input;
-
+    f_surface=&f_surface_input;
+    
     overlap_polynomials.Resize(s.diced.m);
     for(int i=0;i<overlap_polynomials.m;i++){
         OVERLAP_POLYNOMIAL& op=overlap_polynomials(i);
@@ -30,12 +31,12 @@ Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENC
         op.polynomial=diced.polynomial;}
 }
 template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<float,2>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,int,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,int,float);
 template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<float,3>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,int,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,int,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<double,2>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,int,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,int,double);
 template void SYSTEM_SURFACE_BLOCK_COLOR<VECTOR<double,3>,2>::Initialize<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,int,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,int,double);
 #endif

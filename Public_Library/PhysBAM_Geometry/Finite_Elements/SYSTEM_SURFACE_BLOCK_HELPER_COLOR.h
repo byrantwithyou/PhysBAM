@@ -11,10 +11,10 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 
 namespace PhysBAM{
 
-template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
 template<class TV> class CELL_MANAGER_COLOR;
 template<class TV,int d> struct BASIS_STENCIL_UNIFORM;
 template<class T> class SPARSE_MATRIX_FLAT_MXN;

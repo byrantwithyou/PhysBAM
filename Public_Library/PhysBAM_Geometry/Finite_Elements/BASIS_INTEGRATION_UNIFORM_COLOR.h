@@ -12,6 +12,7 @@
 #include <PhysBAM_Tools/Vectors/STATIC_TENSOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_COLOR.h>
 
 namespace PhysBAM{
@@ -24,10 +25,13 @@ template<class TV,int static_degree>
 class BASIS_INTEGRATION_UNIFORM_COLOR:public NONCOPYABLE
 {
 public:
+    enum BOUNDARY_CONDITIONS{SLIP=-3,DIRICHLET=-2,NEUMANN=-1};
+
     typedef SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree> VOLUME_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree> SURFACE_BLOCK;
-    typedef typename VOLUME_BLOCK::OPEN_ENTRY OPEN_ENTRY;
+    typedef SYSTEM_SURFACE_BLOCK_SCALAR_COLOR<TV,static_degree> SURFACE_BLOCK_SCALAR;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
+    typedef typename VOLUME_BLOCK::OPEN_ENTRY OPEN_ENTRY;
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
@@ -43,25 +47,27 @@ public:
 
     ARRAY<VOLUME_BLOCK*> volume_blocks;
     ARRAY<SURFACE_BLOCK*> surface_blocks;
+    ARRAY<SURFACE_BLOCK_SCALAR*> surface_blocks_scalar;
 
     BASIS_INTEGRATION_UNIFORM_COLOR(const GRID<TV>& grid_input,const GRID<TV>& phi_grid_input,
         const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,CELL_DOMAIN_INTERFACE_COLOR<TV>& cdi_input);
     ~BASIS_INTEGRATION_UNIFORM_COLOR();
 
-    void Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface);
+    void Compute_Entries();
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int color);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int subcell,int color);
     void Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
-        const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface,const ARRAY<int>& constraint_offsets,
-        const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
-
+        const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs);
     template<int d0,int d1>
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const ARRAY<T>& scale);
     template<int d>
     void Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc,int axis,T scale);
+        ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale);
+    template<int d>
+    void Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
+        ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale);
 };
 }
 #endif

@@ -65,12 +65,12 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,
     for(int s=0;s<8;s++){
         const ARRAY<TRIPLE<T_FACE,int,int> >& subcell_surface=surface(s);
         for(int i=0;i<subcell_surface.m;i++){
-            const TRIPLE<T_FACE,int,int>& surface_element=subcell_surface(i);
-            if(surface_element.z<0) continue;
+            const TRIPLE<T_FACE,int,int>& V=subcell_surface(i);
+            if(V.z<0) continue;
             int color_pair_index=-1;
-            bool found=ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index);
+            bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
             PHYSBAM_ASSERT(found);
-            normal(color_pair_index)+=surface_element.x.Raw_Normal();}}
+            normal(color_pair_index)+=V.x.Raw_Normal();}}
 
     for(int i=0;i<normal.m;i++){
         normal(i).Normalize();
@@ -81,7 +81,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<TRIPLE<T_FACE,int,int> >,
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
+Compute_Entries()
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
@@ -123,27 +123,33 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
         for(int s=0;s<(1<<TV::m);s++){
             const ARRAY<TRIPLE<T_FACE,int,int> >& subcell_surface=surface(s);
             for(int i=0;i<subcell_surface.m;i++){
-                const TRIPLE<T_FACE,int,int>& surface_element=subcell_surface(i);
-                if(surface_element.z>=0){
-                    VECTOR<int,2> color_pair(surface_element.y,surface_element.z);
+                const TRIPLE<T_FACE,int,int>& V=subcell_surface(i);
+                if(V.y>=0){
+                    VECTOR<int,2> color_pair(V.y,V.z);
                     if(!ht_color_pairs.Contains(color_pair))
                         ht_color_pairs.Insert(color_pair,color_pairs.Append(color_pair));}}}
-
-        ARRAY<MATRIX<T,TV::m> > base_orientation(color_pairs.m);
-        Compute_Averaged_Orientation_Helper(surface,ht_color_pairs,base_orientation);
 
         ARRAY<int> constraint_offsets(color_pairs.m);
         int full_constraints=0;
         int slip_constraints=0;
         for(int i=0;i<color_pairs.m;i++)
-            if(color_pairs(i).x==-2||color_pairs(i).x>=0)
+            if(color_pairs(i).x==DIRICHLET||color_pairs(i).x>=0)
                 constraint_offsets(i)=full_constraints++;
         for(int i=0;i<color_pairs.m;i++)
-            if(color_pairs(i).x==-3)
+            if(color_pairs(i).x==SLIP)
                 constraint_offsets(i)=slip_constraints+full_constraints++;
 
-        cdi.Set_Flat_Base_And_Resize(full_constraints+slip_constraints,full_constraints,it.index);
-        for(int i=0;i<surface_blocks.m;i++) surface_blocks(i)->Resize();
+        ARRAY<MATRIX<T,TV::m> > base_orientation;
+
+        if(surface_blocks.m){
+            base_orientation.Resize(color_pairs.m);
+            Compute_Averaged_Orientation_Helper(surface,ht_color_pairs,base_orientation);
+            cdi.Set_Flat_Base_And_Resize(full_constraints+slip_constraints,full_constraints,it.index);
+            for(int i=0;i<surface_blocks.m;i++) surface_blocks(i)->Resize();}
+        if(surface_blocks_scalar.m){
+            cdi.Set_Flat_Base_And_Resize_Scalar(full_constraints,it.index);
+            for(int i=0;i<surface_blocks_scalar.m;i++) surface_blocks_scalar(i)->Resize();
+            assert(slip_constraints==0 && "Do you really want slip constraints for a scalar variable?");}
 
         for(int s=0;s<(1<<TV::m);s++)
             if(material_subcell(s)){
@@ -152,7 +158,7 @@ Compute_Entries(VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface)
                     assert(color>=0);
                     Add_Uncut_Fine_Cell(it.index,s,color);}
                 else Add_Cut_Fine_Cell(it.index,s,TV(bits((1<<TV::m)-1-s)),surface(s),sides(s),
-                    base_orientation,f_surface,constraint_offsets,ht_color_pairs);}
+                    base_orientation,constraint_offsets,ht_color_pairs);}
         cdi.Update_Constraint_Count();}
     cdi.Update_Total_Constraint_Count();
 }
@@ -243,7 +249,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& sides,
-    const ARRAY<MATRIX<T,TV::m> >& base_orientation,VECTOR<ARRAY<VECTOR_ND<T> >,TV::m>& f_surface,const ARRAY<int>& constraint_offsets,
+    const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,
     const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
     assert(sides.m);
@@ -271,9 +277,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                 if(V.y>=0) integrals(V.y)+=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);}
             for(int i=0;i<surface.m;i++){
                 const TRIPLE<T_FACE,int,int>& V=surface(i);
+                if(V.z<0) continue;
                 T integral=monomial.Quadrature_Over_Primitive(V.x.X)*T_FACE::Normal(V.x.X)(TV::m-1);
                 if(V.y>=0) integrals(V.y)-=integral;
-                if(V.z>=0) integrals(V.z)+=integral;}
+                if("$#*!") integrals(V.z)+=integral;}
             for(int c=0;c<cdi.colors;c++) precomputed_volume_integrals(c)(it.index)+=integrals(c);}
 
     for(int i=0;i<volume_blocks.m;i++){
@@ -286,16 +293,6 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                     int flat_index=cdi.Flatten(cell)+op.flat_index_offset;
                     vb->Add_Entry(flat_index,op.flat_index_diff_ref,c,integral);}}}
 
-    ARRAY<MATRIX<T,TV::m> > orientations;
-    orientations.Resize(surface.m);
-    for(int i=0;i<surface.m;i++){
-        const TRIPLE<T_FACE,int,int>& surface_element=surface(i);
-        if(surface_element.z<0) continue;
-        int color_pair_index=-1;
-        bool found=ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index);
-        PHYSBAM_ASSERT(found);
-        Compute_Consistent_Orientation_Helper(surface(i).x,orientations(i),base_orientation(color_pair_index));}
-
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_surface_integrals(surface.m);
     for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
         if(surface_monomials_needed(it.index)){
@@ -303,37 +300,74 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
             monomial.Set_Term(it.index,1);
             for(int k=0;k<surface.m;k++) precomputed_surface_integrals(k)(it.index)=monomial.Quadrature_Over_Primitive(surface(k).x.X);}
 
-    for(int i=0;i<surface_blocks.m;i++){
-        SURFACE_BLOCK* sb=surface_blocks(i);
-        for(int j=0;j<sb->overlap_polynomials.m;j++){
-            typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
-            if(op.subcell&(1<<subcell))
-                for(int k=0;k<surface.m;k++){
-                    const TRIPLE<T_FACE,int,int>& surface_element=surface(k);
-                    if(surface_element.z<0) continue;
-                    int color_pair_index=-1;
-                    bool found=ht_color_pairs.Get(VECTOR<int,2>(surface_element.y,surface_element.z),color_pair_index);
-                    PHYSBAM_ASSERT(found);
-                    T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                    int constraint_offset=constraint_offsets(color_pair_index);
+    if(surface_blocks.m){
+        ARRAY<MATRIX<T,TV::m> > orientations(surface.m);
+        for(int i=0;i<surface.m;i++){
+            const TRIPLE<T_FACE,int,int>& V=surface(i);
+            if(V.z<0) continue;
+            int color_pair_index=-1;
+            bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+            PHYSBAM_ASSERT(found);
+            Compute_Consistent_Orientation_Helper(surface(i).x,orientations(i),base_orientation(color_pair_index));}
+
+        for(int i=0;i<surface_blocks.m;i++){
+            SURFACE_BLOCK* sb=surface_blocks(i);
+            for(int j=0;j<sb->overlap_polynomials.m;j++){
+                typename SURFACE_BLOCK::OVERLAP_POLYNOMIAL& op=sb->overlap_polynomials(j);
+                if(op.subcell&(1<<subcell))
+                    for(int k=0;k<surface.m;k++){
+                        const TRIPLE<T_FACE,int,int>& V=surface(k);
+                        if(V.z<0) continue;
+                        int color_pair_index=-1;
+                        bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+                        PHYSBAM_ASSERT(found);
+                        const int constraint_offset=constraint_offsets(color_pair_index);
+                        const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
+
+                        if(V.y!=SLIP && V.y!=NEUMANN)
+                            for(int orientation=0;orientation<TV::m-1;orientation++){
+                                T value=integral*orientations(k)(sb->axis,orientation);
+                                if(V.y>=0) sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.y,value);
+                                if("$#*!") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.z,-value);}
                         
-                    if(surface_element.y!=-3 && surface_element.y!=-1)
-                        for(int orientation=0;orientation<TV::m-1;orientation++){
-                            T value=integral*orientations(k)(sb->axis,orientation);
-                            if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.y,value);
-                            if("Alexey is happy!!!") sb->Add_Entry(cdi.constraint_base_tangent+constraint_offset,orientation,op.flat_index_diff_ref,surface_element.z,-value);}
-
-                    if(surface_element.y!=-1){
-                        T value=integral*orientations(k)(sb->axis,TV::m-1);
-                        if(surface_element.y>=0) sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.y,value);
-                        if("Alexey is happy!!!") sb->Add_Entry(cdi.constraint_base_normal+constraint_offset,TV::m-1,op.flat_index_diff_ref,surface_element.z,-value);}
-
-                    if(surface_element.y!=-3 && surface_element.y!=-2){
-                        int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
-                        T value=integral*sb->abc->f_surface(surface_element.x.Center()+grid.Center(cell),surface_element.y,surface_element.z)(sb->axis);
-                        if(surface_element.y>=0) value*=-(T)0.5;
-                        if(surface_element.y>=0) f_surface(sb->axis)(surface_element.y)(flat_index)+=value;
-                        if("Alexey is happy!!!") f_surface(sb->axis)(surface_element.z)(flat_index)+=value;}}}}
+                        if(V.y!=NEUMANN){
+                            T value=integral*orientations(k)(sb->axis,TV::m-1);
+                            if(V.y>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,value);
+                            if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-value);}
+                        
+                        if(V.y!=SLIP && V.y!=DIRICHLET){
+                            int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
+                            T value=integral*sb->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z)(sb->axis);
+                            if(V.y>=0) value*=-(T)0.5;
+                            if(V.y>=0) (*sb->f_surface)(V.y)(flat_index)+=value;
+                            if("$#*!") (*sb->f_surface)(V.z)(flat_index)+=value;}}}}}
+    
+    if(surface_blocks_scalar.m){
+        for(int i=0;i<surface_blocks_scalar.m;i++){
+            SURFACE_BLOCK_SCALAR* sbs=surface_blocks_scalar(i);
+            for(int j=0;j<sbs->overlap_polynomials.m;j++){
+                typename SURFACE_BLOCK_SCALAR::OVERLAP_POLYNOMIAL& op=sbs->overlap_polynomials(j);
+                if(op.subcell&(1<<subcell))
+                    for(int k=0;k<surface.m;k++){
+                        const TRIPLE<T_FACE,int,int>& V=surface(k);
+                        if(V.z<0) continue;
+                        int color_pair_index=-1;
+                        bool found=ht_color_pairs.Get(VECTOR<int,2>(V.y,V.z),color_pair_index);
+                        PHYSBAM_ASSERT(found);
+                        const int constraint_offset=constraint_offsets(color_pair_index);
+                        const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
+                        assert(V.z==SLIP && "Do you really want slip constraints for a scalar variable?");
+                        
+                        if(V.y!=NEUMANN){
+                            if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,integral);
+                            if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-integral);}
+                        
+                        if(V.y!=DIRICHLET){
+                            int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
+                            T value=integral*sbs->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z);
+                            if(V.y>=0) value*=-(T)0.5;
+                            if(V.y>=0) (*sbs->f_surface)(V.y)(flat_index)+=value;
+                            if("$#*!") (*sbs->f_surface)(V.z)(flat_index)+=value;}}}}}
 }
 //#####################################################################
 // Function Add_Volume_Block
@@ -357,16 +391,33 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCI
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc,int axis,T scale)
+    ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale)
 {
     SURFACE_BLOCK* sb=new SURFACE_BLOCK;
-    sb->Initialize(helper,s,abc,axis,scale);
+    sb->Initialize(helper,s,abc,f_surface,axis,scale);
     surface_blocks.Append(sb);
         
     for(int i=0;i<sb->overlap_polynomials.m;i++){
         RANGE<TV_INT> range(TV_INT(),sb->overlap_polynomials(i).polynomial.size+1);
         for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
             if(sb->overlap_polynomials(i).polynomial.terms(it.index))
+                surface_monomials_needed(it.index)=true;}
+}
+//#####################################################################
+// Function Add_Surface_Block_Scalar
+//#####################################################################
+template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
+Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
+    ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale)
+{
+    SURFACE_BLOCK_SCALAR* sbs=new SURFACE_BLOCK_SCALAR;
+    sbs->Initialize(helper,s,abc,f_surface,scale);
+    surface_blocks_scalar.Append(sbs);
+        
+    for(int i=0;i<sbs->overlap_polynomials.m;i++){
+        RANGE<TV_INT> range(TV_INT(),sbs->overlap_polynomials(i).polynomial.size+1);
+        for(RANGE_ITERATOR<TV::m> it(range);it.Valid();it.Next())
+            if(sbs->overlap_polynomials(i).polynomial.terms(it.index))
                 surface_monomials_needed(it.index)=true;}
 }
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>;
@@ -376,13 +427,17 @@ template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Blo
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,int,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,int,float);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,3> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,float);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,int,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,int,float);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,2> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>;
@@ -391,11 +446,15 @@ template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Bl
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,int,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,int,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,3> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,double);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,int,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,int,double);
+template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,2> >&,
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,double);
 #endif

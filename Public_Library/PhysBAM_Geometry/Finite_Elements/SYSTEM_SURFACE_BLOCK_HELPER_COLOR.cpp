@@ -66,7 +66,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
         int row=0;
         for(int orientation=0;orientation<TV::m;orientation++){
             MATRIX_MXN<T>& d=data(orientation)(c);
-            for(int i=0;i<*cdi->constraint_base(orientation);i++,row++){
+            for(int i=0;i<d.m;i++,row++){
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
                 for(int j=0;j<d.n;j++){
                     T value=d(i,j);

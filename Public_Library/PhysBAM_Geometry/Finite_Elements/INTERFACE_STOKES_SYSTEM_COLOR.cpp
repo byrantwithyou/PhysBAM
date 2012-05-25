@@ -28,42 +28,10 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_value_input,ARRAY<int,TV_INT>& phi_color_input)
+INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input)
     :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices()),phi_color(phi_grid.Node_Indices())
 {
-    // DEFINE DOUBLE FINE LEVELSET
-
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
-        phi_value(it.index*2)=phi_value_input(it.index);
-        phi_color(it.index*2)=phi_color_input(it.index);}
-
-    TV_INT counts(grid.counts+1);
-    TV_INT scale(TV_INT()+2);
-    for(int axis=0;axis<TV::m;axis++){
-        counts(axis)=grid.counts(axis);
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),counts));it.Valid();it.Next()){
-            TV_INT a=scale*it.index;
-            TV_INT m(a);m+=TV_INT::Axis_Vector(axis);
-            TV_INT b(m);b+=TV_INT::Axis_Vector(axis);
-            const T& phi_value_a=phi_value(a);
-            const T& phi_value_b=phi_value(b);
-            const int& phi_color_a=phi_color(a);
-            const int& phi_color_b=phi_color(b);
-            if(phi_color_a!=phi_color_b){
-                phi_value(m)=(T).5*abs(phi_value_a-phi_value_b);
-                phi_color(m)=(phi_value_a<phi_value_b)?phi_color_b:phi_color_a;}
-            else{
-                phi_value(m)=(T).5*abs(phi_value_a+phi_value_b);
-                phi_color(m)=phi_color_a;}}
-        counts(axis)=phi_grid.counts(axis)+1;
-        scale(axis)=1;}
-    
-    // PERTURB LEVELSET
-    
-    T panic_threshold=phi_grid.dX.Min()*1e-2;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
-        T& value=phi_value(it.index);
-        if(value<panic_threshold) value=panic_threshold;}
+    CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
 }
 //#####################################################################
 // Destructor
@@ -134,6 +102,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
 
     ARRAY<T> double_mu(mu*(T)2),ones(CONSTANT_ARRAY<T>(mu.m,(T)1)),minus_ones(CONSTANT_ARRAY<T>(mu.m,-(T)1));
 
+    for(int i=0;i<TV::m;i++){
+        rhs_surface(i).Resize(cdi->colors);
+        for(int c=0;c<cdi->colors;c++)
+            rhs_surface(i)(c).Resize(cdi->flat_size);}
+
     // Diagonal blocks
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<TV::m;j++)
@@ -147,17 +120,12 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
         biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),minus_ones);
     // Traction blocks
     for(int i=0;i<TV::m;i++)
-        biu.Add_Surface_Block(helper_qu(i),*u_stencil(i),abc,i,1);
+        biu.Add_Surface_Block(helper_qu(i),*u_stencil(i),abc,rhs_surface(i),i,1);
     // RHS pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),ones);
 
-    for(int i=0;i<TV::m;i++){
-        rhs_surface(i).Resize(cdi->colors);
-        for(int c=0;c<cdi->colors;c++)
-            rhs_surface(i)(c).Resize(cdi->flat_size);}
-
-    biu.Compute_Entries(rhs_surface);
+    biu.Compute_Entries();
         
     // BUILD SYSTEM MATRIX BLOCKS
     
@@ -192,8 +160,8 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
     Resize_Vector(null_p);
     for(int c=0;c<cdi->colors;c++){
         null_p.p(c).Fill(1);
-        int start=cdi->constraint_base_tangent*(TV::m-1);
-        int end=start+cdi->constraint_base_normal;
+        int start=cdi->constraint_base_t*(TV::m-1);
+        int end=start+cdi->constraint_base_n;
         for(int k=start;k<end;k++)
             null_p.q(k)=-1;}
     for(int c=0;c<cdi->colors;c++)
@@ -222,7 +190,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* 
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> > f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u)
+Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u)
 {
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> U;

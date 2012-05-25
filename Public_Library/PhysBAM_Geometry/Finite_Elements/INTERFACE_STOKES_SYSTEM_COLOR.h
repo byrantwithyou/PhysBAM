@@ -86,12 +86,12 @@ public:
     CELL_MANAGER_COLOR<TV> *cm_p;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
 
-    INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_value_input,ARRAY<int,TV_INT>& phi_color_input);
+    INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input);
     virtual ~INTERFACE_STOKES_SYSTEM_COLOR();
 
 //#####################################################################
     void Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc);
-    void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> > f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u);
+    void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

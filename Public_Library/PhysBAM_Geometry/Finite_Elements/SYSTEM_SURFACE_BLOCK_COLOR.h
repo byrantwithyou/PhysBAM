@@ -15,6 +15,8 @@
 
 namespace PhysBAM{
 
+template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
+
 template<class TV,int static_degree>
 class SYSTEM_SURFACE_BLOCK_COLOR:public NONCOPYABLE
 {
@@ -35,12 +37,13 @@ public:
     
     T scale;
     int axis;
+    ARRAY<VECTOR_ND<T> >* f_surface;
     ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,int axis_input,T scale_input);
+        ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,ARRAY<VECTOR_ND<T> >& f_surface_input,int axis_input,T scale_input);
 
     void Add_Entry(int constraint_index,int orientation,int flat_index_diff_ref,int color,T value)
     {helper->data(orientation)(color)(constraint_index,flat_index_diff_ref)+=value*scale;}
