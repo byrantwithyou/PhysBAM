@@ -98,6 +98,7 @@ Compute_Entries()
         bool material_cell=false;
         for(int b=0;b<(1<<TV::m);b++){
             int color=phi_color(cell_base+bits(b)*2);
+            assert(color<cdi.colors);
             cell_corners|=(color!=base_color)<<b;
             material_cell|=(color>=0);}
         if(!material_cell) continue;
@@ -112,9 +113,11 @@ Compute_Entries()
             VECTOR<T,1<<TV::m> subcell_phi_values;
             for(int b=0;b<(1<<TV::m);b++){
                 TV_INT subcell_vertex=subcell_base+bits(b);
-                subcell_phi_colors(b)=phi_color(subcell_vertex);
                 subcell_phi_values(b)=phi_value(subcell_vertex);
-                material_subcell(s)|=subcell_phi_colors(b)>=0;}
+                int color=phi_color(subcell_vertex);
+                assert(color<cdi.colors);
+                subcell_phi_colors(b)=color;
+                material_subcell(s)|=color>=0;}
             if(material_subcell(s)) MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface(s),sides(s),subcell_phi_colors,subcell_phi_values);}
 
         HASHTABLE<VECTOR<int,2>,int> ht_color_pairs;
