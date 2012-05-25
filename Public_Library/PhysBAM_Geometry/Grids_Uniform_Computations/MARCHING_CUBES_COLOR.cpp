@@ -147,6 +147,7 @@ int Edges_Intersect(int a,int b,int c,int d)
 }
 namespace{
 int cube_location_labels[27]={-1,0,-1,4,16,5,-1,1,-1,8,14,9,12,18,13,10,15,11,-1,2,-1,6,17,7,-1,3,-1};
+bool on_face[19][19]={};
 int depth=0;
 void Set_Edges_Ok_Helper(int a,int b,int c,int d,int z)
 {
@@ -167,8 +168,11 @@ void Set_Edges_Ok(int a,int b,int c,int d)
     int aa=cube_location_labels[a],bb=cube_location_labels[b],cc=cube_location_labels[c],dd=cube_location_labels[d];
     if(aa==-1 || bb==-1 || cc==-1 || dd==-1) return;
 //    printf("%*s%i %i %i %i\n", depth, "", aa,bb,cc,dd);
-    VECTOR<int,3> A(a%3-b%3,(a/3)%3-(b/3)%3,(a/9)%3-(b/9)%3),C(c%3-d%3,(c/3)%3-(d/3)%3,(c/9)%3-(d/9)%3);
-    Set_Edges_Ok_Helper(aa,bb,cc,dd,A.Cross(C)==VECTOR<int,3>()?2:0);
+    int x=0;
+    if(abs(a-b)!=abs(c-d)){
+        VECTOR<int,3> A(a%3-b%3,(a/3)%3-(b/3)%3,(a/9)%3-(b/9)%3),C(c%3-d%3,(c/3)%3-(d/3)%3,(c/9)%3-(d/9)%3);
+        if(A.Cross(C)==VECTOR<int,3>()) x=2;}
+    Set_Edges_Ok_Helper(aa,bb,cc,dd,x);
 }
 }
 void Initialize_Edges_Intersect()
@@ -176,7 +180,6 @@ void Initialize_Edges_Intersect()
     // Initially everything intersects
     edges_intersect.Resize(19*19*19*19,true,false,1);
 
-    printf("ei a %i\n", Edges_Intersect(16,18,16,18));
     // Share an endpoint
     for(int a=0;a<27;a++)
         if(cube_location_labels[a]>=0)
@@ -184,8 +187,7 @@ void Initialize_Edges_Intersect()
                 if(cube_location_labels[b]>=0)
                     for(int c=b;c<27;c++)
                         if(cube_location_labels[c]>=0)
-                            Set_Edges_Ok_Helper(cube_location_labels[a],cube_location_labels[b],cube_location_labels[a],cube_location_labels[c],b==c?2:0);
-    printf("ei b %i\n", Edges_Intersect(16,18,16,18));
+                            Set_Edges_Ok_Helper(cube_location_labels[a],cube_location_labels[b],cube_location_labels[a],cube_location_labels[c],0);
 
     // Edge on cube face
     for(int a=0;a<9;a++)
@@ -197,7 +199,6 @@ void Initialize_Edges_Intersect()
                             for(int d=c+1;d<27;d++)
                                 if(cube_location_labels[d]>=0)
                                     Set_Edges_Ok(a,b,c,d);
-    printf("ei c %i\n", Edges_Intersect(16,18,16,18));
 
     // Plane tests
     for(int a0=0;a0<3;a0++)
@@ -218,8 +219,6 @@ void Initialize_Edges_Intersect()
                                                                 for(int d2=0;d2<3;d2++)
                                                                     Set_Edges_Ok((a0*3+a1)*3+a2,(b0*3+b1)*3+b2,(c1*3+c0)*3+c2,(d1*3+d0)*3+d2);
 
-    printf("ei e %i\n", Edges_Intersect(16,18,16,18));
-    depth+=10;
     // Surface criterion
     for(int a0=0;a0<3;a0++)
         for(int a1=0;a1<3;a1++)
@@ -236,9 +235,7 @@ void Initialize_Edges_Intersect()
                                                     Set_Edges_Ok((a0*3+a1)*3+0,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+2);
                                                     Set_Edges_Ok((a0*3+a1)*3+0,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+1);
                                                     Set_Edges_Ok((a0*3+a1)*3+1,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+1);}
-    depth-=10;
 
-    printf("ei f %i\n", Edges_Intersect(16,18,16,18));
     // Projection criterion
     for(int a0=0;a0<3;a0++)
         for(int a1=0;a1<3;a1++)
@@ -248,28 +245,80 @@ void Initialize_Edges_Intersect()
                         for(int d0=0;d0<3;d0++)
                             Set_Edges_Ok((a0*3+a1)*3+0,(c0*3+0)*3+1,(b0*3+b1)*3+2,(d0*3+0)*3+1);
 
-
-    printf("ei h %i\n", Edges_Intersect(16,18,16,18));
     // Triangle criterion
     int tri0[5]={(1*3+1)*3+0,(1*3+1)*3+1,(1*3+1)*3+2,(1*3+0)*3+0,(1*3+2)*3+0};
     int tri1[5]={(1*3+0)*3+0,(1*3+0)*3+1,(1*3+0)*3+2,(1*3+1)*3+0,(1*3+2)*3+0};
     for(int i=0;i<5;i++)
-        for(int j=0;j<5;j++)
+        for(int j=0;j<5;j++){
+            for(int k=0;k<3;k++)
+                for(int m=0;m<3;m++)
+                    Set_Edges_Ok(tri0[i],(2*3+1)*3+k,tri0[j],(0*3+1)*3+m);
             for(int k=0;k<5;k++){
-                Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+0);
-                Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+2);
-                Set_Edges_Ok(tri1[i],tri1[j],tri1[k],(0*3+1)*3+0);}
-    printf("ei i %i\n", Edges_Intersect(16,18,16,18));
+                for(int m=0;m<3;m++)
+                    Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+m);
+                Set_Edges_Ok(tri1[i],tri1[j],tri1[k],(0*3+1)*3+0);}}
+
+    for(int a0=0;a0<3;a0++)
+        for(int a1=0;a1<3;a1++)
+            for(int b0=0;b0<3;b0++)
+                for(int b1=0;b1<3;b1++)
+                    for(int s=0;s<3;s+=2){
+                        int aa=cube_location_labels[(a0*3+a1)*3+s],ba=cube_location_labels[(b0*3+b1)*3+s];
+                        if(aa>=0 && ba>=0) on_face[aa][ba]=true;
+                        int ab=cube_location_labels[(a0*3+s)*3+a1],bb=cube_location_labels[(b0*3+s)*3+b1];
+                        if(ab>=0 && bb>=0) on_face[ab][bb]=true;
+                        int ac=cube_location_labels[(s*3+a1)*3+a0],bc=cube_location_labels[(s*3+b1)*3+b0];
+                        if(ac>=0 && bc>=0) on_face[ac][bc]=true;}
 }
 namespace{
-// void Add_Edge(int v0,int v1,int v2,int c0,int c1)
-// {
-//     interface_triangle_table.Append((c0<<18)|(c1<<15)|(v0<<10)|(v1<<5)|v2);
-// }
-// void Try_Add_Edge(int (*cur_edges)[2])
-// {
-//    int cur_edges[50][2],num_cur_edges=0,num_face_edges=0;
-// }
+void Add_Edge(int v0,int v1,int v2,int c0,int c1)
+{
+    interface_triangle_table.Append((c0<<18)|(c1<<15)|(v0<<10)|(v1<<5)|v2);
+}
+bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur_edges)
+{
+    bool reduced=true;
+    for(int i=0;i<12;i++){
+        if(adj[i][0]==-1) continue;
+        EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
+        PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
+        if(in.v0==out.v1) continue;
+        if(on_face[in.v0][out.v1] && out.v1<12 && edges[adj[out.v1][1]].v1!=in.v0){
+            reduced=false;
+            continue;}
+
+        bool ok=true;
+        for(int j=0;j<num_cur_edges;j++){
+            if(Edges_Intersect(in.v0,out.v1,cur_edges[j][0],cur_edges[j][1])!=0){
+                ok=false;
+                reduced=false;
+                break;}}
+        if(!ok) continue;
+
+        Add_Edge(in.v0,in.v1,out.v1,in.c0,in.c1);
+        in.v1=out.v1;
+        int adj_in_v1=-1;
+        if(in.v1<12){
+            adj_in_v1=adj[in.v1][0];
+            adj[in.v1][0]=adj[i][0];}
+        int a0=adj[i][0],a1=adj[i][1];
+        adj[i][0]=-1;
+        adj[i][1]=-1;
+        cur_edges[num_cur_edges][0]=in.v0;
+        cur_edges[num_cur_edges++][1]=out.v1;
+
+        if(Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges))
+            return true;
+
+        interface_triangle_table.Pop();
+        num_cur_edges--;
+        adj[i][0]=a0;
+        adj[i][1]=a1;
+        if(in.v1<12) adj[in.v1][0]=adj_in_v1;
+        in.v1=i;}
+
+    return reduced;
+}
 //#####################################################################
 // Function Emit_Interface_Triangles
 //#####################################################################
@@ -318,7 +367,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                 adj[i][0]=-1;
                 adj[i][1]=-1;
                 continue;}
-            interface_triangle_table.Append((in.c0<<18)|(in.c1<<15)|(in.v0<<10)|(in.v1<<5)|out.v1);
+            Add_Edge(in.v0,in.v1,out.v1,in.c0,in.c1);
             in.v1=out.v1;
             if(in.v1<12) adj[in.v1][0]=adj[i][0];
             else if(in.v0>=12){
@@ -328,40 +377,35 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
             adj[i][0]=-1;
             adj[i][1]=-1;}}
     else if(greedy==2){
-        int cur_edges[50][2],num_cur_edges=0,num_face_edges=0;
+        int cur_edges[100][2],num_cur_edges=0,num_face_edges=0;
         EDGE face_edges[20];
+        int face_mask=0;
         for(int i=0;i<12;i++){
             EDGE& in=edges[adj[i][0]];
             if(in.v0<12) continue;
             int c=i;
             while(edges[adj[c][1]].v1<12) c=edges[adj[c][1]].v1;
-            face_edges[num_face_edges].v0=in.v0;
-            face_edges[num_face_edges].v1=edges[adj[c][1]].v1;
+            face_edges[num_face_edges].v0=in.v0-12;
+            face_edges[num_face_edges].v1=edges[adj[c][1]].v1-12;
             face_edges[num_face_edges].c0=in.c0;
             face_edges[num_face_edges++].c1=in.c1;
-            cur_edges[num_cur_edges][0]=in.v0;
-            cur_edges[num_cur_edges][1]=edges[adj[c][1]].v1;}
+            face_mask|=(1<<in.v0)|(1<<edges[adj[c][1]].v1);}
+        for(int i=12;i<18;i++)
+            if(face_mask&(1<<i))
+                for(int j=i+1;j<18;j++)
+                    if(face_mask&(1<<j)){
+                        cur_edges[num_cur_edges][0]=i;
+                        cur_edges[num_cur_edges++][1]=j;}
 
-
-        for(int i=0;i<12;i++){
-            if(adj[i][0]==-1) continue;
-            EDGE& in=edges[adj[i][0]],&out=edges[adj[i][1]];
-            PHYSBAM_ASSERT(in.c0==out.c0 && in.c1==out.c1);
-            if(in.v0==out.v1){
-                adj[in.v0][0]=-1;
-                adj[in.v0][1]=-1;
-                adj[i][0]=-1;
-                adj[i][1]=-1;
-                continue;}
-            interface_triangle_table.Append((in.c0<<18)|(in.c1<<15)|(in.v0<<10)|(in.v1<<5)|out.v1);
-            in.v1=out.v1;
-            if(in.v1<12) adj[in.v1][0]=adj[i][0];
-            else if(in.v0>=12){
-                in.v0-=12;
-                in.v1-=12;
-                Insert_Face_Graph_Edge(face_graph,edges,adj[i][0]);}
-            adj[i][0]=-1;
-            adj[i][1]=-1;}}
+        bool add_tri=Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
+        if(!add_tri){
+            interface_triangle_table.Append(pt_mask|(1<<24));
+            for(int i=0;i<num_edges;i++)
+                Add_Edge(edges[i].v0,edges[i].v1,18,edges[i].c0,edges[i].c1);}
+        else
+            for(int i=0;i<num_face_edges;i++){
+                edges[i]=face_edges[i];
+                Insert_Face_Graph_Edge(face_graph,edges,i);}}
     else if(greedy==1){
         int vertices[30];
         for(int i=0;i<12;i++){
@@ -390,7 +434,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                 assert(v>=0);
                 if(v>=12) break;}
             int M=(L+R)/2;
-            interface_triangle_table.Append((in.c0<<18)|(in.c1<<15)|(vertices[L]<<10)|(vertices[M]<<5)|vertices[R]);
+            Add_Edge(vertices[L],vertices[M],vertices[R],in.c0,in.c1);
             out.v0=vertices[L]-12;
             out.v1=vertices[R]-12;
             Insert_Face_Graph_Edge(face_graph,edges,adj[i][1]);
@@ -457,11 +501,17 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                     interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);}
                 else{
                     interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[curve.L]<<10)|(curve.vertices[i]<<5)|curve.vertices[curve.R]);
-                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[i]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);
-                }}}}
+                    interface_triangle_table.Append((curve.c0<<18)|(curve.c1<<15)|(curve.vertices[i]<<10)|(curve.vertices[i+1]<<5)|curve.vertices[curve.R]);}}}}
 
-    int face_graph_copy[64],start_face_graph_tri=interface_triangle_table.m;
-    for(int i=0;i<64;i++) face_graph_copy[i]=face_graph[i][0];
+    int start_face_graph_tri=interface_triangle_table.m;
+    EDGE face_graph_edge[12];
+    int num_face_graph_edge=0;
+    for(int i=0;i<6;i++)
+        for(int j=i+1;j<6;j++)
+            for(int m=0;m<2;m++){
+                int* fgij=face_graph[(1<<i)|(1<<j)],fg0=fgij[m];
+                if(fg0>=0)
+                    face_graph_edge[num_face_graph_edge++]=edges[fg0];}
 
     bool progress=true,make_center=false;
     while(progress){
@@ -479,7 +529,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                                 if(fg1>=0){
                                     if(((1<<edges[fg0].c0)|(1<<edges[fg0].c1))==((1<<edges[fg1].c0)|(1<<edges[fg1].c1))){
                                         if(edges[fg1].v0!=j) edges[fg1].Flip();
-                                        interface_triangle_table.Append((edges[fg1].c0<<18)|(edges[fg1].c1<<15)|((i+12)<<10)|((j+12)<<5)|(k+12));
+                                        Add_Edge(i+12,j+12,k+12,edges[fg1].c0,edges[fg1].c1);
                                         if(edges[fg0].v1==j) edges[fg0].v1=k;
                                         else edges[fg0].v0=k;
                                         Insert_Face_Graph_Edge(face_graph,edges,fg0);
@@ -492,31 +542,10 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     if(make_center){
         interface_triangle_table(mask_tri_index)=pt_mask|(1<<24);
         interface_triangle_table.Resize(start_face_graph_tri);
-        for(int i=0;i<6;i++)
-            for(int j=0;j<6;j++){
-                int fg=face_graph_copy[(1<<i)|(1<<j)];
-                if(fg==-1) continue;
-                interface_triangle_table.Append((edges[fg].c0<<18)|(edges[fg].c1<<15)|((i+12)<<10)|((j+12)<<5)|18);}}
+        for(int i=0;i<num_face_graph_edge;i++)
+            Add_Edge(face_graph_edge[i].v0+12,face_graph_edge[i].v1+12,18,face_graph_edge[i].c0,face_graph_edge[i].c1);}
     PHYSBAM_ASSERT(table_size!=interface_triangle_table.m);
     interface_triangle_table.Last()|=last_tri_bit;
-
-    HASHTABLE<VECTOR<int,2> > ed;
-    for(int i=table_size;i<interface_triangle_table.m;i++){
-        int pat=interface_triangle_table(i);
-        if(pat&pts_bit) continue;
-        int a=(pat>>10)&0x1f,b=pat&0x1f,c=(pat>>5)&0x1f;
-        if(0) if(a==18 || b==18 || c==18) printf("col (%i %i %i %i %i %i %i %i x %x) -> (%i %i %i)\n", colors[0], colors[1], colors[2], colors[3], colors[4], colors[5], colors[6], colors[7], color_hint,a,b,c);
-
-        ed.Set(VECTOR<int,2>(a,b).Sorted());
-        ed.Set(VECTOR<int,2>(a,c).Sorted());
-        ed.Set(VECTOR<int,2>(b,c).Sorted());}
-
-    for(HASHTABLE<VECTOR<int,2> >::ITERATOR it(ed);it.Valid();it.Next())
-        for(HASHTABLE<VECTOR<int,2> >::ITERATOR it2(it);it2.Valid();it2.Next())
-            if(Edges_Intersect(it.Key().x,it.Key().y,it2.Key().x,it2.Key().y)==1)
-                if(0)printf("col (%i %i %i %i %i %i %i %i x %x) -> (%i %i) (%i %i)\n",
-                    colors[0], colors[1], colors[2], colors[3], colors[4], colors[5], colors[6], colors[7], color_hint,it.Key().x,it.Key().y,it2.Key().x,it2.Key().y);
-
 }
 //#####################################################################
 // Function Emit_Interface_Triangles
