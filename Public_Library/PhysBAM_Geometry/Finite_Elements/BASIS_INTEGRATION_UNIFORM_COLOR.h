@@ -25,11 +25,10 @@ template<class TV,int static_degree>
 class BASIS_INTEGRATION_UNIFORM_COLOR:public NONCOPYABLE
 {
 public:
-    enum BOUNDARY_CONDITIONS{SLIP=-3,DIRICHLET=-2,NEUMANN=-1};
-
     typedef SYSTEM_VOLUME_BLOCK_COLOR<TV,static_degree> VOLUME_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree> SURFACE_BLOCK;
     typedef SYSTEM_SURFACE_BLOCK_SCALAR_COLOR<TV,static_degree> SURFACE_BLOCK_SCALAR;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_CONDITIONS BC;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     typedef typename VOLUME_BLOCK::OPEN_ENTRY OPEN_ENTRY;
     typedef typename TV::SCALAR T;

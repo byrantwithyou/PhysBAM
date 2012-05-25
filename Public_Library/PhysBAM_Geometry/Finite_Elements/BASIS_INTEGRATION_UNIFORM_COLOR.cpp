@@ -136,10 +136,10 @@ Compute_Entries()
         int full_constraints=0;
         int slip_constraints=0;
         for(int i=0;i<color_pairs.m;i++)
-            if(color_pairs(i).x==DIRICHLET||color_pairs(i).x>=0)
+            if(color_pairs(i).x==BC::DIRICHLET||color_pairs(i).x>=0)
                 constraint_offsets(i)=full_constraints++;
         for(int i=0;i<color_pairs.m;i++)
-            if(color_pairs(i).x==SLIP)
+            if(color_pairs(i).x==BC::SLIP)
                 constraint_offsets(i)=slip_constraints+full_constraints++;
 
         ARRAY<MATRIX<T,TV::m> > base_orientation;
@@ -327,18 +327,18 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
 
-                        if(V.y!=SLIP && V.y!=NEUMANN)
+                        if(V.y!=BC::SLIP && V.y!=BC::NEUMANN)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
                                 T value=integral*orientations(k)(sb->axis,orientation);
                                 if(V.y>=0) sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.y,value);
                                 if("$#*!") sb->Add_Entry(cdi.constraint_base_t+constraint_offset,orientation,op.flat_index_diff_ref,V.z,-value);}
                         
-                        if(V.y!=NEUMANN){
+                        if(V.y!=BC::NEUMANN){
                             T value=integral*orientations(k)(sb->axis,TV::m-1);
                             if(V.y>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,value);
                             if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-value);}
                         
-                        if(V.y!=SLIP && V.y!=DIRICHLET){
+                        if(V.y!=BC::SLIP && V.y!=BC::DIRICHLET){
                             int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
                             T value=integral*sb->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z)(sb->axis);
                             if(V.y>=0) value*=-(T)0.5;
@@ -359,13 +359,13 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         PHYSBAM_ASSERT(found);
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                        assert(V.z!=SLIP && "Do you really want slip constraints for a scalar variable?");
+                        assert(V.z!=BC::SLIP && "Do you really want slip constraints for a scalar variable?");
                         
-                        if(V.y!=NEUMANN){
+                        if(V.y!=BC::NEUMANN){
                             if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,integral);
                             if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-integral);}
                         
-                        if(V.y!=DIRICHLET){
+                        if(V.y!=BC::DIRICHLET){
                             int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
                             T value=integral*sbs->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z);
                             if(V.y>=0) value*=-(T)0.5;

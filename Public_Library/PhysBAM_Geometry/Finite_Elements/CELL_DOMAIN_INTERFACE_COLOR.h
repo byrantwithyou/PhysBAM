@@ -29,6 +29,11 @@ class CELL_DOMAIN_INTERFACE_COLOR:public NONCOPYABLE
 
 public:
 
+    struct BOUNDARY_CONDITIONS
+    {
+        enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1};
+    };
+
     const GRID<TV>& grid;
     const int padding;
     const TV_INT size;
