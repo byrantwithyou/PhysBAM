@@ -160,7 +160,6 @@ template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 Set_Jacobi_Preconditioner()
 {
     Resize_Vector(J);
-    inactive_u.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++){
         int u_dofs=cm_u->dofs(c);
         SPARSE_MATRIX_FLAT_MXN<T>& m_uu=matrix_uu(c);
