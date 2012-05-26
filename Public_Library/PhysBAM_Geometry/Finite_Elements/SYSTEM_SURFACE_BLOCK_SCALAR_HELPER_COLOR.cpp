@@ -62,7 +62,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
         M.m=m;
 
         MATRIX_MXN<T>& d=data(c);
-        for(int row=0;row<d.m;row++,row++){
+        for(int row=0;row<d.m;row++){
             ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
             for(int j=0;j<d.n;j++){
                 T value=d(row,j);
