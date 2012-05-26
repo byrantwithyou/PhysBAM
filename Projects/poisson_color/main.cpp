@@ -5,6 +5,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -20,8 +21,6 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 
 using namespace PhysBAM;
 
@@ -37,9 +36,125 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
     return old_grid;
 }
 
+typedef VECTOR<double,3> TV3;
+TV3 color_map[3]={TV3(0,0.7,0),TV3(0.85,0.5,0),TV3(0,0.4,1)};
+
 template<class TV> struct ANALYTIC_TEST;
 
-// TODO - Insert dump debug particles routines
+//#################################################################################################################################################
+// Debug Particles ################################################################################################################################
+//#################################################################################################################################################
+
+template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
+{
+    static DEBUG_PARTICLES<TV> debug_particles;
+    return debug_particles;
+}
+
+template<class T, class TV>
+void Dump_Frame(const ARRAY<T,FACE_INDEX<TV::m> >& u,const char* title)
+{
+    static int frame=0;
+    char buff[100];
+    sprintf(buff, "%s/%i", output_directory.c_str(), frame);
+    FILE_UTILITIES::Create_Directory(buff);
+    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
+    if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
+    Get_Debug_Particles<TV>().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
+    frame++;
+}
+
+template<class T,class TV>
+void Flush_Frame(const char* title)
+{
+    Dump_Frame<T,TV>(ARRAY<T,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
+}
+
+template<class T,class TV>
+void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
+{
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+
+    for(int i=0;i<ips.cdi->surface_mesh.m;i++){
+        SURFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
+        if((V.z)>=0){
+            if((V.z)>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.z]);
+            if("#############################") Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
+        else if((V.y)>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
+}
+
+template<class T,class TV>
+void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>& at)
+{
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
+    
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next())
+        Add_Debug_Particle(it.Location(),color_map[at.phi_color(it.Location())]);
+    Flush_Frame<T,TV>("level set");
+
+    Dump_Interface<T,TV>(ips);
+    Flush_Frame<T,TV>("surfaces");
+    
+    char buff[100];
+    for(int c=0;c<ips.cdi->colors;c++){
+        Dump_Interface<T,TV>(ips);
+        sprintf(buff,"dofs u%d",c);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+            int index=ips.cm_u->Get_Index(it.index,c);
+            if(index>=0){
+                bool duplicated=false;
+                for(int c_other=0;c_other<ips.cdi->colors;c_other++){
+                    if(c_other==c) continue;
+                    if(ips.cm_u->Get_Index(it.index,c_other)>=0) duplicated=true;}
+                if(duplicated) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,1));
+                else Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}}                        
+        Flush_Frame<T,TV>(buff);}
+
+    for(int i=0;i<ips.cdi->surface_mesh.m;i++){
+        SURFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
+        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.f_surface(V.x.Center(),V.y,V.z)*T_FACE::Normal(V.x.X));}
+    Flush_Frame<T,TV>("surface forces");
+    
+    Dump_Interface<T,TV>(ips);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+        int c=at.phi_color(it.Location());
+        T f_volume=at.f_volume(it.Location(),c);
+        Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}
+        Flush_Frame<T,TV>("volumetric forces");
+}
+
+template<class T,class TV>
+void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v,const char* title)
+{
+    char buff[100];
+    for(int c=0;c<ips.cdi->colors;c++){
+        Dump_Interface<T,TV>(ips);
+        sprintf(buff,"%s u%d",title,c);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+            int k=ips.cm_u->Get_Index(it.index,c);
+            if(k>=0){
+                T u_value=v.u(c)(k);
+                Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}}
+        Flush_Frame<T,TV>(buff);}
+}
+
+template<class T,class TV>
+void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VECTOR<int,TV::m> >& u,const char* title)
+{
+    INTERPOLATED_COLOR_MAP<T> cm;
+    cm.Initialize_Colors(1e-12,1,true,true,true);
+
+    Dump_Interface<T,TV>(ips);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
+        T u_value=u(it.index);
+        Add_Debug_Particle(it.Location(),u_value==0?VECTOR<T,3>(0.25,0.25,0.25):(u_value>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,u_value);}
+    Flush_Frame<T,TV>(title);
+}
 
 //#################################################################################################################################################
 // Analytic Test ##################################################################################################################################
@@ -149,17 +264,10 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     LOG::cout<<ips.grid.counts<<" U error:   linf "<<error_u_linf<<"   l2 "<<error_u_l2<<std::endl<<std::endl;
 
-    /*if(debug_particles){
+    if(debug_particles){
         Dump_System<T,TV>(ips,at);
         Dump_Vector<T,TV>(ips,sol,"solution");
-        Dump_u_p(ips,error_u,error_p,"error");
-        Dump_u_p(ips.grid,error_u,error_p,"color mapped error");
-        if(null&&ips.Nullspace_Check(rhs)){
-            OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
-            ips.Multiply(rhs,*vectors(0));
-            LOG::cout<<"nullspace found: "<<sqrt(ips.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
-            rhs*=1/rhs.Max_Abs();
-            Dump_Vector2<T,TV>(ips,rhs,"extra null mode");}}*/
+        Dump_Vector<T,TV>(ips,error_u,"error");}
         
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
 }
@@ -174,7 +282,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
 
-    // Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
     int test_number;
     if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
@@ -183,8 +291,34 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     ANALYTIC_TEST<TV>* test=0;
 
     switch(test_number){
-        case 0:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], no pressure
+        case 0:{ // One color, periodic. No interface, no forces, u=0.
             struct ANALYTIC_TEST_0:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);}
+                virtual T phi_value(const TV& X){return (T)1;}
+                virtual int phi_color(const TV& X){return T();}
+                virtual T u(const TV& X,int color){return T();}
+                virtual T f_volume(const TV& X,int color){return T();}
+                virtual T f_surface(const TV& X,int color0,int color1){return T();}
+            };
+            test=new ANALYTIC_TEST_0;
+            break;}
+        case 1:{ // One color, periodic. No interface, u=sin(2*pi*x), f=(2*pi)^2*sin(2*pi*x).
+            struct ANALYTIC_TEST_1:public ANALYTIC_TEST<TV>
+            {
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);}
+                virtual T phi_value(const TV& X){return (T)1;}
+                virtual int phi_color(const TV& X){return T();}
+                virtual T u(const TV& X,int color){return sin(2*M_PI*X.x);}
+                virtual T f_volume(const TV& X,int color){return sqr(2*M_PI)*sin(2*M_PI*X.x);}
+                virtual T f_surface(const TV& X,int color0,int color1){return T();}
+            };
+            test=new ANALYTIC_TEST_1;
+            break;}
+        case 2:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], no pressure
+            struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
@@ -194,7 +328,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_volume(const TV& X,int color){return T();}
                 virtual T f_surface(const TV& X,int color0,int color1){return ((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
             };
-            test=new ANALYTIC_TEST_0;
+            test=new ANALYTIC_TEST_2;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
@@ -212,7 +346,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     test->Initialize();
 
     TV_INT counts=TV_INT()+res;
-    GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,false);
+    LOG::cout<<"DOMAIN INFO "<<counts<<" "<<RANGE<TV>(TV(),TV()+1)*test->m<<std::endl;
+    GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
 
     Global_Grid(&grid);
 

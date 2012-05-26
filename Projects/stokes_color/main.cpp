@@ -367,11 +367,11 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_6;
             break;}
-        case 7:{ // One color, periodic. No inteface, no forces
+        case 7:{ // One color, periodic. No interface, no forces
             struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);}
+                virtual void Initialize(){wrap=true;mu.Append(1);}
                 virtual T phi_value(const TV& X){return 1;}
                 virtual int phi_color(const TV& X){return 0;}
                 virtual TV u(const TV& X,int color){return TV();}

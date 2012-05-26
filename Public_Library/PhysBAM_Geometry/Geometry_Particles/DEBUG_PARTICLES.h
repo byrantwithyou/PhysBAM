@@ -45,6 +45,6 @@ public:
 template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
 template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
 template<class TV> void Add_Debug_Object(const VECTOR<TV,2>& object,const VECTOR<typename TV::SCALAR,3>& color);
-template<class TV> void Add_Debug_Object(const VECTOR<TV,3>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor);
+template<class TV> void Add_Debug_Object(const VECTOR<TV,3>& object,const VECTOR<typename TV::SCALAR,3>& color,const VECTOR<typename TV::SCALAR,3>& bgcolor=VECTOR<typename TV::SCALAR,3>());
 }
 #endif
