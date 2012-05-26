@@ -208,6 +208,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}}*/
         
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
+    vectors.Delete_Pointers_And_Clean_Memory();
 }
 
 //#################################################################################################################################################
