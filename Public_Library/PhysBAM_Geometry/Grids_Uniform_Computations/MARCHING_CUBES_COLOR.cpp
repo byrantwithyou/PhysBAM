@@ -21,7 +21,6 @@ ARRAY<int> interface_case_table_2d;
 ARRAY<int> interface_segment_table;
 const int comparison_bit=1<<31;
 const int last_tri_bit=1<<30;
-const int pts_bit=1<<29;
 /* Triangle encoding
  * 0 e 000000000 xxx yyy aaaaa bbbbb ccccc   (triangle)
  * 1 0 aaa bbb ccc ddd ssssss ssssss ssssss (comparison)
@@ -259,6 +258,8 @@ void Initialize_Edges_Intersect()
                 for(int m=0;m<3;m++)
                     Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+m);
                 Set_Edges_Ok(tri1[i],tri1[j],tri1[k],(0*3+1)*3+0);}}
+    Set_Edges_Ok(tri1[1],tri1[4],tri1[2],tri1[3]);
+    Set_Edges_Ok_Helper(0,6,11,18,0);
 
     for(int a0=0;a0<3;a0++)
         for(int a1=0;a1<3;a1++)
@@ -339,22 +340,6 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
         if(edges[i].v0<12) adj[edges[i].v0][1]=i;
         if(edges[i].v1<12) adj[edges[i].v1][0]=i;}
 
-    long long pt_mask_helper=0;
-    int pt_mask=pts_bit;
-    for(int i=0;i<num_edges;i++){
-        if(edges[i].v0>=12)
-            pt_mask_helper|=1LL<<(12*((edges[i].v0-12)/2)+edges[i].v1);
-        if(edges[i].v1>=12)
-            pt_mask_helper|=1LL<<(12*((edges[i].v1-12)/2)+edges[i].v0);}
-
-    for(int f=0;f<6;f++)
-        for(int i=0;i<4;i++)
-            if(pt_mask_helper&(1LL<<((f/2)*12+face_edges[f][i])))
-                pt_mask|=1<<(4*f+i);
-    int mask_tri_index=-1;
-    if(pt_mask!=pts_bit)
-        mask_tri_index=interface_triangle_table.Append(pt_mask);
-
     int face_graph[64][2];
     for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
 
@@ -380,7 +365,6 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
 
     bool add_tri=Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
     if(!add_tri){
-        interface_triangle_table.Append(pt_mask|(1<<24));
         for(int i=0;i<num_edges;i++)
             Add_Edge(edges[i].v0,edges[i].v1,18,edges[i].c0,edges[i].c1);}
     else
@@ -425,7 +409,6 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                                         progress=true;}}}}}}
 
     if(make_center){
-        interface_triangle_table(mask_tri_index)=pt_mask|(1<<24);
         interface_triangle_table.Resize(start_face_graph_tri);
         for(int i=0;i<num_face_graph_edge;i++)
             Add_Edge(face_graph_edge[i].v0+12,face_graph_edge[i].v1+12,18,face_graph_edge[i].c0,face_graph_edge[i].c1);}
@@ -592,6 +575,7 @@ void Initialize_Case_Table_2D()
 #undef EMIT
 #undef LA
 }
+const int averaging_order[7][2]={{4,6},{5,7},{0,2},{1,3},{0,1},{2,3},{12,13}};
 //#####################################################################
 // Function Get_Interface_Elements_For_Cell
 //#####################################################################
@@ -621,51 +605,24 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
             if(color_list[amb1]<color_list[amb0]) tri+=(pat>>12)&0x3f;
             else tri++;}}
 
-    const int num_pts=19;
+    for(int i=0;i<8;i++) LOG::cout<<i<<" "<<phi(i)<<std::endl;
+
     VECTOR<VECTOR<int,3>,8> bits=GRID<TV>::Binary_Counts(VECTOR<int,3>());
-    TV pts[num_pts];
+    TV pts[19];
+    T pts_phi[19];
     for(int a=0,k=0;a<3;a++){
         int mask=1<<a;
         for(int v=0;v<8;v++)
             if(!(v&mask)){
-                if(colors(v)!=colors(v|mask)){
-                    T theta=phi(v)/(phi(v)+phi(v|mask));
-                    pts[k]=(1-theta)*TV(bits(v))+theta*TV(bits(v|mask));}
-                k++;}}
+                T theta=phi(v)/(phi(v)+phi(v|mask));
+                pts[k]=(1-theta)*TV(bits(v))+theta*TV(bits(v|mask));
+                pts_phi[k++]=(1-theta)*phi(v)+theta*phi(v|mask);}}
 
-    int pt_mask=interface_triangle_table(tri);
-    if(pt_mask&pts_bit){
-        tri++;
-        int num_center_points=0;
-        if(0){
-            for(int f=0;f<6;f++){
-                int bits=(pt_mask>>(f*4))&0xf;
-                if(!bits) continue;
-                for(int i=0;i<4;i++)
-                    if(bits&(1<<i))
-                        pts[12+f]+=pts[face_edges[f][i]];
-                pts[12+f]/=(3+(bits==0xf));
-                if(pt_mask&(1<<24)){
-                    num_center_points++;
-                    pts[18]+=pts[12+f];}}
-            if(pt_mask&(1<<24))
-                pts[18]/=num_center_points;}
-        else{
-            for(int a=0;a<3;a++){
-                T total[2]={0};
-                pts[12+2*a]=TV();
-                pts[12+2*a+1]=TV();
-                for(int v=0;v<8;v++){
-                    total[(v>>a)&1]+=1/phi(v);
-                    pts[12+2*a+((v>>a)&1)]+=TV(bits(v))/phi(v);}
-                pts[12+2*a]/=total[0];
-                pts[12+2*a+1]/=total[1];}
-
-            T total=0;
-            for(int v=0;v<8;v++){
-                total+=1/phi(v);
-                pts[18]+=TV(bits(v))/phi(v);}
-            pts[18]/=total;}}
+    for(int i=0;i<7;i++){
+        int a=averaging_order[i][0],b=averaging_order[i][1];
+        T theta=pts_phi[a]/(pts_phi[a]+pts_phi[b]);
+        pts[12+i]=(1-theta)*pts[a]+theta*pts[b];
+        pts_phi[12+i]=(1-theta)*pts_phi[a]+theta*pts_phi[b];}
 
     int pat;
     do{
