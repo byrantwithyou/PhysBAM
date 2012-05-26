@@ -20,7 +20,7 @@ CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int col
     b=(TV_INT()+padding).Dot(a);
 
     remap=IDENTITY_ARRAY<>(flat_size);
-    constraint_base_n=constraint_base_t=0;
+    constraint_base_n=constraint_base_t=constraint_base_scalar=0;
     for(int orientation=0;orientation<TV::m-1;orientation++){
         flat_base(orientation)=&flat_base_t;
         constraint_base(orientation)=&constraint_base_t;}

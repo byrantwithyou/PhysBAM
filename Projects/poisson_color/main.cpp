@@ -77,10 +77,10 @@ void Dump_Interface(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips)
 
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
         SURFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
-        if((V.z)>=0){
-            if((V.z)>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.z]);
-            if("#############################") Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
-        else if((V.y)>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
+        if(V.z>=0){
+            if(V.z>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.z]);
+            if("$#*!") Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
+        else if(V.y>=0) Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*ips.grid.dX.Min(),color_map[V.y]);}
 }
 
 template<class T,class TV>
@@ -170,6 +170,8 @@ struct ANALYTIC_TEST: public ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
 
     bool wrap;
     ARRAY<T> mu;
+
+    virtual ~ANALYTIC_TEST(){}
 
     virtual void Initialize()=0;
     virtual T phi_value(const TV& X)=0;
@@ -447,6 +449,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
     Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    LOG::Finish_Logging();
+    delete test;
 }
 
 //#################################################################################################################################################

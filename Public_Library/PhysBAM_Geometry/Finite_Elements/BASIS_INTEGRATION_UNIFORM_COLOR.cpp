@@ -28,6 +28,7 @@ template<class TV,int static_degree> BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_d
 {
     volume_blocks.Delete_Pointers_And_Clean_Memory();
     surface_blocks.Delete_Pointers_And_Clean_Memory();
+    surface_blocks_scalar.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Precomputed_Integral

@@ -59,6 +59,8 @@ struct ANALYTIC_TEST: public ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>
     bool wrap;
     ARRAY<T> mu;
 
+    virtual ~ANALYTIC_TEST(){}
+
     virtual void Initialize()=0;
     virtual T phi_value(const TV& X)=0;
     virtual int phi_color(const TV& X)=0;
@@ -463,6 +465,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
     Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    LOG::Finish_Logging();
+    delete test;
 }
 
 //#################################################################################################################################################
