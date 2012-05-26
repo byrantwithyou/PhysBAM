@@ -312,12 +312,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T phi_value(const TV& X){return (T)1;}
                 virtual int phi_color(const TV& X){return T();}
                 virtual T u(const TV& X,int color){return sin(2*M_PI*X.x);}
-                virtual T f_volume(const TV& X,int color){return sqr(2*M_PI)*sin(2*M_PI*X.x);}
+                virtual T f_volume(const TV& X,int color){return sqr(2*M_PI)*sin(2*M_PI*X.x)*mu(color);}
                 virtual T f_surface(const TV& X,int color0,int color1){return T();}
             };
             test=new ANALYTIC_TEST_1;
             break;}
-        case 2:{ // Two colors, periodic. Linear flow [u,v]=[0,v(x)] on [0,1/3],[1/3,2/3],[2/3,1], no pressure
+        case 2:{ // Two colors, periodic. Linear on [0,1/3],[1/3,2/3],[2/3,1], no volumetric forces.
             struct ANALYTIC_TEST_2:public ANALYTIC_TEST<TV>
             {
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
@@ -329,6 +329,97 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_surface(const TV& X,int color0,int color1){return ((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
             };
             test=new ANALYTIC_TEST_2;
+            break;}
+        case 3:{ // Two colors, periodic. u=x^2 for r<R, zero elsewhere.
+            struct ANALYTIC_TEST_3:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
+                virtual T u(const TV& X,int color){return (X-0.5*m).Magnitude_Squared()*color;}
+                virtual T f_volume(const TV& X,int color){return -(TV::m)*2*mu(color)*color;}
+                virtual T f_surface(const TV& X,int color0,int color1){return (X-0.5*m).Magnitude()*(-2)*mu(1);}
+            };
+            test=new ANALYTIC_TEST_3;
+            break;}
+        case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
+            struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
+            {
+                T r,m2,m4;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
+                virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*color;}
+                virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*color;}
+                virtual T f_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*sqrt(x2)*2*mu(1)/m2;}
+            };
+            test=new ANALYTIC_TEST_4;
+            break;}
+        case 5:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
+            struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                TV n;
+                VECTOR<T,3> a;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
+                    for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
+                }
+                virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
+                virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
+                virtual T u(const TV& X,int color){return a(color);}
+                virtual T f_volume(const TV& X,int color){return T();}
+                virtual T f_surface(const TV& X,int color0,int color1){return T();}
+            };
+            test=new ANALYTIC_TEST_5;
+            break;}
+        case 6:{ // Three colors, periodic. u=a*x^2 for r<R and x*n>0, u=b*x^2 for r<R and x*n<0, zero elsewhere.
+            struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                TV n;
+                VECTOR<T,3> a;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;
+                    for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
+                }
+                virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
+                virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
+                virtual T u(const TV& X,int color){return (X-0.5*m).Magnitude_Squared()*a(color);}
+                virtual T f_volume(const TV& X,int color){return -(TV::m)*2*mu(color)*a(color);}
+                virtual T f_surface(const TV& X,int color0,int color1){if(color0==0) return (X-0.5*m).Magnitude()*(-2)*mu(color1)*a(color1);else return T();}
+            };
+            test=new ANALYTIC_TEST_6;
+            break;}
+        case 7:{ // Three colors, periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
+            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
+            {
+                T r,a1,a2,m2,m4;
+                TV n;
+                VECTOR<T,3> a;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
+                    for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
+                }
+                virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return (s<0)?min(abs(s),abs(x.Dot(n))):abs(s);}
+                virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?2:1):0;}
+                virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*a(color);}
+                virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
+                virtual T f_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared();if(color0==0) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
+            };
+            test=new ANALYTIC_TEST_7;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
@@ -346,7 +437,6 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     test->Initialize();
 
     TV_INT counts=TV_INT()+res;
-    LOG::cout<<"DOMAIN INFO "<<counts<<" "<<RANGE<TV>(TV(),TV()+1)*test->m<<std::endl;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
 
     Global_Grid(&grid);
