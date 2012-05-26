@@ -112,8 +112,8 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLO
         VECTOR_ND<T>& u=null_u.u(c);
         const ARRAY<int>& inactive=inactive_u(c);
         u.Fill(1);
-        for(int k=0;k<inactive.m;k++) u(inactive(k))=0;
-        null_u.Normalize();}
+        for(int k=0;k<inactive.m;k++) u(inactive(k))=0;}
+    null_u.Normalize();
 
     for(int i=0;i<TV::m;i++) delete udx_stencil(i);
 }
