@@ -253,7 +253,13 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     if(debug_particles){
         Dump_System<T,TV>(ips,at);
         Dump_Vector<T,TV>(ips,sol,"solution");
-        Dump_Vector<T,TV>(ips,error_u,"error");}
+        Dump_Vector<T,TV>(ips,error_u,"error");
+        if(null&&ips.Nullspace_Check(rhs)){
+            OCTAVE_OUTPUT<T>("n.txt").Write("n",rhs);
+            ips.Multiply(rhs,*vectors(0));
+            LOG::cout<<"Extra nullspace found: "<<sqrt(ips.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
+            rhs*=1/rhs.Max_Abs();
+            Dump_Vector<T,TV>(ips,rhs,"extra null mode");}}
         
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
     vectors.Delete_Pointers_And_Clean_Memory();
