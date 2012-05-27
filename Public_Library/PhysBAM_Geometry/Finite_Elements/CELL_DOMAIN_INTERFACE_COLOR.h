@@ -52,6 +52,10 @@ public:
     const int colors;
     const bool wrap;
 
+    bool nc_present;
+    bool dc_present;
+    bool sc_present;
+
     ARRAY<int> remap; // maps ghost cells inside in case of wrapping, identity otherwise
 
     int constraint_base_n;

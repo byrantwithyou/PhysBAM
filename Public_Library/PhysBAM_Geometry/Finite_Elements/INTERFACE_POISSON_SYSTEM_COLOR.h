@@ -15,6 +15,28 @@
 
 namespace PhysBAM{
 
+template<class TV>
+struct ANALYTIC_TEST: public ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
+{
+    typedef typename TV::SCALAR T;
+    using ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>::kg;
+    using ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>::m;
+    using ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>::s;
+
+    bool wrap;
+    ARRAY<T> mu;
+
+    virtual ~ANALYTIC_TEST(){}
+
+    virtual void Initialize()=0;
+    virtual T phi_value(const TV& X)=0;
+    virtual int phi_color(const TV& X)=0;
+    virtual T u(const TV& X,int color)=0;
+    virtual T f_volume(const TV& X,int color)=0;
+
+    T u(const TV& X){return u(X,phi_color(X));}
+};
+
 template<class TV> class GRID;
 template<class T_GRID> class LEVELSET_UNIFORM;
 template<class TV> class CELL_MANAGER_COLOR;
@@ -69,7 +91,7 @@ public:
     virtual ~INTERFACE_POISSON_SYSTEM_COLOR();
 
 //#####################################################################
-    void Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc);
+    void Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool double_fine=false);
     void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<T,TV_INT> >& f_volume,const ARRAY<ARRAY<T,TV_INT> >& u);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;

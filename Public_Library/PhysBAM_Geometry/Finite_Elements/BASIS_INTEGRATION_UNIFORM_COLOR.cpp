@@ -77,7 +77,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<SURFACE_ELEMENT>,8>& surf
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
-Compute_Entries()
+Compute_Entries(bool double_fine)
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
@@ -89,16 +89,17 @@ Compute_Entries()
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         TV_INT cell_base=it.index*2;
-        int base_color=phi_color(cell_base);
-        int cell_corners=0;
-        bool material_cell=false;
-        for(int b=0;b<(1<<TV::m);b++){
-            int color=phi_color(cell_base+bits(b)*2);
-            assert(color<cdi.colors);
-            cell_corners|=(color!=base_color)<<b;
-            material_cell|=(color>=0);}
-        if(!material_cell) continue;
-        if(cell_corners==0){Add_Uncut_Cell(it.index,base_color);continue;}
+        if(!double_fine){
+            int base_color=phi_color(cell_base);
+            int cell_corners=0;
+            bool material_cell=false;
+            for(int b=0;b<(1<<TV::m);b++){
+                int color=phi_color(cell_base+bits(b)*2);
+                assert(color<cdi.colors);
+                cell_corners|=(color!=base_color)<<b;
+                material_cell|=(color>=0);}
+            if(!material_cell) continue;
+            if(cell_corners==0){Add_Uncut_Cell(it.index,base_color);continue;}}
 
         VECTOR<bool,(1<<TV::m)> material_subcell;
         for(int s=0;s<(1<<TV::m);s++){
@@ -123,7 +124,7 @@ Compute_Entries()
             const ARRAY<SURFACE_ELEMENT>& subcell_surface=surface(s);
             for(int i=0;i<subcell_surface.m;i++){
                 const SURFACE_ELEMENT& V=subcell_surface(i);
-                if(V.y>=0){
+                if(V.z>=0){
                     VECTOR<int,2> color_pair(V.y,V.z);
                     if(!ht_color_pairs.Contains(color_pair))
                         ht_color_pairs.Insert(color_pair,color_pairs.Append(color_pair));}}}
@@ -248,8 +249,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,MATRIX<T,3>& orient
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<SURFACE_ELEMENT>& surface,ARRAY<SIDES_ELEMENT>& sides,
-    const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,
-    const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
+    const ARRAY<MATRIX<T,TV::m> >& base_orientation,const ARRAY<int>& constraint_offsets,const HASHTABLE<VECTOR<int,2>,int>& ht_color_pairs)
 {
     assert(sides.m);
     assert(surface.m);
@@ -327,6 +327,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
 
+                        cdi.nc_present|=(V.y==BC::NEUMANN);
+                        cdi.dc_present|=(V.y==BC::DIRICHLET);
+                        cdi.sc_present|=(V.y==BC::SLIP);
+
                         if(V.y!=BC::SLIP && V.y!=BC::NEUMANN)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
                                 T value=integral*orientations(k)(sb->axis,orientation);
@@ -340,8 +344,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         
                         if(V.y!=BC::SLIP && V.y!=BC::DIRICHLET){
                             int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
-                            T value=integral*sb->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z)(sb->axis);
-                            if(V.y>=0) value*=-(T)0.5;
+                            T value=-integral*sb->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z)(sb->axis);
+                            if(V.y>=0) value*=(T)0.5;
                             if(V.y>=0) (*sb->f_surface)(V.y)(flat_index)+=value;
                             if("$#*!") (*sb->f_surface)(V.z)(flat_index)+=value;}}}}}
     
@@ -360,6 +364,9 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
                         assert(V.z!=BC::SLIP && "Do you really want slip constraints for a scalar variable?");
+
+                        cdi.nc_present|=(V.y==BC::NEUMANN);
+                        cdi.dc_present|=(V.y==BC::DIRICHLET);
                         
                         if(V.y!=BC::NEUMANN){
                             if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,integral);
@@ -367,8 +374,8 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         
                         if(V.y!=BC::DIRICHLET){
                             int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
-                            T value=integral*sbs->abc->f_surface(V.x.Center()+cell_center,V.y,V.z);
-                            if(V.y>=0) value*=-(T)0.5;
+                            T value=-integral*sbs->abc->f_surface(V.x.Center()+cell_center,V.y,V.z);
+                            if(V.y>=0) value*=(T)0.5;
                             if(V.y>=0) (*sbs->f_surface)(V.y)(flat_index)+=value;
                             if("$#*!") (*sbs->f_surface)(V.z)(flat_index)+=value;}}}}}
 }

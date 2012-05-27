@@ -14,7 +14,6 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Finite_Elements/ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR.h>
@@ -38,8 +37,6 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
 
 typedef VECTOR<double,3> TV3;
 TV3 color_map[3]={TV3(0,0.7,0),TV3(0.85,0.5,0),TV3(0,0.4,1)};
-
-template<class TV> struct ANALYTIC_TEST;
 
 //#################################################################################################################################################
 // Debug Particles ################################################################################################################################
@@ -120,9 +117,10 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
     Dump_Interface<T,TV>(ips);
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(ips.grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
-        T f_volume=at.f_volume(it.Location(),c);
-        Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}
+        if(c>=0){
+            T f_volume=at.f_volume(it.Location(),c);
+            Add_Debug_Particle(it.Location(),f_volume==0?VECTOR<T,3>(0.25,0.25,0.25):(f_volume>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0)));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,f_volume);}}
         Flush_Frame<T,TV>("volumetric forces");
 }
 
@@ -161,29 +159,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
 //#################################################################################################################################################
 
 template<class TV>
-struct ANALYTIC_TEST: public ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
-{
-    typedef typename TV::SCALAR T;
-    using ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>::kg;
-    using ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>::m;
-    using ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>::s;
-
-    bool wrap;
-    ARRAY<T> mu;
-
-    virtual ~ANALYTIC_TEST(){}
-
-    virtual void Initialize()=0;
-    virtual T phi_value(const TV& X)=0;
-    virtual int phi_color(const TV& X)=0;
-    virtual T u(const TV& X,int color)=0;
-    virtual T f_volume(const TV& X,int color)=0;
-
-    T u(const TV& X){return u(X,phi_color(X));}
-};
-
-template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool double_fine)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -197,7 +173,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     
     INTERFACE_POISSON_SYSTEM_COLOR<TV> ips(grid,phi_value,phi_color);
     ips.use_preconditioner=use_preconditioner;
-    ips.Set_Matrix(at.mu,at.wrap,&at);
+    ips.Set_Matrix(at.mu,at.wrap,&at,double_fine);
 
     printf("\n");
     for(int c=0;c<ips.cdi->colors;c++) printf("u%d [%i]\t",c,ips.cm_u->dofs(c));printf("\n");
@@ -235,7 +211,10 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     LOG::cout<<"Residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
 
     ips.Multiply(ips.null_u,*vectors(0));
-    LOG::cout<<"null u "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
+    LOG::cout<<"D constraints: "<<(ips.cdi->dc_present?"yes":"no")<<std::endl;
+    LOG::cout<<"N constraints: "<<(ips.cdi->nc_present?"yes":"no")<<std::endl;
+    if(ips.cdi->dc_present) LOG::cout<<"No null modes"<<std::endl;
+    else LOG::cout<<"Null mode residual: "<<ips.Convergence_Norm(*vectors(0))<<std::endl;
 
     ARRAY<T,TV_INT> exact_u,numer_u,error_u;
 
@@ -244,24 +223,29 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     error_u.Resize(ips.grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
-        int k=ips.cm_u->Get_Index(it.index,c);
-        assert(k>=0);
-        numer_u(it.index)=sol.u(c)(k);}
+        if(c>=0){
+            int k=ips.cm_u->Get_Index(it.index,c);
+            assert(k>=0);
+            numer_u(it.index)=sol.u(c)(k);}}
 
     T avg_u=0;
     int cnt_u=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        exact_u(it.index)=at.u(it.Location());
-        error_u(it.index)=numer_u(it.index)-exact_u(it.index);
-        avg_u+=error_u(it.index);
-        cnt_u++;}
+        int c=at.phi_color(it.Location());
+        if(c>=0){
+            exact_u(it.index)=at.u(it.Location());
+            error_u(it.index)=numer_u(it.index)-exact_u(it.index);
+            avg_u+=error_u(it.index);
+            cnt_u++;}}
     avg_u/=cnt_u;
 
     T error_u_linf=0,error_u_l2=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        error_u(it.index)-=avg_u;
-        error_u_linf=max(error_u_linf,abs(error_u(it.index)));
-        error_u_l2+=sqr(error_u(it.index));}
+        int c=at.phi_color(it.Location());
+        if(c>=0){
+            error_u(it.index)-=avg_u;
+            error_u_linf=max(error_u_linf,abs(error_u(it.index)));
+            error_u_l2+=sqr(error_u(it.index));}}
     error_u_l2=sqrt(error_u_l2/cnt_u);
 
     LOG::cout<<ips.grid.counts<<" U error:   linf "<<error_u_linf<<"   l2 "<<error_u_l2<<std::endl<<std::endl;
@@ -361,8 +345,106 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_4;
             break;}
-        case 5:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
+        case 5:{ // Three colors, periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
+            {
+                T a,b,c;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    a=m/6;b=m*5/12;c=m*5/6;
+                }
+                virtual T phi_value(const TV& X)
+                {
+                    if(X.x<a) return abs(X.x-a);
+                    if(X.x<b) return (b-a)/2-abs(X.x-(b+a)/2);
+                    if(X.x<c) return (c-b)/2-abs(X.x-(c+b)/2);
+                    return abs(X.x-c);
+                }
+                virtual int phi_color(const TV& X)
+                {
+                    if(X.x<a) return 0;
+                    if(X.x<b) return 1;
+                    if(X.x<c) return 2;
+                    return 0;
+                }
+                virtual T u(const TV& X,int color){
+                    switch (color){
+                        case 0: return 0;
+                        case 1: return exp(X.x/m);
+                        case 2: return sin(2*M_PI*X.y/m);
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual T f_volume(const TV& X,int color)
+                {
+                    switch (color){
+                        case 0: return 0;
+                        case 1: return -exp(X.x/m)*mu(color)/sqr(m);
+                        case 2: return sqr(2*M_PI)*sin(2*M_PI*X.y/m)*mu(color)/sqr(m);
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual T f_surface(const TV& X,int color0,int color1)
+                {
+                    if(color0==0 && color1==1) return exp(X.x/m)*mu(1)/m;
+                    if(color0==0 && color1==2) return 0;
+                    if(color0==1 && color1==2) return -exp(X.x/m)*mu(1)/m;
+                    PHYSBAM_FATAL_ERROR();
+                }
+            };
+            test=new ANALYTIC_TEST_5;
+            break;}
+        case 6:{ // Three colors (one dirichlet or neumann), periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
+            struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
+            {
+                T a,b,c;
+                int constraint; // [-1] - Neumann, [-2] - Dirichlet
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);
+                    a=m/6;b=m*5/12;c=m*5/6;
+                    constraint=-1;
+                }
+                virtual T phi_value(const TV& X)
+                {
+                    if(X.x<a) return abs(X.x-a);
+                    if(X.x<b) return (b-a)/2-abs(X.x-(b+a)/2);
+                    if(X.x<c) return (c-b)/2-abs(X.x-(c+b)/2);
+                    return abs(X.x-c);
+                }
+                virtual int phi_color(const TV& X)
+                {
+                    if(X.x<a) return constraint;
+                    if(X.x<b) return 0;
+                    if(X.x<c) return 1;
+                    return constraint;
+                }
+                virtual T u(const TV& X,int color){
+                    switch (color){
+                        case 0: return exp(X.x/m);
+                        case 1: return sin(2*M_PI*X.y/m);
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual T f_volume(const TV& X,int color)
+                {
+                    switch (color){
+                        case 0: return -exp(X.x/m)*mu(color)/sqr(m);
+                        case 1: return sqr(2*M_PI)*sin(2*M_PI*X.y/m)*mu(color)/sqr(m);
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual T f_surface(const TV& X,int color0,int color1)
+                {
+                    if(color0==constraint && color1==0) return exp(X.x/m)*mu(0)/m;
+                    if(color0==constraint && color1==1) return 0;
+                    if(color0==0 && color1==1) return -exp(X.x/m)*mu(0)/m;
+                    PHYSBAM_FATAL_ERROR();
+                }
+            };
+            test=new ANALYTIC_TEST_6;
+            break;}
+        case 7:{ // Three colors, periodic. u=a for r<R and x>0, u=b for r<R and x<0, zero elsewhere.
+            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
             {
                 T r;
                 TV n;
@@ -380,10 +462,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_volume(const TV& X,int color){return T();}
                 virtual T f_surface(const TV& X,int color0,int color1){return T();}
             };
-            test=new ANALYTIC_TEST_5;
+            test=new ANALYTIC_TEST_7;
             break;}
-        case 6:{ // Three colors, periodic. u=a*x^2 for r<R and x*n>0, u=b*x^2 for r<R and x*n<0, zero elsewhere.
-            struct ANALYTIC_TEST_6:public ANALYTIC_TEST<TV>
+        case 8:{ // Three colors, periodic. u=a*x^2 for r<R and x*n>0, u=b*x^2 for r<R and x*n<0, zero elsewhere.
+            struct ANALYTIC_TEST_8:public ANALYTIC_TEST<TV>
             {
                 T r;
                 TV n;
@@ -401,10 +483,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_volume(const TV& X,int color){return -(TV::m)*2*mu(color)*a(color);}
                 virtual T f_surface(const TV& X,int color0,int color1){if(color0==0) return (X-0.5*m).Magnitude()*(-2)*mu(color1)*a(color1);else return T();}
             };
-            test=new ANALYTIC_TEST_6;
+            test=new ANALYTIC_TEST_8;
             break;}
-        case 7:{ // Three colors, periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
-            struct ANALYTIC_TEST_7:public ANALYTIC_TEST<TV>
+        case 9:{ // Three colors, periodic. u=a*exp(-x^2) for r<R and x*n>0, u=b*exp(-x^2) for r<R and x*n<0, zero elsewhere.
+            struct ANALYTIC_TEST_9:public ANALYTIC_TEST<TV>
             {
                 T r,a1,a2,m2,m4;
                 TV n;
@@ -422,7 +504,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
                 virtual T f_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared();if(color0==0) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
             };
-            test=new ANALYTIC_TEST_7;
+            test=new ANALYTIC_TEST_9;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
@@ -437,6 +519,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     bool null=parse_args.Get_Option_Value("-null");
     bool dump_matrix=parse_args.Get_Option_Value("-dump_matrix");
     bool debug_particles=parse_args.Get_Option_Value("-debug_particles");
+    bool double_fine=parse_args.Get_Option_Value("-double_fine");
     test->Initialize();
 
     TV_INT counts=TV_INT()+res;
@@ -449,7 +532,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,double_fine);
     LOG::Finish_Logging();
     delete test;
 }
@@ -476,6 +559,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-null","find extra null modes of the matrix");
     parse_args.Add_Option_Argument("-dump_matrix","dump system matrix");
     parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
+    parse_args.Add_Option_Argument("-double_fine","set level set exactly on double fine grid");
     parse_args.Parse(argc,argv);
 
     if(parse_args.Get_Option_Value("-3d"))

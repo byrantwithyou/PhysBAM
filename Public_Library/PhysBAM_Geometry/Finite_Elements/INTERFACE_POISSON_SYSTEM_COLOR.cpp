@@ -45,8 +45,16 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool double_fine)
 {
+    // SET LEVELSET EXACTLY ON DOUBLE FINE GRID
+
+    if(double_fine){
+        ANALYTIC_TEST<TV> *at=debug_cast<ANALYTIC_TEST<TV>*>(abc);
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
+            phi_value(it.index)=at->phi_value(it.Location());
+            phi_color(it.index)=at->phi_color(it.Location());}}
+
     // SET UP STENCILS
 
     BASIS_STENCIL_UNIFORM<TV,1> u_stencil(grid.dX);
@@ -87,7 +95,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLO
     biu.Add_Surface_Block_Scalar(helper_qu,u_stencil,abc,rhs_surface,1);
     biu.Add_Volume_Block(helper_rhs_uu,u_stencil,u_stencil,ARRAY<T>(CONSTANT_ARRAY<T>(mu.m,(T)1)));
 
-    biu.Compute_Entries();
+    biu.Compute_Entries(double_fine);
         
     // BUILD SYSTEM MATRIX BLOCKS
     
@@ -234,14 +242,13 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
     // TODO: This needs to change for N/D BC.
     VECTOR_T& v=debug_cast<VECTOR_T&>(x);
-    v.Copy(-v.Dot(null_u),null_u,v);
+    if(!cdi->dc_present) v.Copy(-v.Dot(null_u),null_u,v);
 
     for(int c=0;c<cdi->colors;c++){
         VECTOR_ND<T>& u=v.u(c);
         const ARRAY<int>& inactive=inactive_u(c);
         for(int k=0;k<inactive.m;k++)
             u(inactive(k))=0;}
-    
     for(int k=0;k<inactive_q.m;k++)
         v.q(inactive_q(k))=0;
 }
