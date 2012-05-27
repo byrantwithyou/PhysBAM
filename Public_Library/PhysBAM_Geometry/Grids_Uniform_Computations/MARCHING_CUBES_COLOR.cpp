@@ -507,8 +507,8 @@ void Register_Permutation(const int* colors,const int* perm,const int* cperm,int
     for(;i<end;i++)
         Add_Mapped_Triangle(interface_triangle_table(i),perm,color_map,flip);
 
-    Register_Permutation(colors,permute_rx,permute_rx_corners,start,end-st+start,false);
-    Register_Permutation(colors,permute_ry,permute_ry_corners,start,end-st+start,false);
+    Register_Permutation(col,permute_rx,permute_rx_corners,start,end-st+start,false);
+    Register_Permutation(col,permute_ry,permute_ry_corners,start,end-st+start,false);
 }
 //#####################################################################
 // Function Enumerate_Interface_Cases_3D
