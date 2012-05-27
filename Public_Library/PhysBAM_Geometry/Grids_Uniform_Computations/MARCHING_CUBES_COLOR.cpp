@@ -21,14 +21,47 @@ ARRAY<int> interface_case_table_2d;
 ARRAY<int> interface_segment_table;
 const int comparison_bit=1<<31;
 const int last_tri_bit=1<<30;
+#define GET_C(t,i) (((t)>>3*(i))&0x7)
+#define GET_V(t,i) (((t)>>(5*(i)+6))&0x1f)
+// void Pr_Tri(int t,const char* str="")
+// {
+//     printf("tri %s %i %i  %i %i %i %i %c\n", str, GET_C(t,0), GET_C(t,1), GET_V(t,0), GET_V(t,1), GET_V(t,2), GET_V(t,3), t&last_tri_bit?'L':' ');
+// }
+int Encode_Triangle(int c0,int c1,int v0,int v1,int v2,int v3=31)
+{
+    return (v3<<21)|(v2<<16)|(v1<<11)|(v0<<6)|(c1<<3)|c0;
+}
+void Add_Triangle(int c0,int c1,int v0,int v1,int v2,int v3=31)
+{
+    interface_triangle_table.Append(Encode_Triangle(c0,c1,v0,v1,v2,v3));
+}
+void Add_Mapped_Triangle(int t,const int* mp,const int* cmp,bool flip)
+{
+    int v3=GET_V(t,3);
+    Add_Triangle(cmp[GET_C(t,0)],cmp[GET_C(t,1)],mp[GET_V(t,0)],mp[GET_V(t,1+flip)],mp[GET_V(t,2-flip)],v3==31?31:mp[v3]);
+    if(t&last_tri_bit)
+        interface_triangle_table.Last()|=last_tri_bit;
+}
+// bool Merge_Triangles(ARRAY<int>& arr,int st)
+// {
+//     for(int i=st;i<arr.m;i++)
+//         if(GET_C(arr(i),0)>GET_C(arr(i),0))
+//             Encode_Triangle(GET_C(t,1),GET_C(t,0),GET_V(t,0),GET_V(t,2),GET_V(t,1),GET_V(t,3));
+
+//     for(int i=st;i<arr.m;i++)
+//         for(int j=i+1;j<arr.m;j++)
+//             if(GET_C(arr(i),0)==GET_C(arr(j),0) && GET_C(arr(i),1)==GET_C(arr(j),1)){
+                
+//             }
+
+//     }
+// }
 /* Triangle encoding
- * 0 e 000000000 xxx yyy aaaaa bbbbb ccccc   (triangle)
+ * 0 e 0000 ddddd ccccc bbbbb aaaaa xxx yyy   (triangle)
  * 1 0 aaa bbb ccc ddd ssssss ssssss ssssss (comparison)
  *
  * indexing: [0-11 = edges] [12-17; axis*2+side] [18 center]
  * faces: [0-3 = corners] [edges: 1 0 3 4] [8 center]
- * 
- * 0 0 1 0000 x aaaa bbbb cccc dddd eeee ffff
  * 
  */
 // start, end, inside color, outside color (c0<c1)
@@ -37,9 +70,10 @@ EDGE center_edges[6][4]; // c0,c1 are vertex to take color from
 struct DOMINANT_PAIR {EDGE a,b;int dc;} dominant_pair[6][2];
 const int permute_rx[19]={1,3,0,2,10,11,8,9,4,5,6,7,12,13,16,17,15,14,18};
 const int permute_ry[19]={8,10,9,11,6,4,7,5,2,0,3,1,17,16,14,15,12,13,18};
+const int permute_flip[19]={0,1,2,3,5,4,7,6,9,8,11,10,13,12,14,15,16,17,18};
 const int permute_rx_corners[8]={2,3,6,7,0,1,4,5};
 const int permute_ry_corners[8]={4,0,6,2,5,1,7,3};
-const int permute_flip[19]={0,1,2,3,5,4,7,6,9,8,11,10,13,12,14,15,16,17,18};
+const int permute_flip_corners[8]={1,0,3,2,5,4,7,6};
 int face_edges[6][4];
 #ifdef ENABLE_TIMING
 #define rdtscll(val) do { \
@@ -274,10 +308,6 @@ void Initialize_Edges_Intersect()
                         if(ac>=0 && bc>=0) on_face[ac][bc]=true;}
 }
 namespace{
-void Add_Edge(int v0,int v1,int v2,int c0,int c1)
-{
-    interface_triangle_table.Append((c0<<18)|(c1<<15)|(v0<<10)|(v1<<5)|v2);
-}
 bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur_edges)
 {
     bool reduced=true;
@@ -298,7 +328,7 @@ bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur
                 break;}}
         if(!ok) continue;
 
-        Add_Edge(in.v0,in.v1,out.v1,in.c0,in.c1);
+        Add_Triangle(in.c0,in.c1,in.v0,in.v1,out.v1);
         in.v1=out.v1;
         int adj_in_v1=-1;
         if(in.v1<12){
@@ -366,7 +396,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     bool add_tri=Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
     if(!add_tri){
         for(int i=0;i<num_edges;i++)
-            Add_Edge(edges[i].v0,edges[i].v1,18,edges[i].c0,edges[i].c1);}
+            Add_Triangle(edges[i].c0,edges[i].c1,edges[i].v0,edges[i].v1,18);}
     else
         for(int i=0;i<num_face_edges;i++){
             edges[i]=face_edges[i];
@@ -398,7 +428,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
                                 if(fg1>=0){
                                     if(((1<<edges[fg0].c0)|(1<<edges[fg0].c1))==((1<<edges[fg1].c0)|(1<<edges[fg1].c1))){
                                         if(edges[fg1].v0!=j) edges[fg1].Flip();
-                                        Add_Edge(i+12,j+12,k+12,edges[fg1].c0,edges[fg1].c1);
+                                        Add_Triangle(edges[fg1].c0,edges[fg1].c1,i+12,j+12,k+12);
                                         if(edges[fg0].v1==j) edges[fg0].v1=k;
                                         else edges[fg0].v0=k;
                                         Insert_Face_Graph_Edge(face_graph,edges,fg0);
@@ -411,7 +441,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     if(make_center){
         interface_triangle_table.Resize(start_face_graph_tri);
         for(int i=0;i<num_face_graph_edge;i++)
-            Add_Edge(face_graph_edge[i].v0+12,face_graph_edge[i].v1+12,18,face_graph_edge[i].c0,face_graph_edge[i].c1);}
+            Add_Triangle(face_graph_edge[i].c0,face_graph_edge[i].c1,face_graph_edge[i].v0+12,face_graph_edge[i].v1+12,18);}
     PHYSBAM_ASSERT(table_size!=interface_triangle_table.m);
     interface_triangle_table.Last()|=last_tri_bit;
 }
@@ -451,13 +481,49 @@ void Emit_Interface_Triangles(int* colors)
     interface_triangle_table(test_index)=comparison_bit|(hint0<<24)|(hint1<<18)|(skip0<<12)|(skip1<<6)|skip2;
 }
 //#####################################################################
+// Function Register_Permutation
+//#####################################################################
+void Register_Permutation(const int* colors,const int* perm,const int* cperm,int st,int end,bool flip)
+{
+//    return;
+    int col[8],cs=0,next_color=0,color_map[8]={-1,-1,-1,-1,-1,-1,-1,-1};
+    for(int i=0;i<8;i++) col[cperm[i]]=colors[i];
+    for(int i=0;i<8;i++){
+        int& cm=color_map[col[i]];
+        if(cm==-1) cm=next_color++;
+        col[i]=cm;
+        cs=cs*(i+1)+cm;}
+    if(interface_case_table(cs)) return;
+    int start=interface_triangle_table.m;;
+    interface_case_table(cs)=start;
+
+    int i=st,ct=interface_triangle_table(i);
+    if(ct&comparison_bit){
+        int t=(ct&0xc003ffff)|(color_map[(ct>>24)&7]<<24)|(color_map[(ct>>27)&7]<<27);
+        if(ct&0xf30000)
+            t|=(color_map[(ct>>18)&7]<<18)|(color_map[(ct>>21)&7]<<21);
+        interface_triangle_table.Append(t);
+        i++;}
+    for(;i<end;i++)
+        Add_Mapped_Triangle(interface_triangle_table(i),perm,color_map,flip);
+
+    Register_Permutation(colors,permute_rx,permute_rx_corners,start,end-st+start,false);
+    Register_Permutation(colors,permute_ry,permute_ry_corners,start,end-st+start,false);
+}
+//#####################################################################
 // Function Enumerate_Interface_Cases_3D
 //#####################################################################
 void Enumerate_Interface_Cases_3D(int* colors, int i, int mc, int cs)
 {
     if(i==8){
-        interface_case_table(cs)=interface_triangle_table.m;
-        if(cs) Emit_Interface_Triangles(colors);
+        if(!cs || interface_case_table(cs)) return;
+        int start=interface_triangle_table.m;
+        interface_case_table(cs)=start;
+        Emit_Interface_Triangles(colors);
+        int end=interface_triangle_table.m;
+        Register_Permutation(colors,permute_flip,permute_flip_corners,start,end,true);
+        Register_Permutation(colors,permute_rx,permute_rx_corners,start,end,false);
+        Register_Permutation(colors,permute_ry,permute_ry_corners,start,end,false);
         return;}
 
     for(int c=0;c<=mc;c++){
@@ -473,7 +539,7 @@ void Enumerate_Interface_Cases_3D(int* colors, int i, int mc, int cs)
 void Enumerate_Boundary_Cases_3D()
 {
 #define ST(c) boundary_case_table(c)=boundary_triangle_table.m
-#define EMIT(v0,v1,v2,c) boundary_triangle_table.Append((c<<18)|((v0)<<10)|((v1)<<5)|(v2))
+#define EMIT(v0,v1,v2,c) boundary_triangle_table.Append(Encode_Triangle(c,0,v0,v1,v2))
 #define LA boundary_triangle_table.Last()|=last_tri_bit
     ST(0);EMIT(0,2,3,0);EMIT(0,3,1,0);LA;
     ST(1);EMIT(0,2,1,0);EMIT(2,7,1,0);EMIT(2,5,7,0);EMIT(5,3,7,1);LA;
@@ -549,7 +615,7 @@ void Initialize_Case_Table_2D()
 {
     interface_case_table_2d.Resize(24);
 #define ST(c) interface_case_table_2d(c)=interface_segment_table.m
-#define EMIT(v0,v1,c0,c1) interface_segment_table.Append((c0<<18)|(c1<<15)|(v0<<10)|(v1<<5))
+#define EMIT(v0,v1,c0,c1) interface_segment_table.Append(Encode_Triangle(c0,c1,v0,v1,31));
 #define LA interface_segment_table.Last()|=last_tri_bit
     ST(1);EMIT(1,3,0,1);LA;
     ST(4);EMIT(2,1,0,1);LA;
@@ -592,7 +658,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     int tri=interface_case_table(cs);
     if(interface_triangle_table(tri)&comparison_bit){
         int pat=interface_triangle_table(tri);
-        if((pat>>18)&0x3f){
+        if(pat&(0x3f<<18)){
             int amb0=(pat>>24)&7,amb1=(pat>>27)&7,amb2=(pat>>18)&7,amb3=(pat>>21)&7;
             if(color_list[amb0]<color_list[amb1]){
                 if(color_list[amb2]<color_list[amb3]) tri++;
@@ -604,8 +670,6 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
             int amb0=(pat>>24)&7,amb1=(pat>>27)&7;
             if(color_list[amb1]<color_list[amb0]) tri+=(pat>>12)&0x3f;
             else tri++;}}
-
-    for(int i=0;i<8;i++) LOG::cout<<i<<" "<<phi(i)<<std::endl;
 
     VECTOR<VECTOR<int,3>,8> bits=GRID<TV>::Binary_Counts(VECTOR<int,3>());
     TV pts[19];
@@ -627,8 +691,8 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
     int pat;
     do{
         pat=interface_triangle_table(tri++);
-        TRIANGLE_3D<T> triangle(pts[(pat>>10)&0x1f],pts[pat&0x1f],pts[(pat>>5)&0x1f]);
-        TRIPLE<TRIANGLE_3D<T>,int,int> triple(triangle,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
+        TRIANGLE_3D<T> triangle(pts[GET_V(pat,0)],pts[GET_V(pat,2)],pts[GET_V(pat,1)]);
+        TRIPLE<TRIANGLE_3D<T>,int,int> triple(triangle,color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
         if(triple.y>triple.z){
             exchange(triple.y,triple.z);
             exchange(triple.x.X(1),triple.x.X(2));}
@@ -670,8 +734,8 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const 
     int pat;
     do{
         pat=boundary_triangle_table(tri++);
-        TRIANGLE_3D<T> triangle(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f],pts[pat&0x1f]);
-        PAIR<TRIANGLE_3D<T>,int> pair(triangle,color_list[(pat>>18)&0x7]);
+        TRIANGLE_3D<T> triangle(pts[GET_V(pat,0)],pts[GET_V(pat,1)],pts[GET_V(pat,2)]);
+        PAIR<TRIANGLE_3D<T>,int> pair(triangle,color_list[GET_C(pat,0)]);
         if(s) exchange(pair.x.X.y,pair.x.X.z);
         boundary.Append(pair);
     } while(!(pat&last_tri_bit));
@@ -713,8 +777,8 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,c
     int pat;
     do{
         pat=interface_segment_table(seg++);
-        SEGMENT_2D<T> segment(pts[(pat>>10)&0x1f],pts[(pat>>5)&0x1f]);
-        TRIPLE<SEGMENT_2D<T>,int,int> triple(segment,color_list[(pat>>18)&0x7],color_list[(pat>>15)&0x7]);
+        SEGMENT_2D<T> segment(pts[GET_V(pat,0)],pts[GET_V(pat,1)]);
+        TRIPLE<SEGMENT_2D<T>,int,int> triple(segment,color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
         if(triple.y>triple.z){
             exchange(triple.y,triple.z);
             exchange(triple.x.X(0),triple.x.X(1));}
