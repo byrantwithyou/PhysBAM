@@ -23,10 +23,12 @@ const int comparison_bit=1<<31;
 const int last_tri_bit=1<<30;
 #define GET_C(t,i) (((t)>>3*(i))&0x7)
 #define GET_V(t,i) (((t)>>(5*(i)+6))&0x1f)
-// void Pr_Tri(int t,const char* str="")
-// {
-//     printf("tri %s %i %i  %i %i %i %i %c\n", str, GET_C(t,0), GET_C(t,1), GET_V(t,0), GET_V(t,1), GET_V(t,2), GET_V(t,3), t&last_tri_bit?'L':' ');
-// }
+}
+void Pr_Tri(int t,const char* str="")
+{
+    printf("tri %s %i %i  %i %i %i %i %c\n", str, GET_C(t,0), GET_C(t,1), GET_V(t,0), GET_V(t,1), GET_V(t,2), GET_V(t,3), t&last_tri_bit?'L':' ');
+}
+namespace{
 int Encode_Triangle(int c0,int c1,int v0,int v1,int v2,int v3=31)
 {
     return (v3<<21)|(v2<<16)|(v1<<11)|(v0<<6)|(c1<<3)|c0;
@@ -56,6 +58,30 @@ void Add_Mapped_Triangle(int t,const int* mp,const int* cmp,bool flip)
 
 //     }
 // }
+void Fix_T_Jnct(int st)
+{
+    int has=0,n=interface_triangle_table.m;
+    const int mask[4]={3<<12,3<<14,3<<16,1<<18};
+    for(int i=st;i<n;i++){
+        int t=interface_triangle_table(i);
+        int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
+        for(int j=0;j<4;j++)
+            if((m&mask[j])==mask[j])
+                has|=1<<j;}
+    if(!(has&(has-1))) return;
+    for(int i=st;i<n;i++){
+        int t=interface_triangle_table(i);
+        int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
+        int k=-1;
+        for(int j=0;j<3;j++)
+            if((m&mask[j])==mask[j])
+                k=12+2*j;
+        if(k==-1) continue;
+        int v0=GET_V(t,0),v1=GET_V(t,1),v2=GET_V(t,2),c0=GET_C(t,0),c1=GET_C(t,1);
+        Add_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);
+        k++;
+        interface_triangle_table(i)=Encode_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);}
+}
 /* Triangle encoding
  * 0 e 0000 ddddd ccccc bbbbb aaaaa xxx yyy   (triangle)
  * 1 0 aaa bbb ccc ddd ssssss ssssss ssssss (comparison)
@@ -283,6 +309,8 @@ void Initialize_Edges_Intersect()
     // Triangle criterion
     int tri0[5]={(1*3+1)*3+0,(1*3+1)*3+1,(1*3+1)*3+2,(1*3+0)*3+0,(1*3+2)*3+0};
     int tri1[5]={(1*3+0)*3+0,(1*3+0)*3+1,(1*3+0)*3+2,(1*3+1)*3+0,(1*3+2)*3+0};
+    Set_Edges_Ok_Helper(0,15,16,3,2);
+    Set_Edges_Ok_Helper(0,6,11,18,0);
     for(int i=0;i<5;i++)
         for(int j=0;j<5;j++){
             for(int k=0;k<3;k++)
@@ -292,8 +320,6 @@ void Initialize_Edges_Intersect()
                 for(int m=0;m<3;m++)
                     Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+m);
                 Set_Edges_Ok(tri1[i],tri1[j],tri1[k],(0*3+1)*3+0);}}
-    Set_Edges_Ok(tri1[1],tri1[4],tri1[2],tri1[3]);
-    Set_Edges_Ok_Helper(0,6,11,18,0);
 
     for(int a0=0;a0<3;a0++)
         for(int a1=0;a1<3;a1++)
@@ -358,7 +384,7 @@ bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur
 void Emit_Interface_Triangles(int* colors,int color_hint)
 {
     EDGE edges[25]; // need an extra one
-    int num_edges=0,table_size=interface_triangle_table.m;
+    int num_edges=0,case_start=interface_triangle_table.m;
     for(int a=0;a<3;a++)
         for(int b=a+1;b<3;b++)
             for(int s=0;s<2;s++)
@@ -377,6 +403,7 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     EDGE face_edges[20];
     int face_mask=0;
     for(int i=0;i<12;i++){
+        if(adj[i][0]==-1) continue;
         EDGE& in=edges[adj[i][0]];
         if(in.v0<12) continue;
         int c=i;
@@ -442,7 +469,8 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
         interface_triangle_table.Resize(start_face_graph_tri);
         for(int i=0;i<num_face_graph_edge;i++)
             Add_Triangle(face_graph_edge[i].c0,face_graph_edge[i].c1,face_graph_edge[i].v0+12,face_graph_edge[i].v1+12,18);}
-    PHYSBAM_ASSERT(table_size!=interface_triangle_table.m);
+    PHYSBAM_ASSERT(case_start!=interface_triangle_table.m);
+    Fix_T_Jnct(case_start);
     interface_triangle_table.Last()|=last_tri_bit;
 }
 //#####################################################################
@@ -485,7 +513,6 @@ void Emit_Interface_Triangles(int* colors)
 //#####################################################################
 void Register_Permutation(const int* colors,const int* perm,const int* cperm,int st,int end,bool flip)
 {
-//    return;
     int col[8],cs=0,next_color=0,color_map[8]={-1,-1,-1,-1,-1,-1,-1,-1};
     for(int i=0;i<8;i++) col[cperm[i]]=colors[i];
     for(int i=0;i<8;i++){
@@ -500,7 +527,7 @@ void Register_Permutation(const int* colors,const int* perm,const int* cperm,int
     int i=st,ct=interface_triangle_table(i);
     if(ct&comparison_bit){
         int t=(ct&0xc003ffff)|(color_map[(ct>>24)&7]<<24)|(color_map[(ct>>27)&7]<<27);
-        if(ct&0xf30000)
+        if(ct&(0x3f<<18))
             t|=(color_map[(ct>>18)&7]<<18)|(color_map[(ct>>21)&7]<<21);
         interface_triangle_table.Append(t);
         i++;}
