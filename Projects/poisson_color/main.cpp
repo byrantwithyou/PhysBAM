@@ -522,7 +522,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
+                    wrap=true;mu.Append(1);mu.Append(2);
                     r=m/M_PI;a(0)=0;a(1)=5;a(2)=7;m2=sqr(m);m4=sqr(m2);
                     for(int i=0;i<TV::m;i++) n(i)=i+M_PI/(i+M_PI);n.Normalize();
                     constraint=-2;
