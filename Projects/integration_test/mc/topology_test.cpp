@@ -23,6 +23,13 @@ typedef float RW;
 typedef VECTOR<T,3> TV;
 typedef VECTOR<int,3> TV_INT;
 
+#define rdtscll(val) do {  \
+        unsigned int __a,__d;                        \
+        asm volatile("rdtsc" : "=a" (__a), "=d" (__d));                 \
+        (val) = ((unsigned long long)__a) | (((unsigned long long)__d)<<32); \
+    } while(0)
+inline unsigned long long rdtsc(){unsigned long long x;rdtscll(x);return x;}
+
 std::string output_directory;
 
 template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
@@ -81,7 +88,7 @@ int main(int argc, char* argv[])
     color.Fill(0);
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,-2);it.Valid();it.Next()){
         phi(it.index)=random.Get_Uniform_Number(0.1,1);
-        color(it.index)=random.Get_Uniform_Integer(0,9);}
+        color(it.index)=random.Get_Uniform_Integer(0,0);}
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
@@ -90,6 +97,7 @@ int main(int argc, char* argv[])
 
     HASHTABLE<VECTOR<TV_INT,2>,ARRAY<VECTOR<int,2> > > hash;
 
+    unsigned long long t0=rdtsc();
     const VECTOR<TV_INT,8>& bits=GRID<TV>::Binary_Counts(TV_INT());
     for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,-1);it.Valid();it.Next()){
         VECTOR<T,8> p;
@@ -114,6 +122,8 @@ int main(int argc, char* argv[])
             hash.Get_Or_Insert(VECTOR<TV_INT,2>(a,b)).Append(col);
             hash.Get_Or_Insert(VECTOR<TV_INT,2>(b,c)).Append(col);
             hash.Get_Or_Insert(VECTOR<TV_INT,2>(c,a)).Append(col);}}
+    unsigned long long t1=rdtsc();
+    printf("setup: %.2f\n", (t1-t0)/3059.107e6);
 
     for(HASHTABLE<VECTOR<TV_INT,2>,ARRAY<VECTOR<int,2> > >::ITERATOR it(hash);it.Valid();it.Next()){
         ARRAY<int> a,b;
