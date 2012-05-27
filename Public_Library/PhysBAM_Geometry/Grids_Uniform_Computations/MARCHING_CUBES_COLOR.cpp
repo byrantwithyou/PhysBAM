@@ -368,6 +368,7 @@ bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur
 
         if(Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges))
             return true;
+        reduced=false;
 
         interface_triangle_table.Pop();
         num_cur_edges--;
