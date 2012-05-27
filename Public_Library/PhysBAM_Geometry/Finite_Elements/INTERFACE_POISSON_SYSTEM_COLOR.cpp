@@ -50,9 +50,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLO
     // SET LEVELSET EXACTLY ON DOUBLE FINE GRID
 
     if(double_fine){
+        T tol=1e-2;
+        T panic_threshold=phi_grid.dX.Min()*tol;
         ANALYTIC_TEST<TV> *at=debug_cast<ANALYTIC_TEST<TV>*>(abc);
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
-            phi_value(it.index)=at->phi_value(it.Location());
+            phi_value(it.index)=max(at->phi_value(it.Location()),panic_threshold);
             phi_color(it.index)=at->phi_color(it.Location());}}
 
     // SET UP STENCILS
