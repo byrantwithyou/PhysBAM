@@ -36,7 +36,7 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
 }
 
 typedef VECTOR<double,3> TV3;
-TV3 color_map[3]={TV3(0,0.7,0),TV3(0.85,0.5,0),TV3(0,0.4,1)};
+TV3 color_map[4]={TV3(0,0.7,0),TV3(0.8,0.8,0),TV3(0,0.4,1),TV3(0.8,0.2,0)};
 
 //#################################################################################################################################################
 // Debug Particles ################################################################################################################################
@@ -534,6 +534,90 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T f_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared();if(color0==-2) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
             };
             test=new ANALYTIC_TEST_10;
+            break;}
+        case 11:{ // Four colors, periodic. Three equal bubbles.
+            struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                TV n; // rotate angle with respect to e_y
+                TV a; // shift
+                VECTOR<TV,3> centers;
+                VECTOR<TV,3> normals;
+                VECTOR<VECTOR<int,3>,3> sectors;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);mu.Append(4);
+                    r=(T)1/(2*M_PI-1);
+                    n=TV::Axis_Vector(1);a=TV()+M_PI/100;
+                    centers(0)=TV::Axis_Vector(1);
+                    centers(1).x=(T)sqrt(3)/2;centers(1).y=-(T)1/2;
+                    centers(2).x=-(T)sqrt(3)/2;centers(2).y=-(T)1/2;
+                    for(int i=0;i<3;i++){
+                        normals(i).x=-centers(i).y;
+                        normals(i).y=centers(i).x;
+                        centers(i)*=r;
+                        for(int j=0;j<3;j++) sectors(i)(j)=(i+j)%3;}
+                    LOG::cout<<sectors<<std::endl;
+                    LOG::cout<<normals<<std::endl;
+                    LOG::cout<<centers<<std::endl;
+                }
+                virtual TV Transform(const TV& X){return X-0.5+a;}
+                virtual T phi_value(const TV& X)
+                {
+                    TV x=Transform(X);
+                    int i;
+                    for(i=0;i<2;i++) if(x.Dot(normals(sectors(i)(1)))>=0 && x.Dot(normals(sectors(i)(2)))<0) break;
+                    T d=(x-centers(i)).Magnitude();
+                    if(d>r && x.Magnitude()>r/100) return d-r;
+                    else return min(abs(d-r),abs(x.Dot(normals(sectors(i)(1)))),abs(x.Dot(normals(sectors(i)(2)))));
+                }
+                virtual int phi_color(const TV& X){
+                    TV x=Transform(X);
+                    int i;
+                    for(i=0;i<2;i++) if(x.Dot(normals(sectors(i)(1)))>=0 && x.Dot(normals(sectors(i)(2)))<0) break;
+                    T d=(x-centers(i)).Magnitude();
+                    if(d>r && x.Magnitude()>r/100) return 0;
+                    else return i+1;
+                }
+                virtual T u(const TV& X,int color)
+                {
+                    switch(color){
+                        case 0: return T();
+                        case 1: return sin(X.x);
+                        case 2: return cos(X.y);
+                        case 3: return X.Magnitude_Squared();
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual TV grad_u(const TV& X,int color)
+                {
+                    switch(color){
+                        case 0: return TV();
+                        case 1: return TV::Axis_Vector(0)*cos(X.x)*mu(color);
+                        case 2: return -TV::Axis_Vector(1)*sin(X.y)*mu(color);
+                        case 3: return (TV()+2)*X*mu(color);
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual T f_volume(const TV& X,int color)
+                {
+                    switch(color){
+                        case 0: return T();
+                        case 1: return sin(X.x)*mu(color);
+                        case 2: return cos(X.y)*mu(color);
+                        case 3: return -2*TV::m*mu(color);
+                        default: PHYSBAM_FATAL_ERROR();}
+                }
+                virtual T f_surface(const TV& X,int color0,int color1)
+                {
+                    TV x=Transform(X);
+                    if(color0==0){return -grad_u(X,color1).Dot((x-centers(color1-1)).Normalized());}
+                    if(color0==1 && color1==2) return normals(2).Dot(grad_u(X,2)-grad_u(X,1));
+                    if(color0==2 && color1==3) return normals(0).Dot(grad_u(X,3)-grad_u(X,2));
+                    if(color0==1 && color1==3) return normals(1).Dot(grad_u(X,1)-grad_u(X,3));
+                    PHYSBAM_FATAL_ERROR();
+                }
+            };
+            test=new ANALYTIC_TEST_11;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
