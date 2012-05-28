@@ -12,4 +12,5 @@ Automatic_Program(env,"colored_case",["mc/colored_case.cpp"])
 Automatic_Program(env,"colored_case2",["mc/colored_case2.cpp"])
 Automatic_Program(env,"intersect",["mc/intersect.cpp"])
 Automatic_Program(env,"topology_test",["mc/topology_test.cpp"])
+Automatic_Program(env,"mc2tex",["mc/mc2tex.cpp"])
 
