@@ -95,6 +95,10 @@ int main(int argc, char* argv[])
                 for(int m=k+1;m<19;m++){
                     if(j!=k && j!=m){
                         TV I(all_pts[0][i]),J(all_pts[0][j]),K(all_pts[0][k]),M(all_pts[0][m]);
+                        VECTOR<IV,4> KY(IV(rint(I*2)),IV(rint(J*2)),IV(rint(K*2)),IV(rint(M*2)));
+                        if(hash.Contains(KY)) continue;
+                        Add(KY);
+
                         if(abs((I+J)-(T)1).Max()>.99 || abs((K+M)-(T)1).Max()>.99){
                             printf("OK%i  (%i %i) (%i %i) - face edge\n", Edges_Intersect(i,j,k,m), i, j, k, m);
                             continue;}
@@ -132,18 +136,18 @@ int main(int argc, char* argv[])
                         for(int a=0;a<256;a++){
                             TV I(all_pts[a][i]),J(all_pts[a][j]),K(all_pts[a][k]),M(all_pts[a][m]);
                             T v=TV::Dot_Product(TV::Cross_Product(J-I,K-I),M-I);
-                            if(v>1e-6*0) has[1]=1;
-                            if(v<-1e-6*0) has[0]=1;
+                            if(v>1e-6) has[1]=1;
+                            if(v<-1e-6) has[0]=1;
                             if(has[0] && has[1]){
                                 status=2;
                                 printf("BAD%i  (%i %i) (%i %i) - crossed sign %i %i\n", Edges_Intersect(i,j,k,m), i, j, k, m, a, stored_case);
                                 break;}
                             stored_case=a;}
+                        if(!has[0] && !has[1]){
+                                status=2;
+                                printf("ON%i  (%i %i) (%i %i) - zero sign\n", Edges_Intersect(i,j,k,m), i, j, k, m);
+                                break;}
                         if(status) continue;
-
-                        VECTOR<IV,4> KY(IV(rint(I*2)),IV(rint(J*2)),IV(rint(K*2)),IV(rint(M*2)));
-                        if(hash.Contains(KY)) continue;
-                        Add(KY);
 
                         printf("UNKNOWN%i (%i %i) (%i %i)\n", Edges_Intersect(i,j,k,m), i, j, k, m);
                     }
