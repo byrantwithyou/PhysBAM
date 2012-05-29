@@ -61,8 +61,6 @@ TV3 X[27]={
     
     /* 18 */ TV3( 0.5, 0.5, 0.5 )};
 
-std::string C[8]={"red","green","blue","orange","cyan","magenta"};
-
 bool Visible(const TV3& x0,const TV3& x1)
 {
     if(x0.x==1 && x1.x==1) return true;
