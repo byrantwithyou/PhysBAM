@@ -162,9 +162,9 @@ struct OBJECT
                 fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){0.03}\n";
                 fout<<"\\psset{linecolor=black}";
 
-                T alpha=0.425;
+                T alpha=M_PI/6;
                 T start=(alpha*c0)/2;
-                T r=0.05;
+                T r=0.04625;
                 int sectors=3;
                 T offset=-M_PI/2;
 
@@ -172,7 +172,7 @@ struct OBJECT
                     T phi=2*M_PI*i/sectors-start+offset;
                     for(int j=0;j<c0+1;j++){
                         fout<<"\\psline[linecolor=color"<<c0<<",";
-                        fout<<"linewidth=0.012";
+                        fout<<"linewidth=0.0125";
                         fout<<"]{c-c}("<<xp.x<<","<<xp.y<<")("<<xp.x+cos(phi+j*alpha)*r<<","<<xp.y+sin(phi+j*alpha)*r<<")\n";}}
 
                 break;}
