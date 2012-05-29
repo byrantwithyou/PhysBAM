@@ -18,7 +18,11 @@ typedef VECTOR<int,2> TV_INT2;
 typedef VECTOR<int,3> TV_INT3;
 
 TV2 Project(const TV3& X)
-{return TV2(X.y-0.35*X.x,X.z-0.25*X.x);}
+{
+    T r=0.4;
+    T phi=M_PI/6;
+    return TV2(X.y-r*cos(phi)*X.x,X.z-r*sin(phi)*X.x);
+}
 
 TV3 X[27]={
 
