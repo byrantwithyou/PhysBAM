@@ -228,18 +228,17 @@ void Set_Edges_Ok(int a,int b,int c,int d)
 {
     int aa=cube_location_labels[a],bb=cube_location_labels[b],cc=cube_location_labels[c],dd=cube_location_labels[d];
     if(aa==-1 || bb==-1 || cc==-1 || dd==-1) return;
-//    printf("%*s%i %i %i %i\n", depth, "", aa,bb,cc,dd);
-    int x=0;
-    if(abs(a-b)!=abs(c-d)){
-        VECTOR<int,3> A(a%3-b%3,(a/3)%3-(b/3)%3,(a/9)%3-(b/9)%3),C(c%3-d%3,(c/3)%3-(d/3)%3,(c/9)%3-(d/9)%3);
-        if(A.Cross(C)==VECTOR<int,3>()) x=2;}
-    Set_Edges_Ok_Helper(aa,bb,cc,dd,x);
+    Set_Edges_Ok_Helper(aa,bb,cc,dd,0);
 }
 }
 void Initialize_Edges_Intersect()
 {
     // Initially everything intersects
     edges_intersect.Resize(19*19*19*19,true,false,1);
+
+    Set_Edges_Ok_Helper(0,15,16,3,2);
+    Set_Edges_Ok_Helper(12,13,14,15,0);
+    Set_Edges_Ok_Helper(0,6,11,18,0);
 
     // Share an endpoint
     for(int a=0;a<27;a++)
@@ -248,7 +247,7 @@ void Initialize_Edges_Intersect()
                 if(cube_location_labels[b]>=0)
                     for(int c=b;c<27;c++)
                         if(cube_location_labels[c]>=0)
-                            Set_Edges_Ok_Helper(cube_location_labels[a],cube_location_labels[b],cube_location_labels[a],cube_location_labels[c],0);
+                            Set_Edges_Ok(a,b,a,c);
 
     // Edge on cube face
     for(int a=0;a<9;a++)
@@ -309,8 +308,6 @@ void Initialize_Edges_Intersect()
     // Triangle criterion
     int tri0[5]={(1*3+1)*3+0,(1*3+1)*3+1,(1*3+1)*3+2,(1*3+0)*3+0,(1*3+2)*3+0};
     int tri1[5]={(1*3+0)*3+0,(1*3+0)*3+1,(1*3+0)*3+2,(1*3+1)*3+0,(1*3+2)*3+0};
-    Set_Edges_Ok_Helper(0,15,16,3,2);
-    Set_Edges_Ok_Helper(0,6,11,18,0);
     for(int i=0;i<5;i++)
         for(int j=0;j<5;j++){
             for(int k=0;k<3;k++)
