@@ -18,7 +18,7 @@ typedef VECTOR<int,2> TV_INT2;
 typedef VECTOR<int,3> TV_INT3;
 
 TV2 Project(const TV3& X)
-{return TV2(X.y-0.4*X.x,X.z-0.3*X.x);}
+{return TV2(X.y-0.35*X.x,X.z-0.25*X.x);}
 
 TV3 X[27]={
 
@@ -45,10 +45,10 @@ TV3 X[27]={
     /* 06 */ TV3( 0.0, 0.5, 1.0 ),
     /* 07 */ TV3( 1.0, 0.5, 1.0 ),
 
-    /* 08 */ TV3( 0.0, 0.0, 0.5 ),
-    /* 09 */ TV3( 1.0, 0.0, 0.5 ),
-    /* 10 */ TV3( 0.0, 1.0, 0.5 ),
-    /* 11 */ TV3( 1.0, 1.0, 0.5 ),
+    /* 08 */ TV3( 0.0, 0.0, 0.475 ),
+    /* 09 */ TV3( 1.0, 0.0, 0.525 ),
+    /* 10 */ TV3( 0.0, 1.0, 0.525 ),
+    /* 11 */ TV3( 1.0, 1.0, 0.475 ),
     
     /* 12 */ TV3( 0.0, 0.5, 0.5 ),
     /* 13 */ TV3( 1.0, 0.5, 0.5 ),
@@ -76,7 +76,7 @@ bool Visible(const TV3& x0,const TV3& x1)
 
 struct OBJECT
 {
-    enum WORKAROUND{SEGMENT,CUBE_SEGMENT,POINT,CUBE_POINT};
+    enum WORKAROUND{CENTER_SEGMENT,CUBE_SEGMENT,SEGMENT,POINT,CUBE_POINT};
 
     int v0,v1,c0,c1;
     int type;
@@ -85,7 +85,7 @@ struct OBJECT
     {
         switch(type){
             case POINT: return X[v0+8];
-            case SEGMENT: return (X[v0+8]+X[v1+8])/2;
+            case SEGMENT:case CENTER_SEGMENT: return (X[v0+8]+X[v1+8])/2;
             case CUBE_POINT: return X[v0];
             case CUBE_SEGMENT: return (X[v0]+X[v1])/2;
             default: PHYSBAM_FATAL_ERROR();}
@@ -108,7 +108,7 @@ struct OBJECT
         switch(type){
             case POINT:{
                 TV2 xp=Project(X[v0+8]);
-                fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){3pt}\n";
+                fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){0.025}\n";
                 break;}
             case SEGMENT:{
                 TV3 x0=X[v0+8];
@@ -120,48 +120,93 @@ struct OBJECT
                 TV2 t=xp1-xp0;
                 t.Normalize();
                 TV2 n=t.Rotate_Clockwise_90();
-                TV2 diff;
-                T shift=0.0055;
-                if(visible) diff=n*shift;
-                else diff=n*(-shift);
 
-                fout<<"\\psline[linecolor="<<C[c1]<<",";
-                if(Visible(x0,x1)) fout<<"linewidth=1.5pt";
-                else fout<<"linewidth=1.5pt,linestyle=dotted";
-                fout<<"]{c-c}("<<xp0.x+diff.x<<","<<xp0.y+diff.y<<")("<<xp1.x+diff.x<<","<<xp1.y+diff.y<<")\n";
+                T shift=0.0115;
+                T linewidth=0.0175;
+                std::string dash=",dash=0.015 0.01";
 
-                fout<<"\\psline[linecolor="<<C[c0]<<",";
-                if(Visible(x0,x1)) fout<<"linewidth=1.5pt";
-                else fout<<"linewidth=1.5pt,linestyle=dotted";
-                fout<<"]{c-c}("<<xp0.x-diff.x<<","<<xp0.y-diff.y<<")("<<xp1.x-diff.x<<","<<xp1.y-diff.y<<")\n";
-
+                T space=-0.005;
+                T length=0.04;
                 T width=0.025;
-                T length=0.025;
-                T inner_length=0.015;
-                T front=0.025;
+                T back=0.005;
 
-                fout<<"\\pspolygon[fillstyle=solid,fillcolor=white]";
-                fout<<"("<<c.x+t.x*front<<","<<c.y+t.y*front<<")";
-                fout<<"("<<c.x-t.x*length+n.x*width<<","<<c.y-t.y*length+n.y*width<<")";
-                fout<<"("<<c.x-t.x*inner_length<<","<<c.y-t.y*inner_length<<")";
-                fout<<"("<<c.x-t.x*length-n.x*width<<","<<c.y-t.y*length-n.y*width<<")";
+                T sign[2];
+                if(visible) {sign[0]=-1;sign[1]=1;}
+                else {sign[0]=1;sign[1]=-1;}
+
+                int color[2];
+                color[0]=c0;
+                color[1]=c1;
+
+                for(int s=0;s<2;s++){
+                    int spikes=color[s]+1;
+                    int spaces=color[s];
+                    T start=(spikes*length+spaces*space)/2;
+
+                for(int i=0;i<spikes;i++){
+                    fout<<"\\pspolygon[fillstyle=solid,fillcolor=color"<<color[s]<<",linecolor=color"<<color[s]<<"]";
+                    fout<<"("<<c.x+sign[s]*shift*n.x+start*t.x-i*(space+length)*t.x<<","
+                             <<c.y+sign[s]*shift*n.y+start*t.y-i*(space+length)*t.y<<")";
+                    fout<<"("<<c.x+sign[s]*shift*n.x+start*t.x-i*(space+length)*t.x-(length-back)*t.x<<","
+                             <<c.y+sign[s]*shift*n.y+start*t.y-i*(space+length)*t.y-(length-back)*t.y<<")";
+                    fout<<"("<<c.x+sign[s]*shift*n.x+start*t.x-i*(space+length)*t.x-length*t.x+sign[s]*width*n.x<<","
+                             <<c.y+sign[s]*shift*n.y+start*t.y-i*(space+length)*t.y-length*t.y+sign[s]*width*n.y<<")";}
+
+                fout<<"\\psline[linecolor=color"<<color[s]<<",";
+                if(Visible(x0,x1)) fout<<"linewidth="<<linewidth;
+                else fout<<"linewidth="<<linewidth<<",linestyle=dashed"<<dash;
+                fout<<"]{c-c}("<<xp0.x+sign[s]*shift*n.x<<","<<xp0.y+sign[s]*shift*n.y<<")("<<xp1.x+sign[s]*shift*n.x<<","<<xp1.y+sign[s]*shift*n.y<<")\n";}
 
                 break;}
             case CUBE_POINT:{
                 TV2 xp=Project(X[v0]);
-                fout<<"\\psset{linecolor="<<C[c0]<<"}";
-                fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){4pt}\n";
+                fout<<"\\psset{linecolor=color"<<c0<<"}";
+                fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){0.03}\n";
                 fout<<"\\psset{linecolor=black}";
+
+                T alpha=0.425;
+                T start=(alpha*c0)/2;
+                T r=0.05;
+                int sectors=3;
+                T offset=-M_PI/2;
+
+                for(int i=0;i<sectors;i++){
+                    T phi=2*M_PI*i/sectors-start+offset;
+                    for(int j=0;j<c0+1;j++){
+                        fout<<"\\psline[linecolor=color"<<c0<<",";
+                        fout<<"linewidth=0.012";
+                        fout<<"]{c-c}("<<xp.x<<","<<xp.y<<")("<<xp.x+cos(phi+j*alpha)*r<<","<<xp.y+sin(phi+j*alpha)*r<<")\n";}}
+
                 break;}
             case CUBE_SEGMENT:{
                 TV3 x0=X[v0];
                 TV3 x1=X[v1];
                 TV2 xp0=Project(x0);
                 TV2 xp1=Project(x1);
+                
+                T linewidth=0.005;
+
                 fout<<"\\psline[linecolor=black,";
-                if(Visible(x0,x1)) fout<<"linewidth=1.5pt";
-                else fout<<"linewidth=1.5pt,linestyle=dotted";
+                if(Visible(x0,x1)) fout<<"linewidth="<<linewidth;
+                else fout<<"linewidth="<<linewidth<<",linestyle=dashed,dash=0.01 0.01";
                 fout<<"]{c-c}("<<xp0.x<<","<<xp0.y<<")("<<xp1.x<<","<<xp1.y<<")\n";
+                break;}
+            case CENTER_SEGMENT:{
+                TV3 x0=X[v0+8];
+                TV3 x1=X[v1+8];
+                TV2 xp0=Project(x0);
+                TV2 xp1=Project(x1);
+                
+                T linewidth=0.003;
+
+                fout<<"\\psline[linecolor=gray,";
+                fout<<"linewidth="<<linewidth<<",linestyle=dashed,dash=0.005 0.005";
+                fout<<"]{c-c}("<<xp0.x<<","<<xp0.y<<")("<<xp1.x<<","<<xp1.y<<")\n";
+                
+                T r=0.006;
+                
+                fout<<"\\qdisk("<<xp0.x<<","<<xp0.y<<"){"<<r<<"}\n";
+                fout<<"\\qdisk("<<xp1.x<<","<<xp1.y<<"){"<<r<<"}\n";
                 break;}
             default: PHYSBAM_FATAL_ERROR();}
     }
@@ -203,8 +248,14 @@ int main(int argc, char* argv[])
     OBJECT cs21={1,5,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs21);
     OBJECT cs22={2,6,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs22);
     OBJECT cs23={3,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs23);
-    
+
+    OBJECT cs0={12,13,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs0);
+    OBJECT cs1={14,15,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs1);
+    OBJECT cs2={16,17,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs2);
+
     objects.Sort();
+    
+    fout<<std::fixed;
 
     fout<<"\\documentclass{article}\n";
     fout<<"\\usepackage{pstricks}\n";
@@ -213,7 +264,10 @@ int main(int argc, char* argv[])
     fout<<"\\pagestyle{empty}\n";
     fout<<"\n";
     fout<<"\\begin{pspicture}(6,6)\n";
-    fout<<"\\psset{unit=5cm}\n";
+    fout<<"\\psset{unit=4cm}\n";
+    fout<<"\\newrgbcolor{color0}{0.95 0 0}";
+    fout<<"\\newrgbcolor{color1}{0 0.75 0}";
+    fout<<"\\newrgbcolor{color2}{0 0.25 1}";
     fout<<"\n";
     
     for(int i=0;i<objects.m;i++){
