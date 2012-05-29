@@ -133,7 +133,7 @@ struct OBJECT
                 T back=0.005;
 
                 T sign[2];
-                if(visible) {sign[0]=-1;sign[1]=1;}
+                if(!visible) {sign[0]=-1;sign[1]=1;}
                 else {sign[0]=1;sign[1]=-1;}
 
                 int color[2];
@@ -270,6 +270,7 @@ int main(int argc, char* argv[])
     fout<<"\\newrgbcolor{color0}{0.95 0 0}";
     fout<<"\\newrgbcolor{color1}{0 0.75 0}";
     fout<<"\\newrgbcolor{color2}{0 0.25 1}";
+    fout<<"\\newrgbcolor{color3}{.7 .7 0}";
     fout<<"\n";
     
     for(int i=0;i<objects.m;i++){
