@@ -21,31 +21,6 @@ typedef VECTOR<int,3> TV_INT3;
 TV2 Project(const TV3& X)
 {return TV2(X.y-0.4*X.x,X.z-0.3*X.x);}
 
-void Emit_Begin(std::ofstream& fout)
-{
-    fout<<std::fixed;
-    fout<<"\\documentclass{article}\n";
-    fout<<"\\usepackage{pstricks}\n";
-    fout<<"\n";
-    fout<<"\\begin{document}\n";
-    fout<<"\\pagestyle{empty}\n";
-    fout<<"\n";
-    fout<<"\\begin{pspicture}(6,6)\n";
-    fout<<"\\psset{unit=4cm}\n";
-    fout<<"\\newrgbcolor{color0}{0.95 0 0}";
-    fout<<"\\newrgbcolor{color1}{0 0.75 0}";
-    fout<<"\\newrgbcolor{color2}{0 0.25 1}";
-    fout<<"\\newrgbcolor{color3}{.7 .7 0}";
-    fout<<"\n";
-}    
-
-void Emit_End(std::ofstream& fout)
-{    
-    fout<<"\n";
-    fout<<"\\end{pspicture}\n";
-    fout<<"\\end{document}\n";
-}
-
 TV3 X[27]={
 
     /* CUBE POINTS */ 
@@ -100,6 +75,43 @@ bool Visible(const TV3& x0,const TV3& x1)
     PHYSBAM_FATAL_ERROR();
 }
 
+void Emit_Begin(std::ofstream& fout)
+{
+    fout<<std::fixed;
+    fout<<"\\documentclass{article}\n";
+    fout<<"\\usepackage{pstricks}\n";
+    fout<<"\n";
+    fout<<"\\begin{document}\n";
+    fout<<"\\pagestyle{empty}\n";
+    fout<<"\n";
+    fout<<"\\begin{pspicture}(6,6)\n";
+    fout<<"\\psset{unit=4cm}\n";
+    fout<<"\\newrgbcolor{color0}{0.95 0 0}";
+    fout<<"\\newrgbcolor{color1}{0 0.75 0}";
+    fout<<"\\newrgbcolor{color2}{0 0.25 1}";
+    fout<<"\\newrgbcolor{color3}{.7 .7 0}";
+    fout<<"\n";
+}    
+
+void Emit_End(std::ofstream& fout)
+{    
+    fout<<"\n";
+    fout<<"\\end{pspicture}\n";
+    fout<<"\\end{document}\n";
+}
+
+void Emit_Arrow(const TV2& xp,T linewidth,std::ofstream& fout)
+{    
+    T length=0.15;
+
+    fout<<"\\psline[linecolor=black,";
+    fout<<"linewidth="<<linewidth;
+    fout<<",arrowsize=0.06";
+    fout<<",arrowlength=1";
+    fout<<",arrowinset=.4";
+    fout<<"]{c->}("<<xp.x-length<<","<<xp.y<<")("<<xp.x+length<<","<<xp.y<<")\n";
+}
+
 void Emit_Edge(TV2& xp0,TV2& xp1,int* color,T* sign,bool visible,std::ofstream& fout)
 {
     TV2 c=(xp1+xp0)/2;
@@ -136,8 +148,17 @@ void Emit_Edge(TV2& xp0,TV2& xp1,int* color,T* sign,bool visible,std::ofstream& 
         fout<<"]{c-c}("<<xp0.x+sign[s]*shift*n.x<<","<<xp0.y+sign[s]*shift*n.y<<")("<<xp1.x+sign[s]*shift*n.x<<","<<xp1.y+sign[s]*shift*n.y<<")\n";}
 }
 
-void Emit_Point(TV2& xp,std::ofstream& fout)
-{fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){0.03}\n";}
+void Emit_Point(TV2& xp,std::ofstream& fout,bool black=true)
+{
+    T r=0.03;
+
+    if(black) fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){"<<r<<"}\n";
+    else{
+        fout<<"\\psset{linecolor=white}";
+        fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){"<<r<<"}\n";
+        fout<<"\\psset{linecolor=black}";
+        fout<<"\\pscircle[linewidth=0.0075]("<<xp.x<<","<<xp.y<<"){"<<r<<"}\n";}
+}
 
 struct OBJECT
 {
@@ -245,7 +266,7 @@ struct OBJECT
             default: PHYSBAM_FATAL_ERROR();}
     }
 
-    void Draw_Flat(std::ofstream& fout)
+    void Draw_Flat(std::ofstream& fout,bool black=true)
     {
         TV2 xp0=V(v0);
         TV2 xp1=V(v1);
@@ -256,8 +277,8 @@ struct OBJECT
         sign[0]=-1;
         sign[1]=1;
         Emit_Edge(xp0,xp1,color,sign,true,fout);
-        Emit_Point(xp0,fout);
-        Emit_Point(xp1,fout);
+        Emit_Point(xp0,fout,black);
+        Emit_Point(xp1,fout,black);
     }
 
     bool Flip()
@@ -277,127 +298,300 @@ int main(int argc, char* argv[])
     parse_args.Add_String_Argument("-ic","in_curves.txt","input file with curves");
     parse_args.Add_String_Argument("-ir","in_reduction.txt","input file with reduction");
     parse_args.Add_String_Argument("-o","out","output file");
-    parse_args.Add_Double_Argument("-scale",1,"scale graph");
+    parse_args.Add_Double_Argument("-scale",1,"scale for graph reduction");
+    parse_args.Add_Option_Argument("-emit_curves","create output tex file with cube and curves");
+    parse_args.Add_Option_Argument("-emit_reduction","create output tex files with graph reduction process");
+    parse_args.Add_Option_Argument("-emit_rules","create output tex files with reduction rules");
     parse_args.Parse(argc,argv);
     std::string input_file_curves=parse_args.Get_String_Value("-ic");
     std::string input_file_reduction=parse_args.Get_String_Value("-ir");
     std::string output_file=parse_args.Get_String_Value("-o");
     T scale=parse_args.Get_Double_Value("-scale");
+    bool EMIT_REDUCTION=parse_args.Get_Option_Value("-emit_reduction");
+    bool EMIT_CURVES=parse_args.Get_Option_Value("-emit_curves");
+    bool EMIT_RULES=parse_args.Get_Option_Value("-emit_rules");
 
+    std::ifstream fin;
+    std::ofstream fout;
+    int v0,v1,v2,c0,c1;
+    T x0,x1;
+ 
     // ##### CURVES ON CUBE #############################################################
 
-    std::ifstream fin(input_file_curves.c_str());
-    std::ofstream fout((output_file+".tex").c_str());
-
-    int v0,v1,v2,c0,c1;
-    for(int i=0;i<8 && fin>>c0;i++){
-        OBJECT cp={i,-1,c0,-1,OBJECT::CUBE_POINT};objects.Append(cp);}
-    while(fin>>v0>>v1>>c0>>c1){
-        OBJECT s={v0,v1,c0,c1,OBJECT::SEGMENT};objects.Append(s);
-        OBJECT p0={v0,-1,c0,c1,OBJECT::POINT};objects.Append(p0);
-        OBJECT p1={v1,-1,c0,c1,OBJECT::POINT};objects.Append(p1);}
-    
-    OBJECT cs00={0,1,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs00);
-    OBJECT cs01={2,3,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs01);
-    OBJECT cs02={4,5,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs02);
-    OBJECT cs03={6,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs03);
-
-    OBJECT cs10={0,2,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs10);
-    OBJECT cs11={1,3,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs11);
-    OBJECT cs12={4,6,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs12);
-    OBJECT cs13={5,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs13);
-
-    OBJECT cs20={0,4,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs20);
-    OBJECT cs21={1,5,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs21);
-    OBJECT cs22={2,6,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs22);
-    OBJECT cs23={3,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs23);
-
-    OBJECT cs0={12,13,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs0);
-    OBJECT cs1={14,15,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs1);
-    OBJECT cs2={16,17,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs2);
-
-    objects.Sort();
-
-    Emit_Begin(fout);
-    for(int i=0;i<objects.m;i++){
-        if(i>0 && objects(i)==objects(i-1)) continue;
-        objects(i).Draw(fout);}
-    Emit_End(fout);
-
-    fin.close();
-    fout.close();
+    if(EMIT_CURVES||EMIT_REDUCTION)
+    {
+        fin.open(input_file_curves.c_str());
+        
+        for(int i=0;i<8 && fin>>c0;i++){
+            OBJECT cp={i,-1,c0,-1,OBJECT::CUBE_POINT};objects.Append(cp);}
+        while(fin>>v0>>v1>>c0>>c1){
+            OBJECT s={v0,v1,c0,c1,OBJECT::SEGMENT};objects.Append(s);
+            OBJECT p0={v0,-1,c0,c1,OBJECT::POINT};objects.Append(p0);
+            OBJECT p1={v1,-1,c0,c1,OBJECT::POINT};objects.Append(p1);}
+        
+        OBJECT cs00={0,1,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs00);
+        OBJECT cs01={2,3,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs01);
+        OBJECT cs02={4,5,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs02);
+        OBJECT cs03={6,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs03);
+        
+        OBJECT cs10={0,2,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs10);
+        OBJECT cs11={1,3,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs11);
+        OBJECT cs12={4,6,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs12);
+        OBJECT cs13={5,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs13);
+        
+        OBJECT cs20={0,4,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs20);
+        OBJECT cs21={1,5,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs21);
+        OBJECT cs22={2,6,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs22);
+        OBJECT cs23={3,7,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs23);
+        
+        OBJECT cs0={12,13,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs0);
+        OBJECT cs1={14,15,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs1);
+        OBJECT cs2={16,17,-1,-1,OBJECT::CENTER_SEGMENT};objects.Append(cs2);
+        
+        objects.Sort();
+        
+        if(EMIT_CURVES)
+        {
+            LOG::cout<<"EMITTING CURVES"<<std::endl;
+        
+            fout.open((output_file+".tex").c_str());
+            LOG::cout<<output_file+".tex"<<std::endl;
+            Emit_Begin(fout);
+            for(int i=0;i<objects.m;i++){
+                if(i>0 && objects(i)==objects(i-1)) continue;
+                objects(i).Draw(fout);}
+            Emit_End(fout);
+            fout.close();
+        }
+        
+        fin.close();
+    }
 
     // ##### GRAPH REDUCTION #############################################################
 
-    fin.open(input_file_reduction.c_str());
+    if(EMIT_REDUCTION)
+    {
+        LOG::cout<<"EMITTING GRAPH REDUCTION"<<std::endl;
+
+        fin.open(input_file_reduction.c_str());
     
-    T x0,x1;
-    for(int i=0;i<18 && fin>>c0>>x0>>x1;i++) V.Append(TV2(x0,x1)*scale);
+        for(int i=0;i<18 && fin>>c0>>x0>>x1;i++) V.Append(TV2(x0,x1)*scale);
+        
+        ARRAY<OBJECT> edges;
+        for(int i=0;i<objects.m;i++)
+            if(objects(i).type==OBJECT::SEGMENT)
+                edges.Append(objects(i));
+        
+        fout.open((output_file+"_0.tex").c_str());
+        LOG::cout<<output_file+"_0.tex"<<std::endl;
+        Emit_Begin(fout);
+        for(int i=0;i<edges.m;i++) edges(i).Draw_Flat(fout);
+        Emit_End(fout);
+        fout.close();
+        
+        int count=0;
+        while(fin>>v0>>v1>>v2>>c0>>c1){
+            ARRAY<int> index;
+            for(int i=0;i<edges.m;i++)
+                if((edges(i).c0==c0 && edges(i).c1==c1) &&
+                    (edges(i).v0==v0 || edges(i).v0==v1 || edges(i).v0==v2) &&
+                    (edges(i).v1==v0 || edges(i).v1==v1 || edges(i).v1==v2)){
+                    index.Append(i);
+                    if(index.m==2) break;}
+            assert(index.m==2);
+            int a,b;
+            if(edges(index(0)).v1==edges(index(1)).v0) a=index(0),b=index(1);
+            else a=index(1),b=index(0);
+            assert(edges(a).v1==edges(b).v0);
+            // LOG::cout<<"remove "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl;
+            // LOG::cout<<"remove "<<edges(b).v0<<" "<<edges(b).v1<<" "<<edges(b).c0<<" "<<edges(b).c1<<std::endl<<std::endl;
+            edges(a).v1=edges(b).v1;
+            edges.Remove_Index(b);
+            if(a>b) a--;
+            // LOG::cout<<"add "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl<<std::endl;
+            for(b=0;b<edges.m;b++){
+                if(a==b) continue;
+                if((edges(a).v0==edges(b).v0 && edges(a).v1==edges(b).v1) ||
+                    (edges(a).v0==edges(b).v1 && edges(a).v1==edges(b).v0 && edges(a).Flip())){
+                    // LOG::cout<<"merge a "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl;
+                    // LOG::cout<<"merge b "<<edges(b).v0<<" "<<edges(b).v1<<" "<<edges(b).c0<<" "<<edges(b).c1<<std::endl<<std::endl;
+                    if(edges(a).c1==edges(b).c0) edges(a).c1=edges(b).c1;
+                    else if(edges(a).c0==edges(b).c1) edges(a).c0=edges(b).c0;
+                    edges.Remove_Index(b);
+                    if(a>b) a--;
+                    // LOG::cout<<"merge complete "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl<<std::endl;;                
+                    if(edges(a).c0>edges(a).c1) edges(a).Flip();
+                    if(edges(a).c0==edges(a).c1) edges.Remove_Index(a);
+                    break;}}
+            count++;
+            if(edges.m){
+                char buff[10];
+                sprintf(buff,"%d",count);
+                fout.open((output_file+"_"+buff+".tex").c_str());
+                LOG::cout<<output_file+"_"+buff+".tex"<<std::endl;
+                Emit_Begin(fout);
+                for(int i=0;i<edges.m;i++) edges(i).Draw_Flat(fout);
+                Emit_End(fout);
+                fout.close();}}
+        fin.close();
+    }
 
-    ARRAY<OBJECT> edges;
-    for(int i=0;i<objects.m;i++)
-        if(objects(i).type==OBJECT::SEGMENT)
-            edges.Append(objects(i));
-    
-    fout.open((output_file+"_0.tex").c_str());
-    Emit_Begin(fout);
-    for(int i=0;i<edges.m;i++) edges(i).Draw_Flat(fout);
-    Emit_End(fout);
-    fout.close();
+    // ##### REDUCTION RULES #############################################################
 
-    int count=0;
-    while(fin>>v0>>v1>>v2>>c0>>c1){
-        ARRAY<int> index;
-        for(int i=0;i<edges.m;i++)
-            if((edges(i).c0==c0 && edges(i).c1==c1) &&
-               (edges(i).v0==v0 || edges(i).v0==v1 || edges(i).v0==v2) &&
-               (edges(i).v1==v0 || edges(i).v1==v1 || edges(i).v1==v2)){
-                index.Append(i);
-                if(index.m==2) break;}
-        assert(index.m==2);
-        int a,b;
-        if(edges(index(0)).v1==edges(index(1)).v0) a=index(0),b=index(1);
-        else a=index(1),b=index(0);
-        assert(edges(a).v1==edges(b).v0);
+    if(EMIT_RULES)
+    {
+        LOG::cout<<"EMITTING REDUCTION RULES"<<std::endl;
 
-        LOG::cout<<"remove "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl;
-        LOG::cout<<"remove "<<edges(b).v0<<" "<<edges(b).v1<<" "<<edges(b).c0<<" "<<edges(b).c1<<std::endl<<std::endl;
-
-        edges(a).v1=edges(b).v1;
-        edges.Remove_Index(b);
-        if(a>b) a--;
-
-        LOG::cout<<"add "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl<<std::endl;
-
-        for(b=0;b<edges.m;b++){
-            if(a==b) continue;
-            if((edges(a).v0==edges(b).v0 && edges(a).v1==edges(b).v1) ||
-                (edges(a).v0==edges(b).v1 && edges(a).v1==edges(b).v0 && edges(a).Flip())){
-                
-                LOG::cout<<"merge a "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl;
-                LOG::cout<<"merge b "<<edges(b).v0<<" "<<edges(b).v1<<" "<<edges(b).c0<<" "<<edges(b).c1<<std::endl<<std::endl;
-
-                if(edges(a).c1==edges(b).c0) edges(a).c1=edges(b).c1;
-                else if(edges(a).c0==edges(b).c1) edges(a).c0=edges(b).c0;
-
-                edges.Remove_Index(b);
-                if(a>b) a--;
-
-                LOG::cout<<"merge complete "<<edges(a).v0<<" "<<edges(a).v1<<" "<<edges(a).c0<<" "<<edges(a).c1<<std::endl<<std::endl;;                
-
-                if(edges(a).c0>edges(a).c1) edges(a).Flip();
-                if(edges(a).c0==edges(a).c1) edges.Remove_Index(a);
-                break;}}
-        count++;
-        if(edges.m){
-            char buff[10];
-            sprintf(buff,"%d",count);
-            fout.open((output_file+"_"+buff+".tex").c_str());
+        T height=0.2;
+        T spacing_arrow=0.4;
+        T spacing_arrow_tri=0.35;
+        T spacing_lines=height/2;
+        T ellipse_horizontal=0.12;
+        T ellipse_vertical=0.07;
+        T linewidth=0.01;
+        
+        {
+            LOG::cout<<output_file+"_rule_A.tex"<<std::endl;
+            fout.open((output_file+"_rule_A.tex").c_str());
             Emit_Begin(fout);
-            for(int i=0;i<edges.m;i++) edges(i).Draw_Flat(fout);
-            Emit_End(fout);
-            fout.close();}}
-    fin.close();
 
+            V.Remove_All();
+            V.Append(TV2(0,-height));
+            V.Append(TV2(0,height));
+            OBJECT input={0,1,0,1,OBJECT::SEGMENT};
+            input.Draw_Flat(fout);
+
+            V.Remove_All();
+            V.Append(TV2(2*spacing_arrow,-height));
+            V.Append(TV2(2*spacing_arrow,height));
+            OBJECT output={1,0,1,0,OBJECT::SEGMENT};
+            output.Draw_Flat(fout);
+
+            Emit_Arrow(TV2(spacing_arrow,0),linewidth,fout);
+
+            Emit_End(fout);
+            fout.close();
+        }
+
+        {
+            LOG::cout<<output_file+"_rule_B.tex"<<std::endl;
+            fout.open((output_file+"_rule_B.tex").c_str());
+            Emit_Begin(fout);
+
+            V.Remove_All();
+            V.Append(TV2(0,-height));
+            V.Append(TV2(height*2/sqrt(3),height));
+            V.Append(TV2(height*4/sqrt(3),-height));
+            OBJECT input0={0,1,0,1,OBJECT::SEGMENT};
+            OBJECT input1={1,2,0,1,OBJECT::SEGMENT};
+            input0.Draw_Flat(fout);
+            input1.Draw_Flat(fout);
+
+            Emit_Arrow(TV2(height*4/sqrt(3)+spacing_arrow_tri,0),linewidth,fout);
+
+            V.Remove_All();
+            V.Append(TV2(height*4/sqrt(3)+2*spacing_arrow_tri,-height+spacing_lines));
+            V.Append(TV2(height*4/sqrt(3)+2*spacing_arrow_tri+height*2/sqrt(3),height));
+            V.Append(TV2(height*4/sqrt(3)+2*spacing_arrow_tri+height*4/sqrt(3),-height+spacing_lines));
+            OBJECT output0={0,1,0,1,OBJECT::SEGMENT};
+            OBJECT output1={1,2,0,1,OBJECT::SEGMENT};
+            OBJECT output2={2,0,0,1,OBJECT::SEGMENT};
+            output0.Draw_Flat(fout,false);
+            output1.Draw_Flat(fout,false);
+            output2.Draw_Flat(fout,false);
+
+            V.Remove_All();
+            V.Append(TV2(height*4/sqrt(3)+2*spacing_arrow_tri,-height));
+            V.Append(TV2(height*4/sqrt(3)+2*spacing_arrow_tri+height*4/sqrt(3),-height));
+            OBJECT output3={0,1,0,1,OBJECT::SEGMENT};
+            output3.Draw_Flat(fout);
+
+            Emit_End(fout);
+            fout.close();
+        }
+
+        {
+            LOG::cout<<output_file+"_rule_C.tex"<<std::endl;
+            fout.open((output_file+"_rule_C.tex").c_str());
+            Emit_Begin(fout);
+
+            V.Remove_All();
+            V.Append(TV2(0,-height));
+            V.Append(TV2(0,height));
+            OBJECT input0={0,1,0,1,OBJECT::SEGMENT};
+            input0.Draw_Flat(fout);
+
+            V.Remove_All();
+            V.Append(TV2(spacing_lines,-height));
+            V.Append(TV2(spacing_lines,height));
+            OBJECT input1={0,1,1,2,OBJECT::SEGMENT};
+            input1.Draw_Flat(fout);
+
+            fout<<"\\psellipse[bordercolor=white,border=0.0075,linewidth="<<linewidth<<"]("<<spacing_lines/2<<","<<height<<")("<<ellipse_horizontal<<","<<ellipse_vertical<<")\n";
+            fout<<"\\psellipse[bordercolor=white,border=0.0075,linewidth="<<linewidth<<"]("<<spacing_lines/2<<","<<-height<<")("<<ellipse_horizontal<<","<<ellipse_vertical<<")\n";
+
+            Emit_Arrow(TV2(spacing_lines+spacing_arrow,0),linewidth,fout);
+
+            V.Remove_All();
+            V.Append(TV2(2*spacing_arrow+spacing_lines,-height));
+            V.Append(TV2(2*spacing_arrow+spacing_lines,height));
+            OBJECT output={0,1,0,2,OBJECT::SEGMENT};
+            output.Draw_Flat(fout);
+
+            Emit_End(fout);
+            fout.close();
+        }
+
+        {
+            LOG::cout<<output_file+"_rule_D.tex"<<std::endl;
+            fout.open((output_file+"_rule_D.tex").c_str());
+            Emit_Begin(fout);
+
+            V.Remove_All();
+            V.Append(TV2(0,-height));
+            V.Append(TV2(0,height));
+            OBJECT input={0,1,0,0,OBJECT::SEGMENT};
+            input.Draw_Flat(fout);
+
+            Emit_Arrow(TV2(spacing_arrow,0),linewidth,fout);
+
+            T r=0.1;
+            fout<<"\\pscircle[bordercolor=white,linewidth="<<linewidth<<"]("<<spacing_arrow+spacing_arrow_tri+r<<","<<0<<"){"<<r<<"}\n";
+            fout<<"\\psline[linewidth="<<linewidth<<"]{c-c}("<<spacing_arrow+spacing_arrow_tri<<","<<-r<<")("<<spacing_arrow+spacing_arrow_tri+2*r<<","<<r<<")\n";
+
+            Emit_End(fout);
+            fout.close();
+        }
+
+        {
+            LOG::cout<<output_file+"_rule_E.tex"<<std::endl;
+            fout.open((output_file+"_rule_E.tex").c_str());
+            Emit_Begin(fout);
+
+            V.Remove_All();
+            V.Append(TV2(0,-height));
+            V.Append(TV2(0,height));
+            OBJECT input={0,1,0,1,OBJECT::SEGMENT};
+            input.Draw_Flat(fout);
+
+            V.Remove_All();
+            V.Append(TV2(2*spacing_arrow,-height));
+            V.Append(TV2(2*spacing_arrow,height));
+            V.Append(TV2(2*spacing_arrow+height*sqrt(3),0));
+            OBJECT output0={0,1,0,1,OBJECT::SEGMENT};
+            OBJECT output1={1,2,0,1,OBJECT::SEGMENT};
+            OBJECT output2={2,0,0,1,OBJECT::SEGMENT};
+            output0.Draw_Flat(fout,false);
+            output1.Draw_Flat(fout,false);
+            output2.Draw_Flat(fout,false);
+            fout<<"\\qdisk("<<V(2).x<<","<<V(2).y<<"){0.0125}\n";
+
+            Emit_Arrow(TV2(spacing_arrow,0),linewidth,fout);
+
+            Emit_End(fout);
+            fout.close();
+        }
+    }
+    
     return 0;
 }
