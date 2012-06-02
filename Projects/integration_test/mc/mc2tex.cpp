@@ -18,6 +18,8 @@ typedef VECTOR<T,3> TV3;
 typedef VECTOR<int,2> TV_INT2;
 typedef VECTOR<int,3> TV_INT3;
 
+T arrow_delay=0;
+
 TV2 Project(const TV3& X)
 {return TV2(X.y-0.4*X.x,X.z-0.3*X.x);}
 
@@ -75,17 +77,17 @@ bool Visible(const TV3& x0,const TV3& x1)
     PHYSBAM_FATAL_ERROR();
 }
 
-void Emit_Begin(std::ofstream& fout)
+void Emit_Begin(std::ofstream& fout,T x0,T y0,T x1,T y1,T unit)
 {
     fout<<std::fixed;
     fout<<"\\documentclass{article}\n";
     fout<<"\\usepackage{pstricks}\n";
+    fout<<"\\usepackage[margin=0cm,papersize={"<<(x1-x0)*unit*1.001<<"cm,"<<(y1-y0)*unit*1.001<<"cm}]{geometry}\n";
     fout<<"\n";
-    fout<<"\\begin{document}\n";
-    fout<<"\\pagestyle{empty}\n";
-    fout<<"\n";
-    fout<<"\\begin{pspicture}(6,6)\n";
-    fout<<"\\psset{unit=4cm}\n";
+    fout<<"\\begin{document}%\n";
+    fout<<"\\psset{unit="<<unit<<"cm}%\n";
+    fout<<"\\noindent%\n";
+    fout<<"\\begin{pspicture}("<<x0<<","<<y0<<")("<<x1<<","<<y1<<")\n";
     fout<<"\\newrgbcolor{color0}{0.95 0 0}";
     fout<<"\\newrgbcolor{color1}{0 0.75 0}";
     fout<<"\\newrgbcolor{color2}{0 0.25 1}";
@@ -112,40 +114,44 @@ void Emit_Arrow(const TV2& xp,T linewidth,std::ofstream& fout)
     fout<<"]{c->}("<<xp.x-length<<","<<xp.y<<")("<<xp.x+length<<","<<xp.y<<")\n";
 }
 
-void Emit_Edge(TV2& xp0,TV2& xp1,int* color,T* sign,bool visible,std::ofstream& fout)
+void Emit_Edge_Color(TV2 xp0,TV2 xp1,int color,bool visible,std::ofstream& fout)
 {
-    TV2 c=(xp1+xp0)/2;
-    TV2 t=xp1-xp0;
-    t.Normalize();
+//    TV2 c[2]={xp1,xp0};
+    TV2 t=(xp1-xp0).Normalized();
     TV2 n=t.Rotate_Clockwise_90();
-    
     T shift=0.0115;
+    if(visible) n=-n;
+    xp0+=shift*n;
+    xp1+=shift*n;
+
+    T radius=0.03;
     T linewidth=0.0175;
     std::string dash=",dash=0.015 0.01";
-    
-    T space=-0.005;
-    T length=0.04;
-    T width=0.025;
-    T back=0.005;
 
-    for(int s=0;s<2;s++){
-        int spikes=color[s]+1;
-        int spaces=color[s];
-        T start=(spikes*length+spaces*space)/2;
-        
-        for(int i=0;i<spikes;i++){
-            fout<<"\\pspolygon[fillstyle=solid,fillcolor=color"<<color[s]<<",linecolor=color"<<color[s]<<"]";
-            fout<<"("<<c.x+sign[s]*shift*n.x+start*t.x-i*(space+length)*t.x<<","
-                     <<c.y+sign[s]*shift*n.y+start*t.y-i*(space+length)*t.y<<")";
-            fout<<"("<<c.x+sign[s]*shift*n.x+start*t.x-i*(space+length)*t.x-(length-back)*t.x<<","
-                     <<c.y+sign[s]*shift*n.y+start*t.y-i*(space+length)*t.y-(length-back)*t.y<<")";
-            fout<<"("<<c.x+sign[s]*shift*n.x+start*t.x-i*(space+length)*t.x-length*t.x+sign[s]*width*n.x<<","
-                     <<c.y+sign[s]*shift*n.y+start*t.y-i*(space+length)*t.y-length*t.y+sign[s]*width*n.y<<")\n";}
-        
-        fout<<"\\psline[linecolor=color"<<color[s]<<",";
-        if(visible) fout<<"linewidth="<<linewidth;
-        else fout<<"linewidth="<<linewidth<<",linestyle=dashed"<<dash;
-        fout<<"]{c-c}("<<xp0.x+sign[s]*shift*n.x<<","<<xp0.y+sign[s]*shift*n.y<<")("<<xp1.x+sign[s]*shift*n.x<<","<<xp1.y+sign[s]*shift*n.y<<")\n";}
+    T scale=1.4;
+    T space=-0.015*scale;
+    T length=0.04*scale;
+    T width=0.025*scale;
+    T back=0.005*scale;
+
+    int spikes=1;
+
+    for(int i=0;i<spikes;i++){
+        TV2 a=xp1-(T)i*t*(length+space)-(radius+arrow_delay)*t;
+        TV2 b=a-t*(length-back);
+        TV2 c=a-t*length+n*width;
+        fout<<"\\pspolygon[fillstyle=solid,linestyle=none,fillcolor=color"<<color<<",linecolor=color"<<color<<"]("<<a.x<<","<<a.y<<")("<<b.x<<","<<b.y<<")("<<c.x<<","<<c.y<<")\n";}
+
+    fout<<"\\psline[linecolor=color"<<color<<",";
+    if(visible) fout<<"linewidth="<<linewidth;
+    else fout<<"linewidth="<<linewidth<<",linestyle=dashed"<<dash;
+    fout<<"]{c-c}("<<xp0.x<<","<<xp0.y<<")("<<xp1.x<<","<<xp1.y<<")\n";
+}
+
+void Emit_Edge(TV2& xp0,TV2& xp1,int* color,bool visible,std::ofstream& fout)
+{
+    Emit_Edge_Color(xp1,xp0,color[0],visible,fout);
+    Emit_Edge_Color(xp0,xp1,color[1],visible,fout);
 }
 
 void Emit_Point(TV2& xp,std::ofstream& fout,bool black=true)
@@ -211,18 +217,18 @@ struct OBJECT
                 color[0]=c0;
                 color[1]=c1;
 
-                Emit_Edge(xp0,xp1,color,sign,visible,fout);
+                Emit_Edge(xp0,xp1,color,visible,fout);
                 break;}
             case CUBE_POINT:{
                 TV2 xp=Project(X[v0]);
                 fout<<"\\psset{linecolor=color"<<c0<<"}";
-                fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){0.03}\n";
+                fout<<"\\qdisk("<<xp.x<<","<<xp.y<<"){0.035}\n";
                 fout<<"\\psset{linecolor=black}";
 
                 T alpha=M_PI/6;
                 T start=0;//(alpha*c0)/2;
                 T r=0.04625;
-                int sectors=3;
+                int sectors=0;
                 T offset=0;//-M_PI/2;
 
                 for(int i=0;i<sectors;i++){
@@ -273,10 +279,7 @@ struct OBJECT
         int color[2];
         color[0]=c0;
         color[1]=c1;
-        T sign[2];
-        sign[0]=-1;
-        sign[1]=1;
-        Emit_Edge(xp0,xp1,color,sign,true,fout);
+        Emit_Edge(xp0,xp1,color,true,fout);
         Emit_Point(xp0,fout,black);
         Emit_Point(xp1,fout,black);
     }
@@ -299,6 +302,7 @@ int main(int argc, char* argv[])
     parse_args.Add_String_Argument("-ir","in_reduction.txt","input file with reduction");
     parse_args.Add_String_Argument("-o","out","output file");
     parse_args.Add_Double_Argument("-scale",1,"scale for graph reduction");
+    parse_args.Add_Double_Argument("-unit",1,"choose units");
     parse_args.Add_Option_Argument("-emit_curves","create output tex file with cube and curves");
     parse_args.Add_Option_Argument("-emit_reduction","create output tex files with graph reduction process");
     parse_args.Add_Option_Argument("-emit_rules","create output tex files with reduction rules");
@@ -307,6 +311,7 @@ int main(int argc, char* argv[])
     std::string input_file_reduction=parse_args.Get_String_Value("-ir");
     std::string output_file=parse_args.Get_String_Value("-o");
     T scale=parse_args.Get_Double_Value("-scale");
+    T unit=parse_args.Get_Double_Value("-unit");
     bool EMIT_REDUCTION=parse_args.Get_Option_Value("-emit_reduction");
     bool EMIT_CURVES=parse_args.Get_Option_Value("-emit_curves");
     bool EMIT_RULES=parse_args.Get_Option_Value("-emit_rules");
@@ -314,21 +319,23 @@ int main(int argc, char* argv[])
     std::ifstream fin;
     std::ofstream fout;
     int v0,v1,v2,c0,c1;
-    T x0,x1;
+    T x0,x1,y0,y1,z0,z1;
  
     // ##### CURVES ON CUBE #############################################################
 
+    arrow_delay=.01*0;
     if(EMIT_CURVES||EMIT_REDUCTION)
     {
         fin.open(input_file_curves.c_str());
-        
+        fin>>x0>>y0>>x1>>y1;
+
         for(int i=0;i<8 && fin>>c0;i++){
             OBJECT cp={i,-1,c0,-1,OBJECT::CUBE_POINT};objects.Append(cp);}
         while(fin>>v0>>v1>>c0>>c1){
             OBJECT s={v0,v1,c0,c1,OBJECT::SEGMENT};objects.Append(s);
             OBJECT p0={v0,-1,c0,c1,OBJECT::POINT};objects.Append(p0);
             OBJECT p1={v1,-1,c0,c1,OBJECT::POINT};objects.Append(p1);}
-        
+
         OBJECT cs00={0,1,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs00);
         OBJECT cs01={2,3,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs01);
         OBJECT cs02={4,5,-1,-1,OBJECT::CUBE_SEGMENT};objects.Append(cs02);
@@ -356,7 +363,7 @@ int main(int argc, char* argv[])
         
             fout.open((output_file+".tex").c_str());
             LOG::cout<<output_file+".tex"<<std::endl;
-            Emit_Begin(fout);
+            Emit_Begin(fout,x0,y0,x1,y1,unit);
             for(int i=0;i<objects.m;i++){
                 if(i>0 && objects(i)==objects(i-1)) continue;
                 objects(i).Draw(fout);}
@@ -369,13 +376,22 @@ int main(int argc, char* argv[])
 
     // ##### GRAPH REDUCTION #############################################################
 
+    arrow_delay=.03*0;
     if(EMIT_REDUCTION)
     {
         LOG::cout<<"EMITTING GRAPH REDUCTION"<<std::endl;
 
         fin.open(input_file_reduction.c_str());
+        fin>>x0>>y0>>x1>>y1;
+        x0*=scale;
+        y0*=scale;
+        x1*=scale;
+        y1*=scale;
     
-        for(int i=0;i<18 && fin>>c0>>x0>>x1;i++) V.Append(TV2(x0,x1)*scale);
+        for(int i=0;i<18 && fin>>c0>>z0>>z1;i++){
+            z0*=scale;
+            z1*=scale;
+            V.Append(TV2(z0,z1));}
         
         ARRAY<OBJECT> edges;
         for(int i=0;i<objects.m;i++)
@@ -384,7 +400,7 @@ int main(int argc, char* argv[])
         
         fout.open((output_file+"_0.tex").c_str());
         LOG::cout<<output_file+"_0.tex"<<std::endl;
-        Emit_Begin(fout);
+        Emit_Begin(fout,x0,y0,x1,y1,unit);
         for(int i=0;i<edges.m;i++) edges(i).Draw_Flat(fout);
         Emit_End(fout);
         fout.close();
@@ -429,7 +445,7 @@ int main(int argc, char* argv[])
                 sprintf(buff,"%d",count);
                 fout.open((output_file+"_"+buff+".tex").c_str());
                 LOG::cout<<output_file+"_"+buff+".tex"<<std::endl;
-                Emit_Begin(fout);
+                Emit_Begin(fout,x0,y0,x1,y1,unit);
                 for(int i=0;i<edges.m;i++) edges(i).Draw_Flat(fout);
                 Emit_End(fout);
                 fout.close();}}
@@ -453,7 +469,7 @@ int main(int argc, char* argv[])
         {
             LOG::cout<<output_file+"_rule_A.tex"<<std::endl;
             fout.open((output_file+"_rule_A.tex").c_str());
-            Emit_Begin(fout);
+            Emit_Begin(fout,x0,y0,x1,y1,unit);
 
             V.Remove_All();
             V.Append(TV2(0,-height));
@@ -476,7 +492,7 @@ int main(int argc, char* argv[])
         {
             LOG::cout<<output_file+"_rule_B.tex"<<std::endl;
             fout.open((output_file+"_rule_B.tex").c_str());
-            Emit_Begin(fout);
+            Emit_Begin(fout,x0,y0,x1,y1,unit);
 
             V.Remove_All();
             V.Append(TV2(0,-height));
@@ -513,7 +529,7 @@ int main(int argc, char* argv[])
         {
             LOG::cout<<output_file+"_rule_C.tex"<<std::endl;
             fout.open((output_file+"_rule_C.tex").c_str());
-            Emit_Begin(fout);
+            Emit_Begin(fout,x0,y0,x1,y1,unit);
 
             V.Remove_All();
             V.Append(TV2(0,-height));
@@ -545,7 +561,7 @@ int main(int argc, char* argv[])
         {
             LOG::cout<<output_file+"_rule_D.tex"<<std::endl;
             fout.open((output_file+"_rule_D.tex").c_str());
-            Emit_Begin(fout);
+            Emit_Begin(fout,x0,y0,x1,y1,unit);
 
             V.Remove_All();
             V.Append(TV2(0,-height));
@@ -566,7 +582,7 @@ int main(int argc, char* argv[])
         {
             LOG::cout<<output_file+"_rule_E.tex"<<std::endl;
             fout.open((output_file+"_rule_E.tex").c_str());
-            Emit_Begin(fout);
+            Emit_Begin(fout,x0,y0,x1,y1,unit);
 
             V.Remove_All();
             V.Append(TV2(0,-height));
