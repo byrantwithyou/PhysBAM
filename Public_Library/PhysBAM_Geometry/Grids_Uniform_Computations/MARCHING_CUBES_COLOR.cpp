@@ -58,30 +58,30 @@ void Add_Mapped_Triangle(int t,const int* mp,const int* cmp,bool flip)
 
 //     }
 // }
-void Fix_T_Jnct(int st)
-{
-    int has=0,n=interface_triangle_table.m;
-    const int mask[4]={3<<12,3<<14,3<<16,1<<18};
-    for(int i=st;i<n;i++){
-        int t=interface_triangle_table(i);
-        int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
-        for(int j=0;j<4;j++)
-            if((m&mask[j])==mask[j])
-                has|=1<<j;}
-    if(!(has&(has-1))) return;
-    for(int i=st;i<n;i++){
-        int t=interface_triangle_table(i);
-        int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
-        int k=-1;
-        for(int j=0;j<3;j++)
-            if((m&mask[j])==mask[j])
-                k=12+2*j;
-        if(k==-1) continue;
-        int v0=GET_V(t,0),v1=GET_V(t,1),v2=GET_V(t,2),c0=GET_C(t,0),c1=GET_C(t,1);
-        Add_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);
-        k++;
-        interface_triangle_table(i)=Encode_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);}
-}
+// void Fix_T_Jnct(int st)
+// {
+//     int has=0,n=interface_triangle_table.m;
+//     const int mask[4]={3<<12,3<<14,3<<16,1<<18};
+//     for(int i=st;i<n;i++){
+//         int t=interface_triangle_table(i);
+//         int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
+//         for(int j=0;j<4;j++)
+//             if((m&mask[j])==mask[j])
+//                 has|=1<<j;}
+//     if(!(has&(has-1))) return;
+//     for(int i=st;i<n;i++){
+//         int t=interface_triangle_table(i);
+//         int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
+//         int k=-1;
+//         for(int j=0;j<3;j++)
+//             if((m&mask[j])==mask[j])
+//                 k=12+2*j;
+//         if(k==-1) continue;
+//         int v0=GET_V(t,0),v1=GET_V(t,1),v2=GET_V(t,2),c0=GET_C(t,0),c1=GET_C(t,1);
+//         Add_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);
+//         k++;
+//         interface_triangle_table(i)=Encode_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);}
+// }
 /* Triangle encoding
  * 0 e 0000 ddddd ccccc bbbbb aaaaa xxx yyy   (triangle)
  * 1 0 aaa bbb ccc ddd ssssss ssssss ssssss (comparison)
@@ -173,31 +173,31 @@ void Add_Face_Edges(int* colors,EDGE* edges,int& num_edges,int a,int b,int s,int
         return;}
     Add_Center_Edges(colors,edges,num_edges,axis,s);
 }
-bool Merge_Edges(EDGE& e0,EDGE& e1)
-{
-    if(e0.c0==e1.c1){e0.c0=e1.c0;return true;}
-    if(e0.c1==e1.c0){e0.c1=e1.c1;return true;}
-    return false;
-}
-void Insert_Face_Graph_Edge(int (*face_graph)[2],EDGE* edges,int e)
-{
-    if(edges[e].v0>edges[e].v1) edges[e].Flip();
-    int* fg=face_graph[(1<<edges[e].v0)|(1<<edges[e].v1)];
-    if(fg[0]==-1){fg[0]=e;return;}
-    if(fg[1]!=-1){
-        EDGE& e0=edges[fg[0]],&e1=edges[fg[1]];
-        int s=Merge_Edges(e1,edges[e]);
-        PHYSBAM_ASSERT(s);
-        if(e1.c0==e1.c1){fg[1]=-1;return;}
-        int t=Merge_Edges(e0,e1);
-        PHYSBAM_ASSERT(t);
-        fg[1]=-1;
-        if(e0.c0==e0.c1){fg[0]=-1;return;}
-        return;}
-    EDGE& e0=edges[fg[0]];
-    if(!Merge_Edges(e0,edges[e])){fg[1]=e;return;}
-    if(e0.c0==e0.c1) fg[0]=-1;
-}
+// bool Merge_Edges(EDGE& e0,EDGE& e1)
+// {
+//     if(e0.c0==e1.c1){e0.c0=e1.c0;return true;}
+//     if(e0.c1==e1.c0){e0.c1=e1.c1;return true;}
+//     return false;
+// }
+// void Insert_Face_Graph_Edge(int (*face_graph)[2],EDGE* edges,int e)
+// {
+//     if(edges[e].v0>edges[e].v1) edges[e].Flip();
+//     int* fg=face_graph[(1<<edges[e].v0)|(1<<edges[e].v1)];
+//     if(fg[0]==-1){fg[0]=e;return;}
+//     if(fg[1]!=-1){
+//         EDGE& e0=edges[fg[0]],&e1=edges[fg[1]];
+//         int s=Merge_Edges(e1,edges[e]);
+//         PHYSBAM_ASSERT(s);
+//         if(e1.c0==e1.c1){fg[1]=-1;return;}
+//         int t=Merge_Edges(e0,e1);
+//         PHYSBAM_ASSERT(t);
+//         fg[1]=-1;
+//         if(e0.c0==e0.c1){fg[0]=-1;return;}
+//         return;}
+//     EDGE& e0=edges[fg[0]];
+//     if(!Merge_Edges(e0,edges[e])){fg[1]=e;return;}
+//     if(e0.c0==e0.c1) fg[0]=-1;
+// }
 ARRAY<char> edges_intersect;
 
 // 0 = no intersection, 1 = can intersect, 2 = coplanar
@@ -380,9 +380,9 @@ bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur
 // Function Emit_Interface_Triangles
 //#####################################################################
 void Emit_Interface_Triangles(int* colors,int color_hint)
-{
+{  
     EDGE edges[25]; // need an extra one
-    int num_edges=0,case_start=interface_triangle_table.m;
+    int num_edges=0;
     for(int a=0;a<3;a++)
         for(int b=a+1;b<3;b++)
             for(int s=0;s<2;s++)
@@ -397,78 +397,21 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
     int face_graph[64][2];
     for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
 
-    int cur_edges[100][2],num_cur_edges=0,num_face_edges=0;
-    EDGE face_edges[20];
-    int face_mask=0;
+    int cur_edges[100][2],num_cur_edges=0;
+    bool loops_only=true;
     for(int i=0;i<12;i++){
         if(adj[i][0]==-1) continue;
         EDGE& in=edges[adj[i][0]];
         if(in.v0<12) continue;
-        int c=i;
-        while(edges[adj[c][1]].v1<12) c=edges[adj[c][1]].v1;
-        face_edges[num_face_edges].v0=in.v0-12;
-        face_edges[num_face_edges].v1=edges[adj[c][1]].v1-12;
-        face_edges[num_face_edges].c0=in.c0;
-        face_edges[num_face_edges++].c1=in.c1;
-        face_mask|=(1<<in.v0)|(1<<edges[adj[c][1]].v1);}
-    for(int i=12;i<18;i++)
-        if(face_mask&(1<<i))
-            for(int j=i+1;j<18;j++)
-                if(face_mask&(1<<j)){
-                    cur_edges[num_cur_edges][0]=i;
-                    cur_edges[num_cur_edges++][1]=j;}
-
-    bool add_tri=Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
-    if(!add_tri){
+        loops_only=false;
+        break;}
+    if(!loops_only){
         for(int i=0;i<num_edges;i++)
-            Add_Triangle(edges[i].c0,edges[i].c1,edges[i].v0,edges[i].v1,18);}
-    else
-        for(int i=0;i<num_face_edges;i++){
-            edges[i]=face_edges[i];
-            Insert_Face_Graph_Edge(face_graph,edges,i);}
+            Add_Triangle(edges[i].c0,edges[i].c1,edges[i].v0,edges[i].v1,18);
+        interface_triangle_table.Last()|=last_tri_bit;
+        return;}
 
-    int start_face_graph_tri=interface_triangle_table.m;
-    EDGE face_graph_edge[12];
-    int num_face_graph_edge=0;
-    for(int i=0;i<6;i++)
-        for(int j=i+1;j<6;j++)
-            for(int m=0;m<2;m++){
-                int* fgij=face_graph[(1<<i)|(1<<j)],fg0=fgij[m];
-                if(fg0>=0)
-                    face_graph_edge[num_face_graph_edge++]=edges[fg0];}
-
-    bool progress=true,make_center=false;
-    while(progress){
-        progress=false;
-        make_center=false;
-        for(int i=0;i<6;i++)
-            for(int j=0;j<6;j++)
-                for(int m=0;m<2;m++){
-                    int* fgij=face_graph[(1<<i)|(1<<j)],fg0=fgij[m];
-                    if(fg0>=0){
-                        make_center=true;
-                        for(int k=i+1;k<6;k++)
-                            for(int n=0;n<2;n++){
-                                int* fgjk=face_graph[(1<<j)|(1<<k)],fg1=fgjk[n];
-                                if(fg1>=0){
-                                    if(((1<<edges[fg0].c0)|(1<<edges[fg0].c1))==((1<<edges[fg1].c0)|(1<<edges[fg1].c1))){
-                                        if(edges[fg1].v0!=j) edges[fg1].Flip();
-                                        Add_Triangle(edges[fg1].c0,edges[fg1].c1,i+12,j+12,k+12);
-                                        if(edges[fg0].v1==j) edges[fg0].v1=k;
-                                        else edges[fg0].v0=k;
-                                        Insert_Face_Graph_Edge(face_graph,edges,fg0);
-                                        fgij[m]=-1;
-                                        if(m==0 && fgij[1]>=0) exchange(fgij[0],fgij[1]);
-                                        fgjk[n]=-1;
-                                        if(m==0 && fgjk[1]>=0) exchange(fgjk[0],fgjk[1]);
-                                        progress=true;}}}}}}
-
-    if(make_center){
-        interface_triangle_table.Resize(start_face_graph_tri);
-        for(int i=0;i<num_face_graph_edge;i++)
-            Add_Triangle(face_graph_edge[i].c0,face_graph_edge[i].c1,face_graph_edge[i].v0+12,face_graph_edge[i].v1+12,18);}
-    PHYSBAM_ASSERT(case_start!=interface_triangle_table.m);
-    Fix_T_Jnct(case_start);
+    Try_Add_Triangle(adj,edges,cur_edges,num_cur_edges);
     interface_triangle_table.Last()|=last_tri_bit;
 }
 //#####################################################################
