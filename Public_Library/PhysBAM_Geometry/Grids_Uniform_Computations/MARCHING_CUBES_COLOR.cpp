@@ -672,7 +672,7 @@ const int averaging_order[7][2]={{4,6},{5,7},{0,2},{1,3},{0,1},{2,3},{12,13}};
 //#####################################################################
 template<class T> void
 Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,const VECTOR<int,8>& re_color,
-    const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const HASHTABLE<int,int>& color_map,const int* color_list)
+    const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const int* color_list)
 {
     typedef VECTOR<T,3> TV;
     int cs=0;
@@ -729,7 +729,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
 //#####################################################################
 template<class T> void
 Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const int* re_color,
-    const int* colors,const T* phi,int s,const HASHTABLE<int,int>& color_map,const int* color_list)
+    const int* colors,const T* phi,int s,const int* color_list)
 {
     typedef VECTOR<T,3> TV;
     int cs=0;
@@ -770,7 +770,7 @@ Get_Boundary_Elements_For_Cell(ARRAY<PAIR<TRIANGLE_3D<T>,int> >& boundary,const 
 //#####################################################################
 template<class T> void
 Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,const VECTOR<int,4>& re_color,
-    const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const HASHTABLE<int,int>& color_map,const int* color_list)
+    const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const int* color_list)
 {
     typedef VECTOR<T,2> TV;
     int cs=0;
@@ -815,7 +815,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<SEGMENT_2D<T>,int,int> >& surface,c
 //#####################################################################
 template<class T> void
 Get_Boundary_Elements_For_Cell(ARRAY<PAIR<SEGMENT_2D<T>,int> >& boundary,const int* re_color,
-    const int* colors,const T* phi,int s,const HASHTABLE<int,int>& color_map,const int* color_list)
+    const int* colors,const T* phi,int s,const int* color_list)
 {
     typedef VECTOR<T,2> TV;
     if(colors[0]==colors[1]){
@@ -863,8 +863,8 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
             color_list[next_color]=colors(i);
             color_map.Set(colors(i),next_color++);}
 
-    Get_Interface_Elements_For_Cell(surface,re_color,colors,phi,color_map,color_list);
-    Get_Boundary_Elements_For_Cell(boundary,re_color.array,colors.array,phi.array,0,color_map,color_list);
+    Get_Interface_Elements_For_Cell(surface,re_color,colors,phi,color_list);
+    Get_Boundary_Elements_For_Cell(boundary,re_color.array,colors.array,phi.array,0,color_list);
 
     next_color=0;
     color_map.Remove_All();
@@ -874,7 +874,7 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
             re_color2[i]=next_color;
             color_list[next_color]=colors(i+num_corners/2);
             color_map.Set(colors(i+num_corners/2),next_color++);}
-    Get_Boundary_Elements_For_Cell(boundary,re_color2,colors.array+num_corners/2,phi.array+num_corners/2,1,color_map,color_list);
+    Get_Boundary_Elements_For_Cell(boundary,re_color2,colors.array+num_corners/2,phi.array+num_corners/2,1,color_list);
 #ifdef ENABLE_TIMING
     unsigned long long t5=rdtsc();
     printf("query: %.2f\n", (t5-t0)/3059.107);
