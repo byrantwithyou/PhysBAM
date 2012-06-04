@@ -7,9 +7,13 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;
 //#define ENABLE_TIMING
 namespace{
@@ -44,44 +48,6 @@ void Add_Mapped_Triangle(int t,const int* mp,const int* cmp,bool flip)
     if(t&last_tri_bit)
         interface_triangle_table.Last()|=last_tri_bit;
 }
-// bool Merge_Triangles(ARRAY<int>& arr,int st)
-// {
-//     for(int i=st;i<arr.m;i++)
-//         if(GET_C(arr(i),0)>GET_C(arr(i),0))
-//             Encode_Triangle(GET_C(t,1),GET_C(t,0),GET_V(t,0),GET_V(t,2),GET_V(t,1),GET_V(t,3));
-
-//     for(int i=st;i<arr.m;i++)
-//         for(int j=i+1;j<arr.m;j++)
-//             if(GET_C(arr(i),0)==GET_C(arr(j),0) && GET_C(arr(i),1)==GET_C(arr(j),1)){
-                
-//             }
-
-//     }
-// }
-// void Fix_T_Jnct(int st)
-// {
-//     int has=0,n=interface_triangle_table.m;
-//     const int mask[4]={3<<12,3<<14,3<<16,1<<18};
-//     for(int i=st;i<n;i++){
-//         int t=interface_triangle_table(i);
-//         int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
-//         for(int j=0;j<4;j++)
-//             if((m&mask[j])==mask[j])
-//                 has|=1<<j;}
-//     if(!(has&(has-1))) return;
-//     for(int i=st;i<n;i++){
-//         int t=interface_triangle_table(i);
-//         int m=(1<<GET_V(t,0))|(1<<GET_V(t,1))|(1<<GET_V(t,2));
-//         int k=-1;
-//         for(int j=0;j<3;j++)
-//             if((m&mask[j])==mask[j])
-//                 k=12+2*j;
-//         if(k==-1) continue;
-//         int v0=GET_V(t,0),v1=GET_V(t,1),v2=GET_V(t,2),c0=GET_C(t,0),c1=GET_C(t,1);
-//         Add_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);
-//         k++;
-//         interface_triangle_table(i)=Encode_Triangle(c0,c1,v0==k?18:v0,v1==k?18:v1,v2==k?18:v2);}
-// }
 /* Triangle encoding
  * 0 e 0000 ddddd ccccc bbbbb aaaaa xxx yyy   (triangle)
  * 1 0 aaa bbb ccc ddd ssssss ssssss ssssss (comparison)
@@ -173,164 +139,7 @@ void Add_Face_Edges(int* colors,EDGE* edges,int& num_edges,int a,int b,int s,int
         return;}
     Add_Center_Edges(colors,edges,num_edges,axis,s);
 }
-// bool Merge_Edges(EDGE& e0,EDGE& e1)
-// {
-//     if(e0.c0==e1.c1){e0.c0=e1.c0;return true;}
-//     if(e0.c1==e1.c0){e0.c1=e1.c1;return true;}
-//     return false;
-// }
-// void Insert_Face_Graph_Edge(int (*face_graph)[2],EDGE* edges,int e)
-// {
-//     if(edges[e].v0>edges[e].v1) edges[e].Flip();
-//     int* fg=face_graph[(1<<edges[e].v0)|(1<<edges[e].v1)];
-//     if(fg[0]==-1){fg[0]=e;return;}
-//     if(fg[1]!=-1){
-//         EDGE& e0=edges[fg[0]],&e1=edges[fg[1]];
-//         int s=Merge_Edges(e1,edges[e]);
-//         PHYSBAM_ASSERT(s);
-//         if(e1.c0==e1.c1){fg[1]=-1;return;}
-//         int t=Merge_Edges(e0,e1);
-//         PHYSBAM_ASSERT(t);
-//         fg[1]=-1;
-//         if(e0.c0==e0.c1){fg[0]=-1;return;}
-//         return;}
-//     EDGE& e0=edges[fg[0]];
-//     if(!Merge_Edges(e0,edges[e])){fg[1]=e;return;}
-//     if(e0.c0==e0.c1) fg[0]=-1;
-// }
-ARRAY<char> edges_intersect;
-
-// 0 = no intersection, 1 = can intersect, 2 = coplanar
-}
-int Edges_Intersect(int a,int b,int c,int d)
-{
-    return edges_intersect(((a*19+b)*19+c)*19+d);
-}
-namespace{
-int cube_location_labels[27]={-1,0,-1,4,16,5,-1,1,-1,8,14,9,12,18,13,10,15,11,-1,2,-1,6,17,7,-1,3,-1};
 bool on_face[19][19]={};
-int depth=0;
-void Set_Edges_Ok_Helper(int a,int b,int c,int d,int z)
-{
-    char& x=edges_intersect(((a*19+b)*19+c)*19+d);
-    if(x!=1) return;
-    depth++;
-    x=z;
-//    printf("%*s%i %i %i %i\n", depth, "", a,b,c,d);
-    Set_Edges_Ok_Helper(a,b,d,c,z);
-    Set_Edges_Ok_Helper(c,d,a,b,z);
-    Set_Edges_Ok_Helper(permute_flip[a],permute_flip[b],permute_flip[c],permute_flip[d],z);
-    Set_Edges_Ok_Helper(permute_rx[a],permute_rx[b],permute_rx[c],permute_rx[d],z);
-    Set_Edges_Ok_Helper(permute_ry[a],permute_ry[b],permute_ry[c],permute_ry[d],z);
-    depth--;
-}
-void Set_Edges_Ok(int a,int b,int c,int d)
-{
-    int aa=cube_location_labels[a],bb=cube_location_labels[b],cc=cube_location_labels[c],dd=cube_location_labels[d];
-    if(aa==-1 || bb==-1 || cc==-1 || dd==-1) return;
-    Set_Edges_Ok_Helper(aa,bb,cc,dd,0);
-}
-}
-void Initialize_Edges_Intersect()
-{
-    // Initially everything intersects
-    edges_intersect.Resize(19*19*19*19,true,false,1);
-
-    Set_Edges_Ok_Helper(0,15,16,3,2);
-    Set_Edges_Ok_Helper(12,13,14,15,0);
-    Set_Edges_Ok_Helper(0,6,11,18,0);
-
-    // Share an endpoint
-    for(int a=0;a<27;a++)
-        if(cube_location_labels[a]>=0)
-            for(int b=0;b<27;b++)
-                if(cube_location_labels[b]>=0)
-                    for(int c=b;c<27;c++)
-                        if(cube_location_labels[c]>=0)
-                            Set_Edges_Ok(a,b,a,c);
-
-    // Edge on cube face
-    for(int a=0;a<9;a++)
-        if(cube_location_labels[a]>=0)
-            for(int b=a+1;b<9;b++)
-                if(cube_location_labels[b]>=0)
-                    for(int c=0;c<27;c++)
-                        if(cube_location_labels[c]>=0)
-                            for(int d=c+1;d<27;d++)
-                                if(cube_location_labels[d]>=0)
-                                    Set_Edges_Ok(a,b,c,d);
-
-    // Plane tests
-    for(int a0=0;a0<3;a0++)
-        for(int a1=a0;a1<3;a1++)
-            if(a0!=1 || a1!=1)
-                for(int b0=0;b0<3;b0++)
-                    for(int b1=b0;b1<3;b1++)
-                        if(b0!=1 || b1!=1)
-                            for(int c0=0;c0<3;c0++)
-                                for(int c1=c0;c1<3;c1++)
-                                    if(c0!=1 || c1!=1)
-                                        for(int d0=0;d0<3;d0++)
-                                            for(int d1=d0;d1<3;d1++)
-                                                if(d0!=1 || d1!=1)
-                                                    for(int a2=0;a2<3;a2++)
-                                                        for(int b2=0;b2<3;b2++)
-                                                            for(int c2=0;c2<3;c2++)
-                                                                for(int d2=0;d2<3;d2++)
-                                                                    Set_Edges_Ok((a0*3+a1)*3+a2,(b0*3+b1)*3+b2,(c1*3+c0)*3+c2,(d1*3+d0)*3+d2);
-
-    // Surface criterion
-    for(int a0=0;a0<3;a0++)
-        for(int a1=0;a1<3;a1++)
-            if(a0==1 || a1==1)
-                for(int b0=0;b0<3;b0++)
-                    for(int b1=0;b1<3;b1++)
-                        if(b0==1 || b1==1)
-                            for(int c0=0;c0<3;c0++)
-                                for(int c1=0;c1<3;c1++)
-                                    if(c0==1 || c1==1)
-                                        for(int d0=0;d0<3;d0++)
-                                            for(int d1=0;d1<3;d1++)
-                                                if(d0==1 || d1==1){
-                                                    Set_Edges_Ok((a0*3+a1)*3+0,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+2);
-                                                    Set_Edges_Ok((a0*3+a1)*3+0,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+1);
-                                                    Set_Edges_Ok((a0*3+a1)*3+1,(b0*3+b1)*3+1,(c0*3+c1)*3+1,(d0*3+d1)*3+1);}
-
-    // Projection criterion
-    for(int a0=0;a0<3;a0++)
-        for(int a1=0;a1<3;a1++)
-            for(int b0=0;b0<3;b0++)
-                for(int b1=0;b1<3;b1++)
-                    for(int c0=0;c0<3;c0++)
-                        for(int d0=0;d0<3;d0++)
-                            Set_Edges_Ok((a0*3+a1)*3+0,(c0*3+0)*3+1,(b0*3+b1)*3+2,(d0*3+0)*3+1);
-
-    // Triangle criterion
-    int tri0[5]={(1*3+1)*3+0,(1*3+1)*3+1,(1*3+1)*3+2,(1*3+0)*3+0,(1*3+2)*3+0};
-    int tri1[5]={(1*3+0)*3+0,(1*3+0)*3+1,(1*3+0)*3+2,(1*3+1)*3+0,(1*3+2)*3+0};
-    for(int i=0;i<5;i++)
-        for(int j=0;j<5;j++){
-            for(int k=0;k<3;k++)
-                for(int m=0;m<3;m++)
-                    Set_Edges_Ok(tri0[i],(2*3+1)*3+k,tri0[j],(0*3+1)*3+m);
-            for(int k=0;k<5;k++){
-                for(int m=0;m<3;m++)
-                    Set_Edges_Ok(tri0[i],tri0[j],tri0[k],(0*3+1)*3+m);
-                Set_Edges_Ok(tri1[i],tri1[j],tri1[k],(0*3+1)*3+0);}}
-
-    for(int a0=0;a0<3;a0++)
-        for(int a1=0;a1<3;a1++)
-            for(int b0=0;b0<3;b0++)
-                for(int b1=0;b1<3;b1++)
-                    for(int s=0;s<3;s+=2){
-                        int aa=cube_location_labels[(a0*3+a1)*3+s],ba=cube_location_labels[(b0*3+b1)*3+s];
-                        if(aa>=0 && ba>=0) on_face[aa][ba]=true;
-                        int ab=cube_location_labels[(a0*3+s)*3+a1],bb=cube_location_labels[(b0*3+s)*3+b1];
-                        if(ab>=0 && bb>=0) on_face[ab][bb]=true;
-                        int ac=cube_location_labels[(s*3+a1)*3+a0],bc=cube_location_labels[(s*3+b1)*3+b0];
-                        if(ac>=0 && bc>=0) on_face[ac][bc]=true;}
-}
-namespace{
 bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur_edges)
 {
     bool reduced=true;
@@ -342,14 +151,6 @@ bool Try_Add_Triangle(int (*adj)[2],EDGE* edges,int (*cur_edges)[2],int& num_cur
         if(on_face[in.v0][out.v1] && out.v1<12 && edges[adj[out.v1][1]].v1!=in.v0){
             reduced=false;
             continue;}
-
-        bool ok=true;
-        for(int j=0;j<num_cur_edges;j++){
-            if(Edges_Intersect(in.v0,out.v1,cur_edges[j][0],cur_edges[j][1])!=0){
-                ok=false;
-                reduced=false;
-                break;}}
-        if(!ok) continue;
 
         Add_Triangle(in.c0,in.c1,in.v0,in.v1,out.v1);
         in.v1=out.v1;
@@ -571,10 +372,8 @@ void Initialize_Case_Table_3D()
     interface_case_table.Resize(40320);
     boundary_case_table.Resize(24);
     int colors[8]={0};
-    Initialize_Edges_Intersect();
     Enumerate_Interface_Cases_3D(colors, 1, 0, 0);
     Enumerate_Boundary_Cases_3D();
-    edges_intersect.Clean_Memory();
 }
 //#####################################################################
 // Function Initialize_Case_Table_2D
@@ -639,7 +438,7 @@ Get_Interface_Elements_For_Cell(ARRAY<TRIPLE<TRIANGLE_3D<T>,int,int> >& surface,
             if(color_list[amb1]<color_list[amb0]) tri+=(pat>>12)&0x3f;
             else tri++;}}
 
-    VECTOR<VECTOR<int,3>,8> bits=GRID<TV>::Binary_Counts(VECTOR<int,3>());
+    const VECTOR<VECTOR<int,3>,8>& bits=GRID<TV>::Binary_Counts(VECTOR<int,3>());
     TV pts[19];
     T pts_phi[19];
     for(int a=0,k=0;a<3;a++){
@@ -822,6 +621,114 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
     unsigned long long t5=rdtsc();
     printf("query: %.2f\n", (t5-t0)/3059.107);
 #endif
+}
+int vertex_lookup_2d[4][2]={{0,1},{2,3},{0,2},{1,3}};
+//#####################################################################
+// Function Get_Interface_Elements_For_Cell
+//#####################################################################
+template<class T,class TV_INT,class TV,class T_SURFACE> void
+Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,8>& re_color,
+    const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const int* color_list,HASHTABLE<FACE_INDEX<3>,int>& edge_vertices,
+    HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,const TV_INT& cell_index,
+    GEOMETRY_PARTICLES<TV>& particles)
+{
+}
+//#####################################################################
+// Function Get_Interface_Elements_For_Cell
+//#####################################################################
+template<class T,class TV_INT,class TV,class T_SURFACE> void
+Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,4>& re_color,
+    const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const int* color_list,HASHTABLE<FACE_INDEX<2>,int>& edge_vertices,
+    HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,const TV_INT& cell_index,
+    GEOMETRY_PARTICLES<TV>& particles)
+{
+    int cs=0;
+    for(int i=0;i<4;i++)
+        cs=cs*(i+1)+re_color(i);
+    if(!cs) return;
+
+    int seg=interface_case_table_2d(cs);
+    if(interface_segment_table(seg)&comparison_bit){
+        int pat=interface_segment_table(seg);
+        int amb0=(pat>>24)&7,amb1=(pat>>27)&7;
+        if(color_list[amb1]<color_list[amb0]) seg+=(pat>>12)&0x3f;
+        else seg++;}
+
+    const VECTOR<VECTOR<int,2>,4>& bits=GRID<TV>::Binary_Counts(TV_INT());
+    TV corners[4]={TV(range.min_corner.x,range.min_corner.y),TV(range.max_corner.x,range.min_corner.y),
+        TV(range.min_corner.x,range.max_corner.y),TV(range.max_corner.x,range.max_corner.y)};
+    int pts[5]={-1,-1,-1,-1,-1};
+    int num=0;
+    for(int e=0;e<4;e++){
+        int v0=vertex_lookup_2d[e][0],v1=vertex_lookup_2d[e][1];
+        if(colors[v0]!=colors[v1]){
+            FACE_INDEX<TV::m> fi(e/2,cell_index+bits(v0));
+            num++;
+            if(!edge_vertices.Get(fi,pts[e])){
+                int index=particles.Add_Element();
+                pts[e]=index;
+                edge_vertices.Set(fi,index);
+                T theta=phi[v0]/(phi[v0]+phi[v1]);
+                particles.X(index)=(1-theta)*corners[v0]+theta*corners[v1];}}}
+    if(num>=3){
+        if(!cell_vertices.Get(cell_index,pts[4])){
+            int index=particles.Add_Element();
+            pts[4]=index;
+            cell_vertices.Set(cell_index,index);
+            T total=0;
+            TV X;
+            for(int v=0;v<4;v++){
+                total+=1/phi[v];
+                X+=corners[v]/phi[v];}
+            particles.X(index)=X/total;}}
+
+    int pat;
+    do{
+        pat=interface_segment_table(seg++);
+        VECTOR<int,2> c(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
+        VECTOR<int,2> v(pts[GET_V(pat,0)],pts[GET_V(pat,1)]);
+        printf("%i %i %i %i\n",GET_V(pat,0),GET_V(pat,1),v.x,v.y);
+        if(c.x>c.y){
+            exchange(c.x,c.y);
+            exchange(v.x,v.y);}
+
+        T_SURFACE* s=0;
+        if(!surface.Get(c,s)){
+            s=T_SURFACE::Create(particles);
+            surface.Set(c,s);}
+        s->mesh.elements.Append(v);
+    } while(!(pat&last_tri_bit));
+}
+//#####################################################################
+// Function Get_Elements_For_Cell
+//#####################################################################
+template<class TV> void MARCHING_CUBES_COLOR<TV>::
+Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
+    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi)
+{
+    const int num_corners=1<<TV::m;
+    HASHTABLE<FACE_INDEX<TV::m>,int> edge_vertices;
+    HASHTABLE<FACE_INDEX<TV::m>,int> face_vertices;
+    HASHTABLE<TV_INT,int> cell_vertices;
+    GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
+
+    const VECTOR<VECTOR<int,TV::m>,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        VECTOR<int,num_corners> cell_color;
+        VECTOR<T,num_corners> cell_phi;
+        for(int i=0;i<num_corners;i++) cell_color(i)=color(it.index+bits(i));
+        for(int i=0;i<num_corners;i++) cell_phi(i)=phi(it.index+bits(i));
+        int next_color=0;
+        HASHTABLE<int,int> color_map;
+        VECTOR<int,num_corners> re_color;
+        int color_list[num_corners];
+        for(int i=0;i<num_corners;i++)
+            if(!color_map.Get(cell_color(i),re_color(i))){
+                re_color(i)=next_color;
+                color_list[next_color]=cell_color(i);
+                color_map.Set(cell_color(i),next_color++);}
+        Get_Interface_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
+            face_vertices,cell_vertices,it.index,particles);}
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
