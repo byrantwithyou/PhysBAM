@@ -226,10 +226,10 @@ Advance_To_Target_Time(const T target_time)
             T maximum_particle_speed=0,max_particle_collision_distance=pls.max_collision_distance_factor*example.fine_mac_grid.dX.Max();
             if(pls.use_removed_negative_particles) for(typename GRID<TV>::CELL_ITERATOR iterator(pls.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=pls.removed_negative_particles(iterator.Cell_Index());
-                if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}
+                if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
             if(pls.use_removed_positive_particles) for(typename GRID<TV>::CELL_ITERATOR iterator(pls.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=pls.removed_positive_particles(iterator.Cell_Index());
-                if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}
+                if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
             example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_particle_speed+2*max_particle_collision_distance+(T).5*example.fine_mac_grid.dX.Max(),10);}
         else{
             T maximum_fluid_speed=example.fine_face_velocities.Maxabs().Max();

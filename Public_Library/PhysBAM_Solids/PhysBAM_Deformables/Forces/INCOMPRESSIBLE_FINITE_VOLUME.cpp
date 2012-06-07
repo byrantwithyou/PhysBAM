@@ -182,7 +182,7 @@ public:
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bx) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx);
     assert(x.v.Size()==dynamic_particles.Size());
-    T convergence_norm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(x.v);
+    T convergence_norm=x.v.Maximum_Magnitude();
     if(fvm.mpi_solids) convergence_norm=fvm.mpi_solids->Reduce_Max(convergence_norm);
     return convergence_norm;}
 
@@ -290,7 +290,7 @@ Test_System()
             pressure_full(p)=exp(random.Get_Uniform_Number(-(T)10,(T)10));}
         system.Project(pressure);
 
-        T convergence_norm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(V);
+        T convergence_norm=V.Maximum_Magnitude();
         if(mpi_solids) convergence_norm=mpi_solids->Reduce_Max(convergence_norm);
         LOG::cout<<"|V|_inf = "<<convergence_norm<<std::endl;
         V/=convergence_norm;

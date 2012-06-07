@@ -8,7 +8,6 @@
 #define __ARRAY_COLLECTION_ELEMENT__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Clone/CLONEABLE.h>
 #include <PhysBAM_Tools/Math_Tools/Hash.h>
 #include <PhysBAM_Tools/Particles/ARRAY_COLLECTION_ELEMENT_BASE.h>
@@ -66,7 +65,7 @@ public:
     {(*array)(to)=(*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(from_attribute).array)(from);}
 
     void Copy_With_Offset(const ARRAY_COLLECTION_ELEMENT_BASE& from_attribute,const int offset)
-    {ARRAYS_COMPUTATIONS::Copy_With_Offset(*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(from_attribute).array,*array,offset);}
+    {array->Copy_With_Offset(*dynamic_cast<const ARRAY_COLLECTION_ELEMENT<T>&>(from_attribute).array,offset);}
     int Pack_Size() const
     {return array->Pack_Size();}
 

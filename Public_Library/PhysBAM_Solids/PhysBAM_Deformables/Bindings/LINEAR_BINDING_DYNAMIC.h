@@ -83,11 +83,11 @@ public:
     {for(int i=0;i<parents.m;i++) particles.X(parents(i))+=particles.one_over_mass(parents(i))*weights(i)*impulse;}
 
     void Apply_Displacement_To_Parents_Based_On_Embedding(const TV& dX,const ARRAY<bool>* skip_particle) PHYSBAM_OVERRIDE
-    {T one_over_weights_squared=1/ARRAYS_COMPUTATIONS::Magnitude_Squared(weights);
+    {T one_over_weights_squared=1/weights.Magnitude_Squared();
     for(int i=0;i<parents.m;i++) if(!skip_particle || !(*skip_particle)(parents(i))) particles.X(parents(i))+=one_over_weights_squared*weights(i)*dX;}
 
     void Apply_Velocity_Change_To_Parents_Based_On_Embedding(const TV& dV,const ARRAY<bool>* skip_particle) PHYSBAM_OVERRIDE
-    {T one_over_weights_squared=1/ARRAYS_COMPUTATIONS::Magnitude_Squared(weights);
+    {T one_over_weights_squared=1/weights.Magnitude_Squared();
     for(int i=0;i<parents.m;i++) if(!skip_particle || !(*skip_particle)(parents(i))) particles.V(parents(i))+=one_over_weights_squared*weights(i)*dV;}
 
     void Distribute_Force_To_Parents(ARRAY_VIEW<TV> F_full,const TV& force) const PHYSBAM_OVERRIDE

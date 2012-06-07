@@ -645,7 +645,7 @@ Print_Statistics(std::ostream& output)
     output<<"particles touched = "<<particles_touched<<std::endl;}
     output<<"bounding box = "<<*bounding_box<<std::endl;
     if(particles.store_velocity){
-        int index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(particles.V);
+        int index=particles.V.Arg_Maximum_Magnitude();
         output<<"max_speed = "<<particles.V(index).Magnitude()<<" ("<<index<<")"<<std::endl;}
     int index;
     output<<"total volume = "<<Total_Volume()<<std::endl;

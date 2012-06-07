@@ -8,7 +8,6 @@
 #define __ARRAY__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>

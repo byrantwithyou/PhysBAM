@@ -398,7 +398,7 @@ Advance_Dynamics(const T time,const T stopping_time,const bool verbose)
     if(verbose){int index=-1;
         TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume=deformable_body_collection.deformable_geometry.template Find_Structure<TETRAHEDRALIZED_VOLUME<T>&>();
         LOG::cout<<" maxPhi="<<tetrahedralized_volume.Maximum_Magnitude_Phi_On_Boundary(*implicit_surface,&index)<<"("<<index<<")";
-        index=ARRAYS_COMPUTATIONS::Arg_Maximum_Magnitude(deformable_body_collection.particles.V);
+        index=deformable_body_collection.particles.V.Arg_Maximum_Magnitude();
         LOG::cout<<"  maxV="<<deformable_body_collection.particles.V(index).Magnitude()<<"("<<index<<")";
         LOG::cout<<"  maxAR="<<tetrahedralized_volume.Maximum_Aspect_Ratio(&index)<<"("<<index<<")\n";}
 }

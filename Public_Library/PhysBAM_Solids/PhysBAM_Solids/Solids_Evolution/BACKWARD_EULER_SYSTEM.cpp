@@ -145,7 +145,7 @@ template<class TV> typename TV::SCALAR BACKWARD_EULER_SYSTEM<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BR) const
 {
     const VECTOR_T& R=debug_cast<const VECTOR_T&>(BR);
-    T convergence_norm_squared=sqr(ARRAYS_COMPUTATIONS::Maximum_Magnitude(R.V));
+    T convergence_norm_squared=sqr(R.V.Maximum_Magnitude());
     for(int p=0;p<R.rigid_V.Size();p++){
         const TWIST<TV>& twist=R.rigid_V(p);
         const RIGID_BODY_MASS<TV,true> &rigid_mass=projection_data.mass.world_space_rigid_mass(p),&rigid_mass_inverse=projection_data.mass.world_space_rigid_mass_inverse(p);

@@ -101,7 +101,7 @@ Maximum_Error(const T_ARRAYS& local_data,const T_ARRAYS& global_data,const int b
     RANGE<TV_INT> region=Interior_Region(sentinels).Thickened(bandwidth);
     T max_error=0;CELL_ITERATOR local(grid,region),global(grid,region+offset);
     for(;local.Valid();local.Next(),global.Next()) if(global_data.Valid_Index(global.Cell_Index()) && local_data.Valid_Index(local.Cell_Index())){
-            T error=sqrt((T)ARRAYS_COMPUTATIONS::Magnitude_Squared(global_data(global.Cell_Index())-local_data(local.Cell_Index())));
+            T error=sqrt((T)Magnitude_Squared(global_data(global.Cell_Index())-local_data(local.Cell_Index())));
         if(max_error<error){max_error=error;index=local.Cell_Index();}}
     return max_error;
 }

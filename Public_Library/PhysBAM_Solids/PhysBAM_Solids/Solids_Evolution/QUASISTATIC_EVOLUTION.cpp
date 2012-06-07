@@ -64,7 +64,7 @@ public:
 
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bdX) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dX=debug_cast<const KRYLOV_VECTOR_T&>(bdX);
-    T convergence_norm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(dX.v);
+    T convergence_norm=dX.v.Maximum_Magnitude();
     if(mpi_solids) convergence_norm=mpi_solids->Reduce_Max(convergence_norm);
     return convergence_norm;}
 
@@ -142,7 +142,7 @@ Advance_One_Time_Step_Position(const T dt,const T time,const bool solids)
         example_forces_and_velocities.Add_External_Forces(R.V.array,time+dt);
         binding_list.Distribute_Force_To_Parents(R.V.array);
         example_forces_and_velocities.Zero_Out_Enslaved_Position_Nodes(R.V.array,time+dt);
-        supnorm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(R.V);
+        supnorm=R.V.Maximum_Magnitude();
         if(mpi_solids) supnorm=mpi_solids->Reduce_Max(supnorm);
         if(solid_body_collection.print_residuals) LOG::cout<<"Newton iteration residual after "<<iteration+1<<" iterations = "<<supnorm<<std::endl;
         if(supnorm<=solids_parameters.newton_tolerance && solid_body_collection.print_diagnostics){

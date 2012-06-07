@@ -7,7 +7,6 @@
 #ifndef __ARRAYS_ND__
 #define __ARRAYS_ND__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>

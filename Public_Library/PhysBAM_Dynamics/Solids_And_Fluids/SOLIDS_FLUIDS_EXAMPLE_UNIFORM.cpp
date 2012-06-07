@@ -447,10 +447,10 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
             PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);
             if(particle_levelset.use_removed_negative_particles) for(CELL_ITERATOR iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());
-                if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}
+                if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
             if(particle_levelset.use_removed_positive_particles) for(CELL_ITERATOR iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
                 PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_positive_particles(iterator.Cell_Index());
-                if(particles) maximum_particle_speed=max(maximum_particle_speed,ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles->V));}}}
+                if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}}}
     T max_particle_collision_distance=0;
     for(int i=0;i<fluids_parameters.number_of_regions;i++)
         max_particle_collision_distance=max(max_particle_collision_distance,fluids_parameters.particle_levelset_evolution->Particle_Levelset(i).max_collision_distance_factor*grid.dX.Max());

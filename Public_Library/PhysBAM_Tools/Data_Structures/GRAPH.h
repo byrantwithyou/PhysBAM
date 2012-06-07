@@ -8,7 +8,6 @@
 #define __GRAPH__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 namespace PhysBAM{
 
 class GRAPH

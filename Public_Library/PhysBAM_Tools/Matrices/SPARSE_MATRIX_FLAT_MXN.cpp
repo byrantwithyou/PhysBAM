@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_MXN
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Arrays_Computations/SORT.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{

@@ -11,7 +11,6 @@
 #ifndef __AXIAL_BENDING_SPRINGS__
 #define __AXIAL_BENDING_SPRINGS__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Data_Structures/FORCE_ELEMENTS.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>

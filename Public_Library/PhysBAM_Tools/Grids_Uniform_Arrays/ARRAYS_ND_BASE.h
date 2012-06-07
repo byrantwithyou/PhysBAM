@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/ONE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>

@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DIRECTED_GRAPH
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

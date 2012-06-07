@@ -8,7 +8,6 @@
 #define __OPERATION_HASH__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 namespace PhysBAM{
 
 template<class ID> // ID=int

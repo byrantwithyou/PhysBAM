@@ -6,7 +6,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -67,7 +66,7 @@ public:
     return dV1.v.Inner_Product_Double_Precision(mass,dV2.v);}
 
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bdV) const PHYSBAM_OVERRIDE
-    {const KRYLOV_VECTOR_T& dV=debug_cast<const KRYLOV_VECTOR_T&>(bdV);return ARRAYS_COMPUTATIONS::Maximum_Magnitude(dV.v);}
+    {const KRYLOV_VECTOR_T& dV=debug_cast<const KRYLOV_VECTOR_T&>(bdV);return dV.v.Maximum_Magnitude();}
 
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& dV) const PHYSBAM_OVERRIDE {}
 };
@@ -157,13 +156,13 @@ Advance_One_Time_Step_Velocity(const T dt,const T time,const bool solids) // TOD
         INDIRECT_ARRAY<ARRAY_VIEW<T> > one_over_mass(particles.one_over_mass,solid_body_collection.deformable_body_collection.dynamic_particles);
         for(int p=0;p<R.Size();p++) R(p)=V_save(p)-V(p)+dt*one_over_mass(p)*R(p);
         example_forces_and_velocities.Zero_Out_Enslaved_Velocity_Nodes(R.array,time+dt,time+dt);
-        supnorm=ARRAYS_COMPUTATIONS::Maximum_Magnitude(R);
+        supnorm=R.Maximum_Magnitude();
         if(solid_body_collection.print_residuals) LOG::cout<<"Newton iteration residual after "<<iteration+1<<" iterations = "<<supnorm<<std::endl;
         if(supnorm<=solids_parameters.newton_tolerance && solid_body_collection.print_diagnostics){
             LOG::cout<<"Newton converged in "<<iteration+1<<std::endl;break;}}
     if(iteration>=solids_parameters.newton_iterations && solid_body_collection.print_diagnostics)
         LOG::cout<<"Newton iteration did not converge in "<<solids_parameters.newton_iterations<<", error = "<<supnorm<<" > "<<solids_parameters.newton_tolerance<<std::endl;
-    LOG::cout<<"maximum velocity = "<<ARRAYS_COMPUTATIONS::Maximum_Magnitude(particles.V.Subset(solid_body_collection.deformable_body_collection.dynamic_particles))<<std::endl;
+    LOG::cout<<"maximum velocity = "<<particles.V.Subset(solid_body_collection.deformable_body_collection.dynamic_particles).Maximum_Magnitude()<<std::endl;
 }
 //#####################################################################
 template class BACKWARD_EULER_EVOLUTION<VECTOR<float,2> >;

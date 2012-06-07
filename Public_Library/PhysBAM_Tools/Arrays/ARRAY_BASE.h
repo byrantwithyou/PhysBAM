@@ -272,7 +272,43 @@ public:
     template<class T_ARRAY2> static double
     Dot_Product_Double_Precision(const ARRAY_BASE& a1,const ARRAY_BASE<T,T_ARRAY2,ID>& a2)
     {return a1.Dot_Double_Precision(a2);}
-    
+
+    typename SCALAR_POLICY<T>::TYPE Magnitude_Squared() const
+    {const T_ARRAY& self=Derived();
+    typename SCALAR_POLICY<T>::TYPE result(0);ID m=self.Size();for(ID i(0);i<m;i++) result+=PhysBAM::Magnitude_Squared(self(i));return result;}
+
+    typename SCALAR_POLICY<T>::TYPE Maximum_Magnitude() const
+    {return Maximum_Magnitude((T*)0);}
+
+    ID Arg_Maximum_Magnitude() const
+    {return Arg_Maximum_Magnitude((ID*)0);}
+
+private:
+    template<class U>
+    typename ENABLE_IF<IS_SCALAR<T>::value,U>::TYPE Maximum_Magnitude(U*) const
+    {T result=(T)0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
+
+    template<class U>
+    typename U::SCALAR Maximum_Magnitude(U*) const
+    {typename T::SCALAR result(0);for(int i=0;i<Size();i++) result=PhysBAM::max(result,PhysBAM::Magnitude_Squared((*this)(i)));return sqrt(result);}
+
+    template<class U>
+    typename ENABLE_IF<IS_SCALAR<T>::value,U>::TYPE Arg_Maximum_Magnitude(U*) const
+    {const T_ARRAY& self=Derived();ID m=self.Size();
+    T maximum=-1;ID argmax=ID();
+    for(ID i(0);i<m;i++){T current=abs(self(i));if(maximum<current){maximum=current;argmax=i;}}
+    return argmax;}
+
+    template<class U>
+    typename DISABLE_IF<IS_SCALAR<T>::value,U>::TYPE Arg_Maximum_Magnitude(U*) const
+    {const T_ARRAY& self=Derived();ID m=self.Size();
+    typename T::SCALAR maximum=-1;ID argmax=ID();
+    for(ID i(0);i<m;i++){
+        typename T::SCALAR current=self(i).Magnitude_Squared();
+        if(maximum<current){maximum=current;argmax=i;}}
+    return argmax;}
+public:
+
     template<class T_ARRAY1>
     ELEMENT Weighted_Sum(const T_ARRAY1& weights) const
     {STATIC_ASSERT_SAME(typename T_ARRAY1::ELEMENT,SCALAR);assert(weights.Size()==Size());
@@ -351,6 +387,12 @@ public:
     template<class T2>
     static void Put(const T2 constant,const T_ARRAY& old_copy,T_ARRAY& new_copy)
     {new_copy.Prefix(old_copy.Size())=constant*old_copy;}
+
+    template<class T1,class T_ARRAY1>
+    void Copy_With_Offset(const ARRAY_BASE<T1,T_ARRAY1,ID>& old_copy,const ID offset)
+    {STATIC_ASSERT(CAN_ASSIGN<T1,T>::value);
+    ID m=old_copy.Size();assert(m+offset<=Size());
+    for(ID i(0);i<m;i++) (*this)(i+offset)=old_copy(i);}
 
     void Clamp_Below(const T& value)
     {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=clamp_min(self(i),value);}

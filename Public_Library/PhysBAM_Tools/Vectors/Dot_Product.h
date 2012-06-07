@@ -34,5 +34,17 @@ inline double Dot_Product_Double_Precision(const float a1,const float a2)
 inline double Dot_Product_Double_Precision(const double a1,const double a2)
 {return a1*a2;}
 
+inline int Magnitude_Squared(const int a)
+{return a*a;}
+
+inline float Magnitude_Squared(const float a)
+{return a*a;}
+
+inline double Magnitude_Squared(const double a)
+{return a*a;}
+
+template<class TV>
+inline typename TV::SCALAR Magnitude_Squared(const TV& v)
+{return v.Magnitude_Squared();}
 }
 #endif

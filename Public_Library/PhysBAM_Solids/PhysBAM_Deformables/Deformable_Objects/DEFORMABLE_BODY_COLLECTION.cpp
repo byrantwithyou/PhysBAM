@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DEFORMABLE_BODY_COLLECTION
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -437,9 +436,9 @@ Test_Force_Derivatives(const T time)
         G*=(T).5;
         particles.X.Exchange(X2);
         deformables_forces(i)->Update_Position_Based_State(time,true);
-        T MF=sqrt(ARRAYS_COMPUTATIONS::Magnitude_Squared(F));
-        T MG=sqrt(ARRAYS_COMPUTATIONS::Magnitude_Squared(G));
-        T MD=sqrt(ARRAYS_COMPUTATIONS::Magnitude_Squared(F-G));
+        T MF=sqrt(F.Magnitude_Squared());
+        T MG=sqrt(G.Magnitude_Squared());
+        T MD=sqrt((F-G).Magnitude_Squared());
         LOG::cout<<"force derivative error "<<MD<<" vs "<<MF<<"   "<<MG<<"   rel "<<MD/max((T)1e-30,MF,MG)<<"    "<<typeid(*deformables_forces(i)).name()<<std::endl;
     }
 }
