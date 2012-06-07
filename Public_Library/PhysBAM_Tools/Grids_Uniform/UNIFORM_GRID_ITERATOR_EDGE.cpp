@@ -14,10 +14,10 @@ template<class TV> UNIFORM_GRID_ITERATOR_EDGE<TV>::
 UNIFORM_GRID_ITERATOR_EDGE(const GRID<TV>& grid_input,const int number_of_ghost_cells_input,const T_REGION& region_type_input,const int side_input,int axis_input)
     :UNIFORM_GRID_ITERATOR<TV>(grid_input),region_type(region_type_input),side(side_input),number_of_ghost_cells(number_of_ghost_cells_input)
 {
-    assert(side==0);
+    assert(side==-1);
     assert(region_type==GRID<TV>::WHOLE_REGION);
     if(axis_input>=0){single_axis=true;Reset_Axis(axis_input);}
-    else{single_axis=false;Reset_Axis(-1);}
+    else{single_axis=false;Reset_Axis(0);}
 }
 //#####################################################################
 // Constructor
