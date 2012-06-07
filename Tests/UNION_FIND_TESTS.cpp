@@ -9,7 +9,6 @@
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Utilities/TEST_BASE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 namespace PhysBAM{
 
 class UNION_FIND_TESTS:public TEST_BASE
