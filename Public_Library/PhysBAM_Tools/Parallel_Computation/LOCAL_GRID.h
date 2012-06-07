@@ -7,7 +7,6 @@
 #ifndef __LOCAL_GRID__
 #define __LOCAL_GRID__
 
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 namespace PhysBAM{

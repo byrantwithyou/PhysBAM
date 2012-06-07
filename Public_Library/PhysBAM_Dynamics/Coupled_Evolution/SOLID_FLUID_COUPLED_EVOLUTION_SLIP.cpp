@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/IDENTITY_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>

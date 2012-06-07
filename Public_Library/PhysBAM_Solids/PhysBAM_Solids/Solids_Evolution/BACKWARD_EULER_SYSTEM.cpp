@@ -4,7 +4,6 @@
 //#####################################################################
 // Class BACKWARD_EULER_SYSTEM
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>

@@ -5,7 +5,6 @@
 // Class TRIANGULATED_SURFACE
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>

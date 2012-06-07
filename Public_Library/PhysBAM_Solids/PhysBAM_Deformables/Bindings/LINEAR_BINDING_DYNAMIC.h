@@ -8,7 +8,6 @@
 #define __LINEAR_BINDING_DYNAMIC__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING.h>
 namespace PhysBAM{
 

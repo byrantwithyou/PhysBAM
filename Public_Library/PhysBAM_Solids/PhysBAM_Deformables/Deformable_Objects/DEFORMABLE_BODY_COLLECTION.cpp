@@ -4,7 +4,6 @@
 //#####################################################################
 // Class DEFORMABLE_BODY_COLLECTION
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>

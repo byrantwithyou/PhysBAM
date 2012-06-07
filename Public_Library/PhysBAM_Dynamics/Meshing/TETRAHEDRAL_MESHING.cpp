@@ -4,7 +4,6 @@
 //#####################################################################
 // Class TETRAHEDRAL_MESHING
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
