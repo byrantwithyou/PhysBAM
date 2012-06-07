@@ -5,7 +5,6 @@
 // Class MATRIX_SOLID_INTERPOLATION_BASE
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
@@ -84,8 +83,8 @@ Test_Matrix(int number_particles,int number_rigid_particles) const
     Transpose_Times(constraints,solids2);
 
     CONSTANT_ARRAY<RIGID_BODY_MASS<TV,true> > rigid_mass(twist.m,RIGID_BODY_MASS<TV,true>(1,typename RIGID_BODY_POLICY<TV>::INERTIA_TENSOR()+1));
-    T inner_solids=ARRAYS_COMPUTATIONS::Dot_Product(V,V2)+twist.Inner_Product(rigid_mass,twist2);
-    T inner_constraints=ARRAYS_COMPUTATIONS::Dot_Product(constraints,constraints2);
+    T inner_solids=V.Dot(V2)+twist.Inner_Product(rigid_mass,twist2);
+    T inner_constraints=constraints.Dot(constraints2);
 
     LOG::cout<<"MATRIX_SOLID_INTERPOLATION_BASE Test: "<<inner_solids<<"  vs  "<<inner_constraints<<"  relative  "<<
         abs(inner_solids-inner_constraints)/maxabs((T)1e-30,inner_solids,inner_constraints)<<std::endl;

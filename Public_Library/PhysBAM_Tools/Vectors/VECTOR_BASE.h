@@ -120,7 +120,11 @@ public:
 
     template<class T_VECTOR1,class T_VECTOR2>
     static double Dot_Product_Double_Precision(const VECTOR_BASE<T,T_VECTOR1>& v1,const VECTOR_BASE<T,T_VECTOR2>& v2)
-    {v1.Static_Assert_Not_Small();Assert_Same_Size(v1,v2);double sum=0;for(int i=0;i<v1.Size();i++) sum+=(double)v1(i)*(double)v2(i);return sum;}
+    {return v1.Dot_Double_Precision(v2);}
+
+    template<class T_VECTOR1> double
+    Dot_Double_Precision(const VECTOR_BASE<T,T_VECTOR1>& v) const
+    {Static_Assert_Not_Small();Assert_Same_Size(*this,v);double sum=0;for(int i=0;i<Size();i++) sum+=(double)(*this)(i)*(double)v(i);return sum;}
 
     template<class T_VECTOR1,class T_VECTOR2>
     static double Dot_Product_Double_Precision(const VECTOR_BASE<T,T_VECTOR1>& v1,const VECTOR_BASE<T,T_VECTOR2>& v2,const int start_index,const int end_index)

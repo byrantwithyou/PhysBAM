@@ -2,7 +2,6 @@
 // Copyright 2009, Nipun Kwatra, Jon Gretarsson, Avi Robinson-Mosher, Craig Schroeder
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
@@ -626,10 +625,10 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& bV1,const KRYLOV_VECTOR_BASE<T>& bV2)
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(bV1);const VECTOR_T& V2=debug_cast<const VECTOR_T&>(bV2);
     double inner_product_pressure=Dot_Product_Double_Precision(V1.pressure,V2.pressure);
-    double inner_product_lambda=ARRAYS_COMPUTATIONS::Dot_Product_Double_Precision(V1.lambda,V2.lambda);
+    double inner_product_lambda=V1.lambda.Dot_Double_Precision(V2.lambda);
     double inner_product_force_coefficients=0;
-    if(!leakproof_solve) inner_product_force_coefficients=ARRAYS_COMPUTATIONS::Dot_Product_Double_Precision(V1.force_coefficients,V2.force_coefficients);
-    double inner_product_viscous_force_coefficients=ARRAYS_COMPUTATIONS::Dot_Product_Double_Precision(V1.viscous_force_coefficients,V2.viscous_force_coefficients);
+    if(!leakproof_solve) inner_product_force_coefficients=V1.force_coefficients.Dot_Double_Precision(V2.force_coefficients);
+    double inner_product_viscous_force_coefficients=V1.viscous_force_coefficients.Dot_Double_Precision(V2.viscous_force_coefficients);
     //LOG::cout<<"Inner products: p: "<<inner_product_pressure<<" lambda: "<<inner_product_lambda<<" solid: "<<inner_product_force_coefficients<<std::endl;
     double ret=inner_product_pressure+inner_product_lambda+inner_product_force_coefficients+inner_product_viscous_force_coefficients;
     T tmp=0;

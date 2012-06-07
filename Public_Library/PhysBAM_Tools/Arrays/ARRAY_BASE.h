@@ -23,6 +23,7 @@
 #include <PhysBAM_Tools/Math_Tools/minmag.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
+#include <PhysBAM_Tools/Vectors/Dot_Product.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <algorithm>
 #include <iostream>
@@ -253,6 +254,24 @@ public:
     
     T Average() const
     {const T_ARRAY& self=Derived();return self.Size()?Sum()/typename ARRAY_BASE<T,T_ARRAY,ID>::SCALAR(self.Size()):T();}
+
+    template<class T_ARRAY2> typename SCALAR_POLICY<T>::TYPE
+    Dot(const ARRAY_BASE<T,T_ARRAY2,ID>& a) const
+    {assert(Size()==a.Size());
+    typename SCALAR_POLICY<T>::TYPE result(0);ID m=Size();for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product((*this)(i),a(i));return result;}
+
+    template<class T_ARRAY2> double
+    Dot_Double_Precision(const ARRAY_BASE<T,T_ARRAY2,ID>& a) const
+    {assert(Size()==a.Size());
+    double result(0);ID m=Size();for(ID i(0);i<m;i++) result+=PhysBAM::Dot_Product((*this)(i),a(i));return result;}
+
+    template<class T_ARRAY2> static typename SCALAR_POLICY<T>::TYPE
+    Dot_Product(ARRAY_BASE& a1,const ARRAY_BASE<T,T_ARRAY2,ID>& a2)
+    {return a1.Dot(a2);}
+
+    template<class T_ARRAY2> static double
+    Dot_Product_Double_Precision(const ARRAY_BASE& a1,const ARRAY_BASE<T,T_ARRAY2,ID>& a2)
+    {return a1.Dot_Double_Precision(a2);}
     
     template<class T_ARRAY1>
     ELEMENT Weighted_Sum(const T_ARRAY1& weights) const

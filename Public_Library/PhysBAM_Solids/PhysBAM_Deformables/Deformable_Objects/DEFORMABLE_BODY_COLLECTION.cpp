@@ -5,7 +5,6 @@
 // Class DEFORMABLE_BODY_COLLECTION
 //#####################################################################
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -407,7 +406,7 @@ Test_Energy(const T time)
         T PE2=deformables_forces(i)->Potential_Energy(time);
         particles.X.Exchange(X2);
         deformables_forces(i)->Update_Position_Based_State(time,true);
-        T W=ARRAYS_COMPUTATIONS::Dot_Product(F,dX)/2;
+        T W=F.Dot(dX)/2;
         T dPE=(PE1-PE2)/e,dW=W/e,rel=(dPE-dW)/max(abs(dW),(T)1e-20);
         LOG::cout<<"potential energy test d phi "<<dPE<<"  W "<<dW<<"   rel "<<rel<<"   "<<typeid(*deformables_forces(i)).name()<<std::endl;
     }

@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
@@ -176,7 +175,7 @@ public:
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bx,const KRYLOV_VECTOR_BASE<T>& by) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& x=debug_cast<const KRYLOV_VECTOR_T&>(bx),&y=debug_cast<const KRYLOV_VECTOR_T&>(by);
     assert(x.v.Size()==dynamic_particles.Size());
-    T inner_product=ARRAYS_COMPUTATIONS::Dot_Product(x.v,y.v);
+    T inner_product=x.v.Dot(y.v);
     if(fvm.mpi_solids) inner_product=fvm.mpi_solids->Reduce_Add(inner_product);
     return inner_product;}
 
@@ -296,7 +295,7 @@ Test_System()
         LOG::cout<<"|V|_inf = "<<convergence_norm<<std::endl;
         V/=convergence_norm;
 
-        T magnitude_squared=ARRAYS_COMPUTATIONS::Dot_Product(V,V);
+        T magnitude_squared=V.Dot(V);
         if(mpi_solids) magnitude_squared=mpi_solids->Reduce_Add(magnitude_squared);
         T magnitude=sqrt(magnitude_squared);
         LOG::cout<<"|V|_before = "<<magnitude<<std::endl;
@@ -308,7 +307,7 @@ Test_System()
         Gradient(pressure_full,gradient_full);
         Project_Vector_Field(gradient_full);
 
-        T gradient_dot_V=ARRAYS_COMPUTATIONS::Dot_Product(gradient,V),divergence_dot_pressure=(T)system.Inner_Product(divergence,pressure);
+        T gradient_dot_V=gradient.Dot(V),divergence_dot_pressure=(T)system.Inner_Product(divergence,pressure);
         if(mpi_solids) gradient_dot_V=mpi_solids->Reduce_Add(gradient_dot_V);
         LOG::cout<<"gradient_dot_V = "<<gradient_dot_V<<", divergence_dot_pressure = "<<divergence_dot_pressure
             <<", relative error: "<<abs(Robust_Divide(gradient_dot_V,divergence_dot_pressure)-1)<<std::endl;

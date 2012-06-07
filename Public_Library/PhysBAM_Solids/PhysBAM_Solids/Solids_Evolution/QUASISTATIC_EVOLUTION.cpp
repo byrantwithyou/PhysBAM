@@ -6,7 +6,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
@@ -59,7 +58,7 @@ public:
 
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bdX1,const KRYLOV_VECTOR_BASE<T>& bdX2) const PHYSBAM_OVERRIDE
     {const KRYLOV_VECTOR_T& dX1=debug_cast<const KRYLOV_VECTOR_T&>(bdX1),&dX2=debug_cast<const KRYLOV_VECTOR_T&>(bdX2);
-    T inner_product=ARRAYS_COMPUTATIONS::Dot_Product(dX1.v,dX2.v);
+    T inner_product=dX1.v.Dot(dX2.v);
     if(mpi_solids) inner_product=mpi_solids->Reduce_Add(inner_product);
     return inner_product;}
 

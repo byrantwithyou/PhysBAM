@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POINT_SIMPLEX_1D.h>
@@ -75,7 +74,7 @@ Test_Matrix() const
     Transpose_Times(constraints,faces2);
 
     T inner_faces=faces.Dot_Product(faces,faces2);
-    T inner_constraints=ARRAYS_COMPUTATIONS::Dot_Product(constraints,constraints2);
+    T inner_constraints=constraints.Dot(constraints2);
 
     LOG::cout<<"MATRIX_FLUID_INTERPOLATION_BASE Test: "<<inner_faces<<"  vs  "<<inner_constraints<<"  relative  "<<
         abs(inner_faces-inner_constraints)/maxabs((T)1e-30,inner_faces,inner_constraints)<<std::endl;

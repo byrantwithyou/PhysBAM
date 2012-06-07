@@ -11,7 +11,7 @@ namespace PhysBAM{
 
 template<class TV>
 inline typename TV::SCALAR Dot_Product(const TV& v1,const TV& v2)
-{return TV::Dot_Product(v1,v2);}
+{return v1.Dot(v2);}
 
 inline float Dot_Product(const float a1,const float a2)
 {return a1*a2;}
@@ -21,12 +21,12 @@ inline double Dot_Product(const double a1,const double a2)
 
 template<class TV>
 inline double Dot_Product_Double_Precision(const TV& v1,const TV& v2)
-{return TV::Dot_Product_Double_Precision(v1,v2);}
+{return v1.Dot_Double_Precision(v2);}
 
 template<class T,int d> class VECTOR;
 template<class T,int d>
 inline double Dot_Product_Double_Precision(const VECTOR<T,d>& v1,const VECTOR<T,d>& v2)
-{return VECTOR<T,d>::Dot_Product(v1,v2);}
+{return v1.Dot(v2);}
 
 inline double Dot_Product_Double_Precision(const float a1,const float a2)
 {return a1*a2;}

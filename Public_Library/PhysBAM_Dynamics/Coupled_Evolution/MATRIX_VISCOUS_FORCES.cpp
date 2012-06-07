@@ -4,7 +4,6 @@
 //#####################################################################
 // Class MATRIX_VISCOUS_FORCES
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays_Computations/DOT_PRODUCT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
@@ -123,8 +122,8 @@ Test_Matrix() const
     Times(V,K2);
     Transpose_Times(K,V2);
 
-    T inner_V=V.Dot_Product(V,V2);
-    T inner_K=ARRAYS_COMPUTATIONS::Dot_Product(K,K2);
+    T inner_V=V.Dot(V2);
+    T inner_K=K.Dot(K2);
     LOG::cout<<"MATRIX_VISCOUS_FORCES Symmetry Test: "<<inner_V<<"  vs  "<<inner_K<<"  relative  "<<abs(inner_V-inner_K)/maxabs((T)1e-30,inner_V,inner_K)<<std::endl;
 }
 //#####################################################################
