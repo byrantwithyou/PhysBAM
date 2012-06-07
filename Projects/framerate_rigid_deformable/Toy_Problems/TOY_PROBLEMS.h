@@ -15,7 +15,6 @@
 #ifndef __TOY_PROBLEMS__
 #define __TOY_PROBLEMS__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 

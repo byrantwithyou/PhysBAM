@@ -20,7 +20,6 @@
 #ifndef __STANDARD_TESTS_2D__
 #define __STANDARD_TESTS_2D__
 
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Data_Structures/FORCE_ELEMENTS.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>

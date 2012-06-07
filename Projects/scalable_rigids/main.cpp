@@ -6,7 +6,6 @@
 #include "Standard_Tests/STANDARD_TESTS.h"
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/ARRAY_COPY.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 
