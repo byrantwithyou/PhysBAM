@@ -1,7 +1,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Dynamics/Meshing/COLLISION_AWARE_SUBDIVISION.h>
 #include "../../Public_Library/Deformable_Objects/DEFORMABLE_OBJECT_LIST_3D.h"
 #include "../../Public_Library/Rigid_Bodies/RIGID_BODY_LIST_3D.h"
+#include <PhysBAM_Dynamics/Meshing/COLLISION_AWARE_SUBDIVISION.h>
 
 bool PHYSBAM_THREADED_RUN=false;
 

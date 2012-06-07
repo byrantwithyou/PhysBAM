@@ -6,8 +6,8 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_NEW.h>
-#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_NEW.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_HELPER_NEW.h>
+#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_INTERFACE_BLOCK_NEW.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Initialize

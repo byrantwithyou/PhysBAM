@@ -2,7 +2,7 @@
 // Copyright 2002-2007, Ronald Fedkiw, Eran Guendelman, Geoffrey Irving, Sergey Koltakov, Frank Losasso, Duc Nguyen, Nick Rasmussen, Avi Robinson-Mosher, Andrew Selle, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
+#include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>

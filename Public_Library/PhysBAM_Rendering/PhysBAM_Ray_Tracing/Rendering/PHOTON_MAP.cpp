@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 // Structure of this class is inspired by Henrik Wann Jackassen's "Realistic Synthesis Using Photon Mapping" Appendix B
-#include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
+#include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>

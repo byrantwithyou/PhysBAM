@@ -4,7 +4,7 @@
 //#####################################################################
 // Class STRAIN_MEASURE
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X2.h>

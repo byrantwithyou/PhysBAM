@@ -4,7 +4,7 @@
 //#####################################################################
 // Class PARTICLE_LEVELSET
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>

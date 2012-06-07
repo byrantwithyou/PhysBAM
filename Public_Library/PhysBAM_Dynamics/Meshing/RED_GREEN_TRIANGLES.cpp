@@ -4,7 +4,7 @@
 //#####################################################################
 // Class RED_GREEN_TRIANGLES
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
 using namespace PhysBAM;
 //#####################################################################

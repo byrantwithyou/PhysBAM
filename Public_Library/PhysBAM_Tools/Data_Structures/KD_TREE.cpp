@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
+#include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE.h>
 #include <PhysBAM_Tools/Data_Structures/KD_TREE_NODE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

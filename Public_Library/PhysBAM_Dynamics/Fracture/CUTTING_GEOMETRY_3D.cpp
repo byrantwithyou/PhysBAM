@@ -2,7 +2,7 @@
 // Copyright 2007, Kevin Der, Geoffrey Irving, Andrew Selle, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>

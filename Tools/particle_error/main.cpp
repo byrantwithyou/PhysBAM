@@ -1,4 +1,3 @@
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>

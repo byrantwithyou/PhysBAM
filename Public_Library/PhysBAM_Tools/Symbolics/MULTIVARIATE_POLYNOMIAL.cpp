@@ -2,7 +2,7 @@
 // Copyright 2012, Craig Schroeder, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 using namespace PhysBAM;

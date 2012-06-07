@@ -5,7 +5,7 @@
 // Class LINEAR_SPRINGS
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>

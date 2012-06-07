@@ -4,7 +4,7 @@
 //#####################################################################
 #ifndef __RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE__
 #define __RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE__
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/UNDIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Log/LOG.h>

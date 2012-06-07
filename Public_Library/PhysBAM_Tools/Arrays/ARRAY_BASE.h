@@ -14,7 +14,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY_PRODUCT.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_SUM.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/maxabs.h>
@@ -313,6 +313,9 @@ public:
     ELEMENT Weighted_Sum(const T_ARRAY1& weights) const
     {STATIC_ASSERT_SAME(typename T_ARRAY1::ELEMENT,SCALAR);assert(weights.Size()==Size());
     ELEMENT result((ELEMENT()));INDEX m=Size();for(INDEX i(0);i<m;i++) result+=weights(i)*(*this)(i);return result;}
+
+    void Reverse()
+    {for(ID i(0),s=Size();i<s-1-i;i++) exchange((*this)(i),(*this)(s-1-i));}
 
     ID Find(const T& element) const
     {const T_ARRAY& self=Derived();ID m=self.Size();

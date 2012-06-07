@@ -4,7 +4,7 @@
 //#####################################################################
 // Class BANDED_SYMMETRIC_MATRIX
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Math_Tools/minabs.h>

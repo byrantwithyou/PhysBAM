@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_1D.h>

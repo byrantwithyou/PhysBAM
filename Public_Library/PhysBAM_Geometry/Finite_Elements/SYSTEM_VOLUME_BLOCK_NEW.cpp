@@ -5,8 +5,8 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_STENCIL_UNIFORM.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_NEW.h>
-#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_NEW.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_NEW.h>
+#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_NEW.h>
 using namespace PhysBAM;
 template<class TV,int static_degree> template<int d0,int d1> void SYSTEM_VOLUME_BLOCK_NEW<TV,static_degree>::
 Initialize(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,

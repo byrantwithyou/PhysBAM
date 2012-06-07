@@ -2,7 +2,7 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>

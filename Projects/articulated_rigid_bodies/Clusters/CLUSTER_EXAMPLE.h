@@ -13,14 +13,14 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Articulated_Rigid_Bodies/ARTICULATED_RIGID_BODY_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_COLLISION_MANAGER.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_IMPULSE_ACCUMULATOR.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/JOINT_FUNCTION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/POINT_JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Joints/RIGID_JOINT.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Bindings/RIGID_BODY_BINDING.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/FRACTURE_EVOLUTION_CLUSTER_3D.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
 #include "../ARB_PARAMETERS.h"
+#include <PhysBAM_Solids/PhysBAM_Rigids/Collisions/RIGID_BODY_IMPULSE_ACCUMULATOR.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/FRACTURE_EVOLUTION_CLUSTER_3D.h>
 #include <Rigid_Bodies/CONSTRAINED_POINT_IN_RIGID_BODY.h>
 #include <Rigid_Bodies/RIGID_BODY_CLUSTER_3D.h>
 namespace PhysBAM{

@@ -3,7 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/STACK.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

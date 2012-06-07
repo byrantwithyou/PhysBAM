@@ -4,7 +4,7 @@
 //#####################################################################
 // Class DIAGONALIZED_ISOTROPIC_STRESS_DERIVATIVE
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>

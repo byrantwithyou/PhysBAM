@@ -5,7 +5,7 @@
 // Class EDGE_EDGE_ADHESION_VISITOR
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
+#include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_3D.h>

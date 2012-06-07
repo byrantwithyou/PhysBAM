@@ -6,7 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXPANSION_ARITHMETIC.h>
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
+#include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 using namespace PhysBAM;
 namespace PhysBAM{
@@ -119,7 +119,7 @@ Compress_Expansion(ARRAY<T>& e)
       enow=e(eindex);
       Fast_Two_Sum(Q,enow,Qnew,q);
       if(q!=0){h.Append(const_cast<T&>(Qnew));Q=q;} else Q=Qnew;}
-  ARRAYS_COMPUTATIONS::Reverse_In_Place(h);
+  h.Reverse();
   for(hindex=0;hindex<h.m;hindex++){
       hnow=h(hindex);
       Fast_Two_Sum(hnow,Q,Qnew,q);

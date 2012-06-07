@@ -4,7 +4,7 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_NXN
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 using namespace PhysBAM;

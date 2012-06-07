@@ -37,10 +37,6 @@ namespace ARRAYS_COMPUTATIONS
         if(index_of_largest!=index){exchange(a(index),a(index_of_largest));index=index_of_largest;}else return;}}
 
     template<class T_ARRAY>
-    void Reverse_In_Place(T_ARRAY& input)
-    {typedef typename T_ARRAY::INDEX ID;for(ID i(0);i<ID(Value(input.m)/2);i++) exchange(input(i),input(input.m+1-i));}
-
-    template<class T_ARRAY>
     void Heapify(T_ARRAY& a) // largest on top
     {typedef typename T_ARRAY::INDEX ID;for(ID i=a.Size()/2-1;i>=ID(0);i--) Heapify(a,i,a.Size());}
 

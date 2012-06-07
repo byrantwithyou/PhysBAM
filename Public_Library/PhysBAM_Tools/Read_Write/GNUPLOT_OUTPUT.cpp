@@ -2,7 +2,7 @@
 // Copyright 2002-2004, Ronald Fedkiw, Geoffrey Irving, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>

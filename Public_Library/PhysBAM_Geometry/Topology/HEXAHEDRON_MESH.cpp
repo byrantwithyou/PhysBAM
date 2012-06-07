@@ -6,7 +6,7 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/STACK.h>

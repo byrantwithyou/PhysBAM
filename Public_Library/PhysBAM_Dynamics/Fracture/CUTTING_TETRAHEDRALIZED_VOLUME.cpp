@@ -8,9 +8,9 @@
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXACT_FLOAT.h>
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXACT_RATIONAL.h>
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXPANSION_ARITHMETIC.h>
-#include <PhysBAM_Tools/Arrays_Computations/HEAPIFY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
+#include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -1280,7 +1280,7 @@ Duplicate_And_Merge_Elements()
                     if(verbose) LOG::cout<<"Deleting duplicate tet "<<otet<<" with copy ids "<<i<<" and "<<j<<std::endl;break;}}
             if(create){assert(!next_tetrahedralized_volume->mesh.Simplex(collapsed_dup_particles_1));
                 tets_to_add.Append(collapsed_dup_particles_1);}}
-        ARRAYS_COMPUTATIONS::Reverse_In_Place(tets_to_add);
+        tets_to_add.Reverse();
         next_tetrahedralized_volume->mesh.elements.Append_Elements(tets_to_add);}
     // fix embedding map
     final_parent_weights_per_new_particle.Remove_All();final_parents_per_new_particle.Remove_All();

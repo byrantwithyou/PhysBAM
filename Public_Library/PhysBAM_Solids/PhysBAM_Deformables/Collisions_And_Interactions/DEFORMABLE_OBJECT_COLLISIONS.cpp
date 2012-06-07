@@ -6,7 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/CONSTANT_ARRAY.h>
 #include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Utilities/Find_Type.h>
 #include <PhysBAM_Geometry/Collision_Detection/COLLISION_GEOMETRY_SPATIAL_PARTITION.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>

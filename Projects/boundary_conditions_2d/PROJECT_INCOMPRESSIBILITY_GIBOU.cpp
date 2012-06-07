@@ -1,5 +1,4 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/MAGNITUDE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>

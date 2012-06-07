@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #ifdef USE_MPI
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>

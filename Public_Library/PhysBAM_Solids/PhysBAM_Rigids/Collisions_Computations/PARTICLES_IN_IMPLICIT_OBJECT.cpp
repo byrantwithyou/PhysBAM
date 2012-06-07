@@ -6,7 +6,7 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>

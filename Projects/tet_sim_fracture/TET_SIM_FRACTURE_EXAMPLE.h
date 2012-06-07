@@ -12,9 +12,9 @@
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Forces/TRIANGLE_BENDING_ELEMENTS.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Fracture/FRACTURE_TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/FRACTURE_EVOLUTION_3D.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/FRACTURE_EVOLUTION_3D.h>
 namespace PhysBAM{
 
 template<class T_input>

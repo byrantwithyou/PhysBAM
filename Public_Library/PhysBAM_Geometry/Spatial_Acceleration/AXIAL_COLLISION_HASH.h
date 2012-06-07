@@ -8,7 +8,7 @@
 #define __AXIAL_COLLISION_HASH__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{

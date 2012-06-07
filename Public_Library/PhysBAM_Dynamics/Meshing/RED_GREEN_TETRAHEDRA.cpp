@@ -4,7 +4,7 @@
 //#####################################################################
 // Class RED_GREEN_TETRAHEDRA
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays_Computations/SORT.h>
+#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
 using namespace PhysBAM; 
 template<class T> RED_GREEN_TETRAHEDRA<T>::
