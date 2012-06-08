@@ -8,15 +8,8 @@
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_RESIDUAL.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
-#include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <PhysBAM_Tools/Math_Tools/clamp.h>
-#include <PhysBAM_Tools/Matrices/MATRIX.h>
-#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
-#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
@@ -694,6 +687,7 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
         pat=interface_segment_table(seg++);
         VECTOR<int,2> c(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
         VECTOR<int,2> v(pts[GET_V(pat,0)],pts[GET_V(pat,1)]);
+        printf("%i %i %i %i\n",GET_V(pat,0),GET_V(pat,1),v.x,v.y);
         if(c.x>c.y){
             exchange(c.x,c.y);
             exchange(v.x,v.y);}
@@ -704,130 +698,6 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
             surface.Set(c,s);}
         s->mesh.elements.Append(v);
     } while(!(pat&last_tri_bit));
-}
-template<class TV>
-class MARCHING_CUBES_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
-{
-    typedef typename TV::SCALAR T;
-    typedef KRYLOV_VECTOR_BASE<T> BASE;
-public:
-    ARRAY<TV> v;
-
-    MARCHING_CUBES_VECTOR(){}
-    virtual ~MARCHING_CUBES_VECTOR(){}
-
-    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE
-    {v+=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).v;return *this;}
-
-    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE
-    {v-=debug_cast<const MARCHING_CUBES_VECTOR&>(bv).v;return *this;}
-
-    BASE& operator*=(const T a) PHYSBAM_OVERRIDE
-    {v*=a;return *this;}
-
-    void Copy(const T c1,const BASE& bv1) PHYSBAM_OVERRIDE
-    {v.Copy(c1,debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).v,v);}
-
-    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
-    {v.Copy(c1,debug_cast<const MARCHING_CUBES_VECTOR&>(bv1).v,debug_cast<const MARCHING_CUBES_VECTOR&>(bv2).v,v);}
-
-    int Raw_Size() const PHYSBAM_OVERRIDE
-    {return v.m*TV::m;}
-
-    T& Raw_Get(int i) PHYSBAM_OVERRIDE
-    {return v(i/TV::m)(i%TV::m);}
-
-    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE
-    {MARCHING_CUBES_VECTOR* V=new MARCHING_CUBES_VECTOR;V->v.Resize(v.m);return V;}
-
-    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE
-    {v.Resize(debug_cast<const MARCHING_CUBES_VECTOR&>(bv).v.m);}
-};
-
-template<class TV>
-class MARCHING_CUBES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
-{
-    typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::m> TV_INT;
-    typedef MARCHING_CUBES_VECTOR<TV> VECTOR_T;
-    typedef KRYLOV_SYSTEM_BASE<T> BASE;
-
-public:
-    struct BLOCK
-    {
-        VECTOR<int,TV::m+1> index;
-        MATRIX<T,TV::m> M[TV::m+1][TV::m+1];
-    };
-
-    ARRAY<BLOCK> blocks;
-    ARRAY<int> project_flags;
-
-    MARCHING_CUBES_SYSTEM()
-        :BASE(false,false)
-    {}
-
-    virtual ~MARCHING_CUBES_SYSTEM(){}
-
-//#####################################################################
-    void Multiply(const KRYLOV_VECTOR_BASE<T>& bx,KRYLOV_VECTOR_BASE<T>& bresult) const PHYSBAM_OVERRIDE
-    {
-        const ARRAY<TV>& x=debug_cast<const VECTOR_T&>(bx).v;
-        ARRAY<TV>& r=debug_cast<VECTOR_T&>(bresult).v;
-        r.Fill(TV());
-        for(int i=0;i<blocks.m;i++)
-            for(int j=0;j<TV::m+1;j++)
-                for(int k=0;k<TV::m+1;k++){
-                    int a=blocks(i).index(j),b=blocks(i).index(k);
-                    if(a>=0 && b>=0)
-                        r(a)+=blocks(i).M[j][k]*x(b);}
-    }
-
-    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const PHYSBAM_OVERRIDE
-    {return debug_cast<const VECTOR_T&>(x).v.Dot(debug_cast<const VECTOR_T&>(y).v);}
-
-    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
-    {return sqrt(Inner_Product(x,x));}
-
-    void Project(KRYLOV_VECTOR_BASE<T>& bx) const PHYSBAM_OVERRIDE
-    {
-        return;
-        ARRAY<TV>& x=debug_cast<VECTOR_T&>(bx).v;
-        for(int i=0;i<project_flags.m;i++)
-            for(int j=0;j<TV::m;j++)
-                if(!(project_flags(i)&(1<<j)))
-                    x(i)(j)=0;
-    }
-
-    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE {}
-    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE
-    {Project(x);}
-
-    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const PHYSBAM_OVERRIDE {}
-//#####################################################################
-};
-//#####################################################################
-// Function Fill_Matrix_Block_And_Rhs
-//#####################################################################
-template<class TV> typename TV::SCALAR
-Fill_Matrix_Block_And_Rhs(typename MARCHING_CUBES_SYSTEM<TV>::BLOCK& block,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,3>&> rhs,
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,3>&> X)
-{
-    typedef typename TV::SCALAR T;
-    TV a=X(0),x=X(1),b=X(2),e=b-a;
-    T t=e.Dot(x-a)/e.Dot(e);
-    t=clamp(t,(T)0,(T)1);
-    TV p=a+t*e,f=(x-p);
-    T E=f.Magnitude_Squared()*100;
-    T sc[3]={-(1-t),1,-t};
-    for(int i=0;i<3;i++) rhs(i)+=2*sc[i]*f*100;
-    for(int i=0;i<3;i++) for(int j=0;j<3;j++) block.M[i][j]+=2*sc[i]*sc[j]*100;
-    return E;
-}
-template<class TV> typename TV::SCALAR
-Fill_Matrix_Block_And_Rhs(typename MARCHING_CUBES_SYSTEM<TV>::BLOCK& block,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,4>&> rhs,
-    INDIRECT_ARRAY<ARRAY_VIEW<TV>,VECTOR<int,4>&> X)
-{
-    return 0;
 }
 //#####################################################################
 // Function Get_Elements_For_Cell
@@ -843,7 +713,6 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
 
     const VECTOR<VECTOR<int,TV::m>,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
-    ARRAY<bool,TV_INT> triple_cell(grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         VECTOR<int,num_corners> cell_color;
         VECTOR<T,num_corners> cell_phi;
@@ -858,88 +727,8 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 re_color(i)=next_color;
                 color_list[next_color]=cell_color(i);
                 color_map.Set(cell_color(i),next_color++);}
-        triple_cell(it.index)=next_color>=3;
         Get_Interface_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
             face_vertices,cell_vertices,it.index,particles);}
-
-    ARRAY<int> solve_dof(particles.number);
-    for(typename HASHTABLE<TV_INT,int>::ITERATOR it(cell_vertices);it.Valid();it.Next()){
-        Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,0,0));
-        solve_dof(it.Data())=(1<<TV::m)-1;}
-
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_vertices);it.Valid();it.Next())
-        solve_dof(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);
-
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(edge_vertices);it.Valid();it.Next()){
-        RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box());
-        range.max_corner(it.Key().axis)=2;
-        bool ok=true;
-        for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
-            if(triple_cell(it2.index+it.Key().index)){
-                ok=false;
-                break;}}
-        if(!ok){
-            solve_dof(it.Data())=1<<it.Key().axis;
-            Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,1,1));}}
-
-    for(int i=0;i<particles.X.m;i++)
-        if(abs(particles.X(i)(1))<.3)
-            solve_dof(i)=-1;
-
-    ARRAY<int> index_map,reverse_index_map(solve_dof.m);
-    for(int i=0;i<solve_dof.m;i++){
-        reverse_index_map(i)=-1;
-        if(solve_dof(i))
-            reverse_index_map(i)=index_map.Append(i);}
-
-    for(int kkk=4;kkk>0;kkk--){
-    ARRAY<TV> rhs_full(particles.number);
-    MARCHING_CUBES_VECTOR<TV> rhs,sol;
-    MARCHING_CUBES_SYSTEM<TV> system;
-    system.project_flags=solve_dof.Subset(index_map);
-    T E=0;
-    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::ITERATOR it(surface);it.Valid();it.Next()){
-        T_SURFACE& surf=*it.Data();
-        surf.Update_Number_Nodes();
-        surf.mesh.Initialize_Adjacent_Elements();
-        const ARRAY<ARRAY<int> >& adjacent_elements=*surf.mesh.adjacent_elements;
-        for(int i=0;i<adjacent_elements.m;i++){
-            for(int j=0;j<adjacent_elements(i).m;j++){
-                int k=adjacent_elements(i)(j);
-                if(i<k){
-                    typename MARCHING_CUBES_SYSTEM<TV>::BLOCK block;
-                    VECTOR<int,TV::m+1> nodes;
-                    TV_INT ei=surf.mesh.elements(i);
-                    TV_INT ek=surf.mesh.elements(k);
-                    int u=-1;
-                    for(int m=0;m<TV::m;m++)
-                        if(!ek.Contains(ei(m))){
-                            u=m;
-                            break;}
-                    for(int m=0;m<TV::m;m++){
-                        nodes(m)=ei(u++);
-                        if(u==TV::m) u=0;}
-                    nodes(TV::m)=ek.Sum()-ei.Sum()+nodes(0);
-                    block.index=reverse_index_map.Subset(nodes);
-                    if(block.index.Sum()==-block.index.m) continue;
-                    E+=Fill_Matrix_Block_And_Rhs(block,rhs_full.Subset(nodes),particles.X.Subset(nodes));
-                    system.blocks.Append(block);}}}}
-
-    LOG::cout<<E<<std::endl;
-    if(kkk==1) break;
-    rhs.v=rhs_full.Subset(index_map);
-    sol.Resize(rhs);
-
-    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-    CONJUGATE_RESIDUAL<T> cr;
-    cr.Ensure_Size(vectors,rhs,3);
-    cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,10000);
-
-    for(int i=0;i<index_map.m;i++)
-        for(int j=0;j<TV::m;j++)
-            if(system.project_flags(i)&(1<<j))
-                particles.X(index_map(i))(j)-=sol.v(i)(j)/1;
-    }
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
