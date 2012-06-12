@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Matrices/ROTATION.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
@@ -20,6 +21,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
+#include <iostream>
 
 using namespace PhysBAM;
 
@@ -159,7 +161,7 @@ void Dump_Vector(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,const ARRAY<T,VEC
 //#################################################################################################################################################
 
 template<class TV>
-void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool debug_particles,bool double_fine)
+void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_preconditioner,bool null,bool dump_matrix,bool dump_geometry,bool debug_particles,bool double_fine)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
@@ -260,6 +262,18 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             LOG::cout<<"Extra nullspace found: "<<sqrt(ips.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
             rhs*=1/rhs.Max_Abs();
             Dump_Vector<T,TV>(ips,rhs,"extra null mode");}}
+    
+    if(dump_geometry){
+        std::ofstream fout("geometry.txt");
+        fout<<TV::m<<std::endl;
+        for(int i=0;i<TV::m;i++) fout<<grid.counts(i)<<((i==TV::m-1)?"\n":" ");
+        for(int i=0;i<TV::m;i++) fout<<grid.domain.min_corner(i)<<((i==TV::m-1)?"\n":" ");
+        for(int i=0;i<TV::m;i++) fout<<grid.domain.max_corner(i)<<((i==TV::m-1)?"\n":" ");
+        for(int k=0;k<ips.cdi->surface_mesh.m;k++){
+            typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT& se=ips.cdi->surface_mesh(k);
+            for(int i=0;i<TV::m;i++) for(int j=0;j<TV::m;j++) fout<<se.x.X(i)(j)<<" ";
+            fout<<se.y<<" "<<se.z<<std::endl;}
+        fout.close();}
         
     if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",ips,*vectors(0),*vectors(1));
     vectors.Delete_Pointers_And_Clean_Memory();
@@ -544,12 +558,13 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 VECTOR<TV,3> centers;
                 VECTOR<TV,3> normals;
                 VECTOR<VECTOR<int,3>,3> sectors;
+                ROTATION<TV> rotation;
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize()
                 {
                     wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);mu.Append(4);
                     r=(T)1/(2*M_PI-1);
-                    n=TV::Axis_Vector(1);a=TV()+M_PI/100;
+                    n=TV::Axis_Vector(1);a=TV()-1./90;
                     centers(0)=TV::Axis_Vector(1);
                     centers(1).x=(T)sqrt(3)/2;centers(1).y=-(T)1/2;
                     centers(2).x=-(T)sqrt(3)/2;centers(2).y=-(T)1/2;
@@ -558,11 +573,17 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                         normals(i).y=centers(i).x;
                         centers(i)*=r;
                         for(int j=0;j<3;j++) sectors(i)(j)=(i+j)%3;}
+                    const int rot_dim=(TV::m==3)?3:1;
+                    VECTOR<T,rot_dim> rotation_vector;
+                    for(int i=0;i<rot_dim;i++) rotation_vector(i)=i+M_PI/10;
+                    rotation=ROTATION<TV>::From_Rotation_Vector(rotation_vector);
                     LOG::cout<<sectors<<std::endl;
                     LOG::cout<<normals<<std::endl;
                     LOG::cout<<centers<<std::endl;
+                    for(int i=0;i<3;i++) LOG::cout<<rotation.Inverse_Rotate(centers(i))-a+0.5<<" ";
+                    LOG::cout<<std::endl;
                 }
-                virtual TV Transform(const TV& X){return X-0.5+a;}
+                virtual TV Transform(const TV& X){return rotation.Rotate(X-0.5+a);}
                 virtual T phi_value(const TV& X)
                 {
                     TV x=Transform(X);
@@ -633,7 +654,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {
                     wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);
                     r=(T)1/(2*M_PI-1);
-                    n=TV::Axis_Vector(1);a=TV()+M_PI/100;
+                    n=TV::Axis_Vector(1);a=TV()+M_PI/200;
                     centers(0)=TV::Axis_Vector(1);
                     centers(1).x=(T)sqrt(3)/2;centers(1).y=-(T)1/2;
                     centers(2).x=-(T)sqrt(3)/2;centers(2).y=-(T)1/2;
@@ -714,6 +735,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     bool dump_matrix=parse_args.Get_Option_Value("-dump_matrix");
     bool debug_particles=parse_args.Get_Option_Value("-debug_particles");
     bool double_fine=parse_args.Get_Option_Value("-double_fine");
+    bool dump_geometry=parse_args.Get_Option_Value("-dump_geometry");
     test->Initialize();
 
     TV_INT counts=TV_INT()+res;
@@ -726,7 +748,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     LOG::Instance()->Copy_Log_To_File(output_directory+"/common/log.txt",false);
     FILE_UTILITIES::Write_To_File<RW>(output_directory+"/common/grid.gz",grid);
 
-    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,debug_particles,double_fine);
+    Analytic_Test(grid,*test,max_iter,use_preconditioner,null,dump_matrix,dump_geometry,debug_particles,double_fine);
     LOG::Finish_Logging();
     delete test;
 }
@@ -754,8 +776,9 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-dump_matrix","dump system matrix");
     parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
     parse_args.Add_Option_Argument("-double_fine","set level set exactly on double fine grid");
+    parse_args.Add_Option_Argument("-dump_geometry","dump grid info and interface");
     parse_args.Parse(argc,argv);
-
+    
     if(parse_args.Get_Option_Value("-3d"))
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);
     else
