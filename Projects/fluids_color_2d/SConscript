@@ -1,5 +1,5 @@
 # SConscript
 
 Import('env Automatic_Program')
-Automatic_Program(env,"fluids_color_2d",["main.cpp","FLUIDS_COLOR.cpp"])
+Automatic_Program(env,"fluids_color_2d",["main.cpp"])
 

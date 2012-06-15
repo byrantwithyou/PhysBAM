@@ -1,139 +1,107 @@
 //#####################################################################
-// Copyright 2004-2007, Ron Fedkiw, Eran Guendelman, Geoffrey Irving, Nipun Kwatra, Frank Losasso, Andrew Selle, Eftychios Sifakis, Jerry Talton.
+// Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class PLS_FC_EXAMPLE
-//#####################################################################
-#ifndef __PLS_FC_EXAMPLE__
-#define __PLS_FC_EXAMPLE__
-
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
-#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
-#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>
+#ifndef __PLS_EXAMPLE__
+#define __PLS_EXAMPLE__
+#include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/EXAMPLE_FORCES_AND_VELOCITIES.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION_CALLBACKS.h>
-#include <PhysBAM_Fluids/PhysBAM_Fluids/Fluids/FLUID_COLLECTION.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/INCOMPRESSIBLE_COLLISIONS_FORWARD.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_POLICY.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/GEOMETRY_BOUNDARY_POLICY.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
+#include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_CALLBACKS.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
-#include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_CALLBACKS.h>
+#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 namespace PhysBAM{
 
-template<class TV> class RIGID_BODY;
-template<class TV> class SOLIDS_FLUIDS_PARAMETERS;
-template<class TV> class SOLID_BODY_COLLECTION;
-template<class T_GRID> class LAPLACE_UNIFORM;
-template<class TV> class KANG_POISSON_VISCOSITY;
+template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
 
 template<class TV>
-class PLS_FC_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,public SOLIDS_EVOLUTION_CALLBACKS<TV>,public SOLIDS_FLUIDS_CALLBACKS<TV>,
-                      public LEVELSET_CALLBACKS<GRID<TV> >,public FLUIDS_PARAMETERS_CALLBACKS<GRID<TV> >,public NONCOPYABLE
+class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
-    typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
+    typedef typename TV::SCALAR T;
+    typedef typename TV::template REBIND<int>::TYPE TV_INT;
+    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
+    typedef typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET T_PARTICLE_LEVELSET;
+    typedef typename GEOMETRY_BOUNDARY_POLICY<GRID<TV> >::BOUNDARY_PHI_WATER T_BOUNDARY_PHI_WATER;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP T_FACE_LOOKUP;typedef typename INTERPOLATION_COLLIDABLE_POLICY<GRID<TV> >::FACE_LOOKUP_COLLIDABLE T_FACE_LOOKUP_COLLIDABLE;
-    typedef typename INTERPOLATION_COLLIDABLE_POLICY<GRID<TV> >::AVERAGING T_AVERAGING;
-    typedef typename INTERPOLATION_POLICY<GRID<TV> >::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET_EVOLUTION T_PARTICLE_LEVELSET_EVOLUTION;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
-    typedef typename LEVELSET_ADVECTION_POLICY<GRID<TV> >::FAST_LEVELSET_ADVECTION_T T_FAST_LEVELSET_ADVECTION;
-public:
-    typedef EXAMPLE<TV> BASE;using BASE::parse_args;using BASE::Set_Write_Substeps_Level;
-    using BASE::output_directory;using BASE::first_frame;using BASE::restart;using BASE::Write_Frame_Title;using BASE::stream_type;
-    using FLUIDS_PARAMETERS_CALLBACKS<GRID<TV> >::Get_Source_Reseed_Mask;
-    using FLUIDS_PARAMETERS_CALLBACKS<GRID<TV> >::Get_Source_Velocities;using FLUIDS_PARAMETERS_CALLBACKS<GRID<TV> >::Get_Object_Velocities; // silence -Woverloaded-virtual
+    enum workaround1{d=TV::m};
 
-protected:
-    T minimum_collision_thickness; // needed for ray tracing, etc.
 public:
-    SOLIDS_PARAMETERS<TV>& solids_parameters;
-    SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
-    SOLID_BODY_COLLECTION<TV>& solid_body_collection;
-    SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
-    FLUIDS_PARAMETERS_UNIFORM<GRID<TV> > fluids_parameters;
-    FLUID_COLLECTION<TV> fluid_collection;
-    int resolution;
-    int convection_order;
-    bool use_pls_evolution_for_structure;
-    bool two_phase;
-    bool use_kang;
-    bool print_matrix;
-    bool test_system;
-    KANG_POISSON_VISCOSITY<TV>* kang_poisson_viscosity;
-    T m,s,kg;
+    STREAM_TYPE stream_type;
+    T initial_time;
+    int first_frame,last_frame;
+    T frame_rate;
+    std::string frame_title;
+    int write_substeps_level;
+    bool write_output_files;
+    std::string output_directory;
+    int restart;
+    int number_of_ghost_cells;
 
-    PLS_FC_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
+    T cfl;
+
+    GRID<TV> mac_grid;
+    MPI_UNIFORM_GRID<GRID<TV> > *mpi_grid;
+    PROJECTION_DYNAMICS_UNIFORM<GRID<TV> > projection;
+    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
+    INCOMPRESSIBLE_UNIFORM<GRID<TV> > incompressible;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
+    BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
+    BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
+    T_BOUNDARY_PHI_WATER phi_boundary_water;
+    //ARRAY<T,TV_INT> density,temperature;
+    VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
+    T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;    
+
+    PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_FC_EXAMPLE();
+    
+    T Time_At_Frame(const int frame) const
+    {return initial_time+(frame-first_frame)/frame_rate;}
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
-    {V_levelset=fluid_collection.incompressible_fluid_collection.face_velocities;}
+    void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    {V_levelset=face_velocities;}
 
-    void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) PHYSBAM_OVERRIDE
-    {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE
+    {
+        if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
 
-    void Set_Minimum_Collision_Thickness(const T minimum_collision_thickness_input=1e-6)
-    {minimum_collision_thickness=minimum_collision_thickness_input;}
+        TV& X=particles.X(index);TV X_new=X+dt*V;
+        T max_collision_distance=particle_levelset_evolution.particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
+        T min_collision_distance=particle_levelset_evolution.particle_levelset.min_collision_distance_factor*max_collision_distance;
+        TV min_corner=mac_grid.domain.Minimum_Corner(),max_corner=mac_grid.domain.Maximum_Corner();
+        for(int axis=0;axis<GRID<TV>::dimension;axis++){
+            if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
+                T collision_distance=X[axis]-min_corner[axis];
+                if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
+                collision_distance=max(min_collision_distance,collision_distance);
+                X_new[axis]+=max((T)0,min_corner[axis]-X_new[axis]+collision_distance);
+                V[axis]=max((T)0,V[axis]);X=X_new-dt*V;}
+            if(domain_boundary[axis][1] && X_new[axis]>max_corner[axis]-max_collision_distance){
+                T collision_distance=max_corner[axis]-X[axis];
+                if(collision_distance>max_collision_distance) collision_distance=max_corner[axis]-X_new[axis];
+                collision_distance=max(min_collision_distance,collision_distance);
+                X_new[axis]-=max((T)0,X_new[axis]-max_corner[axis]+collision_distance);
+                V[axis]=min((T)0,V[axis]);X=X_new-dt*V;}}
+    }
+    
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
+    virtual void Write_Output_Files(const int frame);
+    virtual void Read_Output_Files(const int frame);
+    virtual void Set_Boundary_Conditions(const T time)=0;
+    virtual void Adjust_Phi_With_Sources(const T time)=0;
+    virtual void Initialize_Phi()=0;
+    virtual void Advect_Particles(const T dt,const T time) {}
 
 //#####################################################################
-    void Add_Volumetric_Body_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision=true,bool add_coupling=true);
-    void Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision=true,bool add_coupling=true);
-    void Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_collisions,bool add_collision=true,bool add_coupling=true);
-    template<class GEOMETRY> void Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity);
-    template<class GEOMETRY> void Get_Source_Velocities(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,const TV& constant_source_velocity,
-        const ARRAY<bool,FACE_INDEX<TV::m> >& invalid_mask);
-    template<class GEOMETRY> void Adjust_Phi_With_Source(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source);
-    template<class GEOMETRY> void Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORMATION_MATRIX& world_to_source);
-    void Revalidate_Fluid_Scalars();
-    void Revalidate_Phi_After_Modify_Levelset();
-    void Revalidate_Fluid_Velocity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
-    void Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE;
-    void Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities);
-    void Read_Output_Files_Fluids(const int frame);
-    void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;
-    void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time) PHYSBAM_OVERRIDE;
-    void Log_Parameters() const PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,
-        const T time) PHYSBAM_OVERRIDE;
-    virtual void Update_Fluid_Parameters(const T dt,const T time);
-//#####################################################################
-    virtual void Post_Initialization(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Preprocess_Frame(const int frame){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Frame(const int frame){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Preprocess_Substep(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Substep(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();} // time at start of substep
-    // solids
-    virtual void Initialize_Bodies() {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Read_Output_Files_Solids(const int frame);
-    // fluids
-    virtual void Extrapolate_Phi_Into_Objects(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Postprocess_Phi(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual bool Adjust_Phi_With_Sources(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN(); return false; }
-    virtual void Adjust_Phi_With_Objects(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Initialize_Velocities(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Setup_Initial_Refinement(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Initialize_Advection(){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Clamp_Velocities(const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    // melting
-    virtual void Melting_Substep(const T dt,const T time){}
-    virtual void Modify_Fluid_For_Melting(const T dt,const T time){}
-    virtual void Update_Melting_Substep_Parameters(const T dt,const T time){}
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
-    template<class T_MPI> void Adjust_Output_Directory_For_MPI(const T_MPI mpi);
-    virtual void Set_Boundary_Conditions_Callback(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
-        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    void Set_Boundary_Conditions(ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& psi_D_value,
-        ARRAY<T,FACE_INDEX<TV::dimension> >& psi_N_value) const;
 };
 }
 #endif

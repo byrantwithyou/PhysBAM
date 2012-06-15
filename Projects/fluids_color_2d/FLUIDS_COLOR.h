@@ -1,213 +1,121 @@
 //#####################################################################
-// Copyright 2010.
+// Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class FLUIDS_COLOR
-//#####################################################################
-//   1. Circle with surface tension, pressure jump condition
-//   2. Surface tension on a thin solid
-//   3. Circle with surface tension, pressure jump condition, coupled to passive solid
-//   4. Oscillating deformed circle
-//   5. Oscillating deformed circle with massless solid
-//   6. Analytic viscosity test
-//   7. Two-phase rising bubble test
-//   8. Analytic curvature test
-//   9. Stationary circle test for JCP with pressure jump version
-//   10. Stationary circle test for JCP with phi and front tracking version
-//   11. Small rising bubble test
-//   12. Popinet example
-//   13. Small rising bubble test using pressure jump
-//#####################################################################
-#ifndef __FLUIDS_COLOR__
-#define __FLUIDS_COLOR__
+#ifndef __SMOKE_TESTS__
+#define __SMOKE_TESTS__
 
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_MAC_GRID_PERIODIC.h>
-#include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_MAC.h>
-#include <PhysBAM_Tools/Krylov_Solvers/IMPLICIT_SOLVE_PARAMETERS.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
-#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
+#include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
-#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
-#include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
-#include <PhysBAM_Geometry/Tessellation/SPHERE_TESSELLATION.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/NEO_HOOKEAN.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/FINITE_VOLUME.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_ALTITUDE_SPRINGS_2D.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_POINT_ATTRACTION.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/LINEAR_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Deformables/Forces/SEGMENT_BENDING_SPRINGS.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
-#include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLISION_PARAMETERS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Collisions/RIGID_DEFORMABLE_COLLISIONS.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/GRAVITY.h>
-#include <PhysBAM_Solids/PhysBAM_Solids/Standard_Tests/SOLIDS_STANDARD_TESTS.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/SMOKE_STANDARD_TESTS_2D.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_CUT.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/FLUID_TO_SOLID_INTERPOLATION_PHI.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
-#include <PhysBAM_Dynamics/Coupled_Evolution/SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM.h>
-#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
-#include <fstream>
+
 namespace PhysBAM{
-template<class TV> void Add_Debug_Particle(const TV& X, const VECTOR<typename TV::SCALAR,3>& color);
-template<class TV> void Add_Debug_Particle(const TV& X){Add_Debug_Particle(X,VECTOR<typename TV::SCALAR,3>(1,0,0));}
-template<class TV,class ATTR> void Debug_Particle_Set_Attribute(ATTRIBUTE_ID id,const ATTR& attr);
 
-template<class T_input>
-class FLUIDS_COLOR:public PLS_FC_EXAMPLE<VECTOR<T_input,2> >
+template<class TV>
+class WATER_TESTS:public PLS_FC_EXAMPLE<TV>
 {
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
-    typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
-    typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
-    typedef ARRAY<bool,FACE_INDEX<2> > T_FACE_ARRAYS_BOOL;
-public:
+    typedef typename TV::SCALAR T;
+    typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef PLS_FC_EXAMPLE<TV> BASE;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_LEVELSET;
-    using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::solids_fluids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
-    using BASE::Set_External_Velocities;using BASE::Zero_Out_Enslaved_Velocity_Nodes;using BASE::Set_External_Positions; // silence -Woverloaded-virtual
-    using BASE::Add_Volumetric_Body_To_Fluid_Simulation;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::two_phase;
-    using BASE::parse_args;using BASE::test_number;using BASE::resolution;using BASE::data_directory;using BASE::convection_order;using BASE::use_pls_evolution_for_structure;
-    using BASE::Mark_Outside;using BASE::Add_Thin_Shell_To_Fluid_Simulation;using BASE::Add_To_Fluid_Simulation;
 
-    SOLIDS_STANDARD_TESTS<TV> solids_tests;
+    CYLINDER<T> source_cyl;
+    RANGE<TV> source;
 
-    bool run_self_tests;
-    bool print_poisson_matrix;
-    bool print_index_map;
-    bool print_matrix;
-    bool print_each_matrix;
-    bool use_full_ic;
-    bool output_iterators;
-    bool use_decoupled_viscosity;
-    T max_dt;
-    T exact_dt;
-    T current_dt;
-    bool implicit_solid,use_cut_volume,use_low_order_advection;
+public:
+    using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;
+    using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
 
-    GEOMETRY_PARTICLES<TV> debug_particles;
-    SEGMENTED_CURVE_2D<T>* front_tracked_structure;
-    SEGMENTED_CURVE_2D<T>* rebuild_curve;
-    ARRAY<TV> saved_tracked_particles_X;
-    DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>* deformable_collisions;
-    FLUID_TO_SOLID_INTERPOLATION_CUT<TV>* fsi;
+    WATER_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
+        :PLS_FC_EXAMPLE<TV>(stream_type)
+    {
+        int test_number=1;last_frame=200;
+        int scale=parse_args.Get_Integer_Value("-resolution");
+        restart=parse_args.Get_Integer_Value("-restart");
+        write_substeps_level=parse_args.Get_Integer_Value("-substep");
+        mac_grid.Initialize(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true);
+        output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d_%d",test_number,scale);
+        if(TV::dimension==3){
+            VECTOR<T,3> point1,point2;
+            point1=VECTOR<T,3>::All_Ones_Vector()*(T).6;point1(1)=.4;point1(2)=.95;point2=VECTOR<T,3>::All_Ones_Vector()*(T).6;point2(1)=.4;point2(2)=1;
+            source_cyl.Set_Endpoints(point1,point2);source_cyl.radius=.1;}
+        else{
+            TV point1,point2;
+            point1=TV::All_Ones_Vector()*(T).5;
+            point1(0)=.4;
+            point1(1)=.95;
+            point2=TV::All_Ones_Vector()*(T).65;
+            point2(0)=.55;
+            point2(1)=1;
+            source.min_corner=point1;source.max_corner=point2;}
+    }
 
-    int number_surface_particles;
-    bool rebuild_surface;
-    ARRAY<VECTOR<int,2> > particle_segments;
-    FREE_PARTICLES<TV>* free_particles;
-    ARRAY<typename MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::ENTRY> fluid_interpolation_entries;
-    ARRAY<int> solid_interpolation_entries;
-    ARRAY<bool,TV_INT>* psi_D;
+    void Write_Output_Files(const int frame)
+    {BASE::Write_Output_Files(frame);}
 
-    T circle_radius;
-    T circle_perturbation;
-    int oscillation_mode;
-    bool use_massless_structure;
-    ARRAY<int>* coupled_particles;
-    bool make_ellipse,use_phi,remesh;
-    T m,s,kg;
-    int solid_refinement;
-    T solid_density,solid_width,analytic_solution;
-    T omega;
-    T laplace_number,surface_tension;
-    bool use_T_nu;
+    void Set_Boundary_Conditions(const T time)
+    {projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+        if(domain_boundary(axis)(axis_side)){
+            for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
+                TV_INT face=iterator.Face_Index()+boundary_face_offset;
+                if(particle_levelset_evolution.phi(face+interior_cell_offset)<=0){
+                    if(face_velocities.Component(axis).Valid_Index(face)){projection.elliptic_solver->psi_N.Component(axis)(face)=true;face_velocities.Component(axis)(face)=0;}}
+                else{TV_INT cell=face+exterior_cell_offset;projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}
+        else for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
+            projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}
+    for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
+        if(time<=3 && Lazy_Inside_Source(iterator.Location())){
+            projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
+            if(iterator.Axis()==1) face_velocities(iterator.Full_Index())=-1;
+            else face_velocities(iterator.Full_Index())=0;}}}
 
-    FLUIDS_COLOR(const STREAM_TYPE stream_type);
-    virtual ~FLUIDS_COLOR();
+    bool Lazy_Inside_Source(const VECTOR<T,2> X)
+    {
+        return source.Lazy_Inside(X);
+    }
 
-    // Unused callbacks
-    //void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Postprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Apply_Constraints(const T dt,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TV> F,const T time) PHYSBAM_OVERRIDE {}
-    void Add_External_Forces(ARRAY_VIEW<TWIST<TV> > wrench,const T time) PHYSBAM_OVERRIDE {}
-    //void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<FRAME<TV> > frame,const T time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE {}
-    void Preprocess_Solids_Substep(const T time,const int substep) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Position_Nodes(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TWIST<TV> > twist,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Filter_Velocities(const T dt,const T time,const bool velocity_update) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Set_Deformable_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Set_Rigid_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
-    void Add_External_Impulses_Before(ARRAY_VIEW<TV> V,const T time,const T dt) PHYSBAM_OVERRIDE {}
-    void Post_Initialization() PHYSBAM_OVERRIDE {}
-    void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE {}
-    void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T current_position_time) PHYSBAM_OVERRIDE {}
-    void Set_External_Positions(ARRAY_VIEW<TV> X,const T time) PHYSBAM_OVERRIDE {}
-    void Postprocess_Phi(const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
-    void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
-    bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE {return false;}
-    void Mark_Outside(ARRAY<bool,TV_INT>& outside) {}
+    bool Lazy_Inside_Source(const VECTOR<T,3> X)
+    {
+        return source_cyl.Lazy_Inside(X);
+    }
 
-//#####################################################################
-    void Postprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Postprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Register_Options() PHYSBAM_OVERRIDE;
-    void Parse_Options() PHYSBAM_OVERRIDE;
-    void Add_Rigid_Body_Walls(const T coefficient_of_restitution=(T).5,const T coefficient_of_friction=(T).5,ARRAY<int>* walls_added=0);
-    void Parse_Late_Options() PHYSBAM_OVERRIDE;
-    void Initialize_Advection() PHYSBAM_OVERRIDE;
-    void Initialize_Phi() PHYSBAM_OVERRIDE;
-    void Preprocess_Substep(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Preprocess_Frame(const int frame) PHYSBAM_OVERRIDE;
-    void Initialize_Velocities() PHYSBAM_OVERRIDE;
-    void Set_Dirichlet_Boundary_Conditions(const T time);
-    void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE;
-    void Initialize_Bodies() PHYSBAM_OVERRIDE;
-    void Kang_Circle(bool use_surface);
-    void Oscillating_Circle(bool use_surface);
-    void Test_Analytic_Velocity(T time);
-    void Test_Analytic_Pressure(T time);
-    void Solid_Circle();
-    void Adjust_Phi_With_Objects(const T time);
-    void Sync_Particle_To_Level_Set(int p);
-    void Sync_Front_Tracked_Particles_To_Level_Set();
-    void Divide_Segment(int e);
-    void Swap_Particles(int p,int r);
-    void Swap_Segments(int e,int f);
-    void Remove_Particle(int p);
-    T Compute_New_Mass(int p);
-    void Copy_Front_Tracked_Velocity_From_Fluid();
-    void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE;
-    void Limit_Solids_Dt(T& dt,const T time) PHYSBAM_OVERRIDE;
-    void Write_Output_Files(const int frame) const;
-    void Initialize_Surface_Particles(int number);
-    void Rebuild_Surface();
-    void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve) PHYSBAM_OVERRIDE;
-    void Advance_One_Time_Step_Begin_Callback(const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Update_Time_Varying_Material_Properties(const T time) PHYSBAM_OVERRIDE;
-    static GEOMETRY_PARTICLES<TV>*  Store_Debug_Particles(GEOMETRY_PARTICLES<TV>* particle=0);
-    void FSI_Analytic_Test();
-    void Sine_Wave();
-    void Initialize_Sine_Phi();
+    void Set_Phi_Inside_Source(const VECTOR<int,2>& index,const VECTOR<T,2> X)
+    {
+        if(source.Lazy_Inside(X)) particle_levelset_evolution.phi(index)=min(particle_levelset_evolution.phi(index),source.Signed_Distance(X));
+    }
+
+    void Set_Phi_Inside_Source(const VECTOR<int,3>& index,const VECTOR<T,3> X)
+    {
+        if(source_cyl.Lazy_Inside(X)) particle_levelset_evolution.phi(index)=min(particle_levelset_evolution.phi(index),source_cyl.Signed_Distance(X));
+    }
+
+    void Adjust_Phi_With_Sources(const T time)
+    {
+        if(time>3) return;
+        for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){Set_Phi_Inside_Source(iterator.Cell_Index(),iterator.Location());}
+    }
+
+    void Initialize_Phi()
+    {
+        ARRAY<T,TV_INT>& phi=particle_levelset_evolution.phi;
+        for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
+            //TV center=TV::All_Ones_Vector()*.5;center(2)=.75;
+            //static SPHERE<TV> circle(center,(T).2);
+            const TV &X=iterator.Location();
+            //phi(iterator.Cell_Index())=min(circle.Signed_Distance(X),X.y-(T).412134);}
+            phi(iterator.Cell_Index())=X.y-(T)mac_grid.min_dX*5;}
+            //phi(iterator.Cell_Index())=X.y-(T).412134;}
+    }
+
 //#####################################################################
 };
-
 }
-#endif
 
+#endif
