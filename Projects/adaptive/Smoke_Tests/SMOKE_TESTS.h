@@ -65,16 +65,16 @@ public:
 
     void Set_Boundary_Conditions(const T time,const GRID<TV>& mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities,PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >* projection)
     {if(projection){projection->elliptic_solver->psi_D.Fill(false);
-        for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
             //if(!mpi_grid || domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
             if(true){ //No mpi yet
-                TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
+                TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
                 for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
                     projection->elliptic_solver->psi_D(cell)=true;projection->p(cell)=0;}}}}
     for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(source_box.Lazy_Inside(iterator.Location())){
             if(projection) projection->elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==2)face_velocities(iterator.Full_Index())=1;
+            if(iterator.Axis()==1)face_velocities(iterator.Full_Index())=1;
             else face_velocities(iterator.Full_Index())=0;}
         if(use_collisions && collision_sphere.Lazy_Inside(iterator.Location())){
             if(projection) projection->elliptic_solver->psi_N(iterator.Full_Index())=true;

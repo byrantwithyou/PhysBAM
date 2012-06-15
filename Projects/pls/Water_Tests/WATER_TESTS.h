@@ -40,11 +40,11 @@ public:
         output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d_%d",test_number,scale);
         if(TV::dimension==3){
             VECTOR<T,3> point1,point2;
-            point1=VECTOR<T,3>::All_Ones_Vector()*(T).6;point1(1)=.4;point1(2)=.95;point2=VECTOR<T,3>::All_Ones_Vector()*(T).6;point2(1)=.4;point2(2)=1;
+            point1=VECTOR<T,3>::All_Ones_Vector()*(T).6;point1(0)=.4;point1(1)=.95;point2=VECTOR<T,3>::All_Ones_Vector()*(T).6;point2(0)=.4;point2(1)=1;
             source_cyl.Set_Endpoints(point1,point2);source_cyl.radius=.1;}
         else{
             TV point1,point2;
-            point1=TV::All_Ones_Vector()*(T).5;point1(1)=.4;point1(2)=.95;point2=TV::All_Ones_Vector()*(T).65;point2(1)=.55;point2(2)=1;
+            point1=TV::All_Ones_Vector()*(T).5;point1(0)=.4;point1(1)=.95;point2=TV::All_Ones_Vector()*(T).65;point2(0)=.55;point2(1)=1;
             source.min_corner=point1;source.max_corner=point2;}
     }
 
@@ -53,10 +53,10 @@ public:
 
     void Set_Boundary_Conditions(const T time)
     {projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -68,7 +68,7 @@ public:
     for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(time<=3 && Lazy_Inside_Source(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==2) face_velocities(iterator.Full_Index())=-1;
+            if(iterator.Axis()==1) face_velocities(iterator.Full_Index())=-1;
             else face_velocities(iterator.Full_Index())=0;}}}
 
     bool Lazy_Inside_Source(const VECTOR<T,2> X)
@@ -101,7 +101,7 @@ public:
     {
         ARRAY<T,TV_INT>& phi=particle_levelset_evolution.phi;
         for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
-            //TV center=TV::All_Ones_Vector()*.5;center(2)=.75;
+            //TV center=TV::All_Ones_Vector()*.5;center(1)=.75;
             //static SPHERE<TV> circle(center,(T).2);
             const TV &X=iterator.Location();
             //phi(iterator.Cell_Index())=min(circle.Signed_Distance(X),X.y-(T).412134);}

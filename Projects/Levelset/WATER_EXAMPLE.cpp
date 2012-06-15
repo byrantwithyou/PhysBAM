@@ -60,10 +60,10 @@ template<class TV> void WATER_EXAMPLE<TV>::
 Set_Boundary_Conditions(const T time)
 {
     projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -75,7 +75,7 @@ Set_Boundary_Conditions(const T time)
     for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
         if(time<=3 && source.Lazy_Inside(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if((TV::dimension==2 && iterator.Axis()==2)|| (TV::dimension==3 && iterator.Axis()==2)) face_velocities(iterator.Full_Index())=3;
+            if((TV::dimension==2 && iterator.Axis()==1)|| (TV::dimension==3 && iterator.Axis()==1)) face_velocities(iterator.Full_Index())=3;
             else face_velocities(iterator.Full_Index())=0;}}
     for(typename GRID<TV>::CELL_ITERATOR iterator(projection.p_grid);iterator.Valid();iterator.Next()) if(levelset.phi(iterator.Cell_Index())>0){
         projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=0;}

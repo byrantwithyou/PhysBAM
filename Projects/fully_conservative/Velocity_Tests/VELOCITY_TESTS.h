@@ -97,14 +97,14 @@ public:
     void Set_Boundary_Conditions(const T time)
     {
         projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-        for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+        for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
             if(domain_boundary(axis)(axis_side)){
-                TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
+                TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
                 for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Face_Index()+interior_cell_offset;
-                    TV_INT boundary_face=axis_side==1?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
+                    TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                     if((axis!=2 && test_number==1) || ((axis==2 || (axis!=2 && iterator.Location()(2)<.9)) && test_number==2)){if(face_velocities.Component(axis).Valid_Index(boundary_face)) projection.elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(axis,boundary_face))=true;}
                     else {projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}
-                for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT boundary_face=axis_side==1?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
+                for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){TV_INT boundary_face=axis_side==0?iterator.Face_Index()+TV_INT::Axis_Vector(axis):iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                     if(((axis!=2 && test_number==1) || ((axis==2 || (axis!=2 && iterator.Location()(2)<.9)) && test_number==2)) && face_velocities.Component(axis).Valid_Index(boundary_face)) face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}}}
         for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
             if(test_number==2 && iterator.Location()(2)>.9){

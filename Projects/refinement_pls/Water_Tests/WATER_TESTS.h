@@ -104,9 +104,9 @@ public:
         surface_solve=!parse_args.Get_Option_Value("-nosurface");
         output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d_%d_%d%s_%1.2f_%d%s%s",test_number,scale,sub_scale,binary_refinement_levels?"_binary":"",alpha,buffer,use_cubic_interpolation?"_cubic":"",surface_solve?"_surface":"");
         ratio=TV::All_Ones_Vector();
-        if(parse_args.Get_Double_Value("-x")!=1) ratio(1)*=parse_args.Get_Double_Value("-x");
-        if(parse_args.Get_Double_Value("-y")!=1) ratio(2)*=parse_args.Get_Double_Value("-y");
-        if(parse_args.Get_Double_Value("-z")!=1) ratio(3)*=parse_args.Get_Double_Value("-z");
+        if(parse_args.Get_Double_Value("-x")!=1) ratio(0)*=parse_args.Get_Double_Value("-x");
+        if(parse_args.Get_Double_Value("-y")!=1) ratio(1)*=parse_args.Get_Double_Value("-y");
+        if(parse_args.Get_Double_Value("-z")!=1) ratio(2)*=parse_args.Get_Double_Value("-z");
         TV_INT dimensions=TV_INT(ratio*scale);
         fine_mac_grid.Initialize(dimensions,RANGE<TV>(TV(),ratio),true);
         coarse_mac_grid.Initialize(dimensions/sub_scale,RANGE<TV>(TV(),ratio),true);
@@ -133,11 +133,11 @@ public:
         phi_interpolation=new LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T>();
         if(TV::dimension==3){
             VECTOR<T,3> point1,point2;
-            point1=VECTOR<T,3>::All_Ones_Vector()*(T).6;point1(1)=.4;point1(2)=.95;point2=VECTOR<T,3>::All_Ones_Vector()*(T).6;point2(1)=.4;point2(2)=1;
+            point1=VECTOR<T,3>::All_Ones_Vector()*(T).6;point1(0)=.4;point1(1)=.95;point2=VECTOR<T,3>::All_Ones_Vector()*(T).6;point2(0)=.4;point2(1)=1;
             source_cyl.Set_Endpoints(point1,point2);source_cyl.radius=.1;}
         else{
             TV point1,point2;
-            point1=TV::All_Ones_Vector()*(T).5;point1(1)=.4;point1(2)=.95;point2=TV::All_Ones_Vector()*(T).65;point2(1)=.55;point2(2)=1;
+            point1=TV::All_Ones_Vector()*(T).5;point1(0)=.4;point1(1)=.95;point2=TV::All_Ones_Vector()*(T).65;point2(0)=.55;point2(1)=1;
             source.min_corner=point1;source.max_corner=point2;}
         //gravity=2;
     }
@@ -207,10 +207,10 @@ public:
 
     void Set_Boundary_Conditions_For_Coarse_Only(const T time)
     {projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(coarse_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -259,10 +259,10 @@ public:
     int ghost=max(3,sub_scale);
     ARRAY<T,TV_INT> phi_ghost(fine_mac_grid.Domain_Indices(ghost));
     phi_boundary->Fill_Ghost_Cells(fine_mac_grid,particle_levelset_evolution.phi,phi_ghost,0,time,ghost);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(coarse_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -281,17 +281,17 @@ public:
     for(typename GRID<TV>::FACE_ITERATOR iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){
         if(time<=3 && Lazy_Inside_Source(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==2) coarse_face_velocities(iterator.Full_Index())=-1;
+            if(iterator.Axis()==1) coarse_face_velocities(iterator.Full_Index())=-1;
             else coarse_face_velocities(iterator.Full_Index())=0;}}}
 
     void Set_Coarse_Boundary_Conditions_Only()
     {
         ARRAY<bool,TV_INT>& psi_D=projection.elliptic_solver->psi_D;ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N=projection.elliptic_solver->psi_N;
         for(int axis=0;axis<GRID<TV>::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-            int side=2*(axis-1)+axis_side;
-            TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-            TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-            TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+            int side=2*axis+axis_side;
+            TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+            TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+            TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
             if(domain_boundary(axis)(axis_side)){
                 for(typename GRID<TV>::FACE_ITERATOR iterator(projection.elliptic_solver->grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                     TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -306,10 +306,10 @@ public:
     }
 
     void Set_Fine_Boundary_Conditions(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,const T time)
-    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(local_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -319,7 +319,7 @@ public:
     for(typename GRID<TV>::FACE_ITERATOR iterator(local_mac_grid);iterator.Valid();iterator.Next()){
         if(time<=3 && Lazy_Inside_Source(iterator.Location())){
             psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==2) local_face_velocities(iterator.Full_Index())=-1;
+            if(iterator.Axis()==1) local_face_velocities(iterator.Full_Index())=-1;
             else local_face_velocities(iterator.Full_Index())=0;}}}
 
     bool Set_Local_Boundary_Conditions(GRID<TV>& local_mac_grid,PROJECTION_UNIFORM<GRID<TV> >& projection,TV_INT coarse_index)
@@ -365,10 +365,10 @@ public:
 
     void Set_Levelset_Boundary_Conditions(const GRID<TV>& levelset_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& levelset_velocities,const ARRAY<T,TV_INT>& levelset_phi,const T time)
     {levelset_projection.elliptic_solver->psi_D.Fill(false);levelset_projection.elliptic_solver->psi_N.Fill(false);
-    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
-        TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);
-        TV_INT exterior_cell_offset=axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT();
-        TV_INT boundary_face_offset=axis_side==1?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
+    for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
+        TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
+        TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
+        TV_INT boundary_face_offset=axis_side==0?TV_INT::Axis_Vector(axis):-TV_INT::Axis_Vector(axis);
         if(domain_boundary(axis)(axis_side)){
             for(typename GRID<TV>::FACE_ITERATOR iterator(levelset_grid,1,GRID<TV>::BOUNDARY_REGION,side);iterator.Valid();iterator.Next()){
                 TV_INT face=iterator.Face_Index()+boundary_face_offset;
@@ -384,12 +384,12 @@ public:
     for(typename GRID<TV>::FACE_ITERATOR iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
         if(time<=3 && source.Lazy_Inside(iterator.Location())){
             levelset_projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
-            if(iterator.Axis()==2) levelset_velocities(iterator.Full_Index())=-1;
+            if(iterator.Axis()==1) levelset_velocities(iterator.Full_Index())=-1;
             else levelset_velocities(iterator.Full_Index())=0;}}
     for(typename GRID<TV>::CELL_ITERATOR iterator(coarse_mac_grid);iterator.Valid();iterator.Next()){ 
         if(!Contains_Outside(iterator.Cell_Index(),levelset_phi,buffer)) for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
-            TV_INT offset=(axis_side==1?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
-            TV_INT face=iterator.Cell_Index()+(axis_side==1?TV_INT():TV_INT::Axis_Vector(axis));
+            TV_INT offset=(axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT::Axis_Vector(axis));
+            TV_INT face=iterator.Cell_Index()+(axis_side==0?TV_INT():TV_INT::Axis_Vector(axis));
             if(non_mpi_boundary(axis)(axis_side) && ((iterator.Cell_Index()(axis)+offset(axis))<1 || (iterator.Cell_Index()(axis)+offset(axis))>coarse_mac_grid.Counts()(axis))) continue;
             TV_INT adjacent_cell=iterator.Cell_Index()+offset;
             bool adjacent_outside=false;
@@ -862,7 +862,7 @@ public:
     bool Set_Kinematic_Velocities(TWIST<TV>& twist,const T time,const int id)
     {
         twist.linear=TV();
-        if(time>1) twist.linear(2)=1;
+        if(time>1) twist.linear(1)=1;
         return true;
     }
 

@@ -180,11 +180,11 @@ public:
     {BASE::Write_Output_Files(frame);}
 
     void Set_Coarse_Boundary_Conditions()
-    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*(axis-1)+axis_side;
+    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         if(domain_boundary(axis)(axis_side)){ //Need to check mpi as smaller solves are never using mpi (for now)
-            TV_INT interior_cell_offset=axis_side==1?TV_INT():-TV_INT::Axis_Vector(axis);    
+            TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);    
             for(typename GRID<TV>::FACE_ITERATOR local_iterator(coarse_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT cell=local_iterator.Face_Index()+interior_cell_offset;
-                TV_INT boundary_face=axis_side==1?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
+                TV_INT boundary_face=axis_side==0?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
                 if(axis!=2){ if(coarse_face_velocities.Component(axis).Valid_Index(boundary_face)){projection.elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(axis,boundary_face))=true;coarse_face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}}
                 else{projection.elliptic_solver->psi_D(cell)=true;projection.p(cell)=0;}}}}
     for(typename GRID<TV>::FACE_ITERATOR iterator(coarse_mac_grid);iterator.Valid();iterator.Next()) projection.poisson->beta_face.Component(iterator.Axis())(iterator.Face_Index())=0;
@@ -206,13 +206,13 @@ public:
             projection.poisson->beta_face.Component(iterator.Axis())(iterator.Face_Index())*=(factor==1)?sub_scale_face_inverse:0.5*sub_scale_face_inverse;}}}
 
     void Set_Fine_Boundary_Conditions(GRID<TV>& local_mac_grid,ARRAY<T,FACE_INDEX<TV::dimension> >& local_face_velocities,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N)
-    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(domain_boundary(axis)(axis_side)){int side=2*(axis-1)+axis_side;
-         for(typename GRID<TV>::FACE_ITERATOR local_iterator(fine_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT boundary_face=axis_side==1?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
+    {for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++) if(domain_boundary(axis)(axis_side)){int side=2*axis+axis_side;
+         for(typename GRID<TV>::FACE_ITERATOR local_iterator(fine_mac_grid,1,GRID<TV>::BOUNDARY_REGION,side);local_iterator.Valid();local_iterator.Next()){TV_INT boundary_face=axis_side==0?local_iterator.Face_Index()+TV_INT::Axis_Vector(axis):local_iterator.Face_Index()-TV_INT::Axis_Vector(axis);
              if(axis!=2 && fine_face_velocities.Component(axis).Valid_Index(boundary_face)) fine_face_velocities(FACE_INDEX<TV::dimension>(axis,boundary_face))=0;}}
     for(typename GRID<TV>::FACE_ITERATOR local_iterator(local_mac_grid);local_iterator.Valid();local_iterator.Next()){
         //if(Source_Box_Lazy_Inside(local_iterator.Location())){
         //    psi_N.Component(local_iterator.Axis())(local_iterator.Face_Index())=true;
-        //    if(local_iterator.Axis()==2)local_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index())=.5;
+        //    if(local_iterator.Axis()==1)local_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index())=.5;
         //    else local_face_velocities.Component(local_iterator.Axis())(local_iterator.Face_Index())=0;}
         if(use_collisions){
             int first_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(local_iterator.First_Cell_Center()),second_cell_in_solid=rigid_geometry_collection.particles.rigid_geometry(rigid_particle_id)->Implicit_Geometry_Lazy_Inside(local_iterator.Second_Cell_Center());

@@ -145,8 +145,8 @@ public:
                 temperature(iterator.Cell_Index())=0;}}
         else if(test_number==3){
             for(typename GRID<TV>::FACE_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
-                if(iterator.Axis()==1) face_velocities(iterator.Full_Index())=628*(pi/314.*(50.-iterator.Location()(2)));
-                else if(iterator.Axis()==2) face_velocities(iterator.Full_Index())=628*(pi/314.*(iterator.Location()(1)-50.));}
+                if(iterator.Axis()==0) face_velocities(iterator.Full_Index())=628*(pi/314.*(50.-iterator.Location()(2)));
+                else if(iterator.Axis()==1) face_velocities(iterator.Full_Index())=628*(pi/314.*(iterator.Location()(1)-50.));}
             TV center=TV::All_Ones_Vector()*75;center(1)=50;
             SPHERE<TV> sphere(center,15);RANGE<TV> box;box.min_corner=TV::All_Ones_Vector()*50;box.min_corner(1)=47.5;box.max_corner=TV::All_Ones_Vector()*75;box.max_corner(1)=52.5;
             for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){
