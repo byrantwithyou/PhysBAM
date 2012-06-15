@@ -368,7 +368,6 @@ template<class T> void FLUIDS_COLOR<T>::
 Preprocess_Substep(const T dt,const T time)
 {
     current_dt=dt;
-    if(FLUIDS_COLOR_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<FLUIDS_COLOR_FORCE<TV>*>()) force->dt=dt;
     if(LINEAR_POINT_ATTRACTION<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<LINEAR_POINT_ATTRACTION<TV>*>()) force->dt=dt;
 
     if(test_number==4 || test_number==5){
@@ -456,15 +455,6 @@ Initialize_Bodies()
     solid_body_collection.deformable_body_collection.binding_list.Clear_Hard_Bound_Particles(particles.mass);
     particles.Compute_Auxiliary_Attributes(solid_body_collection.deformable_body_collection.soft_bindings);
     solid_body_collection.deformable_body_collection.soft_bindings.Set_Mass_From_Effective_Mass();
-
-    SEGMENTED_CURVE_2D<T>* curve=rebuild_curve;
-    if(!curve) curve=solid_body_collection.deformable_body_collection.deformable_geometry.template Find_Structure<SEGMENTED_CURVE_2D<T>*>();
-    if(curve){
-        FLUIDS_COLOR_FORCE<TV>* stf=new FLUIDS_COLOR_FORCE<TV>(*curve,fluids_parameters.surface_tension);
-        solid_body_collection.Add_Force(stf);
-        stf->apply_explicit_forces=true;
-        stf->apply_implicit_forces=implicit_solid;
-        fluids_parameters.surface_tension=0;}
 
     for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->compute_half_forces=true;
     for(int k=0;k<solid_body_collection.deformable_body_collection.deformables_forces.m;k++) solid_body_collection.deformable_body_collection.deformables_forces(k)->compute_half_forces=true;
@@ -1007,69 +997,6 @@ Rebuild_Surface()
 template<class T> void FLUIDS_COLOR<T>::
 Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve)
 {
-    if(use_massless_structure){
-        SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>& system=dynamic_cast<SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>&>(coupled_system);
-        if(!use_phi){
-            if(remesh){
-                T dx=fluids_parameters.grid->dX.Min();
-                ARRAY_VIEW<TV>& X(front_tracked_structure->particles.X);
-                ARRAY<TV> copy_X;
-                copy_X=front_tracked_structure->particles.X.Prefix(front_tracked_structure->mesh.elements.Flattened().Max());
-                X.Fill(TV());
-                front_tracked_structure->mesh.elements.Remove_All();
-                X(0)=copy_X(0);
-                for(int i=0,j=0;j<copy_X.m;j++){
-                    int j1=j%copy_X.m+1;
-                    T full_length=(X(i)-copy_X(j1)).Magnitude();
-                    if(full_length>(T)1.5*dx){
-                        int j0=j-1,j2=j1%copy_X.m+1;if(j0==0) j0=copy_X.m;
-                        X(++i)=(-copy_X(j0)+(T)9*copy_X(j)+(T)9*copy_X(j1)-copy_X(j2))/(T)16;
-                        front_tracked_structure->mesh.elements.Append(TV_INT(i-1,i));
-                        if(j1!=1){
-                            X(++i)=copy_X(j1);
-                            front_tracked_structure->mesh.elements.Append(TV_INT(i-1,i));}
-                        else front_tracked_structure->mesh.elements.Append(TV_INT(i,1));}
-                    else if(full_length<(T).5*dx){
-                        if(j1==1){
-                            front_tracked_structure->mesh.elements.Last()=TV_INT(i-1,1);
-                            X(i)=TV();}}
-                    else{
-                        if(j1!=1){
-                            X(++i)=copy_X(j1);
-                            front_tracked_structure->mesh.elements.Append(TV_INT(i-1,i));}
-                        else front_tracked_structure->mesh.elements.Append(TV_INT(i,1));}}}
-            fsi=new FLUID_TO_SOLID_INTERPOLATION_CUT<TV>(system.index_map,*front_tracked_structure,fluids_parameters.density);}
-        else{
-            FLUID_TO_SOLID_INTERPOLATION_PHI<TV>* local_fsi=new FLUID_TO_SOLID_INTERPOLATION_PHI<TV>(system.index_map,fluids_parameters.particle_levelset_evolution->Levelset(0).phi,*front_tracked_structure,fluids_parameters.density);
-            local_fsi->cut_order=parse_args->Get_Integer_Value("-cut_order");
-            local_fsi->Setup_Mesh();
-            fsi=dynamic_cast<FLUID_TO_SOLID_INTERPOLATION_CUT<TV>*>(local_fsi);}
-        system.fluid_to_solid_interpolation=fsi;
-        fsi->outside_density=fluids_parameters.outside_density;
-        fsi->use_cut_volume=use_cut_volume;
-        MATRIX_FLUID_GRADIENT_CUT<TV>* gradient=new MATRIX_FLUID_GRADIENT_CUT<TV>(system.index_map);
-        system.fluid_gradient=gradient;    
-        fsi->fluid_mass=&system.fluid_mass;
-        fsi->gradient=gradient;
-        FLUIDS_COLOR_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<FLUIDS_COLOR_FORCE<TV>*>();
-        if(!force) return;
-        force->Update_Position_Based_State(current_position_time,true);}
-
-    if(rebuild_surface){
-        FLUIDS_COLOR_FORCE<TV>* force=solid_body_collection.deformable_body_collection.template Find_Force<FLUIDS_COLOR_FORCE<TV>*>();
-        if(!force) return;
-
-        SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>& system=dynamic_cast<SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>&>(coupled_system);
-        MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>* fi=new MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>(system.index_map);
-        MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<TV>* si=new MATRIX_SOLID_INTERPOLATION_EXTRAPOLATED<TV>(system.index_map.iterator_info);
-        system.fluid_interpolation=fi;
-        system.solid_interpolation=si;
-        fi->entries=fluid_interpolation_entries;
-        si->entries=solid_interpolation_entries;
-
-        force->Update_Position_Based_State(current_position_time,true);
-
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("after particle rebuild",0,0);}
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Begin_Callback
