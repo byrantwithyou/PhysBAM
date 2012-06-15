@@ -2,8 +2,8 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef __PLS_EXAMPLE__
-#define __PLS_EXAMPLE__
+#ifndef __PLS_FC_EXAMPLE__
+#define __PLS_FC_EXAMPLE__
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
@@ -36,8 +36,7 @@ class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
 public:
     STREAM_TYPE stream_type;
     T initial_time;
-    int first_frame,last_frame;
-    T frame_rate;
+    int last_frame;
     std::string frame_title;
     int write_substeps_level;
     bool write_output_files;
@@ -45,7 +44,8 @@ public:
     int restart;
     int number_of_ghost_cells;
 
-    T cfl;
+    T dt;
+    int time_steps_per_frame;
 
     GRID<TV> mac_grid;
     MPI_UNIFORM_GRID<GRID<TV> > *mpi_grid;
@@ -57,16 +57,12 @@ public:
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
-    //ARRAY<T,TV_INT> density,temperature;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;    
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_FC_EXAMPLE();
     
-    T Time_At_Frame(const int frame) const
-    {return initial_time+(frame-first_frame)/frame_rate;}
-
     void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {V_levelset=face_velocities;}
 

@@ -2,8 +2,8 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#ifndef __PLS_DRIVER__
-#define __PLS_DRIVER__
+#ifndef __PLS_FC_DRIVER__
+#define __PLS_FC_DRIVER__
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -38,7 +38,8 @@ public:
     
     void Execute_Main_Program();
     void Initialize();
-    void Advance_To_Target_Time(const T target_time);
+
+    void Advance_One_Time_Step(bool first_step);
     void Simulate_To_Frame(const int frame_input);
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
