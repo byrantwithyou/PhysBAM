@@ -52,7 +52,6 @@ protected:
     T dt_old; // saved for the central time method
     bool use_force_x,use_force_y,use_force_z; // TODO(jontg): deprecated?
     bool use_force;
-    bool conserve_kinetic_energy;
 public:
     bool use_variable_surface_tension;
     bool use_variable_viscosity;

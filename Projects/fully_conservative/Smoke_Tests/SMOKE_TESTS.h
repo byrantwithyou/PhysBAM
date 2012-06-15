@@ -47,7 +47,6 @@ public:
         int scale=parse_args.Get_Integer_Value("-scale");
         restart=parse_args.Get_Integer_Value("-restart");
         use_conservative_advection=parse_args.Is_Value_Set("-conservative");
-        incompressible.conserve_kinetic_energy=parse_args.Is_Value_Set("-energy");
         output_directory=STRING_UTILITIES::string_sprintf("Smoke_Tests/Test_%d_%d_%d%s",test_number,scale,TV::dimension,use_conservative_advection?"_conservative":"");
         source_box.min_corner=TV::Constant_Vector(0.45);
         source_box.max_corner=TV::Constant_Vector(0.55);

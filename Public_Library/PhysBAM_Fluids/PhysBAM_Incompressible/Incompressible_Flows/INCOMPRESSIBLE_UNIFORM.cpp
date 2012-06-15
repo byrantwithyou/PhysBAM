@@ -34,7 +34,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> INCOMPRESSIBLE_UNIFORM<T_GRID>::
 INCOMPRESSIBLE_UNIFORM(const T_GRID& grid_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,THREAD_QUEUE* thread_queue_input)
-    :grid(grid_input.Get_MAC_Grid()),mpi_grid(0),projection(projection_input),strain(0),collision_body_list(0),momentum_conserving_vorticity(false),use_analytic_energy(false),use_vorticity_weights(false),energy_clamp(0),vc_projection_direction(0),buoyancy_constant(0),thread_queue(thread_queue_input),
+    :grid(grid_input.Get_MAC_Grid()),mpi_grid(0),projection(projection_input),strain(0),collision_body_list(0),momentum_conserving_vorticity(false),use_vorticity_weights(false),energy_clamp(0),vc_projection_direction(0),buoyancy_constant(0),thread_queue(thread_queue_input),
     boundary_default(*new BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID>),advection_maccormack(0)
 { 
     boundary=&boundary_default;
@@ -106,7 +106,6 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
         for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
             for(int i=0;i<TV::dimension;i++) if(abs(F(cell)(i))<tolerance) F(cell)(i)=0;}
         Apply_Vorticity_Confinement_Force(face_velocities,F);}
-    Update_Potential_Energy(face_velocities,face_velocities_old,dt,time);
 
     boundary->Apply_Boundary_Condition_Face(grid,face_velocities,time+dt);
 }
@@ -123,15 +122,6 @@ Add_Body_Force_Threaded(RANGE<TV_INT>& domain,T_FACE_ARRAYS_SCALAR& face_velocit
         face_velocities.Component(iterator.Axis())(iterator.Face_Index())+=dt*force.Component(iterator.Axis())(iterator.Face_Index());}
 }
 //#####################################################################
-// Function Calculate_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Calculate_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
-{
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
-        kinetic_energy(face)=(T)(.5*projection.density*face_velocities(face)*face_velocities(face));}
-}
-//#####################################################################
 // Function Update_Kinetic_Energy
 //#####################################################################
 template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
@@ -139,87 +129,6 @@ Apply_Pressure_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_A
 {
     T_FACE_ARRAYS_SCALAR face_velocities(grid);
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();face_velocities(face)=(T)((face_velocities_new(face)+face_velocities_old(face))/2.);}
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
-        TV_INT first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
-        if(!projection.elliptic_solver->psi_N(face) && !(projection.elliptic_solver->psi_D(first_cell) && projection.elliptic_solver->psi_D(second_cell)))
-            kinetic_energy(face)-=face_velocities(face)*(projection.p(second_cell)-projection.p(first_cell))/grid.dX[iterator.Axis()];}
-}
-//#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Update_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,const T dt,const T time)
-{
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
-        kinetic_energy(face)+=(T)(.5*projection.density*(face_velocities_new(face)*face_velocities_new(face)-face_velocities_old(face)*face_velocities_old(face)));}
-}
-//#####################################################################
-// Function Update_Potential_Energy
-//#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
-{
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();if(projection.elliptic_solver->psi_N(face)) continue;
-        potential_energy(face)+=(T)(kinetic_energy(face)-.5*projection.density*(face_velocities(face)*face_velocities(face)));}
-}
-//#####################################################################
-// Function Correct_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,const T dt,const T time)
-{
-    int number_of_faces=0;
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) number_of_faces++;
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
-        potential_energy(face)-=(T)(.5*projection.density*(face_velocities_new(face)*face_velocities_new(face)-face_velocities_old(face)*face_velocities_old(face)));
-        potential_energy(face)+=allowed_energy_gained/(T)number_of_faces;}
-    allowed_energy_gained=0;
-}
-//#####################################################################
-// Function Correct_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Correct_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
-{
-    if(conserve_kinetic_energy) for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> face=iterator.Full_Index();
-        face_velocities(face)=(T)(sign_nonzero(face_velocities(face))*sqrt(kinetic_energy(face)*2./projection.density));}
-}
-//#####################################################################
-// Function Correct_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void INCOMPRESSIBLE_UNIFORM<T_GRID>::
-Advect_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int iterations,const int number_of_ghost_cells)
-{
-    PHYSBAM_DEBUG_WRITE_SUBSTEP("Advect with Vorticity START",0,0);
-    //calculate vorticity directions
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
-    T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);
-    T_ARRAYS_SCALAR vorticity_magnitude(grid.Cell_Indices(2));
-    T_ARRAYS_VECTOR vortex_normal_vector(grid.Cell_Indices(1));
-    if(collision_body_list){
-        FACE_LOOKUP_UNIFORM<T_GRID> face_velocities_lookup_uniform(face_velocities_ghost);
-        FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> face_velocities_lookup(face_velocities_lookup_uniform,*collision_body_list,&valid_mask);
-        VORTICITY_UNIFORM<TV>::Vorticity(grid,face_velocities_lookup,vorticity,vorticity_magnitude);}
-    else VORTICITY_UNIFORM<TV>::Vorticity(grid,T_FACE_LOOKUP(face_velocities_ghost),vorticity,vorticity_magnitude);
-    for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){ // do collision awareness when these are averaged to faces
-        vortex_normal_vector(iterator.Cell_Index())=T_LEVELSET::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());}
-    T_FACE_ARRAYS_SCALAR face_normal_vectors(grid);
-    for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();int axis=full_index.axis;
-        face_normal_vectors(full_index)=(T)((vortex_normal_vector(iterator.First_Cell_Index())(axis)+vortex_normal_vector(iterator.Second_Cell_Index())(axis))/2.);}
-
-    //Advect energy using vorticity vectors
-    for(int i=0;i<iterations;i++){
-        boundary->Set_Fixed_Boundary(true,0);
-        ARRAY<T,FACE_INDEX<TV::dimension> > kinetic_energy_ghost(grid,7),face_normals_ghost(grid,4);
-        boundary->Fill_Ghost_Cells_Face(grid,kinetic_energy,kinetic_energy_ghost,time,7);
-        boundary->Fill_Ghost_Cells_Face(grid,face_normal_vectors,face_normals_ghost,time,4);
-        advection->Update_Advection_Equation_Face(grid,kinetic_energy,kinetic_energy_ghost,face_normals_ghost,*boundary,dt,time);
-        ARRAY<T,FACE_INDEX<TV::dimension> > potential_energy_ghost(grid,7);
-        boundary->Fill_Ghost_Cells_Face(grid,potential_energy,potential_energy_ghost,time,7);
-        advection->Update_Advection_Equation_Face(grid,potential_energy,potential_energy_ghost,face_normals_ghost,*boundary,dt,time);
-        boundary->Set_Fixed_Boundary(false);
-        PHYSBAM_DEBUG_WRITE_SUBSTEP("Advect with Vorticity END",0,0);}
 }
 //#####################################################################
 // Function Correct_Kinetic_Energy
@@ -232,66 +141,8 @@ Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VEC
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();
         RANGE<TV_INT> domain=grid.Domain_Indices();domain.max_corner(iterator.Axis())++;
         for(int i=0;i<TV::dimension;i++){if(domain_boundary(i)(0)) domain.min_corner(i)++;if(domain_boundary(i)(1)) domain.max_corner(i)--;}
-        vorticity_weights(index)=(conserve_kinetic_energy && lsv)?(-1*lsv->Phi(iterator.Location())):1;
-        if(vorticity_weights(index)<energy_clamp) vorticity_weights(index)=0;if(projection.elliptic_solver->psi_N(index) || !domain.Lazy_Inside_Half_Open(index.index)) vorticity_weights(index)=0;}
-    if(!conserve_kinetic_energy) return;
-    //int iterations=1;
-    //Advect_With_Vorticity(face_velocities,dt,time,iterations);
-
-    T_ARRAYS_VECTOR F(grid.Cell_Indices(1));
-    T_FACE_ARRAYS_SCALAR face_velocities_ghost;face_velocities_ghost.Resize(grid,number_of_ghost_cells,false);
-    T_FACE_ARRAYS_SCALAR potential_energy_ghost;potential_energy_ghost.Resize(grid,number_of_ghost_cells,false);
-    boundary->Fill_Ghost_Cells_Face(grid,face_velocities,face_velocities_ghost,time,number_of_ghost_cells);
-    boundary->Fill_Ghost_Cells_Face(grid,potential_energy,potential_energy_ghost,time,number_of_ghost_cells);
-    Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
-    if(!use_variable_vorticity_confinement) Use_Variable_Vorticity_Confinement(true);
-    if(true){
-        T uF=0,PE=0,Fsqr=0;
-        if(use_analytic_energy){
-            T KE=0,potential=0;
-            for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
-                if(lsv && lsv->phi(iterator.Cell_Index())>0) continue;
-                if(density) potential+=(*density)(iterator.Cell_Index())*(*density)(iterator.Cell_Index())*buoyancy_constant*(1-iterator.Location()(1));
-                else potential+=(T)(projection.density*grid.dX.Product()*iterator.Location()(1)*9.8);}
-            for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();if(lsv && lsv->Phi(iterator.Location())>0) continue;
-                T mass=(T)(density?(((*density)(iterator.First_Cell_Index())+((*density)(iterator.Second_Cell_Index())))*.5):projection.density*grid.dX.Product());
-                KE+=(T)(0.5*mass*face_velocities(index)*face_velocities(index));
-                potential_energy(index)=0;}
-            LOG::cout<<"Confinement analytical "<<analytic_energy<<" potential "<<potential<<" KE "<<KE<<std::endl;
-            PE=(analytic_energy-KE)+(analytic_potential-potential);
-            if(!density) PE/=grid.dX.Product();}
-        else for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();
-            PE+=potential_energy(index);}
-        for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> index=iterator.Full_Index();
-            T mass=(T)(density?(((*density)(iterator.First_Cell_Index())+((*density)(iterator.Second_Cell_Index())))*.5):projection.density);
-            T force=(T)(vorticity_weights(index)*(F(iterator.First_Cell_Index())(iterator.Axis())+F(iterator.Second_Cell_Index())(iterator.Axis()))*dt/2.);
-            Fsqr+=mass*force*force;uF+=mass*face_velocities(index)*force;}
-        LOG::cout<<"Confinement debug uF "<<uF<<" Fsqr "<<Fsqr<<" PE "<<PE<<" allowed "<<allowed_energy_gained<<std::endl;
-        if(mpi_grid){
-            T allowed_mpi=mpi_grid->Reduce_Add(allowed_energy_gained),PE_mpi=mpi_grid->Reduce_Add(PE),uF_mpi=mpi_grid->Reduce_Add(uF),Fsqr_mpi=mpi_grid->Reduce_Add(Fsqr);
-            T sqr_term=uF_mpi*uF_mpi+2*(PE_mpi+allowed_mpi)*Fsqr_mpi;if(sqr_term<0) sqr_term=0;
-            vorticity_confinement=Fsqr_mpi>1e-2?(sign(uF_mpi)*(sqrt(sqr_term)-abs(uF_mpi))/(Fsqr_mpi)):0;}
-        else{
-            T sqr_term=uF*uF+2*(PE+allowed_energy_gained)*Fsqr;if(sqr_term<0) sqr_term=0;
-            vorticity_confinement=Fsqr>1e-2?(sign(uF)*(sqrt(sqr_term)-abs(uF))/(Fsqr)):0;}
-        LOG::cout<<"Confinement force "<<vorticity_confinement<<std::endl;
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
-            variable_vorticity_confinement(index)=vorticity_confinement;}}
-    else{
-        potential_energy_ghost*=0.5;
-        T_ARRAYS_VECTOR V(grid.Cell_Indices(1),false);
-        T_ARRAYS_SCALAR PE(grid.Domain_Indices(1),false);
-        AVERAGING_UNIFORM<T_GRID> averaging;
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-            V(cell)=averaging.Face_To_Cell_Vector(grid,cell,face_velocities_ghost);
-            PE(cell)=0;for(int axis=0;axis<TV::dimension;axis++) PE(cell)+=potential_energy_ghost(iterator.Full_First_Face_Index(axis))+potential_energy_ghost(iterator.Full_Second_Face_Index(axis));}
-        for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-            T energy_sqr=(T)(2*(PE(cell)+0.5*projection.density*V(cell).Magnitude_Squared())/projection.density);
-            if(energy_sqr<0) energy_sqr=0;T energy=sqrt(energy_sqr)-V(cell).Magnitude();
-            T mag=F(cell).Magnitude();
-            if(mag<1e-6) variable_vorticity_confinement(cell)=0;
-            else variable_vorticity_confinement(cell)=energy/mag;
-            if(abs(variable_vorticity_confinement(cell))>vorticity_confinement*mag) variable_vorticity_confinement(iterator.Cell_Index())=vorticity_confinement*mag*sign(variable_vorticity_confinement(iterator.Cell_Index()));}}
+        vorticity_weights(index)=1;
+        if(projection.elliptic_solver->psi_N(index) || !domain.Lazy_Inside_Half_Open(index.index)) vorticity_weights(index)=0;}
 }
 //#####################################################################
 // Function Advance_One_Time_Step_Implicit_Part
@@ -323,7 +174,6 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
         //viscosity_helper.Add_Implicit_Forces_Before_Projection(grid,face_velocities,face_velocities,dt,time);}
 
     projection.Make_Divergence_Free(face_velocities,dt,time);
-    if(conserve_kinetic_energy) projection.Update_Potential_Energy(face_velocities_ghost,face_velocities,potential_energy,allowed_energy_gained,dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("After final projection",0,0);
 }
 //#####################################################################
@@ -340,7 +190,6 @@ Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T
         IMPLICIT_VISCOSITY_UNIFORM<T_GRID> implicit_viscosity(*projection.elliptic_solver,variable_viscosity,projection.density,viscosity,0,axis,false,false);
         implicit_viscosity.Viscous_Update(grid,face_velocities,face_velocities_ghost,dt,time,maximum_implicit_viscosity_iterations);}
     if(mpi_grid) mpi_grid->Copy_Common_Face_Data(face_velocities);
-    Update_Kinetic_Energy(face_velocities,face_velocities_ghost,dt,time);
 }
 //#####################################################################
 // Function Real_CFL

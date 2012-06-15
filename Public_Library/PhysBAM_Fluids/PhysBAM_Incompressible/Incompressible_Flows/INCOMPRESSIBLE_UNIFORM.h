@@ -38,7 +38,7 @@ public:
     using BASE::use_variable_vorticity_confinement;using BASE::dt_old;using BASE::gravity;using BASE::nonzero_surface_tension;using BASE::nonzero_viscosity;
     using BASE::downward_direction;using BASE::Set_Custom_Advection;using BASE::valid_mask;
     using BASE::use_explicit_part_of_implicit_viscosity;using BASE::vorticity_confinement;using BASE::max_time_step;using BASE::advection;
-    using BASE::maximum_implicit_viscosity_iterations;using BASE::conserve_kinetic_energy;
+    using BASE::maximum_implicit_viscosity_iterations;
     
     T_GRID grid;
     T_MPI_GRID* mpi_grid;
@@ -47,13 +47,11 @@ public:
     T_ARRAYS_SCALAR variable_surface_tension;
     T_ARRAYS_SCALAR variable_viscosity;
     T_FACE_ARRAYS_SCALAR force;
-    T_FACE_ARRAYS_SCALAR kinetic_energy,potential_energy;
+    T_FACE_ARRAYS_SCALAR potential_energy;
     T_ARRAYS_SCALAR variable_vorticity_confinement;
     FLUID_STRAIN_UNIFORM<T_GRID>* strain;
     T_GRID_BASED_COLLISION_GEOMETRY* collision_body_list;
     bool momentum_conserving_vorticity;    
-    T allowed_energy_gained,analytic_energy,analytic_potential;
-    bool use_analytic_energy;
     bool use_vorticity_weights;
     T_FACE_ARRAYS_SCALAR vorticity_weights;
     T energy_clamp;
@@ -74,9 +72,6 @@ public:
     void Set_Collision_Body_List(T_GRID_BASED_COLLISION_GEOMETRY& collision_body_list_input)
     {collision_body_list=&collision_body_list_input;}
 
-    void Conserve_Kinetic_Energy(bool conserve=true)
-    {conserve_kinetic_energy=conserve;if(conserve){kinetic_energy.Resize(grid);potential_energy.Resize(grid);}else{kinetic_energy.Clean_Memory();potential_energy.Clean_Memory();}}
-
 //#####################################################################
     void Initialize_Grids(const T_GRID& grid_input) PHYSBAM_OVERRIDE;
     void Set_Body_Force(const bool use_force_input=true);
@@ -86,12 +81,6 @@ public:
     void Use_Variable_Vorticity_Confinement(T_GRID& grid,const bool use_variable_vorticity_confinement_input=true);
     void Use_Strain();
     void Apply_Pressure_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,const T dt,const T time);
-    void Calculate_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Update_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,const T dt,const T time);
-    void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,const T dt,const T time);
-    void Correct_Kinetic_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Advect_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int iterations,const int number_of_ghost_cells);
     void Add_Energy_With_Vorticity(T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<VECTOR<bool,2>,TV::dimension>& domain_boundary,const T dt,const T time,const int number_of_ghost_cells,T_LEVELSET* lsv=0,T_ARRAYS_SCALAR* density=0);
     void Advance_One_Time_Step_Convection(const T dt,const T time,const T_FACE_ARRAYS_SCALAR& advecting_face_velocities,T_FACE_ARRAYS_SCALAR& face_velocities_to_advect,const int number_of_ghost_cells);
     void Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const bool implicit_viscosity,const T_ARRAYS_SCALAR* phi_ghost,const int number_of_ghost_cells);

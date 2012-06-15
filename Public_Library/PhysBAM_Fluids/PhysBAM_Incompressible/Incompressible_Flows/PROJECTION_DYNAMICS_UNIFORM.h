@@ -71,14 +71,7 @@ public:
     void Initialize_Dsd(const LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
     void Initialize_Dsd(const T_LEVELSET& levelset,const ARRAY<bool>& fuel_region);
     virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
-    void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_SCALAR& potential_energy,const T dt);
-    void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,T_ARRAYS_SCALAR& potential_energy,const T dt);
-    void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& potential_energy,const T dt);
-    void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,T_ARRAYS_SCALAR& potential_energy,const T dt);
-    template<class T_POTENTIAL> void Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& face_velocities_new,T_POTENTIAL& potential_energy,T& allowed_energy_gained,const T dt);
-    VECTOR<T,2> Compare_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& face_velocities_new,const T dt);
     void Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
-    void Compute_Divergence_For_Energy_Correction(const T_FACE_ARRAYS_SCALAR& face_velocities);
     void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
     void Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
     void Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);

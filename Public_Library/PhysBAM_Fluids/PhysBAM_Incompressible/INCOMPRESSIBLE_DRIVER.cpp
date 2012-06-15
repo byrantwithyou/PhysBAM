@@ -87,8 +87,6 @@ Initialize()
     for(typename GRID<TV>::FACE_ITERATOR iterator(example.mac_grid);iterator.Valid();iterator.Next()) sum_jc(iterator.Full_Index())=1;
     example.density.Resize(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
     example.temperature.Resize(example.mac_grid.Domain_Indices(example.number_of_ghost_cells));
-    example.incompressible.kinetic_energy.Resize(example.mac_grid);
-    if(example.incompressible.conserve_kinetic_energy) example.incompressible.Conserve_Kinetic_Energy();
     example.Initialize_Fields();
     example.Initialize_Confinement();
 
@@ -118,7 +116,6 @@ Initialize()
         example.incompressible.Set_Variable_Viscosity(false);}
 
     example.Get_Scalar_Field_Sources(time);
-    example.incompressible.Calculate_Kinetic_Energy(example.face_velocities,0,0);
     if(!example.restart) Write_Output_Files(example.first_frame);
 }
 //#####################################################################
@@ -147,21 +144,7 @@ Convect(const T dt,const T time)
     LOG::Time("Velocity Advection");
     example.boundary->Set_Fixed_Boundary(true,0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before convection",0,1);
-    if(example.incompressible.conserve_kinetic_energy){
-        ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
-        ARRAY<T,FACE_INDEX<TV::dimension> > sum_jc_back(example.mac_grid);
-        if(!first) sum_jc_back=advection_conservative->sum_jc;
-        advection_conservative->sum_jc=sum_jc;
-        ARRAY<T,FACE_INDEX<TV::dimension> > kinetic_energy_ghost(example.mac_grid,2*example.number_of_ghost_cells+1);
-        ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(example.mac_grid,2*example.number_of_ghost_cells+1);
-        example.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,dt,2*example.number_of_ghost_cells+1);
-        example.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.incompressible.kinetic_energy,kinetic_energy_ghost,dt,2*example.number_of_ghost_cells+1);
-        example.incompressible.advection->Update_Advection_Equation_Face(example.mac_grid,example.incompressible.kinetic_energy,kinetic_energy_ghost,face_velocities_ghost,*example.boundary,dt,time);
-        example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
-        sum_jc=advection_conservative->sum_jc;
-        advection_conservative->sum_jc=sum_jc_back;
-        example.incompressible.Correct_Kinetic_Energy(example.face_velocities,dt,time);} 
-    else example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
+    example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
     example.boundary->Set_Fixed_Boundary(false);
     first=false;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",0,1);
@@ -190,7 +173,6 @@ Project(const T dt,const T time)
 {
     LOG::Time("Project");
     example.Set_Boundary_Conditions(time+dt);
-    example.incompressible.Calculate_Kinetic_Energy(example.face_velocities,dt,time);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",0,1);
     example.projection.p*=dt; // rescale pressure for guess
     example.incompressible.Advance_One_Time_Step_Implicit_Part(example.face_velocities,dt,time,true);

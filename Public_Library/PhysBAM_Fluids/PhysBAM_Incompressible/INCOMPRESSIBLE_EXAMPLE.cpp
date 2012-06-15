@@ -45,7 +45,6 @@ Write_Output_Files(const int frame)
     if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
-    if(incompressible.use_analytic_energy) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/analytic_energy",incompressible.analytic_energy);
     ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(incompressible.advection);
     if(advection_conservative){
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_barjc",advection_conservative->sum_jc);
@@ -74,7 +73,6 @@ Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/density",density);
-    if(incompressible.use_analytic_energy) FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/analytic_energy",incompressible.analytic_energy);
     std::string filename;
     filename=output_directory+"/"+f+"/mac_velocities";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}

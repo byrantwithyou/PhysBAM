@@ -45,9 +45,7 @@ public:
         int scale=parse_args.Get_Integer_Value("-scale");
         restart=parse_args.Get_Integer_Value("-restart");
         use_conservative_advection=parse_args.Is_Value_Set("-conservative");
-        incompressible.conserve_kinetic_energy=parse_args.Is_Value_Set("-energy");
-        PHYSBAM_ASSERT((incompressible.conserve_kinetic_energy && use_conservative_advection) || !incompressible.conserve_kinetic_energy);
-        output_directory=STRING_UTILITIES::string_sprintf("Velocity_Tests/Test_%d_%d_%d%s%s",test_number,scale,TV::dimension,use_conservative_advection?"_conservative":"",incompressible.conserve_kinetic_energy?"_energy":"");
+        output_directory=STRING_UTILITIES::string_sprintf("Velocity_Tests/Test_%d_%d_%d%s",test_number,scale,TV::dimension,use_conservative_advection?"_conservative":"");
         TV_INT counts=TV_INT::All_Ones_Vector()*scale;
         RANGE<TV> range=RANGE<TV>(TV(),TV::All_Ones_Vector());
         mac_grid.Initialize(counts,range,true);

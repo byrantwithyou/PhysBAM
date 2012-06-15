@@ -24,7 +24,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> INCOMPRESSIBLE<T_GRID>::
 INCOMPRESSIBLE()
-    :use_force_x(false),use_force_y(false),use_force_z(false),use_force(false),conserve_kinetic_energy(false),use_variable_surface_tension(false),use_variable_viscosity(false),
+    :use_force_x(false),use_force_y(false),use_force_z(false),use_force(false),use_variable_surface_tension(false),use_variable_viscosity(false),
     use_variable_vorticity_confinement(false),nonzero_viscosity(false),nonzero_surface_tension(false),
     nested_semi_lagrangian_collidable(0),semi_lagrangian_collidable(0),nested_semi_lagrangian_collidable_slip(0),semi_lagrangian_collidable_slip(0),
     nested_semi_lagrangian_fire_multiphase(0),semi_lagrangian_fire_multiphase(0),nested_nested_semi_lagrangian_fire_multiphase_collidable(0),

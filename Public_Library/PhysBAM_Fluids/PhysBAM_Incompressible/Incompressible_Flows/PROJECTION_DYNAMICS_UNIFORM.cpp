@@ -94,125 +94,6 @@ Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T ti
     Apply_Pressure(face_velocities,dt,time);
 }
 //#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_SCALAR& potential_energy,const T dt)
-{
-    for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        if(elliptic_solver->psi_N(full_index)) continue;
-        TV_INT first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
-        potential_energy(full_index)-=density*(face_velocities(full_index))*(p(first_cell)-p(second_cell))/p_grid.dX(full_index.axis);}
-}
-//#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities,T_ARRAYS_SCALAR& potential_energy,const T dt)
-{
-    ARRAY<TV,TV_INT> energy_gained(p_grid.Domain_Indices());
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) energy_gained(iterator.Cell_Index())=TV();
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();for(int i=0;i<TV::dimension;i++){
-        if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))) && elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) continue;
-        if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))))
-            energy_gained(cell)(i)+=face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))*p(cell)*p_grid.dX(i);
-        else if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) 
-            energy_gained(cell)(i)-=face_velocities(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))*p(cell)*p_grid.dX(i);
-        else energy_gained(cell)(i)+=(face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))-face_velocities(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))))*p(cell)*p_grid.dX(i);}}
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) energy_gained(iterator.Cell_Index())/=(p_grid.dX.Product());
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        potential_energy(cell)+=energy_gained(cell).Sum();}
-}
-//#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,T_ARRAYS_SCALAR& potential_energy,const T dt)
-{
-    PHYSBAM_FATAL_ERROR();
-}
-//#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_new,T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& potential_energy,const T dt)
-{
-    for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        potential_energy(full_index)-=(T)(0.5*density*(face_velocities_new(full_index)*face_velocities_new(full_index)-face_velocities_old(full_index)*face_velocities_old(full_index)));}
-}
-//#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> template<class T_POTENTIAL> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Update_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& face_velocities_new,T_POTENTIAL& potential_energy,T& allowed_energy_gained,const T dt)
-{
-    return;
-    PHYSBAM_ASSERT(allowed_energy_gained==0);
-    TV one_over_dx=p_grid.one_over_dX;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities(p_grid);
-    for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        face_velocities(full_index)=(T)((face_velocities_old(full_index)+face_velocities_new(full_index))/2.);}
-    Update_Potential_Energy(face_velocities,potential_energy,dt);
-    
-    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) for(int i=0;i<TV::dimension;i++){
-        if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))) && elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) continue;
-        if(!elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i))) && !elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))) continue;
-        if(elliptic_solver->psi_N(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))) 
-            allowed_energy_gained+=density*p(iterator.Cell_Index())*face_velocities(FACE_INDEX<TV::dimension>(i,iterator.First_Face_Index(i)))*one_over_dx[i];
-        else allowed_energy_gained-=density*p(iterator.Cell_Index())*face_velocities(FACE_INDEX<TV::dimension>(i,iterator.Second_Face_Index(i)))*one_over_dx[i];}
-    T allowed_energy_gained_tmp=allowed_energy_gained;
-    for(FACE_ITERATOR iterator(p_grid,0,GRID<TV>::BOUNDARY_REGION);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        if(!elliptic_solver->psi_N(full_index)){
-            if(p_grid.Domain_Indices().Lazy_Inside_Half_Open(iterator.First_Cell_Index()))
-                allowed_energy_gained-=density*p(iterator.Second_Cell_Index())*face_velocities(full_index)*one_over_dx[iterator.Axis()];
-            else allowed_energy_gained+=density*p(iterator.First_Cell_Index())*face_velocities(full_index)*one_over_dx[iterator.Axis()];}}
-    PHYSBAM_ASSERT(abs(allowed_energy_gained-allowed_energy_gained_tmp)<1e-5);
-    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        T divergence_u_hat=0;
-        for(int axis=0;axis<T_GRID::dimension;axis++)divergence_u_hat+=(face_velocities.Component(axis)(iterator.Second_Face_Index(axis))-face_velocities.Component(axis)(iterator.First_Face_Index(axis)))*one_over_dx[axis];
-        T divergence_cell=divergence.Valid_Index(cell)?divergence(cell):0;
-        allowed_energy_gained+=density*(divergence_u_hat-divergence_cell)*p(cell);}
-}
-//#####################################################################
-// Function Update_Kinetic_Energy
-//#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,2> PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Compare_Potential_Energy(T_FACE_ARRAYS_SCALAR& face_velocities_old,T_FACE_ARRAYS_SCALAR& face_velocities_new,const T dt)
-{
-    //Assumes density of 1 for now
-    T energy_gained_cell_total=0,energy_gained_face_total=0;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities(p_grid);
-    for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        face_velocities(full_index)=(T)((face_velocities_old(full_index)+face_velocities_new(full_index))/2.);}
-    
-    ARRAY<T,TV_INT> energy_gained(p_grid.Domain_Indices());
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) energy_gained(iterator.Cell_Index())=0;
-    Update_Potential_Energy(face_velocities,energy_gained,dt);
-    for(typename GRID<TV>::CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        energy_gained_cell_total+=energy_gained(cell);}
-
-    ARRAY<T,FACE_INDEX<TV::dimension> > energy_gained_face(p_grid);
-    for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()) energy_gained_face(iterator.Full_Index())=0;
-    Update_Potential_Energy(face_velocities,energy_gained_face,dt);
-    for(typename GRID<TV>::FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){FACE_INDEX<TV::dimension> full_index=iterator.Full_Index();
-        energy_gained_face_total+=energy_gained_face(full_index);}
- 
-    return VECTOR<T,2>(energy_gained_cell_total,energy_gained_face_total);
-}
-//#####################################################################
-// Function Compute_Divergence
-//#####################################################################
-template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Compute_Divergence_For_Energy_Correction(const T_FACE_ARRAYS_SCALAR& face_velocities)
-{
-    divergence.Resize(p_grid.Domain_Indices());
-    TV one_over_dx=p_grid.one_over_dX;
-    for(CELL_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
-        T local_divergence=0;
-        for(int axis=0;axis<T_GRID::dimension;axis++)local_divergence+=(face_velocities.Component(axis)(iterator.Second_Face_Index(axis))-face_velocities.Component(axis)(iterator.First_Face_Index(axis)))*one_over_dx[axis];
-        divergence(iterator.Cell_Index())=local_divergence;}
-}
-//#####################################################################
 // Function Compute_Divergence
 //#####################################################################
 template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
@@ -383,9 +264,7 @@ Face_Jump_Multiphase(const int axis,const TV_INT& face_index,const int current_r
 }
 //#####################################################################
 #define INSTANTIATION_HELPER(T_GRID) \
-    template class PROJECTION_DYNAMICS_UNIFORM<T_GRID>; \
-    template void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::Update_Potential_Energy(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& face_velocities_old,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& face_velocities_new,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& potential_energy,T&,const T dt); \
-    template void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::Update_Potential_Energy(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& face_velocities_old,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& face_velocities_new,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR& potential_energy,T&,const T dt);
+    template class PROJECTION_DYNAMICS_UNIFORM<T_GRID>;
 
 #define P(...) __VA_ARGS__
 INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >));

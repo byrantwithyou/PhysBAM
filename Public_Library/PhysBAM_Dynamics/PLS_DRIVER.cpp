@@ -72,7 +72,6 @@ Initialize()
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     example.face_velocities.Resize(example.mac_grid);
-    if(example.incompressible.conserve_kinetic_energy) example.incompressible.Conserve_Kinetic_Energy();
 
     example.particle_levelset_evolution.Set_Time(time);
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
