@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_DRIVER.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
@@ -86,15 +85,10 @@ Initialize()
         example.boundary=&example.boundary_scalar;
         example.phi_boundary=&example.phi_boundary_water;}
 
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> > *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&example.projection)){
-        refine->boundary=example.boundary;
-        refine->phi_boundary=example.phi_boundary;}
-
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.boundary->Set_Constant_Extrapolation(domain_open_boundaries);
     example.particle_levelset_evolution.Levelset_Advection(0).Set_Custom_Advection(example.advection_scalar);
-    //example.incompressible.Set_Custom_Advection(example.advection_scalar);
 
     {
         example.particle_levelset_evolution.Initialize_Domain(example.mac_grid);

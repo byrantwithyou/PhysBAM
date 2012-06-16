@@ -25,21 +25,14 @@ public:
     typedef BOUNDARY_UNIFORM<T_GRID,T> BASE;
     using BASE::Constant_Extrapolation;using BASE::Fill_Single_Ghost_Region;using BASE::Find_Ghost_Regions;
 
-    ARRAY<bool> open_boundary;
+    VECTOR<bool,2*TV_INT::m> open_boundary;
     T attenuate_inflow;
     BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID> boundary_mac_grid_solid_wall_slip;
 
-    BOUNDARY_OPEN_WATER(const T attenuate_inflow_input=T(1),const bool left_open_boundary_input=false,const bool right_open_boundary_input=false,const bool bottom_open_boundary_input=false,const bool top_open_boundary_input=false,
-        const bool front_open_boundary_input=false,const bool back_open_boundary_input=false)
-        :open_boundary(6,true),boundary_mac_grid_solid_wall_slip()
+    BOUNDARY_OPEN_WATER(const T attenuate_inflow_input=1)
+        :boundary_mac_grid_solid_wall_slip()
     {
         attenuate_inflow=attenuate_inflow_input;
-        open_boundary(0)=left_open_boundary_input;
-        open_boundary(1)=right_open_boundary_input;
-        open_boundary(2)=bottom_open_boundary_input;
-        open_boundary(3)=top_open_boundary_input;
-        open_boundary(4)=front_open_boundary_input;
-        open_boundary(5)=back_open_boundary_input;
     }
 
     ~BOUNDARY_OPEN_WATER(){}
