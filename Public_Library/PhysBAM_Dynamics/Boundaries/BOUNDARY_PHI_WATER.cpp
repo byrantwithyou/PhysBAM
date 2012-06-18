@@ -15,9 +15,10 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> BOUNDARY_PHI_WATER<T_GRID>::
 BOUNDARY_PHI_WATER(const TV_SIDES& constant_extrapolation)
-    :sign(1),use_open_boundary_mode(false),V(0)
+    :sign(1),use_open_boundary_mode(false),open_boundary(6,true),V(0)
 {
     Set_Constant_Extrapolation(constant_extrapolation);
+    Set_Open_Boundary(false,false,false,false,false,false);
     Use_Extrapolation_Mode(false);
     Set_Tolerance();
 }
@@ -35,10 +36,10 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_BASE& u,T_ARRAYS_BASE& u_ghos
 {
     assert(grid.Is_MAC_Grid() && V);T_ARRAYS_BASE::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
-    ARRAY<RANGE<TV_INT> > regions;
-    Find_Ghost_Regions(grid,regions,number_of_ghost_cells); 
-    for(int side=0;side<2*T_GRID::dimension;side++)
-        Fill_Single_Ghost_Region_Threaded(regions(side), grid, u_ghost, side);
+    ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells); 
+    for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
+        int side=2*axis+axis_side;
+        Fill_Single_Ghost_Region_Threaded(regions(side), grid, u_ghost, side);}
 }
 //#####################################################################
 // Function Fill_Single_Ghost_Region_Threaded
