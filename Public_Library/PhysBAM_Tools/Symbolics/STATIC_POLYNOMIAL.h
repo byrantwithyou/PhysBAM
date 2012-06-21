@@ -210,10 +210,10 @@ struct STATIC_POLYNOMIAL
     {
         T table[d+1][d+1];
         table[0][0]=1;
-        for(int i=1;i<=size(v);i++){
+        for(int i=1;i<=size(v) && i<d+1;i++){
             table[i][0]=1;
             table[i][i]=table[i-1][i-1]*shift;
-            for(int j=1;j<i;j++)
+            for(int j=1;j<i && j<d+1;j++)
                 table[i][j]=table[i-1][j-1]*shift+table[i-1][j];}
         RANGE<TV_INT> range(TV_INT(),size+1);
         for(RANGE_ITERATOR<rank> it(range);it.Valid();it.Next()){
