@@ -7,6 +7,7 @@
 #ifndef __FAST_LEVELSET_ADVECTION__
 #define __FAST_LEVELSET_ADVECTION__
 
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_1D.h>
@@ -57,8 +58,8 @@ public:
 
     void Euler_Step(const T_ARRAYS_VECTOR& velocity,const T dt,const T time,const int number_of_ghost_cells);
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& velocity,const T dt,const T time,const int number_of_ghost_cells);
-    void Euler_Step_Of_Reinitialization(const T_ARRAYS_SCALAR& signed_distance,const T_ARRAYS_SCALAR& sign_phi,const T dt,const T time);
-    void Reinitialize(const int time_steps=10,const T time=0);
+    void Reinitialize(const int time_steps=10,const T time=0)
+    {PhysBAM::Reinitialize((FAST_LEVELSET<GRID<TV> >*)levelset,time_steps,time,((FAST_LEVELSET<GRID<TV> >*)levelset)->half_band_width,((FAST_LEVELSET<GRID<TV> >*)levelset)->grid.dX.Max()*(1+min(3,local_advection_spatial_order)),reinitialization_cfl,reinitialization_runge_kutta_order,reinitialization_spatial_order);}
 };
 
 }
