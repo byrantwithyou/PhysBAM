@@ -18,7 +18,6 @@ namespace PhysBAM{
 template<class T,class T2> class BOUNDARY;
 
 template<class T_GRID> class LEVELSET_CALLBACKS;
-template<class T_GRID> class LEVELSET_NORMAL_COMPUTATION;
 template<class T_GRID>
 class LEVELSET_MULTIPLE:public NONCOPYABLE
 {
@@ -106,7 +105,6 @@ public:
     void Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input);
     void Set_Custom_Secondary_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input);
     void Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input);
-    void Set_Custom_Normal_Computation(LEVELSET_NORMAL_COMPUTATION<T_GRID>* normal_computation);
     void Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input);
     void Set_Levelset_Callbacks(LEVELSET_CALLBACKS<T_GRID>& levelset_callbacks_input);
     int Inside_Region(const TV_INT& index) const; // assumes exactly one Phi<0 on a node

@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET_NORMAL_COMPUTATION.h>
 namespace PhysBAM{
 template<class T> class TRIANGULATED_SURFACE;
 
@@ -27,16 +26,12 @@ public:
     using BASE::fmm_initialization_iterative_drift_fraction;
     using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;using BASE::max_time_step;
     using BASE::curvature_motion;using BASE::sigma;using BASE::interpolation;
-    using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::secondary_interpolation;using BASE::custom_normal_computation;
+    using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::secondary_interpolation;
     using BASE::collision_aware_interpolation_minus;using BASE::thread_queue;
     using BASE::number_of_ghost_cells;using BASE::Phi;using BASE::Extended_Phi;
 
     LEVELSET_3D(T_GRID& grid_input,ARRAY<T,VECTOR<int,3> >& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET_3D();
-
-    static VECTOR<T,3> Normal_At_Node(const T_GRID& grid,const ARRAY<T,VECTOR<int,3> >& phi,const VECTOR<int,3>& index)
-    {int i=index.x,j=index.y,ij=index.z;return VECTOR<T,3>((phi(i+1,j,ij)-phi(i-1,j,ij))*grid.one_over_dX.x,(phi(i,j+1,ij)-phi(i,j-1,ij))*grid.one_over_dX.y,(phi(i,j,ij+1)-phi(i,j,ij-1))
-        *grid.one_over_dX.z).Normalized();}
 
     T Compute_Curvature(const VECTOR<int,3>& index) const
     {return Compute_Curvature(phi,index);}
@@ -44,13 +39,10 @@ public:
 //#####################################################################
     SYMMETRIC_MATRIX<T,3> Hessian(const VECTOR<T,3>& X) const;
     VECTOR<T,2> Principal_Curvatures(const VECTOR<T,3>& X) const;
-    void Compute_Normals(const T time=0);
     void Compute_Curvature(const T time=0);
     T Compute_Curvature(const ARRAY<T,VECTOR<int,3> >& phi_input,const VECTOR<int,3>& index) const;
     T Compute_Curvature(const VECTOR<T,3>& location) const;
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
-    VECTOR<T,3> Normal(const VECTOR<T,3>& location) const;
-    VECTOR<T,3> Extended_Normal(const VECTOR<T,3>& location) const;
 public:
     void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,3> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false);
     void Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false);

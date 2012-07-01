@@ -79,14 +79,6 @@ Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_inp
     for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Interpolation(normal_interpolation_input);
 }
 //#####################################################################
-// Function Set_Custom_Normal_Computation
-//#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
-Set_Custom_Normal_Computation(LEVELSET_NORMAL_COMPUTATION<T_GRID>* normal_computation)
-{
-    for(int i=0;i<levelsets.m;i++) levelsets(i)->Set_Custom_Normal_Computation(normal_computation);
-}
-//#####################################################################
 // Function Set_Custom_Curvature_Interpolation
 //#####################################################################
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::

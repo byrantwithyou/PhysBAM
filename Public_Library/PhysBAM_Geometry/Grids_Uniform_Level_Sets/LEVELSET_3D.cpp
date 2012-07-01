@@ -70,28 +70,6 @@ Principal_Curvatures(const TV& X) const
     return VECTOR<T,2>(quadratic.root1,quadratic.root2);
 }
 //#####################################################################
-// Function Compute_Normals
-//#####################################################################
-// note that sqrt(phix^2+phiy^2+phiz^2)=1 if it's a distance function
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Compute_Normals(const T time)
-{
-    int ghost_cells=3;
-    T one_over_two_dx=2*grid.one_over_dX.x,one_over_two_dy=2*grid.one_over_dX.y,one_over_two_dz=2*grid.one_over_dX.z;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    int z=phi_ghost.counts.z,yz=phi_ghost.counts.y*z;
-
-    if(!normals) normals=new ARRAY<TV,VECTOR<int,3> >(grid.Domain_Indices(ghost_cells-1));
-    for(CELL_ITERATOR iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){
-        const TV_INT& cell = iterator.Cell_Index();
-        int index=phi_ghost.Standard_Index(iterator.Cell_Index());
-        VECTOR<T,3>& N((*normals)(cell));
-        N.x=(phi_ghost.array(index+yz)-phi_ghost.array(index-yz))*one_over_two_dx;
-        N.y=(phi_ghost.array(index+z)-phi_ghost.array(index-z))*one_over_two_dy;
-        N.z=(phi_ghost.array(index+1)-phi_ghost.array(index-1))*one_over_two_dz;
-        N.Normalize();}
-}
-//#####################################################################
 // Function Compute_Curvature
 //#####################################################################
 // kappa = - DIV(normal), negative for negative phi inside, positive for positive phi inside, sqrt(phix^2+phiy^2+phiy^2)=1 for distance functions
@@ -369,29 +347,6 @@ Append_Triangles(TRIANGULATED_SURFACE<T>& triangulated_surface,const int e1,cons
     else if(e4>=0 && e2>=0 && e5>=0){
         if(phi1>0) triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e4,e5,e2));
         else triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e4,e2,e5));}
-}
-//#####################################################################
-// Function Normal
-//#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,3> LEVELSET_3D<T_GRID>::
-Normal(const VECTOR<T,3>& location) const
-{
-    if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,location).Normalized();
-    else if(custom_normal_computation) return custom_normal_computation->Compute_Normal(*this,location);
-    else return VECTOR<T,3>((Phi(VECTOR<T,3>(location.x+grid.dX.x,location.y,location.z))-Phi(VECTOR<T,3>(location.x-grid.dX.x,location.y,location.z)))/(2*grid.dX.x),
-        (Phi(VECTOR<T,3>(location.x,location.y+grid.dX.y,location.z))-Phi(VECTOR<T,3>(location.x,location.y-grid.dX.y,location.z)))/(2*grid.dX.y),
-        (Phi(VECTOR<T,3>(location.x,location.y,location.z+grid.dX.z))-Phi(VECTOR<T,3>(location.x,location.y,location.z-grid.dX.z)))/(2*grid.dX.z)).Normalized();
-}
-//#####################################################################
-// Function Extended_Normal
-//#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,3> LEVELSET_3D<T_GRID>::
-Extended_Normal(const VECTOR<T,3>& location) const
-{
-    if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,grid.Clamp(location)).Normalized();
-    else return VECTOR<T,3>((Extended_Phi(VECTOR<T,3>(location.x+grid.dX.x,location.y,location.z))-Extended_Phi(VECTOR<T,3>(location.x-grid.dX.x,location.y,location.z)))/(2*grid.dX.x),
-        (Extended_Phi(VECTOR<T,3>(location.x,location.y+grid.dX.y,location.z))-Extended_Phi(VECTOR<T,3>(location.x,location.y-grid.dX.y,location.z)))/(2*grid.dX.y),
-        (Extended_Phi(VECTOR<T,3>(location.x,location.y,location.z+grid.dX.z))-Extended_Phi(VECTOR<T,3>(location.x,location.y,location.z-grid.dX.z)))/(2*grid.dX.z)).Normalized();
 }
 //#####################################################################
 template class LEVELSET_3D<GRID<VECTOR<float,3> > >;

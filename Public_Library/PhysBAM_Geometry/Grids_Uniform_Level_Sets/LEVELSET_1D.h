@@ -32,17 +32,6 @@ public:
     LEVELSET_1D(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,1> >& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET_1D();
 
-    VECTOR<T,1> Normal(const VECTOR<T,1>& location) const
-    {if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,location).Normalized();
-    else return VECTOR<T,1>((Phi(location+grid.dX)-Phi(location-grid.dX))/(2*grid.dX.x)).Normalized();}
-        
-    VECTOR<T,1> Extended_Normal(const VECTOR<T,1>& location) const
-    {if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,grid.Clamp(location)).Normalized();
-    else return VECTOR<T,1>((Extended_Phi(location+grid.dX)-Extended_Phi(location-grid.dX))/(2*grid.dX.x)).Normalized();}
-
-    static VECTOR<T,1> Normal_At_Node(const GRID<TV>& grid,const ARRAY<T,VECTOR<int,1> >& phi,const VECTOR<int,1>& index)
-    {int i=index.x;return VECTOR<T,1>((phi(i+1)-phi(i-1))*grid.one_over_dX.x).Normalized();}
-
     T Compute_Curvature(const ARRAY<T,VECTOR<int,1> >& phi_input,const VECTOR<int,1>& index) const
     {return 0;}
 

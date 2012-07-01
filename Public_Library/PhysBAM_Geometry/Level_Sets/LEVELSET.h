@@ -21,7 +21,6 @@ namespace PhysBAM{
 template<class T_GRID> struct COLLISION_GEOMETRY_COLLECTION_POLICY;
 template<class T_GRID> struct INTERPOLATION_POLICY;
 template<class T_GRID> class LEVELSET_CALLBACKS;
-template<class T_GRID> class LEVELSET_NORMAL_COMPUTATION;
 template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
@@ -62,7 +61,6 @@ public:
     static T_LINEAR_INTERPOLATION_SCALAR interpolation_default;
     T_INTERPOLATION_SCALAR *collision_aware_interpolation_plus,*collision_aware_interpolation_minus,*collision_unaware_interpolation;
     static typename REBIND<T_LINEAR_INTERPOLATION_SCALAR,TV>::TYPE normal_interpolation_default;
-    LEVELSET_NORMAL_COMPUTATION<T_GRID>* custom_normal_computation;
     T collidable_phi_replacement_value;
 public:
     T_ARRAYS_BOOL valid_mask_current;
@@ -71,8 +69,7 @@ protected:
 
     LEVELSET()
         :levelset_callbacks(0),collision_body_list(0),face_velocities_valid_mask_current(0),clamp_phi_with_collision_bodies(true),boundary_default(*new T_BOUNDARY_SCALAR),
-        collision_aware_interpolation_plus(0),collision_aware_interpolation_minus(0),collision_unaware_interpolation(0),custom_normal_computation(0),
-        collidable_phi_replacement_value((T)1e-5)
+        collision_aware_interpolation_plus(0),collision_aware_interpolation_minus(0),collision_unaware_interpolation(0),collidable_phi_replacement_value((T)1e-5)
     {
         Set_Small_Number();
         Set_Max_Time_Step();
@@ -130,9 +127,6 @@ public:
 
     void Set_Custom_Normal_Interpolation(T_INTERPOLATION_VECTOR& normal_interpolation_input)
     {normal_interpolation=&normal_interpolation_input;}
-
-    void Set_Custom_Normal_Computation(LEVELSET_NORMAL_COMPUTATION<T_GRID>* normal_computation)
-    {custom_normal_computation=normal_computation;}
 
     void Set_Custom_Curvature_Interpolation(T_INTERPOLATION_SCALAR& curvature_interpolation_input)
     {curvature_interpolation=&curvature_interpolation_input;}

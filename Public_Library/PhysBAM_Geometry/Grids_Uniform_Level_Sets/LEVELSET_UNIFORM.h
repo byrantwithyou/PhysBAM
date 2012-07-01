@@ -30,7 +30,7 @@ public:
     typedef T_GRID_input T_GRID;
     typedef LEVELSET<T,T_GRID> BASE;
     using BASE::interpolation;using BASE::secondary_interpolation;using BASE::curvature_interpolation;using BASE::curvature_motion;using BASE::sigma;using BASE::max_time_step;
-    using BASE::collision_body_list;using BASE::collidable_phi_replacement_value;using BASE::valid_mask_current;using BASE::boundary;
+    using BASE::collision_body_list;using BASE::collidable_phi_replacement_value;using BASE::valid_mask_current;using BASE::boundary;using BASE::normal_interpolation;
 
     T_GRID& grid;
     T_ARRAYS_SCALAR& phi;
@@ -124,12 +124,18 @@ public:
     void Write(std::ostream& output) const
     {Write_Binary<RW>(output,grid,phi);}
 
+    static TV Normal_At_Node(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const TV_INT& index)
+    {TV N;for(int d=0;d<TV::m;d++){TV_INT a(index),b(index);a(d)--;b(d)++;N(d)=(phi(b)-phi(a))*grid.one_over_dX(d);}return N.Normalized();}
+
 //#####################################################################
     T Collision_Aware_Phi(const TV& location) const;
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
     T CFL(const T_ARRAYS_VECTOR& velocity) const;
     TV Iterative_Find_Interface(TV left,TV right,const int iterations=3) const;
     void Compute_Gradient(T_ARRAYS_VECTOR& gradient,const T time=0) const;
+    void Compute_Normals(const T time=0);
+    TV Normal(const TV& location) const;
+    TV Extended_Normal(const TV& location) const;
 //#####################################################################
 };
 }

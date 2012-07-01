@@ -105,6 +105,60 @@ Compute_Gradient(T_ARRAYS_VECTOR& gradient,const T time) const
             gradient(cell_index)(axis)=(phi_ghost(cell_index+axis_vector)-phi_ghost(cell_index-axis_vector))*one_over_two_dx(axis);}}
 }
 //#####################################################################
+//#####################################################################
+// Function Normal
+//#####################################################################
+template<class T_GRID> typename T_GRID::VECTOR_T LEVELSET_UNIFORM<T_GRID>::
+Normal(const TV& location) const
+{
+    if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,location).Normalized();
+    TV N;
+    for(int d=0;d<TV::m;d++){
+        TV a(location),b(location);
+        a(d)-=grid.dX(d);
+        b(d)+=grid.dX(d);
+        N(d)=(T).5*(Phi(b)-Phi(a))*grid.one_over_dX(d);}
+    return N.Normalized();
+}
+//#####################################################################
+// Function Extended_Normal
+//#####################################################################
+template<class T_GRID> typename T_GRID::VECTOR_T LEVELSET_UNIFORM<T_GRID>::
+Extended_Normal(const TV& location) const
+{
+    if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,grid.Clamp(location)).Normalized();
+    TV N;
+    for(int d=0;d<TV::m;d++){
+        TV a(location),b(location);
+        a(d)-=grid.dX(d);
+        b(d)+=grid.dX(d);
+        N(d)=(T).5*(Extended_Phi(b)-Extended_Phi(a))*grid.one_over_dX(d);}
+    return N.Normalized();
+}
+//#####################################################################
+// Function Compute_Normals
+//#####################################################################
+// note that sqrt(phix^2+phiy^2+phiz^2)=1 if it's a distance function
+template<class T_GRID> void LEVELSET_UNIFORM<T_GRID>::
+Compute_Normals(const T time)
+{
+    int ghost_cells=3;
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));
+    boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+    TV_INT offset;
+    offset(TV::m-1)=1;
+    for(int d=TV::m-1;d>=1;d--)
+        offset(d-1)=offset(d)*phi_ghost.counts(d);
+
+    if(!normals) normals=new ARRAY<TV,TV_INT>(grid.Domain_Indices(ghost_cells-1));
+    for(CELL_ITERATOR iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next()){
+        const TV_INT& cell = iterator.Cell_Index();
+        int index=phi_ghost.Standard_Index(iterator.Cell_Index());
+        TV& N((*normals)(cell));
+        for(int d=0;d<TV::m;d++)
+            N(d)=(T).5*(phi_ghost.array(index+offset(d))-phi_ghost.array(index-offset(d)))*grid.one_over_dX(d);
+        N.Normalize();}
+}
 #define INSTANTIATION_HELPER(T,d) \
     template class LEVELSET_UNIFORM<GRID<VECTOR<T,d> > >;
 
