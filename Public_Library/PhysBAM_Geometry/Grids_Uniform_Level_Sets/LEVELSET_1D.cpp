@@ -24,14 +24,6 @@ template<class T> LEVELSET_1D<T>::
 ~LEVELSET_1D()
 {}
 //#####################################################################
-// Function Hessian
-//#####################################################################
-template<class T> MATRIX<T,1> LEVELSET_1D<T>::
-Hessian(const VECTOR<T,1>& X) const
-{
-    return MATRIX<T,1>((Phi(X+grid.dX)-2*Phi(X)+Phi(X-grid.dX))/sqr(grid.dX.x));
-}
-//#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
 template<class T> VECTOR<T,0> LEVELSET_1D<T>::

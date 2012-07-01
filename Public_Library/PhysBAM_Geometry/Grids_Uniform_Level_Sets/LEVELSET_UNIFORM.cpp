@@ -159,6 +159,33 @@ Compute_Normals(const T time)
             N(d)=(T).5*(phi_ghost.array(index+offset(d))-phi_ghost.array(index-offset(d)))*grid.one_over_dX(d);
         N.Normalize();}
 }
+//#####################################################################
+// Function Hessian
+//#####################################################################
+template<class T_GRID> SYMMETRIC_MATRIX<typename T_GRID::SCALAR,T_GRID::VECTOR_T::m> LEVELSET_UNIFORM<T_GRID>::
+Hessian(const TV& X) const
+{
+    SYMMETRIC_MATRIX<T,TV::m> H;
+    for(int i=0;i<TV::m;i++){
+        TV A(X),B(X);
+        A(i)-=grid.dX(i);
+        B(i)+=grid.dX(i);
+        H(i,i)=(Phi(B)-2*Phi(X)+Phi(A))*sqr(grid.one_over_dX(i));}
+
+    for(int i=0;i<TV::m;i++){
+        TV A(X),B(X);
+        A(i)-=grid.dX(i);
+        B(i)+=grid.dX(i);
+        for(int j=i+1;j<TV::m;j++){
+            TV C(A),D(A),E(B),F(B);
+            C(j)-=grid.dX(j);
+            D(j)+=grid.dX(j);
+            E(j)-=grid.dX(j);
+            F(j)+=grid.dX(j);
+            H(i,j)=(Phi(F)-Phi(E)-Phi(D)+Phi(A))*(T).25*grid.one_over_dX(i)*grid.one_over_dX(j);}}
+
+    return H;
+}
 #define INSTANTIATION_HELPER(T,d) \
     template class LEVELSET_UNIFORM<GRID<VECTOR<T,d> > >;
 

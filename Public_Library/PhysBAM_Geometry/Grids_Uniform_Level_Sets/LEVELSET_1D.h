@@ -42,7 +42,6 @@ public:
     {return 0;}
 
 //#####################################################################
-    MATRIX<T,1> Hessian(const VECTOR<T,1>& X) const;
     VECTOR<T,0> Principal_Curvatures(const VECTOR<T,1>& X) const;
     void Compute_Normals(const T time=0);
     void Compute_Curvature(const T time=0);

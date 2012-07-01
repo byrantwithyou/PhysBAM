@@ -37,7 +37,6 @@ public:
     {return Compute_Curvature(phi,index);}
 
 //#####################################################################
-    SYMMETRIC_MATRIX<T,3> Hessian(const VECTOR<T,3>& X) const;
     VECTOR<T,2> Principal_Curvatures(const VECTOR<T,3>& X) const;
     void Compute_Curvature(const T time=0);
     T Compute_Curvature(const ARRAY<T,VECTOR<int,3> >& phi_input,const VECTOR<int,3>& index) const;

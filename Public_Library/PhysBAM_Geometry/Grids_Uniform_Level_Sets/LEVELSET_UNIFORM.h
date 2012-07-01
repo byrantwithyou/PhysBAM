@@ -10,6 +10,8 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
@@ -136,6 +138,7 @@ public:
     void Compute_Normals(const T time=0);
     TV Normal(const TV& location) const;
     TV Extended_Normal(const TV& location) const;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
 //#####################################################################
 };
 }

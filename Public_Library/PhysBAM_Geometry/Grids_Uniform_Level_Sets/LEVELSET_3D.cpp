@@ -34,24 +34,6 @@ template<class T_GRID> LEVELSET_3D<T_GRID>::
 ~LEVELSET_3D()
 {}
 //#####################################################################
-// Function Hessian
-//#####################################################################
-template<class T_GRID> SYMMETRIC_MATRIX<typename T_GRID::SCALAR,3> LEVELSET_3D<T_GRID>::
-Hessian(const TV& X) const
-{
-    T one_over_dx=1/grid.dX.x,one_over_dy=1/grid.dX.y,one_over_dz=1/grid.dX.z;T two_phi_center=2*Phi(X);
-    T phi_xx=(Phi(TV(X.x+grid.dX.x,X.y,X.z))-two_phi_center+Phi(TV(X.x-grid.dX.x,X.y,X.z)))*sqr(one_over_dx),
-       phi_yy=(Phi(TV(X.x,X.y+grid.dX.y,X.z))-two_phi_center+Phi(TV(X.x,X.y-grid.dX.y,X.z)))*sqr(one_over_dy),
-       phi_zz=(Phi(TV(X.x,X.y,X.z+grid.dX.z))-two_phi_center+Phi(TV(X.x,X.y,X.z-grid.dX.z)))*sqr(one_over_dz),
-       phi_xy=(Phi(TV(X.x+grid.dX.x,X.y+grid.dX.y,X.z))-Phi(TV(X.x+grid.dX.x,X.y-grid.dX.y,X.z))
-                  -Phi(TV(X.x-grid.dX.x,X.y+grid.dX.y,X.z))+Phi(TV(X.x-grid.dX.x,X.y-grid.dX.y,X.z)))*(T).25*one_over_dx*one_over_dy,
-       phi_xz=(Phi(TV(X.x+grid.dX.x,X.y,X.z+grid.dX.z))-Phi(TV(X.x+grid.dX.x,X.y,X.z-grid.dX.z))
-                  -Phi(TV(X.x-grid.dX.x,X.y,X.z+grid.dX.z))+Phi(TV(X.x-grid.dX.x,X.y,X.z-grid.dX.z)))*(T).25*one_over_dx*one_over_dz,
-       phi_yz=(Phi(TV(X.x,X.y+grid.dX.y,X.z+grid.dX.z))-Phi(TV(X.x,X.y+grid.dX.y,X.z-grid.dX.z))
-                   -Phi(TV(X.x,X.y-grid.dX.y,X.z+grid.dX.z))+Phi(TV(X.x,X.y-grid.dX.y,X.z-grid.dX.z)))*(T).25*one_over_dy*one_over_dz;
-    return SYMMETRIC_MATRIX<T,3>(phi_xx,phi_xy,phi_xz,phi_yy,phi_yz,phi_zz);
-}
-//#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
 template<class T_GRID> VECTOR<typename T_GRID::SCALAR,2> LEVELSET_3D<T_GRID>::

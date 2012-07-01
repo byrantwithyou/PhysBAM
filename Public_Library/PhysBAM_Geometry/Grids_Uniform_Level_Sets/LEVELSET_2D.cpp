@@ -28,19 +28,6 @@ template<class T_GRID> LEVELSET_2D<T_GRID>::
 ~LEVELSET_2D()
 {}
 //#####################################################################
-// Function Hessian
-//#####################################################################
-template<class T_GRID> SYMMETRIC_MATRIX<typename T_GRID::SCALAR,2> LEVELSET_2D<T_GRID>::
-Hessian(const VECTOR<T,2>& X) const
-{
-    T one_over_dx=1/grid.dX.x,one_over_dy=1/grid.dX.y;T two_phi_center=2*Phi(X);
-    T phi_xx=(Phi(VECTOR<T,2>(X.x+grid.dX.x,X.y))-two_phi_center+Phi(VECTOR<T,2>(X.x-grid.dX.x,X.y)))*sqr(one_over_dx),
-       phi_yy=(Phi(VECTOR<T,2>(X.x,X.y+grid.dX.y))-two_phi_center+Phi(VECTOR<T,2>(X.x,X.y-grid.dX.y)))*sqr(one_over_dy),
-       phi_xy=(Phi(VECTOR<T,2>(X.x+grid.dX.x,X.y+grid.dX.y))-Phi(VECTOR<T,2>(X.x+grid.dX.x,X.y-grid.dX.y))
-                  -Phi(VECTOR<T,2>(X.x-grid.dX.x,X.y+grid.dX.y))+Phi(VECTOR<T,2>(X.x-grid.dX.x,X.y-grid.dX.y)))*(T).25*one_over_dx*one_over_dy;
-    return SYMMETRIC_MATRIX<T,2>(phi_xx,phi_xy,phi_yy);
-}
-//#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
 template<class T_GRID> VECTOR<typename T_GRID::SCALAR,1> LEVELSET_2D<T_GRID>::
