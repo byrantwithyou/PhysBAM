@@ -25,3 +25,8 @@ pls/pls
 refinement/refinement
 refinement_pls/refinement_pls
 scalable_rigids/scalable_rigids
+stokes_color/stokes_color
+stokes_color/stokes_color_debug
+poisson_color/poisson_color
+poisson_color/poisson_color_debug
+krylov_solver_test/krylov_solver_test
