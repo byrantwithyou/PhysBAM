@@ -58,7 +58,7 @@ Topology_Aware_Intersection_Test(VECTOR<int,3> a,VECTOR<int,3> b,ARRAY_VIEW<cons
     if(R.Column(0).All_Greater(TV()) || R.Column(1).All_Greater(TV())) return true;
     MATRIX<T,2> S=M2.Inverse()*M1;
     if(S.Column(0).All_Greater(TV()) || S.Column(1).All_Greater(TV())) return true;
-	return false;
+    return false;
 }
 //#####################################################################
 // Function Topology_Aware_Intersection_Test

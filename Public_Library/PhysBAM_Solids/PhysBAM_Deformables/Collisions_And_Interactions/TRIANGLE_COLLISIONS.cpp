@@ -323,7 +323,7 @@ Get_Moving_Faces_Near_Moving_Points(STRUCTURE_INTERACTION_GEOMETRY<TV>& structur
     int old_total=pairs_internal.m;
     TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV> visitor(pairs_internal,pairs_external,structure_1,structure_2,geometry,detection_thickness,mpi_solids);
     if(mpi_solids){
-	 BOX_VISITOR_MPI<TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV> > mpi_visitor(visitor,structure_1.point_processor_masks,structure_2.Face_Processor_Masks());
+        BOX_VISITOR_MPI<TRIANGLE_COLLISIONS_POINT_FACE_VISITOR<TV> > mpi_visitor(visitor,structure_1.point_processor_masks,structure_2.Face_Processor_Masks());
         structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),mpi_visitor,detection_thickness);}
     else structure_1.particle_hierarchy.Intersection_List(structure_2.Face_Hierarchy(),visitor,detection_thickness);
 
