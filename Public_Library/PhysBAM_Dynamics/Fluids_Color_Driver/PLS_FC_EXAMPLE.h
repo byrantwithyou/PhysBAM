@@ -47,8 +47,6 @@ public:
     int time_steps_per_frame;
 
     GRID<TV> grid;
-    MPI_UNIFORM_GRID<GRID<TV> > *mpi_grid;
-    PROJECTION_DYNAMICS_UNIFORM<GRID<TV> > projection;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;

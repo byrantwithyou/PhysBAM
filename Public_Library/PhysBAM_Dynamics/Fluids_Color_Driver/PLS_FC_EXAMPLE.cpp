@@ -15,7 +15,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
     number_of_ghost_cells(3),dt(0),time_steps_per_frame(1),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
-    mpi_grid(0),projection(grid),particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
+    particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
     collision_bodies_affecting_fluid(grid)
 {
 //    incompressible.Set_Custom_Advection(advection_scalar);
@@ -28,9 +28,6 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
 template<class TV> PLS_FC_EXAMPLE<TV>::
 ~PLS_FC_EXAMPLE()
 {
-    if(mpi_grid){
-        delete boundary;
-        delete phi_boundary;}
 }
 //#####################################################################
 // 
@@ -42,20 +39,8 @@ Write_Output_Files(const int frame)
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-    if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&projection)){
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",refinement->levelset_projection.p);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",refinement->levelset_projection.elliptic_solver->psi_N);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",refinement->levelset_projection.elliptic_solver->psi_D);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_mac_velocities",refinement->coarse_face_velocities);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/coarse_grid",refinement->coarse_grid);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_psi_N",refinement->elliptic_solver->psi_N);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_psi_D",refinement->elliptic_solver->psi_D);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_levelset",refinement->coarse_levelset);}
-    else{
-//        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",incompressible.projection.p);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);}
+//    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
+//    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
     T_PARTICLE_LEVELSET& particle_levelset=particle_levelset_evolution.particle_levelset;
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);

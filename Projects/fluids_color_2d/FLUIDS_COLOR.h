@@ -26,7 +26,7 @@ class WATER_TESTS:public PLS_FC_EXAMPLE<TV>
     RANGE<TV> source;
 
 public:
-    using BASE::grid;using BASE::projection;using BASE::output_directory;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;
+    using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
 
     WATER_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
@@ -57,7 +57,9 @@ public:
     {BASE::Write_Output_Files(frame);}
 
     void Set_Boundary_Conditions(const T time)
-    {projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
+    {
+#if 0
+    projection.elliptic_solver->psi_D.Fill(false);projection.elliptic_solver->psi_N.Fill(false);
     for(int axis=0;axis<TV::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
         TV_INT interior_cell_offset=axis_side==0?TV_INT():-TV_INT::Axis_Vector(axis);
         TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();
@@ -74,7 +76,9 @@ public:
         if(time<=3 && Lazy_Inside_Source(iterator.Location())){
             projection.elliptic_solver->psi_N(iterator.Full_Index())=true;
             if(iterator.Axis()==1) face_velocities(iterator.Full_Index())=-1;
-            else face_velocities(iterator.Full_Index())=0;}}}
+            else face_velocities(iterator.Full_Index())=0;}}
+#endif
+    }
 
     bool Lazy_Inside_Source(const VECTOR<T,2> X)
     {

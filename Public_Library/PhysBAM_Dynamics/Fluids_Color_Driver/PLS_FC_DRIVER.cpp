@@ -65,7 +65,6 @@ Initialize()
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
         example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
-        example.projection.Initialize_Grid(example.grid);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     example.face_velocities.Resize(example.grid);
@@ -73,20 +72,8 @@ Initialize()
     example.particle_levelset_evolution.Set_Time(time);
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
 
-    if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
-    example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
-    example.particle_levelset_evolution.Particle_Levelset(0).mpi_grid=example.mpi_grid;
-    if(example.mpi_grid){
-        example.boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.boundary_scalar);
-        example.phi_boundary=new BOUNDARY_MPI<GRID<TV> >(example.mpi_grid,example.phi_boundary_water);
-        example.particle_levelset_evolution.Particle_Levelset(0).last_unique_particle_id=example.mpi_grid->rank*30000000;}
-    else{
-        example.boundary=&example.boundary_scalar;
-        example.phi_boundary=&example.phi_boundary_water;}
-
-    if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> > *refine=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&example.projection)){
-        refine->boundary=example.boundary;
-        refine->phi_boundary=example.phi_boundary;}
+    example.boundary=&example.boundary_scalar;
+    example.phi_boundary=&example.phi_boundary_water;
 
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
@@ -97,7 +84,6 @@ Initialize()
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
         example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
-        example.projection.Initialize_Grid(example.grid);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
     
@@ -120,7 +106,6 @@ Initialize()
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
         example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
-        example.projection.Initialize_Grid(example.grid);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
 
@@ -235,15 +220,11 @@ Advance_One_Time_Step(bool first_step)
 // TODO Set_Dirichlet_Boundary_Conditions
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",0,1);
 
-    example.projection.p*=dt;
-    example.projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method();
 // TODO Advance_One_Time_Step_Implicit_Part
-    example.projection.p*=(1/dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
 
 // TODO example.incompressible.boundary->Apply_Boundary_Condition_Face(example.incompressible.grid,example.face_velocities,time+dt);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after boundary",0,1);
-    example.projection.collidable_solver->Set_Up_Second_Order_Cut_Cell_Method(false);
 
     LOG::Time("extrapolating velocity across interface");
     int band_width=example.number_of_ghost_cells+1;
