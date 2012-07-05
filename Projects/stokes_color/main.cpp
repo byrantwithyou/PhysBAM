@@ -85,7 +85,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(grid,phi_value,phi_color);
     iss.use_preconditioner=use_preconditioner;
-    iss.Set_Matrix(at.mu,at.wrap,&at);
+    iss.Set_Matrix(at.mu,at.wrap,&at,0);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -114,7 +114,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
                 FACE_INDEX<TV::m> face(it.Full_Index()); 
                 u(c)(face)=at.u(it.Location(),c)(face.axis);}
         
-        iss.Set_RHS(rhs,f_volume,u);
+        iss.Set_RHS(rhs,f_volume,&u);
         iss.Resize_Vector(sol);
     }
 

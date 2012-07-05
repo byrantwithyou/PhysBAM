@@ -47,7 +47,7 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T inertial_coefficient)
 {
     // SET UP STENCILS
 
@@ -90,7 +90,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc)
     
     BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,phi_value,phi_color,*cdi);
     VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m>,TV::m> helper_uu;
-    VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m> helper_pu,helper_rhs_pu;
+    VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m> helper_pu,helper_rhs_pu,helper_inertial_rhs;
     VECTOR<SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>,TV::m> helper_qu;
 
     for(int i=0;i<TV::m;i++){
@@ -98,7 +98,9 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc)
             helper_uu(i)(j).Initialize(*u_stencil(i),*u_stencil(j),*cm_u(i),*cm_u(j),*cdi);
         helper_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
         helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
-        helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);}
+        helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
+        if(inertial_coefficient)
+            helper_inertial_rhs(i).Initialize(*u_stencil(i),*u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
 
     ARRAY<T> double_mu(mu*(T)2),ones(CONSTANT_ARRAY<T>(mu.m,(T)1)),minus_ones(CONSTANT_ARRAY<T>(mu.m,-(T)1));
 
@@ -115,6 +117,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc)
     for(int i=0;i<TV::m;i++)
         for(int j=i+1;j<TV::m;j++)
             biu.Add_Volume_Block(helper_uu(i)(j),*udx_stencil(i)(j),*udx_stencil(j)(i),mu);
+    // Diagonal inertial term (use p stencil since it will give us what we want)
+    if(inertial_coefficient){
+        ARRAY<T> coeff(CONSTANT_ARRAY<T>(mu.m,inertial_coefficient));
+        for(int i=0;i<TV::m;i++)
+            biu.Add_Volume_Block(helper_uu(i)(i),*u_stencil(i),*u_stencil(i),coeff);}
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),minus_ones);
@@ -193,17 +200,16 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc)
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >& u)
+Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u)
 {
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
-    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> U;
     
+    Resize_Vector(rhs); // assumes rhs was 0
+
     for(int i=0;i<TV::m;i++){
         F_volume(i).Resize(cdi->colors);
-        U(i).Resize(cdi->colors);
-        for(int c=0;c<cdi->colors;c++){
-            F_volume(i)(c).Resize(cm_p->dofs(c));
-            U(i)(c).Resize(cm_u(i)->dofs(c));}}
+        for(int c=0;c<cdi->colors;c++)
+            F_volume(i)(c).Resize(cm_p->dofs(c));}
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
         for(int c=0;c<cdi->colors;c++){
@@ -212,25 +218,33 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY
                 for(int i=0;i<TV::m;i++)
                     F_volume(i)(c)(k)=f_volume(c)(it.index)(i);}
 
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-        FACE_INDEX<TV::m> face(it.Full_Index()); 
-        for(int c=0;c<cdi->colors;c++){
-            int k=cm_u(face.axis)->Get_Index(it.index,c);
-            if(k>=0) U(face.axis)(c)(k)=u(c)(face);}}
+    for(int i=0;i<TV::m;i++)
+        for(int c=0;c<cdi->colors;c++)
+            matrix_rhs_pu(i)(c).Transpose_Times_Add(F_volume(i)(c),rhs.u(i)(c));
 
-    Resize_Vector(rhs); // assumes rhs was 0
+    if(u){
+        VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> U;
+        for(int i=0;i<TV::m;i++){
+            U(i).Resize(cdi->colors);
+            for(int c=0;c<cdi->colors;c++){
+                U(i)(c).Resize(cm_u(i)->dofs(c));}}
+
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            FACE_INDEX<TV::m> face(it.Full_Index()); 
+            for(int c=0;c<cdi->colors;c++){
+                int k=cm_u(face.axis)->Get_Index(it.index,c);
+                if(k>=0) U(face.axis)(c)(k)=(*u)(c)(face);}}
+
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<cdi->colors;c++){
+                matrix_qu(i)(c).Times_Add(U(i)(c),rhs.q);
+                matrix_pu(i)(c).Times_Add(U(i)(c),rhs.p(c));}}
 
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++)
             for(int j=0;j<cdi->flat_size;j++){
                 int k=cm_u(i)->Get_Index(j,c);
                 if(k>=0) rhs.u(i)(c)(k)+=rhs_surface(i)(c)(j);}
-    
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<cdi->colors;c++){
-            matrix_rhs_pu(i)(c).Transpose_Times_Add(F_volume(i)(c),rhs.u(i)(c));
-            matrix_qu(i)(c).Times_Add(U(i)(c),rhs.q);
-            matrix_pu(i)(c).Times_Add(U(i)(c),rhs.p(c));}
 
     for(int i=0;i<TV::m;i++) matrix_rhs_pu(i).Clean_Memory();
     for(int i=0;i<TV::m;i++) rhs_surface(i).Clean_Memory();
