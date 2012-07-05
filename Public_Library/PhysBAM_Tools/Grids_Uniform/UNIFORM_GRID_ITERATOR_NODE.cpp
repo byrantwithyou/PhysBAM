@@ -26,10 +26,10 @@ UNIFORM_GRID_ITERATOR_NODE(const GRID<TV>& grid_input,const int number_of_ghost_
                     domain.max_corner(axis)=0;
                     Add_Region(domain);
                     domain.max_corner(axis)=max_copy(axis);
-                    domain.min_corner(axis)=counts(axis)+1;
+                    domain.min_corner(axis)=counts(axis);
                     Add_Region(domain);
                     domain.max_corner(axis)=counts(axis);
-                    domain.min_corner(axis)=1;}}
+                    domain.min_corner(axis)=0;}}
             else{int axis=side/2;if(side&1) domain.min_corner(axis)=counts(axis)+1;else domain.max_corner(axis)=0;Add_Region(domain);}
             break;
         case GRID<TV>::BOUNDARY_REGION: // outer boundary of grid with specified ghost cells
