@@ -10,40 +10,42 @@ using namespace PhysBAM;
 
 template<class T> T f(const VECTOR<T,1>& r){return cos(r.x);}
 
+typedef float RW;
+typedef double T;
+typedef VECTOR<T,1> TV;
+typedef VECTOR<int,1> TV_INT;
+
 int main(int argc,char* argv[])
 {
-    typedef double T;
-    typedef VECTOR<T,1> TV;
-    typedef VECTOR<int,1> TV_INT;
     LOG::cout<<std::setprecision(2*sizeof(T));
 
     int resolution=atoi(argv[1]);
     int iterations=atoi(argv[2]);
     int order=atoi(argv[3]);
+    int ghost=atoi(argv[4]);
 
-    GRID<TV> grid(TV_INT(resolution),RANGE<TV>::Centered_Box()*(T)pi,true);
-    ARRAY<T,FACE_INDEX<TV::m> > x(grid.Domain_Indices());
+    GRID<TV> grid(TV_INT()+resolution,RANGE<TV>::Centered_Box()*(T)pi,true);
+    ARRAY<T,FACE_INDEX<TV::m> > x(grid.Domain_Indices(ghost));
+    ARRAY<bool,FACE_INDEX<TV::m> > inside(grid.Domain_Indices());
     ARRAY<T,TV_INT> p(grid.Domain_Indices());
     LEVELSET_1D<T> phi(grid,p);
-
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
-        TV X(it.Location());
-        T r=X.Magnitude()-sqrt((T)2.0);
-        p(it.index)=r;}
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV X(it.Location());
         T r=X.Magnitude()-sqrt((T)2.0);
-        if(r<=0) x(it.Full_Index())=f(it.Location())+it.Axis();}
+        p(it.index)=r;
+        if(r<=0){
+            x(it.Full_Index())=f(it.Location());
+            inside(it.Full_Index())=true;}}
 
-    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,0,x,iterations,order,3);
+    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,inside,ghost,x,iterations,order,ghost);
 
     T m=0;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV X(it.Location()),Y=X;
         T r=Y.Normalize(),c=sqrt((T)2.0);
-        T e=x(it.Full_Index())-(f(X)+it.Axis());
-        if(r-c<grid.dX.Max()*3) m=max(abs(e),m);}
+        T e=x(it.Full_Index())-f(X);
+        if(r-c<grid.dX.Max()*ghost) m=max(abs(e),m);}
     LOG::cout<<"L-inf "<<m<<std::endl;
 
     return 0;

@@ -7,6 +7,9 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <cmath>
 #include <cstdio>
@@ -26,7 +29,10 @@ template<class TV>
 void Fill_Ghost_Cells(const GRID<TV>& grid,int ghost,int distance,ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >& u,const BOUNDARY_CONDITIONS<TV>& bc)
 {
     typedef typename TV::SCALAR T;
-    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,*bc.phi,ghost,u,100,3,distance);
+    ARRAY<bool,FACE_INDEX<TV::m> > inside(grid.Domain_Indices());
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+        inside(it.Full_Index())=bc.phi->Phi(it.Location())<=0;
+    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,*bc.phi,inside,ghost,u,100,3,distance);
 }
 
 template<class TV>
