@@ -46,11 +46,10 @@ public:
     T dt;
     int time_steps_per_frame;
 
-    GRID<TV> mac_grid;
+    GRID<TV> grid;
     MPI_UNIFORM_GRID<GRID<TV> > *mpi_grid;
     PROJECTION_DYNAMICS_UNIFORM<GRID<TV> > projection;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
-    INCOMPRESSIBLE_UNIFORM<GRID<TV> > incompressible;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
@@ -72,7 +71,7 @@ public:
         TV& X=particles.X(index);TV X_new=X+dt*V;
         T max_collision_distance=particle_levelset_evolution.particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
         T min_collision_distance=particle_levelset_evolution.particle_levelset.min_collision_distance_factor*max_collision_distance;
-        TV min_corner=mac_grid.domain.Minimum_Corner(),max_corner=mac_grid.domain.Maximum_Corner();
+        TV min_corner=grid.domain.Minimum_Corner(),max_corner=grid.domain.Maximum_Corner();
         for(int axis=0;axis<GRID<TV>::dimension;axis++){
             if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
                 T collision_distance=X[axis]-min_corner[axis];

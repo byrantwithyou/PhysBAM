@@ -14,9 +14,9 @@ template<class TV> PLS_FC_EXAMPLE<TV>::
 PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
-    number_of_ghost_cells(3),dt(0),time_steps_per_frame(1),mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
-    mpi_grid(0),projection(mac_grid),particle_levelset_evolution(mac_grid,number_of_ghost_cells),boundary(0),
-    collision_bodies_affecting_fluid(mac_grid)
+    number_of_ghost_cells(3),dt(0),time_steps_per_frame(1),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
+    mpi_grid(0),projection(grid),particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
+    collision_bodies_affecting_fluid(grid)
 {
 //    incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
@@ -41,7 +41,7 @@ Write_Output_Files(const int frame)
     if(!write_output_files) return;
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
+    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
     if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
     if(PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >* refinement=dynamic_cast<PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<GRID<TV> >*>(&projection)){
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/pressure",refinement->levelset_projection.p);
