@@ -45,7 +45,7 @@ template<class TV> INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool double_fine)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool double_fine)
 {
     // SET LEVELSET EXACTLY ON DOUBLE FINE GRID
 

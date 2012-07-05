@@ -64,10 +64,10 @@ public:
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const ARRAY<T>& scale);
     template<int d>
     void Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale);
+        BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale);
     template<int d>
     void Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale);
+        BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale);
 };
 }
 #endif

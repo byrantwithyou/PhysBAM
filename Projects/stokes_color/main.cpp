@@ -16,7 +16,7 @@
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
-#include <PhysBAM_Geometry/Finite_Elements/ANALYTIC_BOUNDARY_CONDITIONS_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
@@ -49,16 +49,15 @@ template<class TV> struct ANALYTIC_TEST;
 //#################################################################################################################################################
 
 template<class TV>
-struct ANALYTIC_TEST: public ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>
+struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_COLOR<TV>
 {
     typedef typename TV::SCALAR T;
-    using ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>::kg;
-    using ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>::m;
-    using ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>::s;
+    T kg,m,s;
 
     bool wrap;
     ARRAY<T> mu;
 
+    ANALYTIC_TEST(): kg(1),m(1),s(1) {}
     virtual ~ANALYTIC_TEST(){}
 
     virtual void Initialize()=0;

@@ -401,7 +401,7 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCI
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    ANALYTIC_BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale)
+    BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale)
 {
     SURFACE_BLOCK* sb=new SURFACE_BLOCK;
     sb->Initialize(helper,s,abc,f_surface,axis,scale);
@@ -418,7 +418,7 @@ Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STEN
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale)
+    BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale)
 {
     SURFACE_BLOCK_SCALAR* sbs=new SURFACE_BLOCK_SCALAR;
     sbs->Initialize(helper,s,abc,f_surface,scale);
@@ -437,17 +437,17 @@ template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Blo
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ARRAY<float> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,int,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,int,float);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,3>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,3> >*,ARRAY<VECTOR_ND<float> >&,float);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ARRAY<float> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,int,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,int,float);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<float,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,float);
+    BASIS_STENCIL_UNIFORM<VECTOR<float,2>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<float,2> >*,ARRAY<VECTOR_ND<float> >&,float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>;
 template class BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>;
@@ -456,15 +456,15 @@ template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Bl
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ARRAY<double> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,int,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,int,double);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,3>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,3> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,3>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,3> >*,ARRAY<VECTOR_ND<double> >&,double);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<0,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,0> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Volume_Block<1,1>(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
     BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ARRAY<double> const&);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block<1>(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,int,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BOUNDARY_CONDITIONS_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,int,double);
 template void BASIS_INTEGRATION_UNIFORM_COLOR<VECTOR<double,2>,2>::Add_Surface_Block_Scalar<1>(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<double,2> >&,
-    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,ANALYTIC_BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,double);
+    BASIS_STENCIL_UNIFORM<VECTOR<double,2>,1> const&,BOUNDARY_CONDITIONS_SCALAR_COLOR<VECTOR<double,2> >*,ARRAY<VECTOR_ND<double> >&,double);
 #endif
