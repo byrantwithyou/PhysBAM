@@ -36,7 +36,10 @@ void Run(const STREAM_TYPE& stream_type,const std::string& file)
         val=std::max(val,-(T)3.5-X.y);
         phi_array(it.index)=val;}
 
-    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,ghost,u,100,3,ghost-1);
+    ARRAY<bool,FACE_INDEX<2> > inside(grid);
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+        inside(it.Full_Index())=phi.Phi(it.Location());
+    EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(grid,phi,inside,ghost,u,100,3,ghost-1);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,ghost);it.Valid();it.Next()){
         T du=u(FACE_INDEX<2>(1,it.index+TV_INT(1,0)))-u(FACE_INDEX<2>(1,it.index));
