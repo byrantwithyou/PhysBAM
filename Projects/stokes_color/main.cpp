@@ -57,7 +57,7 @@ struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_COLOR<TV>
     bool wrap;
     ARRAY<T> mu;
 
-    ANALYTIC_TEST(): kg(1),m(1),s(1) {}
+    ANALYTIC_TEST(): kg(1),m(1),s(1),wrap(false) {}
     virtual ~ANALYTIC_TEST(){}
 
     virtual void Initialize()=0;
