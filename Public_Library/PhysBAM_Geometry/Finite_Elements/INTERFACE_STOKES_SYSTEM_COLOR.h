@@ -61,7 +61,7 @@ public:
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_pu;
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_qu;
 
-    VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu,inertial_rhs;
+    VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu,matrix_inertial_rhs;
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> rhs_surface;
 
     VECTOR<VECTOR_T,TV::m> null_u;
@@ -91,7 +91,7 @@ public:
 
 //#####################################################################
     void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T inertial_coefficient);
-    void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u=0);
+    void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u=0,bool analytic_velocity_correction=false);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

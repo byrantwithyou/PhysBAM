@@ -114,7 +114,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
                 FACE_INDEX<TV::m> face(it.Full_Index()); 
                 u(c)(face)=at.u(it.Location(),c)(face.axis);}
         
-        iss.Set_RHS(rhs,f_volume,&u);
+        iss.Set_RHS(rhs,f_volume,&u,true);
         iss.Resize_Vector(sol);
     }
 

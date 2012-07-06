@@ -117,11 +117,12 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
     for(int i=0;i<TV::m;i++)
         for(int j=i+1;j<TV::m;j++)
             biu.Add_Volume_Block(helper_uu(i)(j),*udx_stencil(i)(j),*udx_stencil(j)(i),mu);
-    // Diagonal inertial term (use p stencil since it will give us what we want)
+    // Diagonal inertial term
     if(inertial_coefficient){
         ARRAY<T> coeff(CONSTANT_ARRAY<T>(mu.m,inertial_coefficient));
-        for(int i=0;i<TV::m;i++)
-            biu.Add_Volume_Block(helper_uu(i)(i),*u_stencil(i),*u_stencil(i),coeff);}
+        for(int i=0;i<TV::m;i++){
+            biu.Add_Volume_Block(helper_uu(i)(i),*u_stencil(i),*u_stencil(i),coeff);
+            biu.Add_Volume_Block(helper_inertial_rhs(i),*u_stencil(i),*u_stencil(i),coeff);}}
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),minus_ones);
@@ -159,7 +160,10 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
     // RHS PU Block 
     for(int i=0;i<TV::m;i++)
         helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
-
+    // RHS Inertial Block 
+    if(inertial_coefficient)
+        for(int i=0;i<TV::m;i++)
+            helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
     // FILL IN THE NULL MODES
 
     for(int i=0;i<TV::m;i++) inactive_u(i).Resize(cdi->colors);
@@ -200,7 +204,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u)
+Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
 {
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
     
@@ -236,9 +240,15 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY
                 if(k>=0) U(face.axis)(c)(k)=(*u)(c)(face);}}
 
         for(int i=0;i<TV::m;i++)
-            for(int c=0;c<cdi->colors;c++){
-                matrix_qu(i)(c).Times_Add(U(i)(c),rhs.q);
-                matrix_pu(i)(c).Times_Add(U(i)(c),rhs.p(c));}}
+            if(matrix_inertial_rhs(i).m)
+                for(int c=0;c<cdi->colors;c++)
+                    matrix_inertial_rhs(i)(c).Times_Add(U(i)(c),rhs.u(i)(c));
+
+        if(analytic_velocity_correction)
+            for(int i=0;i<TV::m;i++)
+                for(int c=0;c<cdi->colors;c++){
+                    matrix_qu(i)(c).Times_Add(U(i)(c),rhs.q);
+                    matrix_pu(i)(c).Times_Add(U(i)(c),rhs.p(c));}}
 
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++)

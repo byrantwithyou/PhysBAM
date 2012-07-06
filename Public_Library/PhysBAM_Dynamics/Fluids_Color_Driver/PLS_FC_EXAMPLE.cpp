@@ -14,11 +14,11 @@ template<class TV> PLS_FC_EXAMPLE<TV>::
 PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
-    number_of_ghost_cells(3),dt(0),time_steps_per_frame(1),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
+    number_of_ghost_cells(3),dt(0),time_steps_per_frame(1),use_preconditioner(true),max_iter(1000),
+    dump_matrix(false),wrap(true),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
-    collision_bodies_affecting_fluid(grid)
+    levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(grid)
 {
-//    incompressible.Set_Custom_Advection(advection_scalar);
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;
 }
@@ -28,6 +28,8 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
 template<class TV> PLS_FC_EXAMPLE<TV>::
 ~PLS_FC_EXAMPLE()
 {
+    delete &levelset_color.color;
+    delete &levelset_color.phi;
 }
 //#####################################################################
 // 

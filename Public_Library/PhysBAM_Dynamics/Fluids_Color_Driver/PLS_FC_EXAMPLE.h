@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/LEVELSET_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
@@ -45,15 +46,22 @@ public:
 
     T dt;
     int time_steps_per_frame;
+    bool use_preconditioner;
+    int max_iter;
+    bool dump_matrix;
+    bool wrap;
+    ARRAY<T> mu;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
+    ARRAY<int,FACE_INDEX<TV::dimension> > face_color;
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
     T_BOUNDARY_PHI_WATER phi_boundary_water;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
+    LEVELSET_COLOR<TV> levelset_color;
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;    
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
