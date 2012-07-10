@@ -180,7 +180,8 @@ Extrapolate_RK2(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,AR
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,int iterations,int order,int fill_width)
+Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,
+    int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,int iterations,int order,int fill_width)
 {
     PHYSBAM_ASSERT(order>=1 && order<=3);
     PHYSBAM_ASSERT(!grid.Is_MAC_Grid());
@@ -203,7 +204,8 @@ Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,int iterations,int order,int fill_width)
+Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,
+    int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,int iterations,int order,int fill_width)
 {
     GRID<TV> node_grid(grid.Get_Regular_Grid_At_MAC_Positions());
     Extrapolate_Node(node_grid,phi,inside_mask,ghost,u,iterations,order,fill_width);
@@ -212,7 +214,8 @@ Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE
 // Function Quadratic_Extrapolate
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
-Extrapolate_Face(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int iterations,int order,int fill_width)
+Extrapolate_Face(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,
+    int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& u,int iterations,int order,int fill_width)
 {
     for(int i=0;i<TV::m;i++){
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
