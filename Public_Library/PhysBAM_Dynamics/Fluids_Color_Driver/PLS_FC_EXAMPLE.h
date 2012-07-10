@@ -6,6 +6,7 @@
 #define __PLS_FC_EXAMPLE__
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_SEMI_LAGRANGIAN_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
+#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/PROJECTION_UNIFORM.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -59,10 +60,10 @@ public:
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
-    T_BOUNDARY_PHI_WATER phi_boundary_water;
+    BOUNDARY_EXTRAPOLATE_CELL<TV,T> cell_extrapolate;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     LEVELSET_COLOR<TV> levelset_color;
-    T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;    
+    T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_FC_EXAMPLE();

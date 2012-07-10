@@ -68,8 +68,6 @@ Initialize()
     output_number=current_frame;
     time=example.time_steps_per_frame*current_frame*example.dt;
 
-    example.phi_boundary_water.Set_Velocity_Pointer(example.face_velocities);
-
     example.levelset_color.phi.Resize(example.grid.Node_Indices());
     example.levelset_color.color.Resize(example.grid.Node_Indices());
     example.face_velocities.Resize(example.grid);
@@ -84,7 +82,7 @@ Initialize()
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
 
     example.boundary=&example.boundary_scalar;
-    example.phi_boundary=&example.phi_boundary_water;
+    example.phi_boundary=&example.cell_extrapolate;
 
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_open_boundaries=VECTOR_UTILITIES::Complement(example.domain_boundary);
     example.phi_boundary->Set_Constant_Extrapolation(domain_open_boundaries);
@@ -161,17 +159,14 @@ Update_Pls(T dt)
     example.phi_boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution.Particle_Levelset(0).levelset.phi,phi_back,dt,time,example.number_of_ghost_cells);
     LOG::Time("Advect Levelset");
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi",0,1);
-    example.phi_boundary_water.Use_Extrapolation_Mode(false);
     example.particle_levelset_evolution.Advance_Levelset(dt);
-    example.phi_boundary_water.Use_Extrapolation_Mode(true);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after phi",0,1);
     LOG::Time("advecting particles");
     example.particle_levelset_evolution.Particle_Levelset(0).Euler_Step_Particles(face_velocities_ghost,dt,time,true,true,false,false);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after advection",0,1);
 
     LOG::Time("updating removed particle velocities");
-    example.phi_boundary_water.Use_Extrapolation_Mode(true);
-    example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);
+        example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after particles",0,1);
 
     example.particle_levelset_evolution.Make_Signed_Distance();
