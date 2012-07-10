@@ -18,6 +18,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_DRIVER.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
@@ -69,12 +70,15 @@ Initialize()
 
     example.phi_boundary_water.Set_Velocity_Pointer(example.face_velocities);
 
+    example.levelset_color.phi.Resize(example.grid.Node_Indices());
+    example.levelset_color.color.Resize(example.grid.Node_Indices());
+    example.face_velocities.Resize(example.grid);
+    example.face_color.Resize(example.grid);
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
         example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
         example.collision_bodies_affecting_fluid.Initialize_Grids();
     }
-    example.face_velocities.Resize(example.grid);
 
     example.particle_levelset_evolution.Set_Time(time);
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
@@ -120,8 +124,7 @@ Initialize()
         example.collision_bodies_affecting_fluid.Update_Intersection_Acceleration_Structures(false);
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.Minimum_Edge_Length(),5);
-        example.Initialize_Phi();
-        example.Adjust_Phi_With_Sources(time);
+        example.Initialize();
         example.particle_levelset_evolution.Make_Signed_Distance();
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);}
 
@@ -135,7 +138,6 @@ Initialize()
     example.particle_levelset_evolution.particle_levelset.levelset.boundary->Fill_Ghost_Cells(example.grid,example.particle_levelset_evolution.phi,exchanged_phi_ghost,0,time,extrapolation_cells);
 // TODO    example.incompressible.Extrapolate_Velocity_Across_Interface(example.face_velocities,exchanged_phi_ghost,false,example.number_of_ghost_cells,0,TV());
 
-    example.Set_Boundary_Conditions(time); // get so CFL is correct
     if(!example.restart) Write_Output_Files(0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after init",0,1);
 }
@@ -253,16 +255,16 @@ Apply_Pressure_And_Viscosity(T dt)
             u(c)(it.Full_Index())=example.face_velocities(it.Full_Index());
             inside(c)(it.Full_Index())=true;}
 
-        ARRAY<T,TV_INT> color_phi(example.levelset_color.grid.Domain_Indices());
-        typename LEVELSET_POLICY<GRID<TV> >::LEVELSET phi(example.levelset_color.grid,color_phi);
+//        ARRAY<T,TV_INT> color_phi(example.levelset_color.grid.Domain_Indices());
+//        typename LEVELSET_POLICY<GRID<TV> >::LEVELSET phi(example.levelset_color.grid,color_phi);
         for(int c=0;c<iss.cdi->colors;c++){
-            for(UNIFORM_GRID_ITERATOR_CELL<TV> it(example.levelset_color.grid);it.Valid();it.Next()){
-                int k=example.levelset_color.color(it.index);
-                T p=example.levelset_color.phi(it.index);
-                if(k!=c) p=-p;
-                color_phi(it.index)=p;}
+            // for(UNIFORM_GRID_ITERATOR_CELL<TV> it(example.levelset_color.grid);it.Valid();it.Next()){
+            //     int k=example.levelset_color.color(it.index);
+            //     T p=example.levelset_color.phi(it.index);
+            //     if(k!=c) p=-p;
+            //     color_phi(it.index)=p;}
 
-            EXTRAPOLATION_HIGHER_ORDER<TV,T>::Extrapolate_Face(example.grid,phi,inside(c),2,u(c),20,3,2);
+            EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,inside(c),2,u(c),3,2);
             f_volume(c).Resize(example.grid.Domain_Indices());
             u(c).Resize(example.grid);
             inside(c).Resize(example.grid);}
