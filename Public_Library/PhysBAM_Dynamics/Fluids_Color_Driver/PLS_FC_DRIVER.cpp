@@ -271,11 +271,9 @@ Apply_Pressure_And_Viscosity(T dt)
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
 
-    for(int i=0;i<TV::m;i++){
-        iss.Multiply(iss.null_u(i),*vectors(0));
-        LOG::cout<<"null u["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
-    iss.Multiply(iss.null_p,*vectors(0));
-    LOG::cout<<"null p "<<" "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
+    for(int i=0;i<iss.null_modes.m;i++){
+        iss.Multiply(iss.null_modes(i),*vectors(0));
+        LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());

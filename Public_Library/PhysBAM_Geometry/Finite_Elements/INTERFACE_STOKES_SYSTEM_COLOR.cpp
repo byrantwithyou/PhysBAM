@@ -171,29 +171,26 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
 
     if(this->use_preconditioner) Set_Jacobi_Preconditioner();
 
-    Resize_Vector(null_p);
-    for(int c=0;c<cdi->colors;c++){
-        null_p.p(c).Fill(1);
-        int start=cdi->constraint_base_t*(TV::m-1);
-        int end=start+cdi->constraint_base_n;
-        for(int k=start;k<end;k++)
-            null_p.q(k)=-1;}
-    for(int c=0;c<cdi->colors;c++)
-        for(int k=0;k<inactive_p(c).m;k++)
-            null_p.p(c)(inactive_p(c)(k))=0;
-    for(int k=0;k<inactive_q.m;k++)
-        null_p.q(inactive_q(k))=0;
-    null_p.Normalize();
-
-    for(int i=0;i<TV::m;i++){
-        Resize_Vector(null_u(i));
+    if(true){
+        null_modes.Append(VECTOR_T());
+        Resize_Vector(null_modes.Last());
         for(int c=0;c<cdi->colors;c++){
-            VECTOR_ND<T>& u=null_u(i).u(i)(c);
-            const ARRAY<int>& inactive=inactive_u(i)(c);
-            u.Fill(1);
-            for(int k=0;k<inactive.m;k++)
-                u(inactive(k))=0;}
-        null_u(i).Normalize();}
+            null_modes.Last().p(c).Fill(1);
+            int start=cdi->constraint_base_t*(TV::m-1);
+            int end=start+cdi->constraint_base_n;
+            for(int k=start;k<end;k++)
+                null_modes.Last().q(k)=-1;}}
+
+    if(!inertial_coefficient)
+        for(int i=0;i<TV::m;i++){
+            null_modes.Append(VECTOR_T());
+            Resize_Vector(null_modes.Last());
+            for(int c=0;c<cdi->colors;c++)
+                null_modes.Last().u(i)(c).Fill(1);}
+
+    for(int i=0;i<null_modes.m;i++){
+        Clear_Unused_Entries(null_modes(i));
+        null_modes(i).Normalize();}
 
     for(int i=0;i<TV::m;i++){
         delete u_stencil(i);
@@ -361,17 +358,11 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
     return debug_cast<const VECTOR_T&>(x).Max_Abs();
 }
 //#####################################################################
-// Function Project
+// Function Clear_Unused_Entries
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Project(KRYLOV_VECTOR_BASE<T>& x) const
+Clear_Unused_Entries(VECTOR_T& v) const
 {
-    // TODO: This needs to change for N/D BC.
-    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
-    v.Copy(-v.Dot(null_p),null_p,v);
-    for(int i=0;i<TV::m;i++)
-        v.Copy(-v.Dot(null_u(i)),null_u(i),v);
-
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++){
             VECTOR_ND<T>& u=v.u(i)(c);
@@ -385,6 +376,19 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
 
     for(int k=0;k<inactive_q.m;k++)
         v.q(inactive_q(k))=0;
+}
+//#####################################################################
+// Function Project
+//#####################################################################
+template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
+Project(KRYLOV_VECTOR_BASE<T>& x) const
+{
+    // TODO: This needs to change for N/D BC.
+    VECTOR_T& v=debug_cast<VECTOR_T&>(x);
+    for(int i=0;i<null_modes.m;i++)
+        v.Copy(-v.Dot(null_modes(i)),null_modes(i),v);
+
+    Clear_Unused_Entries(v);
 }
 //#####################################################################
 // Function Set_Boundary_Conditions

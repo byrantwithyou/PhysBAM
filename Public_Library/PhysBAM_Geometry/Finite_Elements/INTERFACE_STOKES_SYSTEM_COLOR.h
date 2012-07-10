@@ -64,8 +64,7 @@ public:
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu,matrix_inertial_rhs;
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> rhs_surface;
 
-    VECTOR<VECTOR_T,TV::m> null_u;
-    VECTOR_T null_p;
+    ARRAY<VECTOR_T> null_modes;
     VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;
     ARRAY<ARRAY<int> > inactive_p;
     ARRAY<int> inactive_q;
@@ -97,6 +96,7 @@ public:
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;
     void Project(KRYLOV_VECTOR_BASE<T>& x) const;
+    void Clear_Unused_Entries(VECTOR_T& v) const;
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const;
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const;
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const;
