@@ -43,6 +43,9 @@ public:
     {int c;Phi_And_Color(X,c);return c;}
 
     T Phi_And_Color(const TV& X,int& c) const;
+
+    void Get_Raw_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const;
+    void Get_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const;
 };
 }
 #endif

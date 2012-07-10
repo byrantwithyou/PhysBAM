@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/LEVELSET_COLOR.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 using namespace PhysBAM;
 template<class T> static T Phi_And_Color_Helper(VECTOR<T,1>& phi,VECTOR<int,1>& color,const VECTOR<T,0>&,int& c)
 {
@@ -48,6 +49,29 @@ Phi_And_Color(const TV& X,int& c) const
         color_vector(i)=color(ind);}
 
     return Phi_And_Color_Helper(phi_vector,color_vector,interp_frac,c);
+}
+//#####################################################################
+// Function Get_Raw_Levelset_For_Color
+//#####################################################################
+template<class TV> void LEVELSET_COLOR<TV>::
+Get_Raw_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const
+{
+    color_phi.Resize(grid.Domain_Indices(ghost));
+    for(RANGE_ITERATOR<TV::m> it(phi.domain);it.Valid();it.Next()){
+        int k=color(it.index);
+        T p=phi(it.index);
+        if(k!=c) p=-p;
+        color_phi(it.index)=p;}
+}
+//#####################################################################
+// Function Get_Levelset_For_Color
+//#####################################################################
+template<class TV> void LEVELSET_COLOR<TV>::
+Get_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const
+{
+    Get_Raw_Levelset_For_Color(color_phi,c,ghost);
+    FAST_LEVELSET<GRID<TV> > fl(grid,color_phi,ghost);
+    Reinitialize(&fl,10*ghost,(T)0,(T)ghost,(T)0,(T).5,3,3);
 }
 template class LEVELSET_COLOR<VECTOR<float,2> >;
 template class LEVELSET_COLOR<VECTOR<float,3> >;

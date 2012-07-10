@@ -247,7 +247,7 @@ Apply_Pressure_And_Viscosity(T dt)
 
         for(int c=0;c<iss.cdi->colors;c++){
             f_volume(c).Resize(example.grid.Domain_Indices());
-            u(c).Resize(example.grid);
+            u(c).Resize(example.grid,2);
             inside(c).Resize(example.grid);}
 
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
@@ -255,15 +255,7 @@ Apply_Pressure_And_Viscosity(T dt)
             u(c)(it.Full_Index())=example.face_velocities(it.Full_Index());
             inside(c)(it.Full_Index())=true;}
 
-//        ARRAY<T,TV_INT> color_phi(example.levelset_color.grid.Domain_Indices());
-//        typename LEVELSET_POLICY<GRID<TV> >::LEVELSET phi(example.levelset_color.grid,color_phi);
         for(int c=0;c<iss.cdi->colors;c++){
-            // for(UNIFORM_GRID_ITERATOR_CELL<TV> it(example.levelset_color.grid);it.Valid();it.Next()){
-            //     int k=example.levelset_color.color(it.index);
-            //     T p=example.levelset_color.phi(it.index);
-            //     if(k!=c) p=-p;
-            //     color_phi(it.index)=p;}
-
             EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,inside(c),2,u(c),3,2);
             f_volume(c).Resize(example.grid.Domain_Indices());
             u(c).Resize(example.grid);
