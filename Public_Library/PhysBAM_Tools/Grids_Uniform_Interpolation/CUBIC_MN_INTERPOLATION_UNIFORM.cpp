@@ -21,7 +21,7 @@ namespace{
 // Function From_Base_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> T2
-From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
 {
     return cub.cubic_mn_interpolation.Cubic_MN(u(index.x),u(index.x+1),u(index.x+2),u(index.x+3),(X.x-grid.X(index.x+1).x)*grid.one_over_dX.x);
 }
@@ -29,7 +29,7 @@ From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cu
 // Function From_Base_Node_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> >
-From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
 {
     typedef VECTOR<int,1> TV_INT;
     ARRAY<T> local_weights;
@@ -42,7 +42,7 @@ From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOO
 // Function From_Base_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> T2
-From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
 {
     VECTOR<T,2> alpha=X-grid.X(index+VECTOR<int,2>::All_Ones_Vector());alpha*=grid.one_over_dX;
     T2 interpolated_in_x[4],value[4];
@@ -55,7 +55,7 @@ From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cu
 // Function From_Base_Node_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> >
-From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
 {
     typedef VECTOR<int,2> TV_INT;
     VECTOR<T,2> alpha=X-grid.X(index+VECTOR<int,2>::All_Ones_Vector());alpha*=grid.one_over_dX;
@@ -69,7 +69,7 @@ From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOO
 // Function From_Base_Node_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> >
-From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
+From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
 {
     typedef VECTOR<int,3> TV_INT;
     ARRAY<PAIR<TV_INT,T> > weights;
@@ -80,7 +80,7 @@ From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOO
 // Function From_Base_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> T2
-From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,3> >& u,const VECTOR<T,3>& X,
+From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,
     const VECTOR<int,3>& index)
 {
     VECTOR<T,3> alpha=X-grid.X(index+VECTOR<int,3>::All_Ones_Vector());alpha*=grid.one_over_dX;
@@ -114,7 +114,7 @@ namespace{
 // Function From_Base_Node_Periodic
 //#####################################################################
 template<class T,class T_GRID,class T2,class T_FACE_LOOKUP> T2
-    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u,const VECTOR<T,2>& X,
+    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,
         const VECTOR<int,2>& index)
 {
     VECTOR<T,2> alpha=X-grid.X(index+VECTOR<int,2>::All_Ones_Vector());alpha*=grid.one_over_dX;
@@ -131,7 +131,7 @@ template<class T,class T_GRID,class T2,class T_FACE_LOOKUP> T2
     return cub.cubic_mn_interpolation.Cubic_MN(interpolated_in_x[0],interpolated_in_x[1],interpolated_in_x[2],interpolated_in_x[3],alpha.y);
 }
 template<class T,class TV,class T_GRID,class T2,class T_FACE_LOOKUP,int d> T2
-    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,d> >& u,const VECTOR<T,d>& X,
+    From_Base_Node_Periodic(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,d> >& u,const VECTOR<T,d>& X,
         const VECTOR<int,d>& index)
 {
     PHYSBAM_FATAL_ERROR();

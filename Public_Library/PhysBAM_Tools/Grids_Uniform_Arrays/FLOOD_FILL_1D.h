@@ -22,12 +22,12 @@ public:
     FLOOD_FILL_1D()
     {}
 
-    int Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAY<bool,FACE_INDEX<1> >& edge_is_blocked,ARRAY<bool>* color_touches_uncolorable_node=0)
+    int Flood_Fill(ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAY<bool,FACE_INDEX<1> >& edge_is_blocked,ARRAY<bool>* color_touches_uncolorable_node=0)
     {return Flood_Fill(colors,edge_is_blocked.Component(1),color_touches_uncolorable_node);}
 
     // colors should be initialized by the user with 0's where colors will be filled and negative values for nodes which will not be colored.
     // -1 is the distinguished uncolorable node (which color_touches_uncolorable_node refers to)
-    int Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,1> >& edge_is_blocked_x,ARRAY<bool>* color_touches_uncolorable_node=0)
+    int Flood_Fill(ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAYS_ND_BASE<bool,VECTOR<int,1> >& edge_is_blocked_x,ARRAY<bool>* color_touches_uncolorable_node=0)
     {int fill_color=0,number_of_regions=0;if(color_touches_uncolorable_node) color_touches_uncolorable_node->Remove_All();region_boundaries.Clean_Memory();
     bool touches_uncolorable_node=false;
     for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++){
@@ -42,7 +42,7 @@ public:
                     color_touches_uncolorable_node->Append(touches_uncolorable_node||(i+1<colors.domain.max_corner.x&&colors(i+1)==-2&&!edge_is_blocked_x(i+1)));}}}
     return region_boundaries.m;}
 
-    void Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,1> >& edge_is_blocked_x,ARRAY<bool>& color_touches_boundary)
+    void Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAYS_ND_BASE<bool,VECTOR<int,1> >& edge_is_blocked_x,ARRAY<bool>& color_touches_boundary)
     {color_touches_boundary.Resize(number_of_colors);color_touches_boundary.Fill(false);
     int left_color=colors(colors.domain.min_corner.x),right_color=colors(colors.domain.max_corner.x);
     if(left_color>0)color_touches_boundary(left_color)=true;

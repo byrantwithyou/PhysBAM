@@ -220,7 +220,7 @@ All_Reduce(bool& flag) const
 // Function Exchange_Boundary_Cell_Data
 //#####################################################################
 template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
-Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
+Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
 {
 #ifdef USE_PTHREADS
     RANGE<TV_INT> sentinels=RANGE<TV_INT>::Zero_Box();
@@ -347,7 +347,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
 // Function Sync_Scalar
 //#####################################################################
 template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
-Sync_Scalar(const ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& local_data,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& global_data) const
+Sync_Scalar(const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
 {
     for(CELL_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();global_data(cell+local_to_global_offset)=local_data(cell);}
 }
@@ -355,7 +355,7 @@ Sync_Scalar(const ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& local_data,ARRAYS_N
 // Function Distribute_Scalar
 //#####################################################################
 template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
-Distribute_Scalar(ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& local_data,const ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& global_data) const
+Distribute_Scalar(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& local_data,const ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& global_data) const
 {
     for(CELL_ITERATOR iterator(local_grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();local_data(cell)=global_data(cell+local_to_global_offset);}
 }

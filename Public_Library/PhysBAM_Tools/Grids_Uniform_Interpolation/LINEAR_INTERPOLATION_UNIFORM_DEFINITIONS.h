@@ -73,7 +73,7 @@ namespace{
 // Function From_Base_Node_Helper
 //#####################################################################
 template<class T,class T2> T2
-From_Base_Node_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+From_Base_Node_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
 {
     int i=index.x;
     return LINEAR_INTERPOLATION<T,T2>::Linear(u(index),u(i+1),(X-grid.X(index))*grid.one_over_dX);
@@ -82,7 +82,7 @@ From_Base_Node_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<VECTOR
 // Function From_Base_Node_Helper
 //#####################################################################
 template<class T,class T2> T2
-From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
 {
     int i=index.x,j=index.y;
     return LINEAR_INTERPOLATION<T,T2>::Bilinear(u(index),u(i+1,j),u(i,j+1),u(i+1,j+1),(X-grid.X(index))*grid.one_over_dX);
@@ -91,7 +91,7 @@ From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR
 // Function From_Base_Node_Helper
 //#####################################################################
 template<class T,class T2> T2
-From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
+From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
 {
     const T2 *base=&u(index),*basep1=base+u.counts.y*u.counts.z;
     return LINEAR_INTERPOLATION<T,T2>::Trilinear(*base,*basep1,base[u.counts.z],basep1[u.counts.z],base[1],basep1[1],base[u.counts.z+1],basep1[u.counts.z+1],(X-grid.X(index))*grid.one_over_dX);
@@ -102,7 +102,7 @@ namespace{
 // Function From_Base_Node_Weights_Helper
 //#####################################################################
 template<class T,class T2> ARRAY<PAIR<VECTOR<int,1>,T> >
-From_Base_Node_Weights_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+From_Base_Node_Weights_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
 {
     typedef VECTOR<int,1> TV_INT;
     int i=index.x;
@@ -116,7 +116,7 @@ From_Base_Node_Weights_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BAS
 // Function From_Base_Node_Weights_Helper
 //#####################################################################
 template<class T,class T2> ARRAY<PAIR<VECTOR<int,2>,T> >
-From_Base_Node_Weights_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+From_Base_Node_Weights_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
 {
     typedef VECTOR<int,2> TV_INT;typedef VECTOR<T,2> TV;
     int i=index.x;
@@ -133,7 +133,7 @@ From_Base_Node_Weights_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BAS
 // Function From_Base_Node_Weights_Helper
 //#####################################################################
 template<class T,class T2> ARRAY<PAIR<VECTOR<int,3>,T> >
-From_Base_Node_Weights_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
+From_Base_Node_Weights_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
 {
     typedef VECTOR<int,3> TV_INT;typedef VECTOR<T,3> TV;
     int i=index.x;
@@ -155,7 +155,7 @@ From_Base_Node_Weights_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BAS
 // Function Extrema_From_Base_Node_Helper
 //#####################################################################
 template<class T,class T2> VECTOR<T2,2>
-Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u_min,const ARRAYS_ND_BASE<VECTOR<T2,1> >& u_max,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
+Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u_min,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u_max,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
 {
     int i=index.x;
     return VECTOR<T2,2>(Componentwise_Min(u_min(i),u_min(i+1)),Componentwise_Max(u_max(i),u_max(i+1)));
@@ -164,7 +164,7 @@ Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BAS
 // Function Extrema_From_Base_Node_Helper
 //#####################################################################
 template<class T,class T2> VECTOR<T2,2>
-Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u_min,const ARRAYS_ND_BASE<VECTOR<T2,2> >& u_max,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
+Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u_min,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u_max,const VECTOR<T,2>& X,const VECTOR<int,2>& index)
 {
     int i=index.x,j=index.y;
     return VECTOR<T2,2>(Componentwise_Min(u_min(i,j),u_min(i+1,j),u_min(i,j+1),u_min(i+1,j+1)),Componentwise_Max(u_max(i,j),u_max(i+1,j),u_max(i,j+1),u_max(i+1,j+1)));
@@ -173,7 +173,7 @@ Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,2> >& grid,const ARRAYS_ND_BAS
 // Function Extrema_From_Base_Node_Helper
 //#####################################################################
 template<class T,class T2> VECTOR<T2,2>
-Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<VECTOR<T2,3> >& u_min,const ARRAYS_ND_BASE<VECTOR<T2,3> >& u_max,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
+Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u_min,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u_max,const VECTOR<T,3>& X,const VECTOR<int,3>& index)
 {
     const T2 *min_base=&u_min(index),*max_base=&u_max(index),*min_basep1=min_base+u_min.counts.y*u_min.counts.z,*max_basep1=max_base+u_max.counts.y*u_max.counts.z;
     return VECTOR<T2,2>(

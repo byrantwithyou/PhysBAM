@@ -19,8 +19,8 @@ template<int d> struct UPDATE_ADVECTION_EQUATION_HELPER;
 template<> struct UPDATE_ADVECTION_EQUATION_HELPER<1>
 {
     template<class T_ADVECTION_SEPARABLE_UNIFORM,class T,class T2>
-    static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,1> >& grid,ARRAYS_ND_BASE<VECTOR<T2,1> >& Z,
-        const ARRAYS_ND_BASE<VECTOR<T2,1> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<VECTOR<T,1>,1> >& V,const T dt,const T time)
+    static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,1> >& grid,ARRAYS_ND_BASE<T2,VECTOR<int,1> >& Z,
+        const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<T,1>,VECTOR<int,1> >& V,const T dt,const T time)
     {
         int i;int m=grid.counts.x;T dx=grid.dX.x;ARRAY<T2,VECTOR<int,1> > rhs(0,m);
 
@@ -38,8 +38,8 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<1>
 template<> struct UPDATE_ADVECTION_EQUATION_HELPER<2>
 {
     template<class T_ADVECTION_SEPARABLE_UNIFORM,class T,class T2>
-    static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,2> >& grid,ARRAYS_ND_BASE<VECTOR<T2,2> >& Z,
-        const ARRAYS_ND_BASE<VECTOR<T2,2> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<VECTOR<T,2>,2> >& V,const T dt,const T time)
+    static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,2> >& grid,ARRAYS_ND_BASE<T2,VECTOR<int,2> >& Z,
+        const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<T,2>,VECTOR<int,2> >& V,const T dt,const T time)
     {
         int i,j;int m=grid.counts.x,n=grid.counts.y;T dx=grid.dX.x,dy=grid.dX.y;ARRAY<T2,VECTOR<int,2> > rhs(0,m,0,n);
 
@@ -66,8 +66,8 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<2>
 template<> struct UPDATE_ADVECTION_EQUATION_HELPER<3>
 {
     template<class T_ADVECTION_SEPARABLE_UNIFORM,class T,class T2>
-    static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,3> >& grid,ARRAYS_ND_BASE<VECTOR<T2,3> >& Z,
-        const ARRAYS_ND_BASE<VECTOR<T2,3> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<VECTOR<T,3>,3> >& V,const T dt,const T time)
+    static void Apply(T_ADVECTION_SEPARABLE_UNIFORM& advection,const GRID<VECTOR<T,3> >& grid,ARRAYS_ND_BASE<T2,VECTOR<int,3> >& Z,
+        const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& Z_ghost,const ARRAYS_ND_BASE<VECTOR<T,3>,VECTOR<int,3> >& V,const T dt,const T time)
     {
         int i,j,ij;int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;T dx=grid.dX.x,dy=grid.dX.y,dz=grid.dX.z;ARRAY<T2,VECTOR<int,3> > rhs(0,m,0,n,0,mn);
 

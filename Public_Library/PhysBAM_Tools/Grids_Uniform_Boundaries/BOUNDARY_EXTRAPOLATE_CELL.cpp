@@ -13,9 +13,9 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_EXTRAPOLATE_CELL<TV,T2>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    ARRAYS_ND_BASE<VECTOR<T2,TV::m> >::Put(u,u_ghost); // interior
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     ARRAY<bool,TV_INT> inside_mask(grid.Domain_Indices(number_of_ghost_cells));
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
         inside_mask(it.index)=true;
@@ -26,7 +26,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class TV,class T2> void BOUNDARY_EXTRAPOLATE_CELL<TV,T2>::
-Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,const T time)
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
 {
 }
 template class BOUNDARY_EXTRAPOLATE_CELL<VECTOR<float,1>,float>;

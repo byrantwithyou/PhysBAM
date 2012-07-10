@@ -105,7 +105,7 @@ public:
     }
 
     template<class T>
-    static void Get_Face_Index_Range(const OPENGL_UNIFORM_SLICE *slice, const ARRAYS_ND_BASE<VECTOR<T,3> >& array, int face, VECTOR<int,3> &index_start, VECTOR<int,3> &index_end, int scale=1)
+    static void Get_Face_Index_Range(const OPENGL_UNIFORM_SLICE *slice, const ARRAYS_ND_BASE<T,VECTOR<int,3> >& array, int face, VECTOR<int,3> &index_start, VECTOR<int,3> &index_end, int scale=1)
     {
         index_start=VECTOR<int,3>(array.domain.min_corner.x,array.domain.min_corner.y,array.domain.min_corner.z);
         index_end=VECTOR<int,3>(array.domain.max_corner.x,array.domain.max_corner.y,array.domain.max_corner.z);

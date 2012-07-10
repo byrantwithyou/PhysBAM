@@ -51,13 +51,13 @@ protected:
     virtual ~EULER();
 
 public:
-    static VECTOR<T,1> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,3>,1> >& U,const VECTOR<int,1>& cell)
+    static VECTOR<T,1> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<T,3>,VECTOR<int,1> >& U,const VECTOR<int,1>& cell)
     {return VECTOR<T,1>(U(cell)(1))/U(cell)(0);}
 
-    static VECTOR<T,2> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,4>,2> >& U,const VECTOR<int,2>& cell)
+    static VECTOR<T,2> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<T,4>,VECTOR<int,2> >& U,const VECTOR<int,2>& cell)
     {return VECTOR<T,2>(U(cell)(1),U(cell)(2))/U(cell)(0);}
 
-    static VECTOR<T,3> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,5>,3> >& U,const VECTOR<int,3>& cell)
+    static VECTOR<T,3> Get_Velocity(const ARRAYS_ND_BASE<VECTOR<T,5>,VECTOR<int,3> >& U,const VECTOR<int,3>& cell)
     {return VECTOR<T,3>(U(cell)(1),U(cell)(2),U(cell)(3))/U(cell)(0);}
 
     static VECTOR<T,1> Get_Velocity(const VECTOR<T,3>& u)
@@ -93,13 +93,13 @@ public:
      U(T_GRID::dimension+1)=rho*(e+(T).5*velocity.Magnitude_Squared());
      return U;}
 
-    static T e(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,3>,1> >& U,const VECTOR<int,1>& cell)
+    static T e(const ARRAYS_ND_BASE<VECTOR<T,3>,VECTOR<int,1> >& U,const VECTOR<int,1>& cell)
     {return e(U(cell)(0),U(cell)(1),U(cell)(2));}
 
-    static T e(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,4>,2> >& U,const VECTOR<int,2>& cell)
+    static T e(const ARRAYS_ND_BASE<VECTOR<T,4>,VECTOR<int,2> >& U,const VECTOR<int,2>& cell)
     {return e(U(cell)(0),U(cell)(1),U(cell)(2),U(cell)(3));}
 
-    static T e(const ARRAYS_ND_BASE<VECTOR<VECTOR<T,5>,3> >& U,const VECTOR<int,3>& cell)
+    static T e(const ARRAYS_ND_BASE<VECTOR<T,5>,VECTOR<int,3> >& U,const VECTOR<int,3>& cell)
     {return e(U(cell)(0),U(cell)(1),U(cell)(2),U(cell)(3),U(cell)(4));}
 
     static T e(const VECTOR<T,3>& u)

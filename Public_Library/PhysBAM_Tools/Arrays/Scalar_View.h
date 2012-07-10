@@ -24,7 +24,7 @@ template<class TV> struct SCALAR_VIEW_IS_VECTOR_SPACE<ARRAY_VIEW<TV> >:public IS
 //template<class TV,int d> struct SCALAR_VIEW_IS_VECTOR_SPACE<ARRAY<VECTOR<TV,d> ,VECTOR<int,2> > >:public IS_SCALAR_VECTOR_SPACE<TV>{};
 //template<class TV,int d> struct SCALAR_VIEW_IS_VECTOR_SPACE<ARRAY<VECTOR<TV,d> ,VECTOR<int,3> > >:public IS_SCALAR_VECTOR_SPACE<TV>{};
 template<class TV,int d> struct SCALAR_VIEW_IS_VECTOR_SPACE<ARRAY<TV,VECTOR<int,d> > >:public IS_SCALAR_VECTOR_SPACE<TV>{};
-template<class T,int d> struct SCALAR_VIEW_IS_VECTOR_SPACE<ARRAYS_ND_BASE<VECTOR<T,d> > >:public IS_SCALAR_VECTOR_SPACE<T>{};
+template<class T,int d> struct SCALAR_VIEW_IS_VECTOR_SPACE<ARRAYS_ND_BASE<T,VECTOR<int,d> > >:public IS_SCALAR_VECTOR_SPACE<T>{};
 
 template<class TV> typename ENABLE_IF<IS_SCALAR_BLOCK<TV>::value,ARRAY_VIEW<typename SCALAR_POLICY<TV>::TYPE> >::TYPE
 Scalar_View(TV& block)
@@ -43,7 +43,7 @@ Scalar_View(ARRAY_BASE<TV,T_ARRAY>& array)
 }
 
 template<class T,int d> ARRAY_VIEW<typename SCALAR_POLICY<T>::TYPE>
-Scalar_View(ARRAYS_ND_BASE<VECTOR<T,d> >& array)
+Scalar_View(ARRAYS_ND_BASE<T,VECTOR<int,d> >& array)
 {
     return Scalar_View(array.array);
 }

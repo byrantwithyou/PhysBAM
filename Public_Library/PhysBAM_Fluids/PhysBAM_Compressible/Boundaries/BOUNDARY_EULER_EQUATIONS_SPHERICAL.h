@@ -20,7 +20,7 @@ namespace PhysBAM{
 template<class T_input>
 class BOUNDARY_EULER_EQUATIONS_SPHERICAL:public BOUNDARY_UNIFORM<GRID<VECTOR<T_input,1> >,VECTOR<T_input,3> >
 {
-    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,3> TV_DIMENSION;typedef VECTOR<int,1> TV_INT;typedef ARRAYS_ND_BASE<VECTOR<TV_DIMENSION,1> > T_ARRAYS_DIMENSION_BASE;
+    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<T,3> TV_DIMENSION;typedef VECTOR<int,1> TV_INT;typedef ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,1> > T_ARRAYS_DIMENSION_BASE;
 public:
     BOUNDARY_EULER_EQUATIONS_SPHERICAL() 
     {}

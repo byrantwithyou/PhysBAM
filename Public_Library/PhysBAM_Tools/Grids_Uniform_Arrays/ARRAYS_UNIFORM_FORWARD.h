@@ -11,7 +11,7 @@
 namespace PhysBAM{
 
 template<class T,class T_ARRAY,class ID> class ARRAY_BASE;
-template<class TV> class ARRAYS_ND_BASE;
+template<class T,class TV_INT> class ARRAYS_ND_BASE;
 template<class T,class ID> class ARRAY;
 template<int d> class FACE_INDEX;
 template<int d> class SIDED_FACE_INDEX;
@@ -25,7 +25,7 @@ template<class T,class T_NEW,int d> struct REBIND<ARRAY<T,VECTOR<int,d> >,T_NEW>
 template<class T,class T_NEW,int d> struct REBIND<ARRAY<T,FACE_INDEX<d> >,T_NEW>{typedef ARRAY<T_NEW,FACE_INDEX<d> > TYPE;};
 template<class T,class T_NEW,int d> struct REBIND<ARRAY<T,SIDED_FACE_INDEX<d> >,T_NEW>{typedef ARRAY<T_NEW,SIDED_FACE_INDEX<d> > TYPE;};
 //template<class T,class T_NEW,int d> struct REBIND<ARRAYS_BASE<T,ARRAYS_ND_BASE,VECTOR<int,d> >,T_NEW>{typedef ARRAY_BASE<T_NEW,ARRAYS_ND_BASE,VECTOR<int,d> > TYPE;};
-template<class T,class T_NEW,int d> struct REBIND<ARRAYS_ND_BASE<VECTOR<T,d> >,T_NEW>{typedef ARRAYS_ND_BASE<VECTOR<T_NEW,d> > TYPE;};
+template<class T,class T_NEW,class TV_INT> struct REBIND<ARRAYS_ND_BASE<T,TV_INT>,T_NEW>{typedef ARRAYS_ND_BASE<T_NEW,TV_INT> TYPE;};
 
 template<class T,int d> class VECTOR;
 template<class T_ARRAY,int length_new> struct REBIND_LENGTH;

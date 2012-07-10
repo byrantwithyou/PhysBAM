@@ -65,7 +65,7 @@ public:
     }
 
     template<class T,int dimension,class T_BOX_INT>
-    MPI_PACKAGE(ARRAYS_ND_BASE<VECTOR<T,dimension> >& array,const T_BOX_INT& indices)
+    MPI_PACKAGE(ARRAYS_ND_BASE<T,VECTOR<int,dimension> >& array,const T_BOX_INT& indices)
         :data(&array(indices.Minimum_Corner())),count(1),type_needs_free(true)
     {
         type=Make_Arrays_Type(array,indices);
@@ -138,15 +138,15 @@ public:
     {assert(array.Valid_Index(box.Minimum_Corner().x) && array.Valid_Index(box.Maximum_Corner().x));
     return Make_Arrays_Type_1D(MPI_UTILITIES::Datatype<T2>(),1,box);}
 
-    template<class T2> static MPI::Datatype Make_Arrays_Type(const ARRAYS_ND_BASE<VECTOR<T2,1> >& array,const RANGE<VECTOR<int,1> >& box)
+    template<class T2> static MPI::Datatype Make_Arrays_Type(const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& array,const RANGE<VECTOR<int,1> >& box)
     {assert(array.Valid_Index(box.Minimum_Corner()) && array.Valid_Index(box.Maximum_Corner()));
     return Make_Arrays_Type_1D(MPI_UTILITIES::Datatype<T2>(),1,box);}
 
-    template<class T2> static MPI::Datatype Make_Arrays_Type(const ARRAYS_ND_BASE<VECTOR<T2,2> >& array,const RANGE<VECTOR<int,2> >& box)
+    template<class T2> static MPI::Datatype Make_Arrays_Type(const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& array,const RANGE<VECTOR<int,2> >& box)
     {assert(array.Valid_Index(box.Minimum_Corner()) && array.Valid_Index(box.Maximum_Corner()));
     return Make_Arrays_Type_2D(MPI_UTILITIES::Datatype<T2>(),1,array.counts.y,box);}
 
-    template<class T2> static MPI::Datatype Make_Arrays_Type(const ARRAYS_ND_BASE<VECTOR<T2,3> >& array,const RANGE<VECTOR<int,3> >& box)
+    template<class T2> static MPI::Datatype Make_Arrays_Type(const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& array,const RANGE<VECTOR<int,3> >& box)
     {assert(array.Valid_Index(box.Minimum_Corner()) && array.Valid_Index(box.Maximum_Corner()));
     return Make_Arrays_Type_3D(MPI_UTILITIES::Datatype<T2>(),1,array.counts.y,array.counts.z,box);}
 

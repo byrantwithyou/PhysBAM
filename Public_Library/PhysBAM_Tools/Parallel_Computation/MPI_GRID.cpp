@@ -501,7 +501,7 @@ Synchronize_J_Bounds(int& jmin,int& jmax) const
 // Function Exchange_Boundary_Cell_Data
 //#####################################################################
 template<class T_GRID> template<class T_MPI_GRID,class T2> void MPI_GRID<T_GRID>::
-Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
+Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
 {
     PHYSBAM_ASSERT(bandwidth>0,"0 bandwidth exchange");
     Exchange_Boundary_Cell_Data(mpi_grid,local_grid,data,bandwidth,include_corners);
@@ -516,7 +516,7 @@ Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAY_BASE<T2,T_ARRAYS,IN
 // Function Exchange_Boundary_Cell_Data
 //#####################################################################
 template<class T_GRID> template<class T_MPI_GRID,class T2> void MPI_GRID<T_GRID>::
-Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
+Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners) const
 {
     RANGE<TV_INT> sentinels=RANGE<TV_INT>::Zero_Box();
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;
@@ -935,9 +935,9 @@ template<class T_GRID> void MPI_GRID<T_GRID>::Initialize(VECTOR<VECTOR<bool,2>,T
 template<class T_GRID> bool MPI_GRID<T_GRID>::Neighbor(const int axis,const int axis_side) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> void MPI_GRID<T_GRID>::Synchronize_Dt(T&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> void MPI_GRID<T_GRID>::Synchronize_J_Bounds(int&,int&) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> template<class T_MPI_GRID,class T2> void MPI_GRID<T_GRID>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const int bandwidth,
+template<class T_GRID> template<class T_MPI_GRID,class T2> void MPI_GRID<T_GRID>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,
     const bool include_corners) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> template<class T_MPI_GRID,class T2> void MPI_GRID<T_GRID>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,
+template<class T_GRID> template<class T_MPI_GRID,class T2> void MPI_GRID<T_GRID>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,
     const int bandwidth,const bool include_corners) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void MPI_GRID<T_GRID>::Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,
     const bool include_corners) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

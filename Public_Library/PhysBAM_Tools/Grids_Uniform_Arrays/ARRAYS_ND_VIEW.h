@@ -18,12 +18,12 @@
 namespace PhysBAM{
 
 template<class T,int d>
-class ARRAY_VIEW<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<VECTOR<typename REMOVE_CONST<T>::TYPE,d> >
+class ARRAY_VIEW<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<typename REMOVE_CONST<T>::TYPE,VECTOR<int,d> >
 {
     typedef VECTOR<int,d> TV_INT;
     struct UNUSABLE{};
     template<class S> struct COPY_CONST:public IF<IS_CONST<T>::value,typename ADD_CONST<S>::TYPE,S>{};
-    typedef ARRAYS_ND_BASE<VECTOR<typename REMOVE_CONST<T>::TYPE,d> > BASE;
+    typedef ARRAYS_ND_BASE<typename REMOVE_CONST<T>::TYPE,VECTOR<int,d> > BASE;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
     typedef typename REMOVE_CONST<T>::TYPE ELEMENT;typedef TV_INT INDEX;

@@ -56,18 +56,16 @@ protected:
     return self;}
 };
 
-template<class TV>
-class ARRAYS_ND_BASE:public ARRAY_BASE<typename TV::ELEMENT,ARRAYS_ND_BASE<TV>,VECTOR<int,TV::dimension> >
+template<class T,class TV_INT>
+class ARRAYS_ND_BASE:public ARRAY_BASE<T,ARRAYS_ND_BASE<T,TV_INT>,TV_INT>
 {
     struct UNUSABLE{};
 public:
-    typedef typename TV::ELEMENT T;
-    enum WORKAROUND {d=TV::dimension};
+    enum WORKAROUND {d=TV_INT::m};
     typedef T ELEMENT;typedef T& RESULT_TYPE;typedef const T& CONST_RESULT_TYPE;
     typedef typename SCALAR_POLICY<T>::TYPE SCALAR;
-    template<class T2> struct REBIND{typedef ARRAYS_ND_BASE<VECTOR<T2,d> > TYPE;};
-    typedef VECTOR<int,d> TV_INT;
-    typedef ARRAY_BASE<T,ARRAYS_ND_BASE<TV>,TV_INT> BASE;
+    template<class T2> struct REBIND{typedef ARRAYS_ND_BASE<T2,VECTOR<int,d> > TYPE;};
+    typedef ARRAY_BASE<T,ARRAYS_ND_BASE<T,TV_INT>,TV_INT> BASE;
     typedef TV_INT INDEX;
 
     RANGE<TV_INT> domain;
@@ -122,7 +120,7 @@ public:
     {array-=a;return *this;}
 
     template<class T2>
-    ARRAYS_ND_BASE& operator*=(const ARRAYS_ND_BASE<VECTOR<T2,d> >& v)
+    ARRAYS_ND_BASE& operator*=(const ARRAYS_ND_BASE<T2,VECTOR<int,d> >& v)
     {assert(Equal_Dimensions(*this,v));array*=v.array;return *this;}
 
     ARRAYS_ND_BASE& operator*=(const T& a)
@@ -214,7 +212,7 @@ public:
     return ARRAY_VIEW<T>::Dot_Product(a1.array,a2.array);}
 
     template<class TV2>
-    static typename SCALAR_POLICY<TV>::TYPE Maximum_Magnitude(const ARRAYS_ND_BASE<VECTOR<TV2,d> >& a)
+    static typename SCALAR_POLICY<T>::TYPE Maximum_Magnitude(const ARRAYS_ND_BASE<TV2,VECTOR<int,d> >& a)
     {STATIC_ASSERT(IS_SAME<T,TV2>::value);typedef typename TV2::SCALAR TS;
     return ARRAY_VIEW<T>::Maximum_Magnitude(a.array);}
 
@@ -305,7 +303,7 @@ public:
     {STATIC_ASSERT(d==3);TV_INT index=Clamp_Interior_End_Minus_One(TV_INT(i,j,ij));i=index.x;j=index.y;ij=index.z;}
 
     template<class T2>
-    static bool Equal_Dimensions(const ARRAYS_ND_BASE& a,const ARRAYS_ND_BASE<VECTOR<T2,d> >& b)
+    static bool Equal_Dimensions(const ARRAYS_ND_BASE& a,const ARRAYS_ND_BASE<T2,VECTOR<int,d> >& b)
     {return a.domain==b.domain;}
 
     static bool Equal_Dimensions(const ARRAYS_ND_BASE& a,const int m_start,const int m_end,const int n_start,const int n_end,const int mn_start,const int mn_end)
@@ -319,7 +317,7 @@ public:
     static bool Equal_Dimensions(const ARRAYS_ND_BASE& a,const int m_start,const int m_end)
     {STATIC_ASSERT(d==1);return a.domain==RANGE<TV_INT>(m_start,m_end);}
 
-    static void Extract_Dimension(const ARRAYS_ND_BASE& old_array,ARRAYS_ND_BASE<VECTOR<ELEMENT_OF_T,d> >& extracted_array,int dim)
+    static void Extract_Dimension(const ARRAYS_ND_BASE& old_array,ARRAYS_ND_BASE<ELEMENT_OF_T,VECTOR<int,d> >& extracted_array,int dim)
     {STATIC_ASSERT(IS_VECTOR<T>::value);assert(Equal_Dimensions(old_array,extracted_array));//extracted_array.Resize(old_array.domain,false,false);
     for(int i=0;i<old_array.array.m;i++) extracted_array.array(i)=old_array.array(i)(dim);}
 

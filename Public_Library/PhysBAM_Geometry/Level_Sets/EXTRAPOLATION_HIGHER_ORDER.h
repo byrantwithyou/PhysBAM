@@ -32,12 +32,12 @@ public:
     EXTRAPOLATION_HIGHER_ORDER();
     ~EXTRAPOLATION_HIGHER_ORDER();
 
-    static void Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& x,int iterations,int order,int fill_width);
-    static void Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& x,int iterations,int order,int fill_width);
+    static void Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& x,int iterations,int order,int fill_width);
+    static void Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& x,int iterations,int order,int fill_width);
     static void Extrapolate_Face(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int iterations,int order,int fill_width);
 protected:
     static void Add_Neighbors(MAPPING& m,ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& index,int unregistered,int registered);
-    static void Register_Nodes(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,MAPPING& m,ARRAY<TV>& normal,
+    static void Register_Nodes(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,MAPPING& m,ARRAY<TV>& normal,
         ARRAY<VECTOR<STENCIL,TV::m> >& stencil,int order,int fill_width);
     static void Extrapolate_FE(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,const ARRAY<T2>& x,ARRAY<T2>& y,const ARRAY<T2>* z,int o,T dt,T alpha);
     static void Extrapolate_RK2(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,ARRAY<T2>& x,const ARRAY<T2>* z,ARRAY<T2>& tmp,int o,T dt);

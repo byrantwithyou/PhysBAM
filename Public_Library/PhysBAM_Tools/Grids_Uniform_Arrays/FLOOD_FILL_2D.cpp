@@ -16,7 +16,7 @@ FLOOD_FILL_2D::
     // colors should be initialized by the user with -1's where colors will be filled and negative values for nodes which will not be colored.
     // -2 is the distinguished uncolorable node (which color_touches_uncolorable_node refers to)
 int FLOOD_FILL_2D::
-Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,ARRAY<bool>* color_touches_uncolorable_node)
+Flood_Fill(ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_y,ARRAY<bool>* color_touches_uncolorable_node)
 {
     TV_INT seed_node;
     int fill_color=0;
@@ -33,22 +33,22 @@ Flood_Fill(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >&
     return fill_color;
 }
 void FLOOD_FILL_2D::
-Fill_Single_Cell_Regions(ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,int& fill_color)
+Fill_Single_Cell_Regions(ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_y,int& fill_color)
 {
     for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++) if(colors(i,j)==-1)
         if((i==colors.domain.min_corner.x || edge_is_blocked_x(i,j)) && (i==colors.domain.max_corner.x-1 || edge_is_blocked_x(i+1,j)) &&
            (j==colors.domain.min_corner.y || edge_is_blocked_y(i,j)) && (j==colors.domain.max_corner.y-1 || edge_is_blocked_y(i,j+1))) colors(i,j)=fill_color++;
 }
 bool  FLOOD_FILL_2D::
-Find_Uncolored_Node(const ARRAYS_ND_BASE<TV_INT>& colors,TV_INT& node_index)
+Find_Uncolored_Node(const ARRAYS_ND_BASE<int,TV_INT>& colors,TV_INT& node_index)
 {
     for(int i=colors.domain.min_corner.x;i<colors.domain.max_corner.x;i++) for(int j=colors.domain.min_corner.y;j<colors.domain.max_corner.y;j++)
         if(colors(i,j)==-1){node_index=TV_INT(i,j);return true;}
     return false;
 }
 void FLOOD_FILL_2D::
-Flood_Fill_From_Seed_Node(ARRAYS_ND_BASE<TV_INT>& colors,const int fill_color,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,
-    const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,bool& touches_uncolorable_node,const TV_INT& seed_node)
+Flood_Fill_From_Seed_Node(ARRAYS_ND_BASE<int,TV_INT>& colors,const int fill_color,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_x,
+    const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_y,bool& touches_uncolorable_node,const TV_INT& seed_node)
 {
     assert(colors(seed_node)==-1);
     touches_uncolorable_node=false;
@@ -59,7 +59,7 @@ Flood_Fill_From_Seed_Node(ARRAYS_ND_BASE<TV_INT>& colors,const int fill_color,co
         Flood_Fill_Node(colors,fill_color,edge_is_blocked_x,edge_is_blocked_y,touches_uncolorable_node,flood_fill_stack,node);}
 }
 void FLOOD_FILL_2D::
-Flood_Fill_Node(ARRAYS_ND_BASE<TV_INT>& colors,const int fill_color,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,
+Flood_Fill_Node(ARRAYS_ND_BASE<int,TV_INT>& colors,const int fill_color,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_x,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_y,
     bool& touches_uncolorable_node,STACK<TV_INT >& flood_fill_stack,const TV_INT& node)
 {
     if(colors(node)==-2){touches_uncolorable_node=true;return;}else if(colors(node)!=-1)return;colors(node)=fill_color;
@@ -69,8 +69,8 @@ Flood_Fill_Node(ARRAYS_ND_BASE<TV_INT>& colors,const int fill_color,const ARRAYS
     if(node.y<colors.domain.max_corner.y-1&&!edge_is_blocked_y(node.x,node.y+1)&&colors(node.x,node.y+1)<0) flood_fill_stack.Push(TV_INT(node.x,node.y+1));
 }
 void FLOOD_FILL_2D::
-Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,
-    const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,ARRAY<bool>& color_touches_boundary)
+Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_x,
+    const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_y,ARRAY<bool>& color_touches_boundary)
 {
     color_touches_boundary.Resize(number_of_colors);
     color_touches_boundary.Fill(false);
@@ -84,8 +84,8 @@ Identify_Colors_Touching_Boundary(const int number_of_colors,const ARRAYS_ND_BAS
         if(top_color>=0) color_touches_boundary(top_color)=true;}
 }
 void FLOOD_FILL_2D::
-Identify_Colors_Touching_Color(const int color,const int number_of_colors,const ARRAYS_ND_BASE<TV_INT>& colors,const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_x,
-    const ARRAYS_ND_BASE<VECTOR<bool,2> >& edge_is_blocked_y,ARRAY<bool>& color_touches_color)
+Identify_Colors_Touching_Color(const int color,const int number_of_colors,const ARRAYS_ND_BASE<int,TV_INT>& colors,const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_x,
+    const ARRAYS_ND_BASE<bool,VECTOR<int,2> >& edge_is_blocked_y,ARRAY<bool>& color_touches_color)
 {
     color_touches_color.Resize(number_of_colors);
     color_touches_color.Fill(false);

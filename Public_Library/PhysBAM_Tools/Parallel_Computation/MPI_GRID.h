@@ -88,8 +88,8 @@ public:
     void Sync_Common_Face_Weights_From(ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,T> >,FACE_INDEX<TV::dimension> >& weights_to,ARRAY<ARRAY<PAIR<FACE_INDEX<TV::dimension>,int> >,FACE_INDEX<TV::dimension> >& weights_from,const int ghost_cells);
     void Sync_Common_Cell_Weights_To(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells);
     void Sync_Common_Cell_Weights_From(ARRAY<ARRAY<PAIR<TV_INT,T> >,TV_INT>& weights_to,ARRAY<ARRAY<PAIR<TV_INT,int> >,TV_INT>& weights_from,const int ghost_cells);
-    template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const int bandwidth,const bool include_corners=true) const;
-    template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<VECTOR<T2,TV::dimension> >& data,const int bandwidth,
+    template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,const bool include_corners=true) const;
+    template<class T_MPI_GRID,class T2> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,const int bandwidth,
         const bool include_corners=true) const;
     template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,const bool include_corners=true) const;
     template<class T_MPI_GRID,class T2,class T_ARRAYS,class INDEX> void Exchange_Boundary_Cell_Data(const T_MPI_GRID& mpi_grid,const T_GRID& local_grid,ARRAY_BASE<T2,T_ARRAYS,INDEX>& data,const int bandwidth,

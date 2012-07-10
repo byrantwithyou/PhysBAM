@@ -15,7 +15,7 @@
 namespace PhysBAM{
 
 template<class T,int d>
-class ARRAY<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<VECTOR<T,d> >
+class ARRAY<T,VECTOR<int,d> >:public ARRAYS_ND_BASE<T,VECTOR<int,d> >
 {
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -23,7 +23,7 @@ public:
     enum WORKAROUND1 {dimension=d};
     template<class T2> struct REBIND{typedef ARRAY<T2,TV_INT> TYPE;};
     typedef T ELEMENT;typedef TV_INT INDEX;typedef T& RESULT_TYPE;typedef const T& CONST_RESULT_TYPE;
-    typedef ARRAYS_ND_BASE<VECTOR<T,d> > BASE;
+    typedef ARRAYS_ND_BASE<T,VECTOR<int,d> > BASE;
 
     using BASE::array; // one-dimensional data storage
     using BASE::domain;using BASE::counts;
@@ -203,13 +203,13 @@ protected:
 //#####################################################################
 };
 
-template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAYS_ND_BASE<VECTOR<T,1> >& a)
+template<class T> inline std::ostream& operator<<(std::ostream& output_stream,const ARRAYS_ND_BASE<T,VECTOR<int,1> >& a)
 {for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++) output_stream<<a(i)<<" ";output_stream<<std::endl;return output_stream;}
 
-template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<VECTOR<T,2> >& a)
+template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<T,VECTOR<int,2> >& a)
 {for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<a.domain.max_corner.y;j++) output<<a(i,j)<<" ";output<<std::endl;}return output;}
 
-template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<VECTOR<T,3> >& a)
+template<class T> inline std::ostream& operator<<(std::ostream& output,const ARRAYS_ND_BASE<T,VECTOR<int,3> >& a)
 {for(int i=a.domain.min_corner.x;i<a.domain.max_corner.x;i++){for(int j=a.domain.min_corner.y;j<a.domain.max_corner.y;j++){for(int ij=a.domain.min_corner.z;ij<a.domain.max_corner.z;ij++)output<<a(i,j,ij)<<" ";output<<std::endl;}
     output<<"------------------------------------------"<<std::endl;}
 return output;}

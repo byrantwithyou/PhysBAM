@@ -20,7 +20,7 @@ namespace PhysBAM{
 template<class T_input>
 class BOUNDARY_EULER_EQUATIONS_CYLINDRICAL:public BOUNDARY_UNIFORM<GRID<VECTOR<T_input,2> >,VECTOR<T_input,4> >
 {
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;typedef VECTOR<int,2> TV_INT;typedef ARRAYS_ND_BASE<VECTOR<TV_DIMENSION,2> > T_ARRAYS_T2;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;typedef VECTOR<int,2> TV_INT;typedef ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> > T_ARRAYS_T2;
     enum {d=4};
 public:
     BOUNDARY_EULER_EQUATIONS_CYLINDRICAL()

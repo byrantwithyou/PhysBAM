@@ -23,8 +23,8 @@ public:
     EXTRAPOLATION_HIGHER_ORDER_POLY();
     ~EXTRAPOLATION_HIGHER_ORDER_POLY();
 
-    static void Extrapolate_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& x,int order,int fill_width,T order_reduction_penalty=3);
-    static void Extrapolate_Cell(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& x,int order,int fill_width,T order_reduction_penalty=3);
+    static void Extrapolate_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
+    static void Extrapolate_Cell(const GRID<TV>& grid,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
     static void Extrapolate_Face(const GRID<TV>& grid,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,T order_reduction_penalty=3);
 //#####################################################################
 };
