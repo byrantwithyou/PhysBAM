@@ -42,7 +42,7 @@ Extrapolate(const T time,const bool fill_ghost_cells)
 {
     T_ARRAYS_SCALAR phi_ghost(node_grid.Domain_Indices(ghost_cells),false);T_ARRAYS_T2 u_ghost(node_grid.Domain_Indices(ghost_cells),false); 
     if(fill_ghost_cells){
-        T_BOUNDARY_SCALAR phi_boundary;phi_boundary.Fill_Ghost_Cells(node_grid,phi,phi_ghost,0,time,ghost_cells);
+        BOUNDARY_UNIFORM<T_GRID,T> phi_boundary;phi_boundary.Fill_Ghost_Cells(node_grid,phi,phi_ghost,0,time,ghost_cells);
         boundary->Fill_Ghost_Cells(node_grid,u,u_ghost,0,time,ghost_cells);}
     else{
         phi_ghost=phi;

@@ -19,7 +19,7 @@ template<class T_GRID,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_CO
 }
 template<class T_GRID,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
-        const T_FACE_LOOKUP& face_velocities,T_BOUNDARY_T2& boundary,const T dt,const T time,
+        const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
 {
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){

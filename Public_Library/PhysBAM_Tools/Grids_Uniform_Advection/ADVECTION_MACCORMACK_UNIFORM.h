@@ -21,7 +21,6 @@ class ADVECTION_MACCORMACK_UNIFORM:public ADVECTION<T_GRID,T2>
     typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY;typedef typename REBIND<T_BOUNDARY,T2>::TYPE T_BOUNDARY_T2;
 private:
     // false to use 1st order advection
     const T_ARRAYS_BOOL* node_mask;
@@ -35,13 +34,13 @@ public:
 
     ADVECTION_MACCORMACK_UNIFORM(T_NESTED_ADVECTION& nested_advection_input,const T_ARRAYS_BOOL* node_mask_input,const T_ARRAYS_BOOL* cell_mask_input,const T_FACE_ARRAYS_BOOL* face_mask_input,THREAD_QUEUE* thread_queue=0);
 
-    void Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_ARRAYS_VECTOR& V,T_BOUNDARY_T2& boundary,const T dt,const T time,
+    void Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost_input=0,const T_ARRAYS_T2* Z_max_ghost_input=0,T_ARRAYS_T2* Z_min_input=0,T_ARRAYS_T2* Z_max_input=0);
     void Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,
-        T_BOUNDARY_T2& boundary,const T dt,const T time,const T_ARRAYS_T2* Z_min_ghost_input,const T_ARRAYS_T2* Z_max_ghost_input,T_ARRAYS_T2* Z_min_input,
+        BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,const T_ARRAYS_T2* Z_min_ghost_input,const T_ARRAYS_T2* Z_max_ghost_input,T_ARRAYS_T2* Z_min_input,
         T_ARRAYS_T2* Z_max_input);
     void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const FACE_LOOKUP_UNIFORM<T_GRID>& Z_ghost,
-        const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,T_BOUNDARY& boundary,const T dt,const T time,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_min_ghost_input,
+        const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_min_ghost_input,
         const FACE_LOOKUP_UNIFORM<T_GRID>* Z_max_ghost_input,T_FACE_ARRAYS_SCALAR* Z_min_input,T_FACE_ARRAYS_SCALAR* Z_max_input);
 private:
     void Apply_Clamped_Extrema_Limiter_Node_Threaded(RANGE<TV_INT>& domain,const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_forward_ghost,const T_ARRAYS_T2& Z_backward_ghost,const T_ARRAYS_T2& Z_min,const T_ARRAYS_T2& Z_max);

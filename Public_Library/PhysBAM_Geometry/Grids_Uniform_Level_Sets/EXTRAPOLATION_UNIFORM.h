@@ -29,7 +29,6 @@ class EXTRAPOLATION_UNIFORM:public EXTRAPOLATION<T_GRID,T2>
     typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_T2_BASE;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename T_ARRAYS_BASE::template REBIND<bool>::TYPE T_ARRAYS_BOOL_BASE;
     typedef typename T_ARRAYS_BASE::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_ARRAYS_BOOL_DIMENSION_BASE;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY_SCALAR;
 public:
     template<class T3> struct REBIND{typedef EXTRAPOLATION_UNIFORM<T_GRID,T3> TYPE;};
     typedef  EXTRAPOLATION<T_GRID,T2> BASE;

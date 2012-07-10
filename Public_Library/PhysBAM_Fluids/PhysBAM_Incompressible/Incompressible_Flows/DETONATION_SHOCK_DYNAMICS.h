@@ -25,7 +25,7 @@ class DETONATION_SHOCK_DYNAMICS
     typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,3> >::TYPE T_ARRAYS_RGB;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY_SCALAR;typedef typename REBIND<T_BOUNDARY_SCALAR,TV>::TYPE T_BOUNDARY_TV;
+    typedef typename REBIND<BOUNDARY_UNIFORM<T_GRID,T>,TV>::TYPE T_BOUNDARY_TV;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
 public:
     T_GRID& grid;
@@ -44,13 +44,13 @@ public:
     // Narrowband Indices
     ARRAY<TV_INT> indices_interface,indices_interface_ghost;
 
-    T_BOUNDARY_SCALAR *boundary,boundary_default;
+    BOUNDARY_UNIFORM<T_GRID,T> *boundary,boundary_default;
     T_BOUNDARY_TV *boundary_vector,boundary_vector_default;
 
     DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const T_LEVELSET& levelset_input,const int order_input=3);
     virtual ~DETONATION_SHOCK_DYNAMICS();
 
-    void Set_Custom_Boundary(T_BOUNDARY_SCALAR* boundary_input,T_BOUNDARY_TV* boundary_vector_input)
+    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>* boundary_input,T_BOUNDARY_TV* boundary_vector_input)
     {boundary=boundary_input;boundary_vector=boundary_vector_input;
     Dn.Set_Custom_Boundary(*boundary_input);Dn_dot.Set_Custom_Boundary(*boundary_input);curvature.Set_Custom_Boundary(*boundary_input);curvature_old.Set_Custom_Boundary(*boundary_input);}
 

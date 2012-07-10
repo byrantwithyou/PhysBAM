@@ -25,18 +25,17 @@ class GRID_AND_ARRAY_CONTAINER:public NONCOPYABLE
     typedef typename REBIND<T_ARRAYS_SCALAR,T2>::TYPE T_ARRAYS_T2;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
     typedef typename REBIND<T_ARRAYS_SCALAR,TV>::TYPE T_ARRAYS_VECTOR;
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY_SCALAR;
     typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_REFLECTION T_BOUNDARY_REFLECTION;
 public:
     T_GRID& grid;
     T_ARRAYS_T2 array;
     ADVECTION<T_GRID,T>* advection;
     ADVECTION<T_GRID,T>* advection_maccormack;
-    T_BOUNDARY_SCALAR* boundary;
+    BOUNDARY_UNIFORM<T_GRID,T>* boundary;
 private:
     T_ADVECTION_SEMI_LAGRANGIAN_SCALAR& advection_default;
 protected:
-    T_BOUNDARY_SCALAR& boundary_default; 
+    BOUNDARY_UNIFORM<T_GRID,T>& boundary_default; 
     const T_FACE_ARRAYS_SCALAR* face_velocities;
     const T_ARRAYS_VECTOR* cell_velocities;
 public:
@@ -53,7 +52,7 @@ public:
     void Initialize_Domain_Boundary_Conditions(const TV_SIDES& domain_walls=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)))
     {boundary->Set_Constant_Extrapolation(VECTOR_UTILITIES::Complement(domain_walls));}
 
-    void Set_Custom_Boundary(T_BOUNDARY_SCALAR& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>& boundary_input)
     {boundary=&boundary_input;}
 
     void Set_Custom_Advection(ADVECTION<T_GRID,T>& advection_input)

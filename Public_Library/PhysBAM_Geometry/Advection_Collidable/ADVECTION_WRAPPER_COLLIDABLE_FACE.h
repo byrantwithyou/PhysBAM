@@ -21,7 +21,6 @@ class ADVECTION_WRAPPER_COLLIDABLE_FACE:public ADVECTION<T_GRID,T2,T_NESTED_LOOK
     typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename T_FACE_LOOKUP_COLLIDABLE::template REBIND_NESTED_LOOKUP<T_NESTED_LOOKUP>::TYPE T_FACE_LOOKUP_COLLIDABLE_NESTED_LOOKUP;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY;
 public:
     T_NESTED_ADVECTION& nested_advection;
     const T_GRID_BASED_COLLISION_GEOMETRY& body_list;
@@ -32,7 +31,7 @@ public:
     {}
 
     void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_NESTED_LOOKUP& Z_ghost,
-        const T_NESTED_LOOKUP& face_velocities,T_BOUNDARY& boundary,const T dt,const T time,
+        const T_NESTED_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
         const T_NESTED_LOOKUP* Z_min_ghost,const T_NESTED_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
     {T_FACE_LOOKUP_COLLIDABLE_NESTED_LOOKUP Z_ghost_lookup(Z_ghost,body_list,&face_velocities_valid_mask);
     T_FACE_LOOKUP_COLLIDABLE_NESTED_LOOKUP V_lookup(face_velocities,body_list,&face_velocities_valid_mask);

@@ -20,8 +20,7 @@ class COMPRESSIBLE_EXAMPLE:public EXAMPLE<TV>
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;typedef VECTOR<T,GRID<TV>::dimension+2> TV_DIMENSION;
-    typedef typename BOUNDARY_POLICY<GRID<TV> >::BOUNDARY_SCALAR T_BOUNDARY_SCALAR;
-    typedef typename REBIND_LENGTH<T_BOUNDARY_SCALAR,GRID<TV>::dimension+2>::TYPE T_BOUNDARY_DIMENSION_SCALAR;
+    typedef typename REBIND_LENGTH<BOUNDARY_UNIFORM<GRID<TV>,T>,GRID<TV>::dimension+2>::TYPE T_BOUNDARY_DIMENSION_SCALAR;
     typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename REBIND<T_ARRAYS_SCALAR,bool>::TYPE T_ARRAYS_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
@@ -49,7 +48,7 @@ public:
 
     CONSERVATION<GRID<TV>,GRID<TV>::dimension+2>* conservation_method;
     T_BOUNDARY_DIMENSION_SCALAR* boundary;
-    T_BOUNDARY_SCALAR* pressure_boundary;
+    BOUNDARY_UNIFORM<GRID<TV>,T>* pressure_boundary;
 
     T_GRID_BASED_COLLISION_GEOMETRY* collision_bodies_affecting_fluid;
 

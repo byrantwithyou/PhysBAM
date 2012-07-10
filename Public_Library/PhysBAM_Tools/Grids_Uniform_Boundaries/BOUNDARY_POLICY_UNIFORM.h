@@ -17,7 +17,6 @@ template<class T_GRID> struct BOUNDARY_POLICY;
 template<class TV>
 struct BOUNDARY_POLICY<GRID<TV> >
 {
-    typedef BOUNDARY_UNIFORM<GRID<TV>,typename TV::SCALAR> BOUNDARY_SCALAR;
     typedef BOUNDARY_REFLECTION_UNIFORM<GRID<TV>,typename TV::SCALAR> BOUNDARY_REFLECTION;
 };
 

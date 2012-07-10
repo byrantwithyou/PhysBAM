@@ -25,7 +25,6 @@ class ADVECTION_SEMI_LAGRANGIAN_TASK_NODE:public THREAD_QUEUE::TASK
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY;typedef typename REBIND<T_BOUNDARY,T2>::TYPE T_BOUNDARY_T2;
 
 public:
 
@@ -33,7 +32,7 @@ public:
     T_ARRAYS_T2& Z;
     const T_ARRAYS_T2& Z_ghost;
     const T_ARRAYS_VECTOR& V;
-    T_BOUNDARY_T2& boundary;
+    BOUNDARY_UNIFORM<T_GRID,T2>& boundary;
     const T dt;
     const T time;
     const T_ARRAYS_T2* Z_min_ghost;
@@ -42,7 +41,7 @@ public:
     T_ARRAYS_T2* Z_max;
     RANGE<TV_INT> domain;
 
-    ADVECTION_SEMI_LAGRANGIAN_TASK_NODE(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_ARRAYS_VECTOR& V,T_BOUNDARY_T2& boundary,const T dt,const T time,
+    ADVECTION_SEMI_LAGRANGIAN_TASK_NODE(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max,RANGE<TV_INT> domain)
         :grid(grid),Z(Z),Z_ghost(Z_ghost),V(V),boundary(boundary),dt(dt),time(time),Z_min_ghost(Z_min_ghost),Z_max_ghost(Z_max_ghost),Z_min(Z_min),Z_max(Z_max),domain(domain)
     {}
@@ -67,7 +66,6 @@ class ADVECTION_SEMI_LAGRANGIAN_TASK_CELL:public THREAD_QUEUE::TASK
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY;typedef typename REBIND<T_BOUNDARY,T2>::TYPE T_BOUNDARY_T2;
 
 public:
 
@@ -75,7 +73,7 @@ public:
     T_ARRAYS_T2& Z;
     const T_ARRAYS_T2& Z_ghost;
     const T_FACE_LOOKUP& face_velocities;
-    T_BOUNDARY_T2& boundary;
+    BOUNDARY_UNIFORM<T_GRID,T2>& boundary;
     const T dt;
     const T time;
     const T_ARRAYS_T2* Z_min_ghost;
@@ -84,7 +82,7 @@ public:
     T_ARRAYS_T2* Z_max;
     RANGE<TV_INT> domain;
 
-    ADVECTION_SEMI_LAGRANGIAN_TASK_CELL(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_FACE_LOOKUP& face_velocities,T_BOUNDARY_T2& boundary,const T dt,const T time,
+    ADVECTION_SEMI_LAGRANGIAN_TASK_CELL(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max,RANGE<TV_INT> domain)
         :grid(grid),Z(Z),Z_ghost(Z_ghost),face_velocities(face_velocities),boundary(boundary),dt(dt),time(time),Z_min_ghost(Z_min_ghost),Z_max_ghost(Z_max_ghost),Z_min(Z_min),Z_max(Z_max),domain(domain)
     {}
@@ -113,7 +111,6 @@ class ADVECTION_SEMI_LAGRANGIAN_TASK_FACE:public THREAD_QUEUE::TASK
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_AVERAGING::FACE_LOOKUP T_FACE_LOOKUP;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY;typedef typename REBIND<T_BOUNDARY,T2>::TYPE T_BOUNDARY_T2;
 
 public:
 
@@ -121,7 +118,7 @@ public:
     T_FACE_ARRAYS_SCALAR& Z;
     const T_FACE_LOOKUP& Z_ghost;
     const T_FACE_LOOKUP& face_velocities;
-    T_BOUNDARY& boundary;
+    BOUNDARY_UNIFORM<T_GRID,T>& boundary;
     const T dt;
     const T time;
     const T_FACE_LOOKUP* Z_min_ghost;
@@ -131,7 +128,7 @@ public:
     RANGE<TV_INT> domain;
     int axis;
 
-    ADVECTION_SEMI_LAGRANGIAN_TASK_FACE(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& face_velocities,T_BOUNDARY& boundary,const T dt,const T time,
+    ADVECTION_SEMI_LAGRANGIAN_TASK_FACE(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max,RANGE<TV_INT> domain,int axis)
         :grid(grid),Z(Z),Z_ghost(Z_ghost),face_velocities(face_velocities),boundary(boundary),dt(dt),time(time),Z_min_ghost(Z_min_ghost),Z_max_ghost(Z_max_ghost),Z_min(Z_min),Z_max(Z_max),domain(domain),axis(axis)
     {}

@@ -24,6 +24,7 @@ template<class T_GRID> class LEVELSET_CALLBACKS;
 template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class TV> class GRID;
+template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 
 template<class T,class T_GRID=GRID<VECTOR<T,1> > >
 class LEVELSET:public NONCOPYABLE
@@ -36,7 +37,7 @@ class LEVELSET:public NONCOPYABLE
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
     typedef typename REBIND<T_INTERPOLATION_SCALAR,TV>::TYPE T_INTERPOLATION_VECTOR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::FACE_LOOKUP_COLLIDABLE T_FACE_LOOKUP_COLLIDABLE;
-    typedef typename REBIND<typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS,bool>::TYPE T_FACE_ARRAYS_BOOL;typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY_SCALAR;
+    typedef typename REBIND<typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::FACE_LOOKUP_COLLIDABLE_SLIP T_FACE_LOOKUP_COLLIDABLE_SLIP;
 public:
     T small_number;
@@ -51,13 +52,13 @@ public:
     T fmm_initialization_iterative_tolerance;
     T fmm_initialization_iterative_drift_fraction;
 
-    T_BOUNDARY_SCALAR* boundary;
+    BOUNDARY_UNIFORM<T_GRID,T>* boundary;
     LEVELSET_CALLBACKS<T_GRID>* levelset_callbacks;
     T_GRID_BASED_COLLISION_GEOMETRY* collision_body_list;
     const T_FACE_ARRAYS_BOOL* face_velocities_valid_mask_current;
     bool collision_aware_signed_distance,clamp_phi_with_collision_bodies;
 //protected:
-    T_BOUNDARY_SCALAR& boundary_default;
+    BOUNDARY_UNIFORM<T_GRID,T>& boundary_default;
     static T_LINEAR_INTERPOLATION_SCALAR interpolation_default;
     T_INTERPOLATION_SCALAR *collision_aware_interpolation_plus,*collision_aware_interpolation_minus,*collision_unaware_interpolation;
     static typename REBIND<T_LINEAR_INTERPOLATION_SCALAR,TV>::TYPE normal_interpolation_default;
@@ -68,7 +69,7 @@ public:
 protected:
 
     LEVELSET()
-        :levelset_callbacks(0),collision_body_list(0),face_velocities_valid_mask_current(0),clamp_phi_with_collision_bodies(true),boundary_default(*new T_BOUNDARY_SCALAR),
+        :levelset_callbacks(0),collision_body_list(0),face_velocities_valid_mask_current(0),clamp_phi_with_collision_bodies(true),boundary_default(*new BOUNDARY_UNIFORM<T_GRID,T>),
         collision_aware_interpolation_plus(0),collision_aware_interpolation_minus(0),collision_unaware_interpolation(0),collidable_phi_replacement_value((T)1e-5)
     {
         Set_Small_Number();
@@ -116,7 +117,7 @@ public:
         valid_mask_next.Resize(grid_input.Cell_Indices(3),false);
     }
 
-    void Set_Custom_Boundary(T_BOUNDARY_SCALAR& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>& boundary_input)
     {boundary=&boundary_input;}
 
     void Set_Custom_Interpolation(T_INTERPOLATION_SCALAR& interpolation_input)

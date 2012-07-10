@@ -10,7 +10,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID,class T2> BOUNDARY_MPI<T_GRID,T2>::
-BOUNDARY_MPI(T_MPI_GRID* mpi_grid_input,T_BOUNDARY_T2& boundary_input)
+BOUNDARY_MPI(T_MPI_GRID* mpi_grid_input,BOUNDARY_UNIFORM<T_GRID,T2>& boundary_input)
     :mpi_grid(mpi_grid_input),boundary(boundary_input)
 {
     assert(&boundary);

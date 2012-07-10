@@ -33,7 +33,7 @@ Euler_Step_Subset(const ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocity,int m
     DEBUG_UTILITIES::Debug_Breakpoint();
     
     GRID<TV>& grid=levelset->grid;
-    T_BOUNDARY_SCALAR* boundary=levelset->boundary;
+    BOUNDARY_UNIFORM<GRID<TV>,T>* boundary=levelset->boundary;
     T_ARRAYS_SCALAR& phi=levelset->phi;
     
     assert(grid.Is_MAC_Grid() && advection);
@@ -91,7 +91,7 @@ template<class T> void LEVELSET_ADVECTION_3D<T>::
 Euler_Step_Of_Reinitialization(const ARRAY<T,VECTOR<int,3> >& sign_phi,const T dt,const T time)
 {
     GRID<TV>& grid=levelset->grid;
-    T_BOUNDARY_SCALAR* boundary=levelset->boundary;
+    BOUNDARY_UNIFORM<GRID<TV>,T>* boundary=levelset->boundary;
     T_ARRAYS_SCALAR& phi=levelset->phi;
     
     TV_INT i;int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;T dx=grid.dX.x,dy=grid.dX.y,dz=grid.dX.z;

@@ -18,18 +18,17 @@ namespace PhysBAM{
 template<class T_GRID> struct BOUNDARY_POLICY;
 
 template<class T_GRID,class T2=typename T_GRID::SCALAR>
-class BOUNDARY_MPI:public REBIND<typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR,T2>::TYPE
+class BOUNDARY_MPI:public BOUNDARY_UNIFORM<T_GRID,T2>
 {
     typedef typename T_GRID::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;
     typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_T2;
     typedef typename REBIND<T_FACE_ARRAYS,T2>::TYPE T_FACE_ARRAYS_T2;
-    typedef typename REBIND<typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR,T2>::TYPE T_BOUNDARY_T2;
 public:
     T_MPI_GRID* mpi_grid;
-    T_BOUNDARY_T2& boundary;
+    BOUNDARY_UNIFORM<T_GRID,T2>& boundary;
 
-    BOUNDARY_MPI(T_MPI_GRID* mpi_grid_input,T_BOUNDARY_T2& boundary_input);
+    BOUNDARY_MPI(T_MPI_GRID* mpi_grid_input,BOUNDARY_UNIFORM<T_GRID,T2>& boundary_input);
     ~BOUNDARY_MPI();
 
     void Set_Constant_Extrapolation(const TV_SIDES& constant_extrapolation_input=TV_SIDES::Constant_Vector(TV_BOOL2::Constant_Vector(true)));

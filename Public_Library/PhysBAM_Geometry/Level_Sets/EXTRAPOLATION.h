@@ -19,26 +19,25 @@ template<class T_GRID,class T2>
 class EXTRAPOLATION:public NONCOPYABLE
 {
     typedef typename T_GRID::SCALAR T;
-    typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY_SCALAR;typedef typename REBIND<T_BOUNDARY_SCALAR,T2>::TYPE T_BOUNDARY_T2;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<bool>::TYPE T_ARRAYS_BOOL_BASE;
     typedef typename T_GRID::INDEX T_INDEX;
 public:
     T band_width; // band for extrapolation near the interface
     T isobaric_fix_width;  // band for the isobaric fix
-    T_BOUNDARY_T2* boundary;
+    BOUNDARY_UNIFORM<T_GRID,T2>* boundary;
 private:
-    T_BOUNDARY_T2& boundary_default;
+    BOUNDARY_UNIFORM<T_GRID,T2>& boundary_default;
 
 protected:
     EXTRAPOLATION()
-        :boundary_default(*new T_BOUNDARY_T2)
+        :boundary_default(*new BOUNDARY_UNIFORM<T_GRID,T2>)
     {boundary=&boundary_default;}
 
     ~EXTRAPOLATION()
     {delete &boundary_default;}
 
 public:
-    void Set_Custom_Boundary(T_BOUNDARY_T2& boundary_input)
+    void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T2>& boundary_input)
     {boundary=&boundary_input;}
 
 protected:

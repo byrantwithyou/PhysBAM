@@ -23,7 +23,7 @@ class ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM:public ADVECTION<T_GRID,
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename T_ARRAYS_BOOL::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_ARRAYS_BOOL_DIMENSION;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename BOUNDARY_POLICY<T_GRID>::BOUNDARY_SCALAR T_BOUNDARY;
+    typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
 public:
     T_GRID_BASED_COLLISION_GEOMETRY& body_list;
 private:
@@ -43,7 +43,7 @@ public:
     {}
 
     void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
-        const T_FACE_LOOKUP& face_velocities,T_BOUNDARY& boundary,const T dt,const T time,
+        const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
         const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
     {T_FACE_ARRAYS_BOOL face_velocities_valid_mask_next(grid,3,false);
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){

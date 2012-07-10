@@ -37,7 +37,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     store_particle_ids(false),reincorporate_removed_particle_velocity(false),removed_particle_mass_scaling(1),
     use_sph_for_removed_negative_particles(false),
     normal_flame_speed((T).5),curvature_flame_speed(0),
-    fluid_boundary_water(*new T_BOUNDARY_SCALAR),
+    fluid_boundary_water(*new BOUNDARY_UNIFORM<T_GRID,T>),
     boundary_mac_slip(*new T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP(VECTOR_UTILITIES::Complement(domain_walls))),
     incompressible_tolerance((T)1e-8),incompressible_iterations(20),cg_restart_iterations(0),
     use_body_force(false),
