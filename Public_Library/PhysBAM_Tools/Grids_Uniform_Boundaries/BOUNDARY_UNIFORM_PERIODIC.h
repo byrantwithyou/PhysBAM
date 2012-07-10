@@ -13,8 +13,8 @@ namespace PhysBAM{
 template<class T_GRID,class T2>
 class BOUNDARY_UNIFORM_PERIODIC:public BOUNDARY_UNIFORM<T_GRID,T2>
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_GRID::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
+    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;
+    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_T2;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
 public:
 

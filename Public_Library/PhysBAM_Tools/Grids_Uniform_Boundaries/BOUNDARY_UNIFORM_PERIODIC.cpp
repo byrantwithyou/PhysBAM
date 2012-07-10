@@ -4,6 +4,8 @@
 //#####################################################################
 // Class BOUNDARY_UNIFORM_PERIODIC
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM_PERIODIC.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -18,7 +20,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
         TV_INT period=(axis_side==0?1:-1)*periods[axis]*TV_INT::Axis_Vector(axis);
-        for(NODE_ITERATOR iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,regions(side));iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             u_ghost(node)=u_ghost(node+period);}}
 }
 //#####################################################################
@@ -29,7 +31,13 @@ Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_T2& u,const T time)
 {
     assert(!grid.Is_MAC_Grid());
     for(int axis=0;axis<T_GRID::dimension;axis++)
-        for(NODE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION,2*axis);iterator.Valid();iterator.Next()){TV_INT node=iterator.Node_Index();
             TV_INT opposite_node=node;opposite_node[axis]=1;
             u(node)=u(opposite_node);}
 }
+template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<float,2> >,float>;
+template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<float,3> >,float>;
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<double,2> >,double>;
+template class BOUNDARY_UNIFORM_PERIODIC<GRID<VECTOR<double,3> >,double>;
+#endif
