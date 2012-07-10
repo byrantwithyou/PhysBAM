@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_1X1.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
@@ -22,6 +21,7 @@ namespace PhysBAM{
 
 template<class T> class EXTERNAL_STRAIN_ADJUSTMENT;
 template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
+template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 
 template<class T_GRID>
 class FLUID_STRAIN_UNIFORM:public FLUID_STRAIN<typename T_GRID::SCALAR>

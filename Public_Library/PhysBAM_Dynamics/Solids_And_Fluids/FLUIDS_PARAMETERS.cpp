@@ -30,7 +30,7 @@ FLUIDS_PARAMETERS(const TYPE type)
     :smoke(type==SMOKE),fire(type==FIRE),water(type==WATER),sph(type==SPH),compressible(type==COMPRESSIBLE),quadtree(false),octree(false),
     number_of_ghost_cells(3),cfl((T).9),gravity((T)9.8),gravity_direction(-TV::Axis_Vector(TV::m==1?0:1)),grid(new T_GRID()),need_destroy_grid(true),maximum_tree_depth(1),
     levelset_refinement_bandwidth(6),minimal_air_bandwidth(false),
-    phi_boundary_reflection(*new T_BOUNDARY_REFLECTION(VECTOR_UTILITIES::Complement(domain_walls))),phi_boundary_water(*new T_BOUNDARY_PHI_WATER),
+    phi_boundary_reflection(*new BOUNDARY_REFLECTION_UNIFORM<GRID<TV>,T>(VECTOR_UTILITIES::Complement(domain_walls))),phi_boundary_water(*new T_BOUNDARY_PHI_WATER),
     particle_half_bandwidth(3),reseeding_frame_rate(20),reinitialize_geometry_frame_rate(1),bias_towards_negative_particles(false),
     use_particle_levelset(true),number_particles_per_cell(64),
     use_removed_positive_particles(false),use_removed_negative_particles(false),

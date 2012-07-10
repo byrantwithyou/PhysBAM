@@ -11,12 +11,12 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 namespace PhysBAM{
+template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION>
 class ADVECTION_SEMI_LAGRANGIAN_TASK_NODE:public THREAD_QUEUE::TASK

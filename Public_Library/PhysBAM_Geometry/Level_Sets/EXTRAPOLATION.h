@@ -8,12 +8,12 @@
 #define __EXTRAPOLATION__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 
 template<class T_GRID,class T2>
 class EXTRAPOLATION:public NONCOPYABLE

@@ -14,7 +14,6 @@
 #define __ADVECTION__
 
 #include <PhysBAM_Tools/Advection/ADVECTION_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
@@ -22,6 +21,7 @@ namespace PhysBAM{
 
 template<class T_GRID> struct BOUNDARY_POLICY;
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
+template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 
 template<class T_GRID,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=typename T_GRID::FACE_LOOKUP
 class ADVECTION:public NONCOPYABLE

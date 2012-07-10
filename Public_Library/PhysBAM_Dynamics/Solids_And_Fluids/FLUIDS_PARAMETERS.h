@@ -25,6 +25,7 @@ template<class T> class FLUIDS_PARAMETERS_CALLBACKS;
 template<class T> class EOS;
 template<class T_GRID,int d> class CONSERVATION;
 template<class TV> class GRID;
+template<class T_GRID,class T2> class BOUNDARY_REFLECTION_UNIFORM;
 
 template <class T_GRID>
 class FLUIDS_PARAMETERS:public NONCOPYABLE
@@ -36,10 +37,9 @@ class FLUIDS_PARAMETERS:public NONCOPYABLE
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_HAMILTON_JACOBI_WENO_SCALAR T_ADVECTION_HAMILTON_JACOBI_WENO_SCALAR;
     typedef typename TURBULENCE_POLICY<TV>::TURBULENCE T_TURBULENCE;typedef typename LEVELSET_POLICY<T_GRID>::PARTICLE_LEVELSET_EVOLUTION T_PARTICLE_LEVELSET_EVOLUTION;
     typedef typename LEVELSET_POLICY<T_GRID>::PARTICLE_LEVELSET T_PARTICLE_LEVELSET;typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::INCOMPRESSIBLE T_INCOMPRESSIBLE;
-    typedef BOUNDARY_REFLECTION_UNIFORM<T_GRID,T> T_BOUNDARY_REFLECTION;typedef BOUNDARY_PHI_WATER<T_GRID> T_BOUNDARY_PHI_WATER;
+    typedef BOUNDARY_PHI_WATER<T_GRID> T_BOUNDARY_PHI_WATER;
     typedef BOUNDARY_MAC_GRID_SOLID_WALL_SLIP<T_GRID> T_BOUNDARY_MAC_GRID_SOLID_WALL_SLIP;
     typedef BOUNDARY_UNIFORM<T_GRID,SYMMETRIC_MATRIX<T,TV::m> > T_BOUNDARY_SYMMETRIC_MATRIX;
-    typedef typename REBIND_LENGTH<BOUNDARY_UNIFORM<T_GRID,T>,T_GRID::dimension+2>::TYPE T_BOUNDARY_DIMENSION_SCALAR;
 public:
     const bool smoke,fire,water,sph,compressible;
     bool quadtree,octree;
@@ -57,7 +57,7 @@ public:
     bool minimal_air_bandwidth;
     BOUNDARY_UNIFORM<T_GRID,T>* phi_boundary;
     ARRAY<BOUNDARY_UNIFORM<T_GRID,T>*> phi_boundary_multiphase;
-    T_BOUNDARY_REFLECTION& phi_boundary_reflection;
+    BOUNDARY_REFLECTION_UNIFORM<GRID<TV>,T>& phi_boundary_reflection;
     T_BOUNDARY_PHI_WATER& phi_boundary_water;
     T particle_half_bandwidth;
     int reseeding_frame_rate;
@@ -157,7 +157,7 @@ public:
     bool use_maccormack_for_incompressible;
     T bandwidth_without_maccormack_near_interface;
     bool analytic_test;
-    T_BOUNDARY_DIMENSION_SCALAR* compressible_boundary;
+    BOUNDARY_UNIFORM<GRID<TV>,VECTOR<T,T_GRID::dimension+2> >* compressible_boundary;
     BOUNDARY_UNIFORM<T_GRID,T>* compressible_pressure_boundary;
     EOS<T>* compressible_eos;
     CONSERVATION<T_GRID,T_GRID::dimension+2>* compressible_conservation_method;

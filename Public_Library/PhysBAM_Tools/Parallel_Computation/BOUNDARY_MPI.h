@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID_POLICY.h>

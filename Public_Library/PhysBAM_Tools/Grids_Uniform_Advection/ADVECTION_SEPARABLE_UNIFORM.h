@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Advection/ADVECTION.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 namespace PhysBAM{

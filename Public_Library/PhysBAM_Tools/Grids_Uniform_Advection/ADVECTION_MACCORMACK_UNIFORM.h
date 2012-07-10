@@ -8,7 +8,6 @@
 #define __ADVECTION_MACCORMACK_UNIFORM__
 
 #include <PhysBAM_Tools/Advection/ADVECTION.h>
-#include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
 namespace PhysBAM{
 
