@@ -2,12 +2,8 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
-#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <climits>
 using namespace PhysBAM;
@@ -32,8 +28,8 @@ template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T2>::
 Extrapolate_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >& inside_mask,int ghost,ARRAYS_ND_BASE<VECTOR<T2,TV::m> >& u,int order,int fill_width,T order_reduction_penalty)
 {
     PHYSBAM_ASSERT(fill_width<=ghost);
-    ARRAY<int,TV_INT> distance(grid.Domain_Indices(ghost));
-    ARRAY<TV_INT,TV_INT> nearest(grid.Domain_Indices(ghost));
+    ARRAY<int,TV_INT> distance(grid.Domain_Indices(ghost+1));
+    ARRAY<TV_INT,TV_INT> nearest(grid.Domain_Indices(ghost+1));
     ARRAY<ARRAY<TV_INT> > todo;
     int inf=INT_MAX/10,ignore=-inf;
 
@@ -70,7 +66,7 @@ Extrapolate_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >&
         a=~oo;
         seed(oo).Append(it.index);}
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost+1,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         distance(it.index)=ignore;
 
     ARRAY<TV_INT> next_outside,current,solve;
@@ -121,7 +117,7 @@ Extrapolate_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<bool,TV::m> >&
         todo.Clean_Memory();
 
         if(o!=order-1)
-            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost);it.Valid();it.Next()){
+            for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,ghost+1);it.Valid();it.Next()){
                 int& a=distance(it.index);
                 if(a>=0 && a<inf) a=(int)sqr(sqrt(a)+order_reduction_penalty);}}
 
@@ -174,11 +170,11 @@ Extrapolate_Face(const GRID<TV>& grid,const ARRAY<bool,FACE_INDEX<TV::m> >& insi
         GRID<TV> node_grid(grid.Get_Face_Grid(i));
         Extrapolate_Node(node_grid,inside_mask.Component(i),ghost,u.Component(i),order,fill_width,order_reduction_penalty);}
 }
-//template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<float,1>,float>;
+template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<float,1>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<float,2>,float>;
 template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<float,3>,float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-//template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<double,1>,double>;
+template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<double,1>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<double,2>,double>;
 template class EXTRAPOLATION_HIGHER_ORDER_POLY<VECTOR<double,3>,double>;
 #endif
