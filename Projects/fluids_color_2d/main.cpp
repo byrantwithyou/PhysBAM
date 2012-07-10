@@ -16,6 +16,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Integer_Argument("-restart",0,"restart frame");
     parse_args.Add_Integer_Argument("-resolution",32,"fine scale grid resolution");
     parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
+    parse_args.Add_Integer_Argument("-last_frame",20,"last simulation frame");
 
     parse_args.Parse(argc,argv);
     parse_args.Print_Arguments(argc,argv);

@@ -30,10 +30,11 @@ public:
     FLUIDS_COLOR(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type)
     {
-        int test_number=1;last_frame=200;
+        int test_number=1;
         int resolution=parse_args.Get_Integer_Value("-resolution");
         restart=parse_args.Get_Integer_Value("-restart");
         write_substeps_level=parse_args.Get_Integer_Value("-substep");
+        last_frame=parse_args.Get_Integer_Value("-last_frame");
         output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d",test_number);
         grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
     }
@@ -45,7 +46,7 @@ public:
     {
         dt=(T).1;
         mu.Append(1);
-        face_velocities.Fill(0);
+        face_velocities.Fill(1);
         levelset_color.phi.Fill(-1);
         levelset_color.color.Fill(0);
     }
