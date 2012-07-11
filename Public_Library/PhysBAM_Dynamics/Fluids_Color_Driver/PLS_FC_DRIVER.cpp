@@ -80,6 +80,7 @@ Initialize()
 
     example.particle_levelset_evolution.Set_Time(time);
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
+    example.particle_levelset_evolution.Use_Reinitialization();
 
     example.boundary=&example.boundary_scalar;
     example.phi_boundary=&example.cell_extrapolate;
