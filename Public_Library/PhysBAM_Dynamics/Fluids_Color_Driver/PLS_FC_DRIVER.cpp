@@ -260,9 +260,7 @@ Apply_Pressure_And_Viscosity(T dt)
             u(c).Resize(example.grid);
             inside(c).Resize(example.grid);}
 
-        LOG::cout<<u<<std::endl;
         iss.Set_RHS(rhs,f_volume,&u);
-        LOG::cout<<rhs.u<<std::endl;
         iss.Resize_Vector(sol);
     }
     PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
