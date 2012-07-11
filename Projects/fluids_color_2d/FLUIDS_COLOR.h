@@ -27,16 +27,20 @@ public:
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::dump_matrix;
 
-    FLUIDS_COLOR(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
+    FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type)
     {
-        int test_number=1;
-        int resolution=parse_args.Get_Integer_Value("-resolution");
-        restart=parse_args.Get_Integer_Value("-restart");
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");
-        last_frame=parse_args.Get_Integer_Value("-last_frame");
-        output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d",test_number);
-        dump_matrix=parse_args.Is_Value_Set("-dump_matrix");
+        int test_number=1,resolution=32;
+        last_frame=20;
+        parse_args.Add("-restart",&restart,"frame","restart frame");
+        parse_args.Add("-resolution",&resolution,"resolution","fine scale grid resolution");
+        parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
+        parse_args.Add("-last_frame",&last_frame,"frame","last simulation frame");
+        parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
+        parse_args.Print_Arguments();
+        parse_args.Parse();
+
+        output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
     }
 
