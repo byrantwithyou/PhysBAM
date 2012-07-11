@@ -235,11 +235,13 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY
             for(int c=0;c<cdi->colors;c++){
                 int k=cm_u(face.axis)->Get_Index(it.index,c);
                 if(k>=0) U(face.axis)(c)(k)=(*u)(c)(face);}}
+        LOG::cout<<"U "<<U<<std::endl;
 
         for(int i=0;i<TV::m;i++)
             if(matrix_inertial_rhs(i).m)
                 for(int c=0;c<cdi->colors;c++)
                     matrix_inertial_rhs(i)(c).Times_Add(U(i)(c),rhs.u(i)(c));
+        LOG::cout<<"mat "<<matrix_inertial_rhs<<std::endl;
 
         if(analytic_velocity_correction)
             for(int i=0;i<TV::m;i++)

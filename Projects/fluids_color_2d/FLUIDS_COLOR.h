@@ -25,7 +25,7 @@ class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
-    using BASE::dt;using BASE::levelset_color;using BASE::mu;
+    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::dump_matrix;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type)
@@ -36,6 +36,7 @@ public:
         write_substeps_level=parse_args.Get_Integer_Value("-substep");
         last_frame=parse_args.Get_Integer_Value("-last_frame");
         output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d",test_number);
+        dump_matrix=parse_args.Is_Value_Set("-dump_matrix");
         grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box(),true);
     }
 
