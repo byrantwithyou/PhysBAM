@@ -94,21 +94,33 @@ Set_Extra_Usage_Callback(void (*extra_usage_callback_input)())
 // Function Parse
 //#####################################################################
 void PARSE_ARGS::
-Parse()
+Parse(bool partial)
 {
-    program_name=argv[0];int current_arg=1;
+    program_name=argv[0];
     extra_arg_list.Remove_All();
-    while(current_arg<argc){
-        if(use_help_option && !strcmp(argv[current_arg],"--help"))Print_Usage(true); // print help
-        int match=Find_Match(argv[current_arg]);
-        if(match==-1){
-            if(argv[current_arg][0]=='-') Print_Usage(true);
-            else extra_arg_list.Append(argv[current_arg++]);}
-        else if(!arg_data_list(match).Parse_Value(argc,argv,current_arg))
-            Print_Usage(true);
-        else arg_data_list(match).value_set=true;}
-    if(num_expected_extra_args!=-1 && extra_arg_list.m!=num_expected_extra_args) Print_Usage(true); // didn't get the expected number of extra args
-    for(int i=current_arg;i<argc;i++)extra_arg_list.Append(argv[i]);
+    int kept=1;
+    for(int i=1;i<argc;i++){
+        if(OPTION* o=options.Get_Pointer(argv[i])){
+            if(o->found) *o->found=true;
+            if(o->store)
+                if(!argv[++i] || !o->store_func(o->store,argv[i]))
+                    Print_Usage(true);}
+        else{
+            int match=Find_Match(argv[i]);
+            if(match>=0){
+                if(!arg_data_list(match).Parse_Value(argc,argv,i))
+                    Print_Usage(true);
+                else arg_data_list(match).value_set=true;
+                i--;}
+            else argv[kept++]=argv[i];}}
+    argc=kept;
+    argv[argc]=0;
+
+    if(!partial){
+        for(int i=1;i<argc;i++){
+            if(argv[i][0]=='-' && isalpha(argv[i][1])) Print_Usage(true);
+            extra_arg_list.Append(argv[i]);}
+        if(num_expected_extra_args!=-1 && extra_arg_list.m<num_expected_extra_args) Print_Usage(true);} // didn't get the expected number of extra args
 }
 //#####################################################################
 // Function Get_Option_Value
@@ -259,19 +271,43 @@ Find_And_Remove_Integer(const char *str,int& argc,char** argv)
 void PARSE_ARGS::
 Print_Usage(bool do_exit) const
 {
-    int i;LOG::cerr<<"Usage: "<<program_name<<" ";
-    for(i=0;i<arg_data_list.m;i++){arg_data_list(i).Print_Synopsis();LOG::cerr<<" ";}
+    ARRAY<std::string> args;
+    options.Get_Keys(args);
+    args.Sort();
+
+    LOG::cerr<<"Usage: "<<program_name;
+    for(int i=0;i<arg_data_list.m;i++){LOG::cerr<<" ";arg_data_list(i).Print_Synopsis();}
+    for(int i=0;i<args.m;i++){
+        const OPTION& o=options.Get(args(i));
+        LOG::cerr<<" ["<<o.opt;
+        if(o.store) LOG::cerr<<" <"<<(o.name.size()?o.name:"arg")<<">";
+        LOG::cerr<<"]";}
     LOG::cerr<<extra_args_synopsis<<std::endl;
+
     int width=0;
-    for(i=0;i<arg_data_list.m;i++){int len=(int)arg_data_list(i).str.length();if(len>width)width=len;}
-    for(i=0;i<arg_data_list.m;i++){arg_data_list(i).Print_Description(width+2);LOG::cerr<<std::endl;}
-    LOG::cerr<<extra_args_desc<<std::endl;if(extra_usage_callback)extra_usage_callback();if(do_exit) exit(-1);
+    for(int i=0;i<arg_data_list.m;i++){int len=(int)arg_data_list(i).str.length();if(len>width)width=len;}
+    for(int i=0;i<args.m;i++) width=max((int)args(i).size(),width);
+
+    for(int i=0;i<arg_data_list.m;i++){arg_data_list(i).Print_Description(width+2);LOG::cerr<<std::endl;}
+    for(int i=0;i<args.m;i++){
+        const OPTION& o=options.Get(args(i));
+        LOG::cerr.flags(std::ios::left);
+        LOG::cerr.width(width+2);
+        LOG::cerr<<o.opt<<o.desc;
+        if(o.store){
+            LOG::cerr<<" (";
+            o.print_default_func(o.store);
+            LOG::cerr<<")";}
+        LOG::cerr<<std::endl;}
+    if(extra_args_desc.size()) LOG::cerr<<" "<<extra_args_desc<<std::endl;
+    if(extra_usage_callback) extra_usage_callback();
+    if(do_exit) exit(-1);
 }
 //#####################################################################
 // Function Print_Arguments
 //#####################################################################
 std::string PARSE_ARGS::
-Print_Arguments()
+Print_Arguments() const
 {
     std::string s="command = ";
     for(int i=0;i<argc;i++){s+=argv[i];s+=' ';}
