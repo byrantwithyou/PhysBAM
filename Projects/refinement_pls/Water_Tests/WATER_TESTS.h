@@ -77,36 +77,47 @@ public:
     CYLINDER<T> source_cyl;
     RANGE<TV> source;
     
-    WATER_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
-        :PLS_REFINEMENT_EXAMPLE<TV>(stream_type),binary_refinement_levels(0),use_direct_solver(false),buffer(1),use_cubic_interpolation(false),surface_solve(true),thread_queue(0),
-        local_mac_grid(TV_INT::All_Ones_Vector(),RANGE<TV>::Centered_Box(),true),local_face_velocities(local_mac_grid),local_projection(local_mac_grid),local_projection_analytic(local_mac_grid),levelset_projection(fine_mac_grid),
-        //levelset_incompressible(fine_mac_grid,levelset_projection),
-        interpolation(0),phi_interpolation(0)
+    WATER_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
+        :PLS_REFINEMENT_EXAMPLE<TV>(stream_type),scale(128),binary_refinement_levels(0),alpha(1),use_direct_solver(false),number_of_threads_per_mpi_proc(0),
+        buffer(1),use_cubic_interpolation(false),surface_solve(true),thread_queue(0),
+        local_mac_grid(TV_INT::All_Ones_Vector(),RANGE<TV>::Centered_Box(),true),local_face_velocities(local_mac_grid),local_projection(local_mac_grid),local_projection_analytic(local_mac_grid),
+        levelset_projection(fine_mac_grid),interpolation(0),phi_interpolation(0)
     {
-        int test_number=2;last_frame=200;
-        restart=parse_args.Get_Integer_Value("-restart");
-        alpha=parse_args.Get_Double_Value("-alpha");
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");
-        number_of_threads_per_mpi_proc=parse_args.Get_Integer_Value("-threads");
-        scale=parse_args.Get_Integer_Value("-scale");
-        cfl=parse_args.Get_Double_Value("-cfl");
-        binary_refinement_levels=parse_args.Get_Integer_Value("-binary");
-        split_dir=parse_args.Get_String_Value("-split");
+        int test_number=2,opt_subscale=2;
+        last_frame=200;
+        bool opt_nosurface=false;
+        T opt_x=1,opt_y=1,opt_z=1;
+        parse_args.Add("-restart",&restart,"frame","restart frame");
+        parse_args.Add("-split",&split_dir,"dir","split restart data");
+        parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+        parse_args.Add("-subscale",&opt_subscale,"scale","fine/coarse scale grid resolution ratio");
+        parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
+        parse_args.Add("-threads",&number_of_threads_per_mpi_proc,"threads","number of threads");
+        parse_args.Add("-buffer",&buffer,"buffer","surface buffer");
+        parse_args.Add("-cfl",&cfl,"cfl","CFL");
+        parse_args.Add("-x",&opt_x,"multiplier","ratio multiplier");
+        parse_args.Add("-y",&opt_y,"multiplier","ratio multiplier");
+        parse_args.Add("-z",&opt_z,"multiplier","ratio multiplier");
+        parse_args.Add("-binary",&binary_refinement_levels,"levels","total number of binary adaptive refinement levels");
+        parse_args.Add("-alpha",&alpha,"alpha","interpolation parameter");
+        parse_args.Add("-last_frame",&last_frame,"frame","number of frames simulated");
+        parse_args.Add("-cubic",&use_cubic_interpolation,"cubic interpolation");
+        parse_args.Add("-nosurface",&opt_nosurface,"don't solve the surface as one solve");
+        parse_args.Add("-write_debug",&write_debug_data,"write debug data");
+        parse_args.Parse();
+    
         if(binary_refinement_levels){
             sub_scale=1;
             for(int i=0;i<binary_refinement_levels;i++) sub_scale<<=1;
             Initialize_Binary_Local_Solve();}
-        else sub_scale=parse_args.Get_Integer_Value("-subscale");
+        else sub_scale=opt_subscale;
         if(sub_scale==1) LOG::cout<<"WARNING: Please use one_phase_incompressible instead"<<std::endl;
-        buffer=parse_args.Get_Integer_Value("-buffer");
-        use_cubic_interpolation=parse_args.Get_Option_Value("-cubic");
-        write_debug_data=parse_args.Get_Option_Value("-write_debug");
-        surface_solve=!parse_args.Get_Option_Value("-nosurface");
+        surface_solve=!opt_nosurface;
         output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d_%d_%d%s_%1.2f_%d%s%s",test_number,scale,sub_scale,binary_refinement_levels?"_binary":"",alpha,buffer,use_cubic_interpolation?"_cubic":"",surface_solve?"_surface":"");
         ratio=TV::All_Ones_Vector();
-        if(parse_args.Get_Double_Value("-x")!=1) ratio(0)*=parse_args.Get_Double_Value("-x");
-        if(parse_args.Get_Double_Value("-y")!=1) ratio(1)*=parse_args.Get_Double_Value("-y");
-        if(parse_args.Get_Double_Value("-z")!=1) ratio(2)*=parse_args.Get_Double_Value("-z");
+        ratio(0)*=opt_x;
+        ratio(1)*=opt_y;
+        ratio(2)*=opt_z;
         TV_INT dimensions=TV_INT(ratio*scale);
         fine_mac_grid.Initialize(dimensions,RANGE<TV>(TV(),ratio),true);
         coarse_mac_grid.Initialize(dimensions/sub_scale,RANGE<TV>(TV(),ratio),true);

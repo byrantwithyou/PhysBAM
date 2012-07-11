@@ -397,6 +397,25 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
+    int res=4,max_iter=1000000,cgf=2;
+    bool use_preconditioner=false,null=false,dump_matrix=false,debug_particles=false;
+    T opt_mu_i=1,opt_mu_o=1,opt_m=1,opt_s=1,opt_kg=1;
+
+    parse_args.Add("-o",&output_directory,"dir","output directory");
+    parse_args.Add("-mu_i",&opt_mu_i,"viscosity","viscosity inside");
+    parse_args.Add("-mu_o",&opt_mu_o,"viscosity","viscosity outside");
+    parse_args.Add("-m",&opt_m,"scale","meter scale");
+    parse_args.Add("-s",&opt_s,"scale","second scale");
+    parse_args.Add("-kg",&opt_kg,"scale","kilogram scale");
+    parse_args.Add("-resolution",&res,"res","resolution");
+    parse_args.Add("-cgf",&cgf,"factor","coarse grid factor");
+    parse_args.Add("-max_iter",&max_iter,"iterations","max number of interations");
+    parse_args.Add("-use_preconditioner",&use_preconditioner,"use Jacobi preconditioner");
+    parse_args.Add("-null",&null,"find extra null modes of the matrix");
+    parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
+    parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
+    parse_args.Parse();
+
     int test_number;
     if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
     if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
@@ -646,19 +665,11 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
-    output_directory=parse_args.Get_String_Value("-o");
-    test->m=parse_args.Get_Double_Value("-m");
-    test->s=parse_args.Get_Double_Value("-sec");
-    test->kg=parse_args.Get_Double_Value("-kg");
-    test->mu(0)=parse_args.Get_Double_Value("-mu_o")*test->kg/(test->s*(d==3?test->m:1));
-    test->mu(1)=parse_args.Get_Double_Value("-mu_i")*test->kg/(test->s*(d==3?test->m:1));
-    int res=parse_args.Get_Integer_Value("-resolution");
-    int cgf=parse_args.Get_Integer_Value("-cgf");
-    int max_iter=parse_args.Get_Integer_Value("-max_iter");
-    bool use_preconditioner=parse_args.Get_Option_Value("-use_preconditioner");
-    bool null=parse_args.Get_Option_Value("-null");
-    bool dump_matrix=parse_args.Get_Option_Value("-dump_matrix");
-    bool debug_particles=parse_args.Get_Option_Value("-debug_particles");
+    test->m=opt_m;
+    test->s=opt_s;
+    test->kg=opt_kg;
+    test->mu(0)=opt_mu_o;
+    test->mu(1)=opt_mu_i;
 
     if(res%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
 
@@ -687,26 +698,13 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
+    bool opt_3d=false;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Set_Extra_Arguments(-1,"<example number>");
-    parse_args.Add_String_Argument("-o","output","output directory");
-    parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
-    parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
-    parse_args.Add_Double_Argument("-m",1,"meter scale");
-    parse_args.Add_Double_Argument("-sec",1,"second scale");
-    parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
-    parse_args.Add_Integer_Argument("-test",1,"test number");
-    parse_args.Add_Integer_Argument("-resolution",4,"resolution");
-    parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
-    parse_args.Add_Integer_Argument("-max_iter",1000000,"max number of interations");
-    parse_args.Add_Option_Argument("-use_preconditioner","use Jacobi preconditioner");
-    parse_args.Add_Option_Argument("-3d","use 3D");
-    parse_args.Add_Option_Argument("-null","find extra null modes of the matrix");
-    parse_args.Add_Option_Argument("-dump_matrix","dump system matrix");
-    parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
-    parse_args.Parse();
+    parse_args.Add("-3d",&opt_3d,"use 3D");
+    parse_args.Parse(true);
 
-    if(parse_args.Get_Option_Value("-3d"))
+    if(opt_3d)
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);
     else
         Integration_Test<VECTOR<double,2> >(argc,argv,parse_args);

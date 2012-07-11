@@ -19,30 +19,7 @@ int main(int argc,char *argv[])
     MPI_WORLD mpi_world(argc,argv);
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-restart",0,"restart frame");
-    parse_args.Add_String_Argument("-split","","split restart data");
-    parse_args.Add_Integer_Argument("-scale",128,"fine scale grid resolution");
-    parse_args.Add_Integer_Argument("-subscale",2,"fine/coarse scale grid resolution ratio");
-    parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
-    parse_args.Add_Integer_Argument("-threads",0,"number of threads");
-    parse_args.Add_Integer_Argument("-buffer",1,"surface buffer");
-    parse_args.Add_Double_Argument("-cfl",.9,"CFL");
-    parse_args.Add_Double_Argument("-x",1,"ratio multiplier");
-    parse_args.Add_Double_Argument("-y",1,"ratio multiplier");
-    parse_args.Add_Double_Argument("-z",1,"ratio multiplier");
-    parse_args.Add_String_Argument("-output","output","output directory");
-    parse_args.Add_Integer_Argument("-binary",0,"total number of binary adaptive refinement levels");
-    parse_args.Add_Double_Argument("-alpha",1,"interpolation parameter");
-    parse_args.Add_Integer_Argument("-last_frame",100,"number of frames simulated");
-    parse_args.Add_Option_Argument("-3d","3D examples");
-    parse_args.Add_Option_Argument("-cubic","cubic interpolation");
-    parse_args.Add_Option_Argument("-nosurface","don't solve the surface as one solve");
-    parse_args.Add_Option_Argument("-write_debug","write debug data");
-    parse_args.Add_Integer_Argument("-scheme",1,"scheme type for binary");
-
     parse_args.Print_Arguments();
-    parse_args.Parse();
-    
     WATER_TESTS<TV>* example=new WATER_TESTS<TV>(stream_type,parse_args);
 
     if(mpi_world.initialized){

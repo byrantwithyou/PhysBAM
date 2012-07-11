@@ -78,26 +78,25 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
+    int scale=128,threads=1,refine=1;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-restart",0,"restart frame");
-    parse_args.Add_Integer_Argument("-scale",128,"fine scale grid resolution");
-    parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
-    parse_args.Add_Integer_Argument("-e",100,"last frame");
-    parse_args.Add_Integer_Argument("-refine",1,"refine levels");
-    parse_args.Add_Integer_Argument("-threads",1,"number of threads");
-    parse_args.Add_Double_Argument("-cfl",1,"cfl number");
-
     parse_args.Print_Arguments();
-    parse_args.Parse();
-    
-    WATER_EXAMPLE<TV>* example=new WATER_EXAMPLE<TV>(stream_type,parse_args.Get_Integer_Value("-threads"),parse_args.Get_Integer_Value("-refine"));
+    parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+    parse_args.Add("-refine",&refine,"levels","refine levels");
+    parse_args.Add("-threads",&threads,"threads","number of threads");
+    parse_args.Parse(true);
 
-    int scale=parse_args.Get_Integer_Value("-scale");
+    WATER_EXAMPLE<TV>* example=new WATER_EXAMPLE<TV>(stream_type,threads,refine);
+
+    example->last_frame=100;
+    example->cfl=1;
+    parse_args.Add("-restart",&example->restart,"frame","restart frame");
+    parse_args.Add("-substep",&example->write_substeps_level,"level","output-substep level");
+    parse_args.Add("-e",&example->last_frame,"frame","last frame");
+    parse_args.Add("-cfl",&example->cfl,"cfl","cfl number");
+    parse_args.Parse();
+
     example->Initialize_Grid(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()));
-    example->restart=parse_args.Get_Integer_Value("-restart");
-    example->last_frame=parse_args.Get_Integer_Value("-e");
-    example->write_substeps_level=parse_args.Get_Integer_Value("-substep");
-    example->cfl=parse_args.Get_Double_Value("-cfl");
     Add_Source(example);
     Add_Sphere(example);
 
