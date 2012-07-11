@@ -25,7 +25,7 @@ int main(int argc,char* argv[])
     parse_args.Add_String_Argument("-in","input_directory");
     parse_args.Add_String_Argument("-data","density","Data to parse");
     parse_args.Add_Integer_Argument("-frame",-1);
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     std::string input_directory=parse_args.Get_String_Value("-in"),
         data_file=parse_args.Get_String_Value("-data");
     int frame=parse_args.Get_Integer_Value("-frame");

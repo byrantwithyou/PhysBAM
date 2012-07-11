@@ -297,7 +297,7 @@ ARRAY<OBJECT> objects;
 
 int main(int argc, char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-ic","in_curves.txt","input file with curves");
     parse_args.Add_String_Argument("-ir","in_reduction.txt","input file with reduction");
     parse_args.Add_String_Argument("-o","out","output file");
@@ -306,7 +306,7 @@ int main(int argc, char* argv[])
     parse_args.Add_Option_Argument("-emit_curves","create output tex file with cube and curves");
     parse_args.Add_Option_Argument("-emit_reduction","create output tex files with graph reduction process");
     parse_args.Add_Option_Argument("-emit_rules","create output tex files with reduction rules");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     std::string input_file_curves=parse_args.Get_String_Value("-ic");
     std::string input_file_reduction=parse_args.Get_String_Value("-ir");
     std::string output_file=parse_args.Get_String_Value("-o");

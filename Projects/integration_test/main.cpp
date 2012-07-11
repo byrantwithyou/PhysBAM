@@ -616,7 +616,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add_String_Argument("-o","output","output directory");
     parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
@@ -629,7 +629,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
     parse_args.Add_Option_Argument("-use_preconditioner","Use Jacobi preconditioner");
     parse_args.Add_Option_Argument("-3d","Use 3D");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     if(parse_args.Get_Option_Value("-3d"))
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);

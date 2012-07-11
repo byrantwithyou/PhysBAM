@@ -214,7 +214,7 @@ int main(int argc, char* argv[])
     parse_args.Add_Double_Argument("-curvature_cfl",1);
     parse_args.Add_Option_Argument("-extrapolate_into_objects");
     parse_args.Set_Extra_Arguments(1,"<frame number>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     int frame=atoi(parse_args.Extra_Arg(0).c_str());
     PROCESSOR<float>(parse_args).Process<float>(frame);

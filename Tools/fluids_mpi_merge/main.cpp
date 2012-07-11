@@ -418,7 +418,7 @@ Do_Merge(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-f","force");
     parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
     parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
@@ -440,7 +440,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-2d","input data is 2-D");
     parse_args.Add_Option_Argument("-3d","input data is 3-D");
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(parse_args.Is_Value_Set("-double")) Do_Merge<double>(parse_args); 

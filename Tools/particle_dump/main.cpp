@@ -25,12 +25,12 @@ int main(int argc,char *argv[])
     bool type_double=false;
     int dim=3;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-float","data should be in float format");
     parse_args.Add_Option_Argument("-double","data should be in double format");
     parse_args.Add_Integer_Argument("-d",3,"dimension");
     parse_args.Set_Extra_Arguments(1,"<file>","<obj file> obj file to convert");
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
     if(parse_args.Is_Value_Set(("-d"))) dim=parse_args.Get_Integer_Value("-d");
 
     std::string filename=parse_args.Extra_Arg(0);

@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Integer_Argument("-end_frame",1000000);
     parse_args.Set_Extra_Arguments(-1, "<filename_pattern>");
 
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
 
     if (parse_args.Num_Extra_Args() < 1) return 1;
 

@@ -19,11 +19,11 @@ int main(int argc,char **argv)
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-o","","output directory","output directory");
     parse_args.Add_String_Argument("-d","","data directory","data directory");
     parse_args.Set_Extra_Arguments(1,"<parameter file>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string parameter_file=parse_args.Extra_Arg(0);
     GENERIC_EXAMPLE<T> example(stream_type,parameter_file);

@@ -25,7 +25,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Option_Argument("-double");
     parse_args.Add_Option_Argument("-float");
     parse_args.Set_Extra_Arguments(1, "<filename>");
-    int extraarg = parse_args.Parse(argc, argv);
+    int extraarg = parse_args.Parse();
     std::string filename;
     if (extraarg < argc)
         filename = argv[extraarg];

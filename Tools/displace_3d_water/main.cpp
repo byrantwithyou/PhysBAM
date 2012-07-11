@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
     PARSE_ARGS parse_args;
     parse_args.Add_String_Argument("-o", "output", "directory", "output directory");
     parse_args.Set_Extra_Arguments(1, "<frame number>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     if (parse_args.Num_Extra_Args() != 1) 
     {
         parse_args.Print_Usage();

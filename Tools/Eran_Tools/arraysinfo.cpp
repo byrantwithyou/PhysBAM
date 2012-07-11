@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Integer_Argument("-skip", 0, "<bytes>", "skip header bytes");
     parse_args.Add_Integer_Argument("-n", 1, "<num arrays>", "number of consecutive arrays in the file");
     parse_args.Set_Extra_Arguments(1, "<filename>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     if (parse_args.Num_Extra_Args() != 1) {
         std::cerr << "Missing filename argument" << std::endl;

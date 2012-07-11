@@ -57,7 +57,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Vector_3D_Argument("-p",VECTOR<double,3>(),"position");
     parse_args.Set_Extra_Arguments(1,"<filename>");
 
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string filename=parse_args.Extra_Arg(0);
 

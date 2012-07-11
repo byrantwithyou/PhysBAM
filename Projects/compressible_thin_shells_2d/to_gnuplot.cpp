@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-in","input_directory");
     parse_args.Add_String_Argument("-data","density","Data to parse");
     parse_args.Add_Integer_Argument("-frame",-1);
@@ -34,7 +34,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Double_Argument("-transverse_velocity",-1);
     parse_args.Add_Option_Argument("-follow_transverse_velocity");
 
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     std::string input_directory=parse_args.Get_String_Value("-in"),
         data_file=parse_args.Get_String_Value("-data"),
         surface_file=parse_args.Get_String_Value("-surface");

@@ -52,12 +52,12 @@ void norm(TV a,TV b,const char* linecolor, const char* color, T width, T normal_
 
 int main(int argc, char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-case",-1,"case number");
     parse_args.Add_Double_Argument("-corner_radius",.05,"corner radius");
     parse_args.Add_Double_Argument("-tri_edge_width",.025,"triangle edge widths");
     parse_args.Add_String_Argument("-o","case.tex","output filename");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     int case_number=parse_args.Get_Integer_Value("-case");
     T corner_radius=parse_args.Get_Double_Value("-corner_radius");
     T tri_edge_width=parse_args.Get_Double_Value("-tri_edge_width");

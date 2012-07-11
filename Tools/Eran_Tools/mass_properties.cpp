@@ -67,7 +67,7 @@ int main(int argc,char *argv[])
 {
     bool type_double=false,write_double=false;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-float");
     parse_args.Add_Option_Argument("-double");
     parse_args.Add_Option_Argument("-write_float");
@@ -78,7 +78,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Double_Argument("-density",1,"density");
     parse_args.Add_String_Argument("-secondary_surface","");
     parse_args.Set_Extra_Arguments(1,"<filename>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string filename=parse_args.Extra_Arg(0);
 

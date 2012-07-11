@@ -20,7 +20,7 @@ int main(int argc,char **argv)
     PARSE_ARGS parse_args;
     parse_args.Add_Double_Argument("-aspect_ratio",6);
     parse_args.Set_Extra_Arguments(2,"<input.tet> <output.tet>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string input_file=parse_args.Extra_Arg(0);
     std::string output_file=parse_args.Extra_Arg(1);

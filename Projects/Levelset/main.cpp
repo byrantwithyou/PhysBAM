@@ -43,7 +43,7 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-restart",0,"restart frame");
     parse_args.Add_Integer_Argument("-scale",100,"fine scale grid resolution");
     parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
@@ -51,8 +51,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Integer_Argument("-threads",1,"number of threads");
     parse_args.Add_Option_Argument("-3d","run in 3 dimensions");
 
-    parse_args.Parse(argc,argv);
-    parse_args.Print_Arguments(argc,argv);
+    parse_args.Parse();
+    parse_args.Print_Arguments();
     
     if(parse_args.Is_Value_Set("-3d")){
         Execute_Main_Program<VECTOR<T,3> >(stream_type,parse_args,mpi_world);}

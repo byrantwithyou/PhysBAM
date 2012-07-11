@@ -51,14 +51,14 @@ int main(int argc,char *argv[])
 
     bool type_double=false;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-float","data should be in float format");
     parse_args.Add_Option_Argument("-double","data should be in double format");
     parse_args.Add_Option_Argument("-compute_using_doubles");
     parse_args.Set_Extra_Arguments(1,"<obj file>","<obj file> obj file to convert");
     parse_args.Set_Extra_Arguments(2,"<tet file>","<tet file> output tet file name");
 
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
 
     std::string input_filename=parse_args.Extra_Arg(0);
     std::string output_filename=parse_args.Extra_Arg(1);

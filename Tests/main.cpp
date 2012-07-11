@@ -10,10 +10,10 @@ using namespace PhysBAM;
 
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Set_Extra_Arguments(2,STRING_UTILITIES::string_sprintf("%s <suite-name> <test-number>",argv[0]));
-    parse_args.Parse(argc,argv);
-    parse_args.Print_Arguments(argc,argv);
+    parse_args.Parse();
+    parse_args.Print_Arguments();
 
     TEST_BASE::TEST_RESULT result;
     std::string test_suite=parse_args.Extra_Arg(0),test_number=parse_args.Extra_Arg(1).c_str();

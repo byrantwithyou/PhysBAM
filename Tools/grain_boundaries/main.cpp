@@ -33,7 +33,7 @@ int main(int argc,const char *argv[])
     parse_args.Add_Integer_Argument("-max_coarse_bcc_res",10,"resolution of largest bounding box dimension");
     parse_args.Add_Integer_Argument("-num_smoothing_steps",0,"number of smooting steps");
 
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     int max_refinement_levels=0;
     int max_dim_resolution=20;

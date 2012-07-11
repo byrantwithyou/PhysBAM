@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
     parse_args.Add_Double_Argument("-p", 1, "power", "particle power");
     parse_args.Add_Double_Argument("-e", 1, "object_expansion", "number of grid cells to expand the objects");
     parse_args.Set_Extra_Arguments(2, "<input directory> <frame number>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     if (parse_args.Num_Extra_Args() != 2) 
     {
         parse_args.Print_Usage();

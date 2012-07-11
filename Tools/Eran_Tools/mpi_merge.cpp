@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Integer_Argument("-np", 1, "<num nodes>", "number of nodes");
     parse_args.Add_String_Argument("-o", "merged.out");
     parse_args.Set_Extra_Arguments(3, "<master grid> <domain filename pattern> <array filename pattern>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     if (parse_args.Num_Extra_Args() != 3) {
         std::cerr << "Missing arguments" << std::endl;

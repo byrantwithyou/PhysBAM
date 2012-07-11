@@ -687,7 +687,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add_String_Argument("-o","output","output directory");
     parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
@@ -704,7 +704,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-null","find extra null modes of the matrix");
     parse_args.Add_Option_Argument("-dump_matrix","dump system matrix");
     parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     if(parse_args.Get_Option_Value("-3d"))
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);

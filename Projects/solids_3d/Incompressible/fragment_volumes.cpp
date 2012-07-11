@@ -19,7 +19,7 @@ int main(int argc,char* argv[])
 {
     PARSE_ARGS parse_args;
     parse_args.Set_Extra_Arguments(-1,"<frame>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     int start_frame=0,last_frame=0;
     if(parse_args.Num_Extra_Args()>=1) start_frame=last_frame=atoi(parse_args.Extra_Arg(0).c_str());

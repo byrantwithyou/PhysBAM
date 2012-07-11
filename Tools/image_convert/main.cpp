@@ -41,21 +41,21 @@ Bloom(ARRAY<VECTOR<T,3>,VECTOR<int,2> >& image,const T bloom_radius,const T bloo
 
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS args;
-    args.Add_Double_Argument("-gamma",1,"-gamma","gamma correction");
-    args.Add_Double_Argument("-bloom_weight",.5,"-bloom_weight","bloom weight");
-    args.Add_Double_Argument("-bloom_radius",.0,"-bloom_radius","bloom radius"); 
-    args.Add_Double_Argument("-bloom_multiply",1,"-bloom_multiply","bloom multiply"); 
-    args.Set_Extra_Arguments(2,"<image in> <image out>","images to read and write");
-    args.Parse(argc,argv);
-    std::string file_input=args.Extra_Arg(0);
-    std::string file_output=args.Extra_Arg(1);
-    double gamma=args.Get_Double_Value("-gamma");
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Double_Argument("-gamma",1,"-gamma","gamma correction");
+    parse_args.Add_Double_Argument("-bloom_weight",.5,"-bloom_weight","bloom weight");
+    parse_args.Add_Double_Argument("-bloom_radius",.0,"-bloom_radius","bloom radius"); 
+    parse_args.Add_Double_Argument("-bloom_multiply",1,"-bloom_multiply","bloom multiply"); 
+    parse_args.Set_Extra_Arguments(2,"<image in> <image out>","images to read and write");
+    parse_args.Parse();
+    std::string file_input=parse_args.Extra_Arg(0);
+    std::string file_output=parse_args.Extra_Arg(1);
+    double gamma=parse_args.Get_Double_Value("-gamma");
     ARRAY<VECTOR<float,3>,VECTOR<int,2> > image;
     LOG::Time("Reading Image");
     IMAGE<float>::Read(file_input,image);
-    if(args.Is_Value_Set("-bloom_radius"))
-        Bloom(image,(float)args.Get_Double_Value("-bloom_radius"),(float)args.Get_Double_Value("-bloom_weight"));
+    if(parse_args.Is_Value_Set("-bloom_radius"))
+        Bloom(image,(float)parse_args.Get_Double_Value("-bloom_radius"),(float)parse_args.Get_Double_Value("-bloom_weight"));
     LOG::Time("Writing Image");
     IMAGE<float>::Write(file_output,image,(float)gamma);
 }

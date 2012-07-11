@@ -196,7 +196,7 @@ int main(int argc,char *argv[])
     int boundary_cells=3;
     int positive_boundary_band=0;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-float","data is in float format");
     parse_args.Add_Option_Argument("-double","data is in double format");
     parse_args.Add_Option_Argument("-heaviside","compute heaviside function");
@@ -227,7 +227,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Option_Argument("-compute_using_doubles");
     parse_args.Set_Extra_Arguments(1,"<tri file>","<tri file> tri file to convert");
 
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
 
     if(parse_args.Is_Value_Set("-b")) boundary_cells=parse_args.Get_Integer_Value("-b");
     std::string input_filename=parse_args.Extra_Arg(0);

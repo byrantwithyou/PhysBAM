@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,3> TV;
     STREAM_TYPE stream_type((RW()));
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
 
 //    SURFACE_MUSCLE_EXAMPLE<T> example(stream_type);
     VISIBLE_HUMAN_MUSCLE_EXAMPLE<T> example(stream_type);

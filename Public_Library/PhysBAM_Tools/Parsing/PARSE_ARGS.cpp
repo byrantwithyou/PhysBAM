@@ -14,8 +14,8 @@ using namespace PhysBAM;
 // Function Use_Help_Option
 //#####################################################################
 PARSE_ARGS::
-PARSE_ARGS() 
-    :num_expected_extra_args(0),use_help_option(true),extra_usage_callback(0)
+PARSE_ARGS(int argc_input,char** argv_input)
+    :num_expected_extra_args(0),use_help_option(true),extra_usage_callback(0),argc(argc_input),argv(argv_input)
 {
 }
 PARSE_ARGS::
@@ -94,7 +94,7 @@ Set_Extra_Usage_Callback(void (*extra_usage_callback_input)())
 // Function Parse
 //#####################################################################
 void PARSE_ARGS::
-Parse(int argc,char* argv[])
+Parse()
 {
     program_name=argv[0];int current_arg=1;
     extra_arg_list.Remove_All();
@@ -109,14 +109,6 @@ Parse(int argc,char* argv[])
         else arg_data_list(match).value_set=true;}
     if(num_expected_extra_args!=-1 && extra_arg_list.m!=num_expected_extra_args) Print_Usage(true); // didn't get the expected number of extra args
     for(int i=current_arg;i<argc;i++)extra_arg_list.Append(argv[i]);
-}
-//#####################################################################
-// Function Parse
-//#####################################################################
-void PARSE_ARGS::
-Parse(int argc,const char* argv[])
-{
-    Parse(argc,(char**)argv);
 }
 //#####################################################################
 // Function Get_Option_Value
@@ -279,7 +271,7 @@ Print_Usage(bool do_exit) const
 // Function Print_Arguments
 //#####################################################################
 std::string PARSE_ARGS::
-Print_Arguments(int argc,char* argv[])
+Print_Arguments()
 {
     std::string s="command = ";
     for(int i=0;i<argc;i++){s+=argv[i];s+=' ';}

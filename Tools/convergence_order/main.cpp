@@ -67,7 +67,7 @@ Find_Dimension(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Double_Argument("-start",0,"start range");
     parse_args.Add_Double_Argument("-end",0,"end range");
     parse_args.Add_Integer_Argument("-frame",0,"frame output");
@@ -76,7 +76,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-2d","input data is 2-D");
     parse_args.Add_Option_Argument("-3d","input data is 3-D");
     parse_args.Set_Extra_Arguments(2,"<low res input_directory> <high res input directory>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(parse_args.Is_Value_Set("-double")) Find_Dimension<double>(parse_args); 

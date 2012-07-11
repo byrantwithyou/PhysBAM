@@ -95,7 +95,7 @@ int main(int argc, char* argv[])
     parse_args.Add_Vector_3D_Argument("-subdomain_2_minimum_corner",VECTOR<double,3>());
     parse_args.Add_Vector_3D_Argument("-subdomain_2_maximum_corner",VECTOR<double,3>());
     parse_args.Set_Extra_Arguments(2, "<input directory> <frame number>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     if (parse_args.Num_Extra_Args() != 2) 
     {
         parse_args.Print_Usage();

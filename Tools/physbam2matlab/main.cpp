@@ -62,7 +62,7 @@ int main(int argc,char* argv[])
 #endif
     typedef double RW;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
     parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
     parse_args.Add_String_Argument("-o","","output directory");
@@ -75,7 +75,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-pressure","convert pressure");
     parse_args.Add_Option_Argument("-internal_energy","convert internal_energy");
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
     if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");

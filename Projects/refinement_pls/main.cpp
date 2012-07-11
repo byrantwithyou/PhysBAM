@@ -18,7 +18,7 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-restart",0,"restart frame");
     parse_args.Add_String_Argument("-split","","split restart data");
     parse_args.Add_Integer_Argument("-scale",128,"fine scale grid resolution");
@@ -40,8 +40,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Option_Argument("-write_debug","write debug data");
     parse_args.Add_Integer_Argument("-scheme",1,"scheme type for binary");
 
-    parse_args.Parse(argc,argv);
-    parse_args.Print_Arguments(argc,argv);
+    parse_args.Parse();
+    parse_args.Print_Arguments();
     
     WATER_TESTS<TV>* example=new WATER_TESTS<TV>(stream_type,parse_args);
 

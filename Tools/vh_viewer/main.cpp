@@ -23,7 +23,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Vector_3D_Argument("-box_max",VECTOR<double,3>(),"maximum box dimensions","maximum box dimensions");
     parse_args.Add_Integer_Argument("-granularity",100,"granularity","granularity in all directions");
     parse_args.Set_Extra_Arguments(-1,"indices to be removed","indices to be removed");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string output_filename="visible_human_levelset.phi";
     std::string data_directory="../../Private_Data/VH_Raw";

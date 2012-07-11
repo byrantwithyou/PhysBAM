@@ -146,9 +146,9 @@ Parse_Arguments(PARSE_ARGS& parse_args)
 void BASIC_VISUALIZATION::
 Parse_Args(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     Add_Arguments(parse_args);
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     Parse_Arguments(parse_args);
 }
 //#####################################################################

@@ -35,7 +35,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Option_Argument("-3d", "force 3d mode");
     parse_args.Set_Extra_Arguments(1, "<filename>");
 
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
 
     filename=parse_args.Extra_Arg(0);
 

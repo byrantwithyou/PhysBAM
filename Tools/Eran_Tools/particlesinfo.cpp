@@ -67,7 +67,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Option_Argument("-vvv");
     parse_args.Set_Extra_Arguments(1, "<filename>");
 
-    int extraarg = parse_args.Parse(argc, argv);
+    int extraarg = parse_args.Parse();
 
     if (extraarg < argc)
         strcpy(filename, argv[extraarg]);

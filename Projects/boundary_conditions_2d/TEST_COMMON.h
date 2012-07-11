@@ -15,10 +15,10 @@ struct TEST_COMMON
     PARSE_ARGS parse_args;
     SIM_COMMON<TV> sim;
 
-    TEST_COMMON();
+    TEST_COMMON(int argc,char** argv);
     ~TEST_COMMON();
     void Init_1();
-    void Init_2(int argc,char** argv);
+    void Init_2();
     void Init_3();
 };
 

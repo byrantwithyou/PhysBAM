@@ -35,10 +35,10 @@ typedef VECTOR<int,2> TV_INT2;
 
 int main(int argc, char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-o","out.tex","output filename");
     parse_args.Add_String_Argument("-i","","input filename");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     std::string file=parse_args.Get_String_Value("-o");
     std::string infile=parse_args.Get_String_Value("-i");
 

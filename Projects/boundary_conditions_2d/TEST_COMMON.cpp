@@ -6,7 +6,8 @@
 #include "TEST_COMMON.h"
 
 template<class TV> TEST_COMMON<TV>::
-TEST_COMMON()
+TEST_COMMON(int argc,char** argv)
+    :parse_args(argc,argv)
 {
 }
 
@@ -30,10 +31,10 @@ Init_1()
     parse_args.Add_String_Argument("-o","output","Output Directory");
 }
 template<class TV> void TEST_COMMON<TV>::
-Init_2(int argc,char** argv)
+Init_2()
 {
-    parse_args.Print_Arguments(argc,argv);
-    parse_args.Parse(argc,argv);
+    parse_args.Print_Arguments();
+    parse_args.Parse();
     sim.Init_2(parse_args);
 
     output_directory=parse_args.Get_String_Value("-o");

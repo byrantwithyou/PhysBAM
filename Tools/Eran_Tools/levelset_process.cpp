@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
     parse_args.Add_String_Argument("-i","","input file");
     parse_args.Add_String_Argument("-o","","output file");
     parse_args.Set_Extra_Arguments(0, "");
-    int extraarg = parse_args.Parse(argc, argv);
+    int extraarg = parse_args.Parse();
 
     std::string input_filename=parse_args.Get_String_Value("-i");
     std::string output_filename=parse_args.Get_String_Value("-o");

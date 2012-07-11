@@ -73,7 +73,7 @@ int main(int argc,char *argv[])
     parse_args.Add_String_Argument("-g","","output grid");
     parse_args.Add_Integer_Argument("-negative_bandwidth",3,"rle levelset negative_bandwidth");
     parse_args.Add_Integer_Argument("-positive_bandwidth",3,"rle levelset positive_bandwidth");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string input_file,output_file,output_grid;
     input_file=parse_args.Get_String_Value("-i");

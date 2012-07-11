@@ -78,7 +78,7 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-restart",0,"restart frame");
     parse_args.Add_Integer_Argument("-scale",128,"fine scale grid resolution");
     parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
@@ -87,8 +87,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Integer_Argument("-threads",1,"number of threads");
     parse_args.Add_Double_Argument("-cfl",1,"cfl number");
 
-    parse_args.Parse(argc,argv);
-    parse_args.Print_Arguments(argc,argv);
+    parse_args.Parse();
+    parse_args.Print_Arguments();
     
     WATER_EXAMPLE<TV>* example=new WATER_EXAMPLE<TV>(stream_type,parse_args.Get_Integer_Value("-threads"),parse_args.Get_Integer_Value("-refine"));
 

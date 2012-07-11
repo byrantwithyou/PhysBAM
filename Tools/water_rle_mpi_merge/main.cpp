@@ -447,7 +447,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-fast","skip everything except for levelset");
     parse_args.Add_Option_Argument("-removed_particles","process removed particles");
     parse_args.Set_Extra_Arguments(-1,"<input_directory>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string input_directory;
     if(!parse_args.Num_Extra_Args()) input_directory=".";

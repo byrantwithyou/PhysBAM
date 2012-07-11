@@ -24,7 +24,9 @@ private:
     void (*extra_usage_callback)();
 public:
 
-    PARSE_ARGS();
+    int argc;
+    char** argv;
+    PARSE_ARGS(int argc_input,char** argv_input);
     ~PARSE_ARGS();
 
 //#####################################################################
@@ -37,8 +39,7 @@ public:
     void Add_String_Argument(const std::string& arg_str,const std::string& default_value,const std::string& val_name="",const std::string& desc="");
     void Set_Extra_Arguments(int num,const std::string& synopsis="",const std::string& desc="");
     void Set_Extra_Usage_Callback(void (*extra_usage_callback_input)());
-    void Parse(int argc,char* argv[]);
-    void Parse(int argc,const char* argv[]); // for backwards compatibility
+    void Parse();
     bool Get_Option_Value(const std::string& arg_str) const;
     int Get_Integer_Value(const std::string& arg_str) const;
     double Get_Double_Value(const std::string& arg_str) const;
@@ -56,7 +57,7 @@ public:
     static int Find_And_Remove_Integer(const char *str,int& argc,char** argv);
     static double Find_And_Remove_Double(const char *str,int& argc,char** argv);
     void Print_Usage(bool do_exit=false) const;
-    static std::string Print_Arguments(int argc,char* argv[]);
+    std::string Print_Arguments();
 //#####################################################################
 };
 }

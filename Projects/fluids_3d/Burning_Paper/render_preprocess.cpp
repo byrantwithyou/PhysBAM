@@ -18,7 +18,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
 {
     PARSE_ARGS parse_args;
     parse_args.Set_Extra_Arguments(1, "<frame>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     int frame=-10;
     if(parse_args.Num_Extra_Args() >= 1) frame=atoi(parse_args.Extra_Arg(0).c_str());

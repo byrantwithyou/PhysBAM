@@ -12,15 +12,15 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,2> TV;
 //    typedef VECTOR<T,3> TV;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-restart",0,"restart frame");
     parse_args.Add_Integer_Argument("-resolution",32,"fine scale grid resolution");
     parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
     parse_args.Add_Integer_Argument("-last_frame",20,"last simulation frame");
     parse_args.Add_Option_Argument("-dump_matrix","dump out system and rhs");
 
-    parse_args.Parse(argc,argv);
-    parse_args.Print_Arguments(argc,argv);
+    parse_args.Parse();
+    parse_args.Print_Arguments();
     
     FLUIDS_COLOR<TV>* example=new FLUIDS_COLOR<TV>(stream_type,parse_args);
 

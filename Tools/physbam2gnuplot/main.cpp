@@ -104,7 +104,7 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(const PARSE_ARGS& parse_
 }
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
     parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
     parse_args.Add_Integer_Argument("-verbosity",0,"Verbosity level");
@@ -122,7 +122,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-pressure","convert pressure");
     parse_args.Add_Option_Argument("-internal_energy","convert internal_energy");
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     int verbosity=parse_args.Get_Integer_Value("-verbosity");
     int dimension=parse_args.Get_Integer_Value("-dimension");

@@ -37,7 +37,7 @@ int main(int argc,char *argv[])
 
     bool type_double=false;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-float","data is in float format");
     parse_args.Add_Option_Argument("-double","data is in double format");
     parse_args.Add_Option_Argument("-compute_using_doubles");
@@ -51,7 +51,7 @@ int main(int argc,char *argv[])
     std::cout<<resolutions<<std::endl;
     
 
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
 
     std::string input_filename=parse_args.Extra_Arg(0);
 

@@ -31,7 +31,7 @@ int main(int argc,char** argv)
     parse_args.Add_String_Argument("-b","","PhysBAM bone name","PhysBAM bone name");
     parse_args.Add_Option_Argument("-g","Binary file");
     parse_args.Set_Extra_Arguments(1, "<muscle_file>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     bone_directory=DEFAULT_BONEDIR;
     simm_directory=DEFAULT_SIMMDIR;

@@ -137,7 +137,7 @@ int main(int argc, const char *argv[])
     parse_args.Add_String_Argument("-i", "", "use this rgd file's mass, position, orientation");
     parse_args.Set_Extra_Arguments(1, "<ply or tri file>");
 
-    int extraarg = parse_args.Parse(argc, argv);
+    int extraarg = parse_args.Parse();
 
     char input_filename[256];
     if (extraarg < argc)

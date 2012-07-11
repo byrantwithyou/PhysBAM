@@ -17,7 +17,7 @@ int main(int argc,char* argv[])
     const int d=TV::m;
     typedef VECTOR<int,d> TV_INT;
 
-    TEST_COMMON<TV> tc;
+    TEST_COMMON<TV> tc(argc,argv);
     tc.Init_1();
     tc.parse_args.Add_String_Argument("-bc_types","sfwf","[swf][swf][swf][swf] source/wall/free for left, bottom, right, top");
     tc.parse_args.Add_Double_Argument("-offset",0,"Offset bottom face");
@@ -26,7 +26,7 @@ int main(int argc,char* argv[])
     tc.parse_args.Add_Option_Argument("-circle","Circular boundaray");
     tc.parse_args.Add_String_Argument("-error_image","","Image showing error distribution");
 
-    tc.Init_2(argc,argv);
+    tc.Init_2();
     output_directory=tc.output_directory;
 
     std::string bc_types=tc.parse_args.Get_String_Value("-bc_types");

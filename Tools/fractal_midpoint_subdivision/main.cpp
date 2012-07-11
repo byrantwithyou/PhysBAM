@@ -34,13 +34,13 @@ void Fractal_Midpoint_Subdivide(TRIANGULATED_SURFACE<T>& surface,const int steps
 int main(int argc,char *argv[])
 {
     typedef float T;
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-i",""); // input surface
     parse_args.Add_String_Argument("-o",""); // output surface
     parse_args.Add_Integer_Argument("-depth",1);
     parse_args.Add_Double_Argument("-power",(T).25);
     parse_args.Add_Double_Argument("-scale",(T).25);
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     TRIANGULATED_SURFACE<T>& triangulated_surface=*TRIANGULATED_SURFACE<T>::Create();
     FILE_UTILITIES::Read_From_File<T>(parse_args.Get_String_Value("-i"),triangulated_surface);
     Fractal_Midpoint_Subdivide(triangulated_surface,parse_args.Get_Integer_Value("-depth"),(T)parse_args.Get_Double_Value("-power"),(T)parse_args.Get_Double_Value("-scale"));

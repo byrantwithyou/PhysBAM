@@ -218,7 +218,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Vector_3D_Argument("-color",VECTOR<double,3>(1,0,0),"color to map to height");
     parse_args.Add_Option_Argument("-already_heightfield");
     parse_args.Set_Extra_Arguments(1,"<heighfield>","heighfield to convert");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string input_file,output_base;
     input_file=parse_args.Extra_Arg(0);

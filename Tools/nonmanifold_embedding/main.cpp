@@ -255,7 +255,7 @@ int main_templatized(int argc,char *argv[])
     parse_args.Add_String_Argument("-m","","material geometry file","material geometry file");
     parse_args.Add_String_Argument("-e","","embedding geometry file","embedding geometry file");
     parse_args.Add_String_Argument("-o","","output mesh file","output mesh file");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string material_filename,embedding_filename,output_filename;
     if(parse_args.Is_Value_Set("-m")) material_filename=parse_args.Get_String_Value("-m");else parse_args.Print_Usage(true);

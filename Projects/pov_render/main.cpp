@@ -214,9 +214,9 @@ int main(int argc, char *argv[])
 {  
     PROCESS_UTILITIES::Set_Backtrace(true);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Set_Extra_Arguments(-1, "<scene file> <output scene file> <frame number>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     if(parse_args.Num_Extra_Args() != 3){parse_args.Print_Usage();exit(0);}
     std::string scene_filename=parse_args.Extra_Arg(0);
     std::string output_filename=parse_args.Extra_Arg(1);

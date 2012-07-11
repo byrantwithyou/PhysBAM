@@ -761,7 +761,7 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add_String_Argument("-o","output","output directory");
     parse_args.Add_Double_Argument("-m",1,"meter scale");
@@ -777,7 +777,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
     parse_args.Add_Option_Argument("-double_fine","set level set exactly on double fine grid");
     parse_args.Add_Option_Argument("-dump_geometry","dump grid info and interface");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     
     if(parse_args.Get_Option_Value("-3d"))
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);

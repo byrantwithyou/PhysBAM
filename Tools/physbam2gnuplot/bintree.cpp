@@ -93,7 +93,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Option_Argument("-pressure","convert pressure");
     parse_args.Add_Option_Argument("-internal_energy","convert internal_energy");
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     int verbosity=parse_args.Get_Integer_Value("-verbosity");
     int dimension=parse_args.Get_Integer_Value("-dimension");

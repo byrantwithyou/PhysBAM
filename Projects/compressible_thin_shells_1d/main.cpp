@@ -4,9 +4,9 @@
 using namespace PhysBAM;
 int main(int argc,char* argv[]){
     bool run_strawman_example=PARSE_ARGS::Find_And_Remove("-strawman",argc,argv);
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Integer_Argument("-resolution",100);
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     typedef float T;
     if(run_strawman_example){

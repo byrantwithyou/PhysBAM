@@ -43,11 +43,11 @@ int main(int argc, char* argv[])
 {
     srand(time(0));
     Get_Debug_Particles<TV>();
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-o","output","output directory");
     parse_args.Add_String_Argument("-c","aaaa","color case");
     parse_args.Add_Integer_Argument("-n",5,"extra random tests");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     output_directory=parse_args.Get_String_Value("-o");
     std::string colors=parse_args.Get_String_Value("-c");
     int n=parse_args.Get_Integer_Value("-n");

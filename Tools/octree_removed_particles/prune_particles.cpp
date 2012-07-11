@@ -46,7 +46,7 @@ int main(int argc, char* argv[])
     parse_args.Add_String_Argument("-ids_to_keep","");
     parse_args.Add_String_Argument("-ids_to_delete","");
     parse_args.Set_Extra_Arguments(1, "<filename>");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     if (parse_args.Num_Extra_Args() != 1) 
     {
         parse_args.Print_Usage();

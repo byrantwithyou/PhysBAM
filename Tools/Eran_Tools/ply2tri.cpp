@@ -145,7 +145,7 @@ int main(int argc, char *argv[])
     parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to convert");
 
     std::string input_filename;
-    int extraarg = parse_args.Parse(argc, argv);
+    int extraarg = parse_args.Parse();
     if (extraarg < argc) input_filename = argv[extraarg];
     else parse_args.Print_Usage(true);
 

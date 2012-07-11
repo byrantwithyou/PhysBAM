@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Vector_2D_Argument("-p", VECTOR<double,2>(0,0), "position");
     parse_args.Set_Extra_Arguments(1, "<filename>");
 
-    int extraarg = parse_args.Parse(argc, argv);
+    int extraarg = parse_args.Parse();
 
     if (extraarg < argc)
         strcpy(filename, argv[extraarg]);

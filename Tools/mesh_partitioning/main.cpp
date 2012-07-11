@@ -340,7 +340,7 @@ void Optimize_Particle_Order(const int reorder_partition_input)
 //#####################################################################
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-all","-cluster, -optimize, and -reorder");
     parse_args.Add_Option_Argument("-cluster","compute initial clustering");
     parse_args.Add_Option_Argument("-optimize","optimize clustering");
@@ -356,7 +356,7 @@ int main(int argc,char* argv[])
     parse_args.Add_Double_Argument("-annealing_factor",.999,"factor","annealing factor");
     parse_args.Add_Integer_Argument("-cross_edge_factor",1,"factor","cross edge functional multiplier");
     parse_args.Add_Integer_Argument("-reverse",0,"range","use reverse mutations for reordering with given range (e.g. 10) (default is swap neighbors)");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     LOG::Initialize_Logging();
     MESH_PARTITIONING<float> mesh_partitioning;

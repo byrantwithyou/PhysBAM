@@ -26,7 +26,7 @@ main_templatized(int argc, char**argv)
     parse_args.Add_Integer_Argument("-phoneme_start",0,"first sample of phoneme","first sample of phoneme");
     parse_args.Add_Integer_Argument("-phoneme_end",0);
     parse_args.Add_Double_Argument("-frame_rate",120.0);
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
 
     std::string input_prefix;if(parse_args.Is_Value_Set("-i"))input_prefix=parse_args.Get_String_Value("-i");else {LOG::cerr<<"Incorrect arguments"<<std::endl;exit(0);}
     std::string output_filename;if(parse_args.Is_Value_Set("-o"))output_filename=parse_args.Get_String_Value("-o");else {LOG::cerr<<"Incorrect arguments"<<std::endl;exit(0);}

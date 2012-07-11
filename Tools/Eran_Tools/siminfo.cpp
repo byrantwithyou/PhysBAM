@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     parse_args.Add_Double_Argument("-r", frame_rate, "frame rate");
     parse_args.Set_Extra_Arguments(-1, "<input_directory>");
 
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
     
     body_index = parse_args.Get_Integer_Value("-b");
     get_max = parse_args.Get_Option_Value("-m");

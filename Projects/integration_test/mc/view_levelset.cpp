@@ -26,10 +26,10 @@ typedef VECTOR<T,2> V2;
 
 int main(int argc, char* argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_String_Argument("-o","surface.tri","output filename");
     parse_args.Add_String_Argument("-i","<none>","input level set");
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     std::string file=parse_args.Get_String_Value("-o");
     std::string input=parse_args.Get_String_Value("-i");
 

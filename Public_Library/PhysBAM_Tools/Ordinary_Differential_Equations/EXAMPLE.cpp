@@ -169,11 +169,11 @@ Parse(int argc,char* argv[])
     PROCESS_UTILITIES::Set_Backtrace(true);
 
     if(want_mpi_world) mpi_world=new MPI_WORLD(argc,argv);
-    parse_args=new PARSE_ARGS;
+    parse_args=new PARSE_ARGS(argc,argv);
     Register_Options();
 
-    parse_args->Parse(argc,argv);
-    std::string print_args=parse_args->Print_Arguments(argc,argv);
+    parse_args->Parse();
+    std::string print_args=parse_args->Print_Arguments();
 
     Parse_Options();
     LOG::cout<<print_args<<std::endl;

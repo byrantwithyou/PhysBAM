@@ -27,7 +27,7 @@ int main(int argc,char* argv[])
     typedef double T;
     typedef float RW;
     typedef VECTOR<T,2> TV;
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     
     /*bool use_extended_neohookean;
     bool use_extended_neohookean_refined;
@@ -62,7 +62,7 @@ int main(int argc,char* argv[])
     //parse_args.Add_Option_Argument("-use_ext_mooney");
     parse_args.Add_Option_Argument("-use_constant_ife");   
     
-    parse_args.Parse(argc,argv);
+    parse_args.Parse();
     
     stiffness=(T)parse_args.Get_Double_Value("-youngs_modulus");
     poissons_ratio=(T)parse_args.Get_Double_Value("-poissons_ratio");

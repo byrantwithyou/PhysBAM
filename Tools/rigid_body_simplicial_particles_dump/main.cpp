@@ -39,7 +39,7 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Option_Argument("-float","data should be in float format");
     parse_args.Add_Option_Argument("-double","data should be in double format");
     parse_args.Add_Integer_Argument("-d",1,"dimension");
@@ -47,7 +47,7 @@ int main(int argc,char *argv[])
     parse_args.Add_Integer_Argument("-rbid",1,"rigid body id");
     parse_args.Add_String_Argument("-o","","output file");
     parse_args.Set_Extra_Arguments(1,"<basedir>","base directory");
-    parse_args.Parse(argc, argv);
+    parse_args.Parse();
 
     bool use_double=false;
     if(parse_args.Get_Option_Value("-float")) use_double=false;
