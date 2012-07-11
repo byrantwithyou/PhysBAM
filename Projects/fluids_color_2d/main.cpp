@@ -19,8 +19,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Integer_Argument("-last_frame",20,"last simulation frame");
     parse_args.Add_Option_Argument("-dump_matrix","dump out system and rhs");
 
-    parse_args.Parse();
     parse_args.Print_Arguments();
+    parse_args.Parse();
     
     FLUIDS_COLOR<TV>* example=new FLUIDS_COLOR<TV>(stream_type,parse_args);
 

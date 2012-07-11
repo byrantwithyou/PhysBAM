@@ -19,8 +19,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Option_Argument("-binary","use binary refinement");
     parse_args.Add_Double_Argument("-alpha",1,"interpolation parameter");    
 
-    parse_args.Parse();
     parse_args.Print_Arguments();
+    parse_args.Parse();
 
     SMOKE_TESTS<TV>* example=new SMOKE_TESTS<TV>(stream_type,parse_args);
     INCOMPRESSIBLE_ADAPTIVE_DRIVER<TV> driver(*example);

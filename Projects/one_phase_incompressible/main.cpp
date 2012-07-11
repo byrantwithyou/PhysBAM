@@ -26,8 +26,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Option_Argument("-3d","do 3d solve");
     parse_args.Add_Option_Argument("-conservative","use conservative advection");
   
-    parse_args.Parse();
     parse_args.Print_Arguments();
+    parse_args.Parse();
     
     if(!parse_args.Is_Value_Set("-3d")){
         typedef VECTOR<T,2> TV;

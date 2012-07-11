@@ -41,8 +41,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Double_Argument("-source_radius",0.05,"radius of source");
     parse_args.Add_Option_Argument("-3d","do 3d solver");
     
-    parse_args.Parse();
     parse_args.Print_Arguments();
+    parse_args.Parse();
 
     if(!parse_args.Is_Value_Set("-3d")){
         typedef VECTOR<T,2> TV;

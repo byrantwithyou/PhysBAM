@@ -87,8 +87,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Integer_Argument("-threads",1,"number of threads");
     parse_args.Add_Double_Argument("-cfl",1,"cfl number");
 
-    parse_args.Parse();
     parse_args.Print_Arguments();
+    parse_args.Parse();
     
     WATER_EXAMPLE<TV>* example=new WATER_EXAMPLE<TV>(stream_type,parse_args.Get_Integer_Value("-threads"),parse_args.Get_Integer_Value("-refine"));
 

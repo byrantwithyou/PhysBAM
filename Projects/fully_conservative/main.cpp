@@ -48,8 +48,8 @@ int main(int argc,char *argv[])
     parse_args.Add_Option_Argument("-eno","use eno advection");
     parse_args.Add_Option_Argument("-energy","conserve energy");
   
-    parse_args.Parse();
     parse_args.Print_Arguments();
+    parse_args.Parse();
     
     if(parse_args.Is_Value_Set("-3d")){
         Execute_Main_Program<VECTOR<T,2> >(stream_type,parse_args,mpi_world);}

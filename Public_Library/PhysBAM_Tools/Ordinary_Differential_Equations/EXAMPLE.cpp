@@ -172,8 +172,8 @@ Parse(int argc,char* argv[])
     parse_args=new PARSE_ARGS(argc,argv);
     Register_Options();
 
-    parse_args->Parse();
     std::string print_args=parse_args->Print_Arguments();
+    parse_args->Parse();
 
     Parse_Options();
     LOG::cout<<print_args<<std::endl;
