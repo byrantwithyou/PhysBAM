@@ -224,7 +224,7 @@ Apply_Pressure_And_Viscosity(T dt)
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
     iss.use_preconditioner=example.use_preconditioner;
-    iss.Set_Matrix(ARRAY<T>(example.mu*dt*0),example.wrap,&bccl,1);
+    iss.Set_Matrix(ARRAY<T>(example.mu*dt),example.wrap,&bccl,1);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
