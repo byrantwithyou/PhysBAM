@@ -21,5 +21,6 @@ int main(int argc,char *argv[])
     PLS_FC_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
 
+    LOG::Finish_Logging();
     return 0;
 }
