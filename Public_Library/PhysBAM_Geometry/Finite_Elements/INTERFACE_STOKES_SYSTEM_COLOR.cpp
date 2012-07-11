@@ -142,7 +142,9 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
             helper_uu(i)(j).Mark_Active_Cells();
         helper_pu(i).Mark_Active_Cells();
         helper_qu(i).Mark_Active_Cells();
-        helper_rhs_pu(i).Mark_Active_Cells();}
+        helper_rhs_pu(i).Mark_Active_Cells();
+        if(inertial_coefficient)
+            helper_inertial_rhs(i).Mark_Active_Cells();}
     
     cm_p->Compress_Indices();
     for(int i=0;i<TV::m;i++) cm_u(i)->Compress_Indices();
