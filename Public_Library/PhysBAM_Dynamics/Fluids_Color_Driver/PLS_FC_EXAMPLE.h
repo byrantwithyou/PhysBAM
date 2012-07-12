@@ -55,8 +55,8 @@ public:
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
-    ARRAY<int,FACE_INDEX<TV::dimension> > face_color;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities;
+    ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
+    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities,prev_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;

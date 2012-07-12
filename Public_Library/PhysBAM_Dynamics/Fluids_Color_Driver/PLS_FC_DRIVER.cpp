@@ -70,8 +70,10 @@ Initialize()
 
     example.levelset_color.phi.Resize(example.grid.Node_Indices());
     example.levelset_color.color.Resize(example.grid.Node_Indices());
-    example.face_velocities.Resize(example.grid);
-    example.face_color.Resize(example.grid);
+    example.face_velocities.Resize(example.grid,3);
+    example.face_color.Resize(example.grid,3);
+    example.prev_face_velocities.Resize(example.grid,3);
+    example.prev_face_color.Resize(example.grid,3);
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
         example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
@@ -204,7 +206,11 @@ Advance_One_Time_Step(bool first_step)
     T dt=example.dt;
 //    Update_Pls(dt);
 
-    Apply_Pressure_And_Viscosity(dt);
+    example.prev_face_velocities.Exchange(example.face_velocities);
+    if(!first_step) example.face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,example.face_velocities,example.face_velocities);
+    else example.face_velocities=example.prev_face_velocities;
+
+    Apply_Pressure_And_Viscosity(dt,first_step);
     time+=dt;
     example.End_Time_Step(time);
 }
@@ -212,10 +218,9 @@ Advance_One_Time_Step(bool first_step)
 // Function Apply_Pressure_And_Viscosity
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
-Apply_Pressure_And_Viscosity(T dt)
+Apply_Pressure_And_Viscosity(T dt,bool first_step)
 {
     static int solve_id=-1;solve_id++;
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
     struct BOUNDARY_CONDITIONS_COLOR_LOCAL:public BOUNDARY_CONDITIONS_COLOR<TV>
     {
         virtual TV f_surface(const TV& X,int color0,int color1) {return TV();}
@@ -226,7 +231,7 @@ Apply_Pressure_And_Viscosity(T dt)
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
 //    iss.use_preconditioner=example.use_preconditioner; // TODO: preconditioner is causing problems; why?
-    iss.Set_Matrix(ARRAY<T>(example.mu*dt),example.wrap,&bccl,1);
+    iss.Set_Matrix(ARRAY<T>(example.mu*dt),example.wrap,&bccl,first_step?1:(T)1.5);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -235,7 +240,6 @@ Apply_Pressure_And_Viscosity(T dt)
     printf("qt [%i] ",iss.cdi->constraint_base_t);
     printf("\n");
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
     {
         ARRAY<ARRAY<TV,TV_INT> > f_volume;
@@ -265,7 +269,6 @@ Apply_Pressure_And_Viscosity(T dt)
         iss.Set_RHS(rhs,f_volume,&u);
         iss.Resize_Vector(sol);
     }
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
 
     MINRES<T> mr;
     KRYLOV_SOLVER<T>* solver=&mr;
@@ -275,9 +278,7 @@ Apply_Pressure_And_Viscosity(T dt)
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
 
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
@@ -287,7 +288,6 @@ Apply_Pressure_And_Viscosity(T dt)
         iss.Multiply(iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
 
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
         example.face_color(it.Full_Index())=c;
@@ -295,7 +295,6 @@ Apply_Pressure_And_Viscosity(T dt)
         assert(k>=0);
         example.face_velocities(it.Full_Index())=sol.u(it.Axis())(c)(k);}
     vectors.Delete_Pointers_And_Clean_Memory();
-    PHYSBAM_DEBUG_WRITE_SUBSTEP(STRING_UTILITIES::string_sprintf("Line time=%d",__LINE__),1,1);
 }
 //#####################################################################
 // Simulate_To_Frame
