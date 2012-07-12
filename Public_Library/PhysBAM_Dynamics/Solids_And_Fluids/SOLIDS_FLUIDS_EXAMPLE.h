@@ -44,6 +44,7 @@ public:
     SOLIDS_FLUIDS_PARAMETERS<TV>& solids_fluids_parameters;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
+    bool opt_solidssymmqmr,opt_solidscr,opt_solidscg;
 
     SOLIDS_FLUIDS_EXAMPLE(const STREAM_TYPE stream_type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE();

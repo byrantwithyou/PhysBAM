@@ -48,8 +48,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type)
-    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(0),
-    debug_particles(*new DEBUG_PARTICLES<TV>)
+    :SOLIDS_FLUIDS_EXAMPLE<TV>(stream_type),fluids_parameters(number_of_regions,type),fluid_collection(*fluids_parameters.grid),resolution(8),
+    debug_particles(*new DEBUG_PARTICLES<TV>),opt_skip_debug_data(false)
 {}
 //#####################################################################
 // Destructor
@@ -67,9 +67,10 @@ template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Register_Options()
 {
     BASE::Register_Options();
-    this->parse_args->Add_Option_Argument("-skip_debug_data","turn off file io for debug data");
-    this->parse_args->Add_Option_Argument("-use_fmm_extrapolation","use fast marching to extrapolate compressible flow data into solid state.");
-    this->parse_args->Add_Integer_Argument("-resolution",1);
+    this->parse_args->Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
+    this->parse_args->Add("-use_fmm_extrapolation",&fluids_parameters.euler_solid_fluid_coupling_utilities->use_fast_marching,
+        "use fast marching to extrapolate compressible flow data into solid state.");
+    this->parse_args->Add("-resolution",&resolution,"resolution","simulation resolution");
 }
 //#####################################################################
 // Function Parse_Options
@@ -78,9 +79,7 @@ template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Parse_Options()
 {
     BASE::Parse_Options();
-    if(this->parse_args->Is_Value_Set("-skip_debug_data")) fluids_parameters.write_debug_data=false;
-    if(this->parse_args->Is_Value_Set("-use_fmm_extrapolation")) fluids_parameters.euler_solid_fluid_coupling_utilities->use_fast_marching=true;
-    resolution=this->parse_args->Get_Integer_Value("-resolution");
+    fluids_parameters.write_debug_data=!opt_skip_debug_data;
 }
 //#####################################################################
 // Function Add_Volumetric_Body_To_Fluid_Simulation

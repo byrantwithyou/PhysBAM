@@ -94,6 +94,12 @@ Add_Arguments(PARSE_ARGS& parse_args)
 template<class T,class RW> void OPENGL_1D_VISUALIZATION<T,RW>::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
+#ifdef __linux__
+    opengl_window_title="opengl_1d: " + FILE_UTILITIES::Real_Path(basedir);
+#endif
+
+    if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame")) FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame);
+
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
 
     if(parse_args.Num_Extra_Args()>1)
@@ -103,14 +109,8 @@ Parse_Arguments(PARSE_ARGS& parse_args)
 
     last_frame_filename=basedir+"/common/last_frame";
 
-    if(FILE_UTILITIES::File_Exists(basedir+"/common/first_frame") && !parse_args.Is_Value_Set("-start_frame")) FILE_UTILITIES::Read_From_Text_File(basedir+"/common/first_frame",start_frame);
-
     // don't override camera script filename if it was already set in base class based on command line argument
     if(camera_script_filename.empty()) camera_script_filename=basedir+"/camera_script";
-
-#ifdef __linux__
-    if(!parse_args.Is_Value_Set("-window_title")) opengl_window_title="opengl_1d: " + FILE_UTILITIES::Real_Path(basedir);
-#endif
 }
 //#####################################################################
 // Function Read_Grid

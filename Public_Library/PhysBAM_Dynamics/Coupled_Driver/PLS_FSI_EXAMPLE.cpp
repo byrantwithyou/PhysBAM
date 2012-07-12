@@ -60,8 +60,9 @@ template<class TV> PLS_FSI_EXAMPLE<TV>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
-    fluids_parameters(number_of_regions,FLUIDS_PARAMETERS<GRID<TV> >::WATER),fluid_collection(*fluids_parameters.grid),resolution(0),convection_order(1),use_pls_evolution_for_structure(false),
-    two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),m(1),s(1),kg(1)
+    fluids_parameters(number_of_regions,FLUIDS_PARAMETERS<GRID<TV> >::WATER),fluid_collection(*fluids_parameters.grid),resolution(8),convection_order(1),
+    use_pls_evolution_for_structure(false),two_phase(false),use_kang(false),print_matrix(false),test_system(false),kang_poisson_viscosity(0),m(1),s(1),kg(1),
+    opt_skip_debug_data(false),opt_solidscg(false),opt_solidscr(false),opt_solidssymmqmr(false)
 {
     Set_Minimum_Collision_Thickness();
     Set_Write_Substeps_Level(-1);
@@ -89,17 +90,16 @@ Register_Options()
 {
     if(!parse_args) return;
     BASE::Register_Options();
-    parse_args->Add_String_Argument("-params","","parameter file");
-    parse_args->Add_Double_Argument("-solidscfl",.9,"solids CFL");
-    parse_args->Add_Option_Argument("-solidscg","Use CG for time integration");
-    parse_args->Add_Option_Argument("-solidscr","Use CONJUGATE_RESIDUAL for time integration");
-    parse_args->Add_Option_Argument("-solidssymmqmr","Use SYMMQMR for time integration");
-    parse_args->Add_Double_Argument("-rigidcfl",.5,"rigid CFL");
-    parse_args->Add_Option_Argument("-skip_debug_data","turn off file io for debug data");
-    parse_args->Add_Integer_Argument("-resolution",1);
-    parse_args->Add_Double_Argument("-m",1,"length unit");
-    parse_args->Add_Double_Argument("-s",1,"time unit");
-    parse_args->Add_Double_Argument("-kg",1,"mass unit");
+    parse_args->Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
+    parse_args->Add("-solidscg",&opt_solidscg,"Use CG for time integration");
+    parse_args->Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
+    parse_args->Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
+    parse_args->Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
+    parse_args->Add("-skip_debug_data",&opt_skip_debug_data,"turn off file io for debug data");
+    parse_args->Add("-resolution",&resolution,"resolution","simulation resolution");
+    parse_args->Add("-m",&m,"scale","length unit");
+    parse_args->Add("-s",&s,"scale","time unit");
+    parse_args->Add("-kg",&kg,"scale","mass unit");
 }
 //#####################################################################
 // Function Parse_Options
@@ -108,11 +108,7 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-skip_debug_data")) fluids_parameters.write_debug_data=false;
-    resolution=parse_args->Get_Integer_Value("-resolution");
-    kg=(T)parse_args->Get_Double_Value("-kg");
-    m=(T)parse_args->Get_Double_Value("-m");
-    s=(T)parse_args->Get_Double_Value("-s");
+    fluids_parameters.write_debug_data=!opt_skip_debug_data;
 }
 //#####################################################################
 // Function Add_Volumetric_Body_To_Fluid_Simulation
@@ -363,11 +359,9 @@ Parse_Late_Options()
 {
     if(!parse_args) return;
     BASE::Parse_Late_Options();
-    if(parse_args->Is_Value_Set("-solidscfl")) solids_parameters.cfl=(T)parse_args->Get_Double_Value("-solidscfl");
-    if(parse_args->Is_Value_Set("-rigidcfl")) solids_parameters.rigid_body_evolution_parameters.rigid_cfl=(T)parse_args->Get_Double_Value("-rigidcfl");
-    if(parse_args->Is_Value_Set("-solidscg")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    if(parse_args->Is_Value_Set("-solidscr")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    if(parse_args->Is_Value_Set("-solidssymmqmr")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
+    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries

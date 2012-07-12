@@ -16,7 +16,8 @@
 using namespace PhysBAM;
 
 ANIMATED_VISUALIZATION::ANIMATED_VISUALIZATION()
-    :animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),frame(0),frame_rate(24),frame_increment(1),last_frame_filename("")
+    :animation_enabled(true),play(false),loop(false),fixed_frame_rate(false),start_frame(0),stop_frame(INT_MAX),
+    frame(0),frame_rate(24),frame_increment(1),last_frame_filename(""),jpeg_quality(95)
 {
     if(MOV_WRITER<float>::Enabled()) saved_frame_filename="capture.mov";
     else if(IMAGE<float>::Is_Supported(".png")) saved_frame_filename="capture.%05d.png";
@@ -29,23 +30,17 @@ Add_Arguments(PARSE_ARGS& parse_args)
 {
     BASIC_VISUALIZATION::Add_Arguments(parse_args);
 
-    parse_args.Add_Integer_Argument("-jpeg_quality",95,"jpeg quality settings");
-    parse_args.Add_String_Argument("-so",saved_frame_filename,"save frames output");
-    parse_args.Add_Integer_Argument("-start_frame",0,"start frame");
-    parse_args.Add_Integer_Argument("-stop_frame",INT_MAX,"stop frame");
-    parse_args.Add_Integer_Argument("-fps",24,"frames per second");
+    parse_args.Add("-jpeg_quality",&jpeg_quality,"quality","jpeg quality settings");
+    parse_args.Add("-so",&saved_frame_filename,"file","save frames output");
+    parse_args.Add("-start_frame",&start_frame,"frame","start frame");
+    parse_args.Add("-stop_frame",&stop_frame,"frame","stop frame");
+    parse_args.Add("-fps",&frame_rate,"rate","frames per second");
 }
 
 void ANIMATED_VISUALIZATION::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
     BASIC_VISUALIZATION::Parse_Arguments(parse_args);
-
-    jpeg_quality=parse_args.Get_Integer_Value("-jpeg_quality");
-    if(parse_args.Is_Value_Set("-so")) saved_frame_filename=parse_args.Get_String_Value("-so");
-    if(parse_args.Is_Value_Set("-start_frame")) start_frame=parse_args.Get_Integer_Value("-start_frame");
-    if(parse_args.Is_Value_Set("-stop_frame")) stop_frame=parse_args.Get_Integer_Value("-stop_frame");
-    if(parse_args.Is_Value_Set("-fps")) frame_rate=parse_args.Get_Integer_Value("-fps");
 }
 
 void ANIMATED_VISUALIZATION::

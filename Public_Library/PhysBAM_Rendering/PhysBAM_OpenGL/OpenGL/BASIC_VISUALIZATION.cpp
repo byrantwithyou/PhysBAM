@@ -26,7 +26,8 @@ namespace{
 // Constructor
 //#####################################################################
 BASIC_VISUALIZATION::BASIC_VISUALIZATION() 
-    :opengl_axes(0),opengl_window_title("OpenGL Visualization"),add_axes(true),selection_enabled(true),current_selection(0)
+    :opengl_axes(0),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
+    opt_left_handed(false),opt_smooth(false),selection_enabled(true),current_selection(0)
 {
     the_visualization=this;
 }
@@ -110,17 +111,16 @@ Add_Arguments(PARSE_ARGS &parse_args)
     width=1024;
     height=768;
     fovy=20;
-
-    parse_args.Add_Integer_Argument("-w",width,"width","window width");
-    parse_args.Add_Integer_Argument("-h",height,"height","window height");
-    parse_args.Add_Vector_2D_Argument("-window_position",VECTOR<double,2>(0,0),"initial window corner position");
-    parse_args.Add_String_Argument("-window_title","Basic Visualization","window title");
-    parse_args.Add_Double_Argument("-fov",fovy,"angle","full field of view (y direction) in degrees");
-    parse_args.Add_Option_Argument("-offscreen","render offscreen");
-    parse_args.Add_Option_Argument("-smooth","smooth defaults");
-    parse_args.Add_String_Argument("-camera_script","");
-    parse_args.Add_String_Argument("-keys","","initialization key sequence");
-    parse_args.Add_Option_Argument("-left_handed","treat coordinate system as left handed");
+    parse_args.Add("-w",&width,"width","window width");
+    parse_args.Add("-h",&height,"height","window height");
+    parse_args.Add("-window_position",&window_position,"position","initial window corner position");
+    parse_args.Add("-window_title",&opengl_window_title,"title","window title");
+    parse_args.Add("-fov",&fovy,"angle","full field of view (y direction) in degrees");
+    parse_args.Add("-offscreen",&render_offscreen,"render offscreen");
+    parse_args.Add("-smooth",&opt_smooth,"smooth defaults");
+    parse_args.Add("-camera_script",&camera_script_filename,"script","camera script filename");
+    parse_args.Add("-keys",&initialization_key_sequence,"keys","initialization key sequence");
+    parse_args.Add("-left_handed",&opt_left_handed,"treat coordinate system as left handed");
 }
 //#####################################################################
 // Function Parse_Arguments
@@ -128,17 +128,8 @@ Add_Arguments(PARSE_ARGS &parse_args)
 void BASIC_VISUALIZATION::
 Parse_Arguments(PARSE_ARGS& parse_args)
 {
-    width=parse_args.Get_Integer_Value("-w");
-    height=parse_args.Get_Integer_Value("-h");
-    fovy=parse_args.Get_Double_Value("-fov");
-    render_offscreen=parse_args.Get_Option_Value("-offscreen");
-    if(parse_args.Is_Value_Set("-smooth")) OPENGL_PREFERENCES::Set_Smooth_Defaults();
-    if(parse_args.Is_Value_Set("-camera_script"))
-        camera_script_filename=parse_args.Get_String_Value("-camera_script");
-    initialization_key_sequence=parse_args.Get_String_Value("-keys");
-    if((set_window_position=parse_args.Is_Value_Set("-window_position"))) window_position=VECTOR<int,2>(parse_args.Get_Vector_2D_Value("-window_position"));
-    if(parse_args.Is_Value_Set("-window_title")) opengl_window_title=parse_args.Get_String_Value("-window_title");
-    opengl_world.Set_Left_Handed(parse_args.Get_Option_Value("-left_handed"));
+    if(opt_smooth) OPENGL_PREFERENCES::Set_Smooth_Defaults();
+    opengl_world.Set_Left_Handed(opt_left_handed);
 }
 //#####################################################################
 // Function Parse_Args

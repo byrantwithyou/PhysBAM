@@ -85,6 +85,7 @@ public:
     bool                    render_offscreen;
     std::string             camera_script_filename;
     std::string             initialization_key_sequence;
+    bool opt_left_handed,opt_smooth;
 
     // Selection stuff
     bool                                selection_enabled;

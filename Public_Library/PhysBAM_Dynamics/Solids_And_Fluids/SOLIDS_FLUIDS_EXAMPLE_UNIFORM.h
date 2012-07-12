@@ -53,6 +53,7 @@ public:
     FLUID_COLLECTION<TV> fluid_collection;
     int resolution;
     DEBUG_PARTICLES<TV>& debug_particles;
+    bool opt_skip_debug_data;
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
