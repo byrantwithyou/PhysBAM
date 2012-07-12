@@ -83,7 +83,7 @@ public:
     {transition_to_using_implicit_pressure=transition_to_using_implicit_pressure_input;}
 
     void Exchange_Pressures_For_Projection()
-    {T_ARRAYS_SCALAR::Exchange_Arrays(p,p_save_for_projection);}
+    {T_ARRAYS_SCALAR::Exchange(p,p_save_for_projection);}
 
     void Set_Incompressible_Coupling_Callbacks(INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS<TV>* incompressible_coupling_callbacks_input)
     {incompressible_coupling_callbacks=incompressible_coupling_callbacks_input;}

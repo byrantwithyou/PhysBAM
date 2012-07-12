@@ -76,9 +76,9 @@ void Get_Initial_Data(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
         for(int p=0;p<particles.Size();p++){
             T scale=particles.X(p).Lp_Norm(6)/(particles.X(p).Magnitude()+(T)1e-10);
             plastic_goal(p)=scale*particles.X(p);}
-        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);
+        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange(particles.X,plastic_goal.array);
         T new_volume=tetrahedralized_volume.Total_Volume(),scale=pow(cube_volume/new_volume,(T)one_third);
-        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);
+        ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange(particles.X,plastic_goal.array);
         for(int p=0;p<particles.Size();p++)plastic_goal(p)*=scale;}
 
     tetrahedralized_volume.Update_Bounding_Box();

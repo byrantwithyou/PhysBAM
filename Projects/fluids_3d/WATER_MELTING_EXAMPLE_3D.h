@@ -104,7 +104,7 @@ void Modify_Fluid_For_Melting(const T dt,const T time)
     Mark_Nodes_Inside_Objects(nodes_inside_objects_new);
     for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)for(int ij=0;ij<grid.mn;ij++) if((*nodes_inside_objects)(i,j,ij)&&!nodes_inside_objects_new(i,j,ij)) 
         fluids_parameters.particle_levelset_evolution.phi(i,j,ij)=-grid.max_dx_dy_dz;
-    ARRAY<bool,VECTOR<int,3> >::Exchange_Arrays(nodes_inside_objects_new,*nodes_inside_objects);
+    ARRAY<bool,VECTOR<int,3> >::Exchange(nodes_inside_objects_new,*nodes_inside_objects);
 */
     // remove all the air particles that are in/next to the object
     PARTICLE_LEVELSET_3D<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution.particle_levelset;

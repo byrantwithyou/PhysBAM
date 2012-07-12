@@ -98,7 +98,7 @@ public:
     T* p_start=p;
     for(int i=0;i<dimension;i++){
         T_ARRAY_VIEW array_new(domains(i),p_start);
-        T_ARRAY_VIEW::Exchange_Arrays(array_new,data(i));
+        T_ARRAY_VIEW::Exchange(array_new,data(i));
         p_start+=sizes_new(i);}
     delete[] base_pointer;
     base_pointer=p;}
@@ -165,9 +165,12 @@ public:
     TV Maxabs() const
     {TV maxabs_vector;for(int i=0;i<dimension;i++) maxabs_vector(i)=data(i).Maxabs();return maxabs_vector;}
 
-    static void Exchange_Arrays(ARRAY& a,ARRAY& b)
-    {exchange(a.domain_indices,b.domain_indices);exchange(a.base_pointer,b.base_pointer);exchange(a.buffer_size,b.buffer_size);
-    for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Exchange_Arrays(a.data(i),b.data(i));}
+    static void Exchange(ARRAY& a,ARRAY& b)
+    {a.Exchange(b);}
+
+    void Exchange(ARRAY& a)
+    {exchange(domain_indices,a.domain_indices);exchange(base_pointer,a.base_pointer);exchange(buffer_size,a.buffer_size);
+    for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Exchange(data(i),a.data(i));}
 
     template<class T_INDICES>
     INDIRECT_ARRAY<ARRAY,T_INDICES&> Subset(const T_INDICES& indices)
@@ -188,7 +191,7 @@ public:
         RANGE<TV_INT> domain;
         Read_Binary<RW>(input,domain);
         T_ARRAY_VIEW array_new(domain,p_start);
-        T_ARRAY_VIEW::Exchange_Arrays(array_new,data(i));
+        T_ARRAY_VIEW::Exchange(array_new,data(i));
         p_start+=(domain.Edge_Lengths()).Product();}}
 
     template<class RW> void Write(std::ostream& output) const

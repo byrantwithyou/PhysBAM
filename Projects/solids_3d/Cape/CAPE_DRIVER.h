@@ -157,7 +157,7 @@ void Advance_One_Time_Step(const T dt,const bool verbose)
    
     // update position
     deformable_object.Euler_Step_Position(dt);
-    ARRAY<VECTOR_3D<T> >::Exchange_Arrays(V_save,particles.V.array); // don't care about V_save, but Exchange_Arrays is faster than copy (since it does pointers)
+    ARRAY<VECTOR_3D<T> >::Exchange(V_save,particles.V.array); // don't care about V_save, but Exchange is faster than copy (since it does pointers)
 
     // rigid body collisions
     example.Update_Rigid_Body_Velocities(rigid_bodies,time+dt);example.Update_Rigid_Body_Positions(rigid_bodies,time+dt);

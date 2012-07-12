@@ -166,7 +166,7 @@ public:
     if(array.Size()>=counts_new.Product()){domain=box;counts=counts_new;Calculate_Acceleration_Constants();}
     else Resize(box,false,false);}
 
-    static void Exchange_Arrays(ARRAY& a,ARRAY& b)
+    static void Exchange(ARRAY& a,ARRAY& b)
     {a.array.Exchange(b.array);
     exchange(a.domain,b.domain);exchange(a.counts,b.counts);
     a.Calculate_Acceleration_Constants();b.Calculate_Acceleration_Constants();}

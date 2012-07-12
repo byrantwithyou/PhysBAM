@@ -115,7 +115,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
-        ARRAY<VECTOR<T,3> > V_save(particles.Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
+        ARRAY<VECTOR<T,3> > V_save(particles.Size());ARRAY<VECTOR<T,3> >::Exchange(V_save,particles.V.array);
         for(int n=0;n<reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
             particles.V(levelset.node_to_particle_mapping(n)).x=reaction(n);
             if(inflammable_levelset) particles.V(levelset.node_to_particle_mapping(n)).y=inflammable_levelset->Phi(node_locations(n));}
@@ -138,7 +138,7 @@ void Get_Divergence(ARRAY<T,VECTOR<int,3> >& divergence,const T dt,const T time)
             else if(r<reaction_peak_stop) divergence(i,j,ij)+=divergence_max*(bandwidth-distance);
             else if(r<reaction_stop) divergence(i,j,ij)+=divergence_max*(bandwidth-distance)*(reaction_stop-r)/(reaction_stop-reaction_peak_stop);}
         // undo absurd hack
-        ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);deformable_object.triangles_of_material->Update_Particle_Velocities();} 
+        ARRAY<VECTOR<T,3> >::Exchange(V_save,particles.V.array);deformable_object.triangles_of_material->Update_Particle_Velocities();} 
     LOG::cout<<"divergence sum = "<<ARRAY<T,VECTOR<int,3> >::sum(divergence)<<std::endl;
 }
 //#####################################################################
@@ -160,7 +160,7 @@ void Adjust_Phi_With_Sources(const T time)
         ARRAY<VECTOR_2D<T> >& node_locations=levelset.grid.Node_Locations();
         ARRAY<T>& reaction=*melting_parameters.reaction(object);
         // absurd hack: replace velocities with reactions and use Update_Particle_Velocities to interpolate them to the material surface
-        ARRAY<VECTOR<T,3> > V_save(particles.Size());ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);
+        ARRAY<VECTOR<T,3> > V_save(particles.Size());ARRAY<VECTOR<T,3> >::Exchange(V_save,particles.V.array);
         for(int n=0;n<reaction.m;n++)if(levelset.node_to_particle_mapping(n)){
             particles.V(levelset.node_to_particle_mapping(n)).x=reaction(n);
             if(inflammable_levelset) particles.V(levelset.node_to_particle_mapping(n)).y=inflammable_levelset->Phi(node_locations(n));}
@@ -182,7 +182,7 @@ void Adjust_Phi_With_Sources(const T time)
             else if(r<reaction_peak_start && phi_source_smooth_start){phi(i,j,ij)=min(phi(i,j,ij),distance-depth*(r-reaction_start)/(reaction_peak_start-reaction_start));count++;}
             else if(r<reaction_stop){phi(i,j,ij)=min(phi(i,j,ij),distance-depth);count++;}}
         // undo absurd hack
-        ARRAY<VECTOR<T,3> >::Exchange_Arrays(V_save,particles.V.array);deformable_object.triangles_of_material->Update_Particle_Velocities();} 
+        ARRAY<VECTOR<T,3> >::Exchange(V_save,particles.V.array);deformable_object.triangles_of_material->Update_Particle_Velocities();} 
     LOG::cout<<"cloth sourcing adjusted phi at "<<count<<" nodes"<<std::endl; 
 }
 //#####################################################################

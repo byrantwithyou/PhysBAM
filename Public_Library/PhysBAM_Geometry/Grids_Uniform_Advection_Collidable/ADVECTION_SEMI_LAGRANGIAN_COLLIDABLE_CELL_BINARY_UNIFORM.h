@@ -73,7 +73,7 @@ public:
                 if(Z_min && Z_max){
                     VECTOR<T2,2> extrema=linear_interpolation_collidable.Extrema_Clamped_To_Array(grid,*Z_min_ghost,*Z_max_ghost,interpolation_point);
                     (*Z_min)(cell)=extrema.x;(*Z_max)(cell)=extrema.y;}}}}
-    T_ARRAYS_BOOL::Exchange_Arrays(cell_valid_points_current,cell_valid_points_next);}
+    T_ARRAYS_BOOL::Exchange(cell_valid_points_current,cell_valid_points_next);}
 
     T2 Compute_Revalidation_Value(const TV& from,const TV& to,const T2& current_invalid_value,const T2& default_value)
     {return default_value;}

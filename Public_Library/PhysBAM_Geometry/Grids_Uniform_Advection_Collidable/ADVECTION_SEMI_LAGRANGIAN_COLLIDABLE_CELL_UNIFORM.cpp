@@ -45,7 +45,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
                 if(Z_min && Z_max){
                     VECTOR<T2,2> extrema=linear_interpolation_collidable.Extrema_Clamped_To_Array(grid,*Z_min_ghost,*Z_max_ghost,interpolation_point);
                     (*Z_min)(cell)=extrema.x;(*Z_max)(cell)=extrema.y;}}}}
-    T_ARRAYS_BOOL::Exchange_Arrays(cell_valid_points_current,cell_valid_points_next);
+    T_ARRAYS_BOOL::Exchange(cell_valid_points_current,cell_valid_points_next);
 }
 template<class T_GRID,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,T_ARRAYS_T2& values)

@@ -176,9 +176,9 @@ public:
         if(convergence_norm<=tolerance){
             if(print_diagnostics) LOG::Stat("cg iterations",0);return true;}
 
-	ARRAY<T,TV_INT>::Exchange_Arrays(z,p);
+	ARRAY<T,TV_INT>::Exchange(z,p);
 	system.Precondition_And_Compute_Dot_Product(r,p,rho,nullspace_component);
-	ARRAY<T,TV_INT>::Exchange_Arrays(z,p);
+	ARRAY<T,TV_INT>::Exchange(z,p);
 
         int iterations;for(iterations=1;;iterations++){
             LOG::SCOPE scope("PCG iteration","PCG iteration %d",iterations);

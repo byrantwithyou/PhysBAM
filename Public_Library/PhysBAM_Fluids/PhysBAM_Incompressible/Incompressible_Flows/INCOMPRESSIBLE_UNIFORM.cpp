@@ -293,8 +293,8 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
     // make extrapolated velocity divergence free
     if(enforce_divergence_free){
         T_ARRAYS_SCALAR p_new(grid.Domain_Indices(1));T_ARRAYS_BOOL psi_D_new(grid.Domain_Indices(1));T_FACE_ARRAYS_BOOL psi_N_new(grid);
-        T_ARRAYS_SCALAR::Exchange_Arrays(p_new,projection.p);T_ARRAYS_BOOL::Exchange_Arrays(psi_D_new,projection.elliptic_solver->psi_D);
-        T_FACE_ARRAYS_BOOL::Exchange_Arrays(psi_N_new,projection.elliptic_solver->psi_N);
+        T_ARRAYS_SCALAR::Exchange(p_new,projection.p);T_ARRAYS_BOOL::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
+        T_FACE_ARRAYS_BOOL::Exchange(psi_N_new,projection.elliptic_solver->psi_N);
         projection.elliptic_solver->Set_Dirichlet_Outer_Boundaries();
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
             if(phi_ghost(index) >= delta) projection.elliptic_solver->psi_D(index)=true;
@@ -304,8 +304,8 @@ Extrapolate_Velocity_Across_Interface(T_FACE_ARRAYS_SCALAR& face_velocities,cons
                 for(int i=0;i<T_GRID::number_of_neighbors_per_cell;i++) if(phi_ghost(index)<phi_ghost(iterator.Cell_Neighbor(i))){local_maximum=false;break;}
                 if(local_maximum)projection.elliptic_solver->psi_D(index)=true;}}
         projection.Make_Divergence_Free(face_velocities,0,0); // TODO: use real dt/time
-        T_ARRAYS_SCALAR::Exchange_Arrays(p_new,projection.p);T_ARRAYS_BOOL::Exchange_Arrays(psi_D_new,projection.elliptic_solver->psi_D);
-        T_FACE_ARRAYS_BOOL::Exchange_Arrays(psi_N_new,projection.elliptic_solver->psi_N);} // restore pressure for use as initial guess for incompressible projection
+        T_ARRAYS_SCALAR::Exchange(p_new,projection.p);T_ARRAYS_BOOL::Exchange(psi_D_new,projection.elliptic_solver->psi_D);
+        T_FACE_ARRAYS_BOOL::Exchange(psi_N_new,projection.elliptic_solver->psi_N);} // restore pressure for use as initial guess for incompressible projection
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions

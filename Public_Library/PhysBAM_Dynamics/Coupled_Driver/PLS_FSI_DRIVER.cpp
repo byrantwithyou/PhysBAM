@@ -301,7 +301,7 @@ First_Order_Time_Step(int substep,T dt)
         Write_Substep("explicit viscosity",substep,1);
         example.kang_poisson_viscosity->Apply_Viscosity(face_velocities,dt,fluids_parameters.implicit_viscosity);
         Write_Substep("explicit viscosity",substep,1);
-        face_velocities_scratch.Exchange_Arrays(face_velocities,face_velocities_scratch);
+        face_velocities_scratch.Exchange(face_velocities,face_velocities_scratch);
         face_velocities_scratch-=face_velocities;
         Write_Substep("revert velocity and store difference",substep,1);}
 

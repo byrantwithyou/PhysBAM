@@ -112,7 +112,7 @@ void Get_Initial_Data(TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume)
         plastic_goal.Exact_Resize(1,particles.Size());
         T goal_thickness=(T).125,threshold=(T).9;
         for(int p=0;p<particles.Size();p++)plastic_goal(p)=Peace_Map(particles.X(p));
-        if(show_goal){ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);/*use_control=false*/;}}
+        if(show_goal){ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange(particles.X,plastic_goal.array);/*use_control=false*/;}}
 
     for(int p=0;p<particles.Size();p++)particles.X(p)*=(T).5;
     if(use_control)for(int p=0;p<particles.Size();p++)plastic_goal(p)*=(T).5;

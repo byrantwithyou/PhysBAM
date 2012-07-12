@@ -137,8 +137,8 @@ public:
     TV Maxabs() const
     {TV maxabs_values;for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Maxabs(),Component(2,i).Maxabs());return maxabs_values;}
 
-    static void Exchange_Arrays(ARRAY& a,ARRAY& b)
-    {BASE::Exchange_Arrays(a,b);BASE::Exchange_Arrays(a.u2,b.u2);a.Initialize();b.Initialize();}
+    static void Exchange(ARRAY& a,ARRAY& b)
+    {BASE::Exchange(a,b);BASE::Exchange(a.u2,b.u2);a.Initialize();b.Initialize();}
     
     template<class RW> void Read(std::istream& input)
     {BASE::Read(input);Read_Binary<RW>(input,u2);}

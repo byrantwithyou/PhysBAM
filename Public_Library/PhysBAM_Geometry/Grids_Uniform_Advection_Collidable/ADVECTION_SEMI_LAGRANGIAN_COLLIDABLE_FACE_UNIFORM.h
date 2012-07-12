@@ -74,7 +74,7 @@ public:
                     const typename T_FACE_LOOKUP::LOOKUP &Z_min_lookup=Z_min_ghost->Starting_Point_Face(axis,face),&Z_max_lookup=Z_max_ghost->Starting_Point_Face(axis,face);
                     VECTOR<T,2> extrema=linear_interpolation_collidable.Extrema_Clamped_To_Array_Face_Component(axis,grid,Z_min_lookup,Z_max_lookup,interpolation_point);
                     Z_min->Component(axis)(face)=extrema.x;Z_max->Component(axis)(face)=extrema.y;}}}}
-    T_FACE_ARRAYS_BOOL::Exchange_Arrays(face_velocities_valid_mask,face_velocities_valid_mask_next);
+    T_FACE_ARRAYS_BOOL::Exchange(face_velocities_valid_mask,face_velocities_valid_mask_next);
     // ghost values should always be valid
     for(int axis=0;axis<T_GRID::dimension;axis++) grid.Get_Face_Grid(axis).Put_Ghost(true,face_velocities_valid_mask.Component(axis),3);}
 

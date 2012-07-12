@@ -72,7 +72,7 @@ public:
     void Exchange(ARRAY_VIEW& other)
     {STATIC_ASSERT(!IS_CONST<T>::value);this->Exchange(other);} // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
 
-    static void Exchange_Arrays(ARRAY_VIEW& array1,ARRAY_VIEW& array2)
+    static void Exchange(ARRAY_VIEW& array1,ARRAY_VIEW& array2)
     {STATIC_ASSERT(!IS_CONST<T>::value); // make ARRAY_VIEW<const T> equivalent to const ARRAY_VIEW<const T>
     array1.array.Exchange(array2.array);
     exchange(array1.domain,array2.domain);exchange(array1.counts,array2.counts);array1.Calculate_Acceleration_Constants();array2.Calculate_Acceleration_Constants();}

@@ -71,11 +71,11 @@ void Get_Initial_Data()
         for(int p=0;p<particles.Size();p++)plastic_goal(p)=Pancake_Map(particles.X(p),goal_thickness,threshold,Q);
         if(preserve_volume){
             T volume=tetrahedralized_volume.Total_Volume();
-            ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);
+            ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange(particles.X,plastic_goal.array);
             T scale=pow(volume/tetrahedralized_volume.Total_Volume(),(T)one_third);
             for(int p=0;p<particles.Size();p++)particles.X(p)*=scale;
-            ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);}
-        if(show_goal){ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange_Arrays(particles.X,plastic_goal.array);use_control=false;}}
+            ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange(particles.X,plastic_goal.array);}
+        if(show_goal){ARRAY<VECTOR_3D<T> ,VECTOR<int,1> >::Exchange(particles.X,plastic_goal.array);use_control=false;}}
 
     for(int p=0;p<particles.Size();p++)particles.X(p)*=(T).5;
     tetrahedralized_volume.Update_Bounding_Box();

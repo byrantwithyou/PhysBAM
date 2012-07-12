@@ -948,12 +948,12 @@ Dump_Substep(const VECTOR_ND<T>& fluid_velocity,const char* name,int substep,int
     ARRAY<T,FACE_INDEX<TV::m> > tmp(debug_velocity->Domain_Indices());
     ARRAY<T> tmp_constrained(index_map.indexed_constraints.m);
     index_map.Distribute(fluid_velocity,tmp,tmp_constrained);
-    debug_velocity->Exchange_Arrays(*debug_velocity,tmp);
+    debug_velocity->Exchange(*debug_velocity,tmp);
     if(fluid_to_solid_interpolation)
         if(FLUID_TO_SOLID_INTERPOLATION_CUT<TV>* cut=dynamic_cast<FLUID_TO_SOLID_INTERPOLATION_CUT<TV>*>(fluid_to_solid_interpolation))
             cut->Dump_Extra_Velocities(fluid_velocity);
     PHYSBAM_DEBUG_WRITE_SUBSTEP(name,substep,level);
-    debug_velocity->Exchange_Arrays(*debug_velocity,tmp);
+    debug_velocity->Exchange(*debug_velocity,tmp);
 }
 //#####################################################################
 // Function Dump_Substep

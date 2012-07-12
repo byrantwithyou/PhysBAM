@@ -195,7 +195,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
 Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
-    T_FACE_ARRAYS_SCALAR::Exchange_Arrays(face_velocities,face_velocities_save_for_projection);
+    T_FACE_ARRAYS_SCALAR::Exchange(face_velocities,face_velocities_save_for_projection);
 }
 //#####################################################################
 // Function Exchange_Pressures_For_Projection
@@ -203,7 +203,7 @@ Restore_After_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
 Exchange_Pressures_For_Projection()
 {
-    T_ARRAYS_SCALAR::Exchange_Arrays(p,p_save_for_projection);
+    T_ARRAYS_SCALAR::Exchange(p,p_save_for_projection);
 }
 //#####################################################################
 template class PROJECTION_UNIFORM<GRID<VECTOR<float,1> > >;
