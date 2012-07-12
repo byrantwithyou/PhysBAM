@@ -51,7 +51,7 @@ public:
     int max_iter;
     bool dump_matrix;
     bool wrap;
-    ARRAY<T> mu;
+    ARRAY<T> mu,rho;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;

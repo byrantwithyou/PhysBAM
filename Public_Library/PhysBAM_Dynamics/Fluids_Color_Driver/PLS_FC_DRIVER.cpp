@@ -207,7 +207,7 @@ Advance_One_Time_Step(bool first_step)
 //    Update_Pls(dt);
 
     example.prev_face_velocities.Exchange(example.face_velocities);
-    if(!first_step) example.face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,example.face_velocities,example.face_velocities);
+    if(!first_step) example.face_velocities.Copy((T)2,example.prev_face_velocities,-(T).5,example.face_velocities,example.face_velocities);
     else example.face_velocities=example.prev_face_velocities;
 
     Apply_Pressure_And_Viscosity(dt,first_step);
@@ -231,7 +231,9 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
 //    iss.use_preconditioner=example.use_preconditioner; // TODO: preconditioner is causing problems; why?
-    iss.Set_Matrix(ARRAY<T>(example.mu*dt),example.wrap,&bccl,first_step?1:(T)1.5);
+    ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
+    if(!first_step) system_inertia*=(T)1.5;
+    iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&example.rho);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}

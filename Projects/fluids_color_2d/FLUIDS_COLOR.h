@@ -25,7 +25,7 @@ class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
-    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::dump_matrix;
+    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;
     int test_number;
     int resolution;
     int stored_last_frame;
@@ -87,6 +87,7 @@ public:
     void Uniform_Translation_Periodic()
     {
         mu.Append(mu0);
+        rho.Append(rho0);
         face_velocities.Fill(1);
         levelset_color.phi.Fill(-1);
         levelset_color.color.Fill(0);
@@ -94,12 +95,13 @@ public:
 
     TV Taylor_Green_Vortex_Velocity(const TV& X,T t)
     {
-        return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*mu0/rho0*t);
+        return TV(sin(X.x/m)*cos(X.y/m),-cos(X.x/m)*sin(X.y/m))*exp(-2*mu0/rho0*t/(m*m))*m/s;
     }
 
     void Taylor_Green_Vortex_Periodic()
     {
         mu.Append(mu0);
+        rho.Append(rho0);
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
             face_velocities(it.Full_Index())=Taylor_Green_Vortex_Velocity(it.Location(),0)(it.Axis());
         levelset_color.phi.Fill(-1);

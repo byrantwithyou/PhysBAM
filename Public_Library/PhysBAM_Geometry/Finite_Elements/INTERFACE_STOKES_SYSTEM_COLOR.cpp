@@ -47,8 +47,9 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 // Function Set_Matrix
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T inertial_coefficient)
+Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia)
 {
+    PHYSBAM_ASSERT((bool)system_inertia==(bool)rhs_inertia);
     // SET UP STENCILS
 
     BASIS_STENCIL_UNIFORM<TV,0> p_stencil(grid.dX);
@@ -99,7 +100,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
         helper_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
         helper_qu(i).Initialize(*u_stencil(i),*cm_u(i),*cdi);
         helper_rhs_pu(i).Initialize(p_stencil,*u_stencil(i),*cm_p,*cm_u(i),*cdi);
-        if(inertial_coefficient)
+        if(system_inertia)
             helper_inertial_rhs(i).Initialize(*u_stencil(i),*u_stencil(i),*cm_u(i),*cm_u(i),*cdi);}
 
     ARRAY<T> double_mu(mu*(T)2),ones(CONSTANT_ARRAY<T>(mu.m,(T)1)),minus_ones(CONSTANT_ARRAY<T>(mu.m,-(T)1));
@@ -118,11 +119,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
         for(int j=i+1;j<TV::m;j++)
             biu.Add_Volume_Block(helper_uu(i)(j),*udx_stencil(i)(j),*udx_stencil(j)(i),mu);
     // Diagonal inertial term
-    if(inertial_coefficient){
-        ARRAY<T> coeff(CONSTANT_ARRAY<T>(mu.m,inertial_coefficient));
+    if(system_inertia){
+        PHYSBAM_ASSERT(system_inertia->m==mu.m && system_inertia->m==rhs_inertia->m);
         for(int i=0;i<TV::m;i++){
-            biu.Add_Volume_Block(helper_uu(i)(i),*u_stencil(i),*u_stencil(i),coeff);
-            biu.Add_Volume_Block(helper_inertial_rhs(i),*u_stencil(i),*u_stencil(i),coeff);}}
+            biu.Add_Volume_Block(helper_uu(i)(i),*u_stencil(i),*u_stencil(i),*system_inertia);
+            biu.Add_Volume_Block(helper_inertial_rhs(i),*u_stencil(i),*u_stencil(i),*rhs_inertia);}}
     // Pressure blocks
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_pu(i),p_stencil,*udx_stencil(i)(i),minus_ones);
@@ -143,7 +144,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
         helper_pu(i).Mark_Active_Cells();
         helper_qu(i).Mark_Active_Cells();
         helper_rhs_pu(i).Mark_Active_Cells();
-        if(inertial_coefficient)
+        if(system_inertia)
             helper_inertial_rhs(i).Mark_Active_Cells();}
     
     cm_p->Compress_Indices();
@@ -163,7 +164,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
     for(int i=0;i<TV::m;i++)
         helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
     // RHS Inertial Block 
-    if(inertial_coefficient)
+    if(system_inertia)
         for(int i=0;i<TV::m;i++)
             helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
     // FILL IN THE NULL MODES
@@ -183,7 +184,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,T ine
             for(int k=start;k<end;k++)
                 null_modes.Last().q(k)=-1;}}
 
-    if(!inertial_coefficient)
+    if(!system_inertia)
         for(int i=0;i<TV::m;i++){
             null_modes.Append(VECTOR_T());
             Resize_Vector(null_modes.Last());
