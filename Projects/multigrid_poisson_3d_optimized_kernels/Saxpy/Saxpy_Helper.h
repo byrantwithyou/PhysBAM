@@ -17,7 +17,7 @@ protected:
 
 public:
     explicit Saxpy_Size_Specific_Helper_Base(const T& c1_input,const T* const u1_input,T* const result_input)
-	:result(result_input),u1(u1_input),c1(c1_input)
+        :result(result_input),u1(u1_input),c1(c1_input)
     {}
 
     virtual ~Saxpy_Size_Specific_Helper_Base() {};
@@ -64,8 +64,8 @@ class Saxpy_Size_Specific_Helper:public Saxpy_Size_Specific_Helper_Base<T>
 
 public:
     explicit Saxpy_Size_Specific_Helper(const int x_size_input,const T& c1_input,const T* const u1_input,T* const result_input)
-	:Base(c1_input,u1_input,result_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
+        :Base(c1_input,u1_input,result_input)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
     {}
 
     void Run()
@@ -75,14 +75,14 @@ public:
 
     static void Allocate_Data(T*& result,T*& u1)
     {
-	int padded_length=padded_y_size*padded_y_size*padded_z_size;
+        int padded_length=padded_y_size*padded_y_size*padded_z_size;
         result=new T[padded_length];
         u1=new T[padded_length];
     }
 
     static void Initialize_Data(T* const result,T* const u1)
     {
-	int padded_length=padded_y_size*padded_y_size*padded_z_size;
+        int padded_length=padded_y_size*padded_y_size*padded_z_size;
         for(int i=0;i<padded_length;i++) result[i]=u1[i]=(T)i;
     }
 

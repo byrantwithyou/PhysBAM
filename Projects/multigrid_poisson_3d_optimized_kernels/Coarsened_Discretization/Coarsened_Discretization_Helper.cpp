@@ -58,31 +58,31 @@ Run_X_Range(const int xmin,const int xmax)
             int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_shift-y_shift-z_shift;
             int coarse_index=i*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
 
-	    if(fine_cell_type[index]==DIRICHLET_CELL_TYPE ||
-		fine_cell_type[index+z_plus_one_shift]==DIRICHLET_CELL_TYPE||
-		fine_cell_type[index+y_plus_one_shift]==DIRICHLET_CELL_TYPE ||
-		fine_cell_type[index+y_plus_one_z_plus_one_shift]==DIRICHLET_CELL_TYPE||
-		fine_cell_type[index+x_plus_one_shift]==DIRICHLET_CELL_TYPE ||
-		fine_cell_type[index+x_plus_one_z_plus_one_shift]==DIRICHLET_CELL_TYPE||
-		fine_cell_type[index+x_plus_one_y_plus_one_shift]==DIRICHLET_CELL_TYPE ||
-		fine_cell_type[index+x_plus_one_y_plus_one_z_plus_one_shift]==DIRICHLET_CELL_TYPE)
+            if(fine_cell_type[index]==DIRICHLET_CELL_TYPE ||
+                fine_cell_type[index+z_plus_one_shift]==DIRICHLET_CELL_TYPE||
+                fine_cell_type[index+y_plus_one_shift]==DIRICHLET_CELL_TYPE ||
+                fine_cell_type[index+y_plus_one_z_plus_one_shift]==DIRICHLET_CELL_TYPE||
+                fine_cell_type[index+x_plus_one_shift]==DIRICHLET_CELL_TYPE ||
+                fine_cell_type[index+x_plus_one_z_plus_one_shift]==DIRICHLET_CELL_TYPE||
+                fine_cell_type[index+x_plus_one_y_plus_one_shift]==DIRICHLET_CELL_TYPE ||
+                fine_cell_type[index+x_plus_one_y_plus_one_z_plus_one_shift]==DIRICHLET_CELL_TYPE)
 
-		coarse_cell_type[coarse_index]=DIRICHLET_CELL_TYPE;
-	    
-	    else if(fine_cell_type[index]==INTERIOR_CELL_TYPE ||
-		fine_cell_type[index+z_plus_one_shift]==INTERIOR_CELL_TYPE||
-		fine_cell_type[index+y_plus_one_shift]==INTERIOR_CELL_TYPE ||
-		fine_cell_type[index+y_plus_one_z_plus_one_shift]==INTERIOR_CELL_TYPE||
-		fine_cell_type[index+x_plus_one_shift]==INTERIOR_CELL_TYPE ||
-		fine_cell_type[index+x_plus_one_z_plus_one_shift]==INTERIOR_CELL_TYPE||
-		fine_cell_type[index+x_plus_one_y_plus_one_shift]==INTERIOR_CELL_TYPE ||
-		fine_cell_type[index+x_plus_one_y_plus_one_z_plus_one_shift]==INTERIOR_CELL_TYPE)
+                coarse_cell_type[coarse_index]=DIRICHLET_CELL_TYPE;
+            
+            else if(fine_cell_type[index]==INTERIOR_CELL_TYPE ||
+                fine_cell_type[index+z_plus_one_shift]==INTERIOR_CELL_TYPE||
+                fine_cell_type[index+y_plus_one_shift]==INTERIOR_CELL_TYPE ||
+                fine_cell_type[index+y_plus_one_z_plus_one_shift]==INTERIOR_CELL_TYPE||
+                fine_cell_type[index+x_plus_one_shift]==INTERIOR_CELL_TYPE ||
+                fine_cell_type[index+x_plus_one_z_plus_one_shift]==INTERIOR_CELL_TYPE||
+                fine_cell_type[index+x_plus_one_y_plus_one_shift]==INTERIOR_CELL_TYPE ||
+                fine_cell_type[index+x_plus_one_y_plus_one_z_plus_one_shift]==INTERIOR_CELL_TYPE)
 
-		coarse_cell_type[coarse_index]=INTERIOR_CELL_TYPE;
-	
-	    else		
-		coarse_cell_type[coarse_index]=NEUMANN_CELL_TYPE;
-	}
+                coarse_cell_type[coarse_index]=INTERIOR_CELL_TYPE;
+        
+            else                
+                coarse_cell_type[coarse_index]=NEUMANN_CELL_TYPE;
+        }
 }
 //#####################################################################
 template class Coarsened_Discretization_Helper<float>;

@@ -15,7 +15,7 @@ protected:
 
 public:
     explicit Reduce_Maxabs_Size_Specific_Helper_Base(const T* const u_input)
-	:u(u_input),maxabs_partial_results(0)
+        :u(u_input),maxabs_partial_results(0)
     {}
     
     virtual ~Reduce_Maxabs_Size_Specific_Helper_Base() {}
@@ -61,7 +61,7 @@ class Reduce_Maxabs_Size_Specific_Helper:public Reduce_Maxabs_Size_Specific_Help
 
 public:
     explicit Reduce_Maxabs_Size_Specific_Helper(const int x_size_input,const T* const u_input)
-	:Base(u_input),x_size(x_size_input),padded_x_size(x_size_input+2)
+        :Base(u_input),x_size(x_size_input),padded_x_size(x_size_input+2)
     {}
     
     T Run()

@@ -63,7 +63,7 @@ class Prolongation_Size_Specific_Helper:public Prolongation_Size_Specific_Helper
         coarse_z_size=z_size/2,
         coarse_padded_y_size=coarse_y_size+2,
         coarse_padded_z_size=coarse_z_size+2,
-	x_shift=padded_y_size*padded_z_size,
+        x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
         z_shift=1,
         coarse_x_shift=coarse_padded_y_size*coarse_padded_z_size,
@@ -107,8 +107,8 @@ class Prolongation_Size_Specific_Helper:public Prolongation_Size_Specific_Helper
 public:
     explicit Prolongation_Size_Specific_Helper(const int x_size_input,T* const u_input,const T* const u_coarse_input,const unsigned char* const bit_writemask_input)
         :Base(u_input,u_coarse_input,bit_writemask_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
-	,coarse_x_size(x_size/2),coarse_padded_x_size(coarse_x_size+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,coarse_x_size(x_size/2),coarse_padded_x_size(coarse_x_size+2)
     {}
 
     void Run()
@@ -118,17 +118,17 @@ public:
 
     static void Allocate_Data(T*& u,T*& u_coarse,unsigned char*& bit_writemask)
     {
-	int padded_length = padded_y_size*padded_y_size*padded_z_size;
-	int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
-	u=new T[padded_length];u_coarse=new T[coarse_padded_length];bit_writemask=new unsigned char[coarse_padded_length];}
+        int padded_length = padded_y_size*padded_y_size*padded_z_size;
+        int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
+        u=new T[padded_length];u_coarse=new T[coarse_padded_length];bit_writemask=new unsigned char[coarse_padded_length];}
 
     static void Initialize_Data(T* const u,T* const u_coarse,unsigned char* const bit_writemask)
     {
-	int padded_length = padded_y_size*padded_y_size*padded_z_size;
-	int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
-	for(int i=0;i<padded_length;i++) u[i]=(T)i;
-	for(int i=0;i<coarse_padded_length;i++) u_coarse[i]=(T)i;
-	for(int i=0;i<coarse_padded_length;i++) bit_writemask[i]=i%256;}
+        int padded_length = padded_y_size*padded_y_size*padded_z_size;
+        int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
+        for(int i=0;i<padded_length;i++) u[i]=(T)i;
+        for(int i=0;i<coarse_padded_length;i++) u_coarse[i]=(T)i;
+        for(int i=0;i<coarse_padded_length;i++) bit_writemask[i]=i%256;}
 
 //#####################################################################
     void Run_Parallel(const int number_of_partitions);

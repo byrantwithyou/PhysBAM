@@ -23,7 +23,7 @@ protected:
 public:
     explicit Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_Helper_Base(const T& c1_input,const T* const u1_input,
         T* const result_input,double &sum_input,T& minimum_input,T& maximum_input)
-	:result(result_input),u1(u1_input),c1(c1_input),sum(sum_input),minimum(minimum_input),maximum(maximum_input),sum_partial_results(0),
+        :result(result_input),u1(u1_input),c1(c1_input),sum(sum_input),minimum(minimum_input),maximum(maximum_input),sum_partial_results(0),
         minimum_partial_results(0),maximum_partial_results(0)
     {}
 
@@ -65,7 +65,7 @@ class Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_H
         x_block_size=4,
         y_block_size=4,
         z_block_size=4,
-	padded_y_size=y_size+2,
+        padded_y_size=y_size+2,
         padded_z_size=z_size+2,
         x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
@@ -76,7 +76,7 @@ public:
     explicit Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_Helper(const int x_size_input,const T& c1_input,const T* const u1_input,T* const result_input,
         double &sum_input,T& minimum_input,T& maximum_input)
         :Base(c1_input,u1_input,result_input,sum_input,minimum_input,maximum_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
     {}
 
     void Run()

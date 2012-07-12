@@ -329,7 +329,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 42: case 52:
             mattress_grid=GRID<TV>(20,20,20,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01,(T)-0.01,(T)0.01);
             break;
-    	default:{
+            default:{
             if(!parameter) parameter=10;
         
             mattress_grid=GRID<TV>(2*parameter,parameter,2*parameter,(T)-1,(T)1,(T)-.5,(T).5,(T)-1,(T)1);
@@ -2101,8 +2101,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     T final_time=50;
     if(test_number==24){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         TV velocity_x=velocity_time<final_time?TV(attachment_velocity,0,0):TV();
         TV velocity_y=velocity_time<final_time?TV(0,attachment_velocity,0):TV();
         TV velocity_z=velocity_time<final_time?TV(0,0,attachment_velocity):TV();
@@ -2112,8 +2112,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     }
     if(test_number==25){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         V(0)=         velocity_time<final_time?TV(-attachment_velocity,-attachment_velocity,-attachment_velocity):TV();
         V(m-1)=         velocity_time<final_time?TV( attachment_velocity,-attachment_velocity,-attachment_velocity):TV();
         V(m*(n-1))= velocity_time<final_time?TV(-attachment_velocity, attachment_velocity,-attachment_velocity):TV();
@@ -2125,8 +2125,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     }
     if(test_number==26){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         TV velocity_x=velocity_time<final_time?TV(attachment_velocity,0,0):TV();
         TV velocity_y=velocity_time<final_time?TV(0,attachment_velocity,0):TV();
         for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++){V(m*j+m*n*ij)=-velocity_x;V(m-1+m*j+m*n*ij)=velocity_x;}
@@ -2135,8 +2135,8 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
     if(test_number==27){
         final_time=70;
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         TV velocity_x=velocity_time<final_time?TV(attachment_velocity,0,0):TV();
         for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++){V(m*j+m*n*ij)=velocity_x;V(m-1+m*j+m*n*ij)=-velocity_x;}
     }
@@ -2181,16 +2181,16 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     if(test_number==24){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         for(int i=m/3+0;i<2*m/3;i++)for(int j=n/3;j<2*n/3;j++){V(i+m*j)=TV();V(i+m*j+(mn-1)*m*n)=TV();}
         for(int i=m/3+0;i<2*m/3;i++)for(int ij=mn/3;ij<2*mn/3;ij++){V(i+m*n*ij)=TV();V(i+m*(n-1)+m*n*ij)=TV();}
         for(int ij=mn/3;ij<2*mn/3;ij++)for(int j=n/3;j<2*n/3;j++){V(m*j+m*n*ij)=TV();V(m-1+m*j+m*n*ij)=TV();}
     }
     if(test_number==25){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         V(0)=TV();
         V(m-1)=TV();
         V(m*(n-1))=TV();
@@ -2202,8 +2202,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     }
     if(test_number==26){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++){V(m*j+m*n*ij)=TV();V(m-1+m*j+m*n*ij)=TV();}
         for(int i=3*m/7+0;i<4*m/7;i++)for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++){V(i+m*j+m*n*ij)=TV();V(i+m*j+m*n*ij)=TV();}
     }
@@ -2215,8 +2215,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     }
     if(test_number==27){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++){V(m*j+m*n*ij)=TV();V(m-1+m*j+m*n*ij)=TV();}
     }
     if(test_number==28){
@@ -2235,8 +2235,8 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
     }
     if(test_number==24){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
-	int mn=mattress_grid.counts.z;
+        int n=mattress_grid.counts.y;
+        int mn=mattress_grid.counts.z;
         for(int i=m/3+0;i<2*m/3;i++)for(int j=n/3;j<2*n/3;j++){V(i+m*j)=TV();V(i+m*j+(mn-1)*m*n)=TV();}
         for(int i=m/3+0;i<2*m/3;i++)for(int ij=mn/3;ij<2*mn/3;ij++){V(i+m*n*ij)=TV();V(i+m*(n-1)+m*n*ij)=TV();}
     }

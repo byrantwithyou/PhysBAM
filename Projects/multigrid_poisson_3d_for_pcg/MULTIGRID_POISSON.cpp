@@ -135,50 +135,50 @@ Initialize_Boundary_Region(){
     index_is_extended_boundary.Fill(0);
     unsigned char full_interior_coarse_cell; // bitmask for fully interior coarse cell
     if(d==2)
-	full_interior_coarse_cell=0x0f;
+        full_interior_coarse_cell=0x0f;
     else if(d==3)
-	full_interior_coarse_cell=0xff;
+        full_interior_coarse_cell=0xff;
 
     LOG::Time("Boundary Initialization");
     // any interior cell along the unpadded domain is boundary
     for(BOUNDARY_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	const T_INDEX& index=iterator.Index();
-	if(cell_type(index)==INTERIOR_CELL_TYPE)
-	    index_is_boundary(index)=true;
+        const T_INDEX& index=iterator.Index();
+        if(cell_type(index)==INTERIOR_CELL_TYPE)
+            index_is_boundary(index)=true;
     }
 
     for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
 
-	// check if any 2x2(x2) children of the coarse cell are not interior cells
-	// if any are not interior, mark all fine cells with coarse cell 
-	// in prolongation stencil as boundary
+        // check if any 2x2(x2) children of the coarse cell are not interior cells
+        // if any are not interior, mark all fine cells with coarse cell 
+        // in prolongation stencil as boundary
         if(index_is_interior_coarse_bitmask(coarse_index)!=full_interior_coarse_cell)
             for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index-1,base_fine_index+2));fine_iterator.Valid();fine_iterator.Next()){
-		const T_INDEX& fine_index=fine_iterator.Index();
-		if(cell_type(fine_index)==INTERIOR_CELL_TYPE)
-		    index_is_boundary(fine_index)=true;}
+                const T_INDEX& fine_index=fine_iterator.Index();
+                if(cell_type(fine_index)==INTERIOR_CELL_TYPE)
+                    index_is_boundary(fine_index)=true;}
     }
 
     // find extended boundary cells
     // an interior cell is an extended boundary cell if 
     // it or any of its 6 face neighbors are boundary cells
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	const T_INDEX& index=iterator.Index();
-	if(cell_type(index)!=INTERIOR_CELL_TYPE) continue;
-	if(index_is_boundary(index)){ 
-	    index_is_extended_boundary(index)=true; 
-	    continue;
-	}
-	for(int v=0;v<d;v++){
-	    if(index_is_boundary(index+T_INDEX::Axis_Vector(v))){
-		index_is_extended_boundary(index)=true; 
-		break;}
-	    if(index_is_boundary(index-T_INDEX::Axis_Vector(v))){
-		index_is_extended_boundary(index)=true; 
-		break;}
-	}
+        const T_INDEX& index=iterator.Index();
+        if(cell_type(index)!=INTERIOR_CELL_TYPE) continue;
+        if(index_is_boundary(index)){ 
+            index_is_extended_boundary(index)=true; 
+            continue;
+        }
+        for(int v=0;v<d;v++){
+            if(index_is_boundary(index+T_INDEX::Axis_Vector(v))){
+                index_is_extended_boundary(index)=true; 
+                break;}
+            if(index_is_boundary(index-T_INDEX::Axis_Vector(v))){
+                index_is_extended_boundary(index)=true; 
+                break;}
+        }
     }
     LOG::Time("Block Counting");
     for(int v=0;v<d;v++) PHYSBAM_ASSERT(n(v)%boundary_block_size==0);
@@ -189,26 +189,26 @@ Initialize_Boundary_Region(){
     // find all blocks with boundary and extended boundary nodes.
     // store index of the first node in each block.
     for(BOX_ITERATOR<d,boundary_block_size> domain_iterator(unpadded_domain);domain_iterator.Valid();domain_iterator.Next()){
-	const T_INDEX& base_index=domain_iterator.Index();
-	RANGE<T_INDEX> box=RANGE<T_INDEX>(base_index-boundary_block_padding,base_index+boundary_block_size-1+boundary_block_padding);
+        const T_INDEX& base_index=domain_iterator.Index();
+        RANGE<T_INDEX> box=RANGE<T_INDEX>(base_index-boundary_block_padding,base_index+boundary_block_size-1+boundary_block_padding);
 
-	bool contains_boundary=false;
-	bool contains_extended_boundary=false;
-	for(BOX_ITERATOR<d> box_iterator(box);box_iterator.Valid();box_iterator.Next())
-	    if(index_is_boundary(box_iterator.Index())){
-		contains_boundary=true;
-		contains_extended_boundary=true;
- 		break;
-	    }else if(index_is_extended_boundary(box_iterator.Index())){
-		contains_extended_boundary=true;
-	    }
-	if(contains_boundary){
-	    T_INDEX block_index=(base_index-2)/boundary_block_size;
-	    int box_color = (block_index(1)+block_index(2)+block_index(3))%2+1;
-	    boundary_block_base_index(box_color).Append(base_index);
-	}
-	if(contains_extended_boundary)
-	    extended_boundary_block_base_index.Append(base_index);
+        bool contains_boundary=false;
+        bool contains_extended_boundary=false;
+        for(BOX_ITERATOR<d> box_iterator(box);box_iterator.Valid();box_iterator.Next())
+            if(index_is_boundary(box_iterator.Index())){
+                contains_boundary=true;
+                contains_extended_boundary=true;
+                 break;
+            }else if(index_is_extended_boundary(box_iterator.Index())){
+                contains_extended_boundary=true;
+            }
+        if(contains_boundary){
+            T_INDEX block_index=(base_index-2)/boundary_block_size;
+            int box_color = (block_index(1)+block_index(2)+block_index(3))%2+1;
+            boundary_block_base_index(box_color).Append(base_index);
+        }
+        if(contains_extended_boundary)
+            extended_boundary_block_base_index.Append(base_index);
     }
 
     total_red_boundary_blocks=boundary_block_base_index(1).m;
@@ -227,33 +227,33 @@ Initialize_Boundary_Region(){
 //    block=1;
     LOG::Time("Block Enumeration");
     for(int c=0;c<2;c++){
-	for(int b=0;b<boundary_block_base_index(c).m;b++){ // for each block with boundary indices
+        for(int b=0;b<boundary_block_base_index(c).m;b++){ // for each block with boundary indices
             const T_INDEX& offset=boundary_block_base_index(c)(b);
- 	    boundary_block_start.Append(boundary_indices.m+1); // first boundary_index of the block (1-indexed)
+             boundary_block_start.Append(boundary_indices.m+1); // first boundary_index of the block (1-indexed)
 
-	    for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
-		iterator.Valid();iterator.Next()){
-		const T_INDEX& index=iterator.Index();
-		if(index_is_boundary(index)){
- 		    boundary_indices.Append(index);
-		}
-	    }
- 	    boundary_block_end.Append(boundary_indices.m); // last boundary_index of the block (1-indexed)
+            for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
+                iterator.Valid();iterator.Next()){
+                const T_INDEX& index=iterator.Index();
+                if(index_is_boundary(index)){
+                     boundary_indices.Append(index);
+                }
+            }
+             boundary_block_end.Append(boundary_indices.m); // last boundary_index of the block (1-indexed)
 
-	}
+        }
     }
     // by going through the blocks, 
     // we enumerate extended boundary indices
     // in a block-by-block order (for fast reading)
     for(int b=0;b<extended_boundary_block_base_index.m;b++){
-	const T_INDEX& offset=extended_boundary_block_base_index(b);
-	
-	for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
-	    iterator.Valid();iterator.Next()){
-	    const T_INDEX& index=iterator.Index();
-	    if(index_is_extended_boundary(index))
-		extended_boundary_indices.Append(index);
-	}
+        const T_INDEX& offset=extended_boundary_block_base_index(b);
+        
+        for(BOX_ITERATOR<d> iterator(RANGE<T_INDEX>(offset,offset+T_INDEX::All_Ones_Vector()*(boundary_block_size-1)));
+            iterator.Valid();iterator.Next()){
+            const T_INDEX& index=iterator.Index();
+            if(index_is_extended_boundary(index))
+                extended_boundary_indices.Append(index);
+        }
     }
     LOG::cout<<"Found "<<boundary_block_end(total_red_boundary_blocks)<<" red boundary indices"<<std::endl;
  #endif
@@ -261,7 +261,7 @@ Initialize_Boundary_Region(){
     LOG::cout<<"Found "<<total_red_boundary_blocks<<" red boundary blocks"<<std::endl;
     LOG::cout<<"Found "<<total_black_boundary_blocks<<" black boundary blocks"<<std::endl;
     LOG::cout<<"Found "<<extended_boundary_indices.m<<" extended boundary indices"<<std::endl;
-	 
+         
 }
 
 
@@ -277,19 +277,19 @@ Build_System_Matrix(){
 #ifndef MGPCG_UNOPTIMIZED
     const T* const diagonal_entries_ptr=&diagonal_entries(1,1,1);
     for(int i=0;i<boundary_indices.m;i++){
-	int index=boundary_indices(i);
-	if(diagonal_entries_ptr[index]!=0) 
-	    one_over_diagonal_part.Append((T)1/diagonal_entries_ptr[index]);
-	else one_over_diagonal_part.Append((T)0);
+        int index=boundary_indices(i);
+        if(diagonal_entries_ptr[index]!=0) 
+            one_over_diagonal_part.Append((T)1/diagonal_entries_ptr[index]);
+        else one_over_diagonal_part.Append((T)0);
     }
 
 #else
     for(int i=0;i<boundary_indices.m;i++){
-	const T_INDEX& index=boundary_indices(i);
-	if(diagonal_entries(index)!=0) 
-	    one_over_diagonal_part.Append((T)1/diagonal_entries(index));
-	else
-	    one_over_diagonal_part.Append((T)0);
+        const T_INDEX& index=boundary_indices(i);
+        if(diagonal_entries(index)!=0) 
+            one_over_diagonal_part.Append((T)1/diagonal_entries(index));
+        else
+            one_over_diagonal_part.Append((T)0);
     }
 
 #endif
@@ -305,13 +305,13 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
     LOG::Time("Zeroing out fields");
 
     for(BOUNDARY_ITERATOR<d> iterator(padded_coarse_domain);iterator.Valid();iterator.Next()){
-	const T_INDEX& index=iterator.Index();
-	index_is_interior_coarse_bitmask(index)=0;
-	index_has_full_diagonal_coarse_bitmask(index)=0;
+        const T_INDEX& index=iterator.Index();
+        index_is_interior_coarse_bitmask(index)=0;
+        index_has_full_diagonal_coarse_bitmask(index)=0;
     }
 
     for(BOUNDARY_ITERATOR<d> iterator(padded_domain);iterator.Valid();iterator.Next())
-	diagonal_entries(iterator.Index())=0;
+        diagonal_entries(iterator.Index())=0;
 
 #ifndef MGPCG_UNOPTIMIZED
     LOG::Time("Computing bitmaps and diagonal");
@@ -328,29 +328,29 @@ Initialize_Interior_Bitmaps_And_Diagonal_Entries(){
     for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
-	
-	index_is_interior_coarse_bitmask(coarse_index)=0;
-	index_has_full_diagonal_coarse_bitmask(coarse_index)=0;
-	
-	unsigned char mask=0x01;
-	for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
-	    const T_INDEX& fine_index=fine_iterator.Index();
-	    int active_neighbors=0;
-	    if(cell_type(fine_index)==INTERIOR_CELL_TYPE){
-		index_is_interior_coarse_bitmask(coarse_index)|=mask;
-		for(int v=0;v<d;v++){
-		    if(cell_type(fine_index+T_INDEX::Axis_Vector(v))!=NEUMANN_CELL_TYPE)
-			active_neighbors++;
-		    if(cell_type(fine_index-T_INDEX::Axis_Vector(v))!=NEUMANN_CELL_TYPE)
-			active_neighbors++;
-		}
-	    }
-	    diagonal_entries(fine_index)=-(T)active_neighbors;
-	    if(active_neighbors==full_diagonal) 
-		index_has_full_diagonal_coarse_bitmask(coarse_index)|=mask;
+        
+        index_is_interior_coarse_bitmask(coarse_index)=0;
+        index_has_full_diagonal_coarse_bitmask(coarse_index)=0;
+        
+        unsigned char mask=0x01;
+        for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+            const T_INDEX& fine_index=fine_iterator.Index();
+            int active_neighbors=0;
+            if(cell_type(fine_index)==INTERIOR_CELL_TYPE){
+                index_is_interior_coarse_bitmask(coarse_index)|=mask;
+                for(int v=0;v<d;v++){
+                    if(cell_type(fine_index+T_INDEX::Axis_Vector(v))!=NEUMANN_CELL_TYPE)
+                        active_neighbors++;
+                    if(cell_type(fine_index-T_INDEX::Axis_Vector(v))!=NEUMANN_CELL_TYPE)
+                        active_neighbors++;
+                }
+            }
+            diagonal_entries(fine_index)=-(T)active_neighbors;
+            if(active_neighbors==full_diagonal) 
+                index_has_full_diagonal_coarse_bitmask(coarse_index)|=mask;
 
-	    mask<<=1;
-	}
+            mask<<=1;
+        }
     }
 
 
@@ -367,7 +367,7 @@ Boundary_Relaxation(const bool reverse_order,const int subloops)
 #ifndef MGPCG_UNOPTIMIZED
     Relaxation_Boundary_Helper<T> boundary_relax(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&one_over_diagonal_part(1),&boundary_indices(1),&boundary_block_start(1),&boundary_block_end(1),total_red_boundary_blocks,total_black_boundary_blocks,10,reverse_order);
     for(int loop=0;loop<subloops;loop++)
- 	boundary_relax.Run_Parallel(number_of_threads);
+         boundary_relax.Run_Parallel(number_of_threads);
 
 #else
     // NOTE: we can ignore red-black partitioning since we are running serially
@@ -375,36 +375,36 @@ Boundary_Relaxation(const bool reverse_order,const int subloops)
     // #(total_red_boundary_blocks) boundary blocks separately
     // from the last #(total_black_boundary_blocks) boundary blocks
     for(int loop=0;loop<subloops;loop++){
-	if(reverse_order)
-	    for(int block=boundary_block_start.m;block>=1;block--){
-		int first_index=boundary_block_start(block);
-		int last_index=boundary_block_end(block);	
-		for(int block_loop=0;block_loop<10;block_loop++)
-		    for(int i=last_index;i>=first_index;i--){
-			const T_INDEX& index=boundary_indices(i);
-			u(index)=b(index);
-			for(int v=0;v<d;v++)
-			    u(index)-=u(index+T_INDEX::Axis_Vector(v))
-				+u(index-T_INDEX::Axis_Vector(v));
-			u(index)*=one_over_diagonal_part(i);
-		    }
-	    }
+        if(reverse_order)
+            for(int block=boundary_block_start.m;block>=1;block--){
+                int first_index=boundary_block_start(block);
+                int last_index=boundary_block_end(block);        
+                for(int block_loop=0;block_loop<10;block_loop++)
+                    for(int i=last_index;i>=first_index;i--){
+                        const T_INDEX& index=boundary_indices(i);
+                        u(index)=b(index);
+                        for(int v=0;v<d;v++)
+                            u(index)-=u(index+T_INDEX::Axis_Vector(v))
+                                +u(index-T_INDEX::Axis_Vector(v));
+                        u(index)*=one_over_diagonal_part(i);
+                    }
+            }
 
 
-	else
-	    for(int block=0;block<boundary_block_start.m;block++){
-		int first_index=boundary_block_start(block);
-		int last_index=boundary_block_end(block);
-		for(int block_loop=0;block_loop<10;block_loop++)
-		    for(int i=first_index;i<=last_index;i++){
-			const T_INDEX& index=boundary_indices(i);
-			u(index)=b(index);
-			for(int v=0;v<d;v++)
-			    u(index)-=u(index+T_INDEX::Axis_Vector(v))
-				+u(index-T_INDEX::Axis_Vector(v));
-			u(index)*=one_over_diagonal_part(i);
-		    }
-	    }
+        else
+            for(int block=0;block<boundary_block_start.m;block++){
+                int first_index=boundary_block_start(block);
+                int last_index=boundary_block_end(block);
+                for(int block_loop=0;block_loop<10;block_loop++)
+                    for(int i=first_index;i<=last_index;i++){
+                        const T_INDEX& index=boundary_indices(i);
+                        u(index)=b(index);
+                        for(int v=0;v<d;v++)
+                            u(index)-=u(index+T_INDEX::Axis_Vector(v))
+                                +u(index-T_INDEX::Axis_Vector(v));
+                        u(index)*=one_over_diagonal_part(i);
+                    }
+            }
     }
 
 #endif
@@ -423,15 +423,15 @@ template<class T,int d> T MULTIGRID_POISSON<T,d>::
 Apply_System_Matrix(const T_INDEX& index,const ARRAY<T,TV_INT>& u_input) const
 {
     if(!diagonal_entries(index))
-	return (T)0;
+        return (T)0;
     T lu=0;
     for(int v=0;v<d;v++){
-	T_INDEX neighbor_index = index+T_INDEX::Axis_Vector(v);
-	if(diagonal_entries(neighbor_index))
-	    lu+=u_input(neighbor_index);
-	neighbor_index=index-T_INDEX::Axis_Vector(v);
-	if(diagonal_entries(neighbor_index))
-	    lu+=u_input(neighbor_index);
+        T_INDEX neighbor_index = index+T_INDEX::Axis_Vector(v);
+        if(diagonal_entries(neighbor_index))
+            lu+=u_input(neighbor_index);
+        neighbor_index=index-T_INDEX::Axis_Vector(v);
+        if(diagonal_entries(neighbor_index))
+            lu+=u_input(neighbor_index);
     }
     lu+=diagonal_entries(index)*u_input(index);
     return lu;
@@ -452,24 +452,24 @@ Subtract_Multiple_Of_System_Matrix_And_Compute_Sum_And_Extrema(const ARRAY<T,TV_
     rmax=-std::numeric_limits<T>::max();
     T scale_factor=(T)1/(h*h);
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	const T_INDEX& index=iterator.Index();
-	if(diagonal_entries(index)==0)
-	    continue;
-	T result=diagonal_entries(index)*x(index);
-	for(int v=0;v<d;v++){
-	    T_INDEX axis_vector=T_INDEX::Axis_Vector(v);
-	    if(diagonal_entries(index+axis_vector))
-		result+=x(index+axis_vector);
-	    if(diagonal_entries(index-axis_vector))
-		result+=x(index-axis_vector);
-	}
-	result*=scale_factor;
-	y(index)-=result;
-	sum+=y(index);
-	if(y(index)<rmin) 
-	    rmin=y(index);
-	if(y(index)>rmax)
-	    rmax=y(index);
+        const T_INDEX& index=iterator.Index();
+        if(diagonal_entries(index)==0)
+            continue;
+        T result=diagonal_entries(index)*x(index);
+        for(int v=0;v<d;v++){
+            T_INDEX axis_vector=T_INDEX::Axis_Vector(v);
+            if(diagonal_entries(index+axis_vector))
+                result+=x(index+axis_vector);
+            if(diagonal_entries(index-axis_vector))
+                result+=x(index-axis_vector);
+        }
+        result*=scale_factor;
+        y(index)-=result;
+        sum+=y(index);
+        if(y(index)<rmin) 
+            rmin=y(index);
+        if(y(index)>rmax)
+            rmax=y(index);
     }
 #endif
 }
@@ -489,23 +489,23 @@ Multiply_With_System_Matrix_And_Compute_Dot_Product(const ARRAY<T,TV_INT>& x,ARR
     T scale_factor=(T)1/(h*h);
     double dot_product=0;
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	const T_INDEX& index=iterator.Index();
-	if(diagonal_entries(index)==0)
-	    continue;
-	T result=diagonal_entries(index)*x(index);
-	for(int v=0;v<d;v++){
-	    T_INDEX axis_vector=T_INDEX::Axis_Vector(v);
-	    if(diagonal_entries(index+axis_vector))
-		result+=x(index+axis_vector);
-	    if(diagonal_entries(index-axis_vector))
-		result+=x(index-axis_vector);
-	}
-	result*=scale_factor;
-	y(index)=result;
-	dot_product+=y(index)*x(index);
+        const T_INDEX& index=iterator.Index();
+        if(diagonal_entries(index)==0)
+            continue;
+        T result=diagonal_entries(index)*x(index);
+        for(int v=0;v<d;v++){
+            T_INDEX axis_vector=T_INDEX::Axis_Vector(v);
+            if(diagonal_entries(index+axis_vector))
+                result+=x(index+axis_vector);
+            if(diagonal_entries(index-axis_vector))
+                result+=x(index-axis_vector);
+        }
+        result*=scale_factor;
+        y(index)=result;
+        dot_product+=y(index)*x(index);
     }
     return dot_product;
-	
+        
 
 #endif
 }
@@ -521,16 +521,16 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
     // apply deltas only where diagonal entry is actually full.
 #ifndef MGPCG_UNOPTIMIZED
     for(int loop=1;loop<loops;loop++){
-	Relaxation_Interior_Helper<T> relaxation(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&index_has_full_diagonal_coarse_bitmask(1,1,1));
-	relaxation.Run_Parallel(number_of_threads);}
+        Relaxation_Interior_Helper<T> relaxation(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&index_has_full_diagonal_coarse_bitmask(1,1,1));
+        relaxation.Run_Parallel(number_of_threads);}
         
     if(compute_dot_product){
-	Relaxation_And_Dot_Product_Interior_Helper<T> relaxation(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&index_has_full_diagonal_coarse_bitmask(1,1,1));
+        Relaxation_And_Dot_Product_Interior_Helper<T> relaxation(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&index_has_full_diagonal_coarse_bitmask(1,1,1));
         return relaxation.Run_Parallel(number_of_threads);
     }
     else{
-	Relaxation_Interior_Helper<T> relaxation(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&index_has_full_diagonal_coarse_bitmask(1,1,1));
-	relaxation.Run_Parallel(number_of_threads);}
+        Relaxation_Interior_Helper<T> relaxation(n(1),n(2),n(3),&u(1,1,1),&b(1,1,1),&delta(1,1,1),&index_has_full_diagonal_coarse_bitmask(1,1,1));
+        relaxation.Run_Parallel(number_of_threads);}
     return T();
 #else
     const T one_over_diagonal=(T)1/(2*d);
@@ -543,88 +543,88 @@ Interior_Relaxation(const int loops,const bool compute_dot_product)
 
     double dot_product=0;
     for(int loop=0;loop<loops;loop++){
-	
+        
 
-	// compute deltas on first coarse x-slice
-	T_INDEX xmin_ymax_zmax=unpadded_coarse_domain.max_corner;
-	xmin_ymax_zmax(1)=unpadded_coarse_domain.min_corner(1);
-	for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner,xmin_ymax_zmax));
-	    coarse_iterator.Valid();coarse_iterator.Next()){
-	    
-	    const T_INDEX& coarse_index=coarse_iterator.Index();
-	    const T_INDEX base_fine_index=(coarse_index-1)*2;
-	    
-	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
-		
-		const T_INDEX& fine_index=fine_iterator.Index();
-		delta(fine_index)=-b(fine_index);
-		for(int v=0;v<d;v++){
-		    delta(fine_index)+=u(fine_index+T_INDEX::Axis_Vector(v));
-		    delta(fine_index)+=u(fine_index-T_INDEX::Axis_Vector(v));
-		}
-		delta(fine_index)*=one_over_diagonal;
-		delta(fine_index)-=u(fine_index);
-	    }
-	}
-	
-	// compute deltas on remainder of x-slices.
-	// apply deltas, lagging by 1 x-slice
-	// since write bitmask is based on coarse cells, 
-	// we'll iterate over coarse domain
-	for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner+T_INDEX::Axis_Vector(1),unpadded_coarse_domain.max_corner));
-	    coarse_iterator.Valid();coarse_iterator.Next()){
-	    const T_INDEX& coarse_index=coarse_iterator.Index();
-	    T_INDEX shifted_coarse_index=coarse_index;
-	    shifted_coarse_index(1)-=1;
-	    const T_INDEX base_fine_index=(coarse_index-1)*2;
-	    
-	    unsigned char mask=0x01;
-	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
-		
-		const T_INDEX& fine_index=fine_iterator.Index();		    
-		T_INDEX shifted_fine_index=fine_index;
-		shifted_fine_index(1)-=2;
+        // compute deltas on first coarse x-slice
+        T_INDEX xmin_ymax_zmax=unpadded_coarse_domain.max_corner;
+        xmin_ymax_zmax(1)=unpadded_coarse_domain.min_corner(1);
+        for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner,xmin_ymax_zmax));
+            coarse_iterator.Valid();coarse_iterator.Next()){
+            
+            const T_INDEX& coarse_index=coarse_iterator.Index();
+            const T_INDEX base_fine_index=(coarse_index-1)*2;
+            
+            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+                
+                const T_INDEX& fine_index=fine_iterator.Index();
+                delta(fine_index)=-b(fine_index);
+                for(int v=0;v<d;v++){
+                    delta(fine_index)+=u(fine_index+T_INDEX::Axis_Vector(v));
+                    delta(fine_index)+=u(fine_index-T_INDEX::Axis_Vector(v));
+                }
+                delta(fine_index)*=one_over_diagonal;
+                delta(fine_index)-=u(fine_index);
+            }
+        }
+        
+        // compute deltas on remainder of x-slices.
+        // apply deltas, lagging by 1 x-slice
+        // since write bitmask is based on coarse cells, 
+        // we'll iterate over coarse domain
+        for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(unpadded_coarse_domain.min_corner+T_INDEX::Axis_Vector(1),unpadded_coarse_domain.max_corner));
+            coarse_iterator.Valid();coarse_iterator.Next()){
+            const T_INDEX& coarse_index=coarse_iterator.Index();
+            T_INDEX shifted_coarse_index=coarse_index;
+            shifted_coarse_index(1)-=1;
+            const T_INDEX base_fine_index=(coarse_index-1)*2;
+            
+            unsigned char mask=0x01;
+            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+                
+                const T_INDEX& fine_index=fine_iterator.Index();                    
+                T_INDEX shifted_fine_index=fine_index;
+                shifted_fine_index(1)-=2;
 
-		delta(fine_index)=-b(fine_index);
-		for(int v=0;v<d;v++){
-		    delta(fine_index)+=u(fine_index+T_INDEX::Axis_Vector(v));
-		    delta(fine_index)+=u(fine_index-T_INDEX::Axis_Vector(v));
-		}
-		delta(fine_index)*=one_over_diagonal;
-		delta(fine_index)-=u(fine_index);
-		
-		if(index_has_full_diagonal_coarse_bitmask(shifted_coarse_index) & mask){
-		    u(shifted_fine_index)+=two_thirds*delta(shifted_fine_index);
-		}
+                delta(fine_index)=-b(fine_index);
+                for(int v=0;v<d;v++){
+                    delta(fine_index)+=u(fine_index+T_INDEX::Axis_Vector(v));
+                    delta(fine_index)+=u(fine_index-T_INDEX::Axis_Vector(v));
+                }
+                delta(fine_index)*=one_over_diagonal;
+                delta(fine_index)-=u(fine_index);
+                
+                if(index_has_full_diagonal_coarse_bitmask(shifted_coarse_index) & mask){
+                    u(shifted_fine_index)+=two_thirds*delta(shifted_fine_index);
+                }
 
 
-		if(compute_dot_product && loop==loops)
-		    dot_product+=u(shifted_fine_index)*b(shifted_fine_index);
-		mask<<=0x01;
-	    }
-	}
-	
-	// apply deltas to last coarse x-slice
-	T_INDEX xmax_ymin_zmin=unpadded_coarse_domain.min_corner;
-	xmax_ymin_zmin(1)=unpadded_coarse_domain.max_corner(1);
-	for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(xmax_ymin_zmin,unpadded_coarse_domain.max_corner));
-	    coarse_iterator.Valid();coarse_iterator.Next()){
-	    const T_INDEX& coarse_index=coarse_iterator.Index();
-	    const T_INDEX base_fine_index=(coarse_index-1)*2;
-	    
-	    unsigned char mask=0x01;
-	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+                if(compute_dot_product && loop==loops)
+                    dot_product+=u(shifted_fine_index)*b(shifted_fine_index);
+                mask<<=0x01;
+            }
+        }
+        
+        // apply deltas to last coarse x-slice
+        T_INDEX xmax_ymin_zmin=unpadded_coarse_domain.min_corner;
+        xmax_ymin_zmin(1)=unpadded_coarse_domain.max_corner(1);
+        for(BOX_ITERATOR<d> coarse_iterator(RANGE<T_INDEX>(xmax_ymin_zmin,unpadded_coarse_domain.max_corner));
+            coarse_iterator.Valid();coarse_iterator.Next()){
+            const T_INDEX& coarse_index=coarse_iterator.Index();
+            const T_INDEX base_fine_index=(coarse_index-1)*2;
+            
+            unsigned char mask=0x01;
+            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
 
-		const T_INDEX& fine_index=fine_iterator.Index();
-		if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask){
-		    u(fine_index)+=two_thirds*delta(fine_index);
-		    
-		}
-		if(compute_dot_product && loop==loops)
-		    dot_product+=u(fine_index)*b(fine_index);
-		mask<<=0x01;
-	    }
-	}
+                const T_INDEX& fine_index=fine_iterator.Index();
+                if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask){
+                    u(fine_index)+=two_thirds*delta(fine_index);
+                    
+                }
+                if(compute_dot_product && loop==loops)
+                    dot_product+=u(fine_index)*b(fine_index);
+                mask<<=0x01;
+            }
+        }
     }
     return dot_product;
 #endif
@@ -638,7 +638,7 @@ Relaxation_Sweep(const bool reverse_order,const int boundary_pre_relaxations, co
     T dot_product=T();
     // Boundary pre-relaxation
     if(boundary_pre_relaxations){
-	Boundary_Relaxation(reverse_order,boundary_pre_relaxations);
+        Boundary_Relaxation(reverse_order,boundary_pre_relaxations);
     }
     
     // Interior relaxation
@@ -648,7 +648,7 @@ Relaxation_Sweep(const bool reverse_order,const int boundary_pre_relaxations, co
 
     // Boundary post-relaxation
     if(boundary_post_relaxations){
-	Boundary_Relaxation(reverse_order,boundary_post_relaxations);
+        Boundary_Relaxation(reverse_order,boundary_post_relaxations);
     }
     return dot_product;
 }
@@ -671,57 +671,57 @@ Relax_And_Compute_Residuals(const int interior_relaxations,const int boundary_po
     for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
         const T_INDEX& coarse_index=coarse_iterator.Index();
         const T_INDEX base_fine_index=(coarse_index-1)*2;
-	
-	unsigned char mask=0x01;
-	for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
-	    const T_INDEX& fine_index=fine_iterator.Index();
+        
+        unsigned char mask=0x01;
+        for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+            const T_INDEX& fine_index=fine_iterator.Index();
 
-	    // subtract nullspace component from right hand side (interior indices only)
-	    if(nullspace_component)
-		if(index_is_interior_coarse_bitmask(coarse_index) & mask)
-		    b(fine_index)-=nullspace_component;
+            // subtract nullspace component from right hand side (interior indices only)
+            if(nullspace_component)
+                if(index_is_interior_coarse_bitmask(coarse_index) & mask)
+                    b(fine_index)-=nullspace_component;
 
-	    // replace solution with relaxed value,
-	    // or zero if it does not have full diagonal
-	    if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask)
-		u(fine_index)=minus_two_thirds_over_diagonal_part*b(fine_index);
-	    else
-		u(fine_index)=T();
-	    
-	    // update residual if no nullspace component.
-	    // (we'll update it in a separate loop otherwise
-	    if(!nullspace_component){
-		delta(fine_index)=0;
-		if(index_is_interior_coarse_bitmask(coarse_index) & mask){
-		    delta(fine_index) = one_third*b(fine_index);
-		    for(int v=0;v<d;v++)
-			delta(fine_index)+=two_thirds_over_diagonal_part*(b(fine_index+T_INDEX::Axis_Vector(v))
-			    +b(fine_index-T_INDEX::Axis_Vector(v)));
-		}
-	    }
-	    mask<<=1;
-	}
+            // replace solution with relaxed value,
+            // or zero if it does not have full diagonal
+            if(index_has_full_diagonal_coarse_bitmask(coarse_index) & mask)
+                u(fine_index)=minus_two_thirds_over_diagonal_part*b(fine_index);
+            else
+                u(fine_index)=T();
+            
+            // update residual if no nullspace component.
+            // (we'll update it in a separate loop otherwise
+            if(!nullspace_component){
+                delta(fine_index)=0;
+                if(index_is_interior_coarse_bitmask(coarse_index) & mask){
+                    delta(fine_index) = one_third*b(fine_index);
+                    for(int v=0;v<d;v++)
+                        delta(fine_index)+=two_thirds_over_diagonal_part*(b(fine_index+T_INDEX::Axis_Vector(v))
+                            +b(fine_index-T_INDEX::Axis_Vector(v)));
+                }
+            }
+            mask<<=1;
+        }
     }
-		
+                
     if(nullspace_component)
-	for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
-	    const T_INDEX& coarse_index=coarse_iterator.Index();
-	    const T_INDEX base_fine_index=(coarse_index-1)*2;
-	
-	    unsigned char mask=0x01;
-	    for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
-		const T_INDEX& fine_index=fine_iterator.Index();
+        for(BOX_ITERATOR<d> coarse_iterator(unpadded_coarse_domain);coarse_iterator.Valid();coarse_iterator.Next()){
+            const T_INDEX& coarse_index=coarse_iterator.Index();
+            const T_INDEX base_fine_index=(coarse_index-1)*2;
+        
+            unsigned char mask=0x01;
+            for(BOX_ITERATOR<d> fine_iterator(RANGE<T_INDEX>(base_fine_index,base_fine_index+1));fine_iterator.Valid();fine_iterator.Next()){
+                const T_INDEX& fine_index=fine_iterator.Index();
 
-	    	delta(fine_index)=0;
-		if(index_is_interior_coarse_bitmask(coarse_index) & mask){
-		    delta(fine_index) = one_third*b(fine_index);
-		    for(int v=0;v<d;v++)
-			delta(fine_index)+=two_thirds_over_diagonal_part*(b(fine_index+T_INDEX::Axis_Vector(v))
-			    +b(fine_index-T_INDEX::Axis_Vector(v)));
-		}
-		mask<<=1;
-	    }
-	}
+                    delta(fine_index)=0;
+                if(index_is_interior_coarse_bitmask(coarse_index) & mask){
+                    delta(fine_index) = one_third*b(fine_index);
+                    for(int v=0;v<d;v++)
+                        delta(fine_index)+=two_thirds_over_diagonal_part*(b(fine_index+T_INDEX::Axis_Vector(v))
+                            +b(fine_index-T_INDEX::Axis_Vector(v)));
+                }
+                mask<<=1;
+            }
+        }
 #endif
 
     Boundary_Relaxation(true,boundary_post_relaxations);
@@ -740,15 +740,15 @@ Compute_Residuals_Boundary()
     residual_helper.Run_Parallel(number_of_threads);
 #else
     for(int i=0;i<extended_boundary_indices.m;i++){
-	const T_INDEX& index=extended_boundary_indices(i);
-	if(diagonal_entries(index)!=0){
-	    delta(index)=b(index)-diagonal_entries(index)*u(index);
-	    for(int v=0;v<d;v++)
-		delta(index)-=u(index+T_INDEX::Axis_Vector(v))
-		    +u(index-T_INDEX::Axis_Vector(v));
-	}
-	else
-	    delta(index)=0;
+        const T_INDEX& index=extended_boundary_indices(i);
+        if(diagonal_entries(index)!=0){
+            delta(index)=b(index)-diagonal_entries(index)*u(index);
+            for(int v=0;v<d;v++)
+                delta(index)-=u(index+T_INDEX::Axis_Vector(v))
+                    +u(index-T_INDEX::Axis_Vector(v));
+        }
+        else
+            delta(index)=0;
     }
 
 #endif
@@ -761,10 +761,10 @@ template<class T,int d> void MULTIGRID_POISSON<T,d>::
 Initialize_Square_Domain()
 {
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next())
-	cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
+        cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
 
     for(BOUNDARY_ITERATOR<d> iterator(padded_domain);iterator.Valid();iterator.Next())
-	cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
+        cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
 }
 template<class T,int d> void MULTIGRID_POISSON<T,d>::
 Initialize_Square_Minus_Circle_Domain()
@@ -777,11 +777,11 @@ Initialize_Square_Minus_Circle_Domain()
     T radius_squared=radius*radius;
 
     for(BOUNDARY_ITERATOR<d> iterator(padded_domain);iterator.Valid();iterator.Next())
-	cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
+        cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
 
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	TV X=grid.Node(iterator.Index());
-	if((X-circle_center).Magnitude_Squared()<radius_squared)
+        TV X=grid.Node(iterator.Index());
+        if((X-circle_center).Magnitude_Squared()<radius_squared)
             cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
         else
             cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
@@ -794,12 +794,12 @@ Initialize_Test_Domain()
 
     // Sinusoidal dirichlet interface, with 2 Neumann bubbles
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	TV X=grid.Node(iterator.Index());
-	if((X-TV::All_Ones_Vector()*(T).25).Magnitude()<.125){
-	    cell_type(iterator.Index())=NEUMANN_CELL_TYPE;}
+        TV X=grid.Node(iterator.Index());
+        if((X-TV::All_Ones_Vector()*(T).25).Magnitude()<.125){
+            cell_type(iterator.Index())=NEUMANN_CELL_TYPE;}
         else if((X-TV::All_Ones_Vector()*(T).5).Magnitude()<.125){
-	    cell_type(iterator.Index())=NEUMANN_CELL_TYPE;}
-	else if(d==2 && (X(2)<.5+.25*sin((X(1))*2*pi)))
+            cell_type(iterator.Index())=NEUMANN_CELL_TYPE;}
+        else if(d==2 && (X(2)<.5+.25*sin((X(1))*2*pi)))
             cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
         else if(d==3 && (X(2)<.5+.25*sin((X(1)+X(3))*2*pi)))
             cell_type(iterator.Index())=INTERIOR_CELL_TYPE;
@@ -809,7 +809,7 @@ Initialize_Test_Domain()
 
 
     for(BOUNDARY_ITERATOR<d> iterator(padded_domain);iterator.Valid();iterator.Next())
-	cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
+        cell_type(iterator.Index())=NEUMANN_CELL_TYPE;
 }
 template<class T,int d> void MULTIGRID_POISSON<T,d>::
 Initialize_Test_Right_Hand_Side(ARRAY<T,TV_INT>& b_input)
@@ -820,13 +820,13 @@ Initialize_Test_Right_Hand_Side(ARRAY<T,TV_INT>& b_input)
     b_input(spike_index)=-.5;
 #else
     for(BOX_ITERATOR<d> iterator(unpadded_domain);iterator.Valid();iterator.Next()){
-	TV X=grid.Node(iterator.Index());
-	if(cell_type(iterator.Index())==INTERIOR_CELL_TYPE){
-	    if(d==2)
-		b_input(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi);
-	    else if(d==3)
-		b_input(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
-	}
+        TV X=grid.Node(iterator.Index());
+        if(cell_type(iterator.Index())==INTERIOR_CELL_TYPE){
+            if(d==2)
+                b_input(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi);
+            else if(d==3)
+                b_input(iterator.Index())=sin(X(1)*2*pi)*cos(X(2)*2*pi)*sin(X(3)*2*pi);
+        }
     }
 #endif
 

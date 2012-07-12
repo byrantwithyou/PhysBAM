@@ -122,35 +122,35 @@ Apply_Delta_X_Range(const int xmin,const int xmax,const int partition_number)
             if(bit_writemask[coarse_index] & 0x01){
                 u[index]+=two_thirds*delta[index];
                 u[index]+=minus_one_ninth*b[index];}
-	    local_u_dot_b+=u[index]*b[index];
+            local_u_dot_b+=u[index]*b[index];
             if(bit_writemask[coarse_index] & 0x02){
                 u[index+z_shift]+=two_thirds*delta[index+z_shift];
                 u[index+z_shift]+=minus_one_ninth*b[index+z_shift];}
-	    local_u_dot_b+=u[index+z_shift]*b[index+z_shift];
+            local_u_dot_b+=u[index+z_shift]*b[index+z_shift];
             if(bit_writemask[coarse_index] & 0x04){
                 u[index+y_shift]+=two_thirds*delta[index+y_shift];
                 u[index+y_shift]+=minus_one_ninth*b[index+y_shift];}
-	    local_u_dot_b+=u[index+y_shift]*b[index+y_shift];
+            local_u_dot_b+=u[index+y_shift]*b[index+y_shift];
             if(bit_writemask[coarse_index] & 0x08){
                 u[index+y_shift+z_shift]+=two_thirds*delta[index+y_shift+z_shift];
                 u[index+y_shift+z_shift]+=minus_one_ninth*b[index+y_shift+z_shift];}
-	    local_u_dot_b+=u[index+y_shift+z_shift]*b[index+y_shift+z_shift];
+            local_u_dot_b+=u[index+y_shift+z_shift]*b[index+y_shift+z_shift];
             if(bit_writemask[coarse_index] & 0x10){
                 u[index+x_shift]+=two_thirds*delta[index+x_shift];
                 u[index+x_shift]+=minus_one_ninth*b[index+x_shift];}
-	    local_u_dot_b+=u[index+x_shift]*b[index+x_shift];
+            local_u_dot_b+=u[index+x_shift]*b[index+x_shift];
             if(bit_writemask[coarse_index] & 0x20){
                 u[index+x_shift+z_shift]+=two_thirds*delta[index+x_shift+z_shift];
                 u[index+x_shift+z_shift]+=minus_one_ninth*b[index+x_shift+z_shift];}
-	    local_u_dot_b+=u[index+x_shift+z_shift]*b[index+x_shift+z_shift];
+            local_u_dot_b+=u[index+x_shift+z_shift]*b[index+x_shift+z_shift];
             if(bit_writemask[coarse_index] & 0x40){
                 u[index+x_shift+y_shift]+=two_thirds*delta[index+x_shift+y_shift];
                 u[index+x_shift+y_shift]+=minus_one_ninth*b[index+x_shift+y_shift];}
-	    local_u_dot_b+=u[index+x_shift+y_shift]*b[index+x_shift+y_shift];
+            local_u_dot_b+=u[index+x_shift+y_shift]*b[index+x_shift+y_shift];
             if(bit_writemask[coarse_index] & 0x80){
                 u[index+x_shift+y_shift+z_shift]+=two_thirds*delta[index+x_shift+y_shift+z_shift];
                 u[index+x_shift+y_shift+z_shift]+=minus_one_ninth*b[index+x_shift+y_shift+z_shift];}
-	    local_u_dot_b+=u[index+x_shift+y_shift+z_shift]*b[index+x_shift+y_shift+z_shift];
+            local_u_dot_b+=u[index+x_shift+y_shift+z_shift]*b[index+x_shift+y_shift+z_shift];
         }
 
     u_dot_b_partial_results[partition_number]=local_u_dot_b;

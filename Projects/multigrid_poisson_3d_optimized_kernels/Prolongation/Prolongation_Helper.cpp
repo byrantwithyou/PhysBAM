@@ -76,7 +76,7 @@ Run_X_Range(const int xmin,const int xmax)
                 +twenty_seven_over_sixty_four*(
                     u_coarse[coarse_index]);
 
-	    u[index+z_plus_one_shift]+=
+            u[index+z_plus_one_shift]+=
                 one_over_sixty_four*(
                     u_coarse[coarse_index+coarse_x_minus_one_coarse_y_minus_one_coarse_z_plus_one_shift])
                 +three_over_sixty_four*(
@@ -174,9 +174,9 @@ Run_X_Range(const int xmin,const int xmax)
                 +twenty_seven_over_sixty_four*(
                     u_coarse[coarse_index]);
 
-	    if(!(bit_writemask[coarse_index]&0x01))
-		u[index]=T();
-	    if(!(bit_writemask[coarse_index] & 0x02))            
+            if(!(bit_writemask[coarse_index]&0x01))
+                u[index]=T();
+            if(!(bit_writemask[coarse_index] & 0x02))            
                 u[index+z_shift]=T();
             if(!(bit_writemask[coarse_index] & 0x04))
                 u[index+y_shift]=T();

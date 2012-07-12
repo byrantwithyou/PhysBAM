@@ -31,7 +31,7 @@ private:
 public:
 
     MULTIGRID_POISSON_SOLVER()
-	:number_of_threads(1),n(0),h(0),levels(0)
+        :number_of_threads(1),n(0),h(0),levels(0)
     {}
 
 
@@ -57,13 +57,13 @@ public:
 
     void Reinitialize_Multigrid_Hierarchy()
     { 
-	discretizations(0)->Reinitialize();
-	refinements.Delete_Pointers_And_Clean_Memory();
+        discretizations(0)->Reinitialize();
+        refinements.Delete_Pointers_And_Clean_Memory();
         refinements.Resize(levels-1);
-	   for(int level=1;level<levels;level++){
-	       delete discretizations(level+1);
-	       discretizations(level+1)=MULTIGRID_POISSON_REFINEMENT<T,d>::Coarsened_Discretization(*discretizations(level));
-	       refinements(level)=new MULTIGRID_POISSON_REFINEMENT<T,d>(*discretizations(level),*discretizations(level+1));}
+           for(int level=1;level<levels;level++){
+               delete discretizations(level+1);
+               discretizations(level+1)=MULTIGRID_POISSON_REFINEMENT<T,d>::Coarsened_Discretization(*discretizations(level));
+               refinements(level)=new MULTIGRID_POISSON_REFINEMENT<T,d>(*discretizations(level),*discretizations(level+1));}
     }
 
     T_CELL_TYPE& Cell_Type(const T_INDEX& index)
@@ -80,8 +80,8 @@ public:
 
     MULTIGRID_POISSON<T,d>& Discretization() const
     {
-	assert(discretizations.Size());
-	return *discretizations(0);}
+        assert(discretizations.Size());
+        return *discretizations(0);}
 
 
     MULTIGRID_POISSON_REFINEMENT<T,d>& Refinement() const
@@ -89,10 +89,10 @@ public:
     
     T V_Cycle(const T nullspace_component)
     {
-	T dot_product=T();
+        T dot_product=T();
 
-	int min_boundary_sweeps=2;
-	int max_boundary_sweeps=min(16,min_boundary_sweeps<<(levels-2));
+        int min_boundary_sweeps=2;
+        int max_boundary_sweeps=min(16,min_boundary_sweeps<<(levels-2));
         int boundary_sweeps_at_coarsest_level=2;
 
         PHYSBAM_ASSERT(levels>=1); // Needed for the removal of nullspace component
@@ -102,10 +102,10 @@ public:
             int boundary_sweeps=min(max_boundary_sweeps,min_boundary_sweeps<<(level-1));
 
             T nullspace_component_at_this_level=(level==1)?nullspace_component:0;
-	    discretizations(level)->Relax_And_Compute_Residuals(1,boundary_sweeps,nullspace_component_at_this_level);
-	    refinements(level)->Transfer_Residual_To_Coarse_Grid();
+            discretizations(level)->Relax_And_Compute_Residuals(1,boundary_sweeps,nullspace_component_at_this_level);
+            refinements(level)->Transfer_Residual_To_Coarse_Grid();
   
-	}}
+        }}
             
         {//LOG::SCOPE scope("V-cycle bottom","V-cycle bottom");
         discretizations(levels)->u.Fill(0);
@@ -120,9 +120,9 @@ public:
         for(int level=levels-1;level>=1;level--){
             refinements(level)->Transfer_Correction_To_Fine_Grid();
             int boundary_sweeps=min(max_boundary_sweeps,min_boundary_sweeps<<(level-1));
-	    dot_product=discretizations(level)->Relaxation_Sweep(false,boundary_sweeps,1,0,level==1);	}}
+            dot_product=discretizations(level)->Relaxation_Sweep(false,boundary_sweeps,1,0,level==1);        }}
 
-	return dot_product;
+        return dot_product;
     }
 
 //#####################################################################

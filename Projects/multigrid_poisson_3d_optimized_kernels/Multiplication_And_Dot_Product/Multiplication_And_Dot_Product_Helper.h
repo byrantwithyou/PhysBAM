@@ -19,7 +19,7 @@ protected:
 
 public:
     explicit Multiplication_And_Dot_Product_Size_Specific_Helper_Base(const T* const u_input,T* const v_input,const T* const diagonal_part_input,const T scale_factor_input)
-	:u(u_input),v(v_input),diagonal_part(diagonal_part_input),u_dot_v_partial_results(0),scale_factor(scale_factor_input)
+        :u(u_input),v(v_input),diagonal_part(diagonal_part_input),u_dot_v_partial_results(0),scale_factor(scale_factor_input)
     {}
     
     virtual ~Multiplication_And_Dot_Product_Size_Specific_Helper_Base() {}
@@ -73,7 +73,7 @@ class Multiplication_And_Dot_Product_Size_Specific_Helper:public Multiplication_
 public:
     explicit Multiplication_And_Dot_Product_Size_Specific_Helper(const int x_size_input,const T* const u_input,T* const v_input,const T* const diagonal_part_input,const T scale_factor_input=(T)1)
         :Base(u_input,v_input,diagonal_part_input,scale_factor_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
     {}
     
     double Run()
@@ -87,13 +87,13 @@ public:
 
     static void Allocate_Data(T*& x,T*& y,T*& diagonal_part)
     {
-	int padded_length=padded_y_size*padded_y_size*padded_z_size;
-	x=new T[padded_length];y=new T[padded_length];diagonal_part=new T[padded_length];}
+        int padded_length=padded_y_size*padded_y_size*padded_z_size;
+        x=new T[padded_length];y=new T[padded_length];diagonal_part=new T[padded_length];}
 
     static void Initialize_Data(T* const x,T* const y,T* const diagonal_part)
     {
-	int padded_length=padded_y_size*padded_y_size*padded_z_size;
-	for(int i=0;i<padded_length;i++) x[i]=y[i]=diagonal_part[i]=(T)i;}
+        int padded_length=padded_y_size*padded_y_size*padded_z_size;
+        for(int i=0;i<padded_length;i++) x[i]=y[i]=diagonal_part[i]=(T)i;}
 
 //#####################################################################
     double Run_Parallel(const int number_of_partitions);

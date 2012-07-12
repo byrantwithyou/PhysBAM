@@ -36,8 +36,8 @@ Run_Parallel(const int number_of_partitions)
         int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition+1)+std::min(number_of_x_blocks%number_of_partitions,partition+1);
         int xmin=(first_block_of_partition-1)*x_block_size+1;
         int xmax=last_block_of_partition*x_block_size;
-	Reduce_Maxabs_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Reduce_Maxabs_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax,partition);
-	pthread_queue->Queue(task);}
+        Reduce_Maxabs_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Reduce_Maxabs_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax,partition);
+        pthread_queue->Queue(task);}
     pthread_queue->Wait();
 
     T maxabs=T();
@@ -61,8 +61,8 @@ Run_X_Range(const int xmin,const int xmax,const int partition_number)
         for(int k=block_k;k<block_k+z_block_size;k++)
         {    
             int index=i*x_shift+j*y_shift+k*z_shift;
-	    local_maxabs=std::max(local_maxabs,u[index]<0?-u[index]:u[index]);
-	}
+            local_maxabs=std::max(local_maxabs,u[index]<0?-u[index]:u[index]);
+        }
 
     maxabs_partial_results[partition_number]=local_maxabs;
 }

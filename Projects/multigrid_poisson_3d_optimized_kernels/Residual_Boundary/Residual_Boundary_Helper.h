@@ -19,7 +19,7 @@ protected:
 
 public:
     explicit Residual_Boundary_Size_Specific_Helper_Base(const T* const u_input,const T* const b_input,T* const r_input,const T* const diagonal_part_input,
-	const int* const boundary_index_input,const int number_of_indices_input)
+        const int* const boundary_index_input,const int number_of_indices_input)
         :u(u_input),b(b_input),r(r_input),diagonal_part(diagonal_part_input), boundary_index(boundary_index_input),number_of_indices(number_of_indices_input)
     {}
 
@@ -58,7 +58,7 @@ class Residual_Boundary_Size_Specific_Helper:public Residual_Boundary_Size_Speci
     enum WORKAROUND{
         padded_y_size=y_size+2,
         padded_z_size=z_size+2,
-	x_shift=padded_y_size*padded_z_size,
+        x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
         z_shift=1,
         x_plus_one_shift=x_shift,
@@ -71,9 +71,9 @@ class Residual_Boundary_Size_Specific_Helper:public Residual_Boundary_Size_Speci
 
 public:
     explicit Residual_Boundary_Size_Specific_Helper(const int x_size_input,const T* const u_input,const T* const b_input,T* const r_input,const T* const diagonal_part_input,
-	const int* const boundary_index_input,const int number_of_indices_input)
+        const int* const boundary_index_input,const int number_of_indices_input)
         :Base(u_input,b_input,r_input,diagonal_part_input,boundary_index_input,number_of_indices_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
     {}
 
     void Run()

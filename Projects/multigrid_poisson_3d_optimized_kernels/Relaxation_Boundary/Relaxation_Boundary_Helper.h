@@ -67,7 +67,7 @@ class Relaxation_Boundary_Size_Specific_Helper:public Relaxation_Boundary_Size_S
     enum WORKAROUND{
         padded_y_size=y_size+2,
         padded_z_size=z_size+2,
-	x_shift=padded_y_size*padded_z_size,
+        x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
         z_shift=1,
         x_plus_one_shift=x_shift,
@@ -80,16 +80,16 @@ class Relaxation_Boundary_Size_Specific_Helper:public Relaxation_Boundary_Size_S
 
 public:
     explicit Relaxation_Boundary_Size_Specific_Helper(const int x_size_input,T* const u_input,const T* const b_input,const T* const one_over_diagonal_part_input,
-	const int* const boundary_index_input,const int* const block_start_input,const int* const block_end_input,const int number_of_red_blocks_input,
+    const int* const boundary_index_input,const int* const block_start_input,const int* const block_end_input,const int number_of_red_blocks_input,
         const int number_of_black_blocks_input,const int loops_input,const bool reverse_order_input)
         :Base(u_input,b_input,one_over_diagonal_part_input,boundary_index_input,block_start_input,block_end_input,number_of_red_blocks_input,
             number_of_black_blocks_input,loops_input,reverse_order_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
     {}
 
     void Run()
     {
-	Run_Block_Range(0,number_of_red_blocks+number_of_black_blocks-1);
+        Run_Block_Range(0,number_of_red_blocks+number_of_black_blocks-1);
     }
 
     // For debugging purposes only

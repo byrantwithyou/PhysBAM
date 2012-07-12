@@ -11,10 +11,10 @@ extern PTHREAD_QUEUE* pthread_queue;
 // Constructor/Desctructor of non-size-specific class
 //#####################################################################
 CONSTRUCTOR_INSTANTIATION_HELPERX(Block_Counting,(const int x_size_input,const int y_size_input,const int z_size_input,const unsigned char* const is_boundary_bytemask,const unsigned char* const is_extended_boundary_bytemask,int* const boundary_nodes_in_block,int* const extended_boundary_nodes_in_block,
-	int& total_red_boundary_blocks_input,int& total_black_boundary_blocks_input,int& total_extended_boundary_blocks_input,
-	int& total_red_boundary_indices_input,int& total_black_boundary_indices_input,int& total_extended_boundary_indices_input),(x_size_input,is_boundary_bytemask,is_extended_boundary_bytemask,boundary_nodes_in_block,extended_boundary_nodes_in_block,
-	    total_red_boundary_blocks_input,total_black_boundary_blocks_input,total_extended_boundary_blocks_input,
-	    total_red_boundary_indices_input,total_black_boundary_indices_input,total_extended_boundary_indices_input))
+        int& total_red_boundary_blocks_input,int& total_black_boundary_blocks_input,int& total_extended_boundary_blocks_input,
+        int& total_red_boundary_indices_input,int& total_black_boundary_indices_input,int& total_extended_boundary_indices_input),(x_size_input,is_boundary_bytemask,is_extended_boundary_bytemask,boundary_nodes_in_block,extended_boundary_nodes_in_block,
+            total_red_boundary_blocks_input,total_black_boundary_blocks_input,total_extended_boundary_blocks_input,
+            total_red_boundary_indices_input,total_black_boundary_indices_input,total_extended_boundary_indices_input))
 //#####################################################################
 // Function Run_Parallel
 //#####################################################################
@@ -60,14 +60,14 @@ Run_Parallel(const int number_of_partitions)
     total_black_boundary_indices=0;
     total_extended_boundary_indices=0;
     for(int partition=0;partition<number_of_partitions;partition++){
-	total_red_boundary_blocks += red_boundary_blocks_partial_results[partition];
-	total_black_boundary_blocks += black_boundary_blocks_partial_results[partition];
-	total_extended_boundary_blocks+=extended_boundary_blocks_partial_results[partition];
-	total_red_boundary_indices+=red_boundary_indices_partial_results[partition];
-	total_black_boundary_indices+=black_boundary_indices_partial_results[partition];
-	total_extended_boundary_indices+=extended_boundary_indices_partial_results[partition];
+        total_red_boundary_blocks += red_boundary_blocks_partial_results[partition];
+        total_black_boundary_blocks += black_boundary_blocks_partial_results[partition];
+        total_extended_boundary_blocks+=extended_boundary_blocks_partial_results[partition];
+        total_red_boundary_indices+=red_boundary_indices_partial_results[partition];
+        total_black_boundary_indices+=black_boundary_indices_partial_results[partition];
+        total_extended_boundary_indices+=extended_boundary_indices_partial_results[partition];
     }
-	
+        
     delete[] red_boundary_blocks_partial_results; red_boundary_blocks_partial_results=0;
     delete[] black_boundary_blocks_partial_results; black_boundary_blocks_partial_results=0;
     delete[] extended_boundary_blocks_partial_results; extended_boundary_blocks_partial_results=0;
@@ -92,11 +92,11 @@ Run_X_Range(const int xmin,const int xmax,const int partition)
         int bk=(block_k-1)/z_block_size;
         
         int block_index=(bi*number_of_y_blocks+bj)*number_of_z_blocks+bk;
-	int block_color=(bi+bj+bk)%2;
+        int block_color=(bi+bj+bk)%2;
             
         boundary_nodes_in_block[block_index]=0;
-	extended_boundary_nodes_in_block[block_index]=0;
-	
+        extended_boundary_nodes_in_block[block_index]=0;
+        
 
         for(int i=block_i;i<block_i+x_block_size;i++)
         for(int j=block_j;j<block_j+y_block_size;j++)
@@ -107,17 +107,17 @@ Run_X_Range(const int xmin,const int xmax,const int partition)
             if(is_extended_boundary_bytemask[index]) extended_boundary_nodes_in_block[block_index]++;
         }
 
-	local_ebb+=extended_boundary_nodes_in_block[block_index]?1:0;
-	local_ebi+=extended_boundary_nodes_in_block[block_index];
+        local_ebb+=extended_boundary_nodes_in_block[block_index]?1:0;
+        local_ebi+=extended_boundary_nodes_in_block[block_index];
 
-	if(block_color){
-	    local_bbb+=boundary_nodes_in_block[block_index]?1:0;
-	    local_bbi+=boundary_nodes_in_block[block_index];
-	}else{	    
-	    local_rbb+=boundary_nodes_in_block[block_index]?1:0;
-	    local_rbi+=boundary_nodes_in_block[block_index];
-	}
-	
+        if(block_color){
+            local_bbb+=boundary_nodes_in_block[block_index]?1:0;
+            local_bbi+=boundary_nodes_in_block[block_index];
+        }else{            
+            local_rbb+=boundary_nodes_in_block[block_index]?1:0;
+            local_rbi+=boundary_nodes_in_block[block_index];
+        }
+        
     }
     red_boundary_blocks_partial_results[partition]=local_rbb;
     black_boundary_blocks_partial_results[partition]=local_bbb;

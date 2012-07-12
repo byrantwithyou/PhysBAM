@@ -16,7 +16,7 @@ protected:
 
 public:
     explicit Coarsened_Discretization_Size_Specific_Helper_Base(const unsigned char* const fine_cell_type_input, unsigned char* const coarse_cell_type_input)
-	: fine_cell_type(fine_cell_type_input),coarse_cell_type(coarse_cell_type_input)
+        : fine_cell_type(fine_cell_type_input),coarse_cell_type(coarse_cell_type_input)
     {}
 
     virtual ~Coarsened_Discretization_Size_Specific_Helper_Base() {}
@@ -52,9 +52,9 @@ class Coarsened_Discretization_Size_Specific_Helper:public Coarsened_Discretizat
     const int coarse_x_size,coarse_padded_x_size;
     
     enum WORKAROUND{
-	INTERIOR_CELL_TYPE=1,
-	DIRICHLET_CELL_TYPE=2,
-	NEUMANN_CELL_TYPE=3,
+        INTERIOR_CELL_TYPE=1,
+        DIRICHLET_CELL_TYPE=2,
+        NEUMANN_CELL_TYPE=3,
         x_block_size=4,
         y_block_size=4,
         z_block_size=4,
@@ -64,7 +64,7 @@ class Coarsened_Discretization_Size_Specific_Helper:public Coarsened_Discretizat
         coarse_z_size=z_size/2,
         coarse_padded_y_size=coarse_y_size+2,
         coarse_padded_z_size=coarse_z_size+2,
-	x_shift=padded_y_size*padded_z_size,
+        x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
         z_shift=1,
         coarse_x_shift=coarse_padded_y_size*coarse_padded_z_size,
@@ -82,8 +82,8 @@ class Coarsened_Discretization_Size_Specific_Helper:public Coarsened_Discretizat
 public:
     explicit Coarsened_Discretization_Size_Specific_Helper(const int x_size_input,const unsigned char* const fine_cell_type_input, unsigned char* const coarse_cell_type_input)
         :Base(fine_cell_type_input,coarse_cell_type_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
-	,coarse_x_size(x_size/2),coarse_padded_x_size(coarse_x_size+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,coarse_x_size(x_size/2),coarse_padded_x_size(coarse_x_size+2)
     {}
 
     void Run()

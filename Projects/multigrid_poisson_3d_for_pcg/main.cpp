@@ -24,14 +24,14 @@ int main(int argc,char* argv[])
     static const int d=3;
 
     if(argc<3 || argc >4){
-	std::cout<<"Usage: "<<argv[0]<<" <test_number> <number_of_threads> <resolution>(optional)"<<std::endl; return 1;
+        std::cout<<"Usage: "<<argv[0]<<" <test_number> <number_of_threads> <resolution>(optional)"<<std::endl; return 1;
     }
 
     const int test_number=atoi(argv[1]);
     const int number_of_threads=atoi(argv[2]);
     int resolution =256;
     if(argc==4)
-	resolution=atoi(argv[3]);
+        resolution=atoi(argv[3]);
 
 
     pthread_queue=new PhysBAM::PTHREAD_QUEUE(number_of_threads);

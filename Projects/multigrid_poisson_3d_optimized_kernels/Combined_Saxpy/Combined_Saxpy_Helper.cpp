@@ -35,8 +35,8 @@ Run_Parallel(const int number_of_partitions)
         int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition+1)+std::min(number_of_x_blocks%number_of_partitions,partition+1);
         int xmin=(first_block_of_partition-1)*x_block_size+1;
         int xmax=last_block_of_partition*x_block_size;
-	Combined_Saxpy_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Combined_Saxpy_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
-	pthread_queue->Queue(task);}
+        Combined_Saxpy_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Combined_Saxpy_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
+        pthread_queue->Queue(task);}
     pthread_queue->Wait();    
 }
 //#####################################################################
@@ -56,7 +56,7 @@ Run_X_Range(const int xmin,const int xmax)
             int index=i*x_shift+j*y_shift+k*z_shift;
             x[index]+=alpha*p[index];
             p[index]=z[index]+beta*p[index];
-	}
+        }
 }
 //#####################################################################
 template class Combined_Saxpy_Helper<float>;

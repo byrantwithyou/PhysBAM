@@ -26,33 +26,33 @@ Transfer_Residual_To_Coarse_Grid()
     RANGE<T_INDEX> restriction_indices(-T_INDEX::All_Ones_Vector(),2*T_INDEX::All_Ones_Vector());
     ARRAY<T,T_INDEX> restriction_stencil(restriction_indices);
     for(BOX_ITERATOR<d> iterator(restriction_indices);iterator.Valid();iterator.Next()){
-	const T_INDEX& offset_index=iterator.Index();
- 	T scale=(T)1/(1<<(d-2));
-	for(int v=0;v<d;v++)
-	    switch(offset_index(v)){
-		case -1:
-		case 2:
-		    scale*=.25;
-		    break;
-		case 0:
-		case 1:
-		    scale*=.75;
-		    break;
-	    }
-	restriction_stencil(offset_index)=scale;
+        const T_INDEX& offset_index=iterator.Index();
+         T scale=(T)1/(1<<(d-2));
+        for(int v=0;v<d;v++)
+            switch(offset_index(v)){
+                case -1:
+                case 2:
+                    scale*=.25;
+                    break;
+                case 0:
+                case 1:
+                    scale*=.75;
+                    break;
+            }
+        restriction_stencil(offset_index)=scale;
     }
 
 
     for(BOX_ITERATOR<d> iterator(coarse.unpadded_domain);iterator.Valid();iterator.Next()){
-	const T_INDEX& coarse_index=iterator.Index();
-	T_INDEX base_fine_index=(coarse_index-1)*2;
-	coarse.b(coarse_index)=0;
-	if(coarse.cell_type(coarse_index)!=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE)
-	    continue;
-	for(BOX_ITERATOR<d> local_iterator(restriction_indices);local_iterator.Valid();local_iterator.Next()){
-	    const T_INDEX& offset_index=local_iterator.Index();
-	    coarse.b(coarse_index)+=restriction_stencil(offset_index)*fine.delta(base_fine_index+offset_index);
-	}
+        const T_INDEX& coarse_index=iterator.Index();
+        T_INDEX base_fine_index=(coarse_index-1)*2;
+        coarse.b(coarse_index)=0;
+        if(coarse.cell_type(coarse_index)!=MULTIGRID_POISSON<T,d>::INTERIOR_CELL_TYPE)
+            continue;
+        for(BOX_ITERATOR<d> local_iterator(restriction_indices);local_iterator.Valid();local_iterator.Next()){
+            const T_INDEX& offset_index=local_iterator.Index();
+            coarse.b(coarse_index)+=restriction_stencil(offset_index)*fine.delta(base_fine_index+offset_index);
+        }
     }
 #endif    
 }
@@ -70,43 +70,43 @@ Transfer_Correction_To_Fine_Grid()
     RANGE<T_INDEX> prolongation_indices(-T_INDEX::All_Ones_Vector(),T_INDEX::All_Ones_Vector());
     ARRAY<T,T_INDEX> prolongation_stencil(prolongation_indices);
     for(BOX_ITERATOR<d> iterator(prolongation_indices);iterator.Valid();iterator.Next()){
-	const T_INDEX& offset_index=iterator.Index();
-	T scale=(T)1;
-	for(int v=0;v<d;v++)
-	    switch(offset_index(v)){
-		case -1:
-		case 1:
-		    scale*=.25;
-		    break;
-		case 0:
-		    scale*=.75;
-		    break;
-	    }
-	prolongation_stencil(offset_index)=scale;
+        const T_INDEX& offset_index=iterator.Index();
+        T scale=(T)1;
+        for(int v=0;v<d;v++)
+            switch(offset_index(v)){
+                case -1:
+                case 1:
+                    scale*=.25;
+                    break;
+                case 0:
+                    scale*=.75;
+                    break;
+            }
+        prolongation_stencil(offset_index)=scale;
     }
 
     for(BOX_ITERATOR<d> coarse_iterator(coarse.unpadded_domain);coarse_iterator.Valid();coarse_iterator.Next()){
-	const T_INDEX& coarse_index=coarse_iterator.Index();
-	T_INDEX base_fine_index=(coarse_index-1)*2;
-	unsigned char mask=0x01;
-	for(BOX_ITERATOR<d> fine_offset_iterator(RANGE<T_INDEX>(T_INDEX(),T_INDEX::All_Ones_Vector()));fine_offset_iterator.Valid();fine_offset_iterator.Next()){
-	    const T_INDEX& fine_offset=fine_offset_iterator.Index();
-	    if(!(fine.index_is_interior_coarse_bitmask(coarse_index) & mask)){
-		fine.u(base_fine_index+fine_offset)=0;
-		mask<<=1;
-		continue;
-	    }
-	    
-	    for(BOX_ITERATOR<d> coarse_offset_iterator(RANGE<T_INDEX>(fine_offset-1,fine_offset));coarse_offset_iterator.Valid();coarse_offset_iterator.Next()){
-		const T_INDEX& coarse_offset=coarse_offset_iterator.Index();
-		
-		fine.u(base_fine_index+fine_offset)+=prolongation_stencil(coarse_offset)*coarse.u(coarse_index+coarse_offset);
-	    }
+        const T_INDEX& coarse_index=coarse_iterator.Index();
+        T_INDEX base_fine_index=(coarse_index-1)*2;
+        unsigned char mask=0x01;
+        for(BOX_ITERATOR<d> fine_offset_iterator(RANGE<T_INDEX>(T_INDEX(),T_INDEX::All_Ones_Vector()));fine_offset_iterator.Valid();fine_offset_iterator.Next()){
+            const T_INDEX& fine_offset=fine_offset_iterator.Index();
+            if(!(fine.index_is_interior_coarse_bitmask(coarse_index) & mask)){
+                fine.u(base_fine_index+fine_offset)=0;
+                mask<<=1;
+                continue;
+            }
+            
+            for(BOX_ITERATOR<d> coarse_offset_iterator(RANGE<T_INDEX>(fine_offset-1,fine_offset));coarse_offset_iterator.Valid();coarse_offset_iterator.Next()){
+                const T_INDEX& coarse_offset=coarse_offset_iterator.Index();
+                
+                fine.u(base_fine_index+fine_offset)+=prolongation_stencil(coarse_offset)*coarse.u(coarse_index+coarse_offset);
+            }
 
-	    mask<<=1;
-	}
+            mask<<=1;
+        }
     }
-	
+        
 #endif
 }
 

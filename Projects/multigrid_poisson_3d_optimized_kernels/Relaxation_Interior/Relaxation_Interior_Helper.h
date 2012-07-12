@@ -65,7 +65,7 @@ class Relaxation_Interior_Size_Specific_Helper:public Relaxation_Interior_Size_S
         coarse_z_size=z_size/2,
         coarse_padded_y_size=coarse_y_size+2,
         coarse_padded_z_size=coarse_z_size+2,
-	x_shift=padded_y_size*padded_z_size,
+        x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
         z_shift=1,
         coarse_x_shift=coarse_padded_y_size*coarse_padded_z_size,
@@ -107,8 +107,8 @@ class Relaxation_Interior_Size_Specific_Helper:public Relaxation_Interior_Size_S
 public:
     explicit Relaxation_Interior_Size_Specific_Helper(const int x_size_input,T* const u_input,const T* const b_input,T* const delta_input,const unsigned char* const bit_writemask_input)
         :Base(u_input,b_input,delta_input,bit_writemask_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2)
-	,coarse_x_size(x_size/2),coarse_padded_x_size(coarse_x_size+2)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2)
+        ,coarse_x_size(x_size/2),coarse_padded_x_size(coarse_x_size+2)
     {}
 
     void Run()

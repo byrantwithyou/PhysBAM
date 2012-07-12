@@ -126,7 +126,7 @@ Run_X_Range(const int xmin,const int xmax)
                 +r[index+x_plus_one_y_plus_one_shift]
                 +r[index+x_plus_one_y_plus_one_z_plus_one_shift]);
 
-	    b_coarse[coarse_index]*=(T)0.0078125;
+            b_coarse[coarse_index]*=(T)0.0078125;
 
             if(cell_type_coarse[coarse_index]!=INTERIOR_CELL_TYPE) b_coarse[coarse_index]=T();
         }

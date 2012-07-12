@@ -82,56 +82,56 @@ class BOUNDARY_ITERATOR
     bool valid;
 public:
     BOUNDARY_ITERATOR(const RANGE<TV_INT>& box_input,int side=0)
-	:box(box_input),side(side)
+        :box(box_input),side(side)
     {
-	assert(side<2*d);
-	TV_INT min_corner=box.min_corner+1;
-	TV_INT max_corner=box.max_corner-1;
-	for(int v=0;v<d;v++){
-	    min_corner(v)=box.min_corner(v);
-	    max_corner(v)=box.min_corner(v);
-	    regions[v*2]=RANGE<TV_INT>(min_corner,max_corner);
-	    min_corner(v)=box.max_corner(v);
-	    max_corner(v)=box.max_corner(v);
-	    regions[v*2+1]=RANGE<TV_INT>(min_corner,max_corner);
-	    min_corner(v)=box.min_corner(v);
-	}
-	if(side)
-	    Reset(side-1);
-	else
-	    Reset();
-    }	
+        assert(side<2*d);
+        TV_INT min_corner=box.min_corner+1;
+        TV_INT max_corner=box.max_corner-1;
+        for(int v=0;v<d;v++){
+            min_corner(v)=box.min_corner(v);
+            max_corner(v)=box.min_corner(v);
+            regions[v*2]=RANGE<TV_INT>(min_corner,max_corner);
+            min_corner(v)=box.max_corner(v);
+            max_corner(v)=box.max_corner(v);
+            regions[v*2+1]=RANGE<TV_INT>(min_corner,max_corner);
+            min_corner(v)=box.min_corner(v);
+        }
+        if(side)
+            Reset(side-1);
+        else
+            Reset();
+    }        
     
     void Reset(const int region_index=0)
     {
-	valid=side?region_index<side:(region_index<2*d);
-	if(valid){
-	    current_region=region_index;
-	    index=regions[current_region].min_corner;
-	}
+        valid=side?region_index<side:(region_index<2*d);
+        if(valid){
+            current_region=region_index;
+            index=regions[current_region].min_corner;
+        }
     }
 
     bool Valid() const
     {
-	return valid;
+        return valid;
     }
 
     void Next()
     {
-	if(!valid) return;
-	for(int i=d-1;i>=0;i--){
-	    if(index(i)<regions[current_region].max_corner(i)){
-		index(i)++; return;
-	    }
-	    else
-		index(i)=regions[current_region].min_corner(i);
-	}
-	Reset(current_region+1);
+        if(!valid) return;
+        for(int i=d-1;i>=0;i--){
+            if(index(i)<regions[current_region].max_corner(i)){
+                index(i)++; return;
+            }
+            else
+                index(i)=regions[current_region].min_corner(i);
+        }
+        Reset(current_region+1);
     }
-	
+        
     const TV_INT&  Index()
     {return index;}
-	
+        
 
 };
 

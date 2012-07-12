@@ -26,14 +26,14 @@ protected:
 public:
     explicit Block_Enumeration_Size_Specific_Helper_Base(const unsigned char* const is_boundary_bytemask_input,
         const unsigned char* const is_extended_boundary_bytemask_input,const int* const boundary_nodes_in_block_input,const int* const extended_boundary_nodes_in_block_input,
-	int* const red_boundary_block_start_input,int* const red_boundary_block_end_input,int* const black_boundary_block_start_input,int* const black_boundary_block_end_input,
-	int* const red_boundary_indices_input,int* const black_boundary_indices_input,const int red_indices_count_input,int* const extended_boundary_indices_input)
+        int* const red_boundary_block_start_input,int* const red_boundary_block_end_input,int* const black_boundary_block_start_input,int* const black_boundary_block_end_input,
+        int* const red_boundary_indices_input,int* const black_boundary_indices_input,const int red_indices_count_input,int* const extended_boundary_indices_input)
         :is_boundary_bytemask(is_boundary_bytemask_input),is_extended_boundary_bytemask(is_extended_boundary_bytemask_input),
         boundary_nodes_in_block(boundary_nodes_in_block_input),extended_boundary_nodes_in_block(extended_boundary_nodes_in_block_input),
-	red_boundary_block_start(red_boundary_block_start_input),red_boundary_block_end(red_boundary_block_end_input),
-	black_boundary_block_start(black_boundary_block_start_input),black_boundary_block_end(black_boundary_block_end_input),
-	red_boundary_indices(red_boundary_indices_input),black_boundary_indices(black_boundary_indices_input),
-	red_indices_count(red_indices_count_input),extended_boundary_indices(extended_boundary_indices_input)
+        red_boundary_block_start(red_boundary_block_start_input),red_boundary_block_end(red_boundary_block_end_input),
+        black_boundary_block_start(black_boundary_block_start_input),black_boundary_block_end(black_boundary_block_end_input),
+        red_boundary_indices(red_boundary_indices_input),black_boundary_indices(black_boundary_indices_input),
+        red_indices_count(red_indices_count_input),extended_boundary_indices(extended_boundary_indices_input)
     {}
 
     virtual ~Block_Enumeration_Size_Specific_Helper_Base() {}
@@ -57,8 +57,8 @@ public:
 //#####################################################################
     Block_Enumeration_Helper(const int x_size_input,const int y_size_input,const int z_size_input,const unsigned char* const is_boundary_bytemask_input,
         const unsigned char* const is_extended_boundary_bytemask_input,const int* const boundary_nodes_in_block_input,const int* const extended_boundary_nodes_in_block_input,
-	int* const red_boundary_block_start_input,int* const red_boundary_block_end_input,int* const black_boundary_block_start_input,int* const black_boundary_block_end_input,
-	int* const red_boundary_indices_input,int* const black_boundary_indices_input,const int red_indices_count_input,int* const extended_boundary_indices_input);
+        int* const red_boundary_block_start_input,int* const red_boundary_block_end_input,int* const black_boundary_block_start_input,int* const black_boundary_block_end_input,
+        int* const red_boundary_indices_input,int* const black_boundary_indices_input,const int red_indices_count_input,int* const extended_boundary_indices_input);
 //#####################################################################
 };
 
@@ -92,8 +92,8 @@ class Block_Enumeration_Size_Specific_Helper:public Block_Enumeration_Size_Speci
 
         padded_y_size=y_size+2,
         padded_z_size=z_size+2,
-	
-	x_shift=padded_y_size*padded_z_size,
+        
+        x_shift=padded_y_size*padded_z_size,
         y_shift=padded_z_size,
         z_shift=1,
     };
@@ -102,34 +102,34 @@ class Block_Enumeration_Size_Specific_Helper:public Block_Enumeration_Size_Speci
 public:
     explicit Block_Enumeration_Size_Specific_Helper(const int x_size_input,const unsigned char* const is_boundary_bytemask_input,
         const unsigned char* const is_extended_boundary_bytemask_input,const int* const boundary_nodes_in_block_input,const int* const extended_boundary_nodes_in_block_input,
-	int* const red_boundary_block_start_input,int* const red_boundary_block_end_input,int* const black_boundary_block_start_input,int* const black_boundary_block_end_input,
-	int* const red_boundary_indices_input,int* const black_boundary_indices_input,const int red_indices_count_input,int* const extended_boundary_indices_input)
+        int* const red_boundary_block_start_input,int* const red_boundary_block_end_input,int* const black_boundary_block_start_input,int* const black_boundary_block_end_input,
+        int* const red_boundary_indices_input,int* const black_boundary_indices_input,const int red_indices_count_input,int* const extended_boundary_indices_input)
         :Base(is_boundary_bytemask_input,is_extended_boundary_bytemask_input,boundary_nodes_in_block_input,extended_boundary_nodes_in_block_input,
-	     red_boundary_block_start_input, red_boundary_block_end_input, black_boundary_block_start_input, black_boundary_block_end_input,
-	    red_boundary_indices_input, black_boundary_indices_input, red_indices_count_input,extended_boundary_indices_input)
-	,x_size(x_size_input),padded_x_size(x_size_input+2),number_of_x_blocks(x_size_input/x_block_size)
+             red_boundary_block_start_input, red_boundary_block_end_input, black_boundary_block_start_input, black_boundary_block_end_input,
+            red_boundary_indices_input, black_boundary_indices_input, red_indices_count_input,extended_boundary_indices_input)
+        ,x_size(x_size_input),padded_x_size(x_size_input+2),number_of_x_blocks(x_size_input/x_block_size)
     {}
 
     void Run()
     {
-	Run_X_Range(1,x_size,0,0,0,0,0);
+        Run_X_Range(1,x_size,0,0,0,0,0);
     }
     
     // For debugging purposes only
 
 //     static void Allocate_Data(T*& u,T*& u_coarse,unsigned char*& bit_writemask)
 //     {
-// 	int padded_length = padded_y_size*padded_y_size*padded_z_size;
-// 	int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;u=new T[padded_length];
-// 	u_coarse=new T[coarse_padded_length];bit_writemask=new unsigned char[coarse_padded_length];}
+//         int padded_length = padded_y_size*padded_y_size*padded_z_size;
+//         int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;u=new T[padded_length];
+//         u_coarse=new T[coarse_padded_length];bit_writemask=new unsigned char[coarse_padded_length];}
 
 //     static void Initialize_Data(T* const u,T* const u_coarse,unsigned char* const bit_writemask)
 //     {
-// 	int padded_length = padded_y_size*padded_y_size*padded_z_size;
-// 	int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
-// 	for(int i=0;i<padded_length;i++) u[i]=(T)i;
-// 	for(int i=0;i<coarse_padded_length;i++) u_coarse[i]=(T)i;
-// 	for(int i=0;i<coarse_padded_length;i++) bit_writemask[i]=i%256;}
+//         int padded_length = padded_y_size*padded_y_size*padded_z_size;
+//         int coarse_padded_length=coarse_padded_y_size*coarse_padded_y_size*coarse_padded_z_size;
+//         for(int i=0;i<padded_length;i++) u[i]=(T)i;
+//         for(int i=0;i<coarse_padded_length;i++) u_coarse[i]=(T)i;
+//         for(int i=0;i<coarse_padded_length;i++) bit_writemask[i]=i%256;}
 
 //#####################################################################
     void Run_Parallel(const int number_of_partitions);

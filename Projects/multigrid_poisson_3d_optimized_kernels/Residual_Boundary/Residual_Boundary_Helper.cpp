@@ -33,10 +33,10 @@ Run_Parallel(const int number_of_partitions)
     if(x_size*y_size*z_size<=32*32*32) {Run();return;} // Run serially for small problems
 
     for(int partition=0;partition<number_of_partitions;partition++){
-	int first_index_of_partition=(number_of_indices/number_of_partitions)*(partition-1)+std::min(number_of_indices%number_of_partitions,partition-1);
-	int last_index_of_partition=(number_of_indices/number_of_partitions)*partition+std::min(number_of_indices%number_of_partitions,partition);
-	Residual_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Residual_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>(this,first_index_of_partition,last_index_of_partition);
-	pthread_queue->Queue(task);}
+        int first_index_of_partition=(number_of_indices/number_of_partitions)*(partition-1)+std::min(number_of_indices%number_of_partitions,partition-1);
+        int last_index_of_partition=(number_of_indices/number_of_partitions)*partition+std::min(number_of_indices%number_of_partitions,partition);
+        Residual_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Residual_Boundary_Size_Specific_Thread_Helper<T,y_size,z_size>(this,first_index_of_partition,last_index_of_partition);
+        pthread_queue->Queue(task);}
     pthread_queue->Wait();
 }
 //#####################################################################
@@ -46,17 +46,17 @@ template<class T,int y_size,int z_size> void Residual_Boundary_Size_Specific_Hel
 Run_Index_Range(const int first_index, const int last_index)
 {   
     for(int i=first_index;i<last_index;i++){
-	int index=boundary_index[i];
-	if(diagonal_part[index]!=0)
-	    r[index]=b[index]-diagonal_part[index]*u[index]
+        int index=boundary_index[i];
+        if(diagonal_part[index]!=0)
+            r[index]=b[index]-diagonal_part[index]*u[index]
                 -u[index+x_plus_one_shift]
                 -u[index+x_minus_one_shift]
                 -u[index+y_plus_one_shift]
                 -u[index+y_minus_one_shift]
                 -u[index+z_plus_one_shift]
                 -u[index+z_minus_one_shift];
-	else
-	    r[index]=T();}
+        else
+            r[index]=T();}
 }
 //#####################################################################
 template class Residual_Boundary_Helper<float>;

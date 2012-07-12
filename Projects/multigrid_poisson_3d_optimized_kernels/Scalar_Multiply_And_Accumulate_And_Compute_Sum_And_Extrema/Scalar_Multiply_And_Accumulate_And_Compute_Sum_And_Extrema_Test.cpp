@@ -50,7 +50,7 @@ int main(int argc,char *argv[]){
     while(1){
         // Running benchmark
         printf("Running benchmark");start_timer();
-	test.Run_Parallel(number_of_threads);
+        test.Run_Parallel(number_of_threads);
         
         stop_timer();printf(" [Seconds: %g]\n",get_time());
     }

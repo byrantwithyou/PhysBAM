@@ -38,14 +38,14 @@ Run_Parallel(const int number_of_partitions)
         int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition+1)+std::min(number_of_x_blocks%number_of_partitions,partition+1);
         int xmin=(first_block_of_partition-1)*x_block_size+1;
         int xmax=last_block_of_partition*x_block_size;
-	Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax,partition);
-	pthread_queue->Queue(task);}
+        Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Scalar_Multiply_And_Accumulate_And_Compute_Sum_And_Extrema_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax,partition);
+        pthread_queue->Queue(task);}
     pthread_queue->Wait();
     
     sum=0;minimum=std::numeric_limits<T>::max();maximum=-std::numeric_limits<T>::max();
     
     for(int i=0;i<number_of_partitions;i++){
-	sum+=sum_partial_results[i];
+        sum+=sum_partial_results[i];
         if(minimum_partial_results[i]<minimum) minimum=minimum_partial_results[i];
         if(maximum_partial_results[i]>maximum) maximum=maximum_partial_results[i];}
 
@@ -71,12 +71,12 @@ Run_X_Range(const int xmin,const int xmax,const int partition_number)
         for(int k=block_k;k<block_k+z_block_size;k++)
         {    
             int index=i*x_shift+j*y_shift+k*z_shift;
-	    result[index]+=c1*u1[index];
+            result[index]+=c1*u1[index];
 
             local_sum+=result[index];
             if(result[index]<local_minimum) local_minimum=result[index];
             if(result[index]>local_maximum) local_maximum=result[index];
-	}
+        }
 
     sum_partial_results[partition_number]=local_sum;
     minimum_partial_results[partition_number]=local_minimum;

@@ -244,7 +244,7 @@ Run_Major_X_Range(const int xmin,const int xmax)
 
         int shifted_index=index-2*x_shift;
         int coarse_shifted_index=(i-1)*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
-	
+    
         if(bit_writemask[coarse_shifted_index] & 0x01)
             u[shifted_index]+=two_thirds*delta[shifted_index];
         if(bit_writemask[coarse_shifted_index] & 0x02)            
@@ -278,7 +278,7 @@ Run_Minor_X_Range(const int xmin,const int xmax)
         for(int j=block_j;j<block_j+y_block_size;j++)
         for(int k=block_k;k<block_k+z_block_size;k++)
         {
-	    int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_shift-y_shift-z_shift;
+        int index=2*(i*x_shift+j*y_shift+k*z_shift)-x_shift-y_shift-z_shift;
             int coarse_index=i*coarse_x_shift+j*coarse_y_shift+k*coarse_z_shift;
 
             if(bit_writemask[coarse_index] & 0x01)
@@ -297,7 +297,7 @@ Run_Minor_X_Range(const int xmin,const int xmax)
                 u[index+x_plus_one_y_plus_one_shift]+=two_thirds*delta[index+x_plus_one_y_plus_one_shift];
             if(bit_writemask[coarse_index] & 0x80)
                 u[index+x_plus_one_y_plus_one_z_plus_one_shift]+=two_thirds*delta[index+x_plus_one_y_plus_one_z_plus_one_shift];
-	}
+    }
 }
 //#####################################################################
 template class Relaxation_Interior_Helper<float>;

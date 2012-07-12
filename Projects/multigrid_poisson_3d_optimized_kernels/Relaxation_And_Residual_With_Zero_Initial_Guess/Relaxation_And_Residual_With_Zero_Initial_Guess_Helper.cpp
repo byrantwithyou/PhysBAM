@@ -55,34 +55,34 @@ Run_Parallel(const int number_of_partitions)
     if(x_size*y_size*z_size<=32*32*32) {Run();return;} // Run serially for small problems
 
     if(nullspace_component){ // need to do relaxation (and nullspace projection) separately from residual computation
-	int number_of_x_blocks=coarse_x_size/x_block_size;
-	for(int partition=0;partition<number_of_partitions;partition++){
-	    int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
-	    int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
-	    int xmin=(first_block_of_partition-1)*x_block_size+1;
-	    int xmax=last_block_of_partition*x_block_size;
-	    Relaxation_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Relaxation_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
-	    pthread_queue->Queue(task);}
-	pthread_queue->Wait();
-	
-	for(int partition=0;partition<number_of_partitions;partition++){
-	    int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
-	    int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
-	    int xmin=(first_block_of_partition-1)*x_block_size+1;
-	    int xmax=last_block_of_partition*x_block_size;
-	    Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
-	    pthread_queue->Queue(task);}
-	pthread_queue->Wait();
-    }else{	
-	int number_of_x_blocks=coarse_x_size/x_block_size;
-	for(int partition=0;partition<number_of_partitions;partition++){
-	    int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
-	    int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
-	    int xmin=(first_block_of_partition-1)*x_block_size+1;
-	    int xmax=last_block_of_partition*x_block_size;
-	    Relaxation_And_Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Relaxation_And_Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
-	    pthread_queue->Queue(task);}
-	pthread_queue->Wait();
+    int number_of_x_blocks=coarse_x_size/x_block_size;
+    for(int partition=0;partition<number_of_partitions;partition++){
+        int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
+        int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
+        int xmin=(first_block_of_partition-1)*x_block_size+1;
+        int xmax=last_block_of_partition*x_block_size;
+        Relaxation_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Relaxation_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
+        pthread_queue->Queue(task);}
+    pthread_queue->Wait();
+    
+    for(int partition=0;partition<number_of_partitions;partition++){
+        int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
+        int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
+        int xmin=(first_block_of_partition-1)*x_block_size+1;
+        int xmax=last_block_of_partition*x_block_size;
+        Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
+        pthread_queue->Queue(task);}
+    pthread_queue->Wait();
+    }else{    
+    int number_of_x_blocks=coarse_x_size/x_block_size;
+    for(int partition=0;partition<number_of_partitions;partition++){
+        int first_block_of_partition=(number_of_x_blocks/number_of_partitions)*(partition-1)+std::min(number_of_x_blocks%number_of_partitions,partition-1)+1;
+        int last_block_of_partition=(number_of_x_blocks/number_of_partitions)*partition+std::min(number_of_x_blocks%number_of_partitions,partition);
+        int xmin=(first_block_of_partition-1)*x_block_size+1;
+        int xmax=last_block_of_partition*x_block_size;
+        Relaxation_And_Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>* task=new Relaxation_And_Residual_With_Zero_Initial_Guess_Size_Specific_Thread_Helper<T,y_size,z_size>(this,xmin,xmax);
+        pthread_queue->Queue(task);}
+    pthread_queue->Wait();
     }
 }
 //#####################################################################
@@ -147,9 +147,9 @@ Run_X_Range(const int xmin,const int xmax)
             else
                 u[index+x_plus_one_y_plus_one_z_plus_one_shift]=T();
             
-	    // update residual for interior cells
+        // update residual for interior cells
 #if 1
-	    r[index]=one_ninth*(
+        r[index]=one_ninth*(
                 b[index+x_plus_one_shift]
                 +b[index+x_minus_one_shift]
                 +b[index+y_plus_one_shift]
@@ -246,99 +246,99 @@ Run_X_Range(const int xmin,const int xmax)
             if(!(bit_interiormask[coarse_index] & 0x80))
                 r[index+x_plus_one_y_plus_one_z_plus_one_shift]=0;
 #else
-	    r[index]=0;
+        r[index]=0;
             if(bit_interiormask[coarse_index] & 0x01)
-		r[index]=one_ninth*(
-		    b[index+x_plus_one_shift]
-		    +b[index+x_minus_one_shift]
-		    +b[index+y_plus_one_shift]
-		    +b[index+y_minus_one_shift]
-		    +b[index+z_plus_one_shift]
-		    +b[index+z_minus_one_shift])
-		    +one_third*b[index];
+        r[index]=one_ninth*(
+            b[index+x_plus_one_shift]
+            +b[index+x_minus_one_shift]
+            +b[index+y_plus_one_shift]
+            +b[index+y_minus_one_shift]
+            +b[index+z_plus_one_shift]
+            +b[index+z_minus_one_shift])
+            +one_third*b[index];
 
-	    r[index+z_plus_one_shift]=0;
+        r[index+z_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x02)
-		r[index+z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_one_z_plus_one_shift]
-		    +b[index+x_minus_one_z_plus_one_shift]
-		    +b[index+y_plus_one_z_plus_one_shift]
-		    +b[index+y_minus_one_z_plus_one_shift]
-		    +b[index+z_plus_two_shift]
-		    +b[index])
-		    +one_third*b[index+z_plus_one_shift];
+        r[index+z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_one_z_plus_one_shift]
+            +b[index+x_minus_one_z_plus_one_shift]
+            +b[index+y_plus_one_z_plus_one_shift]
+            +b[index+y_minus_one_z_plus_one_shift]
+            +b[index+z_plus_two_shift]
+            +b[index])
+            +one_third*b[index+z_plus_one_shift];
 
 
-	    r[index+y_plus_one_shift]=0;
+        r[index+y_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x04)
-		r[index+y_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_one_y_plus_one_shift]
-		    +b[index+x_minus_one_y_plus_one_shift]
-		    +b[index+y_plus_two_shift]
-		    +b[index]
-		    +b[index+y_plus_one_z_plus_one_shift]
-		    +b[index+y_plus_one_z_minus_one_shift])
-		    +one_third*b[index+y_plus_one_shift];
-	    
+        r[index+y_plus_one_shift]=one_ninth*(
+            b[index+x_plus_one_y_plus_one_shift]
+            +b[index+x_minus_one_y_plus_one_shift]
+            +b[index+y_plus_two_shift]
+            +b[index]
+            +b[index+y_plus_one_z_plus_one_shift]
+            +b[index+y_plus_one_z_minus_one_shift])
+            +one_third*b[index+y_plus_one_shift];
+        
 
-	    r[index+y_plus_one_shift]=0;
+        r[index+y_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x08)
-		r[index+y_plus_one_z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+x_minus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+y_plus_two_z_plus_one_shift]
-		    +b[index+z_plus_one_shift]
-		    +b[index+y_plus_one_z_plus_two_shift]
-		    +b[index+y_plus_one_shift])
-		    +one_third*b[index+y_plus_one_z_plus_one_shift];
+        r[index+y_plus_one_z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_one_y_plus_one_z_plus_one_shift]
+            +b[index+x_minus_one_y_plus_one_z_plus_one_shift]
+            +b[index+y_plus_two_z_plus_one_shift]
+            +b[index+z_plus_one_shift]
+            +b[index+y_plus_one_z_plus_two_shift]
+            +b[index+y_plus_one_shift])
+            +one_third*b[index+y_plus_one_z_plus_one_shift];
 
 
-	    r[index+x_plus_one_shift]=0;
+        r[index+x_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x10)
-		r[index+x_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_shift]
-		    +b[index]
-		    +b[index+x_plus_one_y_plus_one_shift]
-		    +b[index+x_plus_one_y_minus_one_shift]
-		    +b[index+x_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_z_minus_one_shift])
-		    +one_third*b[index+x_plus_one_shift];
+        r[index+x_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_shift]
+            +b[index]
+            +b[index+x_plus_one_y_plus_one_shift]
+            +b[index+x_plus_one_y_minus_one_shift]
+            +b[index+x_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_z_minus_one_shift])
+            +one_third*b[index+x_plus_one_shift];
 
 
-	    r[index+x_plus_one_z_plus_one_shift]=0;
+        r[index+x_plus_one_z_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x20)
-		r[index+x_plus_one_z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_z_plus_one_shift]
-		    +b[index+z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_minus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_z_plus_two_shift]
-		    +b[index+x_plus_one_shift])
-		    +one_third*b[index+x_plus_one_z_plus_one_shift];
+        r[index+x_plus_one_z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_z_plus_one_shift]
+            +b[index+z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_minus_one_z_plus_one_shift]
+            +b[index+x_plus_one_z_plus_two_shift]
+            +b[index+x_plus_one_shift])
+            +one_third*b[index+x_plus_one_z_plus_one_shift];
 
-	    
-	    r[index+x_plus_one_y_plus_one_shift]=0;
+        
+        r[index+x_plus_one_y_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x40)
-		r[index+x_plus_one_y_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_y_plus_one_shift]
-		    +b[index+y_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_two_shift]
-		    +b[index+x_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_minus_one_shift])
-		    +one_third*b[index+x_plus_one_y_plus_one_shift];
-	    
+        r[index+x_plus_one_y_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_y_plus_one_shift]
+            +b[index+y_plus_one_shift]
+            +b[index+x_plus_one_y_plus_two_shift]
+            +b[index+x_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_minus_one_shift])
+            +one_third*b[index+x_plus_one_y_plus_one_shift];
+        
 
-	    r[index+x_plus_one_y_plus_one_z_plus_one_shift]=0;
+        r[index+x_plus_one_y_plus_one_z_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x80)
-		r[index+x_plus_one_y_plus_one_z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_y_plus_one_z_plus_one_shift]
-		    +b[index+y_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_two_z_plus_one_shift]
-		    +b[index+x_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_plus_two_shift]
-		    +b[index+x_plus_one_y_plus_one_shift])
-		    +one_third*b[index+x_plus_one_y_plus_one_z_plus_one_shift];
+        r[index+x_plus_one_y_plus_one_z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_y_plus_one_z_plus_one_shift]
+            +b[index+y_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_two_z_plus_one_shift]
+            +b[index+x_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_plus_two_shift]
+            +b[index+x_plus_one_y_plus_one_shift])
+            +one_third*b[index+x_plus_one_y_plus_one_z_plus_one_shift];
 #endif
         }
 }
@@ -450,7 +450,7 @@ Run_X_Range_Residual(const int xmin,const int xmax)
             
             
 #if 1
-	    r[index]=one_ninth*(
+        r[index]=one_ninth*(
                 b[index+x_plus_one_shift]
                 +b[index+x_minus_one_shift]
                 +b[index+y_plus_one_shift]
@@ -547,99 +547,99 @@ Run_X_Range_Residual(const int xmin,const int xmax)
             if(!(bit_interiormask[coarse_index] & 0x80))
                 r[index+x_plus_one_y_plus_one_z_plus_one_shift]=0;
 #else
-	    r[index]=0;
+        r[index]=0;
             if(bit_interiormask[coarse_index] & 0x01)
-		r[index]=one_ninth*(
-		    b[index+x_plus_one_shift]
-		    +b[index+x_minus_one_shift]
-		    +b[index+y_plus_one_shift]
-		    +b[index+y_minus_one_shift]
-		    +b[index+z_plus_one_shift]
-		    +b[index+z_minus_one_shift])
-		    +one_third*b[index];
+        r[index]=one_ninth*(
+            b[index+x_plus_one_shift]
+            +b[index+x_minus_one_shift]
+            +b[index+y_plus_one_shift]
+            +b[index+y_minus_one_shift]
+            +b[index+z_plus_one_shift]
+            +b[index+z_minus_one_shift])
+            +one_third*b[index];
 
-	    r[index+z_plus_one_shift]=0;
+        r[index+z_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x02)
-		r[index+z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_one_z_plus_one_shift]
-		    +b[index+x_minus_one_z_plus_one_shift]
-		    +b[index+y_plus_one_z_plus_one_shift]
-		    +b[index+y_minus_one_z_plus_one_shift]
-		    +b[index+z_plus_two_shift]
-		    +b[index])
-		    +one_third*b[index+z_plus_one_shift];
+        r[index+z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_one_z_plus_one_shift]
+            +b[index+x_minus_one_z_plus_one_shift]
+            +b[index+y_plus_one_z_plus_one_shift]
+            +b[index+y_minus_one_z_plus_one_shift]
+            +b[index+z_plus_two_shift]
+            +b[index])
+            +one_third*b[index+z_plus_one_shift];
 
 
-	    r[index+y_plus_one_shift]=0;
+        r[index+y_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x04)
-		r[index+y_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_one_y_plus_one_shift]
-		    +b[index+x_minus_one_y_plus_one_shift]
-		    +b[index+y_plus_two_shift]
-		    +b[index]
-		    +b[index+y_plus_one_z_plus_one_shift]
-		    +b[index+y_plus_one_z_minus_one_shift])
-		    +one_third*b[index+y_plus_one_shift];
-	    
+        r[index+y_plus_one_shift]=one_ninth*(
+            b[index+x_plus_one_y_plus_one_shift]
+            +b[index+x_minus_one_y_plus_one_shift]
+            +b[index+y_plus_two_shift]
+            +b[index]
+            +b[index+y_plus_one_z_plus_one_shift]
+            +b[index+y_plus_one_z_minus_one_shift])
+            +one_third*b[index+y_plus_one_shift];
+        
 
-	    r[index+y_plus_one_shift]=0;
+        r[index+y_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x08)
-		r[index+y_plus_one_z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+x_minus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+y_plus_two_z_plus_one_shift]
-		    +b[index+z_plus_one_shift]
-		    +b[index+y_plus_one_z_plus_two_shift]
-		    +b[index+y_plus_one_shift])
-		    +one_third*b[index+y_plus_one_z_plus_one_shift];
+        r[index+y_plus_one_z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_one_y_plus_one_z_plus_one_shift]
+            +b[index+x_minus_one_y_plus_one_z_plus_one_shift]
+            +b[index+y_plus_two_z_plus_one_shift]
+            +b[index+z_plus_one_shift]
+            +b[index+y_plus_one_z_plus_two_shift]
+            +b[index+y_plus_one_shift])
+            +one_third*b[index+y_plus_one_z_plus_one_shift];
 
 
-	    r[index+x_plus_one_shift]=0;
+        r[index+x_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x10)
-		r[index+x_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_shift]
-		    +b[index]
-		    +b[index+x_plus_one_y_plus_one_shift]
-		    +b[index+x_plus_one_y_minus_one_shift]
-		    +b[index+x_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_z_minus_one_shift])
-		    +one_third*b[index+x_plus_one_shift];
+        r[index+x_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_shift]
+            +b[index]
+            +b[index+x_plus_one_y_plus_one_shift]
+            +b[index+x_plus_one_y_minus_one_shift]
+            +b[index+x_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_z_minus_one_shift])
+            +one_third*b[index+x_plus_one_shift];
 
 
-	    r[index+x_plus_one_z_plus_one_shift]=0;
+        r[index+x_plus_one_z_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x20)
-		r[index+x_plus_one_z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_z_plus_one_shift]
-		    +b[index+z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_minus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_z_plus_two_shift]
-		    +b[index+x_plus_one_shift])
-		    +one_third*b[index+x_plus_one_z_plus_one_shift];
+        r[index+x_plus_one_z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_z_plus_one_shift]
+            +b[index+z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_minus_one_z_plus_one_shift]
+            +b[index+x_plus_one_z_plus_two_shift]
+            +b[index+x_plus_one_shift])
+            +one_third*b[index+x_plus_one_z_plus_one_shift];
 
-	    
-	    r[index+x_plus_one_y_plus_one_shift]=0;
+        
+        r[index+x_plus_one_y_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x40)
-		r[index+x_plus_one_y_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_y_plus_one_shift]
-		    +b[index+y_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_two_shift]
-		    +b[index+x_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_minus_one_shift])
-		    +one_third*b[index+x_plus_one_y_plus_one_shift];
-	    
+        r[index+x_plus_one_y_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_y_plus_one_shift]
+            +b[index+y_plus_one_shift]
+            +b[index+x_plus_one_y_plus_two_shift]
+            +b[index+x_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_minus_one_shift])
+            +one_third*b[index+x_plus_one_y_plus_one_shift];
+        
 
-	    r[index+x_plus_one_y_plus_one_z_plus_one_shift]=0;
+        r[index+x_plus_one_y_plus_one_z_plus_one_shift]=0;
             if(bit_interiormask[coarse_index] & 0x80)
-		r[index+x_plus_one_y_plus_one_z_plus_one_shift]=one_ninth*(
-		    b[index+x_plus_two_y_plus_one_z_plus_one_shift]
-		    +b[index+y_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_two_z_plus_one_shift]
-		    +b[index+x_plus_one_z_plus_one_shift]
-		    +b[index+x_plus_one_y_plus_one_z_plus_two_shift]
-		    +b[index+x_plus_one_y_plus_one_shift])
-		    +one_third*b[index+x_plus_one_y_plus_one_z_plus_one_shift];
+        r[index+x_plus_one_y_plus_one_z_plus_one_shift]=one_ninth*(
+            b[index+x_plus_two_y_plus_one_z_plus_one_shift]
+            +b[index+y_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_two_z_plus_one_shift]
+            +b[index+x_plus_one_z_plus_one_shift]
+            +b[index+x_plus_one_y_plus_one_z_plus_two_shift]
+            +b[index+x_plus_one_y_plus_one_shift])
+            +one_third*b[index+x_plus_one_y_plus_one_z_plus_one_shift];
 #endif
         }
 }

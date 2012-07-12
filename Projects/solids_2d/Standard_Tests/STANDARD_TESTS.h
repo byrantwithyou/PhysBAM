@@ -191,13 +191,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
     last_frame=1000;
 
     switch(test_number){
-	case 20: case 21: case 26:
-	    mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
-	break;
-	case 22: case 23: case 24: case 25: case 27:
-	    mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
-	break;
-    	default:
+        case 20: case 21: case 26:
+            mattress_grid=GRID<TV>(40,8,(T)-2,(T)2,(T)-.4,(T).4);
+        break;
+        case 22: case 23: case 24: case 25: case 27:
+            mattress_grid=GRID<TV>(20,20,(T)-.9,(T).9,(T)-.9,(T).9);
+        break;
+            default:
             mattress_grid=GRID<TV>(20,10,(T)-1,(T)1,(T)-.5,(T).5);
     }
     
@@ -261,7 +261,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         case 15:
         case 16:
         case 22:
-	case 21:
+        case 21:
         case 17:
         case 18:
         case 19:
@@ -287,14 +287,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
             last_frame=500;
             frame_rate=120;
             break;
-	case 20:
+        case 20:
             solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-3;
             solids_parameters.implicit_solve_parameters.cg_iterations=900;
             solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
             //solids_parameters.deformable_object_collision_parameters.perform_collision_body_collisions=false;
             attachment_velocity=TV((T).8,0);
-	    last_frame=400;
-            break;	    
+            last_frame=400;
+            break;            
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);}
 
@@ -452,7 +452,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         case 19:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0))));
             break;}
-	case 20:{
+        case 20:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             //RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("circle",4,(T)0);
             RIGID_BODY<TV>& box2=tests.Add_Rigid_Body("square",(T).2,(T)0);
@@ -466,13 +466,13 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             curve.Add_Control_Point(5,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(6,FRAME<TV>(TV(0,0)));
             curve.Add_Control_Point(11,FRAME<TV>(TV(0,12)));
-	    break;}
-	case 21:{
+            break;}
+        case 21:{
             tests.Create_Mattress(mattress_grid,true,RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4))));
             RIGID_BODY<TV>& box1=tests.Add_Rigid_Body("square",1,(T)0);
             box1.Frame().t=TV(0,-6);
             box1.is_static=true;
-	    break;
+            break;
 }
         default:
             LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}
@@ -655,12 +655,12 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
 {
     if(test_number==4||test_number==5||test_number==6||test_number==20){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         TV velocity=velocity_time<5.0?attachment_velocity:TV();
         for(int j=0;j<n;j++){V(m*j)=-velocity;V(m-1+m*j)=velocity;}}
     if(test_number==24){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         T velocity=(T).2;
         T final_time=50;
         TV velocity_top=velocity_time<final_time?TV((T)0,velocity):TV();
@@ -671,7 +671,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for(int i=m/3;i<2*m/3;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==25){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         T velocity=(T).2;
         T final_time=50;
         TV velocity_tr=velocity_time<final_time?TV(velocity,velocity):TV();
@@ -684,7 +684,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         V(m*n-1)=velocity_tr;}
     if(test_number==26){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         T velocity=(T).2;
         T final_time=50;
         TV velocity_top=velocity_time<final_time?TV((T)0,-velocity):TV();
@@ -695,7 +695,7 @@ void Set_External_Velocities(ARRAY_VIEW<TV> V,const T velocity_time,const T curr
         for(int i=2*m/5+1;i<=3*m/5+1;i++){V(i)=velocity_bot;V(m*(n-1)+i)=velocity_top;}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         T velocity=(T).1;
         T final_time=50;
         TV velocity_rig=velocity_time<final_time?TV(-velocity,(T)0):TV();
@@ -710,28 +710,28 @@ void Zero_Out_Enslaved_Velocity_Nodes(ARRAY_VIEW<TV> V,const T velocity_time,con
 {
     if(test_number==4||test_number==5||test_number==6||test_number==20){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         for(int j=0;j<n;j++) V(m*j)=V(m*j+m-1)=TV();}
     if(test_number==24){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         for(int j=n/3;j<2*n/3;j++){V(m*j)=V(m+m*j)=TV();}
         for(int i=m/3;i<2*m/3;i++){V(i)=V(m*(n-1)+i)=TV();}}
     if(test_number==25){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         V(0)=TV();
         V(m-1)=TV();
         V(m*(n-1))=TV();
         V(m*n-1)=TV();}
     if(test_number==26){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         for(int j=0;j<n;j++) V(m*j)=V(m*j+m-1)=TV();
         for(int i=2*m/5;i<3*m/5;i++){V(i)=TV();V(m*(n-1)+i)=TV();}}
     if(test_number==27){
         int m=mattress_grid.counts.x;
-	int n=mattress_grid.counts.y;
+        int n=mattress_grid.counts.y;
         for(int j=0;j<n;j++){V(m*j)=TV();V(m-1+m*j)=TV();}}
     if(test_number==10) for(int p=0;p<segment_ramp_particles.m;p++) V(p)=TV();
 }
