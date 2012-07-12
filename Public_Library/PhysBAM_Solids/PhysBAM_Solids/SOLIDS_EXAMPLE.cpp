@@ -27,7 +27,7 @@ using namespace PhysBAM;
 template<class TV> SOLIDS_EXAMPLE<TV>::
 SOLIDS_EXAMPLE(const STREAM_TYPE stream_type)
     :BASE(stream_type),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this)),
-    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection))
+    solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),opt_solidscg(false),opt_solidscr(false),opt_solidssymmqmr(false)
 {
     Set_Write_Substeps_Level(-1);
 }
@@ -95,11 +95,11 @@ Register_Options()
 {
     BASE::Register_Options();
     parse_args->Add_String_Argument("-params","","parameter file");
-    parse_args->Add_Double_Argument("-solidscfl",.9,"solids CFL");
-    parse_args->Add_Option_Argument("-solidscg","Use CG for time integration");
-    parse_args->Add_Option_Argument("-solidscr","Use CONJUGATE_RESIDUAL for time integration");
-    parse_args->Add_Option_Argument("-solidssymmqmr","Use SYMMQMR for time integration");
-    parse_args->Add_Double_Argument("-rigidcfl",.5,"rigid CFL");
+    parse_args->Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
+    parse_args->Add("-solidscg",&opt_solidscg,"Use CG for time integration");
+    parse_args->Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
+    parse_args->Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
+    parse_args->Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"cfl","rigid CFL");
 }
 //#####################################################################
 // Function Parse_Late_Options
@@ -108,11 +108,9 @@ template<class TV> void SOLIDS_EXAMPLE<TV>::
 Parse_Late_Options()
 {
     BASE::Parse_Late_Options();
-    if(parse_args->Is_Value_Set("-solidscfl")) solids_parameters.cfl=(T)parse_args->Get_Double_Value("-solidscfl");
-    if(parse_args->Is_Value_Set("-rigidcfl")) solids_parameters.rigid_body_evolution_parameters.rigid_cfl=(T)parse_args->Get_Double_Value("-rigidcfl");
-    if(parse_args->Is_Value_Set("-solidscg")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    if(parse_args->Is_Value_Set("-solidscr")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    if(parse_args->Is_Value_Set("-solidssymmqmr")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
+    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 template class SOLIDS_EXAMPLE<VECTOR<float,1> >;

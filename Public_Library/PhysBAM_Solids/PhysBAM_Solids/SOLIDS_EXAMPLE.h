@@ -33,6 +33,7 @@ public:
     SOLIDS_PARAMETERS<TV>& solids_parameters;
     SOLID_BODY_COLLECTION<TV>& solid_body_collection;
     SOLIDS_EVOLUTION<TV>* solids_evolution; // defaults to newmark
+    bool opt_solidscg,opt_solidscr,opt_solidssymmqmr;
 
     SOLIDS_EXAMPLE(const STREAM_TYPE stream_type);
     virtual ~SOLIDS_EXAMPLE();

@@ -46,8 +46,12 @@ public:
     int substeps_delay_frame;
     int substeps_delay_level;
     bool use_test_output;
-    std::string test_output_prefix;
-
+    std::string test_output_prefix,stored_data_directory,stored_output_directory;
+    bool opt_all_verbose,user_dt,user_frame_rate,user_max_dt,user_first_frame,user_last_frame,user_data_directory,user_output_directory;
+    bool opt_query_output,opt_nolog;
+    int opt_verbosity,stored_first_frame,stored_last_frame;
+    T stored_dt,stored_frame_rate,stored_max_dt;
+    
     EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~EXAMPLE();
     
