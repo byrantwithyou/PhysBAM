@@ -223,7 +223,7 @@ Apply_Pressure_And_Viscosity(T dt)
     ARRAY<int,TV_INT> phi_color(example.grid.Node_Indices());
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
-    iss.use_preconditioner=example.use_preconditioner;
+//    iss.use_preconditioner=example.use_preconditioner; // TODO: preconditioner is causing problems; why?
     iss.Set_Matrix(ARRAY<T>(example.mu*dt),example.wrap,&bccl,1);
 
     printf("\n");
