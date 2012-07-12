@@ -32,7 +32,7 @@ class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
     typedef typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET T_PARTICLE_LEVELSET;
     typedef BOUNDARY_PHI_WATER<GRID<TV> > T_BOUNDARY_PHI_WATER;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    enum workaround1{d=TV::m};
+    enum WORKAROUND1{d=TV::m};
 
 public:
     STREAM_TYPE stream_type;
@@ -76,7 +76,8 @@ public:
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Initialize()=0;
-
+    virtual void Begin_Time_Step(const T time)=0;
+    virtual void End_Time_Step(const T time)=0;
 //#####################################################################
 };
 }

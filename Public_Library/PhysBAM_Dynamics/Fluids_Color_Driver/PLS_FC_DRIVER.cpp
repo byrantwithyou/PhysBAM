@@ -200,11 +200,13 @@ Update_Pls(T dt)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Advance_One_Time_Step(bool first_step)
 {
+    example.Begin_Time_Step(time);
     T dt=example.dt;
 //    Update_Pls(dt);
 
     Apply_Pressure_And_Viscosity(dt);
     time+=dt;
+    example.End_Time_Step(time);
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity

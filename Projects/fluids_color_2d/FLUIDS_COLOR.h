@@ -106,6 +106,20 @@ public:
         levelset_color.color.Fill(0);
     }
 
+    void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE {}
+
+    void End_Time_Step(const T time) PHYSBAM_OVERRIDE
+    {
+        if(test_number==1){
+            T max_error=0,a=0,b=0;
+            for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+                T A=face_velocities(it.Full_Index()),B=Taylor_Green_Vortex_Velocity(it.Location(),time)(it.Axis());
+                a=max(a,abs(A));
+                b=max(b,abs(B));
+                max_error=max(max_error,abs(A-B));}
+            LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
+    }
+
 //#####################################################################
 };
 }
