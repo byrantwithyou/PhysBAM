@@ -74,6 +74,7 @@ Initialize()
     example.face_color.Resize(example.grid,3);
     example.prev_face_velocities.Resize(example.grid,3);
     example.prev_face_color.Resize(example.grid,3);
+
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
         example.particle_levelset_evolution.particle_levelset.Set_Band_Width(6);
@@ -131,8 +132,9 @@ Initialize()
 
     example.collision_bodies_affecting_fluid.Compute_Grid_Visibility();
     example.particle_levelset_evolution.Set_Seed(2606);
-    if(!example.restart) example.particle_levelset_evolution.Seed_Particles(time);
-    example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
+//    Put these back in for PLS
+//    if(!example.restart) example.particle_levelset_evolution.Seed_Particles(time);
+//    example.particle_levelset_evolution.Delete_Particles_Outside_Grid();
 
     int extrapolation_cells=2*example.number_of_ghost_cells+2;
     ARRAY<T,TV_INT> exchanged_phi_ghost(example.grid.Domain_Indices(extrapolation_cells));
@@ -230,7 +232,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     ARRAY<int,TV_INT> phi_color(example.grid.Node_Indices());
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
-//    iss.use_preconditioner=example.use_preconditioner; // TODO: preconditioner is causing problems; why?
+    iss.use_preconditioner=example.use_preconditioner; // TODO: preconditioner is causing problems; why?
     ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) system_inertia*=(T)1.5;
     iss.Set_Matrix(dt_mu,example.wrap,&bccl,&system_inertia,&example.rho);
@@ -279,6 +281,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     if(example.dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("M-%d.txt",solve_id).c_str()).Write("M",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("P-%d.txt",solve_id).c_str()).Write_Preconditioner("P",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("b-%d.txt",solve_id).c_str()).Write("b",rhs);}
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,example.max_iter);
 
@@ -292,6 +295,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
+        if(c<0) continue;
         example.face_color(it.Full_Index())=c;
         int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
         assert(k>=0);
@@ -309,7 +313,7 @@ Simulate_To_Frame(const int frame)
         for(int substep=0;substep<example.time_steps_per_frame;substep++){
             LOG::SCOPE scope("SUBSTEP","substep %d",substep+1);
             Advance_One_Time_Step(current_frame==0 && substep==0);}
-        if(current_frame%1==0){
+        if(current_frame%1==0 && 0){
             example.particle_levelset_evolution.Reseed_Particles(time);
             example.particle_levelset_evolution.Delete_Particles_Outside_Grid();}
         Write_Output_Files(++output_number);}

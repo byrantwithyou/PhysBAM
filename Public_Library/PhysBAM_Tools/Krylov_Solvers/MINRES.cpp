@@ -119,7 +119,6 @@ Solve(const KRYLOV_SYSTEM_BASE<T>& system,KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_
 
         x.Copy(pr(0), c_k, x);
 
-
         if(print_residuals) LOG::cout<< residual <<std::endl;
         if(residual <= tolerance || b_k1 < small_number){Print_Diagnostics(iterations);return true;}
         if(iterations == max_iterations){Print_Diagnostics(iterations);break;}

@@ -26,6 +26,8 @@ public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;
+    enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
+
     int test_number;
     int resolution;
     int stored_last_frame;
@@ -68,6 +70,7 @@ public:
         switch(test_number){
             case 0: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 1: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);break;
+            case 2: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
@@ -79,6 +82,7 @@ public:
         switch(test_number){
             case 0: Uniform_Translation_Periodic();break;
             case 1: Taylor_Green_Vortex_Periodic();break;
+            case 2: Taylor_Green_Vortex_BC((T).2);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(user_last_frame) last_frame=stored_last_frame;
@@ -93,9 +97,28 @@ public:
         levelset_color.color.Fill(0);
     }
 
-    TV Taylor_Green_Vortex_Velocity(const TV& X,T t)
+    TV Taylor_Green_Vortex_Velocity(const TV& X,T t) const
     {
         return TV(sin(X.x/m)*cos(X.y/m),-cos(X.x/m)*sin(X.y/m))*exp(-2*mu0/rho0*t/(m*m))*m/s;
+    }
+
+    T Taylor_Green_Vortex_Isocontour(const TV& X) const
+    {
+        return sin(X.x/m)*sin(X.y/m);
+    }
+
+    T Taylor_Green_Vortex_Levelset(const TV& X,T k) const
+    {
+        TV w=(X-pi/2).Normalized()+pi/2;
+        VECTOR<T,3> z(w.x,w.y,0);
+        for(int i=1;i<100;i++){
+            T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
+            VECTOR<T,3> G(-2*X.x+2*z.x+z.z*cx*sy,-2*X.y+2*z.y+z.z*sx*cy,-k+sx*sy);
+            MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
+            z-=H.Solve_Linear_System(G);
+            if(G.Magnitude_Squared()<1e-25) break;}
+        T sign=((T).2-sin(X.x)*sin(X.y))>0?1:-1;
+        return (z.Remove_Index(2)-X).Magnitude()*sign;
     }
 
     void Taylor_Green_Vortex_Periodic()
@@ -108,11 +131,23 @@ public:
         levelset_color.color.Fill(0);
     }
 
+    void Taylor_Green_Vortex_BC(T contour)
+    {
+        mu.Append(mu0);
+        rho.Append(rho0);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
+            face_velocities(it.Full_Index())=Taylor_Green_Vortex_Velocity(it.Location(),0)(it.Axis());
+        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+            T p=Taylor_Green_Vortex_Levelset(it.Location(),contour);
+            levelset_color.phi(it.index)=abs(p);
+            levelset_color.color(it.index)=p>0?DIRICHLET:0;}
+    }
+
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE {}
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
-        if(test_number==1){
+        if(test_number==1 || test_number==2){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 T A=face_velocities(it.Full_Index()),B=Taylor_Green_Vortex_Velocity(it.Location(),time)(it.Axis());
