@@ -159,7 +159,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
         helper_pu(i).Build_Matrix(matrix_pu(i));
     // QU Block
     for(int i=0;i<TV::m;i++)
-        helper_qu(i).Build_Matrix(matrix_qu(i));
+        helper_qu(i).Build_Matrix(matrix_qu(i),q_rhs);
     // RHS PU Block 
     for(int i=0;i<TV::m;i++)
         helper_rhs_pu(i).Build_Matrix(matrix_rhs_pu(i));
@@ -209,6 +209,7 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
     
     Resize_Vector(rhs); // assumes rhs was 0
+    rhs.q=q_rhs;
 
     for(int i=0;i<TV::m;i++){
         F_volume(i).Resize(cdi->colors);

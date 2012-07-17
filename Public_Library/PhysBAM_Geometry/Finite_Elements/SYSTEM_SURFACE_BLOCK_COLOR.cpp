@@ -12,14 +12,14 @@ using namespace PhysBAM;
 // Function Initialize
 //#####################################################################
 template<class TV,int static_degree> template<int d> void SYSTEM_SURFACE_BLOCK_COLOR<TV,static_degree>::
-Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,
-    ARRAY<VECTOR_ND<T> >& f_surface_input,int axis_input,T scale_input)
+Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,BOUNDARY_CONDITIONS_COLOR<TV>* bc_input,
+    ARRAY<VECTOR_ND<T> >& rhs_input,int axis_input,T scale_input)
 {
-    abc=abc_input;
+    bc=bc_input;
     axis=axis_input;
     scale=scale_input;
     helper=&helper_input;
-    f_surface=&f_surface_input;
+    rhs=&rhs_input;
     
     overlap_polynomials.Resize(s.diced.m);
     for(int i=0;i<overlap_polynomials.m;i++){

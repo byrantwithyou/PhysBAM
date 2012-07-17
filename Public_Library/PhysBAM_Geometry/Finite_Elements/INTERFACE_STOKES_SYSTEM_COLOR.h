@@ -63,6 +63,7 @@ public:
 
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu,matrix_inertial_rhs;
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> rhs_surface;
+    VECTOR_ND<T> q_rhs;
 
     ARRAY<VECTOR_T> null_modes;
     VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;

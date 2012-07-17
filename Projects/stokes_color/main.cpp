@@ -141,6 +141,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         int i=it.Axis();
         int c=at.phi_color(it.Location());
+        if(c<0) continue;
         int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
         assert(k>=0);
         numer_u(it.Full_Index())=sol.u(i)(c)(k);}
@@ -150,6 +151,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     error_p.Resize(iss.grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         int c=at.phi_color(it.Location());
+        if(c<0) continue;
         int k=iss.cm_p->Get_Index(it.index,c);
         assert(k>=0);
         numer_p(it.index)=sol.p(c)(k);}
@@ -217,6 +219,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::m> TV_INT;
+    enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1};
 
     // Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
@@ -252,7 +255,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
                 virtual TV f_volume(const TV& X,int color){return TV();}
-                virtual TV f_surface(const TV& X,int color0,int color1){return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
+                virtual TV j_surface(const TV& X,int color0,int color1){return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*(2*mu(1)+mu(0))/s;}
             };
             test=new ANALYTIC_TEST_0;
             break;}
@@ -266,7 +269,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(X.x-0.5*m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return T();}
                 virtual TV f_volume(const TV& X,int color){return TV();}
-                virtual TV f_surface(const TV& X,int color0,int color1){return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*mu.Sum()/s;}
+                virtual TV j_surface(const TV& X,int color0,int color1){return TV::Axis_Vector(1)*((X.x>0.5*m)?(T)(-1):(T)1)*mu.Sum()/s;}
             };
             test=new ANALYTIC_TEST_1;
             break;}
@@ -281,7 +284,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {return TV::Axis_Vector(1)*color*(sqr(0.25*m)-sqr(X.x-0.5*m))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(1)*(color*2*mu(1)/(m*s));}
-                virtual TV f_surface(const TV& X,int color0,int color1){return (T)0.5*TV::Axis_Vector(1)*mu(1)/s;}
+                virtual TV j_surface(const TV& X,int color0,int color1){return (T)0.5*TV::Axis_Vector(1)*mu(1)/s;}
             };
             test=new ANALYTIC_TEST_2;
             break;}
@@ -296,7 +299,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 {return TV::Axis_Vector(1)*(color?(sqr(0.25*m)-sqr(X.x-0.5*m)):((X.x>0.5*m)?(sqr(X.x-m)-sqr(0.25*m)):(sqr(X.x)-sqr(0.25*m))))/(m*s);}
                 virtual T p(const TV& X){return T();}
                 virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(1)*(color?mu(1):-mu(0))*2/(m*s);}
-                virtual TV f_surface(const TV& X,int color0,int color1){return (T)0.5*TV::Axis_Vector(1)*(mu(1)-mu(0))/s;}
+                virtual TV j_surface(const TV& X,int color0,int color1){return (T)0.5*TV::Axis_Vector(1)*(mu(1)-mu(0))/s;}
             };
             test=new ANALYTIC_TEST_3;
             break;}
@@ -337,7 +340,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     force*=mu(1)*8/(rb2mra2)/s;
                     return force;
                 }
-                virtual TV f_surface(const TV& X,int color0,int color1)
+                virtual TV j_surface(const TV& X,int color0,int color1)
                 {
                     VECTOR<T,2> z(X.x-0.5*m,X.y-0.5*m);
                     T r=z.Normalize();
@@ -362,7 +365,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return phi_color(X)*sin(2*M_PI*X.y/m)*kg/(sqr(s)*(TV::m==3?m:1));}
                 virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(1)*2*M_PI*cos(2*M_PI*X.y/m)*kg/(sqr(s)*(TV::m==3?sqr(m):m))*color;}
-                virtual TV f_surface(const TV& X,int color0,int color1)
+                virtual TV j_surface(const TV& X,int color0,int color1)
                 {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s-TV::Axis_Vector(0)*sin(2*M_PI*X.y/m)*kg/(sqr(s)*(TV::m==3?m:1)))*((X.x>0.5*m)?(T)(-1):(T)1);}
             };
             test=new ANALYTIC_TEST_5;
@@ -377,7 +380,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return TV::Axis_Vector(1)*(color?(2*X.x-m):((X.x>0.5*m)?(m-X.x):(-X.x)))/s;}
                 virtual T p(const TV& X){return phi_color(X)*(X.x-0.5*m)*kg/(sqr(s)*(TV::m==3?sqr(m):m));}
                 virtual TV f_volume(const TV& X,int color){return TV::Axis_Vector(0)*kg/(sqr(s)*(TV::m==3?sqr(m):m))*color;}
-                virtual TV f_surface(const TV& X,int color0,int color1)
+                virtual TV j_surface(const TV& X,int color0,int color1)
                 {return (TV::Axis_Vector(1)*(2*mu(1)+mu(0))/s-TV::Axis_Vector(0)*(X.x-0.5*m)*kg/(sqr(s)*(TV::m==3?sqr(m):m)))*((X.x>0.5*m)?(T)(-1):(T)1);}
             };
             test=new ANALYTIC_TEST_6;
@@ -392,7 +395,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return TV();}
                 virtual T p(const TV& X){return 0;}
                 virtual TV f_volume(const TV& X,int color){return TV();}
-                virtual TV f_surface(const TV& X,int color0,int color1){return TV();}
+                virtual TV j_surface(const TV& X,int color0,int color1){return TV();}
             };
             test=new ANALYTIC_TEST_7;
             break;}
@@ -407,7 +410,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return (X-0.5*m)*color;}
                 virtual T p(const TV& X){return 0;}
                 virtual TV f_volume(const TV& X,int color){return TV();}
-                virtual TV f_surface(const TV& X,int color0,int color1){return -(X-0.5*m).Normalized()*2*mu(1);}
+                virtual TV j_surface(const TV& X,int color0,int color1){return -(X-0.5*m).Normalized()*2*mu(1);}
             };
             test=new ANALYTIC_TEST_8;
             break;}
@@ -422,7 +425,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV u(const TV& X,int color){return (X-0.5*m)*color;}
                 virtual T p(const TV& X){return phi_color(X)*(X-0.5*m).Magnitude_Squared();}
                 virtual TV f_volume(const TV& X,int color){return (X-0.5*m)*2*color;}
-                virtual TV f_surface(const TV& X,int color0,int color1){return (X-0.5*m).Normalized()*((X-0.5*m).Magnitude_Squared()-2*mu(1));}
+                virtual TV j_surface(const TV& X,int color0,int color1){return (X-0.5*m).Normalized()*((X-0.5*m).Magnitude_Squared()-2*mu(1));}
             };
             test=new ANALYTIC_TEST_9;
             break;}
@@ -443,12 +446,29 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     T x2m2=x2/m2;
                     return x*(2*p_term*cos(x2m2)/m2+u_term*mu(1)*((TV::m+2)*m2-2*x2)*4*exp(-x2m2)/m4)*color;
                 }
-                virtual TV f_surface(const TV& X,int color0,int color1)
+                virtual TV j_surface(const TV& X,int color0,int color1)
                 {
                     TV x=X-0.5*m;
                     T x2m2=x.Magnitude_Squared()/m2;
                     return (p_term*sin(x2m2)+u_term*2*mu(1)*exp(-x2m2)*(2*x2m2-1))*x.Normalized();  
                 }
+            };
+            test=new ANALYTIC_TEST_10;
+            break;}
+        case 11:{ // 
+            struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
+            {
+                T r,m2,m4,u_term,p_term;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){wrap=true;mu.Append(1);r=m/pi;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:DIRICHLET;}
+                virtual TV u(const TV& X,int color){TV x=X-0.5*m;x(1)=-x(1);return x;}
+                virtual T p(const TV& X){return 0;}
+                virtual TV f_volume(const TV& X,int color){return TV();}
+                virtual TV j_surface(const TV& X,int color0,int color1){return TV();}
+                virtual TV n_surface(const TV& X,int color0,int color1){return TV();}
+                virtual TV d_surface(const TV& X,int color0,int color1){return u(X,max(color0,color1));}
             };
             test=new ANALYTIC_TEST_10;
             break;}

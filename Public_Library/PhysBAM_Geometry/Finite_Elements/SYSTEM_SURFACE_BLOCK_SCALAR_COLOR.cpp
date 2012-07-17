@@ -12,10 +12,10 @@ using namespace PhysBAM;
 // Function Initialize
 //#####################################################################
 template<class TV,int static_degree> template<int d> void SYSTEM_SURFACE_BLOCK_SCALAR_COLOR<TV,static_degree>::
-Initialize(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc_input,
+Initialize(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc_input,
     ARRAY<VECTOR_ND<T> >& f_surface_input,T scale_input)
 {
-    abc=abc_input;
+    bc=bc_input;
     scale=scale_input;
     helper=&helper_input;
     f_surface=&f_surface_input;

@@ -34,19 +34,22 @@ public:
         int subcell; // flags indicating fine cells
         STATIC_POLYNOMIAL<T,TV::m,static_degree> polynomial;
     };
-    
+
     T scale;
     int axis;
-    ARRAY<VECTOR_ND<T> >* f_surface;
-    BOUNDARY_CONDITIONS_COLOR<TV>* abc;
+    ARRAY<VECTOR_ND<T> >* rhs;
+    BOUNDARY_CONDITIONS_COLOR<TV>* bc;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        BOUNDARY_CONDITIONS_COLOR<TV>* abc_input,ARRAY<VECTOR_ND<T> >& f_surface_input,int axis_input,T scale_input);
+        BOUNDARY_CONDITIONS_COLOR<TV>* bc_input,ARRAY<VECTOR_ND<T> >& rhs_input,int axis_input,T scale_input);
 
     void Add_Entry(int constraint_index,int orientation,int flat_index_diff_ref,int color,T value)
     {helper->data(orientation)(color)(constraint_index,flat_index_diff_ref)+=value*scale;}
+
+    void Add_Constraint_Rhs_Entry(int constraint_index,int orientation,T value)
+    {helper->rhs_data(orientation)(constraint_index)+=value*scale;}
 
     int Flat_Diff(int i)
     {return helper->flat_diff(i);}

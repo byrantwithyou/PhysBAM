@@ -28,6 +28,7 @@ class SYSTEM_SURFACE_BLOCK_HELPER_COLOR:public NONCOPYABLE
 public:
     
     VECTOR<ARRAY<MATRIX_MXN<T> >,TV::m> data;
+    VECTOR<ARRAY<T>,TV::m> rhs_data;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
     CELL_MANAGER_COLOR<TV> *cm;
     ARRAY<int> flat_diff;
@@ -35,7 +36,7 @@ public:
     template<int d> 
     void Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_COLOR<TV>& cm_input,CELL_DOMAIN_INTERFACE_COLOR<TV> &cdi_input);
     void Mark_Active_Cells(T tol=0);
-    void Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix);
+    void Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_rhs);
     void Resize();
 };
 }

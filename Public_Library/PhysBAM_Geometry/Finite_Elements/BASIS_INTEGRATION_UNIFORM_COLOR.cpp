@@ -326,10 +326,16 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         PHYSBAM_ASSERT(found);
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
+                        int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
 
                         cdi.nc_present|=(V.y==BC::NEUMANN);
                         cdi.dc_present|=(V.y==BC::DIRICHLET);
                         cdi.sc_present|=(V.y==BC::SLIP);
+
+                        TV bc_d,bc_n,X=V.x.Center()+grid.Center(cell);
+                        if(V.y<0){
+                            if(V.y==BC::SLIP || V.y==BC::DIRICHLET) bc_d=integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.y,V.z));
+                            if(V.y==BC::SLIP || V.y==BC::NEUMANN) bc_n=integral*orientations(k).Transpose_Times(sb->bc->n_surface(X,V.y,V.z));}
 
                         if(V.y!=BC::SLIP && V.y!=BC::NEUMANN)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
@@ -342,13 +348,25 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             if(V.y>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,value);
                             if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-value);}
                         
-                        if(V.y!=BC::SLIP && V.y!=BC::DIRICHLET){
-                            int flat_index=cdi.Flatten(cell)+sb->Flat_Diff(op.flat_index_diff_ref);
-                            T value=-integral*sb->abc->f_surface(V.x.Center()+grid.Center(cell),V.y,V.z)(sb->axis);
+                        if(V.y>=0){
+                            T value=-integral*sb->bc->j_surface(X,V.y,V.z)(sb->axis);
                             if(V.y>=0) value*=(T)0.5;
-                            if(V.y>=0) (*sb->f_surface)(V.y)(flat_index)+=value;
-                            if("$#*!") (*sb->f_surface)(V.z)(flat_index)+=value;}}}}}
-    
+                            if(V.y>=0) (*sb->rhs)(V.y)(flat_index)+=value;
+                            if("$#*!") (*sb->rhs)(V.z)(flat_index)+=value;}
+                        else if(V.y==BC::NEUMANN){
+                            T value=-integral*sb->bc->n_surface(X,V.y,V.z)(sb->axis);
+                            (*sb->rhs)(V.z)(flat_index)+=value;}
+                        else if(V.y==BC::DIRICHLET){
+                            TV value=-integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.y,V.z));
+                            for(int d=0;d<TV::m;d++)
+                                sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,value(d));}
+                        else{
+                            TV N=orientations(k).Column(TV::m-1);
+                            T n_value=-integral*sb->bc->n_surface(X,V.y,V.z).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
+                            (*sb->rhs)(V.z)(flat_index)+=n_value;
+                            T d_value=-integral*sb->bc->d_surface(X,V.y,V.z).Dot(N);
+                            sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,d_value);}}}}}
+
     if(surface_blocks_scalar.m){
         for(int i=0;i<surface_blocks_scalar.m;i++){
             SURFACE_BLOCK_SCALAR* sbs=surface_blocks_scalar(i);
@@ -374,7 +392,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         
                         if(V.y!=BC::DIRICHLET){
                             int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
-                            T value=-integral*sbs->abc->f_surface(V.x.Center()+cell_center,V.y,V.z);
+                            T value=-integral*sbs->bc->f_surface(V.x.Center()+cell_center,V.y,V.z);
                             if(V.y>=0) value*=(T)0.5;
                             if(V.y>=0) (*sbs->f_surface)(V.y)(flat_index)+=value;
                             if("$#*!") (*sbs->f_surface)(V.z)(flat_index)+=value;}}}}}
@@ -401,10 +419,10 @@ Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCI
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale)
+    BOUNDARY_CONDITIONS_COLOR<TV>* bc,ARRAY<VECTOR_ND<T> >& f_surface,int axis,T scale)
 {
     SURFACE_BLOCK* sb=new SURFACE_BLOCK;
-    sb->Initialize(helper,s,abc,f_surface,axis,scale);
+    sb->Initialize(helper,s,bc,f_surface,axis,scale);
     surface_blocks.Append(sb);
         
     for(int i=0;i<sb->overlap_polynomials.m;i++){
@@ -418,10 +436,10 @@ Add_Surface_Block(SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>& helper,const BASIS_STEN
 //#####################################################################
 template<class TV,int static_degree> template<int d> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,static_degree>::
 Add_Surface_Block_Scalar(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-    BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,ARRAY<VECTOR_ND<T> >& f_surface,T scale)
+    BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc,ARRAY<VECTOR_ND<T> >& f_surface,T scale)
 {
     SURFACE_BLOCK_SCALAR* sbs=new SURFACE_BLOCK_SCALAR;
-    sbs->Initialize(helper,s,abc,f_surface,scale);
+    sbs->Initialize(helper,s,bc,f_surface,scale);
     surface_blocks_scalar.Append(sbs);
         
     for(int i=0;i<sbs->overlap_polynomials.m;i++){
