@@ -53,7 +53,7 @@ struct PROGRAM
     void Execute(PROGRAM_CONTEXT<T>& context) const
     {Execute(context.reg);}
     void Execute_Op(ARRAY<T>& reg,int& ip) const;
-    int Diff(int diff_out,int diff_in);
+    int Diff(int diff_expr,int diff_var);
     void Parse(const char* str);
     int Parse_Command(const char*& str);
     void Print() const;
