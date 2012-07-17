@@ -95,13 +95,12 @@ template<class T> int PROGRAM<T>::
 Diff(int diff_expr,int diff_var)
 {
     ARRAY<INSTRUCTION> c;
-    extra_out++;
 
-    ARRAY<int> diff_tmp;
+    ARRAY<int> diff_tmp(num_tmp);
     diff_tmp.Fill(-1);
-    for(int i=0;i<var_in.m;i++)
-        diff_tmp(dict.Get(var_in(i)))=mem_const;
-    diff_tmp(diff_var)=1|mem_const;
+    // for(int i=0;i<var_in.m;i++)
+    //     diff_tmp(dict.Get(var_in(i)))=mem_const;
+    // diff_tmp(diff_var)=1|mem_const;
 
     for(int ip=0;ip<code.m;ip++){
         const INSTRUCTION& o=code(ip);
@@ -109,16 +108,20 @@ Diff(int diff_expr,int diff_var)
         if(!(op_flags_table[o.type]&flag_reg_dest)) continue;
 
         int d=-1,s0=-1,s1=-1;
-        if(o.dest==diff_expr) continue;
-        if(diff_tmp(o.dest)>=0) d=diff_tmp(o.dest);
+        if((o.dest&mem_mask)==mem_out){
+            if(o.dest!=(mem_out|diff_expr)) continue;
+            d=(var_out.m+extra_out)|mem_out;}
+        else if(diff_tmp(o.dest)>=0) d=diff_tmp(o.dest);
         else diff_tmp(o.dest)=d=num_tmp++;
 
         if(op_flags_table[o.type]&flag_reg_src0){
             if((o.src0&mem_mask)==mem_const) s0=mem_const;
+            else if((o.src0&mem_mask)==mem_in) s0=mem_const+(o.src0==(mem_in|diff_var));
             else s0=diff_tmp(o.src0);}
 
         if(op_flags_table[o.type]&flag_reg_src1){
             if((o.src1&mem_mask)==mem_const) s1=mem_const;
+            else if((o.src1&mem_mask)==mem_in) s1=mem_const+(o.src1==(mem_in|diff_var));
             else s1=diff_tmp(o.src1);}
 
         switch(o.type){
@@ -162,7 +165,7 @@ Diff(int diff_expr,int diff_var)
         }
     }
     code.Exchange(c);
-    return diff_tmp(diff_expr);
+    return var_out.m+extra_out++;
 }
 struct OPERATOR_DEFINITIONS
 {
@@ -224,6 +227,7 @@ Parse(const char* str)
 
     while(Parse_Command(str)!=-1){}
 
+    LOG::cout<<var_out<<std::endl;
     for(int i=0;i<var_out.m;i++){
         INSTRUCTION in={op_copy,i|mem_out,dict.Get(var_out(i)),-1};
         code.Append(in);}
@@ -236,7 +240,6 @@ Parse_Command(const char*& str)
 {
     str+=strspn(str, " \t\n");
     if(!*str || *str==')') return -1;
-    puts(str);
 
     // Number
     char* endptr=0;
@@ -263,7 +266,6 @@ Parse_Command(const char*& str)
         str+=strspn(str, " \t\n");
         int len=strcspn(str, " \t\n");
         std::string op(str,len);
-        printf("op %s\n",op.c_str());
         str+=len;
         int cur=Parse_Command(str);
         if(op=="if"){
