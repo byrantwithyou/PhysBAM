@@ -122,6 +122,11 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     KRYLOV_SOLVER<T>* solver=&mr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
+    if(dump_matrix){
+        KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
+        OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
+        OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);}
+
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,max_iter);
     
     iss.Multiply(sol,*vectors(0));
@@ -206,7 +211,6 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             rhs*=1/rhs.Max_Abs();
             Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}}*/
         
-    if(dump_matrix) OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 

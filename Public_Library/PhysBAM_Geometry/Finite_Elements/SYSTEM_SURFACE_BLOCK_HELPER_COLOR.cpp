@@ -69,7 +69,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_
             const MATRIX_MXN<T>& d=data(orientation)(c);
             const ARRAY<T>& rd=rhs_data(orientation);
             for(int i=0;i<d.m;i++,row++){
-                constraint_rhs(row)=rd(i);
+                constraint_rhs(row)+=rd(i);
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
                 for(int j=0;j<d.n;j++){
                     T value=d(i,j);
@@ -88,13 +88,11 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_
 template<class TV> void SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>::
 Resize()
 {
-    LOG::cout<<"Resize"<<std::endl;
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++)
             data(i)(c).Resize(cdi->flat_base(i)->m,flat_diff.m);
-    for(int i=0;i<TV::m;i++){
-        LOG::cout<<*cdi->constraint_base(i)<<std::endl;
-        rhs_data(i).Resize(cdi->flat_base(i)->m);}
+    for(int i=0;i<TV::m;i++)
+        rhs_data(i).Resize(cdi->flat_base(i)->m);
 }
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >;

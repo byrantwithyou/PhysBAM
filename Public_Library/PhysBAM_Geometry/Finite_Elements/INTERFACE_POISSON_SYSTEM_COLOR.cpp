@@ -108,7 +108,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     cm_u->Compress_Indices();
 
     helper_uu.Build_Matrix(matrix_uu);
-    helper_qu.Build_Matrix(matrix_qu);
+    helper_qu.Build_Matrix(matrix_qu,rhs_constraint);
     helper_rhs_uu.Build_Matrix(matrix_rhs_uu);
 
     // FILL IN THE NULL MODES
@@ -150,6 +150,7 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<T,TV_INT> >& f_volume,const ARRAY<ARRAY<
                     U(c)(k)=u(c)(it.index);}}
 
     Resize_Vector(rhs); // assumes rhs was 0
+    rhs.q=rhs_constraint;
 
     for(int c=0;c<cdi->colors;c++)
         for(int j=0;j<cdi->flat_size;j++){

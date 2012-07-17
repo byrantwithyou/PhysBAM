@@ -19,7 +19,9 @@ struct BOUNDARY_CONDITIONS_SCALAR_COLOR: public NONCOPYABLE
 
     BOUNDARY_CONDITIONS_SCALAR_COLOR() {}
 
-    virtual T f_surface(const TV& X,int color0,int color1)=0;
+    virtual T j_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+    virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+    virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
 };
 }
 #endif

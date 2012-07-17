@@ -66,6 +66,7 @@ public:
 
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_rhs_uu;
     ARRAY<VECTOR_ND<T> > rhs_surface;
+    VECTOR_ND<T> rhs_constraint;
 
     VECTOR_T null_u;
     ARRAY<ARRAY<int> > inactive_u;

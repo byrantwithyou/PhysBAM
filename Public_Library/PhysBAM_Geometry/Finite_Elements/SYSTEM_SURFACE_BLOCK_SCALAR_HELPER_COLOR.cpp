@@ -47,7 +47,7 @@ Mark_Active_Cells(T tol)
 // Function Build_Matrix
 //#####################################################################
 template<class TV> void SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>::
-Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
+Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_rhs)
 {
     if(!cdi->wrap) PHYSBAM_FATAL_ERROR();
     matrix.Resize(cdi->colors);
@@ -60,6 +60,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix)
         M.Reset(n);
         M.offsets.Resize(m+1);
         M.m=m;
+        constraint_rhs.Resize(m);
 
         MATRIX_MXN<T>& d=data(c);
         for(int row=0;row<d.m;row++){
@@ -83,6 +84,7 @@ Resize()
 {
     for(int c=0;c<cdi->colors;c++)
         data(c).Resize(cdi->flat_base_scalar.m,flat_diff.m);
+    rhs_data.Resize(cdi->flat_base_scalar.m);
 }
 template class SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,3> >;

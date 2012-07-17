@@ -36,16 +36,19 @@ public:
     };
     
     T scale;
-    ARRAY<VECTOR_ND<T> >* f_surface;
+    ARRAY<VECTOR_ND<T> >* rhs;
     BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc_input,ARRAY<VECTOR_ND<T> >& f_surface_input,T scale_input);
+        BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc_input,ARRAY<VECTOR_ND<T> >& rhs_input,T scale_input);
 
-    void Add_Entry(int constraint_index,int orientation,int flat_index_diff_ref,int color,T value)
+    void Add_Entry(int constraint_index,int flat_index_diff_ref,int color,T value)
     {helper->data(color)(constraint_index,flat_index_diff_ref)+=value*scale;}
+
+    void Add_Constraint_Rhs_Entry(int constraint_index,T value)
+    {helper->rhs_data(constraint_index)+=value*scale;}
 
     int Flat_Diff(int i)
     {return helper->flat_diff(i);}

@@ -350,9 +350,9 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         
                         if(V.y>=0){
                             T value=-integral*sb->bc->j_surface(X,V.y,V.z)(sb->axis);
-                            if(V.y>=0) value*=(T)0.5;
-                            if(V.y>=0) (*sb->rhs)(V.y)(flat_index)+=value;
-                            if("$#*!") (*sb->rhs)(V.z)(flat_index)+=value;}
+                            value*=(T)0.5;
+                            (*sb->rhs)(V.y)(flat_index)+=value;
+                            (*sb->rhs)(V.z)(flat_index)+=value;}
                         else if(V.y==BC::NEUMANN){
                             T value=-integral*sb->bc->n_surface(X,V.y,V.z)(sb->axis);
                             (*sb->rhs)(V.z)(flat_index)+=value;}
@@ -387,15 +387,22 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         cdi.dc_present|=(V.y==BC::DIRICHLET);
                         
                         if(V.y!=BC::NEUMANN){
-                            if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,integral);
-                            if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-integral);}
-                        
-                        if(V.y!=BC::DIRICHLET){
-                            int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
-                            T value=-integral*sbs->bc->f_surface(V.x.Center()+cell_center,V.y,V.z);
-                            if(V.y>=0) value*=(T)0.5;
-                            if(V.y>=0) (*sbs->f_surface)(V.y)(flat_index)+=value;
-                            if("$#*!") (*sbs->f_surface)(V.z)(flat_index)+=value;}}}}}
+                            if(V.y>=0) sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.y,integral);
+                            if("$#*!") sbs->Add_Entry(cdi.constraint_base_scalar+constraint_offset,op.flat_index_diff_ref,V.z,-integral);}
+
+                        TV X=V.x.Center()+cell_center;
+                        int flat_index=cdi.Flatten(cell)+sbs->Flat_Diff(op.flat_index_diff_ref);
+                        if(V.y>=0){
+                            T value=-integral*sbs->bc->j_surface(X,V.y,V.z);
+                            value*=(T)0.5;
+                            (*sbs->rhs)(V.y)(flat_index)+=value;
+                            (*sbs->rhs)(V.z)(flat_index)+=value;}
+                        else if(V.y==BC::NEUMANN){
+                            T value=-integral*sbs->bc->n_surface(X,V.y,V.z);
+                            (*sbs->rhs)(V.z)(flat_index)+=value;}
+                        else{
+                            T value=-integral*sbs->bc->d_surface(X,V.y,V.z);
+                            sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,value);}}}}}
 }
 //#####################################################################
 // Function Add_Volume_Block
