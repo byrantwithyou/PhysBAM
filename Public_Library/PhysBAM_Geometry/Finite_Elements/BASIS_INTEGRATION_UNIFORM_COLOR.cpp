@@ -358,14 +358,16 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             (*sb->rhs)(V.z)(flat_index)+=value;}
                         else if(V.y==BC::DIRICHLET){
                             TV value=-integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.y,V.z));
-                            for(int d=0;d<TV::m;d++)
-                                sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,value(d));}
+                            if(sb->axis==0) // This code should not be repeated for each block
+                                for(int d=0;d<TV::m;d++)
+                                    sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,value(d));}
                         else{
                             TV N=orientations(k).Column(TV::m-1);
                             T n_value=-integral*sb->bc->n_surface(X,V.y,V.z).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
                             (*sb->rhs)(V.z)(flat_index)+=n_value;
-                            T d_value=-integral*sb->bc->d_surface(X,V.y,V.z).Dot(N);
-                            sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,d_value);}}}}}
+                            if(sb->axis==0){ // This code should not be repeated for each block
+                                T d_value=-integral*sb->bc->d_surface(X,V.y,V.z).Dot(N);
+                                sb->Add_Constraint_Rhs_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,d_value);}}}}}}
 
     if(surface_blocks_scalar.m){
         for(int i=0;i<surface_blocks_scalar.m;i++){

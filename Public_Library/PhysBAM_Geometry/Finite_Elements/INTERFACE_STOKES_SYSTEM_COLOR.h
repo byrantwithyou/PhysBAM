@@ -65,7 +65,7 @@ public:
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> rhs_surface;
     VECTOR_ND<T> q_rhs;
 
-    ARRAY<VECTOR_T> null_modes;
+    ARRAY<VECTOR_T*> null_modes;
     VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;
     ARRAY<ARRAY<int> > inactive_p;
     ARRAY<int> inactive_q;
@@ -79,6 +79,8 @@ public:
     bool run_self_tests;
     bool print_matrix;
     bool print_rhs;
+    bool use_p_null_mode;
+    bool use_u_null_mode;
 
     static int solve_id;
 

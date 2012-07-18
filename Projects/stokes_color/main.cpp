@@ -86,6 +86,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(grid,phi_value,phi_color);
     iss.use_preconditioner=use_preconditioner;
     iss.Set_Matrix(at.mu,at.wrap,&at,0,0);
+//    iss.use_p_null_mode=true;
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -114,27 +115,32 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
                 FACE_INDEX<TV::m> face(it.Full_Index()); 
                 u(c)(face)=at.u(it.Location(),c)(face.axis);}
         
-        iss.Set_RHS(rhs,f_volume,&u,true);
+        iss.Set_RHS(rhs,f_volume,&u,false);
         iss.Resize_Vector(sol);
     }
 
     MINRES<T> mr;
+    CONJUGATE_RESIDUAL<T> cr;
     KRYLOV_SOLVER<T>* solver=&mr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+    KRYLOV_VECTOR_BASE<T>& tr=*rhs.Clone_Default();
+    tr=rhs;
 
     if(dump_matrix){
         KRYLOV_SOLVER<T>::Ensure_Size(vectors,rhs,2);
         OCTAVE_OUTPUT<T>("M.txt").Write("M",iss,*vectors(0),*vectors(1));
         OCTAVE_OUTPUT<T>("b.txt").Write("b",rhs);}
 
+//    solver->print_residuals=true;
     solver->Solve(iss,sol,rhs,vectors,1e-10,0,max_iter);
-    
+    if(dump_matrix) OCTAVE_OUTPUT<T>("x.txt").Write("x",sol);
+
     iss.Multiply(sol,*vectors(0));
     *vectors(0)-=rhs;
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
 
     for(int i=0;i<iss.null_modes.m;i++){
-        iss.Multiply(iss.null_modes(i),*vectors(0));
+        iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
 
     ARRAY<T,FACE_INDEX<TV::m> > exact_u,numer_u,error_u;
@@ -164,15 +170,20 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     TV avg_u;
     TV_INT cnt_u;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        int c=at.phi_color(it.Location());
+        if(c<0) continue;
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         exact_u(face)=at.u(it.Location())(face.axis);
         error_u(face)=numer_u(face)-exact_u(face);
+//        LOG::cout<<numer_u(face)<<"   "<<exact_u(face)<<"   "<<error_u(face)<<"   "<<at.phi_value(it.Location())<<std::endl;
         avg_u(face.axis)+=error_u(face);
         cnt_u(face.axis)++;}
     avg_u/=(TV)cnt_u;
 
     TV error_u_linf,error_u_l2;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        int c=at.phi_color(it.Location());
+        if(c<0) continue;
         FACE_INDEX<TV::m> face(it.Full_Index()); 
         error_u(face)-=avg_u(face.axis);
         error_u_linf(face.axis)=max(error_u_linf(face.axis),abs(error_u(face)));
@@ -184,6 +195,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     T avg_p=0;
     int cnt_p=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
+        int c=at.phi_color(it.Location());
+        if(c<0) continue;
         exact_p(it.index)=at.p(it.Location());
         error_p(it.index)=numer_p(it.index)-exact_p(it.index);
         avg_p+=error_p(it.index);
@@ -460,21 +473,21 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             test=new ANALYTIC_TEST_10;
             break;}
         case 11:{ // 
-            struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
+            struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
             {
                 T r,m2,m4,u_term,p_term;
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){wrap=true;mu.Append(1);r=m/pi;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:DIRICHLET;}
-                virtual TV u(const TV& X,int color){TV x=X-0.5*m;x(1)=-x(1);return x;}
+                virtual TV u(const TV& X,int color){TV x=X-0.5*m;TV u;u(0)=x.x;u(1)=-x.y;return u;}
                 virtual T p(const TV& X){return 0;}
                 virtual TV f_volume(const TV& X,int color){return TV();}
                 virtual TV j_surface(const TV& X,int color0,int color1){return TV();}
-                virtual TV n_surface(const TV& X,int color0,int color1){return TV();}
+                virtual TV n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m;x.Normalize();x(1)*=-mu(0)*3;return -x;}
                 virtual TV d_surface(const TV& X,int color0,int color1){return u(X,max(color0,color1));}
             };
-            test=new ANALYTIC_TEST_10;
+            test=new ANALYTIC_TEST_11;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

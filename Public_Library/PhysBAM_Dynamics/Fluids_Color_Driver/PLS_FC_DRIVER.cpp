@@ -287,7 +287,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     LOG::cout<<"Residual: "<<iss.Convergence_Norm(*vectors(0))<<std::endl;
 
     for(int i=0;i<iss.null_modes.m;i++){
-        iss.Multiply(iss.null_modes(i),*vectors(0));
+        iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){

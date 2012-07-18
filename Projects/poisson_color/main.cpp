@@ -113,7 +113,11 @@ void Dump_System(const INTERFACE_POISSON_SYSTEM_COLOR<TV>& ips,ANALYTIC_TEST<TV>
     for(int i=0;i<ips.cdi->surface_mesh.m;i++){
         SURFACE_ELEMENT& V=ips.cdi->surface_mesh(i);
         Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.x.Center(),V.y,V.z)*T_FACE::Normal(V.x.X));}
+        T k=0;
+        if(V.y>=0) k=at.j_surface(V.x.Center(),V.y,V.z);
+        else if(V.y==-1) k=at.n_surface(V.x.Center(),V.y,V.z);
+        else if(V.y==-2) k=at.d_surface(V.x.Center(),V.y,V.z);
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,k*T_FACE::Normal(V.x.X));}
     Flush_Frame<T,TV>("surface forces");
     
     Dump_Interface<T,TV>(ips);
@@ -730,6 +734,26 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 }
             };
             test=new ANALYTIC_TEST_12;
+            break;}
+        case 13:{
+            struct ANALYTIC_TEST_10:public ANALYTIC_TEST<TV>
+            {
+                T r;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize()
+                {
+                    wrap=true;
+                    mu.Append(1);
+                    r=(T).3;
+                }
+                virtual T phi_value(const TV& X){TV x=X-0.5*m;T s=x.Magnitude()-r;return abs(s);}
+                virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?0:-1;}
+                virtual T u(const TV& X,int color){TV x=X-0.5*m;return x.y*x.y;}
+                virtual T f_volume(const TV& X,int color){TV x=X-0.5*m;return -2;}
+                virtual T d_surface(const TV& X,int color0,int color1){return u(X,color1);}
+                virtual T n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m,z;z(1)=2*x.y;return z.Dot(x.Normalized());}
+            };
+            test=new ANALYTIC_TEST_10;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

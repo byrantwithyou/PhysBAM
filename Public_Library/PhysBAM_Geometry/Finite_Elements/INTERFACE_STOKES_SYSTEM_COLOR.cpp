@@ -29,7 +29,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input)
-    :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices()),phi_color(phi_grid.Node_Indices())
+    :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices()),phi_color(phi_grid.Node_Indices()),use_p_null_mode(false),use_u_null_mode(false)
 {
     CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
 }
@@ -42,6 +42,7 @@ template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
     for(int i=0;i<TV::m;i++) delete cm_u(i);
     delete cm_p;
     delete cdi;
+    null_modes.Delete_Pointers_And_Clean_Memory();
 }
 //#####################################################################
 // Function Set_Matrix
@@ -87,7 +88,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
     cm_p=new CELL_MANAGER_COLOR<TV>(*cdi);
     for(int i=0;i<TV::m;i++) cm_u(i)=new CELL_MANAGER_COLOR<TV>(*cdi);
 
-    // STENCILS INTEGRATION 
+    // STENCILS INTEGRATION
     
     BASIS_INTEGRATION_UNIFORM_COLOR<TV,2> biu(grid,phi_grid,phi_value,phi_color,*cdi);
     VECTOR<VECTOR<SYSTEM_VOLUME_BLOCK_HELPER_COLOR<TV>,TV::m>,TV::m> helper_uu;
@@ -174,26 +175,26 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
 
     if(this->use_preconditioner) Set_Jacobi_Preconditioner();
 
-    if(true){
-        null_modes.Append(VECTOR_T());
-        Resize_Vector(null_modes.Last());
+    if(use_p_null_mode){
+        null_modes.Append(new VECTOR_T);
+        Resize_Vector(*null_modes.Last());
         for(int c=0;c<cdi->colors;c++){
-            null_modes.Last().p(c).Fill(1);
+            null_modes.Last()->p(c).Fill(1);
             int start=cdi->constraint_base_t*(TV::m-1);
             int end=start+cdi->constraint_base_n;
             for(int k=start;k<end;k++)
-                null_modes.Last().q(k)=-1;}}
+                null_modes.Last()->q(k)=-1;}}
 
-    if(!system_inertia)
+    if(!system_inertia && use_u_null_mode)
         for(int i=0;i<TV::m;i++){
-            null_modes.Append(VECTOR_T());
-            Resize_Vector(null_modes.Last());
+            null_modes.Append(new VECTOR_T);
+            Resize_Vector(*null_modes.Last());
             for(int c=0;c<cdi->colors;c++)
-                null_modes.Last().u(i)(c).Fill(1);}
+                null_modes.Last()->u(i)(c).Fill(1);}
 
     for(int i=0;i<null_modes.m;i++){
-        Clear_Unused_Entries(null_modes(i));
-        null_modes(i).Normalize();}
+        Clear_Unused_Entries(*null_modes(i));
+        null_modes(i)->Normalize();}
 
     for(int i=0;i<TV::m;i++){
         delete u_stencil(i);
@@ -390,7 +391,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     // TODO: This needs to change for N/D BC.
     VECTOR_T& v=debug_cast<VECTOR_T&>(x);
     for(int i=0;i<null_modes.m;i++)
-        v.Copy(-v.Dot(null_modes(i)),null_modes(i),v);
+        v.Copy(-v.Dot(*null_modes(i)),*null_modes(i),v);
 
     Clear_Unused_Entries(v);
 }
