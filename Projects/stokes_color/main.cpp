@@ -31,6 +31,9 @@ using namespace PhysBAM;
 typedef float RW;
 std::string output_directory="output";
 
+typedef VECTOR<double,3> TV3;
+TV3 color_map[4]={TV3(0,0.7,0),TV3(0.8,0.8,0),TV3(0,0.4,1),TV3(0.8,0.2,0)};
+
 template<class TV>
 GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
 {
@@ -42,7 +45,188 @@ GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
 
 template<class TV> struct ANALYTIC_TEST;
 
-// TODO - Insert dump debug particles routines
+
+template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
+{
+    static DEBUG_PARTICLES<TV> debug_particles;
+    return debug_particles;
+}
+
+template<class T,int d>
+void Dump_Frame(const ARRAY<T,FACE_INDEX<d> >& u,const char* title)
+{
+    static int frame=0;
+    char buff[100];
+    sprintf(buff, "%s/%i", output_directory.c_str(), frame);
+    FILE_UTILITIES::Create_Directory(buff);
+    FILE_UTILITIES::Write_To_File<RW>((std::string)buff+"/mac_velocities.gz",u);
+    if(title) FILE_UTILITIES::Write_To_Text_File((std::string)buff+"/frame_title",title);
+    Get_Debug_Particles<VECTOR<T,d> >().Write_Debug_Particles(STREAM_TYPE((RW())),output_directory,frame);
+    frame++;
+}
+
+template<class T,class TV>
+void Flush_Frame(const char* title)
+{
+    Dump_Frame(ARRAY<typename TV::SCALAR,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
+}
+
+
+template<class T,class TV>
+void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss)
+{
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+
+    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
+        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        Add_Debug_Object(V.x.X-V.x.Normal()*(T).03*iss.grid.dX.Min(),V.z>=0?color_map[V.z]:(TV3::Axis_Vector(-V.z-1)+3)/4);
+        Add_Debug_Object(V.x.X+V.x.Normal()*(T).03*iss.grid.dX.Min(),V.y>=0?color_map[V.y]:(TV3::Axis_Vector(-V.y-1)+3)/4);}
+}
+// template<class T,class TV>
+// void Dump_Interface(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const bool arrows)
+// {
+//     for(int i=0;i<iss.object.mesh.elements.m;i++){
+//         Add_Debug_Particle(iss.object.Get_Element(i).X(0),VECTOR<T,3>(0,0.5,0));
+//         if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(iss.object.Get_Element(i).X(1)-iss.object.Get_Element(i).X(0))/iss.grid.dX);
+//         Add_Debug_Particle(iss.object.Get_Element(i).X(1),VECTOR<T,3>(0,0.5,0));
+//         if(arrows) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,(iss.object.Get_Element(i).X(0)-iss.object.Get_Element(i).X(1))/iss.grid.dX);
+//         Add_Debug_Particle(iss.object.Get_Element(i).Center(),VECTOR<T,3>(0,0.3,1));}
+// }
+
+template<class T,class TV>
+void Dump_System(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,ANALYTIC_TEST<TV>& at)
+{
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
+
+    Dump_Interface<T,TV>(iss);
+    Flush_Frame<T,TV>("interface");
+    const char* names[3]={"(neumann)","(dirichlet)","(slip)"};
+    char buff[100];
+    for(int c=0;c<iss.cdi->colors;c++){
+        Dump_Interface<T,TV>(iss);
+        sprintf(buff,"dofs %i %s",c,c>=0?"":names[-c-1]);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+            int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+            if(index>=0){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(it.Axis()));}}
+        Flush_Frame<T,TV>(buff);}
+
+    for(int c=0;c<iss.cdi->colors;c++){
+        Dump_Interface<T,TV>(iss);
+        sprintf(buff,"dofs p %i %s",c,c>=0?"":names[-c-1]);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+            int index=iss.cm_p->Get_Index(it.index,c);
+            if(index>=0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,1,1));}
+        Flush_Frame<T,TV>(buff);}
+
+    // for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+    //     if(at.phi(it.Location())<0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,0.3,1));
+    //     else Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.9,0.2,0.2));}
+    // Flush_Frame<T,TV>("analytic level set");
+
+    Dump_Interface<T,TV>(iss);
+    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
+        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        if(V.y<0) continue;
+        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.j_surface(V.x.Center(),V.y,V.z));}
+    Flush_Frame<T,TV>("analytic interfacial forces");
+
+    Dump_Interface<T,TV>(iss);
+    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
+        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        if(V.y!=-2 && V.y!=-3) continue;
+        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.d_surface(V.x.Center(),V.y,V.z));}
+    Flush_Frame<T,TV>("analytic dirichlet conditions");
+
+    Dump_Interface<T,TV>(iss);
+    for(int i=0;i<iss.cdi->surface_mesh.m;i++){
+        SURFACE_ELEMENT& V=iss.cdi->surface_mesh(i);
+        if(V.y!=-1 && V.y!=-3) continue;
+        Add_Debug_Particle(V.x.Center(),VECTOR<T,3>(0,0.1,0.5));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,at.n_surface(V.x.Center(),V.y,V.z));}
+    Flush_Frame<T,TV>("analytic neumann forces");
+}
+
+template<class T,class TV>
+void Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const char* title)
+{
+    char buff[100];
+    for(int c=0;c<iss.cdi->colors;c++){
+        Dump_Interface<T,TV>(iss);
+        sprintf(buff,"%s %i",title,c);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+            int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
+            if(index>=0){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,v.u(it.Axis())(c)(index));}}
+        Flush_Frame<T,TV>(buff);}
+
+    for(int c=0;c<iss.cdi->colors;c++){
+        Dump_Interface<T,TV>(iss);
+        sprintf(buff,"%s p %i",title,c);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+            int k=iss.cm_p->Get_Index(it.index,c);
+            if(k>=0){
+                Add_Debug_Particle(it.Location(),v.p(c)(k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v.p(c)(k));}}
+        Flush_Frame<T,TV>(buff);}
+}
+
+template<class T,class TV>
+void Dump_Vector2(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const char* title)
+{
+    char buff[100];
+    for(int c=0;c<iss.cdi->colors;c++){
+        sprintf(buff,"%s %i",title,c);
+        Dump_Interface<T,TV>(iss);
+        ARRAY<T,FACE_INDEX<TV::m> > u(iss.grid);
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+            int i=it.Axis();
+            int k=iss.cm_u(i)->Get_Index(it.index,c);
+            if(k>=0) u(it.Full_Index())=v.u(i)(c)(k);}
+
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+            int k=iss.cm_p->Get_Index(it.index,c);
+            if(k>=0){
+                Add_Debug_Particle(it.Location(),v.p(c)(k)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,v.p(c)(k));}}
+
+        Dump_Frame(u,buff);}
+}
+
+template<class T,class TV,class TV_INT>
+void Dump_u_p(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<T,TV_INT>& p,const char* title)
+{
+    char buff[100];
+    Dump_Interface<T,TV>(iss);
+    sprintf(buff,"%s",title);
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(iss.grid);it.Valid();it.Next()){
+        Add_Debug_Particle(it.Location(),VECTOR<T,3>(0.25,0.25,0.25));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(it.Axis())*u(it.Full_Index()));}
+    Flush_Frame<T,TV>(buff);
+
+    Dump_Interface<T,TV>(iss);
+    sprintf(buff,"%s p",title);
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(iss.grid);it.Valid();it.Next()){
+        Add_Debug_Particle(it.Location(),p(it.index)>0?VECTOR<T,3>(0,1,0):VECTOR<T,3>(1,0,0));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,p(it.index));}
+    Flush_Frame<T,TV>(buff);
+}
+
+template<class T,class TV,class TV_INT>
+void Dump_u_p(const GRID<TV>& grid,const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<T,TV_INT>& p,const char* title)
+{
+    INTERPOLATED_COLOR_MAP<T> color_map;
+    color_map.Initialize_Colors(1e-12,1,true,true,true);
+
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
+        Add_Debug_Particle(it.Location(),color_map(p(it.index)));
+
+    Dump_Frame(u,title);
+}
 
 //#################################################################################################################################################
 // Analytic Test ##################################################################################################################################
@@ -212,7 +396,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
 
     LOG::cout<<iss.grid.counts<<" P error:   linf "<<error_p_linf<<"   l2 "<<error_p_l2<<std::endl<<std::endl;
 
-    /*if(debug_particles){
+    if(debug_particles){
         Dump_System<T,TV>(iss,at);
         Dump_Vector<T,TV>(iss,sol,"solution");
         Dump_u_p(iss,error_u,error_p,"error");
@@ -222,8 +406,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             iss.Multiply(rhs,*vectors(0));
             LOG::cout<<"nullspace found: "<<sqrt(iss.Inner_Product(*vectors(0),*vectors(0)))<<std::endl;
             rhs*=1/rhs.Max_Abs();
-            Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}}*/
-        
+            Dump_Vector2<T,TV>(iss,rhs,"extra null mode");}}
+
     vectors.Delete_Pointers_And_Clean_Memory();
 }
 
@@ -238,7 +422,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     typedef VECTOR<int,TV::m> TV_INT;
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1};
 
-    // Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
     T opt_s=1,opt_m=1,opt_kg=1;
     int res=4,max_iter=1000000;
@@ -479,12 +663,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
                 virtual void Initialize(){wrap=true;mu.Append(1);r=m/pi;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
-                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:DIRICHLET;}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:NEUMANN;}
                 virtual TV u(const TV& X,int color){TV x=X-0.5*m;TV u;u(0)=x.x;u(1)=-x.y;return u;}
                 virtual T p(const TV& X){return 0;}
                 virtual TV f_volume(const TV& X,int color){return TV();}
                 virtual TV j_surface(const TV& X,int color0,int color1){return TV();}
-                virtual TV n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m;x.Normalize();x(1)*=-mu(0)*3;return -x;}
+                virtual TV n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m;x.Normalize();x(1)*=-mu(0);return x;}
                 virtual TV d_surface(const TV& X,int color0,int color1){return u(X,max(color0,color1));}
             };
             test=new ANALYTIC_TEST_11;
