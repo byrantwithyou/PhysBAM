@@ -30,3 +30,9 @@ stokes_color/stokes_color_debug
 poisson_color/poisson_color
 poisson_color/poisson_color_debug
 krylov_solver_test/krylov_solver_test
+stokes_new/stokes_new_debug
+stokes_new/stokes_new
+krylov_solver_test/krylov_solver_test_debug
+fluids_color_2d/fluids_color_2d_profile
+stokes/stokes_debug
+stokes/stokes
