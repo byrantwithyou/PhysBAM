@@ -23,24 +23,18 @@ int main(int argc,char* argv[])
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
+    std::string input_directory="input_directory",data_file="density",surface_file;
+    int frame=-1,xcut=-1;
+    T xstart=0;
+    bool opt_follow_transverse_velocity=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_String_Argument("-in","input_directory");
-    parse_args.Add_String_Argument("-data","density","Data to parse");
-    parse_args.Add_Integer_Argument("-frame",-1);
-    parse_args.Add_Integer_Argument("-xcut",-1);
-    parse_args.Add_String_Argument("-surface","");
-
-    parse_args.Add_Double_Argument("-xstart",0);
-    parse_args.Add_Double_Argument("-transverse_velocity",-1);
-    parse_args.Add_Option_Argument("-follow_transverse_velocity");
-
+    parse_args.Add("-in",&input_directory,"dir","input_directory");
+    parse_args.Add("-data",&data_file,"file","Data to parse");
+    parse_args.Add("-frame",&frame,"frame","frame");
+    parse_args.Add("-xcut",&xcut,"xcut","xcut");
+    parse_args.Add("-surface",&surface_file,"file","surface file");
+    parse_args.Add("-follow_transverse_velocity",&opt_follow_transverse_velocity,"","");
     parse_args.Parse();
-    std::string input_directory=parse_args.Get_String_Value("-in"),
-        data_file=parse_args.Get_String_Value("-data"),
-        surface_file=parse_args.Get_String_Value("-surface");
-    int frame=parse_args.Get_Integer_Value("-frame"),
-        xcut=parse_args.Get_Integer_Value("-xcut");
-    T xstart=(T)parse_args.Get_Double_Value("-xstart");
 
 //##########################  INITIALIZATION  #########################
     GRID<TV> grid;
@@ -63,7 +57,7 @@ int main(int argc,char* argv[])
             GRID<VECTOR<T,1> > cut_grid(grid.counts.Remove_Index(1),grid.domain.Remove_Dimension(1),grid.Is_MAC_Grid());
             for(GRID<VECTOR<T,1> >::CELL_ITERATOR iter(cut_grid);iter.Valid();iter.Next())
                 LOG::cout<<iter.Location().x<<"\t"<<data(iter.Cell_Index().Insert(xcut,1))<<std::endl;}
-        else if(parse_args.Get_Option_Value("-follow_transverse_velocity")){
+        else if(opt_follow_transverse_velocity){
             T time;FILE_UTILITIES::Read_From_File<RW>(f+"time",time);
             T transverse_velocity;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/transverse_velocity",transverse_velocity);
             T x_position=xstart+time*transverse_velocity;

@@ -45,20 +45,24 @@ public:
     using BASE::face_velocities;using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_geometry_collection;using BASE::boundary_scalar;using BASE::density;
     using BASE::boundary;using BASE::restart;using BASE::temperature;
 
-    SMOKE_TESTS(const STREAM_TYPE stream_type_input,const PARSE_ARGS& parse_args)
-        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),stream_type(stream_type_input),use_collisions(false),use_conservative_advection(false)
+    SMOKE_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),vc((T).06),test_number(1),stream_type(stream_type_input),use_collisions(false),upsample(1),buoyancy_clamp(1),use_conservative_advection(false)
     {
+        int scale=64;
+        T source_radius=(T).05;
+        parse_args.Add("-scale",&scale,"scale","grid resolution");
+        parse_args.Add("-restart",&restart,"frame","restart");
+        parse_args.Add("-vc",&vc,"scalar","vorticity confinement");
+        parse_args.Add("-source_radius",&source_radius,"radius","radius of source");
+        parse_args.Add("-buoyancy",&buoyancy_clamp,"const","buoyancy constant");
+        parse_args.Add("-test_number",&test_number,"test","test number");
+        parse_args.Add("-substep",&write_substeps_level,"level","level of writing sub-steps");
+        parse_args.Add("-upsample",&upsample,"level","level of refinement");
+        parse_args.Add("-conservative",&use_conservative_advection,"use conservative advection");
+        parse_args.Parse();
+
         last_frame=200;
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");;
-        test_number=parse_args.Get_Integer_Value("-test_number");
-        int scale=parse_args.Get_Integer_Value("-scale");
-        upsample=parse_args.Get_Integer_Value("-upsample");
-        restart=parse_args.Get_Integer_Value("-restart");
-        vc=parse_args.Get_Double_Value("-vc");
-        buoyancy_clamp=parse_args.Get_Double_Value("-buoyancy");
         output_directory=STRING_UTILITIES::string_sprintf("Smoke_Tests/Test_%d_%d_%d_vc_%1.2f_%dd_%1.2f",test_number,scale,upsample,vc,TV::dimension,buoyancy_clamp);
-        T source_radius=parse_args.Get_Double_Value("-source_radius");
-        use_conservative_advection=parse_args.Is_Value_Set("-conservative");
         if(TV::dimension==2){
             source_box_2d.min_corner=TV::Constant_Vector(0.25-source_radius);
             source_box_2d.max_corner=TV::Constant_Vector(0.25+source_radius);

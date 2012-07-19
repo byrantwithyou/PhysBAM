@@ -19,7 +19,7 @@ typedef double T;
 typedef float RW;
 typedef VECTOR<T,3> TV;
 
-std::string output_directory;
+std::string output_directory="output";
 
 template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
 {
@@ -43,14 +43,13 @@ int main(int argc, char* argv[])
 {
     srand(time(0));
     Get_Debug_Particles<TV>();
+    std::string colors="abbbbbbb";
+    int n=5;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_String_Argument("-o","output","output directory");
-    parse_args.Add_String_Argument("-c","abbbbbbb","color case");
-    parse_args.Add_Integer_Argument("-n",5,"extra random tests");
+    parse_args.Add("-o",&output_directory,"dir","output directory");
+    parse_args.Add("-c",&colors,"colors","color case");
+    parse_args.Add("-n",&n,"tests","extra random tests");
     parse_args.Parse();
-    output_directory=parse_args.Get_String_Value("-o");
-    std::string colors=parse_args.Get_String_Value("-c");
-    int n=parse_args.Get_Integer_Value("-n");
 
     ARRAY<TV> color_map(128);
     color_map('a')=TV(1,0,0);

@@ -68,41 +68,49 @@ public:
     int rigid_particle_id;
     int short_kol;
 
-    SMOKE_TESTS(const STREAM_TYPE stream_type_input,const PARSE_ARGS& parse_args)
-        :INCOMPRESSIBLE_REFINEMENT_EXAMPLE<TV>(stream_type_input),use_collisions(false),binary_refinement_levels(0),
-        use_direct_solver(false),number_of_threads(0),
-        local_mac_grid(TV_INT::All_Ones_Vector(),RANGE<TV>::Centered_Box(),true),local_face_velocities(local_mac_grid),local_projection(local_mac_grid),local_projection_analytic(local_mac_grid),stream_type(stream_type_input)
+    SMOKE_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :INCOMPRESSIBLE_REFINEMENT_EXAMPLE<TV>(stream_type_input),scale(64),use_collisions(false),binary_refinement_levels(0),
+        alpha(1),vc((T).1),use_direct_solver(false),number_of_threads(0),buoyancy_clamp(1),
+        local_mac_grid(TV_INT::All_Ones_Vector(),RANGE<TV>::Centered_Box(),true),local_face_velocities(local_mac_grid),
+        local_projection(local_mac_grid),local_projection_analytic(local_mac_grid),test_number(1),stream_type(stream_type_input),short_kol(0)
     {
-        test_number=parse_args.Get_Integer_Value("-test_number");
-        last_frame=parse_args.Get_Integer_Value("-last_frame");
-        restart=parse_args.Get_Integer_Value("-restart");
-        alpha=parse_args.Get_Double_Value("-alpha");
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");
-        number_of_threads=parse_args.Get_Integer_Value("-threads");
-        scale=parse_args.Get_Integer_Value("-scale");
-        binary_refinement_levels=parse_args.Get_Integer_Value("-binary");
-        split_dir=parse_args.Get_String_Value("-split");
-        buoyancy_clamp=parse_args.Get_Double_Value("-buoyancy");
-        if(parse_args.Is_Value_Set("-coarse_forces")){use_coarse_forces=true;use_interpolated_vorticity=true;}
-        else use_coarse_forces=false;
+        int opt_x=1,opt_y=2,opt_z=1;
+        T source_radius=(T)0.05;
+        last_frame=200;
+        parse_args.Add("-restart",&restart,"frame","restart frame");
+        parse_args.Add("-split",&split_dir,"dir","split restart data");
+        parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+        parse_args.Add("-subscale",&sub_scale,"scale","fine/coarse scale grid resolution ratio");
+        parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
+        parse_args.Add("-threads",&number_of_threads,"threads","number of threads");
+        parse_args.Add("-x",&opt_x,"scale","ratio multiplier");
+        parse_args.Add("-y",&opt_y,"scale","ratio multiplier");
+        parse_args.Add("-z",&opt_z,"scale","ratio multiplier");
+        parse_args.Add("-coarse_forces",&use_coarse_forces,"Use coarse forces");
+        parse_args.Add("-cfl",&cfl,"cfl","CFL");
+        parse_args.Add("-binary",&binary_refinement_levels,"levels","total number of binary adaptive refinement levels");
+        parse_args.Add("-alpha",&alpha,"alpha","interpolation parameter");
+        parse_args.Add("-vc",&vc,"scale","vorticity confinement");
+        parse_args.Add("-last_frame",&last_frame,"frame","number of frames simulated");
+        parse_args.Add("-test_number",&test_number,"test","test number");
+        parse_args.Add("-kol",&kolmogorov,"scale","kolmogorov");
+        parse_args.Add("-short_kol",&short_kol,"frame","turn off kolmogorov after the specified frame. 0 means don't turn off.");
+        parse_args.Add("-source_radius",&source_radius,"radius","radius of source");
+        parse_args.Parse();
+
+        use_interpolated_vorticity=use_coarse_forces;
         if(binary_refinement_levels){
             sub_scale=1;
             for(int i=0;i<binary_refinement_levels;i++) sub_scale<<=1;}
-        else sub_scale=parse_args.Get_Integer_Value("-subscale");
         if(sub_scale==1) LOG::cout<<"WARNING: Please use one_phase_incompressible instead"<<std::endl;
-        vc=parse_args.Get_Double_Value("-vc");
-        cfl=parse_args.Get_Double_Value("-cfl");
-        kolmogorov=parse_args.Get_Double_Value("-kol");
-        short_kol=parse_args.Get_Integer_Value("-short_kol");
-        
+
         TV_INT ratio=TV_INT::All_Ones_Vector();
-        if(parse_args.Get_Integer_Value("-x")!=1) ratio(0)*=parse_args.Get_Integer_Value("-x");
-        if(parse_args.Get_Integer_Value("-y")!=1) ratio(1)*=parse_args.Get_Integer_Value("-y");
-        if(parse_args.Get_Integer_Value("-z")!=1) ratio(2)*=parse_args.Get_Integer_Value("-z");
+        ratio(0)*=opt_x;
+        ratio(1)*=opt_y;
+        ratio(2)*=opt_z;
         TV space;space(0)=T(1);for(int i=2;i<=TV::dimension;i++) space(i)=(T)ratio(i)/(T)ratio(0);
         space*=0.5;
 
-        T source_radius=parse_args.Get_Double_Value("-source_radius");
         if(TV::dimension==2){
             source_box_2d.min_corner=space*0.5-TV::Constant_Vector(source_radius);
             source_box_2d.max_corner=space*0.5+TV::Constant_Vector(source_radius);

@@ -38,19 +38,23 @@ public:
     using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_geometry_collection;using BASE::boundary_scalar;using BASE::density;using BASE::boundary;using BASE::restart;using BASE::analytic_test;
     using BASE::cfl;using BASE::frame_rate;using BASE::stream_type;using BASE::temperature;
 
-    ADVECTION_TESTS(const STREAM_TYPE stream_type_input,const PARSE_ARGS& parse_args)
-        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),use_conservative_advection(false)
+    ADVECTION_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),use_conservative_advection(false),use_eno_advection(false),test_number(1),local_order(1)
     {
+        int scale=64;
+        cfl=(T)0.9;
+        parse_args.Add("-scale",&scale,"scale","grid resolution");
+        parse_args.Add("-restart",&restart,"frame","restart");
+        parse_args.Add("-cfl",&cfl,"cfl","cfl");
+        parse_args.Add("-test_number",&test_number,"number","test number");
+        parse_args.Add("-substep",&write_substeps_level,"level","level of writing sub-steps");
+        parse_args.Add("-order",&local_order,"order","order to use");
+        parse_args.Add("-conservative",&use_conservative_advection,"use conservative advection");
+        parse_args.Add("-eno",&use_eno_advection,"use eno advection");
+        parse_args.Parse();
+
         last_frame=250;analytic_test=true;
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");;
-        test_number=parse_args.Get_Integer_Value("-test_number");
         if(test_number==3) last_frame=24;
-        int scale=parse_args.Get_Integer_Value("-scale");
-        cfl=parse_args.Get_Double_Value("-cfl");
-        restart=parse_args.Get_Integer_Value("-restart");
-        use_conservative_advection=parse_args.Is_Value_Set("-conservative");
-        use_eno_advection=parse_args.Is_Value_Set("-eno");
-        local_order=parse_args.Get_Integer_Value("-order");
         output_directory=STRING_UTILITIES::string_sprintf("Advection_Tests/Test_%d_%d_%d_%1.2f%s%s",test_number,scale,TV::dimension,cfl,use_conservative_advection?"_conservative":(use_eno_advection?"_eno":""),local_order>1?"_high_order":"");
         TV_INT counts=TV_INT::All_Ones_Vector()*scale*(test_number==3?1:3);
         RANGE<TV> range=RANGE<TV>(TV(),TV::All_Ones_Vector()*((test_number==3)?100:15));

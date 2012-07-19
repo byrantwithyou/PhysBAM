@@ -10,11 +10,16 @@ using namespace PhysBAM;
 
 template<class TV> void Execute_Main_Program(STREAM_TYPE& stream_type,PARSE_ARGS& parse_args,MPI_WORLD& mpi_world)
 { 
+    bool opt_smoke=false,opt_velocity=false;
+    parse_args.Add("-smoke",&opt_smoke,"smoke tests");
+    parse_args.Add("-velocity",&opt_velocity,"velocity tests");
+    parse_args.Parse(true);
+
     INCOMPRESSIBLE_EXAMPLE<TV>* example;
-    if(parse_args.Is_Value_Set("-smoke")) example=new SMOKE_TESTS<TV>(stream_type,parse_args);
-    else if(parse_args.Is_Value_Set("-velocity")) example=new VELOCITY_TESTS<TV>(stream_type,parse_args);
+    if(opt_smoke) example=new SMOKE_TESTS<TV>(stream_type,parse_args);
+    else if(opt_velocity) example=new VELOCITY_TESTS<TV>(stream_type,parse_args);
     else example=new ADVECTION_TESTS<TV>(stream_type,parse_args);
-        
+
     if(mpi_world.initialized){
         example->mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(example->mac_grid,3);
         if(example->mpi_grid->Number_Of_Processors()>1) example->output_directory+=STRING_UTILITIES::string_sprintf("_NP%d/%d",example->mpi_grid->Number_Of_Processors(),(mpi_world.rank+1));}
@@ -33,30 +38,19 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
+    bool opt_2d=false,opt_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-scale",64,"grid resolution");
-    parse_args.Add_Integer_Argument("-restart",0,"restart");
-    parse_args.Add_Double_Argument("-cfl",0.9,"cfl");
-    parse_args.Add_Integer_Argument("-test_number",1,"test number");
-    parse_args.Add_Integer_Argument("-substep",-1,"level of writing sub-steps");
-    parse_args.Add_Integer_Argument("-order",1,"order to use");
-    parse_args.Add_Option_Argument("-2d","do 2d solve");
-    parse_args.Add_Option_Argument("-3d","do 3d solve");
-    parse_args.Add_Option_Argument("-smoke","smoke tests");
-    parse_args.Add_Option_Argument("-velocity","velocity tests");
-    parse_args.Add_Option_Argument("-conservative","use conservative advection");
-    parse_args.Add_Option_Argument("-eno","use eno advection");
-    parse_args.Add_Option_Argument("-energy","conserve energy");
-  
     parse_args.Print_Arguments();
-    parse_args.Parse();
-    
-    if(parse_args.Is_Value_Set("-3d")){
-        Execute_Main_Program<VECTOR<T,2> >(stream_type,parse_args,mpi_world);}
-    else if(parse_args.Is_Value_Set("-2d")){
-        Execute_Main_Program<VECTOR<T,2> >(stream_type,parse_args,mpi_world);}
-    else{
-        Execute_Main_Program<VECTOR<T,1> >(stream_type,parse_args,mpi_world);}
+    parse_args.Add("-2d",&opt_2d,"do 2d solve");
+    parse_args.Add("-3d",&opt_3d,"do 3d solve");
+    parse_args.Parse(true);
+
+    if(opt_3d)
+        Execute_Main_Program<VECTOR<T,2> >(stream_type,parse_args,mpi_world);
+    else if(opt_2d)
+        Execute_Main_Program<VECTOR<T,2> >(stream_type,parse_args,mpi_world);
+    else
+        Execute_Main_Program<VECTOR<T,1> >(stream_type,parse_args,mpi_world);
 
     return 0;
 }

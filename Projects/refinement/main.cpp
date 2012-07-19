@@ -16,35 +16,13 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
+    bool opt_3d=true;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-restart",0,"restart frame");
-    parse_args.Add_String_Argument("-split","","split restart data");
-    parse_args.Add_Integer_Argument("-scale",64,"fine scale grid resolution");
-    parse_args.Add_Integer_Argument("-subscale",4,"fine/coarse scale grid resolution ratio");
-    parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
-    parse_args.Add_Integer_Argument("-threads",0,"number of threads");
-    parse_args.Add_Integer_Argument("-x",1,"ratio multiplier");
-    parse_args.Add_Integer_Argument("-y",2,"ratio multiplier");
-    parse_args.Add_Integer_Argument("-z",1,"ratio multiplier");
-    parse_args.Add_Option_Argument("-coarse_forces","Use coarse forces");
-    parse_args.Add_Double_Argument("-cfl",.9,"CFL");
-    parse_args.Add_String_Argument("-output","output","output directory");
-    parse_args.Add_Integer_Argument("-binary",0,"total number of binary adaptive refinement levels");
-    parse_args.Add_Double_Argument("-alpha",1,"interpolation parameter");
-    parse_args.Add_Double_Argument("-vc",.1,"vorticity confinement");
-    parse_args.Add_Double_Argument("-buoyancy",1,"buoyancy constant");
-    parse_args.Add_Integer_Argument("-last_frame",200,"number of frames simulated");
-    parse_args.Add_Integer_Argument("-scheme",2,"scheme type for binary");
-    parse_args.Add_Integer_Argument("-test_number",1,"test number");
-    parse_args.Add_Double_Argument("-kol",0,"kolmogorov");
-    parse_args.Add_Integer_Argument("-short_kol",0,"turn off kolmogorov after the specified frame. 0 means don't turn off.");
-    parse_args.Add_Double_Argument("-source_radius",0.05,"radius of source");
-    parse_args.Add_Option_Argument("-3d","do 3d solver");
-    
     parse_args.Print_Arguments();
-    parse_args.Parse();
+    parse_args.Add("-3d",&opt_3d,"do 3d solver");
+    parse_args.Parse(true);
 
-    if(!parse_args.Is_Value_Set("-3d")){
+    if(!opt_3d){
         typedef VECTOR<T,2> TV;
         typedef VECTOR<int,TV::dimension> TV_INT;
 

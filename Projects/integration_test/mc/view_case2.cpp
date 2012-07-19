@@ -52,19 +52,17 @@ void norm(TV a,TV b,const char* linecolor, const char* color, T width, T normal_
 
 int main(int argc, char* argv[])
 {
+    int case_number=-1;
+    T corner_radius=(T).05,tri_edge_width=(T).025;
+    std::string file="case.tex";
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-case",-1,"case number");
-    parse_args.Add_Double_Argument("-corner_radius",.05,"corner radius");
-    parse_args.Add_Double_Argument("-tri_edge_width",.025,"triangle edge widths");
-    parse_args.Add_String_Argument("-o","case.tex","output filename");
+    parse_args.Add("-case",&case_number,"case","case number");
+    parse_args.Add("-corner_radius",&corner_radius,"radius","corner radius");
+    parse_args.Add("-tri_edge_width",&tri_edge_width,"width","triangle edge widths");
+    parse_args.Add("-o",&file,"file","output filename");
     parse_args.Parse();
-    int case_number=parse_args.Get_Integer_Value("-case");
-    T corner_radius=parse_args.Get_Double_Value("-corner_radius");
-    T tri_edge_width=parse_args.Get_Double_Value("-tri_edge_width");
-    std::string file=parse_args.Get_String_Value("-o");
 
     for(int v=0;v<4;v++) corners[v]=TV(v&1,v/2&1);
-
     for(int v=0;v<4;v++) points[v+4]=corners[v];
     for(int a=0,k=0;a<2;a++){
         int mask=1<<a;

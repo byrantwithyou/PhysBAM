@@ -16,7 +16,7 @@ using namespace PhysBAM;
 template<class TV> INCOMPRESSIBLE_REFINEMENT_EXAMPLE<TV>::
 INCOMPRESSIBLE_REFINEMENT_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),first_frame(0),last_frame(100),frame_rate(24),write_debug_data(true),
-    output_directory("output"),use_coarse_forces(false),use_interpolated_vorticity(false),restart(0),kolmogorov(0),number_of_ghost_cells(3),cfl((T).9),
+    output_directory("output"),use_coarse_forces(false),use_interpolated_vorticity(false),sub_scale(4),restart(0),kolmogorov(0),number_of_ghost_cells(3),cfl((T).9),
     coarse_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),fine_mac_grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     projection(coarse_mac_grid,false,false,true,true),incompressible(fine_mac_grid,projection),advection_scalar(0),threaded_advection_scalar(0),
     boundary(0),rigid_geometry_collection(this),thread_queue(0)

@@ -38,15 +38,18 @@ public:
     using BASE::face_velocities;using BASE::last_frame;using BASE::write_substeps_level;using BASE::rigid_geometry_collection;using BASE::boundary_scalar;using BASE::density;
     using BASE::boundary;using BASE::restart;using BASE::temperature;
 
-    SMOKE_TESTS(const STREAM_TYPE stream_type_input,const PARSE_ARGS& parse_args)
-        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),use_conservative_advection(false)
+    SMOKE_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
+        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),test_number(1),use_conservative_advection(false)
     {
+        int scale=64;
+        parse_args.Add("-scale",&scale,"scale","grid resolution");
+        parse_args.Add("-restart",&restart,"frame","restart");
+        parse_args.Add("-test_number",&test_number,"number","test number");
+        parse_args.Add("-substep",&write_substeps_level,"level","level of writing sub-steps");
+        parse_args.Add("-conservative",&use_conservative_advection,"use conservative advection");
+        parse_args.Parse();
+
         last_frame=200;
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");;
-        test_number=parse_args.Get_Integer_Value("-test_number");
-        int scale=parse_args.Get_Integer_Value("-scale");
-        restart=parse_args.Get_Integer_Value("-restart");
-        use_conservative_advection=parse_args.Is_Value_Set("-conservative");
         output_directory=STRING_UTILITIES::string_sprintf("Smoke_Tests/Test_%d_%d_%d%s",test_number,scale,TV::dimension,use_conservative_advection?"_conservative":"");
         source_box.min_corner=TV::Constant_Vector(0.45);
         source_box.max_corner=TV::Constant_Vector(0.55);

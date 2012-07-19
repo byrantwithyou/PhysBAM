@@ -14,22 +14,13 @@ int main(int argc,char *argv[])
 
     MPI_WORLD mpi_world(argc,argv);
 
+    bool opt_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-scale",64,"grid resolution");
-    parse_args.Add_Integer_Argument("-restart",0,"restart");
-    parse_args.Add_Double_Argument("-vc",.06,"vorticity confinement");
-    parse_args.Add_Double_Argument("-source_radius",.05,"radius of source");
-    parse_args.Add_Double_Argument("-buoyancy",1,"buoyancy constant");
-    parse_args.Add_Integer_Argument("-test_number",1,"test number");
-    parse_args.Add_Integer_Argument("-substep",-1,"level of writing sub-steps");
-    parse_args.Add_Integer_Argument("-upsample",1,"level of refinement");
-    parse_args.Add_Option_Argument("-3d","do 3d solve");
-    parse_args.Add_Option_Argument("-conservative","use conservative advection");
-  
     parse_args.Print_Arguments();
-    parse_args.Parse();
+    parse_args.Add("-3d",&opt_3d,"do 3d solve");
+    parse_args.Parse(true);
     
-    if(!parse_args.Is_Value_Set("-3d")){
+    if(!opt_3d){
         typedef VECTOR<T,2> TV;
         SMOKE_TESTS<TV>* example=new SMOKE_TESTS<TV>(stream_type,parse_args);
         
