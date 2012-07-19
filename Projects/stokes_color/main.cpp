@@ -161,7 +161,7 @@ void Dump_Vector(const INTERFACE_STOKES_SYSTEM_COLOR<TV>& iss,const INTERFACE_ST
             int index=iss.cm_u(it.Axis())->Get_Index(it.index,c);
             if(index>=0){
                 Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,v.u(it.Axis())(c)(index));}}
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,TV::Axis_Vector(it.Axis())*v.u(it.Axis())(c)(index));}}
         Flush_Frame<T,TV>(buff);}
 
     for(int c=0;c<iss.cdi->colors;c++){
@@ -269,8 +269,9 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(grid,phi_value,phi_color);
     iss.use_preconditioner=use_preconditioner;
-    iss.Set_Matrix(at.mu,at.wrap,&at,0,0);
 //    iss.use_p_null_mode=true;
+    iss.use_u_null_mode=true;
+    iss.Set_Matrix(at.mu,at.wrap,&at,0,0);
 
     printf("\n");
     for(int i=0;i<TV::m;i++){for(int c=0;c<iss.cdi->colors;c++) printf("%c%d [%i]\t","uvw"[i],c,iss.cm_u(i)->dofs(c));printf("\n");}
@@ -423,6 +424,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1};
 
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
+    Get_Debug_Particles<TV>().debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);
 
     T opt_s=1,opt_m=1,opt_kg=1;
     int res=4,max_iter=1000000;
