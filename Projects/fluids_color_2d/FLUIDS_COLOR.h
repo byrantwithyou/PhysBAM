@@ -35,9 +35,12 @@ public:
     T mu0,mu1;
     T rho0,rho1;
     T m,s,kg;
+    int bc_type;
+    bool bc_n,bc_d,bc_s;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
-        :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),rho0(1),rho1(2),m(1),s(1),kg(1)
+        :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
+        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false)
     {
         last_frame=16;
         parse_args.Set_Extra_Arguments(1,"<test-number>");
@@ -55,7 +58,9 @@ public:
         parse_args.Add("-m",&m,"scale","meter scale");
         parse_args.Add("-s",&s,"scale","second scale");
         parse_args.Add("-kg",&kg,"scale","kilogram scale");
-        parse_args.Print_Arguments();
+        parse_args.Add("-bc_n",&bc_n,"use Neumann boundary conditions");
+        parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
+        parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
         parse_args.Parse();
         if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
@@ -65,6 +70,8 @@ public:
         rho0*=kg/sqr(m);
         rho1*=kg/sqr(m);
         dt*=s;
+        PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
+        bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
 
         output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         switch(test_number){
@@ -140,7 +147,7 @@ public:
         for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
             T p=Taylor_Green_Vortex_Levelset(it.Location(),contour);
             levelset_color.phi(it.index)=abs(p);
-            levelset_color.color(it.index)=p>0?DIRICHLET:0;}
+            levelset_color.color(it.index)=p>0?bc_type:0;}
     }
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE {}

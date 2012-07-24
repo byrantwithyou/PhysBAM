@@ -10,9 +10,9 @@ int main(int argc,char *argv[])
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,2> TV;
-//    typedef VECTOR<T,3> TV;
 
     PARSE_ARGS parse_args(argc,argv);
+    parse_args.Print_Arguments();
     FLUIDS_COLOR<TV>* example=new FLUIDS_COLOR<TV>(stream_type,parse_args);
 
     FILE_UTILITIES::Create_Directory(example->output_directory+"/common");
