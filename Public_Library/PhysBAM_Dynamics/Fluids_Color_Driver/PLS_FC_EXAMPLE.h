@@ -78,6 +78,8 @@ public:
     virtual void Initialize()=0;
     virtual void Begin_Time_Step(const T time)=0;
     virtual void End_Time_Step(const T time)=0;
+    virtual TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time)=0;
+    virtual TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time)=0;
 //#####################################################################
 };
 }

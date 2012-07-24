@@ -114,6 +114,11 @@ public:
         return sin(X.x/m)*sin(X.y/m);
     }
 
+    TV Taylor_Green_Vortex_Normal(const TV& X) const
+    {
+        return Taylor_Green_Vortex_Velocity(X,0).Orthogonal_Vector();
+    }
+
     T Taylor_Green_Vortex_Levelset(const TV& X,T k) const
     {
         TV w=(X-pi/2).Normalized()+pi/2;
@@ -162,6 +167,21 @@ public:
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));}
             LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
+    }
+
+    TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
+    {
+        if(test_number==2) return Taylor_Green_Vortex_Velocity(X,time);
+        return TV();
+    }
+
+    TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
+    {
+        if(test_number==2){
+            TV N=Taylor_Green_Vortex_Normal(X);
+            N.y*=-1;
+            return 2*sin(X.x/m)*sin(X.y/m)*N;}
+        return TV();
     }
 
 //#####################################################################
