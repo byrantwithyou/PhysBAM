@@ -332,11 +332,6 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         cdi.dc_present|=(V.y==BC::DIRICHLET);
                         cdi.sc_present|=(V.y==BC::SLIP);
 
-                        TV bc_d,bc_n,X=V.x.Center()+grid.Center(cell);
-                        if(V.y<0){
-                            if(V.y==BC::SLIP || V.y==BC::DIRICHLET) bc_d=integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.y,V.z));
-                            if(V.y==BC::SLIP || V.y==BC::NEUMANN) bc_n=integral*orientations(k).Transpose_Times(sb->bc->n_surface(X,V.y,V.z));}
-
                         if(V.y!=BC::SLIP && V.y!=BC::NEUMANN)
                             for(int orientation=0;orientation<TV::m-1;orientation++){
                                 T value=integral*orientations(k)(sb->axis,orientation);
@@ -348,13 +343,14 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             if(V.y>=0) sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.y,value);
                             if("$#*!") sb->Add_Entry(cdi.constraint_base_n+constraint_offset,TV::m-1,op.flat_index_diff_ref,V.z,-value);}
                         
+                        TV X=V.x.Center()+grid.Center(cell);
                         if(V.y>=0){
                             T value=-integral*sb->bc->j_surface(X,V.y,V.z)(sb->axis);
                             value*=(T)0.5;
                             (*sb->rhs)(V.y)(flat_index)+=value;
                             (*sb->rhs)(V.z)(flat_index)+=value;}
                         else if(V.y==BC::NEUMANN){
-                            T value=-integral*sb->bc->n_surface(X,V.y,V.z)(sb->axis);
+                            T value=integral*sb->bc->n_surface(X,V.y,V.z)(sb->axis);
                             (*sb->rhs)(V.z)(flat_index)+=value;}
                         else if(V.y==BC::DIRICHLET){
                             TV value=-integral*orientations(k).Transpose_Times(sb->bc->d_surface(X,V.y,V.z));
@@ -363,7 +359,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                                     sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,value(d));}
                         else{
                             TV N=orientations(k).Column(TV::m-1);
-                            T n_value=-integral*sb->bc->n_surface(X,V.y,V.z).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
+                            T n_value=integral*sb->bc->n_surface(X,V.y,V.z).Projected_Orthogonal_To_Unit_Direction(N)(sb->axis);
                             (*sb->rhs)(V.z)(flat_index)+=n_value;
                             if(sb->axis==0){ // This code should not be repeated for each block
                                 T d_value=-integral*sb->bc->d_surface(X,V.y,V.z).Dot(N);
