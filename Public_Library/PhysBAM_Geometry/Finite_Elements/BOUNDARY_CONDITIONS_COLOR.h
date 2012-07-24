@@ -18,9 +18,9 @@ struct BOUNDARY_CONDITIONS_COLOR: public NONCOPYABLE
     BOUNDARY_CONDITIONS_COLOR(){}
     virtual ~BOUNDARY_CONDITIONS_COLOR(){}
 
-    virtual TV j_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-    virtual TV n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-    virtual TV d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+    virtual TV j_surface(const TV& X,int color0,int color1)=0;
+    virtual TV n_surface(const TV& X,int color0,int color1)=0;
+    virtual TV d_surface(const TV& X,int color0,int color1)=0;
 };
 }
 #endif

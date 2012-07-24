@@ -225,7 +225,9 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     static int solve_id=-1;solve_id++;
     struct BOUNDARY_CONDITIONS_COLOR_LOCAL:public BOUNDARY_CONDITIONS_COLOR<TV>
     {
-        virtual TV f_surface(const TV& X,int color0,int color1) {return TV();}
+        virtual TV j_surface(const TV& X,int color0,int color1) {return TV();}
+        virtual TV d_surface(const TV& X,int color0,int color1) {return TV();}
+        virtual TV n_surface(const TV& X,int color0,int color1) {return TV();}
     } bccl;
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
