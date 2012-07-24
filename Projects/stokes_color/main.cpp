@@ -270,7 +270,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(grid,phi_value,phi_color);
     iss.use_preconditioner=use_preconditioner;
 //    iss.use_p_null_mode=true;
-    iss.use_u_null_mode=true;
+//    iss.use_u_null_mode=true;
     iss.Set_Matrix(at.mu,at.wrap,&at,0,0);
 
     printf("\n");
@@ -428,7 +428,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     T opt_s=1,opt_m=1,opt_kg=1;
     int res=4,max_iter=1000000;
-    bool use_preconditioner=false,null=false,dump_matrix=false,debug_particles=false;
+    bool use_preconditioner=false,null=false,dump_matrix=false,debug_particles=false,bc_n=false,bc_d=false,bc_s=false;
     parse_args.Add("-o",&output_directory,"dir","output directory");
     parse_args.Add("-m",&opt_m,"scale","meter scale");
     parse_args.Add("-s",&opt_s,"scale","second scale");
@@ -439,7 +439,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
+    parse_args.Add("-bc_n",&bc_n,"use Neumann boundary conditions");
+    parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
+    parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
     parse_args.Parse();
+    PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
+    int bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
 
     int test_number;
     if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
@@ -662,10 +667,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
             {
                 T r,m2,m4,u_term,p_term;
+                int bc_type;
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                ANALYTIC_TEST_11(int bc):bc_type(bc){}
                 virtual void Initialize(){wrap=true;mu.Append(1);r=m/pi;m2=sqr(m);m4=sqr(m2);u_term=1;p_term=1;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
-                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:NEUMANN;}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0?0:bc_type;}
                 virtual TV u(const TV& X,int color){TV x=X-0.5*m;TV u;u(0)=x.x;u(1)=-x.y;return u;}
                 virtual T p(const TV& X){return 0;}
                 virtual TV f_volume(const TV& X,int color){return TV();}
@@ -673,7 +680,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual TV n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m;x.Normalize();x(1)*=-1;return x*2;}
                 virtual TV d_surface(const TV& X,int color0,int color1){return u(X,max(color0,color1));}
             };
-            test=new ANALYTIC_TEST_11;
+            test=new ANALYTIC_TEST_11(bc_type);
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
