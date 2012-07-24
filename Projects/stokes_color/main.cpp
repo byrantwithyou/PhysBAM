@@ -670,7 +670,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual T p(const TV& X){return 0;}
                 virtual TV f_volume(const TV& X,int color){return TV();}
                 virtual TV j_surface(const TV& X,int color0,int color1){return TV();}
-                virtual TV n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m;x.Normalize();x(1)*=-mu(0);return x;}
+                virtual TV n_surface(const TV& X,int color0,int color1){TV x=X-0.5*m;x.Normalize();x(1)*=-1;return x*2;}
                 virtual TV d_surface(const TV& X,int color0,int color1){return u(X,max(color0,color1));}
             };
             test=new ANALYTIC_TEST_11;
