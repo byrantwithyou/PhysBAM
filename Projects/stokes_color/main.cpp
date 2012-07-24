@@ -663,7 +663,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_10;
             break;}
-        case 11:{ // 
+        case 11:{ // if r<R then u=x,v=-y.  Otherwise, boundary condition from commandline (default Dirichlet)
             struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
             {
                 T r,m2,m4,u_term,p_term;
