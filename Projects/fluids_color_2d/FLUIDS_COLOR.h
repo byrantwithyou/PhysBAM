@@ -150,7 +150,7 @@ public:
         rho.Append(rho0);
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
             face_velocities(it.Full_Index())=Taylor_Green_Vortex_Velocity(it.Location(),0)(it.Axis());
-        for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             T p=Taylor_Green_Vortex_Levelset(it.Location(),contour);
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=p>0?bc_type:0;}
@@ -163,10 +163,13 @@ public:
         if(test_number==1 || test_number==2){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+                if(levelset_color.Color(it.Location())<0) continue;
                 T A=face_velocities(it.Full_Index()),B=Taylor_Green_Vortex_Velocity(it.Location(),time)(it.Axis());
                 a=max(a,abs(A));
                 b=max(b,abs(B));
-                max_error=max(max_error,abs(A-B));}
+                max_error=max(max_error,abs(A-B));
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
             LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
     }
 
