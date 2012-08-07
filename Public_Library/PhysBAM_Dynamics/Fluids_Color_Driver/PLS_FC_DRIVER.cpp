@@ -68,8 +68,8 @@ Initialize()
     output_number=current_frame;
     time=example.time_steps_per_frame*current_frame*example.dt;
 
-    example.levelset_color.phi.Resize(example.grid.Node_Indices());
-    example.levelset_color.color.Resize(example.grid.Node_Indices());
+    example.levelset_color.phi.Resize(example.grid.Node_Indices(1));
+    example.levelset_color.color.Resize(example.grid.Node_Indices(1));
     example.face_velocities.Resize(example.grid,3);
     example.face_color.Resize(example.grid,3);
     example.prev_face_velocities.Resize(example.grid,3);

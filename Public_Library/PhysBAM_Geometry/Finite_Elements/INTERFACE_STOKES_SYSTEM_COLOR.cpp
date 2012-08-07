@@ -29,7 +29,8 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,bool mac_phi)
-    :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices()),phi_color(phi_grid.Node_Indices()),use_p_null_mode(false),use_u_null_mode(false)
+    :BASE(false,false),grid(grid_input),phi_grid(grid.counts*2,grid.domain,true),phi_value(phi_grid.Node_Indices(mac_phi)),phi_color(phi_grid.Node_Indices(mac_phi)),
+    use_p_null_mode(false),use_u_null_mode(false)
 {
     if(mac_phi) CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Mac_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
     else CELL_DOMAIN_INTERFACE_COLOR<TV>::Interpolate_Level_Set_To_Double_Fine_Grid(grid_input,phi_value_input,phi_color_input,phi_grid,phi_value,phi_color);
