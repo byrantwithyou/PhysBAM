@@ -22,6 +22,8 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;
+    debug_particles.debug_particles.template Add_Array<TV>(ATTRIBUTE_ID_V);
+    debug_particles.debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 }
 //#####################################################################
 // Destructor
