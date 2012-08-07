@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
 
@@ -171,12 +172,14 @@ public:
 
     TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
+        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
         if(test_number==2) return Taylor_Green_Vortex_Velocity(X,time);
         return TV();
     }
 
     TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
+        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
         if(test_number==2){
             TV N=Taylor_Green_Vortex_Normal(X);
             N.y*=-1;
