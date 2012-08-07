@@ -22,6 +22,7 @@
 namespace PhysBAM{
 
 template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
+template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
 class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
@@ -64,6 +65,7 @@ public:
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     LEVELSET_COLOR<TV> levelset_color;
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
+    DEBUG_PARTICLES<TV>& debug_particles;
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_FC_EXAMPLE();

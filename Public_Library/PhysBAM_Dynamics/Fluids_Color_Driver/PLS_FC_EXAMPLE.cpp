@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
@@ -17,7 +18,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     number_of_ghost_cells(3),dt(1),time_steps_per_frame(1),use_preconditioner(true),max_iter(100000),
     dump_matrix(false),wrap(true),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
-    levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(grid)
+    levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;
@@ -50,6 +51,7 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################
 // Function Read_Output_Files
