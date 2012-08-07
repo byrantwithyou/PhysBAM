@@ -26,7 +26,7 @@ template<class T,int d,int e> static T Phi_And_Color_Helper(VECTOR<T,e>& phi,VEC
             if(ph>=0){
                 phi_half(i)=ph;
                 color_half(i)=c0;}
-            else if(ph>=0){
+            else{
                 phi_half(i)=-ph;
                 color_half(i)=c1;}}}
     return Phi_And_Color_Helper(phi_half,color_half,frac.Remove_Index(0),c);
