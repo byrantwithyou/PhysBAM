@@ -96,9 +96,16 @@ public:
     void Update_Constraint_Count();
     void Update_Total_Constraint_Count();
 
+    static void Interpolate_Level_Set_To_Double_Fine_Grid(const RANGE<TV>& range_input,
+        const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
+        const RANGE<TV>& range,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color);
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
         const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
         const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol=1e-2);
+    static void Interpolate_Mac_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
+    const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
+        const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol=1e-2);
+
 };
 }
 #endif

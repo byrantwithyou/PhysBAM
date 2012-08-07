@@ -85,41 +85,66 @@ Update_Total_Constraint_Count()
 //#####################################################################
 // Function Interpolate_Level_Set_To_Double_Fine_Grid
 //#####################################################################
-template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
-Interpolate_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
+template<class TV_INT,class T> static void Interpolate_Level_Set_To_Double_Fine_Grid_Helper(const RANGE<TV_INT>& range_input,
     const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
-    const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol)
+    const RANGE<TV_INT>& range,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T threshold)
 {
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid_input);it.Valid();it.Next()){
-        phi_value(it.index*2)=phi_value_input(it.index);
-        phi_color(it.index*2)=phi_color_input(it.index);}
-    
-    TV_INT counts(phi_grid_input.counts+1);
+    PHYSBAM_ASSERT(range_input.Edge_Lengths()*2==range.Edge_Lengths()+1);
+    TV_INT copy_offset=range.min_corner-range_input.min_corner*2;
+    for(RANGE_ITERATOR<TV_INT::m> it(range_input);it.Valid();it.Next()){
+        phi_value(it.index*2+copy_offset)=phi_value_input(it.index);
+        phi_color(it.index*2+copy_offset)=phi_color_input(it.index);}
+
+    RANGE<TV_INT> source_range(TV_INT(),range_input.Edge_Lengths());
     TV_INT scale(TV_INT()+2);
-    for(int axis=0;axis<TV::m;axis++){
-        counts(axis)=phi_grid_input.counts(axis);
-        for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT(),counts));it.Valid();it.Next()){
-            TV_INT a=scale*it.index;
-            TV_INT m(a);m+=TV_INT::Axis_Vector(axis);
-            TV_INT b(m);b+=TV_INT::Axis_Vector(axis);
-            const T& phi_value_a=phi_value(a);
-            const T& phi_value_b=phi_value(b);
-            const int& phi_color_a=phi_color(a);
-            const int& phi_color_b=phi_color(b);
+    for(int axis=0;axis<TV_INT::m;axis++){
+        source_range.max_corner(axis)--;
+        LOG::cout<<source_range<<std::endl;
+        for(RANGE_ITERATOR<TV_INT::m> it(source_range);it.Valid();it.Next()){
+            TV_INT a=scale*it.index+range.min_corner,m(a),b(a);
+            m(axis)++;
+            b(axis)+=2;
+            T phi_value_a=phi_value(a);
+            T phi_value_b=phi_value(b);
+            int phi_color_a=phi_color(a);
+            int phi_color_b=phi_color(b);
             if(phi_color_a!=phi_color_b){
                 phi_value(m)=(T).5*abs(phi_value_a-phi_value_b);
                 phi_color(m)=(phi_value_a<phi_value_b)?phi_color_b:phi_color_a;}
             else{
                 phi_value(m)=(T).5*abs(phi_value_a+phi_value_b);
                 phi_color(m)=phi_color_a;}}
-        counts(axis)=phi_grid.counts(axis)+1;
+        source_range.max_corner(axis)=range.Edge_Lengths()(axis);
         scale(axis)=1;}
-    
+
     // Perturb levelset
-    T panic_threshold=phi_grid.dX.Min()*tol;
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(phi_grid);it.Valid();it.Next()){
+    for(RANGE_ITERATOR<TV_INT::m> it(phi_value.domain);it.Valid();it.Next()){
         T& value=phi_value(it.index);
-        if(value<panic_threshold) value=panic_threshold;}
+        if(value<threshold) value=threshold;}
+}
+//#####################################################################
+// Function Interpolate_Level_Set_To_Double_Fine_Grid
+//#####################################################################
+template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
+Interpolate_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
+    const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
+    const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol)
+{
+    Interpolate_Level_Set_To_Double_Fine_Grid_Helper(phi_grid_input.Node_Indices(),phi_value_input,
+        phi_color_input,phi_grid.Node_Indices(),phi_value,phi_color,phi_grid.dX.Min()*tol);
+}
+//#####################################################################
+// Function Interpolate_Level_Set_To_Double_Fine_Grid
+//#####################################################################
+template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
+Interpolate_Mac_Level_Set_To_Double_Fine_Grid(const GRID<TV>& phi_grid_input,
+    const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
+    const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color,T tol)
+{
+    PHYSBAM_ASSERT(phi_value_input.domain.min_corner(0)<=-1); // Require a layer of ghost cells
+    PHYSBAM_ASSERT(phi_grid_input.Is_MAC_Grid());
+    Interpolate_Level_Set_To_Double_Fine_Grid_Helper(phi_grid_input.Domain_Indices(1),phi_value_input,
+        phi_color_input,phi_grid.Node_Indices(1),phi_value,phi_color,phi_grid.dX.Min()*tol);
 }
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,2> >;
 template class CELL_DOMAIN_INTERFACE_COLOR<VECTOR<float,3> >;
