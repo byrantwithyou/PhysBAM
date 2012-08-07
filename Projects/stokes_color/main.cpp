@@ -267,7 +267,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
         phi_value(it.index)=at.phi_value(it.Location());
         phi_color(it.index)=at.phi_color(it.Location());}
     
-    INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(grid,phi_value,phi_color);
+    INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(grid,phi_value,phi_color,false);
     iss.use_preconditioner=use_preconditioner;
 //    iss.use_p_null_mode=true;
 //    iss.use_u_null_mode=true;

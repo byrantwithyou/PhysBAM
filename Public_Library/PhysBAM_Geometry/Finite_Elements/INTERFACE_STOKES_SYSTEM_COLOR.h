@@ -88,7 +88,7 @@ public:
     CELL_MANAGER_COLOR<TV> *cm_p;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
 
-    INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input);
+    INTERFACE_STOKES_SYSTEM_COLOR(const GRID<TV>& grid_input,const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,bool mac_phi);
     virtual ~INTERFACE_STOKES_SYSTEM_COLOR();
 
 //#####################################################################

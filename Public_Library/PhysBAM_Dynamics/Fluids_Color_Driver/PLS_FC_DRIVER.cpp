@@ -234,7 +234,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     bccl.example=&example;
     bccl.time=time+dt;
 
-    INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color);
+    INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
     ARRAY<T> system_inertia=example.rho,dt_mu(example.mu*dt);
     if(!first_step) system_inertia*=(T)1.5;
