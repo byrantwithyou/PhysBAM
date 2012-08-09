@@ -39,6 +39,19 @@ public:
     int bc_type;
     bool bc_n,bc_d,bc_s;
 
+    struct ANALYTIC_VELOCITY
+    {
+        virtual TV u(const TV& X,T t) const=0;
+        virtual MATRIX<T,2> du(const TV& X,T t) const=0;
+        virtual T p(const TV& X,T t) const=0;
+    }* analytic_velocity;
+
+    struct ANALYTIC_LEVELSET
+    {
+        virtual T phi(const TV& X,T t,int& c) const=0;
+        virtual TV N(const TV& X,T t) const=0;
+    }* analytic_levelset;
+
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
         rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false)
@@ -74,11 +87,16 @@ public:
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
 
+        analytic_velocity=0;
+        analytic_levelset=0;
+
         output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         switch(test_number){
             case 0: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 1: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);break;
             case 2: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);break;
+            case 3: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
+            case 4: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
@@ -88,83 +106,108 @@ public:
     void Initialize()
     {
         switch(test_number){
-            case 0: Uniform_Translation_Periodic();break;
-            case 1: Taylor_Green_Vortex_Periodic();break;
-            case 2: Taylor_Green_Vortex_BC((T).2);break;
+            case 0: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
+            case 1: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
+            case 2: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
+            case 3: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
+            case 4: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(user_last_frame) last_frame=stored_last_frame;
     }
 
-    void Uniform_Translation_Periodic()
+    void Analytic_Test(ANALYTIC_LEVELSET* ls,ANALYTIC_VELOCITY* v,int colors)
     {
+        analytic_levelset=ls;
+        analytic_velocity=v;
         mu.Append(mu0);
         rho.Append(rho0);
-        face_velocities.Fill(1);
-        levelset_color.phi.Fill(-1);
-        levelset_color.color.Fill(0);
-    }
-
-    TV Taylor_Green_Vortex_Velocity(const TV& X,T t) const
-    {
-        return TV(sin(X.x/m)*cos(X.y/m),-cos(X.x/m)*sin(X.y/m))*exp(-2*mu0/rho0*t/(m*m))*m/s;
-    }
-
-    T Taylor_Green_Vortex_Isocontour(const TV& X) const
-    {
-        return sin(X.x/m)*sin(X.y/m);
-    }
-
-    TV Taylor_Green_Vortex_Normal(const TV& X) const
-    {
-        return Taylor_Green_Vortex_Velocity(X,0).Orthogonal_Vector();
-    }
-
-    T Taylor_Green_Vortex_Levelset(const TV& X,T k) const
-    {
-        TV w=(X-pi/2).Normalized()+pi/2;
-        VECTOR<T,3> z(w.x,w.y,0);
-        for(int i=1;i<100;i++){
-            T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
-            VECTOR<T,3> G(-2*X.x+2*z.x+z.z*cx*sy,-2*X.y+2*z.y+z.z*sx*cy,-k+sx*sy);
-            MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
-            z-=H.Solve_Linear_System(G);
-            if(G.Magnitude_Squared()<1e-25) break;}
-        T sign=((T).2-sin(X.x)*sin(X.y))>0?1:-1;
-        return (z.Remove_Index(2)-X).Magnitude()*sign;
-    }
-
-    void Taylor_Green_Vortex_Periodic()
-    {
-        mu.Append(mu0);
-        rho.Append(rho0);
+        if(colors>1){
+            mu.Append(mu1);
+            rho.Append(rho1);}
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
-            face_velocities(it.Full_Index())=Taylor_Green_Vortex_Velocity(it.Location(),0)(it.Axis());
-        levelset_color.phi.Fill(-1);
-        levelset_color.color.Fill(0);
-    }
-
-    void Taylor_Green_Vortex_BC(T contour)
-    {
-        mu.Append(mu0);
-        rho.Append(rho0);
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
-            face_velocities(it.Full_Index())=Taylor_Green_Vortex_Velocity(it.Location(),0)(it.Axis());
+            face_velocities(it.Full_Index())=analytic_velocity->u(it.Location(),0)(it.Axis());
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
-            T p=Taylor_Green_Vortex_Levelset(it.Location(),contour);
+            int c=0;
+            T p=analytic_levelset->phi(it.Location(),0,c);
             levelset_color.phi(it.index)=abs(p);
-            levelset_color.color(it.index)=p>0?bc_type:0;}
+            levelset_color.color(it.index)=c==-4?bc_type:c;}
     }
+
+    struct ANALYTIC_VELOCITY_CONST:public ANALYTIC_VELOCITY
+    {
+        TV au;
+        ANALYTIC_VELOCITY_CONST(TV v): au(v){}
+        virtual TV u(const TV& X,T t) const {return au;}
+        virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>();}
+        virtual T p(const TV& X,T t) const {return 0;}
+    };
+
+    struct ANALYTIC_VELOCITY_ROTATION:public ANALYTIC_VELOCITY
+    {
+        TV c;
+        ANALYTIC_VELOCITY_ROTATION(TV cc): c(cc){}
+        virtual TV u(const TV& X,T t) const {return (X-c).Orthogonal_Vector();}
+        virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(0,1,-1,0);}
+        virtual T p(const TV& X,T t) const {return 0;}
+    };
+
+    struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY
+    {
+        T nu;
+        ANALYTIC_VELOCITY_VORTEX(T mu,T pho): nu(mu/pho){}
+        virtual TV u(const TV& X,T t) const
+        {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t);}
+        virtual MATRIX<T,2> du(const TV& X,T t) const
+        {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
+        virtual T p(const TV& X,T t) const {return 0;}
+    };
+
+    struct ANALYTIC_LEVELSET_PERIODIC:public ANALYTIC_LEVELSET
+    {
+        virtual T phi(const TV& X,T t,int& c) const {c=0;return 1;}
+        virtual TV N(const TV& X,T t) const {return TV(1,0);}
+    };
+
+    struct ANALYTIC_LEVELSET_CIRCLE:public ANALYTIC_LEVELSET
+    {
+        TV c;
+        T r;
+        ANALYTIC_LEVELSET_CIRCLE(TV cc,T rr): c(cc),r(rr){}
+        virtual T phi(const TV& X,T t,int& c) const {T p=(X-c).Magnitude()-r;c=p>=0?-4:0;return abs(p);}
+        virtual TV N(const TV& X,T t) const {return (X-c).Normalized();}
+    };
+
+    struct ANALYTIC_LEVELSET_VORTEX:public ANALYTIC_LEVELSET
+    {
+        T k;
+        ANALYTIC_LEVELSET_VORTEX(T kk): k(kk){}
+        virtual T phi(const TV& X,T t,int& c) const
+        {
+            TV w=(X-pi/2).Normalized()+pi/2;
+            VECTOR<T,3> z(w.x,w.y,0);
+            for(int i=1;i<100;i++){
+                T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
+                VECTOR<T,3> G(-2*X.x+2*z.x+z.z*cx*sy,-2*X.y+2*z.y+z.z*sx*cy,-k+sx*sy);
+                MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
+                z-=H.Solve_Linear_System(G);
+                if(G.Magnitude_Squared()<1e-25) break;}
+            c=((T).2-sin(X.x)*sin(X.y))>0?-4:0;
+            return (z.Remove_Index(2)-X).Magnitude();
+        }
+        virtual TV N(const TV& X,T t) const
+        {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y)).Orthogonal_Vector().Normalized();}
+    };
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE {}
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
-        if(test_number==1 || test_number==2){
+        if(analytic_velocity){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 if(levelset_color.Color(it.Location())<0) continue;
-                T A=face_velocities(it.Full_Index()),B=Taylor_Green_Vortex_Velocity(it.Location(),time)(it.Axis());
+                T A=face_velocities(it.Full_Index()),B=analytic_velocity->u(it.Location(),time)(it.Axis());
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
@@ -176,17 +219,18 @@ public:
     TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(test_number==2) return Taylor_Green_Vortex_Velocity(X,time);
+        if(analytic_velocity) return analytic_velocity->u(X,time);
         return TV();
     }
 
     TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        if(test_number==2){
-            TV N=Taylor_Green_Vortex_Normal(X);
-            N.y*=-1;
-            return 2*sin(X.x/m)*sin(X.y/m)*N;}
+        if(analytic_velocity && analytic_levelset){
+            MATRIX<T,2> du=analytic_velocity->du(X,time);
+            TV n=analytic_levelset->N(X,time);
+            T p=analytic_velocity->p(X,time);
+            return (du+du.Transposed())*n*mu(fluid_color)+p*n;}
         return TV();
     }
 
