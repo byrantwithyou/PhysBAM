@@ -146,8 +146,10 @@ public:
             TV u0=analytic_velocity->u(X,t),u1=analytic_velocity->u(X+dX,t);
             MATRIX<T,2> du0=analytic_velocity->du(X,t),du1=analytic_velocity->du(X+dX,t);
             T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
-            int c;
-            T l0=analytic_levelset->phi(X,t,c),l1=analytic_levelset->phi(X+dX,t,c);
+            int c0,c1;
+            T l0=analytic_levelset->phi(X,t,c0),l1=analytic_levelset->phi(X+dX,t,c1);
+            if(c0>=0) l0=-l0;
+            if(c1>=0) l1=-l1;
             TV dl0=analytic_levelset->N(X,t),dl1=analytic_levelset->N(X+dX,t);
             T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
             LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
@@ -215,7 +217,7 @@ public:
             return (z.Remove_Index(2)-X).Magnitude();
         }
         virtual TV N(const TV& X,T t) const
-        {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y)).Orthogonal_Vector().Normalized();}
+        {return TV(cos(X.x)*sin(X.y),sin(X.x)*cos(X.y)).Normalized();}
     };
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE {}
