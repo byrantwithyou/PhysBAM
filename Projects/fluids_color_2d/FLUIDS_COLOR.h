@@ -131,10 +131,10 @@ public:
             mu.Append(mu1);
             rho.Append(rho1);}
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
-            face_velocities(it.Full_Index())=analytic_velocity->u(it.Location(),0)(it.Axis());
+            face_velocities(it.Full_Index())=analytic_velocity->u(it.Location()/m,0)(it.Axis())*m/s;
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=0;
-            T p=analytic_levelset->phi(it.Location(),0,c);
+            T p=analytic_levelset->phi(it.Location()/m,0,c)*m;
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=c==-4?bc_type:c;}
 
@@ -143,14 +143,14 @@ public:
             TV X=rand.Get_Uniform_Vector(grid.domain),dX;
             T e=1e-6,t=rand.Get_Uniform_Number(0,1);
             rand.Fill_Uniform(dX,-e,e);
-            TV u0=analytic_velocity->u(X,t),u1=analytic_velocity->u(X+dX,t);
-            MATRIX<T,2> du0=analytic_velocity->du(X,t),du1=analytic_velocity->du(X+dX,t);
+            TV u0=analytic_velocity->u(X/m,t)*m/s,u1=analytic_velocity->u((X+dX)/m,t)*m/s;
+            MATRIX<T,2> du0=analytic_velocity->du(X/m,t)/s,du1=analytic_velocity->du((X+dX)/m,t)/s;
             T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
             int c0,c1;
-            T l0=analytic_levelset->phi(X,t,c0),l1=analytic_levelset->phi(X+dX,t,c1);
+            T l0=analytic_levelset->phi(X/m,t,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t,c1)*m;
             if(c0>=0) l0=-l0;
             if(c1>=0) l1=-l1;
-            TV dl0=analytic_levelset->N(X,t),dl1=analytic_levelset->N(X+dX,t);
+            TV dl0=analytic_levelset->N(X/m,t),dl1=analytic_levelset->N((X+dX)/m,t);
             T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
             LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
     }
@@ -228,7 +228,7 @@ public:
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 if(levelset_color.Color(it.Location())<0) continue;
-                T A=face_velocities(it.Full_Index()),B=analytic_velocity->u(it.Location(),time)(it.Axis());
+                T A=face_velocities(it.Full_Index()),B=analytic_velocity->u(it.Location()/m,time)(it.Axis())*m/s;
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
@@ -239,18 +239,18 @@ public:
 
     TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
-        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(analytic_velocity) return analytic_velocity->u(X,time);
+        Add_Debug_Particle(X/m,VECTOR<T,3>(1,0,0));
+        if(analytic_velocity) return analytic_velocity->u(X/m,time)*m/s;
         return TV();
     }
 
     TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
-        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
+        Add_Debug_Particle(X/m,VECTOR<T,3>(0,1,0));
         if(analytic_velocity && analytic_levelset){
-            MATRIX<T,2> du=analytic_velocity->du(X,time);
-            TV n=analytic_levelset->N(X,time);
-            T p=analytic_velocity->p(X,time);
+            MATRIX<T,2> du=analytic_velocity->du(X/m,time)/s;
+            TV n=analytic_levelset->N(X/m,time);
+            T p=analytic_velocity->p(X/m,time)*kg/(s*s*m);
             return (du+du.Transposed())*n*mu(fluid_color)+p*n;}
         return TV();
     }
