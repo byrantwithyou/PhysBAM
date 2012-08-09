@@ -8,6 +8,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
@@ -38,6 +39,7 @@ public:
     T m,s,kg;
     int bc_type;
     bool bc_n,bc_d,bc_s;
+    bool test_analytic_diff;
 
     struct ANALYTIC_VELOCITY
     {
@@ -75,6 +77,7 @@ public:
         parse_args.Add("-bc_n",&bc_n,"use Neumann boundary conditions");
         parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
         parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
+        parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
         parse_args.Parse();
         if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
@@ -97,6 +100,7 @@ public:
             case 2: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);break;
             case 3: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 4: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
+            case 5: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
@@ -111,6 +115,7 @@ public:
             case 2: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
             case 3: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             case 4: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
+            case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(user_last_frame) last_frame=stored_last_frame;
@@ -132,6 +137,20 @@ public:
             T p=analytic_levelset->phi(it.Location(),0,c);
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=c==-4?bc_type:c;}
+
+        if(test_analytic_diff){
+            RANDOM_NUMBERS<T> rand;
+            TV X=rand.Get_Uniform_Vector(grid.domain),dX;
+            T e=1e-6,t=rand.Get_Uniform_Number(0,1);
+            rand.Fill_Uniform(dX,-e,e);
+            TV u0=analytic_velocity->u(X,t),u1=analytic_velocity->u(X+dX,t);
+            MATRIX<T,2> du0=analytic_velocity->du(X,t),du1=analytic_velocity->du(X+dX,t);
+            T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
+            int c;
+            T l0=analytic_levelset->phi(X,t,c),l1=analytic_levelset->phi(X+dX,t,c);
+            TV dl0=analytic_levelset->N(X,t),dl1=analytic_levelset->N(X+dX,t);
+            T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
+            LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
     }
 
     struct ANALYTIC_VELOCITY_CONST:public ANALYTIC_VELOCITY
