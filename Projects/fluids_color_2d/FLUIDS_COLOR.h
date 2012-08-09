@@ -171,11 +171,11 @@ public:
 
     struct ANALYTIC_LEVELSET_CIRCLE:public ANALYTIC_LEVELSET
     {
-        TV c;
+        TV cen;
         T r;
-        ANALYTIC_LEVELSET_CIRCLE(TV cc,T rr): c(cc),r(rr){}
-        virtual T phi(const TV& X,T t,int& c) const {T p=(X-c).Magnitude()-r;c=p>=0?-4:0;return abs(p);}
-        virtual TV N(const TV& X,T t) const {return (X-c).Normalized();}
+        ANALYTIC_LEVELSET_CIRCLE(TV cc,T rr): cen(cc),r(rr){}
+        virtual T phi(const TV& X,T t,int& c) const {T p=(X-cen).Magnitude()-r;c=p>=0?-4:0;return abs(p);}
+        virtual TV N(const TV& X,T t) const {return (X-cen).Normalized();}
     };
 
     struct ANALYTIC_LEVELSET_VORTEX:public ANALYTIC_LEVELSET
