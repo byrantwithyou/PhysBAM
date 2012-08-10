@@ -99,7 +99,6 @@ template<class TV_INT,class T> static void Interpolate_Level_Set_To_Double_Fine_
     TV_INT scale(TV_INT()+2);
     for(int axis=0;axis<TV_INT::m;axis++){
         source_range.max_corner(axis)--;
-        LOG::cout<<source_range<<std::endl;
         for(RANGE_ITERATOR<TV_INT::m> it(source_range);it.Valid();it.Next()){
             TV_INT a=scale*it.index+range.min_corner,m(a),b(a);
             m(axis)++;
