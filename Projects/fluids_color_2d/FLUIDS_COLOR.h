@@ -111,11 +111,11 @@ public:
     {
         switch(test_number){
             case 0: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
-            case 1: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
-            case 2: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
+            case 1: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
+            case 2: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
             case 3: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             case 4: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
-            case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0,rho0),1);break;
+            case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(user_last_frame) last_frame=stored_last_frame;
@@ -228,7 +228,7 @@ public:
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 if(levelset_color.Color(it.Location())<0) continue;
-                T A=face_velocities(it.Full_Index()),B=analytic_velocity->u(it.Location()/m,time)(it.Axis())*m/s;
+                T A=face_velocities(it.Full_Index()),B=analytic_velocity->u(it.Location()/m,time/s)(it.Axis())*m/s;
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
@@ -240,7 +240,7 @@ public:
     TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(analytic_velocity) return analytic_velocity->u(X/m,time)*m/s;
+        if(analytic_velocity) return analytic_velocity->u(X/m,time/s)*m/s;
         return TV();
     }
 
@@ -248,9 +248,9 @@ public:
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
         if(analytic_velocity && analytic_levelset){
-            MATRIX<T,2> du=analytic_velocity->du(X/m,time)/s;
-            TV n=analytic_levelset->N(X/m,time);
-            T p=analytic_velocity->p(X/m,time)*kg/(s*s*m);
+            MATRIX<T,2> du=analytic_velocity->du(X/m,time/s)/s;
+            TV n=analytic_levelset->N(X/m,time/s);
+            T p=analytic_velocity->p(X/m,time/s)*kg/(s*s*m);
             return (du+du.Transposed())*n*mu(fluid_color)+p*n;}
         return TV();
     }
