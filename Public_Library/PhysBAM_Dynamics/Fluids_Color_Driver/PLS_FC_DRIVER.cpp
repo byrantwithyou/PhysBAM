@@ -226,13 +226,14 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     struct BOUNDARY_CONDITIONS_COLOR_LOCAL:public BOUNDARY_CONDITIONS_COLOR<TV>
     {
         PLS_FC_EXAMPLE<TV>* example;
-        T time;
+        T time,dt;
         virtual TV j_surface(const TV& X,int color0,int color1) {return TV();}
         virtual TV d_surface(const TV& X,int color0,int color1) {return example->Dirichlet_Boundary_Condition(X,color0,color1,time);}
-        virtual TV n_surface(const TV& X,int color0,int color1) {return example->Neumann_Boundary_Condition(X,color0,color1,time);}
+        virtual TV n_surface(const TV& X,int color0,int color1) {return example->Neumann_Boundary_Condition(X,color0,color1,time)*dt;}
     } bccl;
     bccl.example=&example;
     bccl.time=time+dt;
+    bccl.dt=dt;
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
