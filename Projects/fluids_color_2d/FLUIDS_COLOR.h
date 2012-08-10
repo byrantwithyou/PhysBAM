@@ -239,14 +239,14 @@ public:
 
     TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
-        Add_Debug_Particle(X/m,VECTOR<T,3>(1,0,0));
+        Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
         if(analytic_velocity) return analytic_velocity->u(X/m,time)*m/s;
         return TV();
     }
 
     TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
-        Add_Debug_Particle(X/m,VECTOR<T,3>(0,1,0));
+        Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
         if(analytic_velocity && analytic_levelset){
             MATRIX<T,2> du=analytic_velocity->du(X/m,time)/s;
             TV n=analytic_levelset->N(X/m,time);
