@@ -89,14 +89,6 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
         FILE_UTILITIES::Read_From_File<RW>(filename,grid);
         LOG::cout<<"reading grid from "<<filename<<std::endl;}
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    OCTREE_GRID<T> octree_grid;DEPTH_HELPER<T> helper;
-    if(use_octree){
-        helper.default_depth=depth;
-        //helper.depths.Append(PAIR<ORIENTED_BOX_3D<T>,int>(ORIENTED_BOX_3D<T>(TV(-.039,.089,-.07),TV(.076,0,0),TV(0,.04,0),TV(0,0,.026)),depth));
-        octree_grid.Initialize(grid,depth,3,true,true);}
-#endif
-
     std::string output_filename="";
     if(parse_args.Is_Value_Set("-o")) output_filename=parse_args.Get_String_Value("-o");
     else{
@@ -124,9 +116,6 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
     std::cout<<std::endl;
 
 
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    if(!use_octree)
-#endif
     {
         LEVELSET_MAKER_UNIFORM<T> levelset_maker;
         levelset_maker.Verbose_Mode(true);
@@ -154,37 +143,6 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
             LEVELSET_IMPLICIT_OBJECT<TV> levelset_implicit_surface(grid,phi);
             //phi+=(T)1*grid.Maximum_Edge_Length();
         FILE_UTILITIES::Write_To_File<RW>(output_filename,levelset_implicit_surface);}
-#ifndef COMPILE_WITHOUT_DYADIC_SUPPORT
-    else{
-        LEVELSET_MAKER_DYADIC<T> levelset_maker;
-        levelset_maker.Verbose_Mode(true);
-        levelset_maker.Write_Debug_Data(parse_args.Get_Option_Value("-debug"));
-        if(parse_args.Is_Value_Set("-path_start")&&parse_args.Is_Value_Set("-path_end"))
-            levelset_maker.Write_Debug_Path(true,VECTOR<int,3>(parse_args.Get_Vector_3D_Value("-path_start")),VECTOR<int,3>(parse_args.Get_Vector_3D_Value("-path_end")));
-        if(parse_args.Get_Option_Value("-orthogonal_vote")) levelset_maker.Use_Orthogonal_Vote(true);
-        levelset_maker.Set_Surface_Padding_For_Flood_Fill((T)parse_args.Get_Double_Value("-padding"));
-        levelset_maker.Set_Surface_Thickness((T)parse_args.Get_Double_Value("-thickness"));
-        if(parse_args.Get_Option_Value("-heaviside"))
-            levelset_maker.Compute_Heaviside_Function();
-        else{
-            if(parse_args.Get_Option_Value("-unsigned"))
-                levelset_maker.Compute_Unsigned_Distance_Function();
-            else
-                levelset_maker.Compute_Signed_Distance_Function();
-            levelset_maker.Use_Fast_Marching_Method(true,(T)parse_args.Get_Double_Value("-band"));}
-            levelset_maker.Only_Boundary_Region_Is_Outside(parse_args.Get_Option_Value("-only_bdy_outside"));
-            levelset_maker.Keep_Only_Largest_Inside_Region(parse_args.Get_Option_Value("-keep_largest"));
-            levelset_maker.Flip_Sign_If_Corners_Are_Inside(parse_args.Get_Option_Value("-flip"));
-            levelset_maker.Set_Positive_Boundary_Band(parse_args.Get_Integer_Value("-positive_boundary"));
-            levelset_maker.Set_Phi_Offset((T)parse_args.Get_Double_Value("-offset"));
-            ARRAY<T> phi,phi_nodes;
-            levelset_maker.Compute_Level_Set(*triangulated_surface,octree_grid,phi,&phi_nodes,0,coarsen_bandwidth,Depth,&helper);
-            DYADIC_IMPLICIT_OBJECT<TV> implicit_surface(octree_grid,phi,&phi_nodes);
-            FILE_UTILITIES::Write_To_File<T>("octree_grid.0",octree_grid);
-        FILE_UTILITIES::Write_To_File<T>("octree_levelset.0",phi);
-        FILE_UTILITIES::Write_To_File<T>("octree_levelset_nodes.0",phi_nodes);
-        FILE_UTILITIES::Write_To_File<T>(output_filename,octree_grid,phi);}
-#endif
 }
 
 int main(int argc,char *argv[])
