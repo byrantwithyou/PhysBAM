@@ -2,7 +2,7 @@
 // Copyright 2002-2006, Robert Bridson, Ronald Fedkiw, Geoffrey Irving, Sergey Koltakov, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BOX_3D
+// Class RENDERING_BOX
 //#####################################################################
 #ifndef __RENDERING_BOX__
 #define __RENDERING_BOX__

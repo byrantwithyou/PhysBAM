@@ -2,7 +2,7 @@
 // Copyright 2005, Andrew Selle, Fen Zhao.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class BOX_3D
+// Class RENDERING_WALL
 //#####################################################################
 #ifndef __RENDERING_WALL__
 #define __RENDERING_WALL__
