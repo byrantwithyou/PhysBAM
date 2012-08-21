@@ -361,25 +361,25 @@ public:
     void Fill(T value)
     {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=value;}
 
-    template<class T_ARRAY1,class T_ARRAY2>
-    static void Copy(const T_ARRAY1& old_copy,T_ARRAY2& new_copy)
-    {new_copy=old_copy;}
+    template<class T_ARRAY1>
+    void Copy(const T_ARRAY1& old_copy)
+    {*this=old_copy;}
+
+    template<class T2,class T_ARRAY1>
+    void Copy(const T2 constant,const T_ARRAY1& array)
+    {*this=constant*array;}
 
     template<class T2,class T_ARRAY1,class T_ARRAY2>
-    static void Copy(const T2 constant,const T_ARRAY1& array,T_ARRAY2& result)
-    {result=constant*array;}
+    void Copy(const T2 c1,const T_ARRAY1& v1,const T_ARRAY2& v2)
+    {*this=c1*v1+v2;}
+
+    template<class T2,class T_ARRAY1,class T_ARRAY2>
+    void Copy(const T2 c1,const T_ARRAY1& v1,const T2 c2,const T_ARRAY2& v2)
+    {*this=c1*v1+c2*v2;}
 
     template<class T2,class T_ARRAY1,class T_ARRAY2,class T_ARRAY3>
-    static void Copy(const T2 c1,const T_ARRAY1& v1,const T_ARRAY2& v2,T_ARRAY3& result)
-    {result=c1*v1+v2;}
-
-    template<class T2,class T_ARRAY1,class T_ARRAY2,class T_ARRAY3>
-    static void Copy(const T2 c1,const T_ARRAY1& v1,const T2 c2,const T_ARRAY2& v2,T_ARRAY3& result)
-    {result=c1*v1+c2*v2;}
-
-    template<class T2,class T_ARRAY1,class T_ARRAY2,class T_ARRAY3,class T_ARRAY4>
-    static void Copy(const T2 c1,const T_ARRAY1& v1,const T2 c2,const T_ARRAY2& v2,const T2 c3,const T_ARRAY3& v3,T_ARRAY4& result)
-    {result=c1*v1+c2*v2+c3*v3;}
+    void Copy(const T2 c1,const T_ARRAY1& v1,const T2 c2,const T_ARRAY2& v2,const T2 c3,const T_ARRAY3& v3)
+    {*this=c1*v1+c2*v2+c3*v3;}
 
     static void Get(T_ARRAY& new_copy,const T_ARRAY& old_copy)
     {if(&old_copy!=&new_copy) new_copy=old_copy.Prefix(new_copy.Size());}

@@ -68,10 +68,10 @@ public:
     virtual ~EULER_PROJECTION_UNIFORM();
 
     void Save_State(T_FACE_ARRAYS_SCALAR& face_velocities_s)
-    {T_FACE_ARRAYS_SCALAR::Copy(face_velocities,face_velocities_s);}
+    {face_velocities_s.Copy(face_velocities);}
 
     void Restore_State(T_FACE_ARRAYS_SCALAR& face_velocities_s)
-    {T_FACE_ARRAYS_SCALAR::Copy(face_velocities_s,face_velocities);}
+    {face_velocities.Copy(face_velocities_s);}
 
     void Scale_Pressure_By_Dt(const T dt)
     {assert(!is_pressure_scaled);p*=dt;dt_scale_pressure=dt;is_pressure_scaled=true;}

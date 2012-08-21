@@ -187,7 +187,7 @@ Enforce_Velocity_Compatibility(T_FACE_ARRAYS_SCALAR& face_velocities)
 template<class T_GRID> void PROJECTION_UNIFORM<T_GRID>::
 Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities)
 {
-    T_FACE_ARRAYS_SCALAR::Copy(face_velocities,face_velocities_save_for_projection);
+    face_velocities_save_for_projection.Copy(face_velocities);
 }
 //#####################################################################
 // Function Restore_After_Projection

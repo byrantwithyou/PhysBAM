@@ -149,9 +149,9 @@ Get_Object_Velocities(PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection,const T dt
     if(test_number==4){
          T_GRID& grid=*fluids_parameters.grid;
          projection.poisson->Set_Variable_beta(true);
-         T_FACE_ARRAYS_SCALAR::Copy(beta_face,projection.poisson->beta_face);
+         projection.poisson->beta_face.Copy(beta_face);
          projection.poisson->Use_Weighted_Divergence();
-         T_FACE_ARRAYS_SCALAR::Copy(divergence_face_weights,projection.poisson->divergence_face_weights);
+         projection.poisson->divergence_face_weights.Copy(divergence_face_weights);
 
          // We're changing how to calculate Neumann Boundary Conditions
          for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){

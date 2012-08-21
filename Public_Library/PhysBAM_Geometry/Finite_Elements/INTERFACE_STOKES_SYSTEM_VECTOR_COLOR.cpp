@@ -78,9 +78,9 @@ Copy(const T c1,const BASE& bv1)
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv1);
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<colors;c++)
-            VECTOR_ND<T>::Copy(c1,v1.u(i)(c),u(i)(c));
-    for(int c=0;c<colors;c++) VECTOR_ND<T>::Copy(c1,v1.p(c),p(c));
-    VECTOR_ND<T>::Copy(c1,v1.q,q);
+            u(i)(c).Copy(c1,v1.u(i)(c));
+    for(int c=0;c<colors;c++) p(c).Copy(c1,v1.p(c));
+    q.Copy(c1,v1.q);
 }
 //#####################################################################
 // Function Copy
@@ -92,9 +92,9 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v2=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv2);
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<colors;c++)
-            VECTOR_ND<T>::Copy(c1,v1.u(i)(c),v2.u(i)(c),u(i)(c));
-    for(int c=0;c<colors;c++) VECTOR_ND<T>::Copy(c1,v1.p(c),v2.p(c),p(c));
-    VECTOR_ND<T>::Copy(c1,v1.q,v2.q,q);
+            u(i)(c).Copy(c1,v1.u(i)(c),v2.u(i)(c));
+    for(int c=0;c<colors;c++) p(c).Copy(c1,v1.p(c),v2.p(c));
+    q.Copy(c1,v1.q,v2.q);
 }
 //#####################################################################
 // Function Print

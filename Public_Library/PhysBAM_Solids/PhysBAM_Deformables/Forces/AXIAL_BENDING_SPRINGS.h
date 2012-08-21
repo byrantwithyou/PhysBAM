@@ -54,7 +54,7 @@ public:
     {youngs_modulus.Fill(youngs_modulus_input);Invalidate_CFL();}
 
     void Set_Stiffness(ARRAY_VIEW<const T> youngs_modulus_input)
-    {ARRAY<T>::Copy(youngs_modulus_input,youngs_modulus);Invalidate_CFL();}
+    {youngs_modulus.Copy(youngs_modulus_input);Invalidate_CFL();}
 
     void Clamp_Restlength(const T clamped_restlength)
     {for(int i=0;i<restlength.m;i++) restlength(i)=max(visual_restlength(i),clamped_restlength);}
@@ -63,7 +63,7 @@ public:
     {damping.Fill(damping_input);Invalidate_CFL();}
 
     void Set_Damping(ARRAY_VIEW<const T> damping_input)
-    {ARRAY<T>::Copy(damping_input,damping);Invalidate_CFL();}
+    {damping.Copy(damping_input);Invalidate_CFL();}
 
 //#####################################################################
     void Add_Dependencies(SEGMENT_MESH& dependency_mesh) const PHYSBAM_OVERRIDE;

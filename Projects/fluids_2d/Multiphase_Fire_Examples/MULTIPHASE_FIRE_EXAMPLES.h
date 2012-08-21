@@ -200,7 +200,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
             phis(1)(iterator.Cell_Index())=min(iterator.Location().y-(T).2,RANGE<TV>(0,(T).2,0,(T).5).Signed_Distance(iterator.Location()));
         //phis(1)(iterator.Cell_Index())=iterator.Location().y-(T).2;
-        ARRAY<T,VECTOR<int,2> >::Copy(-1,phis(1),phis(2));}
+        phis(2).Copy(-1,phis(1));}
     if(test_number==2){
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<T,2> X=iterator.Location();VECTOR<int,2> cell=iterator.Cell_Index();

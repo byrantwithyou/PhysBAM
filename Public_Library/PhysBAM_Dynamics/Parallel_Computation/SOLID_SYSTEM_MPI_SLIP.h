@@ -39,9 +39,6 @@ public:
 
     virtual ~SOLID_SYSTEM_MPI_SLIP();
 
-    static void Copy(T c,const VECTOR_T& c1,const VECTOR_T& c2,VECTOR_T& v)
-    {v.Copy(c,c1,c2);}
-
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) const PHYSBAM_OVERRIDE
     {const VECTOR_T& V=debug_cast<const VECTOR_T&>(BV);VECTOR_T& R=debug_cast<VECTOR_T&>(BR);
     R.Copy(1,V);}

@@ -73,7 +73,7 @@ Copy(const T c,const BASE& bv)
     const PRESSURE_VELOCITY_VECTOR& v=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv);
     assert(v.pressure.m==pressure.m);
     solid_velocity.Copy(c,v.solid_velocity);
-    for(int i=0;i<v.pressure.m;i++) VECTOR_ND<T>::Copy(c,v.pressure(i),pressure(i));
+    for(int i=0;i<v.pressure.m;i++) pressure(i).Copy(c,v.pressure(i));
 }
 //#####################################################################
 // Function Copy
@@ -84,7 +84,7 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const PRESSURE_VELOCITY_VECTOR& v1=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv1),&v2=debug_cast<const PRESSURE_VELOCITY_VECTOR&>(bv2);
     assert(v1.pressure.m==v2.pressure.m && pressure.m==v1.pressure.m);
     solid_velocity.Copy(c1,v1.solid_velocity,v2.solid_velocity);
-    for(int i=0;i<v1.pressure.m;i++) VECTOR_ND<T>::Copy(c1,v1.pressure(i),v2.pressure(i),pressure(i));
+    for(int i=0;i<v1.pressure.m;i++) pressure(i).Copy(c1,v1.pressure(i),v2.pressure(i));
 }
 //#####################################################################
 // Function Raw_Size

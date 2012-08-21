@@ -50,7 +50,7 @@ public:
     for(int axis=0;axis<3;axis++){
         for(int i=0;i<primitives;i++) primitive_indices(i)=i;
         Sort(primitive_indices,Indirect_Comparison(axial_primitive_centroids[axis]));
-        ARRAY<RANGE<VECTOR<T,1> > >::Copy(RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX),axial_intervals[axis]);
+        axial_intervals[axis].Copy(RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX));
         for(int cluster=0;cluster<axis_clusters;cluster++) for(int i=cluster_ranges(cluster).x;i<cluster_ranges(cluster).y;i++){
             int primitive_index=primitive_indices(i);
             axial_intervals[axis](cluster).Enlarge_To_Include_Box(axial_primitive_bounding_boxes[axis](primitive_index));

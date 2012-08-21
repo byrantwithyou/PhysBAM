@@ -111,7 +111,7 @@ public:
     {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),false,false);repulsion_thickness.Fill(thickness);}
 
     void Set_Repulsion_Thickness(ARRAY_VIEW<const T> thickness)
-    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),false,false);ARRAY<T>::Copy(thickness,repulsion_thickness);}
+    {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size(),false,false);repulsion_thickness.Copy(thickness);}
 
     void Clamp_Repulsion_Thickness(ARRAY_VIEW<const T> max_value)
     {repulsion_thickness.Resize(geometry.deformable_body_collection.particles.Size());

@@ -209,7 +209,7 @@ Advance_One_Time_Step(bool first_step)
 //    Update_Pls(dt);
 
     example.prev_face_velocities.Exchange(example.face_velocities);
-    if(!first_step) example.face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,example.face_velocities,example.face_velocities);
+    if(!first_step) example.face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,example.face_velocities);
     else example.face_velocities=example.prev_face_velocities;
 
     Apply_Pressure_And_Viscosity(dt,first_step);

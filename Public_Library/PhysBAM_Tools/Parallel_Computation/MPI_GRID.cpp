@@ -606,7 +606,7 @@ Average_Common_Face_Data(const T_MPI_GRID& mpi_grid,T_FACE_ARRAYS& data) const
         ARRAY<char> pack_buffer(packages(n).Pack_Size(*comm));packages(n).Pack(pack_buffer,*comm);
         ARRAY<T> local_buffer(buffers(n).m);
         int position=0;T_type.Unpack(pack_buffer.Get_Array_Pointer(),pack_buffer.m,local_buffer.Get_Array_Pointer(),local_buffer.m,position,*comm);
-        ARRAY<T>::Copy((T).5,buffers(n),(T).5,local_buffer,local_buffer); // average
+        local_buffer.Copy((T).5,buffers(n),(T).5,local_buffer); // average
         position=0;T_type.Pack(local_buffer.Get_Array_Pointer(),local_buffer.m,pack_buffer.Get_Array_Pointer(),pack_buffer.m,position,*comm);
         packages(n).Unpack(pack_buffer,*comm);}
     MPI_PACKAGE::Free_All(packages);

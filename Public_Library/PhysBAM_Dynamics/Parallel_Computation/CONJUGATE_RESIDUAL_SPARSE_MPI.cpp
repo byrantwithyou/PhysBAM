@@ -96,11 +96,11 @@ Parallel_Solve(T_SYSTEM& system,TV2& x_array,const TV2& b_array,TV2& p_array,TV2
         T rho=(T)Global_Sum(system.Inner_Product(mr_array,ar_array),global_comm);
 
         if(restart){p_array=mr_array;ap_array=ar_array;}
-        else{T beta=rho/rho_old;T_SYSTEM::Copy(beta,p_array,mr_array,p_array);T_SYSTEM::Copy(beta,ap_array,ar_array,ap_array);}
+        else{T beta=rho/rho_old;p_array.Copy(beta,p_array,mr_array);ap_array.Copy(beta,ap_array,ar_array);}
         const TV2& map_array=debug_cast<const TV2&>(system.Precondition(ap_array,zaq_array));
         T alpha=rho/(T)Global_Sum(system.Inner_Product(map_array,ap_array),global_comm);
-        T_SYSTEM::Copy(alpha,p_array,x_array,x_array);
-        T_SYSTEM::Copy(-alpha,ap_array,r_array,r_array);
+        x_array.Copy(alpha,p_array,x_array);
+        r_array.Copy(-alpha,ap_array,r_array);
         rho_old=rho;}
 
     if(print_diagnostics && iteration==max_iterations){

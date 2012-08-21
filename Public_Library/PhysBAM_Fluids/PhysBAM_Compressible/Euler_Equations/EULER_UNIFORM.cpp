@@ -113,7 +113,7 @@ Initialize_Domain(const T_GRID& grid_input)
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
 {
-    T_ARRAYS_DIMENSION_SCALAR::Copy(U,U_s);
+    U_s.Copy(U);
     euler_projection.Save_State(face_velocities_s);
     need_to_remove_added_internal_energy_s=need_to_remove_added_internal_energy;
 }
@@ -123,7 +123,7 @@ Save_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
 Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velocities_s,bool& need_to_remove_added_internal_energy_s)
 {
-    T_ARRAYS_DIMENSION_SCALAR::Copy(U_s,U);
+    U.Copy(U_s);
     euler_projection.Restore_State(face_velocities_s);
     need_to_remove_added_internal_energy=need_to_remove_added_internal_energy_s;
     Invalidate_Ghost_Cells(); // TODO(jontg): Cheaper to save and restore ghost values, too

@@ -31,7 +31,7 @@ Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
     const T_ARRAYS_T2* Z_min_ghost_input,const T_ARRAYS_T2* Z_max_ghost_input,T_ARRAYS_T2* Z_min_input,T_ARRAYS_T2* Z_max_input)
 {
     assert(node_mask && !Z_min_input && !Z_max_input);
-    T_ARRAYS_VECTOR negative_V(grid.Domain_Indices(0),false);T_ARRAYS_VECTOR::Copy((T)-1,V,negative_V);
+    T_ARRAYS_VECTOR negative_V(grid.Domain_Indices(0),false);negative_V.Copy((T)-1,V);
     T_ARRAYS_T2 Z_temp=Z,Z_min_ghost=Z_ghost,Z_max_ghost=Z_ghost,Z_min(grid.Domain_Indices(),false),Z_max(grid.Domain_Indices(),false);
     int number_of_ghost_cells=Z.Domain_Indices().Minimum_Corner()(1)-Z_ghost.Domain_Indices().Minimum_Corner()(1);
     nested_advection.Update_Advection_Equation_Node(grid,Z_temp,Z_ghost,V,boundary,dt,time,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp now has time n+1 data
@@ -53,7 +53,7 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
     const T dt,const T time,const T_ARRAYS_T2* Z_min_ghost_input,const T_ARRAYS_T2* Z_max_ghost_input,T_ARRAYS_T2* Z_min_input,T_ARRAYS_T2* Z_max_input)
 {
     assert(cell_mask && !Z_min_input && !Z_max_input);
-    T_FACE_ARRAYS_SCALAR negative_V(face_velocities.V_face.Domain_Indices());T_FACE_ARRAYS_SCALAR::Copy(-1,face_velocities.V_face,negative_V);
+    T_FACE_ARRAYS_SCALAR negative_V(face_velocities.V_face.Domain_Indices());negative_V.Copy(-1,face_velocities.V_face);
     T_ARRAYS_T2 Z_temp=Z,Z_min_ghost=Z_ghost,Z_max_ghost=Z_ghost,Z_min(grid.Domain_Indices(),false),Z_max(grid.Domain_Indices(),false);
     int number_of_ghost_cells=Z.Domain_Indices().Minimum_Corner()(1)-Z_ghost.Domain_Indices().Minimum_Corner()(1);
     nested_advection.Update_Advection_Equation_Cell(grid,Z_temp,Z_ghost,face_velocities.V_face,boundary,dt,time,&Z_min_ghost,&Z_max_ghost,&Z_min,&Z_max); // Z_temp now has time n+1 data

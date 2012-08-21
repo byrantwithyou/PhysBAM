@@ -254,7 +254,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
         else fluids_parameters.incompressible->projection.Compute_Divergence(T_FACE_LOOKUP(face_velocities),&poisson);
 
         // restore face velocities for mixed faces
-        T_FACE_ARRAYS_SCALAR::Copy(copy_face_velocities,face_velocities);
+        face_velocities.Copy(copy_face_velocities);
 
         // Set up fluids matrix (A_array) and RHS (b_array from modifying poisson->f for boundary conditions in psi_D)
         number_of_regions=poisson.number_of_regions;
@@ -614,7 +614,7 @@ Set_Neumann_and_Dirichlet_Boundary_Conditions(const T time)
 {
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >& poisson=*Get_Poisson();
     T_FACE_ARRAYS_SCALAR& face_velocities=Get_Face_Velocities();
-    T_FACE_ARRAYS_BOOL::Copy(dual_cell_contains_solid,poisson.psi_N);poisson.psi_D.Fill(false);
+    poisson.psi_N.Copy(dual_cell_contains_solid);poisson.psi_D.Fill(false);
     fluids_parameters.Set_Domain_Boundary_Conditions(poisson,face_velocities,time);
 
     // We aren't actually sourcing here, since these velocities get reset later

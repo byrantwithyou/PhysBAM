@@ -85,7 +85,7 @@ Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv)
 template<class T,class TV> void KRYLOV_VECTOR_WRAPPER<T,TV>::
 Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2)
 {
-    v.Copy(c,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv1).v,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv2).v,v);
+    v.Copy(c,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv1).v,dynamic_cast<const KRYLOV_VECTOR_WRAPPER&>(bv2).v);
 }
 namespace{
 inline int Raw_Size_Helper(const float& p){return 1;}

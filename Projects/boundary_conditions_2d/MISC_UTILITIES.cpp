@@ -169,7 +169,7 @@ void Second_Order_RE_Step(SIM_COMMON<TV>& sim,ARRAY<typename TV::SCALAR,FACE_IND
     sim.param.dt*=2;
     Dump_Frame<RW>(u2,"hi step");
 
-    u.Copy((T)2,u,-(T)1,u2,u);
+    u.Copy((T)2,u,-(T)1,u2);
 }
 
 template<class TV>

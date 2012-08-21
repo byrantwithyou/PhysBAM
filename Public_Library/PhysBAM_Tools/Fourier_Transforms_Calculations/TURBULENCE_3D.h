@@ -50,7 +50,7 @@ public:
 
     void Advance_Turbulence()
     {T increment=time_end-time_start;time_start=time_end;time_end+=increment;
-    ARRAY<T,VECTOR<int,3> >::Copy(u_new,u_old);ARRAY<T,VECTOR<int,3> >::Copy(v_new,v_old);ARRAY<T,VECTOR<int,3> >::Copy(w_new,w_old);
+    u_old.Copy(u_new);v_old.Copy(v_new);w_old.Copy(w_new);
     Generate_Random_Turbulence(grid,u_new,v_new,w_new);}
    
     VECTOR<T,3> Turbulent_Velocity(const VECTOR<T,3>& X,const T fraction) const

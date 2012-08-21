@@ -16,7 +16,7 @@ Update_Mpi(const ARRAY<bool>& particle_is_simulated,MPI_SOLIDS<TV>* mpi_solids)
     this->mpi_solids=mpi_solids;
     if(influence_all_particles) force_particles.Update(Get_Particle_List(IDENTITY_ARRAY<>(particles.Size())),particle_is_simulated);
     else if(influenced_particles) force_particles.Update(Get_Particle_List(*influenced_particles),particle_is_simulated);
-    ARRAY<bool>::Copy(particle_is_simulated,is_simulated);
+    is_simulated.Copy(particle_is_simulated);
 }
 //#####################################################################
 template class POINTWISE_DEFORMABLE_FORCE<VECTOR<float,1> >;

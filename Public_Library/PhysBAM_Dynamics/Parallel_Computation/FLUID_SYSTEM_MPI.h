@@ -40,10 +40,6 @@ public:
         ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array_input,const ARRAY<INTERVAL<int> >& interior_regions_input,const T tolerance_ratio_input,MPI_SOLID_FLUID<TV>* mpi_solid_fluid_input,
         GENERALIZED_VELOCITY<TV>& temp_input,GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<int>& coupled_deformable_particle_indices_input,bool precondition);
 
-    static void Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bc1,const KRYLOV_VECTOR_BASE<T>& bc2,KRYLOV_VECTOR_BASE<T>& bv)
-    {const KRYLOV_VECTOR_T& c1=debug_cast<const KRYLOV_VECTOR_T&>(bc1),&c2=debug_cast<const KRYLOV_VECTOR_T&>(bc2);KRYLOV_VECTOR_T& v=debug_cast<KRYLOV_VECTOR_T&>(bv);
-    for(int i=0;i<c1.v.m;i++) VECTOR_T::Copy(c,c1.v(i),c2.v(i),v.v(i));}
-
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE // only nullspace stuff for fluids - leave out for now
     {}
 

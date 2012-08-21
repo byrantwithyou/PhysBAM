@@ -72,8 +72,8 @@ Copy(const T c1,const BASE& bv1)
 {
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv1);
     for(int c=0;c<colors;c++)
-        VECTOR_ND<T>::Copy(c1,v1.u(c),u(c));
-    VECTOR_ND<T>::Copy(c1,v1.q,q);
+        u(c).Copy(c1,v1.u(c));
+    q.Copy(c1,v1.q);
 }
 //#####################################################################
 // Function Copy
@@ -84,8 +84,8 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv1);
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v2=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv2);
     for(int c=0;c<colors;c++)
-        VECTOR_ND<T>::Copy(c1,v1.u(c),v2.u(c),u(c));
-    VECTOR_ND<T>::Copy(c1,v1.q,v2.q,q);
+        u(c).Copy(c1,v1.u(c),v2.u(c));
+    q.Copy(c1,v1.q,v2.q);
 }
 //#####################################################################
 // Function Print

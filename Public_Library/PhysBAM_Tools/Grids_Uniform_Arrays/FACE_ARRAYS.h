@@ -52,7 +52,7 @@ public:
 
     ARRAY(const ARRAY& old_array)
         :base_pointer(0),buffer_size(0)
-    {Resize(old_array.Domain_Indices(),false,false);Copy(old_array,*this);}
+    {Resize(old_array.Domain_Indices(),false,false);Copy(old_array);}
 
     virtual ~ARRAY()
     {delete[] base_pointer;}
@@ -71,7 +71,7 @@ public:
     {return domain_indices;}
 
     ARRAY& operator=(const ARRAY& source)
-    {if(source.Domain_Indices()!=Domain_Indices()) Resize(source.Domain_Indices(),false,false);Copy(source,*this);return *this;}
+    {if(source.Domain_Indices()!=Domain_Indices()) Resize(source.Domain_Indices(),false,false);Copy(source);return *this;}
 
     template<class T2>
     void Resize(const GRID<VECTOR<T2,dimension> >& grid,const int ghost_cells=0,const bool initialize_new_elements=true,const bool copy_existing_elements=true,const T& initialization_value=T())
@@ -145,19 +145,19 @@ public:
     void Fill(const T& constant)
     {for(int i=0;i<dimension;i++) data(i).Fill(constant);}
 
-    static void Copy(const ARRAY& old_copy,ARRAY& new_copy)
-    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(old_copy.data(i),new_copy.data(i));}
+    void Copy(const ARRAY& old_copy)
+    {for(int i=0;i<dimension;i++) data(i).Copy(old_copy.data(i));}
 
     template<class T2>
-    static void Copy(const T2 c,const ARRAY& old,ARRAY& result)
-    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c,old.data(i),result.data(i));}
+    void Copy(const T2 c,const ARRAY& old)
+    {for(int i=0;i<dimension;i++) data(i).Copy(c,old.data(i));}
 
     void Fill(const TV& value)
     {for(int i=0;i<dimension;i++) data(i).Fill(value.x);}
 
     template<class T2>
-    static void Copy(const T2 c1,const ARRAY& v1,const T2 c2,const ARRAY& v2,ARRAY& result)
-    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c1,v1.data(i),c2,v2.data(i),result.data(i));}
+    void Copy(const T2 c1,const ARRAY& v1,const T2 c2,const ARRAY& v2)
+    {for(int i=0;i<dimension;i++) data(i).Copy(c1,v1.data(i),c2,v2.data(i));}
 
     static void Put(const ARRAY& old_copy,ARRAY& new_copy)
     {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.data(i),new_copy.data(i));}

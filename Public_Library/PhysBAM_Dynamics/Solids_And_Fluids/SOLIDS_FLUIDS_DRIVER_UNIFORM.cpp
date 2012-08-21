@@ -1206,7 +1206,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>&>(solids_evolution).Apply_Pressure(example.fluid_collection.incompressible_fluid_collection.face_velocities,dt,time);
         else
             dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION<TV>&>(solids_evolution).Apply_Pressure(dt,time);
-        if(incompressible) T_ARRAYS_SCALAR::Copy(incompressible->projection.p,incompressible->projection.p_save_for_projection); // save the good pressure for later
+        if(incompressible) incompressible->projection.p_save_for_projection.Copy(incompressible->projection.p); // save the good pressure for later
 
         Write_Substep("after apply pressure",substep,1);
         if(fluids_parameters.compressible){

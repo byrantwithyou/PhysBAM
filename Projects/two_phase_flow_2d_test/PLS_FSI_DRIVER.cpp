@@ -340,7 +340,7 @@ First_Order_Time_Step(int substep,T dt)
 
     slip.Print_Maximum_Velocities(time);
 
-//        if(incompressible) T_ARRAYS_SCALAR::Copy(incompressible->projection.p,incompressible->projection.p_save_for_projection); // save the good pressure for later
+//        if(incompressible) incompressible->projection.p_save_for_projection.Copy(incompressible->projection.p); // save the good pressure for later
     if(!example.use_pls_evolution_for_structure) slip.Euler_Step_Position(dt,time+dt);
 
     Write_Substep("euler step position",substep,1);

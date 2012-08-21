@@ -81,7 +81,7 @@ Copy(const T c,const BASE& bv)
 {
     const COUPLED_SYSTEM_VECTOR& v=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv);
     assert(v.pressure.n==pressure.n);
-    VECTOR_ND<T>::Copy(c,v.pressure,pressure);
+    pressure.Copy(c,v.pressure);
     lambda=c*v.lambda;
     force_coefficients=c*v.force_coefficients;
     viscous_force_coefficients=c*v.viscous_force_coefficients;
@@ -95,7 +95,7 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const COUPLED_SYSTEM_VECTOR& v1=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv1);
     const COUPLED_SYSTEM_VECTOR& v2=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv2);
     assert(v1.pressure.n==v2.pressure.n && pressure.n==v1.pressure.n);
-    VECTOR_ND<T>::Copy(c1,v1.pressure,v2.pressure,pressure);
+    pressure.Copy(c1,v1.pressure,v2.pressure);
     lambda=c1*v1.lambda+v2.lambda;
     force_coefficients=c1*v1.force_coefficients+v2.force_coefficients;
     viscous_force_coefficients=c1*v1.viscous_force_coefficients+v2.viscous_force_coefficients;

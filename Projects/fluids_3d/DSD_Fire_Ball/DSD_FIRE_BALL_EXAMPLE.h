@@ -174,7 +174,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
     ARRAY<T_ARRAYS_SCALAR>& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) phis(1)(iterator.Cell_Index())=source_sphere.Signed_Distance(iterator.Location());
-    T_ARRAYS_SCALAR::Copy(-1,phis(1),phis(2));
+    phis(2).Copy(-1,phis(1));
 }
 //#####################################################################
 // Function Adjust_Phi_With_Sources

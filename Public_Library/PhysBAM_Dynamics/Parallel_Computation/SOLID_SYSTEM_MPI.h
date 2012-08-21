@@ -44,9 +44,6 @@ public:
     const T Solid_Sign() const
     {return (T)-1;}
 
-    static void Copy(T c,const VECTOR_T& c1,const VECTOR_T& c2,VECTOR_T& v)
-    {v.Copy(c,c1,c2);}
-
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& V,KRYLOV_VECTOR_BASE<T>& R) const PHYSBAM_OVERRIDE
     {R=V;}
 

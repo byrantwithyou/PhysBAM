@@ -153,13 +153,13 @@ public:
     T Maximum_Magnitude() const
     {T result=0;for(int i=0;i<Size();i++) result=PhysBAM::max(result,abs((*this)(i)));return result;}
 
-    template<class T2,class T_VECTOR1,class T_VECTOR2>
-    static void Copy(const T2 c,const T_VECTOR1& v,T_VECTOR2& result)
-    {result=c*v;}
+    template<class T2,class T_VECTOR1>
+    void Copy(const T2 c,const T_VECTOR1& v)
+    {Derived()=c*v;}
 
-    template<class T2,class T_VECTOR1,class T_VECTOR2,class T_VECTOR3>
-    static void Copy(const T2 c1,const T_VECTOR1& v1,const T_VECTOR2& v2,T_VECTOR3& result)
-    {result=c1*v1+v2;}
+    template<class T2,class T_VECTOR1,class T_VECTOR2>
+    void Copy(const T2 c1,const T_VECTOR1& v1,const T_VECTOR2& v2)
+    {Derived()=c1*v1+v2;}
 
     template<class T_VECTOR2>
     void Set_Subvector(const int istart,const VECTOR_BASE<T,T_VECTOR2>& v)

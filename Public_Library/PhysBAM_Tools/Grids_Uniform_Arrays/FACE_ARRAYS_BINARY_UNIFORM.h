@@ -113,19 +113,19 @@ public:
     void Fill(const T& constant)
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Fill(constant);}
 
-    static void Copy(const ARRAY& old_copy,ARRAY& new_copy)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(old_copy.Component(side,i),new_copy.Component(side,i));}
+    void Copy(const ARRAY& old_copy,ARRAY& new_copy)
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Copy(old_copy.Component(side,i));}
 
     template<class T2>
-    static void Copy(const T2 c,const ARRAY& old,ARRAY& result)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c,old.Component(side,i),result.Component(side,i));}
+    void Copy(const T2 c,const ARRAY& old)
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Copy(c,old.Component(side,i));}
 
     void Fill(const TV& value)
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Fill(value(i));}
 
     template<class T2>
-    static void Copy(const T2 c1,const ARRAY& v1,const T2 c2,const ARRAY& v2,ARRAY& result)
-    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Copy(c1,v1.Component(side,i),c2,v2.Component(side,i),result.Component(side,i));}
+    void Copy(const T2 c1,const ARRAY& v1,const T2 c2,const ARRAY& v2)
+    {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) Component(side,i).Copy(c1,v1.Component(side,i),c2,v2.Component(side,i));}
 
     static void Put(const ARRAY& old_copy,ARRAY& new_copy)
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.Component(side,i),new_copy.Component(side,i));}

@@ -37,7 +37,7 @@ public:
         fiber_cutoff=(T)1.4;
         T cutoff_scaled=fiber_p2*(fiber_cutoff-1);
         if(peak_isometric_stress) {assert(peak_isometric_stress->m==muscle_activations.m);fiber_max_stress=*peak_isometric_stress;} 
-        else {fiber_max_stress.Resize(muscle_activations.m);ARRAY<T>::Copy((T)3e5,fiber_max_stress);}
+        else {fiber_max_stress.Resize(muscle_activations.m);fiber_max_stress.Copy((T)3e5);}
         fiber_p3=fiber_p1*fiber_p2*(exp(cutoff_scaled)-1);
         fiber_p4=fiber_p1*(exp(cutoff_scaled)*(1-fiber_p2*fiber_cutoff)+fiber_p2-1);
     }

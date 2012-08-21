@@ -72,10 +72,6 @@ public:
         ARRAY<int>& coupled_deformable_particle_indices_input,
         GENERALIZED_VELOCITY<TV>& solid_velocity_input);
 
-    static void Copy(const T c,const KRYLOV_VECTOR_BASE<T>& bc1,const KRYLOV_VECTOR_BASE<T>& bc2,KRYLOV_VECTOR_BASE<T>& bv)
-    {const KRYLOV_VECTOR_T& c1=debug_cast<const KRYLOV_VECTOR_T&>(bc1),&c2=debug_cast<const KRYLOV_VECTOR_T&>(bc2);KRYLOV_VECTOR_T& v=debug_cast<KRYLOV_VECTOR_T&>(bv);
-    VECTOR_T::Copy(c,c1.v,c2.v,v.v);}
-
     void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;
     void Apply(const VECTOR_T& V,VECTOR_ND<T>& result_dual_cells_size_vector) const;
 

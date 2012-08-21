@@ -153,29 +153,24 @@ public:
     void Fill(const T& constant)
     {array.Fill(constant);}
 
-    static void Copy(const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
-    {assert(old_copy.Domain_Indices()==new_copy.Domain_Indices());
-    ARRAY_VIEW<T>::Copy(old_copy.array,new_copy.array);}
+    void Copy(const ARRAYS_ND_BASE& old_copy)
+    {assert(old_copy.Domain_Indices()==Domain_Indices());array.Copy(old_copy.array);}
 
     template<class T2>
-    static void Copy(const T2 constant,const ARRAYS_ND_BASE& old_copy,ARRAYS_ND_BASE& new_copy)
-    {assert(old_copy.Domain_Indices()==new_copy.Domain_Indices());
-    new_copy.array=constant*old_copy.array;}
+    void Copy(const T2 constant,const ARRAYS_ND_BASE& old_copy)
+    {assert(old_copy.Domain_Indices()==Domain_Indices());array=constant*old_copy.array;}
 
     template<class T2>
-    static void Copy(const T2 c1,const ARRAYS_ND_BASE& v1,const ARRAYS_ND_BASE& v2,ARRAYS_ND_BASE& result)
-    {assert(Equal_Dimensions(v1,v2)&&Equal_Dimensions(v2,result));
-    result.array=c1*v1.array+v2.array;}
+    void Copy(const T2 c1,const ARRAYS_ND_BASE& v1,const ARRAYS_ND_BASE& v2)
+    {assert(Equal_Dimensions(v1,v2)&&Equal_Dimensions(v2,*this));array=c1*v1.array+v2.array;}
 
     template<class T2>
-    static void Copy(const T2 c1,const ARRAYS_ND_BASE& v1,const T2 c2,const ARRAYS_ND_BASE& v2,ARRAYS_ND_BASE& result)
-    {assert(Equal_Dimensions(v1,v2)&&Equal_Dimensions(v2,result));
-    result.array=c1*v1.array+c2*v2.array;}
+    void Copy(const T2 c1,const ARRAYS_ND_BASE& v1,const T2 c2,const ARRAYS_ND_BASE& v2)
+    {assert(Equal_Dimensions(v1,v2)&&Equal_Dimensions(v2,*this));array=c1*v1.array+c2*v2.array;}
 
     template<class T2>
-    static void Copy(const T2 c1,const ARRAYS_ND_BASE& v1,const T2 c2,const ARRAYS_ND_BASE& v2,const T2 c3,const ARRAYS_ND_BASE& v3,ARRAYS_ND_BASE& result)
-    {assert(Equal_Dimensions(v1,v2)&&Equal_Dimensions(v2,v3)&&Equal_Dimensions(v3,result));
-    result.array=c1*v1.array+c2*v2.array+c3*v3.array;}
+    void Copy(const T2 c1,const ARRAYS_ND_BASE& v1,const T2 c2,const ARRAYS_ND_BASE& v2,const T2 c3,const ARRAYS_ND_BASE& v3)
+    {assert(Equal_Dimensions(v1,v2)&&Equal_Dimensions(v2,v3)&&Equal_Dimensions(v3,*this));array=c1*v1.array+c2*v2.array+c3*v3.array;}
 
     void Clamp_Below(const T& value)
     {array.Clamp_Below(value);}
