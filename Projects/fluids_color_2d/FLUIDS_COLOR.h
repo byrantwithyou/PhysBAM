@@ -101,6 +101,7 @@ public:
             case 3: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 4: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 5: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
+            case 6: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
@@ -116,6 +117,7 @@ public:
             case 3: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             case 4: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
             case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
+            case 6: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(user_last_frame) last_frame=stored_last_frame;
