@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
-template<class T_GRID,class T2,class T_FACE_LOOKUP> // T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<T_GRID>
+template<class T_GRID,class T2,class T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<T_GRID> >
 class QUADRATIC_INTERPOLATION_UNIFORM:public INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
