@@ -61,11 +61,11 @@ public:
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual void Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-        const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
+        const T_ARRAYS_T2* Z_min_ghost=0,const T_ARRAYS_T2* Z_max_ghost=0,T_ARRAYS_T2* Z_min=0,T_ARRAYS_T2* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const T_FACE_LOOKUP& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
-        const T_FACE_LOOKUP* Z_min_ghost,const T_FACE_LOOKUP* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
+        const T_FACE_LOOKUP* Z_min_ghost=0,const T_FACE_LOOKUP* Z_max_ghost=0,T_FACE_ARRAYS_SCALAR* Z_min=0,T_FACE_ARRAYS_SCALAR* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 };
