@@ -449,15 +449,6 @@ public:
     {TV_INT numbers=numbers_of_cells;numbers(axis)++;TV offset((T).5*dX);offset(axis)=0;
     return GRID<TV>(TV_INT::Componentwise_Max(TV_INT(),numbers),RANGE<TV>(domain.min_corner+offset,domain.max_corner-offset));}
 
-    GRID<TV> Get_X_Face_Grid() const
-    {return Get_Face_Grid(0);}
-
-    GRID<TV> Get_Y_Face_Grid() const
-    {return Get_Face_Grid(1);}
-
-    GRID<TV> Get_Z_Face_Grid() const
-    {return Get_Face_Grid(2);}
-
     GRID<TV> Get_Regular_Grid_At_MAC_Positions() const
     {assert(Is_MAC_Grid());TV expansion=(T).5*dX;return GRID<TV>(counts,RANGE<TV>(domain.min_corner+expansion,domain.max_corner-expansion));}
 

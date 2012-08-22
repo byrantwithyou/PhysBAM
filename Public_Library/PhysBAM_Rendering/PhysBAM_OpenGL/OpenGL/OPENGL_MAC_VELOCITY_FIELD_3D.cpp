@@ -137,9 +137,9 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
     if(selection && selection->type==OPENGL_SELECTION::COMPONENT_PARTICLES_3D){
         OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *particle_selection=(OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T>*)selection;
         LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
-        TV interp(interpolation.Clamped_To_Array(grid.Get_X_Face_Grid(),u,particle_selection->location),
-            interpolation.Clamped_To_Array(grid.Get_Y_Face_Grid(),v,particle_selection->location),
-            interpolation.Clamped_To_Array(grid.Get_Z_Face_Grid(),w,particle_selection->location));
+        TV interp(interpolation.Clamped_To_Array(grid.Get_Face_Grid(0),u,particle_selection->location),
+            interpolation.Clamped_To_Array(grid.Get_Face_Grid(1),v,particle_selection->location),
+            interpolation.Clamped_To_Array(grid.Get_Face_Grid(2),w,particle_selection->location));
         output_stream<<"    @ particle = "<<interp<<std::endl;}
 }
 //#####################################################################

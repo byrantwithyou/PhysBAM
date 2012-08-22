@@ -151,7 +151,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //#####################################################################
 void Get_Source_Velocities(ARRAY<T,FACE_INDEX<2> >& face_velocities,ARRAY<bool,FACE_INDEX<2> >& psi_N,const T time) PHYSBAM_OVERRIDE
 {
-    GRID<TV> u_grid=fluids_parameters.grid->Get_X_Face_Grid(),v_grid=fluids_parameters.grid->Get_Y_Face_Grid();
+    GRID<TV> u_grid=fluids_parameters.grid->Get_Face_Grid(0),v_grid=fluids_parameters.grid->Get_Face_Grid(1);
     T flow_speed=(T)1;
     for(int j=0;j<u_grid.counts.y;j++){
         FACE_INDEX<2> a(1,TV_INT(1,j)),b(1,TV_INT(u_grid.counts.x,j));

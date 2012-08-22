@@ -19,7 +19,10 @@ OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D(const GRID<TV> &grid,const std::string
     draw_density_valid_mask(false),draw_node_neighbors_visible(false),draw_face_corners_visible(false)
 {
     is_animation=true;
-    mac_grid=grid.Get_MAC_Grid();u_grid=grid.Get_X_Face_Grid();v_grid=grid.Get_Y_Face_Grid();w_grid=grid.Get_Z_Face_Grid();
+    mac_grid=grid.Get_MAC_Grid();
+    u_grid=grid.Get_Face_Grid(0);
+    v_grid=grid.Get_Face_Grid(1);
+    w_grid=grid.Get_Face_Grid(2);
 }
 //#####################################################################
 // Function Valid_Frame

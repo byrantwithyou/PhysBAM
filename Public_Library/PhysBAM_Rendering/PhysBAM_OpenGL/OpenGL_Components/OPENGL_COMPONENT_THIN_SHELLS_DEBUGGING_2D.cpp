@@ -21,8 +21,8 @@ OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D(GRID<TV> &grid,const std::string& dire
 {
     is_animation=true;
     mac_grid=grid.Get_MAC_Grid();
-    u_grid=grid.Get_X_Face_Grid();
-    v_grid=grid.Get_Y_Face_Grid();
+    u_grid=grid.Get_Face_Grid(0);
+    v_grid=grid.Get_Face_Grid(1);
 }
 //#####################################################################
 // Function Valid_Frame
