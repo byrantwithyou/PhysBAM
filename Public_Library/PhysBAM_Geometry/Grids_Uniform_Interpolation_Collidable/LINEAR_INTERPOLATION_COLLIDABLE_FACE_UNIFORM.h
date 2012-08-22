@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Interpolation/LINEAR_INTERPOLATION.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_BINARY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/FACE_LOOKUP_COLLIDABLE_UNIFORM.h>
 namespace PhysBAM{
 
