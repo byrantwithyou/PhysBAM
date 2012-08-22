@@ -28,37 +28,6 @@ Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) co
     TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     return From_Base_Node_Weights(grid,u,X,index);
 }
-namespace{
-//#####################################################################
-// Function Compute_Inverse_Map_Helper
-//#####################################################################
-template<class T>
-void Compute_Inverse_Map_Helper(const GRID<VECTOR<T,1> >& domain_grid,const ARRAY<T,VECTOR<int,1> >& function,const GRID<VECTOR<T,1> >& range_grid,ARRAY<T,VECTOR<int,1> >& inverse_function)
-{
-    int domain_i=1;
-    T xmin=domain_grid.Axis_X(0,0),xmax=domain_grid.Axis_X(domain_grid.counts.x,0);
-    for(int i=0;i<range_grid.counts.x;i++){
-        T function_value=range_grid.Axis_X(i,0);
-        while(domain_i<domain_grid.counts.x-1 && function(domain_i+1)<function_value) domain_i++;
-        inverse_function(i)=clamp(domain_grid.Axis_X(domain_i,0)+domain_grid.dX.x*(function_value-function(domain_i))/(function(domain_i+1)-function(domain_i)),xmin,xmax);}
-}
-//#####################################################################
-// Function Compute_Inverse_Map_Helper
-//#####################################################################
-template<class T,class T2,int d>
-void Compute_Inverse_Map_Helper(const GRID<VECTOR<T,d> >& domain_grid,const ARRAY<T2,VECTOR<int,1> >& function,const GRID<VECTOR<T,d> >& range_grid,ARRAY<T2,VECTOR<int,1> >& inverse_function)
-{
-    PHYSBAM_FATAL_ERROR();
-}
-}
-//#####################################################################
-// Function Compute_Inverse_Map
-//#####################################################################
-template<class T_GRID,class T2,class T_FACE_LOOKUP> void LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Compute_Inverse_Map(const GRID<TV>& domain_grid,const ARRAY<T2,VECTOR<int,1> >& function,const GRID<TV>& range_grid,ARRAY<T2,VECTOR<int,1> >& inverse_function)
-{
-    Compute_Inverse_Map_Helper(domain_grid,function,range_grid,inverse_function);
-}
 //#####################################################################
 // Function Extrema_Clamped_To_Array
 //#####################################################################
