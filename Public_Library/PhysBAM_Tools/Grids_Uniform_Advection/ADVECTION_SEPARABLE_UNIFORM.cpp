@@ -107,16 +107,6 @@ Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
     UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,grid,Z,Z_ghost,V,dt,time);
 }
 //#####################################################################
-// Function Update_Advection_Equation_Cell
-//#####################################################################
-template<class T_GRID,class T2,class T_AVERAGING> void ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2,T_AVERAGING>::
-Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-    const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
-{
-    assert(!Z_min && !Z_max);
-    UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,grid,Z,Z_ghost,V,dt,time);
-}
-//#####################################################################
 // Function Update_Advection_Equation_Cell_Lookup
 //#####################################################################
 template<class T_GRID,class T2,class T_AVERAGING> void ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2,T_AVERAGING>::

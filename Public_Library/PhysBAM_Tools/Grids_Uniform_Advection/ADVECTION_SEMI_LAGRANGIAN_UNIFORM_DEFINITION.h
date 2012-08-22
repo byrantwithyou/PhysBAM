@@ -32,20 +32,6 @@ Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
         Z(node)=interpolation.Clamped_To_Array(grid,Z_ghost,iterator.Location()-dt*V(node));}
 }
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
-    const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-    const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
-{
-    T_INTERPOLATION interpolation;
-    if(Z_min && Z_max) for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
-        TV_INT cell=iterator.Cell_Index();TV X=iterator.Location()-dt*V(cell);
-        Z(cell)=interpolation.Clamped_To_Array(grid,Z_ghost,X);
-        VECTOR<T2,2> extrema=interpolation.Extrema_Clamped_To_Array_Cell(grid,*Z_min_ghost,*Z_max_ghost,X);
-        (*Z_min)(cell)=extrema.x;(*Z_max)(cell)=extrema.y;}
-    else for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-        Z(cell)=interpolation.Clamped_To_Array(grid,Z_ghost,iterator.Location()-dt*V(cell));}
-}
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
     const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
     const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)

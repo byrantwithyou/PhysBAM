@@ -27,18 +27,12 @@ ADVECTION_CONSERVATIVE_UNIFORM()
 {}
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
+Update_Advection_Equation_Node(const T_GRID& grid_mac,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
     const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
     const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
 {
     PHYSBAM_FATAL_ERROR();
-}
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_CONSERVATIVE_UNIFORM<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
-    const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-    const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
-{
-    PHYSBAM_FATAL_ERROR();
+    GRID<TV> grid(grid_mac.Get_MAC_Grid_At_Regular_Positions());
     PHYSBAM_ASSERT(!Z_min || !Z_max); //we don't support extrema yet
     T_ARRAYS_VECTOR V_ghost(grid.Domain_Indices(number_of_ghost_cells));
     BOUNDARY_UNIFORM<T_GRID,TV> boundary_vel;

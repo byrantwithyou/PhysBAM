@@ -29,13 +29,6 @@ Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
 }
 
 template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
-Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
-    const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-    const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
-{
-    DOMAIN_ITERATOR_THREADED_ALPHA<ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>,TV>(grid.Domain_Indices(),thread_queue).template Run<const T_GRID&,T_ARRAYS_T2&,const T_ARRAYS_T2&,const T_ARRAYS_VECTOR&,BOUNDARY_UNIFORM<T_GRID,T2>&,T,T,const T_ARRAYS_T2*,const T_ARRAYS_T2*,T_ARRAYS_T2*,T_ARRAYS_T2*>(*this,&ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::Update_Advection_Equation_Cell_Threaded,grid,Z,Z_ghost,V,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);
-}
-template<class T_GRID,class T2,class T_AVERAGING,class T_INTERPOLATION> void ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<T_GRID,T2,T_AVERAGING,T_INTERPOLATION>::
 Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)

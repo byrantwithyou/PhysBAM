@@ -50,12 +50,13 @@ public:
         Update_Advection_Equation_Face_Lookup(grid,Z,T_FACE_LOOKUP(Z_ghost),T_FACE_LOOKUP(face_velocities),boundary,dt,time,&Z_min_lookup,&Z_max_lookup,Z_min,Z_max);}
     else Update_Advection_Equation_Face_Lookup(grid,Z,T_FACE_LOOKUP(Z_ghost),T_FACE_LOOKUP(face_velocities),boundary,dt,time,0,0,0,0);}
 
-//#####################################################################
-    virtual void Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
+    void Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
         const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost=0,const T_ARRAYS_T2* Z_max_ghost=0,T_ARRAYS_T2* Z_min=0,T_ARRAYS_T2* Z_max=0)
-    {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-    virtual void Update_Advection_Equation_Cell(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
+    {Update_Advection_Equation_Node(grid.Get_Regular_Grid_At_MAC_Positions(),Z,Z_ghost,V,boundary,dt,time,Z_min_ghost,Z_max_ghost,Z_min,Z_max);}
+
+//#####################################################################
+    virtual void Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
         const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
         const T_ARRAYS_T2* Z_min_ghost=0,const T_ARRAYS_T2* Z_max_ghost=0,T_ARRAYS_T2* Z_min=0,T_ARRAYS_T2* Z_max=0)
     {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
