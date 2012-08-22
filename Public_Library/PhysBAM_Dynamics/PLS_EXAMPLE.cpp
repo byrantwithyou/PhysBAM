@@ -5,8 +5,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Dynamics/PLS_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -64,13 +62,6 @@ Write_Output_Files(const int frame)
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
     FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(incompressible.advection);
-    if(advection_conservative){
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_barjc",advection_conservative->sum_jc);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_barjc_cell",advection_conservative->sum_jc_cell);
-        if(TV::dimension==2){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_i",advection_conservative->weights_to);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_j",advection_conservative->weights_from);}}
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
 }
 template<class TV> void PLS_EXAMPLE<TV>::
@@ -84,13 +75,6 @@ Read_Output_Files(const int frame)
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
     FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
     FILE_UTILITIES::Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(incompressible.advection);
-    if(advection_conservative){
-        std::string filename;
-        filename=output_directory+"/"+f+"/weights_barjc";
-        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading wjc "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,advection_conservative->sum_jc);}
-        filename=output_directory+"/"+f+"/weights_barjc_cell";
-        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading wjc cell "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,advection_conservative->sum_jc_cell);}}
     std::string filename;
     filename=output_directory+"/"+f+"/pressure";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}

@@ -15,7 +15,6 @@
 #include <PhysBAM_Geometry/Grids_PDE_Linear/LAPLACE_COLLIDABLE_POLICY.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
 namespace PhysBAM{
@@ -94,7 +93,6 @@ public:
     EULER_UNIFORM<T_GRID>* euler;
     SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES<TV>* euler_solid_fluid_coupling_utilities;
     COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>* compressible_incompressible_coupling_utilities;
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative;
     PROJECTION_DYNAMICS_UNIFORM<T_GRID>* projection;
 
     // multiphase parameters
@@ -120,7 +118,6 @@ public:
     bool use_levelset_viscosity;
     bool print_viscosity_matrix;
     bool use_second_order_pressure;
-    bool use_conservative_advection;
     bool use_modified_projection;
     bool use_surface_solve;
     int projection_scale;

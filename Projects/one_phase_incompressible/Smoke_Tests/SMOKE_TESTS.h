@@ -14,8 +14,6 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
 
 namespace PhysBAM{
 
@@ -35,7 +33,6 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_EXAMPLE<TV>
     bool use_collisions;
     int upsample;
     T buoyancy_clamp;
-    bool use_conservative_advection;
 
     GRID<TV> upsampled_mac_grid;
     LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> interpolation;
@@ -46,7 +43,7 @@ public:
     using BASE::boundary;using BASE::restart;using BASE::temperature;
 
     SMOKE_TESTS(const STREAM_TYPE stream_type_input,PARSE_ARGS& parse_args)
-        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),vc((T).06),test_number(1),stream_type(stream_type_input),use_collisions(false),upsample(1),buoyancy_clamp(1),use_conservative_advection(false)
+        :INCOMPRESSIBLE_EXAMPLE<TV>(stream_type_input),vc((T).06),test_number(1),stream_type(stream_type_input),use_collisions(false),upsample(1),buoyancy_clamp(1)
     {
         int scale=64;
         T source_radius=(T).05;
@@ -58,7 +55,6 @@ public:
         parse_args.Add("-test_number",&test_number,"test","test number");
         parse_args.Add("-substep",&write_substeps_level,"level","level of writing sub-steps");
         parse_args.Add("-upsample",&upsample,"level","level of refinement");
-        parse_args.Add("-conservative",&use_conservative_advection,"use conservative advection");
         parse_args.Parse();
 
         last_frame=200;
@@ -82,12 +78,10 @@ public:
         if(test_number>1){
             incompressible.Initialize_Grids(mac_grid);
             incompressible.Set_Body_Force(true);}
-        if(use_conservative_advection) incompressible.Set_Custom_Advection(*new ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>());
     }
 
     ~SMOKE_TESTS()
     {
-        if(use_conservative_advection) delete incompressible.advection;
     }
 
     void Initialize_Confinement()

@@ -9,8 +9,6 @@
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_DRIVER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
 
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 using namespace PhysBAM;
@@ -67,10 +65,6 @@ Initialize()
 
     // mpi
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
-    if(advection_conservative){
-        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(0)=!example.domain_boundary(i)(0);advection_conservative->mpi_boundary(i)(1)=!example.domain_boundary(i)(1);}
-        if(example.mpi_grid) example.mpi_grid->Initialize(advection_conservative->solid_walls_hack_axis);}
     example.incompressible.mpi_grid=example.mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
     if(example.mpi_grid){
@@ -97,9 +91,6 @@ Initialize()
     example.projection.elliptic_solver->pcg.cg_restart_iterations=40;
 
     if(example.restart) example.Read_Output_Files(example.restart);
-    if(example.restart){
-        ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
-        if(advection_conservative) sum_jc=advection_conservative->sum_jc;}
     
     // setup domain boundaries
     VECTOR<VECTOR<bool,2>,TV::dimension> constant_extrapolation;constant_extrapolation.Fill(VECTOR<bool,2>::Constant_Vector(true));
@@ -195,8 +186,6 @@ Advance_To_Target_Time(const T target_time)
         if(time+dt>=target_time){dt=target_time-time;done=true;}
         else if(time+2*dt>=target_time){dt=(T)(.5*(target_time-time));}
         LOG::cout<<"dt is "<<dt<<std::endl;
-        ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
-        if(advection_conservative){advection_conservative->cfl=example.incompressible.Real_CFL(example.face_velocities,false,false,dt);}
 
         // kinematic_update
         kinematic_evolution.Set_External_Positions(example.rigid_geometry_collection.particles.frame,time);

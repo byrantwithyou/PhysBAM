@@ -11,8 +11,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/PLS_DRIVER.h>
 #include <PhysBAM_Dynamics/PLS_EXAMPLE.h>
@@ -77,13 +75,6 @@ Initialize()
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
 
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
-    if(advection_conservative){
-        VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary_local;
-        for(int i=0;i<TV::dimension;i++){domain_boundary_local(i)(0)=true;domain_boundary_local(i)(1)=true;}        
-        if(example.mpi_grid) example.mpi_grid->Initialize(domain_boundary_local);
-        if(example.mpi_grid) example.mpi_grid->Initialize(advection_conservative->solid_walls_hack_axis);
-        for(int i=0;i<TV::dimension;i++){advection_conservative->mpi_boundary(i)(0)=!domain_boundary_local(i)(0);advection_conservative->mpi_boundary(i)(1)=!domain_boundary_local(i)(1);}}
     example.incompressible.mpi_grid=example.mpi_grid;
     example.projection.elliptic_solver->mpi_grid=example.mpi_grid;
     example.particle_levelset_evolution.Particle_Levelset(0).mpi_grid=example.mpi_grid;
@@ -200,8 +191,6 @@ Advance_To_Target_Time(const T target_time)
         if(time+dt>=target_time){dt=target_time-time;done=true;}
         else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
         LOG::cout<<"dt is "<<dt<<std::endl;
-        ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(example.incompressible.advection);
-        if(advection_conservative){advection_conservative->cfl=example.incompressible.Real_CFL(example.face_velocities,false,false,dt);}
 
         T maximum_fluid_speed=example.face_velocities.Maxabs().Max();
         T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(0).max_collision_distance_factor*example.mac_grid.dX.Max();
@@ -246,12 +235,7 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
 
         example.particle_levelset_evolution.Make_Signed_Distance();
         example.phi_boundary->Fill_Ghost_Cells(example.mac_grid,pls.levelset.phi,phi_ghost,dt,time,example.number_of_ghost_cells);
-        if(advection_conservative){
-            advection_conservative->pls=&pls;
-            T_FACE_ARRAYS_SCALAR face_velocities_ghost(example.mac_grid,2*example.number_of_ghost_cells+1,false);
-            example.incompressible.boundary->Fill_Ghost_Cells_Face(example.mac_grid,example.face_velocities,face_velocities_ghost,time,2*example.number_of_ghost_cells+1);
-            advection_conservative->Update_Advection_Equation_Face_Lookup(example.mac_grid,phi_back,phi_ghost,example.face_velocities,face_velocities_ghost,face_velocities_ghost,*example.incompressible.boundary,dt,time,0,0,0,0);}
-        else example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
+        example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
         //example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",0,1);
         example.Advect_Particles(dt,time);
@@ -284,8 +268,6 @@ PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
 
         LOG::Time("re-incorporating removed particles");
         example.particle_levelset_evolution.Particle_Levelset(0).Identify_And_Remove_Escaped_Particles(face_velocities_ghost,1.5,time+dt);
-        if(advection_conservative){
-            example.particle_levelset_evolution.Particle_Levelset(0).Fix_Momentum_With_Escaped_Particles(face_velocities_ghost,advection_conservative->momentum_lost,1.5,1,time+dt);}
         PHYSBAM_DEBUG_WRITE_SUBSTEP("after remove",0,1);
         if(example.particle_levelset_evolution.Particle_Levelset(0).use_removed_positive_particles || example.particle_levelset_evolution.Particle_Levelset(0).use_removed_negative_particles)
             example.particle_levelset_evolution.Particle_Levelset(0).Reincorporate_Removed_Particles(1,1,0,true);

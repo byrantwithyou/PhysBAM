@@ -37,7 +37,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
@@ -58,7 +57,7 @@ FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUID
     maccormack_node_mask(*new T_ARRAYS_BOOL),maccormack_cell_mask(*new T_ARRAYS_BOOL),maccormack_face_mask(*new T_FACE_ARRAYS_BOOL),
     maccormack_semi_lagrangian(*new ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>(semi_lagrangian,&maccormack_node_mask,&maccormack_cell_mask,
         &maccormack_face_mask)),euler(0),euler_solid_fluid_coupling_utilities(0),compressible_incompressible_coupling_utilities(0),projection(0),use_reacting_flow(false),
-    use_flame_speed_multiplier(false),use_dsd(false),use_psi_R(false),use_levelset_viscosity(false),print_viscosity_matrix(false),use_second_order_pressure(false),use_conservative_advection(false),
+    use_flame_speed_multiplier(false),use_dsd(false),use_psi_R(false),use_levelset_viscosity(false),print_viscosity_matrix(false),use_second_order_pressure(false),
     use_modified_projection(false),use_surface_solve(true),projection_scale(1)
 {
     Initialize_Number_Of_Regions(number_of_regions_input);
@@ -151,7 +150,6 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
 template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Use_Fluid_Coupling_Defaults()
 {
-    PHYSBAM_ASSERT(!use_conservative_advection,"cannot do fluid coupling with conservative advection yet");
     PHYSBAM_ASSERT(solid_affects_fluid,"solid_affects_fluid should be true when using coupling"); // This might break out-of-date examples
     if(!compressible) soot_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
     if(!compressible) soot_fuel_container.Use_Semi_Lagrangian_Collidable_Advection(*collision_bodies_affecting_fluid,incompressible->valid_mask);
@@ -179,17 +177,14 @@ Use_Fluid_Coupling_Defaults()
 template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Use_No_Fluid_Coupling_Defaults()
 {
-    if(use_conservative_advection && !advection_conservative) advection_conservative=new ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>();
     if(!compressible) soot_container.Set_Custom_Advection(semi_lagrangian);
     if(!compressible) soot_fuel_container.Set_Custom_Advection(semi_lagrangian);
     density_container.Set_Custom_Advection(semi_lagrangian);
     temperature_container.Set_Custom_Advection(semi_lagrangian);
     for(int i=0;i<number_of_regions;i++){
         if(false && analytic_test){assert(particle_levelset_evolution->runge_kutta_order_levelset==3);particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(hamilton_jacobi_weno);}
-        else if(use_conservative_advection) particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(*advection_conservative);
         else particle_levelset_evolution->Levelset_Advection(i).Set_Custom_Advection(semi_lagrangian);}
     if(!use_reacting_flow){
-        if(use_conservative_advection) incompressible->Set_Custom_Advection(*advection_conservative);
         incompressible->Set_Custom_Advection(semi_lagrangian);}
     else incompressible->Use_Semi_Lagrangian_Fire_Multiphase_Advection(incompressible_multiphase->projection,particle_levelset_evolution_multiple->Levelset_Multiple());
     if(use_maccormack_semi_lagrangian_advection){

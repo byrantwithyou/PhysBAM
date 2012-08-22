@@ -300,7 +300,6 @@ Parse_Late_Options() {BASE::Parse_Late_Options();}
 template<class T> void SURFACE_TENSION<T>::
 Initialize_Advection()
 {
-    PHYSBAM_ASSERT(!fluids_parameters.use_conservative_advection,"cannot do fluid coupling with conservative advection yet");
     fluids_parameters.particle_levelset_evolution->Levelset_Advection(0).
         Use_Semi_Lagrangian_Collidable_Advection(*fluids_parameters.collision_bodies_affecting_fluid,fluids_parameters.collidable_phi_replacement_value,
             fluids_parameters.incompressible->valid_mask);

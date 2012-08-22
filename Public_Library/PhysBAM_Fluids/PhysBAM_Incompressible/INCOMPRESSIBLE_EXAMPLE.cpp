@@ -7,8 +7,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/INCOMPRESSIBLE_EXAMPLE.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Advection_Equations/ADVECTION_CONSERVATIVE_UNIFORM_FORWARD.h>
 using namespace PhysBAM;
 //#####################################################################
 // INCOMPRESSIBLE_EXAMPLE
@@ -45,14 +43,7 @@ Write_Output_Files(const int frame)
     if(mpi_grid) FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/global_grid",mpi_grid->global_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/grid",mac_grid);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",mac_grid);
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(incompressible.advection);
-    if(advection_conservative){
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_barjc",advection_conservative->sum_jc);
-        FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_barjc_cell",advection_conservative->sum_jc_cell);}
     if(write_debug_data){
-        if(advection_conservative){
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_i",advection_conservative->weights_to);
-            FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/weights_j",advection_conservative->weights_from);}
         ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_ghost(mac_grid,number_of_ghost_cells,false);
         ARRAY<T,TV_INT> density_ghost(mac_grid.Domain_Indices(number_of_ghost_cells),false);
         incompressible.boundary->Fill_Ghost_Cells_Face(mac_grid,face_velocities,face_velocities_ghost,0,number_of_ghost_cells);
@@ -78,12 +69,6 @@ Read_Output_Files(const int frame)
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading mac_velocities "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
     filename=output_directory+"/"+f+"/pressure";
     if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
-    ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>* advection_conservative=dynamic_cast<ADVECTION_CONSERVATIVE_UNIFORM<GRID<TV>,T>*>(incompressible.advection);
-    if(advection_conservative){
-        filename=output_directory+"/"+f+"/weights_barjc";
-        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading wjc "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,advection_conservative->sum_jc);}
-        filename=output_directory+"/"+f+"/weights_barjc_cell";
-        if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading wjc cell "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,advection_conservative->sum_jc_cell);}}
     rigid_geometry_collection.Read(stream_type,output_directory,frame);
 }
 //#####################################################################

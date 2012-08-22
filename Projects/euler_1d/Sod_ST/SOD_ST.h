@@ -22,7 +22,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_LLF.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/CONSERVATION_ENO_RF.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/HYBRID_SL_ENO_CONSERVATION.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/Conservation_Law_Solvers/SEMI_LAGRANGIAN_CONSERVATION.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Equations_Of_State/EOS_GAMMA.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS_UNIFORM.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
@@ -156,7 +155,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     else if(eno_scheme==2) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,false);
     else if(eno_scheme==3) fluids_parameters.compressible_conservation_method = new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,true,true);
     else if(eno_scheme==4) fluids_parameters.compressible_conservation_method = new HYBRID_SL_ENO_CONSERVATION<T_GRID,T_GRID::dimension+2>(flux_face,new CONSERVATION_ENO_LLF<T_GRID,T_GRID::dimension+2>(true,false,false));
-    else fluids_parameters.compressible_conservation_method = new SEMI_LAGRANGIAN_CONSERVATION<T_GRID,T_GRID::dimension+2>();
     fluids_parameters.compressible_spatial_order=eno_order;
     fluids_parameters.compressible_conservation_method->Save_Fluxes();
     fluids_parameters.compressible_conservation_method->Scale_Outgoing_Fluxes_To_Clamp_Variable(true,0,(T)1e-5);
