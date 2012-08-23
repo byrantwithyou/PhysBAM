@@ -4,6 +4,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
+#include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_Interpolation/QUADRATIC_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SOLVER.h>
 #include <PhysBAM_Tools/Krylov_Solvers/MINRES.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
@@ -208,13 +210,45 @@ Advance_One_Time_Step(bool first_step)
     T dt=example.dt;
 //    Update_Pls(dt);
 
-    example.prev_face_velocities.Exchange(example.face_velocities);
-    if(!first_step) example.face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,example.face_velocities);
-    else example.face_velocities=example.prev_face_velocities;
-
+    Advection_And_BDF(dt,first_step);
     Apply_Pressure_And_Viscosity(dt,first_step);
     time+=dt;
     example.End_Time_Step(time);
+}
+//#####################################################################
+// Function Advection_And_BDF
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Advection_And_BDF(T dt,bool first_step)
+{
+    if(!example.use_advection){
+        example.prev_face_velocities.Exchange(example.face_velocities);
+        if(!first_step) example.face_velocities.Copy((T)2/(T)1.5,example.prev_face_velocities,-(T).5/(T)1.5,example.face_velocities);
+        else example.face_velocities=example.prev_face_velocities;
+        return;}
+
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,QUADRATIC_INTERPOLATION_UNIFORM<GRID<TV>,T> > quadratic_advection;
+    BOUNDARY_UNIFORM<GRID<TV>,T> boundary;
+    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,3);
+    FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities),lookup_prev_face_velocities(example.prev_face_velocities);
+    if(example.use_reduced_advection){
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+        if(!first_step){
+            quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.face_velocities,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,2*dt,time+dt);
+            example.face_velocities.Copy((T)2/(T)1.5,temp,-(T).5/(T)1.5,example.face_velocities);}
+        else example.face_velocities=temp;
+        return;}
+
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> > linear_advection;
+    ARRAY<T,FACE_INDEX<TV::dimension> > temp2(example.grid,3);
+    FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp2(temp2);
+    linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_face_velocities,lookup_face_velocities,boundary,dt/2,time+dt);
+    quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_face_velocities,lookup_temp2,boundary,dt,time+dt);
+    if(!first_step){
+        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,dt,time+dt);
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.face_velocities,lookup_prev_face_velocities,lookup_temp2,boundary,2*dt,time+dt);
+        example.face_velocities.Copy((T)2/(T)1.5,temp,-(T).5/(T)1.5,example.face_velocities);}
+    else example.face_velocities=temp;
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity

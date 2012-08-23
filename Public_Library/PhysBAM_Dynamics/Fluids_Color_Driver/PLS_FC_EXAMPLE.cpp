@@ -16,7 +16,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
     number_of_ghost_cells(3),dt(1),time_steps_per_frame(1),use_preconditioner(true),max_iter(100000),
-    dump_matrix(false),wrap(true),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
+    dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
     levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
 {

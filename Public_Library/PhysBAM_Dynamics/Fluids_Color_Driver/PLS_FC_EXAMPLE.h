@@ -52,6 +52,8 @@ public:
     int max_iter;
     bool dump_matrix;
     bool wrap;
+    bool use_advection;
+    bool use_reduced_advection;
     ARRAY<T> mu,rho;
 
     GRID<TV> grid;

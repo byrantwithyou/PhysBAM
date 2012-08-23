@@ -8,8 +8,7 @@
 #define __QUADRATIC_INTERPOLATION_UNIFORM__
 
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
-#include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
 
 template<class T_GRID,class T2,class T_FACE_LOOKUP=FACE_LOOKUP_UNIFORM<T_GRID> >
@@ -22,41 +21,38 @@ public:
     typedef INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP> BASE;
     using BASE::Clamped_Index_Interior_End_Minus_One;
 
-    int a_scheme;
 public:
 
     QUADRATIC_INTERPOLATION_UNIFORM();
     ~QUADRATIC_INTERPOLATION_UNIFORM();
 
+    // T2 Clamped_To_Array_No_Extrema(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+    // {return Clamped_To_Array(grid,u,X);}
+
+    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
+    {return From_Base_Node_Weights_Helper(grid,u,X,index);}
+
+    T2 From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
+    {return From_Base_Node_Helper(grid,u,X,index);}
+
+    T2 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const;
+    T2 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;
+    T2 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const;
+    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const;
+    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;
+    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const;
+    TV_INT Base_Index(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const;
+    TV_INT Base_Index_Face(const T_GRID& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int axis,const TV& X) const;
+
     T2 Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE;
     ARRAY<PAIR<TV_INT,T> > Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE;
-    T2 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const;
-    //Sanity Check
-    T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const;
-
-    //New method averaging
-    /*T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const
-    {T w=(X.x-grid.X(index.x).x)*grid.one_over_dX.x;T a=0;
-    if(a_scheme==1) a=(u(index.x-1)+u(index.x+2)-u(index.x)-u(index.x+1))/4.;
-    else if(a_scheme==2){T a1=(u(index.x+2)+u(index.x)-2*u(index.x+1))/2.;T a2=(u(index.x+1)+u(index.x-1)-2*u(index.x))/2.;a=minmag(a1,a2);}
-    return a*w*(w-1)+(1-w)*u(index.x)+w*u(index.x+1);}*/
-
-    template<class T,int d>
-    T abs(const VECTOR<T,d>& vector) const
-    {return vector.Magnitude();}
-    
-    template<class T>
-    T abs(const T val) const
-    {return val>=0?val:-1*val;}
-
-    //New method weights
-    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const;
-
-    T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;
-    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;
-    T2 From_Base_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const;
-    ARRAY<PAIR<TV_INT,T> > From_Base_Node_Weights(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const;
-
+//    VECTOR<T2,2> Extrema_Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAYS_T2& u_max,const TV& X) const  PHYSBAM_OVERRIDE;
+//    VECTOR<T2,2> Extrema_From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAYS_T2& u_max,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE;
+    T From_Block_Face_Component(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const PHYSBAM_OVERRIDE;
+//    ARRAY<PAIR<FACE_INDEX<T_GRID::VECTOR_T::dimension>,T> > From_Block_Face_Component_Weights(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<T_GRID>& block,const typename T_FACE_LOOKUP::LOOKUP& u,const TV& X) const PHYSBAM_OVERRIDE;
+    T2 From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const;
+    T2 From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const;
+    T2 From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const;
 //#####################################################################
 };
 }
