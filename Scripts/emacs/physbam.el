@@ -629,6 +629,7 @@
 (define-key global-map [menu-bar physbam compilesettings j3] '(menu-item "-j 3" (lambda () (interactive) (physbam-set-compile-count 3)) :button (:toggle . (= physbam-compile-count 3))))
 (define-key global-map [menu-bar physbam compilesettings j4] '(menu-item "-j 4" (lambda () (interactive) (physbam-set-compile-count 4)) :button (:toggle . (= physbam-compile-count 4))))
 (define-key global-map [menu-bar physbam compilesettings j8] '(menu-item "-j 8" (lambda () (interactive) (physbam-set-compile-count 8)) :button (:toggle . (= physbam-compile-count 8))))
+(define-key global-map [menu-bar physbam compilesettings j12] '(menu-item "-j 12" (lambda () (interactive) (physbam-set-compile-count 12)) :button (:toggle . (= physbam-compile-count 12))))
 (define-key global-map [menu-bar physbam compilesettings j16] '(menu-item "-j 16" (lambda () (interactive) (physbam-set-compile-count 16)) :button (:toggle . (= physbam-compile-count 16))))
 (define-key global-map [menu-bar physbam compilesettings j32] '(menu-item "-j 32" (lambda () (interactive) (physbam-set-compile-count 32)) :button (:toggle . (= physbam-compile-count 32))))
 (define-key global-map [menu-bar physbam compilesettings j64] '(menu-item "-j 64" (lambda () (interactive) (physbam-set-compile-count 64)) :button (:toggle . (= physbam-compile-count 64))))
@@ -675,7 +676,7 @@
 
 ;(setq physbam-compiler (if (string= (getenv "PLATFORM") "nocona")  "/usr/local/compilers/gcc-3.4-64/bin/g++" "icc"))
 (setq physbam-project-type "release")
-(setq physbam-compile-count 4)
+(setq physbam-compile-count (let ((count (getenv "PHYSBAM_COMPILE_COUNT"))) (if count (string-to-number count) 4)))
 (setq physbam-tee-output t) ; dump output to buffer on runs
 (setq compile-command (format "make -k" physbam-project-directory))
 (setq tags-file-name (format "%s/TAGS" (getenv "PHYSBAM")))
@@ -702,3 +703,5 @@
 ;(global-set-key (kbd "C-<f5>") 'physbam-run-debug)
 ;(global-set-key (kbd "<f6>") 'physbam-run-viewer)
 ;(global-set-key (kbd "<f7>") 'compile)
+
+
