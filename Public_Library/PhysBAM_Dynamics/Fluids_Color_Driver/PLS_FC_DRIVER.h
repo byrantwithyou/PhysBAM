@@ -41,7 +41,12 @@ public:
     void Write_Substep(const std::string& title,const int substep,const int level=0);
     void Advection_And_BDF(T dt,bool first_step);
     void Apply_Pressure_And_Viscosity(T dt,bool first_step);
-
+    void Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color);
+    void Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color,int c);
+    void Swap_State();
+    void No_Advection_And_BDF(T dt,bool first_step,int c);
+    void Reduced_Advection_And_BDF(T dt,bool first_step,int c);
+    void RK2_Advection_And_BDF(T dt,bool first_step,int c);
 //#####################################################################
 };
 }

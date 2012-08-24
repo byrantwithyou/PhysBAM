@@ -55,11 +55,12 @@ public:
     bool use_advection;
     bool use_reduced_advection;
     ARRAY<T> mu,rho;
+    int number_of_colors;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
-    ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities,prev_face_velocities;
+    ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
@@ -73,10 +74,11 @@ public:
     virtual ~PLS_FC_EXAMPLE();
     
     void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
-    {V_levelset=face_velocities;}
+    {Merge_Velocities(V_levelset,face_velocities,face_color);}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE;
     void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
+    void Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const;
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Initialize()=0;

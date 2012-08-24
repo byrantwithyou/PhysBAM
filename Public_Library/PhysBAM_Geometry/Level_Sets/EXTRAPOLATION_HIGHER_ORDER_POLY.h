@@ -22,10 +22,18 @@ class EXTRAPOLATION_HIGHER_ORDER_POLY:public NONCOPYABLE
 public:
     EXTRAPOLATION_HIGHER_ORDER_POLY();
     ~EXTRAPOLATION_HIGHER_ORDER_POLY();
+    struct MASK
+    {
+        virtual bool Inside(const TV_INT& index)=0;
+    };
+    struct MASK_FACE
+    {
+        virtual bool Inside(const FACE_INDEX<TV::m>& index)=0;
+    };
 
-    static void Extrapolate_Node(const GRID<TV>& grid,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
-    static void Extrapolate_Cell(const GRID<TV>& grid,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
-    static void Extrapolate_Face(const GRID<TV>& grid,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,T order_reduction_penalty=3);
+    static void Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
+    static void Extrapolate_Cell(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int order,int fill_width,T order_reduction_penalty=3);
+    static void Extrapolate_Face(const GRID<TV>& grid,MASK_FACE& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int order,int fill_width,T order_reduction_penalty=3);
 //#####################################################################
 };
 }

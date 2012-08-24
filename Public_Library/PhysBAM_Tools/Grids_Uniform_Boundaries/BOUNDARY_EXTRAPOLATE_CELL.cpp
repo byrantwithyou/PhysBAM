@@ -16,11 +16,16 @@ template<class TV,class T2> void BOUNDARY_EXTRAPOLATE_CELL<TV,T2>::
 Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
-    ARRAY<bool,TV_INT> inside_mask(grid.Domain_Indices(number_of_ghost_cells));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        inside_mask(it.index)=true;
-
-    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Cell(grid,inside_mask,number_of_ghost_cells,u_ghost,3,number_of_ghost_cells);
+    struct MASK:public EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::MASK
+    {
+        RANGE<TV_INT> domain;
+        virtual bool Inside(const TV_INT& index)
+        {
+            return domain.Lazy_Inside_Half_Open(index);
+        }
+    } mask;
+    mask.domain=grid.Domain_Indices(number_of_ghost_cells);
+    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Cell(grid,mask,number_of_ghost_cells,u_ghost,3,number_of_ghost_cells);
 }
 //#####################################################################
 // Function Apply_Boundary_Condition

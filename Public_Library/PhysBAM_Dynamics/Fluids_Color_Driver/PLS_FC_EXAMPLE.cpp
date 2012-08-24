@@ -2,6 +2,7 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
@@ -16,7 +17,7 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     :stream_type(stream_type_input),initial_time(0),last_frame(100),
     write_substeps_level(-1),write_output_files(true),output_directory("output"),restart(0),
     number_of_ghost_cells(3),dt(1),time_steps_per_frame(1),use_preconditioner(true),max_iter(100000),
-    dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
+    dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),number_of_colors(1),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
     particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
     levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
@@ -33,6 +34,17 @@ template<class TV> PLS_FC_EXAMPLE<TV>::
 {
     delete &levelset_color.color;
     delete &levelset_color.phi;
+}
+//#####################################################################
+// Function Merge_Velocities
+//#####################################################################
+template<class TV> void PLS_FC_EXAMPLE<TV>::
+Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const
+{
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+        int c=color(it.Full_Index());
+        if(c<0) continue;
+        V(it.Full_Index())=u(c)(it.Full_Index());}
 }
 //#####################################################################
 // Function Write_Output_Files

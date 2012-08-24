@@ -27,7 +27,9 @@ class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
-    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;
+    using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
+    using BASE::use_advection;using BASE::use_reduced_advection;
+
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
     int test_number;
@@ -40,6 +42,7 @@ public:
     int bc_type;
     bool bc_n,bc_d,bc_s;
     bool test_analytic_diff;
+    bool no_advection;
 
     struct ANALYTIC_VELOCITY
     {
@@ -56,7 +59,7 @@ public:
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
-        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false)
+        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false)
     {
         last_frame=16;
         parse_args.Set_Extra_Arguments(1,"<test-number>");
@@ -78,6 +81,8 @@ public:
         parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
         parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
         parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
+        parse_args.Add("-no_advect",&no_advection,"Disable advection");
+        parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Parse();
         if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
@@ -89,6 +94,7 @@ public:
         dt*=s;
         PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
+        use_advection=!no_advection;
 
         analytic_velocity=0;
         analytic_levelset=0;
@@ -120,6 +126,7 @@ public:
             case 6: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
+        PHYSBAM_ASSERT(rho.m==number_of_colors && mu.m==number_of_colors);
         if(user_last_frame) last_frame=stored_last_frame;
     }
 
@@ -132,8 +139,9 @@ public:
         if(colors>1){
             mu.Append(mu1);
             rho.Append(rho1);}
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next())
-            face_velocities(it.Full_Index())=analytic_velocity->u(it.Location()/m,0)(it.Axis())*m/s;
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+            int c=0;
+            face_velocities(c)(it.Full_Index())=analytic_velocity->u(it.Location()/m,0)(it.Axis())*m/s;}
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=0;
             T p=analytic_levelset->phi(it.Location()/m,0,c)*m;
@@ -229,8 +237,9 @@ public:
         if(analytic_velocity){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-                if(levelset_color.Color(it.Location())<0) continue;
-                T A=face_velocities(it.Full_Index()),B=analytic_velocity->u(it.Location()/m,time/s)(it.Axis())*m/s;
+                int c=levelset_color.Color(it.Location());
+                if(c<0) continue;
+                T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity->u(it.Location()/m,time/s)(it.Axis())*m/s;
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
