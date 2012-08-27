@@ -28,7 +28,7 @@ public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
-    using BASE::use_advection;using BASE::use_reduced_advection;
+    using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -108,6 +108,7 @@ public:
             case 4: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 5: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 6: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);break;
+            case 7: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
@@ -124,6 +125,7 @@ public:
             case 4: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
             case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
             case 6: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
+            case 7: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_RAREFACTION,1);omit_solve=true;break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         PHYSBAM_ASSERT(rho.m==number_of_colors && mu.m==number_of_colors);
@@ -194,6 +196,14 @@ public:
         virtual T p(const TV& X,T t) const {return 0;}
     };
 
+    struct ANALYTIC_VELOCITY_RAREFACTION:public ANALYTIC_VELOCITY
+    {
+        ANALYTIC_VELOCITY_RAREFACTION(){}
+        virtual TV u(const TV& X,T t) const {return TV(X.x,0)/(t+1);}
+        virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(1,0,0,0)/(t+1);}
+        virtual T p(const TV& X,T t) const {return 0;}
+    };
+
     struct ANALYTIC_LEVELSET_PERIODIC:public ANALYTIC_LEVELSET
     {
         virtual T phi(const TV& X,T t,int& c) const {c=0;return 1;}
@@ -243,8 +253,8 @@ public:
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
-                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
+                if(0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                if(0) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
             LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
     }
 
