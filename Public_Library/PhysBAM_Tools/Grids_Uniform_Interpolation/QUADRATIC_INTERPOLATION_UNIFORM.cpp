@@ -127,7 +127,7 @@ Base_Index_Face(const T_GRID& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int a
 {
     TV offset;
     offset(axis)=(T).5;
-    return TV_INT(rint((X-grid.domain.min_corner)*grid.one_over_dX-1+offset));
+    return TV_INT(floor((X-grid.domain.min_corner)*grid.one_over_dX+offset));
 }
 //#####################################################################
 // Function From_Block_Face_Component
