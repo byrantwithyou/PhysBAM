@@ -298,6 +298,7 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Apply_Pressure_And_Viscosity(T dt,bool first_step)
 {
+    if(example.omit_solve) return;
     static int solve_id=-1;solve_id++;
     struct BOUNDARY_CONDITIONS_COLOR_LOCAL:public BOUNDARY_CONDITIONS_COLOR<TV>
     {

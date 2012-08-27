@@ -54,6 +54,7 @@ public:
     bool wrap;
     bool use_advection;
     bool use_reduced_advection;
+    bool omit_solve;
     ARRAY<T> mu,rho;
     int number_of_colors;
 
