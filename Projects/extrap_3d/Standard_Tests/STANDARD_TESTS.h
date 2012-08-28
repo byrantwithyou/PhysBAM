@@ -143,10 +143,9 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve,curve2,curve3,curve4,curve5,curve6,curve7,curve8;
     bool print_matrix;
     int parameter;
-    int fishes,jello_size,number_of_jellos,seed_input;
+    int fishes,jello_size,number_of_jellos;
     T stiffness_multiplier;
     T damping_multiplier;
-    T boxsize;
     T degrees_wedge,degrees_incline;
     T rebound_time,rebound_stiffness,rebound_drop;
     bool use_constant_ife;
@@ -173,13 +172,29 @@ public:
     ARRAY<VECTOR<VECTOR<T,2>,2> > contour_segments;
     ARRAY<int> stuck_particles;
     bool pin_corners;
+    int rand_seed;
+    bool use_rand_seed;
     RANDOM_NUMBERS<T> rand;
+    bool use_residuals;
+    bool use_be;
+    bool project_nullspace;
+    bool use_dump_sv;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean2(false),
-        use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_extended_svk(false),
-        use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),dump_sv(false),print_matrix(false),use_constant_ife(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
-        input_poissons_ratio(-1),input_youngs_modulus(0),J_min(0),J_max((T).1),la_min(0),test_model_only(false),ether_drag(0),pin_corners(true)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),
+        use_extended_neohookean(false),use_extended_neohookean2(false),use_extended_neohookean3(false),use_int_j_neo(false),
+        use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),
+        use_extended_neohookean_smooth(false),use_extended_svk(false),use_svk(false),use_corotated(false),use_corotated_fixed(false),
+        use_mooney_rivlin(false),use_extended_mooney_rivlin(false),use_corot_blend(false),dump_sv(false),with_bunny(false),
+        with_hand(false),with_big_arm(false),gears_of_pain(false),override_collisions(false),override_no_collisions(false),
+        print_matrix(false),parameter(0),jello_size(20),number_of_jellos(12),stiffness_multiplier(1),damping_multiplier(1),
+        degrees_wedge(2),degrees_incline(5),rebound_time((T).2),rebound_stiffness(5),rebound_drop((T)1.5),use_constant_ife(false),
+        forces_are_removed(false),self_collision_flipped(false),sloped_floor(false),stretch(1),plateau(0),
+        repulsion_thickness((T)1e-4),hole((T).5),nobind(false),input_cutoff((T).4),input_efc(20),input_poissons_ratio(-1),
+        input_youngs_modulus(0),input_friction(.3),stretch_cutoff(300),J_min((T).6),J_max((T).4),la_min(-(T).1),hand_scale((T).8),
+        test_model_only(false),ether_drag(0),sigma_range(3),image_size(500),pin_corners(false),rand_seed(1234),
+        use_rand_seed(false),use_residuals(false),use_be(false),project_nullspace(false),use_dump_sv(false)
+        
     {
     }
 
@@ -220,72 +235,74 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Option_Argument("-semi_implicit","use semi implicit forces");
-    parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
-    parse_args->Add_Option_Argument("-use_svk");
-    parse_args->Add_Option_Argument("-use_ext_neo");
-    parse_args->Add_Option_Argument("-use_ext_neo2");
-    parse_args->Add_Option_Argument("-use_ext_neo3");
-    parse_args->Add_Option_Argument("-use_int_j_neo");
-    parse_args->Add_Option_Argument("-use_rc_ext");
-    parse_args->Add_Option_Argument("-use_rc2_ext");
-    parse_args->Add_Option_Argument("-use_ext_neo_ref");
-    parse_args->Add_Option_Argument("-use_ext_neo_hyper");
-    parse_args->Add_Option_Argument("-use_ext_neo_smooth");
-    parse_args->Add_Option_Argument("-use_ext_svk");
-    parse_args->Add_Option_Argument("-use_ext_mooney");
-    parse_args->Add_Option_Argument("-use_mooney");
-    parse_args->Add_Option_Argument("-use_corotated");
-    parse_args->Add_Option_Argument("-use_corotated_fixed");
-    parse_args->Add_Option_Argument("-use_corot_blend");
-    parse_args->Add_Option_Argument("-with_bunny");
-    parse_args->Add_Option_Argument("-with_hand");
-    parse_args->Add_Option_Argument("-with_big_arm");
-    parse_args->Add_Option_Argument("-dump_sv");
-    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
-    parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
-    parse_args->Add_Option_Argument("-residuals","print residuals during timestepping");
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Double_Argument("-cgsolids",1e-3,"CG tolerance for backward Euler");
-    parse_args->Add_Option_Argument("-use_be","use backward euler");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-seed",1234,"random seed to use");
-    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
-    parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-collisions","Does not yet work in all sims, see code for details");
-    parse_args->Add_Option_Argument("-no_collisions","Does not yet work in all sims, see code for details");
-    parse_args->Add_Double_Argument("-stretch",1,"stretch");
-    parse_args->Add_Double_Argument("-hole",.5,"hole");
-    parse_args->Add_Double_Argument("-rebound_time",.2,"number of seconds to rebound in test 29");
-    parse_args->Add_Double_Argument("-rebound_stiffness",5,"log10 of youngs modulus of final stiffness");
-    parse_args->Add_Double_Argument("-rebound_drop",1.5,"log10 of youngs modulus of dropoff of final stiffness");
-    parse_args->Add_Option_Argument("-nobind");
-    parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
-    parse_args->Add_Double_Argument("-repulsion_thickness",1e-4,"repulsion thickness");
-    parse_args->Add_Double_Argument("-efc",20,"efc");
-    parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
-    parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
-    parse_args->Add_Integer_Argument("-jello_size",20,"resolution of each jello cube");
-    parse_args->Add_Integer_Argument("-number_of_jellos",12,"number of falling jello cubes in test 41");
-    parse_args->Add_Double_Argument("-degrees_incline",5.0,"degrees of incline");
-    parse_args->Add_Double_Argument("-degrees_wedge",2.0,"degrees of side incline");
-    parse_args->Add_Double_Argument("-friction",.3,"amount of friction");
-    parse_args->Add_Option_Argument("-gears_of_pain");
-    parse_args->Add_Option_Argument("-sloped_floor");
-    parse_args->Add_Double_Argument("-ja",.6,"J to stop interpolating");
-    parse_args->Add_Double_Argument("-jb",.4,"J to start interpolating");
-    parse_args->Add_Double_Argument("-lb",-.1,"final poisson's ratio");
-    parse_args->Add_Double_Argument("-hand_scale",.8,"hand scale on test 58");
-    parse_args->Add_Option_Argument("-test_model_only");
-    parse_args->Add_Double_Argument("-stretch_cutoff",300,"Stretch cutoff on test 58");
-    parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
-    parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
-    parse_args->Add_Double_Argument("-sigma_range",3,"sigma range for plots");
-    parse_args->Add_Option_Argument("-pin_corners");
+    solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
+    solids_parameters.implicit_solve_parameters.cg_iterations=1000;
+    solids_parameters.implicit_solve_parameters.cg_tolerance=1e-3;
+    parse_args->Add("-semi_implicit",&semi_implicit,"use semi implicit forces");
+    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
+    parse_args->Add("-use_svk",&use_svk,"use_svk");
+    parse_args->Add("-use_ext_neo",&use_extended_neohookean,"use_extended_neohookean");
+    parse_args->Add("-use_ext_neo2",&use_extended_neohookean2,"use_extended_neohookean2");
+    parse_args->Add("-use_ext_neo3",&use_extended_neohookean3,"use_extended_neohookean3");
+    parse_args->Add("-use_int_j_neo",&use_int_j_neo,"use_int_j_neo");
+    parse_args->Add("-use_rc_ext",&use_rc_ext,"use_rc_ext");
+    parse_args->Add("-use_rc2_ext",&use_rc2_ext,"use_rc2_ext");
+    parse_args->Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_extended_neohookean_refined");
+    parse_args->Add("-use_ext_neo_hyper",&use_extended_neohookean_hyperbola,"use_extended_neohookean_hyperbola");
+    parse_args->Add("-use_ext_neo_smooth",&use_extended_neohookean_smooth,"use_extended_neohookean_smooth");
+    parse_args->Add("-use_ext_svk",&use_extended_svk,"use_extended_svk");
+    parse_args->Add("-use_ext_mooney",&use_extended_mooney_rivlin,"use_extended_mooney_rivlin");
+    parse_args->Add("-use_mooney",&use_mooney_rivlin,"use_mooney_rivlin");
+    parse_args->Add("-use_corotated",&use_corotated,"use_corotated");
+    parse_args->Add("-use_corotated_fixed",&use_corotated_fixed,"use_corotated_fixed");
+    parse_args->Add("-use_corot_blend",&use_corot_blend,"use blended corotated");
+    parse_args->Add("-with_bunny",&with_bunny,"use bunny");
+    parse_args->Add("-with_hand",&with_hand,"use hand");
+    parse_args->Add("-with_big_arm",&with_big_arm,"use big arm");
+    parse_args->Add("-dump_sv",&dump_sv,"dump singular values");
+    parse_args->Add("-parameter",&parameter,"parameter","parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add("-stiffen",&stiffness_multiplier,"multiplier","stiffness multiplier for various tests");
+    parse_args->Add("-dampen",&damping_multiplier,"multiplier","damping multiplier for various tests");
+    parse_args->Add("-residuals",&use_residuals,"print residuals during timestepping");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tolerance","CG tolerance for backward Euler");
+    parse_args->Add("-use_be",&use_be,"use backward euler");
+    parse_args->Add("-print_matrix",&print_matrix,"print Krylov matrix");
+    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
+    parse_args->Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"iterations","number of iterations used for projection in cg");
+    parse_args->Add("-seed",&rand_seed,&use_rand_seed,"seed","random seed to use");
+    parse_args->Add("-use_constant_ife",&use_constant_ife,"use constant extrapolation on inverting finite element fix");
+    parse_args->Add("-test_system",&solids_parameters.implicit_solve_parameters.test_system,"test system");
+    parse_args->Add("-collisions",&override_collisions,"Does not yet work in all sims, see code for details");
+    parse_args->Add("-no_collisions",&override_no_collisions,"Does not yet work in all sims, see code for details");
+    parse_args->Add("-stretch",&stretch,"stretch","stretch");
+    parse_args->Add("-hole",&hole,"hole","hole size");
+    parse_args->Add("-rebound_time",&rebound_time,"time","number of seconds to rebound in test 29");
+    parse_args->Add("-rebound_stiffness",&rebound_stiffness,"stiffness","log10 of youngs modulus of final stiffness");
+    parse_args->Add("-rebound_drop",&rebound_drop,"drop","log10 of youngs modulus of dropoff of final stiffness");
+    parse_args->Add("-nobind",&nobind,"do not bind particles to rings");
+    parse_args->Add("-cutoff",&input_cutoff,"cutoff","cutoff");
+    parse_args->Add("-repulsion_thickness",&repulsion_thickness,"thickness","repulsion thickness");
+    parse_args->Add("-efc",&input_efc,"efc","efc");
+    parse_args->Add("-poissons_ratio",&input_poissons_ratio,"ratio","poissons_ratio");
+    parse_args->Add("-youngs_modulus",&input_youngs_modulus,"stiffness","youngs modulus, only for test 41 so far");
+    parse_args->Add("-jello_size",&jello_size,"size","resolution of each jello cube");
+    parse_args->Add("-number_of_jellos",&number_of_jellos,"number","number of falling jello cubes in test 41");
+    parse_args->Add("-degrees_incline",&degrees_incline,"angle","degrees of incline");
+    parse_args->Add("-degrees_wedge",&degrees_wedge,"angle","degrees of side incline");
+    parse_args->Add("-friction",&input_friction,"friction","amount of friction");
+    parse_args->Add("-gears_of_pain",&gears_of_pain,"use gears of pain");
+    parse_args->Add("-sloped_floor",&sloped_floor,"use sloped floor");
+    parse_args->Add("-ja",&J_min,"J","J to stop interpolating");
+    parse_args->Add("-jb",&J_max,"J","J to start interpolating");
+    parse_args->Add("-lb",&la_min,"L","final poisson's ratio");
+    parse_args->Add("-hand_scale",&hand_scale,"scale","hand scale on test 58");
+    parse_args->Add("-test_model_only",&test_model_only,"test model but do not run sim");
+    parse_args->Add("-stretch_cutoff",&stretch_cutoff,"cutoff","Stretch cutoff on test 58");
+    parse_args->Add("-ether_drag",&ether_drag,"drag","Ether drag");
+    parse_args->Add("-image_size",&image_size,"size","image size for plots");
+    parse_args->Add("-sigma_range",&sigma_range,"range","sigma range for plots");
+    parse_args->Add("-pin_corners",&pin_corners,"pin corners");
 }
 //#####################################################################
 // Function Parse_Options
@@ -296,10 +313,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     frame_rate=24;
-    plateau=(T)0;
-    parameter=parse_args->Get_Integer_Value("-parameter");
-    jello_size=parse_args->Get_Integer_Value("-jello_size");
-    
+    override_no_collisions=override_no_collisions&&!override_collisions;
+    if(use_rand_seed) rand.Set_Seed(rand_seed);
+    solids_parameters.implicit_solve_parameters.project_nullspace_frequency=project_nullspace;
+
     switch(test_number){
         case 17: case 18: case 24: case 25: case 27: case 10: case 11: case 23: case 57: case 77: case 80:
             if(!parameter) parameter=10;
@@ -336,8 +353,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         }
     }
 
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
+    solids_parameters.use_trapezoidal_rule_for_velocities=!use_be;
     solids_parameters.use_rigid_deformable_contact=false;
     solids_parameters.rigid_body_collision_parameters.use_push_out=true;
     solids_parameters.triangle_collision_parameters.use_gauss_jacobi=true;
@@ -347,66 +363,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.triangle_collision_parameters.perform_per_collision_step_repulsions=false;
     solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=false;
     solids_parameters.triangle_collision_parameters.collisions_output_number_checked=false;
-    stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
-    damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
-    stretch=(T)parse_args->Get_Double_Value("-stretch");
-    input_friction=(T)parse_args->Get_Double_Value("-friction");
-    test_forces=parse_args->Is_Value_Set("-test_forces");
-    use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
-    use_extended_neohookean2=parse_args->Is_Value_Set("-use_ext_neo2");
-    use_extended_neohookean3=parse_args->Is_Value_Set("-use_ext_neo3");
-    use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
-    use_rc_ext=parse_args->Is_Value_Set("-use_rc_ext");
-    use_rc2_ext=parse_args->Is_Value_Set("-use_rc2_ext");
-    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");
-    use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
-    use_extended_mooney_rivlin=parse_args->Is_Value_Set("-use_ext_mooney");
-    use_mooney_rivlin=parse_args->Is_Value_Set("-use_mooney");
-    use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");
-    use_svk=parse_args->Is_Value_Set("-use_svk");
-    use_extended_svk=parse_args->Is_Value_Set("-use_ext_svk");
-    use_corotated=parse_args->Is_Value_Set("-use_corotated");
-    use_corotated_fixed=parse_args->Is_Value_Set("-use_corotated_fixed");
-    use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
-    dump_sv=parse_args->Is_Value_Set("-dump_sv");
-    use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
-    solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
-    override_collisions=parse_args->Is_Value_Set("-collisions");
-    override_no_collisions=parse_args->Is_Value_Set("-no_collisions")&&(!override_collisions);
-    hole=(T)parse_args->Get_Double_Value("-hole");
-    rebound_stiffness=(T)parse_args->Get_Double_Value("-rebound_stiffness");
-    rebound_time=(T)parse_args->Get_Double_Value("-rebound_time");
-    rebound_drop=(T)parse_args->Get_Double_Value("-rebound_drop");
-    with_bunny=parse_args->Is_Value_Set("-with_bunny");
-    with_hand=parse_args->Is_Value_Set("-with_hand");
-    with_big_arm=parse_args->Is_Value_Set("-with_big_arm");
-    number_of_jellos=parse_args->Get_Integer_Value("-number_of_jellos");
-    degrees_incline=parse_args->Get_Double_Value("-degrees_incline");
-    degrees_wedge=parse_args->Get_Double_Value("-degrees_wedge");
-    gears_of_pain=parse_args->Is_Value_Set("-gears_of_pain");
-    sloped_floor=parse_args->Is_Value_Set("-sloped_floor");
-    J_min=(T)parse_args->Get_Double_Value("-ja");
-    J_max=(T)parse_args->Get_Double_Value("-jb");
-    la_min=(T)parse_args->Get_Double_Value("-lb");
-    hand_scale=(T)parse_args->Get_Double_Value("-hand_scale");
-    test_model_only=parse_args->Get_Option_Value("-test_model_only");
-    ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
-    repulsion_thickness=(T)parse_args->Get_Double_Value("-repulsion_thickness");
-    sigma_range=(T)parse_args->Get_Double_Value("-sigma_range");
-    image_size=parse_args->Get_Integer_Value("-image_size");
-    stretch_cutoff=parse_args->Get_Double_Value("-stretch_cutoff");
-    pin_corners=parse_args->Get_Option_Value("-pin_corners");
     
-    semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
-    if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
     solids_parameters.deformable_object_collision_parameters.collide_with_interior=true;
-    nobind=parse_args->Is_Value_Set("-nobind");
-    if(parse_args->Is_Value_Set("-cutoff")) input_cutoff=(T)parse_args->Get_Double_Value("-cutoff");
-    if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
-    if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
-    if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
-    if(parse_args->Is_Value_Set("-seed")) rand.Set_Seed(parse_args->Get_Integer_Value("-seed"));
 
     switch(test_number){
         case 1:
@@ -461,7 +419,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
             solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;//This gets turned off later then back on
             //std::cout << "rame collisions are " << override_collisions << std::endl;
-            self_collision_flipped=false;
             //}
             frame_rate=120;
             last_frame=420;
@@ -625,8 +582,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     //solids_parameters.triangle_collision_parameters.perform_per_time_step_repulsions=override_collisions;
     //solids_parameters.triangle_collision_parameters.perform_self_collision=override_collisions;
 
-    solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
-    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
+    solid_body_collection.Print_Residuals(use_residuals);
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -1451,7 +1407,7 @@ void Get_Initial_Data()
                                                     RIGID_BODY_STATE<TV>(FRAME<TV>(TV(-10*i,10,0),ROTATION<TV>(T(pi),TV(0,1,0)))),true,true,density);
 
             }
-            boxsize=(T)2;
+            T boxsize=(T)2;
             RIGID_BODY<TV>& box1=tests.Add_Analytic_Box(TV(3*boxsize,boxsize,boxsize));
             RIGID_BODY<TV>& box2=tests.Add_Analytic_Box(TV(3*boxsize,boxsize,boxsize));
             RIGID_BODY<TV>& box3=tests.Add_Analytic_Box(TV(boxsize,boxsize,boxsize));
@@ -2082,9 +2038,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         deformable_body_collection.collisions.collision_structures.Append(deformable_body_collection.deformable_geometry.structures(i));
         if(solids_parameters.triangle_collision_parameters.perform_self_collision)
             solid_body_collection.deformable_body_collection.triangle_repulsions_and_collisions_geometry.structures.Append(deformable_body_collection.deformable_geometry.structures(i));}
-
-    if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
-    if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
 
     if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)

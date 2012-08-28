@@ -61,20 +61,49 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
 {
     typedef VECTOR<T,3> TV;
 
+    T dx=0,band=0,padding=0,thickness=(T)1e-5,offset=0;
+    bool use_octree=false,mac=false,opt_heaviside(false),opt_unsigned(false),opt_only_bdy_outside(false);
+    bool opt_keep_largest(false),opt_flip(false),opt_debug(false),opt_orthogonal_vote(false),use_grid_size(false);
+    bool opt_domain_min(false),opt_domain_max(false),opt_path_start(false),opt_path_end(false);
+    VECTOR<int,3> grid_size,path_start,path_end;
+    int depth=1,positive_boundary_band=0;
+    RANGE<TV> domain((TV()),TV());
+    std::string output_filename,exact_grid;
+    parse_args.Add("-heaviside",&opt_heaviside,"compute heaviside function");
+    parse_args.Add("-unsigned",&opt_unsigned,"compute unsigned distance");
+    parse_args.Add("-mac",&mac,"use MAC grid");
+    parse_args.Add("-only_bdy_outside",&opt_only_bdy_outside,"only boundary region is outside");
+    parse_args.Add("-keep_largest",&opt_keep_largest,"keep only largest inside region");
+    parse_args.Add("-flip",&opt_flip,"flip sign if corners are inside");
+    parse_args.Add("-debug",&opt_debug,"write debug data");
+    parse_args.Add("-g",&grid_size,&use_grid_size,"grid size","suggested grid size - actual size may be larger");
+    parse_args.Add("-dx",&dx,"grid dx","specify grid cell size");
+    parse_args.Add("-domain_min",&domain.min_corner,&opt_domain_min,"vector","domain min");
+    parse_args.Add("-domain_max",&domain.max_corner,&opt_domain_max,"vector","domain max");
+    parse_args.Add("-band",&band,"half_band_width","half band width for fast marching method (in grid cells)");
+    parse_args.Add("-padding",&padding,"padding","padding for flood fill");
+    parse_args.Add("-thickness",&thickness,"thickness","surface thickness");
+    parse_args.Add("-offset",&offset,"offset","subtract offset from phi");
+    parse_args.Add("-positive_boundary",&positive_boundary_band,"positive boundary band","ensure this band around boundary is positive");
+    parse_args.Add("-octree",&use_octree,"generate an octree levelset");
+    parse_args.Add("-depth",&depth,"maximum_depth","maximum depth if using an octree");
+    parse_args.Add("-o",&output_filename,"filename","output_filename");
+    parse_args.Add("-exact_grid",&exact_grid,"exact_grid","exact_grid");
+    parse_args.Add("-path_start",&path_start,&opt_path_start,"path_start","path_start");
+    parse_args.Add("-path_end",&path_end,&opt_path_end,"path_end","path_end");
+    parse_args.Add("-orthogonal_vote",&opt_orthogonal_vote,"orthogonal_vote");
+    parse_args.Set_Extra_Arguments(1,"<tri file>","<tri file> tri file to convert");
+
+    parse_args.Parse();
+
     TRIANGULATED_SURFACE<T>* triangulated_surface=0;FILE_UTILITIES::Create_From_File<RW>(input_filename,triangulated_surface);
     triangulated_surface->Update_Bounding_Box();
     RANGE<TV> box=*triangulated_surface->bounding_box;
 
-    T dx=(T)parse_args.Get_Double_Value("-dx");
-    if(parse_args.Is_Value_Set("-g") && dx){LOG::cerr<<"Only one of -g and -dx is allowed."<<std::endl;exit(1);}
-    VECTOR<int,3> grid_size=VECTOR<int,3>(parse_args.Get_Vector_3D_Value("-g"));
+    if(use_grid_size && dx){LOG::cerr<<"Only one of -g and -dx is allowed."<<std::endl;exit(1);}
     if(grid_size.Contains(0)){std::cerr<<"Invalid suggested grid size "<<grid_size<<std::endl;exit(1);}
-    bool use_octree=parse_args.Get_Option_Value("-octree");
-    int depth=parse_args.Get_Integer_Value("-depth");
-    bool mac=parse_args.Get_Option_Value("-mac");
 
-    if(parse_args.Is_Value_Set("-domain_min") && parse_args.Is_Value_Set("-domain_max")){
-        box=RANGE<TV>((TV)parse_args.Get_Vector_3D_Value("-domain_min"),(TV)parse_args.Get_Vector_3D_Value("-domain_max"));}
+    if(opt_domain_min && opt_domain_max) box=domain;
 
     // Make a cube grid using suggested grid_size and boundary cells
     GRID<VECTOR<T,3> > original_grid,grid;
@@ -84,14 +113,11 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
         if(mac && use_octree) PHYSBAM_FATAL_ERROR("Can't use MAC grids on an octree");
         grid=Make_Cube_Grid(original_grid,boundary_cells,use_octree,mac);}
 
-    if(parse_args.Is_Value_Set("-exact_grid")){
-        std::string filename=parse_args.Get_String_Value("-exact_grid");
-        FILE_UTILITIES::Read_From_File<RW>(filename,grid);
-        LOG::cout<<"reading grid from "<<filename<<std::endl;}
+    if(!exact_grid.empty()){
+        FILE_UTILITIES::Read_From_File<RW>(exact_grid,grid);
+        LOG::cout<<"reading grid from "<<exact_grid<<std::endl;}
 
-    std::string output_filename="";
-    if(parse_args.Is_Value_Set("-o")) output_filename=parse_args.Get_String_Value("-o");
-    else{
+    if(output_filename.empty()){
         std::string dimensions=STRING_UTILITIES::string_sprintf("%dx%dx%d",grid.counts.x,grid.counts.y,grid.counts.z);
         output_filename=FILE_UTILITIES::Get_Basename(input_filename)+dimensions+(use_octree?".oct":".phi");}
 
@@ -103,12 +129,12 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
     std::cout<<"Adjusted to make cube voxels and added boundary cells ("<<boundary_cells<<")..."<<std::endl;
     std::cout<<"New number of nodes: m = "<<grid.counts.x<<", n = "<<grid.counts.y<<", mn = "<<grid.counts.z<<std::endl;
     std::cout<<"Voxel size: "<<grid.Minimum_Edge_Length()<<std::endl;
-    if(parse_args.Get_Option_Value("-heaviside"))
+    if(opt_heaviside)
         std::cout<<"Compute heaviside function"<<std::endl;
     else
-        std::cout<<"Fast marching method half band width (in grid cells): "<<parse_args.Get_Double_Value("-band")<<std::endl;
-    std::cout<<"Padding for flood fill: "<<parse_args.Get_Double_Value("-padding")<<std::endl;
-    std::cout<<"Positive boundary band: "<<parse_args.Get_Integer_Value("-positive_boundary")<<std::endl;
+        std::cout<<"Fast marching method half band width (in grid cells): "<<band<<std::endl;
+    std::cout<<"Padding for flood fill: "<<padding<<std::endl;
+    std::cout<<"Positive boundary band: "<<positive_boundary_band<<std::endl;
     std::cout<<"------------------------------------"<<std::endl;
     std::cout<<"Original box: -domain_min "<<box.min_corner<<" -domain_max "<<box.max_corner<<std::endl;
     std::cout<<"New box: -domain_min "<<grid.Domain().min_corner<<" -domain_max "<<grid.Domain().max_corner<<std::endl;
@@ -119,25 +145,25 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
     {
         LEVELSET_MAKER_UNIFORM<T> levelset_maker;
         levelset_maker.Verbose_Mode(true);
-        levelset_maker.Write_Debug_Data(parse_args.Get_Option_Value("-debug"));
-        if(parse_args.Is_Value_Set("-path_start")&&parse_args.Is_Value_Set("-path_end"))
-            levelset_maker.Write_Debug_Path(true,VECTOR<int,3>(parse_args.Get_Vector_3D_Value("-path_start")),VECTOR<int,3>(parse_args.Get_Vector_3D_Value("-path_end")));
-        if(parse_args.Get_Option_Value("-orthogonal_vote")) levelset_maker.Use_Orthogonal_Vote(true);
-        levelset_maker.Set_Surface_Padding_For_Flood_Fill((T)parse_args.Get_Double_Value("-padding"));
-        levelset_maker.Set_Surface_Thickness((T)parse_args.Get_Double_Value("-thickness"));
-        if(parse_args.Get_Option_Value("-heaviside"))
+        levelset_maker.Write_Debug_Data(opt_debug);
+        if(opt_path_start && opt_path_end)
+            levelset_maker.Write_Debug_Path(true,path_start,path_end);
+        if(opt_orthogonal_vote) levelset_maker.Use_Orthogonal_Vote(true);
+        levelset_maker.Set_Surface_Padding_For_Flood_Fill(padding);
+        levelset_maker.Set_Surface_Thickness(thickness);
+        if(opt_heaviside)
             levelset_maker.Compute_Heaviside_Function();
         else{
-            if(parse_args.Get_Option_Value("-unsigned"))
+            if(opt_unsigned)
                 levelset_maker.Compute_Unsigned_Distance_Function();
             else
                 levelset_maker.Compute_Signed_Distance_Function();
-            levelset_maker.Use_Fast_Marching_Method(true,(T)parse_args.Get_Double_Value("-band"));}
-            levelset_maker.Only_Boundary_Region_Is_Outside(parse_args.Get_Option_Value("-only_bdy_outside"));
-            levelset_maker.Keep_Only_Largest_Inside_Region(parse_args.Get_Option_Value("-keep_largest"));
-            levelset_maker.Flip_Sign_If_Corners_Are_Inside(parse_args.Get_Option_Value("-flip"));
-            levelset_maker.Set_Positive_Boundary_Band(parse_args.Get_Integer_Value("-positive_boundary"));
-            levelset_maker.Set_Phi_Offset((T)parse_args.Get_Double_Value("-offset"));
+            levelset_maker.Use_Fast_Marching_Method(true,band);}
+            levelset_maker.Only_Boundary_Region_Is_Outside(opt_only_bdy_outside);
+            levelset_maker.Keep_Only_Largest_Inside_Region(opt_keep_largest);
+            levelset_maker.Flip_Sign_If_Corners_Are_Inside(opt_flip);
+            levelset_maker.Set_Positive_Boundary_Band(positive_boundary_band);
+            levelset_maker.Set_Phi_Offset(offset);
             ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
             levelset_maker.Compute_Level_Set(*triangulated_surface,grid,phi);
             LEVELSET_IMPLICIT_OBJECT<TV> levelset_implicit_surface(grid,phi);
@@ -149,56 +175,25 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool type_double=false;
+    bool type_double=false,type_float=false,compute_using_doubles=false;
     VECTOR<double,3> grid_size(50,50,50);
     int boundary_cells=3;
-    int positive_boundary_band=0;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float","data is in float format");
-    parse_args.Add_Option_Argument("-double","data is in double format");
-    parse_args.Add_Option_Argument("-heaviside","compute heaviside function");
-    parse_args.Add_Option_Argument("-unsigned","compute unsigned distance");
-    parse_args.Add_Option_Argument("-mac","use MAC grid");
-    parse_args.Add_Option_Argument("-only_bdy_outside","only boundary region is outside");
-    parse_args.Add_Option_Argument("-keep_largest","keep only largest inside region");
-    parse_args.Add_Option_Argument("-flip","flip sign if corners are inside");
-    parse_args.Add_Option_Argument("-debug","write debug data");
-    parse_args.Add_Vector_3D_Argument("-g",grid_size,"grid size","suggested grid size - actual size may be larger");
-    parse_args.Add_Double_Argument("-dx",0,"grid dx","specify grid cell size");
-    parse_args.Add_Vector_3D_Argument("-domain_min",VECTOR<double,3>());
-    parse_args.Add_Vector_3D_Argument("-domain_max",VECTOR<double,3>());
-    parse_args.Add_Double_Argument("-coarsen",0,"coarsen_band_width","coarsen band width for fast marching method (in grid cells)");
-    parse_args.Add_Double_Argument("-band",0,"half_band_width","half band width for fast marching method (in grid cells)");
-    parse_args.Add_Double_Argument("-padding",0,"padding for flood fill");
-    parse_args.Add_Double_Argument("-thickness",1e-5,"surface thickness");
-    parse_args.Add_Double_Argument("-offset",0,"subtract offset from phi");
-    parse_args.Add_Integer_Argument("-b",boundary_cells,"boundary cells","number of cells outside bounding box");
-    parse_args.Add_Integer_Argument("-positive_boundary",positive_boundary_band,"positive boundary band","ensure this band around boundary is positive");
-    parse_args.Add_Option_Argument("-octree","generate an octree levelset");
-    parse_args.Add_Integer_Argument("-depth",1,"maximum_depth","maximum depth if using an octree");
-    parse_args.Add_String_Argument("-o","","output filename","output_filename");
-    parse_args.Add_String_Argument("-exact_grid","");
-    parse_args.Add_Vector_3D_Argument("-path_start",VECTOR<double,3>());
-    parse_args.Add_Vector_3D_Argument("-path_end",VECTOR<double,3>());
-    parse_args.Add_Option_Argument("-orthogonal_vote");
-    parse_args.Add_Option_Argument("-compute_using_doubles");
-    parse_args.Set_Extra_Arguments(1,"<tri file>","<tri file> tri file to convert");
+    parse_args.Add("-float",&type_float,"data is in float format");
+    parse_args.Add("-double",&type_double,"data is in double format");
+    parse_args.Add("-b",&boundary_cells,"boundary cells","number of cells outside bounding box");
+    parse_args.Add("-compute_using_doubles",&compute_using_doubles,"perform computations using doubles");
+    parse_args.Parse(true);
 
-    parse_args.Parse();
-
-    if(parse_args.Is_Value_Set("-b")) boundary_cells=parse_args.Get_Integer_Value("-b");
     std::string input_filename=parse_args.Extra_Arg(0);
-
-    if(parse_args.Get_Option_Value("-float")) type_double=false;
-    if(parse_args.Get_Option_Value("-double")) type_double=true;
 
     if(!FILE_UTILITIES::Is_Tri_File(input_filename)){
         std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
         return -1;}
 
     if(!type_double){
-        if(parse_args.Get_Option_Value("-compute_using_doubles")){
+        if(compute_using_doubles){
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
             Convert<double,float>(input_filename,boundary_cells,parse_args);

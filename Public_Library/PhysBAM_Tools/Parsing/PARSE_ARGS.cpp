@@ -51,22 +51,6 @@ Add_Double_Argument(const std::string& arg_str,double default_value,const std::s
     arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
 }
 //#####################################################################
-// Function Add_Vector_2D_Argument
-//#####################################################################
-void PARSE_ARGS::
-Add_Vector_2D_Argument(const std::string& arg_str,const VECTOR<double,2> &default_value,const std::string& val_name,const std::string& desc)
-{
-    arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
-}
-//#####################################################################
-// Function Add_Vector_3D_Argument
-//#####################################################################
-void PARSE_ARGS::
-Add_Vector_3D_Argument(const std::string& arg_str,const VECTOR<double,3> &default_value,const std::string& val_name,const std::string& desc)
-{
-    arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
-}
-//#####################################################################
 // Function Add_String_Argument
 //#####################################################################
 void PARSE_ARGS::

@@ -84,8 +84,6 @@ public:
     void Add_Option_Argument(const std::string& arg_str,const std::string& desc="");
     void Add_Integer_Argument(const std::string& arg_str,int default_value,const std::string& val_name="",const std::string& desc="");
     void Add_Double_Argument(const std::string& arg_str,double default_value,const std::string& val_name="",const std::string& desc="");
-    void Add_Vector_2D_Argument(const std::string& arg_str,const VECTOR<double,2>& default_value,const std::string& val_name="",const std::string& desc="");
-    void Add_Vector_3D_Argument(const std::string& arg_str,const VECTOR<double,3>& default_value,const std::string& val_name="",const std::string& desc="");
     void Add_String_Argument(const std::string& arg_str,const std::string& default_value,const std::string& val_name="",const std::string& desc="");
     void Set_Extra_Arguments(int num,const std::string& synopsis="",const std::string& desc="");
     void Set_Extra_Usage_Callback(void (*extra_usage_callback_input)());
