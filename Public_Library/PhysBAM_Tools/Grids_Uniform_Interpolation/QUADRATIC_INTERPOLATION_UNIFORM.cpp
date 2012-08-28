@@ -143,7 +143,7 @@ From_Block_Face_Component(const int axis,const T_GRID& grid,const BLOCK_UNIFORM<
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const
 {
-    TV w=(X-grid.X(index))*grid.one_over_dX;
+    TV w=(X-grid.Axis_X_Face(FACE_INDEX<TV::m>(axis,index)))*grid.one_over_dX;
     T2 x[3]={u(axis,index-1),u(axis,index),u(axis,index+1)};
     return Quadratic_Interpolation(x,w.x);
 }
@@ -153,7 +153,7 @@ From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typen
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const
 {
-    TV w=(X-grid.X(index))*grid.one_over_dX;
+    TV w=(X-grid.Axis_X_Face(FACE_INDEX<TV::m>(axis,index)))*grid.one_over_dX;
     TV_INT b(index-1);
     T2 x[3];
     for(int i=0;i<3;i++,b.x++){
@@ -167,7 +167,7 @@ From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typen
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 From_Block_Face_Component_Helper(const int axis,const GRID<TV>& grid,const typename T_FACE_LOOKUP::LOOKUP& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const
 {
-    TV w=(X-grid.X(index))*grid.one_over_dX;
+    TV w=(X-grid.Axis_X_Face(FACE_INDEX<TV::m>(axis,index)))*grid.one_over_dX;
     TV_INT b(index-1),c=b;
     T2 x[3],y[3];
     for(int i=0;i<3;i++,b.x++,c=b){
