@@ -30,7 +30,7 @@ typedef VECTOR<int,3> TV_INT;
     } while(0)
 inline unsigned long long rdtsc(){unsigned long long x;rdtscll(x);return x;}
 
-std::string output_directory;
+std::string output_directory="output";
 
 template<class TV> DEBUG_PARTICLES<TV>& Get_Debug_Particles()
 {
@@ -54,15 +54,15 @@ int main(int argc, char* argv[])
 {
     srand(time(0));
     Get_Debug_Particles<TV>();
+    std::string colors="abbbbbbb";
+    int n=5,s=5;
+    bool use_seed=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_String_Argument("-o","output","output directory");
-    parse_args.Add_String_Argument("-c","abbbbbbb","color case");
-    parse_args.Add_Integer_Argument("-n",5,"extra random tests");
-    parse_args.Add_Integer_Argument("-s",5,"random seed");
+    parse_args.Add("-o",&output_directory,"output","output directory");
+    parse_args.Add("-c",&colors,"color","color case");
+    parse_args.Add("-n",&n,"num","extra random tests");
+    parse_args.Add("-s",&s,&use_seed,"seed","random seed");
     parse_args.Parse();
-    output_directory=parse_args.Get_String_Value("-o");
-    std::string colors=parse_args.Get_String_Value("-c");
-    int n=parse_args.Get_Integer_Value("-n");
 
     ARRAY<TV> color_map;
     color_map.Append(TV(1,0,0));
@@ -80,7 +80,7 @@ int main(int argc, char* argv[])
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
 
     RANDOM_NUMBERS<T> random;
-    if(parse_args.Is_Value_Set("-s")) random.Set_Seed(parse_args.Get_Integer_Value("-s"));
+    if(use_seed) random.Set_Seed(s);
     GRID<TV> grid(TV_INT()+n,RANGE<TV>::Unit_Box());
     ARRAY<T,TV_INT> phi(grid.Node_Indices());
     phi.Fill(1);

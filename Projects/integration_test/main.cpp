@@ -31,7 +31,7 @@
 using namespace PhysBAM;
 
 typedef float RW;
-std::string output_directory;
+std::string output_directory="output";
 
 template<class TV>
 GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)
@@ -386,9 +386,25 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
-    int test_number;
-    if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
-    if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
+    T m=1,s=1,kg=1,mu_i=1,mu_o=1;
+    int test_number=1,resolution=4,cgf=2;
+    bool use_preconditioner=false,use_test=false;
+    parse_args.Set_Extra_Arguments(-1,"<example number>");
+    parse_args.Add("-o",&output_directory,"output","output directory");
+    parse_args.Add("-mu_i",&mu_i,"mu","viscosity inside");
+    parse_args.Add("-mu_o",&mu_o,"mu","viscosity outside");
+    parse_args.Add("-m",&m,"unit","meter scale");
+    parse_args.Add("-s",&s,"unit","second scale");
+    parse_args.Add("-kg",&kg,"unit","kilogram scale");
+    parse_args.Add("-test",&test_number,&use_test,"number","test number");
+    parse_args.Add("-resolution",&resolution,"res","resolution");
+    parse_args.Add("-cgf",&cgf,"factor","coarse grid factor");
+    parse_args.Add("-use_preconditioner",&use_preconditioner,"Use Jacobi preconditioner");
+    parse_args.Parse();
+
+    if(!use_test){
+        if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
+        if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");}
 
     ANALYTIC_TEST<TV>* test=0;
 
@@ -579,21 +595,17 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
-    output_directory=parse_args.Get_String_Value("-o");
-    test->m=parse_args.Get_Double_Value("-m");
-    test->s=parse_args.Get_Double_Value("-sec");
-    test->kg=parse_args.Get_Double_Value("-kg");
-    test->mu(0)=parse_args.Get_Double_Value("-mu_o")*test->kg/(test->s*(d==3?test->m:1));
-    test->mu(1)=parse_args.Get_Double_Value("-mu_i")*test->kg/(test->s*(d==3?test->m:1));
-    int res=parse_args.Get_Integer_Value("-resolution");
-    int cgf=parse_args.Get_Integer_Value("-cgf");
-    bool use_preconditioner=parse_args.Get_Option_Value("-use_preconditioner");
+    test->m=m;
+    test->s=s;
+    test->kg=kg;
+    test->mu(0)=mu_o;
+    test->mu(1)=mu_i;
 
-    if(res%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
+    if(resolution%cgf) PHYSBAM_FATAL_ERROR("Resolution must be divisible by coarse grid factor.");
 
     test->Initialize();
 
-    TV_INT counts=TV_INT()+res;
+    TV_INT counts=TV_INT()+resolution;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
     GRID<TV> coarse_grid(grid.counts/cgf,grid.domain,true);
     ARRAY<T,TV_INT> phi(coarse_grid.Node_Indices());
@@ -616,22 +628,12 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
+    bool use_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
-    parse_args.Add_String_Argument("-o","output","output directory");
-    parse_args.Add_Double_Argument("-mu_i",1,"viscosity inside");
-    parse_args.Add_Double_Argument("-mu_o",1,"viscosity outside");
-    parse_args.Add_Double_Argument("-m",1,"meter scale");
-    parse_args.Add_Double_Argument("-sec",1,"second scale");
-    parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
-    parse_args.Add_Integer_Argument("-test",1,"test number");
-    parse_args.Add_Integer_Argument("-resolution",4,"resolution");
-    parse_args.Add_Integer_Argument("-cgf",2,"coarse grid factor");
-    parse_args.Add_Option_Argument("-use_preconditioner","Use Jacobi preconditioner");
-    parse_args.Add_Option_Argument("-3d","Use 3D");
-    parse_args.Parse();
+    parse_args.Add("-3d",&use_3d,"Use 3D");
+    parse_args.Parse(true);
 
-    if(parse_args.Get_Option_Value("-3d"))
+    if(use_3d)
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);
     else
         Integration_Test<VECTOR<double,2> >(argc,argv,parse_args);

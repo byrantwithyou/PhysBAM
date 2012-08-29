@@ -298,23 +298,22 @@ ARRAY<OBJECT> objects;
 int main(int argc, char* argv[])
 {
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_String_Argument("-ic","in_curves.txt","input file with curves");
-    parse_args.Add_String_Argument("-ir","in_reduction.txt","input file with reduction");
-    parse_args.Add_String_Argument("-o","out","output file");
-    parse_args.Add_Double_Argument("-scale",1,"scale for graph reduction");
-    parse_args.Add_Double_Argument("-unit",1,"choose units");
-    parse_args.Add_Option_Argument("-emit_curves","create output tex file with cube and curves");
-    parse_args.Add_Option_Argument("-emit_reduction","create output tex files with graph reduction process");
-    parse_args.Add_Option_Argument("-emit_rules","create output tex files with reduction rules");
+    std::string input_file_curves="in_curves.txt";
+    std::string input_file_reduction="in_reduction.txt";
+    std::string output_file="out";
+    T scale=1,unit=1;
+    bool EMIT_REDUCTION=false;
+    bool EMIT_CURVES=false;
+    bool EMIT_RULES=false;
+    parse_args.Add("-ic",&input_file_curves,"file","input file with curves");
+    parse_args.Add("-ir",&input_file_reduction,"file","input file with reduction");
+    parse_args.Add("-o",&output_file,"file","output file");
+    parse_args.Add("-scale",&scale,"scale","scale for graph reduction");
+    parse_args.Add("-unit",&unit,"unit","choose units");
+    parse_args.Add("-emit_curves",&EMIT_CURVES,"create output tex file with cube and curves");
+    parse_args.Add("-emit_reduction",&EMIT_REDUCTION,"create output tex files with graph reduction process");
+    parse_args.Add("-emit_rules",&EMIT_RULES,"create output tex files with reduction rules");
     parse_args.Parse();
-    std::string input_file_curves=parse_args.Get_String_Value("-ic");
-    std::string input_file_reduction=parse_args.Get_String_Value("-ir");
-    std::string output_file=parse_args.Get_String_Value("-o");
-    T scale=parse_args.Get_Double_Value("-scale");
-    T unit=parse_args.Get_Double_Value("-unit");
-    bool EMIT_REDUCTION=parse_args.Get_Option_Value("-emit_reduction");
-    bool EMIT_CURVES=parse_args.Get_Option_Value("-emit_curves");
-    bool EMIT_RULES=parse_args.Get_Option_Value("-emit_rules");
 
     std::ifstream fin;
     std::ofstream fout;

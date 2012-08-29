@@ -295,9 +295,28 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
-    int test_number;
-    if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
-    if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
+    T m=1,s=1,kg=1;
+    int test_number=1,resolution=4,max_iter=1000000;
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,dump_geometry=false;
+    parse_args.Set_Extra_Arguments(-1,"<example number>");
+    parse_args.Add("-o",&output_directory,"output","output directory");
+    parse_args.Add("-m",&m,"unit","meter scale");
+    parse_args.Add("-s",&s,"unit","second scale");
+    parse_args.Add("-kg",&kg,"unit","kilogram scale");
+    parse_args.Add("-test",&test_number,&use_test,"number","test number");
+    parse_args.Add("-resolution",&resolution,"res","resolution");
+    parse_args.Add("-use_preconditioner",&use_preconditioner,"Use Jacobi preconditioner");
+    parse_args.Add("-max_iter",&max_iter,"iter","max number of interations");
+    parse_args.Add("-null",&null,"find extra null modes of the matrix");
+    parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
+    parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
+    parse_args.Add("-double_fine",&double_fine,"set level set exactly on double fine grid");
+    parse_args.Add("-dump_geometry",&dump_geometry,"dump grid info and interface");
+    parse_args.Parse();
+
+    if(!use_test){
+        if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
+        if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");}
 
     ANALYTIC_TEST<TV>* test=0;
 
@@ -758,21 +777,12 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}
 
-    output_directory=parse_args.Get_String_Value("-o");
-    test->m=parse_args.Get_Double_Value("-m");
-    test->s=parse_args.Get_Double_Value("-sec");
-    test->kg=parse_args.Get_Double_Value("-kg");
-    int res=parse_args.Get_Integer_Value("-resolution");
-    int max_iter=parse_args.Get_Integer_Value("-max_iter");
-    bool use_preconditioner=parse_args.Get_Option_Value("-use_preconditioner");
-    bool null=parse_args.Get_Option_Value("-null");
-    bool dump_matrix=parse_args.Get_Option_Value("-dump_matrix");
-    bool debug_particles=parse_args.Get_Option_Value("-debug_particles");
-    bool double_fine=parse_args.Get_Option_Value("-double_fine");
-    bool dump_geometry=parse_args.Get_Option_Value("-dump_geometry");
+    test->m=m;
+    test->s=s;
+    test->kg=kg;
     test->Initialize();
 
-    TV_INT counts=TV_INT()+res;
+    TV_INT counts=TV_INT()+resolution;
     GRID<TV> grid(counts,RANGE<TV>(TV(),TV()+1)*test->m,true);
 
     Global_Grid(&grid);
@@ -795,25 +805,12 @@ int main(int argc,char* argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
+    bool use_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
-    parse_args.Add_String_Argument("-o","output","output directory");
-    parse_args.Add_Double_Argument("-m",1,"meter scale");
-    parse_args.Add_Double_Argument("-sec",1,"second scale");
-    parse_args.Add_Double_Argument("-kg",1,"kilogram scale");
-    parse_args.Add_Integer_Argument("-test",1,"test number");
-    parse_args.Add_Integer_Argument("-resolution",4,"resolution");
-    parse_args.Add_Integer_Argument("-max_iter",1000000,"max number of interations");
-    parse_args.Add_Option_Argument("-use_preconditioner","use Jacobi preconditioner");
-    parse_args.Add_Option_Argument("-3d","use 3D");
-    parse_args.Add_Option_Argument("-null","find extra null modes of the matrix");
-    parse_args.Add_Option_Argument("-dump_matrix","dump system matrix");
-    parse_args.Add_Option_Argument("-debug_particles","dump debug particles");
-    parse_args.Add_Option_Argument("-double_fine","set level set exactly on double fine grid");
-    parse_args.Add_Option_Argument("-dump_geometry","dump grid info and interface");
-    parse_args.Parse();
+    parse_args.Add("-3d",&use_3d,"Use 3D");
+    parse_args.Parse(true);
     
-    if(parse_args.Get_Option_Value("-3d"))
+    if(use_3d)
         Integration_Test<VECTOR<double,3> >(argc,argv,parse_args);
     else
         Integration_Test<VECTOR<double,2> >(argc,argv,parse_args);

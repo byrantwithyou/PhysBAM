@@ -36,11 +36,11 @@ typedef VECTOR<int,2> TV_INT2;
 int main(int argc, char* argv[])
 {
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_String_Argument("-o","out.tex","output filename");
-    parse_args.Add_String_Argument("-i","","input filename");
+    std::string file="out.tex";
+    std::string infile;
+    parse_args.Add("-o",&file,"file","output filename");
+    parse_args.Add("-i",&infile,"file","input filename");
     parse_args.Parse();
-    std::string file=parse_args.Get_String_Value("-o");
-    std::string infile=parse_args.Get_String_Value("-i");
 
 #ifdef USE_BOOST_GEOMETRY
     HIDDEN_SURFACE_PRIMITIVES<T> hsp;
