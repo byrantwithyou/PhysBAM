@@ -85,7 +85,10 @@ public:
 
     SOLIDS_STANDARD_TESTS<TV> solid_tests;
     FRACTURE_PATTERN<T> fracture_pattern;
+    int eno_scheme,eno_order,rk_order;
+    T cfl_number;
     int fp;
+    bool weak_shock,timesplit,use_slip,use_incompressible_gravity,faster_frame_rate,exact,no_soot,no_solids_gravity,no_preconditioner,createpattern;
     
     int shock_type;
     TV_DIMENSION state_inside,state_outside; // (density,velocity_x,velocity_y,velocity_z,pressure)
@@ -130,6 +133,7 @@ public:
     bool print_rhs;
     bool print_each_matrix;
     bool output_iterators;
+    T time_start_transition,time_end_transition,one_over_c_incompressible,burn_temperature_threshold,burn_rate,soot_fuel_calorific_value;
 
     ARRAY<DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>*> deformable_objects_to_simulate;
 
@@ -159,11 +163,18 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type,const bool incompressible_input)
         :BASE(stream_type,0,incompressible_input?fluids_parameters.SMOKE:fluids_parameters.COMPRESSIBLE),
-        solid_tests(*this,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection),collision_manager(0),
-        incompressible(incompressible_input)
+        solid_tests(*this,solid_body_collection),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),fp(0),weak_shock(false),
+        timesplit(false),use_slip(false),use_incompressible_gravity(false),faster_frame_rate(false),exact(false),no_soot(false),
+        no_solids_gravity(false),no_preconditioner(false),createpattern(false),solid_mass((T).0625),
+        rigid_body_collection(solid_body_collection.rigid_body_collection),fracture_walls(false),collision_manager(0),
+        transition_to_incompressible(false),incompressible(incompressible_input),vorticity_confinement((T)0),use_soot_sourcing(false),
+        use_soot_sourcing_from_shock(false),use_soot_fuel_combustion(false),use_smoke_sourcing(false),read_soot_from_file(false),
+        use_fixed_farfield_boundary(false),run_self_tests(false),print_poisson_matrix(false),print_index_map(false),
+        print_matrix(false),print_rhs(false),print_each_matrix(false),output_iterators(false),time_start_transition((T).5),
+        time_end_transition((T).7),one_over_c_incompressible((T)0),burn_temperature_threshold((T)600),burn_rate((T)100),
+        soot_fuel_calorific_value((T)54000)
     {
     }
-    
     virtual ~STANDARD_TESTS() {}
 
 //#####################################################################
@@ -172,55 +183,56 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",2,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Double_Argument("-cfl",(T).6,"CFL","cfl number");
-    parse_args->Add_Option_Argument("-weak_shock","Use stronger shock with temperature ratio 2900:290, p ratio 1000:1");
-    parse_args->Add_Option_Argument("-no_solids","ensure no solid is added");
-    parse_args->Add_Double_Argument("-mass",(T).0625,"solid_mass","the mass of the solid in the simulation");
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-slip","use slip/spd for coupling");
-    parse_args->Add_Option_Argument("-exact","output a fully-explicit sim to (output_dir)_exact");
 
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_rhs");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
+    parse_args->Add("-weak_shock",&weak_shock,"Use stronger shock with temperature ratio 2900:290, p ratio 1000:1");
+    parse_args->Add("-no_solids",&no_solids,"ensure no solid is added");
+    parse_args->Add("-mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-slip",&use_slip,"use slip/spd for coupling");
+    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
 
-    parse_args->Add_Option_Argument("-transition_to_incompressible","transition to incompressible in a time window");
-    parse_args->Add_Double_Argument("-time_start_transition",(T).5,"time to start transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-time_end_transition",(T).7,"time to end transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-one_over_c_incompressible",(T)0,"one over incompressible sound speed");
-    parse_args->Add_Double_Argument("-vorticity_confinement",(T)0,"vorticity_confinement","Vorticity Confinement");
-    parse_args->Add_Option_Argument("-no_soot","advect around soot");
-    parse_args->Add_Option_Argument("-use_soot_sourcing","source soot");
-    parse_args->Add_Option_Argument("-use_soot_sourcing_from_shock","source soot from initial shock place");
-    parse_args->Add_Option_Argument("-combustion","source soot");
+    parse_args->Add("-test_system",&run_self_tests,"Run self tests");
+    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
+    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args->Add("-print_rhs",&print_rhs,"print_rhs");
+    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
+    parse_args->Add("-no_preconditioner",&no_preconditioner,"no_preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
 
-    parse_args->Add_Double_Argument("-burn_temperature_threshold",(T)600,"temperature above which fuel will burn");
-    parse_args->Add_Double_Argument("-burn_rate",(T)100,"rate of fuel burning");
-    parse_args->Add_Double_Argument("-calorific_value",(T)54000,"heat generated per fuel burnt");
+    parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"value","transition to incompressible in a time window");
+    parse_args->Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
+    parse_args->Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
+    parse_args->Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","one over incompressible sound speed");
+    parse_args->Add("-vorticity_confinement",&vorticity_confinement,"value","Vorticity Confinement");
+    parse_args->Add("-no_soot",&no_soot,"value","advect around soot");
+    parse_args->Add("-use_soot_sourcing",&use_soot_sourcing,"value","source soot");
+    parse_args->Add("-use_soot_sourcing_from_shock",&use_soot_sourcing_from_shock,"value","source soot from initial shock place");
+    parse_args->Add("-combustion",&use_soot_fuel_combustion,"source soot");
 
-    parse_args->Add_Option_Argument("-use_smoke_sourcing","source smoke (denisty,temperature,velocity)");
+    parse_args->Add("-burn_temperature_threshold",&burn_temperature_threshold,"temp","temperature above which fuel will burn");
+    parse_args->Add("-burn_rate",&burn_rate,"rate","rate of fuel burning");
+    parse_args->Add("-calorific_value",&soot_fuel_calorific_value,"value","heat generated per fuel burnt");
 
-    parse_args->Add_Option_Argument("-read_soot_from_file","read soot from input file");
-    parse_args->Add_String_Argument("-soot_data_dir","directory containing grid, soot, velocity files");
+    parse_args->Add("-use_smoke_sourcing",&use_smoke_sourcing,"source smoke (denisty,temperature,velocity)");
+
+    parse_args->Add("-read_soot_from_file",&read_soot_from_file,"read soot from input file");
+    parse_args->Add("-soot_data_dir",&soot_data_dir,"dir","directory containing grid, soot, velocity files");
     
-    parse_args->Add_Option_Argument("-use_fixed_farfield_boundary","use fixed farfield values for outflow boundaries");
-    parse_args->Add_Option_Argument("-use_incompressible_gravity","add gravity on incompressible fluid");
-    parse_args->Add_Option_Argument("-no_solids_gravity","add gravity on solids");
+    parse_args->Add("-use_fixed_farfield_boundary",&use_fixed_farfield_boundary,"use fixed farfield values for outflow boundaries");
+    parse_args->Add("-use_incompressible_gravity",&use_incompressible_gravity,"add gravity on incompressible fluid");
+    parse_args->Add("-no_solids_gravity",&no_solids_gravity,"add gravity on solids");
 
-    parse_args->Add_Integer_Argument("-fp",0,"fracture pattern","fracture pattern");
-    parse_args->Add_Option_Argument("-createpattern");
-    parse_args->Add_Option_Argument("-fracture_walls");
+    parse_args->Add("-fp",&fp,"fracture pattern","fracture pattern");
+    parse_args->Add("-createpattern",&createpattern,"createpattern");
+    parse_args->Add("-fracture_walls",&fracture_walls,"fracture_walls");
     
-    parse_args->Add_Option_Argument("-faster_frame_rate");
+    parse_args->Add("-faster_frame_rate",&faster_frame_rate,"faster_frame_rate");
 }
 //#####################################################################
 // Function Parse_Options
@@ -229,47 +241,14 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
 
-    if(parse_args->Get_Option_Value("-createpattern")){
+    if(createpattern){
        if(test_number==11) Create_Wall_Pattern();
        exit(0);}
 
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    bool strong_shock=!parse_args->Is_Value_Set("-weak_shock");
-    no_solids=parse_args->Is_Value_Set("-no_solids");
-    solid_mass=(T)parse_args->Get_Double_Value("-mass");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit") && !parse_args->Is_Value_Set("-exact");
-    bool use_slip=parse_args->Is_Value_Set("-slip");
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_rhs=parse_args->Is_Value_Set("-print_rhs");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
-    transition_to_incompressible=parse_args->Is_Value_Set("-transition_to_incompressible");
-    T time_start_transition=(T)parse_args->Get_Double_Value("-time_start_transition");
-    T time_end_transition=(T)parse_args->Get_Double_Value("-time_end_transition");
-    T one_over_c_incompressible=(T)parse_args->Get_Double_Value("-one_over_c_incompressible");
-    T vorticity_confinement=(T)parse_args->Get_Double_Value("-vorticity_confinement");
-    use_soot=!parse_args->Is_Value_Set("-no_soot");
-    use_soot_sourcing=parse_args->Is_Value_Set("-use_soot_sourcing");
-    use_soot_fuel_combustion=parse_args->Is_Value_Set("-combustion");
-    T burn_temperature_threshold=parse_args->Get_Double_Value("-burn_temperature_threshold");
-    T burn_rate=parse_args->Get_Double_Value("-burn_rate");
-    T soot_fuel_calorific_value=parse_args->Get_Double_Value("-calorific_value");
-    use_soot_sourcing_from_shock=parse_args->Is_Value_Set("-use_soot_sourcing_from_shock");
-    use_smoke_sourcing=parse_args->Is_Value_Set("-use_smoke_sourcing");
-    read_soot_from_file=parse_args->Is_Value_Set("-read_soot_from_file");
-    soot_data_dir=parse_args->Get_String_Value("-soot_data_dir");
-    use_fixed_farfield_boundary=parse_args->Is_Value_Set("-use_fixed_farfield_boundary");
-    bool use_incompressible_gravity=parse_args->Is_Value_Set("-use_incompressible_gravity");
-    use_solids_gravity=!parse_args->Is_Value_Set("-no_solids_gravity");
-    fracture_walls=parse_args->Is_Value_Set("-fracture_walls");
-    fp=parse_args->Get_Integer_Value("-fp");
-    bool faster_frame_rate=parse_args->Is_Value_Set("-faster_frame_rate");
+    timesplit=timesplit&&!exact;
+    use_soot=!no_soot;
+    use_solids_gravity=!no_solids_gravity;
+    bool strong_shock=!weak_shock;
 
     //grid
     int cells=resolution;
@@ -366,8 +345,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_slip=use_slip;
 
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
+    if(no_preconditioner) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     if(use_soot){
         fluids_parameters.use_soot=true;
