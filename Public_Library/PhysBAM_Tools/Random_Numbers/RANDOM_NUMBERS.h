@@ -50,6 +50,9 @@ public:
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,gaussian_iset,gset);output<<random_number_generator;}
 
+    template<class TV> void Fill_Uniform(TV& X,const RANGE<TV>& box)
+    {X=Get_Uniform_Vector<TV>(box);}
+
 //#####################################################################
     void Set_Seed(const unsigned int seed_input=time(0));
     int Get_Uniform_Integer(const int a,const int b);
