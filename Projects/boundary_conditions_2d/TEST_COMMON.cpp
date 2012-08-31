@@ -9,6 +9,7 @@ template<class TV> TEST_COMMON<TV>::
 TEST_COMMON(int argc,char** argv)
     :parse_args(argc,argv)
 {
+    parse_args.Print_Arguments();
 }
 
 template<class TV> TEST_COMMON<TV>::
@@ -28,16 +29,14 @@ Init_1()
 
     sim.Init_1(parse_args);
 
-    parse_args.Add_String_Argument("-o","output","Output Directory");
+    output_directory="output";
+    parse_args.Add("-o",&output_directory,"dir","Output Directory");
 }
 template<class TV> void TEST_COMMON<TV>::
 Init_2()
 {
-    parse_args.Print_Arguments();
     parse_args.Parse();
     sim.Init_2(parse_args);
-
-    output_directory=parse_args.Get_String_Value("-o");
 
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");

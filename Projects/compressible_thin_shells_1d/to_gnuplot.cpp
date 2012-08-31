@@ -21,14 +21,13 @@ int main(int argc,char* argv[])
     typedef float RW;
     STREAM_TYPE stream_type(RW());
 
+    std::string input_directory="input_directory",data_file="density";
+    int frame=-1;
     PARSE_ARGS parse_args;
-    parse_args.Add_String_Argument("-in","input_directory");
-    parse_args.Add_String_Argument("-data","density","Data to parse");
-    parse_args.Add_Integer_Argument("-frame",-1);
+    parse_args.Add("-in",&input_directory,"dir","input directory");
+    parse_args.Add("-data",&data_file,"file","Data to parse");
+    parse_args.Add("-frame",&frame,"frame","frame");
     parse_args.Parse();
-    std::string input_directory=parse_args.Get_String_Value("-in"),
-        data_file=parse_args.Get_String_Value("-data");
-    int frame=parse_args.Get_Integer_Value("-frame");
 
 //##########################  INITIALIZATION  #########################
     GRID<TV> grid;

@@ -103,7 +103,7 @@ public:
     T max_dt;
     T exact_dt;
     T current_dt;
-    bool implicit_solid,use_cut_volume,use_low_order_advection;
+    bool implicit_solid,no_implicit_solid,use_cut_volume,use_low_order_advection;
 
     GEOMETRY_PARTICLES<TV> debug_particles;
     SEGMENTED_CURVE_2D<T>* front_tracked_structure;
@@ -132,6 +132,9 @@ public:
     T omega;
     T laplace_number,surface_tension;
     bool use_T_nu;
+    bool use_viscosity,no_preconditioner;
+    T linear_force,rand;
+    int cut_order;
 
     SURFACE_TENSION(const STREAM_TYPE stream_type);
     virtual ~SURFACE_TENSION();
