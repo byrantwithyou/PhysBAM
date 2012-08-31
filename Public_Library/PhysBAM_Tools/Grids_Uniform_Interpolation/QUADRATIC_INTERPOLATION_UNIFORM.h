@@ -22,6 +22,7 @@ public:
     using BASE::Clamped_Index_Interior_End_Minus_One;
 
 public:
+    int ghost_cells;
 
     QUADRATIC_INTERPOLATION_UNIFORM();
     ~QUADRATIC_INTERPOLATION_UNIFORM();

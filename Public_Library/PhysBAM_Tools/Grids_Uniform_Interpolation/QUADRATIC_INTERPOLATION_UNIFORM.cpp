@@ -12,6 +12,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 QUADRATIC_INTERPOLATION_UNIFORM()
+    :ghost_cells(0)
 {
 }
 //#####################################################################
@@ -127,7 +128,10 @@ Base_Index_Face(const T_GRID& grid,const typename T_FACE_LOOKUP::LOOKUP& u,int a
 {
     TV offset;
     offset(axis)=(T).5;
-    return TV_INT(floor((X-grid.domain.min_corner)*grid.one_over_dX+offset));
+    TV_INT I(floor((X-grid.domain.min_corner)*grid.one_over_dX+offset));
+    RANGE<TV_INT> range=grid.Domain_Indices(ghost_cells);
+    range.max_corner(axis)++;
+    return clamp(I,range.min_corner+1,range.max_corner-2);
 }
 //#####################################################################
 // Function From_Block_Face_Component
