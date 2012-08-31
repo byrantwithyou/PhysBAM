@@ -29,7 +29,8 @@ template<class T_GRID,class T2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_INT 
 Base_Index(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 {
     TV_INT index(rint((X-grid.domain.min_corner)*grid.one_over_dX-grid.MAC_offset));
-    return clamp(index,u.domain.min_corner+1,u.domain.max_corner-2);
+    RANGE<TV_INT> range=grid.Domain_Indices(ghost_cells);
+    return clamp(index,range.min_corner+1,range.max_corner-2);
 }
 //#####################################################################
 // function Clamped_To_Array
@@ -61,7 +62,7 @@ template<class T> static T Quadratic_Interpolation(const T* x,T w)
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index) const
 {
-    TV w=(X-grid.X(index))*grid.one_over_dX;
+    TV w=(X-grid.Node(index))*grid.one_over_dX;
     return Quadratic_Interpolation(&u(index-1),w.x);
 }
 //#####################################################################
@@ -70,7 +71,7 @@ From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1>
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2> >& u,const VECTOR<T,2>& X,const VECTOR<int,2>& index) const
 {
-    TV w=(X-grid.X(index))*grid.one_over_dX;
+    TV w=(X-grid.Node(index))*grid.one_over_dX;
     const T2* b=&u(index-1);
     T2 x[3];
     for(int i=0;i<3;i++,b+=u.counts.y)
@@ -83,7 +84,7 @@ From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,2>
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
 From_Base_Node_Helper(const GRID<TV>& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,3> >& u,const VECTOR<T,3>& X,const VECTOR<int,3>& index) const
 {
-    TV w=(X-grid.X(index))*grid.one_over_dX;
+    TV w=(X-grid.Node(index))*grid.one_over_dX;
     int dx=u.counts.y*u.counts.z;
     const T2* b=&u(index-1),*c=b;
     T2 x[3],y[3];
