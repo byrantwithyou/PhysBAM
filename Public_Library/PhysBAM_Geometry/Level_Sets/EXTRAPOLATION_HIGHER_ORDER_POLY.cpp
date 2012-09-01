@@ -37,8 +37,9 @@ Extrapolate_Node(const GRID<TV>& grid,MASK& inside_mask,int ghost,ARRAYS_ND_BASE
     for(RANGE_ITERATOR<TV::m> it(RANGE<TV_INT>(TV_INT()-1,TV_INT()+2));it.Valid();it.Next())
         neighbors.Append(it.index);
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next()){
-        if(inside_mask.Inside(it.index)) continue;
+    RANGE<TV_INT> domain(grid.Domain_Indices());
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid,1);it.Valid();it.Next()){
+        if(domain.Lazy_Inside_Half_Open(it.index) && inside_mask.Inside(it.index)) continue;
         distance(it.index)|=1;
         for(int d=0;d<TV::m;d++){
             TV_INT ia(it.index),ib(it.index);
