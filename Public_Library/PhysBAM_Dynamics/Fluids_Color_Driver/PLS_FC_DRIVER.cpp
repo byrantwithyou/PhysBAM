@@ -132,6 +132,8 @@ Initialize()
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.Minimum_Edge_Length(),5);
         example.Initialize();
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,3);it.Valid();it.Next())
+            example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
         example.particle_levelset_evolution.Make_Signed_Distance();
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);}
 
@@ -214,6 +216,7 @@ Update_Pls(T dt)
 template<class TV> void PLS_FC_DRIVER<TV>::
 Advance_One_Time_Step(bool first_step)
 {
+    Extrapolate_Velocity(example.face_velocities,example.face_color);
     example.Begin_Time_Step(time);
     T dt=example.dt;
 //    Update_Pls(dt);
@@ -221,6 +224,7 @@ Advance_One_Time_Step(bool first_step)
     Advection_And_BDF(dt,first_step);
     Apply_Pressure_And_Viscosity(dt,first_step);
     time+=dt;
+    Extrapolate_Velocity(example.face_velocities,example.face_color);
     example.End_Time_Step(time);
 }
 //#####################################################################
@@ -241,6 +245,7 @@ Advection_And_BDF(T dt,bool first_step)
         for(int c=0;c<example.number_of_colors;c++)
             RK2_Advection_And_BDF(dt,first_step,c);
     Swap_State();
+    Extrapolate_Velocity(example.face_velocities,example.face_color);
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -266,8 +271,7 @@ Reduced_Advection_And_BDF(T dt,bool first_step,int c)
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,example.prev_face_velocities(c),-(T).5/(T)1.5,temp);}
     else{
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-        example.face_velocities(c)=example.prev_face_velocities(c);}
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);}
 }
 //#####################################################################
 // Function Advection_And_BDF
@@ -278,19 +282,25 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,QUADRATIC_INTERPOLATION_UNIFORM<GRID<TV>,T> > quadratic_advection;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> > linear_advection;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary;
-    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,3),temp2(example.grid,3);
-    FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp2(temp2);
+    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,3),temp2(example.grid,3),temp3(example.grid,3),temp4(example.grid,3),temp5(example.grid,3);
+    FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp(temp),lookup_temp2(temp2),lookup_temp3(temp3),lookup_temp4(temp4),lookup_temp5(temp5);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
+    example.prev_face_color=example.face_color;
     if(!first_step){
-        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,dt,time+dt);
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_prev_face_velocities,lookup_temp2,boundary,2*dt,time+dt);
-        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_face_velocities,lookup_face_velocities,boundary,dt/2,time+dt);
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_temp2,boundary,dt,time+dt);
-        example.prev_face_velocities(c).Copy((T)2/(T)1.5,example.prev_face_velocities(c),-(T).5/(T)1.5,temp);}
+        temp.Copy((T)1.5,example.face_velocities(c),-(T).5,example.prev_face_velocities(c));
+        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_temp,lookup_face_velocities,boundary,dt/2,time+dt);
+        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp3,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+        Extrapolate_Velocity(temp2,example.prev_face_color,c);
+        Extrapolate_Velocity(temp3,example.prev_face_color,c);
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp4,lookup_face_velocities,lookup_temp2,boundary,dt,time+dt);
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp5,lookup_prev_face_velocities,lookup_temp3,boundary,2*dt,time+dt);
+        Extrapolate_Velocity(temp4,example.prev_face_color,c);
+        Extrapolate_Velocity(temp5,example.prev_face_color,c);
+        example.prev_face_velocities(c).Copy((T)2/(T)1.5,temp4,-(T).5/(T)1.5,temp5);}
     else{
-        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_face_velocities,lookup_face_velocities,boundary,dt/2,time+dt);
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_temp2,boundary,dt,time+dt);
-        example.face_velocities(c)=example.prev_face_velocities(c);}
+        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp3,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
+        Extrapolate_Velocity(temp3,example.face_color,c);
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_temp3,boundary,dt,time+dt);}
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity
@@ -356,10 +366,11 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
         iss.Multiply(*iss.null_modes(i),*vectors(0));
         LOG::cout<<"null mode["<<i<<"] "<<iss.Convergence_Norm(*vectors(0))<<std::endl;}
 
+    // TODO: Handle ghost region
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next()){
         int c=example.levelset_color.Color(it.Location());
-        if(c<0) continue;
         example.face_color(it.Full_Index())=c;
+        if(c<0) continue;
         int k=iss.cm_u(it.Axis())->Get_Index(it.index,c);
         assert(k>=0);
         example.face_velocities(c)(it.Full_Index())=sol.u(it.Axis())(c)(k);}
