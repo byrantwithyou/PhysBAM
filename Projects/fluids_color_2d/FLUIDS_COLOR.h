@@ -109,6 +109,8 @@ public:
             case 5: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
             case 6: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);break;
             case 7: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);break;
+            case 8: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*3*m,true);break;
+            case 9: grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
 
@@ -119,13 +121,15 @@ public:
     {
         switch(test_number){
             case 0: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
-            case 1: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
-            case 2: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
+            case 1: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV()),1);break;
+            case 2: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV()),1);break;
             case 3: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             case 4: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_CONST(TV()+1),1);break;
-            case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),1);break;
+            case 5: Analytic_Test(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV()),1);break;
             case 6: Analytic_Test(new ANALYTIC_LEVELSET_VORTEX((T).2),new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5),1);break;
             case 7: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_RAREFACTION,1);omit_solve=true;break;
+            case 8: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_ROTATION_DECAY,1);omit_solve=true;break;
+            case 9: Analytic_Test(new ANALYTIC_LEVELSET_PERIODIC,new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV((T).2,(T).5)),1);break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         PHYSBAM_ASSERT(rho.m==number_of_colors && mu.m==number_of_colors);
@@ -188,11 +192,12 @@ public:
     struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY
     {
         T nu;
-        ANALYTIC_VELOCITY_VORTEX(T mu,T pho): nu(mu/pho){}
+        TV trans;
+        ANALYTIC_VELOCITY_VORTEX(T mu,T pho,TV t): nu(mu/pho),trans(t){}
         virtual TV u(const TV& X,T t) const
-        {return TV(sin(X.x)*cos(X.y),-cos(X.x)*sin(X.y))*exp(-2*nu*t);}
+        {TV Z=X-t*trans;return TV(sin(Z.x)*cos(Z.y),-cos(Z.x)*sin(Z.y))*exp(-2*nu*t)+trans;}
         virtual MATRIX<T,2> du(const TV& X,T t) const
-        {T c=cos(X.x)*cos(X.y),s=sin(X.x)*sin(X.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
+        {TV Z=X-t*trans;T c=cos(Z.x)*cos(Z.y),s=sin(Z.x)*sin(Z.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
         virtual T p(const TV& X,T t) const {return 0;}
     };
 
@@ -201,6 +206,14 @@ public:
         ANALYTIC_VELOCITY_RAREFACTION(){}
         virtual TV u(const TV& X,T t) const {return TV(X.x,0)/(t+1);}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(1,0,0,0)/(t+1);}
+        virtual T p(const TV& X,T t) const {return 0;}
+    };
+
+    struct ANALYTIC_VELOCITY_ROTATION_DECAY:public ANALYTIC_VELOCITY
+    {
+        ANALYTIC_VELOCITY_ROTATION_DECAY(){}
+        virtual TV u(const TV& X,T t) const {return X.Orthogonal_Vector()*2*exp(-X.Magnitude_Squared());}
+        virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(-2*X.x*X.y,1-2*sqr(X.y),-1+2*sqr(X.x),2*X.x*X.y)*2*exp(-X.Magnitude_Squared());}
         virtual T p(const TV& X,T t) const {return 0;}
     };
 
@@ -253,8 +266,8 @@ public:
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
-                if(0) Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
-                if(0) Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(A-B));}
             LOG::cout<<"max_error "<<max_error<<"  "<<a<<"  "<<b<<std::endl;}
     }
 
