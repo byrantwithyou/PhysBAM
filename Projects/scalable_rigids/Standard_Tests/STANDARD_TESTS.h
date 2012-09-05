@@ -148,7 +148,7 @@ void Ring_Test()
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         rigid_body.Set_Coefficient_Of_Restitution(epsilon);
-        rigid_body.Set_Coefficient_Of_Friction(mu);
+        rigid_body.coefficient_of_friction=mu;
         rigid_body.Set_Mass(10);
         rigid_body.simplicial_object->Set_Desired_Particle_Partition_Size(VECTOR<int,3>(3,1,3));}
 
@@ -156,7 +156,7 @@ void Ring_Test()
         for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
-            rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
+            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
             rigid_body.is_static=true;
             rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
@@ -183,7 +183,7 @@ void Bone_Test()
     for(int i=0;i<solid_body_collection.rigid_body_collection.rigid_body_particle.Size();i++){
         RIGID_BODY<TV>& rigid_body=solid_body_collection.rigid_body_collection.Rigid_Body(i);
         rigid_body.Set_Coefficient_Of_Restitution(epsilon);
-        rigid_body.Set_Coefficient_Of_Friction(mu);
+        rigid_body.coefficient_of_friction=mu;
         rigid_body.Set_Mass(10);
         rigid_body.simplicial_object->Set_Desired_Particle_Partition_Size(VECTOR<int,3>(3,1,3));}
 
@@ -191,7 +191,7 @@ void Bone_Test()
         for(int j=0;j<poles;j++){
             // Poles
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,mu);
-            rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
+            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
             rigid_body.is_static=true;
             rigid_body.Frame().t=TV((i-(poles+1)/(T)2)*7,10,(j-(poles+1)/(T)2)*7);}
 
@@ -216,27 +216,27 @@ void Sphere_Test()
     RIGID_BODY<TV>& left_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.y,size.z));
     left_wall.Frame().t=VECTOR<T,3>(lower_corner.x,center.y,center.z);
     left_wall.Frame().r=ROTATION<VECTOR<T,3> >(-(T).5*(T)pi,VECTOR<T,3>(0,0,1));
-    left_wall.Set_Name("left wall");
+    left_wall.name="left wall";
 
     RIGID_BODY<TV>& right_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.y,size.z));
     right_wall.Frame().t=VECTOR<T,3>(upper_corner.x,center.y,center.z);
     right_wall.Frame().r=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(0,0,1));
-    right_wall.Set_Name("right wall");
+    right_wall.name="right wall";
 
     RIGID_BODY<TV>& bottom_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.z));
     bottom_wall.Frame().t=VECTOR<T,3>(center.x,lower_corner.y,center.z);
     bottom_wall.Frame().r=ROTATION<TV>(0,TV(0,0,1));
-    bottom_wall.Set_Name("bottom wall");
+    bottom_wall.name="bottom wall";
 
     RIGID_BODY<TV>& front_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.y));
     front_wall.Frame().t=VECTOR<T,3>(center.x,center.y,lower_corner.z);
     front_wall.Frame().r=ROTATION<VECTOR<T,3> >((T).5*(T)pi,VECTOR<T,3>(1,0,0));
-    front_wall.Set_Name("front wall");
+    front_wall.name="front wall";
 
     RIGID_BODY<TV>& back_wall=tests.Add_Ground(coefficient_of_friction,0,coefficient_of_restitution,max(size.x,size.y));
     back_wall.Frame().t=VECTOR<T,3>(center.x,center.y,upper_corner.z);
     back_wall.Frame().r=ROTATION<VECTOR<T,3> >((T)-.5*(T)pi,VECTOR<T,3>(1,0,0));
-    back_wall.Set_Name("back wall");
+    back_wall.name="back wall";
 
     //char* object_names[]={"subdivided_box","sphere","New_Bones/Cranium_1","New_Bones/Pelvis_1","New_Bones/Right_Hand"};//,"dumbbell","bowl","spoon"};
     //T object_scales[]={1,1,30,30,30};
@@ -259,11 +259,11 @@ void Bounce(const T angle)
     for(int i=0;i<3;i++){
         RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
         rigid_body.Frame().t=TV(x_pos[i],5,0);rigid_body.Set_Coefficient_Of_Restitution(cor[i]);
-        rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("sphere (cor %g)",cor[i]));}
+        rigid_body.name=STRING_UTILITIES::string_sprintf("sphere (cor %g)",cor[i]);}
 
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("sphere",1,(T).5);
     rigid_body.Frame().t=TV(x_pos[2],8,0);rigid_body.Set_Coefficient_Of_Restitution(0);
-    rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("sphere"));
+    rigid_body.name=STRING_UTILITIES::string_sprintf("sphere");
 
     RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,0,1,1);
     ground.Frame().r=ROTATION<TV>(angle,TV(0,0,1));

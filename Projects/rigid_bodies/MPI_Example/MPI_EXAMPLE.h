@@ -185,12 +185,12 @@ void Pyramid_Of_Boxes()
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
         rigid_body1->Frame().t=TV(first_x-10,i*20,0);
         rigid_body1->is_static = true;
-        rigid_body1->Set_Name("left_box");
+        rigid_body1->name="left_box";
 
         RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
         rigid_body2->Frame().t=TV(current_x+7.5,i*20,0);
         rigid_body2->is_static = true;
-        rigid_body2->Set_Name("right_box");}
+        rigid_body2->name="right_box";}
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
@@ -212,12 +212,12 @@ void Stacked_Boxes() {
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
         rigid_body1->Frame().t=TV(-58,i*20,0);
         rigid_body1->is_static = true;
-        rigid_body1->Set_Name("left_box");
+        rigid_body1->name="left_box";
     
         RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("subdivided_box",(T)10,(T).1);
         rigid_body2->Frame().t=TV(58,i*20,0);
         rigid_body2->is_static = true;
-        rigid_body2->Set_Name("right_box");}
+        rigid_body2->name="right_box";}
 
     tests.Add_Ground(1, -10);
     last_frame = 250;

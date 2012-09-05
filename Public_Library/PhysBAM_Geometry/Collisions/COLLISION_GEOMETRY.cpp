@@ -27,7 +27,7 @@ template<class TV> COLLISION_GEOMETRY<TV>::
 COLLISION_GEOMETRY()
     :active(true),add_to_spatial_partition(true),collision_geometry_id(0),collision_geometries_for_rasterization(0)
 {
-    Set_Collision_Thickness();
+    collision_thickness=(T)1e-3;
 }
 //#####################################################################
 // Destructor

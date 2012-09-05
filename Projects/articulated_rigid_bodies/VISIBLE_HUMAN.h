@@ -399,11 +399,11 @@ void Make_Bones(const ARRAY<bool>& bone_filter=ARRAY<bool>())
             rigid_body=new RIGID_BODY<TV>(rigid_body_collection);FILE_UTILITIES::Read_From_File(stream_type,filename+".rgd",rigid_body->Mass(),frame);
             rigid_body->Frame()=frame;}
         rigid_body->Set_Coefficient_Of_Restitution((T).5);
-        rigid_body->Set_Coefficient_Of_Friction((T).5);
+        rigid_body->coefficient_of_friction=(T).5;
         bone_names(i)=bone_files[i-1];
         if(bone_files[i-1]=="tibia_and_patella_right") bone_names(i)="tibia_right";
         else if(bone_files[i-1]=="tibia_and_patella_left") bone_names(i)="tibia_left";
-        rigid_body->Set_Name(bone_files[i-1]);
+        rigid_body->name=bone_files[i-1];
         // get anatomical frame w.r.t. rigid body frame instead of world frame
         anatomical_frame_in_rigid_body_frame(i)=rigid_body->Frame().Inverse()*anatomical_frame_in_rigid_body_frame(i);
         rigid_body->Frame()=transform*rigid_body->Frame();
@@ -504,7 +504,7 @@ void Add_Reflected_Left_Joint(const int local_left_joint_id)
     else if(typeid(*right_joint)==typeid(ANGLE_JOINT<TV>)) new_joint=new ANGLE_JOINT<TV>();
     else PHYSBAM_NOT_IMPLEMENTED();
     if(Add_Joint_Safe(left_parent_bone,left_child_bone,local_left_joint_id,new_joint)){
-        joint(local_left_joint_id)->Set_Name(joint(local_right_joint_id)->name+"_left");
+        joint(local_left_joint_id)->name=joint(local_right_joint_id)->name+"_left";
         if(verbose) LOG::cout<<"Reflecting joint "<<joint(local_right_joint_id)->name<<" -> "<<joint(local_left_joint_id)->name<<std::endl;
         FRAME<TV> reflected_parent_frame=Reflected_Frame_Relative_To_Body(left_parent_bone,right_joint->frame_pj);
         FRAME<TV> reflected_child_frame=Reflected_Frame_Relative_To_Body(left_child_bone,right_joint->frame_cj);
@@ -522,7 +522,7 @@ void Update_Reflected_Left_Joint(const int local_left_joint_id)
         left_child_bone=Reflected_Bone(joint_parent_and_child(local_right_joint_id).y);
     assert(!right_joint->primary_point_of_bend_joint);
     if(joint(local_left_joint_id)){
-        joint(local_left_joint_id)->Set_Name(joint(local_right_joint_id)->name+"_left");
+        joint(local_left_joint_id)->name=joint(local_right_joint_id)->name+"_left";
         if(verbose) LOG::cout<<"Reflecting joint "<<joint(local_right_joint_id)->name<<" -> "<<joint(local_left_joint_id)->name<<std::endl;
         FRAME<TV> reflected_parent_frame=Reflected_Frame_Relative_To_Body(left_parent_bone,right_joint->frame_pj);
         FRAME<TV> reflected_child_frame=Reflected_Frame_Relative_To_Body(left_child_bone,right_joint->frame_cj);
@@ -542,7 +542,7 @@ JOINT_ID Add_Additional_Reflected_Left_Joint(const JOINT_ID right_joint_id,RIGID
     else if(right_joint->joint_type==JOINT<TV>::TYPE_POINT_JOINT) new_joint=new POINT_JOINT<TV>();
     else assert(false);
 
-    new_joint->Set_Name(right_joint->name+"_left");
+    new_joint->name=right_joint->name+"_left";
     if(verbose) LOG::cout<<"Reflecting joint "<<right_joint->name<<" -> "<<new_joint->name<<std::endl;
     FRAME<TV> reflected_parent_frame=Reflected_Frame_Relative_To_Body_From_Given_Bone(left_parent_bone,right_parent_bone,right_joint->frame_pj,specific_side);
     FRAME<TV> reflected_child_frame=Reflected_Frame_Relative_To_Body_From_Given_Bone(left_child_bone,right_child_bone,right_joint->frame_cj,specific_side);
@@ -806,7 +806,7 @@ void Make_Joints()
         joint(JOINT_R_TOE_5)->Set_Joint_To_Parent_Frame(toe_5_frame_in_parent);
         joint(JOINT_R_TOE_5)->Set_Joint_To_Child_Frame(bones(BONE_R_TOE_5)->Frame().Inverse()*bones(BONE_R_ANKLE)->Frame()*toe_5_frame_in_parent);}
 
-    for(int i=0;i<num_joints;i++) if(joint(i)) joint(i)->Set_Name(joint_names[i-1]);
+    for(int i=0;i<num_joints;i++) if(joint(i)) joint(i)->name=joint_names[i-1];
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(data_directory+"/SIMM_Data/hand_joints",false);
     std::string next;
@@ -859,7 +859,7 @@ void Make_Joints()
                     new_joint->Set_Joint_To_Child_Frame(child->Frame().Inverse()*joint_frame);}
                 else std::cerr<<"Unrecognized joint_center_frame: "<<joint_center_frame<<std::endl;
 
-                new_joint->Set_Name(joint_name);}}
+                new_joint->name=joint_name;}}
         *input>>next;}
     delete input;
 
@@ -900,7 +900,7 @@ MUSCLE<TV>* Reflected_Muscle(MUSCLE<TV>* muscle)
     // MUSCLE<T,GRID<TV> >* reflected_muscle=new MUSCLE<T,GRID<TV> >(muscle->force_curve);
 
     MUSCLE<TV>* reflected_muscle=new MUSCLE<TV>(muscle->force_curve);
-    reflected_muscle->Set_Name(muscle->name+"_left");
+    reflected_muscle->name=muscle->name+"_left";
     reflected_muscle->Set_Attachment_Point_1(Reflected_Constrained_Point(muscle->attachment_point_1));
     reflected_muscle->Set_Attachment_Point_2(Reflected_Constrained_Point(muscle->attachment_point_2));
     for(int i=0;i<muscle->via_points.m;i++) reflected_muscle->Add_Via_Point(Reflected_Constrained_Point(muscle->via_points(i)));
@@ -954,7 +954,7 @@ void Make_Muscles()
     for(int m=0;m<num_muscles;m++){
         ARRAY<T_MUSCLE_SEGMENT_DATA>* segment_data=new ARRAY<T_MUSCLE_SEGMENT_DATA>();
         MUSCLE<TV>* muscle=new MUSCLE<TV>(arb->muscle_list->muscle_force_curve);
-        muscle->Set_Name(muscle_files[m-1]);
+        muscle->name=muscle_files[m-1];
         std::istream* input=FILE_UTILITIES::Safe_Open_Input(viapoint_file_directory+muscle_files[m-1]+".viapts",false);
 
         if(verbose) LOG::cout<<muscle_files[m-1]<<" ";
@@ -1126,8 +1126,8 @@ void Make_Wrapping_Objects()
 
             rigid_body=bones(id);
             rigid_body->Set_Coefficient_Of_Restitution((T).5);
-            rigid_body->Set_Coefficient_Of_Friction((T).5);
-            rigid_body->Set_Name(object_name);
+            rigid_body->coefficient_of_friction=(T).5;
+            rigid_body->name=object_name;
 
 /* code for updating hte points of the triangulated surface . . may need to use to update the via_points on the wrapping surfaces
         for(int i=0;i<triangulated_surface.particles.Size();i++)

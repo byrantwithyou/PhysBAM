@@ -58,7 +58,8 @@ Intersect_With_Rigid_Body(const RIGID_BODY<TV>& body,const TV& point_of_impact,A
         for(int i=0;i<new_regions.m;i++){
             RIGID_BODY<TV>* new_body=new RIGID_BODY<TV>(body.rigid_body_collection,true);
             // Initialize frame, mass, and inertia. coefficient of friction, coefficient of restitution
-            new_body->Set_Coefficient_Of_Friction(body.coefficient_of_friction);new_body->Set_Coefficient_Of_Restitution(body.coefficient_of_restitution);
+            new_body->coefficient_of_friction=body.coefficient_of_friction;
+            new_body->Set_Coefficient_Of_Restitution(body.coefficient_of_restitution);
             T_WORLD_SPACE_INERTIA_TENSOR inertia;
             new_regions(i)->extra_levelset_frame=levelset_frame;
             new_regions(i)->Compute_Inertial_Properties(density,new_body->Frame().t,new_body->Mass(),inertia);

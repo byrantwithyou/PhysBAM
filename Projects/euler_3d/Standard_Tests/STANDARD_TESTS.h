@@ -747,7 +747,7 @@ void Set_Rigid_Body_Parameters(int rigid_body_index,const std::string& name,cons
 {
     rigid_body_collection.Rigid_Body(rigid_body_index).name=name;
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Restitution((T)1);
-    rigid_body_collection.Rigid_Body(rigid_body_index).Set_Coefficient_Of_Friction((T)mu);
+    rigid_body_collection.Rigid_Body(rigid_body_index).coefficient_of_friction=(T)mu;
     rigid_body_collection.rigid_body_particle.frame(rigid_body_index).t=position;
     rigid_body_collection.Rigid_Body(rigid_body_index).Set_Mass(mass);
     rigid_body_collection.rigid_body_particle.kinematic(rigid_body_index)=false;

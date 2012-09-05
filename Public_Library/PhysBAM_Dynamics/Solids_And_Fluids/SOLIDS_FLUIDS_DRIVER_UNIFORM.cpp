@@ -156,7 +156,7 @@ Initialize()
 
     // time
     if(number_of_regions>=1){
-        particle_levelset_evolution->Set_Time(time);
+        particle_levelset_evolution->time=time;
         particle_levelset_evolution->Set_CFL_Number(example.fluids_parameters.cfl);}
     if(example.fluids_parameters.compressible) euler->Set_CFL_Number(example.fluids_parameters.cfl);
 
@@ -180,7 +180,7 @@ Initialize()
             if(example.fluids_parameters.use_removed_negative_particles) particle_levelset_evolution->Particle_Levelset(i).Use_Removed_Negative_Particles();}
         if(example.fluids_parameters.store_particle_ids){
             for(int i=0;i<number_of_regions;i++) particle_levelset_evolution->Particle_Levelset(i).Store_Unique_Particle_Id();}
-        particle_levelset_evolution->Use_Particle_Levelset(example.fluids_parameters.use_particle_levelset);}
+        particle_levelset_evolution->use_particle_levelset=example.fluids_parameters.use_particle_levelset;}
 
     // initialize sph
     if(example.fluids_parameters.sph) example.fluids_parameters.sph_evolution->Set_SPH_Callbacks(example);

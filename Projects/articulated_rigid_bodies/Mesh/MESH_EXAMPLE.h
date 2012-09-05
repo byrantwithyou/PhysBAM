@@ -110,33 +110,33 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body->Frame().t=TV(x_shift+1+2*col,y_shift,z_shift+2*row);
             rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
             rigid_body->Set_Coefficient_Of_Restitution(0);
-            rigid_body->Set_Name("mesh");}
+            rigid_body->name="mesh";}
         for(int col=0;col<num_cols+1;col++){
             id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"sphere",(T).15,true,with_phi);
             rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
             rigid_body->Frame().t=TV(x_shift+2*col,y_shift,z_shift+2*row);
             rigid_body->Set_Coefficient_Of_Restitution(0);
-            rigid_body->Set_Name("mesh_joint");}
+            rigid_body->name="mesh_joint";}
         for(int col=0;col<num_cols+1;col++){
             id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"plank",(T).15,true,with_phi);
             rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
             rigid_body->Frame().t=TV(x_shift+2*col,y_shift,z_shift+1+2*row);
             rigid_body->Set_Coefficient_Of_Restitution(0);
-            rigid_body->Set_Name("mesh");}            
+            rigid_body->name="mesh";}            
         if(row==num_rows-1){
             for(int col=0;col<num_cols+1;col++){
                 id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"sphere",(T).15,true,with_phi);
                 rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
                 rigid_body->Frame().t=TV(x_shift+2*col,y_shift,z_shift+2+2*row);
                 rigid_body->Set_Coefficient_Of_Restitution(0);
-                rigid_body->Set_Name("mesh_joint");}}}
+                rigid_body->name="mesh_joint";}}}
     for(int col=0;col<num_cols;col++){
         id=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies/"+"plank",(T).15,true,with_phi);
         rigid_body=&arb->rigid_body_collection.Rigid_Body(id);
         rigid_body->Frame().t=TV(x_shift+1+2*col,y_shift,z_shift+2*num_rows);
         rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
-        rigid_body->Set_Name("mesh");}
+        rigid_body->name="mesh";}
 
     int num_joints=2+3*(num_cols-1) + 2+3*(num_cols-1) + 6*(num_rows-1)+4*num_cols*(num_rows-1);
     JOINT<TV>** joints;joints=new JOINT<TV>*[num_joints];

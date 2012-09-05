@@ -71,7 +71,7 @@ Initialize()
     }
     example.face_velocities.Resize(example.mac_grid);
 
-    example.particle_levelset_evolution.Set_Time(time);
+    example.particle_levelset_evolution.time=time;
     example.particle_levelset_evolution.Set_CFL_Number((T).9);
 
     if(example.mpi_grid) example.mpi_grid->Initialize(example.domain_boundary);
@@ -114,7 +114,7 @@ Initialize()
     example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Positive_Particles();
     example.particle_levelset_evolution.Particle_Levelset(0).Use_Removed_Negative_Particles();
     example.particle_levelset_evolution.Particle_Levelset(0).Store_Unique_Particle_Id();
-    example.particle_levelset_evolution.Use_Particle_Levelset(true);
+    example.particle_levelset_evolution.use_particle_levelset=true;
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Collision_Body_List(example.collision_bodies_affecting_fluid);
     example.particle_levelset_evolution.particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&example.incompressible.valid_mask);
     example.particle_levelset_evolution.particle_levelset.Set_Collision_Distance_Factors(.1,1);

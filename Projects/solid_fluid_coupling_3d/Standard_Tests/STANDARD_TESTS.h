@@ -419,7 +419,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
         rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).6,(T).5));
         rigid_body.Set_Coefficient_Of_Restitution((T)0);
-        rigid_body.Set_Name("circle");
+        rigid_body.name="circle";
         rigid_body_id=rigid_body.particle_index;
         rigid_body.Set_Mass(4.3);
         TRIANGULATED_SURFACE<T>& surface=rigid_body.template Find_Structure<TRIANGULATED_SURFACE<T>&>();

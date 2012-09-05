@@ -124,7 +124,7 @@ Add_Rigid_Body(const std::string& name,const T scaling_factor,const T friction,c
                 delete implicit;}}
     int id=rigid_body_collection.Add_Rigid_Body(example.stream_type,basename,scaling_factor,read_simplicial,read_implicit);
     RIGID_BODY<TV>& rigid_body=rigid_body_collection.Rigid_Body(id);
-    rigid_body.Set_Coefficient_Of_Friction(friction);
+    rigid_body.coefficient_of_friction=friction;
     rigid_body.name=name;
     return rigid_body;
 }
@@ -140,7 +140,7 @@ Add_Ground(const T friction,const T height,const T coefficient_of_restitution,co
     ground.is_static=true;
     ground.rigid_body_collection.rigid_geometry_collection.collision_body_list->Get_Collision_Geometry(ground.particle_index)->add_to_spatial_partition=false;
     ground.Set_Coefficient_Of_Restitution(coefficient_of_restitution);
-    ground.Set_Name("ground");
+    ground.name="ground";
     return ground;
 }
 //#####################################################################

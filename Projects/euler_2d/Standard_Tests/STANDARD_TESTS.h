@@ -260,7 +260,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 {   
     if(test_number==1){
         int sphere=rigid_body_collection.Add_Rigid_Body(stream_type,data_directory+"/Rigid_Bodies_2D/circle",(T).05,true,true,false);
-        rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Friction((T)1);
+        rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).05);
         rigid_body_collection.Rigid_Body(sphere).Set_Mass(pi*.05*.05*10.77);}
     else if(test_number==2){
@@ -333,7 +333,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 
         int sphere=rigid_body.particle_index;
         rigid_body.Frame().r=ROTATION<TV>::From_Angle((T)pi/4);
-        rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Friction((T)1);
+        rigid_body_collection.Rigid_Body(sphere).Set_Coefficient_Of_Restitution((T)1);rigid_body_collection.Rigid_Body(sphere).coefficient_of_friction=(T)1;
         rigid_body_collection.Rigid_Body(sphere).Is_Kinematic()=false;rigid_body_collection.rigid_body_particle.frame(sphere).t=TV((T).15,(T).04);
         
         MASS_PROPERTIES<TV> mass_properties(*curve,true);

@@ -423,7 +423,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         TV scaling_factor=grid.DX();
         LOG::cout<<"Setting solid size to "<<scaling_factor<<std::endl;
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(scaling_factor);
-        rect.Set_Name("bullet");
+        rect.name="bullet";
         LOG::cout<<"Setting solid mass to "<<solid_mass<<std::endl;
         rect.Set_Mass(solid_mass);
         if(test_number==5) rect.Frame().t=TV(1.5);

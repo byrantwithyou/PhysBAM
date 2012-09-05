@@ -761,16 +761,16 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             bowl.Frame().r=ROTATION<TV>(-(T)pi/2,TV::Axis_Vector(1));
             bowl.is_static=true;
             bowl.Set_Mass((T)1e10);
-            bowl.Set_Coefficient_Of_Restitution((T)0);bowl.Set_Coefficient_Of_Friction((T)1);
+            bowl.Set_Coefficient_Of_Restitution((T)0);bowl.coefficient_of_friction=(T)1;
             light_sphere_index=bowl.particle_index;
             rigid_bodies_to_simulate.Append(bowl.particle_index);
             
             // Set up the thing we're dropping
             RIGID_BODY<TV>& dropped_object=solids_tests.Add_Rigid_Body("sphere",(T).8*(T).5*diameter,(T)0);
             dropped_object.Frame().t=TV((T)0,(T)2,(T)0);
-            dropped_object.Set_Name("falling body");
+            dropped_object.name="falling body";
             dropped_object.Set_Mass(sub_test==1?(T)1e10:(T)1e-10);
-            dropped_object.Set_Coefficient_Of_Restitution((T)0);dropped_object.Set_Coefficient_Of_Friction((T)1);
+            dropped_object.Set_Coefficient_Of_Restitution((T)0);dropped_object.coefficient_of_friction=(T)1;
             rigid_bodies_to_simulate.Append(dropped_object.particle_index);
             break;}
         case 4:{
@@ -809,7 +809,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& rigid_body_square=solids_tests.Add_Rigid_Body("box",(T).4,(T)0);
             rigid_body_square.Frame()=FRAME<TV>(TV((T).4,(T)1.4,(T).4));
             rigid_body_square.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body_square.Set_Name("box");
+            rigid_body_square.name="box";
             T volume=cube((T).4);
             rigid_body_square.Set_Mass(volume*solid_density);
             rigid_bodies_to_simulate.Append(rigid_body_square.particle_index);
@@ -824,7 +824,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // rigid body
             RIGID_BODY<TV>& torus=solids_tests.Add_Rigid_Body("torus",(T).25,(T)0);
             torus.Frame()=FRAME<TV>(TV((T)0,(T)1.5,(T)0));
-            torus.Set_Name("torus");
+            torus.name="torus";
             T volume=cube((T).15);
             torus.Set_Mass(volume*solid_density);
             rigid_bodies_to_simulate.Append(torus.particle_index);
@@ -836,7 +836,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // rigid body
             RIGID_BODY<TV>& torus=solids_tests.Add_Rigid_Body("torus",(T).25,(T).2);
             torus.Frame()=FRAME<TV>(TV((T)0,(T)2.15,(T)0));
-            torus.Set_Name("torus");
+            torus.name="torus";
             T volume=torus.Volume();
             torus.Set_Mass(volume*solid_density);
             rigid_bodies_to_simulate.Append(torus.particle_index);
@@ -850,7 +850,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
 //             pipe.Add_Structure(*pipe_structure.Generate_Triangles(100,100));
 //             DEBUG_UTILITIES::Debug_Breakpoint();
             RIGID_BODY<TV>& pipe=solids_tests.Add_Rigid_Body("funnel_revolve",(T).3,(T)0);
-            pipe.Set_Name("funnel");
+            pipe.name="funnel";
             pipe.is_static=true;pipe.thin_shell=true;
             pipe.Frame()=FRAME<TV>(TV((T)0,(T)heavy_sphere_initial_height,(T)0));
             rigid_bodies_to_simulate.Append(pipe.particle_index);
@@ -861,28 +861,28 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // really light cork
             RIGID_BODY<TV>& light_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
             light_cork.Frame()=FRAME<TV>(TV((T)-1.5,light_sphere_initial_height,(T)0));
-            light_cork.Set_Name("light_cork");light_cork.Set_Mass((T).1*fluid_mass);
+            light_cork.name="light_cork";light_cork.Set_Mass((T).1*fluid_mass);
             light_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(light_cork.particle_index);
 
             // lightish cork
             RIGID_BODY<TV>& lightish_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
             lightish_cork.Frame()=FRAME<TV>(TV((T)-.5,light_sphere_initial_height,(T)0));
-            lightish_cork.Set_Name("lightish_cork");lightish_cork.Set_Mass((T).5*fluid_mass);
+            lightish_cork.name="lightish_cork";lightish_cork.Set_Mass((T).5*fluid_mass);
             lightish_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(lightish_cork.particle_index);
 
             // barely light cork
             RIGID_BODY<TV>& barely_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
             barely_cork.Frame()=FRAME<TV>(TV((T).5,light_sphere_initial_height,(T)0));
-            barely_cork.Set_Name("heavy_cork");barely_cork.Set_Mass((T).9*fluid_mass);
+            barely_cork.name="heavy_cork";barely_cork.Set_Mass((T).9*fluid_mass);
             barely_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(barely_cork.particle_index);
 
             // heavy cork
             RIGID_BODY<TV>& heavy_cork=solids_tests.Add_Rigid_Body("sphere",(T).4,(T)0);
             heavy_cork.Frame()=FRAME<TV>(TV((T)1.5,light_sphere_initial_height,(T)0));
-            heavy_cork.Set_Name("cork");heavy_cork.Set_Mass((T)10*fluid_mass);
+            heavy_cork.name="cork";heavy_cork.Set_Mass((T)10*fluid_mass);
             heavy_cork.Set_Coefficient_Of_Restitution((T)1);
             rigid_bodies_to_simulate.Append(heavy_cork.particle_index);
             break;}
@@ -892,7 +892,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 RIGID_BODY<TV>& sphere=solids_tests.Add_Rigid_Body("sphere",(T).1,(T)0);
                 TV position=TV((T).125+(T)i*(T).25,light_sphere_initial_height,(T).125+(T)j*(T).25);
                 sphere.Frame()=FRAME<TV>(position);
-                sphere.Set_Name(STRING_UTILITIES::string_sprintf("cork_%i_%i",i,j));
+                sphere.name=STRING_UTILITIES::string_sprintf("cork_%i_%i",i,j);
                 sphere.Set_Coefficient_Of_Restitution((T)1);
                 switch(j) {
                     case 0: sphere.Set_Mass(fluid_mass*(T).1); break;
@@ -913,7 +913,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             sphere.Twist().linear=TV((T)-6,(T)-7.23333333333,(T)0);
             sphere.Set_Mass(sub_test==1?(T)1e10:fraction*volume*fluids_parameters.density);
             sphere.Set_Coefficient_Of_Restitution((T)1);
-            sphere.Set_Coefficient_Of_Friction((T).4);
+            sphere.coefficient_of_friction=(T).4;
             rigid_bodies_to_simulate.Append(sphere.particle_index);
             heavy_sphere_index=sphere.particle_index;
             break;}
@@ -958,7 +958,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // Set up the thing we're dropping
             RIGID_BODY<TV>& dropped_object=solids_tests.Add_Rigid_Body("sphere_66k",(T).125,(T)0,true,true);
             dropped_object.Frame().t=TV((T)0,(T)1.5,(T)0);
-            dropped_object.Set_Name("falling body");
+            dropped_object.name="falling body";
             T volume=(T)four_thirds_pi*cube((T).25);
             dropped_object.Set_Mass(volume*solid_density);
             dropped_object.Set_Coefficient_Of_Restitution((T)0);

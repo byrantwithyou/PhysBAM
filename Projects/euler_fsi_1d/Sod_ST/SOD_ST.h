@@ -320,7 +320,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         RANGE<TV> domain=grid.Domain();TV grid_size=domain.Edge_Lengths();
         TV scaling_factor=TV(grid_size.x/(T)6);
         RIGID_BODY<TV>& rect=tests.Add_Analytic_Box(scaling_factor);
-        rect.Set_Name("bullet");
+        rect.name="bullet";
         LOG::cout<<"Setting solid mass to "<<solid_mass<<std::endl;
         rect.Set_Mass(solid_mass);
         TV epsilon=TV(.000);

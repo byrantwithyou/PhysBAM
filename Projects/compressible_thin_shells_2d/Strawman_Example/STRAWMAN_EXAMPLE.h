@@ -203,7 +203,7 @@ void Initialize()
             pls_evolution->Initialize_Domain(grid);
             pls_evolution->particle_levelset.Set_Band_Width(6);
         }
-        pls_evolution->Set_Time(time);
+        pls_evolution->time=time;
         pls_evolution->Set_CFL_Number((T).9);
         pls_evolution->Particle_Levelset(1).mpi_grid=0;
         pls_evolution->Levelset_Advection(1).Set_Custom_Advection(passive_advection_scheme);
@@ -217,7 +217,7 @@ void Initialize()
         pls_evolution->particle_levelset.levelset.Set_Custom_Boundary(pls_boundary); // TODO: better boundary
         pls_evolution->Bias_Towards_Negative_Particles(false);
         pls_evolution->Particle_Levelset(1).Store_Unique_Particle_Id();
-        pls_evolution->Use_Particle_Levelset(true);
+        pls_evolution->use_particle_levelset=true;
         pls_evolution->particle_levelset.levelset.Set_Face_Velocities_Valid_Mask(&face_valid_mask);
         //pls_evolution->particle_levelset.levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid); // TODO: ?
         pls_evolution->particle_levelset.Set_Collision_Distance_Factors(.1,1);

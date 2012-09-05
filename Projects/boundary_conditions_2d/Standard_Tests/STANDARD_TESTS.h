@@ -515,7 +515,7 @@ void Rigid_Circle()
     rigid_body.thin_shell=false;
     rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).5));
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
-    rigid_body.Set_Name("circle");
+    rigid_body.name="circle";
     T density=100;
     rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body);

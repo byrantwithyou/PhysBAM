@@ -56,18 +56,9 @@ public:
     T_STRUCTURE Find_Structure(const int index=0) const
     {return Find_Type<T_STRUCTURE>(structures,index);}
 
-    void Set_Name(const std::string& name_input)
-    {name=name_input;}
-
     virtual std::string Name() const {return Static_Name();}
     static std::string Static_Name()
     {return STRING_UTILITIES::string_sprintf("RIGID_GEOMETRY<VECTOR<T,%d> >",TV::m);}
-
-    void Set_Surface_Roughness(const T surface_roughness_input=(T)1e-6)
-    {surface_roughness=surface_roughness_input;}
-
-    void Set_Coefficient_Of_Friction(const T coefficient_input=.5)
-    {coefficient_of_friction=coefficient_input;}
 
     static T Coefficient_Of_Friction(const RIGID_GEOMETRY<TV>& body1,const RIGID_GEOMETRY<TV>& body2)
     {return min(body1.coefficient_of_friction,body2.coefficient_of_friction);}

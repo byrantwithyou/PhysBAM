@@ -178,18 +178,18 @@ void Kinematic()
     rigid_body->Frame().t=TV(0,2*baseboxsize+boxsize1);
     rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
     rigid_body->Set_Mass(smallboxmass);
-    rigid_body->Set_Name("stack box 1a");
+    rigid_body->name="stack box 1a";
 
     rigid_body=&tests.Add_Rigid_Body(boxfile,boxsize2,stack_mu);
     rigid_body->Frame().t=TV(0,2*baseboxsize+2*boxsize1+boxsize2);
     rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
     rigid_body->Set_Mass(smallboxmass);
-    rigid_body->Set_Name("stack box 1b");
+    rigid_body->name="stack box 1b";
 
     //boxfile="square_refined";
     rigid_body=&tests.Add_Rigid_Body(boxfile,baseboxsize,stack_mu);
     rigid_body->Set_Coefficient_Of_Restitution((T)0.1);
-    rigid_body->Set_Name("base box");
+    rigid_body->name="base box";
     solid_body_collection.rigid_body_collection.rigid_body_particle.kinematic(rigid_body->particle_index)=true;
     kinematic_body_id=rigid_body->particle_index;
 
@@ -223,12 +223,12 @@ void Test_Example()
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("circle",(T)1,(T).1);
     rigid_body1->Frame().r=ROTATION<TV>::From_Angle((T)pi/5);
     rigid_body1->Set_Coefficient_Of_Restitution((T)0.5);
-    rigid_body1->Set_Name("circle");
+    rigid_body1->name="circle";
 
     RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("circle",(T)2,(T).1);
     rigid_body2->Frame().t=TV(0,120);
     rigid_body2->Set_Coefficient_Of_Restitution((T)0.5);
-    rigid_body2->Set_Name("circle");
+    rigid_body2->name="circle";
 
     tests.Add_Ground(1,-20);
     //last_frame=(int)(10*frame_rate);
@@ -259,12 +259,12 @@ void Pyramid_Of_Boxes()
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body1->Frame().t=TV(first_x-10,i*20);
         rigid_body1->is_static = true;
-        rigid_body1->Set_Name("left_square");
+        rigid_body1->name="left_square";
 
         RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body2->Frame().t=TV(current_x+7.5,i*20);
         rigid_body2->is_static = true;
-        rigid_body2->Set_Name("right_square");}
+        rigid_body2->name="right_square";}
 
     tests.Add_Ground(1, -10);
     last_frame = 400;
@@ -286,12 +286,12 @@ void Stacked_Boxes() {
         RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body1->Frame().t=TV(-58,i*20);
         rigid_body1->is_static = true;
-        rigid_body1->Set_Name("left_square");
+        rigid_body1->name="left_square";
     
         RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",(T)10,(T).1);
         rigid_body2->Frame().t=TV(58,i*20);
         rigid_body2->is_static = true;
-        rigid_body2->Set_Name("right_square");}
+        rigid_body2->name="right_square";}
 
     tests.Add_Ground(1, -10);
     last_frame = 250;
@@ -331,22 +331,22 @@ void Cluster()
     RIGID_BODY<TV>* rigid_body_1=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
     rigid_body_1->Frame().t=TV(0,2);
     rigid_body_1->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body_1->Set_Name("box1");
+    rigid_body_1->name="box1";
 
     RIGID_BODY<TV>* rigid_body_2=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
     rigid_body_2->Frame().t=TV(2,3);
     rigid_body_2->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body_2->Set_Name("box2");
+    rigid_body_2->name="box2";
 
     RIGID_BODY<TV>* rigid_body_3=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
     rigid_body_3->Frame().t=TV(4,3);
     rigid_body_3->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body_3->Set_Name("box3");
+    rigid_body_3->name="box3";
 
     RIGID_BODY<TV>* rigid_body_4=&tests.Add_Rigid_Body(boxfile,(T)1,(T)0);
     rigid_body_4->Frame().t=TV(4,5);
     rigid_body_4->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body_4->Set_Name("box4");
+    rigid_body_4->name="box4";
 
     // make clustered object
     ARRAY<int,RIGID_CLUSTER_CONSTITUENT_ID> children;
@@ -356,11 +356,11 @@ void Cluster()
     children.Append(rigid_body_4->particle_index);
     int cluster_particle=rigid_bindings.Add_Binding(children);
     RIGID_BODY<TV>* rigid_body_cluster=&solid_body_collection.rigid_body_collection.Rigid_Body(cluster_particle);
-    rigid_body_cluster->Set_Name("cluster");
+    rigid_body_cluster->name="cluster";
 
     // make duplicate object non-clustered
     RIGID_BODY<TV>* rigid_body_cluster_test=new RIGID_BODY<TV>(solid_body_collection.rigid_body_collection,true);
-    rigid_body_cluster_test->Set_Name("clustertest");
+    rigid_body_cluster_test->name="clustertest";
     rigid_body_cluster_test->Frame()=FRAME<TV>(TV((T)15,0))*rigid_body_cluster->Frame();
     SEGMENTED_CURVE_2D<T>* segmented_curve=SEGMENTED_CURVE_2D<T>::Create();
     segmented_curve->mesh.elements=rigid_body_cluster->simplicial_object->mesh.elements;

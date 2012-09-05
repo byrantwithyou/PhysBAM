@@ -121,7 +121,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         for(int i=0;i<num_poles;i++) for(int j=0;j<num_poles;j++){
             RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body("Rings_Test/medium_cylinder",1,(T).6);
             rigid_body.is_static=true;
-            rigid_body.Set_Name(STRING_UTILITIES::string_sprintf("pole %d %d",i,j));
+            rigid_body.name=STRING_UTILITIES::string_sprintf("pole %d %d",i,j);
             rigid_body.Frame().t=TV((i-(num_poles+1)/(T)2)*7,10,(j-(num_poles+1)/(T)2)*7);}}
 
     tests.Add_Ground((T).5,0,(T).5);

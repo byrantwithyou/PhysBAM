@@ -22,7 +22,7 @@ class TETRAHEDRON_COLLISION_BODY:public COLLISION_GEOMETRY<VECTOR<T_input,3> >
     typedef T_input T;
     typedef VECTOR<T,3> TV;
 public:
-    using COLLISION_GEOMETRY<TV>::Set_Collision_Thickness;using COLLISION_GEOMETRY<TV>::collision_thickness;
+    using COLLISION_GEOMETRY<TV>::collision_thickness;
 
     DEFORMABLE_PARTICLES<TV> &particles,&undeformed_particles;
     TETRAHEDRALIZED_VOLUME<T>& tetrahedralized_volume;

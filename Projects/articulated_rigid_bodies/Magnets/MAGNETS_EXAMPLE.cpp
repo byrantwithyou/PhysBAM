@@ -73,13 +73,13 @@ Initialize_Bodies()
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T).5);
     rigid_body->Frame().t=TV(0,0,(T)11.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("parent");
+    rigid_body->name="parent";
     rigid_body->is_static=true;
     parent_id=rigid_body->particle_index;
     rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T).5);
     rigid_body->Frame().t=TV(0,22,(T)11.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("parent");
+    rigid_body->name="parent";
     rigid_body->is_static=true;
     
     tests.Add_Ground((T).5,-11,0);
@@ -99,18 +99,18 @@ Initialize_Bodies()
     rigid_body=&tests.Add_Rigid_Body("plank",(T).5,(T).5);
     rigid_body->Frame().t=TV(10,17+(T)2.375,(T)1.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("handle");
+    rigid_body->name="handle";
     rigid_body->is_static=true;
     rigid_body=&tests.Add_Rigid_Body("plank",(T).5,(T).5);
     rigid_body->Frame().t=TV(10,17-(T)2.375,(T)1.5);
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("handle");
+    rigid_body->name="handle";
     rigid_body->is_static=true;
     rigid_body=&tests.Add_Rigid_Body("plank",(T).5,(T).5);
     rigid_body->Frame().t=TV(10,17,-1);
     rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(1,0,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("handle");
+    rigid_body->name="handle";
     rigid_body->is_static=true;
     
     // add forces
@@ -160,7 +160,7 @@ Drop_Letter(std::string letter,int parent_id,TV start,ROTATION<TV> orient,bool s
     rigid_body.Frame().t=start;
     rigid_body.Frame().r=orient*ROTATION<TV>((T)pi,TV(0,1,0));
     rigid_body.Set_Coefficient_Of_Restitution(0);
-    rigid_body.Set_Name("letter");
+    rigid_body.name="letter";
 
     PRISMATIC_TWIST_JOINT<TV>* joint=new PRISMATIC_TWIST_JOINT<TV>;
     arb->joint_mesh.Add_Articulation(parent_id,rigid_body.particle_index,joint);

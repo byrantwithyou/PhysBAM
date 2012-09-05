@@ -47,12 +47,6 @@ public:
     COLLISION_GEOMETRY();
     virtual ~COLLISION_GEOMETRY();
 
-    void Set_Collision_Thickness(const T thickness=(T)1e-3)
-    {collision_thickness=thickness;}
-
-    void Set_Collision_Geometry_Id_Number(const COLLISION_GEOMETRY_ID collision_geometry_id_input)
-    {collision_geometry_id=collision_geometry_id_input;}
-
 //#####################################################################
     virtual TV Pointwise_Object_Velocity(const TV& X) const;
     virtual TV Pointwise_Object_Velocity(const int aggregate_id,const TV& X) const;

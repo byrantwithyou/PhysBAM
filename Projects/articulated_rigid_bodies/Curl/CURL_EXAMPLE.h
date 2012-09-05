@@ -136,7 +136,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           rigid_body=&tests.Add_Rigid_Body("sphere",(T).5,(T).5);
           rigid_body->Frame().t=parameter_list.Get_Parameter("ball_position",TV((T)1.5,4,0));
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
-          rigid_body->Set_Name("ball");
+          rigid_body->name="ball";
           rigid_body->Set_Mass(parameter_list.Get_Parameter("ball_mass",(T)1));
           rigid_body->Twist().linear=parameter_list.Get_Parameter("ball_velocity",TV());
           rigid_body->Angular_Momentum()=TV(0,0,parameter_list.Get_Parameter("ball_momentum",(T)0));
@@ -156,7 +156,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           rigid_body=&tests.Add_Rigid_Body("subdivided_box",(T).75,(T)1);
           rigid_body->Frame().t=TV(parameter_list.Get_Parameter("block_x",(T)8),(T).875,0);
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
-          rigid_body->Set_Name("block");
+          rigid_body->name="block";
           rigid_body->Set_Mass(parameter_list.Get_Parameter("block_mass",(T)1));
           num_rigid_bodies+=1;
 
@@ -190,7 +190,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           rigid_body->Frame().t=parameter_list.Get_Parameter("wall_position",TV());
           rigid_body->Frame().r=ROTATION<TV>((T)pi/2,parameter_list.Get_Parameter("wall_rotation_vector",TV(0,0,1)));
           rigid_body->Set_Coefficient_Of_Restitution(1);
-          rigid_body->Set_Name("wall");
+          rigid_body->name="wall";
           rigid_body->is_static=true;
 
         break;
@@ -209,7 +209,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           rigid_body->Frame().t=TV(0,0,0);
           rigid_body->Frame().r=ROTATION<TV>(-(T)pi/2,TV(0,1,0));
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
-          rigid_body->Set_Name("parent");
+          rigid_body->name="parent";
           rigid_body->is_static=true;
           shelf11=rigid_body;
 
@@ -218,14 +218,14 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
           rigid_body->Twist().linear=TV(0,0,0);
           rigid_body->Angular_Momentum()=TV(2,3,5);
           rigid_body->Set_Coefficient_Of_Restitution((T)0.5);
-          rigid_body->Set_Name("child");
+          rigid_body->name="child";
           break;
     }
 
     if(add_ground){
         RIGID_BODY<TV>& ground=tests.Add_Ground((T).5,-10);
         ground.Set_Coefficient_Of_Restitution((T)1.0);
-        ground.Set_Name("ground");}
+        ground.name="ground";}
 
     tests.Add_Gravity();
 
@@ -247,7 +247,7 @@ void PD_Plank_Curl_Test(int& num_joints,int& num_rigid_bodies,TV shift,ROTATION<
     parent_body->Frame().r=orient;
     //parent_body->Angular_Momentum()=TV(0,0,2);
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
-    parent_body->Set_Name("parent");
+    parent_body->name="parent";
     parent_body->Set_Mass(parameter_list.Get_Parameter("parent_mass",(T)5));
     parent_body->is_static=parameter_list.Get_Parameter("pd_curl_test_static",(bool)true);
     num_rigid_bodies+=1;
@@ -262,7 +262,7 @@ void PD_Plank_Curl_Test(int& num_joints,int& num_rigid_bodies,TV shift,ROTATION<
         child_body->Frame().r=orient;
         child_body->Twist().linear=TV(0,0,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
+        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
 
         if(parameter_list.Get_Parameter("use_bend_joint",false)) joint=new ANGLE_JOINT<TV>();
         else joint=new POINT_JOINT<TV>();
@@ -317,8 +317,8 @@ void Raise_To_Horizontal(int& num_joints,int& num_rigid_bodies,const int num_lin
     parent_body=&tests.Add_Rigid_Body("miniplank25wide2",1,(T)1);
     parent_body->Frame().t=TV(-(T).625,-(T).625,0);
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
-    parent_body->Set_Coefficient_Of_Friction(1);
-    parent_body->Set_Name("parent");
+    parent_body->coefficient_of_friction=1;
+    parent_body->name="parent";
     parent_body->Set_Mass(parameter_list.Get_Parameter("parent_mass",(T)5));
     parent_body->is_static=parameter_list.Get_Parameter("pd_curl_test_static",(bool)true);
     num_rigid_bodies+=1;
@@ -330,7 +330,7 @@ void Raise_To_Horizontal(int& num_joints,int& num_rigid_bodies,const int num_lin
         child_body->Frame().t=TV(0,cheight,0);
         child_body->Frame().r=ROTATION<TV>(-(T)pi/2,TV(0,0,1));
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
+        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
 
         joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(int(num_rigid_bodies),int(num_rigid_bodies+1),joint);
 
@@ -382,7 +382,7 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
     parent_body->Twist().linear=TV((T).1,0,0);
     //parent_body->Angular_Momentum()=TV(0,0,2);
-    parent_body->Set_Name("parent");
+    parent_body->name="parent";
     parent_body->Set_Mass(parameter_list.Get_Parameter("parent_mass",(T).001));
    //parent_body->is_static=parameter_list.Get_Parameter("pd_curl_test_static",(bool)true);
     rigid_body_collection.rigid_body_particle.kinematic(parent_body->particle_index)=true;
@@ -396,7 +396,7 @@ void Jitter_Test(int& num_joints,int& num_rigid_bodies,const int num_links)
         child_body->Frame().t=TV(0,cheight,0);
         child_body->Frame().r=ROTATION<TV>::From_Components((T).5,-(T).5,-(T).5,-(T).5);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
+        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
         child_body->Set_Mass((T).001);
 
         joint=new POINT_JOINT<TV>();arb->joint_mesh.Add_Articulation(int(num_rigid_bodies),int(num_rigid_bodies+1),joint);
@@ -451,7 +451,7 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
     parent_body->Frame().t=orient.Rotate(TV(cheight,0,0))+shift;
     parent_body->Frame().r=orient;
     parent_body->Set_Coefficient_Of_Restitution((T)0.5);
-    parent_body->Set_Name("parent");
+    parent_body->name="parent";
     parent_body->is_static=true;
     num_rigid_bodies+=1;
 
@@ -466,7 +466,7 @@ void PD_Plank_Test(int& num_joints,int& num_rigid_bodies,const TV& shift,const R
         child_body->Frame().r=orient;
         child_body->Twist().linear=TV(0,0,0);
         child_body->Set_Coefficient_Of_Restitution((T)0.5);
-        child_body->Set_Name(STRING_UTILITIES::string_sprintf("child_%d",i));
+        child_body->name=STRING_UTILITIES::string_sprintf("child_%d",i);
 
         if(parameter_list.Get_Parameter("use_point_joint",true)) joint=new POINT_JOINT<TV>();
         else joint=new ANGLE_JOINT<TV>();

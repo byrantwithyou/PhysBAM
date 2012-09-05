@@ -60,7 +60,7 @@ void Add_Rigid_Body(const std::string& rigid_body_name,const std::string& filena
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filename,(T).15,0,with_phi);
     rigid_body.Frame()=frame;
     rigid_body.Set_Coefficient_Of_Restitution(0);
-    rigid_body.Set_Name(rigid_body_name);
+    rigid_body.name=rigid_body_name;
     int gravity_particle=particles.Add_Element();
     particles.mass(gravity_particle)=rigid_body.Mass();
     solid_body_collection.deformable_body_collection.binding_list.Add_Binding(new RIGID_BODY_BINDING<TV>(particles,gravity_particle,solid_body_collection.rigid_body_collection,rigid_body.particle_index,TV()));

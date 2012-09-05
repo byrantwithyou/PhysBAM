@@ -985,7 +985,7 @@ void Get_Initial_Data()
             // The 2nd point stops by frame 14 at position 0.18655 -.135535 0.5
             // The tet's 6th point (front most) stops by frame 40 at position 0.378322 -0.274866 1
             RIGID_BODY<TV>& ground=tests.Add_Rigid_Body("ground",(T)1,(T).4);ground.Frame().r=ROTATION<TV>((T)(-pi/5),TV(0,0,1));ground.is_static=true;
-            ground.Set_Coefficient_Of_Friction((T).6); // used .9 for stopping case
+            ground.coefficient_of_friction=(T).6; // used .9 for stopping case
             FREE_PARTICLES<TV>& free_particles=*FREE_PARTICLES<TV>::Create();deformable_body_collection.deformable_geometry.Add_Structure(&free_particles);
             int particle1=particles.Add_Element();free_particles.nodes.Append(particle1);
             particles.mass(particle1)=1;particles.X(particle1)=TV(0,(T).1,0);particles.V(particle1)=ground.Frame().r.Rotate(TV(0,0,0));

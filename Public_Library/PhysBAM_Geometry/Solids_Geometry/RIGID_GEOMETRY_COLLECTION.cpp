@@ -260,7 +260,7 @@ Read(const STREAM_TYPE stream_type,const std::string& directory,const int frame,
             if(!particles.rigid_geometry(p)){
                 if(needs_init) needs_init->Append(p);
                 RIGID_GEOMETRY<TV>* rigid_geometry=New_Body(p);
-                if(p<rigid_body_names.Size()) rigid_geometry->Set_Name(rigid_body_names(p));
+                if(p<rigid_body_names.Size()) rigid_geometry->name=rigid_body_names(p);
                 for(int s=0;s<particles.structure_ids(p).m;s++)
                     if(particles.structure_ids(p)(s)>=0)
                         rigid_geometry->Add_Structure(*structure_list.Element(particles.structure_ids(p)(s)));}

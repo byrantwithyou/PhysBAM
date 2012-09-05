@@ -41,7 +41,7 @@ Add_Body(COLLISION_GEOMETRY<TV>* body,const int geometry_id,bool owns_collision_
     else{
         id=bodies.Append(body);
         owns_collision_geometry.Append(owns_collision_geometry_input);}
-    body->Set_Collision_Geometry_Id_Number(id);
+    body->collision_geometry_id=id;
     owns_collision_geometry(id)=owns_collision_geometry_input;
     geometry_id_to_collision_geometry_id.Set(geometry_id,id);
     collision_geometry_id_to_geometry_id.Set(id,geometry_id);
@@ -64,7 +64,7 @@ template<class TV> void COLLISION_GEOMETRY_COLLECTION<TV>::
 Remove_Body(COLLISION_GEOMETRY_ID id)
 {
     PHYSBAM_ASSERT(Is_Active(id));
-    bodies(id)->Set_Collision_Geometry_Id_Number(COLLISION_GEOMETRY_ID(0));
+    bodies(id)->collision_geometry_id=COLLISION_GEOMETRY_ID(0);
     if(owns_collision_geometry(id)){delete bodies(id);owns_collision_geometry(id)=false;}
     geometry_id_to_collision_geometry_id.Delete_If_Present(collision_geometry_id_to_geometry_id.Get(id));
     collision_geometry_id_to_geometry_id.Delete(id);

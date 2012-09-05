@@ -174,7 +174,7 @@ Initialize()
     example.solids_evolution->Initialize_Rigid_Bodies(example.frame_rate,example.restart);
 
     // time
-    particle_levelset_evolution->Set_Time(time);
+    particle_levelset_evolution->time=time;
     particle_levelset_evolution->Set_CFL_Number(example.fluids_parameters.cfl);
 
     // sets up the proper wall states
@@ -196,7 +196,7 @@ Initialize()
     if(example.fluids_parameters.use_removed_negative_particles) particle_levelset_evolution->Particle_Levelset(0).Use_Removed_Negative_Particles();
     if(example.fluids_parameters.store_particle_ids){
         particle_levelset_evolution->Particle_Levelset(0).Store_Unique_Particle_Id();}
-    particle_levelset_evolution->Use_Particle_Levelset(example.fluids_parameters.use_particle_levelset);
+    particle_levelset_evolution->use_particle_levelset=example.fluids_parameters.use_particle_levelset;
 
     // solid fluid coupling
     particle_levelset_evolution->particle_levelset.levelset.Set_Collision_Body_List(collision_bodies_affecting_fluid);

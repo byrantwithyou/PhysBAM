@@ -205,7 +205,7 @@ Add_Rigid_Body(const std::string& filename,const T scale,const T cof,const T cor
     RIGID_BODY<TV>& rigid_body=tests.Add_Rigid_Body(filename,scale,cof);
     rigid_body.Frame()=frame;
     rigid_body.Set_Coefficient_Of_Restitution(cor);
-    rigid_body.Set_Name(name);
+    rigid_body.name=name;
     if(mass_scale) rigid_body.Set_Mass(rigid_body.Mass()*mass_scale);
     return rigid_body;
 }

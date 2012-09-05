@@ -426,7 +426,7 @@ Initialize_Bodies()
         implicit_rigid_body=&rigid_body_collection.Rigid_Body(id);
         implicit_rigid_body->is_static=true;
         //implicit_rigid_body->Set_Coefficient_Of_Friction((T)0);}
-        implicit_rigid_body->Set_Coefficient_Of_Friction((T)head_friction);
+        implicit_rigid_body->coefficient_of_friction=(T)head_friction;
 
         GRID<TV>& grid_1=*new GRID<TV>;
         ARRAY<T,VECTOR<int,3> >& phi_1=*new ARRAY<T,VECTOR<int,3> >;

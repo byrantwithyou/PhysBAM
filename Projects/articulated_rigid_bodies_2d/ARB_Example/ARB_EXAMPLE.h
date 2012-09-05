@@ -120,15 +120,15 @@ void Two_Tumbling()
     //rigid_body->Frame().r=ROTATION<TV>::From_Rotation_Vector(-(T)pi/4);
     //rigid_body->Angular_Momentum()=-10;
     rigid_body1->Set_Coefficient_Of_Restitution((T)0.5);
-    rigid_body1->Set_Coefficient_Of_Friction(0);
-    rigid_body1->Set_Name("square1");
+    rigid_body1->coefficient_of_friction=0;
+    rigid_body1->name="square1";
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(-1,1)));
     
     rigid_body2=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
     rigid_body2->Frame().t=TV(-2,6);
     rigid_body2->Set_Coefficient_Of_Restitution((T)0.5);
-    rigid_body2->Set_Coefficient_Of_Friction(0);
-    rigid_body2->Set_Name("square2");
+    rigid_body2->coefficient_of_friction=0;
+    rigid_body2->name="square2";
     rigid_body2->is_static=true;
     joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(1,-1)));
 
@@ -155,8 +155,8 @@ void Chain()
         rigid_body(i)->Frame()=xform*rigid_body(i)->Frame();
         rigid_body(i)->Set_Mass(1);
         rigid_body(i)->Set_Coefficient_Of_Restitution((T).5);
-        rigid_body(i)->Set_Coefficient_Of_Friction(1);
-        rigid_body(i)->Set_Name(STRING_UTILITIES::string_sprintf("link%d",i));
+        rigid_body(i)->coefficient_of_friction=1;
+        rigid_body(i)->name=STRING_UTILITIES::string_sprintf("link%d",i);
         rigid_body(i)->is_static=(i==1);
         if(i>1){
             JOINT<TV>* joint=0;
@@ -178,11 +178,11 @@ void Chain()
 #if 0
     rigid_body=&tests.Add_Rigid_Body("circle",2,(T).5);// read only the segmented curves, that way don't get collisions between bodies
     rigid_body->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body->Set_Coefficient_Of_Friction(1);
+    rigid_body->coefficient_of_friction=1;
     rigid_body->Frame().t=TV(5,5);
     rigid_body->Frame()=xform*rigid_body->Frame();
     rigid_body->Set_Mass(10);
-    rigid_body->Set_Name("circle");
+    rigid_body->name="circle");
 #endif
 }
 //#####################################################################
@@ -203,9 +203,9 @@ void Spring()
         if(!horizontal) rigid_body[i]->Frame().r=ROTATION<TV>::From_Complex(COMPLEX<T>(width,vertical_separation));
         rigid_body[i]->Frame()=xform*rigid_body[i]->Frame();
         rigid_body[i]->Set_Coefficient_Of_Restitution(0);
-        rigid_body[i]->Set_Coefficient_Of_Friction(1);
+        rigid_body[i]->coefficient_of_friction=1;
         rigid_body[i]->Set_Mass((horizontal?width:slanted_length)*5);
-        rigid_body[i]->Set_Name(STRING_UTILITIES::string_sprintf("link%d",i));
+        rigid_body[i]->name=STRING_UTILITIES::string_sprintf("link%d",i);
         if(i>1){
             POINT_JOINT<TV>* joint=new POINT_JOINT<TV>();
             if(horizontal){joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(slanted_length/2,0)));joint->Set_Joint_To_Child_Frame(FRAME<TV>(TV(width/2,0)));}
@@ -223,16 +223,16 @@ void Point_Constraint_With_2_Blocks()
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",1,1);
     rigid_body1->Frame().t=TV(0,16);
     rigid_body1->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body1->Set_Coefficient_Of_Friction(1);
-    rigid_body1->Set_Name("square1");
+    rigid_body1->coefficient_of_friction=1;
+    rigid_body1->name="square1";
     
     RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",1,1);
     rigid_body2->Frame().t=TV(2,18);
     rigid_body2->Twist().angular=VECTOR<T,1>((T)4);
     rigid_body2->Update_Angular_Momentum();
     rigid_body2->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body2->Set_Coefficient_Of_Friction(1);
-    rigid_body2->Set_Name("square2");
+    rigid_body2->coefficient_of_friction=1;
+    rigid_body2->name="square2";
 
     POINT_JOINT<TV>* joint=new POINT_JOINT<TV>();
     joint->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,1)));
@@ -250,22 +250,22 @@ void Five_Blocks()
     RIGID_BODY<TV>* rigid_body1=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
     rigid_body1->Frame().t=TV(-1,3);
     rigid_body1->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body1->Set_Coefficient_Of_Friction(0);
-    rigid_body1->Set_Name("square1");
+    rigid_body1->coefficient_of_friction=0;
+    rigid_body1->name="square1";
     
     RIGID_BODY<TV>* rigid_body2=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
     rigid_body2->Frame().t=TV(0,2);
     rigid_body2->Twist().linear=TV();
     rigid_body2->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body2->Set_Coefficient_Of_Friction(0);
-    rigid_body2->Set_Name("squarejoint");
+    rigid_body2->coefficient_of_friction=0;
+    rigid_body2->name="squarejoint";
     
     RIGID_BODY<TV>* rigid_body3=&tests.Add_Rigid_Body("square_refined",scale_factor,(T).5);
     rigid_body3->Frame().t=TV(1,3);
     rigid_body3->Twist().linear=TV();
     rigid_body3->Set_Coefficient_Of_Restitution((T).5);
-    rigid_body3->Set_Coefficient_Of_Friction(0);
-    rigid_body3->Set_Name("square2");
+    rigid_body3->coefficient_of_friction=0;
+    rigid_body3->name="square2";
 
     JOINT<TV> *joint1=new RIGID_JOINT<TV>(),*joint2=new RIGID_JOINT<TV>();
     joint1->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,-1)));
@@ -319,10 +319,10 @@ void Dangling()
             if(i!=6 || !half_chain) joint[1-1]->Set_Joint_To_Parent_Frame(FRAME<TV>(TV(1,0)));}}
 
     rigid_body[0]->Frame().t=TV(+2+9*shift-(T).25,9-8*shift);
-    rigid_body[0]->Set_Name("static");
+    rigid_body[0]->name="static";
     rigid_body[0]->is_static=true;
     rigid_body[1]->Frame().t=TV(-2-9*shift+(T).25,9-8*shift);
-    rigid_body[1]->Set_Name("static");
+    rigid_body[1]->name="static";
     rigid_body[1]->is_static=true;
 
     for(int i=2;i<=5;i++){

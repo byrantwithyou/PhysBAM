@@ -31,7 +31,8 @@ namespace PhysBAM{
 //#####################################################################
 template<class TV> RIGID_GEOMETRY<TV>::
 RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bool create_collision_geometry,int index)
-    :implicit_object(0),simplicial_object(0),rigid_geometry_collection(rigid_geometry_collection_input),is_static(false),bounding_box_up_to_date(false),moving_simplex_hierarchy(0)
+    :implicit_object(0),simplicial_object(0),rigid_geometry_collection(rigid_geometry_collection_input),is_static(false),
+    surface_roughness((T)1e-6),coefficient_of_friction((T).5),bounding_box_up_to_date(false),moving_simplex_hierarchy(0)
 {
     if(index>=0) particle_index=index;
     else{
@@ -43,8 +44,6 @@ RIGID_GEOMETRY(RIGID_GEOMETRY_COLLECTION<TV>& rigid_geometry_collection_input,bo
     else assert(!rigid_geometry_collection.particles.rigid_geometry(particle_index));
     rigid_geometry_collection.particles.rigid_geometry(particle_index)=dynamic_cast<RIGID_GEOMETRY<TV>*>(this);
 
-    Set_Surface_Roughness();
-    Set_Coefficient_Of_Friction();
     if(create_collision_geometry && rigid_geometry_collection.collision_body_list)
         rigid_geometry_collection.collision_body_list->Add_Body(new RIGID_COLLISION_GEOMETRY<TV>(*this),particle_index,true);
 }

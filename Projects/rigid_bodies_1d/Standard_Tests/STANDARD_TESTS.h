@@ -126,24 +126,24 @@ void Kinematic()
         T boxsize1=(T)1.0;
         T boxsize2=(T)0.5;
         rigid_body=&tests.Add_Analytic_Box(VECTOR<T,1>(boxsize1));
-        rigid_body->Set_Coefficient_Of_Friction(stack_mu);
+        rigid_body->coefficient_of_friction=stack_mu;
         rigid_body->Frame().t=TV(2*baseboxsize+boxsize1);
         rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
         rigid_body->Set_Mass(smallboxmass);
-        rigid_body->Set_Name("stack box 1a");
+        rigid_body->name="stack box 1a";
 
         rigid_body=&tests.Add_Analytic_Box(VECTOR<T,1>(boxsize2));
-        rigid_body->Set_Coefficient_Of_Friction(stack_mu);
+        rigid_body->coefficient_of_friction=stack_mu;
         rigid_body->Frame().t=TV(2*baseboxsize+2*boxsize1+boxsize2);
         rigid_body->Set_Coefficient_Of_Restitution(stack_epsilon);
         rigid_body->Set_Mass(smallboxmass);
-        rigid_body->Set_Name("stack box 1b");}
+        rigid_body->name="stack box 1b";}
 
     //boxfile="square_refined";
     rigid_body=&tests.Add_Analytic_Box(VECTOR<T,1>(baseboxsize));
-    rigid_body->Set_Coefficient_Of_Friction(stack_mu);
+    rigid_body->coefficient_of_friction=stack_mu;
     rigid_body->Set_Coefficient_Of_Restitution((T)0.1);
-    rigid_body->Set_Name("base box");
+    rigid_body->name="base box";
     rigid_body->Is_Kinematic()=true;
     kinematic_body_id=rigid_body->particle_index;
 

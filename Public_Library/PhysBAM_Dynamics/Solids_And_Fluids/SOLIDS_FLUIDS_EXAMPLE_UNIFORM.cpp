@@ -106,7 +106,7 @@ Add_Thin_Shell_To_Fluid_Simulation(RIGID_BODY<TV>& rigid_body,bool add_collision
         if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution))
             coupled_evolution->iterator_info.coupling_bodies.Append(collision_geometry);
     rigid_body.thin_shell=true;
-    if(collision_geometry->collision_thickness<minimum_collision_thickness) collision_geometry->Set_Collision_Thickness(minimum_collision_thickness);
+    if(collision_geometry->collision_thickness<minimum_collision_thickness) collision_geometry->collision_thickness=minimum_collision_thickness;
     if(rigid_body.simplicial_object) rigid_body.simplicial_object->Initialize_Hierarchy();
 }
 //#####################################################################
@@ -119,7 +119,7 @@ Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>& deformable_colli
     if(add_coupling)
         if(SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>* coupled_evolution=dynamic_cast<SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>*>(solids_evolution))
             coupled_evolution->iterator_info.coupling_bodies.Append(&deformable_collisions);
-    if(deformable_collisions.collision_thickness<minimum_collision_thickness) deformable_collisions.Set_Collision_Thickness(minimum_collision_thickness);
+    if(deformable_collisions.collision_thickness<minimum_collision_thickness) deformable_collisions.collision_thickness=minimum_collision_thickness;
     deformable_collisions.Initialize_For_Thin_Shells_Fluid_Coupling();
 }
 //#####################################################################

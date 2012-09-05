@@ -1230,12 +1230,12 @@ void Friction_Test()
     rigid_body->Frame()=frame;
     rigid_body->Twist()=twist;
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("box");
+    rigid_body->name="box";
 
     frame.t.z+=(T).2;
     rigid_body=&tests.Add_Rigid_Body("sphere",(T).05,0);
     rigid_body->Frame().t=frame.t;
-    rigid_body->Set_Name("analytic solution");
+    rigid_body->name="analytic solution";
     rigid_body->Is_Kinematic()=true;
     kinematic_id=rigid_body->particle_index;
 

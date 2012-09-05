@@ -118,12 +118,12 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T)1);
         rigid_body->Frame().t=TV(0,(T)10.21,0);
         rigid_body->Set_Coefficient_Of_Restitution(0);
-        rigid_body->Set_Name("fridge");
+        rigid_body->name="fridge";
         rigid_body->is_static=true;
         rigid_body=&tests.Add_Rigid_Body("subdivided_box",11,(T)1);
         rigid_body->Frame().t=TV(0,(T)32.21,0);
         rigid_body->Set_Coefficient_Of_Restitution(0);
-        rigid_body->Set_Name("fridge");
+        rigid_body->name="fridge";
         rigid_body->is_static=true;}
 
     tests.Add_Ground(1,-(T).79,0);
@@ -141,13 +141,13 @@ void Make_Gun()
     gun=&tests.Add_Rigid_Body("ARB/gun",1,(T)1);
     gun->Frame().t=TV(0,initial_height+(T)1.3,0);
     gun->Set_Coefficient_Of_Restitution(0);
-    gun->Set_Name("gun");
+    gun->name="gun";
 
     lid=&tests.Add_Rigid_Body("ARB/tanklid",(T)1.05,(T)1);
     lid->Frame().t=TV((T)-.5,initial_height+(T)2.3,0);//+TV(-7,(T)33.79,11);
     lid->Frame().r=ROTATION<TV>((T)pi/4,TV(0,0,1));
     lid->Set_Coefficient_Of_Restitution(0);
-    lid->Set_Name("lid");
+    lid->name="lid";
 }
 //#####################################################################
 // Function Make_Center
@@ -158,7 +158,7 @@ void Make_Center()
     body=&tests.Add_Rigid_Body("ARB/tankbody",(T)1.025,(T)1);
     body->Frame().t=TV(0,initial_height+(T).25,0);
     body->Set_Coefficient_Of_Restitution(0);
-    body->Set_Name("tankbody");
+    body->name="tankbody";
 }
 //#####################################################################
 // Function Make_Tread
@@ -180,7 +180,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
+        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     // end 1
     T radius2=(T).65;
@@ -191,7 +191,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>(-(k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0); 
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
+        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     // bottom treads
     for(int k=num_joints;k>=0;k--){
@@ -200,7 +200,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>((T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0);
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
+        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     // end 2
     for(int k=4;k>=0;k--){
@@ -209,7 +209,7 @@ void Make_Tread(const T z_shift,int tread_side)
         rigid_body->Frame().r=ROTATION<TV>((k+(T).5)*angle,TV(0,0,1))*ROTATION<TV>((T)pi/2,TV(0,1,0))*ROTATION<TV>(-(T)pi/2,TV(1,0,0));
         rigid_body->Set_Coefficient_Of_Restitution(0); 
         rigid_body->Set_Mass(rigid_body->Mass()*10); // NOTE: was rigid_body->mass*=10
-        rigid_body->Set_Name(STRING_UTILITIES::string_sprintf("tread%d",tread_num));tread_num++;
+        rigid_body->name=STRING_UTILITIES::string_sprintf("tread%d",tread_num);tread_num++;
         treads[tread_side].Append(rigid_body);}
     treads[tread_side].Append(treads[tread_side](1));
 
@@ -219,14 +219,14 @@ void Make_Tread(const T z_shift,int tread_side)
     rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Inertia_Tensor()*=10;
-    rigid_body->Set_Name("wheel1");
+    rigid_body->name="wheel1";
     gears[3*tread_side]=rigid_body;
 
     rigid_body=&tests.Add_Rigid_Body("ARB/gear3",(T).55,(T)1);
     rigid_body->Frame().t=TV(0,initial_height,z_shift)+move;
     rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
-    rigid_body->Set_Name("wheel2");
+    rigid_body->name="wheel2";
     gears[3*tread_side+1]=rigid_body;
 
     rigid_body=&tests.Add_Rigid_Body("ARB/gear3",(T).55,(T)1);
@@ -234,7 +234,7 @@ void Make_Tread(const T z_shift,int tread_side)
     rigid_body->Frame().r=ROTATION<TV>((T)pi/2,TV(0,1,0));
     rigid_body->Set_Coefficient_Of_Restitution(0);
     rigid_body->Inertia_Tensor()*=10;
-    rigid_body->Set_Name("wheel3");
+    rigid_body->name="wheel3";
     gears[3*tread_side+2]=rigid_body;
 }
 //#####################################################################

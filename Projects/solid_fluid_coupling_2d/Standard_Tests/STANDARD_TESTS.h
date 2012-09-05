@@ -849,7 +849,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body.thin_shell=false;
             rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).5));
             rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body.Set_Name("circle");
+            rigid_body.name="circle";
             T density=100;
             rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
             if(test_number==10){
@@ -861,7 +861,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).5));
             rigid_body.Frame().r=ROTATION<TV>::From_Angle((T)pi/7);
             rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body.Set_Name("square");
+            rigid_body.name="square";
             T density=2000;
             rigid_body.Set_Mass((T)pi*(T).01*(T)density*mass_multiplier);
             rigid_body.is_static=true;
@@ -881,7 +881,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& rigid_body_cup=solids_tests.Add_Rigid_Body("cup",(T).1,(T)0);
             rigid_body_cup.Frame()=FRAME<TV>(TV((T).5,(T).3));
             rigid_body_cup.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body_cup.Set_Name("cup");
+            rigid_body_cup.name="cup";
             rigid_body_cup.Set_Mass(50);
             rigid_body_cup.thin_shell=true;
             break;}
@@ -890,7 +890,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
                 RIGID_BODY<TV>& rigid_body=solids_tests.Add_Rigid_Body("circle",(T).05,(T)0);
                 rigid_body.Frame()=FRAME<TV>(TV((T).1+i*(T).1,(T).2+i*(T).1));
                 rigid_body.Set_Coefficient_Of_Restitution((T)0);
-                rigid_body.Set_Name("circle");
+                rigid_body.name="circle";
                 rigid_body.Set_Mass(10);}
             break;}
         case 8:{
@@ -905,7 +905,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body_sphere.Frame().t=TV((T)0,(T)1);
             rigid_body_sphere.Set_Mass(sphere_mass);
             rigid_body_sphere.Set_Coefficient_Of_Restitution((T)1);
-            rigid_body_sphere.Set_Coefficient_Of_Friction((T)1);
+            rigid_body_sphere.coefficient_of_friction=(T)1;
             break;}
         case 12:
             {
@@ -913,7 +913,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             // rigid_body.Frame()=FRAME<TV>(TV((T)1.0,(T)0.5));
             // rigid_body.Frame().r=ROTATION<TV>::From_Angle(rotation_angle);
             // rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            // rigid_body.Set_Name("square");
+            // rigid_body.name="square");
             // T density=2000;
             // rigid_body.Set_Mass((T)pi*(T).01*(T)density*mass_multiplier);
             // rigid_body.thin_shell=true;
@@ -924,7 +924,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body.Frame()=FRAME<TV>(TV((T)1.0,(T)0.5));
             // rigid_body.Frame()=FRAME<TV>(TV((T)5.0,(T)0.5));
             rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body.Set_Name("circle_fixed");
+            rigid_body.name="circle_fixed";
             T density=1000;
             rigid_body.Set_Mass(scale*scale*(T)pi*(T).01*(T)density*mass_multiplier);
             // rigid_body.thin_shell=false;
@@ -933,7 +933,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& rigid_body_dummy=solids_tests.Add_Rigid_Body("circle",(T).05,(T)0);
             rigid_body_dummy.Frame()=FRAME<TV>(TV((T)10,(T)0));
             rigid_body_dummy.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body_dummy.Set_Name("circle");
+            rigid_body_dummy.name="circle";
             rigid_body_dummy.Set_Mass(10);
             }
             break;
@@ -943,7 +943,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body.Frame()=FRAME<TV>(TV((T)1.0,(T)0.5));
             rigid_body.Frame().r=ROTATION<TV>::From_Angle(velocity_angle);
             rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body.Set_Name("square");
+            rigid_body.name="square";
             T density=2000;
             rigid_body.Set_Mass((T)pi*(T).01*(T)density*mass_multiplier);
             rigid_body.thin_shell=true;
@@ -952,7 +952,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             RIGID_BODY<TV>& rigid_body_dummy=solids_tests.Add_Rigid_Body("circle",(T).05,(T)0);
             rigid_body_dummy.Frame()=FRAME<TV>(TV((T)10,(T)0));
             rigid_body_dummy.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body_dummy.Set_Name("circle");
+            rigid_body_dummy.name="circle";
             rigid_body_dummy.Set_Mass(10);
             }
             break;
@@ -963,7 +963,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body.thin_shell=false;
             rigid_body.Frame()=FRAME<TV>(TV((T)1,(T).15));
             rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body.Set_Name("circle");
+            rigid_body.name="circle";
             T density=100;
             rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
             rigid_body.Twist().linear.y=5;
@@ -974,7 +974,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             rigid_body.thin_shell=false;
             rigid_body.Frame()=FRAME<TV>(TV((T).5,(T)1.5));
             rigid_body.Set_Coefficient_Of_Restitution((T)0);
-            rigid_body.Set_Name("circle");
+            rigid_body.name="circle";
             T density=1000;
             rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
             break;}
@@ -1141,7 +1141,7 @@ void Uniform_Flow_Test()
     rigid_body.Frame()=FRAME<TV>(TV((T).5,(T)1.5));
     rigid_body.Twist().linear.y=(T).2;
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
-    rigid_body.Set_Name("circle");
+    rigid_body.name="circle";
     T density=100;
     rigid_body.Set_Mass((T)pi*sqr(radius)*(T)density*mass_multiplier);
 
@@ -1217,7 +1217,7 @@ void Falling_Rigid_Circle_Test()
     rigid_body.thin_shell=false;
     rigid_body.Frame()=FRAME<TV>(TV((T).02,(T)0.14)*scale_length);
     rigid_body.Set_Coefficient_Of_Restitution((T)0);
-    rigid_body.Set_Name("circle");
+    rigid_body.name="circle";
     T density=2000/sqr(scale_length);
     rigid_body.Mass()=(T)pi*sqr(radius)*(T)density;
     rigid_body.Inertia_Tensor()(1,1)=rigid_body.Mass()*sqr(radius)/2;
@@ -1738,7 +1738,7 @@ void Sanity_Test_Stokes_No_Viscosity()
 
     RIGID_BODY<TV>& rigid_body=solids_tests.Add_Analytic_Sphere((T).3,fluids_parameters.density*2,5);
     rigid_body.Frame()=FRAME<TV>(TV((T).5,(T).5));
-    rigid_body.Set_Name("circle");
+    rigid_body.name="circle";
     rigid_body.is_static=true;
 
     Add_Volumetric_Body_To_Fluid_Simulation(rigid_body_collection.Rigid_Body(rigid_body_collection.rigid_body_particle.Size()));
