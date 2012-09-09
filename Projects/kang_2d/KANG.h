@@ -107,6 +107,7 @@ public:
 
     // for tests 7 and 8
     T r_n,r_I,r_p,u_n0,u_p0;
+    bool no_preconditioner;
 
     KANG(const STREAM_TYPE stream_type);
     virtual ~KANG();

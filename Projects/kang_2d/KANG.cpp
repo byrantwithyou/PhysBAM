@@ -18,8 +18,8 @@ using namespace PhysBAM;
 template<class T> KANG<T>::
 KANG(const STREAM_TYPE stream_type)
     :BASE(stream_type,1),solids_tests(*this,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
-    circle_radius(0),circle_perturbation(0),oscillation_mode(0),make_ellipse(false),
-    omega(0),laplace_number(0),uleft(0),uright(0)
+    circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),make_ellipse(false),
+    omega(0),laplace_number(0),uleft(0),uright(0),no_preconditioner(false)
 {
     LOG::cout<<std::setprecision(16);
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -43,21 +43,24 @@ template<class T> void KANG<T>::
 Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-cg_iterations",3000);
-    parse_args->Add_Double_Argument("-solve_tolerance",1e-14);
-    parse_args->Add_Double_Argument("-viscosity",(T)0);
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
-    parse_args->Add_Double_Argument("-max_dt",0);
-    parse_args->Add_Double_Argument("-dt",0);
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Double_Argument("-surface_tension",.0728);
-    parse_args->Add_Integer_Argument("-oscillation_mode",2);
-    parse_args->Add_Option_Argument("-make_ellipse");
-    parse_args->Add_Double_Argument("-epsilon",.05);
+    fluids_parameters.incompressible_iterations=3000;
+    fluids_parameters.incompressible_tolerance=(T)1e-14;
+    fluids_parameters.surface_tension=(T).0728;
+    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"iterations","Incompressible iterations");
+    parse_args->Add("-solve_tolerance",&fluids_parameters.incompressible_tolerance,"tolerance","Incompressible tolerance");
+    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"viscosity","Viscosity");
+    parse_args->Add("-test_system",&test_system,"Test Krylov system properties");
+    parse_args->Add("-print_matrix",&print_matrix,"Print Krylov system");
+    parse_args->Add("-output_iterators",&output_iterators,"Emit debug information for iterators");
+    parse_args->Add("-no_preconditioner",&no_preconditioner,"Disable preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Enable preconditioner");
+    parse_args->Add("-max_dt",&max_dt,"value","Use dt no larger than this");
+    parse_args->Add("-dt",&exact_dt,"value","Use exactly this dt");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-surface_tension",&fluids_parameters.surface_tension,"value","Surface tension coefficient");
+    parse_args->Add("-oscillation_mode",&oscillation_mode,"mode","Oscillation mode for oscillation test");
+    parse_args->Add("-make_ellipse",&make_ellipse,"Use ellipse for initial configuration instead of circle");
+    parse_args->Add("-epsilon",&circle_perturbation,"eps","fraction by which to purturb modes");
 }
 //#####################################################################
 // Function Parse_Options
@@ -79,6 +82,7 @@ Parse_Options()
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     use_kang=true;
+    if(no_preconditioner) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 
@@ -86,8 +90,6 @@ Parse_Options()
     solids_parameters.rigid_body_collision_parameters.use_push_out=false;
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-    fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    fluids_parameters.incompressible_tolerance=(T)parse_args->Get_Double_Value("-solve_tolerance");
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
@@ -97,27 +99,19 @@ Parse_Options()
     fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
     fluids_parameters.use_slip=true;
-    test_system=parse_args->Is_Value_Set("-test_system");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
     two_phase=true;
-
-    fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
-    fluids_parameters.surface_tension=(T)(parse_args->Get_Double_Value("-surface_tension")*kg*m/(s*s));
 
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
     fluids_parameters.write_removed_positive_particles=true;fluids_parameters.write_removed_negative_particles=true;
     fluids_parameters.store_particle_ids=true;
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
 
-    max_dt=(T)(parse_args->Get_Double_Value("-max_dt")*s);
-    exact_dt=(T)(parse_args->Get_Double_Value("-dt")*s);
-    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-    if(parse_args->Is_Value_Set("-make_ellipse")) make_ellipse=true;
+    fluids_parameters.viscosity*=kg/s;
+    max_dt*=s;
+    exact_dt*=s;
+    fluids_parameters.surface_tension*=kg*m/(s*s);
     solids_parameters.use_post_cg_constraints=true;
 
     fluids_parameters.gravity=0;
@@ -372,7 +366,6 @@ Kang_Circle()
         fluids_parameters.gravity=(T)0*m/(s*s);
         fluids_parameters.density=(T)1000*kg/(m*m);
         fluids_parameters.outside_density=(T)1*kg/(m*m);}
-    if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
     fluids_parameters.cfl=(T).9;
 
     solid_body_collection.Set_CFL_Number(10);
@@ -485,8 +478,6 @@ Oscillating_Circle()
     fluids_parameters.use_particle_levelset=true;
 
     circle_radius=(T)1/3*m;
-    circle_perturbation=(T)(circle_radius*parse_args->Get_Double_Value("-epsilon"));
-    oscillation_mode=parse_args->Get_Integer_Value("-oscillation_mode");
     fluids_parameters.surface_tension=(T)2/3*kg*m/(s*s);
     fluids_parameters.density=27*kg/(m*m);
     omega=sqrt(oscillation_mode*(oscillation_mode*oscillation_mode-1)*fluids_parameters.surface_tension/(fluids_parameters.density*circle_radius*circle_radius*circle_radius));
