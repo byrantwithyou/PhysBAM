@@ -66,7 +66,7 @@ public:
 void Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Double_Argument("-sphere_scale",1,"sphere scale");
+    parse_args->Add("-sphere_scale",&sphere_scale,"scale","sphere scale");
 }
 //#####################################################################
 // Function Parse_Options
@@ -74,7 +74,6 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-sphere_scale")) sphere_scale=(T)parse_args->Get_Double_Value("-sphere_scale");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

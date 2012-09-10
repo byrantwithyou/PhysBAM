@@ -79,10 +79,10 @@ public:
 void Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-subsamples",0,"subsamples");
-    parse_args->Add_Double_Argument("-sphere_scale",1,"sphere scale");
-    parse_args->Add_Double_Argument("-radius",1,"radius");
-    parse_args->Add_Option_Argument("-dynamic","dynamic");
+    parse_args->Add("-subsamples",&subsamples,"value","subsamples");
+    parse_args->Add("-sphere_scale",&sphere_scale,"value","sphere scale");
+    parse_args->Add("-radius",&refinement_distance(1),"value","radius");
+    parse_args->Add("-dynamic",&dynamic_subsampling,"dynamic");
 }
 //#####################################################################
 // Function Parse_Options
@@ -90,10 +90,6 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-subsamples")) subsamples=parse_args->Get_Integer_Value("-subsamples");
-    if(parse_args->Is_Value_Set("-sphere_scale")) sphere_scale=(T)parse_args->Get_Double_Value("-sphere_scale");
-    if(parse_args->Is_Value_Set("-radius")) refinement_distance(1)=(T)parse_args->Get_Double_Value("-radius");
-    if(parse_args->Is_Value_Set("-dynamic")) dynamic_subsampling=parse_args->Get_Option_Value("-dynamic");
 }    
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

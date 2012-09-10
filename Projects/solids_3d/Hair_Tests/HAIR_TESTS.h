@@ -52,7 +52,7 @@ public:
 void Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-variant",1,"","variant");
+    parse_args->Add("-variant",&variant,"value","variant");
 }
 //#####################################################################
 // Function Parse_Options
@@ -60,7 +60,6 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
-    variant=parse_args->Get_Integer_Value("-variant");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

@@ -62,9 +62,9 @@ template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_String_Argument("-hairsim","","the hair sime to run");
-    parse_args->Add_String_Argument("-modelname","","the rigid model to bind to");
-    parse_args->Add_String_Argument("-guide","","the guide hair sim to read from");
+    parse_args->Add("-hairsim",&sim_folder,"dir","the hair sime to run");
+    parse_args->Add("-modelname",&rigid_model,"file","the rigid model to bind to");
+    parse_args->Add("-guide",&guide_sim_folder,"dir","the guide hair sim to read from");
 }
 //#####################################################################
 // Function Parse_Options
@@ -73,10 +73,6 @@ template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-d")) data_directory=parse_args->Get_String_Value("-d");
-    sim_folder=parse_args->Get_String_Value("-hairsim");
-    rigid_model=parse_args->Get_String_Value("-modelname");
-    guide_sim_folder=parse_args->Get_String_Value("-guide");
 
     std::string parameter_file=(data_directory+"/"+sim_folder+"/"+parse_args->Get_String_Value("-params"));
     if(!FILE_UTILITIES::File_Exists(parameter_file)){

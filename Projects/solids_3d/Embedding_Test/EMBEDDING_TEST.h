@@ -35,7 +35,7 @@ public:
 //std::string data_directory;
 
     EMBEDDING_TEST(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),test_3_use_bound(true)
+        :BASE(stream_type,0,fluids_parameters.NONE),test_3_use_bound(true),stiffness(1)
     {
     }
 
@@ -45,7 +45,7 @@ public:
 void Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
+    parse_args->Add("-stiffen",&stiffness,"value","stiffness multiplier for various tests");
 }
 //#####################################################################
 // Function Parse_Options
@@ -53,7 +53,6 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
-    stiffness=(T)parse_args->Get_Double_Value("-stiffen");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

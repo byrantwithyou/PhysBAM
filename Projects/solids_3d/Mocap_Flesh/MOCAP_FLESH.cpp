@@ -48,7 +48,7 @@ template<class T_input> void MOCAP_FLESH<T_input>::
 Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-steps",1,"steps per frame");
+    parse_args->Add("-steps",&steps_per_frame,"steps","steps per frame");
 }
 //#####################################################################
 // Function Parse_Options
@@ -57,7 +57,6 @@ template<class T_input> void MOCAP_FLESH<T_input>::
 Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-steps")) steps_per_frame=parse_args->Get_Integer_Value("-steps");
 }
 //#####################################################################
 // Function Limit_Solids_Dt

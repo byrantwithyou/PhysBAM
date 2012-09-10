@@ -88,9 +88,9 @@ void Add_Point_Joint(const int joint_id,const int plank_id,const TV& plank_objec
 void Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-rows",1,"","num rows, num cols");
-    parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
-    parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
+    parse_args->Add("-rows",&num_rows,"value","num rows, num cols");
+    parse_args->Add("-stiffen",&stiffness,"value","stiffness multiplier for various tests");
+    parse_args->Add("-dampen",&overdamping_fraction,"value","damping multiplier for various tests");
 }
 //#####################################################################
 // Function Parse_Options
@@ -98,9 +98,6 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-rows")) num_rows=num_cols=parse_args->Get_Integer_Value("-rows");
-    if(parse_args->Is_Value_Set("-dampen")) overdamping_fraction=(T)parse_args->Get_Double_Value("-dampen");
-    if(parse_args->Is_Value_Set("-stiffen")) stiffness=(T)parse_args->Get_Double_Value("-stiffen");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

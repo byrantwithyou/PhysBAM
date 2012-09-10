@@ -67,8 +67,8 @@ public:
 void Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Double_Argument("-binding_stiffness",100,"");
-    parse_args->Add_Double_Argument("-binding_overdamping_fraction",1,"");
+    parse_args->Add("-binding_stiffness",&stiffness,"value","bending stiffness");
+    parse_args->Add("-binding_overdamping_fraction",&overdamping_fraction,"value","overdamping fraction");
 }
 //#####################################################################
 // Function Parse_Options
@@ -76,8 +76,6 @@ void Register_Options()
 void Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-binding_stiffness")) stiffness=(T)parse_args->Get_Double_Value("-binding_stiffness");
-    if(parse_args->Is_Value_Set("-binding_overdamping_fraction")) overdamping_fraction=(T)parse_args->Get_Double_Value("-binding_overdamping_fraction");
 } 
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
