@@ -298,9 +298,7 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
         Extrapolate_Velocity(temp5,example.prev_face_color,c);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,temp4,-(T).5/(T)1.5,temp5);}
     else{
-        linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp3,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-        Extrapolate_Velocity(temp3,example.face_color,c);
-        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_temp3,boundary,dt,time+dt);}
+        quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);}
 }
 //#####################################################################
 // Function Apply_Pressure_And_Viscosity
