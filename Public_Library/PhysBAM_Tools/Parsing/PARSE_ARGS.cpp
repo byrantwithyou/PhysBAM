@@ -85,7 +85,7 @@ Parse(bool partial)
     int kept=1;
     for(int i=1;i<argc;i++){
         if(OPTION* o=options.Get_Pointer(argv[i])){
-            if(o->found) *o->found=true;
+            if(o->found) *o->found=o->found_value;
             if(o->store)
                 if(!argv[++i] || !o->store_func(o->store,argv[i]))
                     Print_Usage(true);}

@@ -30,6 +30,7 @@ public:
         std::string name;
         std::string desc;
         bool* found;
+        bool found_value;
         void* store;
         bool (*store_func)(void*,const std::string&);
         void (*print_default_func)(const void*);
@@ -57,24 +58,30 @@ public:
 
     template<class T> void Add(const std::string& arg_str,T* store,bool* found,const std::string& name,const std::string& desc)
     {
-        OPTION o={arg_str,name,desc,found,store,&store_impl<T>,&print_default_impl<T>};
+        OPTION o={arg_str,name,desc,found,true,store,&store_impl<T>,&print_default_impl<T>};
         options.Set(arg_str,o);
     }
 
     template<class T,int d> void Add(const std::string& arg_str,bool* found,VECTOR<T,d>* store,const std::string& name,const std::string& desc)
     {
-        OPTION o={arg_str,name,desc,found,store,&store_vec_impl<T,d>,&print_default_impl<VECTOR<T,d> >};
+        OPTION o={arg_str,name,desc,found,true,store,&store_vec_impl<T,d>,&print_default_impl<VECTOR<T,d> >};
         options.Set(arg_str,o);
     }
 
     template<class T> void Add(const std::string& arg_str,bool* found,ARRAY<T>* store,const std::string& name,const std::string& desc)
     {
-        OPTION o={arg_str,name,desc,found,store,&store_multi_impl<T>,&print_default_impl<ARRAY<T> >};
+        OPTION o={arg_str,name,desc,found,true,store,&store_multi_impl<T>,&print_default_impl<ARRAY<T> >};
         options.Set(arg_str,o);
     }
 
     void Add(const std::string& arg_str,bool* found,const std::string& desc)
     {Add(arg_str,(int*)0,found,"",desc);}
+
+    void Add_Not(const std::string& arg_str,bool* found,const std::string& desc)
+    {
+        OPTION o={arg_str,"",desc,found,false,(int*)0,&store_impl<int>,&print_default_impl<int>};
+        options.Set(arg_str,o);
+    }
 
     template<class T> void Add(const std::string& arg_str,T* store,const std::string& name,const std::string& desc)
     {Add(arg_str,store,0,name,desc);}
