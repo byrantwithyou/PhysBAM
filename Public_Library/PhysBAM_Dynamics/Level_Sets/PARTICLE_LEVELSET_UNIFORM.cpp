@@ -584,13 +584,11 @@ template<class T_GRID> template<class T_ARRAYS_PARTICLES> void PARTICLE_LEVELSET
 Delete_Marked_Particles(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles)
 {
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block=iterator.Node_Index();if(particles(block)){
-        typename T_ARRAYS_PARTICLES::ELEMENT parent_particles=NULL;
         typename T_ARRAYS_PARTICLES::ELEMENT cell_particles=particles(block);
         while(1){
             for(int k=0;k<cell_particles->Size();k++) if(cell_particles->radius(k)<0){
                 Delete_Particle_And_Clean_Memory(particles(block),*cell_particles,k);k--;}
             if(!cell_particles->next)break;
-            parent_particles=cell_particles;
             cell_particles=cell_particles->next;}
         if(particles(block)->Size()==0) Free_Particle_And_Clear_Pointer(particles(block));}}
 }

@@ -1,3 +1,4 @@
+#ifdef USE_BOOST_GEOMETRY
 //#####################################################################
 // Copyright 2012, Alexey Stomakhin.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
@@ -104,3 +105,9 @@ int main(int argc, char* argv[])
 
     return 0;
 }
+#else
+int main()
+{
+    return 0;
+}
+#endif
