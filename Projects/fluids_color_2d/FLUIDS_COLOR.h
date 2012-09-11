@@ -279,7 +279,7 @@ public:
     {
         T k;
         ANALYTIC_LEVELSET_VORTEX(T kk): k(kk){}
-        virtual T phi(const TV& X,T t,int& c) const
+        VECTOR<T,3> Find_Closest_Point(const TV& X) const
         {
             TV w=(X-pi/2).Normalized()+pi/2;
             VECTOR<T,3> z(w.x,w.y,0);
@@ -289,11 +289,24 @@ public:
                 MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
                 z-=H.Solve_Linear_System(G);
                 if(G.Magnitude_Squared()<1e-25) break;}
-            c=((T).2-sin(X.x)*sin(X.y))>0?-4:0;
-            return (z.Remove_Index(2)-X).Magnitude();
+            return z;
         }
+
+        virtual T phi(const TV& X,T t,int& c) const
+        {
+            c=(k-sin(X.x)*sin(X.y))>0?-4:0;
+            return (Find_Closest_Point(X).Remove_Index(2)-X).Magnitude();
+        }
+
         virtual TV N(const TV& X,T t) const
-        {return TV(cos(X.x)*sin(X.y),sin(X.x)*cos(X.y)).Normalized();}
+        {
+            VECTOR<T,3> z=Find_Closest_Point(X);
+            T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
+            MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
+            MATRIX<T,2> dP;
+            (H/2).Inverse().Get_Submatrix(0,0,dP);
+            return dP.Transpose_Times(z.Remove_Index(2)-X).Normalized();
+        }
     };
 
     struct ANALYTIC_TEST_BANDED:public ANALYTIC_LEVELSET,public ANALYTIC_VELOCITY
