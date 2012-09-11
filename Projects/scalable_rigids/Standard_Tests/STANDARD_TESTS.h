@@ -46,7 +46,7 @@ public:
     using BASE::fluids_parameters;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),parameter(0)
     {
     }
 
@@ -86,9 +86,9 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Option_Argument("-noanalytic","disable analytic collisions");
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
+    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
+    parse_args->Add("-print_energy",&solid_body_collection.rigid_body_collection.print_energy,"print energy statistics");
 }
 //#####################################################################
 // Function Parse_Options
@@ -97,11 +97,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
-
-    parameter=parse_args->Get_Integer_Value("-parameter");
-    if(parameter) output_directory+=STRING_UTILITIES::string_sprintf("_param%i",parameter);
-    solids_parameters.rigid_body_collision_parameters.use_analytic_collisions=!parse_args->Get_Option_Value("-noanalytic");
-    solid_body_collection.rigid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

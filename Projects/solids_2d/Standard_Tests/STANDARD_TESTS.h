@@ -111,10 +111,11 @@ public:
     int parameter;
     T stiffness_multiplier;
     T damping_multiplier;
+    bool project_nullspace,print_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),fully_implicit(false),test_forces(false),use_extended_neohookean(false),use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_corotated(false),use_corot_blend(false),dump_sv(false),
-        print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1)
+        print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),project_nullspace(false),print_residuals(false)
     {
     }
 
@@ -160,25 +161,29 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Option_Argument("-fully_implicit","use fully implicit forces");
-    parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
-    parse_args->Add_Option_Argument("-use_ext_neo");
-    parse_args->Add_Option_Argument("-use_ext_neo_ref");
-    parse_args->Add_Option_Argument("-use_ext_neo_hyper");
-    parse_args->Add_Option_Argument("-use_corotated");
-    parse_args->Add_Option_Argument("-use_corot_blend");
-    parse_args->Add_Option_Argument("-dump_sv");
-    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
-    parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
-    parse_args->Add_Option_Argument("-residuals","print residuals during timestepping");
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Double_Argument("-cgsolids",1e-2,"CG tolerance for backward Euler");
-    parse_args->Add_Option_Argument("-use_be","use backward euler");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
+    solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
+    solids_parameters.implicit_solve_parameters.cg_iterations=1000;
+    solids_parameters.implicit_solve_parameters.cg_tolerance=(T)1e-2;
+
+    parse_args->Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
+    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
+    parse_args->Add("-use_ext_neo",&use_extended_neohookean,"use_ext_neo");
+    parse_args->Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_ext_neo_ref");
+    parse_args->Add("-use_ext_neo_hyper",&use_extended_neohookean_hyperbola,"use_ext_neo_hyper");
+    parse_args->Add("-use_corotated",&use_corotated,"use_corotated");
+    parse_args->Add("-use_corot_blend",&use_corot_blend,"use_corot_blend");
+    parse_args->Add("-dump_sv",&dump_sv,"Dump singular values");
+    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add("-stiffen",&stiffness_multiplier,"scale","stiffness multiplier for various tests");
+    parse_args->Add("-dampen",&damping_multiplier,"scale","damping multiplier for various tests");
+    parse_args->Add("-residuals",&print_residuals,"print residuals during timestepping");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"tol","CG tolerance for backward Euler");
+    parse_args->Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
+    parse_args->Add("-print_matrix",&print_matrix,"Print Krylov matrix");
+    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
+    parse_args->Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"iterations","number of iterations used for projection in cg");
+    parse_args->Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"iterations","number of iterations used for solids system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -204,23 +209,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     processes_per_dimension=VECTOR<int,2>(2,1);
 
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
-    test_forces=parse_args->Is_Value_Set("-test_forces");
-    use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
-    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref"); // 
-    use_corotated=parse_args->Is_Value_Set("-use_corotated");
-    use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
-    use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
-    dump_sv=parse_args->Is_Value_Set("-dump_sv");
-    solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    parameter=parse_args->Get_Integer_Value("-parameter");
-    stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
-    damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
-    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-    solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
-    if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
+    solid_body_collection.Print_Residuals(print_residuals);
+    if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
 
     switch(test_number){
         case 1:
@@ -611,9 +601,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             default:
                 LOG::cerr<<"Missing implementation for test number "<<test_number<<std::endl;exit(1);}}
     solid_body_collection.Update_Simulated_Particles();
-
-    if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
-    if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
 
     if(fully_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(fully_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)

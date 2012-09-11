@@ -24,10 +24,11 @@ public:
     using BASE::resolution;using BASE::test_number;using BASE::parse_args;using BASE::Get_Object_Velocities; // silence -Woverloaded-virtual
 
     SMOKE_STANDARD_TESTS_2D<GRID<TV> > tests;
+    T angle_fraction;
 
     REFINEMENT(const STREAM_TYPE stream_type)
         :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE),
-        tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection)
+        tests(*this,fluids_parameters,fluid_collection.incompressible_fluid_collection,solid_body_collection.rigid_body_collection),angle_fraction(0)
     {
     }
 
@@ -47,6 +48,7 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
+    parse_args->Add("-angle_fraction",&angle_fraction,"fraction","Angle fraction");
 }
 //#####################################################################
 // Function Parse_Options
@@ -54,7 +56,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    tests.Initialize(test_number,resolution,(T)parse_args->Get_Double_Value("-angle_fraction"));
+    tests.Initialize(test_number,resolution,angle_fraction);
     output_directory="Refinement/output";
     *fluids_parameters.grid=tests.grid;
     last_frame=100;

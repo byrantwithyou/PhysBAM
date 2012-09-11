@@ -29,13 +29,18 @@ public:
     using BASE::mac_grid; using BASE::incompressible;using BASE::projection;using BASE::output_directory;using BASE::mpi_grid;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
 
-    WATER_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
+    WATER_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_EXAMPLE<TV>(stream_type)
     {
-        int test_number=1;last_frame=200;
-        int scale=parse_args.Get_Integer_Value("-scale");
-        restart=parse_args.Get_Integer_Value("-restart");
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");
+        int test_number=1;
+        last_frame=200;
+        int scale=128;
+
+        parse_args.Add("-restart",&restart,"frame","restart frame");
+        parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+        parse_args.Add("-substep",&write_substeps_level,"frame","output-substep level");
+        parse_args.Parse();
+
         mac_grid.Initialize(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true);
         output_directory=STRING_UTILITIES::string_sprintf("Water_Tests/Test_%d_%d",test_number,scale);
         if(TV::dimension==3){

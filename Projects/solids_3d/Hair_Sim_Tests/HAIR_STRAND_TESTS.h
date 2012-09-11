@@ -36,7 +36,7 @@ public:
     T wind_start_time,wind_stop_time;
     TETRAHEDRALIZED_VOLUME<T> *volume;
     PARAMETER_LIST parameter_list;
-    std::string sim_folder;
+    std::string sim_folder,param_file;
     bool use_implicit;
     // Simulation Parameters
     T cfl_strain_rate;

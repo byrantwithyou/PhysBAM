@@ -17,12 +17,7 @@ int main(int argc,char *argv[])
     MPI_WORLD mpi_world(argc,argv);
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-restart",0,"restart frame");
-    parse_args.Add_Integer_Argument("-scale",128,"fine scale grid resolution");
-    parse_args.Add_Integer_Argument("-substep",-1,"output-substep level");
-
     parse_args.Print_Arguments();
-    parse_args.Parse();
     
     WATER_TESTS<TV>* example=new WATER_TESTS<TV>(stream_type,parse_args);
 

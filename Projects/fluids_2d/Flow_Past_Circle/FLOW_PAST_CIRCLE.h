@@ -34,11 +34,11 @@ public:
     SPHERE<TV> circle;
     GEOMETRY_PARTICLES<TV> debug_particles;
     ARRAY<TV> sample_points;
-    bool shed;
+    bool shed,opt_enlarge;
     
     FLOW_PAST_CIRCLE(const STREAM_TYPE stream_type)
         :SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >(stream_type,0,fluids_parameters.SMOKE),solids_tests(*this,solid_body_collection.rigid_body_collection),
-        levelset_object(*fluids_parameters.grid,phi_object),circle(TV((T)2,(T)2),(T).5),shed(false)
+        levelset_object(*fluids_parameters.grid,phi_object),circle(TV((T)2,(T)2),(T).5),shed(false),opt_enlarge(false)
     {
         //fluids_parameters.cfl=0.75;
         fluids_parameters.cfl=.9;
@@ -114,9 +114,9 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Double_Argument("-viscosity",(T)0);
-    parse_args->Add_Option_Argument("-enlarge");
-    parse_args->Add_Option_Argument("-shed");
+    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
+    parse_args->Add("-enlarge",&opt_enlarge,"value","Enlarge");
+    parse_args->Add("-shed",&shed,"shed");
 }
 //#####################################################################
 // Function Parse_Options
@@ -124,12 +124,10 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-shed")) shed=true;
     if(shed) fluids_parameters.grid->Initialize((int)(2.5*resolution)+1,resolution+1,-(T)2.5,15,-(T)3.5,(T)3.5);
     else fluids_parameters.grid->Initialize(resolution+1,resolution+1,0,4,0,4);
-    if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity");
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-    if(parse_args->Is_Value_Set("-enlarge")) circle.radius+=fluids_parameters.grid->dX.Min();
+    if(opt_enlarge) circle.radius+=fluids_parameters.grid->dX.Min();
     if(shed) fluids_parameters.viscosity=(T).01;
     else fluids_parameters.viscosity=(T).1;
     if(shed) circle.center=TV();

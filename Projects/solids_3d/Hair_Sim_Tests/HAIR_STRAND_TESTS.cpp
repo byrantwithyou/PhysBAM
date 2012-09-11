@@ -54,6 +54,7 @@ Register_Options()
 {
     BASE::Register_Options();
     parse_args->Add("-hairsim",&sim_folder,"dir","the hair sime to run");
+    parse_args->Add("-params",&param_file,"file","parameter file");
 }
 //#####################################################################
 // Function Parse_Options
@@ -61,7 +62,7 @@ Register_Options()
 template<class T_input> void HAIR_STRAND_TESTS<T_input>::
 Parse_Options()
 {
-    std::string parameter_file=(data_directory+"/"+sim_folder+"/"+parse_args->Get_String_Value("-params"));
+    std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;
     LOG::cout<<"PARAM FILE is "<<parameter_file<<std::endl;
     parameter_list.Begin_Parse(parameter_file);
     std::string test_name=parameter_list.Get_Parameter("test_name",(std::string)"Test");

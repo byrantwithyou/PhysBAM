@@ -132,6 +132,7 @@ public:
     bool fish_mattress;  // low res mattress for testing
     bool fully_implicit;
     bool use_forces_for_drift;
+    bool project_nullspace;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::restart;
@@ -141,7 +142,7 @@ public:
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),parameter(1),
         rigid_body_collection(solid_body_collection.rigid_body_collection),number_of_joints(2),subsamples(8),refinement_distance((T).2),dynamic_subsampling(false),
         temporarily_disable_dynamic_subsampling(false),old_number_particles(0),ring_mass(10000),num_objects_multiplier((T)1),fish_mattress(false),fully_implicit(false),
-        use_forces_for_drift(false)
+        use_forces_for_drift(false),project_nullspace(false)
     {
     }
 
@@ -193,16 +194,16 @@ TV Sidewinding_Position(const T time,const T segment)
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Integer_Argument("-subsamples",8,"number of particle subsamples per triangle");
-    parse_args->Add_Double_Argument("-n",(T).2,"multiplier for number of objects in drop test");
-    parse_args->Add_Double_Argument("-mass",(T)0,"mass of objects in drop test");
-    parse_args->Add_Option_Argument("-sp","Use spatial partition for collision body collisions");
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Option_Argument("-fully_implicit","use fully implicit forces");
-    parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Option_Argument("-binding_springs","use binding springs for drift particles");
-    parse_args->Add_Option_Argument("-test_system");
+    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add("-subsamples",&subsamples,"samples","number of particle subsamples per triangle");
+    parse_args->Add("-n",&num_objects_multiplier,"scale","multiplier for number of objects in drop test");
+    parse_args->Add("-mass",&ring_mass,"mass","mass of objects in drop test");
+    parse_args->Add("-sp",&solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects,"Use spatial partition for collision body collisions");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-fully_implicit",&fully_implicit,"use fully implicit forces");
+    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
+    parse_args->Add("-binding_springs",&use_forces_for_drift,"use binding springs for drift particles");
+    parse_args->Add("-test_system",&solids_parameters.implicit_solve_parameters.test_system,"Test Krylov system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -211,17 +212,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
-    if(parse_args->Is_Value_Set("-parameter")){parameter=parse_args->Get_Integer_Value("-parameter");output_directory+=STRING_UTILITIES::string_sprintf("_param%i",parameter);}
-    if(parse_args->Is_Value_Set("-n")){num_objects_multiplier=(T)parse_args->Get_Double_Value("-n");output_directory+=STRING_UTILITIES::string_sprintf("_n%f",num_objects_multiplier);}
-    if(parse_args->Is_Value_Set("-mass")){ring_mass=(T)parse_args->Get_Double_Value("-mass");output_directory+=STRING_UTILITIES::string_sprintf("_mass%f",ring_mass);}
-    if(parse_args->Is_Value_Set("-subsamples")){subsamples=parse_args->Get_Integer_Value("-subsamples");output_directory+=STRING_UTILITIES::string_sprintf("_s%i",subsamples);}
-    if(parse_args->Is_Value_Set("-sp")){solids_parameters.deformable_object_collision_parameters.use_spatial_partition_for_levelset_collision_objects=true;}
-    fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
-    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-    fully_implicit=parse_args->Is_Value_Set("-fully_implicit");
-    if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    use_forces_for_drift=parse_args->Get_Option_Value("-binding_springs");
-    solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
+    if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

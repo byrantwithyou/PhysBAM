@@ -79,7 +79,7 @@ public:
     ARRAY<ARRAY<int>,PARTITION_ID> partition_spring_representative; // for each partition a list of particles that represent the spring
     COLLISION_PAIR_COMPARATOR *comparator;
     RIGID_BODY<TV> *implicit_rigid_body;
-    std::string sim_folder,rigid_model,guide_sim_folder;
+    std::string sim_folder,rigid_model,guide_sim_folder,param_file;
     int offset;
     int current_frame,current_levelset;
     T levelset_frequency;

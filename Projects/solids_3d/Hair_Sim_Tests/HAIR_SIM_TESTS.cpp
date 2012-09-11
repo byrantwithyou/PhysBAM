@@ -65,6 +65,7 @@ Register_Options()
     parse_args->Add("-hairsim",&sim_folder,"dir","the hair sime to run");
     parse_args->Add("-modelname",&rigid_model,"file","the rigid model to bind to");
     parse_args->Add("-guide",&guide_sim_folder,"dir","the guide hair sim to read from");
+    parse_args->Add("-params",&param_file,"file","parameter file");
 }
 //#####################################################################
 // Function Parse_Options
@@ -74,7 +75,7 @@ Parse_Options()
 {
     BASE::Parse_Options();
 
-    std::string parameter_file=(data_directory+"/"+sim_folder+"/"+parse_args->Get_String_Value("-params"));
+    std::string parameter_file=data_directory+"/"+sim_folder+"/"+param_file;
     if(!FILE_UTILITIES::File_Exists(parameter_file)){
         LOG::cerr<<"Parameter file '"<<parameter_file<<"' does not exist"<<std::endl;
         exit(1);}
@@ -217,7 +218,6 @@ Initialize_Bodies()
     solids_parameters.use_post_cg_constraints=false;
     //solid_body_collection.print_residuals=true;
     solids_parameters.implicit_solve_parameters.throw_exception_on_backward_euler_failure=false;
-    //data_directory=parse_args.Get_String_Value("-directory");
     assert(!rigid_model.empty());assert(!data_directory.empty());assert(!sim_folder.empty());
     wind_start_time=(T)1;
     wind_stop_time=(T)5;
