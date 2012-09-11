@@ -43,7 +43,8 @@ int main(int argc,char* argv[])
     else if(PARSE_ARGS::Find_And_Remove("-drop",argc,argv)) example=new SOD_ST_DROP<T>(stream_type);
     else example=new SOD_ST<T>(stream_type); //default
     example->want_mpi_world=true;
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);
     example->Adjust_Output_Directory_For_MPI(example->fluids_parameters.mpi_grid);

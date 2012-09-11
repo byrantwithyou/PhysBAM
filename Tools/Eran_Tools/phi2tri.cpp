@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
     char output_filename[256];
 
     PARSE_ARGS parse_args;
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Double_Argument("-resample", 1, "resample grid");
     parse_args.Add_String_Argument("-o", "", "output", "output file name");
     parse_args.Set_Extra_Arguments(1, "<filename>");
@@ -59,11 +59,6 @@ int main(int argc, char *argv[])
         strcpy(filename, argv[extraarg]);
     else
         return -1;
-
-    if (parse_args.Get_Option_Value("-float"))
-        type_double = false;
-    else if (parse_args.Get_Option_Value("-double"))
-        type_double = true;
 
     if (!Is_Phi_File(filename))
     {

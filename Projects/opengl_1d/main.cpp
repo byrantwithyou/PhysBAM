@@ -83,9 +83,6 @@ Add_Arguments(PARSE_ARGS& parse_args)
 
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
 
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-no_ghost");
     parse_args.Set_Extra_Arguments(-1,"[<basedir>]");
 }
 //#####################################################################
@@ -347,8 +344,10 @@ int main(int argc,char *argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
     bool type_double=false; // float by default
-    if(PARSE_ARGS::Find_And_Remove("-float",argc,argv)) type_double=false;
-    if(PARSE_ARGS::Find_And_Remove("-double",argc,argv)) type_double=true;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
     ANIMATED_VISUALIZATION* visualization=0;
     if(!type_double) visualization=new OPENGL_1D_VISUALIZATION<float>;
@@ -357,7 +356,7 @@ int main(int argc,char *argv[])
 #else
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
-    visualization->Initialize_And_Run(argc,argv);
+    visualization->Initialize_And_Run(parse_args);
 
     return 0;
 }

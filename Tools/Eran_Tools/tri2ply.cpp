@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
     bool type_double = false;
 
     PARSE_ARGS parse_args;
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-zero_based", "zero based vertices");
     parse_args.Set_Extra_Arguments(1, "<tri file>", "<tri file> tri file to convert");
 
@@ -60,9 +60,6 @@ int main(int argc, char *argv[])
         parse_args.Print_Usage(true);
         return -1;
     }
-
-    if (parse_args.Get_Option_Value("-float")) type_double = false;
-    if (parse_args.Get_Option_Value("-double")) type_double = true;
 
     char output_filename[256];
     sprintf(output_filename, "%s.ply", FILE_UTILITIES::Get_Basename(input_filename).c_str());

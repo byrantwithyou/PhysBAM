@@ -221,6 +221,9 @@ Find_Dimension(PARSE_ARGS& parse_args)
 int main(int argc,char* argv[])
 {
     PARSE_ARGS parse_args(argc,argv);
+    bool type_double=false;
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Integer_Argument("-frame",-1,"frame output");
     parse_args.Add_Integer_Argument("-type",-1,"particle type");
     parse_args.Add_Option_Argument("-double","input data is in doubles");
@@ -231,7 +234,7 @@ int main(int argc,char* argv[])
     parse_args.Parse();
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(parse_args.Is_Value_Set("-double")) Find_Dimension<double>(parse_args); 
+    if(type_double) Find_Dimension<double>(parse_args); 
     else Find_Dimension<float>(parse_args);
 #else
     Find_Dimension<float>(parse_args);

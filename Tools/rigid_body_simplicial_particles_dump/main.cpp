@@ -39,9 +39,10 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
+    bool type_double=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float","data should be in float format");
-    parse_args.Add_Option_Argument("-double","data should be in double format");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Integer_Argument("-d",1,"dimension");
     parse_args.Add_Integer_Argument("-frame",0,"frame number");
     parse_args.Add_Integer_Argument("-rbid",1,"rigid body id");
@@ -49,9 +50,6 @@ int main(int argc,char *argv[])
     parse_args.Set_Extra_Arguments(1,"<basedir>","base directory");
     parse_args.Parse();
 
-    bool use_double=false;
-    if(parse_args.Get_Option_Value("-float")) use_double=false;
-    if(parse_args.Get_Option_Value("-double")) use_double=true;
     int dimension=parse_args.Get_Integer_Value("-d");
     int frame=parse_args.Get_Integer_Value("-frame");
     int rigid_body_id=parse_args.Get_Integer_Value("-rbid");
@@ -66,12 +64,12 @@ int main(int argc,char *argv[])
     std::string basedir=parse_args.Extra_Arg(0);
 
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        if(use_double) PHYSBAM_FATAL_ERROR("No double support");
+        if(type_double) PHYSBAM_FATAL_ERROR("No double support");
 #endif
 
-    STREAM_TYPE stream_type(use_double?STREAM_TYPE(0.0):STREAM_TYPE(0.0f));
+    STREAM_TYPE stream_type(type_double?STREAM_TYPE(0.0):STREAM_TYPE(0.0f));
 
-    if(!use_double){
+    if(!type_double){
         switch(dimension){
             case 1:
                 Dump_Rigid_Baody_Simplicial_Object_Particles<VECTOR<float,1> >(stream_type,output_stream,basedir,frame,rigid_body_id);

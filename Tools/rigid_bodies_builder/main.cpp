@@ -126,8 +126,8 @@ int main(int argc, const char *argv[])
 {
     PARSE_ARGS parse_args;
     bool type_double = false;
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-no", "print results, don't output to file");
     parse_args.Add_Option_Argument("-thin_shell");
     parse_args.Add_String_Argument("-o", "", "output filename");
@@ -144,9 +144,6 @@ int main(int argc, const char *argv[])
         strcpy(input_filename, argv[extraarg]);
     else
         return -1;
-
-    if (parse_args.Is_Value_Set("-float")) type_double = false;
-    if (parse_args.Is_Value_Set("-double")) type_double = true;
 
     if (type_double) Build_It<double>(input_filename, parse_args); 
     else Build_It<float>(input_filename, parse_args);

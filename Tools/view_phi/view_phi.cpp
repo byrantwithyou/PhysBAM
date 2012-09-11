@@ -69,8 +69,6 @@ Add_Arguments(PARSE_ARGS &parse_args)
 {
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
 
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
     parse_args.Add_Option_Argument("-t", "attempt to read triangulated surface");
     parse_args.Add_String_Argument("-tri", "", "tri file");
     parse_args.Set_Extra_Arguments(1, "<phi_file>");
@@ -212,10 +210,9 @@ Update_OpenGL_Strings()
 int main(int argc, char *argv[])
 {
     bool type_double = false;   // float by default
-    if (PARSE_ARGS::Find_And_Remove("-float", argc, argv))
-        type_double = false;
-    if (PARSE_ARGS::Find_And_Remove("-double", argc, argv))
-        type_double = true;
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
     ANIMATED_VISUALIZATION *visualization = 0;
     if (!type_double)    visualization = new VISUALIZATION<float>;

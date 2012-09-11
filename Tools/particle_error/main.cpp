@@ -38,8 +38,8 @@ int main(int argc,char *argv[])
     bool type_double=false;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float","data is in float format");
-    parse_args.Add_Option_Argument("-double","data is in double format");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-compute_using_doubles");
     parse_args.Add_Integer_Argument("-last_frame",30,"last frame");
     parse_args.Set_Extra_Arguments(1,"<base>","<base> simulation directory path except for resolution");
@@ -55,8 +55,6 @@ int main(int argc,char *argv[])
 
     std::string input_filename=parse_args.Extra_Arg(0);
 
-    if(parse_args.Get_Option_Value("-float")) type_double=false;
-    if(parse_args.Get_Option_Value("-double")) type_double=true;
     int last_frame=parse_args.Get_Integer_Value("-last_frame");
 
 

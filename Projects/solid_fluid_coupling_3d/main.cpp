@@ -31,7 +31,8 @@ int main(int argc,char* argv[])
     if(PARSE_ARGS::Find_And_Remove("-water",argc,argv)) example=new STANDARD_TESTS_WATER<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     std::cout<<"mpi world "<<example->mpi_world->initialized<<std::endl;
 #if 0

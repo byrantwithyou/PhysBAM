@@ -57,8 +57,8 @@ int main(int argc, char *argv[])
 
     PARSE_ARGS parse_args;
 
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-1d");
     parse_args.Add_Option_Argument("-2d");
     parse_args.Add_Option_Argument("-3d");
@@ -74,8 +74,6 @@ int main(int argc, char *argv[])
     else
         return -1;
 
-    if (parse_args.Get_Option_Value("-double")) type_double = true;
-    if (parse_args.Get_Option_Value("-float")) type_double = false;
     if (parse_args.Get_Option_Value("-1d")) dim = 1;
     if (parse_args.Get_Option_Value("-2d")) dim = 2;
     if (parse_args.Get_Option_Value("-3d")) dim = 3;

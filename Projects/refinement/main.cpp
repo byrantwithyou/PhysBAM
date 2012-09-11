@@ -14,11 +14,11 @@ int main(int argc,char *argv[])
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
-    MPI_WORLD mpi_world(argc,argv);
-
-    bool opt_3d=true;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Print_Arguments();
+    MPI_WORLD mpi_world(parse_args);
+
+    bool opt_3d=true;
     parse_args.Add("-3d",&opt_3d,"do 3d solver");
     parse_args.Parse(true);
 

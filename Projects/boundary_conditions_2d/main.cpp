@@ -23,7 +23,8 @@ int main(int argc,char* argv[])
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
     example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

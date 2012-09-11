@@ -57,8 +57,6 @@ public:
 //#####################################################################
 void Initialize_Bodies() PHYSBAM_OVERRIDE
 {
-    //VECTOR_3D<double> ground_color=RGB_COLORS<T>().Ground_Tan(),color1=RGB_COLORS<T>().Light_Steel_Blue();
-
     RIGID_BODY_LIST<T,TV>& rigid_body_list=solids_parameters.rigid_body_parameters.list;
     int id=0;
 

@@ -22,7 +22,8 @@ int main(int argc,char *argv[])
     //KINEMATIC_EXAMPLE<float> example(stream_type,example_number);
     //ARB_EXAMPLE<float> example(stream_type,example_number);
     example.want_mpi_world=true;
-    example.Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example.Parse(parse_args);
 
     SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(example);
     driver.Execute_Main_Program();

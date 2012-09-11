@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -366,7 +367,8 @@ int main(int argc,char *argv[])
     ATTACHMENT_VISUALIZATION<float> visualization(htr,rigid,human);
     // This going to mess with the args?
     int dummy_argc=1;const char *dummy_argv[]={"paint"};
-    visualization.Initialize_And_Run(dummy_argc,(char**)dummy_argv);
+    PARSE_ARGS parse_args(dummy_argc,(char**)dummy_argv);
+    visualization.Initialize_And_Run(parse_args);
 
     return 0;
 }

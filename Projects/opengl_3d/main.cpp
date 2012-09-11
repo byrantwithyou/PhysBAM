@@ -113,7 +113,8 @@ private:
 template<class T,class RW> VISUALIZATION<T,RW>::
 VISUALIZATION()
     :ANIMATED_VISUALIZATION(),positive_particles_component(0),negative_particles_component(0),
-    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0)
+    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0),
+    allow_caching(true),always_add_mac_velocities(false)
 {
 }
 
@@ -135,12 +136,10 @@ Add_Arguments(PARSE_ARGS &parse_args)
 
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
 
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-no_caching");
-    parse_args.Add_Option_Argument("-macvel","force adding mac velocities component");
-    parse_args.Add_String_Argument("-rigid_bodies_no_draw","");
-    parse_args.Add_String_Argument("-deformable_no_draw","");
+    parse_args.Add_Not("-no_caching",&allow_caching,"Allow caching");
+    parse_args.Add("-macvel",&always_add_mac_velocities,"force adding mac velocities component");
+    parse_args.Add("-rigid_bodies_no_draw",&rigid_bodies_no_draw_list,"id","Do not draw this rigid body (may be repeated)");
+    parse_args.Add("-deformable_no_draw",&deformable_no_draw_list,"id","Do not draw this deformable body (may be repeated)");
     parse_args.Set_Extra_Arguments(-1,"[<basedir>]");
 }
 
@@ -160,20 +159,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
     else if(parse_args.Num_Extra_Args()==1)
         basedir=parse_args.Extra_Arg(0);
 
-    if(parse_args.Is_Value_Set("-rigid_bodies_no_draw")){ARRAY<int> int_list;
-        STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-rigid_bodies_no_draw"),int_list);
-        rigid_bodies_no_draw_list.Resize(int_list.Size());
-        for(int i=0;i<rigid_bodies_no_draw_list.m;i++) rigid_bodies_no_draw_list(i)=int(int_list(i));}
-
-    STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-deformable_no_draw"),deformable_no_draw_list);
-    for(int i=deformable_no_draw_list.m;i;i--)
-        if(deformable_no_draw_list(i)<1)
-            deformable_no_draw_list.Remove_Index_Lazy(i);
-
     last_frame_filename=basedir+"/common/last_frame";
-
-    allow_caching=!parse_args.Get_Option_Value("-no_caching");
-    always_add_mac_velocities=parse_args.Is_Value_Set("-macvel");
 
     // don't override camera script filename if it was already set in base class based on command line argument
     if(camera_script_filename.empty()) camera_script_filename=basedir+"/camera_script";
@@ -973,8 +959,10 @@ int main(int argc,char* argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
     bool type_double=false; // float by default
-    if(PARSE_ARGS::Find_And_Remove("-float",argc,argv)) type_double=false;
-    if(PARSE_ARGS::Find_And_Remove("-double",argc,argv)) type_double=true;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
     if(!type_double) visualization=new VISUALIZATION<float>();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
@@ -983,6 +971,6 @@ int main(int argc,char* argv[])
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
     atexit(cleanup_function);
-    visualization->Initialize_And_Run(argc,argv);
+    visualization->Initialize_And_Run(parse_args);
     return 0;
 }

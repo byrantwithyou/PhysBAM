@@ -37,8 +37,9 @@ int main(int argc, char *argv[])
 {
     PARSE_ARGS parse_args;
 
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    bool type_double=false;
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Double_Argument("-scale",1);
     parse_args.Add_Double_Argument("-resolution_scale",1);
     parse_args.Add_String_Argument("-o", "");
@@ -49,7 +50,7 @@ int main(int argc, char *argv[])
 
     if(parse_args.Num_Extra_Args() < 1) return 1;
 
-    if(!parse_args.Get_Option_Value("-double")) Convert<float>(parse_args);
+    if(!type_double) Convert<float>(parse_args);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Convert<double>(parse_args);
 #else

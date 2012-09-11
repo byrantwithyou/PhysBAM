@@ -314,7 +314,8 @@ int main(int argc,char* argv[])
     std::cout << "A3 " << std::endl << A3 << std::endl;*/
 #else
     EXAMPLE<TV>* example=new STANDARD_TESTS<T>(stream_type);
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >*>(example);
     LOG::Instance()->Copy_Log_To_File(example->output_directory+"/common/log.txt",solid_fluid_example->restart);

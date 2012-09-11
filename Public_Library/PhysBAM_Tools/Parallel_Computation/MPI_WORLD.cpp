@@ -44,9 +44,11 @@ MPI_WORLD()
 // Constructor
 //#####################################################################
 MPI_WORLD::
-MPI_WORLD(int& argc,char**& argv)
+MPI_WORLD(PARSE_ARGS& parse_args)
 {
-    Initialize(PARSE_ARGS::Find_And_Remove("-mpi",argc,argv));
+    bool opt_mpi=false;
+    parse_args.Add("-mpi",&opt_mpi,"Use MPI");
+    Initialize(opt_mpi);
 }
 //#####################################################################
 // Function Initialize
@@ -133,7 +135,7 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 MPI_WORLD::
-MPI_WORLD(int& argc,char**& argv)
+MPI_WORLD(PARSE_ARGS& parse_args)
     :initialized(false),rank(0)
 {
     LOG::cerr<<"Not compiled with USE_MPI."<<std::endl;

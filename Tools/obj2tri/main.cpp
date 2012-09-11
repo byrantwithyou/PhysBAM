@@ -53,8 +53,8 @@ int main(int argc,char *argv[])
     bool type_double=false;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float","data should be in float format");
-    parse_args.Add_Option_Argument("-double","data should be in double format");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-compute_using_doubles");
     parse_args.Set_Extra_Arguments(1,"<obj file>","<obj file> obj file to convert");
     parse_args.Set_Extra_Arguments(2,"<tri file>","<tri file> output tri file name");
@@ -63,9 +63,6 @@ int main(int argc,char *argv[])
 
     std::string input_filename=parse_args.Extra_Arg(0);
     std::string output_filename=parse_args.Extra_Arg(1);
-
-    if(parse_args.Get_Option_Value("-float")) type_double=false;
-    if(parse_args.Get_Option_Value("-double")) type_double=true;
 
     if(!FILE_UTILITIES::Is_Tri_File(output_filename)){
         std::cerr<<"Not a tri file: "<<output_filename<<std::endl;

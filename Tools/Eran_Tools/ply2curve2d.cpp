@@ -76,8 +76,8 @@ int main(int argc, char *argv[])
     
     PARSE_ARGS parse_args;
     parse_args.Use_Help_Option(true);
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-closed");
     parse_args.Add_Option_Argument("-v","verbose");
     parse_args.Add_Double_Argument("-max_segment_length",0);
@@ -92,9 +92,6 @@ int main(int argc, char *argv[])
         parse_args.Print_Usage(true);
         return -1;
     }
-
-    if (parse_args.Get_Option_Value("-float")) type_double = false;
-    if (parse_args.Get_Option_Value("-double")) type_double = true;
 
     if (!FILE_UTILITIES::Is_Ply2D_File(input_filename))
     {

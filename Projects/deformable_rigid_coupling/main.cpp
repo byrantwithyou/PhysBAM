@@ -17,7 +17,8 @@ int main(int argc,char* argv[])
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example;
 
     example=new STANDARD_TESTS<T>(stream_type);
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);
     driver.Execute_Main_Program();

@@ -105,13 +105,14 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(const PARSE_ARGS& parse_
 int main(int argc,char* argv[])
 {
     PARSE_ARGS parse_args(argc,argv);
+    bool use_double=false;
     parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
     parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
     parse_args.Add_Integer_Argument("-verbosity",0,"Verbosity level");
     parse_args.Add_String_Argument("-o","","output directory");
     parse_args.Add_Integer_Argument("-dimension",1,"Grid dimension");
     parse_args.Add_String_Argument("-v","","variable to read");
-    parse_args.Add_Option_Argument("-double","Read in file in double format");
+    parse_args.Add("-double",&use_double,"Read in file in double format");
     parse_args.Add_Option_Argument("-density","convert density");
     parse_args.Add_Option_Argument("-log","output log (base 10) of the data");
     parse_args.Add_Option_Argument("-momentum","convert momentum");
@@ -126,7 +127,6 @@ int main(int argc,char* argv[])
 
     int verbosity=parse_args.Get_Integer_Value("-verbosity");
     int dimension=parse_args.Get_Integer_Value("-dimension");
-    bool use_double=parse_args.Is_Value_Set("-double");
     
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(use_double) PHYSBAM_FATAL_ERROR("No double support");

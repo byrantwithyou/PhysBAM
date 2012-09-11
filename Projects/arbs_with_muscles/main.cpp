@@ -28,7 +28,7 @@ int main(int argc,char* argv[])
 //    SURFACE_MUSCLE_EXAMPLE<T> example(stream_type);
     VISIBLE_HUMAN_MUSCLE_EXAMPLE<T> example(stream_type);
     example.want_mpi_world=true;
-    example.Parse(argc,argv);
+    example.Parse(parse_args);
 
     if(example.mpi_world->initialized) example.solid_body_collection.deformable_body_collection.Set_Mpi_Solids(new MPI_SOLIDS<VECTOR<T,3> >);
     example.Adjust_Output_Directory_For_MPI(example.solid_body_collection.deformable_body_collection.mpi_solids);

@@ -119,7 +119,8 @@ int main(int argc,char* argv[])
     //UNDERWATER_DOME<T> example(stream_type);
     //SOLID_FLUID_COUPLING_TEST<T> example(stream_type);
     example->want_mpi_world=true;
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);
     example->Adjust_Output_Directory_For_MPI(example->fluids_parameters.mpi_grid);

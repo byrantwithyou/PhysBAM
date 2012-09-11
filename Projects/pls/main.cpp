@@ -14,9 +14,9 @@ int main(int argc,char *argv[])
     typedef VECTOR<T,2> TV;
 //    typedef VECTOR<T,3> TV;
 
-    MPI_WORLD mpi_world(argc,argv);
-
     PARSE_ARGS parse_args(argc,argv);
+    MPI_WORLD mpi_world(parse_args);
+
     parse_args.Print_Arguments();
     
     WATER_TESTS<TV>* example=new WATER_TESTS<TV>(stream_type,parse_args);

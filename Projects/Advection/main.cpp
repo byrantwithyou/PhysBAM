@@ -42,10 +42,10 @@ int main(int argc,char *argv[])
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
-    MPI_WORLD mpi_world(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    MPI_WORLD mpi_world(parse_args);
 
     bool opt_2d=false,opt_3d=false;
-    PARSE_ARGS parse_args(argc,argv);
     parse_args.Print_Arguments();
     parse_args.Add("-2d",&opt_2d,"run in 2 dimensions");
     parse_args.Add("-3d",&opt_3d,"run in 3 dimensions");

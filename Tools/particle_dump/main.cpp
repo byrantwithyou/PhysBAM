@@ -26,8 +26,8 @@ int main(int argc,char *argv[])
     int dim=3;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float","data should be in float format");
-    parse_args.Add_Option_Argument("-double","data should be in double format");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Integer_Argument("-d",3,"dimension");
     parse_args.Set_Extra_Arguments(1,"<file>","<obj file> obj file to convert");
     parse_args.Parse();
@@ -35,8 +35,6 @@ int main(int argc,char *argv[])
 
     std::string filename=parse_args.Extra_Arg(0);
 
-    if(parse_args.Get_Option_Value("-float")) type_double=false;
-    if(parse_args.Get_Option_Value("-double")) type_double=true;
     STREAM_TYPE stream_type(type_double?STREAM_TYPE(0.0):STREAM_TYPE(0.0f));
 
     if(!type_double && dim==1) Read_Particles<VECTOR<float,1> >(stream_type,filename);

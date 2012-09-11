@@ -126,11 +126,11 @@ Initialize_Components_And_Key_Bindings()
 
 int main(int argc, char *argv[])
 {
-    bool type_double = false;   // float by default
-    if (PARSE_ARGS::Find_And_Remove("-float", argc, argv))
-        type_double = false;
-    if (PARSE_ARGS::Find_And_Remove("-double", argc, argv))
-        type_double = true;
+    bool type_double=false; // float by default
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
     ANIMATED_VISUALIZATION *visualization = 0;
     if(!type_double) visualization=new VISUALIZATION<float>;
@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
 #else
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
-    visualization->Initialize_And_Run(argc, argv);
+    visualization->Initialize_And_Run(parse_args);
 
     delete visualization;
     return 0;

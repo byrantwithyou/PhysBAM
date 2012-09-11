@@ -51,9 +51,9 @@ void Convert(PARSE_ARGS &parse_args)
 int main(int argc, char *argv[])
 {
     PARSE_ARGS parse_args;
-    bool use_double=false,use_float=true;
-    parse_args.Add_Option_Argument("-double",&use_double,"use doubles");
-    parse_args.Add_Option_Argument("-float",&use_float,"use floats");
+    bool use_double=false;
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);
 
     if(!use_doubles) Convert<float>(parse_args);

@@ -57,15 +57,13 @@ int main(int argc,char *argv[])
     bool type_double=false;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float","data should be in float format");
-    parse_args.Add_Option_Argument("-double","data should be in double format");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Set_Extra_Arguments(1,"<directory>","directory to render vortices for");
     parse_args.Parse();
 
     std::string filename=parse_args.Extra_Arg(0);
 
-    if(parse_args.Get_Option_Value("-float")) type_double=false;
-    if(parse_args.Get_Option_Value("-double")) type_double=true;
     STREAM_TYPE stream_type(type_double?STREAM_TYPE(0.0):STREAM_TYPE(0.0f));
 
     if(!type_double) Run<float>(stream_type,filename);

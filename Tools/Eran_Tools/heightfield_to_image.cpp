@@ -36,9 +36,9 @@ void Convert(PARSE_ARGS &parse_args)
 int main(int argc, char *argv[])
 {
     PARSE_ARGS parse_args;
-
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    bool type_double=false;
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_String_Argument("-o", "");
     parse_args.Set_Extra_Arguments(-1, "<filename>");
 
@@ -46,6 +46,6 @@ int main(int argc, char *argv[])
 
     if (parse_args.Num_Extra_Args() < 1) return 1;
 
-    if (parse_args.Get_Option_Value("-double")) Convert<double>(parse_args);
+    if (type_double) Convert<double>(parse_args);
     else Convert<float>(parse_args);
 }

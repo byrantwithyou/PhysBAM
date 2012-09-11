@@ -44,7 +44,8 @@ int main(int argc,char** argv)
     else if(PARSE_ARGS::Find_And_Remove("-magnets",argc,argv)) example=new MAGNETS_EXAMPLE<T>(stream_type);
     else if(PARSE_ARGS::Find_And_Remove("-curl",argc,argv)) example=new CURL_EXAMPLE<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >*>(example);
     SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*solid_fluid_example);

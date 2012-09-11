@@ -43,9 +43,9 @@ BASIC_VISUALIZATION::~BASIC_VISUALIZATION()
 // Function Initialize
 //#####################################################################
 void BASIC_VISUALIZATION::
-Initialize(int argc,char* argv[])
+Initialize(PARSE_ARGS &parse_args)
 {
-    Parse_Args(argc,argv);
+    Parse_Args(parse_args);
     PreInitialize_OpenGL_World();
     Initialize_Components_And_Key_Bindings();
     Goto_Start_Frame();
@@ -64,9 +64,9 @@ Run()
 // Function Initialize_And_Run
 //#####################################################################
 void BASIC_VISUALIZATION::
-Initialize_And_Run(int argc,char* argv[])
+Initialize_And_Run(PARSE_ARGS &parse_args)
 {
-    Initialize(argc,argv);
+    Initialize(parse_args);
     Run();
 }
 //#####################################################################
@@ -135,9 +135,8 @@ Parse_Arguments(PARSE_ARGS& parse_args)
 // Function Parse_Args
 //#####################################################################
 void BASIC_VISUALIZATION::
-Parse_Args(int argc,char* argv[])
+Parse_Args(PARSE_ARGS &parse_args)
 {
-    PARSE_ARGS parse_args(argc,argv);
     Add_Arguments(parse_args);
     parse_args.Parse();
     Parse_Arguments(parse_args);

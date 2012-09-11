@@ -100,8 +100,8 @@ int main(int argc, char *argv[])
 
     PARSE_ARGS parse_args;
 
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-v", "display verbose information");
     parse_args.Add_Option_Argument("-verify", "verify triangles");
     parse_args.Set_Extra_Arguments(1, "<filename>");
@@ -112,9 +112,6 @@ int main(int argc, char *argv[])
         strcpy(filename, argv[extraarg]);
     else
         return -1;
-
-    if (parse_args.Get_Option_Value("-double")) type_double = true;
-    if (parse_args.Get_Option_Value("-float")) type_double = false;
 
     verbose = parse_args.Get_Option_Value("-v");
     verify = parse_args.Get_Option_Value("-verify");

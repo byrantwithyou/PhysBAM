@@ -88,8 +88,9 @@ template<class T> void By_Base_Type()
 
 int main(int argc, char *argv[])
 {
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    bool type_float=false,type_double=false;
+    parse_args.Add("-float",&type_float,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-int");
     parse_args.Add_Option_Argument("-1d");
     parse_args.Add_Option_Argument("-2d");
@@ -117,11 +118,11 @@ int main(int argc, char *argv[])
 
     number_of_nodes = parse_args.Get_Integer_Value("-np");
 
-    if (parse_args.Get_Option_Value("-double")) {
+    if (type_double) {
         if (verbose) std::cout << "Base type = double" << std::endl;
         By_Base_Type<double>();
     }
-    else if (parse_args.Get_Option_Value("-float")) {
+    else if (type_float) {
         if (verbose) std::cout << "Base type = float" << std::endl;
         By_Base_Type<float>();
     } else {

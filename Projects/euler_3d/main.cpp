@@ -16,28 +16,32 @@
 
 using namespace PhysBAM;
 
-template<class T> void main_program(int argc,char* argv[]){
+template<class T> void main_program(PARSE_ARGS& parse_args){
     typedef T RW;
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,3> TV;
 
-    bool incompressible=false;
-    if(PARSE_ARGS::Find_And_Remove("-incompressible",argc,argv)) incompressible=true;
+    bool incompressible=false,opt_sphere=false,opt_drop=false;
+    VECTOR<int,3> procs;
+    parse_args.Add("-incompressible",&incompressible,"Incompressible");
+    parse_args.Add("-sphere",&opt_sphere,"Sphere");
+    parse_args.Add("-drop",&opt_drop,"Drop");
+    parse_args.Add("-xprocs",&procs.x,"n","X procs");
+    parse_args.Add("-yprocs",&procs.y,"n","Y procs");
+    parse_args.Add("-zprocs",&procs.z,"n","Z procs");
+    parse_args.Parse();
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-sphere",argc,argv)) example=new SPHERE_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-drop",argc,argv)) example=new INCOMPRESSIBLE_DROP<T>(stream_type);
+    if(opt_sphere) example=new SPHERE_EXAMPLE<T>(stream_type);
+    else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type,incompressible);
     example->want_mpi_world=true;
-    int xprocs=PARSE_ARGS::Find_And_Remove_Integer("-xprocs",argc,argv),
-        yprocs=PARSE_ARGS::Find_And_Remove_Integer("-yprocs",argc,argv),
-        zprocs=PARSE_ARGS::Find_And_Remove_Integer("-zprocs",argc,argv);
-    example->Parse(argc,argv);
+    example->Parse(parse_args);
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();
         if(example->solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
-            example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3,false,VECTOR<int,3>(xprocs,yprocs,zprocs),
+            example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3,false,procs,
                 VECTOR<bool,3>(),example->solids_fluids_parameters.mpi_solid_fluid->fluid_group);
             example->solid_body_collection.deformable_body_collection.simulate=false;
             example->solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=false;}
@@ -55,12 +59,17 @@ template<class T> void main_program(int argc,char* argv[]){
 
 int main(int argc,char* argv[])
 {
+    PARSE_ARGS parse_args(argc,argv);
+    bool type_double=false;
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
+
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(PARSE_ARGS::Find_And_Remove("-double",argc,argv))
-        main_program<double>(argc,argv);
+    if(type_double)
+        main_program<double>(parse_args);
     else
 #endif
-        main_program<float>(argc,argv);
+        main_program<float>(parse_args);
     return 0;
 }
 //#####################################################################

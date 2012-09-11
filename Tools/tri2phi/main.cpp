@@ -175,13 +175,13 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool type_double=false,type_float=false,compute_using_doubles=false;
+    bool type_double=false,compute_using_doubles=false;
     VECTOR<double,3> grid_size(50,50,50);
     int boundary_cells=3;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add("-float",&type_float,"data is in float format");
-    parse_args.Add("-double",&type_double,"data is in double format");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-b",&boundary_cells,"boundary cells","number of cells outside bounding box");
     parse_args.Add("-compute_using_doubles",&compute_using_doubles,"perform computations using doubles");
     parse_args.Parse(true);

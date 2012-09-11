@@ -76,10 +76,10 @@ int main(int argc,char *argv[])
     //typedef VECTOR<T,3> TV;
     typedef VECTOR<int,TV::dimension> TV_INT;
 
-    MPI_WORLD mpi_world(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    MPI_WORLD mpi_world(parse_args);
 
     int scale=128,threads=1,refine=1;
-    PARSE_ARGS parse_args(argc,argv);
     parse_args.Print_Arguments();
     parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
     parse_args.Add("-refine",&refine,"levels","refine levels");

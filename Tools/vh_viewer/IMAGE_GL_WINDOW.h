@@ -40,7 +40,6 @@ public:
     OPENGL_TEXTURED_RECT rectangle;
     OPENGL_TEXTURE texture;
     T scale,scale_factor;VECTOR<T,2> translate;
-    //ARRAYS<VECTOR<VECTOR_3D<T> ,2> > image;
     VIEWER_WINDOW<T>& parent;
     bool update_image;
     OPENGL_COLOR* opengl_image;
@@ -93,7 +92,6 @@ private:
             glTranslatef(-rectangle.width/2,-rectangle.height/2,0);
             GLdouble modelview[16],projection[16];GLint viewport[4];
             glGetIntegerv(GL_VIEWPORT,viewport);glGetDoublev(GL_PROJECTION_MATRIX,projection);glGetDoublev(GL_MODELVIEW_MATRIX,modelview);
-            //gluUnProject(index.x,h()-index.y-1,1,modelview,projection,viewport,&value.x,&value.y,&value.z);value+=VECTOR_3D<T>(1,1,1);
             gluUnProject(index.x,index.y,1,modelview,projection,viewport,&value.x,&value.y,&value.z);value+=VECTOR<double,3>(1,1,1);
             parent.Update_Hover_Point(VECTOR<int,2>((int)value.x,(int)value.y));
         }

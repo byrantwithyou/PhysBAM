@@ -108,9 +108,21 @@ create_triangulated_surface(const POLYGONAL_SURFACE &polygonal_surface, bool fli
 
 template<class T> void Convert(const std::string &input_filename, const std::string &output_filename, PARSE_ARGS &parse_args)
 {
-    bool flip = parse_args.Get_Option_Value("-f");
-    bool centroid_division = parse_args.Get_Option_Value("-c");
-    bool zero_based_vertices = parse_args.Get_Option_Value("-zero_based");
+    bool flip=false,centroid_division=false,zero_based_vertices=false;
+    std::string output_filename;
+    parse_args.Add("-f",&flip, "flip orientation");
+    parse_args.Add("-c",&centroid_division, "use centroid division for polygons with more than 4 vertices");
+    parse_args.Add("-zero_based",&zero_based_vertices, "zero based vertices");
+    parse_args.Add("-o", &output_filename,"file", "output filename");
+    parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to convert");
+    parse_args.Parse();
+
+    std::string input_filename=parse_args.Extra_Arg(0);
+    if(output_filename.empty()) output_filename=FILE_UTILITIES::Get_Basename(input_filename)+".tri";
+
+    cout << "Input filename: " << input_filename << endl;
+    cout << "Output filename: " << output_filename << " [" << (type_double?"double":"float") << "]" << endl;
+    
 
     ifstream input(input_filename.c_str());
     if (!input)
@@ -136,29 +148,10 @@ int main(int argc, char *argv[])
 
     PARSE_ARGS parse_args;
     parse_args.Use_Help_Option(true);
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-f", "flip orientation");
-    parse_args.Add_Option_Argument("-c", "use centroid division for polygons with more than 4 vertices");
-    parse_args.Add_Option_Argument("-zero_based", "zero based vertices");
-    parse_args.Add_String_Argument("-o", "", "output filename");
-    parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to convert");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
-    std::string input_filename;
-    int extraarg = parse_args.Parse();
-    if (extraarg < argc) input_filename = argv[extraarg];
-    else parse_args.Print_Usage(true);
-
-    if (parse_args.Get_Option_Value("-float")) type_double = false;
-    if (parse_args.Get_Option_Value("-double")) type_double = true;
-
-    std::string output_filename;
-    if (parse_args.Is_Value_Set("-o")) output_filename = parse_args.Get_String_Value("-o");
-    else output_filename = FILE_UTILITIES::Get_Basename(input_filename) + ".tri";
-
-    cout << "Input filename: " << input_filename << endl;
-    cout << "Output filename: " << output_filename << " [" << (type_double?"double":"float") << "]" << endl;
-    
     if(!type_double) Convert<float>(input_filename, output_filename, parse_args);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Convert<double>(input_filename, output_filename, parse_args);

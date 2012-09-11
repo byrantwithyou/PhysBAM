@@ -30,7 +30,8 @@ int main(int argc,char* argv[])
 
     PLS_FSI_EXAMPLE<TV>* example=0;
     example=new KANG<T>(stream_type);
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
     PLS_FSI_DRIVER<TV> driver(*example);
     driver.Execute_Main_Program();
     delete example;

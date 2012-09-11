@@ -29,9 +29,9 @@ public:
              BASIC_VISUALIZATION();
     virtual ~BASIC_VISUALIZATION();
 
-    void    Initialize(int argc, char *argv[]);
+    void    Initialize(PARSE_ARGS &parse_args);
     void    Run();
-    void    Initialize_And_Run(int argc, char *argv[]);
+    void    Initialize_And_Run(PARSE_ARGS &parse_args);
 
     virtual void Process_Hits(GLint hits, GLuint buffer[]);
 
@@ -54,7 +54,7 @@ protected:
     int &Selection_Priority(OPENGL_SELECTION::TYPE selection_type);
 
 private:
-    void Parse_Args(int argc, char *argv[]);
+    void Parse_Args(PARSE_ARGS &parse_args);
     void PreInitialize_OpenGL_World();
     void PostInitialize_OpenGL_World();
     void Reset_Objects_In_World();

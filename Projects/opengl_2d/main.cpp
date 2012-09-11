@@ -125,13 +125,8 @@ template<class T,class RW> void OPENGL_2D_VISUALIZATION<T,RW>::
 Add_Arguments(PARSE_ARGS& parse_args)
 {
     basedir=".";
-
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
-
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-no_ghost");
-    parse_args.Add_String_Argument("-rigid_bodies_no_draw","");
+    parse_args.Add("-rigid_bodies_no_draw",&rigid_bodies_no_draw_list,"id","Do not draw this rigid body (may be repeated)");
     parse_args.Set_Extra_Arguments(-1,"[<basedir>]");
 }
 //#####################################################################
@@ -152,11 +147,6 @@ Parse_Arguments(PARSE_ARGS& parse_args)
         parse_args.Print_Usage(true);
     else if(parse_args.Num_Extra_Args()==1)
         basedir=parse_args.Extra_Arg(0);
-
-    if(parse_args.Is_Value_Set("-rigid_bodies_no_draw")){ARRAY<int> int_list;
-        STRING_UTILITIES::Parse_Integer_List(parse_args.Get_String_Value("-rigid_bodies_no_draw"),int_list);
-        rigid_bodies_no_draw_list.Resize(int_list.Size());
-        for(int i=0;i<rigid_bodies_no_draw_list.m;i++) rigid_bodies_no_draw_list(i)=int(int_list(i));}
 
     last_frame_filename=basedir+"/common/last_frame";
 
@@ -948,8 +938,10 @@ int main(int argc,char* argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
     bool type_double=false; // float by default
-    if(PARSE_ARGS::Find_And_Remove("-float",argc,argv)) type_double=false;
-    if(PARSE_ARGS::Find_And_Remove("-double",argc,argv)) type_double=true;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Parse(true);
 
     ANIMATED_VISUALIZATION* visualization=0;
     if(!type_double) visualization=new OPENGL_2D_VISUALIZATION<float>;
@@ -958,7 +950,7 @@ int main(int argc,char* argv[])
 #else
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
-    visualization->Initialize_And_Run(argc,argv);
+    visualization->Initialize_And_Run(parse_args);
 
     return 0;
 }

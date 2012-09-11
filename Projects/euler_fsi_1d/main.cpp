@@ -47,7 +47,8 @@ int main(int argc,char* argv[])
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
     int xprocs=PARSE_ARGS::Find_And_Remove_Integer("-xprocs",argc,argv);
-    example->Parse(argc,argv);
+    PARSE_ARGS parse_args(argc,argv);
+    example->Parse(parse_args);
 
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();

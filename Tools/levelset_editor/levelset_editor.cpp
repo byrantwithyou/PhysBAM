@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Particles/PARTICLES_SUBSET.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
@@ -346,7 +347,8 @@ int main(int argc,char *argv[])
     ATTACHMENT_VISUALIZATION<float> visualization(data_dir,file);
     // This going to mess with the args?
     int dummy_argc=1;const char *dummy_argv[]={"paint"};
-    visualization.Initialize_And_Run(dummy_argc,(char**)dummy_argv);
+    PARSE_ARGS parse_args(dummy_argc,(char**)dummy_argv);
+    visualization.Initialize_And_Run(parse_args);
 
     return 0;
 }

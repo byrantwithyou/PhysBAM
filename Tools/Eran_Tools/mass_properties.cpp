@@ -68,10 +68,10 @@ int main(int argc,char *argv[])
     bool type_double=false,write_double=false;
 
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-write_float");
-    parse_args.Add_Option_Argument("-write_double");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
+    parse_args.Add_Not("-write_float",&type_double,"Write floats");
+    parse_args.Add("-write_double",&type_double,"Write doubles");
     parse_args.Add_Option_Argument("-thin_shell");
     parse_args.Add_Option_Argument("-generate");
     parse_args.Add_Double_Argument("-mass",1,"mass");
@@ -81,12 +81,6 @@ int main(int argc,char *argv[])
     parse_args.Parse();
 
     std::string filename=parse_args.Extra_Arg(0);
-
-    if(parse_args.Get_Option_Value("-float")) type_double=false;
-    else if(parse_args.Get_Option_Value("-double")) type_double=true;
-
-    if(parse_args.Get_Option_Value("-write_float")) write_double=false;
-    else if(parse_args.Get_Option_Value("-write_double")) write_double=true;
 
     if(!type_double && !write_double) Get_Mass_Properties<float,float>(filename,parse_args);
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT

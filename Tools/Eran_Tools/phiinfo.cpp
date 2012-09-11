@@ -180,8 +180,8 @@ int main(int argc, char *argv[])
 
     PARSE_ARGS parse_args;
 
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Option_Argument("-2d", "force 2d mode");
     parse_args.Add_Option_Argument("-3d", "force 3d mode");
     parse_args.Add_Option_Argument("-s", "write out slices as rgb files");
@@ -208,8 +208,6 @@ int main(int argc, char *argv[])
     if (parse_args.Get_Option_Value("-y")) slice_direction = 2;
     if (parse_args.Get_Option_Value("-z")) slice_direction = 3;
 
-    if (parse_args.Get_Option_Value("-double")) type_double = true;
-    if (parse_args.Get_Option_Value("-float")) type_double = false;
     if (parse_args.Get_Option_Value("-3d")) dimension = 3;
     if (parse_args.Get_Option_Value("-2d")) dimension = 2;
 

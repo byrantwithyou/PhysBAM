@@ -33,7 +33,6 @@ template<class TV> EXAMPLE<TV>::
 {
     delete mpi_world;
     if(need_finish_logging) LOG::Finish_Logging();
-    delete parse_args;
 }
 template<class TV> typename TV::SCALAR EXAMPLE<TV>::
 Time_At_Frame(const int frame) const
@@ -160,13 +159,13 @@ Parse_Late_Options()
 // Function Parse
 //#####################################################################
 template<class TV> void EXAMPLE<TV>::
-Parse(int argc,char* argv[])
+Parse(PARSE_ARGS& parse_args_input)
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
 
-    if(want_mpi_world) mpi_world=new MPI_WORLD(argc,argv);
-    parse_args=new PARSE_ARGS(argc,argv);
+    parse_args=&parse_args_input;
+    if(want_mpi_world) mpi_world=new MPI_WORLD(*parse_args);
     Register_Options();
 
     std::string print_args=parse_args->Print_Arguments();

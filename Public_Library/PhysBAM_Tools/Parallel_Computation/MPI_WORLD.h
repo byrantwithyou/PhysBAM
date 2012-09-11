@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
+class PARSE_ARGS;
 class MPI_WORLD:public NONCOPYABLE
 {
 public:
@@ -17,7 +18,7 @@ public:
     int rank;
 
     MPI_WORLD();
-    MPI_WORLD(int& argc,char**& argv);
+    MPI_WORLD(PARSE_ARGS& parse_args);
     ~MPI_WORLD();
 
 //#####################################################################

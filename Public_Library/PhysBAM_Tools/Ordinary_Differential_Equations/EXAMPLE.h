@@ -63,7 +63,7 @@ public:
     virtual void Limit_Dt(T& dt,const T time);
     virtual void Write_Output_Files(const int frame) const=0;
     virtual void Log_Parameters() const;
-    void Parse(int argc,char* argv[]);
+    void Parse(PARSE_ARGS& parse_args);
     virtual void Register_Options(); // Call parent first
     virtual void Parse_Options(); // Call parent first
     virtual void Override_Options(); // Call parent last

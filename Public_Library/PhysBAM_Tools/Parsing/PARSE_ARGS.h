@@ -62,13 +62,13 @@ public:
         options.Set(arg_str,o);
     }
 
-    template<class T,int d> void Add(const std::string& arg_str,bool* found,VECTOR<T,d>* store,const std::string& name,const std::string& desc)
+    template<class T,int d> void Add(const std::string& arg_str,VECTOR<T,d>* store,bool* found,const std::string& name,const std::string& desc)
     {
         OPTION o={arg_str,name,desc,found,true,store,&store_vec_impl<T,d>,&print_default_impl<VECTOR<T,d> >};
         options.Set(arg_str,o);
     }
 
-    template<class T> void Add(const std::string& arg_str,bool* found,ARRAY<T>* store,const std::string& name,const std::string& desc)
+    template<class T> void Add(const std::string& arg_str,ARRAY<T>* store,bool* found,const std::string& name,const std::string& desc)
     {
         OPTION o={arg_str,name,desc,found,true,store,&store_multi_impl<T>,&print_default_impl<ARRAY<T> >};
         options.Set(arg_str,o);

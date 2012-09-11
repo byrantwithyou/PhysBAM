@@ -26,8 +26,9 @@ void Seal_Holes(PARSE_ARGS& parse_args)
 int main(int argc,char *argv[])
 {
     PARSE_ARGS parse_args;
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
+    bool type_double=false;
+    parse_args.Add_Not("-float",&type_double,"Use floats");
+    parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Double_Argument("-threshold",.1,"threshold","fraction of minimium segment length for threshold");
     parse_args.Add_Option_Argument("-no_vertex_merging");
     parse_args.Add_Option_Argument("-no_hole_filling");
@@ -44,7 +45,7 @@ int main(int argc,char *argv[])
 
     threshold_fraction=parse_args.Get_Double_Value("-threshold");
 
-    if(!parse_args.Get_Option_Value("-double")) Seal_Holes<float,float>(parse_args);
+    if(!type_double) Seal_Holes<float,float>(parse_args);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Seal_Holes<double,float>(parse_args);
 #else
