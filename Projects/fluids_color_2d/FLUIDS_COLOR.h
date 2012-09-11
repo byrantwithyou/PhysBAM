@@ -17,6 +17,45 @@
 
 namespace PhysBAM{
 
+
+template<class TV>
+class ANALYTIC_IMPLICIT_SURFACE_LEVELSET
+{
+    typedef typename TV::SCALAR T;
+public:
+
+    T tolerance;
+    ANALYTIC_IMPLICIT_SURFACE_LEVELSET(): tolerance((T)1e-25) {}
+
+    virtual T f(const TV& X) const=0;
+    virtual TV df(const TV& X) const=0;
+    virtual MATRIX<T,TV::m> ddf(const TV& X) const=0;
+    virtual TV Closest_Point_Estimate(const TV& X) const {return X;}
+
+    VECTOR<T,TV::m+1> Find_Closest_Point(const TV& X) const
+    {
+        TV w=Closest_Point_Estimate(X);
+        VECTOR<T,TV::m+1> z(w.Append(0));
+        for(int i=0;i<100;i++){
+            TV Z(z.Remove_Index(TV::m)),dg=df(Z);
+            T L=z(TV::m),g=f(Z);
+            VECTOR<T,TV::m+1> G=((Z-X)*2+L*dg).Append(g),Hcol=dg.Append(0);
+            MATRIX<T,TV::m+1> H;
+            H.Set_Submatrix(0,0,L*ddf(Z)+2);
+            H.Set_Row(TV::m,Hcol);
+            H.Set_Column(TV::m,Hcol);
+            z-=H.Solve_Linear_System(G);
+            if(G.Magnitude_Squared()<1e-25) break;}
+        return z;
+    }
+
+    T Phi(const TV& X) const
+    {return (X-Find_Closest_Point(X).Remove_Index(TV::m)).Magnitude()*sign(f(X));}
+
+    TV Normal(const TV& X) const
+    {return (X-Find_Closest_Point(X).Remove_Index(TV::m)).Normalized();}
+};
+
 template<class TV>
 class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 {
@@ -278,35 +317,23 @@ public:
     struct ANALYTIC_LEVELSET_VORTEX:public ANALYTIC_LEVELSET
     {
         T k;
-        ANALYTIC_LEVELSET_VORTEX(T kk): k(kk){}
-        VECTOR<T,3> Find_Closest_Point(const TV& X) const
+
+        struct VORTEX_IMPLICIT_SURFACE:public ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>
         {
-            TV w=(X-pi/2).Normalized()+pi/2;
-            VECTOR<T,3> z(w.x,w.y,0);
-            for(int i=1;i<100;i++){
-                T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
-                VECTOR<T,3> G(-2*X.x+2*z.x+z.z*cx*sy,-2*X.y+2*z.y+z.z*sx*cy,-k+sx*sy);
-                MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
-                z-=H.Solve_Linear_System(G);
-                if(G.Magnitude_Squared()<1e-25) break;}
-            return z;
-        }
+            T k;
+            virtual T f(const TV& X) const {return sin(X.x)*sin(X.y)-k;}
+            virtual TV df(const TV& X) const {return TV(cos(X.x)*sin(X.y),sin(X.x)*cos(X.y));}
+            virtual MATRIX<T,TV::m> ddf(const TV& X) const {T A=-sin(X.x)*sin(X.y),B=cos(X.x)*cos(X.y);return MATRIX<T,TV::m>(A,B,B,A);}
+            virtual TV Closest_Point_Estimate(const TV& X) const {return (X-pi/2).Normalized()+pi/2;}
+        } vis;
+
+        ANALYTIC_LEVELSET_VORTEX(T kk): k(kk){vis.k=k;}
 
         virtual T phi(const TV& X,T t,int& c) const
-        {
-            c=(k-sin(X.x)*sin(X.y))>0?-4:0;
-            return (Find_Closest_Point(X).Remove_Index(2)-X).Magnitude();
-        }
+        {T p=vis.Phi(X);c=p>0?-4:0;return abs(p);}
 
         virtual TV N(const TV& X,T t) const
-        {
-            VECTOR<T,3> z=Find_Closest_Point(X);
-            T cx=cos(z.x),cy=cos(z.y),sx=sin(z.x),sy=sin(z.y);
-            MATRIX<T,3> H(2-z.z*sx*sy,z.z*cx*cy,cx*sy,z.z*cx*cy,2-z.z*sx*sy,sx*cy,cx*sy,sx*cy,0);
-            MATRIX<T,2> dP;
-            (H/2).Inverse().Get_Submatrix(0,0,dP);
-            return dP.Transpose_Times(z.Remove_Index(2)-X).Normalized();
-        }
+        {return vis.Normal(X)*sign(vis.f(X));}
     };
 
     struct ANALYTIC_TEST_BANDED:public ANALYTIC_LEVELSET,public ANALYTIC_VELOCITY
