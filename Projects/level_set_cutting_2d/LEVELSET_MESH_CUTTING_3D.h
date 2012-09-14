@@ -22,10 +22,10 @@ public:
     typedef VECTOR<T,3> TV;
     typedef VECTOR<T,4> TV4;
 
-
     struct TET
     {
         TV_INT4 parent,indices;
+        VECTOR<TV4,4> weights;
     };
 
     static void Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& phi0,ARRAY<T>& phi1,ARRAY<TET>& cut_mesh);

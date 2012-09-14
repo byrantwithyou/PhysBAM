@@ -156,12 +156,13 @@ static void Double_Cuts_4(const LEVELSET_MESH_CUTTING_3D::TET& tet,VECTOR<int,2>
 
 void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& phi0,ARRAY<T>& phi1,ARRAY<TET>& cut_mesh)
 {
-    enum CUT_TYPE {cut_none,cut_a,cut_b,cut_ab,cut_ba,cut_int} type;
+    enum CUT_TYPE {cut_none,cut_a,cut_b,cut_ab,cut_ba,cut_int};
     int flip[6]={cut_none,cut_a,cut_b,cut_ba,cut_ab,cut_int};
 
+    int num_nodes=phi0.m;
     HASHTABLE<VECTOR<int,2>,PAIR<int,int> > edge_hash;
     HASHTABLE<VECTOR<int,3>,int> tri_hash;
-    ARRAY<PAIR<TV_INT,TV> > weights(mesh.m);
+    ARRAY<PAIR<TV_INT,TV> > weights(num_nodes);
 
     for(int i=0;i<mesh.m;i++){
         TV_INT4 e=mesh(i);
@@ -305,5 +306,15 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
             continue;}
 
         Double_Cuts_4(temp_mesh(i),dce(0).y,dce(1).y,dce(2).y,dce(3).y,dce(0).x,dce(1).x,dce(2).x,dce(3).x,cut_mesh);}
+
+    for(int i=0;i<cut_mesh.m;i++){
+        for(int j=0;j<4;j++){
+            int k=cut_mesh(i).indices(j);
+            int pk=cut_mesh(i).parent.Find(k);
+            if(pk>=0){cut_mesh(i).weights(j)(pk)=1;continue;}
+            PAIR<TV_INT,TV>& pr=weights(k);
+            for(int l=0;l<3;l++)
+                if(pr.x(l)>=0)
+                    cut_mesh(i).weights(j)(cut_mesh(i).parent.Find(pr.x(l)))=pr.y(l);}}
 }
 
