@@ -58,9 +58,9 @@ static void Intersection_Face_Face(const VECTOR<int,4>& e,VECTOR<int,3> f,VECTOR
     typedef VECTOR<int,4> E;
     int l=e.Sum()-f.Sum(),i=e.Sum()-g.Sum();
     if(!Orientations_Match(f.Append(l),e)) exchange(f(0),f(1));
-    while(f(0)!=a) cyclic_shift(f);
+    while(f(0)!=i) cyclic_shift(f);
     int j=f(1),k=f(2);
-    LEVELSET_MESH_CUTTING_3D::TET r={e,E(i,j,a,b)},t={e,E(i,a,k,b)},u={e,E(i,j,a,b)},v={e,E(i,b,k,l)},w={e,E(i,j,b,l)};
+    LEVELSET_MESH_CUTTING_3D::TET r={e,E(b,k,j,a)},t={e,E(l,b,j,a)},u={e,E(l,k,b,a)},v={e,E(i,l,j,a)},w={e,E(i,k,l,a)};
     cut_mesh.Append(r);
     cut_mesh.Append(t);
     cut_mesh.Append(u);
@@ -84,6 +84,7 @@ static void Double_Cuts_2(const LEVELSET_MESH_CUTTING_3D::TET& tet,VECTOR<int,2>
     if(!Orientations_Match(E(i,j,k,l),tet.indices)){
         exchange(j,k);
         exchange(a,b);}
+    assert(i!=l);
     if(j<k){
         LEVELSET_MESH_CUTTING_3D::TET r={tet.parent,E(i,a,b,l)},t={tet.parent,E(b,a,j,l)},u={tet.parent,E(k,b,j,l)};
         cut_mesh.Append(r);
@@ -166,8 +167,8 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
 
     for(int i=0;i<mesh.m;i++){
         TV_INT4 e=mesh(i);
-        for(int j=0;j<e.m;j++)
-            for(int k=j+1;k<e.m;k++){
+        for(int j=0;j<4;j++)
+            for(int k=j+1;k<4;k++){
                 VECTOR<int,2> s(e(j),e(k));
                 if(edge_hash.Contains(s)) continue;
                 VECTOR<T,2> p0(phi0.Subset(s)),p1(phi1.Subset(s));
@@ -190,7 +191,7 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
 
     for(int i=0;i<mesh.m;i++){
         TV_INT4 e=mesh(i);
-        for(int j=0;j<e.m;j++){
+        for(int j=0;j<4;j++){
             TV_INT t=e.Remove_Index(j),st=t.Sorted();
             if(tri_hash.Contains(st)) continue;
             bool not_inside=false;
@@ -230,19 +231,19 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
             temp_mesh.Append(t);
             continue;}
 
-        for(int j=0;j<0;j++)
+        for(int j=0;j<4;j++)
             if(!p0(j) && !p1(j))
                 hits.Append(PAIR<int,TV_INT>(e(j),TV_INT(e(j),-1,-1)));
 
-        for(int j=0;j<e.m;j++)
-            for(int k=j+1;k<e.m;k++){
-                VECTOR<int,2> s(e(i),e(k));
+        for(int j=0;j<4;j++)
+            for(int k=j+1;k<4;k++){
+                VECTOR<int,2> s(e(j),e(k));
                 PAIR<int,int> z;
                 edge_hash.Get(s,z);
-                if(z.x>=0)
+                if(z.y==cut_int)
                     hits.Append(PAIR<int,TV_INT>(z.x,TV_INT(s(0),s(1),-1)));}
 
-        for(int j=0;j<e.m;j++){
+        for(int j=0;j<4;j++){
             TV_INT t=e.Remove_Index(j),st=t.Sorted();
             int z=tri_hash.Get(st);
             if(z>=0)
@@ -284,9 +285,8 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
             for(int k=j+1;k<4;k++){
                 VECTOR<int,2> s(temp_mesh(i).indices(j),temp_mesh(i).indices(k));
                 PAIR<int,int> z;
-                edge_hash.Get(s,z);
-                if(z.x>=0){
-                    dce.Append(PAIR<int,VECTOR<int,2> >(z.x,s));}}
+                if(edge_hash.Get(s,z) && z.x>=0)
+                    dce.Append(PAIR<int,VECTOR<int,2> >(z.x,s));}
 
         PHYSBAM_ASSERT(dce.m<=4);
         if(dce.m==0){
