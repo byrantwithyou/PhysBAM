@@ -43,9 +43,9 @@ static void Intersection_Edge_Face(const VECTOR<int,4>& e,VECTOR<int,3> f,VECTOR
     typedef VECTOR<int,4> E;
     int l=e.Sum()-f.Sum(),i=s(0)+s(1)-l;
     if(!Orientations_Match(f.Append(l),e)) exchange(f(0),f(1));
-    while(f(0)!=a) cyclic_shift(f);
+    while(f(0)!=i) cyclic_shift(f);
     int j=f(1),k=f(2);
-    LEVELSET_MESH_CUTTING_3D::TET r={e,E(i,j,a,b)},t={e,E(i,a,k,b)},u={e,E(i,j,a,b)},v={e,E(i,b,k,l)},w={e,E(i,j,b,l)};
+    LEVELSET_MESH_CUTTING_3D::TET r={e,E(a,l,j,b)},t={e,E(i,a,j,b)},u={e,E(a,k,l,b)},v={e,E(i,k,a,b)},w={e,E(l,k,j,b)};
     cut_mesh.Append(r);
     cut_mesh.Append(t);
     cut_mesh.Append(u);
@@ -100,7 +100,7 @@ static void Double_Cuts_2(const LEVELSET_MESH_CUTTING_3D::TET& tet,VECTOR<int,2>
 static void Double_Cuts_3(const LEVELSET_MESH_CUTTING_3D::TET& tet,VECTOR<int,2> s0,VECTOR<int,2> s1,VECTOR<int,2> s2,int a,int b,int c,ARRAY<LEVELSET_MESH_CUTTING_3D::TET>& cut_mesh)
 {
     typedef VECTOR<int,4> E;
-    int l=s0.Contains(s1.x)?s1.x:s1.y,i=s0.Sum()-l,j=s0.Sum()-l,k=s0.Sum()-l;
+    int l=s0.Contains(s1.x)?s1.x:s1.y,i=s0.Sum()-l,j=s1.Sum()-l,k=s2.Sum()-l;
     if(i>j){exchange(i,j);exchange(a,b);}
     if(i>k){exchange(i,k);exchange(a,c);}
     if(!Orientations_Match(E(i,j,k,l),tet.indices)){
