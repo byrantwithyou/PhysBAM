@@ -171,9 +171,9 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
                         printf("%i -> %i %i\n", ed, edge_table[TV::m-2][ed][0], edge_table[TV::m-2][ed][1]);
                         S seg(e(edge_table[TV::m-2][ed][0]),e(edge_table[TV::m-2][ed][1]));
                         LOG::cout<<"phi "<<phi(seg.x)<<"  "<<phi(seg.y)<<std::endl;
-                        if(!edge_hash.Get(seg,ed)){
+                        if(!edge_hash.Get(seg.Sorted(),ed)){
                             ed=weights.Append(PAIR<S,T>(seg,phi(seg.x)/(phi(seg.x)-phi(seg.y))))+phi.m;
-                            edge_hash.Set(seg,ed);}}
+                            edge_hash.Set(seg.Sorted(),ed);}}
                     else ed=e(ed);
                     elem(j)=ed;}
                 if(inv) exchange(elem(0),elem(1));
@@ -199,7 +199,8 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
     int condense=0;
     for(int i=0;i<index_map.m;i++){
         int p=union_find.Find(i);
-        if(index_map(p)<0) index_map(p)=index_map(i)=condense++;}
+        if(index_map(p)<0) index_map(p)=condense++;
+        index_map(i)=index_map(p);}
     LOG::cout<<index_map<<std::endl;
     split_parents.Flattened()=index_map.Subset(split_parents.Flattened());
     new_parents.Exchange(parents);
