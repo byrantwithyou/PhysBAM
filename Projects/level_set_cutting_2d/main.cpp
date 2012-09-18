@@ -28,9 +28,8 @@ int main(int argc,char* argv[])
     p0.Append(0.5);
     p0.Append(0.2);
     p0.Append(0.1);
-    ARRAY<VECTOR<int,3> > c,sp;
+    ARRAY<VECTOR<int,3> > c=m,sp;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
-
     LOG::cout<<m<<"    "<<c<<std::endl;
     MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,c,sp,p0,weights);
     LOG::cout<<m<<"    "<<c<<"    "<<sp<<"    "<<weights<<std::endl;

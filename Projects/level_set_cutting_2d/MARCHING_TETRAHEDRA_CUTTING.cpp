@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include "MARCHING_TETRAHEDRA_CUTTING.h"
 using namespace PhysBAM;
 const int edge_table[2][6][2]=
@@ -160,7 +161,7 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
                 E elem,par;
                 for(int j=0;j<TV::m+1;j++){
                     par(j)=next_parent++;
-                    int ed=(mask>>(4*j))%15;
+                    int ed=(mask>>(4*j))%16;
                     if(ed>=TV::m+1){
                         ed-=TV::m+1;
                         S seg(e(edge_table[TV::m-2][ed][0]),e(edge_table[TV::m-2][ed][1]));
