@@ -25,26 +25,30 @@ int main(int argc,char* argv[])
     parse_args.Add("-n",&size,"value","Domain size");
     parse_args.Parse();
 
-#if 0
+#if 1
     ARRAY<VECTOR<int,4> > m;
     m.Append(VECTOR<int,4>(0,1,2,3));
-    ARRAY<T> p0;
-    p0.Append(0.5);
-    p0.Append(0);
-    p0.Append(-0.1);
-    ARRAY<TV> X(4);
-    X(0)=TV(0,0,0);
-    X(1)=TV(1,0,0);
-    X(2)=TV(0,1,0);
-    X(3)=TV(0,0,1);
+    m.Append(VECTOR<int,4>(0,1,4,2));
+    ARRAY<T> p0(5);
+    printf("seed %i\n", seed);
+    RANDOM_NUMBERS<T> random;
+    random.Set_Seed(seed);
+    random.Fill_Uniform(p0,-5,5);
+    for(int i=0;i<p0.m;i++) p0(i)=::PhysBAM::rint(p0(i));
     ARRAY<VECTOR<int,4> > c=m,sp;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
-    LOG::cout<<m<<"    "<<c<<std::endl;
+    LOG::cout<<m<<"  a  "<<c<<"    "<<p0<<std::endl;
     MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,c,sp,p0,weights);
-    LOG::cout<<m<<"    "<<c<<"    "<<sp<<"    "<<weights<<std::endl;
-    for(int i=0;i<weights.m;i++)
-        X.Append(X(weights(i).x.x)*(1-weights(i).y)+X(weights(i).x.y)*weights(i).y);
-    p0.Resize(X.m);
+    LOG::cout<<m<<"  b  "<<c<<"    "<<sp<<"    "<<weights<<std::endl;
+
+    HASHTABLE<VECTOR<int,3>,int> hash;
+    for(int i=0;i<c.m;i++)
+        for(int j=0;j<4;j++)
+            hash.Get_Or_Insert(c(i).Remove_Index(j).Sorted())+=m(i)(3)*10+1;
+    for(HASHTABLE<VECTOR<int,3>,int>::ITERATOR it(hash);it.Valid();it.Next())
+        if(it.Data()==52)
+            LOG::cout<<"SHARE "<<it.Key()<<std::endl;
+    LOG::cout<<hash<<std::endl;
 
     // EPS_FILE<T> eps("out.eps");
     // for(int i=0;i<c.m;i++)
@@ -90,7 +94,7 @@ int main(int argc,char* argv[])
 //    LOG::cout<<tv.mesh.elements<<std::endl;
 //    tv.mesh.elements.Remove_All();
 //    tv.mesh.elements.Append(VECTOR<int,4>(30,31,28,19));
-
+//    tv.mesh.elements(0)=VECTOR<int,4>(3,2,1,0);
 
     tv.mesh.Initialize_Boundary_Mesh();
     int mm=tv.mesh.boundary_mesh->elements.m;
@@ -106,7 +110,7 @@ int main(int argc,char* argv[])
     phi0.Subset(*tv.mesh.boundary_nodes).Fill(1);
     phi1.Subset(*tv.mesh.boundary_nodes).Fill(1);
 
-//    phi0.Subset(tv.mesh.elements(0))=VECTOR<T,4>(-1,-2,3,4);
+    phi0.Subset(tv.mesh.elements(0))=VECTOR<T,4>(-1,-2,3,4);
 
     ARRAY<VECTOR<int,4> > m=tv.mesh.elements,sp;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
