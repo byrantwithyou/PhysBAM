@@ -80,29 +80,35 @@ Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table)
 }
 static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table,const MARCHING_TETRAHEDRA_CUTTING_CASE<3>& cc,int cs)
 {
-    if(table(cs).elements[0][0] || table(cs).elements[1][0]) return;
+    if(table(cs).elements[0][0] || table(cs).elements[1][0]){
+        printf("%*scase filled %i%i%i%i\n",2*depth,"",cs/27,(cs/9)%3,(cs/3)%3,cs%3);
+        return;}
     table(cs)=cc;
+    printf("%*sfill %i%i%i%i { %04x %04x %04x } { %04x %04x %04x }\n",2*depth,"",cs/27,(cs/9)%3,(cs/3)%3,cs%3,cc.elements[0][0],cc.elements[0][1],cc.elements[0][2],cc.elements[1][0],cc.elements[1][1],cc.elements[1][2]);
+    depth++;
 
     int a=cs/27,b=(cs/9)%3,c=(cs/3)%3,d=cs%3;
     // sign flip
     MARCHING_TETRAHEDRA_CUTTING_CASE<3> cc1={
         {cc.comp[0],cc.comp[1],cc.comp[2],cc.comp[3]},
-        {{cc.elements[1][0],cc.elements[1][1]},{cc.elements[0][0],cc.elements[0][1]}}};
+        {{cc.elements[1][0],cc.elements[1][1],cc.elements[1][2]},
+         {cc.elements[0][0],cc.elements[0][1],cc.elements[0][2]}}};
     Fill_Helper(table,cc1,(a^(1-a/2))*27+(b^(1-b/2))*9+(c^(1-c/2))*3+(d^(1-d/2)));
 #define F(i,j,m) (cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)+(m[D(i,j)]<<12)):0)
     // flip
     const int fl[10]={1,0,2,3,6,5,4,9,8,7};
     MARCHING_TETRAHEDRA_CUTTING_CASE<3> cc2={
         {fl[cc.comp[0]],fl[cc.comp[1]],fl[cc.comp[2]],fl[cc.comp[3]]},
-        {{F(0,0,fl),F(0,1,fl)},{F(1,0,fl),F(1,1,fl)}}};
+        {{F(0,0,fl),F(0,1,fl),F(0,2,fl)},{F(1,0,fl),F(1,1,fl),F(1,2,fl)}}};
     Fill_Helper(table,cc2,b*27+a*9+c*3+d);
     // rotate
     const int ro[10]={1,2,3,0,9,6,8,5,7,4};
     MARCHING_TETRAHEDRA_CUTTING_CASE<3> cc0={
         {ro[cc.comp[0]],ro[cc.comp[1]],ro[cc.comp[2]],ro[cc.comp[3]]},
-        {{F(0,0,ro),F(0,1,ro)},{F(1,0,ro),F(1,1,ro)}}};
+        {{F(0,0,ro),F(0,1,ro),F(0,2,ro)},{F(1,0,ro),F(1,1,ro),F(1,2,ro)}}};
     Fill_Helper(table,cc0,d*27+a*9+b*3+c);
 #undef R
+    depth--;
 }
 template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
 Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table)
