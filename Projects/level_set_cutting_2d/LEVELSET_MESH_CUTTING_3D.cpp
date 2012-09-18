@@ -1,4 +1,5 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include "LEVELSET_MESH_CUTTING_3D.h"
@@ -45,7 +46,7 @@ static void Intersection_Edge_Face(const VECTOR<int,4>& e,VECTOR<int,3> f,VECTOR
     if(!Orientations_Match(f.Append(l),e)) exchange(f(0),f(1));
     while(f(0)!=i) cyclic_shift(f);
     int j=f(1),k=f(2);
-    LEVELSET_MESH_CUTTING_3D::TET r={e,E(a,l,j,b)},t={e,E(i,a,j,b)},u={e,E(a,k,l,b)},v={e,E(i,k,a,b)},w={e,E(l,k,j,b)};
+    LEVELSET_MESH_CUTTING_3D::TET r={e,E(l,a,j,b)},t={e,E(a,i,j,b)},u={e,E(k,a,l,b)},v={e,E(k,i,a,b)},w={e,E(l,k,j,b)};
     cut_mesh.Append(r);
     cut_mesh.Append(t);
     cut_mesh.Append(u);
@@ -175,7 +176,19 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
                 bool cross0=(p0(0)>0 && p0(1)<0) || (p0(0)<0 && p0(1)>0);
                 bool cross1=(p1(0)>0 && p1(1)<0) || (p1(0)<0 && p1(1)>0);
                 PAIR<int,int> z(-1,0);
-                if(!cross0) z.y=cross1?cut_b:cut_none;
+                if(!p0(0) && !p0(1) && cross1){
+                    T interp=p1(0)/(p1(0)-p1(1));
+                    z.y=cut_int;
+                    z.x=phi0.Append(0);
+                    phi1.Append(0);
+                    weights.Append(PAIR<TV_INT,TV>(TV_INT(e(j),e(k),-1),TV(1-interp,interp,0)));}
+                else if(!p1(0) && !p1(1) && cross0){
+                    T interp=p0(0)/(p0(0)-p0(1));
+                    z.y=cut_int;
+                    z.x=phi0.Append(0);
+                    phi1.Append(0);
+                    weights.Append(PAIR<TV_INT,TV>(TV_INT(e(j),e(k),-1),TV(1-interp,interp,0)));}
+                else if(!cross0) z.y=cross1?cut_b:cut_none;
                 else if(!cross1) z.y=cut_a;
                 else{
                     T interp=p0(0)/(p0(0)-p0(1));
@@ -194,13 +207,17 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
         for(int j=0;j<4;j++){
             TV_INT t=e.Remove_Index(j),st=t.Sorted();
             if(tri_hash.Contains(st)) continue;
+//            LOG::cout<<"NEW"<<std::endl;
             bool not_inside=false;
-            int ring=0;
+            int ring=0,corner0=0,corner1=0;
             for(int k=0;k<3;k++){
                 if(phi0(t(k))==0){
+                    corner0++;
                     if(phi1(t(k))==0){not_inside=true;break;}
                     ring=ring*16+1;}
-                else if(phi1(t(k))==0) ring=ring*16+2;
+                else if(phi1(t(k))==0){
+                    corner1++;
+                    ring=ring*16+2;}
                 VECTOR<int,2> s(t(k),t((k+1)%3));
                 switch(edge_hash.Get(s).y){
                     case cut_none:break;
@@ -208,8 +225,11 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
                     case cut_a:ring=ring*16+1;break;
                     case cut_ab:ring=ring*16+1;
                     case cut_b:ring=ring*16+2;break;
-                    case cut_int:not_inside=true;break;}}
-            if(!not_inside && (ring==0x1212 || ring==0x2121)){
+                    case cut_int:not_inside=true;break;}
+//                LOG::cout<<phi0(t(k))<<" "<<phi1(t(k))<<"   "<<edge_hash.Get(s).y<<"  "<<ring<<"  "<<t<<" -> "<<phi0.m<<std::endl;
+
+}
+            if(!not_inside && corner0<2 && corner1<2 && (ring==0x1212 || ring==0x2121)){
                 TV p0(phi0.Subset(st)),p1(phi1.Subset(st));
                 MATRIX<T,2> M(p0(0)-p0(2),p1(0)-p1(2),p0(1)-p0(2),p1(1)-p1(2));
                 VECTOR<T,2> R(-p0(2),-p1(2)),L(M.Solve_Linear_System(R));
@@ -251,13 +271,10 @@ void LEVELSET_MESH_CUTTING_3D::Subdivide(const ARRAY<TV_INT4>& mesh,ARRAY<T>& ph
 
         // Must penetrate exactly twice
         if(hits.m!=2){
+            if(hits.m!=0) LOG::cout<<"hits "<<hits<<"   "<<e<<std::endl;
+
             temp_mesh.Append(t);
             continue;}
-
-        // TODO: Compute this: (ind1 ind2 ind3) or (ind1 ind2 -1) (ind1 -1 -1) or (-1 -1 -1)
-        // TV_INT inter0,inter1;
-        // TV weights0,weights1;
-        // int index0,index1;
 
         // Penetrates through node
         if(hits(0).y.y==-1){

@@ -16,7 +16,7 @@ using namespace PhysBAM;
 class LEVELSET_MESH_CUTTING_3D
 {
 public:
-    typedef float T;
+    typedef double T;
     typedef VECTOR<int,3> TV_INT;
     typedef VECTOR<int,4> TV_INT4;
     typedef VECTOR<T,3> TV;

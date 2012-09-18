@@ -95,8 +95,8 @@ int main(int argc,char* argv[])
     tm.Initialize_Boundary_Mesh();
     LOG::cout<<"mesh sizes "<<tm.boundary_mesh->elements.m<<"  "<<tv.mesh.boundary_mesh->elements.m<<std::endl;
     // LOG::cout<<tm.elements<<std::endl;
-    // LOG::cout<<tm.boundary_mesh->elements<<std::endl;
-//    LOG::cout<<tv.mesh.boundary_mesh->elements<<std::endl;
+    LOG::cout<<tm.boundary_mesh->elements<<std::endl;
+    LOG::cout<<tv.mesh.boundary_mesh->elements<<std::endl;
 
     for(int i=0;i<cut_mesh.m;i++){
         VECTOR<TV,4> pts;
