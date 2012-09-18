@@ -31,15 +31,10 @@ Case_Table()
 #define B(i,j) (cc.elements[i][j]>>4)%16
 #define C(i,j) (cc.elements[i][j]>>8)%16
 #define D(i,j) (cc.elements[i][j]>>12)
-int depth=0;
 static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table,const MARCHING_TETRAHEDRA_CUTTING_CASE<2>& cc,int cs)
 {
-    if(table(cs).elements[0][0] || table(cs).elements[1][0]){
-        printf("%*scase filled %i%i%i\n",2*depth,"",cs/9,(cs/3)%3,cs%3);
-        return;}
+    if(table(cs).elements[0][0] || table(cs).elements[1][0]) return;
     table(cs)=cc;
-    printf("%*sfill %i%i%i { %03x %03x } { %03x %03x }\n",2*depth,"",cs/9,(cs/3)%3,cs%3,cc.elements[0][0],cc.elements[0][1],cc.elements[1][0],cc.elements[1][1]);
-    depth++;
 
     int a=cs/9,b=(cs/3)%3,c=cs%3;
     // sign flip
@@ -49,7 +44,6 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table,const
 #define F(i,j,m) (cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)):0)
     // flip
     const int fl[6]={1,0,2,4,3,5};
-    printf("%03x %03x\n", cc.elements[0][0], F(0,0,fl));
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc2={{0,0,0,0},{{F(0,0,fl),F(0,1,fl)},{F(1,0,fl),F(1,1,fl)}}};
     Fill_Helper(table,cc2,b*9+a*3+c);
 #undef F
@@ -59,7 +53,6 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table,const
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc0={{0,0,0,0},{{R(0,0,ro),R(0,1,ro)},{R(1,0,ro),R(1,1,ro)}}};
     Fill_Helper(table,cc0,c*9+a*3+b);
 #undef R
-    depth--;
 }
 template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
 Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table)
@@ -80,12 +73,8 @@ Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table)
 }
 static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table,const MARCHING_TETRAHEDRA_CUTTING_CASE<3>& cc,int cs)
 {
-    if(table(cs).elements[0][0] || table(cs).elements[1][0]){
-        printf("%*scase filled %i%i%i%i\n",2*depth,"",cs/27,(cs/9)%3,(cs/3)%3,cs%3);
-        return;}
+    if(table(cs).elements[0][0] || table(cs).elements[1][0]) return;
     table(cs)=cc;
-    printf("%*sfill %i%i%i%i { %04x %04x %04x } { %04x %04x %04x }\n",2*depth,"",cs/27,(cs/9)%3,(cs/3)%3,cs%3,cc.elements[0][0],cc.elements[0][1],cc.elements[0][2],cc.elements[1][0],cc.elements[1][1],cc.elements[1][2]);
-    depth++;
 
     int a=cs/27,b=(cs/9)%3,c=(cs/3)%3,d=cs%3;
     // sign flip
@@ -108,7 +97,6 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table,const
         {{F(0,0,ro),F(0,1,ro),F(0,2,ro)},{F(1,0,ro),F(1,1,ro),F(1,2,ro)}}};
     Fill_Helper(table,cc0,d*27+a*9+b*3+c);
 #undef R
-    depth--;
 }
 template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
 Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table)
@@ -148,10 +136,8 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
     for(int i=0;i<children.m;i++){
         E e=children(i);
         VECTOR<T,TV::m+1> p(phi.Subset(e));
-        LOG::cout<<p<<std::endl;
         int cs=0;
         for(int j=0;j<TV::m+1;j++) cs=cs*3+(p(j)==0?2:p(j)>0);
-        printf("case %i\n", cs);
         const MARCHING_TETRAHEDRA_CUTTING_CASE<TV::m>& mtcc=table(cs);
         int inv=0;
         if(e(mtcc.comp[0])>e(mtcc.comp[1])){
@@ -167,23 +153,19 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
             for(int t=0;t<max_side_elements;t++){
                 int mask=mtcc.elements[s][t];
                 if(!mask) break;
-                printf("mask %03x\n", mask);
                 E elem,par;
                 for(int j=0;j<TV::m+1;j++){
                     par(j)=next_parent++;
                     int ed=(mask>>(4*j))%16;
                     if(ed>=TV::m+1){
                         ed-=TV::m+1;
-                        printf("%i -> %i %i\n", ed, edge_table[TV::m-2][ed][0], edge_table[TV::m-2][ed][1]);
                         S seg(e(edge_table[TV::m-2][ed][0]),e(edge_table[TV::m-2][ed][1]));
-                        LOG::cout<<"phi "<<phi(seg.x)<<"  "<<phi(seg.y)<<std::endl;
                         if(!edge_hash.Get(seg.Sorted(),ed)){
                             ed=weights.Append(PAIR<S,T>(seg,phi(seg.x)/(phi(seg.x)-phi(seg.y))))+phi.m;
                             edge_hash.Set(seg.Sorted(),ed);}}
                     else ed=e(ed);
                     elem(j)=ed;}
                 if(inv) exchange(elem(0),elem(1));
-                LOG::cout<<e<<elem<<std::endl;
                 new_parents.Append(parents(i));
                 split_parents.Append(par);
                 new_children.Append(elem);
@@ -191,9 +173,7 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
                 for(int j=0;j<TV::m+1;j++){
                     int other=-1;
                     PAIR<TV_INT,int> pr(elem.Remove_Index(j).Sorted(),s);
-                    LOG::cout<<pr<<std::endl;
                     if(neighbor.Get(pr,other)){
-                        LOG::cout<<parents(i)<<"  "<<new_parents(other)<<"  "<<par<<"  "<<split_parents(other)<<std::endl;
                         for(int a=0;a<TV::m+1;a++)
                             for(int b=0;b<TV::m+1;b++)
                                 if(parents(i)(a)==new_parents(other)(b))
@@ -207,7 +187,6 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
         int p=union_find.Find(i);
         if(index_map(p)<0) index_map(p)=condense++;
         index_map(i)=index_map(p);}
-    LOG::cout<<index_map<<std::endl;
     split_parents.Flattened()=index_map.Subset(split_parents.Flattened());
     new_parents.Exchange(parents);
     new_children.Exchange(children);
