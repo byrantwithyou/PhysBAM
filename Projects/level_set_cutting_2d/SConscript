@@ -2,4 +2,4 @@
 
 Import('env Automatic_Program')
 
-Automatic_Program(env,"testing",["main.cpp", "LEVELSET_MESH_CUTTING_3D.cpp"])
+Automatic_Program(env,"testing",["main.cpp", "MARCHING_TETRAHEDRA_CUTTING.cpp"])

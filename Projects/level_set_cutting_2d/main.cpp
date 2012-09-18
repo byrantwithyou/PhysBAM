@@ -3,37 +3,37 @@
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include "LEVELSET_MESH_CUTTING_3D.h"
+#include "MARCHING_TETRAHEDRA_CUTTING.h"
+using namespace PhysBAM;
 
 int main(int argc,char* argv[])
 {
     typedef double T;
-    typedef VECTOR<int,3> TV_INT;
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<int,2> TV_INT;
+    typedef VECTOR<T,2> TV;
 
     int seed=time(0),size=4;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-s",&seed,"value","Seed");
     parse_args.Add("-n",&size,"value","Domain size");
     parse_args.Parse();
-    ARRAY<LEVELSET_MESH_CUTTING_3D::TET> cut_mesh;
 
-    // ARRAY<VECTOR<int,4> > m;
-    // m.Append(VECTOR<int,4>(0,1,2,3));
-    // ARRAY<T> p0,p1;
-    // p0.Append(0.5);
-    // p0.Append(0.2);
-    // p0.Append(-0.1);
-    // p0.Append(-0.6);
-    // p1.Append(0.6);
-    // p1.Append(-0.6);
-    // p1.Append(-0.4);
-    // p1.Append(0.5);
+    ARRAY<VECTOR<int,3> > m;
+    m.Append(VECTOR<int,3>(0,1,2));
+    ARRAY<T> p0;
+    p0.Append(0.5);
+    p0.Append(0.2);
+    p0.Append(0.1);
+    ARRAY<VECTOR<int,3> > c,sp;
+    ARRAY<PAIR<VECTOR<int,2>,T> > weights;
 
-    // LEVELSET_MESH_CUTTING_3D::Subdivide(m,p0,p1,cut_mesh);
+    LOG::cout<<m<<"    "<<c<<std::endl;
+    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,c,sp,p0,weights);
+    LOG::cout<<m<<"    "<<c<<"    "<<sp<<"    "<<weights<<std::endl;
 
     // TETRAHEDRON_MESH tm;
     // for(int i=0;i<cut_mesh.m;i++){
@@ -46,9 +46,9 @@ int main(int argc,char* argv[])
 
     // LOG::cout<<tm.boundary_mesh->elements<<std::endl;
 
-    // return 0;
+    return 0;
 
-
+#if 0
 
     GRID<TV> grid(TV_INT()+(size+1),RANGE<TV>::Unit_Box());
 
@@ -82,7 +82,7 @@ int main(int argc,char* argv[])
 
 //    LOG::cout<<tv.mesh.elements<<std::endl;
 
-    LEVELSET_MESH_CUTTING_3D::Subdivide(tv.mesh.elements,phi0,phi1,cut_mesh);
+//    LEVELSET_MESH_CUTTING_3D::Subdivide(tv.mesh.elements,phi0,phi1,cut_mesh);
 
     // for(int i=0;i<cut_mesh.m;i++){
     //     LOG::cout<<cut_mesh(i).parent<<"  "<<cut_mesh(i).indices<<"  "<<cut_mesh(i).weights<<std::endl;}
@@ -112,5 +112,6 @@ int main(int argc,char* argv[])
             LOG::cout<<"CROSSINGS "<<a<<"  "<<b<<std::endl;}
 
     delete &tv;
+#endif
     return 0;
 }
