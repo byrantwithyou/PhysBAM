@@ -25,7 +25,7 @@ int main(int argc,char* argv[])
     parse_args.Add("-n",&size,"value","Domain size");
     parse_args.Parse();
 
-#if 1
+#if 0
     ARRAY<VECTOR<int,4> > m;
     m.Append(VECTOR<int,4>(0,1,2,3));
     m.Append(VECTOR<int,4>(0,1,4,2));
@@ -110,8 +110,6 @@ int main(int argc,char* argv[])
     phi0.Subset(*tv.mesh.boundary_nodes).Fill(1);
     phi1.Subset(*tv.mesh.boundary_nodes).Fill(1);
 
-    phi0.Subset(tv.mesh.elements(0))=VECTOR<T,4>(-1,-2,3,4);
-
     ARRAY<VECTOR<int,4> > m=tv.mesh.elements,sp;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
     MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,tv.mesh.elements,sp,phi0,weights);
@@ -120,8 +118,8 @@ int main(int argc,char* argv[])
         tv.particles.X(i+phi0.m)=tv.particles.X(weights(i).x.x)*(1-weights(i).y)+tv.particles.X(weights(i).x.y)*weights(i).y;
     phi0.Resize(tv.particles.X.m);
 
-    LOG::cout<<tv.particles.X<<std::endl;
-    LOG::cout<<weights<<std::endl;
+//    LOG::cout<<tv.particles.X<<std::endl;
+//    LOG::cout<<weights<<std::endl;
 
     // EPS_FILE<T> eps("out.eps");
     // for(int i=0;i<tv.mesh.elements.m;i++)
@@ -134,7 +132,6 @@ int main(int argc,char* argv[])
 
     tv.Update_Number_Nodes();
     tv.mesh.Initialize_Boundary_Nodes();
-    printf("boundary: %i\n",tv.mesh.boundary_mesh->elements.m);
 
     tv.mesh.Set_Number_Nodes(tv.mesh.elements.Flattened().Max()+1);
     tv.mesh.Initialize_Boundary_Mesh();
