@@ -11,8 +11,8 @@
 using namespace PhysBAM;
 const int edge_table[2][6][2]=
 {
-    {{0,1},{1,2},{2,0}},
-    {{0,1},{1,2},{2,3},{3,0},{0,2},{1,3}}
+    {{1,2},{0,2},{0,1}},
+    {{0,2},{0,1},{1,2},{0,3},{2,3},{1,3}}
 };
 //#####################################################################
 // Function Case_Table
@@ -46,9 +46,10 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table,const
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc1={{0,0,0,0},{{cc.elements[1][0],cc.elements[1][1]},
                                                         {cc.elements[0][0],cc.elements[0][1]}}};
     Fill_Helper(table,cc1,(a^(1-a/2))*9+(b^(1-b/2))*3+(c^(1-c/2)));
-#define F(i,j,m) (cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<16)):0)
+#define F(i,j,m) (cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)):0)
     // flip
     const int fl[6]={1,0,2,4,3,5};
+    printf("%03x %03x\n", cc.elements[0][0], F(0,0,fl));
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc2={{0,0,0,0},{{F(0,0,fl),F(0,1,fl)},{F(1,0,fl),F(1,1,fl)}}};
     Fill_Helper(table,cc2,b*9+a*3+c);
 #undef F
@@ -56,7 +57,7 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table,const
     // rotate
     const int ro[6]={1,2,0,4,5,3};
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc0={{0,0,0,0},{{R(0,0,ro),R(0,1,ro)},{R(1,0,ro),R(1,1,ro)}}};
-    Fill_Helper(table,cc0,b*9+c*3+a);
+    Fill_Helper(table,cc0,c*9+a*3+b);
 #undef R
     depth--;
 }
@@ -100,7 +101,7 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table,const
     MARCHING_TETRAHEDRA_CUTTING_CASE<3> cc0={
         {ro[cc.comp[0]],ro[cc.comp[1]],ro[cc.comp[2]],ro[cc.comp[3]]},
         {{F(0,0,ro),F(0,1,ro)},{F(1,0,ro),F(1,1,ro)}}};
-    Fill_Helper(table,cc0,b*27+c*9+d*3+a);
+    Fill_Helper(table,cc0,d*27+a*9+b*3+c);
 #undef R
 }
 template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
@@ -136,13 +137,14 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
     const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<TV::m> >& table=Case_Table();
     HASHTABLE<S,int> edge_hash;
     HASHTABLE<PAIR<TV_INT,int>,int> neighbor;
-    UNION_FIND<> union_find(2*max_side_elements*parents.m);
+    UNION_FIND<> union_find(2*max_side_elements*(TV::m+1)*parents.m);
     int next_parent=0;
     for(int i=0;i<children.m;i++){
         E e=children(i);
         VECTOR<T,TV::m+1> p(phi.Subset(e));
         int cs=0;
         for(int j=0;j<TV::m+1;j++) cs=cs*3+(p(j)==0?2:p(j)>0);
+        printf("case %i\n", cs);
         const MARCHING_TETRAHEDRA_CUTTING_CASE<TV::m>& mtcc=table(cs);
         int inv=0;
         if(e(mtcc.comp[0])>e(mtcc.comp[1])){
@@ -158,18 +160,22 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
             for(int t=0;t<max_side_elements;t++){
                 int mask=mtcc.elements[s][t];
                 if(!mask) break;
+                printf("mask %03x\n", mask);
                 E elem,par;
                 for(int j=0;j<TV::m+1;j++){
                     par(j)=next_parent++;
                     int ed=(mask>>(4*j))%16;
                     if(ed>=TV::m+1){
                         ed-=TV::m+1;
+                        printf("%i -> %i %i\n", ed, edge_table[TV::m-2][ed][0], edge_table[TV::m-2][ed][1]);
                         S seg(e(edge_table[TV::m-2][ed][0]),e(edge_table[TV::m-2][ed][1]));
                         if(!edge_hash.Get(seg,ed)){
                             ed=weights.Append(PAIR<S,T>(seg,phi(seg.x)/(phi(seg.x)-phi(seg.y))))+phi.m;
                             edge_hash.Set(seg,ed);}}
+                    else ed=e(ed);
                     elem(j)=ed;}
                 if(inv) exchange(elem(0),elem(1));
+                LOG::cout<<e<<elem<<std::endl;
                 new_parents.Append(parents(i));
                 split_parents.Append(par);
                 new_children.Append(elem);
@@ -177,11 +183,14 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
                 for(int j=0;j<TV::m+1;j++){
                     int other=-1;
                     PAIR<TV_INT,int> pr(elem.Remove_Index(j).Sorted(),s);
-                    if(neighbor.Get(pr,other))
+                    LOG::cout<<pr<<std::endl;
+                    if(neighbor.Get(pr,other)){
+                        LOG::cout<<parents(i)<<"  "<<new_parents(other)<<"  "<<par<<"  "<<split_parents(other)<<std::endl;
                         for(int a=0;a<TV::m+1;a++)
                             for(int b=0;b<TV::m+1;b++)
                                 if(parents(i)(a)==new_parents(other)(b))
-                                    union_find.Union(par(a),split_parents(other)(b));}}}
+                                    union_find.Union(par(a),split_parents(other)(b));}
+                    else neighbor.Set(pr,split_parents.m-1);}}}
 
     ARRAY<int> index_map(split_parents.m*(TV::m+1));
     index_map.Fill(-1);
@@ -189,6 +198,7 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
     for(int i=0;i<index_map.m;i++){
         int p=union_find.Find(i);
         if(index_map(p)<0) index_map(p)=index_map(i)=condense++;}
+    LOG::cout<<index_map<<std::endl;
     split_parents.Flattened()=index_map.Subset(split_parents.Flattened());
     new_parents.Exchange(parents);
     new_children.Exchange(children);
