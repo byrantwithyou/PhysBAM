@@ -92,7 +92,6 @@ int main(int argc,char* argv[])
             TV Y=tv.particles.X(e(j)),Z=tv.particles.X(e((j+1)%3));
             if(p*q<0)
                 X.Append(Y+(Z-Y)*p/(p-q));}
-        printf("%i\n", X.m);
         if(X.m==2)
             eps.Draw_Object(X(0),X(1));}
 
