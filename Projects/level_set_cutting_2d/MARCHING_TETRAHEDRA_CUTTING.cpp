@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
@@ -200,6 +201,7 @@ template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
 Fracture_Cutting(const ARRAY<E>& in_mesh,ARRAY<TV>& X,ARRAY<T>& phi0,ARRAY<T>& phi1,
     ARRAY<E> out_mesh[2],ARRAY<DATA> data[2],ARRAY<TV_INT> surface[2],ARRAY<int>& node_map)
 {
+    if(!in_mesh.m) return;
     ARRAY<E> new_parents,new_children,split_parents;
     ARRAY<bool> side;
     ARRAY<PAIR<S,T> > weights;
@@ -213,14 +215,18 @@ Fracture_Cutting(const ARRAY<E>& in_mesh,ARRAY<TV>& X,ARRAY<T>& phi0,ARRAY<T>& p
         if(!side(i)){
             new_children(k)=new_children(i);
             split_parents(k)=split_parents(i);
-            new_parents(k)=new_parents(i);}
+            new_parents(k++)=new_parents(i);}
+    new_children.Resize(k);
+    split_parents.Resize(k);
+    new_parents.Resize(k);
+    
     ARRAY<int> node_map_first(split_parents.Flattened().Max()+1);
     node_map_first.Subset(split_parents.Flattened())=new_parents.Flattened();
 
     weights.Remove_All();
     side.Remove_All();
     ARRAY<E> new_parents2,new_children2,split_parents2;
-    Query_Case(new_parents,new_children,new_parents2,new_children2,split_parents2,side,phi1,weights);
+    Query_Case(split_parents,new_children,new_parents2,new_children2,split_parents2,side,phi1,weights);
     phi1.Resize(phi1.m+weights.m);
     for(int i=0;i<weights.m;i++){
         X.Append(X(weights(i).x.x)*(1-weights(i).y)+X(weights(i).x.y)*weights(i).y);
@@ -236,17 +242,19 @@ Fracture_Cutting(const ARRAY<E>& in_mesh,ARRAY<TV>& X,ARRAY<T>& phi0,ARRAY<T>& p
  
         typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX simplex;
         simplex.X=X.Subset(new_children2(i));
-        DATA d={parent,new_children2(i),simplex.Signed_Size()};
+        DATA d={parent,new_children2(i),-simplex.Signed_Size()};
         data[s].Append(d);
         mesh[s].elements.Append(new_children2(i));}
 
-    for(int s=0;s<2;s++){
-        mesh[s].Set_Number_Nodes(mesh[s].elements.Flattened().Max()+1);
-        mesh[s].Initialize_Boundary_Mesh();
-        surface[s].Exchange(mesh[s].boundary_mesh->elements);}
+    for(int s=0;s<2;s++)
+        if(mesh[s].elements.m){
+            mesh[s].Set_Number_Nodes(mesh[s].elements.Flattened().Max()+1);
+            mesh[s].Initialize_Boundary_Mesh();
+            surface[s].Exchange(mesh[s].boundary_mesh->elements);
+            for(int i=0;i<surface[s].m;i++) exchange(surface[s](i)(0),surface[s](i)(1));}
 
     node_map.Resize(split_parents2.Flattened().Max()+1);
-    node_map.Subset(split_parents.Flattened())=node_map_first.Subset(new_parents2.Flattened());
+    node_map.Subset(split_parents2.Flattened())=node_map_first.Subset(new_parents2.Flattened());
 }
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::Case_Table();
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::Case_Table();
