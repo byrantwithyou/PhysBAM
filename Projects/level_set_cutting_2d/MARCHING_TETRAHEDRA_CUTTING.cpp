@@ -6,7 +6,6 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
-#include <PhysBAM_Tools/Log/LOG.h>
 #include "MARCHING_TETRAHEDRA_CUTTING.h"
 using namespace PhysBAM;
 const int edge_table[2][6][2]=

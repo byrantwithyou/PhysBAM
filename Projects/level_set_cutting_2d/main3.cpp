@@ -50,28 +50,6 @@ int main(int argc,char* argv[])
             LOG::cout<<"SHARE "<<it.Key()<<std::endl;
     LOG::cout<<hash<<std::endl;
 
-    // EPS_FILE<T> eps("out.eps");
-    // for(int i=0;i<c.m;i++)
-    //     eps.Draw_Object(X(c(i)(0)),X(c(i)(1)),X(c(i)(2)));
-    // for(int i=0;i<p0.m;i++){
-    //     eps.cur_format.fill_color=VECTOR<T,4>(p0(i)<0,p0(i)>0,0);
-    //     eps.cur_format.fill_style=1;
-    //     eps.cur_format.line_style=0;
-    //     eps.Draw_Object(X(i),(T).02);}
-
-
-
-    // TETRAHEDRON_MESH tm;
-    // for(int i=0;i<cut_mesh.m;i++){
-    //     tm.elements.Append(cut_mesh(i).indices);
-    //     LOG::cout<<cut_mesh(i).parent<<"  "<<cut_mesh(i).indices<<"  "<<cut_mesh(i).weights<<std::endl;}
-
-    // tm.elements=m;
-    // tm.Set_Number_Nodes(tm.elements.Flattened().Max()+1);
-    // tm.Initialize_Boundary_Mesh();
-
-    // LOG::cout<<tm.boundary_mesh->elements<<std::endl;
-
     return 0;
 
 #else
@@ -81,20 +59,6 @@ int main(int argc,char* argv[])
     TETRAHEDRALIZED_VOLUME<T>& tv=*TETRAHEDRALIZED_VOLUME<T>::Create();
     tv.Initialize_Cube_Mesh_And_Particles(grid);
     tv.mesh.Initialize_Boundary_Nodes();
-
-//    tv.mesh.elements(0)=tv.mesh.elements(16);
-//    tv.mesh.elements.Resize(1);
-
-    // int k=0;
-    // for(int i=0;i<tv.mesh.elements.m;i++)
-    //     if(tv.mesh.elements(i).Contains(13))
-    //         tv.mesh.elements(k++)=tv.mesh.elements(i);
-    // tv.mesh.elements.Resize(k);
-
-//    LOG::cout<<tv.mesh.elements<<std::endl;
-//    tv.mesh.elements.Remove_All();
-//    tv.mesh.elements.Append(VECTOR<int,4>(30,31,28,19));
-//    tv.mesh.elements(0)=VECTOR<int,4>(3,2,1,0);
 
     tv.mesh.Initialize_Boundary_Mesh();
     int mm=tv.mesh.boundary_mesh->elements.m;
@@ -117,18 +81,6 @@ int main(int argc,char* argv[])
     for(int i=0;i<weights.m;i++)
         tv.particles.X(i+phi0.m)=tv.particles.X(weights(i).x.x)*(1-weights(i).y)+tv.particles.X(weights(i).x.y)*weights(i).y;
     phi0.Resize(tv.particles.X.m);
-
-//    LOG::cout<<tv.particles.X<<std::endl;
-//    LOG::cout<<weights<<std::endl;
-
-    // EPS_FILE<T> eps("out.eps");
-    // for(int i=0;i<tv.mesh.elements.m;i++)
-    //     eps.Draw_Object(tv.particles.X(tv.mesh.elements(i)(0)),tv.particles.X(tv.mesh.elements(i)(1)),tv.particles.X(tv.mesh.elements(i)(2)));
-    // for(int i=0;i<phi0.m;i++){
-    //     eps.cur_format.fill_color=VECTOR<T,4>(phi0(i)<0,phi0(i)>0,phi0(i)==0);
-    //     eps.cur_format.fill_style=1;
-    //     eps.cur_format.line_style=0;
-    //     eps.Draw_Object(tv.particles.X(i),.01);}
 
     tv.Update_Number_Nodes();
     tv.mesh.Initialize_Boundary_Nodes();

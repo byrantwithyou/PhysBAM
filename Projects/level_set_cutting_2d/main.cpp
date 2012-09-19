@@ -1,4 +1,5 @@
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
+#include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
@@ -6,6 +7,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
+#include <PhysBAM_Geometry/Images/TEX_FILE.h>
 #include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
@@ -54,38 +56,15 @@ int main(int argc,char* argv[])
         eps.cur_format.line_style=0;
         eps.Draw_Object(X(i),(T).02);}
 
-
-
-    // TETRAHEDRON_MESH tm;
-    // for(int i=0;i<cut_mesh.m;i++){
-    //     tm.elements.Append(cut_mesh(i).indices);
-    //     LOG::cout<<cut_mesh(i).parent<<"  "<<cut_mesh(i).indices<<"  "<<cut_mesh(i).weights<<std::endl;}
-
-    // tm.elements=m;
-    // tm.Set_Number_Nodes(tm.elements.Flattened().Max()+1);
-    // tm.Initialize_Boundary_Mesh();
-
-    // LOG::cout<<tm.boundary_mesh->elements<<std::endl;
-
     return 0;
 
 #else
 
+    TEX_FILE<T> eps("out.tex");
     GRID<TV> grid(TV_INT()+(size+1),RANGE<TV>::Unit_Box());
 
     TRIANGULATED_AREA<T>& tv=*TRIANGULATED_AREA<T>::Create();
     tv.Initialize_Herring_Bone_Mesh_And_Particles(grid);
-
-    // int k=0;
-    // for(int i=0;i<tv.mesh.elements.m;i++)
-    //     if(tv.mesh.elements(i).Contains(13))
-    //         tv.mesh.elements(k++)=tv.mesh.elements(i);
-    // tv.mesh.elements.Resize(k);
-
-//    LOG::cout<<tv.mesh.elements<<std::endl;
-//    tv.mesh.elements.Remove_All();
-//    tv.mesh.elements.Append(VECTOR<int,4>(30,31,28,19));
-
 
     tv.mesh.Initialize_Boundary_Mesh();
     tv.mesh.Initialize_Boundary_Nodes();
@@ -102,19 +81,72 @@ int main(int argc,char* argv[])
     phi0.Subset(*tv.mesh.boundary_nodes).Fill(1);
     phi1.Subset(*tv.mesh.boundary_nodes).Fill(1);
 
+    eps.cur_format.line_width=.01;
+    eps.cur_format.line_color=VECTOR<T,3>(1,0,0);
+    for(int i=0;i<tv.mesh.elements.m;i++){
+        VECTOR<int,3> e=tv.mesh.elements(i);
+        ARRAY<TV> X;
+        for(int j=0;j<3;j++) if(phi0(e(j))==0) X.Append(tv.particles.X(e(j)));
+        for(int j=0;j<3;j++){
+            T p=phi0(e(j)),q=phi0(e((j+1)%3));
+            TV Y=tv.particles.X(e(j)),Z=tv.particles.X(e((j+1)%3));
+            if(p*q<0)
+                X.Append(Y+(Z-Y)*p/(p-q));}
+        printf("%i\n", X.m);
+        if(X.m==2)
+            eps.Draw_Object(X(0),X(1));}
+
+    eps.cur_format.line_color=VECTOR<T,3>(0,1,0);
+    for(int i=0;i<tv.mesh.elements.m;i++){
+        VECTOR<int,3> e=tv.mesh.elements(i);
+        ARRAY<TV> X;
+        for(int j=0;j<3;j++) if(phi1(e(j))==0) X.Append(tv.particles.X(e(j)));
+        for(int j=0;j<3;j++){
+            T p=phi1(e(j)),q=phi1(e((j+1)%3));
+            TV Y=tv.particles.X(e(j)),Z=tv.particles.X(e((j+1)%3));
+            if(p*q<0)
+                X.Append(Y+(Z-Y)*p/(p-q));}
+        if(X.m==2)
+            eps.Draw_Object(X(0),X(1));}
+
+    eps.cur_format.line_color=VECTOR<T,3>();
+    eps.cur_format.line_width=.002;
     ARRAY<VECTOR<int,3> > m=tv.mesh.elements,sp;
+    TRIANGLE_MESH tm;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
     MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,tv.mesh.elements,sp,phi0,weights);
     tv.particles.Add_Elements(weights.m);
     for(int i=0;i<weights.m;i++)
         tv.particles.X(i+phi0.m)=tv.particles.X(weights(i).x.x)*(1-weights(i).y)+tv.particles.X(weights(i).x.y)*weights(i).y;
-
-    EPS_FILE<T> eps("out.eps");
-    for(int i=0;i<tv.mesh.elements.m;i++)
-        eps.Draw_Object(tv.particles.X(tv.mesh.elements(i)(0)),tv.particles.X(tv.mesh.elements(i)(1)),tv.particles.X(tv.mesh.elements(i)(2)));
+    for(int i=0;i<weights.m;i++)
+        phi1.Append(phi1(weights(i).x.x)*(1-weights(i).y)+phi1(weights(i).x.y)*weights(i).y);
     phi0.Resize(tv.particles.X.m);
-    for(int i=0;i<phi0.m;i++){
-        eps.cur_format.fill_color=VECTOR<T,3>(phi0(i)<0,phi0(i)>0,phi0(i)==0);
+
+    weights.Remove_All();
+    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(sp,tv.mesh.elements,tm.elements,phi1,weights);
+    tm.Set_Number_Nodes(tm.elements.Flattened().Max()+1);
+    tv.particles.Add_Elements(weights.m);
+    for(int i=0;i<weights.m;i++)
+        tv.particles.X(i+phi1.m)=tv.particles.X(weights(i).x.x)*(1-weights(i).y)+tv.particles.X(weights(i).x.y)*weights(i).y;
+    for(int i=0;i<weights.m;i++)
+        phi0.Append(phi0(weights(i).x.x)*(1-weights(i).y)+phi0(weights(i).x.y)*weights(i).y);
+
+    UNION_FIND<> uf(tm.elements.m);
+    ARRAY<VECTOR<T,3> > colors(tm.elements.m);
+    random.Fill_Uniform(colors,0,1);
+    tm.Initialize_Neighbor_Elements();
+    for(int i=0;i<tm.elements.m;i++)
+        for(int j=0;j<(*tm.neighbor_elements)(i).m;j++)
+            uf.Union(i,(*tm.neighbor_elements)(i)(j));
+
+    eps.cur_format.fill_opacity=.5;
+    eps.cur_format.fill_style=1;
+    for(int i=0;i<tv.mesh.elements.m;i++){
+        eps.cur_format.fill_color=colors(uf.Find(i));
+        eps.Draw_Object(tv.particles.X(tv.mesh.elements(i)(0)),tv.particles.X(tv.mesh.elements(i)(1)),tv.particles.X(tv.mesh.elements(i)(2)));}
+    phi1.Resize(tv.particles.X.m);
+    for(int i=0;i<tv.particles.X.m;i++){
+        eps.cur_format.fill_color=VECTOR<T,3>(.5*(1+(phi0(i)<0)-(phi0(i)>0)),.5*(1+(phi1(i)<0)-(phi1(i)>0)),.5);
         eps.cur_format.fill_style=1;
         eps.cur_format.line_style=0;
         eps.Draw_Object(tv.particles.X(i),.01);}
@@ -122,32 +154,6 @@ int main(int argc,char* argv[])
     tv.Update_Number_Nodes();
     tv.mesh.Initialize_Boundary_Nodes();
     printf("boundary: %i\n",tv.mesh.boundary_mesh->elements.m);
-
-    // TETRAHEDRON_MESH tm;
-    // for(int i=0;i<cut_mesh.m;i++)
-    //     tm.elements.Append(cut_mesh(i).indices);
-
-    // tm.Set_Number_Nodes(tm.elements.Flattened().Max()+1);
-    // tm.Initialize_Boundary_Mesh();
-    // LOG::cout<<"mesh sizes "<<tm.boundary_mesh->elements.m<<"  "<<tv.mesh.boundary_mesh->elements.m<<std::endl;
-    // // LOG::cout<<tm.elements<<std::endl;
-    // LOG::cout<<tm.boundary_mesh->elements<<std::endl;
-    // LOG::cout<<tv.mesh.boundary_mesh->elements<<std::endl;
-
-    // for(int i=0;i<cut_mesh.m;i++){
-    //     VECTOR<TV,4> pts;
-    //     for(int j=0;j<4;j++)
-    //         for(int k=0;k<4;k++)
-    //             pts(j)+=tv.particles.X(cut_mesh(i).parent(k))*cut_mesh(i).weights(j)(k);
-    //     if(TETRAHEDRON<T>::Signed_Size(pts)<-1e-15)
-    //         LOG::cout<<"NEGATIVE VOLUME  "<<TETRAHEDRON<T>::Signed_Size(pts)<<"   "<<cut_mesh(i).parent<<"   "<<cut_mesh(i).indices<<std::endl;}
-
-    // for(int i=0;i<cut_mesh.m;i++){
-    //     VECTOR<T,4> a(phi0.Subset(cut_mesh(i).indices)),b(phi1.Subset(cut_mesh(i).indices));
-    //     if(a.Min()<0 && a.Max()>0 && b.Min()<0 && b.Max()>0)
-    //         LOG::cout<<"CROSSINGS "<<a<<"  "<<b<<std::endl;}
-
-    // delete &tv;
 #endif
     return 0;
 }
