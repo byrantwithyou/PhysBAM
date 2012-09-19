@@ -32,8 +32,19 @@ public:
     static const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<TV::m> >& Case_Table();
     static void Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table);
     static void Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table);
-    static void Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,
-        const ARRAY<T>& phi,ARRAY<PAIR<S,T> >& weights);
+    static void Query_Case(const ARRAY<E>& parents,const ARRAY<E>& children,ARRAY<E>& new_parents,
+        ARRAY<E>& new_children,ARRAY<E>& split_parents,ARRAY<bool>& side,const ARRAY<T>& phi,
+        ARRAY<PAIR<S,T> >& weights);
+
+    struct DATA
+    {
+        int parent;
+        E element;
+        T volume;
+    };
+
+    static void Fracture_Cutting(const ARRAY<E>& in_mesh,ARRAY<TV>& X,ARRAY<T>& phi0,ARRAY<T>& phi1,
+        ARRAY<E> out_mesh[2],ARRAY<DATA> data[2],ARRAY<TV_INT> surface[2],ARRAY<int>& node_map);
 //#####################################################################
 };
 }

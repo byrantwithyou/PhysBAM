@@ -110,10 +110,13 @@ int main(int argc,char* argv[])
 
     eps.cur_format.line_color=VECTOR<T,3>();
     eps.cur_format.line_width=.002;
-    ARRAY<VECTOR<int,3> > m=tv.mesh.elements,sp;
+    ARRAY<VECTOR<int,3> > m=tv.mesh.elements,sp,tmp0,tmp1;
     TRIANGLE_MESH tm;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
-    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,tv.mesh.elements,sp,phi0,weights);
+    ARRAY<bool> side;
+    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,tv.mesh.elements,tmp0,tmp1,sp,side,phi0,weights);
+    m=tmp0;
+    tv.mesh.elements=tmp1;
     tv.particles.Add_Elements(weights.m);
     for(int i=0;i<weights.m;i++)
         tv.particles.X(i+phi0.m)=tv.particles.X(weights(i).x.x)*(1-weights(i).y)+tv.particles.X(weights(i).x.y)*weights(i).y;
@@ -122,7 +125,12 @@ int main(int argc,char* argv[])
     phi0.Resize(tv.particles.X.m);
 
     weights.Remove_All();
-    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(sp,tv.mesh.elements,tm.elements,phi1,weights);
+    tmp0.Remove_All();
+    tmp1.Remove_All();
+    side.Remove_All();
+    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(sp,tv.mesh.elements,tmp0,tmp1,tm.elements,side,phi1,weights);
+    sp=tmp0;
+    tv.mesh.elements=tmp1;
     tm.Set_Number_Nodes(tm.elements.Flattened().Max()+1);
     tv.particles.Add_Elements(weights.m);
     for(int i=0;i<weights.m;i++)

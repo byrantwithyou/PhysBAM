@@ -6,6 +6,12 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TETRAHEDRON.h>
+#include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
+#include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
+#include <PhysBAM_Geometry/Topology/TETRAHEDRON_MESH.h>
+#include <PhysBAM_Geometry/Topology/TOPOLOGY_POLICY.h>
+#include <PhysBAM_Geometry/Topology/TRIANGLE_MESH.h>
 #include "MARCHING_TETRAHEDRA_CUTTING.h"
 using namespace PhysBAM;
 const int edge_table[2][6][2]=
@@ -123,10 +129,8 @@ Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table)
 // Function Query_Case
 //#####################################################################
 template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
-Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const ARRAY<T>& phi,ARRAY<PAIR<S,T> >& weights)
+Query_Case(const ARRAY<E>& parents,const ARRAY<E>& children,ARRAY<E>& new_parents,ARRAY<E>& new_children,ARRAY<E>& split_parents,ARRAY<bool>& side,const ARRAY<T>& phi,ARRAY<PAIR<S,T> >& weights)
 {
-    ARRAY<E> new_parents,new_children;
-    ARRAY<bool> side;
     const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<TV::m> >& table=Case_Table();
     HASHTABLE<S,int> edge_hash;
     HASHTABLE<PAIR<TV_INT,int>,int> neighbor;
@@ -165,6 +169,7 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
                     else ed=e(ed);
                     elem(j)=ed;}
                 if(inv) exchange(elem(0),elem(1));
+                side.Append(s);
                 new_parents.Append(parents(i));
                 split_parents.Append(par);
                 new_children.Append(elem);
@@ -187,20 +192,81 @@ Query_Case(ARRAY<E>& parents,ARRAY<E>& children,ARRAY<E>& split_parents,const AR
         if(index_map(p)<0) index_map(p)=condense++;
         index_map(i)=index_map(p);}
     split_parents.Flattened()=index_map.Subset(split_parents.Flattened());
-    new_parents.Exchange(parents);
-    new_children.Exchange(children);
+}
+//#####################################################################
+// Function Fracture_Cutting
+//#####################################################################
+template<class TV> void MARCHING_TETRAHEDRA_CUTTING<TV>::
+Fracture_Cutting(const ARRAY<E>& in_mesh,ARRAY<TV>& X,ARRAY<T>& phi0,ARRAY<T>& phi1,
+    ARRAY<E> out_mesh[2],ARRAY<DATA> data[2],ARRAY<TV_INT> surface[2],ARRAY<int>& node_map)
+{
+    ARRAY<E> new_parents,new_children,split_parents;
+    ARRAY<bool> side;
+    ARRAY<PAIR<S,T> > weights;
+    Query_Case(in_mesh,in_mesh,new_parents,new_children,split_parents,side,phi0,weights);
+    phi0.Resize(phi0.m+weights.m);
+    for(int i=0;i<weights.m;i++){
+        X.Append(X(weights(i).x.x)*(1-weights(i).y)+X(weights(i).x.y)*weights(i).y);
+        phi1.Append(phi1(weights(i).x.x)*(1-weights(i).y)+phi1(weights(i).x.y)*weights(i).y);}
+    int k=0;
+    for(int i=0;i<new_children.m;i++)
+        if(!side(i)){
+            new_children(k)=new_children(i);
+            split_parents(k)=split_parents(i);
+            new_parents(k)=new_parents(i);}
+    ARRAY<int> node_map_first(split_parents.Flattened().Max()+1);
+    node_map_first.Subset(split_parents.Flattened())=new_parents.Flattened();
+
+    weights.Remove_All();
+    side.Remove_All();
+    ARRAY<E> new_parents2,new_children2,split_parents2;
+    Query_Case(new_parents,new_children,new_parents2,new_children2,split_parents2,side,phi1,weights);
+    phi1.Resize(phi1.m+weights.m);
+    for(int i=0;i<weights.m;i++){
+        X.Append(X(weights(i).x.x)*(1-weights(i).y)+X(weights(i).x.y)*weights(i).y);
+        phi0.Append(phi0(weights(i).x.x)*(1-weights(i).y)+phi0(weights(i).x.y)*weights(i).y);}
+
+    HASHTABLE<E,int> out_mesh_hash[2];
+    typename MESH_POLICY<TV::m>::MESH mesh[2];
+    for(int i=0;i<new_children2.m;i++){
+        int parent=-1,s=side(i);
+        if(!out_mesh_hash[s].Get(split_parents2(i),parent)){
+            parent=out_mesh[s].Append(split_parents2(i));
+            out_mesh_hash[s].Set(split_parents2(i),parent);}
+ 
+        typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX simplex;
+        simplex.X=X.Subset(new_children2(i));
+        DATA d={parent,new_children2(i),simplex.Signed_Size()};
+        data[s].Append(d);
+        mesh[s].elements.Append(new_children2(i));}
+
+    for(int s=0;s<2;s++){
+        mesh[s].Set_Number_Nodes(mesh[s].elements.Flattened().Max()+1);
+        mesh[s].Initialize_Boundary_Mesh();
+        surface[s].Exchange(mesh[s].boundary_mesh->elements);}
+
+    node_map.Resize(split_parents2.Flattened().Max()+1);
+    node_map.Subset(split_parents.Flattened())=node_map_first.Subset(new_parents2.Flattened());
 }
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::Case_Table();
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::Case_Table();
-template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::Query_Case(ARRAY<VECTOR<int,4>,int>&,
-    ARRAY<VECTOR<int,4>,int>&,ARRAY<VECTOR<int,4>,int>&,ARRAY<float,int> const&,ARRAY<PAIR<VECTOR<int,2>,float>,int>&);
-template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::Query_Case(ARRAY<VECTOR<int,3>,int>&,
-    ARRAY<VECTOR<int,3>,int>&,ARRAY<VECTOR<int,3>,int>&,ARRAY<float,int> const&,ARRAY<PAIR<VECTOR<int,2>,float>,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::Query_Case(ARRAY<VECTOR<int,3>,int> const&,ARRAY<VECTOR<int,3>,int> const&,
+    ARRAY<VECTOR<int,3>,int>&,ARRAY<VECTOR<int,3>,int>&,ARRAY<VECTOR<int,3>,int>&,ARRAY<bool,int>&,ARRAY<float,int> const&,ARRAY<PAIR<VECTOR<int,2>,float>,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::Query_Case(ARRAY<VECTOR<int,4>,int> const&,ARRAY<VECTOR<int,4>,int> const&,
+    ARRAY<VECTOR<int,4>,int>&,ARRAY<VECTOR<int,4>,int>&,ARRAY<VECTOR<int,4>,int>&,ARRAY<bool,int>&,ARRAY<float,int> const&,ARRAY<PAIR<VECTOR<int,2>,float>,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::Fracture_Cutting(ARRAY<VECTOR<int,3>,int> const&,ARRAY<VECTOR<float,2>,int>&,ARRAY<float,int>&,
+    ARRAY<float,int>&,ARRAY<VECTOR<int,3>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,2> >::DATA,int>*,ARRAY<VECTOR<int,2>,int>*,ARRAY<int,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::Fracture_Cutting(ARRAY<VECTOR<int,4>,int> const&,ARRAY<VECTOR<float,3>,int>&,ARRAY<float,int>&,
+    ARRAY<float,int>&,ARRAY<VECTOR<int,4>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<float,3> >::DATA,int>*,ARRAY<VECTOR<int,3>,int>*,ARRAY<int,int>&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Case_Table();
 template const ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::Case_Table();
-template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::Query_Case(ARRAY<VECTOR<int,4>,int>&,
-    ARRAY<VECTOR<int,4>,int>&,ARRAY<VECTOR<int,4>,int>&,ARRAY<double,int> const&,ARRAY<PAIR<VECTOR<int,2>,double>,int>&);
-template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Query_Case(ARRAY<VECTOR<int,3>,int>&,
-    ARRAY<VECTOR<int,3>,int>&,ARRAY<VECTOR<int,3>,int>&,ARRAY<double,int> const&,ARRAY<PAIR<VECTOR<int,2>,double>,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Query_Case(ARRAY<VECTOR<int,3>,int> const&,ARRAY<VECTOR<int,3>,int> const&,
+    ARRAY<VECTOR<int,3>,int>&,ARRAY<VECTOR<int,3>,int>&,ARRAY<VECTOR<int,3>,int>&,ARRAY<bool,int>&,ARRAY<double,int> const&,ARRAY<PAIR<VECTOR<int,2>,double>,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::Query_Case(ARRAY<VECTOR<int,4>,int> const&,ARRAY<VECTOR<int,4>,int> const&,
+    ARRAY<VECTOR<int,4>,int>&,ARRAY<VECTOR<int,4>,int>&,ARRAY<VECTOR<int,4>,int>&,ARRAY<bool,int>&,ARRAY<double,int> const&,ARRAY<PAIR<VECTOR<int,2>,double>,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::Fracture_Cutting(ARRAY<VECTOR<int,3>,int> const&,ARRAY<VECTOR<double,2>,int>&,ARRAY<double,int>&,
+    ARRAY<double,int>&,ARRAY<VECTOR<int,3>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,2> >::DATA,int>*,ARRAY<VECTOR<int,2>,int>*,ARRAY<int,int>&);
+template void MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::Fracture_Cutting(ARRAY<VECTOR<int,4>,int> const&,ARRAY<VECTOR<double,3>,int>&,ARRAY<double,int>&,
+    ARRAY<double,int>&,ARRAY<VECTOR<int,4>,int>*,ARRAY<MARCHING_TETRAHEDRA_CUTTING<VECTOR<double,3> >::DATA,int>*,ARRAY<VECTOR<int,3>,int>*,ARRAY<int,int>&);
 #endif

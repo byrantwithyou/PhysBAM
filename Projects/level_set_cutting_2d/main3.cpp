@@ -74,9 +74,12 @@ int main(int argc,char* argv[])
     phi0.Subset(*tv.mesh.boundary_nodes).Fill(1);
     phi1.Subset(*tv.mesh.boundary_nodes).Fill(1);
 
-    ARRAY<VECTOR<int,4> > m=tv.mesh.elements,sp;
+    ARRAY<VECTOR<int,4> > m=tv.mesh.elements,sp,tmp0,tmp1;
     ARRAY<PAIR<VECTOR<int,2>,T> > weights;
-    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,tv.mesh.elements,sp,phi0,weights);
+    ARRAY<bool> side;
+    MARCHING_TETRAHEDRA_CUTTING<TV>::Query_Case(m,tv.mesh.elements,tmp0,tmp1,sp,side,phi0,weights);
+    m=tmp0;
+    tv.mesh.elements=tmp1;
     tv.particles.Add_Elements(weights.m);
     for(int i=0;i<weights.m;i++)
         tv.particles.X(i+phi0.m)=tv.particles.X(weights(i).x.x)*(1-weights(i).y)+tv.particles.X(weights(i).x.y)*weights(i).y;
