@@ -121,6 +121,7 @@ public:
         parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
         parse_args.Add("-test_diff",&test_analytic_diff,"test analytic derivatives");
         parse_args.Add("-no_advect",&no_advection,"Disable advection");
+        parse_args.Add("-no_solve",&omit_solve,"Disable visocity and pressure solve");
         parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Parse();
         if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
@@ -186,7 +187,8 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
-                analytic_velocity=new ANALYTIC_VELOCITY_RAREFACTION;omit_solve=true;
+                analytic_velocity=new ANALYTIC_VELOCITY_RAREFACTION;
+                omit_solve=true;
                 break;
             case 8:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
@@ -202,6 +204,18 @@ public:
                     analytic_levelset=atb;
                     analytic_velocity=atb;
                 }
+                break;
+            case 10:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
+                number_of_colors=1;
+                analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
+                analytic_velocity=new ANALYTIC_VELOCITY_CONST(TV()+1);
+                break;
+            case 11:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                number_of_colors=1;
+                analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
+                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8));
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
