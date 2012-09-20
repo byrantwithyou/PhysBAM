@@ -42,8 +42,8 @@ int main(int argc,char* argv[])
     tv.Initialize_Cube_Mesh_And_Particles(grid);
 
     ARRAY<T> phi0(tv.particles.X.m),phi1(tv.particles.X.m);
+    phi0.Fill(-1);
     for(int i=0;i<tv.particles.X.m;i++){
-        phi0(i)=RANGE<TV>::Unit_Box().Thickened(-(T).1).Signed_Distance(tv.particles.X(i))>0?1:0;
         TV Z=tv.particles.X(i)-TV((T).5,(T).5,1);
         phi1(i)=sqr(Z.x/w)+sqr(Z.z/d)-1;}
 
@@ -61,6 +61,7 @@ int main(int argc,char* argv[])
         ts.mesh.elements=surface[s];
         ts.Update_Number_Nodes();
         FILE_UTILITIES::Write_To_File<RW>(files[s],ts);}
+    FILE_UTILITIES::Write_To_File<RW>("notch.tet.gz",tv);
 
     return 0;
 }
