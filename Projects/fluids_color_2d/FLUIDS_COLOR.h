@@ -321,9 +321,9 @@ public:
         struct VORTEX_IMPLICIT_SURFACE:public ANALYTIC_IMPLICIT_SURFACE_LEVELSET<TV>
         {
             T k;
-            virtual T f(const TV& X) const {return sin(X.x)*sin(X.y)-k;}
-            virtual TV df(const TV& X) const {return TV(cos(X.x)*sin(X.y),sin(X.x)*cos(X.y));}
-            virtual MATRIX<T,TV::m> ddf(const TV& X) const {T A=-sin(X.x)*sin(X.y),B=cos(X.x)*cos(X.y);return MATRIX<T,TV::m>(A,B,B,A);}
+            virtual T f(const TV& X) const {return k-sin(X.x)*sin(X.y);}
+            virtual TV df(const TV& X) const {return -TV(cos(X.x)*sin(X.y),sin(X.x)*cos(X.y));}
+            virtual MATRIX<T,TV::m> ddf(const TV& X) const {T A=sin(X.x)*sin(X.y),B=-cos(X.x)*cos(X.y);return MATRIX<T,TV::m>(A,B,B,A);}
             virtual TV Closest_Point_Estimate(const TV& X) const {return (X-pi/2).Normalized()+pi/2;}
         } vis;
 
