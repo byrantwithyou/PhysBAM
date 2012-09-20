@@ -340,25 +340,40 @@ template<class T> void
 Do_Merge(PARSE_ARGS& parse_args)
 {
     std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
-    if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
 
-    int first_frame,last_frame;
+    int first_frame=0,last_frame=0,number_of_processes=0;
+    bool opt_minimal=false,print_maxerrors=false,is_solid_fluid=false;
+    bool is_1d=false,is_2d=false,is_3d=false;
+    bool opt_merge_levelset=false,opt_merge_object_levelset=false,opt_merge_debug_data=false;
+    bool opt_merge_particles=false,opt_merge_removed_particles=false,opt_merge_removed_particle_times=false;
+    bool opt_merge_velocities=false,opt_merge_compressible=false;
+    parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
+    parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
+    parse_args.Add("-np",&number_of_processes,"number","number of mpi processes (use 0 to autodetect)");
+    parse_args.Add("-o",&output_directory,"dir","output directory");
+    parse_args.Add_Not("-skip_levelset",&opt_merge_levelset,"skip_levelset");
+    parse_args.Add_Not("-skip_object_levelset",&opt_merge_object_levelset,"skip_object_levelset");
+    parse_args.Add_Not("-skip_debug_data",&opt_merge_debug_data,"skip_debug_data");
+    parse_args.Add_Not("-skip_particles",&opt_merge_particles,"skip_particles");
+    parse_args.Add_Not("-skip_removed_particles",&opt_merge_removed_particles,"skip_removed_particles");
+    parse_args.Add("-removed_particle_times",&opt_merge_removed_particle_times,"removed_particle_times");
+    parse_args.Add_Not("-skip_velocities",&opt_merge_velocities,"skip_velocities");
+    parse_args.Add("-minimal",&opt_minimal,"skip everything but the levelset");
+    parse_args.Add("-print_maxerrors",&print_maxerrors,"print max errors");
+    parse_args.Add("-compressible",&opt_merge_compressible,"input data is compressible output");
+    parse_args.Add("-solid_fluid",&is_solid_fluid,"input data is solid fluid data");
+    parse_args.Add("-1d",&is_1d,"input data is 1-D");
+    parse_args.Add("-2d",&is_2d,"input data is 2-D");
+    parse_args.Add("-3d",&is_3d,"input data is 3-D");
+    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Parse();
+
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/1/common/first_frame",first_frame);
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/1/common/last_frame",last_frame);
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/first_frame",first_frame);
-    bool print_maxerrors=parse_args.Is_Value_Set("-print_maxerrors");
-    bool is_solid_fluid=parse_args.Is_Value_Set("-solid_fluid");
-    bool is_1d=false,is_2d=false,is_3d=false;
 
-    if(parse_args.Is_Value_Set("-start_frame")) first_frame=parse_args.Get_Integer_Value("-start_frame");
-    if(parse_args.Is_Value_Set("-last_frame")) last_frame=parse_args.Get_Integer_Value("-last_frame");
-    if(parse_args.Is_Value_Set("-1d")) is_1d=true;
-    else if(parse_args.Is_Value_Set("-2d")) is_2d=true;
-    else if(parse_args.Is_Value_Set("-3d")) is_3d=true;
-    //bool force=parse_args.Get_Option_Value("-f");
-    int number_of_processes=parse_args.Get_Integer_Value("-np");
     if(number_of_processes<0){LOG::cerr<<"Invalid np<0"<<std::endl;exit(1);}
     else if(!number_of_processes){ // autodetect number of processes
         FILE_UTILITIES::Find_First_Nonexistent_Directory_In_Sequence(STRING_UTILITIES::string_sprintf("%s/%%d",input_directory.c_str()),1,&number_of_processes);--number_of_processes;
@@ -374,41 +389,41 @@ Do_Merge(PARSE_ARGS& parse_args)
 
     if(is_1d){
         MERGER<T,GRID<VECTOR<T,1> >,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
-        if(parse_args.Is_Value_Set("-skip_levelset"))merger.merge_levelset=false;
-        if(parse_args.Is_Value_Set("-skip_object_levelset"))merger.merge_object_levelset=false;
-        if(parse_args.Is_Value_Set("-skip_debug_data"))merger.merge_debug_data=false;
-        if(parse_args.Is_Value_Set("-skip_particles"))merger.merge_particles=false;
-        if(parse_args.Is_Value_Set("-skip_removed_particles"))merger.merge_removed_particles=false;
-        if(parse_args.Is_Value_Set("-removed_particle_times"))merger.merge_removed_particle_times=true;
-        if(parse_args.Is_Value_Set("-skip_velocities"))merger.merge_velocities=false;
-        if(parse_args.Is_Value_Set("-compressible"))merger.merge_compressible=true;
-        if(parse_args.Is_Value_Set("-minimal")){
+        merger.merge_levelset=opt_merge_levelset;
+        merger.merge_object_levelset=opt_merge_object_levelset;
+        merger.merge_debug_data=opt_merge_debug_data;
+        merger.merge_particles=opt_merge_particles;
+        merger.merge_removed_particles=opt_merge_removed_particles;
+        merger.merge_removed_particle_times=opt_merge_removed_particle_times;
+        merger.merge_velocities=opt_merge_velocities;
+        merger.merge_compressible=opt_merge_compressible;
+        if(opt_minimal){
             merger.merge_object_levelset=false;merger.merge_debug_data=false;merger.merge_particles=false;merger.merge_removed_particles=false;merger.merge_removed_particle_times=false;merger.merge_velocities=false;}
         merger.Merge_All_Frames(first_frame,last_frame);}
     else if(is_2d){
         MERGER<T,GRID<VECTOR<T,2> >,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
-        if(parse_args.Is_Value_Set("-skip_levelset"))merger.merge_levelset=false;
-        if(parse_args.Is_Value_Set("-skip_object_levelset"))merger.merge_object_levelset=false;
-        if(parse_args.Is_Value_Set("-skip_debug_data"))merger.merge_debug_data=false;
-        if(parse_args.Is_Value_Set("-skip_particles"))merger.merge_particles=false;
-        if(parse_args.Is_Value_Set("-skip_removed_particles"))merger.merge_removed_particles=false;
-        if(parse_args.Is_Value_Set("-removed_particle_times"))merger.merge_removed_particle_times=true;
-        if(parse_args.Is_Value_Set("-skip_velocities"))merger.merge_velocities=false;
-        if(parse_args.Is_Value_Set("-compressible"))merger.merge_compressible=true;
-        if(parse_args.Is_Value_Set("-minimal")){
+        merger.merge_levelset=opt_merge_levelset;
+        merger.merge_object_levelset=opt_merge_object_levelset;
+        merger.merge_debug_data=opt_merge_debug_data;
+        merger.merge_particles=opt_merge_particles;
+        merger.merge_removed_particles=opt_merge_removed_particles;
+        merger.merge_removed_particle_times=opt_merge_removed_particle_times;
+        merger.merge_velocities=opt_merge_velocities;
+        merger.merge_compressible=opt_merge_compressible;
+        if(opt_minimal){
             merger.merge_object_levelset=false;merger.merge_debug_data=false;merger.merge_particles=false;merger.merge_removed_particles=false;merger.merge_removed_particle_times=false;merger.merge_velocities=false;}
         merger.Merge_All_Frames(first_frame,last_frame);}
     else if(is_3d){
         MERGER<T,GRID<VECTOR<T,3> >,T> merger(number_of_processes,input_directory,output_directory,print_maxerrors,is_solid_fluid);
-        if(parse_args.Is_Value_Set("-skip_levelset"))merger.merge_levelset=false;
-        if(parse_args.Is_Value_Set("-skip_object_levelset"))merger.merge_object_levelset=false;
-        if(parse_args.Is_Value_Set("-skip_debug_data"))merger.merge_debug_data=false;
-        if(parse_args.Is_Value_Set("-skip_particles"))merger.merge_particles=false;
-        if(parse_args.Is_Value_Set("-skip_removed_particles"))merger.merge_removed_particles=false;
-        if(parse_args.Is_Value_Set("-removed_particle_times"))merger.merge_removed_particle_times=true;
-        if(parse_args.Is_Value_Set("-skip_velocities"))merger.merge_velocities=false;
-        if(parse_args.Is_Value_Set("-compressible"))merger.merge_compressible=true;
-        if(parse_args.Is_Value_Set("-minimal")){
+        merger.merge_levelset=opt_merge_levelset;
+        merger.merge_object_levelset=opt_merge_object_levelset;
+        merger.merge_debug_data=opt_merge_debug_data;
+        merger.merge_particles=opt_merge_particles;
+        merger.merge_removed_particles=opt_merge_removed_particles;
+        merger.merge_removed_particle_times=opt_merge_removed_particle_times;
+        merger.merge_velocities=opt_merge_velocities;
+        merger.merge_compressible=opt_merge_compressible;
+        if(opt_minimal){
             merger.merge_object_levelset=false;merger.merge_debug_data=false;merger.merge_particles=false;merger.merge_removed_particles=false;merger.merge_removed_particle_times=false;merger.merge_velocities=false;}
         merger.Merge_All_Frames(first_frame,last_frame);}
     LOG::cout<<std::endl;
@@ -418,32 +433,13 @@ Do_Merge(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
+    bool opt_double=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-f","force");
-    parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
-    parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
-    parse_args.Add_Integer_Argument("-np",0,"number of mpi processes (use 0 to autodetect)");
-    parse_args.Add_String_Argument("-o","","output directory");
-    parse_args.Add_Option_Argument("-skip_levelset","skip_levelset");
-    parse_args.Add_Option_Argument("-skip_object_levelset","skip_object_levelset");
-    parse_args.Add_Option_Argument("-skip_debug_data","skip_debug_data");
-    parse_args.Add_Option_Argument("-skip_particles","skip_particles");
-    parse_args.Add_Option_Argument("-skip_removed_particles","skip_removed_particles");
-    parse_args.Add_Option_Argument("-removed_particle_times","removed_particle_times");
-    parse_args.Add_Option_Argument("-skip_velocities","skip_velocities");
-    parse_args.Add_Option_Argument("-minimal","skip everything but the levelset");
-    parse_args.Add_Option_Argument("-print_maxerrors","print max errors");
-    parse_args.Add_Option_Argument("-compressible","input data is compressible output");
-    parse_args.Add_Option_Argument("-solid_fluid","input data is solid fluid data");
-    parse_args.Add_Option_Argument("-double","input data is in doubles");
-    parse_args.Add_Option_Argument("-1d","input data is 1-D");
-    parse_args.Add_Option_Argument("-2d","input data is 2-D");
-    parse_args.Add_Option_Argument("-3d","input data is 3-D");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse();
+    parse_args.Add("-double",&opt_double,"input data is in doubles");
+    parse_args.Parse(true);
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(parse_args.Is_Value_Set("-double")) Do_Merge<double>(parse_args); 
+    if(opt_double) Do_Merge<double>(parse_args); 
     else Do_Merge<float>(parse_args);
 #else
     Do_Merge<float>(parse_args);
