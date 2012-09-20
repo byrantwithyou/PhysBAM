@@ -28,24 +28,23 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,3> TV;
     typedef MARCHING_TETRAHEDRA_CUTTING<TV>::DATA DATA;
 
-    int seed=time(0),size=4;
     T w=(T).2,d=(T).4;
+    TV_INT size(TV_INT()+4);
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add("-s",&seed,"value","Seed");
     parse_args.Add("-n",&size,"value","Domain size");
     parse_args.Add("-w",&w,"value","Slit width");
     parse_args.Add("-d",&d,"value","Slit depth");
     parse_args.Parse();
 
-    GRID<TV> grid(TV_INT()+size,RANGE<TV>::Unit_Box());
+    GRID<TV> grid(size+1,RANGE<TV>(-TV(size)/2,TV(size)/2));
     TETRAHEDRALIZED_VOLUME<T> tv;
     tv.Initialize_Cube_Mesh_And_Particles(grid);
 
     ARRAY<T> phi0(tv.particles.X.m),phi1(tv.particles.X.m);
     phi0.Fill(-1);
     for(int i=0;i<tv.particles.X.m;i++){
-        TV Z=tv.particles.X(i)-TV((T).5,(T).5,1);
-        phi1(i)=sqr(Z.x/w)+sqr(Z.z/d)-1;}
+        TV Z=tv.particles.X(i)-TV(0,0,size(2)/2);
+        phi1(i)=sqr(Z.x/(w*size.x))+sqr(Z.z/(d*size.z))-1;}
 
     ARRAY<E> out_mesh[2];
     ARRAY<DATA> data[2];
