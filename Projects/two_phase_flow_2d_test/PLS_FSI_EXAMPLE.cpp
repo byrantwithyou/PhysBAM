@@ -33,7 +33,6 @@
 #include <PhysBAM_Fluids/PhysBAM_Fluids/Coupled_Evolution/COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/DEFORMABLE_OBJECT_FLUID_COLLISIONS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Collisions_And_Interactions/FLUID_COLLISION_BODY_INACCURATE_UNION.h>
-//#include <PhysBAM_Dynamics/Coupled_Driver/PLS_FSI_EXAMPLE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_FLUID_COUPLED_EVOLUTION_SLIP.h>
@@ -45,7 +44,6 @@
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_PARAMETERS.h>
 #include <stdexcept>
 #include "PLS_FSI_EXAMPLE.h"
-#include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_BINARY_UNIFORM.h>
 namespace PhysBAM{namespace Two_Phase_Flow_2D_Test{
 //#####################################################################
 // Constructor
@@ -58,8 +56,8 @@ template<class TV> PLS_FSI_EXAMPLE<TV>::
 PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions)
     :BASE((Initialize_Particles(),stream_type)),solids_parameters(*new SOLIDS_PARAMETERS<TV>),solids_fluids_parameters(*new SOLIDS_FLUIDS_PARAMETERS<TV>(this)),
     solid_body_collection(*new SOLID_BODY_COLLECTION<TV>(this,0)),solids_evolution(new NEWMARK_EVOLUTION<TV>(solids_parameters,solid_body_collection)),
-    fluids_parameters(number_of_regions,fluids_parameters.WATER),fluid_collection(*fluids_parameters.grid),resolution(0),convection_order(1),use_pls_evolution_for_structure(false),
-    two_phase(false)
+    fluids_parameters(number_of_regions,fluids_parameters.WATER),fluid_collection(*fluids_parameters.grid),resolution(1),convection_order(1),use_pls_evolution_for_structure(false),
+    two_phase(false),opt_solidscg(false),opt_solidscr(false),opt_solidssymmqmr(false)
 {
     Initialize_Read_Write_General_Structures();
     Set_Minimum_Collision_Thickness();
@@ -88,14 +86,17 @@ Register_Options()
 {
     if(!parse_args) return;
     BASE::Register_Options();
-    parse_args->Add_String_Argument("-params","","parameter file");
-    parse_args->Add_Double_Argument("-solidscfl",.9,"solids CFL");
-    parse_args->Add_Option_Argument("-solidscg","Use CG for time integration");
-    parse_args->Add_Option_Argument("-solidscr","Use CONJUGATE_RESIDUAL for time integration");
-    parse_args->Add_Option_Argument("-solidssymmqmr","Use SYMMQMR for time integration");
-    parse_args->Add_Double_Argument("-rigidcfl",.5,"rigid CFL");
-    parse_args->Add_Option_Argument("-skip_debug_data","turn off file io for debug data");
-    parse_args->Add_Integer_Argument("-resolution",1);
+    
+    parse_args->Add("-solidscfl",&solids_parameters.cfl,"solids CFL");
+    parse_args->Add("-solidscg",&opt_solidscg,"Use CG for time integration");
+    parse_args->Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
+    parse_args->Add("-solidssymmqmr",&opt_solidssymmqmr,"Use SYMMQMR for time integration");
+    parse_args->Add("-rigidcfl",&solids_parameters.rigid_body_evolution_parameters.rigid_cfl,"rigid CFL");
+    parse_args->Add_Not("-skip_debug_data",&fluids_parameters.write_debug_data,"turn off file io for debug data");
+    parse_args->Add("-resolution",&resolution,"res","Fluid grid resolution");
+    if(opt_solidscg) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
+    if(opt_solidscr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
+    if(opt_solidssymmqmr) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Function Parse_Options
@@ -104,8 +105,6 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-skip_debug_data")) fluids_parameters.write_debug_data=false;
-    resolution=parse_args->Get_Integer_Value("-resolution");
 }
 //#####################################################################
 // Function Add_Volumetric_Body_To_Fluid_Simulation
@@ -338,11 +337,6 @@ Parse_Late_Options()
 {
     if(!parse_args) return;
     BASE::Parse_Late_Options();
-    if(parse_args->Is_Value_Set("-solidscfl")) solids_parameters.cfl=(T)parse_args->Get_Double_Value("-solidscfl");
-    if(parse_args->Is_Value_Set("-rigidcfl")) solids_parameters.rigid_body_evolution_parameters.rigid_cfl=(T)parse_args->Get_Double_Value("-rigidcfl");
-    if(parse_args->Is_Value_Set("-solidscg")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
-    if(parse_args->Is_Value_Set("-solidscr")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cr;
-    if(parse_args->Is_Value_Set("-solidssymmqmr")) solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_symmqmr;
 }
 //#####################################################################
 // Function Adjust_Particle_For_Domain_Boundaries

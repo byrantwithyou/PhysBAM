@@ -58,7 +58,7 @@ template<class T> VISUALIZATION<T>::
 ~VISUALIZATION()
 {
     delete levelset_component;
-    if (grid_component) {
+    if(grid_component) {
         delete &grid_component->object;
         delete grid_component;
     }
@@ -69,45 +69,37 @@ Add_Arguments(PARSE_ARGS &parse_args)
 {
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
 
-    parse_args.Add_Option_Argument("-t", "attempt to read triangulated surface");
-    parse_args.Add_String_Argument("-tri", "", "tri file");
+    parse_args.Add("-t",&read_triangulated_surface,"attempt to read triangulated surface");
+    parse_args.Add("-tri",&triangulated_surface_filename,&read_triangulated_surface,"file","tri file");
     parse_args.Set_Extra_Arguments(1, "<phi_file>");
 }
 
 template<class T> void VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS &parse_args)
 {
-    read_triangulated_surface = false;
-    triangulated_surface_filename = "";
+    read_triangulated_surface=false;
+    triangulated_surface_filename="";
 
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
 
-    if (parse_args.Num_Extra_Args() != 1) parse_args.Print_Usage(true);
-    else levelset_filename = parse_args.Extra_Arg(0);
-
-    animation_enabled = FILE_UTILITIES::Is_Animated(levelset_filename);
-
-    if (parse_args.Is_Value_Set("-tri")) {
-        read_triangulated_surface = true;
-        triangulated_surface_filename = parse_args.Get_String_Value("-tri");
-    }
-    else if (parse_args.Get_Option_Value("-t")) {
-        read_triangulated_surface = true;
-        triangulated_surface_filename = FILE_UTILITIES::Get_Basename(levelset_filename) + ".tri";
-    }
+    if(parse_args.Num_Extra_Args() != 1) parse_args.Print_Usage(true);
+    else levelset_filename=parse_args.Extra_Arg(0);
+    animation_enabled=FILE_UTILITIES::Is_Animated(levelset_filename);
+    if(read_triangulated_surface && !read_triangulated_surface)
+        triangulated_surface_filename=FILE_UTILITIES::Get_Basename(levelset_filename) + ".tri";
 }
 
 template<class T> bool VISUALIZATION<T>::
 Read_Grid()
 {
-    std::string filename = FILE_UTILITIES::Get_Frame_Filename(levelset_filename, start_frame);
+    std::string filename=FILE_UTILITIES::Get_Frame_Filename(levelset_filename, start_frame);
     ARRAYS<VECTOR<T,3> > phi;
     LEVELSET_3D<T> levelset(grid, phi);
     std::istream* levelset_file=FILE_UTILITIES::Safe_Open_Input(filename);
-    if (!levelset_file) return false;
+    if(!levelset_file) return false;
     levelset.template Read<T>(*levelset_file);
     delete levelset_file;
-    std::cout << "Got " << ((grid.MAC_offset==0)?"regular":"MAC") << " grid: " << grid.m << "x" << grid.n << "x" << grid.mn << std::endl;
+    std::cout<<"Got "<<((grid.MAC_offset==0)?"regular":"MAC")<<" grid: "<<grid.m<<"x"<<grid.n<<"x"<<grid.mn<<std::endl;
     return true;
 }
 
@@ -116,29 +108,29 @@ Initialize_Components()
 {
     ANIMATED_VISUALIZATION::Initialize_Components();
 
-    if (!FILE_UTILITIES::Frame_File_Exists(levelset_filename, start_frame))
+    if(!FILE_UTILITIES::Frame_File_Exists(levelset_filename, start_frame))
     {
-        std::cerr << "Can't open " << FILE_UTILITIES::Get_Frame_Filename(levelset_filename, start_frame) << std::endl;
+        std::cerr<<"Can't open "<<FILE_UTILITIES::Get_Frame_Filename(levelset_filename, start_frame)<<std::endl;
         exit(1);
     }
 
-    if (!Read_Grid()) {
-        std::cerr << "Could not read grid" << std::endl;
+    if(!Read_Grid()) {
+        std::cerr<<"Could not read grid"<<std::endl;
         exit(1);
     }
 
     OPENGL_UNIFORM_SLICE* slice=new OPENGL_UNIFORM_SLICE(opengl_world);slice->Initialize(GRID_3D<float>(grid));
     slice_manager.slice=slice;
 
-    if (read_triangulated_surface) std::cout << "Using triangulated surface filename " << triangulated_surface_filename << std::endl;
-    levelset_component = new OPENGL_COMPONENT_LEVELSET_3D<T>(levelset_filename,triangulated_surface_filename,"","",false, false);
+    if(read_triangulated_surface) std::cout<<"Using triangulated surface filename "<<triangulated_surface_filename<<std::endl;
+    levelset_component=new OPENGL_COMPONENT_LEVELSET_3D<T>(levelset_filename,triangulated_surface_filename,"","",false, false);
     Add_Component(levelset_component, "Levelset");
     slice_manager.Add_Object(levelset_component);
 
-    OPENGL_GRID_3D<T> *opengl_grid = new OPENGL_GRID_3D<T>(*(new GRID_3D<T>(grid)), OPENGL_COLOR::Gray(0.5));
-    grid_component = new OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >(*opengl_grid);
+    OPENGL_GRID_3D<T> *opengl_grid=new OPENGL_GRID_3D<T>(*(new GRID_3D<T>(grid)), OPENGL_COLOR::Gray(0.5));
+    grid_component=new OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >(*opengl_grid);
     grid_component->Set_Draw(false);
-    grid_component->selectable = true;
+    grid_component->selectable=true;
     Add_Component(grid_component, "Grid");
     slice_manager.Add_Object(grid_component);
 
@@ -161,7 +153,7 @@ Add_Key_Bindings()
 {
     ANIMATED_VISUALIZATION::Add_Key_Bindings();
 
-    if (levelset_component)
+    if(levelset_component)
     {
         opengl_world.Bind_Key('l', levelset_component->Toggle_Draw_CB());
         opengl_world.Bind_Key('L', levelset_component->Toggle_Slice_Color_Mode_CB());
@@ -185,21 +177,21 @@ Update_OpenGL_Strings()
 
     const LEVELSET_3D<T> *levelset=(levelset_component && levelset_component->opengl_levelset_multiview)?levelset_component->opengl_levelset_multiview->Levelset():0;
 
-    if (current_selection && current_selection->type == OPENGL_SELECTION::GRID_CELL_3D)
+    if(current_selection && current_selection->type == OPENGL_SELECTION::GRID_CELL_3D)
     {
-        VECTOR<int,3> selected_index = ((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
+        VECTOR<int,3> selected_index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
 
-        output_stream << "Selected cell " << selected_index << " (" << grid.Center(selected_index) << ")" << std::endl;
-        if (levelset && levelset->grid.MAC_offset==0.5)
-            output_stream << "phi = " << levelset->phi(selected_index) << std::endl;
+        output_stream<<"Selected cell "<<selected_index<<"("<<grid.Center(selected_index)<<")"<<std::endl;
+        if(levelset && levelset->grid.MAC_offset==0.5)
+            output_stream<<"phi="<<levelset->phi(selected_index)<<std::endl;
     }
-    else if (current_selection && current_selection->type == OPENGL_SELECTION::GRID_NODE_3D)
+    else if(current_selection && current_selection->type == OPENGL_SELECTION::GRID_NODE_3D)
     {
-        VECTOR<int,3> selected_index = ((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
+        VECTOR<int,3> selected_index=((OPENGL_SELECTION_GRID_NODE_3D<T>*)current_selection)->index;
 
-        output_stream << "Selected node " << selected_index << " (" << grid.Node(selected_index) << ")" << std::endl;
-        if (levelset && levelset->grid.MAC_offset==0)
-            output_stream << "phi = " << levelset->phi(selected_index) << std::endl;
+        output_stream<<"Selected node "<<selected_index<<"("<<grid.Node(selected_index)<<")"<<std::endl;
+        if(levelset && levelset->grid.MAC_offset==0)
+            output_stream<<"phi="<<levelset->phi(selected_index)<<std::endl;
     }
 
     opengl_world.Add_String(output_stream.str());
@@ -209,13 +201,13 @@ Update_OpenGL_Strings()
 
 int main(int argc, char *argv[])
 {
-    bool type_double = false;   // float by default
+    bool type_double=false;   // float by default
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);
 
-    ANIMATED_VISUALIZATION *visualization = 0;
-    if (!type_double)    visualization = new VISUALIZATION<float>;
+    ANIMATED_VISUALIZATION *visualization=0;
+    if(!type_double)    visualization=new VISUALIZATION<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else visualization=new VISUALIZATION<double>();
 #else

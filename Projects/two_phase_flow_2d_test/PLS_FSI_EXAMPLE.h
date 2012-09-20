@@ -65,6 +65,7 @@ public:
     int convection_order;
     bool use_pls_evolution_for_structure;
     bool two_phase;
+    bool opt_solidscg,opt_solidscr,opt_solidssymmqmr;
 
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
     virtual ~PLS_FSI_EXAMPLE();

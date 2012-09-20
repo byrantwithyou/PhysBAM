@@ -2,6 +2,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/QUEUE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
@@ -11,11 +12,10 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BOX.h>
 
 using namespace PhysBAM;
 
-int main(int argc,const char *argv[])
+int main(int argc,char *argv[])
 {
     typedef float T;
     typedef float RW;
@@ -24,34 +24,26 @@ int main(int argc,const char *argv[])
     STREAM_TYPE stream_type(rw);
     typedef VECTOR<T,3> TV;
     
-    PARSE_ARGS parse_args;
-    parse_args.Add_String_Argument("-tri","","tri input filename");
-    parse_args.Add_String_Argument("-tet","","tet input filename");
-    parse_args.Add_String_Argument("-seed_centers","","txt file of seed region centers");
-    parse_args.Add_Integer_Argument("-refine_levels",0,"number of refinement levels");
-    parse_args.Add_Integer_Argument("-seeds",10,"number grain boundary regions");
-    parse_args.Add_Integer_Argument("-max_coarse_bcc_res",10,"resolution of largest bounding box dimension");
-    parse_args.Add_Integer_Argument("-num_smoothing_steps",0,"number of smooting steps");
-
-    parse_args.Parse();
-
     int max_refinement_levels=0;
     int max_dim_resolution=20;
     int num_seeds=500;
     int num_interface_surface_smooting_steps=1;
     std::string input_geom_filename,seed_center_filename;
     bool using_existing_seed_centers=false;
-    bool tri_input_geom=false;
-    bool tet_input_geom=false;
+    bool tet_input_geom=false,tri_input_geom=false,opt_seed_centers=false;
 
-    if(parse_args.Is_Value_Set("-refine_levels")) max_refinement_levels=parse_args.Get_Integer_Value("-refine_levels");
-    if(parse_args.Is_Value_Set("-max_coarse_bcc_res")) max_dim_resolution=parse_args.Get_Integer_Value("-max_coarse_bcc_res");
-    if(parse_args.Is_Value_Set("-seeds")) num_seeds=parse_args.Get_Integer_Value("-seeds");
-    if(parse_args.Is_Value_Set("-num_smoothing_steps")) num_interface_surface_smooting_steps=parse_args.Get_Integer_Value("-num_smoothing_steps");
-    if(parse_args.Is_Value_Set("-tet")){input_geom_filename=parse_args.Get_String_Value("-tet");tet_input_geom=true;tri_input_geom=false;}
-    if(parse_args.Is_Value_Set("-tri")){input_geom_filename=parse_args.Get_String_Value("-tri");tri_input_geom=true;tet_input_geom=false;}
-    if(parse_args.Is_Value_Set("-seed_centers")){
-        seed_center_filename=parse_args.Get_String_Value("-seed_centers");
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-tri",&input_geom_filename,&tri_input_geom,"file","tri input filename");
+    parse_args.Add("-tet",&input_geom_filename,&tet_input_geom,"file","tet input filename");
+    parse_args.Add("-seed_centers",&seed_center_filename,&opt_seed_centers,"file","txt file of seed region centers");
+    parse_args.Add("-refine_levels",&max_refinement_levels,"levels","number of refinement levels");
+    parse_args.Add("-seeds",&num_seeds,"num","number grain boundary regions");
+    parse_args.Add("-max_coarse_bcc_res",&max_dim_resolution,"res","resolution of largest bounding box dimension");
+    parse_args.Add("-num_smoothing_steps",&num_interface_surface_smooting_steps,"num","number of smooting steps");
+    parse_args.Parse();
+
+    if(tri_input_geom) tet_input_geom=false;
+    if(opt_seed_centers){
         using_existing_seed_centers=true;
         max_refinement_levels=0;}
 
@@ -95,7 +87,7 @@ int main(int argc,const char *argv[])
     if(tet_input_geom) model_geom.Update_Bounding_Box();
     else if(tri_input_geom) tri_model_geom.Update_Bounding_Box();
 
-    BOX<TV> model_geom_bounding_box;
+    RANGE<TV> model_geom_bounding_box;
 
     if(tet_input_geom)
         model_geom_bounding_box=*(model_geom.bounding_box);

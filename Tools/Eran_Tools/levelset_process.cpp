@@ -24,13 +24,11 @@ void Keep_Only_Largest_Negative_Region(GRID_3D<T>& grid,ARRAYS<VECTOR<T,3> >& ph
 int main(int argc, char *argv[])
 {
     PARSE_ARGS parse_args;
-    parse_args.Add_String_Argument("-i","","input file");
-    parse_args.Add_String_Argument("-o","","output file");
+    std::string input_filename,output_filename;
+    parse_args.Add("-i",&input_filename,"file","input file");
+    parse_args.Add("-o",&output_filename,"file","output file");
     parse_args.Set_Extra_Arguments(0, "");
     int extraarg = parse_args.Parse();
-
-    std::string input_filename=parse_args.Get_String_Value("-i");
-    std::string output_filename=parse_args.Get_String_Value("-o");
 
     if(input_filename.empty() || output_filename.empty()) parse_args.Print_Usage(true);
 

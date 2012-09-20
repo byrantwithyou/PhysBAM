@@ -5,14 +5,24 @@
 
 using namespace PhysBAM;
 
-std::string input_filename, output_filename;
-double threshold_fraction;
-
 template<class T,class RW>
 void Seal_Holes(PARSE_ARGS& parse_args)
 {
-    bool merge_coincident_vertices=!parse_args.Get_Option_Value("-no_vertex_merging");
-    bool fill_holes=!parse_args.Get_Option_Value("-no_hole_filling");
+    std::string input_filename,output_filename;
+    T threshold_fraction=.1;
+    bool merge_coincident_vertices=true,fill_holes=true;
+
+    parse_args.Add("-threshold",&threshold_fraction,"threshold","fraction of minimium segment length for threshold");
+    parse_args.Add_Not("-no_vertex_merging",&merge_coincident_vertices,"merge coincident vertices");
+    parse_args.Add_Not("-no_hole_filling",&fill_holes,"do not fill holes");
+    parse_args.Add("-o",&output_filename,"file","output filename");
+    parse_args.Set_Extra_Arguments(1,"<filename>");
+    parse_args.Parse();
+
+    if(parse_args.Num_Extra_Args()<1) parse_args.Print_Usage(true);
+    else input_filename=parse_args.Extra_Arg(0);
+
+    if(!output_filename.size()) output_filename=FILE_UTILITIES::Get_Basename(input_filename)+"_sealed."+FILE_UTILITIES::Get_File_Extension(input_filename);
 
     TRIANGULATED_SURFACE<T>* surface=0;
     FILE_UTILITIES::Create_From_File<RW>(input_filename,surface);
@@ -25,26 +35,12 @@ void Seal_Holes(PARSE_ARGS& parse_args)
 
 int main(int argc,char *argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     bool type_double=false;
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Double_Argument("-threshold",.1,"threshold","fraction of minimium segment length for threshold");
-    parse_args.Add_Option_Argument("-no_vertex_merging");
-    parse_args.Add_Option_Argument("-no_hole_filling");
-    parse_args.Add_String_Argument("-o","","output filename");
-    parse_args.Set_Extra_Arguments(1,"<filename>");
-
-    parse_args.Parse();
+    parse_args.Parse(true);
     
-    if(parse_args.Num_Extra_Args()<1) parse_args.Print_Usage(true);
-    else input_filename=parse_args.Extra_Arg(0);
-
-    if(parse_args.Is_Value_Set("-o")) output_filename=parse_args.Get_String_Value("-o");
-    else output_filename=FILE_UTILITIES::Get_Basename(input_filename)+"_sealed."+FILE_UTILITIES::Get_File_Extension(input_filename);
-
-    threshold_fraction=parse_args.Get_Double_Value("-threshold");
-
     if(!type_double) Seal_Holes<float,float>(parse_args);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else Seal_Holes<double,float>(parse_args);

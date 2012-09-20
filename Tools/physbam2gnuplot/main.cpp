@@ -30,9 +30,9 @@ public:
         :input_directory(input_directory_input),output_directory(output_directory_input)
     {}
 
-    void Convert(const int frame,const std::string* variable_name=0)
+    void Convert(const int frame,const std::string variable_name="")
     {T_GRID grid;FILE_UTILITIES::Read_From_File<RW>(input_directory+"/common/grid",grid);
-    if(variable_name) Convert_Data<T_ARRAYS_SCALAR>(*variable_name,grid,frame);
+    if(variable_name.size()) Convert_Data<T_ARRAYS_SCALAR>(variable_name,grid,frame);
     if(convert_density) Convert_Data<T_ARRAYS_SCALAR>("density",grid,frame);
     if(convert_momentum) Convert_Data<T_ARRAYS_SCALAR>("momentum",grid,frame);
     if(convert_energy) Convert_Data<T_ARRAYS_SCALAR>("energy",grid,frame);
@@ -43,7 +43,7 @@ public:
     if(convert_machnumber) Convert_Data<T_ARRAYS_SCALAR>("machnumber",grid,frame);
     }
 
-    void Convert_All_Frames(const int first_frame,const int last_frame,const std::string* variable_name=0)
+    void Convert_All_Frames(const int first_frame,const int last_frame,const std::string variable_name="")
     {for(int frame=first_frame;frame<=last_frame;frame++){Convert(frame,variable_name);}}
 
 private:
@@ -57,34 +57,38 @@ private:
             data(iterator.Cell_Index()) = log(tmp)/log((T)10);}}
     gnuplot_output.Write_Output_File(output_file,grid,data,frame);}
 };
-template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(const PARSE_ARGS& parse_args,const int verbosity)
+template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,const int verbosity)
 {
-    bool convert_density=parse_args.Is_Value_Set("-density");
-    bool convert_momentum=parse_args.Is_Value_Set("-momentum");
-    bool convert_energy=parse_args.Is_Value_Set("-energy"); 
-    bool convert_velocity=parse_args.Is_Value_Set("-velocity"); 
-    bool convert_pressure=parse_args.Is_Value_Set("-pressure"); 
-    bool convert_internal_energy=parse_args.Is_Value_Set("-internal_energy"); 
-    bool convert_entropy=parse_args.Is_Value_Set("-entropy"); 
-    bool convert_machnumber=parse_args.Is_Value_Set("-machnumber"); 
-    bool convert_log=parse_args.Is_Value_Set("-log"); 
+    bool convert_density=false,convert_momentum=false,convert_energy=false,convert_velocity=false;
+    bool convert_pressure=false,convert_internal_energy=false,convert_entropy=false,convert_machnumber=false,convert_log=false;
+    int first_frame=0,last_frame=0;
+    std::string output_directory,variable_name;
+    parse_args.Add("-density",&convert_density,"convert density");
+    parse_args.Add("-log",&convert_log,"output log (base 10) of the data");
+    parse_args.Add("-momentum",&convert_momentum,"convert momentum");
+    parse_args.Add("-machnumber",&convert_machnumber,"convert machnumber");
+    parse_args.Add("-energy",&convert_energy,"convert energy");
+    parse_args.Add("-entropy",&convert_entropy,"convert entropy");
+    parse_args.Add("-velocity",&convert_velocity,"convert velocity");
+    parse_args.Add("-pressure",&convert_pressure,"convert pressure");
+    parse_args.Add("-internal_energy",&convert_internal_energy,"convert internal_energy");
+    parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
+    parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
+    parse_args.Add("-o",&output_directory,"file","output directory");
+    parse_args.Add("-v",&variable_name,"var","variable to read");
+    parse_args.Parse();
 
-    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
-    if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
+    std::string input_directory=parse_args.Extra_Arg(0);
+    if(!output_directory.size()) output_directory=input_directory;
     FILE_UTILITIES::Create_Directory(output_directory);
 
-    const std::string* variable_name=(parse_args.Is_Value_Set("-v"))?&parse_args.Get_String_Value("-v"):0;
-
-    int first_frame,last_frame;
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/first_frame",first_frame);
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);
-    if(parse_args.Is_Value_Set("-start_frame")) first_frame=parse_args.Get_Integer_Value("-start_frame");
-    if(parse_args.Is_Value_Set("-last_frame")) last_frame=parse_args.Get_Integer_Value("-last_frame");
 
     if(verbosity>0){
         std::cout<<"input_directory="<<input_directory<<", output_directory="<<output_directory<<std::endl;
         std::cout<<"first_frame="<<first_frame<<std::endl<<"last_frame="<<last_frame<<std::endl;
-        if(variable_name) std::cout<<"variable_name="<<*variable_name<<std::endl;
+        if(variable_name.size()) std::cout<<"variable_name="<<variable_name<<std::endl;
         else std::cout<<"no variable_name specified"<<std::endl;}
 
 
@@ -106,27 +110,14 @@ int main(int argc,char* argv[])
 {
     PARSE_ARGS parse_args(argc,argv);
     bool use_double=false;
-    parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
-    parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
-    parse_args.Add_Integer_Argument("-verbosity",0,"Verbosity level");
-    parse_args.Add_String_Argument("-o","","output directory");
-    parse_args.Add_Integer_Argument("-dimension",1,"Grid dimension");
-    parse_args.Add_String_Argument("-v","","variable to read");
+    int verbosity=0;
+    int dimension=1;
+    parse_args.Add("-verbosity",&verbosity,"value","Verbosity level");
+    parse_args.Add("-dimension",&dimension,"value","Grid dimension");
     parse_args.Add("-double",&use_double,"Read in file in double format");
-    parse_args.Add_Option_Argument("-density","convert density");
-    parse_args.Add_Option_Argument("-log","output log (base 10) of the data");
-    parse_args.Add_Option_Argument("-momentum","convert momentum");
-    parse_args.Add_Option_Argument("-machnumber","convert machnumber");
-    parse_args.Add_Option_Argument("-energy","convert energy");
-    parse_args.Add_Option_Argument("-entropy","convert entropy");
-    parse_args.Add_Option_Argument("-velocity","convert velocity");
-    parse_args.Add_Option_Argument("-pressure","convert pressure");
-    parse_args.Add_Option_Argument("-internal_energy","convert internal_energy");
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse();
+    parse_args.Parse(true);
 
-    int verbosity=parse_args.Get_Integer_Value("-verbosity");
-    int dimension=parse_args.Get_Integer_Value("-dimension");
     
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(use_double) PHYSBAM_FATAL_ERROR("No double support");

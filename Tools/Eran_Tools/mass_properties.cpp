@@ -16,6 +16,17 @@ Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,3> TV;
 
+    bool opt_generate=false,opt_density=false,thin_shell=false;
+    T mass=1,density=1;
+    std::string secondary_filename;
+    parse_args.Add("-thin_shell",&thin_shell,"Thin shell");
+    parse_args.Add("-generate",&opt_generate,"Generate");
+    parse_args.Add("-mass",&mass,"mass","mass");
+    parse_args.Add("-density",&density,&opt_density,"density","density");
+    parse_args.Add("-secondary_surface",&secondary_filename,"file","secondary filename");
+    parse_args.Set_Extra_Arguments(1,"<filename>");
+    parse_args.Parse();
+
     LOG::SCOPE scope("mass properties","mass properties");
     LOG::cout<<"filename = "<<filename<<std::endl;
     LOG::cout<<"using "<<(IS_SAME<T,float>::value?"floats":"doubles")<<std::endl;
@@ -28,13 +39,13 @@ Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
 
     RIGID_BODY_COLLECTION<TV> rigid_body_collection(0,0);
     RIGID_BODY<TV> rigid_body(rigid_body_collection);
-    rigid_body.thin_shell=parse_args.Get_Option_Value("-thin_shell");
     rigid_body.surface_roughness=(T)1e-8;
     SYMMETRIC_MATRIX<T,3> world_space_inertia_tensor;
 
-    MASS_PROPERTIES<TV> mass_properties(surface,parse_args.Get_Option_Value("-thin_shell"));
-    if(parse_args.Is_Value_Set("-density")) mass_properties.Set_Density((T)parse_args.Get_Double_Value("-density"));
-    else mass_properties.Set_Mass((T)parse_args.Get_Double_Value("-mass"));
+    rigid_body.thin_shell=thin_shell;
+    MASS_PROPERTIES<TV> mass_properties(surface,thin_shell);
+    if(opt_density) mass_properties.Set_Density(density);
+    else mass_properties.Set_Mass(mass);
     rigid_body.Mass()=mass_properties.Mass();
     FRAME<TV> frame(rigid_body.Frame());
     mass_properties.Transform_To_Object_Frame(frame,rigid_body.Inertia_Tensor());
@@ -46,14 +57,13 @@ Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
     //LOG::cout<<"world space inertia_tensor = "<<mass_properties.Inertia_Tensor()<<std::endl;
     LOG::cout<<"object space inertia_tensor = "<<rigid_body.Inertia_Tensor()<<std::endl;
 
-    if(parse_args.Get_Option_Value("-generate")){
+    if(opt_generate){
         {LOG::SCOPE scope("transforming surface","transforming surface");
         for(int p=0;p<surface.particles.Size();p++) surface.particles.X(p)=rigid_body.Frame().Inverse_Times(surface.particles.X(p));
         FILE_UTILITIES::Write_To_File<RW>(filename,surface);}
 
-        if(parse_args.Is_Value_Set("-secondary_surface")){
+        if(secondary_filename.size()){
             LOG::SCOPE scope("transforming secondary surface","transforming secondary surface");
-            std::string secondary_filename=parse_args.Get_String_Value("-secondary_surface");
             LOG::cout<<"filename = "<<secondary_filename<<std::endl;
             FILE_UTILITIES::Read_From_File<RW>(secondary_filename,surface);
             for(int p=0;p<surface.particles.Size();p++) surface.particles.X(p)=rigid_body.Frame().Inverse_Times(surface.particles.X(p));
@@ -72,13 +82,7 @@ int main(int argc,char *argv[])
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add_Not("-write_float",&type_double,"Write floats");
     parse_args.Add("-write_double",&type_double,"Write doubles");
-    parse_args.Add_Option_Argument("-thin_shell");
-    parse_args.Add_Option_Argument("-generate");
-    parse_args.Add_Double_Argument("-mass",1,"mass");
-    parse_args.Add_Double_Argument("-density",1,"density");
-    parse_args.Add_String_Argument("-secondary_surface","");
-    parse_args.Set_Extra_Arguments(1,"<filename>");
-    parse_args.Parse();
+    parse_args.Parse(true);
 
     std::string filename=parse_args.Extra_Arg(0);
 
