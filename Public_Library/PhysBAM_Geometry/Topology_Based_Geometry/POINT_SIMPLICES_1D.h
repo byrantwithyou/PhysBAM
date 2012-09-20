@@ -33,6 +33,7 @@ public:
     PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >* hierarchy;
     int number_point_simplices;
 
+    POINT_SIMPLICES_1D();
     POINT_SIMPLICES_1D(POINT_SIMPLEX_MESH& point_simplex_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
 
     void Clean_Memory() PHYSBAM_OVERRIDE

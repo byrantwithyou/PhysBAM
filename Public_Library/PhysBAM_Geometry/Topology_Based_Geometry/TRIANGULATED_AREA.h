@@ -31,6 +31,7 @@ public:
     ARRAY<T>* triangle_areas;
     ARRAY<T>* nodal_areas;
 
+    TRIANGULATED_AREA();
     TRIANGULATED_AREA(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
     virtual ~TRIANGULATED_AREA();
 

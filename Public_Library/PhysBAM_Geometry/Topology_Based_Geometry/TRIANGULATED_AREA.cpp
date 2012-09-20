@@ -21,7 +21,17 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> TRIANGULATED_AREA<T>::
-TRIANGULATED_AREA(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,2> >& particles_input)
+TRIANGULATED_AREA()
+    :MESH_OBJECT<TV,TRIANGLE_MESH>(*new TRIANGLE_MESH,*new GEOMETRY_PARTICLES<TV>),segmented_curve(0),hierarchy(0),triangle_area_fractions(0),triangle_areas(0),
+    nodal_areas(0)
+{
+    this->need_destroy_mesh=this->need_destroy_particles=true;
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> TRIANGULATED_AREA<T>::
+TRIANGULATED_AREA(TRIANGLE_MESH& triangle_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :MESH_OBJECT<TV,TRIANGLE_MESH>(triangle_mesh_input,particles_input),segmented_curve(0),hierarchy(0),triangle_area_fractions(0),triangle_areas(0),
     nodal_areas(0)
 {
@@ -97,7 +107,7 @@ Initialize_Equilateral_Mesh_And_Particles(const GRID<TV>& grid)
 // note: return the first triangle that it is inside of (including boundary), otherwise returns 0
 //#####################################################################
 template<class T> int TRIANGULATED_AREA<T>::
-Inside(const VECTOR<T,2>& location,const T thickness_over_two) const
+Inside(const TV& location,const T thickness_over_two) const
 {
     return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside(*this,location,thickness_over_two);
 }
@@ -151,7 +161,7 @@ Rescale(const T scaling_factor)
 template<class T> void TRIANGULATED_AREA<T>::
 Rescale(const T scaling_x,const T scaling_y)
 {
-    for(int k=0;k<particles.Size();k++) particles.X(k)*=VECTOR<T,2>(scaling_x,scaling_y);
+    for(int k=0;k<particles.Size();k++) particles.X(k)*=TV(scaling_x,scaling_y);
     Refresh_Auxiliary_Structures();
 }
 //#####################################################################
@@ -280,7 +290,7 @@ Area_Incident_On_A_Particle(const int particle_index)
 //#####################################################################
 // warning: will corrupt any aux structures aside from incident_elements
 template<class T> int TRIANGULATED_AREA<T>::
-Split_Node(const int particle_index,const VECTOR<T,2>& normal)
+Split_Node(const int particle_index,const TV& normal)
 {
     return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Split_Node(*this,particle_index,normal);
 }
@@ -330,15 +340,15 @@ Compute_Nodal_Areas(bool save_triangle_areas)
 // Function Triangle_In_Direction_Uninverted
 //#####################################################################
 template<class T> int TRIANGULATED_AREA<T>::
-Triangle_In_Direction_Uninverted(const int node,const VECTOR<T,2>& direction) const
+Triangle_In_Direction_Uninverted(const int node,const TV& direction) const
 {
     assert(mesh.topologically_sorted_neighbor_nodes && mesh.topologically_sorted_incident_elements);
     ARRAY<int> &neighbor_nodes=(*mesh.topologically_sorted_neighbor_nodes)(node),&incident_elements=(*mesh.topologically_sorted_incident_elements)(node);
-    VECTOR<T,2> xnode=particles.X(node);int t=1;
+    TV xnode=particles.X(node);int t=1;
     while(t<neighbor_nodes.m){ // find right edge in right half-space of direction
-        if(VECTOR<T,2>::Cross_Product(particles.X(neighbor_nodes(t))-xnode,direction).x<0){t++;continue;}
+        if(TV::Cross_Product(particles.X(neighbor_nodes(t))-xnode,direction).x<0){t++;continue;}
         while(t<neighbor_nodes.m){ // find left edge in left half-space of direction
-            if(VECTOR<T,2>::Cross_Product(direction,particles.X(neighbor_nodes(t+1))-xnode).x<0){t++;continue;}
+            if(TV::Cross_Product(direction,particles.X(neighbor_nodes(t+1))-xnode).x<0){t++;continue;}
             return t;}
         return t<incident_elements.m?incident_elements(t)-1:-1;}
     return t<incident_elements.m?incident_elements(t)-1:-1;
@@ -347,18 +357,18 @@ Triangle_In_Direction_Uninverted(const int node,const VECTOR<T,2>& direction) co
 // Function Triangle_Walk_Uninverted
 //#####################################################################
 template<class T> int TRIANGULATED_AREA<T>::
-Triangle_Walk_Uninverted(const int start_node,const VECTOR<T,2>& dX) const
+Triangle_Walk_Uninverted(const int start_node,const TV& dX) const
 {
     int t=Triangle_In_Direction_Uninverted(start_node,dX);if(t<0) return -1;
-    VECTOR<T,2> start=particles.X(start_node),goal=start+dX;
+    TV start=particles.X(start_node),goal=start+dX;
     int e1,e2;mesh.Other_Two_Nodes(start_node,t,e1,e2);
-    if(VECTOR<T,2>::Cross_Product(particles.X(e2)-particles.X(e1),goal-particles.X(e1)).x>=0) return t;
+    if(TV::Cross_Product(particles.X(e2)-particles.X(e1),goal-particles.X(e1)).x>=0) return t;
     for(;;){
         t=mesh.Adjacent_Triangle(t,e1,e2);if(t<0) return -1;
         int e3=mesh.Other_Node(e1,e2,t);
-        VECTOR<T,2> w=TRIANGLE_2D<T>::First_Two_Barycentric_Coordinates(goal,particles.X(e2),particles.X(e1),particles.X(e3));
+        TV w=TRIANGLE_2D<T>::First_Two_Barycentric_Coordinates(goal,particles.X(e2),particles.X(e1),particles.X(e3));
         if(w.x>=0){if(w.y>=0) return t;else e1=e3;}
-        else if(w.y>=0 || VECTOR<T,2>::Cross_Product(dX,particles.X(e3)-start).x>0) e2=e3;
+        else if(w.y>=0 || TV::Cross_Product(dX,particles.X(e3)-start).x>0) e2=e3;
         else e1=e3;}
 }
 //#####################################################################

@@ -25,6 +25,15 @@ namespace PhysBAM{
 // Constructor
 //#####################################################################
 template<class TV> SEGMENTED_CURVE<TV>::
+SEGMENTED_CURVE()
+    :MESH_OBJECT<TV,SEGMENT_MESH>(*new SEGMENT_MESH,*new GEOMETRY_PARTICLES<TV>),hierarchy(0),segment_list(0),point_simplices_1d(0)
+{
+    this->need_destroy_mesh=this->need_destroy_particles=true;
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class TV> SEGMENTED_CURVE<TV>::
 SEGMENTED_CURVE(SEGMENT_MESH& segment_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :MESH_OBJECT<TV,SEGMENT_MESH>(segment_mesh_input,particles_input),hierarchy(0),segment_list(0),point_simplices_1d(0)
 {

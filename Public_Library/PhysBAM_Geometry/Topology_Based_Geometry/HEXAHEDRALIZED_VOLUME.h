@@ -32,6 +32,7 @@ public:
     TRIANGULATED_SURFACE<T>* triangulated_surface;
     BOX_HIERARCHY<TV>* hierarchy;
 
+    HEXAHEDRALIZED_VOLUME();
     HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH& mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
     virtual ~HEXAHEDRALIZED_VOLUME();
 

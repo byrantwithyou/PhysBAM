@@ -30,6 +30,7 @@ public:
     ARRAY<T_SEGMENT>* segment_list;
     POINT_SIMPLICES_1D<T>* point_simplices_1d;
 
+    SEGMENTED_CURVE();
     SEGMENTED_CURVE(SEGMENT_MESH& segment_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
     virtual ~SEGMENTED_CURVE();
 

@@ -30,6 +30,7 @@ public:
     ARRAY<T>* tetrahedron_volumes;
     ARRAY<T>* nodal_volumes;
 
+    TETRAHEDRALIZED_VOLUME();
     TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH& tetrahedron_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input);
     virtual ~TETRAHEDRALIZED_VOLUME();
 

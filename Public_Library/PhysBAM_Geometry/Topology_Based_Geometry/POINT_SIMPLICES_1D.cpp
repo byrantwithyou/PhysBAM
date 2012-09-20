@@ -6,10 +6,19 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 namespace PhysBAM{
 //#####################################################################
-// Function Closest_Point_On_Boundary
+// Constructor
 //#####################################################################
 template<class T> POINT_SIMPLICES_1D<T>::
-POINT_SIMPLICES_1D(POINT_SIMPLEX_MESH& point_simplex_mesh_input,GEOMETRY_PARTICLES<VECTOR<T,1> >& particles_input)
+POINT_SIMPLICES_1D()
+    :MESH_OBJECT<TV,POINT_SIMPLEX_MESH>(*new POINT_SIMPLEX_MESH,*new GEOMETRY_PARTICLES<TV>),point_simplex_list(0),particle_partition(0),hierarchy(0),number_point_simplices(0)
+{
+    this->need_destroy_mesh=this->need_destroy_particles=true;
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> POINT_SIMPLICES_1D<T>::
+POINT_SIMPLICES_1D(POINT_SIMPLEX_MESH& point_simplex_mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :MESH_OBJECT<TV,POINT_SIMPLEX_MESH>(point_simplex_mesh_input,particles_input),point_simplex_list(0),particle_partition(0),hierarchy(0),number_point_simplices(0)
 {
 }

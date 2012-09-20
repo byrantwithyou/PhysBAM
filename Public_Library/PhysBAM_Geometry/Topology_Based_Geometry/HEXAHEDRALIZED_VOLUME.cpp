@@ -20,6 +20,15 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T> HEXAHEDRALIZED_VOLUME<T>::
+HEXAHEDRALIZED_VOLUME()
+    :MESH_OBJECT<TV,HEXAHEDRON_MESH>(*new HEXAHEDRON_MESH,*new GEOMETRY_PARTICLES<TV>),hexahedron_list(0),tetrahedralized_volume(0),triangulated_surface(0),hierarchy(0)
+{
+    this->need_destroy_mesh=this->need_destroy_particles=true;
+}
+//#####################################################################
+// Constructor
+//#####################################################################
+template<class T> HEXAHEDRALIZED_VOLUME<T>::
 HEXAHEDRALIZED_VOLUME(HEXAHEDRON_MESH& mesh_input,GEOMETRY_PARTICLES<TV>& particles_input)
     :MESH_OBJECT<TV,HEXAHEDRON_MESH>(mesh_input,particles_input),hexahedron_list(0),tetrahedralized_volume(0),triangulated_surface(0),hierarchy(0)
 {}
