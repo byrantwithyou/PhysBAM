@@ -37,12 +37,12 @@ int main(int argc,char* argv[])
     in_mesh.Append(E(4,3,5,0));
     in_mesh.Append(E(3,1,5,0));
     ARRAY<T> phi0;
-    phi0.Append(-1);
-    phi0.Append(-1);
-    phi0.Append(-1);
-    phi0.Append(-1);
-    phi0.Append(-1);
-    phi0.Append(-1);
+    phi0.Append(1.5);
+    phi0.Append(0.5);
+    phi0.Append(0.5);
+    phi0.Append(0.5);
+    phi0.Append(0.5);
+    phi0.Append(-0.5);
     ARRAY<T> phi1;
     phi1.Append(-1);
     phi1.Append(-1);
