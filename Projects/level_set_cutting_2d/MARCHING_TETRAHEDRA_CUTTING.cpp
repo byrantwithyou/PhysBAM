@@ -113,7 +113,7 @@ Initialize_Case_Table(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table)
     CASE c1={{1,2,2,0},{{EE(8,1,9,7),EE(8,2,1,7),EE(0,1,2,7)},{EE(7,9,8,3),0,0}}};
     CASE c10={{2,0,3,1},{{EE(0,5,2,7),EE(6,5,7,2),EE(6,7,8,2)},{EE(7,6,8,3),EE(7,5,6,3),EE(3,5,6,1)}}};
     CASE c11={{2,0,0,0},{{EE(0,5,2,3),EE(2,5,6,3),0},{EE(5,1,6,3),0,0}}};
-    CASE c23={{0,0,0,0},{{EE(4,1,2,3),0,0},{EE(0,1,4,3),0,0}}};
+    CASE c23={{0,0,0,0},{{EE(0,1,4,3),0,0},{EE(4,1,2,3),0,0}}};
 #undef EE
     table.Resize(81);
     Fill_Helper(table,c0,0);
