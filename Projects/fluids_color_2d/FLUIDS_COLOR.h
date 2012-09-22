@@ -163,7 +163,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5);
+                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0);
                 break;
             case 4:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -181,7 +181,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
-                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5);
+                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0);
                 break;
             case 7:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -215,7 +215,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8));
+                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0);
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
     }
@@ -279,22 +279,23 @@ public:
     struct ANALYTIC_VELOCITY_ROTATION:public ANALYTIC_VELOCITY
     {
         TV c;
-        ANALYTIC_VELOCITY_ROTATION(TV cc): c(cc){}
+        T rho;
+        ANALYTIC_VELOCITY_ROTATION(TV cc,T rho): c(cc),rho(rho){}
         virtual TV u(const TV& X,T t) const {return (X-c).Orthogonal_Vector();}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(0,1,-1,0);}
-        virtual T p(const TV& X,T t) const {return 0;}
+        virtual T p(const TV& X,T t) const {return (T).5*rho*(X-c).Magnitude_Squared();}
     };
 
     struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY
     {
-        T nu;
+        T nu,rho;
         TV trans;
-        ANALYTIC_VELOCITY_VORTEX(T mu,T pho,TV t): nu(mu/pho),trans(t){}
+        ANALYTIC_VELOCITY_VORTEX(T mu,T rho,TV t): nu(mu/rho),rho(rho),trans(t){}
         virtual TV u(const TV& X,T t) const
         {TV Z=X-t*trans;return TV(sin(Z.x)*cos(Z.y),-cos(Z.x)*sin(Z.y))*exp(-2*nu*t)+trans;}
         virtual MATRIX<T,2> du(const TV& X,T t) const
         {TV Z=X-t*trans;T c=cos(Z.x)*cos(Z.y),s=sin(Z.x)*sin(Z.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
-        virtual T p(const TV& X,T t) const {return 0;}
+        virtual T p(const TV& X,T t) const {TV Z=X-t*trans;return (T).25*rho*(cos(2*Z.x)+cos(2*Z.y))*exp(-4*nu*t);}
     };
 
     struct ANALYTIC_VELOCITY_RAREFACTION:public ANALYTIC_VELOCITY
@@ -423,7 +424,7 @@ public:
             MATRIX<T,2> du=analytic_velocity->du(X/m,time/s)/s;
             TV n=analytic_levelset->N(X/m,time/s);
             T p=analytic_velocity->p(X/m,time/s)*kg/(s*s*m);
-            return (du+du.Transposed())*n*mu(fluid_color)+p*n;}
+            return (du+du.Transposed())*n*mu(fluid_color)-p*n;}
         return TV();
     }
 
