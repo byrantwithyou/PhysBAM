@@ -60,6 +60,14 @@ public:
     TV_DIMENSION state_left,state_right; // // (density,velocity_x,velocity_y,pressure)
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection;
 
+    int eno_scheme;
+    int eno_order;
+    int rk_order;
+    T cfl_number;
+    bool timesplit;
+    bool exact;
+    bool use_slip;
+
     /***************
     example explanation:
     1. Cylinder lift-off.
@@ -68,9 +76,9 @@ public:
     4. Rigid Diamond lift-off.
     ***************/
 
-
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),boundary(0),rigid_body_collection(solid_body_collection.rigid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),boundary(0),spring_factor(1),rigid_body_collection(solid_body_collection.rigid_body_collection),
+        eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),exact(false),use_slip(false)
     {}
     
     virtual ~STANDARD_TESTS()
@@ -113,15 +121,15 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",1,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Double_Argument("-cfl",(T).6,"CFL","cfl number");
-    parse_args->Add_Double_Argument("-spring_factor",(T)1);
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-exact","output a fully-explicit sim to (output_dir)_exact");
-    parse_args->Add_Option_Argument("-slip","use slip/spd for coupling");
-    parse_args->Add_Option_Argument("-no_preconditioner");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+    parse_args->Add("-spring_factor",&spring_factor,"factor","spring factor");
+    parse_args->Add("-slip",&use_slip,"use slip/spd for coupling");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Do not use preconditioner for slip system");
 }
 //#####################################################################
 // Function Parse_Options
@@ -129,14 +137,8 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
+    timesplit=timesplit && !exact;
     if(resolution==1) resolution=50; // Stupid hack for a bad default parameter.
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    spring_factor=(T)parse_args->Get_Double_Value("-spring_factor");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit") && !parse_args->Is_Value_Set("-exact");
-    bool use_slip=parse_args->Is_Value_Set("-slip");
 
     //grid
     int cells=resolution;
@@ -171,7 +173,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     fluids_parameters.use_slip=use_slip;
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     if(test_number==1 || test_number==2 || test_number==3 || test_number==4){
         fluids_parameters.solid_affects_fluid=true;

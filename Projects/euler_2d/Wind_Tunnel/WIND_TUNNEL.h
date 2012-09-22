@@ -60,6 +60,13 @@ public:
 
     // isobaric fix parameters
     bool woodward_fix_entropy,woodward_fix_enthalpy,isobaric_fix_only_6_cells;
+    int eno_scheme;
+    int eno_order;
+    int rk_order;
+    T cfl_number;
+    bool timesplit;
+    bool implicit_rk;
+    bool exact;
 
     /***************
     example explanation:
@@ -72,10 +79,10 @@ public:
     7. Double Mach Reflection of a Strong Shock
     ***************/
 
-
     WIND_TUNNEL(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection),
-        rho_left(0),u_left(0),v_left(0),p_left(0),woodward_fix_entropy(false),woodward_fix_enthalpy(true),isobaric_fix_only_6_cells(true)
+        rho_left(0),u_left(0),v_left(0),p_left(0),woodward_fix_entropy(false),woodward_fix_enthalpy(true),isobaric_fix_only_6_cells(true),
+        eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),implicit_rk(false),exact(false)
     {
     }
     
@@ -87,13 +94,13 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",1,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Double_Argument("-cfl",(T).6,"CFL","cfl number");
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-implicit_rk","perform runge kutta on the implicit part");
-    parse_args->Add_Option_Argument("-exact","output a fully-explicit sim to (output_dir)_exact");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
 }
 //#####################################################################
 // Function Parse_Options
@@ -101,13 +108,8 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit") && !parse_args->Is_Value_Set("-exact");
-    bool implicit_rk=parse_args->Is_Value_Set("-implicit_rk");
 
+    timesplit=timesplit && !exact;
     //grid
     int cells=resolution;
     if(test_number==1) fluids_parameters.grid->Initialize(3*cells,cells,0,3,0,1,true);

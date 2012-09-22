@@ -42,6 +42,7 @@ public:
     bool implicit_rk;
     bool use_sound_speed_based_cfl;
     bool multiplication_factor_for_sound_speed_based_dt;
+    bool exact;
 
     /***************
     example explanation:
@@ -49,7 +50,7 @@ public:
 
     SMOOTH_FLOW(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
-        implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false)
+        implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false),exact(false)
     {
     }
     
@@ -64,11 +65,11 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
     parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
     parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
-    parse_args->Add("-cfl",&cfl,"CFL","cfl number");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
     parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
     parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
-    parse_args->Add("-cfl_sound_speed",&cfl_sound_speed,"use sound speed based cfl condition");
-    parse_args->Add("-cfl_sound_speed_multiple",&cfl_sound_speed_multiple,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
+    parse_args->Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
+    parse_args->Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
     parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
 }
 //#####################################################################
@@ -78,6 +79,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
 
+    timesplit=timesplit && !exact;
     //grid
     fluids_parameters.grid->Initialize(resolution,(T)0.,(T)1.);
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
