@@ -83,12 +83,11 @@ public:
     void Register_Options() PHYSBAM_OVERRIDE
     {
         BASE::Register_Options();
-        parse_args->Add_Integer_Argument("-selection",0);
+        parse_args->Add("-selection",&selection,"value","selection");
     }
     void Parse_Options() PHYSBAM_OVERRIDE
     {
         BASE::Parse_Options();
-        if(parse_args->Is_Value_Set("-selection")) selection=parse_args->Get_Integer_Value("-selection");
         output_directory="Chains/output";output_directory+=selection==0?"_blocks_chain":"_lathe_chains";
     }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

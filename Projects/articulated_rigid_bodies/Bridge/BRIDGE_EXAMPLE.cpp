@@ -51,13 +51,12 @@ template<class T> void BRIDGE_EXAMPLE<T>::
 Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-selection",0);
+    parse_args->Add("-selection",&selection,"value","selection");
 }
 template<class T> void BRIDGE_EXAMPLE<T>::
 Parse_Options()
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-selection")) selection=parse_args->Get_Integer_Value("-selection");
     output_directory=STRING_UTILITIES::string_sprintf("Bridge/%s%s",output_directory.c_str(),(selection==0?"_blocks":"_lathe_chains"));
 }
 //#####################################################################

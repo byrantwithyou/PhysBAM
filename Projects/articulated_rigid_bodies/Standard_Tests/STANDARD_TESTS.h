@@ -94,6 +94,7 @@ public:
     T peak_force;
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
     int parameter;
+    bool use_prestab_iterations;
 
     struct NONLINEAR_PENDULUM:public NONLINEAR_FUNCTION<VECTOR<T,2>(T,VECTOR<T,2>)>
     {
@@ -106,7 +107,7 @@ public:
     NONLINEAR_PENDULUM nonlinear_pendulum;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),peak_force(10),parameter(3)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),peak_force(10),parameter(3),use_prestab_iterations(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         fluids_parameters.simulate=false;
@@ -151,34 +152,24 @@ public:
     void Register_Options() PHYSBAM_OVERRIDE
     {
         BASE::Register_Options();
-        parse_args->Add_Integer_Argument("-parameter", 1);
-        parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-        parse_args->Add_Option_Argument("-disable_prestab","disable prestabilization");
-        parse_args->Add_Option_Argument("-disable_poststab","disable poststabilization");
-        parse_args->Add_Option_Argument("-use_krylov_prestab","use krylov prestabilization");
-        parse_args->Add_Option_Argument("-use_krylov_poststab","use krylov poststabilization");
-        parse_args->Add_Option_Argument("-test_arb_system","test arb system properties");
-        parse_args->Add_Option_Argument("-print_arb_matrix","print arb system");
-        parse_args->Add_Integer_Argument("-prestab_iterations",3,"prestabilization iterations");
+        ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
+        parse_args->Add("-parameter",&parameter,"value","general use parameter");
+        parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+        parse_args->Add_Not("-disable_prestab",&arb.use_prestab,"disable prestabilization");
+        parse_args->Add_Not("-disable_poststab",&arb.use_poststab,"disable poststabilization");
+        parse_args->Add_Not("-use_krylov_prestab",&arb.use_krylov_prestab,"use krylov prestabilization");
+        parse_args->Add("-use_krylov_poststab",&arb.use_krylov_poststab,"use krylov poststabilization");
+        parse_args->Add("-test_arb_system",&solids_parameters.implicit_solve_parameters.test_system,"test arb system properties");
+        parse_args->Add("-print_arb_matrix",&solids_parameters.implicit_solve_parameters.print_matrix,"print arb system");
+        parse_args->Add("-prestab_iterations",&arb.max_iterations,&use_prestab_iterations,"iterations","prestabilization iterations");
     }
     void Parse_Options() PHYSBAM_OVERRIDE
     {
         ARTICULATED_RIGID_BODY<TV>& arb=solid_body_collection.rigid_body_collection.articulated_rigid_body;
         BASE::Parse_Options();
-        if(parse_args->Is_Value_Set("-parameter")) parameter=parse_args->Get_Integer_Value("-parameter");
         output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
-        solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-        if(parse_args->Is_Value_Set("-disable_prestab")) arb.use_prestab=false;
-        if(parse_args->Is_Value_Set("-disable_poststab")) arb.use_poststab=false;
-        if(parse_args->Is_Value_Set("-use_krylov_prestab")) arb.use_krylov_prestab=true;
-        if(parse_args->Is_Value_Set("-use_krylov_poststab")){
-            arb.use_krylov_poststab=true;
-            arb.use_poststab_in_cg=false;}
-        if(parse_args->Is_Value_Set("-test_arb_system")) solids_parameters.implicit_solve_parameters.test_system=true;
-        if(parse_args->Is_Value_Set("-print_arb_matrix")) solids_parameters.implicit_solve_parameters.print_matrix=true;
-        if(parse_args->Is_Value_Set("-prestab_iterations")){
-            arb.max_iterations=parse_args->Get_Integer_Value("-prestab_iterations");
-            solids_parameters.rigid_body_collision_parameters.contact_iterations=parse_args->Get_Integer_Value("-prestab_iterations");}
+        if(arb.use_krylov_poststab) arb.use_poststab_in_cg=false;
+        if(use_prestab_iterations) solids_parameters.rigid_body_collision_parameters.contact_iterations=arb.max_iterations;
     }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

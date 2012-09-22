@@ -31,18 +31,23 @@ class SMOKE_TESTS:public INCOMPRESSIBLE_ADAPTIVE_EXAMPLE<TV>
     ARRAY<T,FACE_INDEX<TV::dimension> > face_velocities_save;
     RANGE<TV> source_box;
     SPHERE<TV> collision_sphere;
+    int scale,sub_scale;
+    bool binary_refinement;
 public:
 
-    SMOKE_TESTS(const STREAM_TYPE stream_type,const PARSE_ARGS& parse_args)
-        :INCOMPRESSIBLE_ADAPTIVE_EXAMPLE<TV>(stream_type),source_box((T).25*TV::All_Ones_Vector(),(T).75*TV::All_Ones_Vector()),collision_sphere((T).5*TV::All_Ones_Vector(),.2)
+    SMOKE_TESTS(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
+        :INCOMPRESSIBLE_ADAPTIVE_EXAMPLE<TV>(stream_type),alpha(1),source_box((T).25*TV::All_Ones_Vector(),(T).75*TV::All_Ones_Vector()),
+        collision_sphere((T).5*TV::All_Ones_Vector(),.2),scale(50),sub_scale(2),binary_refinement(false)
     {
+        parse_args.Add("-scale",&scale,"scale","fine scale grid resolution");
+        parse_args.Add("-subscale",&sub_scale,"ratio","fine/coarse scale grid resolution ratio");
+        parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
+        parse_args.Add("-binary",&binary_refinement,"use binary refinement");
+        parse_args.Add("-alpha",&alpha,"param","interpolation parameter");    
+        parse_args.Parse();
+
         use_collisions=false;
         int test_number=1;
-        alpha=parse_args.Get_Double_Value("-alpha");        
-        write_substeps_level=parse_args.Get_Integer_Value("-substep");
-        int scale=parse_args.Get_Integer_Value("-scale");
-        bool binary_refinement=parse_args.Get_Option_Value("-binary");
-        int sub_scale=parse_args.Get_Integer_Value("-subscale");
         binary_refinement_levels=0;
         if(binary_refinement){int tmp=sub_scale;while(tmp>1){assert((tmp&1)==0);tmp>>=1;binary_refinement_levels++;}}
         output_directory=STRING_UTILITIES::string_sprintf("Smoke_Tests/Test_%d_%d_%d%s_%1.2f",test_number,scale,sub_scale,binary_refinement_levels?"_binary":"",alpha);        

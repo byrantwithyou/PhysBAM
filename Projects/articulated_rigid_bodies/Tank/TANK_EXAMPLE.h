@@ -44,7 +44,7 @@ public:
     FRAME<TV> parent_to_joint[10];
 
     TANK_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),turn_in_place(false),start_on_fridge(false)
     {
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
         solids_parameters.cfl=(T).1;
@@ -82,14 +82,12 @@ public:
     void Register_Options() PHYSBAM_OVERRIDE
     {
         BASE::Register_Options();
-        parse_args->Add_Option_Argument("-tank_on_fridge","For the tank example, start on fridge blocks");
-        parse_args->Add_Option_Argument("-tank_turn","For the tank example, turn in place instead of move forward");
+        parse_args->Add("-tank_on_fridge",&start_on_fridge,"For the tank example, start on fridge blocks");
+        parse_args->Add("-tank_turn",&turn_in_place,"For the tank example, turn in place instead of move forward");
     }
     void Parse_Options() PHYSBAM_OVERRIDE
     {
         BASE::Parse_Options();
-        start_on_fridge=parse_args->Is_Value_Set("-tank_on_fridge");
-        turn_in_place=parse_args->Is_Value_Set("-tank_turn");
         output_directory="Tank/output";
     }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}

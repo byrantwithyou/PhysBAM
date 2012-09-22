@@ -98,7 +98,7 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-parameter", 1);
+    parse_args->Add("-njoints",&njoints,"num","number of joints to use");
 }
 //#####################################################################
 // Function Parse_Options
@@ -106,7 +106,6 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    if(parse_args->Is_Value_Set("-parameter")) njoints=parse_args->Get_Integer_Value("-parameter");
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 }
