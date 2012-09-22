@@ -70,7 +70,7 @@ void Get_Initial_Data()
     SOFT_BINDINGS<T,TV>& soft_bindings=solid_body_collection.deformable_body_collection.soft_bindings;
 
     for(int i=0;i<number_of_objects;i++)
-        tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV((T)1.7*(i-4)-(T).85,(T)6,0))),true,true);
+        tests.Create_Tetrahedralized_Volume(data_directory+"/Tetrahedralized_Volumes/sphere.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV((T)1.7*(i-4)-(T).85,(T)6,0))),true,true);
     for(int i=0;i<deformable_object.structures.m;i++) deformable_object.structures(i)->Update_Number_Nodes();
 
     ARRAY<TETRAHEDRALIZED_VOLUME<T>*> tetrahedralized_volumes(deformable_object.structures.m);

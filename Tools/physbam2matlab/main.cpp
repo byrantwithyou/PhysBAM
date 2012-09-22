@@ -62,42 +62,33 @@ int main(int argc,char* argv[])
 #endif
     typedef double RW;
 
+    bool convert_density=false,convert_momentum=false,convert_energy=false,convert_velocity=false;
+    bool convert_pressure=false,convert_internal_energy=false,convert_entropy=false,convert_machnumber=false;
+    int first_frame=0,last_frame=0;
+    std::string output_directory;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
-    parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
-    parse_args.Add_String_Argument("-o","","output directory");
-    parse_args.Add_Option_Argument("-density","convert density");
-    parse_args.Add_Option_Argument("-momentum","convert momentum");
-    parse_args.Add_Option_Argument("-machnumber","convert machnumber");
-    parse_args.Add_Option_Argument("-energy","convert energy");
-    parse_args.Add_Option_Argument("-entropy","convert entropy");
-    parse_args.Add_Option_Argument("-velocity","convert velocity");
-    parse_args.Add_Option_Argument("-pressure","convert pressure");
-    parse_args.Add_Option_Argument("-internal_energy","convert internal_energy");
+    parse_args.Add("-density",&convert_density,"convert density");
+    parse_args.Add("-momentum",&convert_momentum,"convert momentum");
+    parse_args.Add("-machnumber",&convert_machnumber,"convert machnumber");
+    parse_args.Add("-energy",&convert_energy,"convert energy");
+    parse_args.Add("-entropy",&convert_entropy,"convert entropy");
+    parse_args.Add("-velocity",&convert_velocity,"convert velocity");
+    parse_args.Add("-pressure",&convert_pressure,"convert pressure");
+    parse_args.Add("-internal_energy",&convert_internal_energy,"convert internal_energy");
+    parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
+    parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
+    parse_args.Add("-o",&output_directory,"file","output directory");
     parse_args.Set_Extra_Arguments(1,"<input_directory>");
     parse_args.Parse();
 
-    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
-    if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
+    std::string input_directory=parse_args.Extra_Arg(0);
     FILE_UTILITIES::Create_Directory(output_directory);
-
-    int first_frame,last_frame;
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/first_frame",first_frame);
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);
-    if(parse_args.Is_Value_Set("-start_frame")) first_frame=parse_args.Get_Integer_Value("-start_frame");
-    if(parse_args.Is_Value_Set("-last_frame")) last_frame=parse_args.Get_Integer_Value("-last_frame");
 
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
     PHYSBAM_FATAL_ERROR("No double support");
 #else
-    bool convert_density=parse_args.Is_Value_Set("-density");
-    bool convert_momentum=parse_args.Is_Value_Set("-momentum");
-    bool convert_energy=parse_args.Is_Value_Set("-energy"); 
-    bool convert_velocity=parse_args.Is_Value_Set("-velocity"); 
-    bool convert_pressure=parse_args.Is_Value_Set("-pressure"); 
-    bool convert_internal_energy=parse_args.Is_Value_Set("-internal_energy"); 
-    bool convert_entropy=parse_args.Is_Value_Set("-entropy"); 
-    bool convert_machnumber=parse_args.Is_Value_Set("-machnumber"); 
 
     std::cout<<"input_directory="<<input_directory<<"output_directory="<<output_directory<<std::endl;
     std::cout<<"first_frame="<<first_frame<<std::endl<<"last_frame="<<last_frame<<std::endl;

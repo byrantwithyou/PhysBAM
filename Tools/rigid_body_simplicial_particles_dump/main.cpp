@@ -40,24 +40,21 @@ int main(int argc,char *argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
     bool type_double=false;
+    int dimension=1,frame=0,rigid_body_id=1;
+    std::string output_file;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Integer_Argument("-d",1,"dimension");
-    parse_args.Add_Integer_Argument("-frame",0,"frame number");
-    parse_args.Add_Integer_Argument("-rbid",1,"rigid body id");
-    parse_args.Add_String_Argument("-o","","output file");
+    parse_args.Add("-d",&dimension,"dim","dimension");
+    parse_args.Add("-frame",&frame,"frame","frame number");
+    parse_args.Add("-rbid",&rigid_body_id,"id","rigid body id");
+    parse_args.Add("-o",&output_file,"file","output file");
     parse_args.Set_Extra_Arguments(1,"<basedir>","base directory");
     parse_args.Parse();
 
-    int dimension=parse_args.Get_Integer_Value("-d");
-    int frame=parse_args.Get_Integer_Value("-frame");
-    int rigid_body_id=parse_args.Get_Integer_Value("-rbid");
-
     std::ostream* output_stream=&(std::cout);
     std::ofstream output_file_stream;
-    if(parse_args.Is_Value_Set("-o")){
-        std::string output_file=parse_args.Get_String_Value("-o");
+    if(output_file.size()){
         output_file_stream.open(output_file.c_str());
         output_stream=&output_file_stream;}
 

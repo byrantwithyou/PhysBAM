@@ -126,26 +126,30 @@ Merge_Lists(const std::string& filename)
 template<class T> void
 Do_Merge(PARSE_ARGS& parse_args)
 {
-    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory+"/merged";
-    if(parse_args.Is_Value_Set("-o")) output_directory=parse_args.Get_String_Value("-o");
+    std::string output_directory;
+    bool is_1d=false,is_2d=false,is_3d=false,print_maxerrors=false;
+    int first_frame=0,last_frame=0,number_of_processes=0;
+    parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
+    parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
+    parse_args.Add("-np",&number_of_processes,"number","number of mpi processes (use 0 to autodetect)");
+    parse_args.Add("-o",&output_directory,"file","output directory");
+    parse_args.Add("-print_maxerrors",&print_maxerrors,"print max errors");
+    parse_args.Add("-1d",&is_1d,"input data is 1-D");
+    parse_args.Add("-2d",&is_2d,"input data is 2-D");
+    parse_args.Add("-3d",&is_3d,"input data is 3-D");
+    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Parse();
 
-    int first_frame,last_frame;
+    std::string input_directory=parse_args.Extra_Arg(0);
+    if(!output_directory.size()) output_directory=input_directory+"/merged";
+
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/1/common/first_frame",first_frame);
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/1/common/last_frame",last_frame);
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Create_Directory(output_directory+"/common");
     FILE_UTILITIES::Write_To_Text_File(output_directory+"/common/first_frame",first_frame);
-    bool print_maxerrors=parse_args.Is_Value_Set("-print_maxerrors");
-    bool is_1d=false,is_2d=false,is_3d=false;
 
-    if(parse_args.Is_Value_Set("-start_frame")) first_frame=parse_args.Get_Integer_Value("-start_frame");
-    if(parse_args.Is_Value_Set("-last_frame")) last_frame=parse_args.Get_Integer_Value("-last_frame");
-    if(parse_args.Is_Value_Set("-1d")) is_1d=true;
-    else if(parse_args.Is_Value_Set("-2d")) is_2d=true;
-    else if(parse_args.Is_Value_Set("-3d")) is_3d=true;
     if(!is_1d && !is_2d && !is_3d){LOG::cout<<"Assuming 3d"<<std::endl;is_3d=true;}
-    //bool force=parse_args.Get_Option_Value("-f");
-    int number_of_processes=parse_args.Get_Integer_Value("-np");
     if(number_of_processes<0){LOG::cerr<<"Invalid np<0"<<std::endl;exit(1);}
     else if(!number_of_processes){ // autodetect number of processes
         FILE_UTILITIES::Find_First_Nonexistent_Directory_In_Sequence(STRING_UTILITIES::string_sprintf("%s/%%d",input_directory.c_str()),1,&number_of_processes);--number_of_processes;
@@ -167,22 +171,13 @@ Do_Merge(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
+    bool use_doubles=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-f","force");
-    parse_args.Add_Integer_Argument("-start_frame",0,"start frame number");
-    parse_args.Add_Integer_Argument("-last_frame",0,"last frame number");
-    parse_args.Add_Integer_Argument("-np",0,"number of mpi processes (use 0 to autodetect)");
-    parse_args.Add_String_Argument("-o","","output directory");
-    parse_args.Add_Option_Argument("-print_maxerrors","print max errors");
-    parse_args.Add_Option_Argument("-double","input data is in doubles");
-    parse_args.Add_Option_Argument("-1d","input data is 1-D");
-    parse_args.Add_Option_Argument("-2d","input data is 2-D");
-    parse_args.Add_Option_Argument("-3d","input data is 3-D");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse();
+    parse_args.Add("-double",&use_doubles,"input data is in doubles");
+    parse_args.Parse(true);
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(parse_args.Is_Value_Set("-double")) Do_Merge<double>(parse_args); 
+    if(use_doubles) Do_Merge<double>(parse_args); 
     else Do_Merge<float>(parse_args);
 #else
     Do_Merge<float>(parse_args);

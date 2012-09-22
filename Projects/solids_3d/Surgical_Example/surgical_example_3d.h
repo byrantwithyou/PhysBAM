@@ -215,7 +215,7 @@ public:
         DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
         DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
 
-        TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../../Personal_Libraries/Joey_Library/data/Output_Dup/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0,0))),false,true);
+        TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../../Personal_Libraries/Joey_Library/data/Output_Dup/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0,0))),false,true);
         tissue_tet_vol=&tet_volume;   
         tet_volume.Update_Bounding_Box();
         tet_volume.Set_Mass_Of_Particles(true);

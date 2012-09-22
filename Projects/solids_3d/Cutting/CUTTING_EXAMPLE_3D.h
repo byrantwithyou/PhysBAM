@@ -62,12 +62,12 @@ void Initialize_Bodies_Without_Embedding()
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
 
-    TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_better_3d/Output_Orig/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0.5,0))),false,true);
+    TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_better_3d/Output_Orig/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.5,0))),false,true);
     tet_volume.Update_Bounding_Box();
     //for(int p=0;p<particles.Size();p++) if(particles.X(p).y<tet_volume.bounding_box->ymin+(T).01) attached_nodes.Append(p);
     tests.Add_Ground();
 
-    tests.Create_Triangulated_Object("../cutting_better_3d/Output_Orig/cutting_surface.tri",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,0.5,0))),false,true);
+    tests.Create_Triangulated_Object("../cutting_better_3d/Output_Orig/cutting_surface.tri",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,0.5,0))),false,true);
 
     // add structures and rigid bodies to collisions
     deformable_object.collisions.collision_structures.Append_Elements(deformable_object.structures);
@@ -98,7 +98,7 @@ void Initialize_Bodies_With_Embedding()
     DEFORMABLE_OBJECT<TV>& deformable_object=solid_body_collection.deformable_object;
     DEFORMABLE_PARTICLES<TV>& particles=deformable_object.particles;
 
-    TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_3d/Output_Dup/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME_3D<T>(TV(0,4.5,0))),false,true);
+    TETRAHEDRALIZED_VOLUME<T>& tet_volume=tests.Create_Tetrahedralized_Volume("../cutting_3d/Output_Dup/embedding_volume.tet",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,4.5,0))),false,true);
     tet_volume.Update_Bounding_Box();
     tet_volume.Set_Mass_Of_Particles(true);
 

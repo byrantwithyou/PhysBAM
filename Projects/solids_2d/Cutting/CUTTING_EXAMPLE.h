@@ -53,7 +53,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     DEFORMABLE_OBJECT<T,TV>& deformable_object=solid_body_collection.deformable_object;
     DEFORMABLE_PARTICLES<T,TV>& particles=deformable_object.particles;
     
-    TRIANGULATED_AREA<T>& triangulated_area=tests.Create_Triangulated_Object("../cutting_better_2d/Output_Dup/embedding_area.tri2d",RIGID_BODY_STATE<TV>(FRAME_2D<T>(TV(0,10))),false,true);
+    TRIANGULATED_AREA<T>& triangulated_area=tests.Create_Triangulated_Object("../cutting_better_2d/Output_Dup/embedding_area.tri2d",RIGID_BODY_STATE<TV>(FRAME<TV>(TV(0,10))),false,true);
     triangulated_area.Update_Bounding_Box();
     triangulated_area.Set_Mass_Of_Particles(true);
     

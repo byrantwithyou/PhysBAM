@@ -33,7 +33,7 @@ public:
     double initial_temperature,annealing_factor;
 
     MESH_PARTITIONING()
-        :tetrahedralized_volume(0)
+        :tetrahedralized_volume(0),partitions(0),epochs(10000),iterations(1000),cross_edge_factor(1),reverse_range(0),initial_temperature(100),annealing_factor(.999)
     {
         random_numbers.Set_Seed();
     }
@@ -340,49 +340,41 @@ void Optimize_Particle_Order(const int reorder_partition_input)
 //#####################################################################
 int main(int argc,char* argv[])
 {
+    MESH_PARTITIONING<float> mesh_partitioning;
+    std::string geometry,mesh;
+    int reorder_partition=0;
+    bool all=false,cluster=false,optimize=false,reorder=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Option_Argument("-all","-cluster, -optimize, and -reorder");
-    parse_args.Add_Option_Argument("-cluster","compute initial clustering");
-    parse_args.Add_Option_Argument("-optimize","optimize clustering");
-    parse_args.Add_Option_Argument("-reorder","optimize particle order");
-    parse_args.Add_String_Argument("-geometry","","geometry file");
-    parse_args.Add_String_Argument("-mesh","","connectivity segment mesh");
-    parse_args.Add_String_Argument("-o","partitioning_data","output directory");
-    parse_args.Add_Integer_Argument("-partitions",0,"partitions","partitions to use");
-    parse_args.Add_Integer_Argument("-reorder_partition",0,"partition","partition to reorder (defaults to all)");
-    parse_args.Add_Integer_Argument("-epochs",10000,"epochs","epochs of simulated annealing");
-    parse_args.Add_Integer_Argument("-iterations",1000,"iterations","iterations per annealing epoch");
-    parse_args.Add_Double_Argument("-initial_temperature",100,"temperature","initial annealing temperature");
-    parse_args.Add_Double_Argument("-annealing_factor",.999,"factor","annealing factor");
-    parse_args.Add_Integer_Argument("-cross_edge_factor",1,"factor","cross edge functional multiplier");
-    parse_args.Add_Integer_Argument("-reverse",0,"range","use reverse mutations for reordering with given range (e.g. 10) (default is swap neighbors)");
+    parse_args.Add("-all",&all,"-cluster, -optimize, and -reorder");
+    parse_args.Add("-cluster",&cluster,"compute initial clustering");
+    parse_args.Add("-optimize",&optimize,"optimize clustering");
+    parse_args.Add("-reorder",&reorder,"optimize particle order");
+    parse_args.Add("-geometry",&geometry,"file","geometry file");
+    parse_args.Add("-mesh",&mesh,"file","connectivity segment mesh");
+    parse_args.Add("-o",&mesh_partitioning.output_directory,"partitioning_data","output directory");
+    parse_args.Add("-partitions",&mesh_partitioning.partitions,"partitions","partitions to use");
+    parse_args.Add("-reorder_partition",&reorder_partition,"partition","partition to reorder (defaults to all)");
+    parse_args.Add("-epochs",&mesh_partitioning.epochs,"epochs","epochs of simulated annealing");
+    parse_args.Add("-iterations",&mesh_partitioning.iterations,"iterations","iterations per annealing epoch");
+    parse_args.Add("-initial_temperature",&mesh_partitioning.initial_temperature,"temperature","initial annealing temperature");
+    parse_args.Add("-annealing_factor",&mesh_partitioning.annealing_factor,"factor","annealing factor");
+    parse_args.Add("-cross_edge_factor",&mesh_partitioning.cross_edge_factor,"factor","cross edge functional multiplier");
+    parse_args.Add("-reverse",&mesh_partitioning.reverse_range,"range","use reverse mutations for reordering with given range (e.g. 10) (default is swap neighbors)");
     parse_args.Parse();
 
     LOG::Initialize_Logging();
-    MESH_PARTITIONING<float> mesh_partitioning;
 
-    mesh_partitioning.output_directory=parse_args.Get_String_Value("-o");
     FILE_UTILITIES::Create_Directory(mesh_partitioning.output_directory);
     LOG::Instance()->Copy_Log_To_File(mesh_partitioning.output_directory+"/log.txt",false);
 
     {LOG::SCOPE scope("Initialization");
-    if(parse_args.Is_Value_Set("-geometry")) mesh_partitioning.Initialize_Geometry(parse_args.Get_String_Value("-geometry"));
-    if(parse_args.Is_Value_Set("-mesh")) mesh_partitioning.Initialize_Segment_Mesh(parse_args.Get_String_Value("-mesh"));
-    else if(parse_args.Is_Value_Set("-geometry")) mesh_partitioning.Initialize_Segment_Mesh_From_Geometry();
+    if(geometry.size()) mesh_partitioning.Initialize_Geometry(geometry);
+    if(mesh.size()) mesh_partitioning.Initialize_Segment_Mesh(mesh);
+    else if(geometry.size()) mesh_partitioning.Initialize_Segment_Mesh_From_Geometry();
     else{LOG::cerr<<"Must specify either -geometry or -mesh."<<std::endl;parse_args.Print_Usage(true);}}
 
-    if(!parse_args.Is_Value_Set("-partitions")){LOG::cerr<<"Must specify -partitions."<<std::endl;parse_args.Print_Usage(true);}
-    mesh_partitioning.partitions=parse_args.Get_Integer_Value("-partitions");
-    int reorder_partition=parse_args.Get_Integer_Value("-reorder_partition");
-    mesh_partitioning.epochs=parse_args.Get_Integer_Value("-epochs");
-    mesh_partitioning.iterations=parse_args.Get_Integer_Value("-iterations");
-    mesh_partitioning.initial_temperature=parse_args.Get_Double_Value("-initial_temperature");
-    mesh_partitioning.annealing_factor=parse_args.Get_Double_Value("-annealing_factor");    
-    mesh_partitioning.cross_edge_factor=parse_args.Get_Integer_Value("-cross_edge_factor");    
-    mesh_partitioning.reverse_range=parse_args.Get_Integer_Value("-reverse");
+    if(!mesh_partitioning.partitions){LOG::cerr<<"Must specify -partitions."<<std::endl;parse_args.Print_Usage(true);}
 
-    bool all=parse_args.Is_Value_Set("-all");
-    bool cluster=parse_args.Is_Value_Set("-cluster"),optimize=parse_args.Is_Value_Set("-optimize"),reorder=parse_args.Is_Value_Set("-reorder");
     if(all+cluster+optimize+reorder<1){LOG::cerr<<"Must specify one of -all, -cluster, -optimize, or -reorder."<<std::endl;parse_args.Print_Usage();}
     if(all) cluster=optimize=reorder=true;
     if(cluster && !optimize && reorder){LOG::cerr<<"Can't specify -cluster and -reorder without -optimize."<<std::endl;parse_args.Print_Usage();}
