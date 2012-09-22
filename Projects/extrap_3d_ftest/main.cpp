@@ -54,9 +54,6 @@ int main(int argc,char* argv[])
     bool use_ext_neo=false,use_ext_neo2=false,use_ext_neo_smooth=false,use_corotated=false,use_corot_blend=false,use_constant_ife=false,use_rc2_ext=false;
     VECTOR<T,3> singular_vals(1,1,1);
     
-   // if(PARSE_ARGS::Find_And_Remove("-incomp",argc,argv)) example=new INCOMPRESSIBLE_TESTS<T>(stream_type);
-   // else if(PARSE_ARGS::Find_And_Remove("-hair_sim_tests",argc,argv)) example=new HAIR_SIM_TESTS<T>(stream_type);
-    
     parse_args.Add("-youngs_modulus",&stiffness,"value","parameter used by multiple tests to change the parameters of the test");
     parse_args.Add("-poissons_ratio",&poissons_ratio,"value","stiffness multiplier for various tests");
     parse_args.Add("-sv",&singular_vals,"sv sv","Singular Values");

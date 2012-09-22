@@ -35,15 +35,22 @@ int main(int argc,char* argv[])
 
     STREAM_TYPE stream_type((RW()));
 
+    bool opt_sod=false,opt_bangbang=false,opt_smoothflow=false,opt_drop=false;
+
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-sod",&opt_sod,"Use sod test");
+    parse_args.Add("-bangbang",&opt_bangbang,"Use bangbang test");
+    parse_args.Add("-smoothflow",&opt_smoothflow,"Use smoothflow test");
+    parse_args.Add("-drop",&opt_drop,"Use drop test");
+    parse_args.Parse(true);
+
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-sod",argc,argv)) example=new SOD_ST<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-bangbang",argc,argv)) example=new BANG_BANG_ST<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-smoothflow",argc,argv)) 
-        example=new SMOOTH_FLOW<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-drop",argc,argv)) example=new SOD_ST_DROP<T>(stream_type);
+    if(opt_sod) example=new SOD_ST<T>(stream_type);
+    else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type);
+    else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type);
+    else if(opt_drop) example=new SOD_ST_DROP<T>(stream_type);
     else example=new SOD_ST<T>(stream_type); //default
     example->want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);

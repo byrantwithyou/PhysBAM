@@ -104,9 +104,6 @@ public:
     const std::string& Get_Program_Name() const;
     int Find_Match(const std::string& str) const;
     int Find_Match(const std::string& str,const ARG_DATA::TYPE& type) const;
-    static bool Find_And_Remove(const char *str,int& argc,char** argv);
-    static int Find_And_Remove_Integer(const char *str,int& argc,char** argv);
-    static double Find_And_Remove_Double(const char *str,int& argc,char** argv);
     void Print_Usage(bool do_exit=false) const;
     std::string Print_Arguments() const;
 //#####################################################################

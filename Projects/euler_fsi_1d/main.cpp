@@ -37,17 +37,27 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,1> TV;
 
     STREAM_TYPE stream_type((RW()));
+
+    bool opt_sod=false,opt_piston=false,opt_bangbang=false,opt_smoothflow=false,opt_drop=false;
+    int xprocs=0;
+
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-sod",&opt_sod,"Use sod test");
+    parse_args.Add("-piston",&opt_piston,"Use piston test");
+    parse_args.Add("-bangbang",&opt_bangbang,"Use bangbang test");
+    parse_args.Add("-smoothflow",&opt_smoothflow,"Use smoothflow test");
+    parse_args.Add("-drop",&opt_drop,"Use drop test");
+    parse_args.Add("-xprocs",&xprocs,"procs","Processors in x direction");
+    parse_args.Parse(true);
     
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-sod",argc,argv)) example=new SOD_ST<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-piston",argc,argv)) example=new PISTON<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-bangbang",argc,argv)) example=new BANG_BANG_ST<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-smoothflow",argc,argv)) example=new SMOOTH_FLOW<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-drop",argc,argv)) example=new SOD_ST_DROP<T>(stream_type);
+    if(opt_sod) example=new SOD_ST<T>(stream_type);
+    else if(opt_piston) example=new PISTON<T>(stream_type);
+    else if(opt_bangbang) example=new BANG_BANG_ST<T>(stream_type);
+    else if(opt_smoothflow) example=new SMOOTH_FLOW<T>(stream_type);
+    else if(opt_drop) example=new SOD_ST_DROP<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
-    int xprocs=PARSE_ARGS::Find_And_Remove_Integer("-xprocs",argc,argv);
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     if(example->mpi_world->initialized){

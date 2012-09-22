@@ -36,15 +36,25 @@ int main(int argc,char** argv)
     STREAM_TYPE stream_type((RW()));
     typedef VECTOR<T,3> TV;
 
-    EXAMPLE<TV>* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-tank",argc,argv)) example=new TANK_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-mesh",argc,argv)) example=new MESH_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-chains",argc,argv)) example=new CHAINS_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-bridge",argc,argv)) example=new BRIDGE_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-magnets",argc,argv)) example=new MAGNETS_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-curl",argc,argv)) example=new CURL_EXAMPLE<T>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
+    bool opt_tank=false,opt_mesh=false,opt_chains=false,opt_bridge=false,opt_magnets=false,opt_curl=false;
+
     PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-tank",&opt_tank,"Use tank test");
+    parse_args.Add("-mesh",&opt_mesh,"Use mesh test");
+    parse_args.Add("-chains",&opt_chains,"Use chains test");
+    parse_args.Add("-bridge",&opt_bridge,"Use bridge test");
+    parse_args.Add("-magnets",&opt_magnets,"Use magnets test");
+    parse_args.Add("-curl",&opt_curl,"Use curl test");
+    parse_args.Parse(true);
+
+    EXAMPLE<TV>* example=0;
+    if(opt_tank) example=new TANK_EXAMPLE<T>(stream_type);
+    else if(opt_mesh) example=new MESH_EXAMPLE<T>(stream_type);
+    else if(opt_chains) example=new CHAINS_EXAMPLE<T>(stream_type);
+    else if(opt_bridge) example=new BRIDGE_EXAMPLE<T>(stream_type);
+    else if(opt_magnets) example=new MAGNETS_EXAMPLE<T>(stream_type);
+    else if(opt_curl) example=new CURL_EXAMPLE<T>(stream_type);
+    else example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(parse_args);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >*>(example);

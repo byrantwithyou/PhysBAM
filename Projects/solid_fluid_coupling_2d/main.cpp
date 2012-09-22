@@ -27,11 +27,15 @@ int main(int argc,char* argv[])
     typedef GRID<TV> T_GRID;
     STREAM_TYPE stream_type((RW()));
 
+    bool opt_water=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-water",&opt_water,"Use water test");
+    parse_args.Parse(true);
+
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-water",argc,argv)) example=new STANDARD_TESTS_WATER<T>(stream_type);
+    if(opt_water) example=new STANDARD_TESTS_WATER<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     if(example->mpi_world->initialized){

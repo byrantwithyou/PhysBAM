@@ -4,7 +4,10 @@
 
 using namespace PhysBAM;
 int main(int argc,char* argv[]){
-    bool run_strawman_example=PARSE_ARGS::Find_And_Remove("-strawman",argc,argv);
+    bool run_strawman_example=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-strawman",&run_strawman_example,"Use strawman test");
+    parse_args.Parse();
 
     typedef float T;
     if(run_strawman_example){

@@ -24,9 +24,13 @@ int main(int argc,char** argv)
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
 
-    if(PARSE_ARGS::Find_And_Remove("-arb",argc,argv)) example=new ARB_EXAMPLE<float,float>(stream_type);
-    else example=new STANDARD_TESTS<T>(stream_type);
+    bool opt_arb=false;
     PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-arb",&opt_arb,"Use arb test");
+    parse_args.Parse(true);
+
+    if(opt_arb) example=new ARB_EXAMPLE<float,float>(stream_type);
+    else example=new STANDARD_TESTS<T>(stream_type);
     example->Parse(parse_args);
 
     SOLIDS_FLUIDS_DRIVER_UNIFORM<GRID<TV> > driver(*example);

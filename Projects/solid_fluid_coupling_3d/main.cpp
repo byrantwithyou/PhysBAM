@@ -22,25 +22,28 @@ int main(int argc,char* argv[])
     typedef GRID<TV> T_GRID;
     STREAM_TYPE stream_type((RW()));
 
+    bool opt_water=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-water",&opt_water,"Use water test");
 #if 0
-    parse_args.Add_Integer_Argument("-xprocs",0);
-    parse_args.Add_Integer_Argument("-zprocs",0);
+    int xprocs=0,zprocs=0;
+    parse_args.Add("-xprocs",&xprocs,"procs","Processors in x direction");
+    parse_args.Add("-zprocs",&zprocs,"procs","Processors in x direction");
 #endif
+    parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-water",argc,argv)) example=new STANDARD_TESTS_WATER<T>(stream_type);
+    if(opt_water) example=new STANDARD_TESTS_WATER<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     std::cout<<"mpi world "<<example->mpi_world->initialized<<std::endl;
 #if 0
     if(example->mpi_world->initialized){
         example->solids_fluids_parameters.mpi_solid_fluid=new MPI_SOLID_FLUID<TV>();
-        int xprocs=parse_args.Get_Integer_Value("-xprocs");
         VECTOR<int,3> proc_counts;
-        if(xprocs) proc_counts=VECTOR<int,3>(xprocs,1,parse_args.Get_Integer_Value("-zprocs"));
+        if(xprocs) proc_counts=VECTOR<int,3>(xprocs,1,zprocs);
         if(example->solids_fluids_parameters.mpi_solid_fluid->Fluid_Node()){
             example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<T_GRID>(*example->fluids_parameters.grid,3,false,proc_counts,VECTOR<bool,3>(),
                 example->solids_fluids_parameters.mpi_solid_fluid->fluid_group);

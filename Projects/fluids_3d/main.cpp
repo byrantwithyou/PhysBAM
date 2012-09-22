@@ -70,19 +70,38 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,3> TV;
     STREAM_TYPE stream_type((RW()));
 
+    bool opt_sph=false,opt_multiphase=false,opt_fire=false,opt_smoke=false,opt_glass=false;
+    bool opt_lighthouse=false,opt_sheeting=false,opt_dsd_fire_ball=false,opt_dsd_no_navier=false;
+    bool opt_twophase=false,opt_efty=false,opt_waterfall=false;
+
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-sph",&opt_sph,"Use sph test");
+    parse_args.Add("-multiphase",&opt_multiphase,"Use multiphase test");
+    parse_args.Add("-fire",&opt_fire,"Use fire test");
+    parse_args.Add("-smoke",&opt_smoke,"Use smoke test");
+    parse_args.Add("-glass",&opt_glass,"Use glass test");
+    parse_args.Add("-lighthouse",&opt_lighthouse,"Use lighthouse test");
+    parse_args.Add("-sheeting",&opt_sheeting,"Use sheeting test");
+    parse_args.Add("-dsd_fire_ball",&opt_dsd_fire_ball,"Use dsd_fire_ball test");
+    parse_args.Add("-dsd_no_navier",&opt_dsd_no_navier,"Use dsd_no_navier test");
+    parse_args.Add("-twophase",&opt_twophase,"Use twophase test");
+    parse_args.Add("-efty",&opt_efty,"Use efty test");
+    parse_args.Add("-waterfall",&opt_waterfall,"Use waterfall test");
+    parse_args.Parse(true);
+
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("sph",argc,argv)) example=new STANDARD_TESTS_SPH<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("multiphase",argc,argv)) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("fire",argc,argv)) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("smoke",argc,argv)) example=new STANDARD_TESTS_SMOKE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("glass",argc,argv)) example=new GLASS<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("lighthouse",argc,argv)) example=new LIGHTHOUSE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("sheeting",argc,argv)) example=new SHEETING<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("dsd_fire_ball",argc,argv)) example=new DSD_FIRE_BALL_EXAMPLE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("dsd_no_navier",argc,argv)) example=new DSD_NO_NAVIER_STOKES<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("twophase",argc,argv)) example=new TWO_PHASE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("efty",argc,argv)) example=new FLOW_PAST_EFTYCHIS<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("waterfall",argc,argv)) example=new WATERFALL<T>(stream_type);
+    if(opt_sph) example=new STANDARD_TESTS_SPH<T>(stream_type);
+    else if(opt_multiphase) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
+    else if(opt_fire) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type);
+    else if(opt_smoke) example=new STANDARD_TESTS_SMOKE<T>(stream_type);
+    else if(opt_glass) example=new GLASS<T>(stream_type);
+    else if(opt_lighthouse) example=new LIGHTHOUSE<T>(stream_type);
+    else if(opt_sheeting) example=new SHEETING<T>(stream_type);
+    else if(opt_dsd_fire_ball) example=new DSD_FIRE_BALL_EXAMPLE<T>(stream_type);
+    else if(opt_dsd_no_navier) example=new DSD_NO_NAVIER_STOKES<T>(stream_type);
+    else if(opt_twophase) example=new TWO_PHASE<T>(stream_type);
+    else if(opt_efty) example=new FLOW_PAST_EFTYCHIS<T>(stream_type);
+    else if(opt_waterfall) example=new WATERFALL<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     //FILLING_BOX<T> example(stream_type);
     //FLOW_OVER_SPHERE<T> example(stream_type);
@@ -119,7 +138,6 @@ int main(int argc,char* argv[])
     //UNDERWATER_DOME<T> example(stream_type);
     //SOLID_FLUID_COUPLING_TEST<T> example(stream_type);
     example->want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     if(example->mpi_world->initialized) example->fluids_parameters.mpi_grid=new MPI_UNIFORM_GRID<GRID<TV> >(*example->fluids_parameters.grid,3);

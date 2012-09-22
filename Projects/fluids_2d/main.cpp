@@ -55,17 +55,33 @@ int main(int argc,char* argv[])
     typedef VECTOR<T,2> TV;
     STREAM_TYPE stream_type((RW()));
 
+    bool opt_sph=false,opt_multiphase=false,opt_twophase=false,opt_fire=false,opt_density=false,opt_glass=false,opt_smoke=false;
+    bool opt_spinning_bar=false,opt_refinement=false,opt_flow_cylinder=false;
+
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-sph",&opt_sph,"Use sph test");
+    parse_args.Add("-multiphase",&opt_multiphase,"Use multiphase test");
+    parse_args.Add("-twophase",&opt_twophase,"Use twophase test");
+    parse_args.Add("-fire",&opt_fire,"Use fire test");
+    parse_args.Add("-density",&opt_density,"Use density test");
+    parse_args.Add("-glass",&opt_glass,"Use glass test");
+    parse_args.Add("-smoke",&opt_smoke,"Use smoke test");
+    parse_args.Add("-spinning_bar",&opt_spinning_bar,"Use spinning_bar test");
+    parse_args.Add("-refinement",&opt_refinement,"Use refinement test");
+    parse_args.Add("-flow_cylinder",&opt_flow_cylinder,"Use flow_cylinder test");
+    parse_args.Parse(true);
+
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-sph",argc,argv)) example=new STANDARD_TESTS_SPH<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-multiphase",argc,argv)) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-twophase",argc,argv)) example=new TWO_PHASE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-fire",argc,argv)) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-density",argc,argv)) example=new DENSITY_TARGETTING<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-glass",argc,argv)) example=new GLASS<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-smoke",argc,argv)) example=new STANDARD_TESTS_SMOKE<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-spinning_bar",argc,argv)) example=new SPINNING_BAR<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-refinement",argc,argv)) example=new REFINEMENT<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-flow_cylinder",argc,argv)) example=new FLOW_PAST_CIRCLE<T>(stream_type);
+    if(opt_sph) example=new STANDARD_TESTS_SPH<T>(stream_type);
+    else if(opt_multiphase) example=new STANDARD_TESTS_MULTIPHASE<T>(stream_type);
+    else if(opt_twophase) example=new TWO_PHASE<T>(stream_type);
+    else if(opt_fire) example=new MULTIPHASE_FIRE_EXAMPLES<T>(stream_type);
+    else if(opt_density) example=new DENSITY_TARGETTING<T>(stream_type);
+    else if(opt_glass) example=new GLASS<T>(stream_type);
+    else if(opt_smoke) example=new STANDARD_TESTS_SMOKE<T>(stream_type);
+    else if(opt_spinning_bar) example=new SPINNING_BAR<T>(stream_type);
+    else if(opt_refinement) example=new REFINEMENT<T>(stream_type);
+    else if(opt_flow_cylinder) example=new FLOW_PAST_CIRCLE<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     //BREAKING_WAVE<T> example(stream_type,omega,epsilon,depth);;
     //RISING_BUBBLE<T> example(stream_type);
@@ -89,7 +105,6 @@ int main(int argc,char* argv[])
     //example=new ELASTIC_DRIP<T>(stream_type);
     //example=new FLUID_CONTROL<T>(stream_type);
     example->want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
     
     FLUIDS_PARAMETERS_UNIFORM<GRID<TV> >& fluids_parameters=example->fluids_parameters;

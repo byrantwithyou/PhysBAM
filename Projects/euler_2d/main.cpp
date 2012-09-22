@@ -35,20 +35,27 @@ int main(int argc,char* argv[])
 
     STREAM_TYPE stream_type((RW()));
 
-    bool incompressible=false;
-    if(PARSE_ARGS::Find_And_Remove("-incompressible",argc,argv)) incompressible=true;
+    bool opt_sod=false,opt_oblique=false,opt_circle=false,opt_tunnel=false,opt_drop=false,incompressible=false;
+    int xprocs=0,yprocs=0;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-sod",&opt_sod,"Use sod test");
+    parse_args.Add("-oblique",&opt_oblique,"Use oblique test");
+    parse_args.Add("-circle",&opt_circle,"Use circle test");
+    parse_args.Add("-tunnel",&opt_tunnel,"Use tunnel test");
+    parse_args.Add("-drop",&opt_drop,"Use drop test");
+    parse_args.Add("-incompressible",&incompressible,"use incompressible");
+    parse_args.Add("-xprocs",&xprocs,"procs","Processors in x direction");
+    parse_args.Add("-yprocs",&yprocs,"procs","Processors in y direction");
+    parse_args.Parse(true);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* example=0;
-    if(PARSE_ARGS::Find_And_Remove("-sod",argc,argv)) example=new SOD_ST_2D<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-oblique",argc,argv)) example=new OBLIQUE_SOD_ST<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-circle",argc,argv)) example=new CIRCLE_EXAMPLE<T>(stream_type,incompressible);
-    else if(PARSE_ARGS::Find_And_Remove("-tunnel",argc,argv)) example=new WIND_TUNNEL<T>(stream_type);
-    else if(PARSE_ARGS::Find_And_Remove("-drop",argc,argv)) example=new INCOMPRESSIBLE_DROP<T>(stream_type);
+    if(opt_sod) example=new SOD_ST_2D<T>(stream_type);
+    else if(opt_oblique) example=new OBLIQUE_SOD_ST<T>(stream_type);
+    else if(opt_circle) example=new CIRCLE_EXAMPLE<T>(stream_type,incompressible);
+    else if(opt_tunnel) example=new WIND_TUNNEL<T>(stream_type);
+    else if(opt_drop) example=new INCOMPRESSIBLE_DROP<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type); //default
     example->want_mpi_world=true;
-    int xprocs=PARSE_ARGS::Find_And_Remove_Integer("-xprocs",argc,argv),
-        yprocs=PARSE_ARGS::Find_And_Remove_Integer("-yprocs",argc,argv);
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     if(example->mpi_world->initialized){

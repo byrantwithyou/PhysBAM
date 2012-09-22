@@ -186,38 +186,6 @@ Get_Program_Name() const
     return program_name;
 }
 //#####################################################################
-// Function Find_And_Remove
-//#####################################################################
-bool PARSE_ARGS::
-Find_And_Remove(const char *str,int& argc,char** argv)
-{
-    int i;for(i=0;i<argc;i++)if(!strcmp(str,argv[i]))break;
-    if(i<argc){for(;i<argc-1;i++)argv[i]=argv[i+1];argc--;argv[argc]=0;return true;}
-    return false;
-}
-//#####################################################################
-// Function Find_And_Remove_Double
-//#####################################################################
-double PARSE_ARGS::
-Find_And_Remove_Double(const char *str,int& argc,char** argv)
-{
-    double value;
-    int i;for(i=0;i<argc;i++)if(!strcmp(str,argv[i]))break;
-    if(i+1<argc){value=atof(argv[i+1]);for(;i<argc-2;i++)argv[i]=argv[i+2];argc--;argv[argc]=0;argc--;argv[argc]=0;return value;}
-    return 0.0;
-}
-//#####################################################################
-// Function Find_And_Remove_Integer
-//#####################################################################
-int PARSE_ARGS::
-Find_And_Remove_Integer(const char *str,int& argc,char** argv)
-{
-    int value;
-    int i;for(i=0;i<argc;i++)if(!strcmp(str,argv[i]))break;
-    if(i+1<argc){value=atoi(argv[i+1]);for(;i<argc-2;i++)argv[i]=argv[i+2];argc--;argv[argc]=0;argc--;argv[argc]=0;return value;}
-    return 0;
-}
-//#####################################################################
 // Function Print_Usage
 //#####################################################################
 void PARSE_ARGS::

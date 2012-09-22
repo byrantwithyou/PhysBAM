@@ -17,10 +17,14 @@ int main(int argc,char* argv[])
 
     EXAMPLE<TV>* example;
 
-    if(PARSE_ARGS::Find_And_Remove("-testmpi",argc,argv)) example=new MPI_EXAMPLE<T>(stream_type);
+    bool opt_testmpi=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Add("-testmpi",&opt_testmpi,"Use testmpi test");
+    parse_args.Parse(true);
+
+    if(opt_testmpi) example=new MPI_EXAMPLE<T>(stream_type);
     else example=new STANDARD_TESTS<T>(stream_type);
     example->want_mpi_world=true;
-    PARSE_ARGS parse_args(argc,argv);
     example->Parse(parse_args);
 
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >* solid_fluid_example=dynamic_cast<SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> >*>(example);
