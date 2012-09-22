@@ -34,12 +34,22 @@ public:
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;
     using BASE::parse_args;using BASE::resolution;
 
+    int eno_scheme;
+    int eno_order;
+    int rk_order;
+    T cfl_number;
+    bool timesplit;
+    bool implicit_rk;
+    bool use_sound_speed_based_cfl;
+    bool multiplication_factor_for_sound_speed_based_dt;
+
     /***************
     example explanation:
     ***************/
 
     SMOOTH_FLOW(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE)
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
+        implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false)
     {
     }
     
@@ -51,15 +61,15 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",1,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Double_Argument("-cfl",(T).5,"CFL","cfl number");
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-implicit_rk","perform runge kutta on the implicit part");
-    parse_args->Add_Option_Argument("-cfl_sound_speed","use sound speed based cfl condition");
-    parse_args->Add_Double_Argument("-cfl_sound_speed_multiple",(T)0.,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
-    parse_args->Add_Option_Argument("-exact","output a fully-explicit sim to (output_dir)_exact");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl,"CFL","cfl number");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+    parse_args->Add("-cfl_sound_speed",&cfl_sound_speed,"use sound speed based cfl condition");
+    parse_args->Add("-cfl_sound_speed_multiple",&cfl_sound_speed_multiple,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
+    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
 }
 //#####################################################################
 // Function Parse_Options
@@ -67,14 +77,6 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit") && !parse_args->Is_Value_Set("-exact");
-    bool implicit_rk=parse_args->Is_Value_Set("-implicit_rk");
-    bool use_sound_speed_based_cfl=parse_args->Is_Value_Set("-cfl_sound_speed");
-    bool multiplication_factor_for_sound_speed_based_dt=parse_args->Is_Value_Set("-cfl_sound_speed_multiple");
 
     //grid
     fluids_parameters.grid->Initialize(resolution,(T)0.,(T)1.);

@@ -92,13 +92,11 @@ public:
     void Add_Integer_Argument(const std::string& arg_str,int default_value,const std::string& val_name="",const std::string& desc="");
     void Add_Double_Argument(const std::string& arg_str,double default_value,const std::string& val_name="",const std::string& desc="");
     void Set_Extra_Arguments(int num,const std::string& synopsis="",const std::string& desc="");
-    void Set_Extra_Usage_Callback(void (*extra_usage_callback_input)());
     void Parse(bool partial=false);
     bool Get_Option_Value(const std::string& arg_str) const;
     int Get_Integer_Value(const std::string& arg_str) const;
     double Get_Double_Value(const std::string& arg_str) const;
     bool Is_Value_Set(const std::string& arg_str) const;
-    void Override_String_Value(const std::string& arg_str,const std::string& value);
     int Num_Extra_Args() const;
     const std::string& Extra_Arg(int i) const;
     const std::string& Get_Program_Name() const;

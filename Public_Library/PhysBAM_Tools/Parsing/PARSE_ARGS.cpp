@@ -59,14 +59,6 @@ Set_Extra_Arguments(int num,const std::string& synopsis,const std::string& desc)
     num_expected_extra_args=num;if(synopsis.length())extra_args_synopsis=synopsis;if(desc.length())extra_args_desc=desc;
 }
 //#####################################################################
-// Function Set_Extra_Usage_Callback
-//#####################################################################
-void PARSE_ARGS::
-Set_Extra_Usage_Callback(void (*extra_usage_callback_input)())
-{
-    extra_usage_callback=extra_usage_callback_input;
-}
-//#####################################################################
 // Function Parse
 //#####################################################################
 void PARSE_ARGS::
@@ -131,14 +123,6 @@ Is_Value_Set(const std::string& arg_str) const
     int match=Find_Match(arg_str);
     if(match==-1){LOG::cout<<"Argument "<<arg_str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
     return arg_data_list(match).value_set;
-}
-//#####################################################################
-// Function Override_String_Value
-//#####################################################################
-void PARSE_ARGS::
-Override_String_Value(const std::string& arg_str,const std::string& value)
-{
-    arg_data_list(Find_Match(arg_str,ARG_DATA::STRING)).string_value=value;
 }
 //#####################################################################
 // Function Find_Match
