@@ -5,7 +5,7 @@ build
 *_nocona_debug
 
 *.gz
-
+*.pyc
 *.ncb
 *.suo
 *.user
