@@ -51,14 +51,6 @@ Add_Double_Argument(const std::string& arg_str,double default_value,const std::s
     arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
 }
 //#####################################################################
-// Function Add_String_Argument
-//#####################################################################
-void PARSE_ARGS::
-Add_String_Argument(const std::string& arg_str,const std::string& default_value,const std::string& val_name,const std::string& desc)
-{
-    arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
-}
-//#####################################################################
 // Function Set_Extra_Arguments
 //#####################################################################
 void PARSE_ARGS::
@@ -129,30 +121,6 @@ double PARSE_ARGS::
 Get_Double_Value(const std::string& arg_str) const
 {
     return arg_data_list(Find_Match(arg_str,ARG_DATA::DOUBLE)).double_value;
-}
-//#####################################################################
-// Function Get_Vector_2D_Value
-//#####################################################################
-VECTOR<double,2> PARSE_ARGS::
-Get_Vector_2D_Value(const std::string& arg_str) const
-{
-    return arg_data_list(Find_Match(arg_str,ARG_DATA::VECTOR2)).vector_2d_value;
-}
-//#####################################################################
-// Function Get_Vector_3D_Value
-//#####################################################################
-VECTOR<double,3> PARSE_ARGS::
-Get_Vector_3D_Value(const std::string& arg_str) const
-{
-    return arg_data_list(Find_Match(arg_str,ARG_DATA::VECTOR3)).vector_3d_value;
-}
-//#####################################################################
-// Function Get_String_Value
-//#####################################################################
-const std::string& PARSE_ARGS::
-Get_String_Value(const std::string& arg_str) const
-{
-    return arg_data_list(Find_Match(arg_str,ARG_DATA::STRING)).string_value;
 }
 //#####################################################################
 // Function Is_Value_Set

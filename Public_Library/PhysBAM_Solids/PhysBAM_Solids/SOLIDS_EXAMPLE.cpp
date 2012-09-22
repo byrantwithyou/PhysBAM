@@ -94,7 +94,6 @@ template<class TV> void SOLIDS_EXAMPLE<TV>::
 Register_Options()
 {
     BASE::Register_Options();
-    parse_args->Add_String_Argument("-params","","parameter file");
     parse_args->Add("-solidscfl",&solids_parameters.cfl,"cfl","solids CFL");
     parse_args->Add("-solidscg",&opt_solidscg,"Use CG for time integration");
     parse_args->Add("-solidscr",&opt_solidscr,"Use CONJUGATE_RESIDUAL for time integration");
