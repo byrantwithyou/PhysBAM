@@ -390,6 +390,11 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
     mask.face_color=&color;
     mask.c=c;
 
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
+        if(color(it.Full_Index())!=c)
+            u(it.Full_Index())=0;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+        u(it.Full_Index())=0;
     EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,mask,3,u,3,3);
 }
 //#####################################################################
