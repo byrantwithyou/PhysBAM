@@ -157,8 +157,8 @@ public:
         parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
         parse_args->Add_Not("-disable_prestab",&arb.use_prestab,"disable prestabilization");
         parse_args->Add_Not("-disable_poststab",&arb.use_poststab,"disable poststabilization");
-        parse_args->Add_Not("-use_krylov_prestab",&arb.use_krylov_prestab,"use krylov prestabilization");
         parse_args->Add("-use_krylov_poststab",&arb.use_krylov_poststab,"use krylov poststabilization");
+        parse_args->Add("-use_krylov_prestab",&arb.use_krylov_prestab,"use krylov prestabilization");
         parse_args->Add("-test_arb_system",&solids_parameters.implicit_solve_parameters.test_system,"test arb system properties");
         parse_args->Add("-print_arb_matrix",&solids_parameters.implicit_solve_parameters.print_matrix,"print arb system");
         parse_args->Add("-prestab_iterations",&arb.max_iterations,&use_prestab_iterations,"iterations","prestabilization iterations");
