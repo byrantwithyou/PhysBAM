@@ -75,15 +75,12 @@ public:
     void Parse_Arguments(int argc,char *argv[])
     {
         PARSE_ARGS parse_args(argc,argv);
-        parse_args.Add_Option_Argument("-affine","use affine velocities");
-        parse_args.Add_Option_Argument("-use_framework","use integration framework");
-        parse_args.Add_Integer_Argument("-cells",2,"cells","number of grid cells");
-        parse_args.Add_Double_Argument("-viscosity",3,"viscosity");
+        parse_args.Add("-affine",&affine_velicities,"use affine velocities");
+        parse_args.Add("-use_framework",&use_framework,"use integration framework");
+        parse_args.Add("-cells",&n,"cells","number of grid cells");
+        parse_args.Add("-viscosity",&mu,"value","viscosity");
         parse_args.Parse();
-        affine_velicities=parse_args.Is_Value_Set("-affine");
-        n=parse_args.Get_Integer_Value("-cells"); N=n*n;
-        mu=parse_args.Get_Double_Value("-viscosity");
-        use_framework=parse_args.Is_Value_Set("-use_framework");
+        N=n*n;
     }
 
     void Compute_System_Matrix()

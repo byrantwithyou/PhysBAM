@@ -76,6 +76,7 @@ public:
     T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID> *pls_evolution;
     T_BOUNDARY_PHI_WATER pls_boundary;
+    bool opt_analytic,opt_extrapolation,opt_gfm,opt_new_gfm;
 
     inline TV fluid_velocity_field(const TV& X,const T& time) const
     {return TV(fluid_tangential_velocity,-X(2)/(initial_distance+solid_velocity*time));}
@@ -103,8 +104,9 @@ public:
 
   public:
     STRAWMAN_EXAMPLE()
-        : BASE(STREAM_TYPE(T())),frame(0),fill_ghost_region(true),initial_distance((T)-.5),solid_velocity((T)-1),
-        rigid_geometry_collection(0),collision_bodies_affecting_fluid(grid),pls_evolution(0)
+        :BASE(STREAM_TYPE(T())),resolution(100),order(1),frame(0),fill_ghost_region(true),initial_distance((T)-.5),solid_velocity((T)-1),
+        fluid_tangential_velocity(0),rigid_geometry_collection(0),collision_bodies_affecting_fluid(grid),pls_evolution(0),
+        opt_analytic(false),opt_extrapolation(false),opt_gfm(false),opt_new_gfm(false)
     {}
 
     inline T CFL(const T time) const
@@ -116,13 +118,13 @@ public:
 virtual void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Option_Argument("-analytic");
-    parse_args->Add_Option_Argument("-extrapolation");
-    parse_args->Add_Option_Argument("-gfm");
-    parse_args->Add_Option_Argument("-new_gfm");
-    parse_args->Add_Double_Argument("-fluid_velocity",0);
-    parse_args->Add_Integer_Argument("-resolution",100);
-    parse_args->Add_Integer_Argument("-order",1);
+    parse_args->Add("-analytic",&opt_analytic,"analytic");
+    parse_args->Add("-extrapolation",&opt_extrapolation,"extrapolation");
+    parse_args->Add("-gfm",&opt_gfm,"gfm");
+    parse_args->Add("-new_gfm",&opt_new_gfm,"new gfm");
+    parse_args->Add("-fluid_velocity",&fluid_tangential_velocity,"value","fluid tangential velocity");
+    parse_args->Add("-resolution",&resolution,"value","resolution");
+    parse_args->Add("-order",&order,"value","order");
 }
 //#####################################################################
 // Function Parse_Options
@@ -132,12 +134,9 @@ virtual void Parse_Options() PHYSBAM_OVERRIDE
     last_frame=200;
     frame_rate=(T)400;
     BASE::Parse_Options();
-    fluid_tangential_velocity=(T)parse_args->Get_Double_Value("-fluid_velocity");
-    resolution=parse_args->Get_Integer_Value("-resolution");
-    order=parse_args->Get_Integer_Value("-order");
-    if(parse_args->Is_Value_Set("-analytic")) method=ANALYTIC;
-    else if(parse_args->Is_Value_Set("-extrapolation")) method=EXTRAPOLATION;
-    else if(parse_args->Is_Value_Set("-gfm")) method=GFM;
+    if(opt_analytic) method=ANALYTIC;
+    else if(opt_extrapolation) method=EXTRAPOLATION;
+    else if(opt_gfm) method=GFM;
     else method=NEW_GFM;
 
     advection_scheme.Set_Order(order);

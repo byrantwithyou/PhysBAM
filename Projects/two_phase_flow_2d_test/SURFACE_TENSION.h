@@ -133,6 +133,9 @@ public:
     T omega;
     T laplace_number,surface_tension;
     bool use_T_nu;
+    int cut_order;
+    bool use_viscosity,use_viscous_forces;
+    T linear_force;
 
     SURFACE_TENSION(const STREAM_TYPE stream_type);
     virtual ~SURFACE_TENSION();
