@@ -7,29 +7,28 @@
 
 template<class TV> SIM_COMMON<TV>::
 SIM_COMMON()
-    :resolution(0),steps(0),base_resolution(4),proj_algo(proj_default),check_leaks(false),use_accuracy_samples(false),
-    use_extrapolation(true),use_viscosity(false),use_projection(false),use_advection(false)
+    :resolution(0),steps(1),base_resolution(4),proj_algo(proj_default),check_leaks(false),use_accuracy_samples(false),
+    use_extrapolation(true),use_viscosity(true),use_projection(true),use_advection(true),use_proj_slip(false),no_gibou(false)
 {
 }
-
 template<class TV> void SIM_COMMON<TV>::
 Init_1(PARSE_ARGS& parse_args)
 {
     param.Init_1(parse_args);
 
-    parse_args.Add_Integer_Argument("-resolution",0,"Resolution");
-    parse_args.Add_Integer_Argument("-steps",1,"Perform multiple time steps");
+    parse_args.Add("-resolution",&resolution,"res","Resolution");
+    parse_args.Add("-steps",&steps,"value","Perform multiple time steps");
 
-    parse_args.Add_Option_Argument("-leak","check for leaks");
-    parse_args.Add_Option_Argument("-no_gibou","Use Gibou for Neumann");
-    parse_args.Add_Option_Argument("-proj_slip","Use Slip for Neumann");
+    parse_args.Add("-leak",&check_leaks,"check for leaks");
+    parse_args.Add("-no_gibou",&no_gibou,"Use Gibou for Neumann");
+    parse_args.Add("-proj_slip",&use_proj_slip,"Use Slip for Neumann");
 
-    parse_args.Add_Option_Argument("-sample","Use sample points");
-    parse_args.Add_Option_Argument("-no_extrap","Disable extrapolation");
+    parse_args.Add("-sample",&use_accuracy_samples,"Use sample points");
+    parse_args.Add_Not("-no_extrap",&use_extrapolation,"Disable extrapolation");
 
-    parse_args.Add_Option_Argument("-no_viscosity","Do not apply viscosity");
-    parse_args.Add_Option_Argument("-no_projection","Do not perform pressure projection");
-    parse_args.Add_Option_Argument("-no_advection","Do not perform advection");
+    parse_args.Add_Not("-no_viscosity",&use_viscosity,"Do not apply viscosity");
+    parse_args.Add_Not("-no_projection",&use_projection,"Do not perform pressure projection");
+    parse_args.Add_Not("-no_advection",&use_advection,"Do not perform advection");
 }
 template<class TV> void SIM_COMMON<TV>::
 Init_2(PARSE_ARGS& parse_args)
@@ -37,19 +36,8 @@ Init_2(PARSE_ARGS& parse_args)
     param.Init_2(parse_args);
     param.rho=1;
 
-    resolution=parse_args.Get_Integer_Value("-resolution");
-    steps=parse_args.Get_Integer_Value("-steps");
-
-    check_leaks=parse_args.Is_Value_Set("-leak");
-    if(parse_args.Is_Value_Set("-proj_slip")) proj_algo=proj_slip;
-    else if(!parse_args.Is_Value_Set("-no_gibou")) proj_algo=proj_gibou;
-
-    use_accuracy_samples=parse_args.Is_Value_Set("-sample");
-    use_extrapolation=!parse_args.Is_Value_Set("-no_extrap");
-
-    use_viscosity=!parse_args.Is_Value_Set("-no_viscosity");
-    use_advection=!parse_args.Is_Value_Set("-no_advection");
-    use_projection=!parse_args.Is_Value_Set("-no_projection");
+    if(use_proj_slip) proj_algo=proj_slip;
+    else if(!no_gibou) proj_algo=proj_gibou;
 }
 template<class TV> void SIM_COMMON<TV>::
 Init_3()

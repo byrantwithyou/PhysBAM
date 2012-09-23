@@ -109,13 +109,14 @@ public:
     bool viscosity_only;
     ARRAY<FACE_INDEX<TV::m> > face_samples;
     ARRAY<TV_INT> cell_samples;
+    bool use_maccormack;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.SMOKE),
-        solids_tests(*this,solid_body_collection),velocity_multiplier(1),mass_multiplier(0),stiffness_multiplier((T)1),damping_multiplier((T)1),
+        solids_tests(*this,solid_body_collection),velocity_multiplier(1),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),parameter(0),boundary_offset(0),extra_cells(0),base_resolution(4),run_self_tests(false),
         print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),
-        use_eno_advection(false),angle(0),outside_tolerance(0),viscosity_only(false)
+        use_eno_advection(false),angle(0),outside_tolerance(0),viscosity_only(false),use_maccormack(false)
     {
     }
 
@@ -171,25 +172,24 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Double_Argument("-mass",(T)1);
-    parse_args->Add_Integer_Argument("-cg_iterations",3000);
-    parse_args->Add_Double_Argument("-viscosity",(T)0);
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
-    parse_args->Add_Option_Argument("-leakproof");
-    parse_args->Add_Integer_Argument("-parameter",0);
-    parse_args->Add_Option_Argument("-maccormack");
-    parse_args->Add_Double_Argument("-boundary_offset",(T)0);
-    parse_args->Add_Option_Argument("-levelset_viscosity");
-    parse_args->Add_Option_Argument("-print_viscosity_matrix");
-    parse_args->Add_Double_Argument("-angle",(T)0);
-    parse_args->Add_Integer_Argument("-base_resolution",4);
+    parse_args->Add("-mass",&mass_multiplier,"scale","scale mass");
+    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"iterations","solver iterations");
+    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","viscosity");
+    parse_args->Add("-test_system",&run_self_tests,"run self tests");
+    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print poisson matrix");
+    parse_args->Add("-print_index_map",&print_index_map,"print index map");
+    parse_args->Add("-print_matrix",&print_matrix,"print matrix");
+    parse_args->Add("-print_each_matrix",&print_each_matrix,"print each matrix");
+    parse_args->Add("-output_iterators",&output_iterators,"output iterators");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
+    parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
+    parse_args->Add("-maccormack",&use_maccormack,"use maccormack");
+    parse_args->Add("-boundary_offset",&boundary_offset,"value","boundary offset");
+    parse_args->Add("-levelset_viscosity",&fluids_parameters.use_levelset_viscosity,"use levelset viscosity");
+    parse_args->Add("-print_viscosity_matrix",&fluids_parameters.print_viscosity_matrix,"print viscosity matrix");
+    parse_args->Add("-angle",&angle,"angle","angle");
+    parse_args->Add("-base_resolution",&base_resolution,"res","base resolution");
 }
 //#####################################################################
 // Function Parse_Options
@@ -198,9 +198,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     last_frame=100;
-    mass_multiplier=(T)parse_args->Get_Double_Value("-mass");
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 
+    angle*=pi/180;
+    solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
     if(test_number==2 || test_number==3 || test_number==4) fluids_parameters.use_psi_R=true;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
     solids_parameters.rigid_body_collision_parameters.use_push_out=false;
@@ -208,9 +209,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
 
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-    fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    parameter=parse_args->Get_Integer_Value("-parameter");
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
@@ -218,25 +216,12 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.implicit_solve_parameters.evolution_solver_type=krylov_solver_cg;
 
     fluids_parameters.use_slip=true;
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     solids_fluids_parameters.use_leakproof_solve=false;
-    if(parse_args->Is_Value_Set("-leakproof")) solids_fluids_parameters.use_leakproof_solve=true;
 
-    fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity");
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
-    fluids_parameters.use_levelset_viscosity=parse_args->Is_Value_Set("-levelset_viscosity");
-    fluids_parameters.print_viscosity_matrix=parse_args->Is_Value_Set("-print_viscosity_matrix");
-    angle=parse_args->Get_Double_Value("-angle")*pi/180;
 
     fluids_parameters.use_removed_positive_particles=true;
     fluids_parameters.use_removed_negative_particles=true;
@@ -252,11 +237,8 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     fluids_parameters.use_body_force=false;
 
-    boundary_offset=(T)parse_args->Get_Double_Value("-boundary_offset");
-    base_resolution=parse_args->Get_Integer_Value("-base_resolution");
-    
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d_Resolution_%d",test_number,resolution);
-    if(parse_args->Is_Value_Set("-maccormack")){
+    if(use_maccormack){
         fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
         fluids_parameters.use_maccormack_for_incompressible=true;}
 

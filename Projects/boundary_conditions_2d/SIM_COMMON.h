@@ -23,6 +23,7 @@ struct SIM_COMMON
     bool use_accuracy_samples;
     bool use_extrapolation;
     bool use_viscosity,use_projection,use_advection;
+    bool use_proj_slip,no_gibou;
 
     void Init_1(PARSE_ARGS& parse_args);
     void Init_2(PARSE_ARGS& parse_args);

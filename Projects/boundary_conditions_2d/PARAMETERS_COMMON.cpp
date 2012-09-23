@@ -2,37 +2,27 @@
 
 template<class T> PARAMETERS_COMMON<T>::
 PARAMETERS_COMMON()
-    :time(0),dt(0),rho(0),mu(0),theta_threshold(0),cg_tolerance(0),print_matrix(false)
+    :time(0),dt((T)0.01),rho(0),mu(0),theta_threshold((T)1e-8),cg_tolerance((T)1e-14),print_matrix(false)
 {
 }
 
 template<class T> void PARAMETERS_COMMON<T>::
 Init_1(PARSE_ARGS& parse_args)
 {
-    parse_args.Add_Double_Argument("-time",(T)0,"starting time");
-    parse_args.Add_Double_Argument("-dt",(T).01,"time step size");
+    parse_args.Add("-time",&time,"value","starting time");
+    parse_args.Add("-dt",&dt,"value","time step size");
 
-    parse_args.Add_Double_Argument("-rho",rho,"Density");
-    parse_args.Add_Double_Argument("-viscosity",0,"Viscosity");
+    parse_args.Add("-rho",&rho,"value","Density");
+    parse_args.Add("-viscosity",&mu,"value","Viscosity");
     
-    parse_args.Add_Option_Argument("-print_matrix","Print all matrices");
+    parse_args.Add("-print_matrix",&print_matrix,"Print all matrices");
 
-    parse_args.Add_Double_Argument("-theta_tol",1e-8,"zero tolerance for theta");
-    parse_args.Add_Double_Argument("-cg_tol",1e-14,"zero tolerance for CG");
+    parse_args.Add("-theta_tol",&theta_threshold,"value","zero tolerance for theta");
+    parse_args.Add("-cg_tol",&cg_tolerance,"value","zero tolerance for CG");
 }
 template<class TV> void PARAMETERS_COMMON<TV>::
 Init_2(PARSE_ARGS& parse_args)
 {
-    time=parse_args.Get_Double_Value("-time");
-    dt=parse_args.Get_Double_Value("-dt");
-
-    rho=parse_args.Get_Double_Value("-rho");
-    mu=parse_args.Get_Double_Value("-viscosity");
-
-    print_matrix=parse_args.Is_Value_Set("-print_matrix");
-
-    theta_threshold=parse_args.Get_Double_Value("-theta_tol");
-    cg_tolerance=parse_args.Get_Double_Value("-cg_tol");
 }
 
 template struct PARAMETERS_COMMON<double>;
