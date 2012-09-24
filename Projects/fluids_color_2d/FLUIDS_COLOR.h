@@ -238,7 +238,7 @@ public:
     {
         mu.Append(mu0);
         rho.Append(rho0);
-        if(number_of_colors>1){
+        for(int i=1;i<number_of_colors;i++){
             mu.Append(mu1);
             rho.Append(rho1);}
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){

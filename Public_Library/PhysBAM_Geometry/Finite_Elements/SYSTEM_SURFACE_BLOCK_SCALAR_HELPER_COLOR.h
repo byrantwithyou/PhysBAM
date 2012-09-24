@@ -28,7 +28,7 @@ class SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR:public NONCOPYABLE
 public:
     
     ARRAY<MATRIX_MXN<T> > data;
-    ARRAY<T> rhs_data;
+    ARRAY<ARRAY<T> > rhs_data;
     CELL_DOMAIN_INTERFACE_COLOR<TV> *cdi;
     CELL_MANAGER_COLOR<TV> *cm;
     ARRAY<int> flat_diff;

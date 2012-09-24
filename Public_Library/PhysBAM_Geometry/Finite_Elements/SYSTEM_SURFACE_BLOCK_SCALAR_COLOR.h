@@ -47,8 +47,8 @@ public:
     void Add_Entry(int constraint_index,int flat_index_diff_ref,int color,T value)
     {helper->data(color)(constraint_index,flat_index_diff_ref)+=value*scale;}
 
-    void Add_Constraint_Rhs_Entry(int constraint_index,T value)
-    {helper->rhs_data(constraint_index)+=value*scale;}
+    void Add_Constraint_Rhs_Entry(int constraint_index,int color,T value)
+    {helper->rhs_data(color)(constraint_index)+=value*scale;}
 
     int Flat_Diff(int i)
     {return helper->flat_diff(i);}

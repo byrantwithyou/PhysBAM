@@ -82,9 +82,9 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_
 template<class TV> void SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>::
 Resize()
 {
-    for(int c=0;c<cdi->colors;c++)
+    for(int c=0;c<cdi->colors;c++){
         data(c).Resize(cdi->flat_base_scalar.m,flat_diff.m);
-    rhs_data.Resize(cdi->flat_base_scalar.m);
+        rhs_data(c).Resize(cdi->flat_base_scalar.m);}
 }
 template class SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<VECTOR<float,3> >;

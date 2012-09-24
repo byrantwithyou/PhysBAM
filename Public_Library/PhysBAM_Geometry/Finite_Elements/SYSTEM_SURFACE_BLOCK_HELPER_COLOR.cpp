@@ -27,8 +27,9 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_COLOR<TV>& cm_input
     flat_diff.Prune_Duplicates();
     flat_diff.Sort();
 
-    for(int i=0;i<TV::m;i++)
+    for(int i=0;i<TV::m;i++){
         data(i).Resize(cdi->colors);
+        rhs_data(i).Resize(cdi->colors);}
 }
 //#####################################################################
 // Function Mark_Active_Cells
@@ -67,7 +68,7 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_
         int row=0;
         for(int orientation=0;orientation<TV::m;orientation++){
             const MATRIX_MXN<T>& d=data(orientation)(c);
-            const ARRAY<T>& rd=rhs_data(orientation);
+            const ARRAY<T>& rd=rhs_data(orientation)(c);
             for(int i=0;i<d.m;i++,row++){
                 constraint_rhs(row)+=rd(i);
                 ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
@@ -89,10 +90,9 @@ template<class TV> void SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>::
 Resize()
 {
     for(int i=0;i<TV::m;i++)
-        for(int c=0;c<cdi->colors;c++)
+        for(int c=0;c<cdi->colors;c++){
             data(i)(c).Resize(cdi->flat_base(i)->m,flat_diff.m);
-    for(int i=0;i<TV::m;i++)
-        rhs_data(i).Resize(cdi->flat_base(i)->m);
+            rhs_data(i)(c).Resize(cdi->flat_base(i)->m);}
 }
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,2> >;
 template class SYSTEM_SURFACE_BLOCK_HELPER_COLOR<VECTOR<float,3> >;
