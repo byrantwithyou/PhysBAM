@@ -54,7 +54,10 @@ Write_Output_Files(const int frame)
 {
     if(!write_output_files) return;
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",face_velocities(0));
+    ARRAY<T,FACE_INDEX<TV::dimension> > V(face_velocities(0).domain_indices);
+    Merge_Velocities(V,face_velocities,face_color);
+
+    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",V);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
 //    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
 //    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
