@@ -82,6 +82,7 @@ public:
     bool bc_n,bc_d,bc_s;
     bool test_analytic_diff;
     bool no_advection;
+    int refine;
 
     struct ANALYTIC_VELOCITY
     {
@@ -98,7 +99,7 @@ public:
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
-        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false)
+        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false),refine(1)
     {
         last_frame=16;
         parse_args.Set_Extra_Arguments(1,"<test-number>");
@@ -123,9 +124,13 @@ public:
         parse_args.Add("-no_advect",&no_advection,"Disable advection");
         parse_args.Add("-no_solve",&omit_solve,"Disable visocity and pressure solve");
         parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
+        parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
         parse_args.Parse();
         if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
+        resolution*=refine;
+        dt/=refine;
+        this->time_steps_per_frame*=refine;
         stored_last_frame=last_frame;
         mu0*=kg/s;
         mu1*=kg/s;
