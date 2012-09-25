@@ -242,10 +242,12 @@ public:
             mu.Append(mu1);
             rho.Append(rho1);}
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
-            int c=0;
+            int c=-4;
+            analytic_levelset->phi(it.Location()/m,0,c);
+            if(c<0) continue;
             face_velocities(c)(it.Full_Index())=analytic_velocity->u(it.Location()/m,0)(it.Axis())*m/s;}
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
-            int c=0;
+            int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,0,c)*m;
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=c==-4?bc_type:c;}
