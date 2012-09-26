@@ -244,7 +244,7 @@ Advection_And_BDF(T dt,bool first_step)
     else
         for(int c=0;c<example.number_of_colors;c++)
             RK2_Advection_And_BDF(dt,first_step,c);
-    Swap_State();
+    example.prev_face_velocities.Exchange(example.face_velocities);
     Extrapolate_Velocity(example.face_velocities,example.face_color);
 }
 //#####################################################################
@@ -405,15 +405,6 @@ Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > >& u,const ARRAY<
 {
     for(int c=0;c<example.number_of_colors;c++)
         Extrapolate_Velocity(u(c),color,c);
-}
-//#####################################################################
-// Function Swap_State
-//#####################################################################
-template<class TV> void PLS_FC_DRIVER<TV>::
-Swap_State()
-{
-    example.prev_face_velocities.Exchange(example.face_velocities);
-    example.prev_face_color.Exchange(example.face_color);
 }
 //#####################################################################
 // Simulate_To_Frame
