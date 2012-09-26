@@ -134,6 +134,7 @@ Initialize()
         example.Initialize();
         for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,3);it.Valid();it.Next())
             example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
+        example.prev_face_color=example.face_color;
         example.particle_levelset_evolution.Make_Signed_Distance();
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);}
 
@@ -221,8 +222,11 @@ Advance_One_Time_Step(bool first_step)
     T dt=example.dt;
 //    Update_Pls(dt);
 
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
     Advection_And_BDF(dt,first_step);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before solve",0,1);
     Apply_Pressure_And_Viscosity(dt,first_step);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after solve",0,1);
     time+=dt;
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     example.End_Time_Step(time);
