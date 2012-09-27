@@ -89,7 +89,8 @@ public:
         virtual TV u(const TV& X,T t) const=0;
         virtual MATRIX<T,2> du(const TV& X,T t) const=0;
         virtual T p(const TV& X,T t) const=0;
-    }* analytic_velocity;
+    };
+    ARRAY<ANALYTIC_VELOCITY*> analytic_velocity;
 
     struct ANALYTIC_LEVELSET
     {
@@ -141,88 +142,80 @@ public:
         bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
         use_advection=!no_advection;
 
-        analytic_velocity=0;
         analytic_levelset=0;
 
         output_directory=STRING_UTILITIES::string_sprintf("Test_%d",test_number);
         switch(test_number){
             case 0:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
-                analytic_velocity=new ANALYTIC_VELOCITY_CONST(TV()+1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
                 break;
             case 1:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
-                analytic_velocity=new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV());
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV()));
                 break;
             case 2:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
-                analytic_velocity=new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV());
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV()));
                 break;
             case 3:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0));
                 break;
             case 4:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity=new ANALYTIC_VELOCITY_CONST(TV()+1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
                 break;
             case 5:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity=new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV());
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV()));
                 break;
             case 6:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
-                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0));
                 break;
             case 7:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
-                analytic_velocity=new ANALYTIC_VELOCITY_RAREFACTION;
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_RAREFACTION);
                 omit_solve=true;
                 break;
             case 8:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
-                analytic_velocity=new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV((T).2,(T).5));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg,TV((T).2,(T).5)));
                 break;
             case 9:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=2;
                 {
-                    ANALYTIC_TEST_BANDED* atb=new ANALYTIC_TEST_BANDED(rho0,mu0,rho1,mu1);
-                    analytic_levelset=atb;
-                    analytic_velocity=atb;
+                    T x0=(T).2,x1=(T).5,x2=(T).8,v0=1,v2=-1;
+                    T v1=(v0*mu0/(x1-x0)+v2*mu1/(x2-x1))/(mu0/(x1-x0)+mu1/(x2-x1));
+                    MATRIX<T,2> du0(0,(v1-v0)/(x1-x0),0,0),du1(0,(v2-v1)/(x2-x1),0,0);
+                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1));
                 }
                 break;
             case 10:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
-                analytic_velocity=new ANALYTIC_VELOCITY_CONST(TV()+1);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
                 break;
             case 11:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                number_of_colors=1;
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity=new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0);
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0));
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
+
+        if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
     }
 
     void Write_Output_Files(const int frame)
@@ -230,7 +223,7 @@ public:
 
     void Initialize()
     {
-        if(analytic_levelset && analytic_velocity) Analytic_Test();
+        if(analytic_levelset && analytic_velocity.m) Analytic_Test();
         else
             switch(test_number){
                 default: PHYSBAM_FATAL_ERROR("Missing test number");}
@@ -250,7 +243,7 @@ public:
             int c=-4;
             analytic_levelset->phi(it.Location()/m,0,c);
             if(c<0) continue;
-            face_velocities(c)(it.Full_Index())=analytic_velocity->u(it.Location()/m,0)(it.Axis())*m/s;}
+            face_velocities(c)(it.Full_Index())=analytic_velocity(c)->u(it.Location()/m,0)(it.Axis())*m/s;}
         for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
             int c=-4;
             T p=analytic_levelset->phi(it.Location()/m,0,c)*m;
@@ -259,11 +252,16 @@ public:
 
         if(test_analytic_diff){
             RANDOM_NUMBERS<T> rand;
-            TV X=rand.Get_Uniform_Vector(grid.domain),dX;
+            TV X,dX;
             T e=1e-6,t=rand.Get_Uniform_Number(0,1);
             rand.Fill_Uniform(dX,-e,e);
-            TV u0=analytic_velocity->u(X/m,t)*m/s,u1=analytic_velocity->u((X+dX)/m,t)*m/s;
-            MATRIX<T,2> du0=analytic_velocity->du(X/m,t)/s,du1=analytic_velocity->du((X+dX)/m,t)/s;
+            int c=-4;
+            do{
+                X=rand.Get_Uniform_Vector(grid.domain);
+                analytic_levelset->phi(X/m,0,c);}
+            while(c<0);
+            TV u0=analytic_velocity(c)->u(X/m,t)*m/s,u1=analytic_velocity(c)->u((X+dX)/m,t)*m/s;
+            MATRIX<T,2> du0=analytic_velocity(c)->du(X/m,t)/s,du1=analytic_velocity(c)->du((X+dX)/m,t)/s;
             T erru=((du0+du1)*dX/2-(u1-u0)).Magnitude()/e;
             int c0,c1;
             T l0=analytic_levelset->phi(X/m,t,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t,c1)*m;
@@ -321,6 +319,16 @@ public:
         virtual T p(const TV& X,T t) const {return 0;}
     };
 
+    struct ANALYTIC_VELOCITY_AFFINE:public ANALYTIC_VELOCITY
+    {
+        TV v0;
+        MATRIX<T,2> du0;
+        ANALYTIC_VELOCITY_AFFINE(const TV& x0,const TV& v0,const MATRIX<T,2>& du0): v0(v0-du0*x0),du0(du0) {}
+        virtual TV u(const TV& X,T t) const {return du0*X+v0;}
+        virtual MATRIX<T,2> du(const TV& X,T t) const {return du0;}
+        virtual T p(const TV& X,T t) const {return 0;}
+    };
+
     struct ANALYTIC_LEVELSET_PERIODIC:public ANALYTIC_LEVELSET
     {
         virtual T phi(const TV& X,T t,int& c) const {c=0;return 1;}
@@ -358,57 +366,50 @@ public:
         {return vis.Normal(X)*sign(vis.f(X));}
     };
 
-    struct ANALYTIC_TEST_BANDED:public ANALYTIC_LEVELSET,public ANALYTIC_VELOCITY
+    struct ANALYTIC_LEVELSET_BANDED:public ANALYTIC_LEVELSET
     {
-        T x0,x1,x2,mu0,mu1,v0,v1,v2;
-        ANALYTIC_TEST_BANDED(T rho0,T mu0,T rho1,T mu1): x0((T).2),x1((T).5),x2((T).8),mu0(mu0),mu1(mu1),v0(1),v2(-1)
-        {
-            v1=(v0*mu0/(x1-x0)+v2*mu1/(x2-x1))/(mu0/(x1-x0)+mu1/(x2-x1));
-        }
+        int bc0,bc1;
+        T x0,x1;
+        ARRAY<T> x;
+        ANALYTIC_LEVELSET_BANDED(T x0,T x1,int bc0,int bc1): bc0(bc0),bc1(bc1),x0(x0),x1(x1) {}
+        ANALYTIC_LEVELSET_BANDED* Add(T nx) {x.Append(nx);return this;}
         virtual T phi(const TV& X,T t,int& c) const
         {
-            T p0=X.x-x0,p1=X.x-x1,p2=X.x-x2;
-            if(p0<=0){c=DIRICHLET;return -p0;}
-            if(p1<=0){c=0;return min(p0,-p1);}
-            if(p2<=0){c=1;return min(p1,-p2);}
+            T p0=X.x-x0;
+            if(p0<=0){c=bc0;return -p0;}
+            for(int i=0;i<x.m;i++){
+                T p1=X.x-x(i);
+                if(p1<=0){c=i;return min(p0,-p1);}
+                p0=p1;}
+            T p1=X.x-x1;
+            if(p1<=0){c=x.m;return min(p0,-p1);}
             c=DIRICHLET;
-            return p2;
+            return bc1;
         }
         virtual TV N(const TV& X,T t) const
         {
-            T p0=X.x-x0,p1=X.x-x1,p2=X.x-x2;
+            T p0=X.x-x0;
             if(p0<=0) return TV(-1,0);
+            for(int i=0;i<x.m;i++){
+                T p1=X.x-x(i);
+                if(p1<=0) return -TV(p0<-p1?1:-1,0);
+                p0=p1;}
+            T p1=X.x-x1;
             if(p1<=0) return -TV(p0<-p1?1:-1,0);
-            if(p2<=0) return -TV(p1<-p2?1:-1,0);
             return TV(1,0);
         }
-        virtual TV u(const TV& X,T t) const
-        {
-            T a,b;
-            if(X.x<x1){a=(v1-v0)/(x1-x0);b=v0-a*x0;}
-            else{a=(v2-v1)/(x2-x1);b=v1-a*x1;}
-            return TV(0,a*X.x+b);
-        }
-        virtual MATRIX<T,2> du(const TV& X,T t) const
-        {
-            T a,b;
-            if(X.x<x1){a=(v1-v0)/(x1-x0);b=v0-a*x0;}
-            else{a=(v2-v1)/(x2-x1);b=v1-a*x1;}
-            return MATRIX<T,2>(0,a,0,0);
-        }
-        virtual T p(const TV& X,T t) const {return 0;}
     };
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE {}
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
-        if(analytic_velocity){
+        if(analytic_velocity.m){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
                 int c=levelset_color.Color(it.Location());
                 if(c<0) continue;
-                T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity->u(it.Location()/m,time/s)(it.Axis())*m/s;
+                T A=face_velocities(c)(it.Full_Index()),B=analytic_velocity(c)->u(it.Location()/m,time/s)(it.Axis())*m/s;
                 a=max(a,abs(A));
                 b=max(b,abs(B));
                 max_error=max(max_error,abs(A-B));
@@ -420,17 +421,17 @@ public:
     TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(1,0,0));
-        if(analytic_velocity) return analytic_velocity->u(X/m,time/s)*m/s;
+        if(analytic_velocity.m) return analytic_velocity(fluid_color)->u(X/m,time/s)*m/s;
         return TV();
     }
 
     TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
-        if(analytic_velocity && analytic_levelset){
-            MATRIX<T,2> du=analytic_velocity->du(X/m,time/s)/s;
+        if(analytic_velocity.m && analytic_levelset){
+            MATRIX<T,2> du=analytic_velocity(fluid_color)->du(X/m,time/s)/s;
             TV n=analytic_levelset->N(X/m,time/s);
-            T p=analytic_velocity->p(X/m,time/s)*kg/(s*s*m);
+            T p=analytic_velocity(fluid_color)->p(X/m,time/s)*kg/(s*s*m);
             return (du+du.Transposed())*n*mu(fluid_color)-p*n;}
         return TV();
     }
