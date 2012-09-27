@@ -213,7 +213,7 @@ public:
             case 11:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
-                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0));
+                analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0*sqr(m)/kg));
                 break;
             case 12:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -240,6 +240,55 @@ public:
                     analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV(0,v0)));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV(0,v2)));
+                    use_discontinuous_velocity=true;
+                }
+                break;
+            case 15:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).5,x2=(T).8;
+                    analytic_levelset=(new ANALYTIC_LEVELSET_CONCENTRIC(TV(),x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2*0,(T).3,mu0*s/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho1*sqr(m)/kg));
+                    use_discontinuous_velocity=true;
+                }
+                break;
+            case 16:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).5,x2=(T).8;
+                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu0*s/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).2,(T).8,(T).7,mu1*s/kg));
+                    use_discontinuous_velocity=true;
+                }
+                break;
+            case 17:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).5,x2=(T).8;
+                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu0*s/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu1*s/kg));
+                    use_discontinuous_velocity=true;
+                }
+                break;
+            case 18:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).5,x2=(T).8;
+                    analytic_levelset=(new ANALYTIC_LEVELSET_CONCENTRIC(TV(),x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho0*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho1*sqr(m)/kg));
+                    use_discontinuous_velocity=true;
+                }
+                break;
+            case 19:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
+                {
+                    T x0=(T).2,x2=(T).8;
+                    analytic_levelset=(new ANALYTIC_LEVELSET_CONCENTRIC(TV(.01,.021),x0,x2,DIRICHLET,DIRICHLET));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho0*sqr(m)/kg));
                     use_discontinuous_velocity=true;
                 }
                 break;
@@ -430,8 +479,8 @@ public:
                 p0=p1;}
             T p1=X.x-x1;
             if(p1<=0){c=x.m;return min(p0,-p1);}
-            c=DIRICHLET;
-            return bc1;
+            c=bc1;
+            return p1;
         }
         virtual TV N(const TV& X,T t) const
         {
@@ -444,6 +493,42 @@ public:
             T p1=X.x-x1;
             if(p1<=0) return -TV(p0<-p1?1:-1,0);
             return TV(1,0);
+        }
+    };
+
+    struct ANALYTIC_LEVELSET_CONCENTRIC:public ANALYTIC_LEVELSET
+    {
+        TV center;
+        int bc0,bc1;
+        T r0,r1;
+        ARRAY<T> array;
+        ANALYTIC_LEVELSET_CONCENTRIC(TV c,T r0,T r1,int bc0,int bc1): center(c),bc0(bc0),bc1(bc1),r0(r0),r1(r1) {}
+        ANALYTIC_LEVELSET_CONCENTRIC* Add(T nr) {array.Append(nr);return this;}
+        virtual T phi(const TV& X,T t,int& c) const
+        {
+            T r=(X-center).Magnitude(),p0=r-r0;
+            if(p0<=0){c=bc0;return -p0;}
+            for(int i=0;i<array.m;i++){
+                T p1=r-array(i);
+                if(p1<=0){c=i;return min(p0,-p1);}
+                p0=p1;}
+            T p1=r-r1;
+            if(p1<=0){c=array.m;return min(p0,-p1);}
+            c=bc1;
+            return p1;
+        }
+        virtual TV N(const TV& X,T t) const
+        {
+            TV n=X-center;
+            T r=n.Normalize(),p0=r-r0;
+            if(p0<=0) return -n;
+            for(int i=0;i<array.m;i++){
+                T p1=r-array(i);
+                if(p1<=0) return p0<-p1?-n:n;
+                p0=p1;}
+            T p1=r-r1;
+            if(p1<=0) return p0<-p1?-n:n;
+            return n;
         }
     };
 
