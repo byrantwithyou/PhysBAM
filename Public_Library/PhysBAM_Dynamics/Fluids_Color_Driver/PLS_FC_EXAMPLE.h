@@ -57,6 +57,7 @@ public:
     bool omit_solve;
     ARRAY<T> mu,rho;
     int number_of_colors;
+    bool use_discontinuous_velocity;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
@@ -89,6 +90,7 @@ public:
     virtual TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time)=0;
     virtual TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time)=0;
     virtual TV Volume_Force(const TV& X,int color,T time)=0;
+    virtual TV Velocity_Jump(const TV& X,int color0,int color1,T time)=0;
 //#####################################################################
 };
 }

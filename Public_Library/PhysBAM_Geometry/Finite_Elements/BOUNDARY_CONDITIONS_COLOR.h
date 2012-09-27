@@ -15,9 +15,15 @@ namespace PhysBAM{
 template<class TV>
 struct BOUNDARY_CONDITIONS_COLOR: public NONCOPYABLE
 {
-    BOUNDARY_CONDITIONS_COLOR(){}
+    bool use_discontinuous_velocity;
+
+    BOUNDARY_CONDITIONS_COLOR()
+        :use_discontinuous_velocity(false) 
+    {}
+
     virtual ~BOUNDARY_CONDITIONS_COLOR(){}
 
+    virtual TV u_jump(const TV& X,int color0,int color1)=0;
     virtual TV j_surface(const TV& X,int color0,int color1)=0;
     virtual TV n_surface(const TV& X,int color0,int color1)=0;
     virtual TV d_surface(const TV& X,int color0,int color1)=0;

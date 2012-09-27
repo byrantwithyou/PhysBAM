@@ -348,7 +348,13 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             T value=-integral*sb->bc->j_surface(X,V.y,V.z)(sb->axis);
                             value*=(T)0.5;
                             (*sb->rhs)(V.y)(flat_index)+=value;
-                            (*sb->rhs)(V.z)(flat_index)+=value;}
+                            (*sb->rhs)(V.z)(flat_index)+=value;
+
+                            if(sb->bc->use_discontinuous_velocity)
+                                if(sb->axis==0){ // This code should not be repeated for each block
+                                    TV value=-integral*orientations(k).Transpose_Times(sb->bc->u_jump(X,V.y,V.z));
+                                    for(int d=0;d<TV::m;d++)
+                                        sb->Add_Constraint_Rhs_Entry(*cdi.constraint_base(d)+constraint_offset,d,V.z,value(d));}}
                         else if(V.y==BC::NEUMANN){
                             T value=integral*sb->bc->n_surface(X,V.y,V.z)(sb->axis);
                             (*sb->rhs)(V.z)(flat_index)+=value;}

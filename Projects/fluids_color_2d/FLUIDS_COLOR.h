@@ -67,7 +67,8 @@ public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
-    using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;
+    using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
+    using BASE::time_steps_per_frame;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -109,7 +110,7 @@ public:
         parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
         parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
         parse_args.Add("-dt",&dt,"dt","time step size to use for simulation");
-        parse_args.Add("-steps",&this->time_steps_per_frame,"steps","number of time steps per frame");
+        parse_args.Add("-steps",&time_steps_per_frame,"steps","number of time steps per frame");
         parse_args.Add("-last_frame",&last_frame,&user_last_frame,"frame","number of frames to simulate");
         parse_args.Add("-dump_matrix",&dump_matrix,"dump out system and rhs");
         parse_args.Add("-mu0",&mu0,"viscosity","viscosity for first fluid region");
@@ -132,7 +133,7 @@ public:
 
         resolution*=refine;
         dt/=refine;
-        this->time_steps_per_frame*=refine;
+        time_steps_per_frame*=refine;
         stored_last_frame=last_frame;
         mu0*=kg/s;
         mu1*=kg/s;
@@ -230,6 +231,16 @@ public:
                     analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0,rho0*sqr(m)/kg));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1,rho1*sqr(m)/kg));
+                }
+                break;
+            case 14:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).5,x2=(T).8,v0=1,v2=-1;
+                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV(0,v0)));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV(0,v2)));
+                    use_discontinuous_velocity=true;
                 }
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
@@ -483,10 +494,17 @@ public:
         return TV();
     }
 
-    TV Volume_Force(const TV& X,int color,T time)
+    TV Volume_Force(const TV& X,int color,T time) PHYSBAM_OVERRIDE
     {
         if(analytic_velocity.m && analytic_levelset)
             return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);
+        return TV();
+    }
+
+    TV Velocity_Jump(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
+    {
+        if(analytic_velocity.m && analytic_levelset)
+            return (analytic_velocity(color1)->u(X/m,time/s)-analytic_velocity(color0)->u(X/m,time/s))*m/s;
         return TV();
     }
 

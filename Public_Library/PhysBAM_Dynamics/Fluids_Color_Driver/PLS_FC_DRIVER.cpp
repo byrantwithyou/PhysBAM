@@ -317,6 +317,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     {
         PLS_FC_EXAMPLE<TV>* example;
         T time,dt;
+        virtual TV u_jump(const TV& X,int color0,int color1) {return example->Velocity_Jump(X,color0,color1,time);}
         virtual TV j_surface(const TV& X,int color0,int color1) {return example->Jump_Interface_Condition(X,color0,color1,time)*dt;}
         virtual TV d_surface(const TV& X,int color0,int color1) {return example->Dirichlet_Boundary_Condition(X,color0,color1,time);}
         virtual TV n_surface(const TV& X,int color0,int color1) {return example->Neumann_Boundary_Condition(X,color0,color1,time)*dt;}
@@ -324,6 +325,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     bccl.example=&example;
     bccl.time=time+dt;
     bccl.dt=dt;
+    bccl.use_discontinuous_velocity=example.use_discontinuous_velocity;
 
     INTERFACE_STOKES_SYSTEM_COLOR<TV> iss(example.grid,example.levelset_color.phi,example.levelset_color.color,true);
     iss.use_preconditioner=example.use_preconditioner;
