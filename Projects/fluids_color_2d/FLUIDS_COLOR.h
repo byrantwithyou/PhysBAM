@@ -435,6 +435,11 @@ public:
         return TV();
     }
 
+    TV Jump_Interface_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
+    {
+        return TV();
+    }
+
 //#####################################################################
 };
 }
