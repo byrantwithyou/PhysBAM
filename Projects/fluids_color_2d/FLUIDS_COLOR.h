@@ -89,6 +89,7 @@ public:
         virtual TV u(const TV& X,T t) const=0;
         virtual MATRIX<T,2> du(const TV& X,T t) const=0;
         virtual T p(const TV& X,T t) const=0;
+        virtual TV F(const TV& X,T t) const=0;
     };
     ARRAY<ANALYTIC_VELOCITY*> analytic_velocity;
 
@@ -213,6 +214,14 @@ public:
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0));
                 break;
+            case 12:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).8,g=9.8,a=rho0*sqr(m)*g/(2*mu0*s);
+                    analytic_levelset=new ANALYTIC_LEVELSET_BANDED(x0,x1,DIRICHLET,DIRICHLET);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X(a,-a*(x0+x1),a*x0*x1,mu0*s/kg));
+                }
+                break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
@@ -279,6 +288,7 @@ public:
         virtual TV u(const TV& X,T t) const {return au;}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>();}
         virtual T p(const TV& X,T t) const {return 0;}
+        virtual TV F(const TV& X,T t) const {return TV();}
     };
 
     struct ANALYTIC_VELOCITY_ROTATION:public ANALYTIC_VELOCITY
@@ -289,6 +299,7 @@ public:
         virtual TV u(const TV& X,T t) const {return (X-c).Orthogonal_Vector();}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(0,1,-1,0);}
         virtual T p(const TV& X,T t) const {return (T).5*rho*(X-c).Magnitude_Squared();}
+        virtual TV F(const TV& X,T t) const {return TV();}
     };
 
     struct ANALYTIC_VELOCITY_VORTEX:public ANALYTIC_VELOCITY
@@ -301,6 +312,7 @@ public:
         virtual MATRIX<T,2> du(const TV& X,T t) const
         {TV Z=X-t*trans;T c=cos(Z.x)*cos(Z.y),s=sin(Z.x)*sin(Z.y);return MATRIX<T,2>(c,s,-s,-c)*exp(-2*nu*t);}
         virtual T p(const TV& X,T t) const {TV Z=X-t*trans;return (T).25*rho*(cos(2*Z.x)+cos(2*Z.y))*exp(-4*nu*t);}
+        virtual TV F(const TV& X,T t) const {return TV();}
     };
 
     struct ANALYTIC_VELOCITY_RAREFACTION:public ANALYTIC_VELOCITY
@@ -309,6 +321,7 @@ public:
         virtual TV u(const TV& X,T t) const {return TV(X.x,0)/(t+1);}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(1,0,0,0)/(t+1);}
         virtual T p(const TV& X,T t) const {return 0;}
+        virtual TV F(const TV& X,T t) const {return TV();}
     };
 
     struct ANALYTIC_VELOCITY_ROTATION_DECAY:public ANALYTIC_VELOCITY
@@ -317,6 +330,7 @@ public:
         virtual TV u(const TV& X,T t) const {return X.Orthogonal_Vector()*2*exp(-X.Magnitude_Squared());}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(-2*X.x*X.y,1-2*sqr(X.y),-1+2*sqr(X.x),2*X.x*X.y)*2*exp(-X.Magnitude_Squared());}
         virtual T p(const TV& X,T t) const {return 0;}
+        virtual TV F(const TV& X,T t) const {return TV();}
     };
 
     struct ANALYTIC_VELOCITY_AFFINE:public ANALYTIC_VELOCITY
@@ -327,6 +341,17 @@ public:
         virtual TV u(const TV& X,T t) const {return du0*X+v0;}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return du0;}
         virtual T p(const TV& X,T t) const {return 0;}
+        virtual TV F(const TV& X,T t) const {return du0*(du0*X+v0);}
+    };
+
+    struct ANALYTIC_VELOCITY_QUADRATIC_X:public ANALYTIC_VELOCITY
+    {
+        T a,b,c,mu;
+        ANALYTIC_VELOCITY_QUADRATIC_X(T a,T b,T c,T mu): a(a),b(b),c(c),mu(mu) {}
+        virtual TV u(const TV& X,T t) const {return TV(0,(a*X.x+b)*X.x+c);}
+        virtual MATRIX<T,2> du(const TV& X,T t) const {return MATRIX<T,2>(0,2*a*X.x+b,0,0);}
+        virtual T p(const TV& X,T t) const {return 0;}
+        virtual TV F(const TV& X,T t) const {return TV(0,-2*a*mu);}
     };
 
     struct ANALYTIC_LEVELSET_PERIODIC:public ANALYTIC_LEVELSET
@@ -438,6 +463,13 @@ public:
 
     TV Jump_Interface_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
     {
+        return TV();
+    }
+
+    TV Volume_Force(const TV& X,int color,T time)
+    {
+        if(analytic_velocity.m && analytic_levelset)
+            return analytic_velocity(color)->F(X/m,time/s)*kg/(m*s*s);
         return TV();
     }
 

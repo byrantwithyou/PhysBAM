@@ -17,6 +17,7 @@
 #include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
@@ -339,15 +340,19 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
 
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV> rhs,sol;
-    {
-        ARRAY<ARRAY<TV,TV_INT> > f_volume;
-        f_volume.Resize(iss.cdi->colors);
-        for(int c=0;c<iss.cdi->colors;c++)
-            f_volume(c).Resize(example.grid.Domain_Indices());
 
-        iss.Set_RHS(rhs,f_volume,&example.face_velocities);
-        iss.Resize_Vector(sol);
-    }
+    struct VOLUME_FORCE_COLOR_LOCAL:public VOLUME_FORCE_COLOR<TV>
+    {
+        PLS_FC_EXAMPLE<TV>* example;
+        T time,dt;
+        virtual TV F(const TV& X,int color) {return example->Volume_Force(X,color,time)*dt;}
+    } vfcl;
+    vfcl.example=&example;
+    vfcl.time=time+dt;
+    vfcl.dt=dt;
+
+    iss.Set_RHS(rhs,&vfcl,&example.face_velocities,false);
+    iss.Resize_Vector(sol);
 
     MINRES<T> mr;
     KRYLOV_SOLVER<T>* solver=&mr;

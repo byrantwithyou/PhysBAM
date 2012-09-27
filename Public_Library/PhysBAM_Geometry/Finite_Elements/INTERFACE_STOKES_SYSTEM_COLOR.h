@@ -20,6 +20,7 @@ template<class TV> class GRID;
 template<class T_GRID> class LEVELSET_UNIFORM;
 template<class TV> class CELL_MANAGER_COLOR;
 template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
+template<class TV> class VOLUME_FORCE_COLOR;
 
 template<class TV>
 class INTERFACE_STOKES_SYSTEM_COLOR:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
@@ -93,7 +94,7 @@ public:
 
 //#####################################################################
     void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY<T>* system_inertia,ARRAY<T>* rhs_inertia);
-    void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u=0,bool analytic_velocity_correction=false);
+    void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

@@ -88,6 +88,7 @@ public:
     virtual TV Dirichlet_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time)=0;
     virtual TV Neumann_Boundary_Condition(const TV& X,int bc_color,int fluid_color,T time)=0;
     virtual TV Jump_Interface_Condition(const TV& X,int bc_color,int fluid_color,T time)=0;
+    virtual TV Volume_Force(const TV& X,int color,T time)=0;
 //#####################################################################
 };
 }

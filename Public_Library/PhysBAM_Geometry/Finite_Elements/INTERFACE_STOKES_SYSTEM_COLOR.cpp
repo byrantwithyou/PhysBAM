@@ -19,6 +19,7 @@
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
@@ -207,7 +208,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
+Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
 {
     VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
     
@@ -224,7 +225,7 @@ Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<TV,TV_INT> >& f_volume,const ARRAY<ARRAY
             int k=cm_p->Get_Index(it.index,c);
             if(k>=0)
                 for(int i=0;i<TV::m;i++)
-                    F_volume(i)(c)(k)=f_volume(c)(it.index)(i);}
+                    F_volume(i)(c)(k)=vfc->F(it.Location(),c)(i);}
 
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++)
