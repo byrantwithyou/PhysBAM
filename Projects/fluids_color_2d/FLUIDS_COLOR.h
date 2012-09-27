@@ -200,8 +200,8 @@ public:
                     T v1=(v0*mu0/(x1-x0)+v2*mu1/(x2-x1))/(mu0/(x1-x0)+mu1/(x2-x1));
                     MATRIX<T,2> du0(0,(v1-v0)/(x1-x0),0,0),du1(0,(v2-v1)/(x2-x1),0,0);
                     analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0,rho0*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1,rho1*sqr(m)/kg));
                 }
                 break;
             case 10:
@@ -220,6 +220,16 @@ public:
                     T x0=(T).2,x1=(T).8,g=9.8,a=rho0*sqr(m)*g/(2*mu0*s);
                     analytic_levelset=new ANALYTIC_LEVELSET_BANDED(x0,x1,DIRICHLET,DIRICHLET);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X(a,-a*(x0+x1),a*x0*x1,mu0*s/kg));
+                }
+                break;
+            case 13:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    T x0=(T).2,x1=(T).5,x2=(T).8,v0=1,v1=1,v2=-1;
+                    MATRIX<T,2> du0(0,(v1-v0)/(x1-x0),0,0),du1(0,(v2-v1)/(x2-x1),0,0);
+                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0,rho0*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1,rho1*sqr(m)/kg));
                 }
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
@@ -337,11 +347,12 @@ public:
     {
         TV v0;
         MATRIX<T,2> du0;
-        ANALYTIC_VELOCITY_AFFINE(const TV& x0,const TV& v0,const MATRIX<T,2>& du0): v0(v0-du0*x0),du0(du0) {}
+        T rho;
+        ANALYTIC_VELOCITY_AFFINE(const TV& x0,const TV& v0,const MATRIX<T,2>& du0,T rho): v0(v0-du0*x0),du0(du0) {}
         virtual TV u(const TV& X,T t) const {return du0*X+v0;}
         virtual MATRIX<T,2> du(const TV& X,T t) const {return du0;}
         virtual T p(const TV& X,T t) const {return 0;}
-        virtual TV F(const TV& X,T t) const {return du0*(du0*X+v0);}
+        virtual TV F(const TV& X,T t) const {return rho*du0*(du0*X+v0);}
     };
 
     struct ANALYTIC_VELOCITY_QUADRATIC_X:public ANALYTIC_VELOCITY
@@ -461,8 +472,14 @@ public:
         return TV();
     }
 
-    TV Jump_Interface_Condition(const TV& X,int bc_color,int fluid_color,T time) PHYSBAM_OVERRIDE
+    TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time) PHYSBAM_OVERRIDE
     {
+        if(analytic_velocity.m && analytic_levelset){
+            MATRIX<T,2> du0=analytic_velocity(color0)->du(X/m,time/s)/s,du1=analytic_velocity(color1)->du(X/m,time/s)/s;
+            T p0=analytic_velocity(color0)->p(X/m,time/s)*kg/(s*s*m),p1=analytic_velocity(color1)->p(X/m,time/s)*kg/(s*s*m);
+            MATRIX<T,2> stress0=(du0+du0.Transposed())*mu(color0)-p0,stress1=(du1+du1.Transposed())*mu(color1)-p1;
+            TV n=analytic_levelset->N(X/m,time/s);
+            return (stress0-stress1)*n;}
         return TV();
     }
 

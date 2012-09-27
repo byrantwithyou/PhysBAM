@@ -317,7 +317,7 @@ Apply_Pressure_And_Viscosity(T dt,bool first_step)
     {
         PLS_FC_EXAMPLE<TV>* example;
         T time,dt;
-        virtual TV j_surface(const TV& X,int color0,int color1) {return example->Jump_Interface_Condition(X,color0,color1,time);}
+        virtual TV j_surface(const TV& X,int color0,int color1) {return example->Jump_Interface_Condition(X,color0,color1,time)*dt;}
         virtual TV d_surface(const TV& X,int color0,int color1) {return example->Dirichlet_Boundary_Condition(X,color0,color1,time);}
         virtual TV n_surface(const TV& X,int color0,int color1) {return example->Neumann_Boundary_Condition(X,color0,color1,time)*dt;}
     } bccl;

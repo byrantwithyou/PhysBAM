@@ -1,5 +1,5 @@
 #!/bin/bash
-for t in {0..12} ; do
+for t in {0..13} ; do
     for b in d n s ; do
         (
             T="o-$t-$b"
