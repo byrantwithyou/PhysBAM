@@ -146,10 +146,10 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.SMOKE),
-        solids_tests(*this,solid_body_collection),deformable_object_id(0),mass_multiplier(0),stiffness_multiplier((T)1),damping_multiplier((T)1),
+        solids_tests(*this,solid_body_collection),deformable_object_id(0),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),rigid_body_id(0),flow_particles(false),run_self_tests(false),print_poisson_matrix(false),
         print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),circle_refinement(0),scale_length(1),use_solid(false),fluid_gravity((T)9.8),solid_gravity((T)9.8),
-        solid_width((T).1111),solid_density(100),widen_domain(0),max_dt(0)
+        solid_width((T).1111),solid_density(100),widen_domain(0),period(10),max_dt(0),beam_elements_width(2),beam_elements_length(40),solid_resolution(216)
     {
         LOG::cout<<std::setprecision(16);
     }
@@ -182,34 +182,34 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Double_Argument("-mass",(T)1);
-    parse_args->Add_Integer_Argument("-cg_iterations",3000);
-    parse_args->Add_Option_Argument("-slip");
-    parse_args->Add_Double_Argument("-viscosity",(T)0);
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
-    parse_args->Add_Option_Argument("-leakproof");
-    parse_args->Add_Option_Argument("-use_viscous_forces");
-    parse_args->Add_Integer_Argument("-circle_refinement",0);
-    parse_args->Add_Double_Argument("-scale_length",1);
-    parse_args->Add_Option_Argument("-use_solid");
-    parse_args->Add_Double_Argument("-fluid_gravity",9.8);
-    parse_args->Add_Double_Argument("-solid_gravity",9.8);
-    parse_args->Add_Double_Argument("-solid_width",.1111);
-    parse_args->Add_Double_Argument("-solid_density",100);
-    parse_args->Add_Integer_Argument("-widen_domain",0);
-    parse_args->Add_Double_Argument("-period",10);
-    parse_args->Add_Double_Argument("-max_dt",0);
-    parse_args->Add_Option_Argument("-stokes");
-    parse_args->Add_Integer_Argument("-beam_res_w",2);
-    parse_args->Add_Integer_Argument("-beam_res_h",40);
-    parse_args->Add_Integer_Argument("-solid_resolution",216);
+    fluids_parameters.incompressible_iterations=3000;
+    parse_args->Add("-mass",&mass_multiplier,"value","mass_multiplier");
+    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
+    parse_args->Add("-slip",&fluids_parameters.use_slip,"use slip");
+    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","fluid viscosity");
+    parse_args->Add("-test_system",&run_self_tests,"Run self tests");
+    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
+    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
+    parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
+    parse_args->Add("-use_viscous_forces",&use_viscous_forces,"use_viscous_forces");
+    parse_args->Add("-scale_length",&scale_length,"value","scale_length");
+    parse_args->Add("-use_solid",&use_solid,"use_solid");
+    parse_args->Add("-fluid_gravity",&fluid_gravity,"value","fluid_gravity");
+    parse_args->Add("-solid_gravity",&solid_gravity,"value","solid_gravity");
+    parse_args->Add("-solid_width",&solid_width,"value","solid_width");
+    parse_args->Add("-solid_density",&solid_density,"value","solid_density");
+    parse_args->Add("-widen_domain",&widen_domain,"value","widen_domain");
+    parse_args->Add("-period",&period,"value","period");
+    parse_args->Add("-max_dt",&max_dt,"value","maximum dt");
+    parse_args->Add("-stokes",&fluids_parameters.stokes_flow,"disable advection");
+    parse_args->Add("-beam_res_w",&beam_elements_width,"value","beam_elements_width");
+    parse_args->Add("-beam_res_h",&beam_elements_length,"value","beam_elements_length");
+    parse_args->Add("-solid_resolution",&solid_resolution,"value","solid_resolution");
 }
 //#####################################################################
 // Function Parse_Options
@@ -226,8 +226,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.rho_top=(T).65;
     fluids_parameters.density_buoyancy_constant=fluids_parameters.temperature_buoyancy_constant=0;
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);
+    solids_parameters.implicit_solve_parameters.cg_iterations=fluids_parameters.incompressible_iterations;
+    fluids_parameters.use_coupled_implicit_viscosity=use_viscous_forces;
 
-    mass_multiplier=(T)parse_args->Get_Double_Value("-mass");
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 
     //mattress_grid=GRID<TV>(3,3,(T).25,(T).75,(T).81,(T)1.05);
@@ -238,8 +239,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.use_post_cg_constraints=false;
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-    fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-cg_iterations");
 
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
@@ -250,23 +249,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=false;
     velocity_multiplier=(T)1;
 
-    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
-    fluids_parameters.stokes_flow=parse_args->Is_Value_Set("-stokes");
-
     solids_fluids_parameters.use_leakproof_solve=false;
-    if(parse_args->Is_Value_Set("-leakproof")) solids_fluids_parameters.use_leakproof_solve=true;
-
-    if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity");
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
         
     fluids_parameters.use_removed_positive_particles=true;fluids_parameters.use_removed_negative_particles=true;
@@ -275,22 +260,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     // T default_removed_positive_particle_buoyancy_constant=fluids_parameters.removed_positive_particle_buoyancy_constant;
     fluids_parameters.removed_positive_particle_buoyancy_constant=0;
     //solid_body_collection.print_residuals=true;
-
-    circle_refinement=parse_args->Get_Integer_Value("-circle_refinement");
-    use_viscous_forces=parse_args->Is_Value_Set("-use_viscous_forces");
-    fluids_parameters.use_coupled_implicit_viscosity=parse_args->Is_Value_Set("-use_viscous_forces");
-    scale_length=parse_args->Get_Double_Value("-scale_length");
-    use_solid=parse_args->Is_Value_Set("-use_solid");
-    fluid_gravity=parse_args->Get_Double_Value("-fluid_gravity");
-    solid_gravity=parse_args->Get_Double_Value("-solid_gravity");
-    solid_width=parse_args->Get_Double_Value("-solid_width");
-    solid_density=parse_args->Get_Double_Value("-solid_density");
-    widen_domain=parse_args->Get_Integer_Value("-widen_domain");
-    period=parse_args->Get_Double_Value("-period");
-    max_dt=parse_args->Get_Double_Value("-max_dt");
-    beam_elements_length=parse_args->Get_Integer_Value("-beam_res_h");
-    beam_elements_width=parse_args->Get_Integer_Value("-beam_res_w");
-    solid_resolution=parse_args->Get_Integer_Value("-solid_resolution");
 
     fluids_parameters.gravity=0;
 

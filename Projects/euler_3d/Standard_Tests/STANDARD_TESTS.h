@@ -165,7 +165,7 @@ public:
         :BASE(stream_type,0,incompressible_input?fluids_parameters.SMOKE:fluids_parameters.COMPRESSIBLE),
         solid_tests(*this,solid_body_collection),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),fp(0),weak_shock(false),
         timesplit(false),use_slip(false),use_incompressible_gravity(false),faster_frame_rate(false),exact(false),no_soot(false),
-        no_solids_gravity(false),no_preconditioner(false),createpattern(false),solid_mass((T).0625),
+        no_solids_gravity(false),createpattern(false),solid_mass((T).0625),
         rigid_body_collection(solid_body_collection.rigid_body_collection),fracture_walls(false),collision_manager(0),
         transition_to_incompressible(false),incompressible(incompressible_input),vorticity_confinement((T)0),use_soot_sourcing(false),
         use_soot_sourcing_from_shock(false),use_soot_fuel_combustion(false),use_smoke_sourcing(false),read_soot_from_file(false),
@@ -202,7 +202,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-print_rhs",&print_rhs,"print_rhs");
     parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
     parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add("-no_preconditioner",&no_preconditioner,"no_preconditioner");
+    parse_args->Add("-no_preconditioner",&no_preconditioner,"Disable preconditioner");
     parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
 
     parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"value","transition to incompressible in a time window");

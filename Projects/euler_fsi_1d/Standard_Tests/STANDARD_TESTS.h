@@ -77,6 +77,21 @@ public:
     bool output_iterators;
 
     std::ofstream gnuplot_file_stream;
+    int eno_scheme;
+    int eno_order;
+    int rk_order;
+    T cfl_number;
+    bool timesplit;
+    bool implicit_rk;
+    bool use_sound_speed_based_cfl;
+    bool multiplication_factor_for_sound_speed_based_dt;
+    bool flip_shock;
+    bool use_slip;
+    bool all_walls;
+    bool no_walls;
+    T time_start_transition;
+    T time_end_transition;
+    T one_over_c_incompressible;
 
     /***************
     example explanation:
@@ -94,7 +109,11 @@ public:
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),
-        rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(0),solid_position_delta(0),eos_smooth_transition(0)
+        rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(1),solid_position_delta(0),eos_smooth_transition(0),
+        run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_rhs(false),print_each_matrix(false),
+        output_iterators(false),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
+        implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false),flip_shock(false),
+        use_slip(false),all_walls(false),no_walls(false),time_start_transition((T).5),time_end_transition((T).7),one_over_c_incompressible(0)
     {
     }
 
@@ -131,40 +150,39 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",1,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Double_Argument("-cfl",(T).5,"CFL","cfl number");
-    parse_args->Add_Option_Argument("-cfl_sound_speed","use sound speed based cfl condition");
-    parse_args->Add_Double_Argument("-cfl_sound_speed_multiple",(T)0.,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
-    parse_args->Add_Double_Argument("-solid_mass",(T)1,"solid_mass","the mass of the solid in the simulation");
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-slip","use slip/spd for coupling");
-    parse_args->Add_Option_Argument("-implicit_rk","perform runge kutta on the implicit part");
-    parse_args->Add_Option_Argument("-all_walls","Add walls on all sides");
-    parse_args->Add_Option_Argument("-no_walls","No walls on all sides");
-    parse_args->Add_Double_Argument("-solid_position_delta",(T)0,"Move solid from default positions by specified amount");
-    parse_args->Add_Double_Argument("-damping",(T)1,"spring_overdamping_fraction","overdamping fraction for the spring");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+    parse_args->Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
+    parse_args->Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
+    parse_args->Add("-solid_mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
+    parse_args->Add("-slip",&use_slip,"use slip/spd for coupling");
+    parse_args->Add("-all_walls",&all_walls,"Add walls on all sides");
+    parse_args->Add("-no_walls",&no_walls,"No walls on all sides");
+    parse_args->Add("-solid_position_delta",&solid_position_delta,"value","Move solid from default positions by specified amount");
 
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_rhs");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
+    parse_args->Add("-test_system",&run_self_tests,"run self tests");
+    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print poisson matrix");
+    parse_args->Add("-print_index_map",&print_index_map,"print index map");
+    parse_args->Add("-print_matrix",&print_matrix,"print matrix");
+    parse_args->Add("-print_rhs",&print_rhs,"print rhs");
+    parse_args->Add("-print_each_matrix",&print_each_matrix,"print each matrix");
+    parse_args->Add("-output_iterators",&output_iterators,"output iterators");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
     
-    parse_args->Add_Option_Argument("-flip_shock");
+    parse_args->Add("-flip_shock",&flip_shock,"flip_shock");
 
-    parse_args->Add_Option_Argument("-transition_to_incompressible","transition to incompressible in a time window");
-    parse_args->Add_Double_Argument("-time_start_transition",(T).5,"time to start transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-time_end_transition",(T).7,"time to end transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-one_over_c_incompressible",(T)0,"one over incompressible sound speed");
+    parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"transition to incompressible in a time window");
+    parse_args->Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
+    parse_args->Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
+    parse_args->Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","one over incompressible sound speed");
 
-    parse_args->Add_Option_Argument("-apply_cavitation_correction");
-    parse_args->Add_Option_Argument("-adaptive_time_step");
+    parse_args->Add("-apply_cavitation_correction",&fluids_parameters.compressible_apply_cavitation_correction,"compressible_apply_cavitation_correction");
+    parse_args->Add("-adaptive_time_step",&fluids_parameters.compressible_adaptive_time_step,"compressible_adaptive_time_step");
 }
 //#####################################################################
 // Function Parse_Options
@@ -172,31 +190,6 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    T multiplication_factor_for_sound_speed_based_dt=(T)parse_args->Get_Double_Value("-cfl_sound_speed_multiple");
-    solid_mass=(T)parse_args->Get_Double_Value("-solid_mass");
-    solid_position_delta=(T)parse_args->Get_Double_Value("-solid_position_delta");
-    bool use_sound_speed_based_cfl=parse_args->Is_Value_Set("-cfl_sound_speed");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit");
-    bool use_slip=parse_args->Is_Value_Set("-slip");
-    bool implicit_rk=parse_args->Is_Value_Set("-implicit_rk");
-    bool all_walls=parse_args->Is_Value_Set("-all_walls");
-    bool no_walls=parse_args->Is_Value_Set("-no_walls");
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_rhs=parse_args->Is_Value_Set("-print_rhs");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
-    bool flip_shock=parse_args->Is_Value_Set("-flip_shock");
-    transition_to_incompressible=parse_args->Is_Value_Set("-transition_to_incompressible");
-    T time_start_transition=(T)parse_args->Get_Double_Value("-time_start_transition");
-    T time_end_transition=(T)parse_args->Get_Double_Value("-time_end_transition");
-    T one_over_c_incompressible=(T)parse_args->Get_Double_Value("-one_over_c_incompressible");
 
     if(!use_slip && timesplit){LOG::cout<<"*** NON-SLIP VERSION OF SEMI-IMPLICIT FLOW SOLVER NOT AVAILABLE ***"<<std::endl;exit(-1);}
     spring_stiffness=(T)5;
@@ -227,8 +220,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         fluids_parameters.compressible_use_sound_speed_based_dt_multiple_for_cfl=true;
         fluids_parameters.compressible_multiplication_factor_for_sound_speed_based_dt=multiplication_factor_for_sound_speed_based_dt;}
     //custom stuff . . .
-    if(parse_args->Is_Value_Set("-apply_cavitation_correction")) fluids_parameters.compressible_apply_cavitation_correction=true;
-    if(parse_args->Is_Value_Set("-adaptive_time_step")) fluids_parameters.compressible_adaptive_time_step=true;
     if(transition_to_incompressible){
         eos_smooth_transition=new EOS_SMOOTH_TRANSITION_INCOMPRESSIBLE<EOS_GAMMA<T> >(time_start_transition,time_end_transition,one_over_c_incompressible);
         fluids_parameters.compressible_eos=eos_smooth_transition;}

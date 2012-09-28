@@ -49,7 +49,7 @@ public:
     INTERPOLATION_CURVE<T,FRAME<TV> > curve;
 
     MPI_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,this->fluids_parameters.NONE),tests(*this,solid_body_collection)
+        :BASE(stream_type,0,this->fluids_parameters.NONE),width(2),height(4),num_bodies(6),tests(*this,solid_body_collection)
     {
         LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
         solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
@@ -129,9 +129,9 @@ void Update_Solids_Parameters(const T time) PHYSBAM_OVERRIDE
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-width",2,"number of stacks");
-    parse_args->Add_Integer_Argument("-height",4,"height of each stack");
-    parse_args->Add_Integer_Argument("-num_bodies",6,"number of total bodies");
+    parse_args->Add("-width",&width,"value","number of stacks");
+    parse_args->Add("-height",&height,"value","height of each stack");
+    parse_args->Add("-num_bodies",&num_bodies,"value","number of total bodies");
 }
 //#####################################################################
 // Function Parse_Options
@@ -140,9 +140,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     output_directory=STRING_UTILITIES::string_sprintf("MPI_Example/Test_%d",test_number);
-    width=parse_args->Get_Integer_Value("-width");
-    height=parse_args->Get_Integer_Value("-height");
-    num_bodies=parse_args->Get_Integer_Value("-num_bodies");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

@@ -115,7 +115,8 @@ public:
     bool make_ellipse;
     T m,s,kg;
     int solid_refinement;
-    T solid_density,solid_width,analytic_solution;
+    T solid_density,solid_width,analytic_solution,linear_force,rand;
+    bool use_viscosity;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type);
     virtual ~STANDARD_TESTS();

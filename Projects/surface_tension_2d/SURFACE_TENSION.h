@@ -132,7 +132,7 @@ public:
     T omega;
     T laplace_number,surface_tension;
     bool use_T_nu;
-    bool use_viscosity,no_preconditioner;
+    bool use_viscosity;
     T linear_force,rand;
     int cut_order;
 

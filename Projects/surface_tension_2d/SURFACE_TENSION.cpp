@@ -22,7 +22,7 @@ SURFACE_TENSION(const STREAM_TYPE stream_type)
     current_dt(0),implicit_solid(true),no_implicit_solid(false),use_cut_volume(false),use_low_order_advection(false),
     front_tracked_structure(0),rebuild_curve(0),deformable_collisions(0),fsi(0),number_surface_particles(0),rebuild_surface(false),free_particles(0),psi_D(0),
     circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),use_massless_structure(false),coupled_particles(0),make_ellipse(false),use_phi(false),remesh(false),m(1),s(1),kg(1),solid_refinement(7),
-    solid_density(0),solid_width(0),analytic_solution(0),omega(0),laplace_number(120),use_T_nu(false),use_viscosity(false),no_preconditioner(false),linear_force(0),rand(0),cut_order(4)
+    solid_density(0),solid_width(0),analytic_solution(0),omega(0),laplace_number(120),use_T_nu(false),use_viscosity(false),linear_force(0),rand(0),cut_order(4)
 
 {
     LOG::cout<<std::setprecision(16);
@@ -64,7 +64,7 @@ Register_Options()
     parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
     parse_args->Add("-use_full_ic",&use_full_ic,"use_full_ic");
     parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
-    parse_args->Add("-no_preconditioner",&no_preconditioner,"no preconditioner");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
     parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
     parse_args->Add("-leakproof",&solids_fluids_parameters.use_leakproof_solve,"use leakproof solve");
     parse_args->Add("-use_decoupled_viscosity",&use_decoupled_viscosity,"use decoupled viscosity");
@@ -113,7 +113,6 @@ Parse_Options()
     fluids_parameters.density_buoyancy_constant=fluids_parameters.temperature_buoyancy_constant=0;
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
-    if(no_preconditioner) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 

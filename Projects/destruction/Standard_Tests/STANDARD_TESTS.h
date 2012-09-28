@@ -97,13 +97,15 @@ public:
     FRACTURE_PATTERN<T> fracture_pattern;
     ARRAY<PAIR<int,T> > rigid_body_clamp_time;
     T maximum_fall_speed;
+    bool createpattern;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::solids_parameters;using BASE::fluids_parameters;using BASE::data_directory;using BASE::last_frame;using BASE::output_directory;using BASE::frame_rate;
     using BASE::stream_type;using BASE::solid_body_collection;using BASE::solids_evolution;using BASE::parse_args;using BASE::test_number;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),rigid_body_collection(solid_body_collection.rigid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),parameter(0),prune_stacks_from_contact(false),prune_contact_using_velocity(false),
+        use_nonanalytic_levelsets(false),rigid_body_collection(solid_body_collection.rigid_body_collection),createpattern(false)
     {
     }
 
@@ -141,14 +143,14 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Integer_Argument("-fp",2,"specify fracture pattern");
-    parse_args->Add_Option_Argument("-prunestacks","Do something quick for stacks during contact");
-    parse_args->Add_Option_Argument("-velocityprune","Let collisions handle pairs with high velocity");
-    parse_args->Add_Option_Argument("-noanalytic","disable analytic collisions");
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Option_Argument("-noanalyticlevelsets","prevent usage of analytic levelsets");
-    parse_args->Add_Option_Argument("-createpattern","create a fracture pattern");
+    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add("-fp",&fracture_pattern_index,"index","specify fracture pattern");
+    parse_args->Add("-prunestacks",&prune_stacks_from_contact,"Do something quick for stacks during contact");
+    parse_args->Add("-velocityprune",&prune_contact_using_velocity,"Let collisions handle pairs with high velocity");
+    parse_args->Add_Not("-noanalytic",&solids_parameters.rigid_body_collision_parameters.use_analytic_collisions,"disable analytic collisions");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-noanalyticlevelsets",&use_nonanalytic_levelsets,"prevent usage of analytic levelsets");
+    parse_args->Add("-createpattern",&createpattern,"create a fracture pattern");
 }
 //#####################################################################
 // Function Parse_Options
@@ -158,7 +160,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     BASE::Parse_Options();
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
 
-    if(parse_args->Get_Option_Value("-createpattern")){
+    if(createpattern){
         if(test_number==1) Create_Box_Split_Pattern();
         else if(test_number==2) Create_Crossing_Planes_Pattern();
         else if(test_number==3) Create_Grain_Boundary_Surfaces();
@@ -172,15 +174,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     frame_rate=30;
 
-    parameter=parse_args->Get_Integer_Value("-parameter");
     if(parameter) output_directory+=STRING_UTILITIES::string_sprintf("_param%i",parameter);
-    if(parse_args->Is_Value_Set("-fp")) fracture_pattern_index=parse_args->Get_Integer_Value("-fp");
-    prune_stacks_from_contact=parse_args->Get_Option_Value("-prunestacks");
-    prune_contact_using_velocity=parse_args->Get_Option_Value("-velocityprune");
-    use_nonanalytic_levelsets=parse_args->Get_Option_Value("-noanalyticlevelsets");
-
-    solids_parameters.rigid_body_collision_parameters.use_analytic_collisions=!parse_args->Get_Option_Value("-noanalytic");
-    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################

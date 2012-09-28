@@ -74,11 +74,28 @@ public:
     15. 1 with a 1-D deformable beam.
     16. 1d spring-mass system with right particle fixed.
     ***************/
+    int eno_scheme;
+    int eno_order;
+    int rk_order;
+    T cfl_number;
+    bool timesplit;
+    bool implicit_rk;
+    bool use_sound_speed_based_cfl;
+    bool multiplication_factor_for_sound_speed_based_dt;
+    bool exact;
+    bool use_glf;
+    bool all_walls;
+    bool no_walls;
+    T time_start_transition;
+    T time_end_transition;
+    T one_over_c_incompressible;
 
     SOD_ST(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),tests(*this,solid_body_collection),
-        rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(0),write_transparency_output(false),
-        transition_to_incompressible(false),eos_smooth_transition(0)
+        rigid_body_collection(solid_body_collection.rigid_body_collection),solid_mass(1),write_transparency_output(false),
+        transition_to_incompressible(false),eos_smooth_transition(0),eno_scheme(1),eno_order(2),rk_order(3),cfl_number((T).5),timesplit(false),
+        implicit_rk(false),use_sound_speed_based_cfl(false),multiplication_factor_for_sound_speed_based_dt(false),exact(false),
+        use_glf(true),all_walls(false),no_walls(false),time_start_transition((T).5),time_end_transition((T).7),one_over_c_incompressible(0)
     {
     }
 
@@ -114,25 +131,25 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",1,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Option_Argument("-noglf","don't use GLF and use LLF for ENO");
-    parse_args->Add_Double_Argument("-cfl",(T).5,"CFL","cfl number");
-    parse_args->Add_Option_Argument("-cfl_sound_speed","use sound speed based cfl condition");
-    parse_args->Add_Double_Argument("-cfl_sound_speed_multiple",(T)0.,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
-    parse_args->Add_Double_Argument("-solid_mass",(T)1,"solid_mass","the mass of the solid in the simulation");
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-implicit_rk","perform runge kutta on the implicit part");
-    parse_args->Add_Option_Argument("-all_walls","Add walls on all sides");
-    parse_args->Add_Option_Argument("-no_walls","No walls on all sides");
-    parse_args->Add_Option_Argument("-exact","output a fully-explicit sim to (output_dir)_exact");
-    parse_args->Add_Option_Argument("-write_transparency_output","Akin to Ariente's tests, this allows us to visualize a rigid body as though it were 0-D.");
-    parse_args->Add_Option_Argument("-transition_to_incompressible","transition to incompressible in a time window");
-    parse_args->Add_Double_Argument("-time_start_transition",(T).5,"time to start transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-time_end_transition",(T).7,"time to end transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-one_over_c_incompressible",(T)0,"incompressible sound speed");
-    parse_args->Add_Option_Argument("-apply_cavitation_correction");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-implicit_rk",&implicit_rk,"perform runge kutta on the implicit part");
+    parse_args->Add("-cfl_sound_speed",&use_sound_speed_based_cfl,"use sound speed based cfl condition");
+    parse_args->Add("-cfl_sound_speed_multiple",&multiplication_factor_for_sound_speed_based_dt,"cfl_sound_speed_multiple","multiple of sound speed based cfl. Used if non-zero value set.");
+    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+    parse_args->Add_Not("-noglf",&use_glf,"don't use GLF and use LLF for ENO");
+    parse_args->Add("-solid_mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
+    parse_args->Add("-all_walls",&all_walls,"Add walls on all sides");
+    parse_args->Add("-no_walls",&no_walls,"No walls on all sides");
+    parse_args->Add("-write_transparency_output",&write_transparency_output,"Akin to Ariente's tests, this allows us to visualize a rigid body as though it were 0-D.");
+    parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"transition to incompressible in a time window");
+    parse_args->Add("-time_start_transition",&time_start_transition,"value","time to start transitioning to incompressible flow");
+    parse_args->Add("-time_end_transition",&time_end_transition,"value","time to end transitioning to incompressible flow");
+    parse_args->Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","incompressible sound speed");
+    parse_args->Add("-apply_cavitation_correction",&fluids_parameters.compressible_apply_cavitation_correction,"compressible_apply_cavitation_correction");
 }
 //#####################################################################
 // Function Parse_Options
@@ -140,23 +157,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    bool use_glf=!parse_args->Is_Value_Set("-noglf");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    T use_sound_speed_based_cfl=parse_args->Is_Value_Set("-cfl_sound_speed");
-    T multiplication_factor_for_sound_speed_based_dt=(T)parse_args->Get_Double_Value("-cfl_sound_speed_multiple");
-    solid_mass=(T)parse_args->Get_Double_Value("-solid_mass");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit");
-    bool implicit_rk=parse_args->Is_Value_Set("-implicit_rk") && !parse_args->Is_Value_Set("-exact");
-    bool all_walls=parse_args->Is_Value_Set("-all_walls");
-    bool no_walls=parse_args->Is_Value_Set("-no_walls");
-    write_transparency_output=parse_args->Is_Value_Set("-write_transparency_output");
-    transition_to_incompressible=parse_args->Is_Value_Set("-transition_to_incompressible");
-    T time_start_transition=(T)parse_args->Get_Double_Value("-time_start_transition");
-    T time_end_transition=(T)parse_args->Get_Double_Value("-time_end_transition");
-    T one_over_c_incompressible=(T)parse_args->Get_Double_Value("-one_over_c_incompressible");
+    implicit_rk=implicit_rk && !exact;
 
     LOG::cout<<"use_glf="<<use_glf<<std::endl;
 
@@ -199,8 +200,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.compressible_perform_rungekutta_for_implicit_part=implicit_rk;
     solid_body_collection.deformable_body_collection.simulate=false;
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-
-    if(parse_args->Is_Value_Set("-apply_cavitation_correction")) fluids_parameters.compressible_apply_cavitation_correction=true;
 
     if(test_number==11 || test_number==12 || test_number==13 || test_number==14 || test_number==15 || test_number==16){
         fluids_parameters.solid_affects_fluid=true;

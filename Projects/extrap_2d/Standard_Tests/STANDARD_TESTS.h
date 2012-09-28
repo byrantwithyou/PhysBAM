@@ -144,13 +144,16 @@ public:
     T energy_profile_plot_min,energy_profile_plot_range;
     T plot_scale;
     T ether_drag;
+    bool project_nullspace,opt_residuals;
 
     STANDARD_TESTS(const STREAM_TYPE stream_type)
         :BASE(stream_type,0,fluids_parameters.NONE),tests(*this,solid_body_collection),semi_implicit(false),test_forces(false),use_extended_neohookean(false),
-        use_extended_neohookean_refined(false),use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),use_corotated_fixed(false),
-        use_corot_blend(false),use_corot_quartic(false),dump_sv(false),
-        print_matrix(false),parameter(20),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),stretch(1),poissons_ratio((T).45),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
-        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),energy_mesh(0),energy_profile_plot(false),plot_scale(1),ether_drag(0)
+        use_extended_neohookean2(false),use_extended_neohookean3(false),use_int_j_neo(false),use_rc_ext(false),use_rc2_ext(false),use_extended_neohookean_refined(false),
+        use_extended_neohookean_hyperbola(false),use_extended_neohookean_smooth(false),use_corotated(false),use_corotated_fixed(false),use_corot_blend(false),
+        use_corot_quartic(false),dump_sv(false),kinematic_id(0),kinematic_id2(0),print_matrix(false),parameter(0),stiffness_multiplier(1),damping_multiplier(1),use_constant_ife(false),
+        stretch(1),primary_contour(false),sigma_range(3),image_size(500),poissons_ratio((T).45),scatter_plot(false),use_contrails(false),input_cutoff(FLT_MAX),input_efc(FLT_MAX),
+        input_poissons_ratio(-1),input_youngs_modulus(0),test_model_only(false),plot_energy_density(false),energy_mesh(0),energy_profile_plot(false),energy_profile_plot_min(0),
+        energy_profile_plot_range(0),plot_scale(1),ether_drag(0),project_nullspace(false),opt_residuals(false)
     {
     }
 
@@ -207,51 +210,52 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Option_Argument("-semi_implicit","use semi implicit forces");
-    parse_args->Add_Option_Argument("-test_forces","use fully implicit forces");
-    parse_args->Add_Option_Argument("-use_ext_neo");
-    parse_args->Add_Option_Argument("-use_ext_neo2");
-    parse_args->Add_Option_Argument("-use_ext_neo3");
-    parse_args->Add_Option_Argument("-use_int_j_neo");
-    parse_args->Add_Option_Argument("-use_rc_ext");
-    parse_args->Add_Option_Argument("-use_rc2_ext");
-    parse_args->Add_Option_Argument("-use_ext_neo_ref");
-    parse_args->Add_Option_Argument("-use_ext_neo_hyper");
-    parse_args->Add_Option_Argument("-use_ext_neo_smooth");
-    parse_args->Add_Option_Argument("-use_corotated");
-    parse_args->Add_Option_Argument("-use_corotated_fixed");
-    parse_args->Add_Option_Argument("-use_corot_blend");
-    parse_args->Add_Option_Argument("-use_corot_quartic");
-    parse_args->Add_Option_Argument("-dump_sv");
-    parse_args->Add_Integer_Argument("-parameter",0,"parameter used by multiple tests to change the parameters of the test");
-    parse_args->Add_Double_Argument("-stiffen",1,"","stiffness multiplier for various tests");
-    parse_args->Add_Double_Argument("-dampen",1,"","damping multiplier for various tests");
-    parse_args->Add_Option_Argument("-residuals","print residuals during timestepping");
-    parse_args->Add_Option_Argument("-print_energy","print energy statistics");
-    parse_args->Add_Double_Argument("-cgsolids",1e-3,"CG tolerance for backward Euler");
-    parse_args->Add_Option_Argument("-use_be","use backward euler");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-project_nullspace","project out nullspace");
-    parse_args->Add_Integer_Argument("-projection_iterations",5,"number of iterations used for projection in cg");
-    parse_args->Add_Integer_Argument("-solver_iterations",1000,"number of iterations used for solids system");
-    parse_args->Add_Option_Argument("-use_constant_ife","use constant extrapolation on inverting finite element fix");
-    parse_args->Add_Double_Argument("-stretch",1,"stretch");
-    parse_args->Add_Option_Argument("-plot_contour","plot primary contour");
-    parse_args->Add_Option_Argument("-energy_profile_plot","plot energy profiles");
-    parse_args->Add_Integer_Argument("-image_size",500,"image size for plots");
-    parse_args->Add_Double_Argument("-sigma_range",3,"sigma range for plots");
-    parse_args->Add_Double_Argument("-poissons_ratio",.45,"poisson's ratio");
-    parse_args->Add_Option_Argument("-scatter_plot","Create contrail plot with singular values");
-    parse_args->Add_Option_Argument("-use_contrails","Show contrails in plot");
-    parse_args->Add_Double_Argument("-cutoff",.4,"cutoff");
-    parse_args->Add_Double_Argument("-efc",20,"efc");
-    parse_args->Add_Double_Argument("-poissons_ratio",-1,"poissons_ratio");
-    parse_args->Add_Double_Argument("-youngs_modulus",0,"youngs modulus, only for test 41 so far");
-    parse_args->Add_Option_Argument("-test_model_only");
-    parse_args->Add_Option_Argument("-plot_energy_density");
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Double_Argument("-plot_scale",1,"Scale height of energy plot");
-    parse_args->Add_Double_Argument("-ether_drag",0,"Ether drag");
+    solids_parameters.implicit_solve_parameters.cg_projection_iterations=5;
+    parse_args->Add("-semi_implicit",&semi_implicit,"use semi implicit forces");
+    parse_args->Add("-test_forces",&test_forces,"use fully implicit forces");
+    parse_args->Add("-use_ext_neo",&use_extended_neohookean,"use_extended_neohookean");
+    parse_args->Add("-use_ext_neo2",&use_extended_neohookean2,"use_extended_neohookean2");
+    parse_args->Add("-use_ext_neo3",&use_extended_neohookean3,"use_extended_neohookean3");
+    parse_args->Add("-use_int_j_neo",&use_int_j_neo,"use_int_j_neo");
+    parse_args->Add("-use_rc_ext",&use_rc_ext,"use_rc_ext");
+    parse_args->Add("-use_rc2_ext",&use_rc2_ext,"use_rc2_ext");
+    parse_args->Add("-use_ext_neo_ref",&use_extended_neohookean_refined,"use_extended_neohookean_refined");
+    parse_args->Add("-use_ext_neo_hyper",&use_extended_neohookean_hyperbola,"use_extended_neohookean_hyperbola");
+    parse_args->Add("-use_ext_neo_smooth",&use_extended_neohookean_smooth,"use_extended_neohookean_smooth");
+    parse_args->Add("-use_corotated",&use_corotated,"use_corotated");
+    parse_args->Add("-use_corotated_fixed",&use_corotated_fixed,"use_corotated_fixed");
+    parse_args->Add("-use_corot_blend",&use_corot_blend,"use_corot_blend");
+    parse_args->Add("-use_corot_quartic",&use_corot_quartic,"use_corot_quartic");
+    parse_args->Add("-dump_sv",&dump_sv,"dump_sv");
+    parse_args->Add("-parameter",&parameter,"value","parameter used by multiple tests to change the parameters of the test");
+    parse_args->Add("-stiffen",&stiffness_multiplier,"","stiffness multiplier for various tests");
+    parse_args->Add("-dampen",&damping_multiplier,"","damping multiplier for various tests");
+    parse_args->Add("-residuals",&opt_residuals,"print residuals during timestepping");
+    parse_args->Add("-print_energy",&solid_body_collection.print_energy,"print energy statistics");
+    parse_args->Add("-cgsolids",&solids_parameters.implicit_solve_parameters.cg_tolerance,"value","CG tolerance for backward Euler");
+    parse_args->Add_Not("-use_be",&solids_parameters.use_trapezoidal_rule_for_velocities,"use backward euler");
+    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args->Add("-project_nullspace",&project_nullspace,"project out nullspace");
+    parse_args->Add("-projection_iterations",&solids_parameters.implicit_solve_parameters.cg_projection_iterations,"value","number of iterations used for projection in cg");
+    parse_args->Add("-solver_iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,"value","number of iterations used for solids system");
+    parse_args->Add("-use_constant_ife",&use_constant_ife,"use constant extrapolation on inverting finite element fix");
+    parse_args->Add("-stretch",&stretch,"value","stretch");
+    parse_args->Add("-plot_contour",&primary_contour,"value","plot primary contour");
+    parse_args->Add("-energy_profile_plot",&energy_profile_plot,"plot energy profiles");
+    parse_args->Add("-image_size",&image_size,"value","image size for plots");
+    parse_args->Add("-sigma_range",&sigma_range,"value","sigma range for plots");
+    parse_args->Add("-poissons_ratio",&poissons_ratio,"value","poisson's ratio");
+    parse_args->Add("-scatter_plot",&scatter_plot,"Create contrail plot with singular values");
+    parse_args->Add("-use_contrails",&use_contrails,"Show contrails in plot");
+    parse_args->Add("-cutoff",&input_cutoff,"value","cutoff");
+    parse_args->Add("-efc",&input_efc,"value","efc");
+    parse_args->Add("-poissons_ratio",&input_poissons_ratio,"value","poissons_ratio");
+    parse_args->Add("-youngs_modulus",&input_youngs_modulus,"value","youngs modulus, only for test 41 so far");
+    parse_args->Add("-test_model_only",&test_model_only,"test_model_only");
+    parse_args->Add("-test_system",&solids_parameters.implicit_solve_parameters.test_system,"test_system");
+    parse_args->Add("-plot_scale",&plot_scale,"value","Scale height of energy plot");
+    parse_args->Add("-ether_drag",&ether_drag,"value","Ether drag");
+    parse_args->Add("-plot_energy_density",&plot_energy_density,"plot_energy_density");
 }
 //#####################################################################
 // Function Parse_Options
@@ -262,51 +266,10 @@ void Parse_Options() PHYSBAM_OVERRIDE
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests/Test_%d",test_number);
     last_frame=1000;
-    parameter=parse_args->Get_Integer_Value("-parameter");
+    if(project_nullspace) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
+    solid_body_collection.Print_Residuals(opt_residuals);
     
     solids_parameters.triangle_collision_parameters.perform_self_collision=false;
-    semi_implicit=parse_args->Is_Value_Set("-semi_implicit");
-    test_forces=parse_args->Is_Value_Set("-test_forces");
-    use_extended_neohookean=parse_args->Is_Value_Set("-use_ext_neo");
-    use_extended_neohookean2=parse_args->Is_Value_Set("-use_ext_neo2");
-    use_extended_neohookean3=parse_args->Is_Value_Set("-use_ext_neo3");
-    use_int_j_neo=parse_args->Is_Value_Set("-use_int_j_neo");
-    use_rc_ext=parse_args->Is_Value_Set("-use_rc_ext");
-    use_rc2_ext=parse_args->Is_Value_Set("-use_rc2_ext");
-    use_extended_neohookean_refined=parse_args->Is_Value_Set("-use_ext_neo_ref");//
-    use_extended_neohookean_hyperbola=parse_args->Is_Value_Set("-use_ext_neo_hyper");
-    use_extended_neohookean_smooth=parse_args->Is_Value_Set("-use_ext_neo_smooth");
-    use_corotated=parse_args->Is_Value_Set("-use_corotated");
-    use_corotated_fixed=parse_args->Is_Value_Set("-use_corotated_fixed");
-    use_corot_blend=parse_args->Is_Value_Set("-use_corot_blend");
-    use_corot_quartic=parse_args->Is_Value_Set("-use_corot_quartic");
-    dump_sv=parse_args->Is_Value_Set("-dump_sv");
-    solids_parameters.use_trapezoidal_rule_for_velocities=!parse_args->Get_Option_Value("-use_be");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    stiffness_multiplier=(T)parse_args->Get_Double_Value("-stiffen");
-    damping_multiplier=(T)parse_args->Get_Double_Value("-dampen");
-    solid_body_collection.print_energy=parse_args->Get_Option_Value("-print_energy");
-    solids_parameters.implicit_solve_parameters.cg_projection_iterations=parse_args->Get_Integer_Value("-projection_iterations");
-    if(parse_args->Is_Value_Set("-project_nullspace")) solids_parameters.implicit_solve_parameters.project_nullspace_frequency=1;
-    solid_body_collection.Print_Residuals(parse_args->Get_Option_Value("-residuals"));
-    use_constant_ife=parse_args->Get_Option_Value("-use_constant_ife");
-    stretch=(T)parse_args->Get_Double_Value("-stretch");
-    primary_contour=parse_args->Get_Option_Value("-plot_contour");
-    sigma_range=(T)parse_args->Get_Double_Value("-sigma_range");
-    image_size=parse_args->Get_Integer_Value("-image_size");
-    poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
-    scatter_plot=parse_args->Get_Option_Value("-scatter_plot");
-    use_contrails=parse_args->Get_Option_Value("-use_contrails");
-    if(parse_args->Is_Value_Set("-cutoff")) input_cutoff=(T)parse_args->Get_Double_Value("-cutoff");
-    if(parse_args->Is_Value_Set("-efc")) input_efc=(T)parse_args->Get_Double_Value("-efc");
-    if(parse_args->Is_Value_Set("-poissons_ratio")) input_poissons_ratio=(T)parse_args->Get_Double_Value("-poissons_ratio");
-    if(parse_args->Is_Value_Set("-youngs_modulus")) input_youngs_modulus=(T)parse_args->Get_Double_Value("-youngs_modulus");
-    energy_profile_plot=parse_args->Get_Option_Value("-energy_profile_plot");
-    test_model_only=parse_args->Get_Option_Value("-test_model_only");
-    plot_energy_density=parse_args->Get_Option_Value("-plot_energy_density");
-    solids_parameters.implicit_solve_parameters.test_system=parse_args->Is_Value_Set("-test_system");
-    plot_scale=(T)parse_args->Get_Double_Value("-plot_scale");
-    ether_drag=(T)parse_args->Get_Double_Value("-ether_drag");
 
     switch(test_number){
     case 20: case 21: case 26: 
@@ -656,9 +619,6 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
     if(solid_body_collection.deformable_body_collection.mpi_solids)
         solid_body_collection.deformable_body_collection.mpi_solids->Simple_Partition(solid_body_collection.deformable_body_collection,solid_body_collection.rigid_body_collection.rigid_geometry_collection,particles.X,VECTOR<int,2>(2,1));
     solid_body_collection.Update_Simulated_Particles();
-
-    if(parse_args->Is_Value_Set("-solver_iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-solver_iterations");
-    if(parse_args->Is_Value_Set("-cgsolids")) solids_parameters.implicit_solve_parameters.cg_tolerance=(T)parse_args->Get_Double_Value("-cgsolids");
 
     if(!semi_implicit) for(int i=0;i<solid_body_collection.solids_forces.m;i++) solid_body_collection.solids_forces(i)->use_implicit_velocity_independent_forces=true;
     if(!semi_implicit) for(int i=0;i<solid_body_collection.rigid_body_collection.rigids_forces.m;i++)

@@ -85,9 +85,9 @@ public:
 
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,solid_node?0:1,fluids_parameters.WATER),water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
-        solids_tests(*this,solid_body_collection),deformable_object_id(0),solid_density(0),light_sphere_index(0),lightish_sphere_index(0),neutral_sphere_index(0),
+        solids_tests(*this,solid_body_collection),deformable_object_id(0),solid_density(1),light_sphere_index(0),lightish_sphere_index(0),neutral_sphere_index(0),
         heavy_sphere_index(0),light_sphere_initial_height((T)2),heavy_sphere_initial_height((T)2.25),light_sphere_drop_time((T).7),heavy_sphere_drop_time((T)1.25),
-        left_fixed_index(0),right_fixed_index(0),bodies(),solid_scale((T).02),velocity_multiplier(1),mass_multiplier(1),flow_particles(false)
+        left_fixed_index(0),right_fixed_index(0),bodies(5),solid_scale((T).02),velocity_multiplier(1),mass_multiplier(1),flow_particles(false)
     {
         solid_node=mpi_world->initialized && !mpi_world->rank;
         mpi=mpi_world->initialized;
@@ -129,10 +129,10 @@ void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
 
-    parse_args->Add_Integer_Argument("-bodies",5);
-    parse_args->Add_Double_Argument("-mass",(T)1);
-    parse_args->Add_Double_Argument("-scale",(T)1);
-    parse_args->Add_Option_Argument("-slip");
+    parse_args->Add("-bodies",&bodies,"value","bodies");
+    parse_args->Add("-mass",&solid_density,"value","solid_density");
+    parse_args->Add("-scale",&solid_scale,"value","solid_scale");
+    parse_args->Add("-slip",&fluids_parameters.use_slip,"use slip");
 }
 //#####################################################################
 // Function Parse_Options
@@ -140,8 +140,6 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    bodies=parse_args->Get_Integer_Value("-bodies");
-    solid_density=(T)parse_args->Get_Double_Value("-mass");
     water_tests.Initialize(Water_Test_Number(test_number),resolution);
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     last_frame=1000;
@@ -158,9 +156,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
     if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
-    if(parse_args->Is_Value_Set("-scale")){solid_scale=(T)parse_args->Get_Double_Value("-scale");output_directory+=STRING_UTILITIES::string_sprintf("_scale%f",solid_scale);}
 
-    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
         

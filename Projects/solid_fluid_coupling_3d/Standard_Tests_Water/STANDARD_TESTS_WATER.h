@@ -106,14 +106,17 @@ public:
     ORIENTED_BOX<TV> fish_bounding_box;
     LEVELSET_IMPLICIT_OBJECT<TV>* fish_levelset;
     bool solid_node;
-    bool mpi;
+    bool mpi,opt_iterations;
+    T spout_stop_time,ball_initial_height,spout_radius;
+
 
     STANDARD_TESTS_WATER(const STREAM_TYPE stream_type)
         :BASE(stream_type,solid_node?0:1,fluids_parameters.WATER),
         water_tests(*this,fluids_parameters,solid_body_collection.rigid_body_collection),
-        solids_tests(*this,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(0),light_sphere_index(0),heavy_sphere_index(0),
+        solids_tests(*this,solid_body_collection),deformable_object_id(0),solid_density((T)2000),stiffness_ratio(1),light_sphere_index(0),heavy_sphere_index(0),
         light_sphere_initial_height((T)1.75),heavy_sphere_initial_height((T)1.75),light_sphere_drop_time((T)1),heavy_sphere_drop_time((T)1.5),balloon_initial_radius((T)0),
-        initial_fluid_height((T)0),boat_mass((T)7),implicit_springs(0),world_to_source(MATRIX<T,4>::Identity_Matrix()),bodies(5),sub_test(0),fish_levelset(0)
+        initial_fluid_height((T)0),boat_mass((T)7),implicit_springs(false),world_to_source(MATRIX<T,4>::Identity_Matrix()),bodies(5),sub_test(1),fish_levelset(0),
+        opt_iterations(false),spout_stop_time(0),ball_initial_height(0),spout_radius(0)
     {
         solid_node=mpi_world->initialized && !mpi_world->rank;
         mpi=mpi_world->initialized;
@@ -143,20 +146,18 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-suboption",1);
-    parse_args->Add_Double_Argument("-stiffness",(T)1);
-    parse_args->Add_Option_Argument("-implicit");
 
-    parse_args->Add_Integer_Argument("-bodies",5);
-    parse_args->Add_Double_Argument("-mass",(T)1);
-    parse_args->Add_Integer_Argument("-xprocs",0);
-    parse_args->Add_Integer_Argument("-zprocs",0);
-    parse_args->Add_Integer_Argument("-iterations",200);
+    parse_args->Add("-suboption",&sub_test,"value","sub_test");
+    parse_args->Add("-stiffness",&stiffness_ratio,"value","stiffness_ratio");
+    parse_args->Add("-implicit",&implicit_springs,"implicit_springs");
 
-    parse_args->Add_Double_Argument("-height",1.5);
-    parse_args->Add_Double_Argument("-stop_time",1);
-    parse_args->Add_Double_Argument("-radius",.2);
+    parse_args->Add("-bodies",&bodies,"value","bodies");
+    parse_args->Add("-mass",&boat_mass,"value","boat_mass");
+    parse_args->Add("-iterations",&solids_parameters.implicit_solve_parameters.cg_iterations,&opt_iterations,"value","cg iterations");
 
+    parse_args->Add("-height",&ball_initial_height,"value","ball_initial_height");
+    parse_args->Add("-stop_time",&spout_stop_time,"value","spout_stop_time");
+    parse_args->Add("-radius",&spout_radius,"value","spout_radius");
 }
 void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 //#####################################################################
@@ -166,9 +167,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     water_tests.Initialize(Water_Test_Number(test_number),resolution);
-    sub_test=parse_args->Get_Integer_Value("-suboption");
-    stiffness_ratio=(T)parse_args->Get_Double_Value("-stiffness");
-    implicit_springs=parse_args->Get_Option_Value("-implicit");
 
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
     last_frame=1000;
@@ -189,14 +187,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
     output_directory=STRING_UTILITIES::string_sprintf("Standard_Tests_Water/Test_%d_Resolution_%d_Stiffness_%d_Suboption_%d",test_number,resolution,stiffness_ratio,sub_test);
-    if(parse_args->Is_Value_Set("-mass")){boat_mass=(T)parse_args->Get_Double_Value("-mass");output_directory+=STRING_UTILITIES::string_sprintf("_mass%f",boat_mass);solid_density=boat_mass;}
-    if(parse_args->Is_Value_Set("-bodies")){bodies=parse_args->Get_Integer_Value("-bodies");output_directory+=STRING_UTILITIES::string_sprintf("_bodies%f",bodies);}
         
-    T spout_stop_time=0,ball_initial_height=0,spout_radius=0;
-    if(parse_args->Is_Value_Set("-height")){ball_initial_height=(T)parse_args->Get_Double_Value("-height");output_directory+=STRING_UTILITIES::string_sprintf("_height%.02f",ball_initial_height);}
-    if(parse_args->Is_Value_Set("-stop_time")){spout_stop_time=(T)parse_args->Get_Double_Value("-stop_time");output_directory+=STRING_UTILITIES::string_sprintf("_stopat%.02f",spout_stop_time);}
-    if(parse_args->Is_Value_Set("-radius")){spout_radius=(T)parse_args->Get_Double_Value("-radius");output_directory+=STRING_UTILITIES::string_sprintf("_radius%.02f",spout_radius);}
-
     fluids_parameters.domain_walls[1][1]=fluids_parameters.domain_walls[1][0]=false;
     fluids_parameters.density=(T)1000;
     solids_parameters.implicit_solve_parameters.cg_iterations=400;
@@ -211,7 +202,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             mattress_grid=T_GRID(sub_test*20,sub_test*5,sub_test*20,(T).3,(T).7,(T).6,(T).72,(T).3,(T).7);
             (*fluids_parameters.grid).Initialize(10*resolution+1,10*resolution+1,10*resolution+1,(T)0,(T)1,(T)0,(T)1,(T)0,(T)1);
             //solids_parameters.implicit_solve_parameters.cg_iterations=1000;
-            if(!parse_args->Is_Value_Set("-iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=500;
+            if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=500;
             solid_density=(T)300;
             break;
         case 2:
@@ -325,7 +316,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.reincorporate_removed_particle_velocity=true;
             fluids_parameters.removed_particle_mass_scaling=60;
             fluids_parameters.density=(T)1000;
-            if(!parse_args->Is_Value_Set("-iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=800;
+            if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=800;
             fluids_parameters.domain_walls[1][1]=false;
             initial_fluid_height=(T)3.5;
             fluids_parameters.grid->Initialize(32*resolution+1,36*resolution+1,24*resolution+1,(T)-8,(T)8,(T)0,(T)18,(T)-6,(T)6);
@@ -345,7 +336,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.reincorporate_removed_particle_velocity=true;
             fluids_parameters.removed_particle_mass_scaling=60;
             fluids_parameters.density=(T)1000;
-            if(!parse_args->Is_Value_Set("-iterations")) solids_parameters.implicit_solve_parameters.cg_iterations=50;
+            if(!opt_iterations) solids_parameters.implicit_solve_parameters.cg_iterations=50;
             fluids_parameters.reseeding_frame_rate=5;
             fluids_parameters.grid->Initialize(20*resolution+1,30*resolution+1,20*resolution+1,(T)-1.5,(T)1.5,(T)0,(T)4,(T)-1.5,(T)1.5);
             fluids_parameters.domain_walls[1][1]=false;
@@ -469,9 +460,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
         default:
             LOG::cerr<<"Unrecognized test number "<<test_number<<std::endl;exit(1);
     }
-
-    if(parse_args->Is_Value_Set("-iterations")){
-        solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-iterations");output_directory+=STRING_UTILITIES::string_sprintf("_%f_iterations",solids_parameters.implicit_solve_parameters.cg_iterations);}
 
     switch(test_number){
         case 9:THIN_SHELLS_FLUID_COUPLING_UTILITIES<T>::Add_Rigid_Body_Walls(*this,(T).5,(T).5,&rigid_bodies_to_collide_against);break;

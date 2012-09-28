@@ -86,7 +86,6 @@ public:
         solids_tests(*this,solid_body_collection),deformable_circle_id(0),rigid_body_id(0),velocity_multiplier((T)1),number_side_panels(40),aspect_ratio((T)1.1),side_length((T).5),
         stiffness_multiplier((T)1),damping_multiplier((T)1),bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),heavy_sphere_drop_time((T)1.5),source_velocity((T)0,(T).5,(T)0),
         run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false)
-
     {
     }
 
@@ -119,17 +118,17 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-cg_iterations",3000);
-    parse_args->Add_Option_Argument("-slip");
-    parse_args->Add_Double_Argument("-viscosity",(T)0);
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
+    parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
+    parse_args->Add("-slip",&fluids_parameters.use_slip,"use slip");
+    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","fluid viscosity");
+    parse_args->Add("-test_system",&run_self_tests,"Run self tests");
+    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
+    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"preconditioner");
 }
 //#####################################################################
 // Function Parse_Options

@@ -19,7 +19,7 @@ template<class T> KANG<T>::
 KANG(const STREAM_TYPE stream_type)
     :BASE(stream_type,1),solids_tests(*this,solid_body_collection),output_iterators(false),max_dt(0),exact_dt(0),
     circle_radius(0),circle_perturbation((T).05),oscillation_mode(2),make_ellipse(false),
-    omega(0),laplace_number(0),uleft(0),uright(0),no_preconditioner(false)
+    omega(0),laplace_number(0),uleft(0),uright(0)
 {
     LOG::cout<<std::setprecision(16);
     debug_particles.template Add_Array<VECTOR<T,3> >(ATTRIBUTE_ID_COLOR);
@@ -52,7 +52,7 @@ Register_Options()
     parse_args->Add("-test_system",&test_system,"Test Krylov system properties");
     parse_args->Add("-print_matrix",&print_matrix,"Print Krylov system");
     parse_args->Add("-output_iterators",&output_iterators,"Emit debug information for iterators");
-    parse_args->Add("-no_preconditioner",&no_preconditioner,"Disable preconditioner");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Do not use preconditioner for slip system");
     parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"Enable preconditioner");
     parse_args->Add("-max_dt",&max_dt,"value","Use dt no larger than this");
     parse_args->Add("-dt",&exact_dt,"value","Use exactly this dt");
@@ -82,7 +82,6 @@ Parse_Options()
     fluids_parameters.temperature_container.Set_Cooling_Constant(0);
     fluids_parameters.use_density=fluids_parameters.use_temperature=false;
     use_kang=true;
-    if(no_preconditioner) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     LOG::cout<<"Running Standard Test Number "<<test_number<<std::endl;
 

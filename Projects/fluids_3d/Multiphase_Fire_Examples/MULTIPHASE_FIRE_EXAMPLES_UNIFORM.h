@@ -57,7 +57,7 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Option_Argument("-pseudo_dirichlet");
+    parse_args->Add("-pseudo_dirichlet",&pseudo_dirichlet,"pseudo_dirichlet");
 }
 //#####################################################################
 // Function Parse_Options
@@ -66,7 +66,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
     fluids_parameters.Initialize_Number_Of_Regions(Number_Of_Regions(test_number));
-    pseudo_dirichlet=parse_args->Is_Value_Set("-pseudo_dirichlet");
     fluids_parameters.write_particles=true;
     PARAMETER_LIST parameters;
     fluids_parameters.use_reacting_flow=true;

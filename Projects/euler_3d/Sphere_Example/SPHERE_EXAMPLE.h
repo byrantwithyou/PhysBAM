@@ -72,6 +72,17 @@ public:
     bool print_each_matrix;
     bool output_iterators;
 
+    int eno_scheme;
+    int eno_order;
+    int rk_order;
+    T cfl_number;
+    bool timesplit;
+    bool exact;
+    bool use_slip;
+
+    T time_start_transition;
+    T time_end_transition;
+    T one_over_c_incompressible;
 
     /***************
     example explanation:
@@ -80,7 +91,11 @@ public:
     ***************/
 
     SPHERE_EXAMPLE(const STREAM_TYPE stream_type)
-        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),rigid_body_collection(solid_body_collection.rigid_body_collection)
+        :BASE(stream_type,0,fluids_parameters.COMPRESSIBLE),solid_mass((T).0625),rigid_body_collection(solid_body_collection.rigid_body_collection),
+        transition_to_incompressible(false),simulate_rigids(false),simulate_deformable(false),use_fixed_farfield_boundary(false),
+        run_self_tests(false),print_poisson_matrix(false),print_index_map(false),print_matrix(false),print_rhs(false),
+        print_each_matrix(false),output_iterators(false),eno_scheme(2),eno_order(2),rk_order(3),cfl_number((T).6),timesplit(false),
+        exact(false),use_slip(false),time_start_transition((T).5),time_end_transition((T).7),one_over_c_incompressible(0)
     {
     }
     
@@ -92,31 +107,31 @@ public:
 void Register_Options() PHYSBAM_OVERRIDE
 {
     BASE::Register_Options();
-    parse_args->Add_Integer_Argument("-eno_scheme",2,"eno_scheme","eno scheme");
-    parse_args->Add_Integer_Argument("-eno_order",2,"eno_order","eno order");
-    parse_args->Add_Integer_Argument("-rk_order",3,"rk_order","runge kutta order");
-    parse_args->Add_Double_Argument("-cfl",(T).6,"CFL","cfl number");
-    parse_args->Add_Double_Argument("-mass",(T).0625,"solid_mass","the mass of the solid in the simulation");
-    parse_args->Add_Option_Argument("-timesplit","split time stepping into an explicit advection part, and an implicit non-advection part");
-    parse_args->Add_Option_Argument("-slip","use slip/spd for coupling");
-    parse_args->Add_Option_Argument("-exact","output a fully-explicit sim to (output_dir)_exact");
+    parse_args->Add("-eno_scheme",&eno_scheme,"eno_scheme","eno scheme");
+    parse_args->Add("-eno_order",&eno_order,"eno_order","eno order");
+    parse_args->Add("-rk_order",&rk_order,"rk_order","runge kutta order");
+    parse_args->Add("-cfl",&cfl_number,"CFL","cfl number");
+    parse_args->Add("-timesplit",&timesplit,"split time stepping into an explicit advection part, and an implicit non-advection part");
+    parse_args->Add("-exact",&exact,"output a fully-explicit sim to (output_dir)_exact");
+    parse_args->Add("-mass",&solid_mass,"solid_mass","the mass of the solid in the simulation");
+    parse_args->Add("-slip",&use_slip,"use slip/spd for coupling");
 
-    parse_args->Add_Option_Argument("-test_system");
-    parse_args->Add_Option_Argument("-print_poisson_matrix");
-    parse_args->Add_Option_Argument("-print_index_map");
-    parse_args->Add_Option_Argument("-print_matrix");
-    parse_args->Add_Option_Argument("-print_rhs");
-    parse_args->Add_Option_Argument("-print_each_matrix");
-    parse_args->Add_Option_Argument("-output_iterators");
-    parse_args->Add_Option_Argument("-no_preconditioner");
-    parse_args->Add_Option_Argument("-preconditioner");
+    parse_args->Add("-test_system",&run_self_tests,"test_system");
+    parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
+    parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
+    parse_args->Add("-print_matrix",&print_matrix,"print_matrix");
+    parse_args->Add("-print_rhs",&print_rhs,"print_rhs");
+    parse_args->Add("-print_each_matrix",&print_each_matrix,"print_each_matrix");
+    parse_args->Add("-output_iterators",&output_iterators,"output_iterators");
+    parse_args->Add_Not("-no_preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"do not use preconditioner");
+    parse_args->Add("-preconditioner",&fluids_parameters.use_preconditioner_for_slip_system,"use preconditioner");
 
-    parse_args->Add_Option_Argument("-transition_to_incompressible","transition to incompressible in a time window");
-    parse_args->Add_Double_Argument("-time_start_transition",(T).5,"time to start transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-time_end_transition",(T).7,"time to end transitioning to incompressible flow");
-    parse_args->Add_Double_Argument("-one_over_c_incompressible",(T)0,"one over incompressible sound speed");
+    parse_args->Add("-transition_to_incompressible",&transition_to_incompressible,"transition to incompressible in a time window");
+    parse_args->Add("-time_start_transition",&time_start_transition,"time","time to start transitioning to incompressible flow");
+    parse_args->Add("-time_end_transition",&time_end_transition,"time","time to end transitioning to incompressible flow");
+    parse_args->Add("-one_over_c_incompressible",&one_over_c_incompressible,"value","one over incompressible sound speed");
     
-    parse_args->Add_Option_Argument("-use_fixed_farfield_boundary","use fixed farfield values for outflow boundaries");
+    parse_args->Add("-use_fixed_farfield_boundary",&use_fixed_farfield_boundary,"use fixed farfield values for outflow boundaries");
 }
 //#####################################################################
 // Function Parse_Options
@@ -124,25 +139,7 @@ void Register_Options() PHYSBAM_OVERRIDE
 void Parse_Options() PHYSBAM_OVERRIDE
 {
     BASE::Parse_Options();
-    int eno_scheme=parse_args->Get_Integer_Value("-eno_scheme");
-    int eno_order=parse_args->Get_Integer_Value("-eno_order");
-    int rk_order=parse_args->Get_Integer_Value("-rk_order");
-    T cfl_number=(T)parse_args->Get_Double_Value("-cfl");
-    solid_mass=(T)parse_args->Get_Double_Value("-mass");
-    bool timesplit=parse_args->Is_Value_Set("-timesplit") && !parse_args->Is_Value_Set("-exact");
-    bool use_slip=parse_args->Is_Value_Set("-slip");
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_rhs=parse_args->Is_Value_Set("-print_rhs");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
-    transition_to_incompressible=parse_args->Is_Value_Set("-transition_to_incompressible");
-    T time_start_transition=(T)parse_args->Get_Double_Value("-time_start_transition");
-    T time_end_transition=(T)parse_args->Get_Double_Value("-time_end_transition");
-    T one_over_c_incompressible=(T)parse_args->Get_Double_Value("-one_over_c_incompressible");
-    use_fixed_farfield_boundary=parse_args->Is_Value_Set("-use_fixed_farfield_boundary");
+    timesplit=timesplit && !exact;
 
     //grid
     int cells=resolution;
@@ -171,8 +168,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     fluids_parameters.use_slip=use_slip;
 
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     if(test_number==2){
         fluids_parameters.solid_affects_fluid=true;
