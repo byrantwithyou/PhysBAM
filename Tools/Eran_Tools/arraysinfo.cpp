@@ -187,7 +187,8 @@ int main(int argc, char *argv[])
 {
     int skip=0,opt_n=1;
 
-    PARSE_ARGS parse_args;
+    std::string filename;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-double",&opt_double,"double");
     parse_args.Add("-float",&opt_float,"float");
     parse_args.Add("-int",&opt_int,"int");
@@ -204,19 +205,14 @@ int main(int argc, char *argv[])
     parse_args.Add("-v",&verbose,"verbose");
     parse_args.Add("-skip", &skip, "<bytes>", "skip header bytes");
     parse_args.Add("-n", &num_arrays, "<num arrays>", "number of consecutive arrays in the file");
-    parse_args.Set_Extra_Arguments(1, "<filename>");
+    parse_args.Extra(&filename,"filename","filename");
     parse_args.Parse();
-
-    if (parse_args.Num_Extra_Args() != 1) {
-        std::cerr << "Missing filename argument" << std::endl;
-        return 1;
-    }
 
     verbose=opt_v;
 
-    std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(0));
+    std::istream* input=FILE_UTILITIES::Safe_Open_Input(filename);
     if(!(*input)) {
-        std::cerr << "Cannot open " << parse_args.Extra_Arg(0) << std::endl;
+        std::cerr << "Cannot open " << filename << std::endl;
         return 1;
     }
 

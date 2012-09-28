@@ -37,26 +37,21 @@ int main(int argc,char *argv[])
 
     bool type_double=false,compute_using_doubles=false;
     int last_frame=30;
+    std::string input_filename;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-compute_using_doubles",&compute_using_doubles,"compute_using_doubles");
     parse_args.Add("-last_frame",&last_frame,"frame","last frame");
-    parse_args.Set_Extra_Arguments(1,"<base>","<base> simulation directory path except for resolution");
+    parse_args.Extra(&input_filename,"base","simulation directory path except for resolution");
+    parse_args.Parse();
 
     ARRAY<int> resolutions;
     int resolution=8;
     for(int i=1;i<=5;i++,resolution*=2)
         resolutions.Append(resolution);
     std::cout<<resolutions<<std::endl;
-    
-
-    parse_args.Parse();
-
-    std::string input_filename=parse_args.Extra_Arg(0);
-
-
 
     if(!type_double){
         if(compute_using_doubles){

@@ -105,7 +105,7 @@ public:
         rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false),refine(1)
     {
         last_frame=16;
-        parse_args.Set_Extra_Arguments(1,"<test-number>");
+        parse_args.Extra(&test_number,"<example number>","example number to run");
         parse_args.Add("-restart",&restart,"frame","restart frame");
         parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
         parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
@@ -129,7 +129,6 @@ public:
         parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
         parse_args.Parse();
-        if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
         resolution*=refine;
         dt/=refine;

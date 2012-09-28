@@ -32,16 +32,12 @@ void Compact(const std::string &filename)
 int main(int argc,char *argv[])
 {
     bool removed=false;
-    PARSE_ARGS parse_args;
-
-    parse_args.Add("-levelset",&opt_levelset, "levelset particle");
-    parse_args.Set_Extra_Arguments(1, "<filename>");
-    parse_args.Parse();
-
+    PARSE_ARGS parse_args(argc,argv);
     std::string filename;
 
-    if (parse_args.Num_Extra_Args() < 1) return 1;
-    else filename=parse_args.Extra_Arg(0);
+    parse_args.Add("-levelset",&opt_levelset, "levelset particle");
+    parse_args.Extra(&filename,"filename","filename");
+    parse_args.Parse();
 
     if(removed){
         std::cout << "Removed particle" << std::endl;

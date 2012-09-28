@@ -187,14 +187,14 @@ Write_Output(PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
 
+    std::string input_directory_1,input_directory_2;
     int frame=-1,particle_type=-1;
     parse_args.Add("-frame",&frame,"value","frame output");
     parse_args.Add("-type",&particle_type,"value","particle type");
-    parse_args.Set_Extra_Arguments(1,"<input_directory_1>");
-    parse_args.Set_Extra_Arguments(2,"<input_directory_2>");
+    parse_args.Extra(&input_directory_1,"input_directory_1","input_directory_1");
+    parse_args.Extra(&input_directory_2,"input_directory_2","input_directory_2");
     parse_args.Parse();
 
-    std::string input_directory_1=parse_args.Extra_Arg(0),input_directory_2=parse_args.Extra_Arg(1);
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/common/grid",grid);
     GRID<TV> sanity;FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/common/grid",sanity);assert(grid==sanity);
     bool success=Compare_Velocities(input_directory_1,input_directory_2,grid,frame);

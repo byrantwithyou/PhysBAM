@@ -297,8 +297,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     T m=1,s=1,kg=1;
     int test_number=1,resolution=4,max_iter=1000000;
-    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,dump_geometry=false;
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
+    bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,dump_geometry=false,opt_arg=false;
+    parse_args.Extra_Optional(&test_number,&opt_arg,"<example number>","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
     parse_args.Add("-s",&s,"unit","second scale");
@@ -314,9 +314,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-dump_geometry",&dump_geometry,"dump grid info and interface");
     parse_args.Parse();
 
-    if(!use_test){
-        if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
-        if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");}
+    if(!use_test && !opt_arg){
+        LOG::cerr<<"Test number is required."<<std::endl;
+        exit(-1);}
 
     ANALYTIC_TEST<TV>* test=0;
 

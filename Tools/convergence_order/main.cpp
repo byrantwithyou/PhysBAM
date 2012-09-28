@@ -22,15 +22,15 @@ Write_Output(PARSE_ARGS& parse_args)
 
     int frame=0,frame_rate=24;
     T start=0,end=0;
+    std::string input_directory1,input_directory2;
     parse_args.Add("-start",&start,"value","start range");
     parse_args.Add("-end",&end,"value","end range");
     parse_args.Add("-frame",&frame,"value","frame output");
     parse_args.Add("-frame_rate",&frame_rate,"value","frame rate used");
-    parse_args.Set_Extra_Arguments(2,"<low res input_directory> <high res input directory>");
+    parse_args.Extra(&input_directory1,"low res input_directory","low res input_directory");
+    parse_args.Extra(&input_directory2,"high res input_directory","high res input_directory");
     parse_args.Parse();
 
-    std::string input_directory1=parse_args.Extra_Arg(0);
-    std::string input_directory2=parse_args.Extra_Arg(1);
     if(frame==0) FILE_UTILITIES::Read_From_Text_File(input_directory1+"/common/last_frame",frame);
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     GRID<TV> coarse_grid;FILE_UTILITIES::Read_From_File<T>(input_directory1+"/common/grid",coarse_grid);

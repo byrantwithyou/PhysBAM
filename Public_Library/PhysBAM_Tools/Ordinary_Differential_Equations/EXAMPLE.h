@@ -41,6 +41,7 @@ public:
     bool want_mpi_world;
     bool need_finish_logging;
     int test_number;
+    bool use_default_test;
     T fixed_dt;
     T max_dt;
     int substeps_delay_frame;
@@ -68,7 +69,6 @@ public:
     virtual void Parse_Options(); // Call parent first
     virtual void Override_Options(); // Call parent last
     virtual void Parse_Late_Options();
-    int Subexample(const int default_example) const;
 //#####################################################################
 };
 }

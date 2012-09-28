@@ -176,8 +176,8 @@ int main(int argc, char *argv[])
 {
     bool type_double=false,opt_2d=false,opt_3d=false,opt_s=false,opt_b=false,opt_x=false,opt_y=false,opt_z=false,opt_v=false;
     int dimension = -1;
-    char filename[256];
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
+    std::string filename;
 
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
@@ -189,14 +189,8 @@ int main(int argc, char *argv[])
     parse_args.Add("-y",&opt_y, "along y direction");
     parse_args.Add("-z",&opt_z, "along z direction");
     parse_args.Add("-v",&opt_v, "display verbose information");
-    parse_args.Set_Extra_Arguments(1, "<filename>");
-
-    int extraarg = parse_args.Parse();
-
-    if (extraarg < argc)
-        strcpy(filename, argv[extraarg]);
-    else
-        return -1;
+    parse_args.Extra(&filename,"filename","filename");
+    parse_args.Parse();
 
     // By default detection dimension from file extension
     if (Is_Phi_File(filename)) dimension = 3;

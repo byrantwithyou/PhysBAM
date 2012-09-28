@@ -71,7 +71,7 @@ Add_Arguments(PARSE_ARGS &parse_args)
 
     parse_args.Add("-t",&read_triangulated_surface,"attempt to read triangulated surface");
     parse_args.Add("-tri",&triangulated_surface_filename,&read_triangulated_surface,"file","tri file");
-    parse_args.Set_Extra_Arguments(1, "<phi_file>");
+    parse_args.Extra(&levelset_filename, "phi_file", "phi_file");
 }
 
 template<class T> void VISUALIZATION<T>::
@@ -82,8 +82,6 @@ Parse_Arguments(PARSE_ARGS &parse_args)
 
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
 
-    if(parse_args.Num_Extra_Args() != 1) parse_args.Print_Usage(true);
-    else levelset_filename=parse_args.Extra_Arg(0);
     animation_enabled=FILE_UTILITIES::Is_Animated(levelset_filename);
     if(read_triangulated_surface && !read_triangulated_surface)
         triangulated_surface_filename=FILE_UTILITIES::Get_Basename(levelset_filename) + ".tri";

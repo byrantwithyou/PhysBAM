@@ -41,7 +41,7 @@ int main(int argc,char *argv[])
 
     bool type_double=false;
     int dimension=1,frame=0,rigid_body_id=1;
-    std::string output_file;
+    std::string output_file,basedir;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
@@ -49,7 +49,7 @@ int main(int argc,char *argv[])
     parse_args.Add("-frame",&frame,"frame","frame number");
     parse_args.Add("-rbid",&rigid_body_id,"id","rigid body id");
     parse_args.Add("-o",&output_file,"file","output file");
-    parse_args.Set_Extra_Arguments(1,"<basedir>","base directory");
+    parse_args.Extra(&basedir,"basedir","base directory");
     parse_args.Parse();
 
     std::ostream* output_stream=&(std::cout);
@@ -57,8 +57,6 @@ int main(int argc,char *argv[])
     if(output_file.size()){
         output_file_stream.open(output_file.c_str());
         output_stream=&output_file_stream;}
-
-    std::string basedir=parse_args.Extra_Arg(0);
 
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
         if(type_double) PHYSBAM_FATAL_ERROR("No double support");

@@ -11,7 +11,7 @@ using namespace PhysBAM;
 template<class T>
 void Convert(PARSE_ARGS &parse_args)
 {
-    std::string output_filename;
+    std::string output_filename,input_filename;
     int scale=1,samples=2;
     VECTOR<T,3> negative_color(0,0,1),positive_color(1,1,1);
     parse_args.Add("-scale",&scale,"scale","image scale");
@@ -19,11 +19,8 @@ void Convert(PARSE_ARGS &parse_args)
     parse_args.Add("-negative_color",&negative_color,"negative_color","negative_color");
     parse_args.Add("-positive_color",&positive_color,"positive_color","positive_color");
     parse_args.Add("-o",&output_filename,"file","output filename");
-    parse_args.Set_Extra_Arguments(-1, "<filename>");
+    parse_args.Extra(&input_filename, "filename","filename");
     parse_args.Parse();
-
-    if(parse_args.Num_Extra_Args() < 1) return;
-    std::string input_filename=parse_args.Extra_Arg(0);
 
     if(output_filename.empty()) output_filename=FILE_UTILITIES::Get_Basename(input_filename)+".ppm";
     if(!IMAGE<T>::Is_Supported(output_filename)){std::cerr << "Image format for '" << output_filename << "' not supported" << std::endl;exit(1);}
@@ -50,7 +47,7 @@ void Convert(PARSE_ARGS &parse_args)
 
 int main(int argc, char *argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     bool use_double=false;
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");

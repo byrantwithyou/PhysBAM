@@ -43,24 +43,18 @@ template<class T> void Phi_To_Tri(const char *input_filename,
 int main(int argc,char *argv[])
 {
     bool type_double=false;
-    char filename[256];
     char output_filename[256];
+    std::string filename;
 
     double resample=1;
     std::string output_filename;
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-resample",&resample,"value","resample grid");
     parse_args.Add("-o",&output_filename,"file","output","output file name");
-    parse_args.Set_Extra_Arguments(1,"<filename>");
-
-    int extraarg=parse_args.Parse();
-
-    if(extraarg<argc)
-        strcpy(filename,argv[extraarg]);
-    else
-        return -1;
+    parse_args.Extra(&filename,"filename","filename");
+    parse_args.Parse();
 
     if(!Is_Phi_File(filename))
     {

@@ -126,7 +126,7 @@ Merge_Lists(const std::string& filename)
 template<class T> void
 Do_Merge(PARSE_ARGS& parse_args)
 {
-    std::string output_directory;
+    std::string output_directory,input_directory;
     bool is_1d=false,is_2d=false,is_3d=false,print_maxerrors=false;
     int first_frame=0,last_frame=0,number_of_processes=0;
     parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
@@ -137,10 +137,9 @@ Do_Merge(PARSE_ARGS& parse_args)
     parse_args.Add("-1d",&is_1d,"input data is 1-D");
     parse_args.Add("-2d",&is_2d,"input data is 2-D");
     parse_args.Add("-3d",&is_3d,"input data is 3-D");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Extra(&input_directory,"input_directory","input_directory");
     parse_args.Parse();
 
-    std::string input_directory=parse_args.Extra_Arg(0);
     if(!output_directory.size()) output_directory=input_directory+"/merged";
 
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/1/common/first_frame",first_frame);

@@ -26,18 +26,14 @@ int main(int argc, char *argv[])
     int dimension=3;
     std::string filename;
 
-    PARSE_ARGS parse_args;
-
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-1d",&opt_1d, "force 1d mode");
     parse_args.Add("-2d",&opt_2d, "force 2d mode");
     parse_args.Add("-3d",&opt_3d, "force 3d mode");
-    parse_args.Set_Extra_Arguments(1, "<filename>");
-
+    parse_args.Extra(&filename,"filename","filename");
     parse_args.Parse();
-
-    filename=parse_args.Extra_Arg(0);
 
     // By default detection dimension from file extension
     if (opt_3d) dimension = 3;

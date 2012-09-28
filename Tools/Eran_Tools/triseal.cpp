@@ -16,11 +16,8 @@ void Seal_Holes(PARSE_ARGS& parse_args)
     parse_args.Add_Not("-no_vertex_merging",&merge_coincident_vertices,"merge coincident vertices");
     parse_args.Add_Not("-no_hole_filling",&fill_holes,"do not fill holes");
     parse_args.Add("-o",&output_filename,"file","output filename");
-    parse_args.Set_Extra_Arguments(1,"<filename>");
+    parse_args.Extra(&input_filename,"filename","filename");
     parse_args.Parse();
-
-    if(parse_args.Num_Extra_Args()<1) parse_args.Print_Usage(true);
-    else input_filename=parse_args.Extra_Arg(0);
 
     if(!output_filename.size()) output_filename=FILE_UTILITIES::Get_Basename(input_filename)+"_sealed."+FILE_UTILITIES::Get_File_Extension(input_filename);
 

@@ -388,8 +388,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     T m=1,s=1,kg=1,mu_i=1,mu_o=1;
     int test_number=1,resolution=4,cgf=2;
-    bool use_preconditioner=false,use_test=false;
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
+    bool use_preconditioner=false,use_test=false,opt_arg=false;
+    parse_args.Extra_Optional(&test_number,&opt_arg,"<example number>","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-mu_i",&mu_i,"mu","viscosity inside");
     parse_args.Add("-mu_o",&mu_o,"mu","viscosity outside");
@@ -402,9 +402,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-use_preconditioner",&use_preconditioner,"Use Jacobi preconditioner");
     parse_args.Parse();
 
-    if(!use_test){
-        if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
-        if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");}
+    if(!use_test && !opt_arg){
+        LOG::cerr<<"Test number is required."<<std::endl;
+        exit(-1);}
 
     ANALYTIC_TEST<TV>* test=0;
 

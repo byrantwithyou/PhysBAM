@@ -94,7 +94,7 @@ template<class TV> void EXAMPLE<TV>::
 Register_Options()
 {
     if(!parse_args) return;
-    parse_args->Set_Extra_Arguments(-1,"<example number>");
+    parse_args->Extra_Optional(&test_number,"<example number>","example number to run");
     parse_args->Add("-dt",&stored_dt,&user_dt,"size","fix the time step size to this value.");
     parse_args->Add("-framerate",&stored_frame_rate,&user_frame_rate,"rate","frame rate");
     parse_args->Add("-max_dt",&stored_max_dt,&user_max_dt,"size","fix the time step size to be no larger than this value.");
@@ -119,8 +119,6 @@ template<class TV> void EXAMPLE<TV>::
 Parse_Options()
 {
     if(!parse_args) return;
-    test_number=Subexample(1);
-
     if(mpi_world && !opt_all_verbose && mpi_world->initialized && mpi_world->rank) opt_verbosity=0;
     need_finish_logging=true;
     LOG::Initialize_Logging(opt_verbosity<10,false,opt_verbosity,!opt_nolog);
@@ -174,17 +172,6 @@ Parse(PARSE_ARGS& parse_args_input)
     Parse_Options();
     LOG::cout<<print_args<<std::endl;
     Override_Options();
-}
-//#####################################################################
-// Function Subexample
-//#####################################################################
-template<class TV> int EXAMPLE<TV>::
-Subexample(const int default_example) const
-{
-    if(parse_args->Num_Extra_Args()<1) return default_example;
-    int parsed_value;
-    if(STRING_UTILITIES::String_To_Value(parse_args->Extra_Arg(0),parsed_value)) return parsed_value;
-    throw VALUE_ERROR("The argument is not an integer.");
 }
 //#####################################################################
 template class EXAMPLE<VECTOR<float,1> >;

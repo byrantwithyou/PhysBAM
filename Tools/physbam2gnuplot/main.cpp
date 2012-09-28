@@ -62,7 +62,7 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,c
     bool convert_density=false,convert_momentum=false,convert_energy=false,convert_velocity=false;
     bool convert_pressure=false,convert_internal_energy=false,convert_entropy=false,convert_machnumber=false,convert_log=false;
     int first_frame=0,last_frame=0;
-    std::string output_directory,variable_name;
+    std::string output_directory,input_directory,variable_name;
     parse_args.Add("-density",&convert_density,"convert density");
     parse_args.Add("-log",&convert_log,"output log (base 10) of the data");
     parse_args.Add("-momentum",&convert_momentum,"convert momentum");
@@ -76,9 +76,9 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,c
     parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
     parse_args.Add("-o",&output_directory,"file","output directory");
     parse_args.Add("-v",&variable_name,"var","variable to read");
+    parse_args.Extra(&input_directory,"input_directory","input_directory");
     parse_args.Parse();
 
-    std::string input_directory=parse_args.Extra_Arg(0);
     if(!output_directory.size()) output_directory=input_directory;
     FILE_UTILITIES::Create_Directory(output_directory);
 
@@ -90,7 +90,6 @@ template<class T_GRID,class RW> void PhysBAM_To_Gnuplot(PARSE_ARGS& parse_args,c
         std::cout<<"first_frame="<<first_frame<<std::endl<<"last_frame="<<last_frame<<std::endl;
         if(variable_name.size()) std::cout<<"variable_name="<<variable_name<<std::endl;
         else std::cout<<"no variable_name specified"<<std::endl;}
-
 
     PHYSBAM_TO_GNUPLOT_CONVERTER<T_GRID,typename T_GRID::SCALAR> physbam_to_matlab_converter(input_directory,output_directory);
 
@@ -115,10 +114,8 @@ int main(int argc,char* argv[])
     parse_args.Add("-verbosity",&verbosity,"value","Verbosity level");
     parse_args.Add("-dimension",&dimension,"value","Grid dimension");
     parse_args.Add("-double",&use_double,"Read in file in double format");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
     parse_args.Parse(true);
 
-    
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(use_double) PHYSBAM_FATAL_ERROR("No double support");
 #endif

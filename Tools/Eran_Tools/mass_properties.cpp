@@ -12,19 +12,19 @@
 using namespace PhysBAM;
 
 template<class T,class RW> void
-Get_Mass_Properties(const std::string& filename,PARSE_ARGS& parse_args)
+Get_Mass_Properties(PARSE_ARGS& parse_args)
 {
     typedef VECTOR<T,3> TV;
 
     bool opt_generate=false,opt_density=false,thin_shell=false;
     T mass=1,density=1;
-    std::string secondary_filename;
+    std::string secondary_filename,filename;
     parse_args.Add("-thin_shell",&thin_shell,"Thin shell");
     parse_args.Add("-generate",&opt_generate,"Generate");
     parse_args.Add("-mass",&mass,"mass","mass");
     parse_args.Add("-density",&density,&opt_density,"density","density");
     parse_args.Add("-secondary_surface",&secondary_filename,"file","secondary filename");
-    parse_args.Set_Extra_Arguments(1,"<filename>");
+    parse_args.Extra(&filename,"filename","filename");
     parse_args.Parse();
 
     LOG::SCOPE scope("mass properties","mass properties");
@@ -84,15 +84,13 @@ int main(int argc,char *argv[])
     parse_args.Add("-write_double",&type_double,"Write doubles");
     parse_args.Parse(true);
 
-    std::string filename=parse_args.Extra_Arg(0);
-
-    if(!type_double && !write_double) Get_Mass_Properties<float,float>(filename,parse_args);
+    if(!type_double && !write_double) Get_Mass_Properties<float,float>(parse_args);
 #ifdef COMPILE_WITHOUT_DOUBLE_SUPPORT
     else PHYSBAM_FATAL_ERROR("double support not enabled.");
 #else
-    else if(!type_double && write_double) Get_Mass_Properties<float,double>(filename,parse_args);
-    else if(type_double && !write_double) Get_Mass_Properties<double,float>(filename,parse_args);
-    else Get_Mass_Properties<double,double>(filename,parse_args);
+    else if(!type_double && write_double) Get_Mass_Properties<float,double>(parse_args);
+    else if(type_double && !write_double) Get_Mass_Properties<double,float>(parse_args);
+    else Get_Mass_Properties<double,double>(parse_args);
 #endif
     LOG::cout<<std::flush;
     return 0;

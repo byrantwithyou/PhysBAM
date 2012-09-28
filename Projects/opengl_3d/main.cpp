@@ -140,7 +140,7 @@ Add_Arguments(PARSE_ARGS &parse_args)
     parse_args.Add("-macvel",&always_add_mac_velocities,"force adding mac velocities component");
     parse_args.Add("-rigid_bodies_no_draw",&rigid_bodies_no_draw_list,"id","Do not draw this rigid body (may be repeated)");
     parse_args.Add("-deformable_no_draw",&deformable_no_draw_list,"id","Do not draw this deformable body (may be repeated)");
-    parse_args.Set_Extra_Arguments(-1,"[<basedir>]");
+    parse_args.Extra_Optional(&basedir,"basedir","base directory");
 }
 
 template<class T,class RW> void VISUALIZATION<T,RW>::
@@ -154,10 +154,8 @@ Parse_Arguments(PARSE_ARGS &parse_args)
 
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
 
-    if(parse_args.Num_Extra_Args() > 1)
+    if(parse_args.unclaimed_arguments)
         parse_args.Print_Usage(true);
-    else if(parse_args.Num_Extra_Args()==1)
-        basedir=parse_args.Extra_Arg(0);
 
     last_frame_filename=basedir+"/common/last_frame";
 

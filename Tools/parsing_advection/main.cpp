@@ -86,6 +86,7 @@ Write_Output(PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
 
+    std::string input_directory;
     bool opt_m=false,opt_l=false,opt_e=false;
     int frame=-1;
     T start=0,end=0;
@@ -95,10 +96,9 @@ Write_Output(PARSE_ARGS& parse_args)
     parse_args.Add("-m",&opt_m,"print mass");
     parse_args.Add("-l",&opt_l,"print monmentum");
     parse_args.Add("-e",&opt_e,"print energy");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Extra(&input_directory,"input_directory","input_directory");
     parse_args.Parse();
 
-    std::string input_directory=parse_args.Extra_Arg(0);
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<T>(input_directory+"/common/grid",grid);
     if(opt_m) Print_Mass(input_directory,grid,frame);
     else if(opt_l) Print_Momentum(input_directory,grid,frame);

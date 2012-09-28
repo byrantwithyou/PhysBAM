@@ -155,21 +155,16 @@ int main(int argc, char *argv[])
 {
     bool opt_x=false,opt_y=false,opt_z=false,cap=false;
     int num_divisions=4;
-    PARSE_ARGS parse_args;
+    std::string input_filename;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-x",&opt_x, "rotate along x axis (this is the default)");
     parse_args.Add("-y",&opt_y, "rotate along y axis");
     parse_args.Add("-z",&opt_z, "rotate along z axis");
     parse_args.Add("-c",&cap, "cap ends");
     parse_args.Add("-d", &num_divisions, "num div", "number of divisions");
-    parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to revolve");
-
-    int extraarg = parse_args.Parse();
-
-    char input_filename[256];
+    parse_args.Extra(&input_filename,"ply file", "ply file to revolve");
+    parse_args.Parse();
     int axis = 1;
-
-    if (extraarg < argc)
-        strcpy(input_filename, argv[extraarg]);
 
     if (!FILE_UTILITIES::Is_Ply_File(input_filename))
     {

@@ -23,7 +23,7 @@ int main(int argc,char* argv[])
 
     std::string input_directory="input_directory",data_file="density";
     int frame=-1;
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-in",&input_directory,"dir","input directory");
     parse_args.Add("-data",&data_file,"file","Data to parse");
     parse_args.Add("-frame",&frame,"frame","frame");

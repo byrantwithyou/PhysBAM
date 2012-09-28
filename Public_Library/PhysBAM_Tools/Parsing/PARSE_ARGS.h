@@ -16,13 +16,7 @@ namespace PhysBAM{
 
 class PARSE_ARGS:public NONCOPYABLE
 {
-private:
-    int num_expected_extra_args;
-    std::string extra_args_synopsis,extra_args_desc,program_name;
-    bool use_help_option;
-    void (*extra_usage_callback)();
 public:
-
     struct OPTION
     {
         std::string opt;
@@ -35,10 +29,24 @@ public:
         void (*print_default_func)(const void*);
     };
 
+    struct EXTRA
+    {
+        std::string name;
+        std::string desc;
+        bool required;
+        bool exhaust;
+        bool* found;
+        void* store;
+        bool (*store_func)(void*,const std::string&);
+        void (*print_default_func)(const void*);
+    };
+
     int argc;
     char** argv;
+    std::string program_name;
     HASHTABLE<std::string,OPTION> options;
-    ARRAY<std::string> extra_arg_list;
+    ARRAY<EXTRA> extras;
+    bool unclaimed_arguments;
 
     PARSE_ARGS(int argc_input,char** argv_input);
     ~PARSE_ARGS();
@@ -85,12 +93,35 @@ public:
     template<class T> void Add(const std::string& arg_str,T* store,const std::string& name,const std::string& desc)
     {Add(arg_str,store,0,name,desc);}
 
+    template<class T> void Extra_Optional(T* store,bool* found,const std::string& name,const std::string& desc)
+    {
+        EXTRA e={name,desc,false,false,found,store,&store_impl<T>,&print_default_impl<T>};
+        extras.Append(e);
+    }
+
+    template<class T,int d> void Extra_Optional(VECTOR<T,d>* store,bool* found,const std::string& name,const std::string& desc)
+    {
+        EXTRA e={name,desc,false,false,found,store,&store_vec_impl<T,d>,&print_default_impl<VECTOR<T,d> >};
+        extras.Append(e);
+    }
+
+    template<class T> void Extra_Optional(ARRAY<T>* store,bool* found,const std::string& name,const std::string& desc)
+    {
+        EXTRA e={name,desc,false,true,found,store,&store_multi_impl<T>,&print_default_impl<ARRAY<T> >};
+        extras.Append(e);
+    }
+
+    template<class T> void Extra_Optional(T* store,const std::string& name,const std::string& desc)
+    {Extra_Optional(store,0,name,desc);}
+
+    template<class T> void Extra(T* store,const std::string& name,const std::string& desc)
+    {
+        Extra_Optional(store,0,name,desc);
+        extras.Last().required=true;
+    }
+
 //#####################################################################
-    void Use_Help_Option(bool use_it);
-    void Set_Extra_Arguments(int num,const std::string& synopsis="",const std::string& desc="");
     void Parse(bool partial=false);
-    int Num_Extra_Args() const;
-    const std::string& Extra_Arg(int i) const;
     const std::string& Get_Program_Name() const;
     void Print_Usage(bool do_exit=false) const;
     std::string Print_Arguments() const;

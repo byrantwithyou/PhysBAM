@@ -14,16 +14,11 @@ int main(int argc, char *argv[])
 {
     char filename[256];
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
 
-    parse_args.Set_Extra_Arguments(1, "<filename>");
-
-    int extraarg = parse_args.Parse();
-
-    if (extraarg < argc)
-        strcpy(filename, argv[extraarg]);
-    else
-        return -1;
+    std::string filename;
+    parse_args.Extra(&filename,"filename","filename");
+    parse_args.Parse();
 
     cout << "Filename: " << filename << endl;
 

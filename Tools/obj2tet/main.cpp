@@ -50,18 +50,15 @@ int main(int argc,char *argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
     bool type_double=false,compute_using_doubles=false;
+    std::string input_filename,output_filename;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-compute_using_doubles",&compute_using_doubles,"compute_using_doubles");
-    parse_args.Set_Extra_Arguments(1,"<obj file>","<obj file> obj file to convert");
-    parse_args.Set_Extra_Arguments(2,"<tet file>","<tet file> output tet file name");
-
+    parse_args.Extra(&input_filename,"obj file","obj file to convert");
+    parse_args.Extra(&output_filename,"tet file","output tet file name");
     parse_args.Parse();
-
-    std::string input_filename=parse_args.Extra_Arg(0);
-    std::string output_filename=parse_args.Extra_Arg(1);
 
     if(!FILE_UTILITIES::Is_Tet_File(output_filename)){
         std::cerr<<"Not a tet file: "<<output_filename<<std::endl;

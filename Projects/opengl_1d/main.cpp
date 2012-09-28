@@ -83,7 +83,7 @@ Add_Arguments(PARSE_ARGS& parse_args)
 
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
 
-    parse_args.Set_Extra_Arguments(-1,"[<basedir>]");
+    parse_args.Extra_Optional(&basedir,"basedir","base directory");
 }
 //#####################################################################
 // Function Parse_Arguments
@@ -99,10 +99,8 @@ Parse_Arguments(PARSE_ARGS& parse_args)
 
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
 
-    if(parse_args.Num_Extra_Args()>1)
+    if(parse_args.unclaimed_arguments)
         parse_args.Print_Usage(true);
-    else if(parse_args.Num_Extra_Args()==1)
-        basedir=parse_args.Extra_Arg(0);
 
     last_frame_filename=basedir+"/common/last_frame";
 

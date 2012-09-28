@@ -13,15 +13,12 @@ void Convert(PARSE_ARGS &parse_args)
 {
     T scale=1;
     bool opt_fmm=false;
-    std::string output_filename;
+    std::string output_filename,input_filename;
     parse_args.Add("-scale",&scale,"scale","scale");
     parse_args.Add("-o",&output_filename,"file","output filename");
     parse_args.Add("-fmm",&opt_fmm,"use fast marching method");
-    parse_args.Set_Extra_Arguments(-1, "<filename>");
+    parse_args.Extra(&input_filename, "filename", "filename");
     parse_args.Parse();
-    if(parse_args.Num_Extra_Args() < 1) return;
-
-    std::string input_filename=parse_args.Extra_Arg(0);
 
     ARRAYS<VECTOR<VECTOR<T,3> ,2> > image;
     IMAGE<T>::Read(input_filename,image);
@@ -42,7 +39,7 @@ void Convert(PARSE_ARGS &parse_args)
 
 int main(int argc, char *argv[])
 {
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
 
     bool type_double=false;
     parse_args.Add_Not("-float",&type_double,"Use floats");

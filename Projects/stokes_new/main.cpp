@@ -397,6 +397,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     int res=4,max_iter=1000000;
     bool use_preconditioner=false,null=false,dump_matrix=false,debug_particles=false;
     T opt_mu_i=1,opt_mu_o=1,opt_m=1,opt_s=1,opt_kg=1;
+    int test_number;
 
     parse_args.Add("-o",&output_directory,"dir","output directory");
     parse_args.Add("-mu_i",&opt_mu_i,"viscosity","viscosity inside");
@@ -410,11 +411,8 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
+    parse_args.Extra(&test_number,"<example number>","example number to run");
     parse_args.Parse();
-
-    int test_number;
-    if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
-    if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
     ANALYTIC_TEST<TV>* test=0;
 
@@ -691,7 +689,6 @@ int main(int argc,char* argv[])
 
     bool opt_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add("-3d",&opt_3d,"use 3D");
     parse_args.Parse(true);
 

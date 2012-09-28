@@ -44,22 +44,14 @@ template<class T> void Convert(const char *input_filename, const char *output_fi
 int main(int argc, char *argv[])
 {
     bool type_double = false;
+    std::string input_filename;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-zero_based",&zero_based_vertices, "zero based vertices");
-    parse_args.Set_Extra_Arguments(1, "<tri file>", "<tri file> tri file to convert");
-
-    char input_filename[256];
-    int extraarg = parse_args.Parse();
-    if (extraarg < argc)
-        strcpy(input_filename, argv[extraarg]);
-    else
-    {
-        parse_args.Print_Usage(true);
-        return -1;
-    }
+    parse_args.Extra(&input_filename, "tri file", "tri file to convert");
+    parse_args.Parse();
 
     char output_filename[256];
     sprintf(output_filename, "%s.ply", FILE_UTILITIES::Get_Basename(input_filename).c_str());

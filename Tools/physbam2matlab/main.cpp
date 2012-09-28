@@ -65,7 +65,7 @@ int main(int argc,char* argv[])
     bool convert_density=false,convert_momentum=false,convert_energy=false,convert_velocity=false;
     bool convert_pressure=false,convert_internal_energy=false,convert_entropy=false,convert_machnumber=false;
     int first_frame=0,last_frame=0;
-    std::string output_directory;
+    std::string output_directory,input_directory;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-density",&convert_density,"convert density");
     parse_args.Add("-momentum",&convert_momentum,"convert momentum");
@@ -78,10 +78,9 @@ int main(int argc,char* argv[])
     parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
     parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
     parse_args.Add("-o",&output_directory,"file","output directory");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Extra(&input_directory,"input_directory","input_directory");
     parse_args.Parse();
 
-    std::string input_directory=parse_args.Extra_Arg(0);
     FILE_UTILITIES::Create_Directory(output_directory);
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/first_frame",first_frame);
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/common/last_frame",last_frame);

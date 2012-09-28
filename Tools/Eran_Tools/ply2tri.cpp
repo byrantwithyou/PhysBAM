@@ -109,15 +109,14 @@ create_triangulated_surface(const POLYGONAL_SURFACE &polygonal_surface, bool fli
 template<class T> void Convert(const std::string &input_filename, const std::string &output_filename, PARSE_ARGS &parse_args)
 {
     bool flip=false,centroid_division=false,zero_based_vertices=false;
-    std::string output_filename;
+    std::string output_filename,input_filename;
     parse_args.Add("-f",&flip, "flip orientation");
     parse_args.Add("-c",&centroid_division, "use centroid division for polygons with more than 4 vertices");
     parse_args.Add("-zero_based",&zero_based_vertices, "zero based vertices");
     parse_args.Add("-o", &output_filename,"file", "output filename");
-    parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to convert");
+    parse_args.Extra(&input_filename, "ply file", "ply file to convert");
     parse_args.Parse();
 
-    std::string input_filename=parse_args.Extra_Arg(0);
     if(output_filename.empty()) output_filename=FILE_UTILITIES::Get_Basename(input_filename)+".tri";
 
     cout << "Input filename: " << input_filename << endl;
@@ -146,8 +145,7 @@ int main(int argc, char *argv[])
 {
     bool type_double = false;
 
-    PARSE_ARGS parse_args;
-    parse_args.Use_Help_Option(true);
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Parse(true);

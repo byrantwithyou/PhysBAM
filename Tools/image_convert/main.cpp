@@ -43,14 +43,14 @@ int main(int argc,char* argv[])
 {
     float gamma=1,bloom_radius=0,bloom_weight=.5;
     bool use_bloom_radius=false;
+    std::string file_input,file_output;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-gamma",&gamma,"-gamma","gamma correction");
     parse_args.Add("-bloom_weight",&bloom_weight,"-bloom_weight","bloom weight");
     parse_args.Add("-bloom_radius",&bloom_radius,&use_bloom_radius,"-bloom_radius","bloom radius"); 
-    parse_args.Set_Extra_Arguments(2,"<image in> <image out>","images to read and write");
+    parse_args.Extra(&file_input,"image in","image to read");
+    parse_args.Extra(&file_output,"image out","image to write");
     parse_args.Parse();
-    std::string file_input=parse_args.Extra_Arg(0);
-    std::string file_output=parse_args.Extra_Arg(1);
     
     ARRAY<VECTOR<float,3>,VECTOR<int,2> > image;
     LOG::Time("Reading Image");

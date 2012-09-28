@@ -68,17 +68,14 @@ Add_Arguments(PARSE_ARGS &parse_args)
 {
     basedir=".";   // default basedir
     ANIMATED_VISUALIZATION::Add_Arguments(parse_args);
-    parse_args.Set_Extra_Arguments(-1, "[<basedir>]");
+    parse_args.Extra_Optional(&basedir,"basedir","base directory");
 }
 
 template<class T> void VISUALIZATION<T>::
 Parse_Arguments(PARSE_ARGS &parse_args)
 {
     ANIMATED_VISUALIZATION::Parse_Arguments(parse_args);
-    if (parse_args.Num_Extra_Args() > 1)
-        parse_args.Print_Usage(true);
-    else if (parse_args.Num_Extra_Args() == 1)
-        basedir=parse_args.Extra_Arg(0);
+    if(parse_args.unclaimed_arguments) parse_args.Print_Usage(true);
     last_frame_filename = std::string(basedir)+"/common/last_frame";
     
     camera_script_filename = basedir + std::string("/camera_script");

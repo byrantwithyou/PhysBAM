@@ -56,13 +56,12 @@ int main(int argc,char *argv[])
 
     bool type_double=false;
 
+    std::string filename;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Set_Extra_Arguments(1,"<directory>","directory to render vortices for");
+    parse_args.Extra(&filename,"directory","directory to render vortices for");
     parse_args.Parse();
-
-    std::string filename=parse_args.Extra_Arg(0);
 
     STREAM_TYPE stream_type(type_double?STREAM_TYPE(0.0):STREAM_TYPE(0.0f));
 

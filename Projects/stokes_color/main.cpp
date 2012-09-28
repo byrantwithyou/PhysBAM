@@ -423,6 +423,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T opt_s=1,opt_m=1,opt_kg=1;
     int res=4,max_iter=1000000;
     bool use_preconditioner=false,null=false,dump_matrix=false,debug_particles=false,bc_n=false,bc_d=false,bc_s=false;
+    int test_number;
     parse_args.Add("-o",&output_directory,"dir","output directory");
     parse_args.Add("-m",&opt_m,"scale","meter scale");
     parse_args.Add("-s",&opt_s,"scale","second scale");
@@ -436,13 +437,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-bc_n",&bc_n,"use Neumann boundary conditions");
     parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
     parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
+    parse_args.Extra(&test_number,"<example number>","example number to run");
     parse_args.Parse();
     PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
     int bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);
-
-    int test_number;
-    if(parse_args.Num_Extra_Args()<1){LOG::cerr<<"Test number is required."<<std::endl; exit(-1);}
-    if(!STRING_UTILITIES::String_To_Value(parse_args.Extra_Arg(0),test_number)) throw VALUE_ERROR("The argument is not an integer.");
 
     ANALYTIC_TEST<TV>* test=0;
 
@@ -743,7 +741,6 @@ int main(int argc,char* argv[])
 
     bool opt_3d=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Set_Extra_Arguments(-1,"<example number>");
     parse_args.Add("-3d",&opt_3d,"use 3D");
     parse_args.Parse(true);
 

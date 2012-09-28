@@ -19,14 +19,13 @@ int main(int argc,char **argv)
     typedef float RW;
     STREAM_TYPE stream_type((RW()));
 
-    std::string opt_out,opt_data;
+    std::string opt_out,opt_data,parameter_file;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-o",&opt_out,"dir","output directory");
     parse_args.Add("-d",&opt_data,"dir","data directory");
-    parse_args.Set_Extra_Arguments(1,"<parameter file>");
+    parse_args.Extra(&parameter_file,"parameter file","parameter file");
     parse_args.Parse();
 
-    std::string parameter_file=parse_args.Extra_Arg(0);
     GENERIC_EXAMPLE<T> example(stream_type,parameter_file);
     example.tetrahedral_meshing.output_directory=opt_out;
     example.data_directory=opt_data;

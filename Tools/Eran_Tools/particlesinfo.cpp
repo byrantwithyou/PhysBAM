@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
     bool type_double = false,opt_1d=false,opt_2d=false,opt_3d=false,opt_v=false,opt_vv=false,opt_vvv=false;
     char filename[256];
     int verbose_level = 0;
+    std::string filename;
 
-    PARSE_ARGS parse_args;
-
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-1d",&opt_1d,"1d");
@@ -65,14 +65,8 @@ int main(int argc, char *argv[])
     parse_args.Add("-v",&opt_v,"v");
     parse_args.Add("-vv",&opt_vv,"vv");
     parse_args.Add("-vvv",&opt_vvv,"vvv");
-    parse_args.Set_Extra_Arguments(1, "<filename>");
-
-    int extraarg = parse_args.Parse();
-
-    if (extraarg < argc)
-        strcpy(filename, argv[extraarg]);
-    else
-        return -1;
+    parse_args.Extra(&filename,"filename","filename");
+    parse_args.Parse();
 
     if (opt_1d) dim = 1;
     if (opt_2d) dim = 2;

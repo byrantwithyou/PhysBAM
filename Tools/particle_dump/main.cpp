@@ -25,14 +25,13 @@ int main(int argc,char *argv[])
     bool type_double=false;
     int dim=3;
 
+    std::string filename;
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-d",&dim,"value","dimension");
-    parse_args.Set_Extra_Arguments(1,"<file>","<obj file> obj file to convert");
+    parse_args.Extra(&filename,"obj file","obj file to convert");
     parse_args.Parse();
-
-    std::string filename=parse_args.Extra_Arg(0);
 
     STREAM_TYPE stream_type(type_double?STREAM_TYPE(0.0):STREAM_TYPE(0.0f));
 

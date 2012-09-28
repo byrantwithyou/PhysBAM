@@ -57,7 +57,7 @@ static int Depth(int triangle_id,const RANGE<VECTOR<T,3> >& box,void* data)
     return helper.default_depth;
 }
 
-template<class T,class RW> void Convert(const std::string& input_filename,int boundary_cells,PARSE_ARGS &parse_args)
+template<class T,class RW> void Convert(int boundary_cells,PARSE_ARGS &parse_args)
 {
     typedef VECTOR<T,3> TV;
 
@@ -68,7 +68,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
     VECTOR<int,3> grid_size,path_start,path_end;
     int depth=1,positive_boundary_band=0;
     RANGE<TV> domain((TV()),TV());
-    std::string output_filename,exact_grid;
+    std::string output_filename,input_filename,exact_grid;
     parse_args.Add("-heaviside",&opt_heaviside,"compute heaviside function");
     parse_args.Add("-unsigned",&opt_unsigned,"compute unsigned distance");
     parse_args.Add("-mac",&mac,"use MAC grid");
@@ -92,7 +92,7 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
     parse_args.Add("-path_start",&path_start,&opt_path_start,"path_start","path_start");
     parse_args.Add("-path_end",&path_end,&opt_path_end,"path_end","path_end");
     parse_args.Add("-orthogonal_vote",&opt_orthogonal_vote,"orthogonal_vote");
-    parse_args.Set_Extra_Arguments(1,"<tri file>","<tri file> tri file to convert");
+    parse_args.Extra(&input_filename,"tri file","tri file to convert");
 
     parse_args.Parse();
 
@@ -102,6 +102,10 @@ template<class T,class RW> void Convert(const std::string& input_filename,int bo
 
     if(use_grid_size && dx){LOG::cerr<<"Only one of -g and -dx is allowed."<<std::endl;exit(1);}
     if(grid_size.Contains(0)){std::cerr<<"Invalid suggested grid size "<<grid_size<<std::endl;exit(1);}
+
+    if(!FILE_UTILITIES::Is_Tri_File(input_filename)){
+        std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
+        return;}
 
     if(opt_domain_min && opt_domain_max) box=domain;
 
@@ -178,31 +182,27 @@ int main(int argc,char *argv[])
     bool type_double=false,compute_using_doubles=false;
     VECTOR<double,3> grid_size(50,50,50);
     int boundary_cells=3;
+    std::string input_filename;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-b",&boundary_cells,"boundary cells","number of cells outside bounding box");
     parse_args.Add("-compute_using_doubles",&compute_using_doubles,"perform computations using doubles");
+    parse_args.Extra(&input_filename,"filename","input file");
     parse_args.Parse(true);
-
-    std::string input_filename=parse_args.Extra_Arg(0);
-
-    if(!FILE_UTILITIES::Is_Tri_File(input_filename)){
-        std::cerr<<"Not a tri file: "<<input_filename<<std::endl;
-        return -1;}
 
     if(!type_double){
         if(compute_using_doubles){
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
-            Convert<double,float>(input_filename,boundary_cells,parse_args);
+            Convert<double,float>(boundary_cells,parse_args);
 #else
             std::cerr<<"Double support not enabled."<<std::endl;exit(1);
 #endif
-        }else{Convert<float,float>(input_filename,boundary_cells,parse_args);}}
+        }else{Convert<float,float>(boundary_cells,parse_args);}}
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    else Convert<double,double>(input_filename,boundary_cells,parse_args);
+    else Convert<double,double>(boundary_cells,parse_args);
 #else
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif

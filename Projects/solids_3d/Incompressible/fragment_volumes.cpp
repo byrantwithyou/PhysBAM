@@ -17,16 +17,17 @@ typedef VECTOR<T,3> TV;
 
 int main(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
-    parse_args.Set_Extra_Arguments(-1,"<frame>");
+    int frame=0,last_frame=0;
+    bool use_extra=false;
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Extra_Optional(&frame,&use_extra,"frame","frame");
     parse_args.Parse();
 
-    int start_frame=0,last_frame=0;
-    if(parse_args.Num_Extra_Args()>=1) start_frame=last_frame=atoi(parse_args.Extra_Arg(0).c_str());
+    if(use_extra) last_frame=frame;
     else FILE_UTILITIES::Read_From_Text_File("last_frame",last_frame);
 
     RANGE<VECTOR<T,1> > volume_box=RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX);T rest_volume=(T)4.85889;
-    for(int frame=start_frame;frame<=last_frame;frame++){
+    for(;frame<=last_frame;frame++){
         LOG::cout<<"frame "<<frame<<": ";
         // read
         std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);

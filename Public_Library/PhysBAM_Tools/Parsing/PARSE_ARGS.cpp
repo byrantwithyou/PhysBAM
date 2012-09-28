@@ -15,7 +15,7 @@ using namespace PhysBAM;
 //#####################################################################
 PARSE_ARGS::
 PARSE_ARGS(int argc_input,char** argv_input)
-    :num_expected_extra_args(0),use_help_option(true),extra_usage_callback(0),argc(argc_input),argv(argv_input)
+    :argc(argc_input),argv(argv_input),unclaimed_arguments(false)
 {
 }
 //#####################################################################
@@ -26,31 +26,12 @@ PARSE_ARGS::
 {
 }
 //#####################################################################
-// Function Use_Help_Option
-//#####################################################################
-void PARSE_ARGS::
-Use_Help_Option(bool use_it)
-{
-    use_help_option=use_it;
-}
-//#####################################################################
-// Function Set_Extra_Arguments
-//#####################################################################
-void PARSE_ARGS::
-Set_Extra_Arguments(int num,const std::string& synopsis,const std::string& desc) // num=-1 for arbitrary extra rguments
-{
-    num_expected_extra_args=num;
-    if(synopsis.length()) extra_args_synopsis=synopsis;
-    if(desc.length()) extra_args_desc=desc;
-}
-//#####################################################################
 // Function Parse
 //#####################################################################
 void PARSE_ARGS::
 Parse(bool partial)
 {
     program_name=argv[0];
-    extra_arg_list.Remove_All();
     int kept=1;
     for(int i=1;i<argc;i++){
         if(OPTION* o=options.Get_Pointer(argv[i])){
@@ -63,27 +44,20 @@ Parse(bool partial)
     argv[argc]=0;
 
     if(!partial){
+        int k=0;
         for(int i=1;i<argc;i++){
             if(argv[i][0]=='-' && isalpha(argv[i][1])) Print_Usage(true);
-            extra_arg_list.Append(argv[i]);}
-        if(num_expected_extra_args!=-1 && extra_arg_list.m<num_expected_extra_args) Print_Usage(true);} // didn't get the expected number of extra args
-}
-//#####################################################################
-// Function Num_Extra_Args
-//#####################################################################
-int PARSE_ARGS::
-Num_Extra_Args() const
-{
-    return extra_arg_list.m;
-}
-//#####################################################################
-// Function Extra_Arg
-//#####################################################################
-const std::string& PARSE_ARGS::
-Extra_Arg(int i) const
-{
-    PHYSBAM_ASSERT((unsigned)i<(unsigned)extra_arg_list.m);
-    return extra_arg_list(i);
+            if(k<extras.m){
+                if(extras(k).found) *extras(k).found=true;
+                if(extras(k).store)
+                    if(!extras(k).store_func(extras(k).store,argv[i]))
+                        Print_Usage(true);
+                if(!extras(k).exhaust) k++;}
+            else unclaimed_arguments=true;}
+        if(extras(k).exhaust) k++;
+        for(;k<extras.m;k++)
+            if(extras(k).required)
+                Print_Usage(true);}
 }
 //#####################################################################
 // Function Get_Program_Name
@@ -109,10 +83,12 @@ Print_Usage(bool do_exit) const
         LOG::cerr<<" ["<<o.opt;
         if(o.store) LOG::cerr<<" <"<<(o.name.size()?o.name:"arg")<<">";
         LOG::cerr<<"]";}
-    LOG::cerr<<extra_args_synopsis<<std::endl;
+
+    for(int i=0;i<extras.m;i++) LOG::cerr<<(extras(i).required?" <":" [<")<<extras(i).name<<(extras(i).required?">":">]");
 
     int width=0;
     for(int i=0;i<args.m;i++) width=max((int)args(i).size(),width);
+    for(int i=0;i<extras.m;i++) width=max((int)extras(i).name.size()+2,width);
 
     for(int i=0;i<args.m;i++){
         const OPTION& o=options.Get(args(i));
@@ -124,8 +100,15 @@ Print_Usage(bool do_exit) const
             o.print_default_func(o.store);
             LOG::cerr<<")";}
         LOG::cerr<<std::endl;}
-    if(extra_args_desc.size()) LOG::cerr<<" "<<extra_args_desc<<std::endl;
-    if(extra_usage_callback) extra_usage_callback();
+    for(int i=0;i<extras.m;i++){
+        LOG::cerr.flags(std::ios::left);
+        LOG::cerr.width(width+2);
+        LOG::cerr<<"<"<<extras(i).name<<">"<<extras(i).desc;
+        if(!extras(i).required){
+            LOG::cerr<<" (";
+            extras(i).print_default_func(extras(i).store);
+            LOG::cerr<<")";}
+        LOG::cerr<<std::endl;}
     if(do_exit) exit(-1);
 }
 //#####################################################################

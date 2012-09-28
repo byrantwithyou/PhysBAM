@@ -339,7 +339,6 @@ Merge_Particles(const std::string& filename)
 template<class T> void
 Do_Merge(PARSE_ARGS& parse_args)
 {
-    std::string input_directory=parse_args.Extra_Arg(0),output_directory=input_directory;
 
     int first_frame=0,last_frame=0,number_of_processes=0;
     bool opt_minimal=false,print_maxerrors=false,is_solid_fluid=false;
@@ -347,6 +346,7 @@ Do_Merge(PARSE_ARGS& parse_args)
     bool opt_merge_levelset=false,opt_merge_object_levelset=false,opt_merge_debug_data=false;
     bool opt_merge_particles=false,opt_merge_removed_particles=false,opt_merge_removed_particle_times=false;
     bool opt_merge_velocities=false,opt_merge_compressible=false;
+    std::string input_directory,output_directory;
     parse_args.Add("-start_frame",&first_frame,"frame","start frame number");
     parse_args.Add("-last_frame",&last_frame,"frame","last frame number");
     parse_args.Add("-np",&number_of_processes,"number","number of mpi processes (use 0 to autodetect)");
@@ -365,7 +365,7 @@ Do_Merge(PARSE_ARGS& parse_args)
     parse_args.Add("-1d",&is_1d,"input data is 1-D");
     parse_args.Add("-2d",&is_2d,"input data is 2-D");
     parse_args.Add("-3d",&is_3d,"input data is 3-D");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Extra(&input_directory,"input_directory","input_directory");
     parse_args.Parse();
 
     FILE_UTILITIES::Read_From_Text_File(input_directory+"/1/common/first_frame",first_frame);

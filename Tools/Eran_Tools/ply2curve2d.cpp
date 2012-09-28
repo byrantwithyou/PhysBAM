@@ -73,24 +73,15 @@ int main(int argc, char *argv[])
 {
     bool type_double = false;
     
-    PARSE_ARGS parse_args;
-    parse_args.Use_Help_Option(true);
+    std::string input_filename;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
     parse_args.Add("-closed",&closed,"closed");
     parse_args.Add("-v",&verbose,"verbose");
     parse_args.Add("-max_segment_length",&max_segment_length,"max_segment_length");
-    parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to convert");
-
-    char input_filename[256];
-    int extraarg = parse_args.Parse();
-    if (extraarg < argc)
-        strcpy(input_filename, argv[extraarg]);
-    else
-    {
-        parse_args.Print_Usage(true);
-        return -1;
-    }
+    parse_args.Extra(&input_filename,"ply file", "ply file to convert");
+    parse_args.Parse();
 
     if (!FILE_UTILITIES::Is_Ply2D_File(input_filename))
     {

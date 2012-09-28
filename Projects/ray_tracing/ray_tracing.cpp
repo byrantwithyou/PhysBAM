@@ -15,12 +15,13 @@ int main(int argc, char *argv[])
     PROCESS_UTILITIES::Set_Backtrace(true);
     LOG::Initialize_Logging(false,false,1000,true);
 
+    std::string scene_filename;
+    int frame_number=0;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Set_Extra_Arguments(-1, "<scene file> <frame number>");
+    parse_args.Extra(&scene_filename,"scene file","scene file");
+    parse_args.Extra(&frame_number,"frame number","frame number");
     parse_args.Parse();
-    if(parse_args.Num_Extra_Args() != 2){parse_args.Print_Usage();exit(0);}
-    std::string scene_filename=parse_args.Extra_Arg(0);
-    int frame_number=atoi(parse_args.Extra_Arg(1).c_str());
+    if(parse_args.unclaimed_arguments){parse_args.Print_Usage();exit(0);}
 
     GENERIC_RENDER_EXAMPLE<double,float> example(scene_filename,frame_number);
     RAY_TRACING_DRIVER<double>(example).Execute_Main_Program();

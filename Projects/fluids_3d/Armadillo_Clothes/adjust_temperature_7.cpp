@@ -51,13 +51,10 @@ template<class T> inline T Adjust_Density(const T d,const int frame,const VECTOR
 
 template<class T,class RW> void Process(int argc,char* argv[])
 {
-    PARSE_ARGS parse_args;
-    parse_args.Set_Extra_Arguments(1, "<frame>");
-    parse_args.Parse();
-
     int frame=-10;
-    if(parse_args.Num_Extra_Args() >= 1) frame=atoi(parse_args.Extra_Arg(0).c_str());
-    else{std::cout<<"Incorrect.\n";exit(1);}
+    PARSE_ARGS parse_args(argc,argv);
+    parse_args.Extra(&frame,"frame","frame");
+    parse_args.Parse();
 
     std::cout<<"Adjust temperature and density for frame "<<frame<<std::endl;
 

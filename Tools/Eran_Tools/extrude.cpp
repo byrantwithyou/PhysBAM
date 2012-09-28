@@ -65,22 +65,17 @@ int main(int argc, char *argv[])
     bool opt_x=false,opt_y=false,opt_z=false;
     int num_divisions=4;
     double extrude_lengthx=10;
+    std::string input_filename;
 
-    PARSE_ARGS parse_args;
+    PARSE_ARGS parse_args(argc,argv);
     parse_args.Add("-l", &extrude_length, "extrude length", "extrude length");
     parse_args.Add("-d", &num_divisions, "num div", "number of divisions");
     parse_args.Add("-x",&opt_x, "extrude along x axis");
     parse_args.Add("-y",&opt_y, "extrude along y axis");
     parse_args.Add("-z",&opt_z, "extrude along z axis (this is the default)");
-    parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to extrude");
-
-    int extraarg = parse_args.Parse();
-
-    char input_filename[256];
+    parse_args.Extra(&input_filename,"ply file", "ply file to extrude");
+    parse_args.Parse();
     int axis = 3;
-
-    if (extraarg < argc)
-        strcpy(input_filename, argv[extraarg]);
 
     if (!FILE_UTILITIES::Is_Ply_File(input_filename))
     {
