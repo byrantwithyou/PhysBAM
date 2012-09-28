@@ -50,12 +50,12 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool type_double=false;
+    bool type_double=false,compute_using_doubles=false;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-compute_using_doubles");
+    parse_args.Add("-compute_using_doubles",&compute_using_doubles,"compute_using_doubles");
     parse_args.Set_Extra_Arguments(1,"<obj file>","<obj file> obj file to convert");
     parse_args.Set_Extra_Arguments(2,"<tri file>","<tri file> output tri file name");
 
@@ -69,7 +69,7 @@ int main(int argc,char *argv[])
         return -1;}
 
     if(!type_double){
-        if(parse_args.Get_Option_Value("-compute_using_doubles")){
+        if(compute_using_doubles){
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
             Convert<double,float>(input_filename,output_filename);

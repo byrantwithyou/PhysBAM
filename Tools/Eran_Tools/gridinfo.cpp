@@ -22,17 +22,17 @@ template<class TV> void Print_Info(std::string &filename)
 
 int main(int argc, char *argv[])
 {
-    bool type_double = false;
-    int dimension = 3;
+    bool type_double=false,opt_1d=false,opt_2d=false,opt_3d=false;
+    int dimension=3;
     std::string filename;
 
     PARSE_ARGS parse_args;
 
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-1d", "force 1d mode");
-    parse_args.Add_Option_Argument("-2d", "force 2d mode");
-    parse_args.Add_Option_Argument("-3d", "force 3d mode");
+    parse_args.Add("-1d",&opt_1d, "force 1d mode");
+    parse_args.Add("-2d",&opt_2d, "force 2d mode");
+    parse_args.Add("-3d",&opt_3d, "force 3d mode");
     parse_args.Set_Extra_Arguments(1, "<filename>");
 
     parse_args.Parse();
@@ -40,9 +40,9 @@ int main(int argc, char *argv[])
     filename=parse_args.Extra_Arg(0);
 
     // By default detection dimension from file extension
-    if (parse_args.Get_Option_Value("-3d")) dimension = 3;
-    if (parse_args.Get_Option_Value("-2d")) dimension = 2;
-    if (parse_args.Get_Option_Value("-1d")) dimension = 1;
+    if (opt_3d) dimension = 3;
+    if (opt_2d) dimension = 2;
+    if (opt_1d) dimension = 1;
 
     cout << "Filename: " << filename << " [" << ((type_double)?"double":"float") << ", " << dimension << "D]" << endl;
 

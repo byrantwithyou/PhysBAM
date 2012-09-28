@@ -8,16 +8,15 @@ using namespace PhysBAM;
 
 int main(int argc,char* argv[])
 {
+    double gamma=1,ratio=0.5;
     PARSE_ARGS args;
-    args.Add_Double_Argument("-gamma",1,"-gamma","gamma correction");
-    args.Add_Double_Argument("-ratio",0.5,"-ratio","blend ratio");
+    args.Add("-gamma",&gamma,"gamma","gamma correction");
+    args.Add("-ratio",&ratio,"ratio","blend ratio");
     args.Set_Extra_Arguments(3,"<image in1> <image in2> <image out>","images to read and write");
     args.Parse(argc,argv);
     std::string file_input1=args.Extra_Arg(0);
     std::string file_input2=args.Extra_Arg(1);
     std::string file_output=args.Extra_Arg(2);
-    double gamma=args.Get_Double_Value("-gamma");
-    double ratio=args.Get_Double_Value("-ratio");
 
     ARRAYS<VECTOR<VECTOR<float,3> ,2> > image1;IMAGE<float>::Read(file_input1,image1);
     ARRAYS<VECTOR<VECTOR<float,3> ,2> > image2;IMAGE<float>::Read(file_input2,image2);

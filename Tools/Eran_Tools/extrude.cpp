@@ -62,18 +62,21 @@ void extrude(const POLYGONAL_SURFACE &input_surface,
 
 int main(int argc, char *argv[])
 {
+    bool opt_x=false,opt_y=false,opt_z=false;
+    int num_divisions=4;
+    double extrude_lengthx=10;
+
     PARSE_ARGS parse_args;
-    parse_args.Add_Double_Argument("-l", 10, "extrude length", "extrude length");
-    parse_args.Add_Integer_Argument("-d", 4, "num div", "number of divisions");
-    parse_args.Add_Option_Argument("-x", "extrude along x axis");
-    parse_args.Add_Option_Argument("-y", "extrude along y axis");
-    parse_args.Add_Option_Argument("-z", "extrude along z axis (this is the default)");
+    parse_args.Add("-l", &extrude_length, "extrude length", "extrude length");
+    parse_args.Add("-d", &num_divisions, "num div", "number of divisions");
+    parse_args.Add("-x",&opt_x, "extrude along x axis");
+    parse_args.Add("-y",&opt_y, "extrude along y axis");
+    parse_args.Add("-z",&opt_z, "extrude along z axis (this is the default)");
     parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to extrude");
 
     int extraarg = parse_args.Parse();
 
     char input_filename[256];
-    int num_divisions;
     int axis = 3;
 
     if (extraarg < argc)
@@ -85,12 +88,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    num_divisions = parse_args.Get_Integer_Value("-d");
-    if (parse_args.Get_Option_Value("-x")) axis = 1;
-    if (parse_args.Get_Option_Value("-y")) axis = 2;
-    if (parse_args.Get_Option_Value("-z")) axis = 3;
-
-    double extrude_length = parse_args.Get_Double_Value("-l");
+    if (opt_x) axis = 1;
+    if (opt_y) axis = 2;
+    if (opt_z) axis = 3;
 
     char output_filename[256];
     sprintf(output_filename, "%s_extrude.ply", FILE_UTILITIES::Get_Basename(input_filename).c_str());

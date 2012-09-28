@@ -153,18 +153,19 @@ void revolve(const POLYGONAL_SURFACE &input_surface,
 
 int main(int argc, char *argv[])
 {
+    bool opt_x=false,opt_y=false,opt_z=false,cap=false;
+    int num_divisions=4;
     PARSE_ARGS parse_args;
-    parse_args.Add_Option_Argument("-x", "rotate along x axis (this is the default)");
-    parse_args.Add_Option_Argument("-y", "rotate along y axis");
-    parse_args.Add_Option_Argument("-z", "rotate along z axis");
-    parse_args.Add_Option_Argument("-c", "cap ends");
-    parse_args.Add_Integer_Argument("-d", 4, "num div", "number of divisions");
+    parse_args.Add("-x",&opt_x, "rotate along x axis (this is the default)");
+    parse_args.Add("-y",&opt_y, "rotate along y axis");
+    parse_args.Add("-z",&opt_z, "rotate along z axis");
+    parse_args.Add("-c",&cap, "cap ends");
+    parse_args.Add("-d", &num_divisions, "num div", "number of divisions");
     parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to revolve");
 
     int extraarg = parse_args.Parse();
 
     char input_filename[256];
-    int num_divisions;
     int axis = 1;
 
     if (extraarg < argc)
@@ -176,12 +177,9 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-    num_divisions = parse_args.Get_Integer_Value("-d");
-    if (parse_args.Get_Option_Value("-x")) axis = 1;
-    if (parse_args.Get_Option_Value("-y")) axis = 2;
-    if (parse_args.Get_Option_Value("-z")) axis = 3;
-
-    bool cap = parse_args.Get_Option_Value("-c");
+    if (opt_x) axis = 1;
+    if (opt_y) axis = 2;
+    if (opt_z) axis = 3;
 
     char output_filename[256];
     sprintf(output_filename, "%s_revolve.ply", FILE_UTILITIES::Get_Basename(input_filename).c_str());

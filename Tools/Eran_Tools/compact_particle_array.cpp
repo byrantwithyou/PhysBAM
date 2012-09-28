@@ -31,10 +31,10 @@ void Compact(const std::string &filename)
 
 int main(int argc,char *argv[])
 {
+    bool removed=false;
     PARSE_ARGS parse_args;
 
-    parse_args.Add_Option_Argument("-levelset", "levelset particle");
-    parse_args.Add_Option_Argument("-removed", "removed particle");
+    parse_args.Add("-levelset",&opt_levelset, "levelset particle");
     parse_args.Set_Extra_Arguments(1, "<filename>");
     parse_args.Parse();
 
@@ -43,7 +43,7 @@ int main(int argc,char *argv[])
     if (parse_args.Num_Extra_Args() < 1) return 1;
     else filename=parse_args.Extra_Arg(0);
 
-    if(parse_args.Get_Option_Value("-removed")){
+    if(removed){
         std::cout << "Removed particle" << std::endl;
         Compact<PARTICLE_LEVELSET_REMOVED_PARTICLES<float,VECTOR<float,3> >,float>(filename);
     }

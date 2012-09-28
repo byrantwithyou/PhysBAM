@@ -9,10 +9,10 @@
 using namespace std;
 using namespace PhysBAM;
 
+bool zero_based_vertices=false;
+
 template<class T> void Convert(const char *input_filename, const char *output_filename, PARSE_ARGS &parse_args)
 {
-    bool zero_based_vertices = parse_args.Get_Option_Value("-zero_based");
-
     ifstream input(input_filename);
     if (!input)
     {
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     PARSE_ARGS parse_args;
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-zero_based", "zero based vertices");
+    parse_args.Add("-zero_based",&zero_based_vertices, "zero based vertices");
     parse_args.Set_Extra_Arguments(1, "<tri file>", "<tri file> tri file to convert");
 
     char input_filename[256];

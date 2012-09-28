@@ -35,13 +35,14 @@ int main(int argc,char *argv[])
 {
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
 
-    bool type_double=false;
+    bool type_double=false,compute_using_doubles=false;
+    int last_frame=30;
 
     PARSE_ARGS parse_args(argc,argv);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-compute_using_doubles");
-    parse_args.Add_Integer_Argument("-last_frame",30,"last frame");
+    parse_args.Add("-compute_using_doubles",&compute_using_doubles,"compute_using_doubles");
+    parse_args.Add("-last_frame",&last_frame,"frame","last frame");
     parse_args.Set_Extra_Arguments(1,"<base>","<base> simulation directory path except for resolution");
 
     ARRAY<int> resolutions;
@@ -55,11 +56,10 @@ int main(int argc,char *argv[])
 
     std::string input_filename=parse_args.Extra_Arg(0);
 
-    int last_frame=parse_args.Get_Integer_Value("-last_frame");
 
 
     if(!type_double){
-        if(parse_args.Get_Option_Value("-compute_using_doubles")){
+        if(compute_using_doubles){
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
             std::cout<<"COMPUTING USING DOUBLES!"<<std::endl;
             Compute_Errors<double,float>(input_filename,last_frame,resolutions);

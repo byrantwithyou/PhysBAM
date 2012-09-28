@@ -51,7 +51,7 @@ void print_info(const char *filename, int verbose_level)
 int main(int argc, char *argv[])
 {
     int dim = 3;
-    bool type_double = false;
+    bool type_double = false,opt_1d=false,opt_2d=false,opt_3d=false,opt_v=false,opt_vv=false,opt_vvv=false;
     char filename[256];
     int verbose_level = 0;
 
@@ -59,12 +59,12 @@ int main(int argc, char *argv[])
 
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-1d");
-    parse_args.Add_Option_Argument("-2d");
-    parse_args.Add_Option_Argument("-3d");
-    parse_args.Add_Option_Argument("-v");
-    parse_args.Add_Option_Argument("-vv");
-    parse_args.Add_Option_Argument("-vvv");
+    parse_args.Add("-1d",&opt_1d,"1d");
+    parse_args.Add("-2d",&opt_2d,"2d");
+    parse_args.Add("-3d",&opt_3d,"3d");
+    parse_args.Add("-v",&opt_v,"v");
+    parse_args.Add("-vv",&opt_vv,"vv");
+    parse_args.Add("-vvv",&opt_vvv,"vvv");
     parse_args.Set_Extra_Arguments(1, "<filename>");
 
     int extraarg = parse_args.Parse();
@@ -74,12 +74,12 @@ int main(int argc, char *argv[])
     else
         return -1;
 
-    if (parse_args.Get_Option_Value("-1d")) dim = 1;
-    if (parse_args.Get_Option_Value("-2d")) dim = 2;
-    if (parse_args.Get_Option_Value("-3d")) dim = 3;
-    if (parse_args.Get_Option_Value("-v")) verbose_level = 1;
-    if (parse_args.Get_Option_Value("-vv")) verbose_level = 2;
-    if (parse_args.Get_Option_Value("-vvv")) verbose_level = 3;
+    if (opt_1d) dim = 1;
+    if (opt_2d) dim = 2;
+    if (opt_3d) dim = 3;
+    if (opt_v) verbose_level = 1;
+    if (opt_vv) verbose_level = 2;
+    if (opt_vvv) verbose_level = 3;
 
     if (!FILE_UTILITIES::File_Exists(filename))
     {

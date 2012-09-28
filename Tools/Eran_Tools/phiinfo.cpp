@@ -174,22 +174,21 @@ template<class T> void Print_Info_2D(const char *filename, bool verbose)
 
 int main(int argc, char *argv[])
 {
-    bool type_double = false;
+    bool type_double=false,opt_2d=false,opt_3d=false,opt_s=false,opt_b=false,opt_x=false,opt_y=false,opt_z=false,opt_v=false;
     int dimension = -1;
     char filename[256];
-
     PARSE_ARGS parse_args;
 
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-2d", "force 2d mode");
-    parse_args.Add_Option_Argument("-3d", "force 3d mode");
-    parse_args.Add_Option_Argument("-s", "write out slices as rgb files");
-    parse_args.Add_Option_Argument("-b", "if -s selected, only write out binary slices");
-    parse_args.Add_Option_Argument("-x", "along x direction");
-    parse_args.Add_Option_Argument("-y", "along y direction");
-    parse_args.Add_Option_Argument("-z", "along z direction");
-    parse_args.Add_Option_Argument("-v", "display verbose information");
+    parse_args.Add("-2d",&opt_2d, "force 2d mode");
+    parse_args.Add("-3d",&opt_3d, "force 3d mode");
+    parse_args.Add("-s",&opt_s, "write out slices as rgb files");
+    parse_args.Add("-b",&opt_b, "if -s selected, only write out binary slices");
+    parse_args.Add("-x",&opt_x, "along x direction");
+    parse_args.Add("-y",&opt_y, "along y direction");
+    parse_args.Add("-z",&opt_z, "along z direction");
+    parse_args.Add("-v",&opt_v, "display verbose information");
     parse_args.Set_Extra_Arguments(1, "<filename>");
 
     int extraarg = parse_args.Parse();
@@ -204,12 +203,12 @@ int main(int argc, char *argv[])
     else if (Is_Phi2D_File(filename)) dimension = 2;
 
     int slice_direction = 1;
-    if (parse_args.Get_Option_Value("-x")) slice_direction = 1;
-    if (parse_args.Get_Option_Value("-y")) slice_direction = 2;
-    if (parse_args.Get_Option_Value("-z")) slice_direction = 3;
+    if (opt_x) slice_direction = 1;
+    if (opt_y) slice_direction = 2;
+    if (opt_z) slice_direction = 3;
 
-    if (parse_args.Get_Option_Value("-3d")) dimension = 3;
-    if (parse_args.Get_Option_Value("-2d")) dimension = 2;
+    if (opt_3d) dimension = 3;
+    if (opt_2d) dimension = 2;
 
     if (dimension == -1) {
         std::cerr << "Could not determine dimension for file '" << filename << "'" << std::endl;
@@ -221,23 +220,20 @@ int main(int argc, char *argv[])
     if (dimension == 3)
     {
         if(!type_double) Print_Info_3D<float>(filename,
-                                 parse_args.Get_Option_Value("-s"),
-                                 parse_args.Get_Option_Value("-b"),
-                                 slice_direction, parse_args.Get_Option_Value("-v"));
+                                 opt_s,
+                                 opt_b,
+                                 slice_direction, opt_v);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        else Print_Info_3D<double>(filename,
-                                  parse_args.Get_Option_Value("-s"),
-                                  parse_args.Get_Option_Value("-b"),
-                                  slice_direction, parse_args.Get_Option_Value("-v"));
+        else Print_Info_3D<double>(filename,opt_s,opt_b,slice_direction,opt_v);
 #else
         else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
     }
     else if (dimension == 2)
     {
-        if(!type_double) Print_Info_2D<float>(filename, parse_args.Get_Option_Value("-v"));
+        if(!type_double) Print_Info_2D<float>(filename, opt_v);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-        else Print_Info_2D<double>(filename, parse_args.Get_Option_Value("-v"));
+        else Print_Info_2D<double>(filename, opt_v);
 #else
         else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif

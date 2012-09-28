@@ -11,6 +11,9 @@
 using namespace PhysBAM;
 
 bool verbose=false;
+bool opt_double=false,opt_float=false,opt_int=false,opt_bool=false,opt_opengl_color=false,opt_array=false;
+bool opt_arrays=false,opt_1d=false,opt_2d=false,opt_3d=false,opt_vec2d=false,opt_vec3d=false,opt_vec3d=false;
+int num_arrays=1;
 
 template<template<class> class ARRAY,class T> void Print_Min_Value(const ARRAY<T> &array)
 { if(array.m>0) std::cout << "Min = " << ARRAY<T>::min(array) << std::endl; }
@@ -166,41 +169,41 @@ template<class T,class RW> void Print_Array_3D(std::istream &input, int num_arra
 
 template<class T,class RW> void By_Composite_Type(std::istream &input, PARSE_ARGS &parse_args)
 {
-    int num_arrays = parse_args.Get_Integer_Value("-n");
-
-    if (parse_args.Get_Option_Value("-3d")) Print_Array_3D<T,RW>(input,num_arrays);
-    else if (parse_args.Get_Option_Value("-2d")) Print_Array_2D<T,RW>(input,num_arrays);
-    else if (parse_args.Get_Option_Value("-1d")) Print_Array_1D<T,RW>(input,num_arrays);
-    else if (parse_args.Get_Option_Value("-arrays")) Print_Arrays<T,RW>(input,num_arrays);
+    if (opt_3d) Print_Array_3D<T,RW>(input,num_arrays);
+    else if (opt_2d) Print_Array_2D<T,RW>(input,num_arrays);
+    else if (opt_1d) Print_Array_1D<T,RW>(input,num_arrays);
+    else if (opt_arrays) Print_Arrays<T,RW>(input,num_arrays);
     else Print_Array<T,RW>(input,num_arrays);
 }
 
 template<class T> void By_Base_Type(std::istream &input, PARSE_ARGS &parse_args)
 {
-    if (parse_args.Get_Option_Value("-vec3d")) By_Composite_Type<VECTOR<T,3>,T>(input, parse_args);
-    else if (parse_args.Get_Option_Value("-vec2d")) By_Composite_Type<VECTOR<T,2>,T>(input, parse_args);
+    if (opt_vec3d) By_Composite_Type<VECTOR<T,3>,T>(input, parse_args);
+    else if (opt_vec2d) By_Composite_Type<VECTOR<T,2>,T>(input, parse_args);
     else By_Composite_Type<T,T>(input, parse_args);
 }
 
 int main(int argc, char *argv[])
 {
+    int skip=0,opt_n=1;
+
     PARSE_ARGS parse_args;
-    parse_args.Add_Option_Argument("-double");
-    parse_args.Add_Option_Argument("-float");
-    parse_args.Add_Option_Argument("-int");
-    parse_args.Add_Option_Argument("-bool");
-    parse_args.Add_Option_Argument("-opengl_color");
-    parse_args.Add_Option_Argument("-array");   // ARRAY
-    parse_args.Add_Option_Argument("-arrays");   // ARRAYS
-    parse_args.Add_Option_Argument("-1d");      // ARRAYS_1D
-    parse_args.Add_Option_Argument("-2d");      // ARRAYS_2D
-    parse_args.Add_Option_Argument("-3d");      // ARRAYS_3D
-    parse_args.Add_Option_Argument("-vec2d");
-    parse_args.Add_Option_Argument("-vec3d");
-    parse_args.Add_Option_Argument("-vec3d");
-    parse_args.Add_Option_Argument("-v", "verbose");
-    parse_args.Add_Integer_Argument("-skip", 0, "<bytes>", "skip header bytes");
-    parse_args.Add_Integer_Argument("-n", 1, "<num arrays>", "number of consecutive arrays in the file");
+    parse_args.Add("-double",&opt_double,"double");
+    parse_args.Add("-float",&opt_float,"float");
+    parse_args.Add("-int",&opt_int,"int");
+    parse_args.Add("-bool",&opt_bool,"bool");
+    parse_args.Add("-opengl_color",&opt_opengl_color,"opengl_color");
+    parse_args.Add("-array",&opt_array,"array");   // ARRAY
+    parse_args.Add("-arrays",&opt_arrays,"arrays");   // ARRAYS
+    parse_args.Add("-1d",&opt_1d,"1d");      // ARRAYS_1D
+    parse_args.Add("-2d",&opt_2d,"2d");      // ARRAYS_2D
+    parse_args.Add("-3d",&opt_3d,"3d");      // ARRAYS_3D
+    parse_args.Add("-vec2d",&opt_vec2d,"vec2d");
+    parse_args.Add("-vec3d",&opt_vec3d,"vec3d");
+    parse_args.Add("-vec3d",&opt_vec3d,"vec3d");
+    parse_args.Add("-v",&verbose,"verbose");
+    parse_args.Add("-skip", &skip, "<bytes>", "skip header bytes");
+    parse_args.Add("-n", &num_arrays, "<num arrays>", "number of consecutive arrays in the file");
     parse_args.Set_Extra_Arguments(1, "<filename>");
     parse_args.Parse();
 
@@ -209,7 +212,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    verbose=parse_args.Get_Option_Value("-v");
+    verbose=opt_v;
 
     std::istream* input=FILE_UTILITIES::Safe_Open_Input(parse_args.Extra_Arg(0));
     if(!(*input)) {
@@ -217,25 +220,24 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (parse_args.Get_Integer_Value("-skip") > 0) {
-        int skip_bytes = parse_args.Get_Integer_Value("-skip");
-        std::cout << "Skipping " << skip_bytes << " bytes" << std::endl;
-        input->ignore(skip_bytes);
+    if (skip > 0) {
+        std::cout << "Skipping " << skip << " bytes" << std::endl;
+        input->ignore(skip);
     }
 
-    if (parse_args.Get_Option_Value("-double")) {
+    if (opt_double) {
         std::cout << "Base type = double" << std::endl;
         By_Base_Type<double>(*input, parse_args);
     }
-    else if (parse_args.Get_Option_Value("-float")) {
+    else if (opt_float) {
         std::cout << "Base type = float" << std::endl;
         By_Base_Type<float>(*input, parse_args);
     }
-    else if (parse_args.Get_Option_Value("-int")) {
+    else if (opt_int) {
         std::cout << "Base type = int" << std::endl;
         By_Base_Type<int>(*input, parse_args);
     }
-    else if (parse_args.Get_Option_Value("-opengl_color")) {
+    else if (opt_opengl_color) {
         std::cout << "Base type = OPENGL_COLOR" << std::endl;
         By_Composite_Type<OPENGL_COLOR,float>(*input, parse_args);
     } else {
