@@ -81,8 +81,7 @@ Parse_Arguments(PARSE_ARGS &parse_args)
         basedir=parse_args.Extra_Arg(0);
     last_frame_filename = std::string(basedir)+"/common/last_frame";
     
-    if (!parse_args.Is_Value_Set("-camera_script")) 
-        camera_script_filename = basedir + std::string("/camera_script");
+    camera_script_filename = basedir + std::string("/camera_script");
     opengl_window_title = std::string("2D Euler Visualization: ") + FILE_UTILITIES::Real_Path(basedir);
 }
 

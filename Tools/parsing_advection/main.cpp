@@ -66,7 +66,7 @@ Print_Energy(std::string& input_directory,GRID<TV>& grid,int frame)
 // Function Print_Density
 //#####################################################################
 template<class TV> void
-Print_Density(std::string& input_directory,GRID<TV>& grid,int frame,RANGE<TV>& range)
+Print_Density(std::string& input_directory,GRID<TV>& grid,int frame,const RANGE<TV>& range)
 {
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
@@ -86,15 +86,24 @@ Write_Output(PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
 
+    bool opt_m=false,opt_l=false,opt_e=false;
+    int frame=-1;
+    T start=0,end=0;
+    parse_args.Add("-start",&start,"value","start range");
+    parse_args.Add("-end",&end,"value","end range");
+    parse_args.Add("-frame",&frame,"value","frame output");
+    parse_args.Add("-m",&opt_m,"print mass");
+    parse_args.Add("-l",&opt_l,"print monmentum");
+    parse_args.Add("-e",&opt_e,"print energy");
+    parse_args.Set_Extra_Arguments(1,"<input_directory>");
+    parse_args.Parse();
+
     std::string input_directory=parse_args.Extra_Arg(0);
-    int frame=parse_args.Get_Integer_Value("-frame");
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<T>(input_directory+"/common/grid",grid);
-    if(parse_args.Is_Value_Set("-m")) Print_Mass(input_directory,grid,frame);
-    else if(parse_args.Is_Value_Set("-l")) Print_Momentum(input_directory,grid,frame);
-    else if(parse_args.Is_Value_Set("-e")) Print_Energy(input_directory,grid,frame);
-    else{
-        RANGE<TV> range;range.min_corner=TV::All_Ones_Vector()*parse_args.Get_Double_Value("-start");
-        range.max_corner=TV::All_Ones_Vector()*parse_args.Get_Double_Value("-end");Print_Density(input_directory,grid,frame,range);}
+    if(opt_m) Print_Mass(input_directory,grid,frame);
+    else if(opt_l) Print_Momentum(input_directory,grid,frame);
+    else if(opt_e) Print_Energy(input_directory,grid,frame);
+    else Print_Density(input_directory,grid,frame,RANGE<TV>(TV()+start,TV()+end));
 }
 //#####################################################################
 // Function Find_Dimension
@@ -102,33 +111,30 @@ Write_Output(PARSE_ARGS& parse_args)
 template<class T> void
 Find_Dimension(PARSE_ARGS& parse_args)
 {
-    if(parse_args.Is_Value_Set("-3d")){
-        Write_Output<VECTOR<T,3> >(parse_args);}
-    if(parse_args.Is_Value_Set("-2d")){
-        Write_Output<VECTOR<T,2> >(parse_args);}
-    else{
-        Write_Output<VECTOR<T,1> >(parse_args);}
+    bool opt_2d=false,opt_3d=false;
+    parse_args.Add("-2d",&opt_2d,"input data is 2-D");
+    parse_args.Add("-3d",&opt_3d,"input data is 3-D");
+    parse_args.Parse(true);
+
+    if(opt_3d)
+        Write_Output<VECTOR<T,3> >(parse_args);
+    else if(opt_2d)
+        Write_Output<VECTOR<T,2> >(parse_args);
+    else
+        Write_Output<VECTOR<T,1> >(parse_args);
 }
 //#####################################################################
 // MAIN
 //#####################################################################
 int main(int argc,char* argv[])
 {
+    bool use_doubles=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Double_Argument("-start",0,"start range");
-    parse_args.Add_Double_Argument("-end",0,"end range");
-    parse_args.Add_Integer_Argument("-frame",-1,"frame output");
-    parse_args.Add_Option_Argument("-m","print mass");
-    parse_args.Add_Option_Argument("-l","print monmentum");
-    parse_args.Add_Option_Argument("-e","print energy");
-    parse_args.Add_Option_Argument("-double","input data is in doubles");
-    parse_args.Add_Option_Argument("-2d","input data is 2-D");
-    parse_args.Add_Option_Argument("-3d","input data is 3-D");
-    parse_args.Set_Extra_Arguments(1,"<input_directory>");
-    parse_args.Parse();
+    parse_args.Add("-double",&use_doubles,"input data is in doubles");
+    parse_args.Parse(true);
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(parse_args.Is_Value_Set("-double")) Find_Dimension<double>(parse_args); 
+    if(use_doubles) Find_Dimension<double>(parse_args); 
     else Find_Dimension<float>(parse_args);
 #else
     Find_Dimension<float>(parse_args);

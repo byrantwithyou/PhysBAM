@@ -96,7 +96,6 @@ public:
     bool Get_Option_Value(const std::string& arg_str) const;
     int Get_Integer_Value(const std::string& arg_str) const;
     double Get_Double_Value(const std::string& arg_str) const;
-    bool Is_Value_Set(const std::string& arg_str) const;
     int Num_Extra_Args() const;
     const std::string& Extra_Arg(int i) const;
     const std::string& Get_Program_Name() const;

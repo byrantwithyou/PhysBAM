@@ -187,9 +187,14 @@ Write_Output(PARSE_ARGS& parse_args)
 {
     typedef typename TV::SCALAR T;
 
+    int frame=-1,particle_type=-1;
+    parse_args.Add("-frame",&frame,"value","frame output");
+    parse_args.Add("-type",&particle_type,"value","particle type");
+    parse_args.Set_Extra_Arguments(1,"<input_directory_1>");
+    parse_args.Set_Extra_Arguments(2,"<input_directory_2>");
+    parse_args.Parse();
+
     std::string input_directory_1=parse_args.Extra_Arg(0),input_directory_2=parse_args.Extra_Arg(1);
-    int frame=parse_args.Get_Integer_Value("-frame");
-    int particle_type=parse_args.Get_Integer_Value("-type");
     GRID<TV> grid;FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/common/grid",grid);
     GRID<TV> sanity;FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/common/grid",sanity);assert(grid==sanity);
     bool success=Compare_Velocities(input_directory_1,input_directory_2,grid,frame);
@@ -208,12 +213,17 @@ Write_Output(PARSE_ARGS& parse_args)
 template<class T> void
 Find_Dimension(PARSE_ARGS& parse_args)
 {
-    if(parse_args.Is_Value_Set("-3d")){
-        Write_Output<VECTOR<T,3> >(parse_args);}
-    else if(parse_args.Is_Value_Set("-2d")){
-        Write_Output<VECTOR<T,2> >(parse_args);}
-    else{
-        Write_Output<VECTOR<T,1> >(parse_args);}
+    bool opt_2d=false,opt_3d=false;
+    parse_args.Add("-2d",&opt_2d,"input data is 2-D");
+    parse_args.Add("-3d",&opt_3d,"input data is 3-D");
+    parse_args.Parse(true);
+
+    if(opt_3d)
+        Write_Output<VECTOR<T,3> >(parse_args);
+    else if(opt_2d)
+        Write_Output<VECTOR<T,2> >(parse_args);
+    else
+        Write_Output<VECTOR<T,1> >(parse_args);
 }
 //#####################################################################
 // MAIN
@@ -224,14 +234,7 @@ int main(int argc,char* argv[])
     bool type_double=false;
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Integer_Argument("-frame",-1,"frame output");
-    parse_args.Add_Integer_Argument("-type",-1,"particle type");
-    parse_args.Add_Option_Argument("-double","input data is in doubles");
-    parse_args.Add_Option_Argument("-2d","input data is 2-D");
-    parse_args.Add_Option_Argument("-3d","input data is 3-D");
-    parse_args.Set_Extra_Arguments(1,"<input_directory_1>");
-    parse_args.Set_Extra_Arguments(2,"<input_directory_2>");
-    parse_args.Parse();
+    parse_args.Parse(true);
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
     if(type_double) Find_Dimension<double>(parse_args); 

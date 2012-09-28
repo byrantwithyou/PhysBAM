@@ -126,7 +126,6 @@ Parse_Options()
     fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;
 
     fluids_parameters.use_slip=true;
-//    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
 
@@ -173,7 +172,7 @@ Parse_Options()
         case 6:
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
             (*fluids_parameters.grid).Initialize(resolution+1,resolution+1,0,1,(T)0,m);
-            if(!parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=100;
+            if(!use_viscosity) fluids_parameters.viscosity=100;
             solid_density=150;
             solid_width=(T)1/3;
             break;
@@ -493,7 +492,6 @@ Kang_Circle(bool use_surface)
         if(laplace_number) fluids_parameters.viscosity=sqrt(surface_tension*D*density/laplace_number)*kg/s;
         // this is for infinite La
         else fluids_parameters.viscosity=0*kg/s;}
-    if(parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=(T)(parse_args->Get_Double_Value("-viscosity")*kg/s);
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
     fluids_parameters.cfl=(T).9;
 //    solids_parameters.write_static_variables_every_frame=true;

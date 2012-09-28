@@ -247,8 +247,6 @@ void Parse_Options() PHYSBAM_OVERRIDE
     solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=false;
 
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
 
     simulate_rigids=test_number==2||test_number==5||test_number==6||test_number==10;
     simulate_deformable=test_number==3||test_number==4;

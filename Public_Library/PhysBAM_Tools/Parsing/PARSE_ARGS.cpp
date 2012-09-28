@@ -115,16 +115,6 @@ Get_Double_Value(const std::string& arg_str) const
     return arg_data_list(Find_Match(arg_str,ARG_DATA::DOUBLE)).double_value;
 }
 //#####################################################################
-// Function Is_Value_Set
-//#####################################################################
-bool PARSE_ARGS::
-Is_Value_Set(const std::string& arg_str) const
-{
-    int match=Find_Match(arg_str);
-    if(match==-1){LOG::cout<<"Argument "<<arg_str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    return arg_data_list(match).value_set;
-}
-//#####################################################################
 // Function Find_Match
 //#####################################################################
 int PARSE_ARGS::

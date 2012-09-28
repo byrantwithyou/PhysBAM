@@ -20,10 +20,17 @@ Write_Output(PARSE_ARGS& parse_args)
     typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;
 
+    int frame=0,frame_rate=24;
+    T start=0,end=0;
+    parse_args.Add("-start",&start,"value","start range");
+    parse_args.Add("-end",&end,"value","end range");
+    parse_args.Add("-frame",&frame,"value","frame output");
+    parse_args.Add("-frame_rate",&frame_rate,"value","frame rate used");
+    parse_args.Set_Extra_Arguments(2,"<low res input_directory> <high res input directory>");
+    parse_args.Parse();
+
     std::string input_directory1=parse_args.Extra_Arg(0);
     std::string input_directory2=parse_args.Extra_Arg(1);
-    int frame=parse_args.Get_Integer_Value("-frame");
-    int frame_rate=parse_args.Get_Integer_Value("-frame_rate");
     if(frame==0) FILE_UTILITIES::Read_From_Text_File(input_directory1+"/common/last_frame",frame);
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     GRID<TV> coarse_grid;FILE_UTILITIES::Read_From_File<T>(input_directory1+"/common/grid",coarse_grid);
@@ -31,10 +38,9 @@ Write_Output(PARSE_ARGS& parse_args)
     int scale=grid.Counts().x/coarse_grid.Counts().x;
     ARRAY<T,TV_INT> density_coarse;FILE_UTILITIES::Read_From_File<T>(input_directory1+"/"+f+"/density",density_coarse);
     ARRAY<T,TV_INT> density;FILE_UTILITIES::Read_From_File<T>(input_directory2+"/"+f+"/density",density);
-    RANGE<TV> range;range.min_corner=TV::All_Ones_Vector()*parse_args.Get_Double_Value("-start");
-    range.max_corner=TV::All_Ones_Vector()*parse_args.Get_Double_Value("-end");
+    RANGE<TV> range(TV()+start,TV()+end);
     RANGE<TV_INT> cell_range;cell_range.min_corner=coarse_grid.Index(range.min_corner);cell_range.max_corner=coarse_grid.Index(range.max_corner);
-    if(parse_args.Get_Double_Value("-end")==0) cell_range=grid.Domain_Indices();
+    if(end==0) cell_range=grid.Domain_Indices();
     for(typename GRID<TV>::CELL_ITERATOR iterator(coarse_grid,cell_range);iterator.Valid();iterator.Next()){
         TV X_o=iterator.Location()-((T)frame)*1/(T)frame_rate;
         TV X_o_fine=grid.Center(scale*iterator.Cell_Index()-(scale-1)*TV_INT::All_Ones_Vector())-((T)frame)*1/(T)frame_rate;
@@ -55,9 +61,14 @@ Write_Output(PARSE_ARGS& parse_args)
 template<class T> void
 Find_Dimension(PARSE_ARGS& parse_args)
 {
-    if(parse_args.Is_Value_Set("-3d")){
+    bool opt_2d=false,opt_3d=false;
+    parse_args.Add("-2d",&opt_2d,"input data is 2-D");
+    parse_args.Add("-3d",&opt_3d,"input data is 3-D");
+    parse_args.Parse(true);
+
+    if(opt_3d){
         Write_Output<VECTOR<T,3> >(parse_args);}
-    if(parse_args.Is_Value_Set("-2d")){
+    if(opt_2d){
         Write_Output<VECTOR<T,2> >(parse_args);}
     else{
         Write_Output<VECTOR<T,1> >(parse_args);}
@@ -67,19 +78,13 @@ Find_Dimension(PARSE_ARGS& parse_args)
 //#####################################################################
 int main(int argc,char* argv[])
 {
+    bool opt_double=false;
     PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Double_Argument("-start",0,"start range");
-    parse_args.Add_Double_Argument("-end",0,"end range");
-    parse_args.Add_Integer_Argument("-frame",0,"frame output");
-    parse_args.Add_Integer_Argument("-frame_rate",24,"frame rate used");
-    parse_args.Add_Option_Argument("-double","input data is in doubles");
-    parse_args.Add_Option_Argument("-2d","input data is 2-D");
-    parse_args.Add_Option_Argument("-3d","input data is 3-D");
-    parse_args.Set_Extra_Arguments(2,"<low res input_directory> <high res input directory>");
-    parse_args.Parse();
+    parse_args.Add("-double",&opt_double,"input data is in doubles");
+    parse_args.Parse(true);
 
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-    if(parse_args.Is_Value_Set("-double")) Find_Dimension<double>(parse_args); 
+    if(opt_double) Find_Dimension<double>(parse_args); 
     else Find_Dimension<float>(parse_args);
 #else
     Find_Dimension<float>(parse_args);

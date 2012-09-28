@@ -9,14 +9,13 @@
 
 using namespace PhysBAM;
 
+bool closed=false,verbose=false;
+double max_segment_length=0;
+
 template<class T> void Convert(const char *input_filename, const char *output_filename, PARSE_ARGS& parse_args)
 {
     bool closed = false;
     T max_segment_length = 0;
-    bool verbose=parse_args.Get_Option_Value("-v");
-
-    if (parse_args.Get_Option_Value("-closed")) closed = true;
-    if (parse_args.Is_Value_Set("-max_segment_length")) max_segment_length=parse_args.Get_Double_Value("-max_segment_length");
 
     if(closed) std::cout << "Closed" << std::endl;
     if(max_segment_length) std::cout << "Max segment length " << max_segment_length << std::endl;
@@ -78,9 +77,9 @@ int main(int argc, char *argv[])
     parse_args.Use_Help_Option(true);
     parse_args.Add_Not("-float",&type_double,"Use floats");
     parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Add_Option_Argument("-closed");
-    parse_args.Add_Option_Argument("-v","verbose");
-    parse_args.Add_Double_Argument("-max_segment_length",0);
+    parse_args.Add("-closed",&closed,"closed");
+    parse_args.Add("-v",&verbose,"verbose");
+    parse_args.Add("-max_segment_length",&max_segment_length,"max_segment_length");
     parse_args.Set_Extra_Arguments(1, "<ply file>", "<ply file> ply file to convert");
 
     char input_filename[256];

@@ -139,6 +139,7 @@ public:
     int beam_elements_length;
     int solid_resolution;
     T analytic_solution;
+    bool use_viscosity,use_solid_width,use_solid_density;
 
     GEOMETRY_PARTICLES<TV> debug_particles;
     TRIANGULATED_AREA<T>* test_43_triangulated_area;
@@ -149,7 +150,8 @@ public:
         solids_tests(*this,solid_body_collection),deformable_object_id(0),mass_multiplier(1),stiffness_multiplier((T)1),damping_multiplier((T)1),
         bending_stiffness_multiplier((T)1),bending_damping_multiplier((T)1),rigid_body_id(0),flow_particles(false),run_self_tests(false),print_poisson_matrix(false),
         print_index_map(false),print_matrix(false),print_each_matrix(false),output_iterators(false),circle_refinement(0),scale_length(1),use_solid(false),fluid_gravity((T)9.8),solid_gravity((T)9.8),
-        solid_width((T).1111),solid_density(100),widen_domain(0),period(10),max_dt(0),beam_elements_width(2),beam_elements_length(40),solid_resolution(216)
+        solid_width((T).1111),solid_density(100),widen_domain(0),period(10),max_dt(0),beam_elements_width(2),beam_elements_length(40),solid_resolution(216),
+        use_viscosity(false),use_solid_width(false),use_solid_density(false)
     {
         LOG::cout<<std::setprecision(16);
     }
@@ -186,7 +188,7 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-mass",&mass_multiplier,"value","mass_multiplier");
     parse_args->Add("-cg_iterations",&fluids_parameters.incompressible_iterations,"value","cg iterations");
     parse_args->Add("-slip",&fluids_parameters.use_slip,"use slip");
-    parse_args->Add("-viscosity",&fluids_parameters.viscosity,"value","fluid viscosity");
+    parse_args->Add("-viscosity",&fluids_parameters.viscosity,&use_viscosity,"value","fluid viscosity");
     parse_args->Add("-test_system",&run_self_tests,"Run self tests");
     parse_args->Add("-print_poisson_matrix",&print_poisson_matrix,"print_poisson_matrix");
     parse_args->Add("-print_index_map",&print_index_map,"print_index_map");
@@ -201,8 +203,8 @@ void Register_Options() PHYSBAM_OVERRIDE
     parse_args->Add("-use_solid",&use_solid,"use_solid");
     parse_args->Add("-fluid_gravity",&fluid_gravity,"value","fluid_gravity");
     parse_args->Add("-solid_gravity",&solid_gravity,"value","solid_gravity");
-    parse_args->Add("-solid_width",&solid_width,"value","solid_width");
-    parse_args->Add("-solid_density",&solid_density,"value","solid_density");
+    parse_args->Add("-solid_width",&solid_width,&use_solid_width,"value","solid_width");
+    parse_args->Add("-solid_density",&solid_density,&use_solid_density,"value","solid_density");
     parse_args->Add("-widen_domain",&widen_domain,"value","widen_domain");
     parse_args->Add("-period",&period,"value","period");
     parse_args->Add("-max_dt",&max_dt,"value","maximum dt");
@@ -389,9 +391,9 @@ void Parse_Options() PHYSBAM_OVERRIDE
             fluids_parameters.domain_walls[0][0]=true;fluids_parameters.domain_walls[0][1]=true;fluids_parameters.domain_walls[1][0]=false;fluids_parameters.domain_walls[1][1]=false;
             {T extend=(T)1/resolution*widen_domain*scale_length;
                 (*fluids_parameters.grid).Initialize(resolution+1+2*widen_domain,resolution+1,-extend,1+extend,(T)0,(T)scale_length);}
-            if(!parse_args->Is_Value_Set("-viscosity")) fluids_parameters.viscosity=100;
-            if(!parse_args->Is_Value_Set("-solid_density")) solid_density=150;
-            if(!parse_args->Is_Value_Set("-solid_width")) solid_width=(T)1/3;
+            if(!use_viscosity) fluids_parameters.viscosity=100;
+            if(!use_solid_density) solid_density=150;
+            if(!use_solid_width) solid_width=(T)1/3;
             break;
         case 41:
             fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;fluids_parameters.domain_walls[1][1]=true;

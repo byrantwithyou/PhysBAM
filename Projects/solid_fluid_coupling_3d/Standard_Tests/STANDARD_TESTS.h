@@ -147,26 +147,13 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     *fluids_parameters.grid=smoke_tests.grid;
     fluids_parameters.fluid_affects_solid=fluids_parameters.solid_affects_fluid=true;
-    fluids_parameters.incompressible_iterations=parse_args->Get_Integer_Value("-cg_iterations");
-    solids_parameters.implicit_solve_parameters.cg_iterations=parse_args->Get_Integer_Value("-cg_iterations");
         
     solids_parameters.rigid_body_evolution_parameters.simulate_rigid_bodies=true;
     solids_parameters.use_trapezoidal_rule_for_velocities=false;
     solids_parameters.rigid_body_evolution_parameters.maximum_rigid_body_time_step_fraction=(T)1.1;
 
-    fluids_parameters.use_slip=parse_args->Is_Value_Set("-slip");
-    run_self_tests=parse_args->Is_Value_Set("-test_system");
-    print_poisson_matrix=parse_args->Is_Value_Set("-print_poisson_matrix");
-    print_index_map=parse_args->Is_Value_Set("-print_index_map");
-    print_matrix=parse_args->Is_Value_Set("-print_matrix");
-    print_each_matrix=parse_args->Is_Value_Set("-print_each_matrix");
-    output_iterators=parse_args->Is_Value_Set("-output_iterators");
     fluids_parameters.use_vorticity_confinement=false;
     fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=true;
-    if(parse_args->Is_Value_Set("-no_preconditioner")) fluids_parameters.use_preconditioner_for_slip_system=false;
-
-    fluids_parameters.viscosity=parse_args->Get_Double_Value("-viscosity");;
     if(fluids_parameters.viscosity) fluids_parameters.implicit_viscosity=true;
         
     //if(solid_node || !mpi) solids_parameters.use_rigid_deformable_contact=true;
