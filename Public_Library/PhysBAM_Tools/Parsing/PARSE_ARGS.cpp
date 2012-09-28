@@ -18,37 +18,20 @@ PARSE_ARGS(int argc_input,char** argv_input)
     :num_expected_extra_args(0),use_help_option(true),extra_usage_callback(0),argc(argc_input),argv(argv_input)
 {
 }
+//#####################################################################
+// Destructor
+//#####################################################################
 PARSE_ARGS::
 ~PARSE_ARGS()
 {
 }
-void PARSE_ARGS::Use_Help_Option(bool use_it)
+//#####################################################################
+// Function Use_Help_Option
+//#####################################################################
+void PARSE_ARGS::
+Use_Help_Option(bool use_it)
 {
     use_help_option=use_it;
-}
-//#####################################################################
-// Function Add_Option_Argument
-//#####################################################################
-void PARSE_ARGS::
-Add_Option_Argument(const std::string& arg_str,const std::string& desc)
-{
-    arg_data_list.Append(ARG_DATA(arg_str,desc));
-}
-//#####################################################################
-// Function Add_Integer_Argument
-//#####################################################################
-void PARSE_ARGS::
-Add_Integer_Argument(const std::string& arg_str,int default_value,const std::string& val_name,const std::string& desc)
-{
-    arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
-}
-//#####################################################################
-// Function Add_Double_Argument
-//#####################################################################
-void PARSE_ARGS::
-Add_Double_Argument(const std::string& arg_str,double default_value,const std::string& val_name,const std::string& desc)
-{
-    arg_data_list.Append(ARG_DATA(arg_str,val_name,desc,default_value));
 }
 //#####################################################################
 // Function Set_Extra_Arguments
@@ -56,7 +39,9 @@ Add_Double_Argument(const std::string& arg_str,double default_value,const std::s
 void PARSE_ARGS::
 Set_Extra_Arguments(int num,const std::string& synopsis,const std::string& desc) // num=-1 for arbitrary extra rguments
 {
-    num_expected_extra_args=num;if(synopsis.length())extra_args_synopsis=synopsis;if(desc.length())extra_args_desc=desc;
+    num_expected_extra_args=num;
+    if(synopsis.length()) extra_args_synopsis=synopsis;
+    if(desc.length()) extra_args_desc=desc;
 }
 //#####################################################################
 // Function Parse
@@ -73,14 +58,7 @@ Parse(bool partial)
             if(o->store)
                 if(!argv[++i] || !o->store_func(o->store,argv[i]))
                     Print_Usage(true);}
-        else{
-            int match=Find_Match(argv[i]);
-            if(match>=0){
-                if(!arg_data_list(match).Parse_Value(argc,argv,i))
-                    Print_Usage(true);
-                else arg_data_list(match).value_set=true;
-                i--;}
-            else argv[kept++]=argv[i];}}
+        else argv[kept++]=argv[i];}
     argc=kept;
     argv[argc]=0;
 
@@ -89,50 +67,6 @@ Parse(bool partial)
             if(argv[i][0]=='-' && isalpha(argv[i][1])) Print_Usage(true);
             extra_arg_list.Append(argv[i]);}
         if(num_expected_extra_args!=-1 && extra_arg_list.m<num_expected_extra_args) Print_Usage(true);} // didn't get the expected number of extra args
-}
-//#####################################################################
-// Function Get_Option_Value
-//#####################################################################
-bool PARSE_ARGS::
-Get_Option_Value(const std::string& arg_str) const
-{
-    return arg_data_list(Find_Match(arg_str,ARG_DATA::OPTION)).boolean_value;
-}
-//#####################################################################
-// Function Get_Integer_Value
-//#####################################################################
-int PARSE_ARGS::
-Get_Integer_Value(const std::string& arg_str) const
-{
-    return arg_data_list(Find_Match(arg_str,ARG_DATA::INTEGER)).integer_value;
-}
-//#####################################################################
-// Function Get_Double_Value
-//#####################################################################
-double PARSE_ARGS::
-Get_Double_Value(const std::string& arg_str) const
-{
-    return arg_data_list(Find_Match(arg_str,ARG_DATA::DOUBLE)).double_value;
-}
-//#####################################################################
-// Function Find_Match
-//#####################################################################
-int PARSE_ARGS::
-Find_Match(const std::string& str) const
-{
-    for(int i=0;i<arg_data_list.m;i++) if(arg_data_list(i).str==str) return i;
-    return -1;
-}
-//#####################################################################
-// Function Find_Match
-//#####################################################################
-int PARSE_ARGS::
-Find_Match(const std::string& str,const ARG_DATA::TYPE& type) const
-{
-    int match=Find_Match(str);
-    if(match==-1){LOG::cout<<"Argument "<<str<<" undeclared"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    if(arg_data_list(match).type!=type){LOG::cout<<"Type mismatch in Find_Match("<<str<<")"<<std::endl;PHYSBAM_FATAL_ERROR();}
-    return match;
 }
 //#####################################################################
 // Function Num_Extra_Args
@@ -170,7 +104,6 @@ Print_Usage(bool do_exit) const
     args.Sort();
 
     LOG::cerr<<"Usage: "<<program_name;
-    for(int i=0;i<arg_data_list.m;i++){LOG::cerr<<" ";arg_data_list(i).Print_Synopsis();}
     for(int i=0;i<args.m;i++){
         const OPTION& o=options.Get(args(i));
         LOG::cerr<<" ["<<o.opt;
@@ -179,10 +112,8 @@ Print_Usage(bool do_exit) const
     LOG::cerr<<extra_args_synopsis<<std::endl;
 
     int width=0;
-    for(int i=0;i<arg_data_list.m;i++){int len=(int)arg_data_list(i).str.length();if(len>width)width=len;}
     for(int i=0;i<args.m;i++) width=max((int)args(i).size(),width);
 
-    for(int i=0;i<arg_data_list.m;i++){arg_data_list(i).Print_Description(width+2);LOG::cerr<<std::endl;}
     for(int i=0;i<args.m;i++){
         const OPTION& o=options.Get(args(i));
         LOG::cerr.flags(std::ios::left);

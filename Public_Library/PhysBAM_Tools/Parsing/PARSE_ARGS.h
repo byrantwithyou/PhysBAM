@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
-#include <PhysBAM_Tools/Parsing/ARG_DATA.h>
+#include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{
@@ -17,7 +17,6 @@ namespace PhysBAM{
 class PARSE_ARGS:public NONCOPYABLE
 {
 private:
-    ARRAY<ARG_DATA> arg_data_list;
     int num_expected_extra_args;
     std::string extra_args_synopsis,extra_args_desc,program_name;
     bool use_help_option;
@@ -88,19 +87,11 @@ public:
 
 //#####################################################################
     void Use_Help_Option(bool use_it);
-    void Add_Option_Argument(const std::string& arg_str,const std::string& desc="");
-    void Add_Integer_Argument(const std::string& arg_str,int default_value,const std::string& val_name="",const std::string& desc="");
-    void Add_Double_Argument(const std::string& arg_str,double default_value,const std::string& val_name="",const std::string& desc="");
     void Set_Extra_Arguments(int num,const std::string& synopsis="",const std::string& desc="");
     void Parse(bool partial=false);
-    bool Get_Option_Value(const std::string& arg_str) const;
-    int Get_Integer_Value(const std::string& arg_str) const;
-    double Get_Double_Value(const std::string& arg_str) const;
     int Num_Extra_Args() const;
     const std::string& Extra_Arg(int i) const;
     const std::string& Get_Program_Name() const;
-    int Find_Match(const std::string& str) const;
-    int Find_Match(const std::string& str,const ARG_DATA::TYPE& type) const;
     void Print_Usage(bool do_exit=false) const;
     std::string Print_Arguments() const;
 //#####################################################################
