@@ -97,7 +97,7 @@ public:
     struct ANALYTIC_LEVELSET
     {
         virtual T phi(const TV& X,T t,int& c) const=0;
-        virtual TV N(const TV& X,T t) const=0;
+        virtual TV N(const TV& X,T t,int c) const=0;
     }* analytic_levelset;
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
@@ -247,47 +247,8 @@ public:
                 {
                     T x0=(T).2,x1=(T).5,x2=(T).8;
                     analytic_levelset=(new ANALYTIC_LEVELSET_CONCENTRIC(TV(),x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2*0,(T).3,mu0*s/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho1*sqr(m)/kg));
-                    use_discontinuous_velocity=true;
-                }
-                break;
-            case 16:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                {
-                    T x0=(T).2,x1=(T).5,x2=(T).8;
-                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu0*s/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).2,(T).8,(T).7,mu1*s/kg));
-                    use_discontinuous_velocity=true;
-                }
-                break;
-            case 17:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
-                {
-                    T x0=(T).2,x1=(T).5,x2=(T).8;
-                    analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu0*s/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu1*s/kg));
-                    use_discontinuous_velocity=true;
-                }
-                break;
-            case 18:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
-                {
-                    T x0=(T).2,x1=(T).5,x2=(T).8;
-                    analytic_levelset=(new ANALYTIC_LEVELSET_CONCENTRIC(TV(),x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho0*sqr(m)/kg));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho1*sqr(m)/kg));
-                    use_discontinuous_velocity=true;
-                }
-                break;
-            case 19:
-                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Centered_Box()*m,true);
-                {
-                    T x0=(T).2,x2=(T).8;
-                    analytic_levelset=(new ANALYTIC_LEVELSET_CONCENTRIC(TV(.01,.021),x0,x2,DIRICHLET,DIRICHLET));
-                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1)*0,rho0*sqr(m)/kg));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1),rho1*sqr(m)/kg));
                     use_discontinuous_velocity=true;
                 }
                 break;
@@ -345,7 +306,7 @@ public:
             T l0=analytic_levelset->phi(X/m,t,c0)*m,l1=analytic_levelset->phi((X+dX)/m,t,c1)*m;
             if(c0>=0) l0=-l0;
             if(c1>=0) l1=-l1;
-            TV dl0=analytic_levelset->N(X/m,t),dl1=analytic_levelset->N((X+dX)/m,t);
+            TV dl0=analytic_levelset->N(X/m,t,c),dl1=analytic_levelset->N((X+dX)/m,t,c);
             T errl=abs((dl0+dl1).Dot(dX)/2-(l1-l0))/e;
             LOG::cout<<"analytic diff test "<<erru<<"  "<<errl<<std::endl;}
     }
@@ -427,7 +388,7 @@ public:
     struct ANALYTIC_LEVELSET_PERIODIC:public ANALYTIC_LEVELSET
     {
         virtual T phi(const TV& X,T t,int& c) const {c=0;return 1;}
-        virtual TV N(const TV& X,T t) const {return TV(1,0);}
+        virtual TV N(const TV& X,T t,int c) const {return TV(1,0);}
     };
 
     struct ANALYTIC_LEVELSET_CIRCLE:public ANALYTIC_LEVELSET
@@ -436,7 +397,7 @@ public:
         T r;
         ANALYTIC_LEVELSET_CIRCLE(TV cc,T rr): cen(cc),r(rr){}
         virtual T phi(const TV& X,T t,int& c) const {T p=(X-cen).Magnitude()-r;c=p>=0?-4:0;return abs(p);}
-        virtual TV N(const TV& X,T t) const {return (X-cen).Normalized();}
+        virtual TV N(const TV& X,T t,int c) const {return (X-cen).Normalized();}
     };
 
     struct ANALYTIC_LEVELSET_VORTEX:public ANALYTIC_LEVELSET
@@ -457,7 +418,7 @@ public:
         virtual T phi(const TV& X,T t,int& c) const
         {T p=vis.Phi(X);c=p>0?-4:0;return abs(p);}
 
-        virtual TV N(const TV& X,T t) const
+        virtual TV N(const TV& X,T t,int c) const
         {return vis.Normal(X)*sign(vis.f(X));}
     };
 
@@ -481,17 +442,20 @@ public:
             c=bc1;
             return p1;
         }
-        virtual TV N(const TV& X,T t) const
+        virtual TV N(const TV& X,T t,int c) const
         {
-            T p0=X.x-x0;
-            if(p0<=0) return TV(-1,0);
-            for(int i=0;i<x.m;i++){
-                T p1=X.x-x(i);
-                if(p1<=0) return -TV(p0<-p1?1:-1,0);
-                p0=p1;}
-            T p1=X.x-x1;
-            if(p1<=0) return -TV(p0<-p1?1:-1,0);
-            return TV(1,0);
+            if(c>0 && c<x.m)
+            {
+                T p0=X.x-x(c-1),p1=X.x-x(c);
+                return TV(p0<-p1?-1:1,0);
+            }
+            if(c==0)
+            {
+                T p0=X.x-x0,p1=X.x-x(0);
+                return TV(p0<-p1?-1:1,0);
+            }
+            T p0=X.x-x.Last(),p1=X.x-x1;
+            return TV(p0<-p1?-1:1,0);
         }
     };
 
@@ -516,18 +480,22 @@ public:
             c=bc1;
             return p1;
         }
-        virtual TV N(const TV& X,T t) const
+        virtual TV N(const TV& X,T t,int c) const
         {
             TV n=X-center;
-            T r=n.Normalize(),p0=r-r0;
-            if(p0<=0) return -n;
-            for(int i=0;i<array.m;i++){
-                T p1=r-array(i);
-                if(p1<=0) return p0<-p1?-n:n;
-                p0=p1;}
-            T p1=r-r1;
-            if(p1<=0) return p0<-p1?-n:n;
-            return n;
+            T r=n.Normalize();
+            if(c>0 && c<array.m)
+            {
+                T p0=r-array(c-1),p1=r-array(c);
+                return p0<-p1?-n:n;
+            }
+            if(c==0)
+            {
+                T p0=r-r0,p1=r-array(0);
+                return p0<-p1?-n:n;
+            }
+            T p0=r-array.Last(),p1=r-r1;
+            return p0<-p1?-n:n;
         }
     };
 
@@ -561,7 +529,7 @@ public:
         Add_Debug_Particle(X,VECTOR<T,3>(0,1,0));
         if(analytic_velocity.m && analytic_levelset){
             MATRIX<T,2> du=analytic_velocity(fluid_color)->du(X/m,time/s)/s;
-            TV n=analytic_levelset->N(X/m,time/s);
+            TV n=analytic_levelset->N(X/m,time/s,fluid_color);
             T p=analytic_velocity(fluid_color)->p(X/m,time/s)*kg/(s*s*m);
             return (du+du.Transposed())*n*mu(fluid_color)-p*n;}
         return TV();
@@ -573,7 +541,7 @@ public:
             MATRIX<T,2> du0=analytic_velocity(color0)->du(X/m,time/s)/s,du1=analytic_velocity(color1)->du(X/m,time/s)/s;
             T p0=analytic_velocity(color0)->p(X/m,time/s)*kg/(s*s*m),p1=analytic_velocity(color1)->p(X/m,time/s)*kg/(s*s*m);
             MATRIX<T,2> stress0=(du0+du0.Transposed())*mu(color0)-p0,stress1=(du1+du1.Transposed())*mu(color1)-p1;
-            TV n=analytic_levelset->N(X/m,time/s);
+            TV n=analytic_levelset->N(X/m,time/s,color1);
             return (stress0-stress1)*n;}
         return TV();
     }
