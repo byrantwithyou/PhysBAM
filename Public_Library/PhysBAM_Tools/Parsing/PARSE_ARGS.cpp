@@ -54,7 +54,7 @@ Parse(bool partial)
                         Print_Usage(true);
                 if(!extras(k).exhaust) k++;}
             else unclaimed_arguments=true;}
-        if(extras(k).exhaust) k++;
+        if(k<extras.m && extras(k).exhaust) k++;
         for(;k<extras.m;k++)
             if(extras(k).required)
                 Print_Usage(true);}
@@ -83,6 +83,7 @@ Print_Usage(bool do_exit) const
         LOG::cerr<<" ["<<o.opt;
         if(o.store) LOG::cerr<<" <"<<(o.name.size()?o.name:"arg")<<">";
         LOG::cerr<<"]";}
+    LOG::cerr<<"\n"<<std::endl;
 
     for(int i=0;i<extras.m;i++) LOG::cerr<<(extras(i).required?" <":" [<")<<extras(i).name<<(extras(i).required?">":">]");
 
