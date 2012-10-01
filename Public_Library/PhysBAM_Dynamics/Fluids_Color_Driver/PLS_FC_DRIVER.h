@@ -19,14 +19,14 @@ class PLS_FC_DRIVER
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
+public:
 
-protected:
     int current_frame;
     T time;
     int output_number;
+    int ghost;
 
     PLS_FC_EXAMPLE<TV>& example;
-public:
 
     PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example);
     virtual ~PLS_FC_DRIVER();

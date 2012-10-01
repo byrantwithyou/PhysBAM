@@ -37,7 +37,7 @@ template<class TV> void Write_Substep_Helper(void* writer,const std::string& tit
 //#####################################################################
 template<class TV> PLS_FC_DRIVER<TV>::
 PLS_FC_DRIVER(PLS_FC_EXAMPLE<TV>& example)
-    :example(example)
+    :ghost(3),example(example)
 {
     DEBUG_SUBSTEPS::Set_Substep_Writer((void*)this,&Write_Substep_Helper<TV>);
 }
@@ -73,13 +73,13 @@ Initialize()
 
     example.levelset_color.phi.Resize(example.grid.Node_Indices(1));
     example.levelset_color.color.Resize(example.grid.Node_Indices(1));
-    example.face_color.Resize(example.grid,3);
-    example.prev_face_color.Resize(example.grid,3);
+    example.face_color.Resize(example.grid,ghost);
+    example.prev_face_color.Resize(example.grid,ghost);
     example.face_velocities.Resize(example.number_of_colors);
     example.prev_face_velocities.Resize(example.number_of_colors);
     for(int i=0;i<example.number_of_colors;i++){
-        example.face_velocities(i).Resize(example.grid,3);
-        example.prev_face_velocities(i).Resize(example.grid,3);}
+        example.face_velocities(i).Resize(example.grid,ghost);
+        example.prev_face_velocities(i).Resize(example.grid,ghost);}
 
     {
         example.particle_levelset_evolution.Initialize_Domain(example.grid);
@@ -133,9 +133,9 @@ Initialize()
         example.collision_bodies_affecting_fluid.Rasterize_Objects();
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*example.grid.Minimum_Edge_Length(),5);
         example.Initialize();
-        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,3);it.Valid();it.Next())
+        for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,ghost);it.Valid();it.Next())
             example.face_color(it.Full_Index())=example.levelset_color.Color(it.Location());
-        example.prev_face_color=example.face_color;
+        example.prev_face_color.Fill(-9);
         example.particle_levelset_evolution.Make_Signed_Distance();
         example.particle_levelset_evolution.Fill_Levelset_Ghost_Cells(time);}
 
@@ -250,6 +250,7 @@ Advection_And_BDF(T dt,bool first_step)
         for(int c=0;c<example.number_of_colors;c++)
             RK2_Advection_And_BDF(dt,first_step,c);
     example.prev_face_velocities.Exchange(example.face_velocities);
+    example.prev_face_color=example.face_color;
     Extrapolate_Velocity(example.face_velocities,example.face_color);
 }
 //#####################################################################
@@ -271,7 +272,7 @@ Reduced_Advection_And_BDF(T dt,bool first_step,int c)
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary;
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
     if(!first_step){
-        ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,3);
+        ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,ghost);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,2*dt,time+dt);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,example.prev_face_velocities(c),-(T).5/(T)1.5,temp);}
@@ -287,20 +288,15 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,QUADRATIC_INTERPOLATION_UNIFORM<GRID<TV>,T> > quadratic_advection;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T> > linear_advection;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary;
-    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,3),temp2(example.grid,3),temp3(example.grid,3),temp4(example.grid,3),temp5(example.grid,3);
+    ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,ghost),temp2(example.grid,ghost),temp3(example.grid,ghost),temp4(example.grid,ghost),temp5(example.grid,ghost);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp(temp),lookup_temp2(temp2),lookup_temp3(temp3),lookup_temp4(temp4),lookup_temp5(temp5);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
-    example.prev_face_color=example.face_color;
     if(!first_step){
         temp.Copy((T)1.5,example.face_velocities(c),-(T).5,example.prev_face_velocities(c));
         linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_temp,lookup_face_velocities,boundary,dt/2,time+dt);
         linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp3,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
-        Extrapolate_Velocity(temp2,example.prev_face_color,c);
-        Extrapolate_Velocity(temp3,example.prev_face_color,c);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp4,lookup_face_velocities,lookup_temp2,boundary,dt,time+dt);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp5,lookup_prev_face_velocities,lookup_temp3,boundary,2*dt,time+dt);
-        Extrapolate_Velocity(temp4,example.prev_face_color,c);
-        Extrapolate_Velocity(temp5,example.prev_face_color,c);
         example.prev_face_velocities(c).Copy((T)2/(T)1.5,temp4,-(T).5/(T)1.5,temp5);}
     else{
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);}
@@ -403,10 +399,10 @@ Extrapolate_Velocity(ARRAY<T,FACE_INDEX<TV::dimension> >& u,const ARRAY<int,FACE
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
         if(color(it.Full_Index())!=c)
-            u(it.Full_Index())=0;
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,3,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
+            u(it.Full_Index())=1e20;
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid,ghost,GRID<TV>::GHOST_REGION);it.Valid();it.Next())
         u(it.Full_Index())=0;
-    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,mask,3,u,3,3);
+    EXTRAPOLATION_HIGHER_ORDER_POLY<TV,T>::Extrapolate_Face(example.grid,mask,ghost,u,3,ghost);
 }
 //#####################################################################
 // Function Extrapolate_Velocity
