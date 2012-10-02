@@ -5,7 +5,6 @@
 // Class RIGID_LINEAR_SPRINGS
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
@@ -207,8 +206,10 @@ Print_Restlength_Statistics() const
 {
     LOG::SCOPE scope("linear spring statistics","linear spring statistics");
     LOG::Stat("count",restlength.m);
-    ARRAY<T> length(restlength);Sort(length);
-    ARRAY<T> visual_length(visual_restlength);Sort(visual_length);
+    ARRAY<T> length(restlength);
+    length.Sort();
+    ARRAY<T> visual_length(visual_restlength);
+    visual_length.Sort();
     if(length.m){
         LOG::Stat("smallest restlength",length(0));LOG::Stat("smallest visual restlength",visual_length(0));
         LOG::Stat("one percent restlength",length((int)(.01*length.m)+1));LOG::Stat("one percent visual restlength",visual_length((int)(.01*length.m)+1));
@@ -227,7 +228,7 @@ Print_Deformation_Statistics() const
         int i,j;segment_mesh.elements(s).Get(i,j);
         T length=Spring_Length(i),rl=visual_restlength(s);
         deformation(s)=rl?abs(length-rl)/rl:length==0?0:FLT_MAX;}
-    Sort(deformation);
+    deformation.Sort();
     LOG::Stat("maximum deformation",deformation.Last());
     LOG::Stat("one percent deformation",deformation((int)(.99*deformation.m)+1));
     LOG::Stat("ten percent deformation",deformation((int)(.9*deformation.m)+1));

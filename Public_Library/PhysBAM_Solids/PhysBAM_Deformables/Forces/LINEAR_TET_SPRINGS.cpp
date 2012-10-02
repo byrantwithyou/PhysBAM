@@ -258,11 +258,13 @@ template<class T> void LINEAR_TET_SPRINGS<T>::
 Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 {
     {ARRAY<T> length(spring_count*spring_parameters.m,false);
-    for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++) length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;Sort(length);
+    for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++) length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;
+    length.Sort();
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all altitude springs below "<<minimum_restlength<<std::endl;
     for(int i=0;i<spring_parameters.m;i++) for(int k=0;k<spring_count;k++) spring_parameters(i)(k).restlength=max(minimum_restlength,spring_parameters(i)(k).restlength);}
     {ARRAY<T> edge_length(6*edge_restlength_squared.m,false);
-    for(int s=0;s<edge_restlength_squared.m;s++) for(int k=0;k<6;k++) edge_length(6*(s-1)+k)=edge_restlength_squared(s)(k);Sort(edge_length);
+    for(int s=0;s<edge_restlength_squared.m;s++) for(int k=0;k<6;k++) edge_length(6*(s-1)+k)=edge_restlength_squared(s)(k);
+    edge_length.Sort();
     T minimum_edge_restlength=edge_length(min((int)(fraction*edge_length.m)+1,edge_length.m));
     LOG::cout<<"Enlarging the restlength of all altitude spring edges below "<<minimum_edge_restlength<<std::endl;
     for(int i=0;i<edge_restlength_squared.m;i++) for(int k=0;k<6;k++) edge_restlength_squared(i)(k)=max(minimum_edge_restlength,edge_restlength_squared(i)(k));}
@@ -277,7 +279,8 @@ Print_Restlength_Statistics()
     ARRAY<T> length(spring_count*spring_parameters.m,false),visual_restlength(spring_count*spring_parameters.m,false);
     for(int s=0;s<spring_parameters.m;s++) for(int k=0;k<spring_count;k++){
             length(spring_count*(s-1)+k)=spring_parameters(s)(k).restlength;visual_restlength(spring_count*(s-1)+k)=spring_parameters(s)(k).visual_restlength;}
-    Sort(length);Sort(visual_restlength);
+    length.Sort();
+    visual_restlength.Sort();
     int one_percent=(int)(.01*length.m),ten_percent=(int)(.1*length.m),median=(int)(.5*length.m);
     LOG::cout<<"Tetrahedron Springs - Smallest Restlength = "<<length(0)<<", Visual Restlength = "<<visual_restlength(0)<<std::endl;
     LOG::cout<<"Tetrahedron Springs - One Percent Restlength = "<<length(one_percent)<<", Visual Restlength = "<<visual_restlength(one_percent)<<std::endl;

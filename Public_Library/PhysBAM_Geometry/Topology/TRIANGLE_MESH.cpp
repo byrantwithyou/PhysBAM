@@ -5,7 +5,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
@@ -302,7 +301,7 @@ Initialize_Boundary_Nodes()
     for(int t=0;t<boundary_mesh->elements.m;t++){int i,j;boundary_mesh->elements(t).Get(i,j);boundary_nodes->Append(i);boundary_nodes->Append(j);}
     if(!boundary_mesh_defined){delete boundary_mesh;boundary_mesh=0;}
 
-    Sort(*boundary_nodes);
+    boundary_nodes->Sort();
     boundary_nodes->Prune_Duplicates();
 }
 //#####################################################################

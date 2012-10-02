@@ -4,7 +4,6 @@
 //#####################################################################
 // Class PARTICLE_LEVELSET
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
@@ -189,7 +188,7 @@ Delete_Particles_From_Deletion_List(ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,
     while(deletion_list.m>0){
         ARRAY<int> deletion_list_local;
         for(int i=deletion_list.m-1;i>=0;i--) if(deletion_particles==deletion_list(i).x){deletion_list_local.Append(deletion_list(i).y);deletion_list.Remove_Index_Lazy(i);}
-        Sort(deletion_list_local);
+        deletion_list_local.Sort();
         for(int i=deletion_list_local.m-1;i>=0;i--){int index=deletion_list_local(i);
             deletion_particles->Copy_Element(*particles_link,particles_link->Size()-1,index);
             particles_link->Delete_Element(particles_link->Size()-1);

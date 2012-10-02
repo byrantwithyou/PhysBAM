@@ -5,7 +5,6 @@
 // Class SIMPLEX_MESH
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
@@ -216,7 +215,7 @@ Delete_Sorted_Elements(const ARRAY<int>& deletion_list,HASHTABLE<int,int>& index
 template<int d> void SIMPLEX_MESH<d>::
 Delete_Elements(ARRAY<int> deletion_list)
 {
-    Sort(deletion_list);Delete_Sorted_Elements(deletion_list);
+    deletion_list.Sort();Delete_Sorted_Elements(deletion_list);
 }
 //#####################################################################
 // Function Number_Of_Nodes_With_Minimum_Valence

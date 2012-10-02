@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXACT_FLOAT.h>
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXACT_RATIONAL.h>
 #include <PhysBAM_Tools/Adaptive_Arithmetic/EXPANSION_ARITHMETIC.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/DIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Data_Structures/HEAPIFY.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
@@ -763,7 +762,7 @@ Get_Unoriented_Segments_On_Two_Simplices(const int simplex_1,const int simplex_2
     for(int k=0;k<particles.m;k++) particle_weights.Append(intersection_registry->Get_Simplex_Weights_Of_Intersection(particles(k),simplex_1));
     int dominant_axis=(particle_weights(1)-particle_weights(0)).Dominant_Axis();
     ARRAY<int> permutation(IDENTITY_ARRAY<>(particles.m));
-    Sort(permutation,Indirect_Comparison(particle_weights.Project(dominant_axis)));
+    permutation.Sort(Indirect_Comparison(particle_weights.Project(dominant_axis)));
     for(int i=1;i<permutation.m;i++) new_unoriented_segments_on_simplex.Append_Unique(VECTOR<int,2>(particles(permutation(i)),particles(permutation(i+1))));
     if(verbose) LOG::cout<<"Simplex "<<simplex_1<<" and "<<simplex_2<<" have particles "<<particles<<" segments "<<new_unoriented_segments_on_simplex<<std::endl;
 }

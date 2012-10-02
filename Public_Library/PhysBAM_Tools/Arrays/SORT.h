@@ -65,30 +65,6 @@ struct LEXICOGRAPHIC_COMPARE
     for(int i=0;i<m;i++) if(a1(i)!=a2(i)) return a1(i)<a2(i);
     return m1<m2;}
 };
-
-//#####################################################################
-// Functions Sort and Stable_Sort
-//#####################################################################
-template<class T_ARRAY,class T_COMPARE>
-inline void Sort(T_ARRAY& array,const T_COMPARE comparison)
-{
-    std::sort(array.begin(),array.end(),comparison);
-}
-
-template<class T_ARRAY,class T_COMPARE>
-inline void Stable_Sort(T_ARRAY& array,const T_COMPARE& comparison)
-{
-    std::stable_sort(array.begin(),array.end(),comparison);
-}
-
-template<class T_ARRAY>
-inline void Sort(T_ARRAY& array)
-{Sort(array,std::less<typename T_ARRAY::ELEMENT>());}
-
-template<class T_ARRAY>
-inline void Stable_Sort(T_ARRAY& array)
-{Stable_Sort(array,std::less<typename T_ARRAY::ELEMENT>());}
-
 //#####################################################################
 }
 #endif

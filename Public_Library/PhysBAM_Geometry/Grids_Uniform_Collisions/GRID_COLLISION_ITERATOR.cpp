@@ -2,7 +2,6 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
@@ -98,7 +97,7 @@ Initialize(const ARRAY<TRIANGLE_3D<T> >& elements)
         ENTRY e={it.Key(),inside,closest_element};
         faces.Append(e);}
 
-    Sort(faces);
+    faces.Sort();
 
     for(first_z_face=1;faces(first_z_face).face.axis<TV::m;first_z_face++){}
 }

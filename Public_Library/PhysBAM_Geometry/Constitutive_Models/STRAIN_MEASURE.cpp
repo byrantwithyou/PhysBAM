@@ -4,7 +4,6 @@
 //#####################################################################
 // Class STRAIN_MEASURE
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X2.h>
@@ -91,7 +90,9 @@ template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Print_Altitude_Statistics()
 {   
     if(!Dm_inverse.m) return;
-    ARRAY<T> altitude(Dm_inverse.m,false);for(int t=0;t<altitude.m;t++)altitude(t)=Rest_Altitude(t);Sort(altitude);
+    ARRAY<T> altitude(Dm_inverse.m,false);
+    for(int t=0;t<altitude.m;t++) altitude(t)=Rest_Altitude(t);
+    altitude.Sort();
     LOG::cout<<"strain measure - total elements = "<<altitude.m<<std::endl;
     LOG::cout<<"strain measure - smallest altitude = "<<altitude(0)<<std::endl;
     LOG::cout<<"strain measure - one percent altitude = "<<altitude((int)(.01*altitude.m))<<std::endl;

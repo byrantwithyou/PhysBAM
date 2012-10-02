@@ -2,7 +2,6 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
@@ -93,7 +92,7 @@ THREADED_UNIFORM_GRID(ARRAY<THREAD_PACKAGE>& buffers_input,const int tid_input,c
     // sort axes in decreasing order of how much we have to communicate along them
     ARRAY<int> axes(T_GRID::dimension);ARRAY<T> axis_lengths(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++){axes(axis)=axis;axis_lengths(axis)=(T)global_grid.Domain_Indices().Maximum_Corner()[axis]/extents[axis];}
-    Sort(axes,Indirect_Comparison(axis_lengths));
+    axes.Sort(Indirect_Comparison(axis_lengths));
     // lay out process ranks on grid
     Fill_Process_Ranks(process_grid,process_ranks,axes);
     // fill in ghost process_ranks for periodic domains

@@ -285,7 +285,7 @@ Remove_Degeneracy()
             le.cell=it.Key();
             le.e=e;
             list.Append(le);}}
-    Sort(list);
+    list.Sort();
     LOOP_ENTRY<TV> * pa = &list.Last();
     for(int i=0;i<list.m;i++) pa=pa->next=&list(i);
     for(int i=0;i<list.m;i++,pa=pa->next){

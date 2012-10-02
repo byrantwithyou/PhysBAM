@@ -5,7 +5,6 @@
 // Class LINEAR_ALTITUDE_SPRINGS
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
@@ -90,7 +89,8 @@ Compute_Plasticity(const int h,const int t,const T current_length)
 template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Clamp_Restlength_With_Fraction_Of_Springs(const T fraction)
 {
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*(s-1)+k)=parameters(s)(k).restlength;Sort(length);
+    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*(s-1)+k)=parameters(s)(k).restlength;
+    length.Sort();
     T minimum_restlength=length(min((int)(fraction*length.m)+1,length.m));LOG::cout<<"Enlarging the restlength of all altitude springs below "<<minimum_restlength<<std::endl;
     for(int i=0;i<parameters.m;i++) for(int k=0;k<d+1;k++) parameters(i)(k).restlength=max(minimum_restlength,parameters(i)(k).restlength);
 }
@@ -101,9 +101,10 @@ template<class TV,int d> void LINEAR_ALTITUDE_SPRINGS<TV,d>::
 Print_Restlength_Statistics() const
 {
     LOG::cout<<"Altitude Springs - Total Springs = "<<(d+1)*parameters.m<<std::endl;
-    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*s+k)=parameters(s)(k).restlength;Sort(length);
+    ARRAY<T> length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++) length((d+1)*s+k)=parameters(s)(k).restlength;
+    length.Sort();
     ARRAY<T> visual_length((d+1)*parameters.m,false);for(int s=0;s<parameters.m;s++) for(int k=0;k<d+1;k++)visual_length((d+1)*s+k)=parameters(s)(k).visual_restlength;
-    Sort(visual_length);
+    visual_length.Sort();
     int one_percent=(int)(.01*length.m)+1,ten_percent=(int)(.1*length.m)+1,median=(int)(.5*length.m)+1;
     LOG::cout<<"Altitude Springs - Smallest Restlength = "<<length(1)<<", Visual Restlength = "<<visual_length(1)<<std::endl;
     LOG::cout<<"Altitude Springs - One Percent Restlength = "<<length(one_percent)<<", Visual Restlength = "<<visual_length(one_percent)<<std::endl;

@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RED_GREEN_TETRAHEDRA
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Dynamics/Meshing/RED_GREEN_TETRAHEDRA.h>
 using namespace PhysBAM; 
 template<class T> RED_GREEN_TETRAHEDRA<T>::
@@ -637,7 +636,7 @@ Remove_Simplex_List(const ARRAY<int>& tetrahedron_list,ARRAY<HASHTABLE<int,int> 
             int index=-1;(*meshes(level)->incident_elements)(node).Find(level_tetrahedron_list(level)(i),index);PHYSBAM_ASSERT(index>=0);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 
-        Sort(level_tetrahedron_list(level));
+        level_tetrahedron_list(level).Sort();
 
         HASHTABLE<int,int>& simplex_map=(*level_simplex_maps)(level);simplex_map.Remove_All();
         

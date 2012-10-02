@@ -355,8 +355,19 @@ public:
     void Coalesce()
     {Sort();T_ARRAY& self=Derived();int j=-1;if(self.Size()>0) j=0;for(int i=1;i<self.Size();i++){if(!(self(j)<self(i))) self(j).Merge(self(i));else self(++j)=self(i);}self.Resize(j+1);}
 
+    template<class T_COMPARE>
+    void Sort(const T_COMPARE comparison)
+    {std::sort(begin(),end(),comparison);}
+
+    template<class T_COMPARE>
+    void Stable_Sort(const T_COMPARE& comparison)
+    {std::stable_sort(begin(),end(),comparison);}
+
     void Sort()
-    {::PhysBAM::Sort(*this);}
+    {Sort(std::less<typename T_ARRAY::ELEMENT>());}
+
+    void Stable_Sort()
+    {Stable_Sort(std::less<typename T_ARRAY::ELEMENT>());}
 
     void Fill(T value)
     {T_ARRAY& self=Derived();ID m=self.Size();for(ID i(0);i<m;i++) self(i)=value;}

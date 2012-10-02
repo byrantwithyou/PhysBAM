@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Particles/PARTICLES.h>
@@ -78,7 +77,7 @@ Add_Elements_From_Deletion_List(const int count,ARRAY<int>& added_indices)
 template<class TV> void PARTICLES<TV>::
 Delete_Elements_On_Deletion_List(const bool preserve_order)
 {
-    Sort(deletion_list);
+    deletion_list.Sort();
     if(preserve_order){
         for(int k=0;k<deletion_list.m;k++){
             int next=k<deletion_list.m-1?deletion_list(k+1):number;

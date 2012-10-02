@@ -5,7 +5,6 @@
 // Class TETRAHEDRON_MESH
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/STACK.h>
@@ -290,7 +289,7 @@ Initialize_Boundary_Nodes()
         boundary_nodes->Append(i);boundary_nodes->Append(j);boundary_nodes->Append(k);}
     if(!boundary_mesh_defined){delete boundary_mesh;boundary_mesh=0;}
 
-    Sort(*boundary_nodes);
+    boundary_nodes->Sort();
     boundary_nodes->Prune_Duplicates();
 }
 //#####################################################################

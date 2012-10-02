@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/UNION_FIND.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_1D.h>
@@ -72,7 +71,7 @@ ARRAY<int> Convex_Hull(ARRAY<VECTOR<T,2> >& points)
         angles(i)=PAIR<T,int>(angle,i);
     }
     CONVEX_HULL_COMPARATOR<T> comparator;
-    Sort(angles,comparator);
+    angles.Sort(comparator);
 
     /*for(int i=0;i<angles.m;i++)
       LOG::cout << "angle " << i << " " << angles(i).x << " " << angles(i).y << std::endl;*/

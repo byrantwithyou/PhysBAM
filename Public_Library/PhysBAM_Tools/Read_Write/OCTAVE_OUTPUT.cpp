@@ -2,7 +2,6 @@
 // Copyright 2009.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
@@ -212,7 +211,7 @@ template<class T> void OCTAVE_OUTPUT<T>::
 End_Sparse_Matrix()
 {
     if(internal.m){
-        Sort(internal);
+        internal.Sort();
         for(int i=0;i<internal.m;i++)
             out<<(internal(i).r+1)<<" "<<(internal(i).c+1)<<" "<<internal(i).x<<"\n";
         nnz=internal.m;

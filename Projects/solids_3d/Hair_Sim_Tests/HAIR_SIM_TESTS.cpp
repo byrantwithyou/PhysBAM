@@ -473,7 +473,7 @@ Initialize_Bodies()
             if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[0]))||implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(nodes[1]))){
                 deformable_body_collection.collisions.ignored_nodes.Append(nodes[0]);
                 deformable_body_collection.collisions.ignored_nodes.Append(nodes[1]);}}
-        Sort(deformable_body_collection.collisions.ignored_nodes);
+        deformable_body_collection.collisions.ignored_nodes.Sort();
         for(int i=deformable_body_collection.collisions.ignored_nodes.m;i>1;i--) if(deformable_body_collection.collisions.ignored_nodes(i)==deformable_body_collection.collisions.ignored_nodes(i-1)) deformable_body_collection.collisions.ignored_nodes.Remove_Index_Lazy(i);*/
         for(int i=0;i<particles.Size();i++) 
             if(implicit_rigid_body->Implicit_Geometry_Lazy_Inside(particles.X(i))) deformable_body_collection.collisions.ignored_nodes.Append(i);
@@ -995,8 +995,8 @@ Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass)
 //#####################################################################
 template<class T_input> void HAIR_SIM_TESTS<T_input>::
 Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) {
-    Sort(edge_edge_pairs,*comparator);
-    Sort(point_face_pairs,*comparator);
+    edge_edge_pairs.Sort(*comparator);
+    point_face_pairs.Sort(*comparator);
 }
 //#####################################################################
 template class HAIR_SIM_TESTS<float>;

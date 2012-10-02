@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RENDERING_VOXELS
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Log/PROGRESS_INDICATOR.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDER_WORLD.h>
@@ -35,7 +34,7 @@ Precompute_Light_Data(bool use_fast_precomputation,RENDER_WORLD<T>& world)
         average_sample_point/=(T)sample_array.m;
         if(use_fast_precomputation){
             for(int i=0;i<location_list.m;i++)distance_squared_to_light(i)=(average_sample_point-location_list(i)).Magnitude_Squared();
-            Sort(node_indirection,Indirect_Comparison(distance_squared_to_light));}
+            node_indirection.Sort(Indirect_Comparison(distance_squared_to_light));}
         for(int i=0;i<location_list.m;i++){
             SEGMENT_3D<T> s(location_list(node_indirection(i)),average_sample_point);
             RAY<VECTOR<T,3> > rr(s);

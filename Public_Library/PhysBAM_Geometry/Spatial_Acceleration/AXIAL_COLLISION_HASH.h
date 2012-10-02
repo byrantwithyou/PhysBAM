@@ -8,7 +8,6 @@
 #define __AXIAL_COLLISION_HASH__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
@@ -49,7 +48,7 @@ public:
     {ARRAY<int> primitive_indices(primitives,false);
     for(int axis=0;axis<3;axis++){
         for(int i=0;i<primitives;i++) primitive_indices(i)=i;
-        Sort(primitive_indices,Indirect_Comparison(axial_primitive_centroids[axis]));
+        primitive_indices.Sort(Indirect_Comparison(axial_primitive_centroids[axis]));
         axial_intervals[axis].Copy(RANGE<VECTOR<T,1> >(FLT_MAX,-FLT_MAX));
         for(int cluster=0;cluster<axis_clusters;cluster++) for(int i=cluster_ranges(cluster).x;i<cluster_ranges(cluster).y;i++){
             int primitive_index=primitive_indices(i);

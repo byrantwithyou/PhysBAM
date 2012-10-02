@@ -16,6 +16,7 @@
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
+#include <algorithm>
 namespace PhysBAM{
 
 template<class T_VECTOR> struct VECTOR_TYPE;
@@ -260,6 +261,32 @@ public:
     template<class T_VECTOR2>
     bool All_Less_Equal(const VECTOR_BASE<T,T_VECTOR2>& v) const
     {return v.All_Greater_Equal(*this);}
+
+    template<class T_COMPARE>
+    void Sort(const T_COMPARE comparison)
+    {std::sort(begin(),end(),comparison);}
+
+    template<class T_COMPARE>
+    void Stable_Sort(const T_COMPARE& comparison)
+    {std::stable_sort(begin(),end(),comparison);}
+
+    void Sort()
+    {Sort(std::less<typename T_VECTOR::ELEMENT>());}
+
+    void Stable_Sort()
+    {Stable_Sort(std::less<typename T_VECTOR::ELEMENT>());}
+
+    T* begin() // for stl
+    {return Derived().begin();}
+
+    const T* begin() const // for stl
+    {return Derived().begin();}
+
+    T* end() // for stl
+    {return Derived().end();}
+
+    const T* end() const // for stl
+    {return Derived().end();}
 
 //#####################################################################
 };

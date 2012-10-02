@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_MXN
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{
 //#####################################################################
@@ -530,7 +529,8 @@ Finish_Row()
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
 Sort_Entries()
 {
-    for(int i=0;i<m;i++){ARRAY_VIEW<SPARSE_MATRIX_ENTRY<T> > view(A.Array_View(offsets(i),offsets(i+1)-offsets(i)));Sort(view);}
+    for(int i=0;i<m;i++)
+        A.Array_View(offsets(i),offsets(i+1)-offsets(i)).Sort();
 }
 //#####################################################################
 // Function Get_Row
@@ -568,7 +568,7 @@ Keep_Largest_N(ARRAY<SPARSE_MATRIX_ENTRY<T> >& q,int n)
         if(j>elements.m && elements.m<n) elements.Append(q(i));
         if(elements.m>n) elements.Resize(n);}
     q=elements;
-    Sort(q);
+    q.Sort();
     Check_Sorted(q);
 }
 //#####################################################################

@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #ifdef USE_MPI
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
@@ -131,7 +130,7 @@ Initialize_Communicator(const bool manual,MPI::Group* group)
         // sort axes in decreasing order of how much we have to communicate along them
         ARRAY<int> axes(T_GRID::dimension);ARRAY<T> axis_lengths(T_GRID::dimension);
         for(int axis=0;axis<T_GRID::dimension;axis++){axes(axis)=axis;axis_lengths(axis)=(T)global_grid.Domain_Indices().Maximum_Corner()[axis]/extents[axis];}
-        Sort(axes,Indirect_Comparison(axis_lengths));
+        axes.Sort(Indirect_Comparison(axis_lengths));
         // lay out process ranks on grid
         Fill_Process_Ranks(process_grid,process_ranks,axes);
         // fill in ghost process_ranks for periodic domains

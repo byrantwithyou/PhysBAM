@@ -4,7 +4,6 @@
 //#####################################################################
 // Class RED_GREEN_TRIANGLES
 //##################################################################### 
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Dynamics/Meshing/RED_GREEN_TRIANGLES.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -364,7 +363,7 @@ Remove_Simplex_List(const ARRAY<int>& triangle_list,ARRAY<HASHTABLE<int,int> >* 
             int index=-1;(*meshes(level)->incident_elements)(node).Find(level_triangle_list(level)(i),index);assert(index);
             (*meshes(level)->incident_elements)(node).Remove_Index_Lazy(index);}
 
-        Sort(level_triangle_list(level));
+        level_triangle_list(level).Sort();
 
         HASHTABLE<int,int>& simplex_map=(*level_simplex_maps)(level);simplex_map.Remove_All();
         

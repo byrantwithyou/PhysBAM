@@ -2,7 +2,6 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
@@ -46,7 +45,7 @@ Register_Neighbors_As_Collision_Faces()
                 collision_face_info(id).simplices=merged(i/2);
                 new_faces.Set(faces(i),id);}}}
 
-    Sort(collision_face_info);
+    collision_face_info.Sort();
 }
 //#####################################################################
 // Function Initialize_Collision_Aware_Face_Iterator

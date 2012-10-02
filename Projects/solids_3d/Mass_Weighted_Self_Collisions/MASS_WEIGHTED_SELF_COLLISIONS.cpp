@@ -237,8 +237,8 @@ Edge_Edge_Mass_Revert(const VECTOR<int,4>& nodes,ARRAY_VIEW<T>& one_over_mass)
 //#####################################################################
 template<class T_input> void MASS_WEIGHTED_SELF_COLLISIONS<T_input>::
 Reorder_Pairs(ARRAY<VECTOR<int,4> >& edge_edge_pairs,ARRAY<VECTOR<int,4> >& point_face_pairs) {
-    Sort(edge_edge_pairs,*comparator);
-    Sort(point_face_pairs,*comparator);
+    edge_edge_pairs.Sort(*comparator);
+    point_face_pairs.Sort(*comparator);
 }
 //#####################################################################
 template class MASS_WEIGHTED_SELF_COLLISIONS<float>;

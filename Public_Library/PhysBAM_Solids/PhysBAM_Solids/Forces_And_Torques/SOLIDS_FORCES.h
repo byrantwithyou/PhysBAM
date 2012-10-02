@@ -8,7 +8,6 @@
 #define __SOLIDS_FORCES__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_TRIANGLE_3D_INTERSECTION.h>
@@ -224,7 +223,7 @@ void Intersections_Using_Hierarchy_And_Edges_Helper(RIGID_BODY<VECTOR<T,3> >& bo
                     if(INTERSECTION::Lazy_Intersects(ray,(*body2.simplicial_object->triangle_list)(triangle_list2(k)))){
                         bool going_in=TV::Dot_Product((*body2.simplicial_object->triangle_list)(triangle_list2(k)).Normal(),ray.direction) < 0;
                         intersections.Append(PAIR<T,bool>(ray.t_max,going_in));}}
-                Sort(intersections,Field_Comparison(&PAIR<T,bool>::x));
+                intersections.Sort(Field_Comparison(&PAIR<T,bool>::x));
                 for(int kk=1;kk<intersections.m;kk++) // find midpoints of intersecting edges
                     if(intersections(kk).y && !intersections(kk+1).y){              
                         T s=(T).5*(intersections(kk).x+intersections(kk+1).x)*one_over_t_max;

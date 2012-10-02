@@ -28,12 +28,12 @@ template<class T,int d> void
 My_Sort(ARRAY_VIEW<VECTOR<T,d> >& attr)
 {
     VECTOR_COMPARATOR<T,d> vec_comp;
-    Sort(attr,vec_comp);
+    attr.Sort(vec_comp);
 }
 template<class T> void
 My_Sort(ARRAY_VIEW<T>& attr)
 {
-    Sort(attr);
+    attr.Sort();
 }
 //#####################################################################
 // Function Compare_Attribute

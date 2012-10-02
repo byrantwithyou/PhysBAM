@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/SPARSE_UNION_FIND.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/cyclic_shift.h>
@@ -36,7 +35,8 @@ template<class T> void TRIANGLE_BENDING_ELEMENTS<T>::
 Set_Area_Cutoff_With_Fraction_Of_Triangles(TRIANGULATED_SURFACE<T>& triangulated_surface,const T fraction)
 {
     ARRAY<VECTOR<int,3> >& elements=triangulated_surface.mesh.elements;
-    ARRAY<T> area(elements.m);for(int t=0;t<elements.m;t++) area(t)=triangulated_surface.Area(t);Sort(area);
+    ARRAY<T> area(elements.m);for(int t=0;t<elements.m;t++) area(t)=triangulated_surface.Area(t);
+    area.Sort();
     area_cutoff=area(min((int)(fraction*elements.m)+1,area.m));
 }
 //#####################################################################

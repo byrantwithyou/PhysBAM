@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
@@ -99,8 +98,8 @@ Compute_Mpi_Partition(MPI_PARTITION& mpi_partition,const SEGMENT_MESH& connectiv
     for(PARTITION_ID p(0);p<mpi_partition.ghost_dynamic_particles.m;p++){
         if(mpi_partition.ghost_dynamic_particles(p).m)
             mpi_partition.neighbor_partitions.Append(p);
-        Sort(mpi_partition.ghost_dynamic_particles(p));
-        Sort(mpi_partition.boundary_dynamic_particles(p));}
+        mpi_partition.ghost_dynamic_particles(p).Sort();
+        mpi_partition.boundary_dynamic_particles(p).Sort();}
 }
 //#####################################################################
 // Function Exchange_Boundary_Data

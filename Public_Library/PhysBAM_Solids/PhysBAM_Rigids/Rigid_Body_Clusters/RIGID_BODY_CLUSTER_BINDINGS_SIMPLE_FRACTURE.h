@@ -4,7 +4,6 @@
 //#####################################################################
 #ifndef __RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE__
 #define __RIGID_BODY_CLUSTER_BINDINGS_SIMPLE_FRACTURE__
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Data_Structures/UNDIRECTED_GRAPH.h>
 #include <PhysBAM_Tools/Log/LOG.h>
@@ -101,7 +100,7 @@ public:
                                 if(edge==tmp_edge.Sorted()) remove_connections.Append(j);}}}}
                 else data.connections.Remove_Index_Lazy(i);}}
         if(need_rebuild) parents_to_rebuild.Append(iterator.Key());
-        Sort(remove_connections);
+        remove_connections.Sort();
         for(int i=remove_connections.m-1;i>=0;i--) data.connections.Remove_Index_Lazy(remove_connections(i));}}
 
     bool Create_New_Clusters()

@@ -6,7 +6,6 @@
 //##################################################################### 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/STACK.h>
@@ -137,7 +136,7 @@ Initialize_Boundary_Nodes()
             boundary_nodes->Append(p(face_indices[f][2]));boundary_nodes->Append(p(face_indices[f][3]));}}
     if(!incident_elements_defined){delete incident_elements;incident_elements=0;}
 
-    Sort(*boundary_nodes);
+    boundary_nodes->Sort();
     boundary_nodes->Prune_Duplicates();
 }
 //#####################################################################

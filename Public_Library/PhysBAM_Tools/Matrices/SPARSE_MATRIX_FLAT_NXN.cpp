@@ -4,7 +4,6 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_NXN
 //#####################################################################
-#include <PhysBAM_Tools/Arrays/SORT.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 using namespace PhysBAM;
@@ -392,7 +391,8 @@ Finish_Row()
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
 Sort_Entries()
 {
-    for(int i=0;i<n;i++){ARRAY_VIEW<SPARSE_MATRIX_ENTRY<T> > view(A.Array_View(offsets(i),offsets(i+1)-offsets(i)));Sort(view);}
+    for(int i=0;i<n;i++)
+        A.Array_View(offsets(i),offsets(i+1)-offsets(i)).Sort();
 }
 //#####################################################################
 // Function Conjugate_With_Diagonal_Matrix
