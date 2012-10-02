@@ -68,7 +68,7 @@ public:
     using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
-    using BASE::time_steps_per_frame;
+    using BASE::time_steps_per_frame;using BASE::use_p_null_mode;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -128,6 +128,7 @@ public:
         parse_args.Add("-no_solve",&omit_solve,"Disable visocity and pressure solve");
         parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
+        parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
         parse_args.Parse();
 
         resolution*=refine;

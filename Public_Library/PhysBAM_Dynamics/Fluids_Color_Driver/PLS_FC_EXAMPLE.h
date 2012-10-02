@@ -58,6 +58,7 @@ public:
     ARRAY<T> mu,rho;
     int number_of_colors;
     bool use_discontinuous_velocity;
+    bool use_p_null_mode;
 
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
