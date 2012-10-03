@@ -269,6 +269,13 @@ public:
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_CONST(TV()+1),vel));
                 }
                 break;
+            case 18:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
+                {
+                    analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),TV(.1,.2));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_ROTATION(TV()+1,rho0*sqr(m)/kg),TV(0.5,-0.4)));
+                }
+                break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
 
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
