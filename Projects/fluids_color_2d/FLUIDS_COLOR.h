@@ -14,6 +14,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#include <omp.h>
 
 namespace PhysBAM{
 
@@ -105,6 +106,7 @@ public:
         rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false),refine(1)
     {
         last_frame=16;
+        int number_of_threads=1;
         parse_args.Extra(&test_number,"<example number>","example number to run");
         parse_args.Add("-restart",&restart,"frame","restart frame");
         parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
@@ -129,8 +131,17 @@ public:
         parse_args.Add("-reduced_advect",&use_reduced_advection,"Peform reduced advection");
         parse_args.Add("-refine",&refine,"num","Refine space/time by this factor");
         parse_args.Add("-null_p",&use_p_null_mode,"Assume pressure null mode and project it out");
+        parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Parse();
 
+        omp_set_num_threads(number_of_threads);
+#pragma omp parallel
+#pragma omp single
+        {
+            if(omp_get_num_threads()!=number_of_threads) PHYSBAM_FATAL_ERROR();
+            LOG::cout<<"Running on "<<number_of_threads<<" threads"<<std::endl;
+        }
+        
         resolution*=refine;
         dt/=refine;
         time_steps_per_frame*=refine;
@@ -274,6 +285,13 @@ public:
                 {
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),TV(.1,.2));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_ROTATION(TV()+1,rho0*sqr(m)/kg),TV(0.5,-0.4)));
+                }
+                break;
+            case 19:
+                grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
+                {
+                    analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_ROTATE(new ANALYTIC_LEVELSET_SCALE(new ANALYTIC_LEVELSET_VORTEX((T).2),-2),4),TV(9,.4));
+                    analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),TV(.5,-.2)));
                 }
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
@@ -550,6 +568,28 @@ public:
         ~ANALYTIC_LEVELSET_TRANSLATE() {delete al;}
         virtual T phi(const TV& X,T t,int& c) const {return al->phi(X-vel*t,t,c);}
         virtual TV N(const TV& X,T t,int c) const {return al->N(X-vel*t,t,c);}
+    };
+
+    struct ANALYTIC_LEVELSET_ROTATE:public ANALYTIC_LEVELSET
+    {
+        ANALYTIC_LEVELSET* al;
+        T w;
+
+        ANALYTIC_LEVELSET_ROTATE(ANALYTIC_LEVELSET* al,T w): al(al),w(w) {}
+        ~ANALYTIC_LEVELSET_ROTATE() {delete al;}
+        virtual T phi(const TV& X,T t,int& c) const {MATRIX<T,2> Q(MATRIX<T,2>::Rotation_Matrix(w*t));return al->phi(Q.Transpose_Times(X),t,c);}
+        virtual TV N(const TV& X,T t,int c) const {MATRIX<T,2> Q(MATRIX<T,2>::Rotation_Matrix(w*t));return Q*(al->N(Q.Transpose_Times(X),t,c));}
+    };
+
+    struct ANALYTIC_LEVELSET_SCALE:public ANALYTIC_LEVELSET
+    {
+        ANALYTIC_LEVELSET* al;
+        T scale;
+
+        ANALYTIC_LEVELSET_SCALE(ANALYTIC_LEVELSET* al,T scale): al(al),scale(scale) {}
+        ~ANALYTIC_LEVELSET_SCALE() {delete al;}
+        virtual T phi(const TV& X,T t,int& c) const {return (1+t*scale)*al->phi(X/(1+t*scale),t,c);}
+        virtual TV N(const TV& X,T t,int c) const {return al->N(X/(1+t*scale),t,c);}
     };
 
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE

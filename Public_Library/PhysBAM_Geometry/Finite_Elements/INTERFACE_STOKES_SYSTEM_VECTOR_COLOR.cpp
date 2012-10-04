@@ -6,6 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
+#include <omp.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -27,9 +28,19 @@ template<class TV> INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 template<class TV> INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 operator=(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v)
 {
-    u=v.u;
-    p=v.p;
-    q=v.q;
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c)=v.u(i)(c);
+        for(int c=0;c<colors;c++)
+#pragma omp task
+            p(c)=v.p(c);
+#pragma omp task
+        q=v.q;
+    }
     return *this;
 }
 //#####################################################################
@@ -39,9 +50,19 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_STOKES_SYS
 operator+=(const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv);
-    u+=v.u;
-    p+=v.p;
-    q+=v.q;
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c)+=v.u(i)(c);
+        for(int c=0;c<colors;c++)
+#pragma omp task
+            p(c)+=v.p(c);
+#pragma omp task
+        q+=v.q;
+    }
     return *this;
 }
 //#####################################################################
@@ -51,9 +72,19 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_STOKES_SYS
 operator-=(const BASE& bv)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv);
-    u-=v.u;
-    p-=v.p;
-    q-=v.q;
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c)-=v.u(i)(c);
+        for(int c=0;c<colors;c++)
+#pragma omp task
+            p(c)-=v.p(c);
+#pragma omp task
+        q-=v.q;
+    }
     return *this;
 }
 //#####################################################################
@@ -62,11 +93,19 @@ operator-=(const BASE& bv)
 template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 operator*=(const T a)
 {
-    for(int i=0;i<TV::m;i++)
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c)*=a;
         for(int c=0;c<colors;c++)
-            u(i)(c)*=a;
-    for(int c=0;c<colors;c++) p(c)*=a;;
-    q*=a;
+#pragma omp task
+            p(c)*=a;;
+#pragma omp task
+        q*=a;
+    }
     return *this;
 }
 //#####################################################################
@@ -76,11 +115,19 @@ template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 Copy(const T c1,const BASE& bv1)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv1);
-    for(int i=0;i<TV::m;i++)
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c).Copy(c1,v1.u(i)(c));
         for(int c=0;c<colors;c++)
-            u(i)(c).Copy(c1,v1.u(i)(c));
-    for(int c=0;c<colors;c++) p(c).Copy(c1,v1.p(c));
-    q.Copy(c1,v1.q);
+#pragma omp task
+            p(c).Copy(c1,v1.p(c));
+#pragma omp task
+        q.Copy(c1,v1.q);
+    }
 }
 //#####################################################################
 // Function Copy
@@ -90,11 +137,19 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
 {
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv1);
     const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR& v2=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR&>(bv2);
-    for(int i=0;i<TV::m;i++)
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                u(i)(c).Copy(c1,v1.u(i)(c),v2.u(i)(c));
         for(int c=0;c<colors;c++)
-            u(i)(c).Copy(c1,v1.u(i)(c),v2.u(i)(c));
-    for(int c=0;c<colors;c++) p(c).Copy(c1,v1.p(c),v2.p(c));
-    q.Copy(c1,v1.q,v2.q);
+#pragma omp task
+            p(c).Copy(c1,v1.p(c),v2.p(c));
+#pragma omp task
+        q.Copy(c1,v1.q,v2.q);
+    }
 }
 //#####################################################################
 // Function Print
@@ -184,11 +239,31 @@ template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>:
 Dot(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v) const
 {
     T dot=0;
-    for(int i=0;i<TV::m;i++)
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+            {
+                const T tmp=u(i)(c).Dot(v.u(i)(c));
+#pragma omp critical
+                dot+=tmp;
+            }
         for(int c=0;c<colors;c++)
-            dot+=u(i)(c).Dot(v.u(i)(c));
-    for(int c=0;c<colors;c++) dot+=p(c).Dot(v.p(c));
-    dot+=q.Dot(v.q);
+#pragma omp task
+        {
+            const T tmp=p(c).Dot(v.p(c));
+#pragma omp critical
+            dot+=tmp;
+        }
+#pragma omp task
+        {
+            const T tmp=q.Dot(v.q);
+#pragma omp critical
+            dot+=tmp;
+        }
+    }
     return dot;
 }
 //#####################################################################
@@ -214,11 +289,31 @@ template<class TV> typename TV::SCALAR INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>:
 Max_Abs() const
 {
     T max_abs=0;
-    for(int i=0;i<TV::m;i++)
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+            {
+                const T tmp=u(i)(c).Max_Abs();
+#pragma omp critical
+                max_abs=max(tmp,max_abs);
+            }
         for(int c=0;c<colors;c++)
-            max_abs=max(u(i)(c).Max_Abs(),max_abs);
-    for(int c=0;c<colors;c++) max_abs=max(p(c).Max_Abs(),max_abs);
-    max_abs=max(q.Max_Abs(),max_abs);
+#pragma omp task
+        {
+            const T tmp=p(c).Max_Abs();
+#pragma omp critical
+            max_abs=max(tmp,max_abs);
+        }
+#pragma omp task
+        {
+            const T tmp=q.Max_Abs();
+#pragma omp critical
+            max_abs=max(tmp,max_abs);
+        }
+    }
     return max_abs;
 }
 //#####################################################################
@@ -235,15 +330,22 @@ Normalize()
 template<class TV> void INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>::
 Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& s)
 {
-    for(int i=0;i<TV::m;i++)
+#pragma omp parallel
+#pragma omp single
+    {
+        for(int i=0;i<TV::m;i++)
+            for(int c=0;c<colors;c++)
+#pragma omp task
+                for(int k=0;k<u(i)(c).n;k++)
+                    u(i)(c)(k)=v.u(i)(c)(k)*s.u(i)(c)(k);
         for(int c=0;c<colors;c++)
-            for(int k=0;k<u(i)(c).n;k++)
-                u(i)(c)(k)=v.u(i)(c)(k)*s.u(i)(c)(k);
-    for(int c=0;c<colors;c++)
-        for(int k=0;k<p(c).n;k++)
-            p(c)(k)=v.p(c)(k)*s.p(c)(k);
-    for(int k=0;k<q.n;k++)
-        q(k)=v.q(k)*s.q(k);
+#pragma omp task
+            for(int k=0;k<p(c).n;k++)
+                p(c)(k)=v.p(c)(k)*s.p(c)(k);
+#pragma omp task
+        for(int k=0;k<q.n;k++)
+            q(k)=v.q(k)*s.q(k);
+    }
 }
 //#####################################################################
 template class INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<VECTOR<float,1> >;

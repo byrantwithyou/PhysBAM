@@ -24,6 +24,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#include <omp.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -333,21 +334,35 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
     const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
     VECTOR_T& rc=debug_cast<VECTOR_T&>(result);
-    for(int i=0;i<TV::m;i++)
-        for(int c=0;c<cdi->colors;c++){
-            matrix_pu(i)(c).Transpose_Times(xc.p(c),rc.u(i)(c));
-            matrix_qu(i)(c).Transpose_Times_Add(xc.q,rc.u(i)(c));
-            for(int j=0;j<TV::m;j++){
-                if(j>=i) matrix_uu(i)(j)(c).Times_Add(xc.u(j)(c),rc.u(i)(c));
-                else matrix_uu(j)(i)(c).Transpose_Times_Add(xc.u(j)(c),rc.u(i)(c));}}
-    for(int c=0;c<cdi->colors;c++){
-        rc.p(c).Fill(0);
+
+#pragma omp parallel
+#pragma omp single
+    {
         for(int i=0;i<TV::m;i++)
-            matrix_pu(i)(c).Times_Add(xc.u(i)(c),rc.p(c));}
-    rc.q.Fill(0);
-    for(int i=0;i<TV::m;i++)
+            for(int c=0;c<cdi->colors;c++)
+#pragma omp task
+            {
+                matrix_pu(i)(c).Transpose_Times(xc.p(c),rc.u(i)(c));
+                matrix_qu(i)(c).Transpose_Times_Add(xc.q,rc.u(i)(c));
+                for(int j=0;j<TV::m;j++){
+                    if(j>=i) matrix_uu(i)(j)(c).Times_Add(xc.u(j)(c),rc.u(i)(c));
+                    else matrix_uu(j)(i)(c).Transpose_Times_Add(xc.u(j)(c),rc.u(i)(c));}
+            }
         for(int c=0;c<cdi->colors;c++)
-        matrix_qu(i)(c).Times_Add(xc.u(i)(c),rc.q);
+#pragma omp task
+        {
+            rc.p(c).Fill(0);
+            for(int i=0;i<TV::m;i++)
+                matrix_pu(i)(c).Times_Add(xc.u(i)(c),rc.p(c));
+        }
+#pragma omp task
+        {
+            rc.q.Fill(0);
+            for(int i=0;i<TV::m;i++)
+                for(int c=0;c<cdi->colors;c++)
+                    matrix_qu(i)(c).Times_Add(xc.u(i)(c),rc.q);
+        }
+    }
 }
 //#####################################################################
 // Function Inner_Product
