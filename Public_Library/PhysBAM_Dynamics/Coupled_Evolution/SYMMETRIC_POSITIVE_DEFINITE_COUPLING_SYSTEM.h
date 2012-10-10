@@ -55,8 +55,8 @@ protected:
     T_FACE_ARRAYS_SCALAR beta_face;
     ARRAY<T> constrained_beta_face;
     const ARRAY<T,TV_INT>& one_over_rho_c_squared;
-    VECTOR_ND<T> one_over_rho_c_squared_flat;
-    mutable VECTOR_ND<T> full_precondition_in,full_precondition_out;
+    ARRAY<T> one_over_rho_c_squared_flat;
+    mutable ARRAY<T> full_precondition_in,full_precondition_out;
 
 public:
     BACKWARD_EULER_SYSTEM<TV>* solid_system;
@@ -77,10 +77,10 @@ protected:
     mutable ARRAY<T,COUPLING_CONSTRAINT_ID> coupling_faces;
     mutable ARRAY<TV> temporary_velocities;
     mutable ARRAY<TWIST<TV> > temporary_twists;
-    mutable VECTOR_ND<T> pressure;
-    mutable VECTOR_ND<T> temporary_faces;
+    mutable ARRAY<T> pressure;
+    mutable ARRAY<T> temporary_faces;
     mutable ARRAY<T,COUPLING_CONSTRAINT_ID> temporary_lambdas;
-    mutable VECTOR_ND<T> temporary_viscous_velocities;
+    mutable ARRAY<T> temporary_viscous_velocities;
     VECTOR_T tolerances;
     const T_LEVELSET* levelset;
     ARRAY<T,COUPLING_CONSTRAINT_ID> lambda_diagonal_preconditioner;
@@ -132,8 +132,8 @@ public:
     void Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_n,
         const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_np1,ARRAY<TV_DIMENSION,TV_INT>& U) const;
     void Interpolate_Solid_Velocity_To_Coupled_Faces(const GENERALIZED_VELOCITY<TV>& solids_velocity,ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity);
-    void Add_Dirichlet_Pressures_To_Velocity(const ARRAY<T,TV_INT>& pressure,VECTOR_ND<T>& fluid_velocity_vector) const;
-    void Add_Surface_Tension(VECTOR_ND<T>& fluid_velocity_vector) const;
+    void Add_Dirichlet_Pressures_To_Velocity(const ARRAY<T,TV_INT>& pressure,ARRAY<T>& fluid_velocity_vector) const;
+    void Add_Surface_Tension(ARRAY<T>& fluid_velocity_vector) const;
     void Print_Matrix(const VECTOR_T& vec) const;
     void Print_Each_Matrix(int n) const;
     T Residual_Linf_Norm(const VECTOR_T& x,const VECTOR_T& rhs) const;
@@ -148,21 +148,21 @@ public:
     void Compute_Full_Preconditioner();
     void Compute_Scatter_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& scatter_matrix);
     void Compute_Inverse_Mass_Matrix(SPARSE_MATRIX_FLAT_MXN<T>& inverse_mass);
-    void Gather(const KRYLOV_VECTOR_BASE<T>& bV,VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
-    void Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,KRYLOV_VECTOR_BASE<T>& bF) const;
-    void Inverse_Mass(VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
-    void Massless_Gather(const VECTOR_T& V,VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
-    void Massless_Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,VECTOR_T& F) const;
-    void Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity);
+    void Gather(const KRYLOV_VECTOR_BASE<T>& bV,ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
+    void Scatter(const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,KRYLOV_VECTOR_BASE<T>& bF) const;
+    void Inverse_Mass(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
+    void Massless_Gather(const VECTOR_T& V,ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
+    void Massless_Scatter(const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,VECTOR_T& F) const;
+    void Setup_Tolerances(const VECTOR_T& F,const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity);
     void Setup_Initial_Guess(const VECTOR_T& F,VECTOR_T& V,const ARRAY<T,TV_INT>& p_advected) const;
-    void Exchange_Pressure(VECTOR_ND<T>& pressure) const;
+    void Exchange_Pressure(ARRAY<T>& pressure) const;
     void Exchange_Coupled_Vector(VECTOR_T& V) const;
-    void Exchange_Velocities(VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
+    void Exchange_Velocities(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const;
     void Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<GRID<TV> >& mpi_grid_input);
-    void Apply_Massless_Structure_Force_To_Fluid(VECTOR_ND<T>& fluid_velocity,T time) const;
-    void Dump_Substep(const VECTOR_ND<T>& fluid_velocity,const char* name,int substep=0,int level=1) const;
-    void Dump_Substep(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int substep=0,int level=1) const;
-    void Fill_Extra_Velocities(VECTOR_ND<T>& fluid_velocity_vector) const;
+    void Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const;
+    void Dump_Substep(const ARRAY<T>& fluid_velocity,const char* name,int substep=0,int level=1) const;
+    void Dump_Substep(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int substep=0,int level=1) const;
+    void Fill_Extra_Velocities(ARRAY<T>& fluid_velocity_vector) const;
 //#####################################################################
     void Resize_Coupled_System_Vector(VECTOR_T& b) const;
     void Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,

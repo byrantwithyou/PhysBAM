@@ -435,11 +435,11 @@ Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum
         if(fluids_parameters.number_of_regions==1){
             Get_Levelset_Velocity(*fluids_parameters.grid,fluids_parameters.particle_levelset_evolution->particle_levelset.levelset,
                 fluids_parameters.particle_levelset_evolution->V,time);
-            maximum_fluid_speed=max(maximum_fluid_speed,fluids_parameters.particle_levelset_evolution->V.Maxabs().Max());}
+            maximum_fluid_speed=max(maximum_fluid_speed,fluids_parameters.particle_levelset_evolution->V.Max_Abs().Max());}
         else{
             Get_Levelset_Velocity(*fluids_parameters.grid,fluids_parameters.particle_levelset_evolution_multiple->Levelset_Multiple(),
                 fluids_parameters.particle_levelset_evolution_multiple->V,time);
-            maximum_fluid_speed=max(maximum_fluid_speed,fluids_parameters.particle_levelset_evolution_multiple->V.Maxabs().Max());}}
+            maximum_fluid_speed=max(maximum_fluid_speed,fluids_parameters.particle_levelset_evolution_multiple->V.Max_Abs().Max());}}
     if(include_removed_particle_velocities){
         for(int i=0;i<fluids_parameters.number_of_regions;i++){
             PARTICLE_LEVELSET_UNIFORM<T_GRID>& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(i);

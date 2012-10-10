@@ -34,11 +34,11 @@ public:
         const T_ARRAYS_SCALAR& one_over_rho_c_squared_input);
 
 //#####################################################################
-    void Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const VECTOR_ND<T>& one_over_fluid_mass,const T dt,const bool use_preconditioner);
+    void Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const ARRAY<T>& one_over_fluid_mass,const T dt,const bool use_preconditioner);
     void Compute_Preconditioner();
-    void Apply_Preconditioner(VECTOR_ND<T>& pressure) const;
-    void Times_Add(const VECTOR_ND<T>& pressure_in,VECTOR_ND<T>& pressure_out) const;
-    void Times(const VECTOR_ND<T>& pressure_in,VECTOR_ND<T>& pressure_out) const;
+    void Apply_Preconditioner(ARRAY<T>& pressure) const;
+    void Times_Add(const ARRAY<T>& pressure_in,ARRAY<T>& pressure_out) const;
+    void Times(const ARRAY<T>& pressure_in,ARRAY<T>& pressure_out) const;
     void Test_Matrix(const bool print_matrix=false) const;
     void Print_Each_Matrix(int n) const;
 //#####################################################################

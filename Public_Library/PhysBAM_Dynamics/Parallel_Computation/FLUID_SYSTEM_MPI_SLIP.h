@@ -20,7 +20,7 @@ template<class TV>
 class FLUID_SYSTEM_MPI_SLIP:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
-    typedef VECTOR_ND<T> VECTOR_T;
+    typedef ARRAY<T> VECTOR_T;
     typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_T&> KRYLOV_VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 public:
@@ -34,7 +34,7 @@ public:
     const SPARSE_MATRIX_FLAT_MXN<T>& div;
     const SPARSE_MATRIX_FLAT_MXN<T>& PP;
     const SPARSE_MATRIX_FLAT_MXN<T>& W;
-    const VECTOR_ND<T>& M_inverse;
+    const ARRAY<T>& M_inverse;
 
     SPARSE_MATRIX_FLAT_MXN<T> J_transpose;
     SPARSE_MATRIX_FLAT_MXN<T> N_transpose;
@@ -45,11 +45,11 @@ public:
     SPARSE_MATRIX_FLAT_NXN<T> C_f_M_inverse_C_f_transpose;
     SPARSE_MATRIX_FLAT_NXN<T> div_M_inverse_div_transpose_precondition;
 
-    mutable VECTOR_ND<T> fluid_velocities_size_vector;
-    mutable VECTOR_ND<T> solid_velocities_size_vector;
-    mutable VECTOR_ND<T> pressures_size_vector;
-    mutable VECTOR_ND<T> preconditioned_pressures_size_vector;
-    mutable VECTOR_ND<T> lagrange_multipliers_size_vector;
+    mutable ARRAY<T> fluid_velocities_size_vector;
+    mutable ARRAY<T> solid_velocities_size_vector;
+    mutable ARRAY<T> pressures_size_vector;
+    mutable ARRAY<T> preconditioned_pressures_size_vector;
+    mutable ARRAY<T> lagrange_multipliers_size_vector;
 
     const bool leakproof_solve;
     INTERVAL<int> interior_regions;
@@ -60,7 +60,7 @@ public:
         const SPARSE_MATRIX_FLAT_MXN<T>& W_input,
         const SPARSE_MATRIX_FLAT_MXN<T>& N_input,
         const SPARSE_MATRIX_FLAT_MXN<T>& div_input,
-        const VECTOR_ND<T>& M_inverse_input,
+        const ARRAY<T>& M_inverse_input,
         const SPARSE_MATRIX_FLAT_MXN<T>& J_input,
         const SPARSE_MATRIX_FLAT_MXN<T>& P_input,
         const SPARSE_MATRIX_FLAT_MXN<T>& div_precondition,
@@ -73,7 +73,7 @@ public:
         GENERALIZED_VELOCITY<TV>& solid_velocity_input);
 
     void Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const PHYSBAM_OVERRIDE;
-    void Apply(const VECTOR_T& V,VECTOR_ND<T>& result_dual_cells_size_vector) const;
+    void Apply(const VECTOR_T& V,ARRAY<T>& result_dual_cells_size_vector) const;
 
     void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& x) const PHYSBAM_OVERRIDE // only nullspace stuff for fluids - leave out for now
     {}

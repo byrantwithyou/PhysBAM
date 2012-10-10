@@ -119,7 +119,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
 
     Resize_Vector(null_u);
     for(int c=0;c<cdi->colors;c++){
-        VECTOR_ND<T>& u=null_u.u(c);
+        ARRAY<T>& u=null_u.u(c);
         const ARRAY<int>& inactive=inactive_u(c);
         u.Fill(1);
         for(int k=0;k<inactive.m;k++) u(inactive(k))=0;}
@@ -133,7 +133,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
 Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<T,TV_INT> >& f_volume,const ARRAY<ARRAY<T,TV_INT> >& u)
 {
-    ARRAY<VECTOR_ND<T> > F_volume,U;
+    ARRAY<ARRAY<T> > F_volume,U;
     
     F_volume.Resize(cdi->colors);
     U.Resize(cdi->colors);
@@ -180,7 +180,7 @@ Set_Jacobi_Preconditioner()
                 inactive_u(c).Append(k);
                 LOG::cout<<"WARNING: small diagonal entry in the UU block."<<std::endl;}
             else J.u(c)(k)=1/abs(m_uu(k,k));}}
-    for(int k=0;k<J.q.n;k++){
+    for(int k=0;k<J.q.m;k++){
         T sum=0;
         for(int c=0;c<cdi->colors;c++){
             SPARSE_MATRIX_FLAT_MXN<T>& m_qu=matrix_qu(c);
@@ -248,7 +248,7 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     if(!cdi->dc_present) v.Copy(-v.Dot(null_u),null_u,v);
 
     for(int c=0;c<cdi->colors;c++){
-        VECTOR_ND<T>& u=v.u(c);
+        ARRAY<T>& u=v.u(c);
         const ARRAY<int>& inactive=inactive_u(c);
         for(int k=0;k<inactive.m;k++)
             u(inactive(k))=0;}

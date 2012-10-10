@@ -633,8 +633,8 @@ Solid_Position_Update(const T dt,const int substep)
             COLLISION_GEOMETRY<TV>::FLUID_COLLISION_GEOMETRY_OLD_STATE);
         LOG::Time("initializing swept occupied blocks");
         // swept occupied blocks
-        if(euler) example.Initialize_Swept_Occupied_Blocks_For_Advection(dt,time,euler->euler_projection.face_velocities.Maxabs().Max(),true);
-        else if(Simulate_Incompressible_Fluids()) example.Initialize_Swept_Occupied_Blocks_For_Advection(dt,time,example.fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Max(),true);
+        if(euler) example.Initialize_Swept_Occupied_Blocks_For_Advection(dt,time,euler->euler_projection.face_velocities.Max_Abs().Max(),true);
+        else if(Simulate_Incompressible_Fluids()) example.Initialize_Swept_Occupied_Blocks_For_Advection(dt,time,example.fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs().Max(),true);
         // MELTING BROKEN !!! if(example.use_melting && number_of_regions){ // re-rasterize changed bodies
         // MELTING BROKEN !!!    collision_bodies_affecting_fluid.Rasterize_Objects(); // non-swept
         // MELTING BROKEN !!!    collision_bodies_affecting_fluid.Compute_Occupied_Blocks(false,(T)2*grid.Minimum_Edge_Length(),5);}  // static occupied blocks
@@ -1286,7 +1286,7 @@ Advance_Fluid_One_Time_Step_Implicit_Part(const bool done,const T dt,const int s
             LOG::cout<<"time="<<time+dt<<", Density extremas: min at "<<min_cell_index<<"="<<min_density<<", max at "<<max_cell_index<<"="<<max_density<<std::endl;
             LOG::cout<<"time="<<time+dt<<", Maximum velocity ="<<max_velocity.Magnitude()<<": "<<max_velocity<<std::endl;}}
     else
-        LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+        LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs()<<std::endl;
 }
 //#####################################################################
 // Function Postprocess_Frame

@@ -44,7 +44,7 @@ template<class TV> FLUID_TO_SOLID_INTERPOLATION_BASE<TV>::
 // Function Times
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_BASE<TV>::
-Times(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
+Times(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
 {
     solid_velocity*=(T)0;
     Times_Add(fluid_velocity,solid_velocity);
@@ -53,7 +53,7 @@ Times(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocit
 // Function Transpose_Times
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_BASE<TV>::
-Transpose_Times(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const
+Transpose_Times(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const
 {
     // TODO: Careful to zero out enough of the solids state.
     fluid_force.Fill(0);
@@ -73,7 +73,7 @@ Test_Matrix(int number_fluid_faces,int number_particles,int number_rigid_particl
     ARRAY<TWIST<TV> > twist(number_rigid_particles),twist2(number_rigid_particles);
     random.Fill_Uniform(twist,-1,1);
 
-    VECTOR_ND<T> U(number_fluid_faces),U2(number_fluid_faces);
+    ARRAY<T> U(number_fluid_faces),U2(number_fluid_faces);
     random.Fill_Uniform(U,-1,1);
 
     ARRAY<int> empty;

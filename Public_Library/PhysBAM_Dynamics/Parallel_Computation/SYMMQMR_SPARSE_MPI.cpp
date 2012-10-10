@@ -19,8 +19,8 @@ using namespace PhysBAM;
 // Function Parallel_Solve_Fluid_Part
 //#####################################################################
 template<class TV> void SYMMQMR_SPARSE_MPI<TV>::
-Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& x_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& b_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& p_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& ap_array,
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& ar_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& r_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& z_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner)
+Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& b_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& ap_array,
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& ar_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner)
 {
     Initialize_Datatypes();
     Parallel_Solve(fluid_system,x_array,b_array,p_array,ap_array,ar_array,r_array,z_array,zaq_array,min_iterations,max_iterations,tolerance);
@@ -102,7 +102,7 @@ Parallel_Solve(T_SYSTEM& system,TV2& x_array,const TV2& b_array,TV2& p_array,TV2
 // Function Initialize_Datatypes
 //#####################################################################
 template<class TV> void SYMMQMR_SPARSE_MPI<TV>::
-Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& v)
+Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& v)
 {
     ARRAY<MPI::Request> requests;requests.Preallocate(2*(*partition).number_of_sides);
 #ifdef BRICK
@@ -138,7 +138,7 @@ Initialize_Datatypes()
 #define INSTANTIATION_HELPER(T,d) \
     template class SYMMQMR_SPARSE_MPI<VECTOR<T,d> >; \
     template bool SYMMQMR_SPARSE_MPI<VECTOR<T,d> >::Parallel_Solve(SOLID_SYSTEM_MPI_SLIP<VECTOR<T,d> >& system,GENERALIZED_VELOCITY<VECTOR<T,d> >& x_array,const GENERALIZED_VELOCITY<VECTOR<T,d> >& b_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& p_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& ap_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& ar_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& r_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& z_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& zaq_array,const int min_iterations,const int max_iterations,const T tolerance); \
-    template bool SYMMQMR_SPARSE_MPI<VECTOR<T,d> >::Parallel_Solve(FLUID_SYSTEM_MPI_SLIP<VECTOR<T,d> >& system,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& x_array,const KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& b_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& p_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& ap_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& ar_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& r_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& z_array,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance);
+    template bool SYMMQMR_SPARSE_MPI<VECTOR<T,d> >::Parallel_Solve(FLUID_SYSTEM_MPI_SLIP<VECTOR<T,d> >& system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& x_array,const KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& b_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& ap_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& ar_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance);
 
 INSTANTIATION_HELPER(float,1);
 INSTANTIATION_HELPER(float,2);

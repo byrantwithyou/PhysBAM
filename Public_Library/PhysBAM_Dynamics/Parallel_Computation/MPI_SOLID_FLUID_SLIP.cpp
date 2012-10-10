@@ -154,8 +154,8 @@ Set_MPI_Grid(T_MPI_GRID& mpi_grid_input)
 // Function Parallel_Solve_Fluid_Part
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::
-Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,VECTOR_ND<T>& x_array,VECTOR_ND<T>& b_array,VECTOR_ND<T>& p_array,VECTOR_ND<T>& ap_array,
-    VECTOR_ND<T>& ar_array,VECTOR_ND<T>& r_array,VECTOR_ND<T>& z_array,VECTOR_ND<T>& zaq_array,const int min_iterations,const int max_iterations,
+Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,ARRAY<T>& x_array,ARRAY<T>& b_array,ARRAY<T>& p_array,ARRAY<T>& ap_array,
+    ARRAY<T>& ar_array,ARRAY<T>& r_array,ARRAY<T>& z_array,ARRAY<T>& zaq_array,const int min_iterations,const int max_iterations,
     const T tolerance,const bool recompute_preconditioner,const bool leakproof_solve)
 {
     SYMMQMR_SPARSE_MPI<TV> symmqmr_mpi(leakproof_solve?*fluid_comm:*comm,fluid_comm,&partition);
@@ -163,7 +163,7 @@ Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,VECTOR_ND<T>& 
     symmqmr_mpi.restart_iterations=100;
     //symmqmr_mpi.maximum_iterations=solids_parameters.cg_iterations;
     //LOG::cout<<"Before solve"<<std::endl;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T>&> xw(x_array),bw(b_array),pw(p_array),apw(ap_array),arw(ar_array),rw(r_array),zw(z_array),zaqw(zaq_array);
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T>&> xw(x_array),bw(b_array),pw(p_array),apw(ap_array),arw(ar_array),rw(r_array),zw(z_array),zaqw(zaq_array);
     symmqmr_mpi.Parallel_Solve_Fluid_Part(fluid_system,xw,bw,pw,apw,arw,rw,zw,zaqw,min_iterations,max_iterations,tolerance,recompute_preconditioner);
 }
 //#####################################################################
@@ -500,8 +500,8 @@ template<class TV> bool MPI_SOLID_FLUID_SLIP<TV>::Solid_Node() const{PHYSBAM_FUN
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Create_Fluid_Comm_For_Solid_Nodes() const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T2> void MPI_SOLID_FLUID_SLIP<TV>::Reduce_Add(const T2& input,T2& output) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR MPI_SOLID_FLUID_SLIP<TV>::Reduce_Min(const T local_value) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,VECTOR_ND<T>& x_array,VECTOR_ND<T>& b_array,VECTOR_ND<T>& p_array,VECTOR_ND<T>& ap_array,
-    VECTOR_ND<T>& ar_array,VECTOR_ND<T>& r_array,VECTOR_ND<T>& z_array,VECTOR_ND<T>& zaq_array,const int min_iterations,const int max_iterations,
+template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,ARRAY<T>& x_array,ARRAY<T>& b_array,ARRAY<T>& p_array,ARRAY<T>& ap_array,
+    ARRAY<T>& ar_array,ARRAY<T>& r_array,ARRAY<T>& z_array,ARRAY<T>& zaq_array,const int min_iterations,const int max_iterations,
     const T tolerance,const bool recompute_preconditioner,const bool leakproof_solve){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID_SLIP<TV>::Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI_SLIP<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,GENERALIZED_VELOCITY<TV>& ap_array,
     GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

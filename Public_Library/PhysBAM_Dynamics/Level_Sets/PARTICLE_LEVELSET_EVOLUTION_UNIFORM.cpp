@@ -57,7 +57,7 @@ template<class T_GRID> typename T_GRID::SCALAR PARTICLE_LEVELSET_EVOLUTION_UNIFO
 CFL(const bool need_to_get_velocity,const bool analytic_test)
 {
     if(need_to_get_velocity) particle_levelset.levelset.levelset_callbacks->Get_Levelset_Velocity(grid,particle_levelset.levelset,V,time);
-    if(analytic_test) return cfl_number/max((V.Maxabs()/grid.dX).Max(),1/particle_levelset.levelset.max_time_step);
+    if(analytic_test) return cfl_number/max((V.Max_Abs()/grid.dX).Max(),1/particle_levelset.levelset.max_time_step);
     return cfl_number*particle_levelset.levelset.CFL(V);
 }
 //#####################################################################

@@ -50,10 +50,10 @@ public:
 
 //#####################################################################
     void Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu);
-    void Times_Add(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const;
-    void Times(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const;
-    void Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,VECTOR_ND<T>& velocities) const;
-    void Transpose_Times(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,VECTOR_ND<T>& velocities) const;
+    void Times_Add(const ARRAY<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const;
+    void Times(const ARRAY<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const;
+    void Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,ARRAY<T>& velocities) const;
+    void Transpose_Times(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,ARRAY<T>& velocities) const;
     VISCOUS_FORCE_ID Viscous_Forces_Size() const;
     void Test_Matrix() const;
     void Print_Each_Matrix(int n) const;

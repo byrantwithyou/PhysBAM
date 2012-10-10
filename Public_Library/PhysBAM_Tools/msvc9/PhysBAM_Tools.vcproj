@@ -2417,7 +2417,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Read_Write\Matrices_And_Vectors\READ_WRITE_SPARSE_VECTOR_ND.h"
+					RelativePath="..\Read_Write\Matrices_And_Vectors\READ_WRITE_SPARSE_ARRAY.h"
 					>
 				</File>
 				<File
@@ -2549,7 +2549,7 @@
 					>
 				</File>
 				<File
-					RelativePath="..\Read_Write\Vectors\READ_WRITE_VECTOR_ND.h"
+					RelativePath="..\Read_Write\Vectors\READ_WRITE_ARRAY.h"
 					>
 				</File>
 			</Filter>
@@ -2658,7 +2658,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Vectors\SPARSE_VECTOR_ND.h"
+				RelativePath="..\Vectors\SPARSE_ARRAY.h"
 				>
 			</File>
 			<File
@@ -2702,7 +2702,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\Vectors\VECTOR_ND.h"
+				RelativePath="..\Vectors\ARRAY.h"
 				>
 			</File>
 			<File

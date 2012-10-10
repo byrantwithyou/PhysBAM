@@ -72,12 +72,12 @@ public:
     void Compute_Beta();
     FACE_TYPE Face_Type(int f) const;
     void Compute(const int ghost_cells) PHYSBAM_OVERRIDE;
-    void Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const PHYSBAM_OVERRIDE;
-    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const PHYSBAM_OVERRIDE;
+    void Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const PHYSBAM_OVERRIDE;
+    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const PHYSBAM_OVERRIDE;
     void Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const PHYSBAM_OVERRIDE;
     void Cut_Face(FACE_INDEX<TV::m>& f,const TV& normal,const SEGMENT_2D<T>& segment);
-    void Fill_Extra_Velocities(VECTOR_ND<T>& fluid_velocity_vector) const;
-    void Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector);
+    void Fill_Extra_Velocities(ARRAY<T>& fluid_velocity_vector) const;
+    void Dump_Extra_Velocities(const ARRAY<T>& fluid_velocity_vector);
     void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };

@@ -33,7 +33,7 @@ public:
     void Add_Implicit_Forces_Projection(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE {}
     void Initialize_Grids(const T_GRID& grid) PHYSBAM_OVERRIDE {}
     T CFL(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities) PHYSBAM_OVERRIDE
-    {return abs(gravity)*(gravity_direction/grid.DX()).L1_Norm();}
+    {return abs(gravity)*(gravity_direction/grid.DX()).Sum_Abs();}
 //#####################################################################
 };
 }

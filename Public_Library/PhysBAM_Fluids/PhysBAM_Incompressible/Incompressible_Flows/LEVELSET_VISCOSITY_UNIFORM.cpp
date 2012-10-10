@@ -43,7 +43,7 @@ Apply_Full_Viscosity(ARRAY<T,FACE_INDEX<d> >& u,bool fully_explicit,bool fully_i
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b);}
 
     if(!fully_implicit) Apply_Explicit_Viscosity(u,axis);
-    if(!fully_implicit && !fully_explicit) exchange(x.v.x,b.v.x);
+    if(!fully_implicit && !fully_explicit) x.v.Exchange(b.v);
     if(!fully_explicit) Apply_Implicit_Viscosity(u,axis);
     if(print_matrix) OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-x-%i.txt",solve_id).c_str()).Write("x",x);
     index_map.Scatter(x.v,u);

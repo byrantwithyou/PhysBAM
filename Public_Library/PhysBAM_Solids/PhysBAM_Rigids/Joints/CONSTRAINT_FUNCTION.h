@@ -271,7 +271,7 @@ public:
     LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION(const ARTICULATED_RIGID_BODY<TV>& arb,const JOINT_ID joint_id,const T dt_input,const T epsilon_scale_input,TV& location);
 
     T Inner_Product(const T_IMPULSE& j1,const T_IMPULSE& j2) const
-    {return T_IMPULSE::Dot_Product(j1,metric_tensor*j2);}
+    {return j1.Dot(metric_tensor*j2);}
 
     T Magnitude_Squared(const T_IMPULSE& j) const
     {return metric_tensor.Symmetric_Conjugate(j);}

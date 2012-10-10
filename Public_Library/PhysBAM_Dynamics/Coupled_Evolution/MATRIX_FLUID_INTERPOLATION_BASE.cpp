@@ -42,7 +42,7 @@ template<class TV> MATRIX_FLUID_INTERPOLATION_BASE<TV>::
 // Function Times
 //#####################################################################
 template<class TV> void MATRIX_FLUID_INTERPOLATION_BASE<TV>::
-Times(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
+Times(const ARRAY<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
     constraints.Fill(T());
     Times_Add(faces,constraints);
@@ -51,7 +51,7 @@ Times(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) co
 // Function Transpose_Times
 //#####################################################################
 template<class TV> void MATRIX_FLUID_INTERPOLATION_BASE<TV>::
-Transpose_Times(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const
+Transpose_Times(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,ARRAY<T>& faces) const
 {
     faces.Fill(T());
     Transpose_Times_Add(constraints,faces);
@@ -66,7 +66,7 @@ Test_Matrix() const
     ARRAY<T,COUPLING_CONSTRAINT_ID> constraints(Number_Of_Constraints()),constraints2(Number_Of_Constraints());
     random.Fill_Uniform(constraints,-1,1);
 
-    VECTOR_ND<T> faces(index_map.Number_Faces()),faces2(index_map.Number_Faces());
+    ARRAY<T> faces(index_map.Number_Faces()),faces2(index_map.Number_Faces());
     random.Fill_Uniform(faces,-1,1);
 
     Times(faces,constraints2);

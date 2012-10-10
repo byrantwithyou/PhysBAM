@@ -231,7 +231,7 @@ Advance_To_Target_Time(const T target_time)
                 if(particles) maximum_particle_speed=max(maximum_particle_speed,particles->V.Maximum_Magnitude());}
             example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_particle_speed+2*max_particle_collision_distance+(T).5*example.fine_mac_grid.dX.Max(),10);}
         else{
-            T maximum_fluid_speed=example.fine_face_velocities.Maxabs().Max();
+            T maximum_fluid_speed=example.fine_face_velocities.Max_Abs().Max();
             T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(0).max_collision_distance_factor*example.fine_mac_grid.dX.Max();
             example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.fine_mac_grid.dX.Max(),10);}
 

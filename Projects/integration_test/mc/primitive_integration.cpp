@@ -4,6 +4,7 @@
 //#####################################################################
 
 #include <PhysBAM_Tools/Log/LOG.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Symbolics/MULTIVARIATE_POLYNOMIAL.h>
 

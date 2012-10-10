@@ -3,6 +3,7 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.
 //#####################################################################
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/CONJUGATE_GRADIENT.h>
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
@@ -11,7 +12,6 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 
 #include "../multigrid_poisson_3d_optimized_kernels/Thread_Queueing/PTHREAD_QUEUE.h"
 #include "MG_PRECONDITIONED_CONJUGATE_GRADIENT.h"
@@ -290,8 +290,8 @@ int main(int argc,char* argv[])
         T_GRID grid(size+2,RANGE<TV>(-TV::All_Ones_Vector()*.5*h,size*h+TV::All_Ones_Vector()*.5*h));
         T_CELL_TYPE_FIELD cell_type(grid);
         PCG_SPARSE<T> icpcg;
-        VECTOR_ND<T> b_icpcg;
-        VECTOR_ND<T> x_icpcg;
+        ARRAY<T> b_icpcg;
+        ARRAY<T> x_icpcg;
         SPARSE_MATRIX_FLAT_NXN<T> icpcg_matrix;
         LIST_ARRAY<T_INDEX> interior_indices;
         T_INT_ARRAY index_ids(grid);

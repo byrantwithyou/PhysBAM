@@ -7,7 +7,7 @@
 #ifndef __TRANSVERSE_ISOTROPY_3D__
 #define __TRANSVERSE_ISOTROPY_3D__
 
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Geometry/Constitutive_Models/STRAIN_MEASURE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ANISOTROPIC_CONSTITUTIVE_MODEL.h>
 namespace PhysBAM{
@@ -35,11 +35,11 @@ public:
     inline int Hessian_Index(const int m,const int n) const
     {assert(m>=n);return m+(n-1)*(10-n)/2;}
 
-    void Invariants(VECTOR_ND<T>& invariants,const DIAGONAL_MATRIX<T,3>& C,const VECTOR<T,3> V_fiber) const
+    void Invariants(ARRAY<T>& invariants,const DIAGONAL_MATRIX<T,3>& C,const VECTOR<T,3> V_fiber) const
     {invariants(0)=C.Trace();invariants(1)=(C*C).Trace();invariants(2)=C.Determinant();
     invariants(3)=VECTOR<T,3>::Dot_Product(V_fiber,C*V_fiber);invariants(4)=(C*V_fiber).Magnitude_Squared();}
 
-    SYMMETRIC_MATRIX<T,3> S(const DIAGONAL_MATRIX<T,3>& C,const VECTOR<T,3>& V_fiber,const VECTOR_ND<T>& invariants,const VECTOR_ND<T> energy_gradient) const
+    SYMMETRIC_MATRIX<T,3> S(const DIAGONAL_MATRIX<T,3>& C,const VECTOR<T,3>& V_fiber,const ARRAY<T>& invariants,const ARRAY<T> energy_gradient) const
     {SYMMETRIC_MATRIX<T,3> result;
     if(energy_gradient(0)) result+=(T)2*energy_gradient(0);
     if(energy_gradient(1)) result+=(T)4*energy_gradient(1)*C;
@@ -50,7 +50,7 @@ public:
 
     MATRIX<T,3> P_From_Strain(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& V,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold;VECTOR<T,3> V_fiber=V.Transpose_Times(fiber_field(tetrahedron));
-    VECTOR_ND<T> invariants(4),energy_gradient(4);SYMMETRIC_MATRIX<T,3> result;Invariants(invariants,C,V_fiber);Energy_Gradient(energy_gradient,invariants,tetrahedron);
+    ARRAY<T> invariants(4),energy_gradient(4);SYMMETRIC_MATRIX<T,3> result;Invariants(invariants,C,V_fiber);Energy_Gradient(energy_gradient,invariants,tetrahedron);
     return scale*F_threshold*S(C,V_fiber,invariants,energy_gradient);}
 
     MATRIX<T,3> P_From_Strain_Rate(const DIAGONAL_MATRIX<T,3>& F,const MATRIX<T,3>& F_dot,const T scale,const int tetrahedron) const PHYSBAM_OVERRIDE
@@ -61,7 +61,7 @@ public:
     {DIAGONAL_MATRIX<T,3> F_threshold=F.Max(failure_threshold),C=F_threshold*F_threshold,C_inverse=C.Inverse();VECTOR<T,3> V_fiber=V.Transpose_Times(fiber_field(tetrahedron));
     SYMMETRIC_MATRIX<T,3> C_inverse_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(VECTOR<T,3>(C_inverse.x11,C_inverse.x22,C_inverse.x33));
     SYMMETRIC_MATRIX<T,3> V_fiber_outer=SYMMETRIC_MATRIX<T,3>::Outer_Product(V_fiber);
-    VECTOR_ND<T> invariants(4),energy_gradient(4),energy_hessian(15);Invariants(invariants,C,V_fiber);
+    ARRAY<T> invariants(4),energy_gradient(4),energy_hessian(15);Invariants(invariants,C,V_fiber);
     Energy_Gradient(energy_gradient,invariants,tetrahedron);Energy_Hessian(energy_hessian,invariants,tetrahedron);
     ARRAY<VECTOR<T,3> > J_d(4),J_s(4);
     J_d(0)=VECTOR<T,3>((T)1,(T)1,(T)1);
@@ -96,8 +96,8 @@ public:
     if(enforce_definiteness)dP_dF.Enforce_Definiteness();}
 
 //#####################################################################
-    virtual void Energy_Gradient(VECTOR_ND<T>& energy_gradient,const VECTOR_ND<T>& invariants,const int tetrahedron) const=0;
-    virtual void Energy_Hessian(VECTOR_ND<T>& energy_hessian,const VECTOR_ND<T>& invariants,const int tetrahedron) const=0;
+    virtual void Energy_Gradient(ARRAY<T>& energy_gradient,const ARRAY<T>& invariants,const int tetrahedron) const=0;
+    virtual void Energy_Hessian(ARRAY<T>& energy_hessian,const ARRAY<T>& invariants,const int tetrahedron) const=0;
 //#####################################################################
 };
 }

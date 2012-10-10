@@ -12,7 +12,6 @@
 #include <iostream>
 namespace PhysBAM{
 template<class T,class GENERATOR> class RANDOM_NUMBERS;
-template<class T> class VECTOR_ND;
 template<class T> class MATRIX_MXN;
 template<class T,int d> class VECTOR;
 
@@ -64,13 +63,13 @@ public:
     {Write_Binary<RW>(output,n);Write_Binary_Array<RW>(output,x,size);}
 
 //#####################################################################
-    static SYMMETRIC_MATRIX_NXN<T> Outer_Product(const VECTOR_ND<T>& u);
+    static SYMMETRIC_MATRIX_NXN<T> Outer_Product(const ARRAY<T>& u);
     SYMMETRIC_MATRIX_NXN<T> Sqr() const;
     void Givens_Conjugate(const int i,const int j,const T c,const T s);
     void Jacobi_Solve_Eigenproblem(ARRAY<VECTOR<int,2> >& givens_pairs,ARRAY<VECTOR<T,2> >& givens_coefficients,const T tolerance=(T)1e-5,
         const int max_iterations=1000000);
     template<class GENERATOR>
-    void Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,VECTOR_ND<T>& max_eigenvector,RANDOM_NUMBERS<T,GENERATOR>* random_numbers=0,const T tolerance=(T)1e-5,
+    void Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T,GENERATOR>* random_numbers=0,const T tolerance=(T)1e-5,
         const T randomization_decay_factor=(T)0.9,const int max_iterations=1000000);
     void In_Place_Cholesky_Factorization(MATRIX_MXN<T>& L);
     SYMMETRIC_MATRIX_NXN<T>& operator=(const SYMMETRIC_MATRIX_NXN<T>& A);
@@ -80,7 +79,7 @@ public:
     SYMMETRIC_MATRIX_NXN<T> operator+(const SYMMETRIC_MATRIX_NXN<T>& A) const;
     SYMMETRIC_MATRIX_NXN<T> operator-(const SYMMETRIC_MATRIX_NXN<T>& A) const;
     SYMMETRIC_MATRIX_NXN<T> operator*(const T a) const;
-    VECTOR_ND<T> operator*(const VECTOR_ND<T>& y) const;
+    ARRAY<T> operator*(const ARRAY<T>& y) const;
     void Set_Identity_Matrix();
     void Set_Zero_Matrix();
     static SYMMETRIC_MATRIX_NXN<T> Identity_Matrix(const int n);

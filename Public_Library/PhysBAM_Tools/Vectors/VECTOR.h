@@ -7,6 +7,7 @@
 #ifndef __VECTOR__
 #define __VECTOR__
 
+#include <PhysBAM_Tools/Data_Structures/ELEMENT_ID.h>
 #include <PhysBAM_Tools/Math_Tools/Inverse.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_0D.h>
@@ -19,15 +20,15 @@
 namespace PhysBAM{
 
 template<class T_ARRAY,class T_INDICES> class INDIRECT_ARRAY;
+template<class T,int d> struct IS_ARRAY<VECTOR<T,d> > {static const bool value=true;};
 
 template<class T,int d>
-class VECTOR:public VECTOR_BASE<T,VECTOR<T,d> >
+class VECTOR:public ARRAY_BASE<T,VECTOR<T,d> >
 {
     STATIC_ASSERT(d>3);
     struct UNUSABLE{};
 public:
-    typedef VECTOR_BASE<T,VECTOR<T,d> > BASE;
-    using BASE::Assert_Same_Size;
+    typedef ARRAY_BASE<T,VECTOR<T,d> > BASE;
     template<class T2> struct REBIND{typedef VECTOR<T2,d> TYPE;};
     typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
     typedef T ELEMENT;
@@ -38,6 +39,7 @@ public:
     enum WORKAROUND1 {dimension=d};
     enum WORKAROUND2 {m=d};
     typedef int HAS_UNTYPED_READ_WRITE;
+    using BASE::Assert_Same_Size;
 
     T array[d];
 
@@ -72,22 +74,15 @@ public:
         STATIC_ASSERT(d==8);array[0]=x1;array[1]=x2;array[2]=x3;array[3]=x4;array[4]=x5;array[5]=x6;array[6]=x7;array[7]=x8;
     }
 
-    template<class T_ARRAY>
-    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
-    {
-        assert(m==v.Size());
-        for(int i=0;i<d;i++) array[i]=v(i);
-    }
- 
     template<class T_VECTOR>
-    explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
+    explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
     {
         Assert_Same_Size(*this,v);
         for(int i=0;i<d;i++) array[i]=v(i);
     }
 
     template<class T_VECTOR>
-    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+    VECTOR(const ARRAY_EXPRESSION<T,T_VECTOR>& v)
     {
         Assert_Same_Size(*this,v);
         for(int i=0;i<d;i++) array[i]=v(i);
@@ -121,17 +116,9 @@ public:
     }
 
     template<class T_VECTOR>
-    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
-    {
-        Assert_Same_Size(*this,v);
-        for(int i=0;i<d;i++) array[i]=v(i);
-        return *this;
-    }
-
-    template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
     {
-        assert(m==v.Size());
+        Assert_Same_Size(*this,v);
         for(int i=0;i<d;i++) array[i]=v(i);
         return *this;
     }
@@ -157,6 +144,9 @@ public:
     bool operator!=(const VECTOR& v) const
     {return !((*this)==v);}
 
+    VECTOR operator-() const
+    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=-array[i];return r;}
+
     VECTOR operator+(const T& a) const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]+a;return r;}
 
@@ -165,6 +155,15 @@ public:
 
     VECTOR operator*(const T& a) const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*a;return r;}
+
+    VECTOR operator/(const T& a) const
+    {return *this*(1/a);}
+
+    VECTOR operator+(const VECTOR& v) const
+    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]+v.array[i];return r;}
+
+    VECTOR operator-(const VECTOR& v) const
+    {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]-v.array[i];return r;}
 
     VECTOR operator*(const VECTOR& v) const
     {VECTOR r;for(int i=0;i<d;i++) r.array[i]=array[i]*v.array[i];return r;}
@@ -307,6 +306,12 @@ public:
     {for(int i=0;i<n;i++) v1(i)=(*this)(i);
     for(int i=n;i<d;i++) v2(i-n)=(*this)(i);}
 
+    T* Get_Array_Pointer()
+    {return array;}
+
+    const T* Get_Array_Pointer() const
+    {return array;}
+
     T* begin() // for stl
     {return array;}
 
@@ -335,6 +340,10 @@ public:
 template<class T,int d> inline VECTOR<T,d>
 operator+(const T& a,const VECTOR<T,d>& v)
 {VECTOR<T,d> r;for(int i=0;i<d;i++) r.array[i]=a+v.array[i];return r;}
+
+template<class T,int d> inline VECTOR<T,d>
+operator*(const T& a,const VECTOR<T,d>& v)
+{return v*a;}
 
 template<class T,int d> inline VECTOR<T,d>
 operator-(const T& a,const VECTOR<T,d>& v)
@@ -402,14 +411,21 @@ Vector(const T& d1,const T& d2,const T& d3,const T& d4,const T& d5,const T& d6,c
 template<class T> VECTOR<T,8>
 Vector(const T& d1,const T& d2,const T& d3,const T& d4,const T& d5,const T& d6,const T& d7,const T& d8)
 {return VECTOR<T,8>(d1,d2,d3,d4,d5,d6,d7,d8);}
+
 //#####################################################################
-template<class T,int d> struct SUM<VECTOR<T,d>,T,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct SUM<T,VECTOR<T,d>,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct DIFFERENCE<VECTOR<T,d>,T,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct DIFFERENCE<T,VECTOR<T,d>,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct PRODUCT<VECTOR<T,d>,VECTOR<T,d>,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct QUOTIENT<VECTOR<T,d>,VECTOR<T,d>,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct QUOTIENT<T,VECTOR<T,d>,typename ENABLE_IF<(d>3)>::TYPE>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct SUM<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct SUM<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct SUM<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct DIFFERENCE<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct DIFFERENCE<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct DIFFERENCE<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct PRODUCT<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct QUOTIENT<VECTOR<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct QUOTIENT<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct QUOTIENT<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
+template<class T,int d> struct NEGATION<VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
 //#####################################################################
 }
 #endif

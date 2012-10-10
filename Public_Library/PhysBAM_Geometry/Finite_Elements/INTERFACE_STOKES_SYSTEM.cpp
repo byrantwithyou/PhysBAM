@@ -193,9 +193,9 @@ Set_Matrix(const VECTOR<T,2>& mu)
 template<class TV> void INTERFACE_STOKES_SYSTEM<TV>::
 Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const ARRAY<TV>& f_interface,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u)
 {
-    VECTOR<VECTOR_ND<T>,TV::m> F_interface;
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> U;
+    VECTOR<ARRAY<T>,TV::m> F_interface;
+    VECTOR<VECTOR<ARRAY<T>,2>,TV::m> F_body;
+    VECTOR<VECTOR<ARRAY<T>,2>,TV::m> U;
     
     for(int i=0;i<TV::m;i++){
         F_interface(i).Resize(object.mesh.elements.m);

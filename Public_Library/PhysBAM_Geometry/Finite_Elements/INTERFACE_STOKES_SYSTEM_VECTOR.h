@@ -7,9 +7,9 @@
 #ifndef __INTERFACE_STOKES_SYSTEM_VECTOR__
 #define __INTERFACE_STOKES_SYSTEM_VECTOR__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class TV>
@@ -18,9 +18,9 @@ class INTERFACE_STOKES_SYSTEM_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCAL
     typedef typename TV::SCALAR T;
     typedef KRYLOV_VECTOR_BASE<T> BASE;
 public:
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> u;
-    VECTOR<VECTOR_ND<T>,2> p;
-    VECTOR<VECTOR_ND<T>,TV::m> q;
+    VECTOR<VECTOR<ARRAY<T>,2>,TV::m> u;
+    VECTOR<ARRAY<T>,2> p;
+    VECTOR<ARRAY<T>,TV::m> q;
 
     INTERFACE_STOKES_SYSTEM_VECTOR();
     ~INTERFACE_STOKES_SYSTEM_VECTOR();

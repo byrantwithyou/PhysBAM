@@ -2,16 +2,18 @@
 // Copyright 2005-2006, Eran Guendelman, Eftychios Sifakis.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/givens_rotate.h>
 #include <PhysBAM_Tools/Optimization/LINEAR_PROGRAMMING.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //####################################################################################
 // Function Move_Column_From_B_To_N_And_Shift_Down
 //####################################################################################
 // puts column of B in N, shifts remaining columns of B left, and puts column from S in B
 template<class T> void LINEAR_PROGRAMMING<T>::
-Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,VECTOR_ND<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,VECTOR_ND<int>& permute_N,const int n_column)
+Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,ARRAY<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,ARRAY<int>& permute_N,const int n_column)
 {
     assert(B.m==B.n);
     for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);permute_N(n_column)=permute_B(b_column);
@@ -24,12 +26,15 @@ Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,VECTOR_ND<int>& permute_
 // but we can make use of the fact that those values used to be on the diagonal (must be good values)
 // also updates N and b with the transformation
 template<class T> void LINEAR_PROGRAMMING<T>::
-Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>& N,VECTOR_ND<T>& b,const int column,const T tolerance,const bool check_last_column)
+Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>& N,ARRAY<T>& b,const int column,const T tolerance,const bool check_last_column)
 {
     assert(A.m==A.n);
     for(int i=column;i<A.n;i++){
         assert(abs(A(i+1,i))>tolerance);
-        VECTOR<T,2> v(A(i,i),A(i+1,i));A(i,i)=v.Magnitude();A(i+1,i)=0;v.Normalize();
+        VECTOR<T,2> v(A(i,i),A(i+1,i));
+        A(i,i)=v.Magnitude();
+        A(i+1,i)=0;
+        v.Normalize();
         for(int j=i+1;j<A.n;j++) givens_rotate(A(i,j),A(i+1,j),v.x,v.y);
         for(int j=0;j<N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
         givens_rotate(b(i),b(i+1),v.x,v.y);}
@@ -43,17 +48,17 @@ Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>
 // Function Find_Feasible_Solution
 //####################################################################################
 template<class T> void LINEAR_PROGRAMMING<T>::
-Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTOR_ND<T>& b,VECTOR_ND<T>& x_N,VECTOR_ND<int>& permute_B,VECTOR_ND<int>& permute_N,VECTOR_ND<T>& x_unpermuted,
+Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,ARRAY<T>& x_B,ARRAY<T>& b,ARRAY<T>& x_N,ARRAY<int>& permute_B,ARRAY<int>& permute_N,ARRAY<T>& x_unpermuted,
     const ARRAY<PAIR<bool,T> >& x_min,const ARRAY<PAIR<bool,T> >& x_max,const T tolerance,const T step_tolerance,bool verbose)
 {
     assert(B.m==B.n);
     ARRAY<bool> x_in_feasible_region(B.n+N.n);
-    for(int i=0;i<x_N.n;i++){ // TODO: starting x_N at min values (or max if no min)
+    for(int i=0;i<x_N.m;i++){ // TODO: starting x_N at min values (or max if no min)
         if(x_min(permute_N(i)).x) x_N(i)=x_min(permute_N(i)).y;
         else{assert(x_max(permute_N(i)).x);x_N(i)=x_max(permute_N(i)).y;} // must have a max if no min
         x_in_feasible_region(permute_N(i))=true;}
 
-    VECTOR_ND<T> c_B(B.n);
+    ARRAY<T> c_B(B.n);
     int iteration=1;
     for(;;iteration++){
         // solve
@@ -78,7 +83,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
             if(verbose)LOG::cout << "All constraints satisfied!" << std::endl;
             break;} // done
 
-        VECTOR_ND<T> pi=B.Transpose_Lower_Triangular_Solve(c_B),sigma(-N.Transpose_Times(pi));
+        ARRAY<T> pi=B.Transpose_Lower_Triangular_Solve(c_B),sigma(-N.Transpose_Times(pi));
 
         if(verbose) LOG::cout<<"c_B =\n"<<c_B<<"pi =\n"<<pi<<"sigma =\n"<<sigma<<std::endl;
 
@@ -94,10 +99,10 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 
         if(verbose) LOG::cout << "Releasing index " << index_to_release << " (muscle " << permute_N(index_to_release) << ")" << std::endl;
 
-        VECTOR_ND<T> p_N(N.n);
+        ARRAY<T> p_N(N.n);
         if(x_min(permute_N(index_to_release)).x && x_N(index_to_release)==x_min(permute_N(index_to_release)).y) p_N(index_to_release)=1;
         else if(x_max(permute_N(index_to_release)).x && x_N(index_to_release)==x_max(permute_N(index_to_release)).y) p_N(index_to_release)=-1;
-        VECTOR_ND<T> p_B(-B.Upper_Triangular_Solve(N*p_N));
+        ARRAY<T> p_B(-B.Upper_Triangular_Solve(N*p_N));
 
         if(verbose) LOG::cout<<"Got p_B\n"<<p_B<<"\nGot p_N\n"<<p_N<<std::endl;
 
@@ -147,7 +152,7 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 
             // put B column "limiting_index" in N column "index_to_release", and put N column "index_to_release" in
             // the last column of B (after shifting the other columns left)
-            int permute_n=permute_N(index_to_release);VECTOR_ND<T> column_from_N(B.n);N.Get_Column(index_to_release,column_from_N);
+            int permute_n=permute_N(index_to_release);ARRAY<T> column_from_N(B.n);N.Get_Column(index_to_release,column_from_N);
             Move_Column_From_B_To_N_And_Shift_Down(B,permute_B,limiting_index,N,permute_N,index_to_release);
             B.Set_Column(B.n,column_from_N);permute_B(B.n)=permute_n;
 
@@ -164,13 +169,14 @@ Find_Feasible_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTO
 
     if(x_in_feasible_region.Number_False()){ // have some values not in feasible region 
         LOG::cout << "PHYSBAM_WARNING: clamping values into feasible region after unsuccessful LP solve" << std::endl;
-        for(int i=0;i<x_B.n;i++) if(!x_in_feasible_region(permute_B(i))){
+        for(int i=0;i<x_B.m;i++) if(!x_in_feasible_region(permute_B(i))){
             if(x_min(permute_B(i)).x) x_B(i)=max(x_B(i),x_min(permute_B(i)).y);
             if(x_max(permute_B(i)).x) x_B(i)=min(x_B(i),x_max(permute_B(i)).y);}}
 
-    VECTOR_ND<int> permute(B.n+N.n);permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_N);
-    VECTOR_ND<T> x(B.n+N.n);x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_N);
-    x_unpermuted=x.Unpermute(permute);
+    ARRAY<int> permute(permute_B);
+    permute.Append_Elements(permute_N);
+    x_unpermuted.Resize(x_B.m+x_N.m);
+    x_unpermuted.Subset(permute).Combine(x_B,x_N);
 
     LOG::cout << "LP finished in " << iteration << " iterations" << std::endl;
     if(verbose) LOG::cout<<"LP Result x_B:\n"<<x_B<<"\nLP Result permute:\n"<<permute<<std::endl;

@@ -7,7 +7,6 @@
 #ifndef __SPLINE_MODEL__
 #define __SPLINE_MODEL__
 
-#include <PhysBAM_Tools/Arrays/ARRAY_RATIO.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Constitutive_Models/ROTATED_LINEAR.h>
 namespace PhysBAM{

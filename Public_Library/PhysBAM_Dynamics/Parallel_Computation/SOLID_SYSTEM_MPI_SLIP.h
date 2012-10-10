@@ -30,7 +30,7 @@ public:
     mutable ARRAY<ARRAY<TV> > recv_fluid_V_boundary_arrays;
     mutable ARRAY<ARRAY<TWIST<TV> > > recv_fluid_rigid_V_boundary_arrays;
     GENERALIZED_MASS<TV>* solid_mass;
-    mutable VECTOR_ND<T> packed_solid_velocities;
+    mutable ARRAY<T> packed_solid_velocities;
 
     NEWMARK_EVOLUTION<TV>& newmark_evolution;
 

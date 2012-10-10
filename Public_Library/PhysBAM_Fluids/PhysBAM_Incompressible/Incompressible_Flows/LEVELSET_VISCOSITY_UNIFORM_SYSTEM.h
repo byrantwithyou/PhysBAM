@@ -21,7 +21,7 @@ class LEVELSET_VISCOSITY_UNIFORM_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::S
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
 public:
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > VECTOR_T;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VECTOR_T;
 
     LEVELSET_FACE_POISSON_UNIFORM<TV> poisson;
     T scale;

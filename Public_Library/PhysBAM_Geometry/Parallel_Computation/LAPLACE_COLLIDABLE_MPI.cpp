@@ -84,7 +84,7 @@ Update_Solution_Regions_For_Solid_Fluid_Coupling(const T_MPI_GRID& mpi_grid)
 // Function Solve
 //#####################################################################
 template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::
-Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>& q,VECTOR_ND<T>& s,VECTOR_ND<T>& r,VECTOR_ND<T>& k,VECTOR_ND<T>& z,const T tolerance,const int color)
+Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const T tolerance,const int color)
 {
     if(color>filled_region_ranks.m){local_pcg.Solve(A,x,b,q,s,r,k,z,tolerance);return;}
     else{
@@ -97,7 +97,7 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>&
 // Function Solve
 //#####################################################################
 template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::
-Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance,const int color,const ARRAY<VECTOR<int,2> >& global_column_index_boundaries)
+Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const int color,const ARRAY<VECTOR<int,2> >& global_column_index_boundaries)
 {
     SPARSE_MATRIX_PARTITION temp_partition;
     PCG_SPARSE_MPI<T_GRID> pcg_mpi(local_pcg,(*communicators)(color),temp_partition);
@@ -115,8 +115,8 @@ template<class T_GRID> LAPLACE_COLLIDABLE_MPI<T_GRID>::LAPLACE_COLLIDABLE_MPI(T_
 template<class T_GRID> LAPLACE_COLLIDABLE_MPI<T_GRID>::~LAPLACE_COLLIDABLE_MPI(){}
 template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::Synchronize_Solution_Regions(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::Update_Solution_Regions_For_Solid_Fluid_Coupling(const T_MPI_GRID& mpi_grid){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,const T,const int){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance,const int color,
+template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<T>&,ARRAY<T>&,const T,const int){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+template<class T_GRID> void LAPLACE_COLLIDABLE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const int color,
     const ARRAY<VECTOR<int,2> >& global_column_index_boundaries){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 

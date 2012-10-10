@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
@@ -36,7 +35,7 @@ public:
     int solid_node;
     MPI::Intracomm* comm;
     MPI::Group *group,*solid_group,*fluid_group;
-    VECTOR_ND<int> solid_ranks,fluid_ranks;
+    ARRAY<int> solid_ranks,fluid_ranks;
 private:
     mutable int current_tag;
 public:
@@ -58,8 +57,8 @@ public:
     template<class T2> void Reduce_Add(const T2& input,T2& output) const;
     T Reduce_Min(const T local_value) const;
     T Reduce_Max(const T local_value) const;
-    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& x_array,
+        KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
         const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner,
         ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions);
     void Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,

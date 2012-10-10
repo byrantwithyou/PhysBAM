@@ -153,8 +153,8 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     ARRAY<INTERVAL<int> > interior_regions;
     int number_of_regions=0;
     ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array;
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > > kb_array;
-    ARRAY<VECTOR_ND<T> >& b_array=kb_array.v;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > > kb_array;
+    ARRAY<ARRAY<T> >& b_array=kb_array.v;
 
     ARRAY<int> rigid_body_particles_to_dynamic_rigid_body_particles_map(rigid_body_particles.Size());
     rigid_body_particles_to_dynamic_rigid_body_particles_map.Subset(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles)=IDENTITY_ARRAY<int>(solid_body_collection.rigid_body_collection.simulated_rigid_body_particles.m);
@@ -372,7 +372,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
 
     if(solids && Simulate_Fluids()){B.V*=(T)-1;B.rigid_V*=(T)-1;}
 
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > > x_array,p_array,ap_array,ar_array,r_array,z_array,zaq_array;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > > x_array,p_array,ap_array,ar_array,r_array,z_array,zaq_array;
     x_array.v.Resize(A_array.m);p_array.v.Resize(A_array.m);ap_array.v.Resize(A_array.m);ar_array.v.Resize(A_array.m);
     r_array.v.Resize(A_array.m);z_array.v.Resize(A_array.m);zaq_array.v.Resize(A_array.m);
     if(fluids){
@@ -490,7 +490,7 @@ Backward_Euler_Step_Velocity_Helper(const T dt,const T current_velocity_time,con
     if(fluids){
         T_ARRAYS_SCALAR& p=Get_Pressure();
         // Copy pressures back into pressure array
-        for(int i=0;i<x_array.v.m;i++) for(int j=0;j<x_array.v(i).n;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
+        for(int i=0;i<x_array.v.m;i++) for(int j=0;j<x_array.v(i).m;j++) p(matrix_index_to_cell_index_array(i)(j))=x_array.v(i)(j);
         PHYSBAM_DEBUG_WRITE_SUBSTEP("unscaled final pressures (sf coupled evolution)",0,1);
 
         // scale pressure back to get a real pressure
@@ -1086,16 +1086,15 @@ Apply_Pressure(const T dt,const T time)
 // Function Add_Nondynamic_Solids_To_Right_Hand_Side
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION<TV>::
-Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<VECTOR_ND<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
+Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors)
 {
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson=Get_Poisson();
     RIGID_BODY_PARTICLES<TV>& rigid_body_particles=solid_body_collection.rigid_body_collection.rigid_body_particle;
     DEFORMABLE_PARTICLES<TV>& particles=solid_body_collection.deformable_body_collection.particles;
     GENERALIZED_VELOCITY<TV> V(particles.V,rigid_body_particles.twist,solid_body_collection);
-    for(int i=0;i<colors;i++){
-        if(poisson->filled_region_touches_dirichlet(i)||poisson->solve_neumann_regions){
-            VECTOR_ND<T> right_hand_side_i;right_hand_side_i.Set_Subvector_View(right_hand_side(i),interior_regions(i));
-            SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Transpose_Times_Velocity(J_rigid_kinematic(i),V,right_hand_side_i);}}
+    for(int i=0;i<colors;i++)
+        if(poisson->filled_region_touches_dirichlet(i)||poisson->solve_neumann_regions)
+            SOLID_FLUID_SYSTEM<TV,SPARSE_MATRIX_FLAT_NXN<T> >::Add_J_Rigid_Transpose_Times_Velocity(J_rigid_kinematic(i),V,right_hand_side(i).Array_View(interior_regions(i)));
 }
 //#####################################################################
 // Function Average_Solid_Projected_Face_Velocities_For_Energy_Update

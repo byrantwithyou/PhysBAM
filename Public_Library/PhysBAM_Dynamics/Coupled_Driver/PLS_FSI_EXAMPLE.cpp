@@ -261,7 +261,7 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,const ARRAY<T,FACE_INDEX<TV::m> >& face_velocities)
 {
     GRID<TV>& grid=*fluids_parameters.grid;
-    T maximum_fluid_speed=face_velocities.Maxabs().Max(),maximum_particle_speed=0;
+    T maximum_fluid_speed=face_velocities.Max_Abs().Max(),maximum_particle_speed=0;
     PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=fluids_parameters.particle_levelset_evolution->Particle_Levelset(0);
     if(particle_levelset.use_removed_negative_particles) for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(particle_levelset.levelset.grid);iterator.Valid();iterator.Next()){
             PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>* particles=particle_levelset.removed_negative_particles(iterator.Cell_Index());

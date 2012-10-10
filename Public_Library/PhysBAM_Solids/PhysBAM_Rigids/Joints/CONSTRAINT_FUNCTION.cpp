@@ -370,15 +370,16 @@ LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION(const ARTICULATED_RIGID_BODY<TV>& arb,con
 template<class T> VECTOR<T,6> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 F(const T_IMPULSE& j) const
 {
-    TV jn,j_tau;j.Get_Subvector(0,jn);j.Get_Subvector(3,j_tau);
-    TV f_linear[2];ROTATION<TV> f_angular[2];
+    TV jn,j_tau;
+    j.Extract(jn,j_tau);
+    TV f_linear[2];
+    ROTATION<TV> f_angular[2];
     T_CONSTRAINT_ERROR f_of_j;
     for(int i=0;i<2;i++){
         TV j_total=TV::Cross_Product(rhat[i],jn)+j_tau;
         f_linear[i]=F_Linear_Helper(j_total,i);
         f_angular[i]=angular.F_Helper(j_total,i);}
-    f_of_j.Set_Subvector(0,f_linear[0]-f_linear[1]+linear.one_over_m*jn+linear.c);
-    f_of_j.Set_Subvector(3,(f_angular[0]*f_angular[1].Inverse()).Quaternion().v);
+    f_of_j.Combine(f_linear[0]-f_linear[1]+linear.one_over_m*jn+linear.c,(f_angular[0]*f_angular[1].Inverse()).Quaternion().v);
     return f_of_j;
 }
 //#####################################################################
@@ -387,8 +388,10 @@ F(const T_IMPULSE& j) const
 template<class T> MATRIX<T,6> LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<VECTOR<T,3> >::
 Jacobian(const T_IMPULSE& j) const
 {
-    TV jn,j_tau;j.Get_Subvector(0,jn);j.Get_Subvector(3,j_tau);
-    MATRIX<T,6> A;MATRIX<T,6,3> A_angular;
+    TV jn,j_tau;
+    j.Extract(jn,j_tau);
+    MATRIX<T,6> A;
+    MATRIX<T,6,3> A_angular;
     A.Add_To_Submatrix(0,0,one_over_m_matrix);
     TV j_total[2]={TV::Cross_Product(rhat[0],jn)+j_tau,TV::Cross_Product(rhat[1],jn)+j_tau};
     for(int i=0;i<2;i++){

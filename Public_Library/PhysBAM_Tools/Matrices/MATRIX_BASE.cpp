@@ -44,17 +44,17 @@ Householder_QR_Factorization(MATRIX_BASE<T,T_MATRIX2>& V,MATRIX_BASE<T,T_MATRIX3
 // Function Robust_Householder_QR_Solve
 //#####################################################################
 template<class T,class T_MATRIX> template<class T_VECTOR1,class T_VECTOR2> void MATRIX_BASE<T,T_MATRIX>::
-In_Place_Robust_Householder_QR_Solve(VECTOR_BASE<T,T_VECTOR1>& b,VECTOR_BASE<int,T_VECTOR2>& p)
+In_Place_Robust_Householder_QR_Solve(ARRAY_BASE<T,T_VECTOR1>& b,ARRAY_BASE<int,T_VECTOR2>& p)
 {
     assert(Rows()==b.Size() && Columns()==p.Size());
-    VECTOR_ND<T> a((INITIAL_SIZE)Rows());for(int i=0;i<Columns();i++) p(i)=i; // TODO: This should not assume VECTOR_ND.
-    VECTOR_ND<T> column_norm(Columns());for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) column_norm(j)+=sqr((*this)(i,j));
+    ARRAY<T> a((INITIAL_SIZE)Rows());for(int i=0;i<Columns();i++) p(i)=i; // TODO: This should not assume ARRAY.
+    ARRAY<T> column_norm(Columns());for(int j=0;j<Columns();j++) for(int i=0;i<Rows();i++) column_norm(j)+=sqr((*this)(i,j));
     for(int j=0;j<Columns();j++){
         int max_column=0;T max_column_norm=0;for(int k=j;k<Columns();k++) if(column_norm(k)>max_column_norm){max_column_norm=column_norm(k);max_column=k;}
         if(max_column_norm<FLT_MIN) return;
         if(max_column!=j){exchange(column_norm(j),column_norm(max_column));exchange(p(j),p(max_column));for(int i=0;i<Rows();i++) exchange((*this)(i,j),(*this)(i,max_column));}
         if(j==Rows()) return;
-        Get_Column(j,a);VECTOR_ND<T> v=a.Householder_Vector(j);T two_over_v_dot_v=(T)2/v.Magnitude_Squared();
+        Get_Column(j,a);ARRAY<T> v=a.Householder_Vector(j);T two_over_v_dot_v=(T)2/v.Magnitude_Squared();
         if((*this)(j,j)>=0)(*this)(j,j)=-sqrt(max_column_norm);else (*this)(j,j)=sqrt(max_column_norm);for(int i=j+1;i<Rows();i++)(*this)(i,j)=(T)0;
         for(int k=j+1;k<Columns();k++){
             T v_dot_a=0;for(int i=j;i<Rows();i++) v_dot_a+=v(i)*(*this)(i,k);T coefficient=v_dot_a*two_over_v_dot_v;for(int i=j;i<Rows();i++) (*this)(i,k)-=coefficient*v(i);}
@@ -119,7 +119,7 @@ Number_Of_Nonzero_Rows(const T threshold) const
     return nonzero_rows;
 }
 //#####################################################################
-template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Robust_Householder_QR_Solve<VECTOR_ND<float>,VECTOR_ND<int> >(VECTOR_BASE<float,VECTOR_ND<float> >&,VECTOR_BASE<int,VECTOR_ND<int> >&);
+template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Robust_Householder_QR_Solve<ARRAY<float>,ARRAY<int> >(ARRAY_BASE<float,ARRAY<float> >&,ARRAY_BASE<int,ARRAY<int> >&);
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_Gram_Schmidt_QR_Factorization<MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&);
 template void MATRIX_BASE<float,MATRIX<float,1,1> >::In_Place_Cholesky_Factorization();
 template void MATRIX_BASE<float,MATRIX<float,3,3> >::In_Place_Cholesky_Factorization();
@@ -127,12 +127,12 @@ template void MATRIX_BASE<float,MATRIX<float,4,4> >::In_Place_Cholesky_Factoriza
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_Cholesky_Factorization();
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_Cholesky_Factorization();
 template void MATRIX_BASE<float,MATRIX<float,6,6> >::In_Place_PLU_Factorization<MATRIX<float,6,6> >(MATRIX_BASE<float,MATRIX<float,6,6> >&,VECTOR<int,6>&);
-template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_PLU_Factorization<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&,VECTOR_ND<int>&);
+template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_PLU_Factorization<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&,ARRAY<int>&);
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::In_Place_LU_Factorization<MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&);
 template int MATRIX_BASE<float,MATRIX_MXN<float> >::Number_Of_Nonzero_Rows(const float threshold) const;
 template void MATRIX_BASE<float,MATRIX_MXN<float> >::Householder_QR_Factorization<MATRIX_MXN<float>,MATRIX_MXN<float> >(MATRIX_BASE<float,MATRIX_MXN<float> >&,MATRIX_BASE<float,MATRIX_MXN<float> >&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_Robust_Householder_QR_Solve<VECTOR_ND<double>,VECTOR_ND<int> >(VECTOR_BASE<double,VECTOR_ND<double> >&,VECTOR_BASE<int,VECTOR_ND<int> >&);
+template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_Robust_Householder_QR_Solve<ARRAY<double>,ARRAY<int> >(ARRAY_BASE<double,ARRAY<double> >&,ARRAY_BASE<int,ARRAY<int> >&);
 template void MATRIX_BASE<double,MATRIX<double,6,6> >::In_Place_Gram_Schmidt_QR_Factorization<MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&);
 template void MATRIX_BASE<double,MATRIX<double,1,1> >::In_Place_Cholesky_Factorization();
 template void MATRIX_BASE<double,MATRIX<double,3,3> >::In_Place_Cholesky_Factorization();
@@ -140,7 +140,7 @@ template void MATRIX_BASE<double,MATRIX<double,4,4> >::In_Place_Cholesky_Factori
 template void MATRIX_BASE<double,MATRIX<double,6,6> >::In_Place_Cholesky_Factorization();
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_Cholesky_Factorization();
 template void MATRIX_BASE<double,MATRIX<double,6,6> >::In_Place_PLU_Factorization<MATRIX<double,6,6> >(MATRIX_BASE<double,MATRIX<double,6,6> >&,VECTOR<int,6>&);
-template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_PLU_Factorization<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&,VECTOR_ND<int>&);
+template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_PLU_Factorization<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&,ARRAY<int>&);
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::In_Place_LU_Factorization<MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&);
 template int MATRIX_BASE<double,MATRIX_MXN<double> >::Number_Of_Nonzero_Rows(const double threshold) const;
 template void MATRIX_BASE<double,MATRIX_MXN<double> >::Householder_QR_Factorization<MATRIX_MXN<double>,MATRIX_MXN<double> >(MATRIX_BASE<double,MATRIX_MXN<double> >&,MATRIX_BASE<double,MATRIX_MXN<double> >&);

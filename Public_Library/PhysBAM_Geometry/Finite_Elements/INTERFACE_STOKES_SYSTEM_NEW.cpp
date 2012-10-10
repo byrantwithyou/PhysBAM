@@ -139,7 +139,7 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
     for(int i=0;i<TV::m;i++)
         biu.Add_Volume_Block(helper_rhs_pu(i),p_stencil,*u_stencil(i),VECTOR<T,2>(1,1));
 
-    rhs_interface=new VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>;
+    rhs_interface=new VECTOR<VECTOR<ARRAY<T>,2>,TV::m>;
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
             (*rhs_interface)(i)[s].Resize(cdi->flat_size);
@@ -213,8 +213,8 @@ Set_Matrix(const VECTOR<T,2>& mu,const ARRAY<TV>& f_interface)
 template<class TV> void INTERFACE_STOKES_SYSTEM_NEW<TV>::
 Set_RHS(VECTOR_T& rhs,const VECTOR<ARRAY<TV,TV_INT>,2> f_body,const VECTOR<ARRAY<T,FACE_INDEX<TV::m> >,2>& u)
 {
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> F_body;
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m> U;
+    VECTOR<VECTOR<ARRAY<T>,2>,TV::m> F_body;
+    VECTOR<VECTOR<ARRAY<T>,2>,TV::m> U;
     
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++){
@@ -277,7 +277,7 @@ Set_Jacobi_Preconditioner()
                     sum+=sqr(m_pu.A(e).a)*J.u(i)[s](m_pu.A(e).j);}
             if(sum<1e-12) {active_dofs.p[s](k)=0;LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
             else J.p[s](k)=1/sum;}}
-    for(int k=0;k<J.q.n;k++){
+    for(int k=0;k<J.q.m;k++){
         T sum=0;
         for(int i=0;i<TV::m;i++)
             for(int s=0;s<2;s++){

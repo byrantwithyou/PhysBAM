@@ -4,6 +4,9 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_MXN
 //#####################################################################
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Math_Tools/Inverse.h>
+#include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 namespace PhysBAM{
 //#####################################################################
@@ -109,7 +112,7 @@ Element_Present(const int i,const int j) const
 // Function Times_Add
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -121,7 +124,7 @@ Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 // Function Times_Subtract
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -133,7 +136,7 @@ Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 // Function Times
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Times(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     result.Fill(0);
     Times_Add(x,result);
@@ -142,7 +145,7 @@ Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 // Function Transpose_Times_Add
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose_Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Transpose_Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -153,7 +156,7 @@ Transpose_Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 // Function Transpose_Times_Subtract
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose_Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Transpose_Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     int index=offsets(0);
     for(int i=0;i<m;i++){
@@ -164,7 +167,7 @@ Transpose_Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 // Function Times
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
-Transpose_Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Transpose_Times(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     result.Fill(0);
     Transpose_Times_Add(x,result);
@@ -288,9 +291,9 @@ Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
 // Function Times_Diagonal_Times
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
-Times_Diagonal_Times(const VECTOR_ND<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
+Times_Diagonal_Times(const ARRAY<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs)
 {
-    assert(rhs.m==n && diagonal.n==n);
+    assert(rhs.m==n && diagonal.m==n);
     SPARSE_MATRIX_FLAT_MXN result;
     const int columns=rhs.n,rows=m;
     ARRAY<int> row_lengths(rows);
@@ -323,7 +326,7 @@ Times_Diagonal_Times(const VECTOR_ND<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>
 // Function Scale_Rows
 //#####################################################################
 template<class T> SPARSE_MATRIX_FLAT_MXN<T> SPARSE_MATRIX_FLAT_MXN<T>::
-Scale_Rows(const VECTOR_ND<T>& d) const
+Scale_Rows(const ARRAY<T>& d) const
 {
     SPARSE_MATRIX_FLAT_MXN<T> result=*this;
     for(int i=0;i<result.m;i++)

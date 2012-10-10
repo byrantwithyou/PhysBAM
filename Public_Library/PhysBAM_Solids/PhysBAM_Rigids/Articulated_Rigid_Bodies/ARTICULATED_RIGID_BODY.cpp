@@ -320,7 +320,7 @@ Apply_Prestabilization_To_Joint(const JOINT_ID joint_id,const T dt,const T epsil
         typename LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV>::T_IMPULSE j_combined;
         LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this),joint_id,dt,epsilon_scale,location);
         Compute_Constraint_Correcting_Impulse(f_error,j_combined);
-        j_combined.Get_Subvector(0,jn);j_combined.Get_Subvector(TV::dimension,j_tau);
+        j_combined.Extract(jn,j_tau);
         RIGID_BODY<TV>::Apply_Impulse(parent,child,location,jn,j_tau);}
     else if(joint.Has_Prismatic_Constraint()){
         LINEAR_CONSTRAINT_FUNCTION<TV> f_error(debug_cast<ARTICULATED_RIGID_BODY<TV>&>(*this),joint_id,dt,epsilon_scale,location);
@@ -403,7 +403,10 @@ Poststabilization_Projection_Joint(const JOINT_ID joint_id,ARRAY_VIEW<TWIST<TV> 
     int parent_index=Parent(joint_id)->particle_index,child_index=Child(joint_id)->particle_index;
     VECTOR<T,2*TWIST<TV>::dimension> t(twist(parent_index).Get_Vector(),twist(child_index).Get_Vector());
     t-=lambda_to_delta_v(joint_id)*(v_to_lambda(joint_id)*t);
-    VECTOR<T,TWIST<TV>::dimension> tb;t.Get_Subvector(0,tb);twist(parent_index).Set_Vector(tb);t.Get_Subvector(TWIST<TV>::dimension,tb);twist(child_index).Set_Vector(tb);
+    VECTOR<T,TWIST<TV>::dimension> ta,tb;
+    t.Extract(ta,tb);
+    twist(parent_index).Set_Vector(ta);
+    twist(child_index).Set_Vector(tb);
 }
 //####################################################################################
 // Function Initialize_Poststabilization_Projection

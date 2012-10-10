@@ -4,11 +4,11 @@
 //#####################################################################
 // Class MATRIX_VISCOUS_FORCES
 //##################################################################### 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COLLISION_AWARE_INDEX_MAP.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/MATRIX_VISCOUS_FORCES.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO.h>
@@ -64,7 +64,7 @@ Compute(const T dt,const ARRAY<bool,FACE_INDEX<d> >& psi_N,T mu)
 // Function Times_Add
 //#####################################################################
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
-Times_Add(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const
+Times_Add(const ARRAY<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const
 {
     for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);
@@ -74,7 +74,7 @@ Times_Add(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_forc
 // Function Times
 //#####################################################################
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
-Times(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const
+Times(const ARRAY<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients) const
 {
     viscous_force_coefficients.Fill(T());
     Times_Add(velocities,viscous_force_coefficients);
@@ -83,7 +83,7 @@ Times(const VECTOR_ND<T>& velocities,ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_co
 // Function Transpose_Times_Add
 //#####################################################################
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
-Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,VECTOR_ND<T>& velocities) const
+Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,ARRAY<T>& velocities) const
 {
     for(int i=0;i<entries.m;i++){
         const ENTRY& entry=entries(i);
@@ -93,7 +93,7 @@ Transpose_Times_Add(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,
 // Function Transpose_Times
 //#####################################################################
 template<class TV> void MATRIX_VISCOUS_FORCES<TV>::
-Transpose_Times(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,VECTOR_ND<T>& velocities) const
+Transpose_Times(const ARRAY<T,VISCOUS_FORCE_ID>& viscous_force_coefficients,ARRAY<T>& velocities) const
 {
     velocities.Fill(T());
     Transpose_Times_Add(viscous_force_coefficients,velocities);
@@ -115,7 +115,7 @@ Test_Matrix() const
 {
     RANDOM_NUMBERS<T> random;
     ARRAY<T,VISCOUS_FORCE_ID> K(last_id),K2(K);
-    VECTOR_ND<T> V(index_map.Number_Faces()),V2(V);
+    ARRAY<T> V(index_map.Number_Faces()),V2(V);
 
     random.Fill_Uniform(K,-1,1);
     random.Fill_Uniform(V,-1,1);

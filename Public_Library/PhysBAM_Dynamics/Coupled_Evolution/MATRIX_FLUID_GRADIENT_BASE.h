@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 
 namespace PhysBAM{
@@ -49,11 +50,11 @@ public:
 
 //#####################################################################
     virtual void Compute(const ARRAY<bool,FACE_INDEX<d> >& psi_N_domain_boundary)=0;
-    void Collect_Maxabs_Velocity(const VECTOR_ND<T>& faces,VECTOR_ND<T>& cells) const;
-    void Times_Add(const VECTOR_ND<T>& cells,VECTOR_ND<T>& faces) const;
-    void Times(const VECTOR_ND<T>& cells,VECTOR_ND<T>& faces) const;
-    void Transpose_Times_Add(const VECTOR_ND<T>& faces,VECTOR_ND<T>& cells) const;
-    void Transpose_Times(const VECTOR_ND<T>& faces,VECTOR_ND<T>& cells) const;
+    void Collect_Maxabs_Velocity(const ARRAY<T>& faces,ARRAY<T>& cells) const;
+    void Times_Add(const ARRAY<T>& cells,ARRAY<T>& faces) const;
+    void Times(const ARRAY<T>& cells,ARRAY<T>& faces) const;
+    void Transpose_Times_Add(const ARRAY<T>& faces,ARRAY<T>& cells) const;
+    void Transpose_Times(const ARRAY<T>& faces,ARRAY<T>& cells) const;
     void Test_Matrix() const;
     void Print_Each_Matrix(int n) const;
     void Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const PHYSBAM_OVERRIDE;

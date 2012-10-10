@@ -154,7 +154,7 @@ public:
     {return max_corner-min_corner;}
 
     TV Center() const
-    {return (min_corner+max_corner)/2;} // Be nice to T=int
+    {return (min_corner+max_corner)/(T)2;} // Be nice to T=int
 
     TV Minimum_Corner() const
     {return min_corner;}

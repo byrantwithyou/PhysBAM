@@ -18,7 +18,6 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
 
-template<class T> class VECTOR_ND;
 template<class T> class SPARSE_MATRIX_FLAT_NXN;
 
 template<class T>
@@ -78,7 +77,7 @@ public:
     {incomplete_cholesky=true;modified_incomplete_cholesky=true;modified_incomplete_cholesky_coefficient=modified_incomplete_cholesky_coefficient_input;} // note that both are true
     
 //#####################################################################
-    virtual void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+    virtual void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
         const T tolerance=1e-7,const bool recompute_preconditioner=true);
 //#####################################################################
 };

@@ -20,7 +20,6 @@ template<class T,int d> class VECTOR;
 template<class T,int d> class DIAGONAL_MATRIX;
 template<class T,int d> class SYMMETRIC_MATRIX;
 template<class T,int d> class UPPER_TRIANGULAR_MATRIX;
-template<class T,class T_VECTOR> class VECTOR_BASE;
 template<class T,class T_MATRIX> class MATRIX_BASE;
 template<class T,class T_ARRAY,class ID> class ARRAY_BASE;
 class TYPED_ISTREAM;
@@ -61,7 +60,7 @@ public:
     template<int d> VECTOR<T,d> Get_Uniform_Vector(const T a,const T b);
     template<class TV> TV Get_Uniform_Vector(const RANGE<TV>& box);
     void Fill_Uniform(T& x,const T a,const T b);
-    template<class T_VECTOR> void Fill_Uniform(VECTOR_BASE<T,T_VECTOR>& v,const T a,const T b);
+    template<class T_VECTOR> void Fill_Uniform(ARRAY_BASE<T,T_VECTOR>& v,const T a,const T b);
     template<class T_MATRIX> void Fill_Uniform(MATRIX_BASE<T,T_MATRIX>& m,const T a,const T b);
     template<int d> void Fill_Uniform(DIAGONAL_MATRIX<T,d>& m,const T a,const T b);
     template<int d> void Fill_Uniform(SYMMETRIC_MATRIX<T,d>& m,const T a,const T b);

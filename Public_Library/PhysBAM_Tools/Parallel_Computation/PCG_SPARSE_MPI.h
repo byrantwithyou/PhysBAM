@@ -44,21 +44,21 @@ public:
     template<class TYPE> TYPE Global_Max(const TYPE& input)
     {TYPE output;MPI_UTILITIES::Reduce(input,output,MPI::MAX,comm);return output;}
 
-    void Fill_Ghost_Cells(VECTOR_ND<T>& v)
+    void Fill_Ghost_Cells(ARRAY<T>& v)
     {ARRAY<MPI::Request> requests;requests.Preallocate(2*partition.number_of_sides);
     for(int s=0;s<partition.number_of_sides;s++)if(boundary_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append(comm.Isend(v.x-1,1,boundary_datatypes(s),partition.neighbor_ranks(s),s));
     for(int s=0;s<partition.number_of_sides;s++)if(ghost_datatypes(s)!=MPI::DATATYPE_NULL) requests.Append(comm.Irecv(v.x-1,1,ghost_datatypes(s),partition.neighbor_ranks(s),((s-1)^1)+1));
     MPI_UTILITIES::Wait_All(requests);}
     
 //#####################################################################
-    void Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>& q,VECTOR_ND<T>& s,VECTOR_ND<T>& r,VECTOR_ND<T>& k,VECTOR_ND<T>& z,const int tag,const T tolerance=1e-7);
-    void Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance=1e-7,const bool recompute_preconditioner=true);
-    void Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
+    void Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const int tag,const T tolerance=1e-7);
+    void Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance=1e-7,const bool recompute_preconditioner=true);
+    void Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
         const T tolerance=1e-7,const bool recompute_preconditioner=true);
     void Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries);
     void Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries);
-    void Fill_Ghost_Cells_Far(VECTOR_ND<T>& x);
-    void Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x);    
+    void Fill_Ghost_Cells_Far(ARRAY<T>& x);
+    void Fill_Ghost_Cells_Threaded(ARRAY<T>& x);    
     void Initialize_Datatypes();
 //#####################################################################
 };

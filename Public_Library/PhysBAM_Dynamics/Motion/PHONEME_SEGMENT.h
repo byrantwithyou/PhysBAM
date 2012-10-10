@@ -46,7 +46,7 @@ public:
     T World_Time_To_Sample_Time(T time)
     {T offset=time-peak;return offset*time_scaling+phoneme_sample->time_length/2;}
 
-    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,VECTOR_ND<T> >* interpolation_input)
+    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation_input)
     {assert(phoneme_sample);phoneme_sample->Set_Custom_Interpolation(interpolation_input);}
 
     template <class RW>
@@ -70,7 +70,7 @@ public:
     phoneme_sample->template Interpolate_Positions<RW>(positions,STRING_UTILITIES::string_sprintf("%s/%s/%d-%d",phoneme_data_directory.c_str(),sequence_name,first_frame_sequence,last_frame_sequence),
                                                        position_filename_prefix,first_frame_phoneme,World_Time_To_Sample_Time(time));}
 
-    VECTOR_ND<T> Controls(const T time) const
+    ARRAY<T> Controls(const T time) const
     {assert(phoneme_sample);GRID<VECTOR<T,1> > time_grid(phoneme_sample->frame_length,peak-(phoneme_sample->frame_length/(T)2)*phoneme_sample->time_length/phoneme_sample->frame_length*time_scaling,
                                                  peak+(phoneme_sample->frame_length/(T)2)*phoneme_sample->time_length/phoneme_sample->frame_length*time_scaling);
     return phoneme_sample->Controls(clamp(time,time_segment.min_corner.x-leading_context_duration,time_segment.max_corner.x+trailing_context_duration),time_grid);}

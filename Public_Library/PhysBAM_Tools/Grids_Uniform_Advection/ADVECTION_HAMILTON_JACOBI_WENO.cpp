@@ -17,7 +17,7 @@ Advection_Solver(const int m,const T dx,const ARRAY<T2,VECTOR<int,1> >& Z,const 
     ARRAY<T2,VECTOR<int,1> > D1(-2,m+2);for(i=-3;i<m+2;i++) D1(i)=(Z(i+1)-Z(i))*one_over_dx;
 
     if(compute_epsilon){
-        epsilon=(T)1e-6*sqr(D1.Maxabs());
+        epsilon=(T)1e-6*sqr(D1.Max_Abs());
         if(epsilon == 0) epsilon=(T)1e-6;} // epsilon=0 implies all v_i=0 and all u_Zx=0  
 
     for(i=0;i<m;i++){

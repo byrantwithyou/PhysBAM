@@ -8,7 +8,10 @@
 #define __ARRAY__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
+#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
+#include <PhysBAM_Tools/Utilities/EXCEPTIONS.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
@@ -44,6 +47,13 @@ public:
         :base_pointer(0),buffer_size(m_input),m(m_input)
     {
         assert(m>=ID());base_pointer=new T[Value(m)];
+        if(!IS_CLASS<T>::value && initialize_using_default_constructor){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=T();}
+    }
+
+    explicit ARRAY(const INITIAL_SIZE m_input,const bool initialize_using_default_constructor=true)
+        :base_pointer(0),buffer_size(Value(m_input)),m(Value(m_input))
+    {
+        assert(Value(m)>=0);base_pointer=new T[Value(m)];
         if(!IS_CLASS<T>::value && initialize_using_default_constructor){ID m=Size();for(ID i(0);i<m;i++) (*this)(i)=T();}
     }
 
@@ -202,6 +212,18 @@ public:
     bool temporary_array_defined=temporary_array!=0;if(!temporary_array_defined) temporary_array=new ARRAY<T2,ID>(compaction_array_m,false);
     ARRAY<T2,ID>::Put(array,*temporary_array);for(ID i(0);i<compaction_array_m;i++) if(compaction_array(i)>0) array(compaction_array(i))=(*temporary_array)(i);
     if(!temporary_array_defined){delete temporary_array;temporary_array=0;}}
+
+    T* begin() // for stl
+    {return Get_Array_Pointer();}
+
+    const T* begin() const // for stl
+    {return Get_Array_Pointer();}
+
+    T* end() // for stl
+    {return Get_Array_Pointer()+m;}
+
+    const T* end() const // for stl
+    {return Get_Array_Pointer()+m;}
 
 private:
     template<class T2>

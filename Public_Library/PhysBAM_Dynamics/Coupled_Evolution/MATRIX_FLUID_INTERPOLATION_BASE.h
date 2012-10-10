@@ -34,10 +34,10 @@ public:
 //#####################################################################
     virtual COUPLING_CONSTRAINT_ID Number_Of_Constraints() const=0;
     virtual void Compute(int ghost_cells)=0;
-    virtual void Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const=0;
-    void Times(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const;
-    virtual void Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const=0;
-    void Transpose_Times(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const;
+    virtual void Times_Add(const ARRAY<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const=0;
+    void Times(const ARRAY<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const;
+    virtual void Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,ARRAY<T>& faces) const=0;
+    void Transpose_Times(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,ARRAY<T>& faces) const;
     virtual void Print() const=0;
     void Test_Matrix() const;
     virtual void Print_Each_Matrix(int n) const=0;

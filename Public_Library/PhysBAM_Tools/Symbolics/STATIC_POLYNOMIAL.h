@@ -8,6 +8,8 @@
 #define __STATIC_POLYNOMIAL__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #include <PhysBAM_Tools/Vectors/STATIC_TENSOR.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{

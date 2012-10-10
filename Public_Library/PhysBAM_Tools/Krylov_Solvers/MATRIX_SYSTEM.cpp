@@ -92,7 +92,7 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) co
     P->Solve_Forward_Substitution(vr.v,temp_vector->v,true);
     P->Solve_Backward_Substitution(temp_vector->v,vz.v,false,true);
 }
-template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,VECTOR_ND<float> > >;
+template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<float>,float,KRYLOV_VECTOR_WRAPPER<float,ARRAY<float> > >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,VECTOR_ND<double> > >;
+template struct MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<double>,double,KRYLOV_VECTOR_WRAPPER<double,ARRAY<double> > >;
 #endif

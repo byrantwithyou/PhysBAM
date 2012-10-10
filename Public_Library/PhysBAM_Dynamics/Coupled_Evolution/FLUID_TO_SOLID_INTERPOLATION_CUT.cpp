@@ -376,7 +376,7 @@ Compute_Beta()
 {
 //    static VECTOR<T,3> colors[5]={VECTOR<T,3>(1,0,0),VECTOR<T,3>(1,1,0),VECTOR<T,3>(0,1,0),VECTOR<T,3>(0,0,1),VECTOR<T,3>(1,0,1)};
     T dx=index_map.grid.dX(1),full_volume=dx*dx,imi=Inverse(full_volume*density),imo=index_map.two_phase?Inverse(full_volume*outside_density):FLT_MAX;
-    VECTOR_ND<T>& beta_inverse=(*fluid_mass)->one_over_fluid_mass_at_faces;
+    ARRAY<T>& beta_inverse=(*fluid_mass)->one_over_fluid_mass_at_faces;
     T in_length=0,length=index_map.grid.Face_Size(1);
     for(int i=0;i<index_map.indexed_faces.m;i++){
         FACE_INDEX<TV::m> face=index_map.indexed_faces(i);
@@ -493,7 +493,7 @@ Compute_Gradient()
 // Function Times_Add
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
-Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
+Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
 {
     for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
         for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
@@ -503,7 +503,7 @@ Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_vel
 // Function Transpose_Times_Add
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
-Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const
+Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const
 {
     for(int i=0;i<entries.m;i++){const ARRAY<ENTRY>& array=entries(i);
         for(int j=0;j<array.m;j++){const ENTRY& e=array(j);
@@ -557,9 +557,9 @@ Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 // Function Fill_Extra_Velocities
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
-Fill_Extra_Velocities(VECTOR_ND<T>& fluid_velocity_vector) const
+Fill_Extra_Velocities(ARRAY<T>& fluid_velocity_vector) const
 {
-    VECTOR_ND<T> div(gradient->gradient.m);
+    ARRAY<T> div(gradient->gradient.m);
     for(int i=index_map.indexed_faces.m;i<gradient->gradient.m;i++) fluid_velocity_vector(i)=0;
     gradient->Transpose_Times(fluid_velocity_vector,div);
     for(int i=index_map.indexed_faces.m;i<gradient->gradient.m;i++){
@@ -573,7 +573,7 @@ Fill_Extra_Velocities(VECTOR_ND<T>& fluid_velocity_vector) const
 // Function Dump_Extra_Velocities
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION_CUT<TV>::
-Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector)
+Dump_Extra_Velocities(const ARRAY<T>& fluid_velocity_vector)
 {
 /*
     T mn=FLT_MAX,mx=-mn;
@@ -596,14 +596,14 @@ Dump_Extra_Velocities(const VECTOR_ND<T>& fluid_velocity_vector)
 }
 //#####################################################################
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,2> >;
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Dump_Extra_Velocities(const VECTOR_ND<float>&);
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Fill_Extra_Velocities(VECTOR_ND<float>&) const;
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Dump_Extra_Velocities(const VECTOR_ND<float>&);
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Fill_Extra_Velocities(VECTOR_ND<float>&) const;
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Dump_Extra_Velocities(const ARRAY<float>&);
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,1> >::Fill_Extra_Velocities(ARRAY<float>&) const;
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Dump_Extra_Velocities(const ARRAY<float>&);
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<float,3> >::Fill_Extra_Velocities(ARRAY<float>&) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,2> >;
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Dump_Extra_Velocities(const VECTOR_ND<double>&);
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Fill_Extra_Velocities(VECTOR_ND<double>&) const;
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Dump_Extra_Velocities(const VECTOR_ND<double>&);
-template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Fill_Extra_Velocities(VECTOR_ND<double>&) const;
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Dump_Extra_Velocities(const ARRAY<double>&);
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,1> >::Fill_Extra_Velocities(ARRAY<double>&) const;
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Dump_Extra_Velocities(const ARRAY<double>&);
+template void FLUID_TO_SOLID_INTERPOLATION_CUT<VECTOR<double,3> >::Fill_Extra_Velocities(ARRAY<double>&) const;
 #endif

@@ -18,7 +18,7 @@ class PHONEME_ARRANGEMENT
     typedef VECTOR<T,3> TV;
 public:
     ARRAY<PHONEME_SEGMENT<T> > list;
-    const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,VECTOR_ND<T> >* interpolation;
+    const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation;
     typedef T (*BLENDING_CALLBACK_TYPE)(const PHONEME_SEGMENT<T>&,const T);
     BLENDING_CALLBACK_TYPE blending_callback;
     RANGE<VECTOR<T,1> >* valid_segment;
@@ -50,7 +50,7 @@ public:
     void Set_Blending_Callback(BLENDING_CALLBACK_TYPE blending_callback_input=PHONEME_ARRANGEMENT<T>::Linear_Falloff_Blending)
     {blending_callback=blending_callback_input;}
 
-    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,VECTOR_ND<T> >* interpolation_input)
+    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation_input)
     {interpolation=interpolation_input;}
 
     void Set_Face_Control_Parameters(FACE_CONTROL_PARAMETERS<T>* face_control_parameters_input)
@@ -96,16 +96,16 @@ public:
           ARRAY<VECTOR<T,3> >::copy((T)1-blending_fraction,positions(0),blending_fraction,positions(1),position);return;}
       default: PHYSBAM_FATAL_ERROR("Interpolation between 3 or more phoneme segments is not supported");}}
 
-    VECTOR_ND<T> Controls(const T time) const
+    ARRAY<T> Controls(const T time) const
     {assert(interpolation);ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
     switch(segment_list.m){
       case 0: 
           {PHYSBAM_FATAL_ERROR(STRING_UTILITIES::string_sprintf("No value to interpolate from at specified time instance %d",time));}
       case 1: 
           {face_control_parameters->Set(list(segment_list(0)).Controls(time));face_control_parameters->Scale(list(segment_list(0)).scaling);
-          VECTOR_ND<T> controls;face_control_parameters->Get(controls);return controls;}
+          ARRAY<T> controls;face_control_parameters->Get(controls);return controls;}
       case 2:
-          {ARRAY<VECTOR_ND<T> ,VECTOR<int,1> > blending_controls(0,2);
+          {ARRAY<ARRAY<T> ,VECTOR<int,1> > blending_controls(0,2);
           for(int i=0;i<2;i++){
               blending_controls(i)=list(segment_list(i)).Controls(time);
               face_control_parameters->Set(blending_controls(i));
@@ -125,7 +125,7 @@ public:
       case 2:
         // Fill the face_control_parameters twice, with appropriate scaling, and get good distance
           {const PHONEME_SEGMENT<T>& seg1=list(segment_list(0)),&seg2=list(segment_list(1));
-          VECTOR_ND<T> controls1=seg1.Controls(time),controls2=seg2.Controls(time);
+          ARRAY<T> controls1=seg1.Controls(time),controls2=seg2.Controls(time);
           face_control_parameters->Set(controls1);
           if(seg1.scaling!=1)face_control_parameters->Scale(seg1.scaling);
           face_control_parameters->Save_Controls();face_control_parameters->Set(controls2);
@@ -133,23 +133,23 @@ public:
           return (seg2.scaling+seg1.scaling+1/seg1.scaling+1/seg2.scaling)*face_control_parameters->Distance(weights);}
       default: PHYSBAM_FATAL_ERROR("Interpolation between 3 or more phoneme segments is not supported");}}
     
-    VECTOR_ND<T> Optimal_Scaling(const GRID<VECTOR<T,1> > sampling_grid,const T stiffness,int* samples_used=0)
+    ARRAY<T> Optimal_Scaling(const GRID<VECTOR<T,1> > sampling_grid,const T stiffness,int* samples_used=0)
     {if(samples_used)*samples_used=0;
-    MATRIX_MXN<T> normal_equations_matrix(list.m,list.m);VECTOR_ND<T> normal_equations_rhs(list.m);
+    MATRIX_MXN<T> normal_equations_matrix(list.m,list.m);ARRAY<T> normal_equations_rhs(list.m);
     for(int sample=0;sample<sampling_grid.counts.x;sample++){
         T time=sampling_grid.Axis_X(sample,0);ARRAY<int> segment_list;Segments_Intersecting_Time_Instance(time,segment_list);
         if(segment_list.m==2){
             if(samples_used)(*samples_used)++;
             int i=segment_list(0),j=segment_list(1);
-            VECTOR_ND<T> ci=list(i).Controls(time),cj=list(j).Controls(time);
-            normal_equations_matrix(i,i)+=VECTOR_ND<T>::Dot_Product(ci,ci);
-            normal_equations_matrix(i,j)-=VECTOR_ND<T>::Dot_Product(ci,cj);
-            normal_equations_matrix(j,i)-=VECTOR_ND<T>::Dot_Product(cj,ci);
-            normal_equations_matrix(j,j)+=VECTOR_ND<T>::Dot_Product(cj,cj);}
+            ARRAY<T> ci=list(i).Controls(time),cj=list(j).Controls(time);
+            normal_equations_matrix(i,i)+=ARRAY<T>::Dot_Product(ci,ci);
+            normal_equations_matrix(i,j)-=ARRAY<T>::Dot_Product(ci,cj);
+            normal_equations_matrix(j,i)-=ARRAY<T>::Dot_Product(cj,ci);
+            normal_equations_matrix(j,j)+=ARRAY<T>::Dot_Product(cj,cj);}
         for(int segment=0;segment<segment_list.m;segment++){
-            int i=segment_list(segment);VECTOR_ND<T> ci=list(i).Controls(time);
-            normal_equations_matrix(i,i)+=sqr(stiffness)*VECTOR_ND<T>::Dot_Product(ci,ci);
-            normal_equations_rhs(i)+=sqr(stiffness)*VECTOR_ND<T>::Dot_Product(ci,ci);}}
+            int i=segment_list(segment);ARRAY<T> ci=list(i).Controls(time);
+            normal_equations_matrix(i,i)+=sqr(stiffness)*ARRAY<T>::Dot_Product(ci,ci);
+            normal_equations_rhs(i)+=sqr(stiffness)*ARRAY<T>::Dot_Product(ci,ci);}}
     return normal_equations_matrix.PLU_Solve(normal_equations_rhs);}
 
     template<class RW>

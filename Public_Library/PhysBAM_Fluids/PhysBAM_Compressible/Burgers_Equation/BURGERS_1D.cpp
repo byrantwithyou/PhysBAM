@@ -39,7 +39,7 @@ CFL()
 
     ARRAY<T,VECTOR<int,1> > u(0,m);
     for(int i=0;i<m;i++) u(i)=U(i)(0);
-    T dt_convect=u.Maxabs()/dx;
+    T dt_convect=u.Max_Abs()/dx;
 
     return 1/max(dt_convect,1/max_time_step);
 }

@@ -306,7 +306,7 @@ First_Order_Time_Step(int substep,T dt)
         Write_Substep("revert velocity and store difference",substep,1);}
 
     Advect_Fluid(dt,substep);
-    LOG::cout<<"Maximum face velocity (after advect) = ("<<face_velocities.Maxabs().Magnitude()<<": "<<face_velocities.Maxabs()<<std::endl;
+    LOG::cout<<"Maximum face velocity (after advect) = ("<<face_velocities.Max_Abs().Magnitude()<<": "<<face_velocities.Max_Abs()<<std::endl;
     Write_Substep("advect",substep,1);
     if(example.kang_poisson_viscosity && !fluids_parameters.implicit_viscosity){
         face_velocities+=face_velocities_scratch;
@@ -337,7 +337,7 @@ First_Order_Time_Step(int substep,T dt)
         //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
     Write_Substep("extrapolate about interface",substep,1);
     incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,face_velocities,time+dt);
-    LOG::cout<<"Maximum face velocity = ("<<face_velocities.Maxabs().Magnitude()<<": "<<face_velocities.Maxabs()<<std::endl;
+    LOG::cout<<"Maximum face velocity = ("<<face_velocities.Max_Abs().Magnitude()<<": "<<face_velocities.Max_Abs()<<std::endl;
 
     Write_Substep("end step",substep,1);
     example.solids_evolution->time+=dt;

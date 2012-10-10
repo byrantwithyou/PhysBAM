@@ -17,8 +17,8 @@ class LINEAR_BLEND_SKINNING
 public:
     SPARSE_MATRIX_FLAT_NXN<T> h;
     SPARSE_MATRIX_FLAT_NXN<T> surface_laplacian;
-    ARRAY<VECTOR_ND<T> > weights;
-    ARRAY<VECTOR_ND<T> > closest_points;
+    ARRAY<ARRAY<T> > weights;
+    ARRAY<ARRAY<T> > closest_points;
     ARRAY<bool> touched_particles,touched_elements;
     ARRAY<T> areas;
     ARRAY<int> row_lengths;
@@ -149,7 +149,7 @@ public:
         for(int i=0;i<number_particles;i++) surface_laplacian.Set_Element(i,i,surface_laplacian(i,i)*(T)6./areas(i));
 
         for(int i=0;i<body_motion.trajectories.m;i++){
-            VECTOR_ND<T> b(number_particles);
+            ARRAY<T> b(number_particles);
             surface_laplacian.Negate();
             for(int j=0;j<number_particles;j++) surface_laplacian.Add_Element(j,j,h(j,j));
             h.Times(closest_points(i),b);

@@ -389,11 +389,11 @@ CFL_Using_Sound_Speed() const
             velocity(cell_index)=velocity_cell;
             velocity_minus_c(cell_index)=velocity_cell-sound_speed*TV::All_Ones_Vector();velocity_plus_c(cell_index)=velocity_cell+sound_speed*TV::All_Ones_Vector();}}
 
-    TV max_velocity_minus_c=velocity_minus_c.Componentwise_Maxabs();TV max_velocity_plus_c=velocity_plus_c.Componentwise_Maxabs();
+    TV max_velocity_minus_c=velocity_minus_c.Componentwise_Max_Abs();TV max_velocity_plus_c=velocity_plus_c.Componentwise_Max_Abs();
     T dt_convect=0;for(int axis=0;axis<T_GRID::dimension;axis++) dt_convect+=max(max_velocity_minus_c(axis),max_velocity_plus_c(axis))/grid.dX[axis];
     dt_convect=max(dt_convect,1/max_time_step);
     LOG::cout<<"max sound speed="<<max_sound_speed<<std::endl;
-    LOG::cout<<"max velocity="<<velocity.Componentwise_Maxabs()<<std::endl;
+    LOG::cout<<"max velocity="<<velocity.Componentwise_Max_Abs()<<std::endl;
     return 1/dt_convect;
 }
 //#####################################################################

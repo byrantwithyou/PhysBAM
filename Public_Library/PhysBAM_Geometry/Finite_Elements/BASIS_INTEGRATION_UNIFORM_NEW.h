@@ -44,13 +44,13 @@ public:
         const ARRAY<T,TV_INT>& phi_input,CELL_DOMAIN_INTERFACE_NEW<TV>& cdi_input);
     ~BASIS_INTEGRATION_UNIFORM_NEW();
 
-    void Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface);
+    void Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<ARRAY<T>,2>,TV::m>& rhs_interface);
     void Compute_Open_Entries();
     void Add_Uncut_Cell(const TV_INT& cell,int enclose_inside);
     void Add_Uncut_Fine_Cell(const TV_INT& cell,int block,int enclose_inside);
     void Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
         int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation,
-        const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface,int& element_base);
+        const ARRAY<TV>& f_interface,VECTOR<VECTOR<ARRAY<T>,2>,TV::m>& rhs_interface,int& element_base);
     template<int d0,int d1>
     void Add_Volume_Block(SYSTEM_VOLUME_BLOCK_HELPER_NEW<TV>& helper,const BASIS_STENCIL_UNIFORM<TV,d0>& s0,
         const BASIS_STENCIL_UNIFORM<TV,d1>& s1,const VECTOR<T,2>& scale);

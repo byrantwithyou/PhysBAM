@@ -8,6 +8,8 @@
 #define __ARRAY_VIEW__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
+#include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
+#include <PhysBAM_Tools/Utilities/EXCEPTIONS.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
 
@@ -88,6 +90,18 @@ public:
 
     const T* Get_Array_Pointer() const
     {return base_pointer;}
+
+    T* begin() // for stl
+    {return Get_Array_Pointer();}
+
+    const T* begin() const // for stl
+    {return Get_Array_Pointer();}
+
+    T* end() // for stl
+    {return Get_Array_Pointer()+m;}
+
+    const T* end() const // for stl
+    {return Get_Array_Pointer()+m;}
 
     ARRAY_VIEW<typename REMOVE_CONST<T>::TYPE>& Const_Cast() const // return reference to allow Exchange
     {return reinterpret_cast<ARRAY_VIEW<typename REMOVE_CONST<T>::TYPE>&>(const_cast<ARRAY_VIEW&>(*this));}

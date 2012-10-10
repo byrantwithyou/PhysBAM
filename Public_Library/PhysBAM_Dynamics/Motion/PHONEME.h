@@ -5,12 +5,12 @@
 #ifndef __PHONEME__
 #define __PHONEME__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_STATE.h>
 namespace PhysBAM{
 
@@ -23,8 +23,8 @@ public:
     std::string name,previous_name,next_name;
     int frame_length;
     T time_length;
-    ARRAY<VECTOR_ND<T> ,VECTOR<int,1> > controls;
-    const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,VECTOR_ND<T> >* interpolation;
+    ARRAY<ARRAY<T> ,VECTOR<int,1> > controls;
+    const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation;
 
     PHONEME()
         :interpolation(0)
@@ -45,7 +45,7 @@ public:
     void Resize_Controls(const int leading_context_frames=0,const int trailing_context_frames=0)
     {controls.Resize(1-leading_context_frames,frame_length+trailing_context_frames);}
 
-    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,VECTOR_ND<T> >* interpolation_input)
+    void Set_Custom_Interpolation(const INTERPOLATION_UNIFORM<GRID<VECTOR<T,1> >,ARRAY<T> >* interpolation_input)
     {interpolation=interpolation_input;}
 
     template <class RW>
@@ -72,16 +72,16 @@ public:
     if(!positions.m) positions.Resize(first_frame_positions.m);
     ARRAY<VECTOR<T,3> >::copy((T)1-interpolation_fraction,first_frame_positions,interpolation_fraction,second_frame_positions,positions);}
 
-    VECTOR_ND<T> Controls(const T time) const
+    ARRAY<T> Controls(const T time) const
     {assert(interpolation);GRID<VECTOR<T,1> > time_grid(frame_length,0,time_length);return interpolation->Clamped_To_Array(time_grid,controls,time);}
 
-    VECTOR_ND<T> Controls(const T time,const GRID<VECTOR<T,1> >& time_grid) const
+    ARRAY<T> Controls(const T time,const GRID<VECTOR<T,1> >& time_grid) const
     {assert(interpolation);return interpolation->Clamped_To_Array(time_grid,controls,VECTOR<T,1>(time));}
 
-    const VECTOR_ND<T>& Frame_Controls(const int frame) const
+    const ARRAY<T>& Frame_Controls(const int frame) const
     {return controls(frame);}
 
-    VECTOR_ND<T>& Frame_Controls(const int frame)
+    ARRAY<T>& Frame_Controls(const int frame)
     {return controls(frame);}
 
     RANGE<VECTOR<T,1> > Time_Range() const

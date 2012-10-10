@@ -35,14 +35,14 @@ dimensionality known at compile-time. TWIST variables (defined in TWIST.h) resul
 
 B. Heap-allocated vectors
 
-VECTOR_ND.h
-SPARSE_VECTOR_ND.h
+ARRAY.h
+SPARSE_ARRAY.h
 
-VECTOR_ND objects are heap-allocated and are sized at run-time. Unlike the ARRAY or LIST_ARRAY classes which may hold objects of any type, VECTOR_ND objects
+ARRAY objects are heap-allocated and are sized at run-time. Unlike the ARRAY or LIST_ARRAY classes which may hold objects of any type, ARRAY objects
 are intended for vectors of scalar types, and their size (albeit technically changeable at run-time) is expected to be specified just once without any further
-change. Nevertheless, there is much functional overlap between VECTOR_ND<T> and ARRAY<T>, and the latter is frequently used in PhysBAM for linear algebra
-purposes as well. Generally, VECTOR_ND objects are often used in linear algebra operations with explicit matrices (such as MATRIX_MXN) while ARRAY objects are
-commonly used with implicitly defined matrices and operators. Finally, SPARSE_VECTOR_ND is optimized for storing vectors with few nonzero entries.
+change. Nevertheless, there is much functional overlap between ARRAY<T> and ARRAY<T>, and the latter is frequently used in PhysBAM for linear algebra
+purposes as well. Generally, ARRAY objects are often used in linear algebra operations with explicit matrices (such as MATRIX_MXN) while ARRAY objects are
+commonly used with implicitly defined matrices and operators. Finally, SPARSE_ARRAY is optimized for storing vectors with few nonzero entries.
 
 Additional headers:
 

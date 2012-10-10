@@ -60,7 +60,7 @@ public:
     ARRAY<PROJECTION_UNIFORM<GRID<TV> >*> local_projection_array;
 
     SPARSE_MATRIX_FLAT_NXN<T> A;
-    VECTOR_ND<T> b;
+    ARRAY<T> b;
     ARRAY<int,TV_INT> cell_index_to_matrix_index;
     ARRAY<TV_INT,int> matrix_index_to_cell_index;
     int test_number;
@@ -431,7 +431,7 @@ public:
             row_counts(i)=(2*TV::dimension+1)-boundary;}
         A.Set_Row_Lengths(row_counts);
         TV one_over_dx2=Inverse(local_mac_grid.dX*local_mac_grid.dX);
-        T default_row_sum=-2*one_over_dx2.L1_Norm();
+        T default_row_sum=-2*one_over_dx2.Sum_Abs();
         TV_INT grid_counts=local_mac_grid.counts;
         for(typename GRID<TV>::CELL_ITERATOR iterator(local_mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
             T row_sum=default_row_sum;
@@ -455,7 +455,7 @@ public:
         /*{
             int number_of_unknowns=matrix_index_to_cell_index.m;            
             A.Negate();b*=(T)-1;
-            VECTOR_ND<T> x(number_of_unknowns),q,s,r,k,z;
+            ARRAY<T> x(number_of_unknowns),q,s,r,k,z;
             for(int i=0;i<number_of_unknowns;i++) x(i)=local_projection.elliptic_solver->u(matrix_index_to_cell_index(i));
             local_projection.elliptic_solver->Find_Tolerance(b);
             local_projection.elliptic_solver->pcg.Solve(A,x,b,q,s,r,k,z,local_projection.elliptic_solver->tolerance,false);

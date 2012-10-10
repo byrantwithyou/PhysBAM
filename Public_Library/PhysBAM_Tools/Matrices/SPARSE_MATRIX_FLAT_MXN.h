@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class T>
@@ -61,12 +60,12 @@ public:
     int Find_Index(const int i,const int j) const;
     int Find_Index_Exists(const int i,const int j) const;
     bool Element_Present(const int i,const int j) const;
-    void Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Transpose_Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Transpose_Times_Add(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Transpose_Times_Subtract(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
+    void Times(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Transpose_Times(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Transpose_Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Transpose_Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const;
     void Negate();
     SPARSE_MATRIX_FLAT_MXN<T>& operator*=(const T a);
     SPARSE_MATRIX_FLAT_MXN<T>& operator/=(const T a);
@@ -75,8 +74,8 @@ public:
     void Compress(SPARSE_MATRIX_FLAT_MXN<T>& compressed);
     void Transpose(SPARSE_MATRIX_FLAT_MXN<T>& A_transpose) const;
     SPARSE_MATRIX_FLAT_MXN<T> Times_Transpose(const SPARSE_MATRIX_FLAT_MXN<T>& rhs);
-    SPARSE_MATRIX_FLAT_MXN<T> Times_Diagonal_Times(const VECTOR_ND<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs); // (*this) * diagonal * (rhs)
-    SPARSE_MATRIX_FLAT_MXN<T> Scale_Rows(const VECTOR_ND<T>& d) const;
+    SPARSE_MATRIX_FLAT_MXN<T> Times_Diagonal_Times(const ARRAY<T> diagonal,const SPARSE_MATRIX_FLAT_MXN<T>& rhs); // (*this) * diagonal * (rhs)
+    SPARSE_MATRIX_FLAT_MXN<T> Scale_Rows(const ARRAY<T>& d) const;
     SPARSE_MATRIX_FLAT_NXN<T> operator+(const SPARSE_MATRIX_FLAT_NXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator+(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;
     SPARSE_MATRIX_FLAT_MXN<T> operator-(const SPARSE_MATRIX_FLAT_MXN<T>& A_rhs) const;

@@ -234,15 +234,15 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
         dt_surface_tension=sqrt(kappa_cfl)/grid.Minimum_Edge_Length();}
     T dt_viscosity=0;
     /*if(!inviscid && nonzero_viscosity){
-        T norm_2_over_sqr_DX=2*Inverse(sqr_DX).L1_Norm();
+        T norm_2_over_sqr_DX=2*Inverse(sqr_DX).Sum_Abs();
         if(viscosity) dt_viscosity=viscosity/projection.density*norm_2_over_sqr_DX;
-        if(use_variable_viscosity){assert(!projection.flame);dt_viscosity=variable_viscosity.Maxabs()/projection.density*norm_2_over_sqr_DX;}}*/
+        if(use_variable_viscosity){assert(!projection.flame);dt_viscosity=variable_viscosity.Max_Abs()/projection.density*norm_2_over_sqr_DX;}}*/
     if(viscous_only) return 1/max(dt_viscosity,1/max_time_step);
     TV max_force;
-    if(use_force) max_force=force.Maxabs();
+    if(use_force) max_force=force.Max_Abs();
     T dt_force=0;
-    if(use_force) dt_force=(max_force*one_over_DX).L1_Norm();
-    if(gravity) dt_force+=abs(gravity)*(downward_direction*one_over_DX).L1_Norm();
+    if(use_force) dt_force=(max_force*one_over_DX).Sum_Abs();
+    if(gravity) dt_force+=abs(gravity)*(downward_direction*one_over_DX).Sum_Abs();
     if(strain) dt_force+=1/strain->CFL(projection.density);
     T dt_overall=(dt_convection+dt_viscosity+sqrt(sqr(dt_convection+dt_viscosity)+4*dt_force+4*sqr(dt_surface_tension)))/2; 
     return 1/max(dt_overall,1/max_time_step);

@@ -2,13 +2,13 @@
 // Copyright 2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_CUTTING.h>
@@ -159,9 +159,9 @@ Set_Matrix(const VECTOR<T,2>& mu)
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Set_RHS(VECTOR_T& rhs,const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface)
 {
-    VECTOR_ND<T> F_interface(system_size);
-    VECTOR_ND<T>* F_body[TV::m];
-    for(int i=0;i<TV::m;i++) F_body[i]=new VECTOR_ND<T>(system_size);
+    ARRAY<T> F_interface(system_size);
+    ARRAY<T>* F_body[TV::m];
+    for(int i=0;i<TV::m;i++) F_body[i]=new ARRAY<T>(system_size);
     for(int i=0;i<TV::m;i++)
         for(int j=0;j<f_interface.m;j++)
             F_interface(j+index_range_q[i].min_corner)=f_interface(j)(i);
@@ -214,7 +214,7 @@ Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const
 // Function Get_U_Part
 //#####################################################################
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
-Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
+Get_U_Part(const ARRAY<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
 {
     u.Resize(grid);
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
@@ -227,7 +227,7 @@ Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const
 // Function Get_P_Part
 //#####################################################################
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
-Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p) const
+Get_P_Part(const ARRAY<T>& x,ARRAY<T,TV_INT>& p) const
 {
     p.Resize(grid.Domain_Indices());
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
@@ -266,7 +266,7 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Project(KRYLOV_VECTOR_BASE<T>& x) const
 {
-    VECTOR_ND<T>& v=debug_cast<VECTOR_T&>(x).v;
+    ARRAY<T>& v=debug_cast<VECTOR_T&>(x).v;
     v-=v.Dot(null_p)*null_p;
     for(int i=0;i<TV::m;i++)
         v-=v.Dot(null_u[i])*null_u[i];
@@ -293,8 +293,8 @@ Project_Nullspace(KRYLOV_VECTOR_BASE<T>& x) const
 template<class TV> void INTERFACE_FLUID_SYSTEM<TV>::
 Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& r,KRYLOV_VECTOR_BASE<T>& z) const
 {
-    const VECTOR_ND<T>& rv=debug_cast<const VECTOR_T&>(r).v;
-    VECTOR_ND<T>& zv=debug_cast<VECTOR_T&>(z).v;
+    const ARRAY<T>& rv=debug_cast<const VECTOR_T&>(r).v;
+    ARRAY<T>& zv=debug_cast<VECTOR_T&>(z).v;
     for(int i=0;i<system_size;i++) zv(i)=rv(i)*J(i);
 }
 template class INTERFACE_FLUID_SYSTEM<VECTOR<float,2> >;

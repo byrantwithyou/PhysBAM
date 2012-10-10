@@ -7,11 +7,11 @@
 #ifndef __LEVELSET_FACE_POISSON_UNIFORM__
 #define __LEVELSET_FACE_POISSON_UNIFORM__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
@@ -26,7 +26,7 @@ public:
 
     LEVELSET_INDEX_MAP_UNIFORM<TV>& index_map;
     SPARSE_MATRIX_FLAT_MXN<T> P;
-    VECTOR_ND<T> b;
+    ARRAY<T> b;
     T theta_threshold;
 
     LEVELSET_FACE_POISSON_UNIFORM(LEVELSET_INDEX_MAP_UNIFORM<TV>& index_map_input);

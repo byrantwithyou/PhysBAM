@@ -10,9 +10,9 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
-#include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_COLOR.h>
 
 namespace PhysBAM{
 
@@ -63,8 +63,8 @@ public:
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_qu;
 
     VECTOR<ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >,TV::m> matrix_rhs_pu,matrix_inertial_rhs;
-    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> rhs_surface;
-    VECTOR_ND<T> q_rhs;
+    VECTOR<ARRAY<ARRAY<T> >,TV::m> rhs_surface;
+    ARRAY<T> q_rhs;
 
     ARRAY<VECTOR_T*> null_modes;
     VECTOR<ARRAY<ARRAY<int> >,TV::m> inactive_u;

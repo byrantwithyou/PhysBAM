@@ -4,6 +4,7 @@
 //#####################################################################
 // Class KANG_POISSON_VISCOSITY
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATED_COLOR_MAP.h>
@@ -15,7 +16,6 @@
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
@@ -129,7 +129,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
 
     SYSTEM_MATRIX_HELPER<T> helper;
     ARRAY<GRAD_HELPER<T> > grad_helper;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > p,rhs;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > p,rhs;
     p.v.Resize(num_cells);
     rhs.v.Resize(num_cells);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
@@ -195,7 +195,7 @@ Project_Fluid(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T dt) const
     LOG::cout<<"pressure jump range: "<<mn<<"  "<<mx<<std::endl;
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Set_Matrix(num_cells,matrix);
-    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > > SYSTEM;
+    typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
     matrix.Construct_Incomplete_Cholesky_Factorization();
     SYSTEM system(matrix);
     system.P=matrix.C;
@@ -266,13 +266,13 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
             dual_cell_index(it.index)=++num_dual_cells;}
 
     SYSTEM_MATRIX_HELPER<T> helper;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > u,b;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > u,b;
     u.v.Resize(num_dual_cells);
     b.v.Resize(num_dual_cells);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     KRYLOV_SOLVER<T>::Ensure_Size(vectors,u,3);
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >& r=debug_cast<KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >&>(*vectors(0));
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >& q=debug_cast<KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> >&>(*vectors(1));
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >& r=debug_cast<KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >&>(*vectors(0));
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >& q=debug_cast<KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> >&>(*vectors(1));
 
     T mu_n=fluids_parameters.viscosity,mu_p=fluids_parameters.outside_viscosity;
     T rho_n=fluids_parameters.density,rho_p=fluids_parameters.outside_density;
@@ -327,7 +327,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         if(index1>=0 && index2>=0) helper.data.Append(TRIPLE<int,int,T>(index2,index1,-A));
         if(index2>=0) helper.data.Append(TRIPLE<int,int,T>(index2,index2,A));}
 
-    if(implicit) for(int i=0;i<r.v.n;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
+    if(implicit) for(int i=0;i<r.v.m;i++) helper.data.Append(TRIPLE<int,int,T>(i,i,r.v(i)));
 
     SPARSE_MATRIX_FLAT_NXN<T> matrix;
     helper.Set_Matrix(num_dual_cells,matrix);
@@ -340,7 +340,7 @@ Apply_Viscosity(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,int axis,T dt,bool 
         OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("visc-b-%i.txt",solve_id).c_str()).Write("b",b.v);}
 
     if(implicit){
-        typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > > SYSTEM;
+        typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > > SYSTEM;
         matrix.Construct_Incomplete_Cholesky_Factorization();
         SYSTEM system(matrix);
         system.P=matrix.C;

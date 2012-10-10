@@ -211,7 +211,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
 template<class TV> void INTERFACE_STOKES_SYSTEM_COLOR<TV>::
 Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX<TV::m> > >* u,bool analytic_velocity_correction)
 {
-    VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> F_volume;
+    VECTOR<ARRAY<ARRAY<T> >,TV::m> F_volume;
     
     Resize_Vector(rhs); // assumes rhs was 0
     rhs.q=q_rhs;
@@ -233,7 +233,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_COLOR<TV>* vfc,const ARRAY<ARRAY<T,FACE_INDEX
             matrix_rhs_pu(i)(c).Transpose_Times_Add(F_volume(i)(c),rhs.u(i)(c));
 
     if(u){
-        VECTOR<ARRAY<VECTOR_ND<T> >,TV::m> U;
+        VECTOR<ARRAY<ARRAY<T> >,TV::m> U;
         for(int i=0;i<TV::m;i++){
             U(i).Resize(cdi->colors);
             for(int c=0;c<cdi->colors;c++){
@@ -295,7 +295,7 @@ Set_Jacobi_Preconditioner()
                 inactive_p(c).Append(k);
                 LOG::cout<<"WARNING: small row sum in the PU block."<<std::endl;}
             else J.p(c)(k)=1/sum;}}
-    for(int k=0;k<J.q.n;k++){
+    for(int k=0;k<J.q.m;k++){
         T sum=0;
         for(int i=0;i<TV::m;i++)
             for(int c=0;c<cdi->colors;c++){
@@ -388,7 +388,7 @@ Clear_Unused_Entries(VECTOR_T& v) const
 {
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<cdi->colors;c++){
-            VECTOR_ND<T>& u=v.u(i)(c);
+            ARRAY<T>& u=v.u(i)(c);
             const ARRAY<int>& inactive=inactive_u(i)(c);
             for(int k=0;k<inactive.m;k++)
                 u(inactive(k))=0;}

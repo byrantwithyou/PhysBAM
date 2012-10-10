@@ -25,7 +25,7 @@ public:
     typedef PROJECTION_DYNAMICS_UNIFORM<T_GRID> BASE;using BASE::p_grid;using BASE::elliptic_solver;using BASE::Compute_Divergence;using BASE::Apply_Pressure;
     
     SPARSE_MATRIX_FLAT_NXN<T> A;
-    VECTOR_ND<T> b;
+    ARRAY<T> b;
     ARRAY<int,TV_INT> cell_index_to_matrix_index;
     ARRAY<TV_INT,int> matrix_index_to_cell_index;
 

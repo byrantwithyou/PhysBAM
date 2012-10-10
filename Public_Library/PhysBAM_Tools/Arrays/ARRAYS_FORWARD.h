@@ -38,6 +38,12 @@ template<class T_ARRAY> struct ARRAY_RESULT_TYPE{typedef typename T_ARRAY::RESUL
 template<class T_ARRAY> struct ARRAY_RESULT_TYPE<const T_ARRAY>{typedef typename T_ARRAY::CONST_RESULT_TYPE TYPE;};
 
 template<class T,class ID,class SCALAR> struct REPLACE_FLOATING_POINT<ARRAY<T,ID>,SCALAR>{typedef ARRAY<typename REPLACE_FLOATING_POINT<T,SCALAR>::TYPE,ID> TYPE;};
-
+template<class T_ARRAY1,class T_ARRAY2> class ARRAY_SUM;
+template<class T_ARRAY1,class T_ARRAY2> class ARRAY_DIFFERENCE;
+template<class T_ARRAY1,class T_ARRAY2> class ARRAY_PRODUCT;
+template<class T_ARRAY1,class T_ARRAY2> class ARRAY_QUOTIENT;
+template<class T_ARRAY> class ARRAY_NEGATION;
+template<class T1,class T_ARRAY2> class ARRAY_PLUS_SCALAR;
+template<class T1,class T_ARRAY2> class ARRAY_LEFT_MULTIPLE;
 }
 #endif

@@ -128,15 +128,15 @@ Active_Nonkinematic_Subset() const
     return result;
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
-Get(VECTOR_ND<T>& values) const
+Get(ARRAY<T>& values) const
 {
-    values=VECTOR_ND<T>(Size());
+    values=ARRAY<T>(Size());
     for(int i=0;i<Size();i++) values(i)=(*this)(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
-Get(VECTOR_ND<T>& values,const ARRAY<int>& subset) const
+Get(ARRAY<T>& values,const ARRAY<int>& subset) const
 {
-    values=VECTOR_ND<T>(subset.m);
+    values=ARRAY<T>(subset.m);
     for(int i=0;i<subset.m;i++) values(i)=(*this)(subset(i));
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
@@ -152,15 +152,15 @@ Get_Active(ARRAY<bool>& active,const ARRAY<int>& subset) const
     for(int i=0;i<subset.m;i++) active(i)=Active(subset(i));
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
-Set(const VECTOR_ND<T>& values)
+Set(const ARRAY<T>& values)
 {
-    assert(values.n==Size());
+    assert(values.m==Size());
     for(int i=0;i<Size();i++) (*this)(i)=values(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
-Set(const VECTOR_ND<T>& values,const ARRAY<int>& subset)
+Set(const ARRAY<T>& values,const ARRAY<int>& subset)
 {
-    assert(values.n==subset.m);
+    assert(values.m==subset.m);
     for(int i=0;i<subset.m;i++) (*this)(subset(i))=values(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
@@ -192,11 +192,11 @@ Penalty() const
     for(int s=0;s<list.m;s++) result+=list(s)->Penalty();
     return result;
 }
-template<class T> VECTOR_ND<T> FACE_CONTROL_PARAMETERS<T>::
+template<class T> ARRAY<T> FACE_CONTROL_PARAMETERS<T>::
 Penalty_Gradient() const
 {
     ARRAY<int> subset(Active_Subset());
-    VECTOR_ND<T> result(subset.m);
+    ARRAY<T> result(subset.m);
     for(int i=0;i<subset.m;i++){
         int s,c;
         Seek(subset(i),s,c);
@@ -283,9 +283,9 @@ Identity(const int control_index) const
     return (*list(s)).Identity(c);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
-Identity_Controls(VECTOR_ND<T>& values) const
+Identity_Controls(ARRAY<T>& values) const
 {
-    values=VECTOR_ND<T>(Size());
+    values=ARRAY<T>(Size());
     for(int i=0;i<Size();i++) values(i)=Identity(i);
 }
 template<class T> void FACE_CONTROL_PARAMETERS<T>::
@@ -296,17 +296,17 @@ Maximal_Controls()
 template<class T> template<class RW> void FACE_CONTROL_PARAMETERS<T>::
 Read(std::istream& input_stream)
 {
-    VECTOR_ND<T> values;
+    ARRAY<T> values;
     ARRAY<bool> active;
     Read_Binary<RW>(input_stream,values,active);
-    assert(values.n==Size()&&active.m==Size());
+    assert(values.m==Size()&&active.m==Size());
     Set(values);
     Set_Active(active);
 }
 template<class T> template<class RW> void FACE_CONTROL_PARAMETERS<T>::
 Write(std::ostream& output_stream) const
 {
-    VECTOR_ND<T> values;
+    ARRAY<T> values;
     ARRAY<bool> active;
     Get(values);
     Get_Active(active);

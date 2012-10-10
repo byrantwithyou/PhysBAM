@@ -789,7 +789,7 @@ Apply_Rigid_Deformable_Contact_Projection(ARRAY_VIEW<const TV> X,ARRAY_VIEW<TV> 
         VECTOR<T,TV::dimension+T_SPIN::dimension> m_inverse_j_full;
         if(precompute.A_inverted) m_inverse_j_full=precompute.A*b;
         else m_inverse_j_full=precompute.A.In_Place_Cholesky_Solve(b);
-        m_inverse_j_full.Get_Subvector(0,m_inverse_j);m_inverse_j_full.Get_Subvector(TV::dimension,m_inverse_j_tau);
+        m_inverse_j_full.Extract(m_inverse_j,m_inverse_j_tau);
         twist.linear+=m_inverse_j;twist.angular+=m_inverse_j_tau;}
 
     // compute particle impulses and apply to particles
@@ -912,8 +912,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             Y.Set_Submatrix(0,0,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::dimension,-MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
             A.Set_Submatrix(0,0,Z*M[0]);
             A.Set_Submatrix(T_SPIN::dimension,0,Y*M[1]);
-            b.Set_Subvector(0,Z*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]));
-            b.Set_Subvector(T_SPIN::dimension,Y*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]));}
+            b.Combine(Z*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]),Y*VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1]));}
         else{
             assert(equation_type==2 && TV::dimension==3);
             int u_index=eigenvalues.To_Vector().Arg_Max();
@@ -924,7 +923,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
             Y.Set_Submatrix(0,0,MATRIX<T,TV::dimension>::Identity_Matrix());Y.Set_Submatrix(0,T_SPIN::dimension,MATRIX_POLICY<TV>::CROSS_PRODUCT_MATRIX::Cross_Product_Matrix(centroid));
             VECTOR<T,TV::dimension+T_SPIN::dimension> b_helper[2]={VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[0],mrs[0]),VECTOR<T,TV::dimension+T_SPIN::dimension>(ms[1],mrs[1])};
             A.Set_Submatrix(TV::dimension*(TV::dimension==3),0,Y*M[1]); // Don't compile index out of bounds in 2D, even though this case cannot happen in 2D.
-            b.Set_Subvector(TV::dimension,Y*b_helper[1]);
+            b.Array_View((int)TV::dimension,(int)TV::dimension)=Y*b_helper[1];
             MATRIX<T,1,TV::dimension+T_SPIN::dimension> A_row;
             for(int i=0;i<TV::dimension;i++){
                 Z_helper.Get_Submatrix(i,0,A_row);
@@ -936,7 +935,7 @@ Push_Out_From_Rigid_Body(RIGID_BODY<TV>& rigid_body,ARRAY<RIGID_BODY_PARTICLE_IN
         VECTOR<T,TV::dimension+T_SPIN::dimension> delta_twist;
         if(equation_type==0 || equation_type==3) delta_twist=A.In_Place_Cholesky_Solve(b);
         else delta_twist=A.Solve_Linear_System(b);
-        delta_twist.Get_Subvector(0,velocity);delta_twist.Get_Subvector(TV::dimension,angular_velocity);}
+        delta_twist.Extract(velocity,angular_velocity);}
 
     // apply push to particles
     for(int i=0;i<particle_interactions.m;i++){int p=particle_interactions(i);

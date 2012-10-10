@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <fstream>
 namespace PhysBAM{
-template<class T,class T_VECTOR> class VECTOR_BASE;
 template<class T,class T_MATRIX> class MATRIX_BASE;
 template<class T,class T_ARRAY,class ID> class ARRAY_BASE;
 template<class T,int d> class SYMMETRIC_MATRIX;
@@ -56,7 +55,7 @@ public:
     void Write_Entry(int x);
     template<class T2,int d> void Write_Entry(const VECTOR<T2,d>& x);
     template<class T2,class T_ARRAY> void Write(const char* name,const ARRAY_BASE<T2,T_ARRAY>& v,int helper=0);
-    template<class T2,class T_VECTOR> void Write(const char* name,const VECTOR_BASE<T2,T_VECTOR>& v);
+    template<class T2,class T_VECTOR> void Write(const char* name,const ARRAY_BASE<T2,T_VECTOR>& v);
     template<class T2,class T_MATRIX> void Write(const char* name,const MATRIX_BASE<T2,T_MATRIX>& m);
     void Write(const char* name,T scalar);
     void Write(const char* name,const KRYLOV_SYSTEM_BASE<T>& m,KRYLOV_VECTOR_BASE<T>& l,KRYLOV_VECTOR_BASE<T>& r);

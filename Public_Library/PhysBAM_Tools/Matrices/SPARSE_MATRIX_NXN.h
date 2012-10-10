@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Math_Tools/exchange.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Vectors/SPARSE_VECTOR_ND.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <cassert>
 namespace PhysBAM{
 
@@ -23,7 +22,7 @@ public:
     typedef int HAS_UNTYPED_READ_WRITE;
     int n; // size of the n by n matrix
     ARRAY<SPARSE_VECTOR_ND<T>*> A;
-    VECTOR_ND<int>* diagonal_index;
+    ARRAY<int>* diagonal_index;
     SPARSE_MATRIX_NXN<T>* C;
 
     SPARSE_MATRIX_NXN()
@@ -87,12 +86,12 @@ public:
     {assert((unsigned)i<n);A(i)->Clear();}
 
     void Initialize_Diagonal_Index()
-    {if(!diagonal_index) diagonal_index=new VECTOR_ND<int>(n);else if(diagonal_index->n!=n)diagonal_index->Resize(n);
+    {if(!diagonal_index) diagonal_index=new ARRAY<int>(n);else if(diagonal_index->m!=n)diagonal_index->Resize(n);
     for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         for(int j=0;j<row.number_of_active_indices;j++) if(row.indices[j]==i){(*diagonal_index)(i)=j;continue;}}}
 
-    void Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+    void Multiply(const ARRAY<T>& x,ARRAY<T>& result) const
     {for(int i=0;i<n;i++) result(i)=A(i)->Dot_Product(x);}
 
     void Negate()
@@ -132,7 +131,7 @@ public:
     for(int i=0;i<n;i++) for(int j=0;j<n;j++) if(abs(A_transpose(i,j)-(*this)(j,i))>tolerance) return false;
     return true;}
 
-    void Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
+    void Solve_Forward_Substitution(const ARRAY<T>& b,ARRAY<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
     {if(diagonal_is_identity) for(int i=0;i<n;i++){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         T sum=0;for(int j=0;j<(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
@@ -146,7 +145,7 @@ public:
         T sum=0;for(int j=0;j<(*diagonal_index)(i)-1;j++){sum+=row.x[j]*x(row.indices[j]);}
         x(i)=(b(i)-sum)*row.x[(*diagonal_index)(i)];}}
 
-    void Solve_Backward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
+    void Solve_Backward_Substitution(const ARRAY<T>& b,ARRAY<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false)
     {if(diagonal_is_identity) for(int i=n-1;i>=0;i--){
         SPARSE_VECTOR_ND<T>& row=*A(i);
         T sum=0;for(int j=(*diagonal_index)(i)+1;j<row.number_of_active_indices;j++){sum+=row.x[j]*x(row.indices[j]);}
@@ -177,7 +176,7 @@ public:
         if(i==n && denominator<=zero_tolerance) row.x[row_diagonal_index]=1/zero_replacement; // ensure last diagonal element is not zero
         else row.x[row_diagonal_index]=1/denominator;}} // finally, store the diagonal element in inverted form
 
-    void Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b)
+    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
     {assert(x.n==b.n && x.n==n);
     for(int i=0;i<n;i++){
         T rho=0;T diag_entry=0;
@@ -187,9 +186,9 @@ public:
             rho+=A(i)->x[j]*x(index);}
         x(i)=(b(i)-rho)/diag_entry;}}
 
-    void Gauss_Seidel_Solve(VECTOR_ND<T>& x,const VECTOR_ND<T>& b,const T tolerance=1e-12,const int max_iterations=1000000)
+    void Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance=1e-12,const int max_iterations=1000000)
     {assert(x.n==b.n && x.n==n);
-    VECTOR_ND<T> last_x(x);
+    ARRAY<T> last_x(x);
     for(int k=0;k<max_iterations;k++){
         Gauss_Seidel_Single_Iteration(x,b);
         T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual<tolerance) return;}}

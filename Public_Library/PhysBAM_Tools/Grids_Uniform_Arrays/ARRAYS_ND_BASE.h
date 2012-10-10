@@ -71,9 +71,6 @@ public:
     RANGE<TV_INT> domain;
     TV_INT counts;
     ARRAY_VIEW<T> array; // one-dimensional data storage
-private:
-    template<class S> struct ELEMENT_OF{typedef typename S::ELEMENT TYPE;};
-    typedef typename IF<IS_VECTOR<T>::value,ELEMENT_OF<T>,FIRST<UNUSABLE> >::TYPE::TYPE ELEMENT_OF_T;
 
 protected:
     T* base_pointer;
@@ -125,9 +122,11 @@ public:
 
     ARRAYS_ND_BASE& operator*=(const T& a)
     {array*=a;return *this;}
+
     template<class T2> typename ENABLE_IF<IS_CONVERTIBLE<T2,T>::value,ARRAYS_ND_BASE&>::TYPE
     operator*=(const T2 a)
     {array*=(T)a;return *this;}
+
     template<class T2> typename ENABLE_IF<AND<IS_SCALAR<T2>::value,NOT<IS_CONVERTIBLE<T2,T>::value>::value>::value,ARRAYS_ND_BASE&>::TYPE
     operator*=(const T2 a)
     {array*=a;return *this;}
@@ -181,8 +180,8 @@ public:
     T Max() const
     {return array.Max();}
 
-    T Maxabs() const
-    {return array.Maxabs();}
+    T Max_Abs() const
+    {return array.Max_Abs();}
 
     T Maxmag() const
     {return array.Maxmag();}
@@ -199,8 +198,8 @@ public:
     T Sumabs() const
     {return array.Sumabs();}
 
-    T Componentwise_Maxabs() const
-    {return array.Componentwise_Maxabs();}
+    T Componentwise_Max_Abs() const
+    {return array.Componentwise_Max_Abs();}
 
     static T Dot_Product(const ARRAYS_ND_BASE& a1,const ARRAYS_ND_BASE& a2)
     {assert(Equal_Dimensions(a1,a2));
@@ -312,8 +311,8 @@ public:
     static bool Equal_Dimensions(const ARRAYS_ND_BASE& a,const int m_start,const int m_end)
     {STATIC_ASSERT(d==1);return a.domain==RANGE<TV_INT>(m_start,m_end);}
 
-    static void Extract_Dimension(const ARRAYS_ND_BASE& old_array,ARRAYS_ND_BASE<ELEMENT_OF_T,VECTOR<int,d> >& extracted_array,int dim)
-    {STATIC_ASSERT(IS_VECTOR<T>::value);assert(Equal_Dimensions(old_array,extracted_array));//extracted_array.Resize(old_array.domain,false,false);
+    static void Extract_Dimension(const ARRAYS_ND_BASE& old_array,ARRAYS_ND_BASE<typename ELEMENT_OF_VECTOR<T>::TYPE,VECTOR<int,d> >& extracted_array,int dim)
+    {assert(Equal_Dimensions(old_array,extracted_array));//extracted_array.Resize(old_array.domain,false,false);
     for(int i=0;i<old_array.array.m;i++) extracted_array.array(i)=old_array.array(i)(dim);}
 
     static void Get(ARRAYS_ND_BASE& new_copy,const ARRAYS_ND_BASE& old_copy)

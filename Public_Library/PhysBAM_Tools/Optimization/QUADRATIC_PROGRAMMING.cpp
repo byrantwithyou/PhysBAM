@@ -4,23 +4,26 @@
 //#####################################################################
 // Class QUADRATIC_PROGRAMMING
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/givens_rotate.h>
 #include <PhysBAM_Tools/Optimization/QUADRATIC_PROGRAMMING.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
+
 //####################################################################################
 // Matrix utilities
 //####################################################################################
 // puts column of B in N, shifts remaining columns of B left, and puts column from S in B
 template<class T> void QUADRATIC_PROGRAMMING<T>::
-Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,VECTOR_ND<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,VECTOR_ND<int>& permute_N,const int n_column)
+Move_Column_From_B_To_N_And_Shift_Down(MATRIX_MXN<T>& B,ARRAY<int>& permute_B,const int b_column,MATRIX_MXN<T>& N,ARRAY<int>& permute_N,const int n_column)
 {
     assert(B.m==B.n);
     for(int i=0;i<B.n;i++)N(i,n_column)=B(i,b_column);permute_N(n_column)=permute_B(b_column);
     for(int j=b_column;j<B.n;j++){for(int i=0;i<B.n;i++)B(i,j)=B(i,j+1);permute_B(j)=permute_B(j+1);}
 }
 template<class T> void QUADRATIC_PROGRAMMING<T>::
-Remove_Column(const int column,MATRIX_MXN<T>& A,VECTOR_ND<int>& permute,VECTOR_ND<T>* x)
+Remove_Column(const int column,MATRIX_MXN<T>& A,ARRAY<int>& permute,ARRAY<T>* x)
 {
     if(column!=A.n){
         for(int i=0;i<A.m;i++) A(i,column)=A(i,A.n);
@@ -35,12 +38,15 @@ Remove_Column(const int column,MATRIX_MXN<T>& A,VECTOR_ND<int>& permute,VECTOR_N
 // but we can make use of the fact that those values used to be on the diagonal (must be good values)
 // also updates N and b with the transformation
 template<class T> void QUADRATIC_PROGRAMMING<T>::
-Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_ND<T>& b,const int column,const T tolerance,const bool check_last_column)
+Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,ARRAY<T>& b,const int column,const T tolerance,const bool check_last_column)
 {
     assert(A.m==A.n);
     for(int i=column;i<A.n;i++){
         assert(abs(A(i+1,i))>tolerance);
-        VECTOR<T,2> v(A(i,i),A(i+1,i));A(i,i)=v.Magnitude();A(i+1,i)=0;v.Normalize();
+        VECTOR<T,2> v(A(i,i),A(i+1,i));
+        A(i,i)=v.Magnitude();
+        A(i+1,i)=0;
+        v.Normalize();
         for(int j=i+1;j<A.n;j++) givens_rotate(A(i,j),A(i+1,j),v.x,v.y);
         for(int j=0;j<S.n;j++) givens_rotate(S(i,j),S(i+1,j),v.x,v.y);
         for(int j=0;j<N.n;j++) givens_rotate(N(i,j),N(i+1,j),v.x,v.y);
@@ -56,14 +62,14 @@ Update_Upper_Triangular_Matrix_After_Column_Shift(MATRIX_MXN<T>& A,MATRIX_MXN<T>
 //####################################################################################
 // assumes given variables are in feasible region
 template<class T> void QUADRATIC_PROGRAMMING<T>::
-Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_ND<T>& x_B,VECTOR_ND<T>& x_S,VECTOR_ND<T>& b,VECTOR_ND<T>& b_N,VECTOR_ND<int>& permute_B,
-    VECTOR_ND<int>& permute_S,VECTOR_ND<int>& permute_N,const MATRIX_MXN<T>& D_unpermuted,const MATRIX_MXN<T>& epsilon_hat_unpermuted,const VECTOR_ND<T>& f_hat,
-    VECTOR_ND<T>& x_unpermuted,const ARRAY<PAIR<bool,T> >& x_min,const ARRAY<PAIR<bool,T> >& x_max,const T tolerance,const T step_tolerance,const bool debug_optimization)
+Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,ARRAY<T>& x_B,ARRAY<T>& x_S,ARRAY<T>& b,ARRAY<T>& b_N,ARRAY<int>& permute_B,
+    ARRAY<int>& permute_S,ARRAY<int>& permute_N,const MATRIX_MXN<T>& D_unpermuted,const MATRIX_MXN<T>& epsilon_hat_unpermuted,const ARRAY<T>& f_hat,
+    ARRAY<T>& x_unpermuted,const ARRAY<PAIR<bool,T> >& x_min,const ARRAY<PAIR<bool,T> >& x_max,const T tolerance,const T step_tolerance,const bool debug_optimization)
 {
     assert(B.m==B.n);assert(D_unpermuted.m==D_unpermuted.n);
     MATRIX_MXN<T> D(D_unpermuted.n);MATRIX_MXN<T> epsilon_hat(epsilon_hat_unpermuted.m);
-    VECTOR_ND<int> permute(B.n+S.n+N.n);
-    VECTOR_ND<T> x(B.n+S.n+N.n);
+    ARRAY<int> permute(B.n+S.n+N.n);
+    ARRAY<T> x(B.n+S.n+N.n);
 
     int iteration=1;
     for(;;iteration++){
@@ -72,25 +78,31 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             LOG::cout<<"permute_B:\n"<<permute_B<<"\npermute_S:\n"<<permute_S<<"\npermute_N:\n"<<permute_N<<"\n\nx_B:\n"<<x_B<<"\nx_S:\n"<<x_S<<std::endl;}
 
         // update permute and full x vector
-        permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
-        D=D_unpermuted.Permute_Columns(permute);epsilon_hat=epsilon_hat_unpermuted.Permute_Columns(permute);
-        x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N); // note that b_N==x_N
+        permute=permute_B;
+        permute.Append_Elements(permute_S);
+        permute.Append_Elements(permute_N);
+        D=D_unpermuted.Permute_Columns(permute);
+        epsilon_hat=epsilon_hat_unpermuted.Permute_Columns(permute);
+        x=x_B;
+        x.Append_Elements(x_S);
+        x.Append_Elements(b_N); // note that b_N==x_N
 
         // find search direction
-        VECTOR_ND<T> p_S,p_B;
+        ARRAY<T> p_S,p_B;
         T alpha=1,limiting_value=0;int limiting_index=0; // negative limiting_index will indicate it comes from the "S" set
 
         // if S matrix is empty (e.g. in first iteration) then the null space is empty and there are no feasible directions.
         // so we skip the step below and go to lagrange multiplier check
-        if(x_S.n){
+        if(x_S.m){
             MATRIX_MXN<T> negative_B_inverse_S=-B.Upper_Triangular_Solve(S);
-            MATRIX_MXN<T> Z(B.n+S.n+N.n,S.n),D_hat_times_Z(x.n+f_hat.n,S.n);
+            MATRIX_MXN<T> Z(B.n+S.n+N.n,S.n),D_hat_times_Z(x.m+f_hat.m,S.n);
             Z.Add_To_Submatrix(0,0,negative_B_inverse_S);for(int i=0;i<S.n;i++) Z(B.n+i,i)=1;
-            D_hat_times_Z.Add_To_Submatrix(0,0,D*Z);D_hat_times_Z.Add_To_Submatrix(x.n,0,epsilon_hat*Z);
+            D_hat_times_Z.Add_To_Submatrix(0,0,D*Z);D_hat_times_Z.Add_To_Submatrix(x.m,0,epsilon_hat*Z);
 
-            VECTOR_ND<T> rhs(x.n+f_hat.n);rhs.Set_Subvector(0,D*(-x));rhs.Set_Subvector(x.n,f_hat-epsilon_hat*x);
-            VECTOR_ND<T> p_S=D_hat_times_Z.Normal_Equations_Solve(rhs);
-            VECTOR_ND<T> p_B=negative_B_inverse_S*p_S;
+            ARRAY<T> rhs(D*(-x));
+            rhs.Append_Elements(f_hat-epsilon_hat*x);
+            ARRAY<T> p_S=D_hat_times_Z.Normal_Equations_Solve(rhs);
+            ARRAY<T> p_B=negative_B_inverse_S*p_S;
            
             if(debug_optimization) LOG::cout<<"Got p_B\n"<<p_B<<"\nGot p_S\n"<<p_S<<std::endl;
 
@@ -113,15 +125,17 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
             x_B+=alpha*p_B;x_S+=alpha*p_S;
 
             // reconstruct (permuted) x vector (note that b_N==x_N)
-            x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N);}
+            x=x_B;
+            x.Append_Elements(x_S);
+            x.Append_Elements(b_N);}
 
         if(limiting_index==-1){assert(alpha==1); // check lagrange multipliers
-            VECTOR_ND<T> gradient(D.Transpose_Times(D)*x+epsilon_hat.Transpose_Times(epsilon_hat*x-f_hat));
+            ARRAY<T> gradient(D.Transpose_Times(D)*x+epsilon_hat.Transpose_Times(epsilon_hat*x-f_hat));
 
             // decompose gradient
-            VECTOR_ND<T> gradient_B(B.n),gradient_N(N.n);gradient.Get_Subvector(0,gradient_B);gradient.Get_Subvector(B.n+S.n,gradient_N);
-            VECTOR_ND<T> pi=B.Transpose_Lower_Triangular_Solve(gradient_B);
-            VECTOR_ND<T> sigma(gradient_N-N.Transpose_Times(pi));
+            ARRAY<T> gradient_B(gradient.Array_View(0,B.n)),gradient_N(gradient.Array_View(B.n+S.n,gradient.m));
+            ARRAY<T> pi=B.Transpose_Lower_Triangular_Solve(gradient_B);
+            ARRAY<T> sigma(gradient_N-N.Transpose_Times(pi));
 
             if(debug_optimization) LOG::cout<<"gradient_B =\n"<<gradient_B<<"\ngradient_N =\n"<<gradient_N<<"\npi =\n"<<pi<<"\nsigma =\n"<<sigma<<std::endl;
             
@@ -184,9 +198,11 @@ Find_Optimal_Solution(MATRIX_MXN<T>& B,MATRIX_MXN<T>& S,MATRIX_MXN<T>& N,VECTOR_
         }
     }
 
-    x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,b_N); // note that b_N==x_N
-    permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
-    x_unpermuted=x.Unpermute(permute);
+    permute=permute_B;
+    permute.Append_Elements(permute_S);
+    permute.Append_Elements(permute_N);
+    x_unpermuted.Resize(x_B.m+x_S.m+b_N.m);
+    x_unpermuted.Subset(permute).Combine(x_B,x_S,b_N);
 
     if(debug_optimization) LOG::cout << "Result x_B:\n"<<x_B<<"\nResult x_S:\n"<<x_S<<"\nResult permute:\n"<<permute<<"\nResult x:\n"<<x<<std::endl;
 

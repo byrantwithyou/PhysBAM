@@ -150,7 +150,10 @@ Transform_To_Object_Frame(FRAME<TV>& frame,T_INERTIA_TENSOR& object_space_inerti
 {
     Transform_To_Object_Frame(frame,object_space_inertia_tensor);
     if(frame.r==ROTATION<TV>()) point_cloud.X-=frame.t;
-    else{PHYSBAM_ASSERT(TV::m==3);point_cloud.X=frame.Inverse()*point_cloud.X;}
+    else{
+        PHYSBAM_ASSERT(TV::m==3);
+        for(int i=0;i<point_cloud.X.m;i++)
+            point_cloud.X(i)=frame.Inverse()*point_cloud.X(i);}
 }
 //#####################################################################
 template class MASS_PROPERTIES<VECTOR<float,1>,0>;

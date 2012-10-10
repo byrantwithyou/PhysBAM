@@ -192,7 +192,7 @@ Advance_To_Target_Time(const T target_time)
         else if(time+2*dt>=target_time){dt=.5*(target_time-time);}
         LOG::cout<<"dt is "<<dt<<std::endl;
 
-        T maximum_fluid_speed=example.face_velocities.Maxabs().Max();
+        T maximum_fluid_speed=example.face_velocities.Max_Abs().Max();
         T max_particle_collision_distance=example.particle_levelset_evolution.Particle_Levelset(0).max_collision_distance_factor*example.mac_grid.dX.Max();
         example.collision_bodies_affecting_fluid.Compute_Occupied_Blocks(true,dt*maximum_fluid_speed+2*max_particle_collision_distance+(T).5*example.mac_grid.dX.Max(),10);
 

@@ -23,11 +23,11 @@ template<class TV>
 class INTERFACE_FLUID_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > VECTOR_T;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
     SYSTEM_MATRIX_HELPER<T> *helper_rhs_q[TV::m],*helper_rhs_p[TV::m];
-    VECTOR_ND<T> J; // Jacobi preconditioner
+    ARRAY<T> J; // Jacobi preconditioner
 
     void Set_Jacobi_Preconditioner();
 
@@ -38,7 +38,7 @@ public:
     const GRID<TV>& coarse_grid;
     GRID<TV> phi_grid;
     LEVELSET_UNIFORM<GRID<TV> >* phi;
-    VECTOR_ND<T> null_u[TV::m],null_p;
+    ARRAY<T> null_u[TV::m],null_p;
     ARRAY<T> zero_me;
     bool run_self_tests;
     bool print_matrix;
@@ -56,8 +56,8 @@ public:
     void Set_Matrix(const VECTOR<T,2>& mu);
     void Set_RHS(VECTOR_T& rhs, const ARRAY<TV,TV_INT> f_body[2],const ARRAY<TV>& f_interface);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
-    void Get_U_Part(const VECTOR_ND<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const;
-    void Get_P_Part(const VECTOR_ND<T>& x,ARRAY<T,TV_INT>& p) const;
+    void Get_U_Part(const ARRAY<T>& x,ARRAY<T,FACE_INDEX<TV::m> >& u) const;
+    void Get_P_Part(const ARRAY<T>& x,ARRAY<T,TV_INT>& p) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;
     T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& x) const;

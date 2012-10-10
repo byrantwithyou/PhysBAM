@@ -163,8 +163,9 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 
     // TODO: Better inner product.
     double r=0;
-    for(JOINT_ID j(0);j<joint_mesh.Size();j++) if(joint_mesh.Is_Active(j))
-        r+=VECTOR<T,TWIST<TV>::dimension>::Dot_Product(xx(j).Get_Vector(),yy(j).Get_Vector());
+    for(JOINT_ID j(0);j<joint_mesh.Size();j++)
+        if(joint_mesh.Is_Active(j))
+            r+=xx(j).Get_Vector().Dot(yy(j).Get_Vector());
     return r;
 }
 //#####################################################################

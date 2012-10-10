@@ -28,7 +28,7 @@ public:
     using BASE::Parent_Id;using BASE::Child_Id;using BASE::Parent;using BASE::Child;using BASE::Apply_Poststabilization;using BASE::zero_row_tolerance;using BASE::Delta_Relative_Twist;
 
 private:
-    VECTOR_ND<T> last_muscle_actuations;
+    ARRAY<T> last_muscle_actuations;
     MATRIX_MXN<T> global_post_stabilization_matrix_11,global_post_stabilization_matrix_12,global_post_stabilization_matrix_21,global_post_stabilization_matrix_22;
     ARRAY<int> joint_constrained_dimensions,joint_muscle_control_dimensions;
     ARRAY<int> joint_offset_in_post_stabilization_matrix,joint_offset_in_muscle_control_matrix;
@@ -42,8 +42,8 @@ public:
 
 //#####################################################################
     void Compute_Position_Based_State(const T dt,const T time);
-    static void Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const T zero_row_tolerance,const bool verbose=false);
-    void Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const T dt);
+    static void Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T zero_row_tolerance,const bool verbose=false);
+    void Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T dt);
     void Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matrix) PHYSBAM_OVERRIDE;
     JOINT_FUNCTION<TV>* Create_Joint_Function(const JOINT_ID joint_id);
     void Compute_Desired_PD_Velocity(const T dt,const T time) PHYSBAM_OVERRIDE;

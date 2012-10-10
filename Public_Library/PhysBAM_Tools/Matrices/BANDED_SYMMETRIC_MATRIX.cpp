@@ -4,20 +4,20 @@
 //#####################################################################
 // Class BANDED_SYMMETRIC_MATRIX
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Math_Tools/minabs.h>
 #include <PhysBAM_Tools/Math_Tools/Robust_Arithmetic.h>
 #include <PhysBAM_Tools/Math_Tools/sign.h>
 #include <PhysBAM_Tools/Matrices/BANDED_SYMMETRIC_MATRIX.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <limits>
 namespace PhysBAM{
 //#####################################################################
 // Function Multiply
 //#####################################################################
 template<class T,int bandwidth> void BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
-Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Multiply(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     STATIC_ASSERT(bandwidth==3); // TODO: implement for non-tridiagonal matrices
     assert(A.Size()==Size() && x.Size()==Size());
@@ -33,15 +33,16 @@ Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
 // Function Power_Iterate_Shifted
 //#####################################################################
 template<class T,int bandwidth> bool BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
-Power_Iterate_Shifted(VECTOR_ND<T>& x,const T shift,T& eigenvalue,const T tolerance,const int max_iterations) const
+Power_Iterate_Shifted(ARRAY<T>& x,const T shift,T& eigenvalue,const T tolerance,const int max_iterations) const
 {
-    VECTOR_ND<T> y(Size(),false);
+    ARRAY<T> y(Size(),false);
     T tolerance_squared_over_2=sqr(tolerance)/2;
     for(int iteration=0;iteration<max_iterations;iteration++){
-        T magnitude=x.Magnitude();if(!magnitude) return false;
+        T magnitude=x.Magnitude();
+        if(!magnitude) return false;
         x/=magnitude;
         Multiply(x,y);if(shift) y+=shift*x;
-        eigenvalue=VECTOR_ND<T>::Dot_Product(x,y);
+        eigenvalue=ARRAY<T>::Dot_Product(x,y);
         x=y-eigenvalue*x;
         T error_squared=x.Magnitude_Squared();
         x=y;
@@ -52,7 +53,7 @@ Power_Iterate_Shifted(VECTOR_ND<T>& x,const T shift,T& eigenvalue,const T tolera
 // Function Eigenvalue_Range
 //#####################################################################
 template<class T,int bandwidth> bool BANDED_SYMMETRIC_MATRIX<T,bandwidth>::
-Eigenvalue_Range(VECTOR_ND<T>& x,INTERVAL<T>& eigenvalue_range,const T tolerance,const int max_iterations) const
+Eigenvalue_Range(ARRAY<T>& x,INTERVAL<T>& eigenvalue_range,const T tolerance,const int max_iterations) const
 {
     if(Size()==1){eigenvalue_range=INTERVAL<T>(A(0)(0));return true;}
     T lambda_min,lambda_max;

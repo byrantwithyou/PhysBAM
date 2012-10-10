@@ -61,7 +61,8 @@ Initialize_Dm_Inverse_Save()
 template<class TV,int d> void STRAIN_MEASURE<TV,d>::
 Copy_Dm_Inverse_Save_Into_Dm_Inverse(const ARRAY<int>& map)
 {
-    Dm_inverse.Resize(map.m,false,false);ARRAY<UPPER_TRIANGULAR_MATRIX<T,d> >::Permute(*Dm_inverse_save,Dm_inverse,map);
+    Dm_inverse.Resize(map.m,false,false);
+    Dm_inverse=Dm_inverse_save->Subset(map);
 }
 //#####################################################################
 // Function Initialize_Rest_State_To_Equilateral

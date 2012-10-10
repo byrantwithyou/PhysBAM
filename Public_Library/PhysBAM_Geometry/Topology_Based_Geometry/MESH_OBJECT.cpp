@@ -127,6 +127,8 @@ Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping)
 template<class TV,class T_MESH> typename MESH_OBJECT<TV,T_MESH>::T_DERIVED_OBJECT* MESH_OBJECT<TV,T_MESH>::
 Union_Mesh_Objects_Relatively(const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames)
 {
+
+
     T_DERIVED_OBJECT* object=Create();
     Union_Mesh_Objects_Relatively(object,object_list,relative_frames);
     return object;

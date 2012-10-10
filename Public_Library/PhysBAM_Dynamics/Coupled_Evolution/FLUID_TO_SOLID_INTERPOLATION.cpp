@@ -61,7 +61,7 @@ Compute(const int ghost_cells)
 // Function Times_Add
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION<TV>::
-Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
+Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const
 {
     for(int j=0;j<coupled_particles.m;j++){int p=coupled_particles(j);
         for(int a=0;a<TV::m;a++){
@@ -74,7 +74,7 @@ Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_vel
 // Function Transpose_Times_Add
 //#####################################################################
 template<class TV> void FLUID_TO_SOLID_INTERPOLATION<TV>::
-Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const
+Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const
 {
     for(int j=0;j<coupled_particles.m;j++){int p=coupled_particles(j);
         for(int a=0;a<TV::m;a++){

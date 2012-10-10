@@ -50,7 +50,7 @@ Mark_Active_Cells(T tol)
 // Function Build_Matrix
 //#####################################################################
 template<class TV> void SYSTEM_SURFACE_BLOCK_HELPER_COLOR<TV>::
-Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,VECTOR_ND<T>& constraint_rhs)
+Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,ARRAY<T>& constraint_rhs)
 {
     if(!cdi->wrap) PHYSBAM_FATAL_ERROR();
     matrix.Resize(cdi->colors);

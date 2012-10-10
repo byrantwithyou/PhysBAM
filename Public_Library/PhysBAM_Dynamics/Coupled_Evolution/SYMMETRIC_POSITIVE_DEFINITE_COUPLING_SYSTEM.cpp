@@ -108,7 +108,7 @@ template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Apply_Lambda_To_Euler_State(const VECTOR_T& V,const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_n,
     const ARRAY<T,COUPLING_CONSTRAINT_ID>& coupled_faces_solid_interpolated_velocity_np1,ARRAY<TV_DIMENSION,TV_INT>& U) const
 {
-    VECTOR_ND<T> impulse_at_coupling_faces(index_map.Number_Faces());
+    ARRAY<T> impulse_at_coupling_faces(index_map.Number_Faces());
     fluid_interpolation->Transpose_Times(V.lambda,impulse_at_coupling_faces);
     impulse_at_coupling_faces*=(1/index_map.grid.Cell_Size());
     int ghost_cells=0;
@@ -282,7 +282,7 @@ Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_F
 // Function Add_Dirichlet_Pressures_To_Velocity
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Add_Dirichlet_Pressures_To_Velocity(const ARRAY<T,TV_INT>& pressure,VECTOR_ND<T>& fluid_velocity_vector) const
+Add_Dirichlet_Pressures_To_Velocity(const ARRAY<T,TV_INT>& pressure,ARRAY<T>& fluid_velocity_vector) const
 {
     for(int i=0;i<fluid_gradient->ghost_gradient.m;i++){const typename MATRIX_FLUID_GRADIENT_BASE<TV>::GHOST_GRADIENT_ENTRY& ge=fluid_gradient->ghost_gradient(i);
         fluid_velocity_vector(ge.face)-=fluid_mass->one_over_fluid_mass_at_faces(ge.face)*ge.weight*pressure(ge.index)*dt;}
@@ -291,7 +291,7 @@ Add_Dirichlet_Pressures_To_Velocity(const ARRAY<T,TV_INT>& pressure,VECTOR_ND<T>
 // Function Add_Surface_Tension
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Add_Surface_Tension(VECTOR_ND<T>& fluid_velocity_vector) const
+Add_Surface_Tension(ARRAY<T>& fluid_velocity_vector) const
 {
     if(!levelset || !surface_tension_coefficient) return;
     GRID<TV>& grid=index_map.grid;
@@ -324,11 +324,11 @@ Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_veloci
     Resize_Coupled_System_Vector(F);
     Resize_Coupled_System_Vector(V);
     coupling_faces.Resize(fluid_interpolation->Number_Of_Constraints());
-    VECTOR_ND<T> fluid_velocity_vector;
+    ARRAY<T> fluid_velocity_vector;
     if(fluid_node){
         temporary_faces.Resize(index_map.Number_Faces());
         temporary_lambdas.Resize(F.lambda.Size());
-        pressure.Resize(V.pressure.n);
+        pressure.Resize(V.pressure.m);
         temporary_viscous_velocities.Resize(index_map.Number_Faces());
         index_map.Collect(fluids_velocity_star,constrained_fluid_velocity,fluid_velocity_vector);}
 
@@ -342,7 +342,7 @@ Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_veloci
     Dump_Substep(fluid_velocity_vector,"after add solid");
     Scatter(fluid_velocity_vector,solids_velocity_star,F);
     if(fluid_node){
-        VECTOR_ND<T> p_advected_over_rho_c_squared_dt_vector;
+        ARRAY<T> p_advected_over_rho_c_squared_dt_vector;
         index_map.Collect(p_advected_over_rho_c_squared_dt,p_advected_over_rho_c_squared_dt_vector);
         F.pressure+=p_advected_over_rho_c_squared_dt_vector*index_map.grid.Cell_Size();}
 
@@ -363,7 +363,7 @@ Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_veloci
 // Function Setup_Tolerances
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Setup_Tolerances(const VECTOR_T& F,const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity)
+Setup_Tolerances(const VECTOR_T& F,const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity)
 {
     GENERALIZED_VELOCITY<TV> solids_velocity_star_projected(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
 
@@ -429,7 +429,7 @@ Print_Matrix(const VECTOR_T& vec) const
     index_map.Print(solve_id);
     VECTOR_T V(vec),F(vec);
     LOG::cout<<"Printing matrix: "<<std::endl;
-    LOG::cout<<V.pressure.n<<" pressures"<<std::endl;
+    LOG::cout<<V.pressure.m<<" pressures"<<std::endl;
     LOG::cout<<V.lambda.Size()<<" lambdas"<<std::endl;
     LOG::cout<<V.force_coefficients.Size()<<" force coefficients"<<std::endl;
     LOG::cout<<V.viscous_force_coefficients.Size()<<" viscous force coefficients"<<std::endl;
@@ -474,7 +474,7 @@ Print_Each_Matrix(int n) const
 // Function Gather
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Gather(const KRYLOV_VECTOR_BASE<T>& bV,VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
+Gather(const KRYLOV_VECTOR_BASE<T>& bV,ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);
     if(fluid_to_solid_interpolation) return Massless_Gather(V,fluid_velocity,structure_velocity);
@@ -492,7 +492,7 @@ Gather(const KRYLOV_VECTOR_BASE<T>& bV,VECTOR_ND<T>& fluid_velocity,GENERALIZED_
 // Function Scatter
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,KRYLOV_VECTOR_BASE<T>& bF) const
+Scatter(const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,KRYLOV_VECTOR_BASE<T>& bF) const
 {
     VECTOR_T& F=debug_cast<VECTOR_T&>(bF);
     if(fluid_to_solid_interpolation) return Massless_Scatter(fluid_velocity,structure_velocity,F);
@@ -510,7 +510,7 @@ Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& struc
 // Function Inverse_Mass
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Inverse_Mass(VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
+Inverse_Mass(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
 {
     if(!leakproof_solve && solid_node){
         solid_mass->Inverse_Multiply(structure_velocity,structure_velocity,true);
@@ -521,7 +521,7 @@ Inverse_Mass(VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_ve
 // Function Massless_Gather
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Massless_Gather(const VECTOR_T& V,VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
+Massless_Gather(const VECTOR_T& V,ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
 {
     GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
     fluid_gradient->Times(V.pressure,fluid_velocity);
@@ -535,7 +535,7 @@ Massless_Gather(const VECTOR_T& V,VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOC
 // Function Massless_Scatter
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Massless_Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,VECTOR_T& F) const
+Massless_Scatter(const ARRAY<T>& fluid_velocity,const GENERALIZED_VELOCITY<TV>& structure_velocity,VECTOR_T& F) const
 {
     GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
     fluid_gradient->Transpose_Times(fluid_velocity,F.pressure);
@@ -549,11 +549,11 @@ Massless_Scatter(const VECTOR_ND<T>& fluid_velocity,const GENERALIZED_VELOCITY<T
 // Function Apply_Massless_Structure_Force_To_Fluid
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Apply_Massless_Structure_Force_To_Fluid(VECTOR_ND<T>& fluid_velocity,T time) const
+Apply_Massless_Structure_Force_To_Fluid(ARRAY<T>& fluid_velocity,T time) const
 {
     if(!fluid_to_solid_interpolation) return;
     GENERALIZED_VELOCITY<TV> temporary_solids_velocity(temporary_velocities,temporary_twists,solid_system->solid_body_collection);
-    VECTOR_ND<T> temp(temporary_faces.n);
+    ARRAY<T> temp(temporary_faces.m);
     temporary_solids_velocity.V.array.Fill(TV());
     temporary_solids_velocity.rigid_V.array.Fill(TWIST<TV>());
     solid_forces->solid_body_collection.Add_Velocity_Independent_Forces(temporary_solids_velocity.V.array,temporary_solids_velocity.rigid_V.array,time);
@@ -584,7 +584,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const
     if(!leakproof_solve) F.force_coefficients+=V.force_coefficients;
     if(use_viscous_forces) F.viscous_force_coefficients+=V.viscous_force_coefficients;
 
-    for(int i=0;i<one_over_rho_c_squared_flat.n;i++) F.pressure(i)+=one_over_rho_c_squared_flat(i)*V.pressure(i);
+    for(int i=0;i<one_over_rho_c_squared_flat.m;i++) F.pressure(i)+=one_over_rho_c_squared_flat(i)*V.pressure(i);
 }
 //#####################################################################
 // Function Project
@@ -601,13 +601,13 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bR) 
 {
     const VECTOR_T& V=debug_cast<const VECTOR_T&>(bV);VECTOR_T& R=debug_cast<VECTOR_T&>(bR);
     if(use_full_ic){
-        for(int i=0;i<full_precondition_in.n;i++)
+        for(int i=0;i<full_precondition_in.m;i++)
             full_precondition_in(i)=const_cast<VECTOR_T&>(V).Raw_Get(i);
 
         full_matrix.C->Solve_Forward_Substitution(full_precondition_in,full_precondition_out,true);
         full_matrix.C->Solve_Backward_Substitution(full_precondition_out,full_precondition_in,false,true);
 
-        for(int i=0;i<full_precondition_in.n;i++)
+        for(int i=0;i<full_precondition_in.m;i++)
             R.Raw_Get(i)=full_precondition_in(i);}
     else if(fluid_node){
         R.Copy(1,V);
@@ -732,8 +732,8 @@ Test_Incompressibility(const ARRAY<T,FACE_INDEX<TV::dimension> >& fluid_velocity
 {
     VECTOR_T a;
     Resize_Coupled_System_Vector(a);
-    if(!a.pressure.n) return;
-    VECTOR_ND<T> fluid_velocity_vector;
+    if(!a.pressure.m) return;
+    ARRAY<T> fluid_velocity_vector;
     index_map.Collect(fluid_velocity,constrained_fluids_velocity,fluid_velocity_vector);
     fluid_gradient->Transpose_Times(fluid_velocity_vector,a.pressure);
     T mn=a.pressure.Min(),mx=a.pressure.Max(),vol=index_map.grid.Cell_Size();
@@ -775,7 +775,7 @@ Check_Constraints(const GENERALIZED_VELOCITY<TV>& solids_rhs,const ARRAY<T,FACE_
     solid_interpolation->Times_Add(solids_rhs,coupling_faces);
     LOG::cout<<coupling_faces<<std::endl;
 
-    VECTOR_ND<T> fluid_velocity_vector;
+    ARRAY<T> fluid_velocity_vector;
     index_map.Collect(fluids_rhs,constrained_rhs,fluid_velocity_vector);
     fluid_gradient->Transpose_Times(fluid_velocity_vector,pressure);
     LOG::cout<<"Incompressibility constraints"<<std::endl;
@@ -886,7 +886,7 @@ Compute_Full_Preconditioner()
 
     if(!leakproof_solve) for(int i=0;i<size_force;i++) full_matrix(offset_force+i,offset_force+i)+=1;
     if(use_viscous_forces) for(int i=0;i<size_viscous;i++) full_matrix(offset_viscous+i,offset_viscous+i)+=1;
-    for(int i=0;i<one_over_rho_c_squared_flat.n;i++) full_matrix(i,i)+=one_over_rho_c_squared_flat(i);
+    for(int i=0;i<one_over_rho_c_squared_flat.m;i++) full_matrix(i,i)+=one_over_rho_c_squared_flat(i);
 
     full_matrix.Construct_Incomplete_Cholesky_Factorization();
     full_precondition_in.Resize(full_matrix.n);
@@ -896,7 +896,7 @@ Compute_Full_Preconditioner()
 // Function Exchange_Pressure
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Exchange_Pressure(VECTOR_ND<T>& pressure) const
+Exchange_Pressure(ARRAY<T>& pressure) const
 {
     // TODO: This is very inefficient.
     if(mpi_grid){
@@ -920,7 +920,7 @@ Exchange_Coupled_Vector(VECTOR_T& V) const
 // Function Exchange_Velocities
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Exchange_Velocities(VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
+Exchange_Velocities(ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& structure_velocity) const
 {
     // TODO: Exchange enough information to do:
     //    solid node: solid_forces->Times
@@ -943,7 +943,7 @@ Set_MPI(MPI_SOLID_FLUID<TV>& mpi_solid_fluid_input,MPI_UNIFORM_GRID<GRID<TV> >& 
 // Function Dump_Substep
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Dump_Substep(const VECTOR_ND<T>& fluid_velocity,const char* name,int substep,int level) const
+Dump_Substep(const ARRAY<T>& fluid_velocity,const char* name,int substep,int level) const
 {
     ARRAY<T,FACE_INDEX<TV::m> > tmp(debug_velocity->Domain_Indices());
     ARRAY<T> tmp_constrained(index_map.indexed_constraints.m);
@@ -959,7 +959,7 @@ Dump_Substep(const VECTOR_ND<T>& fluid_velocity,const char* name,int substep,int
 // Function Dump_Substep
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Dump_Substep(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int substep,int level) const
+Dump_Substep(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity,const char* name,int substep,int level) const
 {
     debug_generalized_velocity->Exchange(solid_velocity);
     Dump_Substep(fluid_velocity,name,substep,level);
@@ -969,7 +969,7 @@ Dump_Substep(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_
 // Function Fill_Extra_Velocities
 //#####################################################################
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
-Fill_Extra_Velocities(VECTOR_ND<T>& fluid_velocity_vector) const
+Fill_Extra_Velocities(ARRAY<T>& fluid_velocity_vector) const
 {
     if(FLUID_TO_SOLID_INTERPOLATION_CUT<TV>* interp=dynamic_cast<FLUID_TO_SOLID_INTERPOLATION_CUT<TV>*>(fluid_to_solid_interpolation))
         interp->Fill_Extra_Velocities(fluid_velocity_vector);

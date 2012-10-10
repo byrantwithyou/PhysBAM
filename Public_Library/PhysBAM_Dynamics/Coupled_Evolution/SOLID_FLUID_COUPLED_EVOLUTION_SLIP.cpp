@@ -452,7 +452,7 @@ Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const 
 // Function Apply_Second_Order_Cut_Cell_Method
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_matrix_index,const T_FACE_ARRAYS_INT& face_index_to_matrix_index,VECTOR_ND<T>& b)
+Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_matrix_index,const T_FACE_ARRAYS_INT& face_index_to_matrix_index,ARRAY<T>& b)
 {
 /*
     // modify div_active to work for second order cut cell

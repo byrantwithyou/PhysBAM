@@ -21,7 +21,7 @@ class FLUID_SYSTEM_MPI:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;typedef typename TV::SPIN T_SPIN;
 
 public:
-    typedef VECTOR_ND<T> VECTOR_T;
+    typedef ARRAY<T> VECTOR_T;
     typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_T> > KRYLOV_VECTOR_T;
     static const int rows_per_rigid_body=TV::dimension+T_SPIN::dimension;
 
@@ -33,7 +33,7 @@ public:
     T tolerance_ratio;
     GENERALIZED_VELOCITY<TV>& temp;
     GENERALIZED_VELOCITY<TV>& solid_velocity;
-    mutable ARRAY<VECTOR_ND<T> > temp_array;
+    mutable ARRAY<ARRAY<T> > temp_array;
     ARRAY<int>& coupled_deformable_particle_indices;
 
     FLUID_SYSTEM_MPI(const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_deformable_array_input,const ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& J_rigid_array_input,
@@ -62,10 +62,10 @@ public:
     void Send_Generalized_Velocity_To_Solid(const INDIRECT_ARRAY<const ARRAY_VIEW<TV> > V_boundary,const INDIRECT_ARRAY<const ARRAY_VIEW<TWIST<TV> > > rigid_V_boundary) const;
     void Get_Generalized_Velocity_From_Solid(INDIRECT_ARRAY<ARRAY_VIEW<TV> > V_boundary,INDIRECT_ARRAY<ARRAY_VIEW<TWIST<TV> > > rigid_V_boundary) const;
 private:
-    void Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const GENERALIZED_VELOCITY<TV>& V,VECTOR_T& pressure) const;
-    void Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const GENERALIZED_VELOCITY<TV>& V,VECTOR_T& pressure) const;
-    void Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const VECTOR_T& pressure,GENERALIZED_VELOCITY<TV>& V) const;
-    void Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const VECTOR_T& pressure,GENERALIZED_VELOCITY<TV>& V) const;
+    void Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> pressure) const;
+    void Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> pressure) const;
+    void Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,ARRAY_VIEW<const T> pressure,GENERALIZED_VELOCITY<TV>& V) const;
+    void Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,ARRAY_VIEW<const T> pressure,GENERALIZED_VELOCITY<TV>& V) const;
 //#####################################################################
 };
 }

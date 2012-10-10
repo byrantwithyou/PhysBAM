@@ -35,7 +35,7 @@ template<class T> OCTAVE_OUTPUT<T>::
 // Function Write
 //#####################################################################
 template<class T> template<class T2,class T_VECTOR> void OCTAVE_OUTPUT<T>::
-Write(const char* name,const VECTOR_BASE<T2,T_VECTOR>& v)
+Write(const char* name,const ARRAY_BASE<T2,T_VECTOR>& v)
 {
     out<<"# name: "<<name<<"\n# type: matrix\n# rows: "<<v.Size()<<"\n# columns: "<<sizeof(v(0))/sizeof(typename SCALAR_POLICY<T2>::TYPE)<<"\n";
     for(int i=0;i<v.Size();i++)
@@ -389,7 +389,7 @@ template void OCTAVE_OUTPUT<float>::Write<VECTOR<int,2>,ARRAY_VIEW<VECTOR<int,2>
 template void OCTAVE_OUTPUT<float>::Write<VECTOR<int,3>,ARRAY_VIEW<VECTOR<int,3> const,int> >(char const*,ARRAY_BASE<VECTOR<int,3>,ARRAY_VIEW<VECTOR<int,3> const,int>,int> const&,int);
 template void OCTAVE_OUTPUT<float>::Write<VECTOR<int,4>,ARRAY_VIEW<VECTOR<int,4> const,int> >(char const*,ARRAY_BASE<VECTOR<int,4>,ARRAY_VIEW<VECTOR<int,4> const,int>,int> const&,int);
 template void OCTAVE_OUTPUT<float>::Write<float,ARRAY_VIEW<float const,int> >(char const*,ARRAY_BASE<float,ARRAY_VIEW<float const,int>,int> const&,int);
-template void OCTAVE_OUTPUT<float>::Write<float,VECTOR_ND<float> >(char const*,VECTOR_BASE<float,VECTOR_ND<float> > const&);
+template void OCTAVE_OUTPUT<float>::Write<float,ARRAY<float> >(char const*,ARRAY_BASE<float,ARRAY<float> > const&);
 template void OCTAVE_OUTPUT<float>::Write<float>(char const*,ARRAY<float,VECTOR<int,2> > const&);
 template void OCTAVE_OUTPUT<float>::Write<int,ARRAY_VIEW<int const,int> >(char const*,ARRAY_BASE<int,ARRAY_VIEW<int const,int>,int> const&,int);
 template void OCTAVE_OUTPUT<float>::Write<float,ARRAY_VIEW<float,int> >(char const*,ARRAY_BASE<float,ARRAY_VIEW<float,int>,int> const&,int);
@@ -406,7 +406,7 @@ template void OCTAVE_OUTPUT<double>::Write<VECTOR<int,3>,ARRAY_VIEW<VECTOR<int,3
 template void OCTAVE_OUTPUT<double>::Write<VECTOR<int,4>,ARRAY_VIEW<VECTOR<int,4> const,int> >(char const*,ARRAY_BASE<VECTOR<int,4>,ARRAY_VIEW<VECTOR<int,4> const,int>,int> const&,int);
 template void OCTAVE_OUTPUT<double>::Write<double,3>(char const*,ARRAY<VECTOR<double,3>,VECTOR<int,2> > const&);
 template void OCTAVE_OUTPUT<double>::Write<double,ARRAY_VIEW<double const,int> >(char const*,ARRAY_BASE<double,ARRAY_VIEW<double const,int>,int> const&,int);
-template void OCTAVE_OUTPUT<double>::Write<double,VECTOR_ND<double> >(char const*,VECTOR_BASE<double,VECTOR_ND<double> > const&);
+template void OCTAVE_OUTPUT<double>::Write<double,ARRAY<double> >(char const*,ARRAY_BASE<double,ARRAY<double> > const&);
 template void OCTAVE_OUTPUT<double>::Write<int,ARRAY_VIEW<int const,int> >(char const*,ARRAY_BASE<int,ARRAY_VIEW<int const,int>,int> const&,int);
 template void OCTAVE_OUTPUT<double>::Write<double,ARRAY_VIEW<double,int> >(char const*,ARRAY_BASE<double,ARRAY_VIEW<double,int>,int> const&,int);
 template void OCTAVE_OUTPUT<double>::Write<double>(char const*,ARRAY<double,VECTOR<int,2> > const&);

@@ -30,7 +30,7 @@ public:
     {A.Resize(m_new);}
 
     // eigenvalue is within tolerance of a real eigenvalue if return true
-    bool Power_Iterate(VECTOR_ND<T>& x,T& eigenvalue,const T tolerance,const int max_iterations) const
+    bool Power_Iterate(ARRAY<T>& x,T& eigenvalue,const T tolerance,const int max_iterations) const
     {return Power_Iterate_Shifted(x,0,eigenvalue,tolerance,max_iterations);}
 
     // see Golub and Van Loan, 5.1.8, p. 216
@@ -40,9 +40,9 @@ public:
     else{T t=-b/a;c=1/sqrt(1+sqr(t));s=c*t;}}
 
 //#####################################################################
-    void Multiply(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    bool Power_Iterate_Shifted(VECTOR_ND<T>& x,const T shift,T& eigenvalue,const T tolerance,const int max_iterations) const;
-    bool Eigenvalue_Range(VECTOR_ND<T>& x,INTERVAL<T>& eigenvalue_range,const T tolerance,const int max_iterations) const;
+    void Multiply(const ARRAY<T>& x,ARRAY<T>& result) const;
+    bool Power_Iterate_Shifted(ARRAY<T>& x,const T shift,T& eigenvalue,const T tolerance,const int max_iterations) const;
+    bool Eigenvalue_Range(ARRAY<T>& x,INTERVAL<T>& eigenvalue_range,const T tolerance,const int max_iterations) const;
     void Diagonalize();
     void Eigenvalues(ARRAY<T>& eigenvalues) const;
     void Print_Spectral_Information() const;

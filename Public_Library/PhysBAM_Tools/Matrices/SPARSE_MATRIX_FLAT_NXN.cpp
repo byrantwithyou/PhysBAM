@@ -4,6 +4,7 @@
 //#####################################################################
 // Class SPARSE_MATRIX_FLAT_NXN
 //#####################################################################
+#include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 using namespace PhysBAM;
@@ -132,16 +133,16 @@ Initialize_Diagonal_Index()
 // Function Multiply
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Times(const ARRAY<T>& x,ARRAY<T>& result) const
 {
     //TODO: Remove const casting
-    INT_ITERATOR_THREADED_ALPHA<SPARSE_MATRIX_FLAT_NXN<T> >(0,n,thread_queue).template Run<const VECTOR_ND<T>&,VECTOR_ND<T>&>(*const_cast<SPARSE_MATRIX_FLAT_NXN<T>*>(this),&SPARSE_MATRIX_FLAT_NXN<T>::Times_Threaded,x,result);
+    INT_ITERATOR_THREADED_ALPHA<SPARSE_MATRIX_FLAT_NXN<T> >(0,n,thread_queue).template Run<const ARRAY<T>&,ARRAY<T>&>(*const_cast<SPARSE_MATRIX_FLAT_NXN<T>*>(this),&SPARSE_MATRIX_FLAT_NXN<T>::Times_Threaded,x,result);
 }
 //#####################################################################
 // Function Multiply
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Times(const INTERVAL<int>& interval,const ARRAY<INTERVAL<int> >& ghost_intervals,const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Times(const INTERVAL<int>& interval,const ARRAY<INTERVAL<int> >& ghost_intervals,const ARRAY<T>& x,ARRAY<T>& result) const
 {
     Times(interval.min_corner,interval.max_corner,x,result);
     for(int i=0;i<ghost_intervals.m;i++) Times(ghost_intervals(i).min_corner,ghost_intervals(i).max_corner,x,result);
@@ -150,7 +151,7 @@ Times(const INTERVAL<int>& interval,const ARRAY<INTERVAL<int> >& ghost_intervals
 // Function Multiply
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Times(const int row_start,const int row_end,const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const
+Times(const int row_start,const int row_end,const ARRAY<T>& x,ARRAY<T>& result) const
 {
     int index=offsets(row_start);
     for(int i=row_start;i<row_end;i++){
@@ -162,7 +163,7 @@ Times(const int row_start,const int row_end,const VECTOR_ND<T>& x,VECTOR_ND<T>& 
 // Function Multiply
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Times_Threaded(const VECTOR_ND<T>& x,VECTOR_ND<T>& result,int row_start,int row_end)
+Times_Threaded(const ARRAY<T>& x,ARRAY<T>& result,int row_start,int row_end)
 {
     Times(row_start,row_end,x,result); //TODO: Remove this function
 }
@@ -252,7 +253,7 @@ Is_Transpose(const SPARSE_MATRIX_FLAT_NXN<T>& A_transpose,const T tolerance) con
 // Function Solve_Forward_Substitution
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
+Solve_Forward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
 {
     if(diagonal_is_identity) for(int i=0;i<n;i++){
         T sum=0;for(int index=offsets(i);index<diagonal_index(i);index++)sum+=A(index).a*x(A(index).j);
@@ -268,7 +269,7 @@ Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diag
 // Function Solve_Backward_Substitution
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Solve_Backward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
+Solve_Backward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity,const bool diagonal_is_inverted) const
 {
     if(diagonal_is_identity) for(int i=n-1;i>=0;i--){
         T sum=0;for(int index=diagonal_index(i)+1;index<offsets(i+1);index++)sum+=A(index).a*x(A(index).j);
@@ -316,9 +317,9 @@ In_Place_Incomplete_Cholesky_Factorization(const bool modified_version,const T m
 // Function Gauss_Seidel_Single_Iteration
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b)
+Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b)
 {
-    assert(x.n==b.n && x.n==n);
+    assert(x.m==b.m && x.m==n);
     for(int i=0;i<n;i++){
         T rho=0;T diagonal_entry=0;
         for(int index=offsets(i);index<offsets(i+1);index++){
@@ -330,10 +331,10 @@ Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b)
 // Function Gauss_Seidel_Solve
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Gauss_Seidel_Solve(VECTOR_ND<T>& x,const VECTOR_ND<T>& b,const T tolerance,const int max_iterations)
+Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance,const int max_iterations)
 {
-    assert(x.n==b.n && x.n==n);
-    VECTOR_ND<T> last_x(x);
+    assert(x.m==b.m && x.m==n);
+    ARRAY<T> last_x(x);
     for(int k=0;k<max_iterations;k++){
         Gauss_Seidel_Single_Iteration(x,b);
         T residual=0;for(int j=0;j<n;j++){residual+=sqr(last_x(j)-x(j));last_x(j)=x(j);}if(residual < tolerance) return;}
@@ -398,7 +399,7 @@ Sort_Entries()
 // Function Conjugate_With_Diagonal_Matrix
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_NXN<T>::
-Conjugate_With_Diagonal_Matrix(VECTOR_ND<T>& x)
+Conjugate_With_Diagonal_Matrix(ARRAY<T>& x)
 {
     int index=offsets(0);
     for(int i=0;i<n;i++){

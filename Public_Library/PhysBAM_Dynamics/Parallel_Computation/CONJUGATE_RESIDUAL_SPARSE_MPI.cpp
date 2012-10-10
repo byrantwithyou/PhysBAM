@@ -7,21 +7,21 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_PACKAGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
-#include <PhysBAM_Tools/Vectors/SPARSE_VECTOR_ND.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/SOLIDS_EVOLUTION.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/CONJUGATE_RESIDUAL_SPARSE_MPI.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/FLUID_SYSTEM_MPI.h>
 #include <PhysBAM_Dynamics/Parallel_Computation/SOLID_SYSTEM_MPI.h>
 #include <limits>
+#include <PhysBAM_Tools/Vectors/SPARSE_ARRAY.h>
 using namespace PhysBAM;
 
 //#####################################################################
 // Function Parallel_Solve_Fluid_Part
 //#####################################################################
 template<class TV> void CONJUGATE_RESIDUAL_SPARSE_MPI<TV>::
-Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ap_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ar_array,
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& zaq_array,
+Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& b_array,
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& ap_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& ar_array,
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& zaq_array,
     const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner)
 {
     Initialize_Datatypes();
@@ -114,11 +114,11 @@ Parallel_Solve(T_SYSTEM& system,TV2& x_array,const TV2& b_array,TV2& p_array,TV2
 // Function Initialize_Datatypes
 //#####################################################################
 template<class TV> void CONJUGATE_RESIDUAL_SPARSE_MPI<TV>::
-Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& v_array)
+Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& v_array)
 {
     for(int p=0;p<partitions->m;p++){
         SPARSE_MATRIX_PARTITION& partition=(*partitions)(p);
-        VECTOR_ND<T>& v=v_array.v(p);
+        ARRAY<T>& v=v_array.v(p);
         ARRAY<MPI::Datatype>& boundary_datatypes=boundary_datatypes_array(p);
         ARRAY<MPI::Datatype>& ghost_datatypes=ghost_datatypes_array(p);
         ARRAY<MPI::Request> requests;requests.Preallocate(2*partition.number_of_sides);
@@ -158,10 +158,10 @@ Initialize_Datatypes()
         const GENERALIZED_VELOCITY<VECTOR<T,d> >& b_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& p_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& ap_array, \
         GENERALIZED_VELOCITY<VECTOR<T,d> >& ar_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& r_array,GENERALIZED_VELOCITY<VECTOR<T,d> >& z_array, \
         GENERALIZED_VELOCITY<VECTOR<T,d> >& zaq_array,const int min_iterations,const int max_iterations,const T tolerance); \
-    template bool CONJUGATE_RESIDUAL_SPARSE_MPI<VECTOR<T,d> >::Parallel_Solve(FLUID_SYSTEM_MPI<VECTOR<T,d> >& system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array, \
-        const KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ap_array, \
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ar_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& z_array, \
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& zaq_array,const int min_iterations,const int max_iterations,const T tolerance);
+    template bool CONJUGATE_RESIDUAL_SPARSE_MPI<VECTOR<T,d> >::Parallel_Solve(FLUID_SYSTEM_MPI<VECTOR<T,d> >& system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& x_array, \
+        const KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& b_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& ap_array, \
+        KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& ar_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& z_array, \
+        KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& zaq_array,const int min_iterations,const int max_iterations,const T tolerance);
 
 INSTANTIATION_HELPER(float,1);
 INSTANTIATION_HELPER(float,2);

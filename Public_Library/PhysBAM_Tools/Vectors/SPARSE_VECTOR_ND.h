@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class T>
@@ -60,7 +59,7 @@ public:
     void Clear()
     {indices.Clean_Memory();x.Clean_Memory();}
 
-    T Dot_Product(const VECTOR_ND<T>& vector)
+    T Dot_Product(const ARRAY<T>& vector)
     {T sum=T();for(int i=0;i<indices.m;i++) sum+=x(i)*vector(indices(i));return sum;}
 
     void Negate()

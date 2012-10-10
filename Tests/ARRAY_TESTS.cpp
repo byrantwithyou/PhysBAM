@@ -104,22 +104,22 @@ public:
         
         TEST(ar1.Max()==11);
         TEST(ar1.Min()==5);
-        TEST(ar1(ar1.Argmin())==ar1.Min());
-        TEST(ar1(ar1.Argmax())==ar1.Max());
+        TEST(ar1(ar1.Arg_Min())==ar1.Min());
+        TEST(ar1(ar1.Arg_Max())==ar1.Max());
 
         ar1(0)=20;
         ar1(3)=1;
         TEST(ar1.Max()==20);
         TEST(ar1.Min()==1);
-        TEST(ar1(ar1.Argmin())==ar1.Min());
-        TEST(ar1(ar1.Argmax())==ar1.Max());
+        TEST(ar1(ar1.Arg_Min())==ar1.Min());
+        TEST(ar1(ar1.Arg_Max())==ar1.Max());
 
         ar1(0)=0;
         ar1(3)=100;
         TEST(ar1.Max()==100);
         TEST(ar1.Min()==0);
-        TEST(ar1(ar1.Argmin())==ar1.Min());
-        TEST(ar1(ar1.Argmax())==ar1.Max());
+        TEST(ar1(ar1.Arg_Min())==ar1.Min());
+        TEST(ar1(ar1.Arg_Max())==ar1.Max());
 
         TEST(ar1.Find(ar1(0))==0);
         TEST(ar1.Find(ar1(3))==3);

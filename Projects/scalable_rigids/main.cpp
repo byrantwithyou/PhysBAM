@@ -7,15 +7,14 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 
 using namespace PhysBAM;
 
 template<class T>
-VECTOR_ND<T> operator-(const VECTOR_ND<T>& v0,const VECTOR_ND<T>& v1)
+ARRAY<T> operator-(const ARRAY<T>& v0,const ARRAY<T>& v1)
 {
     assert(v0.Size()==v1.Size());
-    VECTOR_ND<T> r(v0.Size());
+    ARRAY<T> r(v0.Size());
     for(int i=0;i<r.Size();i++)
         r(i)=v0(i)-v1(i);
     return r;
@@ -129,7 +128,7 @@ SPARSE_MATRIX_FLAT_MXN<T> Build_Smoothed_Aggregation_Interpolation(const SPARSE_
 }
 
 template<class T>
-void Gauss_Seidel(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,int iterations=1)
+void Gauss_Seidel(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,int iterations=1)
 {
     int n=A.m;
     for(int i=0;i<iterations;i++)
@@ -151,16 +150,16 @@ void Gauss_Seidel(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& b,VECTO
 }
 
 template<class T>
-VECTOR_ND<T> Residual(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& b,const VECTOR_ND<T>& x)
+ARRAY<T> Residual(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,const ARRAY<T>& x)
 {
-    VECTOR_ND<T> Ax(A.m);
+    ARRAY<T> Ax(A.m);
     A.Times(x,Ax);
-    VECTOR_ND<T> r=Ax-b;
+    ARRAY<T> r=Ax-b;
     return r;
 }
 
 template<class T>
-void Solve_Linear_System(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x)
+void Solve_Linear_System(const SPARSE_MATRIX_FLAT_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x)
 {
     LOG::cout << "Solver_Linear_System " << A.m << std::endl;
     //LOG::cout << "A = " << A << std::endl;
@@ -186,8 +185,8 @@ void Solve_Linear_System(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& 
 
     SPARSE_MATRIX_FLAT_MXN<T> A2=It*A*I;
 
-    VECTOR_ND<T> r=Residual(A,b,x);
-    VECTOR_ND<T> e2(n2),r2(n2);
+    ARRAY<T> r=Residual(A,b,x);
+    ARRAY<T> e2(n2),r2(n2);
     It.Times(r,r2);
     e2.Fill(0);
 
@@ -196,7 +195,7 @@ void Solve_Linear_System(const SPARSE_MATRIX_FLAT_MXN<T>& A,const VECTOR_ND<T>& 
 
     //LOG::cout << "coarse_residual = " << Residual(A2,r2,e2).Maximum_Magnitude() << std::endl;
 
-    VECTOR_ND<T> e(n);
+    ARRAY<T> e(n);
     I.Times(e2,e);
     
     //x-=e;
@@ -284,7 +283,7 @@ int main(int argc,char* argv[])
     
     //std::cout << "A = " << std::endl << A << std::endl;
     
-    VECTOR_ND<T> b(A.m),x(A.m);
+    ARRAY<T> b(A.m),x(A.m);
     
     b.Fill(1);
     x.Fill(0);

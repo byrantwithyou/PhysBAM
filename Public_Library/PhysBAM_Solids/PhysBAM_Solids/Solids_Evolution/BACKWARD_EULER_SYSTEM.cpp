@@ -207,8 +207,8 @@ Initialize_World_Space_Masses(const SOLID_BODY_COLLECTION<TV>& solid_body_collec
 template<class TV> void GENERALIZED_MASS<TV>::
 Inverse_Multiply(const GENERALIZED_VELOCITY<TV>& V,GENERALIZED_VELOCITY<TV>& F,bool include_static) const
 {
-    F.V=one_over_mass*V.V;
-    F.rigid_V=world_space_rigid_mass_inverse*V.rigid_V;
+    for(int i=0;i<F.V.Size();i++) F.V(i)=one_over_mass(i)*V.V(i);
+    for(int i=0;i<F.rigid_V.Size();i++) F.rigid_V(i)=world_space_rigid_mass_inverse(i)*V.rigid_V(i);
     if(include_static) F.kinematic_and_static_rigid_V*=0;
 }
 //#####################################################################

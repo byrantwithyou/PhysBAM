@@ -10,8 +10,8 @@
 
 #include <PhysBAM_Tools/Symbolics/STATIC_POLYNOMIAL.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 
 namespace PhysBAM{
 
@@ -36,13 +36,13 @@ public:
     };
     
     T scale;
-    ARRAY<VECTOR_ND<T> >* rhs;
+    ARRAY<ARRAY<T> >* rhs;
     BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc;
     ARRAY<OVERLAP_POLYNOMIAL> overlap_polynomials;
 
     template<int d>
     void Initialize(SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR<TV>& helper_input,const BASIS_STENCIL_UNIFORM<TV,d>& s,
-        BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc_input,ARRAY<VECTOR_ND<T> >& rhs_input,T scale_input);
+        BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* bc_input,ARRAY<ARRAY<T> >& rhs_input,T scale_input);
 
     void Add_Entry(int constraint_index,int flat_index_diff_ref,int color,T value)
     {helper->data(color)(constraint_index,flat_index_diff_ref)+=value*scale;}

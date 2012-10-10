@@ -141,7 +141,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     T theta_threshold,T cg_tolerance,bool verbose)
 {
     typedef VECTOR<int,d> TV_INT;
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > T_VECTOR;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > T_VECTOR;
     typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,T_VECTOR > T_SYSTEM;
 
     ARRAY<int,TV_INT> cell_to_index(grid.Domain_Indices(1));
@@ -182,7 +182,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     system.beta_inverse.Fill(1/density);
 
     system.Initialize();
-    system.projections.Append(VECTOR_ND<T>());
+    system.projections.Append(ARRAY<T>());
     system.projections.Last().Resize(system.poisson.n);
     system.projections.Last().Fill(1/sqrt((T)system.poisson.n));
 
@@ -191,9 +191,9 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     b.v.Resize(index_to_cell.m);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
-    VECTOR_ND<T> temp(index_to_face.m);
+    ARRAY<T> temp(index_to_face.m);
     for(int i=0;i<index_to_face.m;i++) temp(i)=u(index_to_face(i));
-    VECTOR_ND<T> old_u=temp;
+    ARRAY<T> old_u=temp;
     system.neg_divergence.Times(temp,b.v);
 
     ARRAY<T,TV_INT> p(grid.Domain_Indices(1));
@@ -223,8 +223,8 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
     if(verbose){OCTAVE_OUTPUT<T>(STRING_UTILITIES::string_sprintf("proj-x-%i.txt",solve_id).c_str()).Write("x",x);}
 
     LOG::cout<<"P-inf "<<INTERVAL<T>::Bounding_Box(x.v).Size()<<std::endl;
-    VECTOR_ND<T> tmp(x.v);
-    LOG::cout<<"P-1 "<<(tmp-=x.v.Average()).L1_Norm()/x.v.n<<std::endl;
+    ARRAY<T> tmp(x.v);
+    LOG::cout<<"P-1 "<<(tmp-=x.v.Average()).Sum_Abs()/x.v.m<<std::endl;
     for(int i=0;i<index_to_cell.m;i++) p(index_to_cell(i))=x.v(i);
     if(neumann_pocket) p.Subset(ai.cell_samples)-=p.Subset(ai.cell_samples).Average();
 //    ai.Print("PRESSURE",p);
@@ -290,7 +290,7 @@ void Project_Incompressibility_Gibou(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> 
 //     LOG::cout<<"MAX RESIDUAL AFTER EXTRAP "<<s.v.Maximum_Magnitude()<<std::endl;
 
     LOG::cout<<"G-inf "<<INTERVAL<T>::Bounding_Box(temp).Size()<<std::endl;
-    LOG::cout<<"G-1 "<<(temp-=temp.Average()).L1_Norm()/temp.n<<std::endl;
+    LOG::cout<<"G-1 "<<(temp-=temp.Average()).Sum_Abs()/temp.m<<std::endl;
 }
 
 template void Project_Incompressibility_Gibou<double,VECTOR<double,1>,1>(GRID<VECTOR<double,1> > const&,ARRAY<double,FACE_INDEX<1> >&,const BOUNDARY_CONDITIONS<VECTOR<double,1> >&,

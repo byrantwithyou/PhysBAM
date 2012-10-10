@@ -107,7 +107,8 @@ template<class TV> double BW_BACKWARD_EULER_SYSTEM<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
 {
     const VECTOR_T& V1=debug_cast<const VECTOR_T&>(BV1),&V2=debug_cast<const VECTOR_T&>(BV2);
-    double inner_product=V1.V.Inner_Product_Double_Precision(solid_body_collection.deformable_body_collection.particles.mass,V2.V);
+    double inner_product=0;
+    for(int i=0;i<V1.V.Size();i++) inner_product+=V1.V(i).Dot(V2.V(i))*solid_body_collection.deformable_body_collection.particles.mass(i);
 //+ARRAYS_COMPUTATIONS::Inner_Product_Double_Precision(projection_data.mass.world_space_rigid_mass,V1.rigid_V,V2.rigid_V);
     //TODO this should not be mass scaled
     return inner_product;

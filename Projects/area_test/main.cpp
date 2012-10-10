@@ -2,12 +2,12 @@
 // Copyright 2011.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/INDIRECT_ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_2D.h>
 #include <PhysBAM_Geometry/Images/EPS_FILE.h>
@@ -116,7 +116,7 @@ void Test_Triangulated_Areas()
     vc.Compute_Collision_Triangles();
 
     T A1=vc.area;
-    VECTOR_ND<T> G1(ta1->particles.X.m*2);
+    ARRAY<T> G1(ta1->particles.X.m*2);
     MATRIX_MXN<T> H1(ta1->particles.X.m*2,ta1->particles.X.m*2);
     for(HASHTABLE<int,TV>::ITERATOR it(vc.gradient);it.Valid();it.Next())
         for(int s=0;s<2;s++)
@@ -127,7 +127,7 @@ void Test_Triangulated_Areas()
                 H1(it.Key().x*2-2+s,it.Key().y*2-2+t)=it.Data()(s,t);
 
     T e=1e-5;
-    VECTOR_ND<T> vdX(ta1->particles.X.m*2);
+    ARRAY<T> vdX(ta1->particles.X.m*2);
     rn.Fill_Uniform(vdX,-e,e);
     ARRAY_VIEW<TV> dX(ta1->particles.X.m,(TV*)vdX.Get_Array_Pointer());
     ta1->particles.X+=dX;
@@ -137,7 +137,7 @@ void Test_Triangulated_Areas()
     vc.Compute_Collision_Triangles();
 
     T A2=vc.area;
-    VECTOR_ND<T> G2(ta1->particles.X.m*2);
+    ARRAY<T> G2(ta1->particles.X.m*2);
     MATRIX_MXN<T> H2(ta1->particles.X.m*2,ta1->particles.X.m*2);
     for(HASHTABLE<int,TV>::ITERATOR it(vc.gradient);it.Valid();it.Next())
         for(int s=0;s<2;s++)
@@ -161,8 +161,8 @@ void Test_Triangulated_Areas()
     LOG::cout<<trap_cases<<std::endl;
     printf("AG %g %g %g\n", dE1, dE2, fabs((dE1-dE2)/dE2));
 
-    VECTOR_ND<T> dG1((H1*vdX+H2*vdX)/(T)2);
-    VECTOR_ND<T> dG2(G2-G1);
+    ARRAY<T> dG1((H1*vdX+H2*vdX)/(T)2);
+    ARRAY<T> dG2(G2-G1);
     T dG1m=dG1.Magnitude()/e;
     T dG2m=dG2.Magnitude()/e;
     T DGm=(dG2-dG1).Magnitude()/e;

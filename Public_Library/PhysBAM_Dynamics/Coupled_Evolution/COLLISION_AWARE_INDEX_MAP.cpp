@@ -118,7 +118,7 @@ Register_Cell_Index(const TV_INT& index,const int ghost_cells)
 // Function Collect
 //#####################################################################
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
-Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,VECTOR_ND<T>& flattened_faces) const
+Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,ARRAY<T>& flattened_faces) const
 {
     flattened_faces.Resize(Number_Faces());
     for(int i=0;i<indexed_faces.m;i++)
@@ -130,7 +130,7 @@ Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,V
 // Function Collect
 //#####################################################################
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
-Collect(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const
+Collect(const ARRAY<T,TV_INT>& cells,ARRAY<T>& flattened_cells) const
 {
     flattened_cells.Resize(Number_Cells());
     for(int i=0;i<real_cell_indices.m;i++){int index=real_cell_indices(i);
@@ -141,7 +141,7 @@ Collect(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const
 //#####################################################################
 // Collect's pressures outside the domain as well as real ones
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
-Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const
+Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,ARRAY<T>& flattened_cells) const
 {
     flattened_cells.Resize(Number_Cells());
     for(int i=0;i<indexed_cells.m;i++)
@@ -151,7 +151,7 @@ Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells
 // Function Distribute
 //#####################################################################
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
-Distribute(const VECTOR_ND<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,ARRAY<T>& constrained_faces) const
+Distribute(const ARRAY<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,ARRAY<T>& constrained_faces) const
 {
     for(int i=0;i<indexed_faces.m;i++)
         faces(indexed_faces(i))=flattened_faces(i);
@@ -163,7 +163,7 @@ Distribute(const VECTOR_ND<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,AR
 // Function Distribute
 //#####################################################################
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
-Distribute(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
+Distribute(const ARRAY<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
 {
     for(int i=0;i<real_cell_indices.m;i++){int index=real_cell_indices(i);
         cells(indexed_cells(index))=flattened_cells(index);}
@@ -173,7 +173,7 @@ Distribute(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
 //#####################################################################
 // Distributes pressures outside the domain as well as real ones
 template<class TV> void COLLISION_AWARE_INDEX_MAP<TV>::
-Distribute_Indexed_Cells(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
+Distribute_Indexed_Cells(const ARRAY<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const
 {
     for(int i=0;i<indexed_cells.m;i++)
         cells(indexed_cells(i))=flattened_cells(i);

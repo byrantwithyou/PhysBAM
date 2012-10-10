@@ -35,11 +35,11 @@ using ::std::cos;
 using ::std::abs;
 
 template<class T>
-class VECTOR<T,2>:public VECTOR_BASE<T,VECTOR<T,2> >
+class VECTOR<T,2>:public ARRAY_BASE<T,VECTOR<T,2> >
 {
     struct UNUSABLE{};
 public:
-    typedef VECTOR_BASE<T,VECTOR<T,2> > BASE;
+    typedef ARRAY_BASE<T,VECTOR<T,2> > BASE;
     using BASE::Assert_Same_Size;
     template<class T2> struct REBIND{typedef VECTOR<T2,2> TYPE;};
     typedef typename IF<IS_SCALAR<T>::value,T,UNUSABLE>::TYPE SCALAR;
@@ -76,39 +76,17 @@ public:
         :x((T)vector_input.x),y(T())
     {}
 
-    template<class T_ARRAY>
-    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
-        :x(v(0)),y(v(1))
-    {
-        assert(m==v.Size());
-    }
- 
     template<class T_VECTOR>
-    explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
+    explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
         :x(v(0)),y(v(1))
     {
         Assert_Same_Size(*this,v);
-    }
-
-    template<class T_VECTOR>
-    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
-        :x(v(0)),y(v(1))
-    {
-        Assert_Same_Size(*this,v);
-    }
-
-    template<class T_VECTOR>
-    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
-    {
-        Assert_Same_Size(*this,v);
-        x=v(0);y=v(1);
-        return *this;
     }
 
     template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
     {
-        assert(m==v.Size());
+        Assert_Same_Size(*this,v);
         x=v(0);y=v(1);
         return *this;
     }
@@ -205,7 +183,7 @@ public:
     T Lp_Norm(const T& p) const
     {return pow(pow(abs(x),p)+pow(abs(y),p),1/p);}
 
-    T L1_Norm() const
+    T Sum_Abs() const
     {return abs(x)+abs(y);}
 
     T Normalize()
@@ -413,6 +391,12 @@ public:
     void Get_Subvector(const int istart,T_VECTOR& v) const
     {for(int i=0;i<v.Size();i++) v(i)=(*this)(istart+i);}
 
+    T* Get_Array_Pointer()
+    {return (T*)this;}
+
+    const T* Get_Array_Pointer() const
+    {return (const T*)this;}
+
     T* begin() // for stl
     {return &x;}
 
@@ -524,20 +508,6 @@ in_bounds(const VECTOR<T,2>& v,const VECTOR<T,2>& vmin,const VECTOR<T,2>& vmax)
 template<class T> inline VECTOR<T,2>
 wrap(const VECTOR<T,2>& v,const VECTOR<T,2>& vmin,const VECTOR<T,2>& vmax)
 {return VECTOR<T,2>(wrap(v.x,vmin.x,vmax.x),wrap(v.y,vmin.y,vmax.y));}
-//#####################################################################
-template<class T> struct SUM<VECTOR<T,2>,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct SUM<VECTOR<T,2>,T>{typedef VECTOR<T,2> TYPE;};
-template<class T> struct SUM<T,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct DIFFERENCE<VECTOR<T,2>,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct DIFFERENCE<VECTOR<T,2>,T>{typedef VECTOR<T,2> TYPE;};
-template<class T> struct DIFFERENCE<T,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct PRODUCT<VECTOR<T,2>,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct PRODUCT<VECTOR<T,2>,T>{typedef VECTOR<T,2> TYPE;};
-template<class T> struct PRODUCT<T,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct QUOTIENT<VECTOR<T,2>,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct QUOTIENT<VECTOR<T,2>,T>{typedef VECTOR<T,2> TYPE;};
-template<class T> struct QUOTIENT<T,VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
-template<class T> struct NEGATION<VECTOR<T,2> >{typedef VECTOR<T,2> TYPE;};
 //#####################################################################
 template<class T>
 inline std::istream& operator>>(std::istream& input,VECTOR<T,2>& v)

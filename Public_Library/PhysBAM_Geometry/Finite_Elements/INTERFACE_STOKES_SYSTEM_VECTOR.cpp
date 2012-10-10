@@ -111,13 +111,13 @@ Print() const
     // Flat print
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            for(int k=0;k<u(i)[s].n;k++)
+            for(int k=0;k<u(i)[s].m;k++)
                 LOG::cout<<u(i)[s](k)<<" ";
     for(int s=0;s<2;s++)
-        for(int k=0;k<p[s].n;k++)
+        for(int k=0;k<p[s].m;k++)
             LOG::cout<<p[s](k)<<" ";
     for(int i=0;i<TV::m;i++)
-        for(int k=0;k<q(i).n;k++)
+        for(int k=0;k<q(i).m;k++)
             LOG::cout<<q(i)(k)<<" ";
     LOG::cout<<std::endl;
 }
@@ -130,9 +130,9 @@ Raw_Size() const
     int size=0;
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            size+=u(i)[s].n;
-    for(int s=0;s<2;s++) size+=p[s].n;
-    for(int i=0;i<TV::m;i++) size+=q(i).n;
+            size+=u(i)[s].m;
+    for(int s=0;s<2;s++) size+=p[s].m;
+    for(int i=0;i<TV::m;i++) size+=q(i).m;
     return size;
 }
 //#####################################################################
@@ -143,14 +143,14 @@ Raw_Get(int i)
 {
     for(int k=0;k<TV::m;k++)
         for(int s=0;s<2;s++){
-            if(i<u(k)[s].n) return u(k)[s](i);
-            i-=u(k)[s].n;}
+            if(i<u(k)[s].m) return u(k)[s](i);
+            i-=u(k)[s].m;}
     for(int s=0;s<2;s++){
-        if(i<p[s].n) return p[s](i);
-        i-=p[s].n;}
+        if(i<p[s].m) return p[s](i);
+        i-=p[s].m;}
     for(int k=0;k<TV::m;k++){
-        if(i<q(k).n) return q(k)(i);
-        i-=q(k).n;}
+        if(i<q(k).m) return q(k)(i);
+        i-=q(k).m;}
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
@@ -162,9 +162,9 @@ Clone_Default() const
     INTERFACE_STOKES_SYSTEM_VECTOR<TV>* v=new INTERFACE_STOKES_SYSTEM_VECTOR<TV>;
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            v->u(i)[s].Resize(u(i)[s].n);
-    for(int s=0;s<2;s++) v->p[s].Resize(p[s].n);
-    for(int i=0;i<TV::m;i++) v->q(i).Resize(q(i).n);
+            v->u(i)[s].Resize(u(i)[s].m);
+    for(int s=0;s<2;s++) v->p[s].Resize(p[s].m);
+    for(int i=0;i<TV::m;i++) v->q(i).Resize(q(i).m);
     return v;
 }
 //#####################################################################
@@ -176,9 +176,9 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& cs=debug_cast<const INTERFACE_STOKES_SYSTEM_VECTOR<TV>&>(v);
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            u(i)[s].Resize(cs.u(i)[s].n);
-    for(int s=0;s<2;s++) p[s].Resize(cs.p[s].n);
-    for(int i=0;i<TV::m;i++) q(i).Resize(cs.q(i).n);
+            u(i)[s].Resize(cs.u(i)[s].m);
+    for(int s=0;s<2;s++) p[s].Resize(cs.p[s].m);
+    for(int i=0;i<TV::m;i++) q(i).Resize(cs.q(i).m);
 }
 //#####################################################################
 // Function Dot
@@ -246,13 +246,13 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& v,const INTERFACE_STOKES_SYSTEM_
 {
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            for(int k=0;k<u(i)[s].n;k++)
+            for(int k=0;k<u(i)[s].m;k++)
                 u(i)[s](k)=v.u(i)[s](k)*c.u(i)[s](k);
     for(int s=0;s<2;s++)
-        for(int k=0;k<p[s].n;k++)
+        for(int k=0;k<p[s].m;k++)
             p[s](k)=v.p[s](k)*c.p[s](k);
     for(int i=0;i<TV::m;i++)
-        for(int k=0;k<q(i).n;k++)
+        for(int k=0;k<q(i).m;k++)
             q(i)(k)=v.q(i)(k)*c.q(i)(k);
 }
 //#####################################################################
@@ -263,13 +263,13 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR<TV>& c)
 {
     for(int i=0;i<TV::m;i++)
         for(int s=0;s<2;s++)
-            for(int k=0;k<u(i)[s].n;k++)
+            for(int k=0;k<u(i)[s].m;k++)
                 u(i)[s](k)*=c.u(i)[s](k);
     for(int s=0;s<2;s++)
-        for(int k=0;k<p[s].n;k++)
+        for(int k=0;k<p[s].m;k++)
             p[s](k)*=c.p[s](k);
     for(int i=0;i<TV::m;i++)
-        for(int k=0;k<q(i).n;k++)
+        for(int k=0;k<q(i).m;k++)
             q(i)(k)*=c.q(i)(k);
 }
 //#####################################################################

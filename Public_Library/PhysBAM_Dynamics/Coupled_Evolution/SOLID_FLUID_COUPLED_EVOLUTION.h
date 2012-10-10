@@ -122,7 +122,7 @@ public:
     void Compute_W(const T current_position_time);
     void Compute_Coupling_Terms_Deformable(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
     void Compute_Coupling_Terms_Rigid(const T_ARRAYS_INT& cell_index_to_matrix_index,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
-    void Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<VECTOR_ND<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
+    void Add_Nondynamic_Solids_To_Right_Hand_Side(ARRAY<ARRAY<T> >& right_hand_side,const ARRAY<INTERVAL<int> >& interior_regions,const int colors);
     void Apply_Pressure(const T dt,const T time);
     void Average_Solid_Projected_Face_Velocities_For_Energy_Update(const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_star,const T_FACE_ARRAYS_SCALAR& solid_projected_face_velocities_np1,T_FACE_ARRAYS_SCALAR& face_velocities);
     void Apply_Solid_Boundary_Conditions(const T time,const bool use_pseudo_velocities,T_FACE_ARRAYS_SCALAR& face_velocities);

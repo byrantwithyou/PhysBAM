@@ -16,7 +16,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <PhysBAM_Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_GEOMETRY_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
 namespace MPI{class Group;class Intracomm;class Request;class Status;class Op;}
@@ -49,7 +48,7 @@ public:
     MPI::Intracomm* comm;
     MPI::Intracomm* fluid_comm;
     MPI::Group *group,*solid_group,*fluid_group;
-    VECTOR_ND<int> solid_ranks,fluid_ranks;
+    ARRAY<int> solid_ranks,fluid_ranks;
     SPARSE_MATRIX_PARTITION partition;
     T_MPI_GRID* mpi_grid;
     POISSON_COLLIDABLE_UNIFORM<GRID<TV> >* poisson;
@@ -78,8 +77,8 @@ public:
     void Create_Fluid_Comm_For_Solid_Nodes() const;
     template<class T2> void Reduce_Add(const T2& input,T2& output) const;
     T Reduce_Min(const T local_value) const;
-    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,VECTOR_ND<T>& x_array,VECTOR_ND<T>& b_array,VECTOR_ND<T>& p_array,VECTOR_ND<T>& ap_array,
-        VECTOR_ND<T>& ar_array,VECTOR_ND<T>& r_array,VECTOR_ND<T>& z_array,VECTOR_ND<T>& zaq_array,const int min_iterations,const int max_iterations,
+    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI_SLIP<TV>& fluid_system,ARRAY<T>& x_array,ARRAY<T>& b_array,ARRAY<T>& p_array,ARRAY<T>& ap_array,
+        ARRAY<T>& ar_array,ARRAY<T>& r_array,ARRAY<T>& z_array,ARRAY<T>& zaq_array,const int min_iterations,const int max_iterations,
         const T tolerance,const bool recompute_preconditioner,const bool leakproof_solve);
     void Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI_SLIP<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,GENERALIZED_VELOCITY<TV>& ap_array,
         GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance);

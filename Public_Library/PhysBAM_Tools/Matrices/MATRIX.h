@@ -205,7 +205,7 @@ public:
     {MATRIX<T,n> A_transpose_A(Normal_Equations_Matrix());VECTOR<T,n> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}
 
     template<class T_VECTOR>
-    VECTOR<T,n> Solve_Linear_System(const VECTOR_BASE<T,T_VECTOR>& b)
+    VECTOR<T,n> Solve_Linear_System(const ARRAY_BASE<T,T_VECTOR>& b)
     {return PLU_Solve(b);}
 
     T Parallelepiped_Measure() const

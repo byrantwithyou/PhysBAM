@@ -8,7 +8,7 @@
 #define __ARRAY_PRODUCT__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_EXPRESSION.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>
 #include <cassert>
 namespace PhysBAM{
@@ -37,8 +37,8 @@ public:
     INDEX Size() const
     {INDEX size=array1.Size();assert(size==array2.Size());return size;}
 
-    RANGE<INDEX> Domain_Indices() const
-    {RANGE<INDEX> domain_indices=array1.Domain_Indices();assert(domain_indices==array2.Domain_Indices());return domain_indices;}
+    INTERVAL<INDEX> Domain_Indices() const
+    {INTERVAL<INDEX> domain_indices=array1.Domain_Indices();assert(domain_indices==array2.Domain_Indices());return domain_indices;}
 
     const T_PRODUCT operator()(const INDEX i) const
     {return array1(i)*array2(i);}
@@ -46,13 +46,17 @@ public:
 //#####################################################################
 };
 
-template<class T1,class T2,class T_ARRAY1,class T_ARRAY2> ARRAY_PRODUCT<T_ARRAY1,T_ARRAY2>
+template<class T_ARRAY1,class T_ARRAY2,class ENABLE=void> struct ARRAY_PRODUCT_VALID {static const bool value=false;};
+template<class T_ARRAY1,class T_ARRAY2> struct ARRAY_PRODUCT_VALID<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<IS_SAME<typename T_ARRAY1::ELEMENT,typename T_ARRAY2::ELEMENT>::value>::TYPE>
+{static const bool value=IS_ARRAY<T_ARRAY1>::value && IS_ARRAY<T_ARRAY2>::value && (!FIXED_SIZE_VECTOR<T_ARRAY1>::value || !FIXED_SIZE_VECTOR<T_ARRAY2>::value);};
+
+template<class T1,class T2,class T_ARRAY1,class T_ARRAY2> typename ENABLE_IF<ARRAY_PRODUCT_VALID<T_ARRAY1,T_ARRAY2>::value,ARRAY_PRODUCT<T_ARRAY1,T_ARRAY2> >::TYPE
 operator*(const ARRAY_BASE<T1,T_ARRAY1,typename T_ARRAY1::INDEX>& array1,const ARRAY_BASE<T2,T_ARRAY2,typename T_ARRAY1::INDEX>& array2)
 {return ARRAY_PRODUCT<T_ARRAY1,T_ARRAY2>(array1.Derived(),array2.Derived());}
 
 //#####################################################################
 
-template<class T_ARRAY1,class T_ARRAY2> struct PRODUCT<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<IS_ARRAY<T_ARRAY1>::value && IS_ARRAY<T_ARRAY2>::value>::TYPE>
+template<class T_ARRAY1,class T_ARRAY2> struct PRODUCT<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<ARRAY_PRODUCT_VALID<T_ARRAY1,T_ARRAY2>::value>::TYPE>
 {typedef ARRAY_PRODUCT<T_ARRAY1,T_ARRAY2> TYPE;};
 
 //#####################################################################

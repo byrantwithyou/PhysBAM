@@ -25,7 +25,7 @@ MATRIX_FLUID_POISSON(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,
 // Function Compute
 //#####################################################################
 template<class TV> void MATRIX_FLUID_POISSON<TV>::
-Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const VECTOR_ND<T>& one_over_fluid_mass,const T dt,const bool use_preconditioner)
+Compute(const SPARSE_MATRIX_FLAT_MXN<T>& gradient,const ARRAY<T>& one_over_fluid_mass,const T dt,const bool use_preconditioner)
 {
     if(!use_preconditioner) return;
     SPARSE_MATRIX_FLAT_MXN<T> negative_divergence;
@@ -86,10 +86,10 @@ Compute_Preconditioner()
 // Function Apply_Preconditioner
 //#####################################################################
 template<class TV> void MATRIX_FLUID_POISSON<TV>::
-Apply_Preconditioner(VECTOR_ND<T>& pressure) const
+Apply_Preconditioner(ARRAY<T>& pressure) const
 {
 #if 1
-    VECTOR_ND<T> sub_vector(map.m),temp_vector(map.m);
+    ARRAY<T> sub_vector(map.m),temp_vector(map.m);
     for(int i=0;i<map.m;i++) sub_vector(i)=pressure(map(i));
 
     poisson.C->Solve_Forward_Substitution(sub_vector,temp_vector,true);
@@ -97,7 +97,7 @@ Apply_Preconditioner(VECTOR_ND<T>& pressure) const
 
     for(int i=0;i<map.m;i++) pressure(map(i))=sub_vector(i);
 #else
-    VECTOR_ND<T> sub_vector(index_map.real_cell_indices.m),temp_vector(index_map.real_cell_indices.m);
+    ARRAY<T> sub_vector(index_map.real_cell_indices.m),temp_vector(index_map.real_cell_indices.m);
     for(int i=0;i<index_map.real_cell_indices.m;i++) sub_vector(i)=pressure(index_map.real_cell_indices(i));
 
     poisson.C->Solve_Forward_Substitution(sub_vector,temp_vector,true);
@@ -110,9 +110,9 @@ Apply_Preconditioner(VECTOR_ND<T>& pressure) const
 // Function Times_Add
 //#####################################################################
 template<class TV> void MATRIX_FLUID_POISSON<TV>::
-Times_Add(const VECTOR_ND<T>& pressure_in,VECTOR_ND<T>& pressure_out) const
+Times_Add(const ARRAY<T>& pressure_in,ARRAY<T>& pressure_out) const
 {
-    VECTOR_ND<T> result(pressure_in.n);
+    ARRAY<T> result(pressure_in.m);
     poisson.Times(pressure_in,result);
     pressure_out+=result;
 }
@@ -120,7 +120,7 @@ Times_Add(const VECTOR_ND<T>& pressure_in,VECTOR_ND<T>& pressure_out) const
 // Function Times
 //#####################################################################
 template<class TV> void MATRIX_FLUID_POISSON<TV>::
-Times(const VECTOR_ND<T>& pressure_in,VECTOR_ND<T>& pressure_out) const
+Times(const ARRAY<T>& pressure_in,ARRAY<T>& pressure_out) const
 {
     poisson.Times(pressure_in,pressure_out);
 }
@@ -131,15 +131,15 @@ template<class TV> void MATRIX_FLUID_POISSON<TV>::
 Test_Matrix(const bool print_matrix) const
 {
     RANDOM_NUMBERS<T> random;
-    VECTOR_ND<T> a(poisson.n),a2(poisson.n),b(poisson.n),b2(poisson.n);
+    ARRAY<T> a(poisson.n),a2(poisson.n),b(poisson.n),b2(poisson.n);
     random.Fill_Uniform(a,-1,1);
     random.Fill_Uniform(b,-1,1);
 
     poisson.Times(b,a2);
     poisson.Times(a,b2);
 
-    T inner1=VECTOR_ND<T>::Dot_Product(a,a2);
-    T inner2=VECTOR_ND<T>::Dot_Product(b,b2);
+    T inner1=ARRAY<T>::Dot_Product(a,a2);
+    T inner2=ARRAY<T>::Dot_Product(b,b2);
     LOG::cout<<"MATRIX_FLUID_POISSON Test: "<<inner1<<"  vs  "<<inner2<<"  relative  "<<abs(inner1-inner2)/maxabs((T)1e-30,inner1,inner2)<<std::endl;
 
     if(print_matrix) LOG::cout<<"poisson:\n"<<poisson<<std::endl;

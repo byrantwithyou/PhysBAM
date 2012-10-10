@@ -160,12 +160,12 @@ Print() const
     // Flat print
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<colors;c++)
-            for(int k=0;k<u(i)(c).n;k++)
+            for(int k=0;k<u(i)(c).m;k++)
                 LOG::cout<<u(i)(c)(k)<<" ";
     for(int c=0;c<colors;c++)
-        for(int k=0;k<p(c).n;k++)
+        for(int k=0;k<p(c).m;k++)
             LOG::cout<<p(c)(k)<<" ";
-    for(int k=0;k<q.n;k++)
+    for(int k=0;k<q.m;k++)
         LOG::cout<<q(k)<<" ";
     LOG::cout<<std::endl;
 }
@@ -178,9 +178,9 @@ Raw_Size() const
     int size=0;
     for(int i=0;i<TV::m;i++)
         for(int c=0;c<colors;c++)
-            size+=u(i)(c).n;
-    for(int c=0;c<colors;c++) size+=p(c).n;
-    size+=q.n;
+            size+=u(i)(c).m;
+    for(int c=0;c<colors;c++) size+=p(c).m;
+    size+=q.m;
     return size;
 }
 //#####################################################################
@@ -191,12 +191,12 @@ Raw_Get(int i)
 {
     for(int k=0;k<TV::m;k++)
         for(int c=0;c<colors;c++){
-            if(i<u(k)(c).n) return u(k)(c)(i);
-            i-=u(k)(c).n;}
+            if(i<u(k)(c).m) return u(k)(c)(i);
+            i-=u(k)(c).m;}
     for(int c=0;c<colors;c++){
-        if(i<p(c).n) return p(c)(i);
-        i-=p(c).n;}
-    if(i<q.n) return q(i);
+        if(i<p(c).m) return p(c)(i);
+        i-=p(c).m;}
+    if(i<q.m) return q(i);
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
@@ -210,10 +210,10 @@ Clone_Default() const
     for(int i=0;i<TV::m;i++){
         v->u(i).Resize(colors);
         for(int c=0;c<colors;c++)
-            v->u(i)(c).Resize(u(i)(c).n);}
+            v->u(i)(c).Resize(u(i)(c).m);}
     v->p.Resize(colors);
-    for(int c=0;c<colors;c++) v->p(c).Resize(p(c).n);
-    v->q.Resize(q.n);
+    for(int c=0;c<colors;c++) v->p(c).Resize(p(c).m);
+    v->q.Resize(q.m);
     return v;
 }
 //#####################################################################
@@ -227,10 +227,10 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     for(int i=0;i<TV::m;i++){
         u(i).Resize(colors);
         for(int c=0;c<colors;c++)
-            u(i)(c).Resize(cs.u(i)(c).n);}
+            u(i)(c).Resize(cs.u(i)(c).m);}
     p.Resize(colors);
-    for(int c=0;c<colors;c++) p(c).Resize(cs.p(c).n);
-    q.Resize(cs.q.n);
+    for(int c=0;c<colors;c++) p(c).Resize(cs.p(c).m);
+    q.Resize(cs.q.m);
 }
 //#####################################################################
 // Function Dot
@@ -336,14 +336,14 @@ Scale(const INTERFACE_STOKES_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_STOKES_S
         for(int i=0;i<TV::m;i++)
             for(int c=0;c<colors;c++)
 #pragma omp task
-                for(int k=0;k<u(i)(c).n;k++)
+                for(int k=0;k<u(i)(c).m;k++)
                     u(i)(c)(k)=v.u(i)(c)(k)*s.u(i)(c)(k);
         for(int c=0;c<colors;c++)
 #pragma omp task
-            for(int k=0;k<p(c).n;k++)
+            for(int k=0;k<p(c).m;k++)
                 p(c)(k)=v.p(c)(k)*s.p(c)(k);
 #pragma omp task
-        for(int k=0;k<q.n;k++)
+        for(int k=0;k<q.m;k++)
             q(k)=v.q(k)*s.q(k);
     }
 }

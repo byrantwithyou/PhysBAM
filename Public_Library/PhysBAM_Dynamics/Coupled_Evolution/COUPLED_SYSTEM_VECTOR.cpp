@@ -6,7 +6,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Log/LOG.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COUPLED_SYSTEM_VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -80,7 +79,7 @@ template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
 Copy(const T c,const BASE& bv)
 {
     const COUPLED_SYSTEM_VECTOR& v=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv);
-    assert(v.pressure.n==pressure.n);
+    assert(v.pressure.m==pressure.m);
     pressure.Copy(c,v.pressure);
     lambda=c*v.lambda;
     force_coefficients=c*v.force_coefficients;
@@ -94,7 +93,7 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
 {
     const COUPLED_SYSTEM_VECTOR& v1=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv1);
     const COUPLED_SYSTEM_VECTOR& v2=debug_cast<const COUPLED_SYSTEM_VECTOR&>(bv2);
-    assert(v1.pressure.n==v2.pressure.n && pressure.n==v1.pressure.n);
+    assert(v1.pressure.m==v2.pressure.m && pressure.m==v1.pressure.m);
     pressure.Copy(c1,v1.pressure,v2.pressure);
     lambda=c1*v1.lambda+v2.lambda;
     force_coefficients=c1*v1.force_coefficients+v2.force_coefficients;
@@ -107,7 +106,7 @@ template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
 Print() const
 {
     // Flat print
-    for(int i=0;i<pressure.n;i++)
+    for(int i=0;i<pressure.m;i++)
         LOG::cout<<pressure(i)<<" ";
     for(COUPLING_CONSTRAINT_ID i(0);i<lambda.Size();i++)
         LOG::cout<<lambda(i)<<" ";
@@ -122,7 +121,7 @@ Print() const
 template<class TV> int COUPLED_SYSTEM_VECTOR<TV>::
 Raw_Size() const
 {
-    return pressure.n+Value(force_coefficients.m)+Value(lambda.m)+Value(viscous_force_coefficients.m);
+    return pressure.m+Value(force_coefficients.m)+Value(lambda.m)+Value(viscous_force_coefficients.m);
 }
 //#####################################################################
 // Function Raw_Get
@@ -130,8 +129,8 @@ Raw_Size() const
 template<class TV> typename TV::SCALAR& COUPLED_SYSTEM_VECTOR<TV>::
 Raw_Get(int i)
 {
-    if(i<pressure.n) return pressure(i);
-    i-=pressure.n;
+    if(i<pressure.m) return pressure(i);
+    i-=pressure.m;
     int l=Value(lambda.m);
     if(i<l) return lambda(COUPLING_CONSTRAINT_ID(i));
     int f=Value(force_coefficients.m);
@@ -145,7 +144,7 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* COUPLED_SYSTEM_VECTO
 Clone_Default() const
 {
     COUPLED_SYSTEM_VECTOR<TV>* v=new COUPLED_SYSTEM_VECTOR<TV>;
-    v->pressure.Resize(pressure.n);
+    v->pressure.Resize(pressure.m);
     v->lambda.Resize(lambda.m);
     v->force_coefficients.Resize(force_coefficients.m);
     v->viscous_force_coefficients.Resize(viscous_force_coefficients.m);
@@ -158,7 +157,7 @@ template<class TV> void COUPLED_SYSTEM_VECTOR<TV>::
 Resize(const KRYLOV_VECTOR_BASE<T>& v)
 {
     const COUPLED_SYSTEM_VECTOR<TV>& cs=debug_cast<const COUPLED_SYSTEM_VECTOR<TV>&>(v);
-    pressure.Resize(cs.pressure.n);
+    pressure.Resize(cs.pressure.m);
     lambda.Resize(cs.lambda.m);
     force_coefficients.Resize(cs.force_coefficients.m);
     viscous_force_coefficients.Resize(cs.viscous_force_coefficients.m);

@@ -61,7 +61,7 @@ Compute(int ghost_cells)
 // Function Times_Add
 //#####################################################################
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
-Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
+Times_Add(const ARRAY<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
     for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         constraints(i)+=faces(rows(i));
@@ -70,7 +70,7 @@ Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints
 // Function Transpose_Times_Add
 //#####################################################################
 template<class TV> void MATRIX_FLUID_INTERPOLATION<TV>::
-Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const
+Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,ARRAY<T>& faces) const
 {
     for(COUPLING_CONSTRAINT_ID i(0);i<rows.m;i++)
         faces(rows(i))+=constraints(i);
@@ -85,8 +85,8 @@ Print() const
         LOG::cout<<i<<": "<<index_map.indexed_faces(i)<<std::endl;
 
     ARRAY<T,COUPLING_CONSTRAINT_ID> constraints(rows.m);
-    VECTOR_ND<T> faces(index_map.Number_Faces());
-    for(int i=0;i<faces.n;i++){
+    ARRAY<T> faces(index_map.Number_Faces());
+    for(int i=0;i<faces.m;i++){
         faces(i)=1;
         Times(faces,constraints);
         LOG::cout<<constraints<<std::endl;

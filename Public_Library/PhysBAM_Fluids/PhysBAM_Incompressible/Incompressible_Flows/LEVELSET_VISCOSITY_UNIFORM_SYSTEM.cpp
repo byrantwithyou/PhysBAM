@@ -47,7 +47,7 @@ Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) con
 {
     const VECTOR_T& vx=debug_cast<const VECTOR_T&>(x);
     const VECTOR_T& vy=debug_cast<const VECTOR_T&>(y);
-    return vx.v.Dot_Product(vx.v,vy.v);
+    return vx.v.Dot(vy.v);
 }
 //#####################################################################
 // Function Convergence_Norm

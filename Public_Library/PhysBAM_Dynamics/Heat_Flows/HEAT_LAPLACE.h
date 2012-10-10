@@ -18,6 +18,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 namespace PhysBAM{
 
@@ -47,7 +48,7 @@ public:
     filled_region_touches_dirichlet.Fill(true); // don't need to worry about Neumann regions in heat flow
     T_LAPLACE::Solve(time,true);}
 
-    void Find_A_Part_Two(RANGE<VECTOR<int,TV::dimension> >& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<VECTOR_ND<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+    void Find_A_Part_Two(RANGE<VECTOR<int,TV::dimension> >& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
     {if(!coefficient) PHYSBAM_FATAL_ERROR();
     if(coefficient!=1) f/=coefficient; // this will cancel with the multiplication below, leaving only the Dirichlet part multiplied by coefficient
     T_LAPLACE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);

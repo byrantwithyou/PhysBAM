@@ -230,7 +230,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     // viscosity
     T dt_viscosity=0;
     if(!inviscid){
-        T norm_2_over_sqr_DX=2*Inverse(sqr_DX).L1_Norm();
+        T norm_2_over_sqr_DX=2*Inverse(sqr_DX).Sum_Abs();
         for(int i=0;i<viscosities.m;i++)dt_viscosity=max(dt_viscosity,viscosities(i)/projection.densities(i));
         dt_viscosity*=norm_2_over_sqr_DX;
         if(use_variable_viscosity) PHYSBAM_NOT_IMPLEMENTED();}
@@ -250,10 +250,10 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
                           LEVELSET_UTILITIES<T>::Heaviside((T).5*(phi_1-phi_2),projection.densities(region_1),projection.densities(region_2))));}}
         dt_surface_tension=sqrt(kappa_cfl)/grid.Minimum_Edge_Length();}
     TV max_force;
-    if(use_force) max_force=force.Maxabs();
+    if(use_force) max_force=force.Max_Abs();
     T dt_force=0;
-    if(use_force) dt_force=(max_force/DX).L1_Norm();
-    if(gravity) dt_force+=abs(gravity)*(downward_direction/DX).L1_Norm();
+    if(use_force) dt_force=(max_force/DX).Sum_Abs();
+    if(gravity) dt_force+=abs(gravity)*(downward_direction/DX).Sum_Abs();
     T strain_cfl=FLT_MAX;
     if(strain){
         for(int i=0;i<strains.m;i++)if(strains(i))

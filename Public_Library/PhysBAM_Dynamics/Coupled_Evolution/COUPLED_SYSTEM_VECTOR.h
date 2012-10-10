@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/FORCE_AGGREGATE_ID.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/VISCOUS_FORCE_ID.h>
@@ -21,7 +21,7 @@ class COUPLED_SYSTEM_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;
     typedef KRYLOV_VECTOR_BASE<T> BASE;
 public:
-    VECTOR_ND<T> pressure;
+    ARRAY<T> pressure;
     ARRAY<T,COUPLING_CONSTRAINT_ID> lambda;
     ARRAY<T,FORCE_AGGREGATE_ID> force_coefficients;
     ARRAY<T,VISCOUS_FORCE_ID> viscous_force_coefficients;

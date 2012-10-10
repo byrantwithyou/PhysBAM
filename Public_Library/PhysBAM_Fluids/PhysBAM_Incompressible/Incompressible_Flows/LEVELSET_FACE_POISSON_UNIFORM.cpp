@@ -31,7 +31,7 @@ Compute(int axis)
     TV one_over_dX2=index_map.grid.one_over_dX*index_map.grid.one_over_dX;
     P.Reset(index_map.index_to_face.m);
     b.Resize(index_map.index_to_face.m);
-    b.Set_Zero();
+    b.Fill(0);
     typedef BOUNDARY_CONDITIONS_CALLBACKS<TV> CB;
     for(int i=0;i<index_map.index_to_face.m;i++){FACE_INDEX<d> face=index_map.index_to_face(i);
         T middle_value=-2*one_over_dX2.Sum();

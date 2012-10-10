@@ -34,8 +34,8 @@ public:
     ~LEVELSET_INDEX_MAP_UNIFORM();
 
     void Compute(int axis,VECTOR<bool,d> periodic_boundary_input);
-    void Gather(const ARRAY<T,FACE_INDEX<d> >& u,VECTOR_ND<T>& v) const;
-    void Scatter(const VECTOR_ND<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const;
+    void Gather(const ARRAY<T,FACE_INDEX<d> >& u,ARRAY<T>& v) const;
+    void Scatter(const ARRAY<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const;
 
 };
 }

@@ -18,13 +18,13 @@ template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,VECTOR<T,n> >{typedef
 template<class T,int d> struct PRODUCT<DIAGONAL_MATRIX<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
 template<class T,int d> struct PRODUCT<SYMMETRIC_MATRIX<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
 template<class T,int d> struct PRODUCT<UPPER_TRIANGULAR_MATRIX<T,d>,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
-template<class T,int d> struct PRODUCT<MATRIX_MXN<T>,VECTOR<T,d> >{typedef VECTOR_ND<T> TYPE;};
+template<class T,int d> struct PRODUCT<MATRIX_MXN<T>,VECTOR<T,d> >{typedef ARRAY<T> TYPE;};
 
-template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,VECTOR_ND<T> >{typedef VECTOR_ND<T> TYPE;};
-template<class T,int d> struct PRODUCT<DIAGONAL_MATRIX<T,d>,VECTOR_ND<T> >{typedef VECTOR_ND<T> TYPE;};
-template<class T,int d> struct PRODUCT<SYMMETRIC_MATRIX<T,d>,VECTOR_ND<T> >{typedef VECTOR_ND<T> TYPE;};
-template<class T,int d> struct PRODUCT<UPPER_TRIANGULAR_MATRIX<T,d>,VECTOR_ND<T> >{typedef VECTOR_ND<T> TYPE;};
-template<class T> struct PRODUCT<MATRIX_MXN<T>,VECTOR_ND<T> >{typedef VECTOR_ND<T> TYPE;};
+template<class T,int m,int n,class V> struct PRODUCT<MATRIX<T,m,n>,V,typename ENABLE_IF<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::TYPE>{typedef VECTOR<T,m> TYPE;};
+template<class T,int d,class V> struct PRODUCT<DIAGONAL_MATRIX<T,d>,V,typename ENABLE_IF<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::TYPE>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d,class V> struct PRODUCT<SYMMETRIC_MATRIX<T,d>,V,typename ENABLE_IF<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::TYPE>{typedef VECTOR<T,d> TYPE;};
+template<class T,int d,class V> struct PRODUCT<UPPER_TRIANGULAR_MATRIX<T,d>,V,typename ENABLE_IF<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::TYPE>{typedef VECTOR<T,d> TYPE;};
+template<class T,class V> struct PRODUCT<MATRIX_MXN<T>,V,typename ENABLE_IF<(IS_ARRAY<V>::value && !FIXED_SIZE_VECTOR<V>::value)>::TYPE>{typedef ARRAY<T> TYPE;};
 
 template<class T,int m,int n,int k> struct PRODUCT<MATRIX<T,m,k>,MATRIX<T,k,n> >{typedef MATRIX<T,m,n> TYPE;};
 template<class T,int m,int n> struct PRODUCT<MATRIX<T,m,n>,DIAGONAL_MATRIX<T,n> >{typedef MATRIX<T,m,n> TYPE;};

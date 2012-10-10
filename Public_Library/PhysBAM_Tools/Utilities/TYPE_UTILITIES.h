@@ -84,6 +84,10 @@ template<class T_ARRAY> struct IS_ARRAY<const T_ARRAY>:public IS_ARRAY<T_ARRAY>{
 template<class T_ARRAY,class ENABLER=void> struct IS_ARRAY_VIEW {static const bool value=false;};
 template<class T_ARRAY> struct IS_ARRAY_VIEW<const T_ARRAY>:public IS_ARRAY_VIEW<T_ARRAY>{};
 
+template<class T,int d> class VECTOR;
+template<class TV> struct FIXED_SIZE_VECTOR {static const int value=false;};
+template<class T,int d> struct FIXED_SIZE_VECTOR<VECTOR<T,d> > {static const int value=true;};
+
 typedef char YES_TYPE;
 struct NO_TYPE {char padding[8];};
 

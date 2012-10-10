@@ -95,9 +95,9 @@ Print() const
 {
     // Flat print
     for(int c=0;c<colors;c++)
-        for(int k=0;k<u(c).n;k++)
+        for(int k=0;k<u(c).m;k++)
             LOG::cout<<u(c)(k)<<" ";
-    for(int k=0;k<q.n;k++)
+    for(int k=0;k<q.m;k++)
         LOG::cout<<q(k)<<" ";
     LOG::cout<<std::endl;
 }
@@ -109,8 +109,8 @@ Raw_Size() const
 {
     int size=0;
     for(int c=0;c<colors;c++)
-        size+=u(c).n;
-    size+=q.n;
+        size+=u(c).m;
+    size+=q.m;
     return size;
 }
 //#####################################################################
@@ -120,9 +120,9 @@ template<class TV> typename TV::SCALAR& INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV
 Raw_Get(int i)
 {
     for(int c=0;c<colors;c++){
-        if(i<u(c).n) return u(c)(i);
-            i-=u(c).n;}
-    if(i<q.n) return q(i);
+        if(i<u(c).m) return u(c)(i);
+            i-=u(c).m;}
+    if(i<q.m) return q(i);
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
@@ -135,8 +135,8 @@ Clone_Default() const
     v->colors=colors;
     v->u.Resize(colors);
     for(int c=0;c<colors;c++)
-        v->u(c).Resize(u(c).n);
-    v->q.Resize(q.n);
+        v->u(c).Resize(u(c).m);
+    v->q.Resize(q.m);
     return v;
 }
 //#####################################################################
@@ -149,8 +149,8 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     colors=cs.colors;
     u.Resize(colors);
     for(int c=0;c<colors;c++)
-        u(c).Resize(cs.u(c).n);
-    q.Resize(cs.q.n);
+        u(c).Resize(cs.u(c).m);
+    q.Resize(cs.q.m);
 }
 //#####################################################################
 // Function Dot
@@ -207,9 +207,9 @@ template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Scale(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& s)
 {
     for(int c=0;c<colors;c++)
-        for(int k=0;k<u(c).n;k++)
+        for(int k=0;k<u(c).m;k++)
             u(c)(k)=v.u(c)(k)*s.u(c)(k);
-    for(int k=0;k<q.n;k++)
+    for(int k=0;k<q.m;k++)
         q(k)=v.q(k)*s.q(k);
 }
 //#####################################################################

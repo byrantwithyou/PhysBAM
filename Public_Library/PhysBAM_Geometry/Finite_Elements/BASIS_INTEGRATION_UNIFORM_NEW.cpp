@@ -95,7 +95,7 @@ Compute_Averaged_Orientation_Helper(const VECTOR<ARRAY<T_FACE>,8>& interface,con
 // Function Compute_Entries
 //#####################################################################
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
-Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface)
+Compute_Entries(const ARRAY<TV>& f_interface,VECTOR<VECTOR<ARRAY<T>,2>,TV::m>& rhs_interface)
 {
     VECTOR<ARRAY<T_FACE>,(1<<TV::m)> sides,interface;
     VECTOR<bool,(1<<TV::m)> enclose_inside;
@@ -245,7 +245,7 @@ Compute_Consistent_Orientation_Helper(const T_FACE& triangle,bool enclose_inside
 template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_NEW<TV,static_degree>::
 Add_Cut_Fine_Cell(const TV_INT& cell,int block,const TV& block_offset,ARRAY<T_FACE>& interface,ARRAY<T_FACE>& sides,
     int direction,bool enclose_inside,int cut_cell_index,const MATRIX<T,TV::m>& base_orientation,
-    const ARRAY<TV>& f_interface,VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>& rhs_interface,int& element_base)
+    const ARRAY<TV>& f_interface,VECTOR<VECTOR<ARRAY<T>,2>,TV::m>& rhs_interface,int& element_base)
 {
     assert(sides.m);
     assert(interface.m);

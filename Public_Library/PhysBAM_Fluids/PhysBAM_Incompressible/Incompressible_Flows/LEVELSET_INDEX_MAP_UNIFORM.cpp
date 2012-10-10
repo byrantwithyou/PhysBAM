@@ -2,8 +2,8 @@
 // Copyright 2010.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/LEVELSET_INDEX_MAP_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Solids_And_Fluids/BOUNDARY_CONDITIONS_CALLBACKS.h>
 using namespace PhysBAM;
@@ -53,7 +53,7 @@ Compute(int axis,VECTOR<bool,d> periodic_boundary_input)
 // Function Gather
 //#####################################################################
 template<class TV> void LEVELSET_INDEX_MAP_UNIFORM<TV>::
-Gather(const ARRAY<T,FACE_INDEX<d> >& u,VECTOR_ND<T>& v) const
+Gather(const ARRAY<T,FACE_INDEX<d> >& u,ARRAY<T>& v) const
 {
     for(int i=0;i<index_to_face.m;i++) v(i)=u(index_to_face(i));
 }
@@ -61,7 +61,7 @@ Gather(const ARRAY<T,FACE_INDEX<d> >& u,VECTOR_ND<T>& v) const
 // Function Scatter
 //#####################################################################
 template<class TV> void LEVELSET_INDEX_MAP_UNIFORM<TV>::
-Scatter(const VECTOR_ND<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const
+Scatter(const ARRAY<T>& u,ARRAY<T,FACE_INDEX<d> >& v) const
 {
     for(int i=0;i<index_to_face.m;i++) v(index_to_face(i))=u(i);
     for(int a=0;a<d;a++) if(periodic_boundary[a])

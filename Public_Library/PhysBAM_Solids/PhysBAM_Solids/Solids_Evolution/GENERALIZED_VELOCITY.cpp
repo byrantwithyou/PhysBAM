@@ -93,7 +93,7 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
 // Function Pack
 //#####################################################################
 template<class TV> void GENERALIZED_VELOCITY<TV>::
-Pack(VECTOR_ND<T> &velocities) const
+Pack(ARRAY<T> &velocities) const
 {
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
@@ -110,7 +110,7 @@ Pack(VECTOR_ND<T> &velocities) const
 // Function Unpack
 //#####################################################################
 template<class TV> void GENERALIZED_VELOCITY<TV>::
-Unpack(VECTOR_ND<T> &velocities)
+Unpack(ARRAY<T> &velocities)
 {
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;
@@ -127,7 +127,7 @@ Unpack(VECTOR_ND<T> &velocities)
 // Function Unpack_And_Add
 //#####################################################################
 template<class TV> void GENERALIZED_VELOCITY<TV>::
-Unpack_And_Add(VECTOR_ND<T> &velocities)
+Unpack_And_Add(ARRAY<T> &velocities)
 {
     PHYSBAM_ASSERT(velocities.Size()==Raw_Size());
     int index=0;

@@ -60,12 +60,12 @@ public:
     bool Register_Face_Index(const FACE_INDEX<d>& index);
     bool Register_Constrained_Face_Index(const SIDED_FACE_INDEX<d>& index);
     void Register_Cell_Index(const TV_INT& index,const int ghost_cells);
-    void Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,VECTOR_ND<T>& flattened_faces) const;
-    void Collect(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const;
-    void Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,VECTOR_ND<T>& flattened_cells) const;
-    void Distribute(const VECTOR_ND<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,ARRAY<T>& constrained_faces) const;
-    void Distribute(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const;
-    void Distribute_Indexed_Cells(const VECTOR_ND<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const;
+    void Collect(const ARRAY<T,FACE_INDEX<d> >& faces,const ARRAY<T>& constrained_faces,ARRAY<T>& flattened_faces) const;
+    void Collect(const ARRAY<T,TV_INT>& cells,ARRAY<T>& flattened_cells) const;
+    void Collect_Indexed_Cells(const ARRAY<T,TV_INT>& cells,ARRAY<T>& flattened_cells) const;
+    void Distribute(const ARRAY<T>& flattened_faces,ARRAY<T,FACE_INDEX<d> >& faces,ARRAY<T>& constrained_faces) const;
+    void Distribute(const ARRAY<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const;
+    void Distribute_Indexed_Cells(const ARRAY<T>& flattened_cells,ARRAY<T,TV_INT>& cells) const;
     void Print(int id) const;
 //#####################################################################
 };

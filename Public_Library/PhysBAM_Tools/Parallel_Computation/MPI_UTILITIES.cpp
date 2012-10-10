@@ -54,17 +54,17 @@ template<class T,int d> MPI::Datatype Scalar_Block_Datatype()
     return datatype;
 }
 //#####################################################################
-// Pack/Unpack for VECTOR_ND
+// Pack/Unpack for ARRAY
 //#####################################################################
-template<class T> int Pack_Size(const VECTOR_ND<T>& data,const MPI::Comm& comm)
+template<class T> int Pack_Size(const ARRAY<T>& data,const MPI::Comm& comm)
 {return Pack_Size<int>(comm)+Datatype<T>().Pack_size(data.n,comm);}
 
-template<class T> void Pack(const VECTOR_ND<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
+template<class T> void Pack(const ARRAY<T>& data,ARRAY_VIEW<char> buffer,int& position,const MPI::Comm& comm)
 {assert(Pack_Size(data,comm)<=buffer.Size()-position);
 Pack(data.n,buffer,position,comm);
 Datatype<T>().Pack(data.Get_Array_Pointer(),data.n,&buffer(0),buffer.Size(),position,comm);}
 
-template<class T> void Unpack(VECTOR_ND<T>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
+template<class T> void Unpack(ARRAY<T>& data,ARRAY_VIEW<const char> buffer,int& position,const MPI::Comm& comm)
 {int n;Unpack(n,buffer,position,comm);data.Resize(n);
 Datatype<T>().Unpack(&buffer(0),buffer.Size(),data.Get_Array_Pointer(),data.n,position,comm);}
 //#####################################################################
@@ -141,9 +141,9 @@ void Unpack(UNION_FIND<>& data,ARRAY_VIEW<const char> buffer,int& position,const
     template MPI::Datatype Scalar_Block_Datatype<T,8>(); \
     template MPI::Datatype Scalar_Block_Datatype<T,9>(); \
     template MPI::Datatype Scalar_Block_Datatype<T,10>(); \
-    template int Pack_Size<T>(const VECTOR_ND<T>&,const MPI::Comm&); \
-    template void Pack<T>(const VECTOR_ND<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
-    template void Unpack<T>(VECTOR_ND<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&); \
+    template int Pack_Size<T>(const ARRAY<T>&,const MPI::Comm&); \
+    template void Pack<T>(const ARRAY<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
+    template void Unpack<T>(ARRAY<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&); \
     template int Pack_Size<T>(const SPARSE_MATRIX_FLAT_NXN<T>&,const MPI::Comm&); \
     template void Pack<T>(const SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY_VIEW<char>,int&,const MPI::Comm&); \
     template void Unpack<T>(SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY_VIEW<const char>,int&,const MPI::Comm&); \

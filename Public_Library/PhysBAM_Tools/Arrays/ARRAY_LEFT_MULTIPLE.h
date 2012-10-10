@@ -8,7 +8,7 @@
 #define __ARRAY_LEFT_MULTIPLE__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_EXPRESSION.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>
 namespace PhysBAM{
 
@@ -36,7 +36,7 @@ public:
     INDEX Size() const
     {return array.Size();}
 
-    RANGE<INDEX> Domain_Indices() const
+    INTERVAL<INDEX> Domain_Indices() const
     {return array.Domain_Indices();}
 
     const T_PRODUCT operator()(const INDEX i) const
@@ -45,27 +45,31 @@ public:
 //#####################################################################
 };
 
-template<class T1,class T2,class T_ARRAY2> typename ENABLE_IF<CAN_ASSIGN<typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE,typename T_ARRAY2::ELEMENT>::value,ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> >::TYPE
-operator*(const T1& c,const ARRAY_BASE<T2,T_ARRAY2,typename T_ARRAY2::INDEX>& array)
+template<class T1,class T_ARRAY2,class ENABLE=void> struct ARRAY_LEFT_MULTIPLE_VALID {static const bool value=false;};
+template<class T1,class T_ARRAY2> struct ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2,typename FIRST<void,typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE>::TYPE>
+{static const bool value=!FIXED_SIZE_VECTOR<T_ARRAY2>::value && IS_ARRAY<T_ARRAY2>::value && (IS_SAME<T1,typename T_ARRAY2::ELEMENT>::value || IS_SCALAR<T1>::value);};
+
+template<class T1,class T,class T_ARRAY2,class ID> typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2>::value,ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> >::TYPE
+operator*(const T1& c,const ARRAY_BASE<T,T_ARRAY2,ID>& array)
 {return ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2>(c,array.Derived());}
 
-template<class T1,class T2,class T_ARRAY2> typename ENABLE_IF<CAN_ASSIGN<typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE,typename T_ARRAY2::ELEMENT>::value,ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> >::TYPE
-operator/(const ARRAY_BASE<T2,T_ARRAY2,typename T_ARRAY2::INDEX>& array,const T1& c)
+template<class T1,class T,class T_ARRAY2,class ID> typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2>::value,ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> >::TYPE
+operator/(const ARRAY_BASE<T,T_ARRAY2,ID>& array,const T1& c)
 {STATIC_ASSERT(IS_FLOAT_OR_DOUBLE<T1>::value);return ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2>(1/c,array.Derived());}
 
-template<class T1,class T2,class T_ARRAY2> typename ENABLE_IF<CAN_ASSIGN<typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE,typename T_ARRAY2::ELEMENT>::value,ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> >::TYPE
-operator*(const ARRAY_BASE<T2,T_ARRAY2,typename T_ARRAY2::INDEX>& array,const T1& c)
+template<class T1,class T,class T_ARRAY2,class ID> typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2>::value,ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> >::TYPE
+operator*(const ARRAY_BASE<T,T_ARRAY2,ID>& array,const T1& c)
 {STATIC_ASSERT(IS_SCALAR<T1>::value);return ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2>(c,array.Derived());}
 
 //#####################################################################
 
-template<class T1,class T_ARRAY2> struct PRODUCT<T1,T_ARRAY2,typename IF<IS_SCALAR<T1>::value && IS_ARRAY<T_ARRAY2>::value,void,typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE>::TYPE>
+template<class T1,class T_ARRAY2> struct PRODUCT<T1,T_ARRAY2,typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2>::value>::TYPE>
 {typedef ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> TYPE;};
 
-template<class T1,class T_ARRAY2> struct QUOTIENT<T_ARRAY2,T1,typename IF<IS_FLOAT_OR_DOUBLE<T1>::value && IS_ARRAY<T_ARRAY2>::value,void,typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE>::TYPE>
+template<class T1,class T_ARRAY2> struct PRODUCT<T_ARRAY2,T1,typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2>::value>::TYPE>
 {typedef ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> TYPE;};
 
-template<class T1,class T_ARRAY2> struct PRODUCT<T_ARRAY2,T1,typename IF<IS_SCALAR<T1>::value && IS_ARRAY<T_ARRAY2>::value,void,typename PRODUCT<T1,typename T_ARRAY2::ELEMENT>::TYPE>::TYPE>
+template<class T1,class T_ARRAY2> struct QUOTIENT<T_ARRAY2,T1,typename ENABLE_IF<ARRAY_LEFT_MULTIPLE_VALID<T1,T_ARRAY2>::value>::TYPE>
 {typedef ARRAY_LEFT_MULTIPLE<T1,T_ARRAY2> TYPE;};
 
 //#####################################################################

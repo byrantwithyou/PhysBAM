@@ -21,8 +21,6 @@ class ARRAY<T,FACE_INDEX<d> >
 {
     typedef VECTOR<T,d> TV;typedef VECTOR<int,d> TV_INT;
     struct UNUSABLE{};
-    template<class S> struct ELEMENT_OF{typedef typename S::ELEMENT TYPE;};
-    typedef typename IF<IS_VECTOR<T>::value,ELEMENT_OF<T>,FIRST<UNUSABLE> >::TYPE::TYPE ELEMENT_OF_T;    
 public:
     T* base_pointer;
     int buffer_size;
@@ -139,8 +137,8 @@ public:
     void Set_All_Faces(const T& value,const TV_INT& cell_index)
     {for(int i=0;i<dimension;i++) data(i)(cell_index)=data(i)(cell_index+TV_INT::Axis_Vector(i))=value;}
 
-    static void Extract_Dimension(const ARRAY& old_array,ARRAY<ELEMENT_OF_T,FACE_INDEX<dimension> >& extracted_array,const TV_INT& dimensions_to_extract)
-    {STATIC_ASSERT(IS_VECTOR<T>::value);for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.data(i),extracted_array.data(i),dimensions_to_extract(i));}
+    static void Extract_Dimension(const ARRAY& old_array,ARRAY<typename ELEMENT_OF_VECTOR<T>::TYPE,FACE_INDEX<dimension> >& extracted_array,const TV_INT& dimensions_to_extract)
+    {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.data(i),extracted_array.data(i),dimensions_to_extract(i));}
 
     void Fill(const T& constant)
     {for(int i=0;i<dimension;i++) data(i).Fill(constant);}
@@ -162,8 +160,8 @@ public:
     static void Put(const ARRAY& old_copy,ARRAY& new_copy)
     {for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put(old_copy.data(i),new_copy.data(i));}
 
-    TV Maxabs() const
-    {TV maxabs_vector;for(int i=0;i<dimension;i++) maxabs_vector(i)=data(i).Maxabs();return maxabs_vector;}
+    TV Max_Abs() const
+    {TV maxabs_vector;for(int i=0;i<dimension;i++) maxabs_vector(i)=data(i).Max_Abs();return maxabs_vector;}
 
     static void Exchange(ARRAY& a,ARRAY& b)
     {a.Exchange(b);}

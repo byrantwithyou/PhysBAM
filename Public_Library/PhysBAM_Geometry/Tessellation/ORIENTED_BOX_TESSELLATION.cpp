@@ -25,7 +25,7 @@ template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles(const ORIENTED_BOX
     TRIANGULATED_SURFACE<T>* surface=Generate_Triangles(aligned_box);
     GEOMETRY_PARTICLES<TV>& particles=surface->particles;
     FRAME<TV> frame(box.corner,ROTATION<TV>(directions));
-    particles.X=frame*particles.X;
+    for(int i=0;i<particles.X.m;i++) particles.X(i)=frame*particles.X(i);
     return surface;
 }
 //#####################################################################

@@ -30,7 +30,7 @@ public:
     bool needs_sync;
     T max_val;
     int sum_int,number_of_threads;
-    VECTOR_ND<T> temp,p;
+    ARRAY<T> temp,p,z;
     ARRAY<T> sum_array;
 #ifdef USE_PTHREADS
     pthread_mutex_t barr_lock,sum_lock,max_lock,sum_int_lock;
@@ -115,34 +115,34 @@ public:
 #endif
     }
 
-    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance=1e-7,const bool recompute_preconditioner=true)
+    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance=1e-7,const bool recompute_preconditioner=true)
     {
         PHYSBAM_FATAL_ERROR();
     }
 
 //#####################################################################
-    void Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance);
-    void Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threaded_iterator,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance);
-    void Solve_Part_One(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<VECTOR_ND<T> >& z_interior,ARRAY<VECTOR_ND<T> >& x_interior,ARRAY<VECTOR_ND<T> >& b_interior,ARRAY<VECTOR_ND<T> >& p_interior,ARRAY<VECTOR_ND<T> >& temp_interior);
-    void Solve_Part_Two(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,ARRAY<VECTOR_ND<T> >& b_interior,ARRAY<VECTOR_ND<T> >& temp_interior);
+    void Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance);
+    void Solve_In_Parts(DOMAIN_ITERATOR_THREADED_ALPHA<PCG_SPARSE_THREADED<TV>,TV>& threaded_iterator,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance);
+    void Solve_Part_One(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<T>& x,ARRAY<T>& b,ARRAY<ARRAY_VIEW<T> >& z_interior,ARRAY<ARRAY_VIEW<T> >& x_interior,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& p_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior);
+    void Solve_Part_Two(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior);
     void Solve_Part_Three(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>& C);
-    void Solve_Part_Four(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& z_interior,ARRAY<VECTOR_ND<T> >& b_interior,ARRAY<VECTOR_ND<T> >& temp_interior,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>& C);
-    void Solve_Part_Five(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& z_interior,ARRAY<VECTOR_ND<T> >& p_interior,T rho,T rho_old,int iteration);
+    void Solve_Part_Four(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& z_interior,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior,ARRAY<SPARSE_MATRIX_FLAT_NXN<T>*>& C);
+    void Solve_Part_Five(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& z_interior,ARRAY<ARRAY_VIEW<T> >& p_interior,T rho,T rho_old,int iteration);
     void Solve_Part_Six(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,const SPARSE_MATRIX_FLAT_NXN<T>& A);
-    void Solve_Part_Seven(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& x_interior,ARRAY<VECTOR_ND<T> >& b_interior,ARRAY<VECTOR_ND<T> >& p_interior,ARRAY<VECTOR_ND<T> >& temp_interior,T alpha);
-    void Solve_Distribute(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& interior,const T sum);
-    void Solve_Sum(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& interior,ARRAY<T>& sum);
-    void Solve_Max(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& interior,ARRAY<T>& sum);
-    void Solve_Dot(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<VECTOR_ND<T> >& interior_1,ARRAY<VECTOR_ND<T> >& interior_2,ARRAY<T>& sum);
-    void Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance);
-    void Threaded_Subtract(VECTOR_ND<T>& vector,const T sum,int start_index,int end_index);
-    void Threaded_Sum(VECTOR_ND<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid);
-    void Threaded_Dot(VECTOR_ND<T>& vector1,VECTOR_ND<T>& vector2,ARRAY<T>& sum,int start_index,int end_index,int tid);
-    void Threaded_Max(VECTOR_ND<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid);
-    void Threaded_Part_One(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T sum,int start_index,int end_index);
-    void Threaded_Part_Two(VECTOR_ND<T>& z,T rho,T rho_old,int iteration,int start_index,int end_index);
+    void Solve_Part_Seven(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& x_interior,ARRAY<ARRAY_VIEW<T> >& b_interior,ARRAY<ARRAY_VIEW<T> >& p_interior,ARRAY<ARRAY_VIEW<T> >& temp_interior,T alpha);
+    void Solve_Distribute(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& interior,const T sum);
+    void Solve_Sum(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& interior,ARRAY<T>& sum);
+    void Solve_Max(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& interior,ARRAY<T>& sum);
+    void Solve_Dot(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,ARRAY<ARRAY_VIEW<T> >& interior_1,ARRAY<ARRAY_VIEW<T> >& interior_2,ARRAY<T>& sum);
+    void Solve_In_Parts(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance);
+    void Threaded_Subtract(ARRAY<T>& vector,const T sum,int start_index,int end_index);
+    void Threaded_Sum(ARRAY<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid);
+    void Threaded_Dot(ARRAY<T>& vector1,ARRAY<T>& vector2,ARRAY<T>& sum,int start_index,int end_index,int tid);
+    void Threaded_Max(ARRAY<T>& vector,ARRAY<T>& sum,int start_index,int end_index,int tid);
+    void Threaded_Part_One(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T sum,int start_index,int end_index);
+    void Threaded_Part_Two(ARRAY<T>& z,T rho,T rho_old,int iteration,int start_index,int end_index);
     void Threaded_Part_Three(SPARSE_MATRIX_FLAT_NXN<T>& A,int start_index,int end_index);
-    void Threaded_Part_Four(VECTOR_ND<T>& x,VECTOR_ND<T>& b,T alpha,int start_index,int end_index);
+    void Threaded_Part_Four(ARRAY<T>& x,ARRAY<T>& b,T alpha,int start_index,int end_index);
 //#####################################################################
 };
 }

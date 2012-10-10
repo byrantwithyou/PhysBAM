@@ -7,9 +7,9 @@
 #ifndef __VECTOR_0D__
 #define __VECTOR_0D__
 
+#include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_BASE.h>
 #include <cmath>
 #include <cstdlib>
 #ifdef DIFFERENCE // Windows workaround.
@@ -18,7 +18,7 @@
 namespace PhysBAM{
 
 template<class T>
-class VECTOR<T,0>:public VECTOR_BASE<T,VECTOR<T,0> >
+class VECTOR<T,0>:public ARRAY_BASE<T,VECTOR<T,0> >
 {
     struct UNUSABLE{};
 public:
@@ -30,7 +30,8 @@ public:
     typedef T ELEMENT;
     typedef UNUSABLE SPIN;
     typedef int INDEX;
-    typedef VECTOR_BASE<T,VECTOR<T,0> > BASE;
+    typedef ARRAY_BASE<T,VECTOR<T,0> > BASE;
+    using BASE::Assert_Same_Size;
 
     explicit VECTOR(INITIAL_SIZE n=INITIAL_SIZE())
     {
@@ -44,20 +45,8 @@ public:
     template<class T2> explicit VECTOR(const VECTOR<T2,0>& vector_input)
     {}
 
-    template<class T_ARRAY>
-    explicit VECTOR(const ARRAY_BASE<T,T_ARRAY>& v)
-    {
-        assert(m==v.Size());
-    }
- 
     template<class T_VECTOR>
-    explicit VECTOR(const VECTOR_BASE<T,T_VECTOR>& v)
-    {
-        Assert_Same_Size(*this,v);
-    }
-
-    template<class T_VECTOR>
-    VECTOR(const VECTOR_EXPRESSION<T,T_VECTOR>& v)
+    explicit VECTOR(const ARRAY_BASE<T,T_VECTOR>& v)
     {
         Assert_Same_Size(*this,v);
     }
@@ -67,16 +56,9 @@ public:
     }
 
     template<class T_VECTOR>
-    VECTOR& operator=(const VECTOR_BASE<T,T_VECTOR>& v)
-    {
-        Assert_Same_Size(*this,v);
-        return *this;
-    }
-
-    template<class T_VECTOR>
     VECTOR& operator=(const ARRAY_BASE<T,T_VECTOR>& v)
     {
-        assert(m==v.Size());
+        Assert_Same_Size(*this,v);
         return *this;
     }
 
@@ -199,6 +181,12 @@ public:
     static VECTOR Componentwise_Max(const VECTOR& v1,const VECTOR& v2)
     {return VECTOR();}
 
+    T* Get_Array_Pointer()
+    {return (T*)this;}
+
+    const T* Get_Array_Pointer() const
+    {return (const T*)this;}
+
     template<class RW>
     void Read(std::istream& input)
     {}
@@ -225,22 +213,9 @@ operator/(const T&,const VECTOR<T,0>& v)
 {return v;}
 
 //#####################################################################
-template<class T> struct SUM<VECTOR<T,0>,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct SUM<VECTOR<T,0>,T>{typedef VECTOR<T,0> TYPE;};
-template<class T> struct SUM<T,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct DIFFERENCE<VECTOR<T,0>,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct DIFFERENCE<VECTOR<T,0>,T>{typedef VECTOR<T,0> TYPE;};
-template<class T> struct DIFFERENCE<T,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct PRODUCT<VECTOR<T,0>,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct PRODUCT<VECTOR<T,0>,T>{typedef VECTOR<T,0> TYPE;};
-template<class T> struct PRODUCT<T,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct QUOTIENT<VECTOR<T,0>,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct QUOTIENT<VECTOR<T,0>,T>{typedef VECTOR<T,0> TYPE;};
-template<class T> struct QUOTIENT<T,VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-template<class T> struct NEGATION<VECTOR<T,0> >{typedef VECTOR<T,0> TYPE;};
-//#####################################################################
 template<class T>
 inline std::istream& operator>>(std::istream& input,VECTOR<T,0>&)
 {if(input.peek()=='[') input.get();if(input.peek()==']') input.get();return input;}
 }
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 #endif

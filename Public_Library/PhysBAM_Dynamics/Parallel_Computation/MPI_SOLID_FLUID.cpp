@@ -163,8 +163,8 @@ Reduce_Max(const T local_value) const
 // Function Parallel_Solve_Fluid_Part
 //#####################################################################
 template<class TV> void MPI_SOLID_FLUID<TV>::
-Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
+Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& x_array,
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,
     const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner,
     ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions)
 {
@@ -281,8 +281,8 @@ template<class TV> typename TV::SCALAR MPI_SOLID_FLUID<TV>::Reduce_Max(const T l
 template<class TV> void MPI_SOLID_FLUID<TV>::Create_Fluid_Comm_For_Solid_Nodes() const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> template<class T2> void MPI_SOLID_FLUID<TV>::Reduce_Add(const T2& input,T2& output) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> typename TV::SCALAR MPI_SOLID_FLUID<TV>::Reduce_Min(const T local_value) const{PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class TV> void MPI_SOLID_FLUID<TV>::Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array, \
-    KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const int min_iterations,const int max_iterations, const T tolerance,const bool recompute_preconditioner, \
+template<class TV> void MPI_SOLID_FLUID<TV>::Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& x_array, \
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& b_array,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const int min_iterations,const int max_iterations, const T tolerance,const bool recompute_preconditioner, \
     ARRAY<MPI::Intracomm>* fluid_comm,ARRAY<SPARSE_MATRIX_PARTITION>* partitions){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class TV> void MPI_SOLID_FLUID<TV>::Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array, ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,\
     const int min_iterations,const int max_iterations,const T tolerance){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}

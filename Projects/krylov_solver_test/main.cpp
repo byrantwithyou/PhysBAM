@@ -16,7 +16,7 @@ using namespace PhysBAM;
 template<class T>
 class KRYLOV_SYSTEM:public KRYLOV_SYSTEM_BASE<T>
 {
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > VECTOR_T;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
 
 public:
@@ -44,7 +44,7 @@ int main(int argc,char *argv[])
     typedef double T;
 
     MATRIX_MXN<T> M(3,3);
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > b,x;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > b,x;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
     b.v.Resize(3);

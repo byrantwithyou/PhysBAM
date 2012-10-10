@@ -297,7 +297,7 @@ First_Order_Time_Step(int substep,T dt)
 
     Write_Substep("start step",substep,1);
     Advect_Fluid(dt,substep);
-    LOG::cout<<"Maximum face velocity (after advect) = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+    LOG::cout<<"Maximum face velocity (after advect) = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs()<<std::endl;
     Write_Substep("advect",substep,1);
 
     example_forces_and_velocities.Update_Time_Varying_Material_Properties(time+dt);
@@ -352,7 +352,7 @@ First_Order_Time_Step(int substep,T dt)
         //    fluids_parameters.enforce_divergence_free_extrapolation,extrapolation_bandwidth,0,TV(),&collision_bodies_affecting_fluid.face_neighbors_visible);
     Write_Substep("extrapolate about interface",substep,1);
     incompressible->boundary->Apply_Boundary_Condition_Face(incompressible->grid,example.fluid_collection.incompressible_fluid_collection.face_velocities,time+dt);
-    LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Maxabs()<<std::endl;
+    LOG::cout<<"Maximum face velocity = ("<<fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs().Magnitude()<<": "<<fluid_collection.incompressible_fluid_collection.face_velocities.Max_Abs()<<std::endl;
 
     Write_Substep("end step",substep,1);
     example.solids_evolution->time+=dt;

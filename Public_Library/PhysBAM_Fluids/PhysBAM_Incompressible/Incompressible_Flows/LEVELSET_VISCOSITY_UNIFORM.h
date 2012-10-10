@@ -24,7 +24,7 @@ public:
 
     LEVELSET_INDEX_MAP_UNIFORM<TV> index_map;
     LEVELSET_VISCOSITY_UNIFORM_SYSTEM<TV> system;
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > x,b;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > x,b;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     T scale;
     bool print_matrix;

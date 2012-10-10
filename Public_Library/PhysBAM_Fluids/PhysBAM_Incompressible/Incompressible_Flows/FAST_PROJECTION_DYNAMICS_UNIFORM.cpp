@@ -55,7 +55,7 @@ Initialize_Grid(const T_GRID& mac_grid)
         row_counts(i)=(2*TV::dimension+1)-boundary;}
     A.Set_Row_Lengths(row_counts);
     TV one_over_dx2=Inverse(mac_grid.dX*mac_grid.dX);
-    T default_row_sum=-2*one_over_dx2.L1_Norm();
+    T default_row_sum=-2*one_over_dx2.Sum_Abs();
     TV_INT grid_counts=mac_grid.counts;
     for(typename GRID<TV>::CELL_ITERATOR iterator(mac_grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T row_sum=default_row_sum;

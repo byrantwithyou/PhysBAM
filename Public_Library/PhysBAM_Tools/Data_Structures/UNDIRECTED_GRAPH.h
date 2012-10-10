@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
+#include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 namespace PhysBAM{
 
 class DIRECTED_GRAPH_CORE;

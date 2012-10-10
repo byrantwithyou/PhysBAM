@@ -3,6 +3,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_WRAPPER.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 
 // TODO: Detect Neumann pockets.
@@ -12,13 +13,13 @@ template<class TV>
 struct POISSON_PROJECTION_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
 {
     typedef typename TV::SCALAR T;
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > VECTOR_T;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > VECTOR_T;
 
     SPARSE_MATRIX_FLAT_MXN<T> gradient,neg_divergence;
     SPARSE_MATRIX_FLAT_NXN<T> poisson;
-    VECTOR_ND<T> beta_inverse;
-    ARRAY<VECTOR_ND<T> > projections;
-    mutable VECTOR_ND<T> temp;
+    ARRAY<T> beta_inverse;
+    ARRAY<ARRAY<T> > projections;
+    mutable ARRAY<T> temp;
 
     POISSON_PROJECTION_SYSTEM();
     virtual ~POISSON_PROJECTION_SYSTEM();

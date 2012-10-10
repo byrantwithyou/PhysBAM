@@ -90,13 +90,12 @@ Post_Stabilization_With_Actuation(const JOINT_ID joint_id)
             // Create A and b
             MATRIX_MXN<T> A(1,active_muscles);
             for(int i=0;i<active_muscles;i++){const T& moment_arm=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id))(i).y;A(1,i)=moment_arm;}
-            VECTOR_ND<T> b(1);b.Set_Subvector(0,angular_impulse);
             // Solve least squares assuming all muscles are active
             MATRIX_MXN<T> A_transpose_A=A.Normal_Equations_Matrix();
             // assume all relative weights are 1
             for(int i=0;i<active_muscles;i++) A_transpose_A(i,i)+=min_activation_penalty;
-            VECTOR_ND<T> A_transpose_b=A.Transpose_Times(b);
-            VECTOR_ND<T> impulse_magnitudes=A_transpose_A.Cholesky_Solve(A_transpose_b);
+            ARRAY<T> A_transpose_b=A.Transpose_Times(angular_impulse);
+            ARRAY<T> impulse_magnitudes=A_transpose_A.Cholesky_Solve(A_transpose_b);
             for(int i=0;i<active_muscles;i++){int muscle_index=muscles_crossing_joints(joint_mesh.Joint_Index_From_Id(joint_id))(i).x;
                 LOG::cout<<"muscle "<<i<<" impulse "<<impulse_magnitudes(i)<<std::endl;
                 muscle_list->muscles(muscle_index)->Apply_Fixed_Impulse_At_All_Points(impulse_magnitudes(i));

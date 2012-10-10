@@ -7,8 +7,8 @@
 #ifndef __PRESSURE_VELOCITY_VECTOR__
 #define __PRESSURE_VELOCITY_VECTOR__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/GENERALIZED_VELOCITY.h>
 namespace PhysBAM{
 //#####################################################################
@@ -20,10 +20,10 @@ class PRESSURE_VELOCITY_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
     typedef typename TV::SCALAR T;typedef KRYLOV_VECTOR_BASE<typename TV::SCALAR> BASE;
 public:
     GENERALIZED_VELOCITY<TV>& solid_velocity;
-    ARRAY<VECTOR_ND<T> >& pressure;
+    ARRAY<ARRAY<T> >& pressure;
     bool deep_copy;
 
-    PRESSURE_VELOCITY_VECTOR(GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<VECTOR_ND<T> >& pressure_input);
+    PRESSURE_VELOCITY_VECTOR(GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<ARRAY<T> >& pressure_input);
     virtual ~PRESSURE_VELOCITY_VECTOR();
 
     PRESSURE_VELOCITY_VECTOR& operator=(const PRESSURE_VELOCITY_VECTOR& v);

@@ -20,8 +20,6 @@ class ARRAY<T,SIDED_FACE_INDEX<d> >:public ARRAY<T,FACE_INDEX<d> >
 {
     typedef VECTOR<T,d> TV;typedef VECTOR<int,d> TV_INT;
     struct UNUSABLE{};
-    template<class S> struct ELEMENT_OF{typedef typename S::ELEMENT TYPE;};
-    typedef typename IF<IS_VECTOR<T>::value,ELEMENT_OF<T>,FIRST<UNUSABLE> >::TYPE::TYPE ELEMENT_OF_T;
 public:
     enum {dimension=d};
     typedef ARRAY<T,FACE_INDEX<d> > BASE;
@@ -107,7 +105,7 @@ public:
     void Set_All_Faces(const T& value,const TV_INT& cell_index)
     {for(int axis=0;axis<dimension;axis++) Component(2,axis)(cell_index)=Component(1,axis)(cell_index+TV_INT::Axis_Vector(axis))=value;}
 
-    static void Extract_Dimension(const ARRAY& old_array,ARRAY<ELEMENT_OF_T,SIDED_FACE_INDEX<dimension> >& extracted_array,const TV_INT& dimensions_to_extract)
+    static void Extract_Dimension(const ARRAY& old_array,ARRAY<typename ELEMENT_OF_VECTOR<T>::TYPE,SIDED_FACE_INDEX<dimension> >& extracted_array,const TV_INT& dimensions_to_extract)
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Extract_Dimension(old_array.Component(side,i),extracted_array.Component(side,i),dimensions_to_extract(i));}
 
     void Fill(const T& constant)
@@ -134,8 +132,8 @@ public:
     static void Put_Ghost(const T constant,ARRAY& x,const T_GRID& grid,const int ghost_cells)
     {for(int side=0;side<2;side++)for(int i=0;i<dimension;i++) T_ARRAY_VIEW::Put_Ghost(constant,x.Component(side,i),grid,ghost_cells);}
 
-    TV Maxabs() const
-    {TV maxabs_values;for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Maxabs(),Component(2,i).Maxabs());return maxabs_values;}
+    TV Max_Abs() const
+    {TV maxabs_values;for(int i=0;i<dimension;i++) maxabs_values(i)=max(Component(1,i).Max_Abs(),Component(2,i).Max_Abs());return maxabs_values;}
 
     static void Exchange(ARRAY& a,ARRAY& b)
     {BASE::Exchange(a,b);BASE::Exchange(a.u2,b.u2);a.Initialize();b.Initialize();}

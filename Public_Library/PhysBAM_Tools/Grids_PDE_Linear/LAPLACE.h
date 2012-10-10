@@ -7,8 +7,8 @@
 #ifndef __LAPLACE__
 #define __LAPLACE__
 
+#include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class T>
@@ -44,7 +44,7 @@ public:
     virtual void Compute_beta_And_Add_Jumps_To_b(const T dt,const T time)
     {}
 
-    void Find_Tolerance(const VECTOR_ND<T>& b)
+    void Find_Tolerance(const ARRAY<T>& b)
     {tolerance=max(relative_tolerance*b.Max_Abs(),absolute_tolerance);}
 
 //#####################################################################

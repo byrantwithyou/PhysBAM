@@ -66,9 +66,9 @@ public:
     void Fill_Ghost_Cells(GENERALIZED_VELOCITY<TV>& V) {} // stub for solids
 
 //#####################################################################
-    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& b_array,
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ap_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& ar_array,
-        KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& zaq_array,
+    void Parallel_Solve_Fluid_Part(FLUID_SYSTEM_MPI<TV>& fluid_system,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& x_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& b_array,
+        KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& p_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& ap_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& ar_array,
+        KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& r_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& z_array,KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& zaq_array,
         const int min_iterations,const int max_iterations,const T tolerance,const bool recompute_preconditioner);
     void Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,
         GENERALIZED_VELOCITY<TV>& ap_array,GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,
@@ -76,7 +76,7 @@ public:
     template<class T_SYSTEM,class TV2> bool Parallel_Solve(T_SYSTEM& system,TV2& x_array,const TV2& b_array,TV2& p_array,TV2& ap_array,TV2& ar_array,TV2& r_array,TV2& z_array,
         TV2& zaq_array,const int min_iterations,const int maximum_iterations,const T tolerance=1e-7);
 private:
-    void Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<VECTOR_ND<T> > >& v_array);
+    void Fill_Ghost_Cells(KRYLOV_VECTOR_WRAPPER<T,ARRAY<ARRAY<T> > >& v_array);
     void Initialize_Datatypes();
 //#####################################################################
 };

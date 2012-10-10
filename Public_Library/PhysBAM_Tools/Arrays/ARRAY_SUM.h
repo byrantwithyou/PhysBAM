@@ -7,8 +7,9 @@
 #ifndef __ARRAY_SUM__
 #define __ARRAY_SUM__
 
+#include <PhysBAM_Tools/Arrays/ARRAY_BASE.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Math_Tools/RANGE.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>
 #include <cassert>
 namespace PhysBAM{
@@ -37,8 +38,8 @@ public:
     INDEX Size() const
     {INDEX size=array1.Size();assert(size==array2.Size());return size;}
 
-    RANGE<INDEX> Domain_Indices() const
-    {RANGE<INDEX> domain_indices=array1.Domain_Indices();assert(domain_indices==array2.Domain_Indices());return domain_indices;}
+    INTERVAL<INDEX> Domain_Indices() const
+    {INTERVAL<INDEX> domain_indices=array1.Domain_Indices();assert(domain_indices==array2.Domain_Indices());return domain_indices;}
 
     const T_SUM operator()(const INDEX i) const
     {return array1(i)+array2(i);}
@@ -46,13 +47,17 @@ public:
 //#####################################################################
 };
 
-template<class T1,class T2,class T_ARRAY1,class T_ARRAY2> ARRAY_SUM<T_ARRAY1,T_ARRAY2>
+template<class T_ARRAY1,class T_ARRAY2,class ENABLE=void> struct ARRAY_SUM_VALID {static const bool value=false;};
+template<class T_ARRAY1,class T_ARRAY2> struct ARRAY_SUM_VALID<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<IS_SAME<typename EQUIVALENT_ARRAY<T_ARRAY1>::TYPE,typename EQUIVALENT_ARRAY<T_ARRAY2>::TYPE>::value>::TYPE>
+{static const bool value=IS_ARRAY<T_ARRAY1>::value && IS_ARRAY<T_ARRAY2>::value && (!FIXED_SIZE_VECTOR<T_ARRAY1>::value || !FIXED_SIZE_VECTOR<T_ARRAY2>::value);};
+
+template<class T1,class T2,class T_ARRAY1,class T_ARRAY2> typename ENABLE_IF<ARRAY_SUM_VALID<T_ARRAY1,T_ARRAY2>::value,ARRAY_SUM<T_ARRAY1,T_ARRAY2> >::TYPE
 operator+(const ARRAY_BASE<T1,T_ARRAY1,typename T_ARRAY2::INDEX>& array1,const ARRAY_BASE<T2,T_ARRAY2,typename T_ARRAY2::INDEX>& array2)
 {return ARRAY_SUM<T_ARRAY1,T_ARRAY2>(array1.Derived(),array2.Derived());}
 
 //#####################################################################
 
-template<class T_ARRAY1,class T_ARRAY2> struct SUM<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<IS_ARRAY<T_ARRAY1>::value && IS_ARRAY<T_ARRAY2>::value>::TYPE>
+template<class T_ARRAY1,class T_ARRAY2> struct SUM<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<ARRAY_SUM_VALID<T_ARRAY1,T_ARRAY2>::value>::TYPE>
 {typedef ARRAY_SUM<T_ARRAY1,T_ARRAY2> TYPE;};
 
 //#####################################################################

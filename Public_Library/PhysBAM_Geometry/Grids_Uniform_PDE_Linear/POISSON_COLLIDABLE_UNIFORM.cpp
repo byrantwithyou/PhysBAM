@@ -136,7 +136,7 @@ Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 // Function Find_A
 //#####################################################################
 template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<VECTOR_ND<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Find_A_Part_Two(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     BASE::Find_A_Part_Two(domain,A_array,b_array,cell_index_to_matrix_index);
     if(second_order_cut_cell_method) Apply_Second_Order_Cut_Cell_Method(domain,A_array,b_array,cell_index_to_matrix_index);
@@ -201,7 +201,7 @@ Add_Derivative_Jump_To_b(const T_ARRAYS_SCALAR& phi_ghost)
 // Function Apply_Second_Order_Cut_Cell_Method
 //#####################################################################
 template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<VECTOR_ND<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
+Apply_Second_Order_Cut_Cell_Method(RANGE<TV_INT>& domain,ARRAY<SPARSE_MATRIX_FLAT_NXN<T> >& A_array,ARRAY<ARRAY<T> >& b_array,T_ARRAYS_INT& cell_index_to_matrix_index)
 {
     assert(levelset);
     TV minus_one_over_dx_squared=(T)-1*Inverse(grid.dX*grid.dX);

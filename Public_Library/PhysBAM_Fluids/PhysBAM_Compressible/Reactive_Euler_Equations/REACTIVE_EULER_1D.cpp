@@ -45,7 +45,7 @@ CFL()
             T Y=U(i)(3)/U(i)(0);
             T sound_speed=eos.c(U(i)(0),e(U(i)(0),U(i)(1),U(i)(2)),Y);
             u_minus_c(i)=u-sound_speed;u_plus_c(i)=u+sound_speed;}}
-    T dt_convect=max(u_minus_c.Maxabs(),u_plus_c.Maxabs())/dx;
+    T dt_convect=max(u_minus_c.Max_Abs(),u_plus_c.Max_Abs())/dx;
     return 1/dt_convect;
 }
 //#####################################################################

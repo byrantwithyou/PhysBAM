@@ -269,7 +269,7 @@
 				RelativePath="utils.h">
 			</File>
 			<File
-				RelativePath="..\..\Public_Library\Matrices_And_Vectors\VECTOR_ND.h">
+				RelativePath="..\..\Public_Library\Matrices_And_Vectors\ARRAY.h">
 			</File>
 		</Filter>
 		<Filter

@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_NXN.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -41,7 +40,7 @@ template<class T> SYMMETRIC_MATRIX_NXN<T>::
 // Function Outer_Product
 //#####################################################################
 template<class T> SYMMETRIC_MATRIX_NXN<T> SYMMETRIC_MATRIX_NXN<T>::
-Outer_Product(const VECTOR_ND<T>& u)
+Outer_Product(const ARRAY<T>& u)
 {
     SYMMETRIC_MATRIX_NXN<T> result(u.n);
     for(int i=0;i<u.n;i++) for(int j=0;j<i;j++) result(i,j)=u(i)*u(j);
@@ -104,20 +103,20 @@ Jacobi_Solve_Eigenproblem(ARRAY<VECTOR<int,2> >& givens_pairs,ARRAY<VECTOR<T,2> 
 //#####################################################################
 template<class T> template<class GENERATOR>
 void SYMMETRIC_MATRIX_NXN<T>::
-Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,VECTOR_ND<T>& max_eigenvector,RANDOM_NUMBERS<T,GENERATOR>* random_numbers,const T tolerance,
+Maximum_Eigenvalue_Eigenvector_Pair(T& max_eigenvalue,ARRAY<T>& max_eigenvector,RANDOM_NUMBERS<T,GENERATOR>* random_numbers,const T tolerance,
     const T randomization_decay_factor,const int max_iterations)
 {
-    VECTOR_ND<T> last_eigenvector(n);
+    ARRAY<T> last_eigenvector(n);
     T randomization_factor=(T)1,tolerance_squared=sqr(tolerance),tolerance_scaled=tolerance/sqrt((T)n);
     max_eigenvector.Resize(n); // Must provide initial guess if no randomization is used
     for(int iteration=0;iteration<max_iterations;iteration++){
         last_eigenvector=max_eigenvector;
         if(random_numbers) for(int i=0;i<n;i++) last_eigenvector(i)+=random_numbers->Get_Uniform_Number(-randomization_factor,randomization_factor);
-        last_eigenvector/=VECTOR_ND<T>::Dot_Product_Double_Precision(last_eigenvector,last_eigenvector);
+        last_eigenvector/=ARRAY<T>::Dot_Product_Double_Precision(last_eigenvector,last_eigenvector);
         max_eigenvector=(*this)*last_eigenvector;
-        max_eigenvalue=VECTOR_ND<T>::Dot_Product_Double_Precision(max_eigenvector,max_eigenvector);
+        max_eigenvalue=ARRAY<T>::Dot_Product_Double_Precision(max_eigenvector,max_eigenvector);
         max_eigenvalue=sqrt(max_eigenvalue);
-        if(VECTOR_ND<T>::Dot_Product(last_eigenvector,max_eigenvector)<0) max_eigenvalue=-max_eigenvalue;
+        if(ARRAY<T>::Dot_Product(last_eigenvector,max_eigenvector)<0) max_eigenvalue=-max_eigenvalue;
         max_eigenvector/=max_eigenvalue;
         last_eigenvector-=max_eigenvector;
         if((!random_numbers || randomization_factor<tolerance_scaled) && last_eigenvector.Magnitude_Squared()<tolerance_squared) return;
@@ -209,11 +208,11 @@ operator*(const T a) const
 //#####################################################################
 // Function operator*
 //#####################################################################
-template<class T> VECTOR_ND<T> SYMMETRIC_MATRIX_NXN<T>::
-operator*(const VECTOR_ND<T>& y) const
+template<class T> ARRAY<T> SYMMETRIC_MATRIX_NXN<T>::
+operator*(const ARRAY<T>& y) const
 {
     assert(y.n==n);
-    VECTOR_ND<T> result(n);
+    ARRAY<T> result(n);
     for(int i=0;i<n;i++){for(int j=0;j<=i;j++) result.x[i]+=x[((2*n-j-1)*j>>1)+i]*y.x[j];for(int j=i+1;j<n;j++) result.x[i]+=x[((2*n-i-1)*i>>1)+j]*y.x[j];}
     return result;
 }

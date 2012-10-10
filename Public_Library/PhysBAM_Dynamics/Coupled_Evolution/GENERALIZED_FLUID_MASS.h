@@ -9,7 +9,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SYSTEM_MATRIX_HELPER.h>
 
 namespace PhysBAM{
@@ -28,14 +27,14 @@ class GENERALIZED_FLUID_MASS:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typena
     const ARRAY<T>& constrained_beta;
 
 public:
-    VECTOR_ND<T> one_over_fluid_mass_at_faces;
+    ARRAY<T> one_over_fluid_mass_at_faces;
 
     GENERALIZED_FLUID_MASS(const COLLISION_AWARE_INDEX_MAP<TV>& index_map_input,const T_FACE_ARRAYS_SCALAR& beta_input,const ARRAY<T>& constrained_beta_input);
     virtual ~GENERALIZED_FLUID_MASS();
 
     void Compute();
-    void Inverse_Times(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const;
-    void Inverse_Times_Add(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const;
+    void Inverse_Times(const ARRAY<T>& faces_in,ARRAY<T>& faces_out) const;
+    void Inverse_Times_Add(const ARRAY<T>& faces_in,ARRAY<T>& faces_out) const;
     void Second_Order_Mass_Correction(const ARRAY<T,TV_INT>& phi);    
     void Compute_For_Two_Phase_Pressure_Jump(const ARRAY<T,TV_INT>& phi,const ARRAY<T,TV_INT>& density);
 

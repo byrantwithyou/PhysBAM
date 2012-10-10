@@ -89,7 +89,7 @@ CFL()
             T sound_speed=eos->c(U(0,i,j),e(U(0,i,j),U(1,i,j),U(2,i,j),U(3,i,j)));
             u_minus_c(i,j)=u-sound_speed;u_plus_c(i,j)=u+sound_speed;
             v_minus_c(i,j)=v-sound_speed;v_plus_c(i,j)=v+sound_speed;}}
-    T dt_convect=max(u_minus_c.Maxabs(),u_plus_c.Maxabs())/dx+max(v_minus_c.Maxabs(),v_plus_c.Maxabs())/dy;
+    T dt_convect=max(u_minus_c.Max_Abs(),u_plus_c.Max_Abs())/dx+max(v_minus_c.Max_Abs(),v_plus_c.Max_Abs())/dy;
     dt_convect=max(dt_convect,1/max_time_step);
     return 1/dt_convect;
 }           

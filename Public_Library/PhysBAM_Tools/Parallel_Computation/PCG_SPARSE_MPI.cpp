@@ -8,13 +8,13 @@
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UTILITIES.h>
 #include <PhysBAM_Tools/Parallel_Computation/PCG_SPARSE_MPI.h>
 #include <PhysBAM_Tools/Parallel_Computation/SPARSE_MATRIX_PARTITION.h>
-#include <PhysBAM_Tools/Vectors/SPARSE_VECTOR_ND.h>
+#include <PhysBAM_Tools/Vectors/SPARSE_ARRAY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Serial_Solve
 //#####################################################################
 template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
-Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>& q,VECTOR_ND<T>& s,VECTOR_ND<T>& r,VECTOR_ND<T>& k,VECTOR_ND<T>& z,const int tag,const T tolerance)
+Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const int tag,const T tolerance)
 {
     // TODO: this routine is useful only for testing purposes
     LOG::SCOPE scope("MPI SOLVE","mpi solve");
@@ -31,7 +31,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         // receive linear system pieces
         ARRAY<SPARSE_MATRIX_PARTITION> partition_array(processors);partition_array(0)=partition; // TODO: very inefficient to copy everything into one array
         ARRAY<SPARSE_MATRIX_FLAT_NXN<T> > A_array(processors);A_array(0)=A;
-        ARRAY<VECTOR_ND<T> > x_array(processors),b_array(processors);x_array(0)=x;b_array(0)=b;
+        ARRAY<ARRAY<T> > x_array(processors),b_array(processors);x_array(0)=x;b_array(0)=b;
         for(int p=1;p<processors;p++){
             MPI::Status status;
             comm.Probe(MPI::ANY_SOURCE,tag,status);
@@ -57,7 +57,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
         assert(current_row==global_rows+1 && global_A.offsets(current_row)==global_entries+1);}
         // assemble full linear system
         global_A.A.Resize(global_entries);
-        VECTOR_ND<T> global_x(global_rows),global_b(global_rows);
+        ARRAY<T> global_x(global_rows),global_b(global_rows);
         for(int p=0;p<processors;p++) for(int i=partition_array(p).interior_indices.min_corner;i<partition_array(p).interior_indices.max_corner;i++){
             int global_i=partition_array(p).Translate_Index(i);
             global_x(global_i)=x_array(p)(i);
@@ -84,7 +84,7 @@ Serial_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR
 // Function Parallel_Solve
 //#####################################################################
 template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
-Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance,const bool recompute_preconditioner)
+Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const bool recompute_preconditioner)
 {
     if(thread_grid){Parallel_Solve(A,x,b,thread_grid->global_column_index_boundaries,tolerance,recompute_preconditioner);return;}
     Initialize_Datatypes();
@@ -93,10 +93,10 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
     T global_tolerance=Global_Max(tolerance);
     int desired_iterations=global_n;if(pcg.enforce_compatibility) desired_iterations--;if(pcg.maximum_iterations) desired_iterations=min(desired_iterations,pcg.maximum_iterations);
 
-    VECTOR_ND<T> temp(local_n,false),p(local_n,false),z_interior(interior_n,false);
+    ARRAY<T> temp(local_n,false),p(local_n,false),z_interior(interior_n,false);
 
     // build interior views of x,b,p,z,temp
-    VECTOR_ND<T> x_interior,b_interior,p_interior,temp_interior;
+    ARRAY<T> x_interior,b_interior,p_interior,temp_interior;
     x_interior.Set_Subvector_View(x,partition.interior_indices);
     b_interior.Set_Subvector_View(b,partition.interior_indices);
     p_interior.Set_Subvector_View(p,partition.interior_indices);
@@ -131,13 +131,13 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
         if(pcg.enforce_compatibility) z_interior-=(T)(Global_Sum(z_interior.Sum_Double_Precision())/global_n);
 
         // update search direction
-        rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior));
+        rho_old=rho;rho=Global_Sum(ARRAY<T>::Dot_Product_Double_Precision(z_interior,b_interior));
         T beta=0;if(iteration==0) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells(p);
         A.Times(p,temp);
-        T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp_interior)));
+        T alpha=(T)(rho/Global_Sum(ARRAY<T>::Dot_Product_Double_Precision(p_interior,temp_interior)));
         for(int i=0;i<interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
@@ -157,7 +157,7 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,cons
 // Function Parallel_Solve
 //#####################################################################
 template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
-Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
+Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x_local,ARRAY<T>& b_local,const ARRAY<VECTOR<int,2> >& proc_column_index_boundaries,
     const T tolerance,const bool recompute_preconditioner)
 {
     // TODO templatize this with the one above
@@ -168,8 +168,8 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
     int desired_iterations=global_n;if(pcg.enforce_compatibility) desired_iterations--;if(pcg.maximum_iterations) desired_iterations=min(desired_iterations,pcg.maximum_iterations);
     int my_rank=comm.Get_rank();
 
-    VECTOR_ND<T> temp(global_n,false),z(global_n,false),p_interior,x_interior;
-    VECTOR_ND<T> x_global(global_n),p_global(global_n,false);
+    ARRAY<T> temp(global_n,false),z(global_n,false),p_interior,x_interior;
+    ARRAY<T> x_global(global_n),p_global(global_n,false);
     for(int i=0;i<global_n;i++) x_global(i+proc_column_index_boundaries(my_rank).x-1)=x_local(i);
     p_interior.Set_Subvector_View(p_global,INTERVAL<int>(proc_column_index_boundaries(my_rank).x,proc_column_index_boundaries(my_rank).y));
     x_interior.Set_Subvector_View(x_global,INTERVAL<int>(proc_column_index_boundaries(my_rank).x,proc_column_index_boundaries(my_rank).y));
@@ -203,13 +203,13 @@ Parallel_Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x_local,VECTOR_ND<T>& 
         if(pcg.enforce_compatibility) z-=(T)(Global_Sum(z.Sum_Double_Precision())/global_n);
 
         // update search direction
-        rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z,b_local));
+        rho_old=rho;rho=Global_Sum(ARRAY<T>::Dot_Product_Double_Precision(z,b_local));
         T beta=0;if(iteration==0) p_interior=z;else{beta=(T)(rho/rho_old);for(int i=0;i<global_n;i++) p_interior(i)=z(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells_Far(p_global);
         A.Times(p_global,temp);
-        T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp)));
+        T alpha=(T)(rho/Global_Sum(ARRAY<T>::Dot_Product_Double_Precision(p_interior,temp)));
         for(int i=0;i<global_n;i++){x_interior(i)+=alpha*p_interior(i);b_local(i)-=alpha*temp(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff
@@ -254,7 +254,7 @@ Find_Ghost_Regions(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,2> >& pro
     // Find which columns we need from each of the other procs
     columns_to_receive.Resize(proc_column_index_boundaries.m);
     columns_to_send.Resize(proc_column_index_boundaries.m);
-    VECTOR_ND<bool> column_needed(A.n);
+    ARRAY<bool> column_needed(A.n);
     int row_index=A.offsets(0);
     for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
         const int end=A.offsets(row+1);
@@ -297,7 +297,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
     // Find which columns we need from each of the other procs
     columns_to_receive.Resize(proc_column_index_boundaries.m);
     columns_to_send.Resize(proc_column_index_boundaries.m);
-    VECTOR_ND<bool> column_needed(A.n);
+    ARRAY<bool> column_needed(A.n);
     int row_index=A.offsets(0);
     for(int row=0;row<A.n;row++){ // First out which columns of A we actually have stuff in
         const int end=A.offsets(row+1);
@@ -335,7 +335,7 @@ Find_Ghost_Regions_Threaded(SPARSE_MATRIX_FLAT_NXN<T>& A,const ARRAY<VECTOR<int,
 // Function Fill_Ghost_Cells_Far
 //#####################################################################
 template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
-Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
+Fill_Ghost_Cells_Far(ARRAY<T>& x)
 {
     ARRAY<MPI_PACKAGE> packages;ARRAY<MPI::Request> requests;requests.Preallocate(2*columns_to_send.m);
     int my_rank=comm.Get_rank();int tag=1;
@@ -368,7 +368,7 @@ Fill_Ghost_Cells_Far(VECTOR_ND<T>& x)
 // Function Fill_Ghost_Cells_Far
 //#####################################################################
 template<class T_GRID> void PCG_SPARSE_MPI<T_GRID>::
-Fill_Ghost_Cells_Threaded(VECTOR_ND<T>& x)
+Fill_Ghost_Cells_Threaded(ARRAY<T>& x)
 {
     int my_rank=thread_grid->rank;
     // Send out the column values that we owe other people

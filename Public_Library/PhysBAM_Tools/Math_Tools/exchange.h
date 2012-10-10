@@ -17,7 +17,7 @@ namespace PhysBAM{
 
 template<class T,class ENABLE=void> struct EXCHANGE_HELPER
 {
-    STATIC_ASSERT(!IS_ARRAY<T>::value);
+    STATIC_ASSERT((!IS_ARRAY<T>::value || FIXED_SIZE_VECTOR<T>::value));
 
     static void Exchange(T& a,T& b)
     {T c=a;a=b;b=c;}

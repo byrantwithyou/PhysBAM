@@ -17,7 +17,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
     T theta_threshold,T cg_tolerance,bool verbose)
 {
     typedef VECTOR<int,d> TV_INT;
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > T_VECTOR;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > T_VECTOR;
     typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_MXN<T>,T,T_VECTOR > T_SYSTEM;
 
     Fill_Ghost_Cells(grid,3,3,u,callback);
@@ -33,7 +33,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
     ARRAY<T> beta_inverse;
     system.gradient.Reset(index_to_cell.m);
     VECTOR<T,2> sign(-1,1);
-    VECTOR_ND<T> rhs(index_to_cell.m);
+    ARRAY<T> rhs(index_to_cell.m);
 
     bool neumann_pocket=true;
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
@@ -73,7 +73,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
     for(int i=0;i<beta_inverse.m;i++) system.beta_inverse(i)=beta_inverse(i)/density;
     system.Initialize();
     if(neumann_pocket){
-        system.projections.Append(VECTOR_ND<T>());
+        system.projections.Append(ARRAY<T>());
         system.projections.Last().Resize(system.poisson.n);
         system.projections.Last().Fill(1);}
 
@@ -82,7 +82,7 @@ void Project_Incompressibility(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,c
     b.v.Resize(index_to_cell.m);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
-    VECTOR_ND<T> temp(index_to_face.m);
+    ARRAY<T> temp(index_to_face.m);
     for(int i=0;i<index_to_face.m;i++) temp(i)=u(index_to_face(i));
     system.gradient.Transpose_Times(temp,b.v);
     b.v-=rhs; // rhs set up based on a negative definite Poisson system.

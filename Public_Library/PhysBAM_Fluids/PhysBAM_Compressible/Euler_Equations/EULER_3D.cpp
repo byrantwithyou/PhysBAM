@@ -50,7 +50,7 @@ CFL()
             u_minus_c(i,j,ij)=u-sound_speed;u_plus_c(i,j,ij)=u+sound_speed;
             v_minus_c(i,j,ij)=v-sound_speed;v_plus_c(i,j,ij)=v+sound_speed;
             w_minus_c(i,j,ij)=w-sound_speed;w_plus_c(i,j,ij)=w+sound_speed;}}
-    T dt_convect=max(u_minus_c.Maxabs(),u_plus_c.Maxabs())/dx+max(v_minus_c.Maxabs(),v_plus_c.Maxabs())/dy+max(w_minus_c.Maxabs(),w_plus_c.Maxabs())/dz;
+    T dt_convect=max(u_minus_c.Max_Abs(),u_plus_c.Max_Abs())/dx+max(v_minus_c.Max_Abs(),v_plus_c.Max_Abs())/dy+max(w_minus_c.Max_Abs(),w_plus_c.Max_Abs())/dz;
     return 1/dt_convect;
 }              
 //#####################################################################

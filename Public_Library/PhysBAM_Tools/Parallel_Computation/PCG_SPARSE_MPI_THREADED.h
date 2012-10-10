@@ -76,7 +76,7 @@ public:
 #endif
     }
 
-    void Fill_Ghost_Cells(VECTOR_ND<T>& v)
+    void Fill_Ghost_Cells(ARRAY<T>& v)
     {
 #ifdef USE_PTHREADS
     pthread_barrier_wait(&pcg_threaded.barr);
@@ -91,13 +91,13 @@ public:
 #endif
     }
 
-    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,VECTOR_ND<T>& x,VECTOR_ND<T>& b,VECTOR_ND<T>& q,VECTOR_ND<T>& s,VECTOR_ND<T>& r,VECTOR_ND<T>& k,VECTOR_ND<T>& z,const T tolerance=1e-7,const bool recompute_preconditioner=true)
+    void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A_matrix,ARRAY<T>& x,ARRAY<T>& b,ARRAY<T>& q,ARRAY<T>& s,ARRAY<T>& r,ARRAY<T>& k,ARRAY<T>& z,const T tolerance=1e-7,const bool recompute_preconditioner=true)
     {
         PHYSBAM_FATAL_ERROR();
     }
 
 //#####################################################################
-    void Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance);
+    void Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance);
 //#####################################################################
 };
 }

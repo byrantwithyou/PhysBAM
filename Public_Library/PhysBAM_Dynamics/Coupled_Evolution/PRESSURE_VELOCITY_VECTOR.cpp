@@ -8,7 +8,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> PRESSURE_VELOCITY_VECTOR<TV>::
-PRESSURE_VELOCITY_VECTOR(GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<VECTOR_ND<T> >& pressure_input)
+PRESSURE_VELOCITY_VECTOR(GENERALIZED_VELOCITY<TV>& solid_velocity_input,ARRAY<ARRAY<T> >& pressure_input)
     :solid_velocity(solid_velocity_input),pressure(pressure_input),deep_copy(false)
 {
 }
@@ -93,7 +93,7 @@ template<class TV> int PRESSURE_VELOCITY_VECTOR<TV>::
 Raw_Size() const
 {
     int n=solid_velocity.Raw_Size();
-    for(int i=0;i<pressure.m;i++) n+=pressure(i).n;
+    for(int i=0;i<pressure.m;i++) n+=pressure(i).m;
     return n;
 }
 //#####################################################################
@@ -105,8 +105,8 @@ Raw_Get(int i)
     int n=solid_velocity.Raw_Size();
     if(i<n) return solid_velocity.Raw_Get(i);i-=n;
     for(int j=0;j<pressure.m;j++){
-        if(i<pressure(j).n) return pressure(j)(i);
-        i-=pressure(j).n;}
+        if(i<pressure(j).m) return pressure(j)(i);
+        i-=pressure(j).m;}
     PHYSBAM_FATAL_ERROR();
 }
 //#####################################################################
@@ -116,7 +116,7 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>* PRESSURE_VELOCITY_VE
 Clone_Default() const
 {
     GENERALIZED_VELOCITY<TV>& gv=debug_cast<GENERALIZED_VELOCITY<TV>&>(*solid_velocity.Clone_Default());
-    PRESSURE_VELOCITY_VECTOR<TV>* v=new PRESSURE_VELOCITY_VECTOR<TV>(gv,*new ARRAY<VECTOR_ND<T> >(pressure.m));
+    PRESSURE_VELOCITY_VECTOR<TV>* v=new PRESSURE_VELOCITY_VECTOR<TV>(gv,*new ARRAY<ARRAY<T> >(pressure.m));
     for(int i=0;i<v->pressure.m;i++) v->pressure(i).Resize(pressure(i).Size());
     v->deep_copy=true;
     return v;

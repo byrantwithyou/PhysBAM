@@ -74,19 +74,19 @@ Compute_For_Two_Phase_Pressure_Jump(const ARRAY<T,TV_INT>& phi,const ARRAY<T,TV_
 // Function Inverse_Times
 //#####################################################################
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::
-Inverse_Times(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const
+Inverse_Times(const ARRAY<T>& faces_in,ARRAY<T>& faces_out) const
 {
-    assert(faces_in.n==faces_out.n && faces_in.n==one_over_fluid_mass_at_faces.n);
-    for(int i=0;i<faces_out.n;i++) faces_out(i)=one_over_fluid_mass_at_faces(i)*faces_in(i);
+    assert(faces_in.m==faces_out.m && faces_in.m==one_over_fluid_mass_at_faces.m);
+    for(int i=0;i<faces_out.m;i++) faces_out(i)=one_over_fluid_mass_at_faces(i)*faces_in(i);
 }
 //#####################################################################
 // Function Inverse_Times_Add
 //#####################################################################
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::
-Inverse_Times_Add(const VECTOR_ND<T>& faces_in,VECTOR_ND<T>& faces_out) const
+Inverse_Times_Add(const ARRAY<T>& faces_in,ARRAY<T>& faces_out) const
 {
-    assert(faces_in.n==faces_out.n && faces_in.n==one_over_fluid_mass_at_faces.n);
-    for(int i=0;i<faces_out.n;i++) faces_out(i)+=one_over_fluid_mass_at_faces(i)*faces_in(i);
+    assert(faces_in.m==faces_out.m && faces_in.m==one_over_fluid_mass_at_faces.m);
+    for(int i=0;i<faces_out.m;i++) faces_out(i)+=one_over_fluid_mass_at_faces(i)*faces_in(i);
 }
 //#####################################################################
 // Function Print_Each_Matrix
@@ -102,7 +102,7 @@ Print_Each_Matrix(int n) const
 template<class TV> void GENERALIZED_FLUID_MASS<TV>::
 Add_Raw_Matrix(ARRAY<TRIPLE<int,int,T> >& data) const
 {
-    for(int i=0;i<one_over_fluid_mass_at_faces.n;i++)
+    for(int i=0;i<one_over_fluid_mass_at_faces.m;i++)
         data.Append(TRIPLE<int,int,T>(i,i,one_over_fluid_mass_at_faces(i)));
 }
 //#####################################################################

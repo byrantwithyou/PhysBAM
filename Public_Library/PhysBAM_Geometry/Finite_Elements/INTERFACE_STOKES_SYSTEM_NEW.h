@@ -61,7 +61,7 @@ public:
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m> matrix_pu;
 
     VECTOR<VECTOR<SPARSE_MATRIX_FLAT_MXN<T>,2>,TV::m>* matrix_f_pu;
-    VECTOR<VECTOR<VECTOR_ND<T>,2>,TV::m>* rhs_interface;
+    VECTOR<VECTOR<ARRAY<T>,2>,TV::m>* rhs_interface;
 
     VECTOR<VECTOR_T,TV::m> null_u;
     VECTOR_T null_p;

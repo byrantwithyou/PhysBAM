@@ -13,7 +13,6 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Collisions_Computations/SOLVE_CONTACT.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_COLLECTION.h>
 
@@ -22,7 +21,7 @@ namespace PhysBAM{;
 namespace PROJECTED_GAUSS_SEIDEL
 {
 template<class T>
-void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& a,VECTOR_ND<T>& x,T tolerance)
+void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& a,ARRAY<T>& x,T tolerance)
 {
     assert(A.n==a.Size() && A.n==x.Size());
 
@@ -65,7 +64,7 @@ void Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& a,VECTOR_ND<T>& x,T tolera
 }
 
 template<class T,int D>
-void Multiply(SPARSE_MATRIX_FLAT_MXN<VECTOR<T,D> >& A,VECTOR_ND<VECTOR<T,D> >& x,VECTOR_ND<T>& result)
+void Multiply(SPARSE_MATRIX_FLAT_MXN<VECTOR<T,D> >& A,ARRAY<VECTOR<T,D> >& x,ARRAY<T>& result)
 {
     assert(A.n==x.Size()&&A.m==result.Size());
     for(int i=0;i<A.m;i++)

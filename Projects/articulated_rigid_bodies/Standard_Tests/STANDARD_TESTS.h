@@ -799,7 +799,8 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
     for(int i=0;i<6;i++){
         LOG::cout<<"-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@-@"<<std::endl;
         VECTOR<T,6> j_combined;j_combined(i)=impulse_magnitude;
-        TV j,j_tau;j_combined.Get_Subvector(0,j);j_combined.Get_Subvector(3,j_tau);
+        TV j,j_tau;
+        j_combined.Extract(j,j_tau);
         LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
         typename LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV>::T_CONSTRAINT_ERROR f_error_result=f_error.F(j_combined);
         MATRIX<T,6> jacobian=f_error.Jacobian(j_combined);
@@ -808,11 +809,12 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
         typename LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV>::T_CONSTRAINT_ERROR f_error_2_result=f_error_2.F(VECTOR<T,6>());
         MATRIX<T,6> jacobian_2=f_error_2.Jacobian(VECTOR<T,6>());
         RIGID_BODY<TV>::Apply_Impulse(*parent,*child,location,-j/dt,-j_tau/dt);
-        TV f_angular,f_angular_2;f_error_result.Get_Subvector(3,f_angular);f_error_2_result.Get_Subvector(3,f_angular_2);
+        TV f_angular(f_error_result.Array_View(3,3)),f_angular_2(f_error_2_result.Array_View(3,3));
         LOG::cout<<"Testing component "<<i<<std::endl;
         if(TV::Dot_Product(f_angular,f_angular_2)<0){
             LOG::cout<<"Flipping sign"<<std::endl;
-            f_error_2_result.Set_Subvector(3,-f_angular_2);for(int i=3;i<6;i++) for(int j=0;j<6;j++) jacobian_2(i,j)=-jacobian_2(i,j);}
+            f_error_2_result.Array_View(3,3)=-f_angular_2;
+            for(int i=3;i<6;i++) for(int j=0;j<6;j++) jacobian_2(i,j)=-jacobian_2(i,j);}
         Test_System_Prestabilization_Print(f_error_result,f_error_2_result,jacobian,jacobian_2);}
 
     LOG::cout<<"################################################################################"<<std::endl;
@@ -833,7 +835,8 @@ void Test_System_Prestabilization(const JOINT_ID joint_id)
     LOG::cout<<"Difference:\n"<<(jacobian-jacobian_2)<<std::endl;}
 
     {LINEAR_AND_ANGULAR_CONSTRAINT_FUNCTION<TV> f_error(arb,joint_id,dt,epsilon_scale,location);
-    VECTOR<T,6> j_combined;j_combined.Set_Subvector(0,jn);j_combined.Set_Subvector(3,j_tau);
+    VECTOR<T,6> j_combined;
+    j_combined.Combine(jn,j_tau);
     MATRIX<T,6> jacobian(f_error.Jacobian(j_combined)),jacobian_2;
     for(int i=0;i<6;i++){VECTOR<T,6> j;j(i)=epsilon;jacobian_2.Set_Column(i,(f_error.F(j_combined+j)-f_error.F(j_combined-j))/(2*epsilon));}
     LOG::cout<<"Computed Combined Jacobian:\n"<<jacobian<<"Approximated Combined Jacobian:\n"<<jacobian_2;

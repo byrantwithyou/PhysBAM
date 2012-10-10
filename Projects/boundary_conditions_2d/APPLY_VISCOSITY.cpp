@@ -27,7 +27,7 @@ T Face_Fraction(const GRID<TV>& grid,const VECTOR<T,2>& X,const TV& Y,BOUNDARY_C
 template<class T,class TV,int d>
 void Apply_Viscosity(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<d> >& u,const BOUNDARY_CONDITIONS<TV>& callback,T dt,T time,T viscosity,T density,int axis,T theta_threshold,T cg_tolerance,bool verbose)
 {
-    typedef KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > T_VECTOR;
+    typedef KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > T_VECTOR;
     typedef KRYLOV::MATRIX_SYSTEM<SPARSE_MATRIX_FLAT_NXN<T>,T,T_VECTOR > T_SYSTEM;
 
     ARRAY<int,FACE_INDEX<d> > index(u.Domain_Indices());

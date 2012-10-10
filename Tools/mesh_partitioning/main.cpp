@@ -105,7 +105,7 @@ void Compute_Initial_Clustering()
     // Initial labeling
     LOG::Time("Initial labeling");
     ARRAY<int> centers,distances;centers.Append(active_nodes(random_numbers.Get_Uniform_Integer(1,active_nodes.m)));
-    while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(distances.Argmax());}
+    while(centers.m<partitions){Flood_Fill_Mesh(centers,node_labels,distances);centers.Append(distances.Arg_Max());}
     int functional=Flood_Fill_Mesh(centers,node_labels,distances);
     for(int partition=0;partition<partitions;partition++) LOG::cout<<"partition "<<partition<<" has "<<node_labels.Count_Matches(partition)<<" particles"<<std::endl;
     LOG::cout<<node_labels.Count_Matches(0)<<" particles do not belong to any partition"<<std::endl;

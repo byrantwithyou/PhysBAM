@@ -92,7 +92,7 @@ Get_Total_Number_Of_Threads(const int input,const int color)
 //#####################################################################
 template<class T_GRID> void LAPLACE_MPI<T_GRID>::
 Solve_Threaded(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,ARRAY<INTERVAL<int> >& interior_indices,
-    ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,
+    ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,
     ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color,const int multi_proc_mode)
 {
     if(color>filled_region_ranks.m){
@@ -107,7 +107,7 @@ Solve_Threaded(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,ARRAY
 // Function Solve
 //#####################################################################
 template<class T_GRID> void LAPLACE_MPI<T_GRID>::
-Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color)
+Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color)
 {
     if(color>filled_region_ranks.m){local_pcg.Solve(A,x,b,vectors,tolerance);return;}
     else{
@@ -120,7 +120,7 @@ Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_
 // Function Solve
 //#####################################################################
 template<class T_GRID> void LAPLACE_MPI<T_GRID>::
-Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance,const int color,const ARRAY<VECTOR<int,2> >& global_column_index_boundaries)
+Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const int color,const ARRAY<VECTOR<int,2> >& global_column_index_boundaries)
 {
     SPARSE_MATRIX_PARTITION temp_partition;
     PCG_SPARSE_MPI<T_GRID> pcg_mpi(local_pcg,(*communicators)(color),temp_partition);
@@ -138,15 +138,15 @@ template<class T_GRID> LAPLACE_MPI<T_GRID>::LAPLACE_MPI(T_LAPLACE& laplace):mpi_
 template<class T_GRID> LAPLACE_MPI<T_GRID>::~LAPLACE_MPI(){}
 template<class T_GRID> void LAPLACE_MPI<T_GRID>::Synchronize_Solution_Regions(){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> void LAPLACE_MPI<T_GRID>::Update_Solution_Regions_For_Solid_Fluid_Coupling(const T_MPI_GRID& mpi_grid){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>&,VECTOR_ND<T>&,VECTOR_ND<T>&,
+template<class T_GRID> void LAPLACE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>&,ARRAY<T>&,ARRAY<T>&,
     ARRAY<KRYLOV_VECTOR_BASE<T>*>&,const T,const int){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
-template<class T_GRID> void LAPLACE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance,const int color,
+template<class T_GRID> void LAPLACE_MPI<T_GRID>::Solve(SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance,const int color,
     const ARRAY<VECTOR<int,2> >& global_column_index_boundaries){PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> int LAPLACE_MPI<T_GRID>::Get_Total_Number_Of_Threads(const int input,const int color)
 {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 template<class T_GRID> void LAPLACE_MPI<T_GRID>::Solve_Threaded(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,
     ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,
-    VECTOR_ND<T>& x,VECTOR_ND<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color,const int multi_proc_mode)
+    ARRAY<T>& x,ARRAY<T>& b,ARRAY<KRYLOV_VECTOR_BASE<T>*>& vectors,const T tolerance,const int color,const int multi_proc_mode)
 {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
 //#####################################################################
 

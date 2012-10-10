@@ -163,7 +163,8 @@ Compute_Position_Based_State(const T dt,const T time)
                         TV direction=(muscle_attachments.z->Embedded_Position()-muscle_attachments.y->Embedded_Position()).Normalized();
                         TV c21_along_direction=I_inverse*TV::Cross_Product(r_attach,direction);
                         TV c11_along_direction=TV::Cross_Product(c21_along_direction,r_joint)+direction/body.Mass();
-                        VECTOR_ND<T> C_along_direction(6);C_along_direction.Set_Subvector(0,c11_along_direction);C_along_direction.Set_Subvector(3,c21_along_direction);
+                        ARRAY<T> C_along_direction(6);
+                        C_along_direction.Combine(c11_along_direction,c21_along_direction);
                         if(t==0) C_along_direction=-C_along_direction; // child gets negative sign because the relative velocity measures parent vel - child vel
                         global_post_stabilization_matrix_12.Add_To_Submatrix(joint_offset_in_post_stabilization_matrix(i),muscle_index,
                             joint_constraint_matrix(i).Transpose_Times(C_along_direction));
@@ -177,7 +178,7 @@ Compute_Position_Based_State(const T dt,const T time)
 //####################################################################################
 // Uses least squares
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,3> >::
-Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const T dt)
+Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T dt)
 {
     T min_activation_penalty=1; // weight used in minimization of sum of activations squared
     int number_of_muscles=A.n;
@@ -191,7 +192,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             LOG::cout<<A<<std::endl<<b<<std::endl;}
 
         // get initial factorization
-        MATRIX_MXN<T>& A_after_QR(A);VECTOR_ND<T> b_after_QR(b);VECTOR_ND<int> permute(A.n);
+        MATRIX_MXN<T>& A_after_QR(A);ARRAY<T> b_after_QR(b);ARRAY<int> permute(A.n);
 
         // set up muscle bounds
         // NOTE: we normalize x to be between 0 to 1 so our optimization is hopefully better conditioned
@@ -220,25 +221,34 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
         MATRIX_MXN<T> D(number_of_muscles); // this is actually the square root of the weight
         T sqrt_min_activation_penalty=sqrt(min_activation_penalty);for(int i=0;i<number_of_muscles;i++) D(i,i)=sqrt_min_activation_penalty;
 
-        VECTOR_ND<int> permute_B(B.n),permute_S,permute_N(N.n);permute.Get_Subvector(0,permute_B);permute.Get_Subvector(B.n,permute_N);
-        VECTOR_ND<T> b(B.m),f_hat(epsilon_hat.m),x_B(B.n),x_S,x_N(N.n);
-        b_after_QR.Get_Subvector(0,b);b_after_QR.Get_Subvector(equations_to_keep,f_hat);
+        ARRAY<int> permute_B(B.n),permute_S,permute_N(N.n);
+        permute.Extract(permute_B,permute_N);
+        ARRAY<T> b(B.m),f_hat(epsilon_hat.m),x_B(B.n),x_S,x_N(N.n);
+        b_after_QR.Extract(b,f_hat);
 
         // Solve for x_B given previous guess for remainder of vector.  If x_B is within bounds then we have a good initial guess which we can pass to QP.
         bool last_values_are_feasible=false;
-        if(last_muscle_actuations.n && last_muscle_actuations.n==number_of_muscles){ // TODO: this assumes muscle list doesn't change dynamically!
-            for(int i=0;i<x_N.n;i++){int p=permute_N(i);x_N(i)=last_muscle_actuations(p);if(x_min(p).x) x_N(i)=max(x_N(i),x_min(p).y);if(x_max(p).x) x_N(i)=min(x_N(i),x_max(p).y);}
+        if(last_muscle_actuations.m && last_muscle_actuations.m==number_of_muscles){ // TODO: this assumes muscle list doesn't change dynamically!
+            for(int i=0;i<x_N.m;i++){
+                int p=permute_N(i);
+                x_N(i)=last_muscle_actuations(p);
+                if(x_min(p).x) x_N(i)=max(x_N(i),x_min(p).y);
+                if(x_max(p).x) x_N(i)=min(x_N(i),x_max(p).y);}
             x_B=B.Upper_Triangular_Solve(b-N*x_N);
             last_values_are_feasible=true;
-            for(int i=0;i<x_B.n;i++){
-                if((x_min(permute_B(i)).x && x_B(i)<x_min(permute_B(i)).y) || (x_max(permute_B(i)).x && x_B(i)>x_max(permute_B(i)).y)){last_values_are_feasible=false;break;}}
+            for(int i=0;i<x_B.m;i++){
+                if((x_min(permute_B(i)).x && x_B(i)<x_min(permute_B(i)).y) || (x_max(permute_B(i)).x && x_B(i)>x_max(permute_B(i)).y)){
+                    last_values_are_feasible=false;
+                    break;}}
             if(last_values_are_feasible){
                 LOG::cout<<"Using last activations as feasible initial guess"<<std::endl;
                 if(verbose) LOG::cout<<"Before:\nN:\n"<<N<<"\npermute_N:\n"<<permute_N<<"\nx_N:\n"<<x_N<<std::endl;
                 ARRAY<bool> move_to_S(N.n);
-                for(int i=0;i<x_N.n;i++) if((!x_min(permute_N(i)).x || x_N(i)>x_min(permute_N(i)).y) && (!x_max(permute_N(i)).x || x_N(i)<x_max(permute_N(i)).y)) move_to_S(i)=true;
+                for(int i=0;i<x_N.m;i++)
+                    if((!x_min(permute_N(i)).x || x_N(i)>x_min(permute_N(i)).y) && (!x_max(permute_N(i)).x || x_N(i)<x_max(permute_N(i)).y))
+                        move_to_S(i)=true;
                 S.Resize(B.n,move_to_S.Number_True());permute_S.Resize(S.n);x_S.Resize(S.n);
-                MATRIX_MXN<T> new_N(B.n,move_to_S.Number_False());VECTOR_ND<int> new_permute_N(new_N.n);VECTOR_ND<T> new_x_N(new_N.n);
+                MATRIX_MXN<T> new_N(B.n,move_to_S.Number_False());ARRAY<int> new_permute_N(new_N.n);ARRAY<T> new_x_N(new_N.n);
                 int Sj=0,Nj=0;
                 for(int j=0;j<move_to_S.m;j++){
                     if(move_to_S(j)){Sj++;permute_S(Sj)=permute_N(j);x_S(Sj)=x_N(j);for(int i=0;i<S.m;i++) S(i,Sj)=N(i,j);}
@@ -248,16 +258,18 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
 
         if(!last_values_are_feasible) LINEAR_PROGRAMMING<T>::Find_Feasible_Solution(B,N,x_B,b,x_N,permute_B,permute_N,x,x_min,x_max,tolerance,step_tolerance,verbose);
         else{
-            x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x.Set_Subvector(B.n+S.n,x_N);
-            permute.Set_Subvector(0,permute_B);permute.Set_Subvector(B.n,permute_S);permute.Set_Subvector(B.n+S.n,permute_N);
-            x=x.Unpermute(permute);}
+            permute.Combine(permute_B,permute_S,permute_N);
+            x.Subset(permute).Combine(x_B,x_S,x_N);}
 
-        VECTOR_ND<T> x_lp=x;
+        ARRAY<T> x_lp=x;
 
         QUADRATIC_PROGRAMMING<T>::Find_Optimal_Solution(B,S,N,x_B,x_S,b,x_N,permute_B,permute_S,permute_N,D,epsilon_hat_unpermuted,f_hat,x,x_min,x_max,tolerance,step_tolerance,verbose);
 
         last_muscle_actuations=x;
-        for(int i=0;i<x.n;i++){T max_force=muscle_list->muscles(i)->Force(1);x_lp(i)*=max_force*dt;x(i)*=max_force*dt;}
+        for(int i=0;i<x.m;i++){
+            T max_force=muscle_list->muscles(i)->Force(1);
+            x_lp(i)*=max_force*dt;
+            x(i)*=max_force*dt;}
 
         if(verbose){
             if(last_values_are_feasible) LOG::cout<<"===> Initial feasible result x (using last activations):"<<std::endl<<x_lp<<std::endl;
@@ -272,7 +284,7 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
 
         // OLD METHOD
         if(debug || getenv("OLD_LS")){
-            VECTOR_ND<T> negative_penalty(number_of_muscles);
+            ARRAY<T> negative_penalty(number_of_muscles);
             MATRIX_MXN<T> A_transpose_A=A.Normal_Equations_Matrix();
             int iterations=enforce_nonnegative_activations?activation_optimization_iterations:1;
             for(int optimization_iteration=0;optimization_iteration<iterations;optimization_iteration++){
@@ -285,14 +297,14 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
 
                 // assume all relative weights are 1
                 for(int i=0;i<number_of_muscles;i++) A_transpose_A(i,i)+=min_activation_penalty+negative_penalty(i);
-                VECTOR_ND<T> A_transpose_b=A.Transpose_Times(b);
+                ARRAY<T> A_transpose_b=A.Transpose_Times(b);
                 x=A_transpose_A.Cholesky_Solve(A_transpose_b);}}
         if(!getenv("OLD_LS")){
-            VECTOR_ND<T> negative_penalty(number_of_muscles);
-            MATRIX_MXN<T> transformed_A(A);VECTOR_ND<T> transformed_b(b);VECTOR_ND<int> permute(A.n);
+            ARRAY<T> negative_penalty(number_of_muscles);
+            MATRIX_MXN<T> transformed_A(A);ARRAY<T> transformed_b(b);ARRAY<int> permute(A.n);
             transformed_A.In_Place_Robust_Householder_QR_Solve(transformed_b,permute);
 
-            VECTOR_ND<T> old_method_x;
+            ARRAY<T> old_method_x;
             if(debug){
                 old_method_x=x;
                 LOG::cout<<"*** MUSCLE SYSTEM BEFORE TRANSFORM: "<<std::endl;
@@ -306,8 +318,8 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             int equations_to_keep=transformed_A.Number_Of_Nonzero_Rows((T)1e-6);
             MATRIX_MXN<T> R(equations_to_keep,equations_to_keep);MATRIX_MXN<T> U(equations_to_keep,A.n-equations_to_keep),G(A.m-equations_to_keep,A.n-equations_to_keep);
             transformed_A.Get_Submatrix(0,0,R);transformed_A.Get_Submatrix(0,equations_to_keep,U);transformed_A.Get_Submatrix(equations_to_keep,equations_to_keep,G);
-            VECTOR_ND<T> b1(R.n),b2(G.m),x1(R.n),x2(U.n);
-            transformed_b.Get_Subvector(0,b1);transformed_b.Get_Subvector(b1.n,b2);
+            ARRAY<T> b1(R.n),b2(G.m),x1(R.n),x2(U.n);
+            transformed_b.Extract(b1,b2);
 
             // Z is
             // ( -R^-1 * U )
@@ -316,17 +328,18 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
             // Z_rhs is
             // ( -R^-1 * b1 )
             // (     0      )
-            MATRIX_MXN<T> negative_R_inverse_U(U.m,U.n);VECTOR_ND<T> column(U.m),u(U.m);
+            MATRIX_MXN<T> negative_R_inverse_U(U.m,U.n);ARRAY<T> column(U.m),u(U.m);
             for(int j=0;j<U.n;j++){
                 for(int i=0;i<U.m;i++) u(i)=U(i,j);
                 column=R.Upper_Triangular_Solve(u);
                 for(int i=0;i<U.m;i++) negative_R_inverse_U(i,j)=-column(i);}
-            VECTOR_ND<T> negative_R_inverse_b1(-R.Upper_Triangular_Solve(b1));
+            ARRAY<T> negative_R_inverse_b1(-R.Upper_Triangular_Solve(b1));
             MATRIX_MXN<T> Z(A.n,U.n);Z.Add_To_Submatrix(0,0,negative_R_inverse_U);Z.Add_To_Submatrix(equations_to_keep,0,MATRIX_MXN<T>::Identity_Matrix(U.n));
-            VECTOR_ND<T> Z_rhs(A.n);Z_rhs.Set_Subvector(0,negative_R_inverse_b1);
+            ARRAY<T> Z_rhs(negative_R_inverse_b1);
+            Z_rhs.Resize(A.n);
 
             MATRIX_MXN<T> sqrt_D(number_of_muscles,number_of_muscles);
-            MATRIX_MXN<T> ls_A(G.m+A.n,G.n);VECTOR_ND<T> ls_b(G.m+A.n);
+            MATRIX_MXN<T> ls_A(G.m+A.n,G.n);ARRAY<T> ls_b(G.m+A.n);
             MATRIX_MXN<T> A_transpose_A=A.Normal_Equations_Matrix();
             for(int optimization_iteration=0;optimization_iteration<iterations;optimization_iteration++){
 
@@ -342,13 +355,13 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
                 // ( G         )
                 // ( D^1/2 * Z )
                 ls_A.Set_Zero_Matrix();ls_A.Add_To_Submatrix(0,0,G);ls_A.Add_To_Submatrix(G.m,0,sqrt_D*Z);
-                ls_b.Set_Subvector(0,b2);ls_b.Set_Subvector(G.m,sqrt_D*Z_rhs);
+                ls_b.Combine(b2,sqrt_D*Z_rhs);
 
                 x2=ls_A.Normal_Equations_Solve(ls_b);
                 x1=negative_R_inverse_U*x2-negative_R_inverse_b1;
-                x.Set_Subvector(0,x1);x.Set_Subvector(x1.n,x2);}
+                x.Combine(x1,x2);}
 
-            x=x.Unpermute(permute);
+            x.Subset(permute)=ARRAY<T>(x);
 
             if(debug){
                 LOG::cout<<"==> R "<<std::endl<<R<<std::endl;
@@ -363,13 +376,13 @@ Solve_For_Muscle_Control(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,
                 LOG::cout<<"NEW METHOD X:"<<std::endl<<x<<std::endl;
                 LOG::cout<<"RESIDUAL: "<<(A*x-b).Magnitude()<<std::endl;}}}
 
-    if(clamp_negative_activations) for(int i=0;i<x.n;i++) if(x(i)<0) x(i)=0;
+    if(clamp_negative_activations) for(int i=0;i<x.m;i++) if(x(i)<0) x(i)=0;
 }
 //####################################################################################
 // Function Solve_Minimum_Norm_Solution_For_Linear_Constraints
 //####################################################################################
 template<class T> void ARTICULATED_RIGID_BODY<VECTOR<T,3> >::
-Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const T zero_row_tolerance,const bool verbose)
+Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const ARRAY<T>& b,ARRAY<T>& x,const T zero_row_tolerance,const bool verbose)
 {
     assert(A.m==A.n);
     if(verbose){
@@ -377,7 +390,7 @@ Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const VECTOR
         LOG::cout<<A<<std::endl<<b<<std::endl;}
 
     // get initial factorization
-    MATRIX_MXN<T> A_after_QR(A);VECTOR_ND<T> b_after_QR(b);VECTOR_ND<int> permute(A.n);
+    MATRIX_MXN<T> A_after_QR(A);ARRAY<T> b_after_QR(b);ARRAY<int> permute(A.n);
     A_after_QR.In_Place_Robust_Householder_QR_Solve(b_after_QR,permute);
     int equations_to_keep=A_after_QR.Number_Of_Nonzero_Rows(zero_row_tolerance);
 
@@ -388,23 +401,26 @@ Solve_Minimum_Norm_Solution_For_Linear_Constraints(MATRIX_MXN<T>& A,const VECTOR
 
     MATRIX_MXN<T> B(equations_to_keep);A_after_QR.Get_Submatrix(0,0,B);
 
-    if(equations_to_keep==A.n) x=B.Upper_Triangular_Solve(b_after_QR).Unpermute(permute); // unique solution
+    if(equations_to_keep==A.n) x.Subset(permute)=B.Upper_Triangular_Solve(b_after_QR); // unique solution
     else{
         // extract submatrices and subvectors
         int epsilon_size=A.n-equations_to_keep;
         MATRIX_MXN<T> epsilon(epsilon_size);A_after_QR.Get_Submatrix(equations_to_keep,equations_to_keep,epsilon);
         MATRIX_MXN<T> S(equations_to_keep,epsilon_size);A_after_QR.Get_Submatrix(0,equations_to_keep,S);
-        VECTOR_ND<T> b_B(equations_to_keep),b_epsilon(epsilon_size);b_after_QR.Get_Subvector(0,b_B);b_after_QR.Get_Subvector(equations_to_keep,b_epsilon);
+        ARRAY<T> b_B(equations_to_keep),b_epsilon(epsilon_size);
+        b_after_QR.Extract(b_B,b_epsilon);
         // construct the matrix
         MATRIX_MXN<T> B_inverse_S=B.Upper_Triangular_Solve(S);
         MATRIX_MXN<T> C(epsilon_size);MATRIX_MXN<T>::Add_Transpose_Times(B_inverse_S,B_inverse_S,C);MATRIX_MXN<T>::Add_Transpose_Times(epsilon,epsilon,C);C.Add_Identity_Matrix();
         // construct the rhs
-        VECTOR_ND<T> x_B(B.Upper_Triangular_Solve(b_B));
-        VECTOR_ND<T> rhs(epsilon_size);MATRIX_MXN<T>::Add_Transpose_Times(epsilon,b_epsilon,rhs);MATRIX_MXN<T>::Add_Transpose_Times(B_inverse_S,x_B,rhs);
+        ARRAY<T> x_B(B.Upper_Triangular_Solve(b_B));
+        ARRAY<T> rhs(epsilon_size);MATRIX_MXN<T>::Add_Transpose_Times(epsilon,b_epsilon,rhs);MATRIX_MXN<T>::Add_Transpose_Times(B_inverse_S,x_B,rhs);
         // compute solution vector 
-        VECTOR_ND<T> x_S=C.Cholesky_Solve(rhs);
-        MATRIX_MXN<T>::Subtract_Times(S,x_S,b_B);x_B=B.Upper_Triangular_Solve(b_B);
-        x.Resize(A.n);x.Set_Subvector(0,x_B);x.Set_Subvector(B.n,x_S);x=x.Unpermute(permute);}
+        ARRAY<T> x_S=C.Cholesky_Solve(rhs);
+        MATRIX_MXN<T>::Subtract_Times(S,x_S,b_B);
+        x_B=B.Upper_Triangular_Solve(b_B);
+        x.Resize(A.n);
+        x.Subset(permute).Combine(x_B,x_S);}
 
     if(verbose) LOG::cout<<"Result of linearly constrained optimization:\n"<<x<<std::endl;
 }
@@ -419,7 +435,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
 
     if(global_post_stabilization && global_post_stabilization_matrix_11.n+global_post_stabilization_matrix_21.m){
         // build constrained and muscle controlled delta relative joint velocities (also get joint locations)
-        VECTOR_ND<T> constrained_delta_relative_joint_velocities(global_post_stabilization_matrix_11.n),joint_constraint_impulses,muscle_controlled_delta_relative_joint_velocities;
+        ARRAY<T> constrained_delta_relative_joint_velocities(global_post_stabilization_matrix_11.n),joint_constraint_impulses,muscle_controlled_delta_relative_joint_velocities;
         if(use_muscle_actuators){muscle_activations.Resize(muscle_list->muscles.m);muscle_controlled_delta_relative_joint_velocities.Resize(global_post_stabilization_matrix_21.m);}
         ARRAY<TV> joint_locations(joint_mesh.joints.m);
         for(int i=0;i<joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i) || joint_muscle_control_dimensions(i)){
@@ -427,7 +443,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
             if(joint_constrained_dimensions(i)){
                 assert(joint_constrained_dimensions(i)>=3); // assume unconstrained linear directions, constrained angular directions
                 int istart=joint_offset_in_post_stabilization_matrix(i);
-                constrained_delta_relative_joint_velocities.Set_Subvector(istart,delta_relative_twist.linear);
+                constrained_delta_relative_joint_velocities.Array_View(istart,(int)TV::m)=delta_relative_twist.linear;
                 for(int ii=0;ii<joint_constrained_dimensions(i)-3;ii++){
                     TV u;joint_angular_constraint_matrix(i).Get_Column(ii,u);constrained_delta_relative_joint_velocities(istart+ii+2)=TV::Dot_Product(u,delta_relative_twist.angular);}}
             if(joint_muscle_control_dimensions(i)){ // assume muscle control only affects angular dof's
@@ -444,8 +460,8 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
 
             MATRIX_MXN<T> matrix_21_times_11_inverse=global_post_stabilization_matrix_21*global_post_stabilization_matrix_11_inverse;
             MATRIX_MXN<T> A=matrix_21_times_11_inverse*global_post_stabilization_matrix_12-global_post_stabilization_matrix_22;
-            VECTOR_ND<T> b(matrix_21_times_11_inverse*constrained_delta_relative_joint_velocities-muscle_controlled_delta_relative_joint_velocities);
-            VECTOR_ND<T> muscle_impulse_magnitudes(muscle_list->muscles.m);
+            ARRAY<T> b(matrix_21_times_11_inverse*constrained_delta_relative_joint_velocities-muscle_controlled_delta_relative_joint_velocities);
+            ARRAY<T> muscle_impulse_magnitudes(muscle_list->muscles.m);
 
             Solve_For_Muscle_Control(A,b,muscle_impulse_magnitudes,dt);
 
@@ -460,7 +476,7 @@ Solve_Velocities_for_PD(const T time,const T dt,bool test_system,bool print_matr
         for(int i=0;i<joint_mesh.joints.m;i++) if(joint_constrained_dimensions(i)){
             assert(joint_constrained_dimensions(i)>=3); // unconstrained linear directions, constrained angular directions
             int istart=joint_offset_in_post_stabilization_matrix(i);
-            TV impulse;joint_constraint_impulses.Get_Subvector(istart,impulse);
+            TV impulse(joint_constraint_impulses.Array_View(istart,(int)TV::m));
             TV angular_impulse;for(int ii=0;ii<joint_constrained_dimensions(i)-3;ii++){
                 TV u;joint_angular_constraint_matrix(i).Get_Column(ii,u);angular_impulse+=joint_constraint_impulses(istart+ii+2)*u;}
             RIGID_BODY<TV>::Apply_Impulse(*Parent(joint_mesh.joints(i)->id_number),*Child(joint_mesh.joints(i)->id_number),joint_locations(i),impulse,angular_impulse);}}

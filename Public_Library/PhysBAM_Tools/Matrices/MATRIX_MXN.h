@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_BASE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class T>
@@ -149,23 +148,23 @@ public:
     MATRIX_MXN<T> Cross_Product_Matrix_Times(const VECTOR<T,3>& v) const
     {assert(m==3);MATRIX_MXN<T> matrix(3,n);for(int i=0;i<n;i++) matrix.Set_Column(i,VECTOR<T,3>::Cross_Product(v,VECTOR<T,3>((*this)(0,i),(*this)(1,i),(*this)(2,i))));return matrix;}
 
-    MATRIX_MXN<T> Permute_Columns(const VECTOR_ND<int>& p) const
-    {assert(n==p.n);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}
+    MATRIX_MXN<T> Permute_Columns(const ARRAY<int>& p) const
+    {assert(n==p.m);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,j)=(*this)(i,p(j));return x;}
 
-    MATRIX_MXN<T> Unpermute_Columns(const VECTOR_ND<int>& p) const
-    {assert(n==p.n);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,p(j))=(*this)(i,j);return x;}
+    MATRIX_MXN<T> Unpermute_Columns(const ARRAY<int>& p) const
+    {assert(n==p.m);MATRIX_MXN<T> x(m,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++) x(i,p(j))=(*this)(i,j);return x;}
 
-    static MATRIX_MXN<T> Outer_Product(const VECTOR_ND<T> u,const VECTOR_ND<T> v)
-    {MATRIX_MXN<T> result(u.n,v.n);for(int i=0;i<u.n;i++) for(int j=0;j<v.n;j++) result(i,j)=u(i)*v(j);return result;}
+    static MATRIX_MXN<T> Outer_Product(const ARRAY<T> u,const ARRAY<T> v)
+    {MATRIX_MXN<T> result(u.m,v.m);for(int i=0;i<u.m;i++) for(int j=0;j<v.m;j++) result(i,j)=u(i)*v(j);return result;}
 
     MATRIX_MXN<T> Normal_Equations_Matrix() const
     {MATRIX_MXN<T> result(n);for(int j=0;j<n;j++) for(int i=j;i<n;i++){T a=0;for(int k=0;k<m;k++) a+=(*this)(k,i)*(*this)(k,j);result(i,j)=result(j,i)=a;}return result;}
 
-    VECTOR_ND<T> Normal_Equations_Solve(const VECTOR_ND<T>& b) const
-    {MATRIX_MXN<T> A_transpose_A(Normal_Equations_Matrix());VECTOR_ND<T> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}
+    ARRAY<T> Normal_Equations_Solve(const ARRAY<T>& b) const
+    {MATRIX_MXN<T> A_transpose_A(Normal_Equations_Matrix());ARRAY<T> A_transpose_b(Transpose_Times(b));return A_transpose_A.Cholesky_Solve(A_transpose_b);}
 
-    void Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b) const
-    {assert(m==n && x.n==b.n && x.n==n);
+    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b) const
+    {assert(m==n && x.m==b.m && x.m==n);
     for(int i=0;i<n;i++){
         T rho=0;
         for(int j=0;j<i;j++) rho+=(*this)(i,j)*x(j);

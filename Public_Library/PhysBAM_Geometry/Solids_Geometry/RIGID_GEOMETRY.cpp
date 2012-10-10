@@ -296,7 +296,7 @@ Interpolate_Between_States(const RIGID_GEOMETRY_STATE<TV>& state1,const RIGID_GE
 {
     PHYSBAM_ASSERT(((time>=state1.time && time<=state2.time) || (time<=state1.time && time>=state2.time)) && state1.time<state2.time);
     T alpha=(time-state1.time)/(state2.time-state1.time);alpha=clamp(alpha,(T)0,(T)1);
-    interpolated_state.frame.t=TV::Interpolate(state1.frame.t,state2.frame.t,alpha);
+    interpolated_state.frame.t=state1.frame.t+alpha*(state2.frame.t-state1.frame.t);
     interpolated_state.frame.r=ROTATION<TV>::Spherical_Linear_Interpolation(state1.frame.r,state2.frame.r,alpha);
     interpolated_state.twist.linear=(1-alpha)*state1.twist.linear+alpha*state2.twist.linear;
     interpolated_state.time=time;

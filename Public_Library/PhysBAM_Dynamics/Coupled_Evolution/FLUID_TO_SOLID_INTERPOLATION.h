@@ -40,8 +40,8 @@ public:
 //#####################################################################
     void Compute(const int ghost_cells) PHYSBAM_OVERRIDE;
     void Compute_Weights(const TV& X,int axis,ARRAY<ENTRY>& array);
-    void Times_Add(const VECTOR_ND<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const PHYSBAM_OVERRIDE;
-    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,VECTOR_ND<T>& fluid_force) const PHYSBAM_OVERRIDE;
+    void Times_Add(const ARRAY<T>& fluid_velocity,GENERALIZED_VELOCITY<TV>& solid_velocity) const PHYSBAM_OVERRIDE;
+    void Transpose_Times_Add(const GENERALIZED_VELOCITY<TV>& solid_force,ARRAY<T>& fluid_force) const PHYSBAM_OVERRIDE;
     void Print_Each_Matrix(int n,int fluid_faces,GENERALIZED_VELOCITY<TV>& G) const PHYSBAM_OVERRIDE;
 //#####################################################################
 };

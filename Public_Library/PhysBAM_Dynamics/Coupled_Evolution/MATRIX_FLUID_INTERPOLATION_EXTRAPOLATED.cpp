@@ -82,7 +82,7 @@ Compute(int ghost_cells)
 // Function Times_Add
 //#####################################################################
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
-Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
+Times_Add(const ARRAY<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints) const
 {
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
         T& constraint=constraints(COUPLING_CONSTRAINT_ID(d*i+a));
@@ -93,7 +93,7 @@ Times_Add(const VECTOR_ND<T>& faces,ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints
 // Function Transpose_Times_Add
 //#####################################################################
 template<class TV> void MATRIX_FLUID_INTERPOLATION_EXTRAPOLATED<TV>::
-Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,VECTOR_ND<T>& faces) const
+Transpose_Times_Add(const ARRAY<T,COUPLING_CONSTRAINT_ID>& constraints,ARRAY<T>& faces) const
 {
     for(int i=0;i<stencils.m;i++) for(int a=0;a<d;a++){
         T constraint=constraints(COUPLING_CONSTRAINT_ID(d*i+a));

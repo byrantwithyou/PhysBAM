@@ -195,9 +195,9 @@ Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bR) const
 // Function Add_J_Deformable_Transpose_Times_Velocity
 //#####################################################################
 template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
-Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const GENERALIZED_VELOCITY<TV>& V,VECTOR_ND<T>& pressure)
+Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const GENERALIZED_VELOCITY<TV>& V,ARRAY<T>& pressure)
 {
-    assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
+    assert(pressure.m==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     // computes pressure+=J*V.V
     int index=J_deformable.offsets(0);
     for(int i=0;i<J_deformable.m;i++){
@@ -210,9 +210,9 @@ Add_J_Deformable_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_def
 // Function Add_J_Rigid_Transpose_Times_Velocity
 //#####################################################################
 template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
-Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const GENERALIZED_VELOCITY<TV>& V,VECTOR_ND<T>& pressure)
+Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const GENERALIZED_VELOCITY<TV>& V,ARRAY_VIEW<T> pressure)
 {
-    assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
+    assert(pressure.m==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
     int index=J_rigid.offsets(0);
     for(int i=0;i<J_rigid.m;i++){
@@ -226,9 +226,9 @@ Add_J_Rigid_Transpose_Times_Velocity(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,co
 // Function Add_J_Deformable_Times_Pressure
 //#####################################################################
 template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
-Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const VECTOR_ND<T>& pressure,GENERALIZED_VELOCITY<TV>& V)
+Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,const ARRAY<T>& pressure,GENERALIZED_VELOCITY<TV>& V)
 {
-    assert(pressure.n==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
+    assert(pressure.m==J_deformable.n && J_deformable.m==V.V.indices.Size()*TV::dimension);
     int index=J_deformable.offsets(0);
     for(int i=0;i<J_deformable.m;i++){
         const int end=J_deformable.offsets(i+1);
@@ -240,9 +240,9 @@ Add_J_Deformable_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_deformable,co
 // Function Add_J_Rigid_Times_Pressure
 //#####################################################################
 template<class TV,class T_MATRIX> void SOLID_FLUID_SYSTEM<TV,T_MATRIX>::
-Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const VECTOR_ND<T>& pressure,GENERALIZED_VELOCITY<TV>& V)
+Add_J_Rigid_Times_Pressure(const SPARSE_MATRIX_FLAT_MXN<T>& J_rigid,const ARRAY<T>& pressure,GENERALIZED_VELOCITY<TV>& V)
 {
-    assert(pressure.n==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
+    assert(pressure.m==J_rigid.n && J_rigid.m==V.rigid_V.indices.Size()*rows_per_rigid_body);
     // computes pressure+=J*V.V
     int index=J_rigid.offsets(0);
     for(int i=0;i<J_rigid.m;i++){

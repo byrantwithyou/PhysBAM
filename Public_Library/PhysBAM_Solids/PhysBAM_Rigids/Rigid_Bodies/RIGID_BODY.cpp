@@ -279,13 +279,15 @@ Find_Impulse_And_Angular_Impulse_Helper(const RIGID_BODY<TV>& body1,const RIGID_
         MATRIX_MXN<T> c12=(P_T_r_cross_T_I_inverse_1+P_T_r_cross_T_I_inverse_2)*angular_constraint_matrix;
         C.Set_Submatrix(0,prismatic_constrained_axes,c12);C.Set_Submatrix(prismatic_constrained_axes,0,c12.Transposed());}
 
-    VECTOR_ND<T> b(prismatic_constrained_axes+angular_constrained_axes);
-    b.Set_Subvector(0,prismatic_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.linear));
-    if(angular_constrained_axes) b.Set_Subvector(prismatic_constrained_axes,angular_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.angular));
+    ARRAY<T> b(prismatic_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.linear));
+    if(angular_constrained_axes) b.Append_Elements(angular_constraint_matrix.Transpose_Times(delta_relative_twist_at_location.angular));
 
-    TWIST<TV> impulse;VECTOR_ND<T> x=C.Cholesky_Solve(b),linear(prismatic_constrained_axes),angular(angular_constrained_axes);
-    x.Get_Subvector(0,linear);impulse.linear=prismatic_constraint_matrix*linear;
-    if(angular_constrained_axes){x.Get_Subvector(prismatic_constrained_axes,angular);impulse.angular=angular_constraint_matrix*angular;}
+    TWIST<TV> impulse;
+    ARRAY<T> x=C.Cholesky_Solve(b),linear(x.Array_View(0,prismatic_constrained_axes));
+    impulse.linear=prismatic_constraint_matrix*linear;
+    if(angular_constrained_axes){
+        ARRAY<T> angular(x.Array_View(prismatic_constrained_axes,angular_constrained_axes));
+        impulse.angular=angular_constraint_matrix*angular;}
     return impulse;
 }
 template<class TV> TWIST<TV> RIGID_BODY<TV>::

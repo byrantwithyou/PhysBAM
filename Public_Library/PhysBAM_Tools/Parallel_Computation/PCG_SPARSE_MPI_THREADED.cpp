@@ -6,13 +6,13 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Parallel_Computation/INT_ITERATOR_THREADED.h>
 #include <PhysBAM_Tools/Parallel_Computation/PCG_SPARSE_MPI_THREADED.h>
-#include <PhysBAM_Tools/Vectors/SPARSE_VECTOR_ND.h>
+#include <PhysBAM_Tools/Vectors/SPARSE_ARRAY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Parallel_Solve
 //#####################################################################
 template<class T> void PCG_SPARSE_MPI_THREADED<T>::
-Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,VECTOR_ND<T>& x,VECTOR_ND<T>& b,const T tolerance)
+Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<INTERVAL<int> >& all_interior_indices,const ARRAY<ARRAY<INTERVAL<int> > >& all_ghost_indices,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& x,ARRAY<T>& b,const T tolerance)
 {
     pcg_threaded.Init_Barriers();
     BASE::Initialize_Datatypes();
@@ -29,9 +29,9 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
     pcg.maximum_iterations=40;
     int desired_iterations=global_n;if(pcg.enforce_compatibility) desired_iterations--;if(pcg.maximum_iterations) desired_iterations=min(desired_iterations,pcg.maximum_iterations);
 
-    VECTOR_ND<T>& temp=pcg_threaded.temp;
-    VECTOR_ND<T>& p=pcg_threaded.p;
-    VECTOR_ND<T> z_interior(interior_n,false);
+    ARRAY<T>& temp=pcg_threaded.temp;
+    ARRAY<T>& p=pcg_threaded.p;
+    ARRAY<T> z_interior(interior_n,false);
 #ifdef USE_PTHREADS
     pthread_mutex_lock(&pcg_threaded.lock);
 #endif
@@ -41,7 +41,7 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
 #endif
 
     // build interior views of x,b,p,z,temp
-    VECTOR_ND<T> x_interior,b_interior,p_interior,temp_interior;
+    ARRAY<T> x_interior,b_interior,p_interior,temp_interior;
     x_interior.Set_Subvector_View(x,interior_indices);
     b_interior.Set_Subvector_View(b,interior_indices);
     p_interior.Set_Subvector_View(p,interior_indices);
@@ -79,13 +79,13 @@ Solve(RANGE<TV_INT>& domain,const ARRAY<int,TV_INT>& domain_index,const ARRAY<IN
         if(pcg.enforce_compatibility) z_interior-=(T)(Global_Sum(z_interior.Sum_Double_Precision(),tid)/global_n);
 
         // update search direction
-        rho_old=rho;rho=Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(z_interior,b_interior),tid);
+        rho_old=rho;rho=Global_Sum(ARRAY<T>::Dot_Product_Double_Precision(z_interior,b_interior),tid);
         T beta=0;if(iteration==0) p_interior=z_interior;else{beta=(T)(rho/rho_old);for(int i=0;i<interior_n;i++) p_interior(i)=z_interior(i)+beta*p_interior(i);} // when iteration=1, beta=0
 
         // update solution and residual
         Fill_Ghost_Cells(p);
         A.Times(interior_indices,ghost_indices,p,temp);
-        T alpha=(T)(rho/Global_Sum(VECTOR_ND<T>::Dot_Product_Double_Precision(p_interior,temp_interior),tid));
+        T alpha=(T)(rho/Global_Sum(ARRAY<T>::Dot_Product_Double_Precision(p_interior,temp_interior),tid));
         for(int i=0;i<interior_n;i++){x_interior(i)+=alpha*p_interior(i);b_interior(i)-=alpha*temp_interior(i);}
 
         // remove null space component of b before computing residual norm because we might have converged up to the null space but have some null space component left due to roundoff

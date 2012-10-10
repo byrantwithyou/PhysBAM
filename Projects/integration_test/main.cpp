@@ -139,7 +139,7 @@ void Dump_System(const INTERFACE_FLUID_SYSTEM<TV>& ifs,ANALYTIC_TEST<TV>& at)
 }
 
 template<class T,class TV>
-void Dump_Vector(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,const char* title)
+void Dump_Vector(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const ARRAY<T>& v,const char* title)
 {
     char buff[100];
     for(int i=0;i<TV::m;i++)
@@ -172,7 +172,7 @@ void Dump_Vector(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,con
 }
 
 template<class T,class TV>
-void Dump_Vector2(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const VECTOR_ND<T>& v,const char* title)
+void Dump_Vector2(const INTERFACE_FLUID_SYSTEM<TV>& ifs,const ARRAY<T>& v,const char* title)
 {
     char buff[100];
     for(int s=0;s<2;s++){
@@ -276,7 +276,7 @@ void Analytic_Test(GRID<TV>& grid,GRID<TV>& coarse_grid,ANALYTIC_TEST<TV>& at,co
     f_interface.Resize(ifs.object.mesh.elements.m);
     for(int s=0;s<2;s++) f_body[s].Resize(grid.Domain_Indices());
 
-    KRYLOV_VECTOR_WRAPPER<T,VECTOR_ND<T> > rhs,sol;
+    KRYLOV_VECTOR_WRAPPER<T,ARRAY<T> > rhs,sol;
     ifs.Resize_Vector(sol);
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 

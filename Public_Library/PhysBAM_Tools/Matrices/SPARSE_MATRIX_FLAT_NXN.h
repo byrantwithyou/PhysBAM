@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <PhysBAM_Tools/Vectors/VECTOR_ND.h>
 namespace PhysBAM{
 
 template<class T>
@@ -76,10 +75,10 @@ public:
     T& operator()(const int i,const int j);
     bool Element_Present(const int i,const int j) const;
     void Initialize_Diagonal_Index();
-    void Times(const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Times(const INTERVAL<int>& interval,const ARRAY<INTERVAL<int> >& ghost_intervals,const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Times(const int row_start,const int row_end,const VECTOR_ND<T>& x,VECTOR_ND<T>& result) const;
-    void Times_Threaded(const VECTOR_ND<T>& x,VECTOR_ND<T>& result,int row_start,int row_end);
+    void Times(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times(const INTERVAL<int>& interval,const ARRAY<INTERVAL<int> >& ghost_intervals,const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times(const int row_start,const int row_end,const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times_Threaded(const ARRAY<T>& x,ARRAY<T>& result,int row_start,int row_end);
     void Negate();
     SPARSE_MATRIX_FLAT_NXN<T>& operator*=(const T a);
     SPARSE_MATRIX_FLAT_NXN<T>& operator+=(const T a);
@@ -88,21 +87,21 @@ public:
     bool Positive_Diagonal_And_Nonnegative_Row_Sum(const T tolerance=1e-7) const;
     void Transpose(SPARSE_MATRIX_FLAT_NXN<T>& A_transpose) const;
     bool Is_Transpose(const SPARSE_MATRIX_FLAT_NXN<T>& A_transpose,const T tolerance) const;
-    void Solve_Forward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
-    void Solve_Backward_Substitution(const VECTOR_ND<T>& b,VECTOR_ND<T>& x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
+    void Solve_Forward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
+    void Solve_Backward_Substitution(ARRAY_VIEW<const T> b,ARRAY_VIEW<T> x,const bool diagonal_is_identity=false,const bool diagonal_is_inverted=false) const;
     // actually an LU saving square roots, with an inverted diagonal saving divides
     void Construct_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
     // actually an LU saving square roots, with an inverted diagonal saving divides
     void In_Place_Incomplete_Cholesky_Factorization(const bool modified_version=true,const T modified_coefficient=.97,const T zero_tolerance=1e-8,const T zero_replacement=1e-8);
-    void Gauss_Seidel_Single_Iteration(VECTOR_ND<T>& x,const VECTOR_ND<T>& b);
-    void Gauss_Seidel_Solve(VECTOR_ND<T>& x,const VECTOR_ND<T>& b,const T tolerance=1e-12,const int max_iterations=1000000);
+    void Gauss_Seidel_Single_Iteration(ARRAY<T>& x,const ARRAY<T>& b);
+    void Gauss_Seidel_Solve(ARRAY<T>& x,const ARRAY<T>& b,const T tolerance=1e-12,const int max_iterations=1000000);
     void Write_Row_Lengths();
     void Print_Row(const int row);
     void Reset();
     void Append_Entry_To_Current_Row(const int c,const T a);
     void Finish_Row();
     void Sort_Entries();
-    void Conjugate_With_Diagonal_Matrix(VECTOR_ND<T>& x);
+    void Conjugate_With_Diagonal_Matrix(ARRAY<T>& x);
 //#####################################################################
 };
 template<class T> std::ostream& operator<<(std::ostream& output_stream,const SPARSE_MATRIX_FLAT_NXN<T>& A);

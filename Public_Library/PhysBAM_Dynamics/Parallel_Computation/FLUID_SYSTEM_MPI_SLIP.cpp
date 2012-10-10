@@ -20,7 +20,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class TV> FLUID_SYSTEM_MPI_SLIP<TV>::
 FLUID_SYSTEM_MPI_SLIP(const bool use_preconditioner_input,const SPARSE_MATRIX_FLAT_MXN<T>& W_input,const SPARSE_MATRIX_FLAT_MXN<T>& N_input,const SPARSE_MATRIX_FLAT_MXN<T>& div_input,
-    const VECTOR_ND<T>& M_inverse_input,const SPARSE_MATRIX_FLAT_MXN<T>& J_input,const SPARSE_MATRIX_FLAT_MXN<T>& P_input,const SPARSE_MATRIX_FLAT_MXN<T>& div_precondition,
+    const ARRAY<T>& M_inverse_input,const SPARSE_MATRIX_FLAT_MXN<T>& J_input,const SPARSE_MATRIX_FLAT_MXN<T>& P_input,const SPARSE_MATRIX_FLAT_MXN<T>& div_precondition,
     const bool leakproof_solve_input,const bool using_slip,const INTERVAL<int>& interior_regions_input,const INTERVAL<int>& divergence_indices_input,
     MPI_SOLID_FLUID_SLIP<TV>* mpi_solid_fluid_input,ARRAY<int>& coupled_deformable_particle_indices_input,GENERALIZED_VELOCITY<TV>& solid_velocity_input)
     :BASE(use_preconditioner_input,!use_preconditioner_input),mpi_solid_fluid(mpi_solid_fluid_input),coupled_deformable_particle_indices(coupled_deformable_particle_indices_input),
@@ -92,7 +92,7 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BF) const
 // Function Apply
 //#####################################################################
 template<class TV> void FLUID_SYSTEM_MPI_SLIP<TV>::
-Apply(const VECTOR_T& V,VECTOR_ND<T>& result_dual_cells_size_vector) const
+Apply(const VECTOR_T& V,ARRAY<T>& result_dual_cells_size_vector) const
 {
     result_dual_cells_size_vector.Resize(div_transpose.m);
     C_f_transpose.Times(V,fluid_velocities_size_vector);
@@ -107,11 +107,9 @@ Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& BV,KRYLOV_VECTOR_BASE<T>& BR) 
 {
     const KRYLOV_VECTOR_T& V=debug_cast<const KRYLOV_VECTOR_T&>(BV);KRYLOV_VECTOR_T& R=debug_cast<KRYLOV_VECTOR_T&>(BR);
     R.Copy((T)1,V);
-    VECTOR_T V_i;V_i.Set_Subvector_View(V.v,divergence_indices);
-    VECTOR_T R_i;R_i.Set_Subvector_View(R.v,divergence_indices);
     pressures_size_vector.Resize(divergence_indices.Size());
-    div_M_inverse_div_transpose_precondition.C->Solve_Forward_Substitution(V_i,pressures_size_vector,true);
-    div_M_inverse_div_transpose_precondition.C->Solve_Backward_Substitution(pressures_size_vector,R_i,false,true);
+    div_M_inverse_div_transpose_precondition.C->Solve_Forward_Substitution(V.v.Array_View(divergence_indices),pressures_size_vector,true);
+    div_M_inverse_div_transpose_precondition.C->Solve_Backward_Substitution(pressures_size_vector,R.v.Array_View(divergence_indices),false,true);
 }
 //#####################################################################
 // Function Inner_Product
@@ -120,9 +118,7 @@ template<class TV> double FLUID_SYSTEM_MPI_SLIP<TV>::
 Inner_Product(const KRYLOV_VECTOR_BASE<T>& BV1,const KRYLOV_VECTOR_BASE<T>& BV2) const
 {
     const KRYLOV_VECTOR_T& V1=debug_cast<const KRYLOV_VECTOR_T&>(BV1);const KRYLOV_VECTOR_T& V2=debug_cast<const KRYLOV_VECTOR_T&>(BV2);
-    double product=0.0;VECTOR_T V1_i,V2_i;V1_i.Set_Subvector_View(V1.v,interior_regions);V2_i.Set_Subvector_View(V2.v,interior_regions);
-        product=Dot_Product_Double_Precision(V1_i,V2_i);
-    return product;
+    return Dot_Product_Double_Precision(V1.v.Array_View(interior_regions),V2.v.Array_View(interior_regions));
 }
 //#####################################################################
 // Function Convergence_Norm
@@ -131,10 +127,7 @@ template<class TV> typename TV::SCALAR FLUID_SYSTEM_MPI_SLIP<TV>::
 Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& BV) const
 {
     const KRYLOV_VECTOR_T& V=debug_cast<const KRYLOV_VECTOR_T&>(BV);
-    T fluid_convergence_norm=(T)0;
-    VECTOR_T V_i;V_i.Set_Subvector_View(V.v,interior_regions);
-    fluid_convergence_norm=V_i.Maximum_Magnitude();
-    return fluid_convergence_norm;
+    return V.v.Array_View(interior_regions).Maximum_Magnitude();
 }
 #ifdef USE_MPI
 //#####################################################################
