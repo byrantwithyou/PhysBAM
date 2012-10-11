@@ -297,7 +297,7 @@ Levelset(const int i)
 {
     return *particle_levelset_multiple.levelset_multiple.levelsets(i);
 }
-template<class T_GRID> typename LEVELSET_ADVECTION_POLICY<T_GRID>::FAST_LEVELSET_ADVECTION_T& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
+template<class T_GRID> FAST_LEVELSET_ADVECTION<T_GRID>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Levelset_Advection(const int i)
 {
     return levelset_advection_multiple.levelset_advections(i);

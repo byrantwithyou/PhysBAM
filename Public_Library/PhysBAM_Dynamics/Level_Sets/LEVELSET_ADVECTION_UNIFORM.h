@@ -22,7 +22,7 @@ template<class T_GRID>
 class LEVELSET_ADVECTION_UNIFORM:public LEVELSET_ADVECTION<T_GRID>
 {
 public:
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR SCALAR;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
 private:
     typedef LEVELSET_ADVECTION<T_GRID> BASE;
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
@@ -38,16 +38,18 @@ public:
     using BASE::levelset;
     using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;using BASE::Set_Custom_Advection;
 
-    ADVECTION_MACCORMACK_UNIFORM<T_GRID,SCALAR,ADVECTION<T_GRID,SCALAR> >* advection_maccormack;
+    ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >* advection_maccormack;
 
     LEVELSET_ADVECTION_UNIFORM(T_LEVELSET* _levelset)
         :BASE(_levelset),advection_maccormack(0)
     {}
 
     void Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask);
-    SCALAR Approximate_Negative_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;
-    SCALAR Approximate_Positive_Material(const SCALAR interface_thickness=3,const SCALAR time=0) const;
+    T Approximate_Negative_Material(const T interface_thickness=3,const T time=0) const;
+    T Approximate_Positive_Material(const T interface_thickness=3,const T time=0) const;
+    void Euler_Step_Of_Reinitialization(const ARRAY<T,TV_INT>& sign_phi,const T dt,const T time);
+    void Reinitialize(const int time_steps,const T time);
+    void Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T dt,const T time,const int number_of_ghost_cells);
 };
-
 }
 #endif

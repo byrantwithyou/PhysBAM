@@ -11,8 +11,8 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
 #include <PhysBAM_Geometry/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
+#include <PhysBAM_Dynamics/Level_Sets/FAST_LEVELSET_ADVECTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_POLICY.h>
 
 namespace PhysBAM {
     
@@ -20,18 +20,17 @@ template<class T_GRID>
 class LEVELSET_ADVECTION_MULTIPLE
 {
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_MULTIPLE T_LEVELSET_MULTIPLE;
-    typedef typename LEVELSET_ADVECTION_POLICY<T_GRID>::FAST_LEVELSET_ADVECTION_T T_FAST_LEVELSET_ADVECTION;
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
 public:
     T_LEVELSET_MULTIPLE* levelsets;
-    ARRAY<T_FAST_LEVELSET_ADVECTION> levelset_advections;
+    ARRAY<FAST_LEVELSET_ADVECTION<GRID<TV> > > levelset_advections;
 
     LEVELSET_ADVECTION_MULTIPLE(T_LEVELSET_MULTIPLE* _levelsets):levelsets(_levelsets)
     {
         for(int i=0;i<levelsets->levelsets.m;i++)
-            levelset_advections.Append(T_FAST_LEVELSET_ADVECTION(levelsets->levelsets(i)));
+            levelset_advections.Append(FAST_LEVELSET_ADVECTION<GRID<TV> >(levelsets->levelsets(i)));
     }
     
     void Set_Custom_Advection(ADVECTION<T,T,T_GRID>& advection_input)

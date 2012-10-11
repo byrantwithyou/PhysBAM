@@ -8,7 +8,6 @@
 #define __PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM__
 
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE_UNIFORM.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_POLICY.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
 namespace PhysBAM{
@@ -24,8 +23,6 @@ class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM:public PARTICLE_LEVELSET_EVOL
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
-    typedef typename LEVELSET_ADVECTION_POLICY<T_GRID>::LEVELSET_ADVECTION_MULTIPLE T_LEVELSET_ADVECTION_MULTIPLE;
-    typedef typename LEVELSET_ADVECTION_POLICY<T_GRID>::FAST_LEVELSET_ADVECTION_T T_FAST_LEVELSET_ADVECTION;
 public:
     typedef PARTICLE_LEVELSET_EVOLUTION_UNIFORM<T_GRID> BASE;
     using BASE::track_mass;using BASE::runge_kutta_order_levelset;using BASE::runge_kutta_order_particles;using BASE::use_particle_levelset;using BASE::use_frozen_velocity;
@@ -36,7 +33,7 @@ public:
     ARRAY<T> initial_mass;
     ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis;
 
-    T_LEVELSET_ADVECTION_MULTIPLE levelset_advection_multiple;
+    LEVELSET_ADVECTION_MULTIPLE_UNIFORM<T_GRID> levelset_advection_multiple;
 
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM();
@@ -46,7 +43,7 @@ public:
     virtual LEVELSET_MULTIPLE_UNIFORM<T_GRID>& Levelset_Multiple();
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i) PHYSBAM_OVERRIDE;
     virtual T_FAST_LEVELSET& Levelset(const int i) PHYSBAM_OVERRIDE;
-    virtual T_FAST_LEVELSET_ADVECTION& Levelset_Advection(const int i) PHYSBAM_OVERRIDE;
+    virtual FAST_LEVELSET_ADVECTION<T_GRID>& Levelset_Advection(const int i) PHYSBAM_OVERRIDE;
     void Use_Semi_Lagrangian_Advection() PHYSBAM_OVERRIDE;
     void Use_Hamilton_Jacobi_Weno_Advection() PHYSBAM_OVERRIDE;
     void Use_Hamilton_Jacobi_Eno_Advection(const int order) PHYSBAM_OVERRIDE;

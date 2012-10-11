@@ -15,29 +15,29 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Dynamics/Level_Sets/HAMILTON_JACOBI.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_1D.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T> class HAMILTONIAN_1D;
 
 template<class T_input>
-class HAMILTON_JACOBI_1D:public HAMILTON_JACOBI,public LEVELSET_1D<T_input>,public LEVELSET_ADVECTION_1D<T_input>
+class HAMILTON_JACOBI_1D:public HAMILTON_JACOBI,public LEVELSET_1D<T_input>,public LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T_input,1> > >
 {
-    typedef T_input T;
+    typedef T_input T;typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
 public:
     typedef LEVELSET_1D<T> BASE;
     using BASE::grid;using BASE::phi;using BASE::boundary;using BASE::max_time_step;
-    using LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,1> > >::HJ_WENO;using LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T,1> > >::HJ_ENO;
+    using LEVELSET_ADVECTION_UNIFORM<GRID<TV> >::HJ_WENO;using LEVELSET_ADVECTION_UNIFORM<GRID<TV> >::HJ_ENO;
 
     HAMILTONIAN_1D<T>& hamiltonian;
     
-    HAMILTON_JACOBI_1D(HAMILTONIAN_1D<T>& hamiltonian_input,GRID<VECTOR<T,1> >& grid_input,ARRAY<T,VECTOR<int,1> >& phi_input) 
-        :LEVELSET_1D<T>(grid_input,phi_input),LEVELSET_ADVECTION_1D<T>((LEVELSET_1D<T>*)this),hamiltonian(hamiltonian_input)
+    HAMILTON_JACOBI_1D(HAMILTONIAN_1D<T>& hamiltonian_input,GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input) 
+        :LEVELSET_1D<T>(grid_input,phi_input),LEVELSET_ADVECTION_UNIFORM<GRID<TV> >((LEVELSET_1D<T>*)this),hamiltonian(hamiltonian_input)
     {}
     
 //#####################################################################
     void Euler_Step(const T dt,const T time=0);
-    void Calculate_Derivatives(ARRAY<T,VECTOR<int,1> >& phi_ghost,ARRAY<T,VECTOR<int,1> >& phix_minus,ARRAY<T,VECTOR<int,1> >& phix_plus);
+    void Calculate_Derivatives(ARRAY<T,TV_INT>& phi_ghost,ARRAY<T,TV_INT>& phix_minus,ARRAY<T,TV_INT>& phix_plus);
     T CFL(const T time=0);
 //#####################################################################
 };

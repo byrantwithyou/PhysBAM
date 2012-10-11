@@ -10,17 +10,14 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/REINITIALIZATION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_1D.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_2D.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_3D.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_POLICY.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_UNIFORM.h>
 
 namespace PhysBAM {
 
 template<class T_GRID>
-class FAST_LEVELSET_ADVECTION:public LEVELSET_ADVECTION_POLICY<T_GRID>::LEVELSET_ADVECTION
+class FAST_LEVELSET_ADVECTION:public LEVELSET_ADVECTION_UNIFORM<T_GRID>
 {
-    typedef typename LEVELSET_ADVECTION_POLICY<T_GRID>::LEVELSET_ADVECTION BASE;
+    typedef LEVELSET_ADVECTION_UNIFORM<T_GRID> BASE;
     typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;

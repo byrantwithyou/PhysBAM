@@ -337,7 +337,7 @@ Revalidate_Fluid_Scalars()
 {
     for(int i=0;i<fluids_parameters.number_of_regions;i++){
         T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
-        T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
+        FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
         int sign=1;if(fluids_parameters.number_of_regions>=2&&fluids_parameters.dirichlet_regions(i))sign=-1;
         if(levelset_advection.nested_semi_lagrangian_collidable)
             levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,sign*fluids_parameters.collidable_phi_replacement_value,levelset.phi);}
@@ -358,7 +358,7 @@ Revalidate_Phi_After_Modify_Levelset()
 {
     for(int i=0;i<fluids_parameters.number_of_regions;i++){
         T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
-        T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
+        FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
         int sign=1;if(fluids_parameters.number_of_regions>=2&&fluids_parameters.dirichlet_regions(i))sign=-1;
         if(levelset_advection.nested_semi_lagrangian_collidable){
             levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_current=levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_next;

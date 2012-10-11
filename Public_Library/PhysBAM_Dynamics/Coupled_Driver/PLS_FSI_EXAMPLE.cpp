@@ -206,7 +206,7 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Fluid_Scalars()
 {
     T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
-    T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
+    FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable)
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);
 }
@@ -217,7 +217,7 @@ template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Phi_After_Modify_Levelset()
 {
     T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
-    T_FAST_LEVELSET_ADVECTION& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
+    FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable){
         levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_current=levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_next;
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);}

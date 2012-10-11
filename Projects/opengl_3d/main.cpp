@@ -36,7 +36,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Dynamics/OpenGL_Dynamics_Components/OPENGL_COMPONENT_BODY_MOTION_SEQUENCE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Dynamics/OpenGL_Dynamics_Components/OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Dynamics/OpenGL_Dynamics_Components/OPENGL_COMPONENT_MOTION_SEQUENCE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h>
@@ -808,12 +807,6 @@ Initialize_Components_And_Key_Bindings()
         slice_manager.Add_Object(strain_component);}}
 
     opengl_world.Set_Key_Binding_Category("Motion");
-
-    filename=basedir+STRING_UTILITIES::string_sprintf("/%d/body_motion_sequence",start_frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
-        OPENGL_COMPONENT_BODY_MOTION_SEQUENCE<T>* body_motion_sequence_component=new OPENGL_COMPONENT_BODY_MOTION_SEQUENCE<T>(filename,false,basedir+"/body_motion_sequence_rigid_body.0",(T)1);
-        Add_Component(body_motion_sequence_component,"Body Motion Sequence",'z',BASIC_VISUALIZATION::OWNED);
-        slice_manager.Add_Object(body_motion_sequence_component);}
 
     filename=basedir+STRING_UTILITIES::string_sprintf("/%d/motion_sequence",start_frame);
     if(FILE_UTILITIES::File_Exists(filename)){

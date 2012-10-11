@@ -8,10 +8,7 @@
 #define __PARTICLE_LEVELSET_EVOLUTION_UNIFORM__
 
 #include <PhysBAM_Dynamics/Level_Sets/FAST_LEVELSET_ADVECTION.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_1D.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_2D.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_3D.h>
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_POLICY.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 namespace PhysBAM{
@@ -21,7 +18,6 @@ template<class TV> class RUNGEKUTTA;
 template<class T_GRID>
 class PARTICLE_LEVELSET_EVOLUTION_UNIFORM:public PARTICLE_LEVELSET_EVOLUTION<typename T_GRID::SCALAR>
 {
-    typedef typename LEVELSET_ADVECTION_POLICY<T_GRID>::FAST_LEVELSET_ADVECTION_T T_FAST_LEVELSET_ADVECTION;
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
@@ -41,7 +37,7 @@ public:
     PARTICLE_LEVELSET_UNIFORM<T_GRID> particle_levelset;
     RUNGEKUTTA<T_ARRAYS_SCALAR>* rungekutta_phi;
 
-    T_FAST_LEVELSET_ADVECTION levelset_advection;
+    FAST_LEVELSET_ADVECTION<GRID<TV> > levelset_advection;
 
     PARTICLE_LEVELSET_EVOLUTION_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_UNIFORM();
@@ -52,7 +48,7 @@ public:
     virtual T_FAST_LEVELSET& Levelset(const int i)
     {assert(i==0);return particle_levelset.levelset;}
     
-    virtual T_FAST_LEVELSET_ADVECTION& Levelset_Advection(const int i)
+    virtual FAST_LEVELSET_ADVECTION<GRID<TV> >& Levelset_Advection(const int i)
     {assert(i==0);return levelset_advection;}
 
     virtual void Use_Semi_Lagrangian_Advection()
