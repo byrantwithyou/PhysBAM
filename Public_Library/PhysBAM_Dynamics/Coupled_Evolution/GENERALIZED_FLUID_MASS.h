@@ -20,7 +20,7 @@ class GENERALIZED_FLUID_MASS:public NONCOPYABLE,public SYSTEM_MATRIX_BASE<typena
 {
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
     const COLLISION_AWARE_INDEX_MAP<TV>& index_map;
     const T_FACE_ARRAYS_SCALAR& beta; // 1/rho

@@ -14,16 +14,16 @@ template<class T_GRID,class T2>
 class CONSTANT_INTERPOLATION:public INTERPOLATION_UNIFORM<T_GRID,T2>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
+    typedef typename T_GRID::VECTOR_INT TV_INT;
 public:
 
     CONSTANT_INTERPOLATION()
     {}
 
-    T2 Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+    T2 Clamped_To_Array(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE
     {return u(INTERPOLATION_UNIFORM<T_GRID,T2>::Clamped_Index(grid,u,X));}
     
-    T2 From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
+    T2 From_Base_Node(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
     {return u(index);}
 
 //#####################################################################

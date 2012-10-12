@@ -5,7 +5,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 using namespace PhysBAM;
 template<class T_GRID,class T2> LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM(const T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,const T_ARRAYS_BOOL* cell_valid_value_mask_input,
+LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM(const T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,const ARRAY<bool,TV_INT>* cell_valid_value_mask_input,
     const T2& default_cell_replacement_value_input,const bool extrapolate_to_invalid_cell_values_input)
     :body_list(body_list_input),cell_valid_value_mask(cell_valid_value_mask_input),default_cell_replacement_value(default_cell_replacement_value_input),
     extrapolate_to_invalid_cell_values(extrapolate_to_invalid_cell_values_input)
@@ -16,7 +16,7 @@ template<class T_GRID,class T2> LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_G
 {
 }
 template<class T_GRID,class T2> T2 LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-Trace_And_Get_Value(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& cell,TV_INT* cells,int& valid_mask,const int mask_value) const
+Trace_And_Get_Value(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,TV_INT* cells,int& valid_mask,const int mask_value) const
 {
     TV intersection_point;
     COLLISION_GEOMETRY_ID body_id;
@@ -26,14 +26,14 @@ Trace_And_Get_Value(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV
     else{valid_mask|=mask_value;return u(cell);}
 }
 template<class T_GRID,class T2> T2 LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-Invalid_Value_Replacement(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& cell,const TV& intersection_point,
+Invalid_Value_Replacement(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,const TV& intersection_point,
     const COLLISION_GEOMETRY_ID body_id,const int aggregate_id,bool& valid,const T ray_t_max) const
 {
     valid=false;
     return default_cell_replacement_value;
 }
 template<class T_GRID,class T2> void LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-Extrapolate_To_Invalid_Values(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& cell,T2* values,int& valid_mask) const
+Extrapolate_To_Invalid_Values(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,T2* values,int& valid_mask) const
 {
     static const int all_valid_mask=(1<<T_GRID::number_of_cells_per_block)-1,neighbor_mask=T_GRID::number_of_cells_per_block-1;
     if(valid_mask==0) for(int t=0;t<T_GRID::number_of_cells_per_block;t++)values[t]=default_cell_replacement_value;
@@ -51,7 +51,7 @@ Extrapolate_To_Invalid_Values(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& 
         valid_mask=all_valid_mask;}
 }
 template<class T_GRID,class T2> T2 LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& cell,bool& interpolation_valid,VECTOR<T2,2>* extrema) const
+From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell,bool& interpolation_valid,VECTOR<T2,2>* extrema) const
 {
     BLOCK_UNIFORM<T_GRID> block(grid,cell+TV_INT::All_Ones_Vector());
     assert(block.Inside(X));
@@ -69,12 +69,12 @@ From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT&
     else return LINEAR_INTERPOLATION<T,T2>::Linear(values,(X-grid.X(cell))*grid.one_over_dX);
 }
 template<class T_GRID,class T2> VECTOR<T2,2> LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-Extrema_Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAYS_T2& u_max,const TV& X) const
+Extrema_Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const
 {
     return Extrema_From_Base_Node(grid,u_min,u_max,X,INTERPOLATION_UNIFORM<T_GRID,T2>::Clamped_Index_End_Minus_One(grid,u_min,X));
 }
 template<class T_GRID,class T2> VECTOR<T2,2> LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-Extrema_From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAYS_T2& u_max,const TV& X,const TV_INT& cell) const
+Extrema_From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X,const TV_INT& cell) const
 {
     VECTOR<T2,2> extrema_min,extrema_max;
     bool unused;
@@ -83,13 +83,13 @@ Extrema_From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAY
     return VECTOR<T2,2>(extrema_min.x,extrema_max.y);
 }
 template<class T_GRID,class T2> T2 LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     return From_Base_Node(grid,u,X,INTERPOLATION_UNIFORM<T_GRID,T2>::Clamped_Index_End_Minus_One(grid,u,X));
 }
 // TODO: this only works for cells, which would ideally be enforced at compile time
 template<class T_GRID,class T2> T2 LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM<T_GRID,T2>::
-From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& cell) const
+From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& cell) const
 {
     bool interpolation_valid;
     return From_Base_Node(grid,u,X,cell,interpolation_valid);

@@ -65,7 +65,7 @@ class STANDARD_TESTS_WATER:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_in
     typedef GRID<TV> T_GRID;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::output_directory;using BASE::last_frame;using BASE::frame_rate;
@@ -137,7 +137,7 @@ public:
     void Initialize_Euler_State() PHYSBAM_OVERRIDE {}
     void Limit_Dt(T& dt,const T time) PHYSBAM_OVERRIDE {}
     void Extrapolate_Phi_Into_Objects(const T time) PHYSBAM_OVERRIDE {}
-    void Get_Source_Reseed_Mask(T_ARRAYS_BOOL*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
+    void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time) PHYSBAM_OVERRIDE {}
     void Set_Particle_Is_Simulated(ARRAY<bool>& particle_is_simulated) PHYSBAM_OVERRIDE {}
 
 //#####################################################################

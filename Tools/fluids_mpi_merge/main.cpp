@@ -26,11 +26,11 @@ template<class T,class T_GRID,class RW>
 class MERGER
 {
 public:
-    typedef typename T_GRID::VECTOR_T TV;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
+    typedef typename T_GRID::VECTOR_T TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
     typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,T_GRID::dimension+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,T_GRID::dimension+2> >::TYPE T_ARRAYS_DIMENSION_SCALAR;
     
 
     const int number_of_processes;
@@ -124,14 +124,14 @@ Merge(const int frame)
         Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"density",0);
         Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"pressure",0);
         Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"temperature",0);
-        Merge_Cell_Data<T_ARRAYS_VECTOR>(f+"centered_velocities",0);
+        Merge_Cell_Data<ARRAY<TV,TV_INT> >(f+"centered_velocities",0);
         if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot")) Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"soot",0);
         if(FILE_UTILITIES::File_Exists(input_directory+"/2/"+f+"soot_fuel")) Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"soot_fuel",0);
         if(merge_debug_data){
-            Merge_Cell_Data<T_ARRAYS_BOOL>(f+"psi_D",1);
+            Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"psi_D",1);
             Merge_Face_Data<T_FACE_ARRAYS_BOOL>(f+"psi_N",1);
             Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"density_gradient",0,true);
-            Merge_Cell_Data<T_ARRAYS_BOOL>(f+"euler_psi",1);
+            Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"euler_psi",1);
             Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"energy",0);
             Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"enthalpy",0);
             Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"entropy",0);
@@ -159,7 +159,7 @@ Merge(const int frame)
         if(merge_debug_data){
             Merge_Cell_Data<T_ARRAYS_SCALAR>(f+"pressure",1);
             Merge_Cell_Data<T_ARRAYS_INT>(f+"colors",0); // TODO: consider changing this back to 1
-            Merge_Cell_Data<T_ARRAYS_BOOL>(f+"psi_D",1);
+            Merge_Cell_Data<ARRAY<bool,TV_INT> >(f+"psi_D",1);
             Merge_Face_Data<T_FACE_ARRAYS_BOOL>(f+"psi_N",1);
             Merge_Particles<PARTICLE_LEVELSET_PARTICLES<TV> >(f+"negative_particles");}
         if(merge_velocities) Merge_Face_Data<T_FACE_ARRAYS>(f+"mac_velocities",3);

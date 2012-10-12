@@ -27,9 +27,8 @@ template<class TV> class RIGID_BODY_COLLECTION;
 template<class T_GRID,class T_WATER_STANDARD_TESTS>
 class WATER_STANDARD_TESTS_MULTIPHASE:public T_WATER_STANDARD_TESTS
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef T_WATER_STANDARD_TESTS BASE;
     using BASE::world_to_source;using BASE::rigid_body_collection;using BASE::sources;using BASE::fluids_parameters;using BASE::grid;using BASE::example;using BASE::Initial_Phi;using BASE::sphere;

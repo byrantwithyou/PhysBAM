@@ -23,11 +23,9 @@ class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<typename T
 {
     typedef typename T_GRID::VECTOR_T TV;
     typedef typename TV::SCALAR T;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_IMPLICIT_OBJECT T_LEVELSET_IMPLICIT_OBJECT;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_T;
-    typedef typename T_ARRAYS_T::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_T;
+    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_IMPLICIT_OBJECT T_LEVELSET_IMPLICIT_OBJECT;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_T;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T;
     typedef typename T_FACE_ARRAYS_T::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_T::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_T::template REBIND<COLLISION_GEOMETRY_ID>::TYPE T_FACE_ARRAYS_COLLISION_GEOMETRY_ID;

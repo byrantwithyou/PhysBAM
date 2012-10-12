@@ -30,12 +30,10 @@ class SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_TV;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<CUT_CELLS<T,TV::dimension>*>::TYPE T_ARRAYS_CUT_CELLS;
-    typedef typename REBIND<T_ARRAYS_SCALAR,bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
@@ -49,24 +47,24 @@ public:
     MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
     GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid;
 
-    T_ARRAYS_BOOL uncovered_cells;
+    ARRAY<bool,TV_INT> uncovered_cells;
     bool thinshell,use_fast_marching,use_higher_order_solid_extrapolation,fluid_affects_solid;
     int number_of_cells_to_extrapolate;
     TV_DIMENSION solid_state;
 
     T_ARRAYS_DIMENSION_SCALAR U_n;
     T_FACE_ARRAYS_BOOL solid_fluid_face_time_n;
-    T_ARRAYS_BOOL cells_inside_fluid_time_n,outside_fluid;
+    ARRAY<bool,TV_INT> cells_inside_fluid_time_n,outside_fluid;
     EULER_FLUID_FORCES<T_GRID>* euler_fluid_forces;
     T_FACE_ARRAYS_SCALAR pressure_at_faces;
     T_ARRAYS_SCALAR phi_all_solids_negated;
 
-    T_ARRAYS_BOOL near_interface;
+    ARRAY<bool,TV_INT> near_interface;
     T_ARRAYS_CUT_CELLS cut_cells_n,cut_cells_n_p_half,cut_cells_np1;
     T_ARRAYS_SCALAR cell_volumes_n,cell_volumes_n_p_half,cell_volumes_np1;
 
-    T_ARRAYS_BOOL psi_n,psi_n_p_half,psi_np1,uncovered_cells_n_p_half;
-    T_ARRAYS_TV advection_velocities_n;
+    ARRAY<bool,TV_INT> psi_n,psi_n_p_half,psi_np1,uncovered_cells_n_p_half;
+    ARRAY<TV,TV_INT> advection_velocities_n;
 
     T_FACE_ARRAYS_DIMENSION_SCALAR accumulated_flux;
 

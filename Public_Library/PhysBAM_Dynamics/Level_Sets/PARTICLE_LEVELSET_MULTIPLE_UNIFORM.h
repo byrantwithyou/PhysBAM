@@ -14,12 +14,10 @@ namespace PhysBAM{
 template<class T_GRID>
 class PARTICLE_LEVELSET_MULTIPLE_UNIFORM:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T min_collision_distance_factor,max_collision_distance_factor,max_minus_min_collision_distance_factor_over_max_short;
 
@@ -81,14 +79,14 @@ public:
     void Euler_Step_Removed_Particles(const T dt,const T time,const bool update_particle_cells_after_euler_step=true,const bool verbose=true)
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Euler_Step_Removed_Particles(dt,time,update_particle_cells_after_euler_step,verbose);}
 
-    int Reseed_Particles(const T time,T_ARRAYS_BOOL* cell_centered_mask=0)
+    int Reseed_Particles(const T time,ARRAY<bool,TV_INT>* cell_centered_mask=0)
     {int new_particles=0;for(int i=0;i<particle_levelsets.m;i++) new_particles+=particle_levelsets(i)->Reseed_Particles(time,cell_centered_mask);
     return new_particles;}
 
     void Delete_Particles_Outside_Grid()
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Delete_Particles_Outside_Grid();}
 
-    void Identify_And_Remove_Escaped_Particles(const T_ARRAYS_VECTOR& V,const T radius_fraction=1.5,const bool verbose=true)
+    void Identify_And_Remove_Escaped_Particles(const ARRAY<TV,TV_INT>& V,const T radius_fraction=1.5,const bool verbose=true)
     {for(int i=0;i<particle_levelsets.m;i++) particle_levelsets(i)->Identify_And_Remove_Escaped_Particles(V,radius_fraction,verbose);}
 
     void Reincorporate_Removed_Particles(const T radius_fraction)

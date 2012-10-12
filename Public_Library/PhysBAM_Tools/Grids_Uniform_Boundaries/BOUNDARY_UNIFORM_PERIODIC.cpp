@@ -12,9 +12,9 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM_PERIODIC<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     TV_INT periods=grid.Domain_Indices().Maximum_Corner()-TV_INT::All_Ones_Vector();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
@@ -27,7 +27,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM_PERIODIC<T_GRID,T2>::
-Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_T2& u,const T time)
+Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
 {
     assert(!grid.Is_MAC_Grid());
     for(int axis=0;axis<T_GRID::dimension;axis++)

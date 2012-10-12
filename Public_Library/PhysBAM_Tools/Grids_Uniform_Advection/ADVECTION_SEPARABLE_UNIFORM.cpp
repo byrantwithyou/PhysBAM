@@ -100,8 +100,8 @@ template<> struct UPDATE_ADVECTION_EQUATION_HELPER<3>
 // Function Update_Advection_Equation_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_AVERAGING> void ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2,T_AVERAGING>::
-Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_ARRAYS_VECTOR& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-    const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
+Update_Advection_Equation_Node(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const ARRAY<TV,TV_INT>& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+    const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     assert(!Z_min && !Z_max);
     UPDATE_ADVECTION_EQUATION_HELPER<TV::dimension>::Apply(*this,grid,Z,Z_ghost,V,dt,time);
@@ -110,12 +110,12 @@ Update_Advection_Equation_Node(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_
 // Function Update_Advection_Equation_Cell_Lookup
 //#####################################################################
 template<class T_GRID,class T2,class T_AVERAGING> void ADVECTION_SEPARABLE_UNIFORM<T_GRID,T2,T_AVERAGING>::
-Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,const T_FACE_LOOKUP& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-    const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
+Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,const T_FACE_LOOKUP& V,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
+    const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     assert(!Z_min && !Z_max);
 
-    T_ARRAYS_VECTOR V_cell(grid.Domain_Indices(3));T_AVERAGING averaging;
+    ARRAY<TV,TV_INT> V_cell(grid.Domain_Indices(3));T_AVERAGING averaging;
 
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) V_cell(iterator.Cell_Index())=averaging.Face_To_Cell_Vector(grid,iterator.Cell_Index(),V);
 

@@ -29,9 +29,8 @@ class EULER_UNIFORM:public EULER<T_GRID>
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename REBIND<T_ARRAYS_SCALAR,bool>::TYPE T_ARRAYS_BOOL;typedef typename REBIND<T_ARRAYS_SCALAR,TV>::TYPE T_ARRAYS_VECTOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
@@ -50,8 +49,8 @@ public:
     T_MPI_GRID* mpi_grid;
     T_ARRAYS_DIMENSION_SCALAR U,U_save; // mass, momentum, and energy
     const T_ARRAYS_DIMENSION_SCALAR& U_ghost;
-    T_ARRAYS_BOOL* psi_pointer; // defines cut out grid
-    T_ARRAYS_BOOL psi;
+    ARRAY<bool,TV_INT>* psi_pointer; // defines cut out grid
+    ARRAY<bool,TV_INT> psi;
     VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension> eigensystems,eigensystems_default,eigensystems_pressureonly;
     bool timesplit,use_sound_speed_for_cfl,perform_rungekutta_for_implicit_part,compute_pressure_fluxes,thinshell;
     bool use_sound_speed_based_dt_multiple_for_cfl; // if set, dt will be set to multiplication_factor_for_sound_speed_based_dt*dt_based_on_c whenever this number is less than dt_based_on_u
@@ -84,14 +83,14 @@ public:
     }
 
 //#####################################################################
-    void Set_Up_Cut_Out_Grid(T_ARRAYS_BOOL& psi_input);
+    void Set_Up_Cut_Out_Grid(ARRAY<bool,TV_INT>& psi_input);
     void Set_Custom_Equation_Of_State(EOS<T>& eos_input);
     void Set_Custom_Boundary(T_BOUNDARY& boundary_input);
     void Set_Body_Force(const bool use_force_input=true);
     void Initialize_Domain(const T_GRID& grid_input);
     void Save_State(T_ARRAYS_DIMENSION_SCALAR& U_save,T_FACE_ARRAYS_SCALAR& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
     void Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_save,T_FACE_ARRAYS_SCALAR& face_velocities_save,bool& need_to_remove_added_internal_energy_save);
-    void Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,T_ARRAYS_VECTOR& centered_velocities);
+    void Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_INT>& centered_velocities);
     void Compute_Total_Conserved_Quantity(const bool update_boundary_flux,const T dt,TV_DIMENSION& total_conserved_quantity);
     void Invalidate_Ghost_Cells();
     void Warn_For_Low_Internal_Energy() const;

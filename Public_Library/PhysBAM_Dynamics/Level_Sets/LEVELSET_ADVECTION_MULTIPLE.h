@@ -20,9 +20,9 @@ template<class T_GRID>
 class LEVELSET_ADVECTION_MULTIPLE
 {
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_MULTIPLE T_LEVELSET_MULTIPLE;
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     T_LEVELSET_MULTIPLE* levelsets;
     ARRAY<FAST_LEVELSET_ADVECTION<GRID<TV> > > levelset_advections;
@@ -39,7 +39,7 @@ public:
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,const int number_of_ghost_cells)
     {for(int i=0;i<levelset_advections.m;i++) levelset_advections(i).Euler_Step(face_velocities,dt,time,number_of_ghost_cells);}
     
-    void Euler_Step(const T_ARRAYS_VECTOR& velocity,const T dt,const T time,const int number_of_ghost_cells)
+    void Euler_Step(const ARRAY<TV,TV_INT>& velocity,const T dt,const T time,const int number_of_ghost_cells)
     {for(int i=0;i<levelset_advections.m;i++) levelset_advections(i).Euler_Step(velocity,dt,time,number_of_ghost_cells);}
     
     void Reinitialize()

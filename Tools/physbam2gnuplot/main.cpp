@@ -16,10 +16,10 @@ using namespace PhysBAM;
 template<class T_GRID,class RW>
 class PHYSBAM_TO_GNUPLOT_CONVERTER
 {
-    typedef typename T_GRID::VECTOR_T TV;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_GRID::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const std::string input_directory,output_directory;
     GNUPLOT_OUTPUT gnuplot_output;

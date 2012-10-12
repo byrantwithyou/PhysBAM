@@ -17,9 +17,9 @@ namespace PhysBAM{
 template<class T_GRID>
 class LINEAR_INTERPOLATION_MAC_3D_HELPER
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::BLOCK T_BLOCK;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS;typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS;typedef typename T_GRID::INDEX T_INDEX;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename T_GRID::BLOCK T_BLOCK;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef typename T_FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS;typedef typename T_GRID::INDEX T_INDEX;
 private:
     TV base,center,one_over_DX;
     T u2,u5,u8,u11,slope_u12,slope_u23,slope_u45,slope_u56,slope_u78,slope_u89,slope_u10_11,slope_u11_12; // standard z-y-x major ordering

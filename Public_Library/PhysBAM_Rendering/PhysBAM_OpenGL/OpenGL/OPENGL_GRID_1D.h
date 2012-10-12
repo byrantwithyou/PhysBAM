@@ -23,7 +23,7 @@ class OPENGL_GRID_1D : public OPENGL_OBJECT
 {
 public:
     typedef VECTOR<T,1> TV;typedef VECTOR<int,1> TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<1> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     GRID<TV> &grid;
     OPENGL_COLOR color;

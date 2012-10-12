@@ -21,7 +21,7 @@ template<class T_input>
 class OPENGL_MAC_VELOCITY_FIELD_3D:public OPENGL_VECTOR_FIELD_3D<T_input>
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     using OPENGL_VECTOR_FIELD_3D<T>::slice;
     using OPENGL_VECTOR_FIELD_3D<T>::vector_field;using OPENGL_VECTOR_FIELD_3D<T>::vector_locations;

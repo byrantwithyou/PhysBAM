@@ -34,11 +34,9 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
     typedef TV_input TV;typedef typename TV::SCALAR T;typedef GRID<TV> T_GRID;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -75,7 +73,7 @@ public:
     T_ARRAYS_SCALAR density;
     T_FACE_ARRAYS_BOOL solved_faces;
 protected:
-    T_ARRAYS_VECTOR centered_velocity;
+    ARRAY<TV,TV_INT> centered_velocity;
     T_ARRAYS_SCALAR one_over_rho_c_squared;
     T_ARRAYS_SCALAR p_advected_over_rho_c_squared_dt;
     T_ARRAYS_SCALAR p_advected;
@@ -128,7 +126,7 @@ public:
     void Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Setup_Boundary_Condition_Collection();
 private:
-    void Warn_For_Exposed_Dirichlet_Cell(const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N);
+    void Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N);
     void Set_Cached_Psi_N_And_Coupled_Face_Data(const COLLISION_AWARE_INDEX_MAP<TV>& index_map,
         const MATRIX_SOLID_INTERPOLATION<TV>& solid_interpolation,const T time);
     void Fill_Coupled_Face_Data(const COUPLING_CONSTRAINT_ID number_of_coupling_faces,const ARRAY<FACE_INDEX<TV_input::dimension> >& indexed_faces,

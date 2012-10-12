@@ -18,9 +18,6 @@ template<class T>
 struct GRID_ARRAYS_POLICY<GRID<VECTOR<T,1> > >
 {
     typedef FLOOD_FILL_1D FLOOD_FILL;
-    typedef ARRAY<T,VECTOR<int,1> > ARRAYS_SCALAR;
-    typedef PhysBAM::ARRAY<T,FACE_INDEX<1> > FACE_ARRAYS;
-    typedef ARRAYS_ND_BASE<T,VECTOR<int,1> > ARRAYS_BASE;
 //#####################################################################
 };
 
@@ -28,9 +25,6 @@ template<class T>
 struct GRID_ARRAYS_POLICY<GRID<VECTOR<T,2> > >
 {
     typedef FLOOD_FILL_2D FLOOD_FILL;
-    typedef ARRAY<T,VECTOR<int,2> > ARRAYS_SCALAR;
-    typedef PhysBAM::ARRAY<T,FACE_INDEX<2> > FACE_ARRAYS;
-    typedef ARRAYS_ND_BASE<T,VECTOR<int,2> > ARRAYS_BASE;
 //#####################################################################
 };
 
@@ -38,9 +32,6 @@ template<class T>
 struct GRID_ARRAYS_POLICY<GRID<VECTOR<T,3> > >
 {
     typedef FLOOD_FILL_3D FLOOD_FILL;
-    typedef ARRAY<T,VECTOR<int,3> > ARRAYS_SCALAR;
-    typedef PhysBAM::ARRAY<T,FACE_INDEX<3> > FACE_ARRAYS;
-    typedef ARRAYS_ND_BASE<T,VECTOR<int,3> > ARRAYS_BASE;
 //#####################################################################
 };
 

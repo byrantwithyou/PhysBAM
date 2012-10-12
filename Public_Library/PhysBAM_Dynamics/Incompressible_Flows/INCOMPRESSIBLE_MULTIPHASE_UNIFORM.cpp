@@ -115,14 +115,14 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
                 twice_curvature*twice_face_normal_component/LEVELSET_UTILITIES<T>::Heaviside(phi_face,projection.densities(region_1),projection.densities(region_2),half_width);}}
 
     if(use_variable_vorticity_confinement){
-        T_ARRAYS_VECTOR F(grid.Cell_Indices(1),false);
+        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         F*=dt*(T).5;F*=variable_vorticity_confinement;
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();
             face_velocities.Component(axis)(iterator.Face_Index())+=F(iterator.First_Cell_Index())[axis]+F(iterator.Second_Cell_Index())[axis];}}
 
     if(vorticity_confinements.Count_Matches(0)!=vorticity_confinements.m){
-        T_ARRAYS_VECTOR F(grid.Cell_Indices(1),false);
+        ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
         Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,F);
         T half_dt=(T).5*dt;
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
@@ -320,7 +320,7 @@ Implicit_Viscous_Update(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T
 // Function Compute_Vorticity_Confinement_Force
 //#####################################################################
 template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
-Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_ARRAYS_VECTOR& F)
+Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F)
 {
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);T_ARRAYS_SCALAR vorticity_magnitude(grid.Cell_Indices(2));
     if(projection.flame){FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> face_velocities_lookup(face_velocities_ghost,projection,projection.poisson_collidable->levelset_multiple);

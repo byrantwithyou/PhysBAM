@@ -78,7 +78,7 @@ Negative_Material_In_Cell(const GRID<TV>& grid,const TV_INT& cell_index,const bo
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_INTERSECTOR<TV>::
 Negative_Material_In_Box(const RANGE<TV>& box,const bool force_full_refinement)
 {
-    T_ARRAYS_VECTOR corners;box.Corners(corners);
+    ARRAY<TV,TV_INT> corners;box.Corners(corners);
     cell_particle_X.Resize(1<<TV::dimension); // redundant
     Make_List(cell_particle_X,corners);
     cell_refinement_simplices.Remove_All();Refined_Object_Initialization_Helper(cell_refinement_simplices);
@@ -124,7 +124,7 @@ Negative_Material_In_Box(const RANGE<TV>& box,const bool force_full_refinement)
 template<class TV> typename TV::SCALAR IMPLICIT_OBJECT_INTERSECTOR<TV>::
 Negative_Material_In_Box_Excluding_Object(const RANGE<TV>& box,const ARRAY<IMPLICIT_OBJECT<TV>*>& excluded_implicit_objects,const bool force_full_refinement)
 {
-    T_ARRAYS_VECTOR corners;box.Corners(corners);
+    ARRAY<TV,TV_INT> corners;box.Corners(corners);
     cell_particle_X.Resize(1<<TV::dimension); // redundant
     Make_List(cell_particle_X,corners);
     cell_refinement_simplices.Remove_All();Refined_Object_Initialization_Helper(cell_refinement_simplices);

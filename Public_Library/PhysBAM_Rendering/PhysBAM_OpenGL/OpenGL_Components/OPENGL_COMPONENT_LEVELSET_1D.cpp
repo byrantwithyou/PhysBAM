@@ -18,7 +18,7 @@ OPENGL_COMPONENT_LEVELSET_1D(GRID<TV> &grid,const std::string& levelset_filename
     :OPENGL_COMPONENT("Levelset 1D"),levelset_filename(levelset_filename_input),opengl_levelset(0)
 {
     is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);
-    opengl_levelset=new OPENGL_LEVELSET_1D<T>(*(new LEVELSET_1D<T>(grid,*(new T_ARRAYS_SCALAR))),point_color,line_color);
+    opengl_levelset=new OPENGL_LEVELSET_1D<T>(*(new LEVELSET_1D<T>(grid,*(new ARRAY<T,TV_INT>))),point_color,line_color);
     Reinitialize();
 }
 //#####################################################################

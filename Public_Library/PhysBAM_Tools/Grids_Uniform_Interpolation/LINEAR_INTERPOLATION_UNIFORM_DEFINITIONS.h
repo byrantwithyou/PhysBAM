@@ -4,7 +4,7 @@ using namespace PhysBAM;
 // Function Clamped_To_Array_No_Extrema
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_No_Extrema(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Clamped_To_Array_No_Extrema(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     TV X_clamped=clamp(X,grid.X(index),grid.X(index+1));
@@ -14,7 +14,7 @@ Clamped_To_Array_No_Extrema(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X)
 // Function Clamped_To_Array
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     return From_Base_Node(grid,u,X,index);
@@ -23,7 +23,7 @@ Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 // Function Clamped_To_Array_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Clamped_To_Array_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u,X);
     return From_Base_Node_Weights(grid,u,X,index);
@@ -32,7 +32,7 @@ Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) co
 // Function Extrema_Clamped_To_Array
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> VECTOR<T2,2> LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Extrema_Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAYS_T2& u_max,const TV& X) const
+Extrema_Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X) const
 {
     TV_INT index=INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::Clamped_Index_End_Minus_One(grid,u_min,X);
     return Extrema_From_Base_Node(grid,u_min,u_max,X,index);
@@ -154,7 +154,7 @@ Extrema_From_Base_Node_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAYS_ND_BAS
 // Function From_Base_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const
+From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
 {
     return From_Base_Node_Helper(grid,u,X,index);
 }
@@ -162,7 +162,7 @@ From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT&
 // Function From_Base_Node_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-From_Base_Node_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const
+From_Base_Node_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X,const TV_INT& index) const
 {
     return From_Base_Node_Weights_Helper(grid,u,X,index);
 }
@@ -170,7 +170,7 @@ From_Base_Node_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const
 // Function Extrema_From_Base_Node
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> VECTOR<T2,2> LINEAR_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Extrema_From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u_min,const T_ARRAYS_T2& u_max,const TV& X,const TV_INT& index) const
+Extrema_From_Base_Node(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u_min,const ARRAYS_ND_BASE<T2,TV_INT>& u_max,const TV& X,const TV_INT& index) const
 {
     return Extrema_From_Base_Node_Helper(grid,u_min,u_max,X,index);
 }

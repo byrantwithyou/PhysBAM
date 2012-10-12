@@ -45,7 +45,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         FILE_UTILITIES::Read_From_File(stream_type,filename,face_velocities);}
     else if(FILE_UTILITIES::File_Exists(centered_velocity_filename)){
         LOG::cout<<"Converting centered velocities from "<<centered_velocity_filename<<" to mac_velocities"<<std::endl;
-        T_ARRAYS_VECTOR centered_velocities;
+        ARRAY<TV,TV_INT> centered_velocities;
         FILE_UTILITIES::Read_From_File(stream_type,centered_velocity_filename,centered_velocities);
 
         TV_INT face_index,first_cell_index,second_cell_index;int axis;

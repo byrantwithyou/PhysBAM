@@ -28,9 +28,9 @@ template<class T_GRID,class T2> BOUNDARY_UNIFORM<T_GRID,T2>::
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2::Put(u,u_ghost);
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost);
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int side=0;side<T_GRID::number_of_faces_per_cell;side++)Fill_Single_Ghost_Region(grid,u_ghost,side,regions(side));
 }
@@ -79,7 +79,7 @@ Find_Ghost_Regions(const T_GRID& grid,ARRAY<RANGE<TV_INT> >& regions,const int g
 // Function Fill_Single_Ghost_Region
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
-Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARRAYS_T2& u_ghost,const int side)
+Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side)
 {
     Fill_Single_Ghost_Region(grid,u_ghost,side,region);
 }
@@ -87,7 +87,7 @@ Fill_Single_Ghost_Region_Threaded(RANGE<TV_INT>& region,const T_GRID& grid,T_ARR
 // Function Fill_Single_Ghost_Region
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
-Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const int side,const RANGE<TV_INT>& region) const
+Fill_Single_Ghost_Region(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const int side,const RANGE<TV_INT>& region) const
 {
     int axis=side/2,boundary=side&1?region.Minimum_Corner()[axis]-1:region.Maximum_Corner()[axis];
     NODE_ITERATOR iterator(grid,region);
@@ -106,7 +106,7 @@ Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const int side,
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
-Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_T2& u,const T time)
+Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
 {
 }
 //#####################################################################
@@ -120,7 +120,7 @@ Apply_Boundary_Condition_Face(const T_GRID& grid,T_FACE_ARRAYS_T2& u,const T tim
 // Function Apply_Boundary_Condition_Single_Side
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
-Apply_Boundary_Condition_Single_Side(const T_GRID& grid,T_ARRAYS_T2& u,const int side,const T time) const
+Apply_Boundary_Condition_Single_Side(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const int side,const T time) const
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }
@@ -128,7 +128,7 @@ Apply_Boundary_Condition_Single_Side(const T_GRID& grid,T_ARRAYS_T2& u,const int
 // Function Fill_Single_Ghost_Region
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
-Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells) const
+Fill_Single_Ghost_Region(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells) const
 {
     PHYSBAM_NOT_IMPLEMENTED();
 }

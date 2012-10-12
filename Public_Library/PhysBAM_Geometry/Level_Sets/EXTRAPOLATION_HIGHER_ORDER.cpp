@@ -181,7 +181,7 @@ Extrapolate_RK2(const MAPPING& m,const ARRAY<VECTOR<STENCIL,TV::m> >& stencil,AR
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,
-    int ghost,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& u,int iterations,int order,int fill_width)
+    int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int iterations,int order,int fill_width)
 {
     PHYSBAM_ASSERT(order>=1 && order<=3);
     PHYSBAM_ASSERT(!grid.Is_MAC_Grid());
@@ -205,7 +205,7 @@ Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE
 //#####################################################################
 template<class TV,class T2> void EXTRAPOLATION_HIGHER_ORDER<TV,T2>::
 Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,
-    int ghost,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& u,int iterations,int order,int fill_width)
+    int ghost,ARRAYS_ND_BASE<T2,TV_INT>& u,int iterations,int order,int fill_width)
 {
     GRID<TV> node_grid(grid.Get_Regular_Grid_At_MAC_Positions());
     Extrapolate_Node(node_grid,phi,inside_mask,ghost,u,iterations,order,fill_width);

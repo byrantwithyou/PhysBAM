@@ -165,7 +165,7 @@ Modify_Levelset_And_Particles(T_FACE_ARRAYS_SCALAR* face_velocities)
 // Function Reseed_Particles
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
-Reseed_Particles(const T time,const int time_step,T_ARRAYS_BOOL* cell_centered_mask,const bool verbose)
+Reseed_Particles(const T time,const int time_step,ARRAY<bool,TV_INT>* cell_centered_mask,const bool verbose)
 {
     if((use_particle_levelset && cell_centered_mask) || (!time_step || (reseeding_frequency && time_step%reseeding_frequency == 0))){
         int new_particles=particle_levelset_multiple.Reseed_Particles(time,cell_centered_mask);

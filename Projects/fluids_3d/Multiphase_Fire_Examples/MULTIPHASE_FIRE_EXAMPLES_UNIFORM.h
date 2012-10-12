@@ -19,11 +19,10 @@ namespace PhysBAM{
 template<class T_GRID>
 class MULTIPHASE_FIRE_EXAMPLES_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>
 {
-    typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
-    typedef typename LEVELSET_POLICY<T_GRID>::EXTRAPOLATION_SCALAR T_EXTRAPOLATION_SCALAR;typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
+    typedef typename LEVELSET_POLICY<T_GRID>::EXTRAPOLATION_SCALAR T_EXTRAPOLATION_SCALAR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;using BASE::Adjust_Phi_With_Source;
@@ -208,7 +207,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
     T ignition_temperature=1075; // 1100 is .5 as fast as 1000, 1150 is .25 as fast as 1000.
     T_ARRAYS_SCALAR temp_temperature(fluids_parameters.grid->Domain_Indices(3));
     BOUNDARY_UNIFORM<T_GRID,T> boundary;boundary.Fill_Ghost_Cells(*fluids_parameters.grid,fluids_parameters.temperature_container.temperature,temp_temperature,dt,time,3);
-    SMOOTH::Smooth<T_GRID>(temp_temperature,5,0);
+    SMOOTH::Smooth<T,TV::m>(temp_temperature,5,0);
     if(fluids_parameters.mpi_grid) fluids_parameters.mpi_grid->Exchange_Boundary_Cell_Data(temp_temperature,1);
     for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
         T face_temperature=(T).5*(temp_temperature(iterator.First_Cell_Index())+temp_temperature(iterator.Second_Cell_Index()));

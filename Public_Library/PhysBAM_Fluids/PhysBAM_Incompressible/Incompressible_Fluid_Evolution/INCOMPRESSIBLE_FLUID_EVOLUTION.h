@@ -21,7 +21,7 @@ template<class T_GRID>
 class INCOMPRESSIBLE_FLUID_EVOLUTION:public NONCOPYABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     
     T_GRID grid;

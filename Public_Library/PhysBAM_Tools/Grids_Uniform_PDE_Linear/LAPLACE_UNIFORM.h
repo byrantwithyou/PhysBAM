@@ -30,10 +30,10 @@ class LAPLACE_UNIFORM:public LAPLACE<typename T_GRID::SCALAR>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename GRID_ARRAYS_POLICY<T_GRID>::FLOOD_FILL T_FLOOD_FILL;typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
 public:
     typedef TV VECTOR_T;
@@ -50,11 +50,11 @@ public:
     ARRAY<bool> filled_region_touches_dirichlet;
     T_FACE_ARRAYS_BOOL psi_N;
     T_FACE_ARRAYS_SCALAR psi_R;
-    T_ARRAYS_BOOL psi_D;
+    ARRAY<bool,TV_INT> psi_D;
     TV_BOOL periodic_boundary;
     LAPLACE_UNIFORM_MPI<T_GRID>* laplace_mpi;
     MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
-    T_ARRAYS_BOOL* psi_D_save_for_sph;
+    ARRAY<bool,TV_INT>* psi_D_save_for_sph;
     T_FACE_ARRAYS_BOOL* psi_N_save_for_sph;
     bool enforce_compatibility;
     bool solve_single_cell_neumann_regions;
@@ -100,7 +100,7 @@ public:
     void Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTERVAL<int> > >& interior_indices,ARRAY<ARRAY<ARRAY<INTERVAL<int> > > >& ghost_indices,ARRAY<int,VECTOR<int,1> >& filled_region_cell_count,ARRAY<ARRAY<TV_INT> >& matrix_index_to_cell_index_array,T_ARRAYS_INT& cell_index_to_matrix_index);
     void Solve_Subregion(ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& b,const int color=0,ARRAY<int,TV_INT>* domain_index=0);
     void Solve_Subregion(ARRAY<INTERVAL<int> >& interior_indices,ARRAY<ARRAY<INTERVAL<int> > >& ghost_indices,ARRAY<TV_INT>& matrix_index_to_cell_index,SPARSE_MATRIX_FLAT_NXN<T>& A,ARRAY<T>& b,const int color=0,ARRAY<int,TV_INT>* domain_index=0);
-    void Build_Single_Solution_Region(T_ARRAYS_BOOL& solve);
+    void Build_Single_Solution_Region(ARRAY<bool,TV_INT>& solve);
     void Use_Psi_R();
 //#####################################################################
 };

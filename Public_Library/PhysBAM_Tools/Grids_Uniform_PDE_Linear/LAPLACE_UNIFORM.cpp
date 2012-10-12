@@ -239,7 +239,7 @@ Compute_Matrix_Indices_Threaded(ARRAY<RANGE<TV_INT> >& domains,ARRAY<ARRAY<INTER
 // Function Build_Single_Solution_Region
 //#####################################################################
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
-Build_Single_Solution_Region(T_ARRAYS_BOOL& solve)
+Build_Single_Solution_Region(ARRAY<bool,TV_INT>& solve)
 {
     number_of_regions=1;
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=solve(iterator.Cell_Index())?0:-2;

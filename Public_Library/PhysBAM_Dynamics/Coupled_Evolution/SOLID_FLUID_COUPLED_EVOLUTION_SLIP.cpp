@@ -459,7 +459,7 @@ Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_
     // assume only one color for the moment
     POISSON_COLLIDABLE_UNIFORM<T_GRID>& poisson=*poisson;
     T_FACE_ARRAYS_BOOL& psi_N=poisson->psi_N;
-    T_ARRAYS_BOOL& psi_D=poisson->psi_D;
+    ARRAY<bool,TV_INT>& psi_D=poisson->psi_D;
     // TODO: this will not work for multiphase, obviously
     assert(fluids_parameters.number_of_regions==1); // this should not be called for gas or multiphase
     T_LEVELSET* levelset=&fluids_parameters.particle_levelset_evolution->Levelset(0);
@@ -581,7 +581,7 @@ Apply_Viscosity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 // Function Warn_For_Exposed_Dirichlet_Cell
 //#####################################################################
 template<class TV> void SOLID_FLUID_COUPLED_EVOLUTION_SLIP<TV>::
-Warn_For_Exposed_Dirichlet_Cell(const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N)
+Warn_For_Exposed_Dirichlet_Cell(const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N)
 {
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         if(!psi_D(cell_index)) continue;

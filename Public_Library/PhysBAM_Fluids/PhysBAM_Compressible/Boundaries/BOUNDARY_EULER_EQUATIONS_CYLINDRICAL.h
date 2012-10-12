@@ -20,27 +20,27 @@ namespace PhysBAM{
 template<class T_input>
 class BOUNDARY_EULER_EQUATIONS_CYLINDRICAL:public BOUNDARY_UNIFORM<GRID<VECTOR<T_input,2> >,VECTOR<T_input,4> >
 {
-    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;typedef VECTOR<int,2> TV_INT;typedef ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> > T_ARRAYS_T2;
+    typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,4> TV_DIMENSION;typedef VECTOR<int,2> TV_INT;
     enum {d=4};
 public:
     BOUNDARY_EULER_EQUATIONS_CYLINDRICAL()
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T> void BOUNDARY_EULER_EQUATIONS_CYLINDRICAL<T>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u,ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     int m=grid.counts.x,n=grid.counts.y;
     int i,j;
 
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAYS_ND_BASE<TV_DIMENSION,VECTOR<int,2> >::Put(u,u_ghost); // interior
 
     // left
     for(i=-3;i<0;i++) for(j=0;j<n;j++){

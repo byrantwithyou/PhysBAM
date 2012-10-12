@@ -22,13 +22,12 @@ template<class T>
 class OPENGL_GRID_2D : public OPENGL_OBJECT
 {
 public:
-    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     GRID<TV>      &grid;
-    T_ARRAYS_BOOL *active_cell_mask,*ghost_cell_mask;
+    ARRAY<bool,TV_INT> *active_cell_mask,*ghost_cell_mask;
     T_FACE_ARRAYS_BOOL *active_face_mask,*ghost_face_mask;
-    T_ARRAYS_BOOL *active_node_mask,*ghost_node_mask;
+    ARRAY<bool,TV_INT> *active_node_mask,*ghost_node_mask;
     OPENGL_COLOR    color;
     bool draw;
     bool draw_ghost_values;

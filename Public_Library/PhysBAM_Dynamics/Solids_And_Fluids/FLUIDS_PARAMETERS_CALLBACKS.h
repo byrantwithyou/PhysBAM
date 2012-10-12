@@ -24,11 +24,9 @@ template<class T_GRID>
 class FLUIDS_PARAMETERS_CALLBACKS:public BOUNDARY_CONDITIONS_CALLBACKS<typename T_GRID::VECTOR_T>
 {    
     typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_T VECTOR_T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename REBIND<T_ARRAYS_SCALAR,VECTOR_T>::TYPE T_ARRAYS_TV;
-    typedef typename REBIND<T_ARRAYS_SCALAR,bool>::TYPE T_ARRAYS_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
 public:
 
@@ -43,7 +41,7 @@ public:
     virtual void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Reflection_Conditions(T_FACE_ARRAYS_SCALAR& psi_R,const T time){}
     virtual void Get_Source_Velocities_Masked(const T time,const T_FACE_ARRAYS_BOOL& invalid_mask){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Get_Source_Reseed_Mask(T_ARRAYS_BOOL*& cell_centered_mask,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();} // allocate mask and set to true where local reseeding should occur
+    virtual void Get_Source_Reseed_Mask(ARRAY<bool,TV_INT>*& cell_centered_mask,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();} // allocate mask and set to true where local reseeding should occur
     virtual void Get_Object_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Object_Velocities(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Analytic_Velocities(const T time) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
@@ -57,8 +55,8 @@ public:
     virtual void Get_Variable_Viscosity(T_ARRAYS_SCALAR& viscosity,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Variable_Vorticity_Confinement(T_ARRAYS_SCALAR& variable_vorticity_confinement,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Get_Divergence(T_ARRAYS_SCALAR& divergence,const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual void Get_External_Velocity(T_ARRAYS_TV& V_blend,T_ARRAYS_SCALAR& blend,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
-    virtual VECTOR_T Get_Analytic_Velocity(const VECTOR_T& location,const T time) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return VECTOR_T();}
+    virtual void Get_External_Velocity(ARRAY<TV,TV_INT>& V_blend,T_ARRAYS_SCALAR& blend,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    virtual TV Get_Analytic_Velocity(const TV& location,const T time) const {PHYSBAM_WARN_IF_NOT_OVERRIDDEN();return TV();}
     virtual void Update_Refinement(const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Topology_Changed(){}
     virtual void Scalar_Advection_Callback(const T dt,const T time){}
@@ -66,7 +64,7 @@ public:
     virtual void Modify_Removed_Particles_Before_Reincorporation(const T dt,const T time){}
     virtual void Modify_Removed_Particles_After_Reincorporation(const T dt,const T time){}
     virtual void Initialize_Fluids_Grids(){}
-    virtual void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR_T>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
+    virtual void Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}
     virtual void Substitute_Coupling_Matrices(KRYLOV_SYSTEM_BASE<T>& coupled_system,T dt,T current_velocity_time,T current_position_time,bool velocity_update,bool leakproof_solve){}
 //#####################################################################
 };

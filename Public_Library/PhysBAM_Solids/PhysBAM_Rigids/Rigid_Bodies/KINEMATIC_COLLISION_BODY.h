@@ -20,7 +20,6 @@ class KINEMATIC_COLLISION_BODY:public RIGID_BODY<typename T_GRID::VECTOR_T>
 {
 public:
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_TV;
     typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_LINEAR_INTERPOLATION_TV;
 
     typedef RIGID_BODY<TV> BASE;
@@ -28,11 +27,11 @@ public:
     using BASE::implicit_object;using BASE::particle_index;using BASE::Object_Space_Point;using BASE::Add_Structure;
 
     T_GRID* velocity_grid;
-    T_ARRAYS_TV* velocity_field; // a field defined on velocity_grid, in object space
+    ARRAY<TV,TV_INT>* velocity_field; // a field defined on velocity_grid, in object space
 
     T_LINEAR_INTERPOLATION_TV interpolation;
 
-    KINEMATIC_COLLISION_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool create_collision_geometry,T_GRID *initial_velocity_grid=0,T_ARRAYS_TV *initial_velocity_field=0)
+    KINEMATIC_COLLISION_BODY(RIGID_BODY_COLLECTION<TV>& rigid_body_collection,bool create_collision_geometry,T_GRID *initial_velocity_grid=0,ARRAY<TV,TV_INT> *initial_velocity_field=0)
         :BASE(rigid_body_collection,create_collision_geometry),velocity_grid(initial_velocity_grid),velocity_field(initial_velocity_field)
     {
         rigid_body_collection.rigid_body_particle.kinematic(particle_index)=true;

@@ -14,9 +14,9 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_MAC_GRID_PERIODIC<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     TV_INT periods=grid.Domain_Indices().Maximum_Corner();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
@@ -34,9 +34,9 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS
     assert(grid.Is_MAC_Grid());
     for(int axis=0;axis<T_GRID::dimension;axis++){
         //Fill_Ghost_Cells(grid.Get_Face_Grid(axis,u.Component(axis),u_ghost.Component(axis),0,time,number_of_ghost_cells);
-        const T_ARRAYS_T2& u_axis=u.Component(axis);
-        T_ARRAYS_T2& u_ghost_axis=u_ghost.Component(axis);
-        T_ARRAYS_T2::Put(u_axis,u_ghost_axis); // interior
+        const ARRAYS_ND_BASE<T2,TV_INT>& u_axis=u.Component(axis);
+        ARRAYS_ND_BASE<T2,TV_INT>& u_ghost_axis=u_ghost.Component(axis);
+        ARRAYS_ND_BASE<T2,TV_INT>::Put(u_axis,u_ghost_axis); // interior
         T_GRID face_grid=grid.Get_Face_Grid(axis);
         TV_INT periods=grid.Domain_Indices().Maximum_Corner();
         ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(face_grid,regions,number_of_ghost_cells);

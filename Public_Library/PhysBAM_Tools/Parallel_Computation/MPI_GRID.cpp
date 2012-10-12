@@ -962,54 +962,221 @@ template<class T_GRID> void MPI_GRID<T_GRID>::Sync_Common_Cell_Weights_To(ARRAY<
 #endif
 
 //#####################################################################
-#define P(...) __VA_ARGS__
-#define INSTANTIATION_HELPER_LENGTH(T,T_GRID,T_REAL_GRID,length) \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_UNIFORM_GRID<T_GRID>&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,length> >::TYPE&,const int,const bool) const;
-#define INSTANTIATION_HELPER(T,T_GRID,T_REAL_GRID) \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<int>::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<int>::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<T_REAL_GRID::VECTOR_T>::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS&,const int) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<T_REAL_GRID::VECTOR_T>::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS&) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<T_REAL_GRID::VECTOR_T>::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE& ) const; \
-    template void MPI_GRID<T_GRID >::Union_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Assert_Common_Face_Data(const MPI_GRID_POLICY<T_REAL_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_REAL_GRID>::FACE_ARRAYS&,const T tolerance) const;
-#define INSTANTIATION_HELPER_UNIFORM(T,T_GRID,d)     \
-    template class MPI_GRID<MPI_GRID_POLICY<T_GRID>::PARALLEL_GRID>;    \
-    INSTANTIATION_HELPER(T,P(T_GRID),P(T_GRID));                        \
-    INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),1);INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),2); \
-    INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),3);INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),4);INSTANTIATION_HELPER_LENGTH(T,P(T_GRID),P(T_GRID),5); \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Cell_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,const T_GRID&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int,const bool) const; \
-    template void MPI_GRID<T_GRID >::Average_Common_Face_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,d+2> >::TYPE&) const; \
-    template void MPI_GRID<T_GRID >::Copy_Common_Face_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&) const; \
-    template void MPI_GRID<T_GRID >::Exchange_Boundary_Face_Data(const MPI_GRID_POLICY<T_GRID>::MPI_GRID&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,d+2> >::TYPE&,const int) const; \
-    template void MPI_GRID<T_GRID >::Reduce_Add(const ARRAY<T>&,ARRAY<T>&) const; \
-    template T MPI_GRID<T_GRID >::Reduce_Add(const T&) const;
-
-#define INSTANTIATION_HELPER_ALL(T) \
-    INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,1> >),1);         \
-    INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,2> >),2);         \
-    INSTANTIATION_HELPER_UNIFORM(T,P(GRID<VECTOR<T,3> >),3);
-
-INSTANTIATION_HELPER_ALL(float);
+template class MPI_GRID<GRID<VECTOR<float,1> > >;
+template class MPI_GRID<GRID<VECTOR<float,2> > >;
+template class MPI_GRID<GRID<VECTOR<float,3> > >;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Assert_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<float,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<float,FACE_INDEX<1> >&,float) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<SYMMETRIC_MATRIX<float,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<SYMMETRIC_MATRIX<float,1>,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<VECTOR<float,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<VECTOR<float,1>,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<VECTOR<float,3>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<VECTOR<float,3>,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<float,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<float,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Copy_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<float,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<float,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,SYMMETRIC_MATRIX<float,1> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAYS_ND_BASE<SYMMETRIC_MATRIX<float,1>,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,VECTOR<float,1> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAYS_ND_BASE<VECTOR<float,1>,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,VECTOR<float,3> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAYS_ND_BASE<VECTOR<float,3>,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,GRID<VECTOR<float,1> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,float>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAYS_ND_BASE<float,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<SYMMETRIC_MATRIX<float,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<SYMMETRIC_MATRIX<float,1>,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<VECTOR<float,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<VECTOR<float,1>,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<VECTOR<float,3>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<VECTOR<float,3>,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<float,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<float,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Reduce_Add<ARRAY<float,int> >(ARRAY<float,int> const&,ARRAY<float,int>&) const;
+template void MPI_GRID<GRID<VECTOR<float,1> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > >,ARRAY<bool,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,1> > > const&,ARRAY<bool,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Assert_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<float,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<float,FACE_INDEX<2> >&,float) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<SYMMETRIC_MATRIX<float,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<SYMMETRIC_MATRIX<float,2>,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<VECTOR<float,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<VECTOR<float,2>,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<VECTOR<float,4>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<VECTOR<float,4>,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<float,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<float,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Copy_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<float,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<float,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,SYMMETRIC_MATRIX<float,2> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAYS_ND_BASE<SYMMETRIC_MATRIX<float,2>,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,VECTOR<float,2> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAYS_ND_BASE<VECTOR<float,2>,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,VECTOR<float,4> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAYS_ND_BASE<VECTOR<float,4>,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,GRID<VECTOR<float,2> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,float>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAYS_ND_BASE<float,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<SYMMETRIC_MATRIX<float,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<SYMMETRIC_MATRIX<float,2>,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<VECTOR<float,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<VECTOR<float,2>,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<VECTOR<float,4>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<VECTOR<float,4>,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<float,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<float,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Reduce_Add<ARRAY<float,int> >(ARRAY<float,int> const&,ARRAY<float,int>&) const;
+template void MPI_GRID<GRID<VECTOR<float,2> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > >,ARRAY<bool,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,2> > > const&,ARRAY<bool,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Assert_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<float,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<float,FACE_INDEX<3> >&,float) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<SYMMETRIC_MATRIX<float,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<SYMMETRIC_MATRIX<float,3>,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<VECTOR<float,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<VECTOR<float,3>,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<VECTOR<float,5>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<VECTOR<float,5>,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<float,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<float,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Copy_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<float,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<float,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,SYMMETRIC_MATRIX<float,3> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAYS_ND_BASE<SYMMETRIC_MATRIX<float,3>,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,VECTOR<float,3> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAYS_ND_BASE<VECTOR<float,3>,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,VECTOR<float,5> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAYS_ND_BASE<VECTOR<float,5>,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,GRID<VECTOR<float,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,float>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAYS_ND_BASE<float,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<SYMMETRIC_MATRIX<float,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<SYMMETRIC_MATRIX<float,3>,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<VECTOR<float,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<VECTOR<float,3>,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<VECTOR<float,5>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<VECTOR<float,5>,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<float,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<float,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Reduce_Add<ARRAY<float,int> >(ARRAY<float,int> const&,ARRAY<float,int>&) const;
+template void MPI_GRID<GRID<VECTOR<float,3> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > >,ARRAY<bool,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<float,3> > > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-INSTANTIATION_HELPER_ALL(double);
+template class MPI_GRID<GRID<VECTOR<double,1> > >;
+template class MPI_GRID<GRID<VECTOR<double,2> > >;
+template class MPI_GRID<GRID<VECTOR<double,3> > >;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Assert_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<double,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<double,FACE_INDEX<1> >&,double) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<SYMMETRIC_MATRIX<double,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<SYMMETRIC_MATRIX<double,1>,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<VECTOR<double,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<VECTOR<double,1>,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<VECTOR<double,3>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<VECTOR<double,3>,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<double,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<double,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Copy_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<double,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<double,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,SYMMETRIC_MATRIX<double,1> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAYS_ND_BASE<SYMMETRIC_MATRIX<double,1>,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,VECTOR<double,1> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAYS_ND_BASE<VECTOR<double,1>,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,VECTOR<double,3> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAYS_ND_BASE<VECTOR<double,3>,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,GRID<VECTOR<double,1> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,double>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAYS_ND_BASE<double,VECTOR<int,1> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<SYMMETRIC_MATRIX<double,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<SYMMETRIC_MATRIX<double,1>,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<VECTOR<double,1>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<VECTOR<double,1>,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<VECTOR<double,3>,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<VECTOR<double,3>,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<double,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<double,FACE_INDEX<1> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Reduce_Add<ARRAY<double,int> >(ARRAY<double,int> const&,ARRAY<double,int>&) const;
+template void MPI_GRID<GRID<VECTOR<double,1> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > >,ARRAY<bool,FACE_INDEX<1> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,1> > > const&,ARRAY<bool,FACE_INDEX<1> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Assert_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<double,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<double,FACE_INDEX<2> >&,double) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<SYMMETRIC_MATRIX<double,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<SYMMETRIC_MATRIX<double,2>,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<VECTOR<double,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<VECTOR<double,2>,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<VECTOR<double,4>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<VECTOR<double,4>,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<double,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<double,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Copy_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<double,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<double,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,SYMMETRIC_MATRIX<double,2> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAYS_ND_BASE<SYMMETRIC_MATRIX<double,2>,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,VECTOR<double,2> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAYS_ND_BASE<VECTOR<double,2>,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,VECTOR<double,4> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAYS_ND_BASE<VECTOR<double,4>,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,GRID<VECTOR<double,2> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,double>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAYS_ND_BASE<double,VECTOR<int,2> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<SYMMETRIC_MATRIX<double,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<SYMMETRIC_MATRIX<double,2>,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<VECTOR<double,2>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<VECTOR<double,2>,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<VECTOR<double,4>,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<VECTOR<double,4>,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<double,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<double,FACE_INDEX<2> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Reduce_Add<ARRAY<double,int> >(ARRAY<double,int> const&,ARRAY<double,int>&) const;
+template void MPI_GRID<GRID<VECTOR<double,2> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > >,ARRAY<bool,FACE_INDEX<2> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,2> > > const&,ARRAY<bool,FACE_INDEX<2> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Assert_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<double,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<double,FACE_INDEX<3> >&,double) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<SYMMETRIC_MATRIX<double,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<SYMMETRIC_MATRIX<double,3>,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<VECTOR<double,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<VECTOR<double,3>,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<VECTOR<double,5>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<VECTOR<double,5>,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<double,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<double,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Copy_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<double,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<double,FACE_INDEX<3> >&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,SYMMETRIC_MATRIX<double,3> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAYS_ND_BASE<SYMMETRIC_MATRIX<double,3>,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,VECTOR<double,3> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAYS_ND_BASE<VECTOR<double,3>,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,VECTOR<double,5> >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAYS_ND_BASE<VECTOR<double,5>,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,bool>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,GRID<VECTOR<double,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,double>(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAYS_ND_BASE<double,VECTOR<int,3> >&,int,bool) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<SYMMETRIC_MATRIX<double,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<SYMMETRIC_MATRIX<double,3>,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<VECTOR<double,3>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<VECTOR<double,3>,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<VECTOR<double,5>,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<VECTOR<double,5>,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<double,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<double,FACE_INDEX<3> >&,int) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Reduce_Add<ARRAY<double,int> >(ARRAY<double,int> const&,ARRAY<double,int>&) const;
+template void MPI_GRID<GRID<VECTOR<double,3> > >::Union_Common_Face_Data<MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > >,ARRAY<bool,FACE_INDEX<3> > >(
+    MPI_UNIFORM_GRID<GRID<VECTOR<double,3> > > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
 #endif

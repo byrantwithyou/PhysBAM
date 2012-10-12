@@ -55,7 +55,7 @@ template<class T_GRID> EULER_UNIFORM<T_GRID>::
 // Function Set_Up_Cut_Out_Grid
 //#####################################################################
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
-Set_Up_Cut_Out_Grid(T_ARRAYS_BOOL& psi_input)
+Set_Up_Cut_Out_Grid(ARRAY<bool,TV_INT>& psi_input)
 {
     psi_pointer=&psi_input;cut_out_grid=true;
     psi=*psi_pointer;
@@ -132,7 +132,7 @@ Restore_State(T_ARRAYS_DIMENSION_SCALAR& U_s,T_FACE_ARRAYS_SCALAR& face_velociti
 // Function Get_Cell_Velocities
 //#####################################################################
 template<class T_GRID> void EULER_UNIFORM<T_GRID>::
-Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,T_ARRAYS_VECTOR& centered_velocities)
+Get_Cell_Velocities(const T dt,const T time,const int ghost_cells,ARRAY<TV,TV_INT>& centered_velocities)
 {
     Fill_Ghost_Cells(dt,time,ghost_cells);
     for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
@@ -378,7 +378,7 @@ Euler_Step(const T dt,const T time,const bool is_time_n)
 template<class T_GRID> typename T_GRID::SCALAR EULER_UNIFORM<T_GRID>::
 CFL_Using_Sound_Speed() const
 {
-    T_ARRAYS_VECTOR velocity(grid.Domain_Indices()),velocity_minus_c(grid.Domain_Indices()),velocity_plus_c(grid.Domain_Indices());
+    ARRAY<TV,TV_INT> velocity(grid.Domain_Indices()),velocity_minus_c(grid.Domain_Indices()),velocity_plus_c(grid.Domain_Indices());
     T max_sound_speed=0;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();
@@ -415,7 +415,7 @@ CFL(const T time) const
             p_approx(iterator.Cell_Index())=eos->p(U_ghost(iterator.Cell_Index())(0),e(U_ghost,iterator.Cell_Index()));
         T_FACE_ARRAYS_SCALAR p_approx_face(grid);
         euler_projection.Compute_Face_Pressure_From_Cell_Pressures(grid,U_ghost,psi,p_approx_face,p_approx);
-        T_ARRAYS_VECTOR grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
+        ARRAY<TV,TV_INT> grad_p_approx(grid.Domain_Indices());ARRAYS_UTILITIES<T_GRID,T>::Compute_Gradient_At_Cells_From_Face_Data(grid,grad_p_approx,p_approx_face);
 
         for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){const TV_INT cell_index=iterator.Cell_Index();
             if(psi(cell_index)) for(int axis=0;axis<T_GRID::dimension;axis++){

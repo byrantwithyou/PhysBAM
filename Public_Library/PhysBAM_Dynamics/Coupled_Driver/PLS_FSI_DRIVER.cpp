@@ -362,7 +362,7 @@ Extrapolate_Velocity_Across_Interface(T time,T dt)
         GRID<TV> face_grid=grid.Get_Face_Grid(axis);
         ARRAY<T,TV_INT> phi_face(face_grid.Domain_Indices(),false);
         ARRAYS_ND_BASE<T,TV_INT>& face_velocity=example.fluid_collection.incompressible_fluid_collection.face_velocities.Component(axis);
-        ARRAYS_ND_BASE<bool,VECTOR<int,TV::m> >& fixed_face=valid_faces.Component(axis);
+        ARRAYS_ND_BASE<bool,TV_INT>& fixed_face=valid_faces.Component(axis);
         for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next()){
             TV_INT index=iterator.Face_Index();
             T phi1=phi_ghost(iterator.First_Cell_Index()),phi2=phi_ghost(iterator.Second_Cell_Index());
@@ -530,7 +530,7 @@ Advect_Fluid(const T dt,const int substep)
     if(example.Adjust_Phi_With_Sources(time+dt)) particle_levelset_evolution->Make_Signed_Distance();
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
     LOG::Time("getting sources");
-    T_ARRAYS_BOOL* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
+    ARRAY<bool,TV_INT>* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
     if(source_mask){LOG::Time("reseeding sources");particle_levelset_evolution->Reseed_Particles(time+dt,0,source_mask);delete source_mask;}
     Write_Substep("after adding sources",0,1);
 

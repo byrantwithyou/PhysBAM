@@ -24,8 +24,8 @@ class SPH_EVOLUTION_UNIFORM:public NONCOPYABLE
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
     STATIC_ASSERT((IS_SAME<typename T_GRID::GRID_TAG,UNIFORM_TAG<TV> >::value));
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
@@ -89,7 +89,7 @@ public:
     void Make_Incompressible(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Calculate_SPH_Constants();
     void Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
-    void Set_Divergence_And_Multiplier(const TV_INT cell,const T_ARRAYS_BOOL& cells_valid,const T time);
+    void Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_valid,const T time);
     void Postprocess_Particles(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Rasterize_Velocities_To_Grid(T_FACE_ARRAYS_SCALAR& velocities,T_ARRAYS_SCALAR& cell_weight,T_FACE_ARRAYS_SCALAR& face_weight);
     void Calculate_Particle_Deltas(const T_FACE_ARRAYS_SCALAR& minus_face_delta,ARRAY<TV>& delta_velocity,ARRAY<TV>& delta_weight);

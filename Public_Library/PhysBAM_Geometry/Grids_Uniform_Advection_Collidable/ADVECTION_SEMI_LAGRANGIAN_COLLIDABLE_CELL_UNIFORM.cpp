@@ -6,8 +6,8 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 using namespace PhysBAM;
 template<class T_GRID,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM(const T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,T_ARRAYS_BOOL& cell_valid_points_current_input,
-    T_ARRAYS_BOOL& cell_valid_points_next_input,const T2& default_cell_replacement_value_input,const bool extrapolate_to_revalidate_interpolation_input)
+ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM(const T_GRID_BASED_COLLISION_GEOMETRY& body_list_input,ARRAY<bool,TV_INT>& cell_valid_points_current_input,
+    ARRAY<bool,TV_INT>& cell_valid_points_next_input,const T2& default_cell_replacement_value_input,const bool extrapolate_to_revalidate_interpolation_input)
     :body_list(body_list_input),cell_valid_points_current(cell_valid_points_current_input),cell_valid_points_next(cell_valid_points_next_input),
     cell_crossover_replacement_value(default_cell_replacement_value_input),extrapolate_to_revalidate_interpolation(extrapolate_to_revalidate_interpolation_input),
     linear_interpolation_collidable(body_list,&cell_valid_points_current,cell_crossover_replacement_value,extrapolate_to_revalidate_interpolation),velocity_averaging_collidable(body_list,0)
@@ -18,9 +18,9 @@ template<class T_GRID,class T2,class T_FACE_LOOKUP> ADVECTION_SEMI_LAGRANGIAN_CO
 {
 }
 template<class T_GRID,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_ARRAYS_T2& Z_ghost,
+Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,ARRAY<T2,TV_INT>& Z,const ARRAY<T2,TV_INT>& Z_ghost,
         const T_FACE_LOOKUP& face_velocities,BOUNDARY_UNIFORM<T_GRID,T2>& boundary,const T dt,const T time,
-        const T_ARRAYS_T2* Z_min_ghost,const T_ARRAYS_T2* Z_max_ghost,T_ARRAYS_T2* Z_min,T_ARRAYS_T2* Z_max)
+        const ARRAY<T2,TV_INT>* Z_min_ghost,const ARRAY<T2,TV_INT>* Z_max_ghost,ARRAY<T2,TV_INT>* Z_min,ARRAY<T2,TV_INT>* Z_max)
 {
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell=iterator.Cell_Index();
@@ -45,12 +45,12 @@ Update_Advection_Equation_Cell_Lookup(const T_GRID& grid,T_ARRAYS_T2& Z,const T_
                 if(Z_min && Z_max){
                     VECTOR<T2,2> extrema=linear_interpolation_collidable.Extrema_Clamped_To_Array(grid,*Z_min_ghost,*Z_max_ghost,interpolation_point);
                     (*Z_min)(cell)=extrema.x;(*Z_max)(cell)=extrema.y;}}}}
-    T_ARRAYS_BOOL::Exchange(cell_valid_points_current,cell_valid_points_next);
+    ARRAY<bool,TV_INT>::Exchange(cell_valid_points_current,cell_valid_points_next);
 }
 template<class T_GRID,class T2,class T_FACE_LOOKUP> void ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,T_ARRAYS_T2& values)
+Average_To_Invalidated_Cells(const T_GRID& grid,const T2 default_value,ARRAY<T2,TV_INT>& values)
 {// average values collision aware in Gauss-Jacobi fashion
-    const T_ARRAYS_BOOL_DIMENSION& cell_neighbors_visible=body_list.cell_neighbors_visible;
+    const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=body_list.cell_neighbors_visible;
     bool done=false;ARRAY<PAIR<TV_INT,bool> > invalid_indices; // index and bool true if entry has been validated on iteration
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next())if(!cell_valid_points_current(iterator.Cell_Index()))
         invalid_indices.Append(PAIR<TV_INT,bool>(iterator.Cell_Index(),false));

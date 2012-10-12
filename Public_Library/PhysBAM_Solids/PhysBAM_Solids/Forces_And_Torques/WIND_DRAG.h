@@ -33,8 +33,7 @@ public:
     typedef typename BASE::DEFORMABLE_FREQUENCY_DATA DEFORMABLE_FREQUENCY_DATA;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::dimension-1>::OBJECT T_SIMPLICIAL_OBJECT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::dimension-1>::SIMPLEX T_SIMPLEX;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     T_SIMPLICIAL_OBJECT* deformable_simplicial_object;
     RIGID_BODY<TV>* rigid_body;
@@ -44,7 +43,7 @@ public:
     bool use_spatially_varying_wind;
     T spatially_varying_wind_viscosity;
     GRID<TV> V_grid;
-    T_ARRAYS_VECTOR *spatially_varying_wind;
+    ARRAY<TV,TV_INT> *spatially_varying_wind;
     T wind_density;
     T_ARRAYS_SCALAR *spatially_varying_wind_density,*spatially_varying_wind_pressure;
     T linear_normal_viscosity; // uses vertex normals
@@ -74,7 +73,7 @@ public:
     void Use_Constant_Wind(const T viscosity_input,const TV& wind_input=TV())
     {use_constant_wind=true;constant_wind_viscosity=viscosity_input;constant_wind=wind_input;}
 
-    void Use_Spatially_Varying_Wind(const T viscosity_input,const GRID<TV>& grid_input,T_ARRAYS_VECTOR& V_input)
+    void Use_Spatially_Varying_Wind(const T viscosity_input,const GRID<TV>& grid_input,ARRAY<TV,TV_INT>& V_input)
     {use_spatially_varying_wind=true;spatially_varying_wind_viscosity=viscosity_input;
     V_grid=grid_input;spatially_varying_wind=&V_input;}
 

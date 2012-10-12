@@ -31,8 +31,7 @@ template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T time,const T bandwidth,const int ghost_cells,const EOS<T>& eos,
     const T_GRID& grid,const T_ARRAYS_SCALAR& phi_ghost,const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,T_ARRAYS_DIMENSION_SCALAR& U)
 {
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
-    T_ARRAYS_SCALAR phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);T_ARRAYS_VECTOR velocity(phi_ghost.Domain_Indices());
+    T_ARRAYS_SCALAR phi_ghost_negated(phi_ghost),entropy(phi_ghost,false),pressure(phi_ghost,false);ARRAY<TV,TV_INT> velocity(phi_ghost.Domain_Indices());
 
     for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){
         TV_INT cell_index=iterator.Cell_Index();T density=U_ghost(cell_index)(0);TV vel=EULER<T_GRID>::Get_Velocity(U_ghost,cell_index);
@@ -82,7 +81,7 @@ Get_Dirichlet_Boundary_Conditions_For_Incompressible_Region(const T_GRID& grid,c
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T incompressible_density,
-    const T_ARRAYS_SCALAR& incompressible_phi,const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_BOOL& euler_psi,T_FACE_ARRAYS_SCALAR& compressible_face_velocities)
+    const T_ARRAYS_SCALAR& incompressible_phi,const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,T_FACE_ARRAYS_SCALAR& compressible_face_velocities)
 {
     TV_INT first_cell_index,second_cell_index,compressible_cell_index;
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -109,7 +108,7 @@ Compute_Compressible_Incompressible_Face_Velocities(const T_GRID& face_grid,cons
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_GRID& face_grid,
     const T_FACE_ARRAYS_SCALAR& incompressible_face_velocities,const T incompressible_density,const T_ARRAYS_SCALAR& incompressible_phi,
-    const T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_BOOL& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face)
+    const T_ARRAYS_DIMENSION_SCALAR& U,const ARRAY<bool,TV_INT>& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face)
 {
     TV_INT first_cell_index,second_cell_index,compressible_cell_index;
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -142,7 +141,7 @@ Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_G
 //#####################################################################
 template<class TV> void COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES<TV>::
 Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,
-    const T_ARRAYS_BOOL& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face) const
+    const ARRAY<bool,TV_INT>& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face) const
 {
     Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(face_grid,incompressible_face_velocities_,incompressible_density_,
         incompressible_phi_,U,euler_psi,p_cell,p_face);

@@ -16,7 +16,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID,class T2> EXTRAPOLATION_UNIFORM<T_GRID,T2>::
-EXTRAPOLATION_UNIFORM(const T_GRID& grid,const T_ARRAYS_BASE& phi_input,T_ARRAYS_T2_BASE& u_input,const int ghost_cells_input)
+EXTRAPOLATION_UNIFORM(const T_GRID& grid,const T_ARRAYS_BASE& phi_input,ARRAYS_ND_BASE<T2,TV_INT>& u_input,const int ghost_cells_input)
     :u(u_input),phi(phi_input),seed_indices(0),seed_done(0),collision_aware_extrapolation(false),neighbors_visible(0),ghost_cells(ghost_cells_input)
 {
     Set_Band_Width();
@@ -40,7 +40,7 @@ template<class T_GRID,class T2> EXTRAPOLATION_UNIFORM<T_GRID,T2>::
 template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
 Extrapolate(const T time,const bool fill_ghost_cells)
 {
-    T_ARRAYS_SCALAR phi_ghost(node_grid.Domain_Indices(ghost_cells),false);T_ARRAYS_T2 u_ghost(node_grid.Domain_Indices(ghost_cells),false); 
+    T_ARRAYS_SCALAR phi_ghost(node_grid.Domain_Indices(ghost_cells),false);ARRAY<T2,TV_INT> u_ghost(node_grid.Domain_Indices(ghost_cells),false); 
     if(fill_ghost_cells){
         BOUNDARY_UNIFORM<T_GRID,T> phi_boundary;phi_boundary.Fill_Ghost_Cells(node_grid,phi,phi_ghost,0,time,ghost_cells);
         boundary->Fill_Ghost_Cells(node_grid,u,u_ghost,0,time,ghost_cells);}
@@ -50,8 +50,8 @@ Extrapolate(const T time,const bool fill_ghost_cells)
     if(isobaric_fix_width) phi_ghost+=isobaric_fix_width;   
 
     int heap_length=0;
-    T_ARRAYS_BOOL done(node_grid.Domain_Indices(ghost_cells+1)); // extra cell for Update_Close_Point
-    T_ARRAYS_BOOL close(node_grid.Domain_Indices(ghost_cells));
+    ARRAY<bool,TV_INT> done(node_grid.Domain_Indices(ghost_cells+1)); // extra cell for Update_Close_Point
+    ARRAY<bool,TV_INT> close(node_grid.Domain_Indices(ghost_cells));
     ARRAY<TV_INT> heap(close.array.Size());
     heap.Fill(TV_INT()-1);
     Initialize(phi_ghost,done,close,heap,heap_length);
@@ -74,7 +74,7 @@ Extrapolate(const T time,const bool fill_ghost_cells)
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && !close(index+axis_vector))
                     Add_To_Heap(phi_ghost,heap,heap_length,close,index+axis_vector);}}}
 
-    T_ARRAYS_T2_BASE::Get(u,u_ghost);
+    ARRAYS_ND_BASE<T2,TV_INT>::Get(u,u_ghost);
     boundary->Apply_Boundary_Condition(node_grid,u,time);
 }
 //#####################################################################
@@ -82,11 +82,11 @@ Extrapolate(const T time,const bool fill_ghost_cells)
 //#####################################################################
 // pass heap_length by reference
 template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
-Initialize(const T_ARRAYS_BASE& phi,T_ARRAYS_BOOL_BASE& done,T_ARRAYS_BOOL_BASE& close,ARRAY<TV_INT>& heap,int& heap_length)
+Initialize(const T_ARRAYS_BASE& phi,ARRAYS_ND_BASE<bool,TV_INT>& done,ARRAYS_ND_BASE<bool,TV_INT>& close,ARRAY<TV_INT>& heap,int& heap_length)
 {  
     assert(!seed_indices||!seed_done);
     if(seed_indices) for(int i=0;i<seed_indices->m;i++) done((*seed_indices)(i))=true;
-    else if(seed_done) T_ARRAYS_BOOL_BASE::Put(*seed_done,done);
+    else if(seed_done) ARRAYS_ND_BASE<bool,TV_INT>::Put(*seed_done,done);
     else for(NODE_ITERATOR iterator(node_grid,ghost_cells);iterator.Valid();iterator.Next()) if(phi(iterator.Node_Index()) <= 0) done(iterator.Node_Index())=true;
 
     // find neighbors of done nodes which have positive phi
@@ -111,7 +111,7 @@ Initialize(const T_ARRAYS_BASE& phi,T_ARRAYS_BOOL_BASE& done,T_ARRAYS_BOOL_BASE&
 // needs done=0 around the outside of the domain
 // note that sqrt(phix^2+phiy^2+phiz^2)=1 if it's a distance function
 template<class T_GRID,class T2> void EXTRAPOLATION_UNIFORM<T_GRID,T2>::
-Update_Close_Point(T_ARRAYS_T2_BASE& u,const T_ARRAYS_BASE& phi,const T_ARRAYS_BOOL_BASE& done,const TV_INT& index)
+Update_Close_Point(ARRAYS_ND_BASE<T2,TV_INT>& u,const T_ARRAYS_BASE& phi,const ARRAYS_ND_BASE<bool,TV_INT>& done,const TV_INT& index)
 {
     T2 value[3]={T2()}; // the value to use in the given direction
     T phix_dx[3]={0}; // the difference in phi value for the direction

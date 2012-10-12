@@ -17,10 +17,10 @@ template<class T_GRID>
 class EULER_PROJECTION:public NONCOPYABLE
 {
     typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_T TV;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::INDEX INDEX;
     typedef VECTOR<T,T_GRID::dimension+2> TV_U;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_U>::TYPE T_ARRAYS_U;
 
 public:

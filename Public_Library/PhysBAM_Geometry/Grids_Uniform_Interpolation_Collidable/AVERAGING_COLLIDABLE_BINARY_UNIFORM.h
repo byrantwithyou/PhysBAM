@@ -14,8 +14,8 @@ template<class T_GRID,class T_FACE_LOOKUP>
 class AVERAGING_COLLIDABLE_BINARY_UNIFORM
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
 public:
     typedef T_FACE_LOOKUP FACE_LOOKUP;
@@ -52,7 +52,7 @@ public:
         return (T).5*(cell1_value+cell2_value);}
     else return (T).5*(u_cell(cell1)+u_cell(cell2));}
 
-    T Cell_To_Face(const T_GRID& grid,const int axis,const TV_INT& face_index,const T_ARRAYS_VECTOR& u_cell) const // this never needs to set starting points doesn't use velocities
+    T Cell_To_Face(const T_GRID& grid,const int axis,const TV_INT& face_index,const ARRAY<TV,TV_INT>& u_cell) const // this never needs to set starting points doesn't use velocities
     {FACE_ITERATOR iterator(grid,axis,face_index);
     TV_INT cell1,cell2;grid.Cells_Touching_Face(axis,face_index,cell1,cell2);
     if(body_list.Occupied_Face_Center(iterator)){

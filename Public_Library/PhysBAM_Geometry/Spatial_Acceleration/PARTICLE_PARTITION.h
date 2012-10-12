@@ -20,7 +20,7 @@ class PARTICLE_PARTITION
 {
     typedef typename TV::SCALAR T;
     enum WORKAROUND {d=TV::m};
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_T;
+    typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef typename REBIND<T_ARRAYS_T,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
     typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
 public:

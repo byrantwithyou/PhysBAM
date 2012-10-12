@@ -19,7 +19,7 @@ using namespace PhysBAM;
 //#####################################################################
 // calculates the approximate area using Heaviside functions
 template<class T_GRID> void LEVELSET_ADVECTION_UNIFORM<T_GRID>::
-Use_Maccormack_Advection(const T_ARRAYS_BOOL& cell_mask)
+Use_Maccormack_Advection(const ARRAY<bool,TV_INT>& cell_mask)
 {
     advection_maccormack=new ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >(*advection,0,&cell_mask,0);
     Set_Custom_Advection(*advection_maccormack);

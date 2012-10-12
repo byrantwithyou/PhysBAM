@@ -57,7 +57,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
     // find divergence free u, v and w 
     if(collidable_solver->second_order_cut_cell_method){
         //Zero_Out_Neumann_Pocket_Velocities(face_velocities); TODO: Why is this here?
-        T_ARRAYS_BOOL& psi_D=elliptic_solver->psi_D;
+        ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
         T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
         T_ARRAYS_SCALAR& phi=collidable_solver->levelset->phi;
         TV dx=p_grid.dX,one_over_dx=Inverse(dx);

@@ -396,56 +396,143 @@ Allgather(ARRAY<int>& data) const
     pthread_barrier_wait(barr);
 #endif
 }
-#define P(...) __VA_ARGS__
-#define INSTANTIATION_HELPER(T,T_GRID,d)      \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<int>::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,1> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,2> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,3> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,4> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,5> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Cell_Data(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int,const bool) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,1> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,2> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,3> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,4> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,5> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Exchange_Boundary_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&,const int) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,1> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,2> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,3> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,4> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<VECTOR<T,5> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,1> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,2> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Average_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<SYMMETRIC_MATRIX<T,3> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Assert_Common_Face_Data(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,const T) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Sync_Scalar(const GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Sync_Scalar(const GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Sync_Scalar(const GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,d> >::TYPE&,GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,d> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Distribute_Scalar(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE&,const GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Distribute_Scalar(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&,const GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<bool>::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Distribute_Scalar(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,d> >::TYPE&,const GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::REBIND<VECTOR<T,d> >::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Sync_Face_Scalar(const GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Sync_Face_Scalar(const GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Distribute_Face_Scalar(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,const GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&) const; \
-    template void THREADED_UNIFORM_GRID<T_GRID>::Distribute_Face_Scalar(GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&,const GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::REBIND<bool>::TYPE&) const; \
-    template class THREADED_UNIFORM_GRID<T_GRID>;
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,1> >),1);
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,2> >),2);
-INSTANTIATION_HELPER(float,P(GRID<VECTOR<float,3> >),3);
+template class THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >;
+template class THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >;
+template class THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Assert_Common_Face_Data<float>(ARRAY<float,FACE_INDEX<1> >&,float) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<SYMMETRIC_MATRIX<float,1> >(ARRAY<SYMMETRIC_MATRIX<float,1>,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<VECTOR<float,1> >(ARRAY<VECTOR<float,1>,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<VECTOR<float,3> >(ARRAY<VECTOR<float,3>,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Average_Common_Face_Data<float>(ARRAY<float,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Distribute_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<1> >&,ARRAY<bool,FACE_INDEX<1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Distribute_Face_Scalar<float>(ARRAY<float,FACE_INDEX<1> >&,ARRAY<float,FACE_INDEX<1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Distribute_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,ARRAYS_ND_BASE<bool,VECTOR<int,1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Distribute_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,1> >&,ARRAYS_ND_BASE<float,VECTOR<int,1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<SYMMETRIC_MATRIX<float,1> >(ARRAYS_ND_BASE<SYMMETRIC_MATRIX<float,1>,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<VECTOR<float,1> >(ARRAYS_ND_BASE<VECTOR<float,1>,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<VECTOR<float,3> >(ARRAYS_ND_BASE<VECTOR<float,3>,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Cell_Data<float>(ARRAYS_ND_BASE<float,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<SYMMETRIC_MATRIX<float,1> >(ARRAY<SYMMETRIC_MATRIX<float,1>,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<VECTOR<float,1> >(ARRAY<VECTOR<float,1>,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<VECTOR<float,3> >(ARRAY<VECTOR<float,3>,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Exchange_Boundary_Face_Data<float>(ARRAY<float,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Sync_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<1> > const&,ARRAY<bool,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Sync_Face_Scalar<float>(ARRAY<float,FACE_INDEX<1> > const&,ARRAY<float,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,1> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,1> > >::Sync_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,1> > const&,ARRAYS_ND_BASE<float,VECTOR<int,1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Assert_Common_Face_Data<float>(ARRAY<float,FACE_INDEX<2> >&,float) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<SYMMETRIC_MATRIX<float,2> >(ARRAY<SYMMETRIC_MATRIX<float,2>,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<VECTOR<float,2> >(ARRAY<VECTOR<float,2>,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<VECTOR<float,4> >(ARRAY<VECTOR<float,4>,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Average_Common_Face_Data<float>(ARRAY<float,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Distribute_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<2> >&,ARRAY<bool,FACE_INDEX<2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Distribute_Face_Scalar<float>(ARRAY<float,FACE_INDEX<2> >&,ARRAY<float,FACE_INDEX<2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Distribute_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,ARRAYS_ND_BASE<bool,VECTOR<int,2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Distribute_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,2> >&,ARRAYS_ND_BASE<float,VECTOR<int,2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<SYMMETRIC_MATRIX<float,2> >(ARRAYS_ND_BASE<SYMMETRIC_MATRIX<float,2>,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<VECTOR<float,2> >(ARRAYS_ND_BASE<VECTOR<float,2>,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<VECTOR<float,4> >(ARRAYS_ND_BASE<VECTOR<float,4>,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Cell_Data<float>(ARRAYS_ND_BASE<float,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<SYMMETRIC_MATRIX<float,2> >(ARRAY<SYMMETRIC_MATRIX<float,2>,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<VECTOR<float,2> >(ARRAY<VECTOR<float,2>,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<VECTOR<float,4> >(ARRAY<VECTOR<float,4>,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Exchange_Boundary_Face_Data<float>(ARRAY<float,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Sync_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<2> > const&,ARRAY<bool,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Sync_Face_Scalar<float>(ARRAY<float,FACE_INDEX<2> > const&,ARRAY<float,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,2> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,2> > >::Sync_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,2> > const&,ARRAYS_ND_BASE<float,VECTOR<int,2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Assert_Common_Face_Data<float>(ARRAY<float,FACE_INDEX<3> >&,float) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<SYMMETRIC_MATRIX<float,3> >(ARRAY<SYMMETRIC_MATRIX<float,3>,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<VECTOR<float,3> >(ARRAY<VECTOR<float,3>,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<VECTOR<float,5> >(ARRAY<VECTOR<float,5>,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Average_Common_Face_Data<float>(ARRAY<float,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Distribute_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<3> >&,ARRAY<bool,FACE_INDEX<3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Distribute_Face_Scalar<float>(ARRAY<float,FACE_INDEX<3> >&,ARRAY<float,FACE_INDEX<3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Distribute_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Distribute_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,3> >&,ARRAYS_ND_BASE<float,VECTOR<int,3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<SYMMETRIC_MATRIX<float,3> >(ARRAYS_ND_BASE<SYMMETRIC_MATRIX<float,3>,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<VECTOR<float,3> >(ARRAYS_ND_BASE<VECTOR<float,3>,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<VECTOR<float,5> >(ARRAYS_ND_BASE<VECTOR<float,5>,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Cell_Data<float>(ARRAYS_ND_BASE<float,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<SYMMETRIC_MATRIX<float,3> >(ARRAY<SYMMETRIC_MATRIX<float,3>,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<VECTOR<float,3> >(ARRAY<VECTOR<float,3>,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<VECTOR<float,5> >(ARRAY<VECTOR<float,5>,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Exchange_Boundary_Face_Data<float>(ARRAY<float,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<3> > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Face_Scalar<float>(ARRAY<float,FACE_INDEX<3> > const&,ARRAY<float,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<float,3> > >::Sync_Scalar<float>(ARRAYS_ND_BASE<float,VECTOR<int,3> > const&,ARRAYS_ND_BASE<float,VECTOR<int,3> >&) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,1> >),1);
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,2> >),2);
-INSTANTIATION_HELPER(double,P(GRID<VECTOR<double,3> >),3);
+template class THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >;
+template class THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >;
+template class THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Assert_Common_Face_Data<double>(ARRAY<double,FACE_INDEX<1> >&,double) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<SYMMETRIC_MATRIX<double,1> >(ARRAY<SYMMETRIC_MATRIX<double,1>,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<VECTOR<double,1> >(ARRAY<VECTOR<double,1>,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<VECTOR<double,3> >(ARRAY<VECTOR<double,3>,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Average_Common_Face_Data<double>(ARRAY<double,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Distribute_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<1> >&,ARRAY<bool,FACE_INDEX<1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Distribute_Face_Scalar<double>(ARRAY<double,FACE_INDEX<1> >&,ARRAY<double,FACE_INDEX<1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Distribute_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,ARRAYS_ND_BASE<bool,VECTOR<int,1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Distribute_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,1> >&,ARRAYS_ND_BASE<double,VECTOR<int,1> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<SYMMETRIC_MATRIX<double,1> >(ARRAYS_ND_BASE<SYMMETRIC_MATRIX<double,1>,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<VECTOR<double,1> >(ARRAYS_ND_BASE<VECTOR<double,1>,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<VECTOR<double,3> >(ARRAYS_ND_BASE<VECTOR<double,3>,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Cell_Data<double>(ARRAYS_ND_BASE<double,VECTOR<int,1> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<SYMMETRIC_MATRIX<double,1> >(ARRAY<SYMMETRIC_MATRIX<double,1>,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<VECTOR<double,1> >(ARRAY<VECTOR<double,1>,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<VECTOR<double,3> >(ARRAY<VECTOR<double,3>,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Exchange_Boundary_Face_Data<double>(ARRAY<double,FACE_INDEX<1> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Sync_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<1> > const&,ARRAY<bool,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Sync_Face_Scalar<double>(ARRAY<double,FACE_INDEX<1> > const&,ARRAY<double,FACE_INDEX<1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,1> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,1> > >::Sync_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,1> > const&,ARRAYS_ND_BASE<double,VECTOR<int,1> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Assert_Common_Face_Data<double>(ARRAY<double,FACE_INDEX<2> >&,double) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<SYMMETRIC_MATRIX<double,2> >(ARRAY<SYMMETRIC_MATRIX<double,2>,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<VECTOR<double,2> >(ARRAY<VECTOR<double,2>,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<VECTOR<double,4> >(ARRAY<VECTOR<double,4>,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Average_Common_Face_Data<double>(ARRAY<double,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Distribute_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<2> >&,ARRAY<bool,FACE_INDEX<2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Distribute_Face_Scalar<double>(ARRAY<double,FACE_INDEX<2> >&,ARRAY<double,FACE_INDEX<2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Distribute_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,ARRAYS_ND_BASE<bool,VECTOR<int,2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Distribute_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,2> >&,ARRAYS_ND_BASE<double,VECTOR<int,2> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<SYMMETRIC_MATRIX<double,2> >(ARRAYS_ND_BASE<SYMMETRIC_MATRIX<double,2>,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<VECTOR<double,2> >(ARRAYS_ND_BASE<VECTOR<double,2>,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<VECTOR<double,4> >(ARRAYS_ND_BASE<VECTOR<double,4>,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Cell_Data<double>(ARRAYS_ND_BASE<double,VECTOR<int,2> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<SYMMETRIC_MATRIX<double,2> >(ARRAY<SYMMETRIC_MATRIX<double,2>,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<VECTOR<double,2> >(ARRAY<VECTOR<double,2>,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<VECTOR<double,4> >(ARRAY<VECTOR<double,4>,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Exchange_Boundary_Face_Data<double>(ARRAY<double,FACE_INDEX<2> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Sync_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<2> > const&,ARRAY<bool,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Sync_Face_Scalar<double>(ARRAY<double,FACE_INDEX<2> > const&,ARRAY<double,FACE_INDEX<2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,2> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,2> > >::Sync_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,2> > const&,ARRAYS_ND_BASE<double,VECTOR<int,2> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Assert_Common_Face_Data<double>(ARRAY<double,FACE_INDEX<3> >&,double) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<SYMMETRIC_MATRIX<double,3> >(ARRAY<SYMMETRIC_MATRIX<double,3>,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<VECTOR<double,3> >(ARRAY<VECTOR<double,3>,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<VECTOR<double,5> >(ARRAY<VECTOR<double,5>,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Average_Common_Face_Data<double>(ARRAY<double,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Distribute_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<3> >&,ARRAY<bool,FACE_INDEX<3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Distribute_Face_Scalar<double>(ARRAY<double,FACE_INDEX<3> >&,ARRAY<double,FACE_INDEX<3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Distribute_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Distribute_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,3> >&,ARRAYS_ND_BASE<double,VECTOR<int,3> > const&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<SYMMETRIC_MATRIX<double,3> >(ARRAYS_ND_BASE<SYMMETRIC_MATRIX<double,3>,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<VECTOR<double,3> >(ARRAYS_ND_BASE<VECTOR<double,3>,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<VECTOR<double,5> >(ARRAYS_ND_BASE<VECTOR<double,5>,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Cell_Data<double>(ARRAYS_ND_BASE<double,VECTOR<int,3> >&,int,bool) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<SYMMETRIC_MATRIX<double,3> >(ARRAY<SYMMETRIC_MATRIX<double,3>,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<VECTOR<double,3> >(ARRAY<VECTOR<double,3>,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<VECTOR<double,5> >(ARRAY<VECTOR<double,5>,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Exchange_Boundary_Face_Data<double>(ARRAY<double,FACE_INDEX<3> >&,int) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Face_Scalar<bool>(ARRAY<bool,FACE_INDEX<3> > const&,ARRAY<bool,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Face_Scalar<double>(ARRAY<double,FACE_INDEX<3> > const&,ARRAY<double,FACE_INDEX<3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Scalar<bool>(ARRAYS_ND_BASE<bool,VECTOR<int,3> > const&,ARRAYS_ND_BASE<bool,VECTOR<int,3> >&) const;
+template void THREADED_UNIFORM_GRID<GRID<VECTOR<double,3> > >::Sync_Scalar<double>(ARRAYS_ND_BASE<double,VECTOR<int,3> > const&,ARRAYS_ND_BASE<double,VECTOR<int,3> >&) const;
 #endif

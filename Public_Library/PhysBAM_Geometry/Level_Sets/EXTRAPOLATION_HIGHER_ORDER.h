@@ -32,8 +32,8 @@ public:
     EXTRAPOLATION_HIGHER_ORDER();
     ~EXTRAPOLATION_HIGHER_ORDER();
 
-    static void Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& x,int iterations,int order,int fill_width);
-    static void Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,VECTOR<int,TV::m> >& x,int iterations,int order,int fill_width);
+    static void Extrapolate_Node(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width);
+    static void Extrapolate_Cell(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAYS_ND_BASE<bool,TV_INT>& inside_mask,int ghost,ARRAYS_ND_BASE<T2,TV_INT>& x,int iterations,int order,int fill_width);
     static void Extrapolate_Face(const GRID<TV>& grid,const T_LEVELSET& phi,const ARRAY<bool,FACE_INDEX<TV::m> >& inside_mask,int ghost,ARRAY<T2,FACE_INDEX<TV::m> >& x,int iterations,int order,int fill_width);
 protected:
     static void Add_Neighbors(MAPPING& m,ARRAY<TV_INT>& next,const ARRAY<TV_INT>& neighbors,const TV_INT& index,int unregistered,int registered);

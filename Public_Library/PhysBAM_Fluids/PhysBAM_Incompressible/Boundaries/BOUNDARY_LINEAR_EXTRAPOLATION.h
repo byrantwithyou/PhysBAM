@@ -22,7 +22,7 @@ class BOUNDARY_LINEAR_EXTRAPOLATION:public BOUNDARY_UNIFORM<T_GRID,T2>
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<T2>::TYPE T_ARRAYS_T2;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
 public:
     using BASE::Find_Ghost_Regions;using BASE::Boundary;
 
@@ -33,17 +33,17 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_T2& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
+    void Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_LINEAR_EXTRAPOLATION<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAY<T2,TV_INT>::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side,outward_sign=axis_side?-1:1;

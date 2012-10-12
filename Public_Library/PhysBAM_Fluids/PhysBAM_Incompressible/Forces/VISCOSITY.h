@@ -15,9 +15,9 @@ template<class T_GRID>
 class VISCOSITY:public INCOMPRESSIBLE_FLUIDS_FORCES<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;
-    typedef typename TV::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     LAPLACE_UNIFORM<T_GRID>& elliptic_solver;
 public:
     T density;

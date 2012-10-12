@@ -17,7 +17,7 @@ using namespace PhysBAM;
 //#####################################################################
 template<class T_GRID> EULER_FLUID_FORCES<T_GRID>::
 EULER_FLUID_FORCES(const T_GRID& grid_input,const T_FACE_ARRAYS_SCALAR& pressure_at_faces_input,
-    const T_FACE_ARRAYS_BOOL& solid_fluid_face_input,const T_ARRAYS_BOOL& cells_inside_fluid_input,
+    const T_FACE_ARRAYS_BOOL& solid_fluid_face_input,const ARRAY<bool,TV_INT>& cells_inside_fluid_input,
     const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_bodies_affecting_fluid_input,DEFORMABLE_PARTICLES<TV>& particles_input,
     RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input):SOLIDS_FORCES<TV>(particles_input,rigid_body_collection_input),
     grid(grid_input),pressure_at_faces(pressure_at_faces_input),solid_fluid_face(solid_fluid_face_input),

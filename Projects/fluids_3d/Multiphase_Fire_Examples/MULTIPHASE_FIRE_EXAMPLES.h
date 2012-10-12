@@ -17,11 +17,11 @@ namespace PhysBAM{
 template<class T_input>
 class MULTIPHASE_FIRE_EXAMPLES:public MULTIPHASE_FIRE_EXAMPLES_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
-    typedef T_input T;typedef VECTOR<T,3> TV;
+    typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef typename LEVELSET_POLICY<GRID<TV> >::EXTRAPOLATION_SCALAR T_EXTRAPOLATION_SCALAR;
 

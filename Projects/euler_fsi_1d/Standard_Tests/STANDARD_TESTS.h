@@ -49,9 +49,9 @@ public:
     typedef VECTOR<bool,2*T_GRID::dimension> T_FACE_VECTOR_BOOL;
     typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR; typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR; typedef typename REBIND<T_ARRAYS_SCALAR,bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     using BASE::initial_time;using BASE::last_frame;using BASE::frame_rate;using BASE::output_directory;using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::stream_type;
     using BASE::solid_body_collection;using BASE::parse_args;using BASE::test_number;using BASE::resolution;
     using BASE::solids_evolution;using BASE::Add_To_Fluid_Simulation;using BASE::Add_Volumetric_Body_To_Fluid_Simulation;
@@ -522,7 +522,7 @@ virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     BASE::Write_Output_Files(frame);
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
     if(fluids_parameters.euler->timesplit){
-        T_ARRAYS_BOOL irregular_cells(fluids_parameters.euler_solid_fluid_coupling_utilities->near_interface);
+        ARRAY<bool,TV_INT> irregular_cells(fluids_parameters.euler_solid_fluid_coupling_utilities->near_interface);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",irregular_cells);}
 }
 //#####################################################################

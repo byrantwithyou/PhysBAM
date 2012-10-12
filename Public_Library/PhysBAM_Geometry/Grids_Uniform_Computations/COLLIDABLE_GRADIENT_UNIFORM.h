@@ -25,7 +25,7 @@ void Collidable_Gradient_Magnitude(const typename COLLISION_GEOMETRY_COLLECTION_
     typedef GRID<TV> T_GRID;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
 
     T_FACE_ARRAYS_BOOL occluded_faces(grid,number_of_ghost_cells);
     collision_body_list.Compute_Psi_N(occluded_faces);

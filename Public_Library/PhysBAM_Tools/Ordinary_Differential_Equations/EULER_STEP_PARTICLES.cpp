@@ -11,7 +11,7 @@ namespace PhysBAM{
 // Function Clamped_To_Array
 //#####################################################################
 template<class TV,class T_GRID> static TV Clamped_To_Array(LINEAR_INTERPOLATION_UNIFORM<T_GRID,TV>& interpolation,const T_GRID& grid,
-    const typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<TV>::TYPE& U,const TV& X)
+    const ARRAY<TV,VECTOR<int,TV::m> >& U,const TV& X)
 {
     return interpolation.Clamped_To_Array(grid,U,X);
 }
@@ -19,7 +19,7 @@ template<class TV,class T_GRID> static TV Clamped_To_Array(LINEAR_INTERPOLATION_
 // Function Euler_Step_Node
 //#####################################################################
 template<class T_GRID> void EULER_STEP_PARTICLES<T_GRID>::
-Euler_Step_Node(ARRAY_VIEW<TV> X,const T_GRID& grid,const T_ARRAYS_TV& U,const T dt)
+Euler_Step_Node(ARRAY_VIEW<TV> X,const T_GRID& grid,const ARRAY<TV,TV_INT>& U,const T dt)
 {
     typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE interpolation;
     for(int k=0;k<X.Size();k++) X(k)+=dt*Clamped_To_Array(interpolation,grid,U,X(k));
@@ -38,7 +38,7 @@ Euler_Step_Face(ARRAY_VIEW<TV> X,const T_GRID& grid,const T_FACE_ARRAYS& face_ve
 // Function Second_Order_Runge_Kutta_Step
 //#####################################################################
 template<class T_GRID> void EULER_STEP_PARTICLES<T_GRID>::
-Second_Order_Runge_Kutta_Step(ARRAY_VIEW<TV> X,const T_GRID& grid,const T_ARRAYS_TV& U,const T dt)
+Second_Order_Runge_Kutta_Step(ARRAY_VIEW<TV> X,const T_GRID& grid,const ARRAY<TV,TV_INT>& U,const T dt)
 {
     typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE interpolation;
     for(int k=0;k<X.Size();k++){

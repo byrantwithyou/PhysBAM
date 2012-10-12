@@ -193,7 +193,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
     LOG::Time("setting divergence variables");
     projection.Use_Non_Zero_Divergence(true);projection.Use_Divergence_Multiplier(true);
     projection.divergence_multiplier.Fill(0);projection.divergence.Fill(0);
-    T_ARRAYS_BOOL cells_valid(grid.Domain_Indices(1));cells_valid.Fill(true); 
+    ARRAY<bool,TV_INT> cells_valid(grid.Domain_Indices(1));cells_valid.Fill(true); 
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         if(projection.elliptic_solver->psi_D(cell)) for(int axis=0;axis<T_GRID::dimension;axis++) for(int k=0;k<2;k++){
             TV_INT face(cell);face[axis]+=k;if(!face_weight(axis,face)) cells_valid(cell)=false;}}
@@ -219,7 +219,7 @@ Set_Up_For_Projection(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 // Function Set_Divergence_And_Multiplier
 //#####################################################################
 template<class T_GRID> void SPH_EVOLUTION_UNIFORM<T_GRID>::
-Set_Divergence_And_Multiplier(const TV_INT cell,const T_ARRAYS_BOOL& cells_valid,const T time)
+Set_Divergence_And_Multiplier(const TV_INT cell,const ARRAY<bool,TV_INT>& cells_valid,const T time)
 {
     Calculate_SPH_Constants();
 
@@ -425,7 +425,7 @@ Modify_Levelset_And_Particles_To_Create_Fluid(const T time,T_FACE_ARRAYS_SCALAR*
             for(int p=0;p<particles.Size();p++) if(one_over_total_removed_negative_particle_cell_weight(block)(p))
                 one_over_total_removed_negative_particle_cell_weight(block)(p)=1/one_over_total_removed_negative_particle_cell_weight(block)(p);}}
 
-    T_ARRAYS_BOOL converting_cells(grid.Domain_Indices(1)),converting_cells_neighborhood(grid.Domain_Indices(1));
+    ARRAY<bool,TV_INT> converting_cells(grid.Domain_Indices(1)),converting_cells_neighborhood(grid.Domain_Indices(1));
 
     bool created_fluid_from_particles=false;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
@@ -502,17 +502,59 @@ Move_Particles_Off_Grid_Boundaries(T_ARRAYS_PARTICLES& particles,const T toleran
                     else particles(block)->X(p)[axis]=min(grid.domain.Maximum_Corner()[axis]-tolerance,particles(block)->X(p)[axis]);}}}}
 }
 //#####################################################################
-#define P(...) __VA_ARGS__
-#define INSTANTIATION_HELPER(T_GRID) \
-    template class SPH_EVOLUTION_UNIFORM<T_GRID >; \
-    template void SPH_EVOLUTION_UNIFORM<T_GRID >::Copy_Particle_Attributes_To_Array(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T>*>::TYPE&) const; \
-    template void SPH_EVOLUTION_UNIFORM<T_GRID >::Make_Incompressible(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T>*>::TYPE&,GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS&,const T_GRID::SCALAR,const T_GRID::SCALAR); \
-    template void SPH_EVOLUTION_UNIFORM<T_GRID >::Move_Particles_Off_Grid_Boundaries(GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<T_GRID::VECTOR_T>*>::TYPE&,const T_GRID::SCALAR) const
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
+template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >;
+template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >;
+template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,ARRAY<float,FACE_INDEX<1> >&,float,float);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,1> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,float) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,ARRAY<float,FACE_INDEX<2> >&,float,float);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,2> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,float) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,ARRAY<float,FACE_INDEX<3> >&,float,float);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<float,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,float) const;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
+template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >;
+template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >;
+template class SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,ARRAY<double,FACE_INDEX<1> >&,double,double);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,1> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,double) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,ARRAY<double,FACE_INDEX<2> >&,double,double);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,2> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,double) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Copy_Particle_Attributes_From_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Copy_Particle_Attributes_To_Array<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&) const;
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Make_Incompressible<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,ARRAY<double,FACE_INDEX<3> >&,double,double);
+template void SPH_EVOLUTION_UNIFORM<GRID<VECTOR<double,3> > >::Move_Particles_Off_Grid_Boundaries<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,double) const;
 #endif

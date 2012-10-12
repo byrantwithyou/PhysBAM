@@ -12,7 +12,7 @@ using namespace PhysBAM;
 // Function Make_Ghost_Mask_From_Active_Mask
 //#####################################################################
 template<class T_GRID,class T2> void ARRAYS_UTILITIES<T_GRID,T2>::
-Make_Ghost_Mask_From_Active_Mask(const T_GRID& grid,const T_ARRAYS_BOOL& input_mask,T_ARRAYS_BOOL& output_mask,const int stencil_width,const int number_of_ghost_cells)
+Make_Ghost_Mask_From_Active_Mask(const T_GRID& grid,const ARRAY<bool,TV_INT>& input_mask,ARRAY<bool,TV_INT>& output_mask,const int stencil_width,const int number_of_ghost_cells)
 {
     // TODO: this could be rewritten with linear complexity independent of the size of stencil_width by handling one dimension at a time
     assert(!grid.Is_MAC_Grid());T_ARRAYS_INT temp_mask(grid.Domain_Indices(number_of_ghost_cells+1));

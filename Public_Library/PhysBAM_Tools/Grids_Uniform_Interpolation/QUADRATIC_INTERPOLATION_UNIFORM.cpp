@@ -26,7 +26,7 @@ template<class T_GRID,class T2,class T_FACE_LOOKUP> QUADRATIC_INTERPOLATION_UNIF
 // Function Clamped_To_Array
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> typename T_GRID::VECTOR_INT QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Base_Index(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Base_Index(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     TV_INT index(rint((X-grid.domain.min_corner)*grid.one_over_dX-grid.MAC_offset));
     RANGE<TV_INT> range=grid.Domain_Indices(ghost_cells);
@@ -36,7 +36,7 @@ Base_Index(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 // function Clamped_To_Array
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> T2 QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Clamped_To_Array(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     return From_Base_Node(grid,u,X,Base_Index(grid,u,X));
 }
@@ -44,7 +44,7 @@ Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
 // Function Clamped_To_Array_Weights
 //#####################################################################
 template<class T_GRID,class T2,class T_FACE_LOOKUP> ARRAY<PAIR<typename T_GRID::VECTOR_INT,typename T_GRID::VECTOR_T::SCALAR> > QUADRATIC_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>::
-Clamped_To_Array_Weights(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const
+Clamped_To_Array_Weights(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,const TV& X) const
 {
     return From_Base_Node_Weights(grid,u,X,Base_Index(grid,u,X));
 }

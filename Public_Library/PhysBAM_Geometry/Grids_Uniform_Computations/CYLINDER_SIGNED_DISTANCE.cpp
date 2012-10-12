@@ -13,12 +13,7 @@ namespace PhysBAM{
 template<class TV> class GRID;
 
 namespace SIGNED_DISTANCE{
-#define CYLINDER_SIGNED_DISTANCE_HELPER(T) \
-    template void Calculate(CYLINDER<T>&,const GRID<VECTOR<T,3> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<T,3> > >::ARRAYS_SCALAR&,bool);
-
-CYLINDER_SIGNED_DISTANCE_HELPER(float);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-CYLINDER_SIGNED_DISTANCE_HELPER(double);
 #endif
 }
 }

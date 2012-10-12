@@ -30,7 +30,7 @@ template<class TV,class T_GRID> void Rasterize_Object(const COLLISION_GEOMETRY<T
 // Function Compute_Occupied_Blocks
 //#####################################################################
 template<class T,class TV,class T_GRID> void Compute_Occupied_Blocks(const COLLISION_GEOMETRY<TV>& collision_geometry,const T_GRID& grid,
-    typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<bool>::TYPE& occupied,const bool with_body_motion,const T& extra_thickness,const T& body_thickness_factor)
+    ARRAY<bool,VECTOR<int,TV::m> >& occupied,const bool with_body_motion,const T& extra_thickness,const T& body_thickness_factor)
 {
     typedef typename REBIND<TV,int>::TYPE TV_INT;
     if(collision_geometry.Number_Of_Simplices()) Compute_Occupied_Blocks_Generic(collision_geometry,grid,occupied,with_body_motion,extra_thickness,body_thickness_factor);
@@ -43,7 +43,7 @@ template<class T,class TV,class T_GRID> void Compute_Occupied_Blocks(const COLLI
 //#####################################################################
 // Function Rasterize_Box_Onto_Blocks
 //#####################################################################
-template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& grid,typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<bool>::TYPE& occupied,const RANGE<TV>& box)
+template<class TV,class T_GRID> void Rasterize_Box_Onto_Blocks(const T_GRID& grid,ARRAY<bool,VECTOR<int,TV::m> >& occupied,const RANGE<TV>& box)
 {
     typedef typename REBIND<TV,int>::TYPE TV_INT;
     TV DX_over_two=(typename TV::SCALAR).5*grid.dX;
@@ -60,20 +60,31 @@ template<class TV,class T_GRID> void Rasterize_Box(const T_GRID& grid,OBJECTS_IN
         objects_in_cell.Add_Object_To_Cell(iterator.Cell_Index(),id);
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T,d) \
-    template void Rasterize_Object(const COLLISION_GEOMETRY<VECTOR<T,d> >&,const GRID<VECTOR<T,d> >&,OBJECTS_IN_CELL<GRID<VECTOR<T,d> >,COLLISION_GEOMETRY_ID>&,const COLLISION_GEOMETRY_ID&); \
-    template void Compute_Occupied_Blocks(const COLLISION_GEOMETRY<VECTOR<T,d> >&,const GRID<VECTOR<T,d> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<bool,d> > >::ARRAYS_SCALAR&,const bool, \
-        const T&,const T&); \
-    template void Rasterize_Box_Onto_Blocks(const GRID<VECTOR<T,d> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<bool,d> > >::ARRAYS_SCALAR&,const RANGE<VECTOR<T,d> >&); \
-    template void Rasterize_Box(const GRID<VECTOR<T,d> >&,OBJECTS_IN_CELL<GRID<VECTOR<T,d> >,COLLISION_GEOMETRY_ID>&,const RANGE<VECTOR<T,d> >&,const COLLISION_GEOMETRY_ID);
-
-INSTANTIATION_HELPER(float,1);
-INSTANTIATION_HELPER(float,2);
-INSTANTIATION_HELPER(float,3);
+template void Compute_Occupied_Blocks<float,VECTOR<float,1>,GRID<VECTOR<float,1> > >(COLLISION_GEOMETRY<VECTOR<float,1> > const&,GRID<VECTOR<float,1> > const&,
+    ARRAY<bool,VECTOR<int,VECTOR<float,1>::m> >&,bool,float const&,float const&);
+template void Compute_Occupied_Blocks<float,VECTOR<float,2>,GRID<VECTOR<float,2> > >(COLLISION_GEOMETRY<VECTOR<float,2> > const&,GRID<VECTOR<float,2> > const&,
+    ARRAY<bool,VECTOR<int,VECTOR<float,2>::m> >&,bool,float const&,float const&);
+template void Compute_Occupied_Blocks<float,VECTOR<float,3>,GRID<VECTOR<float,3> > >(COLLISION_GEOMETRY<VECTOR<float,3> > const&,GRID<VECTOR<float,3> > const&,
+    ARRAY<bool,VECTOR<int,VECTOR<float,3>::m> >&,bool,float const&,float const&);
+template void Rasterize_Object<VECTOR<double,1>,GRID<VECTOR<double,1> > >(COLLISION_GEOMETRY<VECTOR<double,1> > const&,GRID<VECTOR<double,1> > const&,
+    OBJECTS_IN_CELL<GRID<VECTOR<double,1> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
+template void Rasterize_Object<VECTOR<double,2>,GRID<VECTOR<double,2> > >(COLLISION_GEOMETRY<VECTOR<double,2> > const&,GRID<VECTOR<double,2> > const&,
+    OBJECTS_IN_CELL<GRID<VECTOR<double,2> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
+template void Rasterize_Object<VECTOR<double,3>,GRID<VECTOR<double,3> > >(COLLISION_GEOMETRY<VECTOR<double,3> > const&,GRID<VECTOR<double,3> > const&,
+    OBJECTS_IN_CELL<GRID<VECTOR<double,3> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-INSTANTIATION_HELPER(double,1);
-INSTANTIATION_HELPER(double,2);
-INSTANTIATION_HELPER(double,3);
+template void Compute_Occupied_Blocks<double,VECTOR<double,1>,GRID<VECTOR<double,1> > >(COLLISION_GEOMETRY<VECTOR<double,1> > const&,GRID<VECTOR<double,1> > const&,
+    ARRAY<bool,VECTOR<int,VECTOR<double,1>::m> >&,bool,double const&,double const&);
+template void Compute_Occupied_Blocks<double,VECTOR<double,2>,GRID<VECTOR<double,2> > >(COLLISION_GEOMETRY<VECTOR<double,2> > const&,GRID<VECTOR<double,2> > const&,
+    ARRAY<bool,VECTOR<int,VECTOR<double,2>::m> >&,bool,double const&,double const&);
+template void Compute_Occupied_Blocks<double,VECTOR<double,3>,GRID<VECTOR<double,3> > >(COLLISION_GEOMETRY<VECTOR<double,3> > const&,GRID<VECTOR<double,3> > const&,
+    ARRAY<bool,VECTOR<int,VECTOR<double,3>::m> >&,bool,double const&,double const&);
+template void Rasterize_Object<VECTOR<float,1>,GRID<VECTOR<float,1> > >(COLLISION_GEOMETRY<VECTOR<float,1> > const&,GRID<VECTOR<float,1> > const&,
+    OBJECTS_IN_CELL<GRID<VECTOR<float,1> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
+template void Rasterize_Object<VECTOR<float,2>,GRID<VECTOR<float,2> > >(COLLISION_GEOMETRY<VECTOR<float,2> > const&,GRID<VECTOR<float,2> > const&,
+    OBJECTS_IN_CELL<GRID<VECTOR<float,2> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
+template void Rasterize_Object<VECTOR<float,3>,GRID<VECTOR<float,3> > >(COLLISION_GEOMETRY<VECTOR<float,3> > const&,GRID<VECTOR<float,3> > const&,
+    OBJECTS_IN_CELL<GRID<VECTOR<float,3> >,COLLISION_GEOMETRY_ID>&,COLLISION_GEOMETRY_ID const&);
 #endif
 };
 };

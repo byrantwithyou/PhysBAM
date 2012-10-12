@@ -26,7 +26,7 @@ template<class T_input>
 class REACTIVE_EULER_2D:public REACTIVE_EULER<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<T,5> TV_DIMENSION;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
 protected:
     typedef REACTIVE_EULER<GRID<TV> > BASE;
     using BASE::cut_out_grid;using BASE::boundary;using BASE::eos;using BASE::conservation;

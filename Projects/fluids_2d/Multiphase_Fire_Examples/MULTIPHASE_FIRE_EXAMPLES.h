@@ -21,11 +21,11 @@ template<class T_input>
 class MULTIPHASE_FIRE_EXAMPLES:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef typename LEVELSET_POLICY<GRID<TV> >::EXTRAPOLATION_SCALAR T_EXTRAPOLATION_SCALAR;
 
@@ -139,7 +139,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
         T ignition_temperature=1150; // 1100 is .5 as fast as 1000, 1150 is .25 as fast as 1000.
         T_ARRAYS_SCALAR temp_temperature(fluids_parameters.grid->Domain_Indices(3));
         BOUNDARY_UNIFORM<GRID<TV> ,T> boundary;boundary.Fill_Ghost_Cells(*fluids_parameters.grid,fluids_parameters.temperature_container.temperature,temp_temperature,dt,time,3);
-        SMOOTH::Smooth<GRID<TV> >(temp_temperature,5,0);
+        SMOOTH::Smooth<T,TV::m>(temp_temperature,5,0);
         if(fluids_parameters.mpi_grid)fluids_parameters.mpi_grid->Exchange_Boundary_Cell_Data(temp_temperature,1);
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             T face_temperature=(T).5*(temp_temperature(iterator.First_Cell_Index())+temp_temperature(iterator.Second_Cell_Index()));

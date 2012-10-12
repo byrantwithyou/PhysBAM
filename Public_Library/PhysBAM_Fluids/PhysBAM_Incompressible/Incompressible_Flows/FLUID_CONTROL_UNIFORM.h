@@ -22,10 +22,9 @@ class FLUID_CONTROL_UNIFORM:public NONCOPYABLE
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_LEVELSET;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
 public:
     const FLUID_CONTROL_CALLBACKS<T_GRID>* callbacks;
     MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
@@ -62,7 +61,7 @@ public:
 
     void Smooth_Face_Array(BOUNDARY_UNIFORM<T_GRID,TV>* boundary,const T_FACE_ARRAYS_SCALAR& array,T_FACE_ARRAYS_SCALAR& smoothed_array,const int smoothing_steps)
     {int ghost_cells=3;
-    T_ARRAYS_VECTOR cell_array(levelset.grid.Domain_Indices(ghost_cells));
+    ARRAY<TV,TV_INT> cell_array(levelset.grid.Domain_Indices(ghost_cells));
     for(CELL_ITERATOR iterator(levelset.grid);iterator.Valid();iterator.Next()){
         for(int axis=0;axis<levelset.grid.dimension;axis++) cell_array(iterator.Cell_Index())[axis]=(T).5*(array(axis,iterator.First_Face_Index(axis))+array(axis,iterator.Second_Face_Index(axis)));}
     for(int i=0;i<smoothing_steps;i++){

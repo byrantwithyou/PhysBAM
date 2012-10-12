@@ -21,7 +21,7 @@ class PHILLIPS_SPECTRUM
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_T;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef typename T_ARRAYS_T::template REBIND<COMPLEX<T> >::TYPE T_ARRAYS_COMPLEX;
     typedef typename FFT_POLICY<TV>::FFT T_FFT;
 public:

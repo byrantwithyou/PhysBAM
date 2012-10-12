@@ -68,9 +68,9 @@ Display(const int in_color) const
         VECTOR<T,2> min_corner=grid.Node(-ghost_cells,-ghost_cells);
         VECTOR<T,2> max_corner=grid.Node(grid.numbers_of_cells.x+ghost_cells,grid.numbers_of_cells.y+ghost_cells);
 
-        T_ARRAYS_BOOL *cell_mask=0;
+        ARRAY<bool,TV_INT> *cell_mask=0;
         T_FACE_ARRAYS_BOOL *face_mask=0;
-        T_ARRAYS_BOOL *node_mask=0;
+        ARRAY<bool,TV_INT> *node_mask=0;
         if(draw_mask_type==0) cell_mask=active_cell_mask;
         else if(draw_mask_type==1){cell_mask=ghost_cell_mask;ghost_cells=ghost_cells?4:0;}
         else if(draw_mask_type==2) face_mask=active_face_mask;
@@ -224,13 +224,13 @@ Reinitialize()
 {
     std::string filename=STRING_UTILITIES::string_sprintf("%s/%d/active_cell_mask",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
-        if(!active_cell_mask) active_cell_mask=new T_ARRAYS_BOOL();
+        if(!active_cell_mask) active_cell_mask=new ARRAY<bool,TV_INT>();
         active_cell_mask->Clean_Memory();
         FILE_UTILITIES::Read_From_File<bool>(filename,*active_cell_mask);}
 
     filename=STRING_UTILITIES::string_sprintf("%s/%d/ghost_cell_mask",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
-        if(!ghost_cell_mask) ghost_cell_mask=new T_ARRAYS_BOOL();
+        if(!ghost_cell_mask) ghost_cell_mask=new ARRAY<bool,TV_INT>();
         ghost_cell_mask->Clean_Memory();
         FILE_UTILITIES::Read_From_File<bool>(filename,*ghost_cell_mask);}
 
@@ -248,13 +248,13 @@ Reinitialize()
 
     filename=STRING_UTILITIES::string_sprintf("%s/%d/active_node_mask",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
-        if(!active_node_mask) active_node_mask=new T_ARRAYS_BOOL();
+        if(!active_node_mask) active_node_mask=new ARRAY<bool,TV_INT>();
         active_node_mask->Clean_Memory();
         FILE_UTILITIES::Read_From_File<bool>(filename,*active_node_mask);}
 
     filename=STRING_UTILITIES::string_sprintf("%s/%d/ghost_node_mask",basedir.c_str(),frame);
     if(FILE_UTILITIES::File_Exists(filename)){
-        if(!ghost_node_mask) ghost_node_mask=new T_ARRAYS_BOOL();
+        if(!ghost_node_mask) ghost_node_mask=new ARRAY<bool,TV_INT>();
         ghost_node_mask->Clean_Memory();
         FILE_UTILITIES::Read_From_File<bool>(filename,*ghost_node_mask);}
 }

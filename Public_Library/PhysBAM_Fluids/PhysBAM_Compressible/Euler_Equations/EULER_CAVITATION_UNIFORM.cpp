@@ -75,7 +75,7 @@ Compute_Clamped_Momentum_Divergence(const T dt)
     T one_over_dt = (T)1/dt;
 
     // Compute indices of those cells where density is greater than 2*epsilon
-    T_ARRAYS_BOOL sufficient_density_cells(euler.grid.Domain_Indices(0));
+    ARRAY<bool,TV_INT> sufficient_density_cells(euler.grid.Domain_Indices(0));
     T total_deficient_density=(T)0;
     T total_donor_density=(T)0;
 
@@ -111,7 +111,7 @@ Compute_Clamped_Internal_Energy_Divergence(const T dt)
     T one_over_dt = (T)1/dt;
 
     // Compute indices of those cells where density greater than 2*epsilon
-    T_ARRAYS_BOOL sufficient_internal_energy_cells(euler.grid.Domain_Indices(0));
+    ARRAY<bool,TV_INT> sufficient_internal_energy_cells(euler.grid.Domain_Indices(0));
     T total_deficient_energy=(T)0;
     T total_donor_energy=(T)0;
 

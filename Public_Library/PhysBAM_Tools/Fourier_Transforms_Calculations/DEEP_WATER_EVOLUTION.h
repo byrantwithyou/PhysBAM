@@ -22,8 +22,7 @@ class DEEP_WATER_EVOLUTION:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef VECTOR<T,TV::dimension+1> TV_FULL;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_T;
-    typedef typename T_ARRAYS_T::template REBIND<TV>::TYPE T_ARRAYS_TV;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef typename T_ARRAYS_T::template REBIND<COMPLEX<T> >::TYPE T_ARRAYS_COMPLEX;
     typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
     typedef typename FFT_POLICY<TV>::FFT T_FFT;
@@ -36,7 +35,7 @@ public:
 
     GRID<TV> grid;
     T_ARRAYS_T h; // height
-    T_ARRAYS_TV Xh; // optional horizontal displacement
+    ARRAY<TV,TV_INT> Xh; // optional horizontal displacement
     T_ARRAYS_COMPLEX h_hat,h_hat1,h_hat2; // Fourier coefficients
     VECTOR<T_ARRAYS_COMPLEX,TV::m> dXh_hat; // Fourier coefficients
     VECTOR<T_ARRAYS_T,TV::m> displacement; // Real valued signals

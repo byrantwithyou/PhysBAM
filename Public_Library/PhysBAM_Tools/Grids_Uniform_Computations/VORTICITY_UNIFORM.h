@@ -15,7 +15,7 @@ template<class TV>
 class VORTICITY_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef typename REBIND<TV,int>::TYPE TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename TV::SPIN T_SPIN;typedef typename T_ARRAYS_SCALAR::template REBIND<T_SPIN>::TYPE T_ARRAYS_SPIN;
     typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
 

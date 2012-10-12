@@ -30,13 +30,13 @@ template<class T_GRID> VORTICITY_CONFINEMENT<T_GRID>::
 //#####################################################################
 // Function Apply_Vorticity_Confinement_Force
 //#####################################################################
-template<class T_GRID,class T_ARRAYS_TV> static void
-Apply_Vorticity_Confinement_Force_Helper(const T_GRID& grid,typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& face_velocities,T_ARRAYS_TV& F,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>* collision_body_list)
+template<class TV,class T_ARRAYS_TV,class T> static void
+Apply_Vorticity_Confinement_Force_Helper(const GRID<TV>& grid,ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,T_ARRAYS_TV& F,const GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >* collision_body_list)
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef VECTOR<int,TV::m> TV_INT;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
     // want cells to face averaging here
     if(collision_body_list){
-        AVERAGING_COLLIDABLE_UNIFORM<T_GRID,FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> > vorticity_averaging_collidable(*collision_body_list,T());
+        AVERAGING_COLLIDABLE_UNIFORM<GRID<TV>,FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<TV> > > vorticity_averaging_collidable(*collision_body_list,T());
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index();
             face_velocities.Component(axis)(iterator.Face_Index())+=vorticity_averaging_collidable.Cell_To_Face(grid,axis,iterator.Face_Index(),F);}}
     else
@@ -52,7 +52,7 @@ Apply_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<double,1> >&,ARRAY<do
 {PHYSBAM_NOT_IMPLEMENTED();}
 #endif
 template<class T_GRID> void VORTICITY_CONFINEMENT<T_GRID>::
-Apply_Vorticity_Confinement_Force(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,T_ARRAYS_VECTOR& F)
+Apply_Vorticity_Confinement_Force(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& face_velocities,ARRAY<TV,TV_INT>& F)
 {
     Apply_Vorticity_Confinement_Force_Helper(grid,face_velocities,F,collision_body_list);
 }
@@ -83,7 +83,7 @@ Compute_Vorticity_Confinement_Force_Helper(const GRID<VECTOR<T,1> >&,const T_FAC
     PHYSBAM_NOT_IMPLEMENTED();
 }
 template<class T_GRID> void VORTICITY_CONFINEMENT<T_GRID>::
-Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T_FACE_ARRAYS_BOOL* valid_mask,T_ARRAYS_VECTOR& F)
+Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T_FACE_ARRAYS_BOOL* valid_mask,ARRAY<TV,TV_INT>& F)
 {
     Compute_Vorticity_Confinement_Force_Helper(grid,face_velocities_ghost,F,collision_body_list,valid_mask);
 }
@@ -93,7 +93,7 @@ Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALA
 template<class T_GRID> void VORTICITY_CONFINEMENT<T_GRID>::
 Add_Explicit_Forces(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
-    T_ARRAYS_VECTOR F(grid.Cell_Indices(1),false);
+    ARRAY<TV,TV_INT> F(grid.Cell_Indices(1),false);
     Compute_Vorticity_Confinement_Force(grid,face_velocities_ghost,valid_mask,F);
     if(collision_body_list){
         if(use_variable_vorticity_confinement){F*=dt;F*=variable_vorticity_confinement;}else F*=dt*vorticity_confinement;}

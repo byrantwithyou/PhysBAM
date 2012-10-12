@@ -54,7 +54,7 @@ Initialize_Grids()
 template<class T_GRID> void GRID_BASED_COLLISION_GEOMETRY_UNIFORM<T_GRID>::
 Compute_Occupied_Blocks(const bool with_body_motion,const T extra_thickness,const T body_thickness_factor)
 {
-    T_ARRAYS_BOOL& occupied=with_body_motion?swept_occupied_blocks:occupied_blocks;
+    ARRAY<bool,TV_INT>& occupied=with_body_motion?swept_occupied_blocks:occupied_blocks;
     occupied.Resize(grid.Block_Indices(3),false,false);occupied.Fill(false);
     for(COLLISION_GEOMETRY_ID i(0);i<collision_geometry_collection.bodies.m;i++)
         if(collision_geometry_collection.bodies(i) && collision_geometry_collection.bodies(i)->active)

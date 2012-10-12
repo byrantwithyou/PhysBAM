@@ -27,10 +27,10 @@ template<class T_GRID> class PROJECTION_DYNAMICS_UNIFORM;
 template<class T_GRID>
 class SMOKE_STANDARD_TESTS_2D
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,2> TV;
+    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
     FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters;

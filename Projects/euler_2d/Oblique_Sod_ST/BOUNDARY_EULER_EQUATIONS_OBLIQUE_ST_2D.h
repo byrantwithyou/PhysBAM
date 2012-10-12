@@ -20,9 +20,9 @@ template<class T_GRID>
 class BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D:public BOUNDARY_UNIFORM<T_GRID,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
 {
     typedef typename T_GRID::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE::template REBIND<VECTOR<T,4> >::TYPE T_ARRAYS_T2;
     typedef VECTOR<T,2> TV;
+    typedef VECTOR<int,2> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     T angle;
     bool left_constant_extrapolation;
@@ -42,15 +42,15 @@ public:
     {right_constant_extrapolation=true;}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells) PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<T_GRID>::
-Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const GRID<TV>& grid,const ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
     //if(u.length == 1){Default();return;}
 
@@ -60,7 +60,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
     //amount of shifting to do . . 
     int shift = (int)floor(tan(angle)+1.e-16); //somewhat of a hack . . .
 
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAY<VECTOR<T,4>,TV_INT>::Put(u,u_ghost); // interior
 
     //just keep this the same for now . . .
     if (left_constant_extrapolation) for(j=0;j<n;j++) u_ghost(-2,j)=u_ghost(-1,j)=u_ghost(0,j)=u_ghost(1,j);
@@ -96,7 +96,7 @@ Fill_Ghost_Cells(const GRID<TV>& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T_GRID> void BOUNDARY_EULER_EQUATIONS_OBLIQUE_ST_2D<T_GRID>::
-Apply_Boundary_Condition(const GRID<TV>& grid,T_ARRAYS_T2& u,const T time) 
+Apply_Boundary_Condition(const GRID<TV>& grid,ARRAYS_ND_BASE<VECTOR<T,4>,TV_INT>& u,const T time) 
 {
     //if(u.length == 1){Default();return;}
     

@@ -59,7 +59,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 // Function CFL
 //#####################################################################
 template<class T_GRID> typename T_GRID::SCALAR LEVELSET_UNIFORM<T_GRID>::
-CFL(const T_ARRAYS_VECTOR& velocity) const
+CFL(const ARRAY<TV,TV_INT>& velocity) const
 {
     T dt_convection=0;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
@@ -93,7 +93,7 @@ Iterative_Find_Interface(TV left,TV right,const int iterations) const
 // Function Compute_Gradient
 //#####################################################################
 template<class T_GRID> void LEVELSET_UNIFORM<T_GRID>::
-Compute_Gradient(T_ARRAYS_VECTOR& gradient,const T time) const
+Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time) const
 {
     TV one_over_two_dx=(T).5*grid.one_over_dX;
     int ghost_cells=3;

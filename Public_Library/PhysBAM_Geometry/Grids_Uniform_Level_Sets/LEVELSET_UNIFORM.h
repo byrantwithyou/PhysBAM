@@ -21,10 +21,9 @@ template<class T_GRID_input>
 class LEVELSET_UNIFORM:public LEVELSET<typename T_GRID_input::SCALAR,T_GRID_input>
 {
     typedef typename T_GRID_input::VECTOR_T TV;typedef typename T_GRID_input::SCALAR T;
-    typedef typename T_GRID_input::VECTOR_INT TV_INT;typedef typename GRID_ARRAYS_POLICY<T_GRID_input>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef typename T_GRID_input::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename REBIND<T_ARRAYS_SCALAR,RANGE<VECTOR<T,1> > >::TYPE T_ARRAYS_INTERVAL;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID_input>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_GRID_input::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID_input::CELL_ITERATOR CELL_ITERATOR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID_input::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID_input::CELL_ITERATOR CELL_ITERATOR;
     typedef typename INTERPOLATION_POLICY<T_GRID_input>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
 public:
     typedef int HAS_UNTYPED_READ_WRITE;
@@ -35,7 +34,7 @@ public:
 
     T_GRID& grid;
     T_ARRAYS_SCALAR& phi;
-    T_ARRAYS_VECTOR* normals;
+    ARRAY<TV,TV_INT>* normals;
     T_ARRAYS_SCALAR *curvature;
     T_ARRAYS_INTERVAL *cell_range;
     THREAD_QUEUE *thread_queue;
@@ -131,9 +130,9 @@ public:
 //#####################################################################
     T Collision_Aware_Phi(const TV& location) const;
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
-    T CFL(const T_ARRAYS_VECTOR& velocity) const;
+    T CFL(const ARRAY<TV,TV_INT>& velocity) const;
     TV Iterative_Find_Interface(TV left,TV right,const int iterations=3) const;
-    void Compute_Gradient(T_ARRAYS_VECTOR& gradient,const T time=0) const;
+    void Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time=0) const;
     void Compute_Normals(const T time=0);
     TV Normal(const TV& location) const;
     TV Extended_Normal(const TV& location) const;

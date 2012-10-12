@@ -22,8 +22,8 @@ template<class T_input>
 class HAIR_SIM_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >,TRIANGLE_REPULSIONS_AND_COLLISIONS_GEOMETRY<VECTOR<T_input,3> >::MASS_MODIFIER
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
 public:
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;

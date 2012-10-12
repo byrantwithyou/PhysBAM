@@ -17,7 +17,8 @@ class PHYSBAM_TO_MATLAB_CONVERTER
 {
     typedef typename T_GRID::SCALAR T;
     typedef typename T_GRID::VECTOR_T TV;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     const std::string input_directory,output_directory;
     MATLAB_OUTPUT matlab_output;

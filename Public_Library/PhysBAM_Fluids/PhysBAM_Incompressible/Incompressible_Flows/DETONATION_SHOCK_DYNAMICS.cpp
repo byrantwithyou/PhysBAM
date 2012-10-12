@@ -53,13 +53,13 @@ Advance_One_Time_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,cons
 
     LOG::Time("Fill ghost phis and normals");
     T_ARRAYS_SCALAR& phi=levelset.phi;
-    T_ARRAYS_VECTOR& normals=*levelset.normals;
+    ARRAY<TV,TV_INT>& normals=*levelset.normals;
     T_ARRAYS_SCALAR phi_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
-    T_ARRAYS_VECTOR normals_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary_vector->Fill_Ghost_Cells(grid,normals,normals_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<TV,TV_INT> normals_ghost(grid.Cell_Indices(number_of_ghost_cells));boundary_vector->Fill_Ghost_Cells(grid,normals,normals_ghost,dt,time,number_of_ghost_cells);
 
     LOG::Time("Update state variables");
     T small_number=(T)0.01*grid.dX.x;int max_iteration=10;
-    T_ARRAYS_BOOL interfacial(grid.Cell_Indices());
+    ARRAY<bool,TV_INT> interfacial(grid.Cell_Indices());
     Make_NB_Indices(grid,phi,indices_interface,dt,time,number_of_ghost_cells);
     T mean_curvature=(T)0;
     T mean_A=(T)0,mean_B=(T)0,mean_C=(T)0,mean_D=(T)0;
@@ -152,7 +152,7 @@ Make_NB_Indices(T_GRID &grid,T_ARRAYS_SCALAR &phi,ARRAY<TV_INT>& indices_interfa
 // Function Closest_Point_On_Boundary
 //#####################################################################
 template<class T_GRID> bool DETONATION_SHOCK_DYNAMICS<T_GRID>::
-Closest_Point_On_Boundary(T_ARRAYS_SCALAR &phi_ghost,T_ARRAYS_VECTOR &normals_ghost,const TV& location,TV& new_location,const T tolerance,const int max_iterations) const
+Closest_Point_On_Boundary(T_ARRAYS_SCALAR &phi_ghost,ARRAY<TV,TV_INT> &normals_ghost,const TV& location,TV& new_location,const T tolerance,const int max_iterations) const
 {
     RANGE<TV> box=grid.Ghost_Domain(3);
     LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;

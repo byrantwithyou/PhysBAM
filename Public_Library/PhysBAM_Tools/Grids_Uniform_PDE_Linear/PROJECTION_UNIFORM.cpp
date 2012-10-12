@@ -93,7 +93,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
     Zero_Out_Neumann_Pocket_Velocities(face_velocities);
     // find divergence free u, v and w 
     TV dx=p_grid.dX,one_over_dx=Inverse(dx);
-    T_ARRAYS_BOOL& psi_D=elliptic_solver->psi_D;
+    ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
     T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
     if(scale_by_dt) p*=dt;
     if(laplace) 

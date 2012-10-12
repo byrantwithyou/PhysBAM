@@ -120,7 +120,7 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
 
     // fix the jump in pressure - interior only
     if(poisson && poisson->u_jumps){
-        T_ARRAYS_BOOL& psi_D=elliptic_solver->psi_D;
+        ARRAY<bool,TV_INT>& psi_D=elliptic_solver->psi_D;
         T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver->psi_N;
         TV dx=p_grid.dX,one_over_dx=Inverse(dx);
         int ghost_cells=1;
@@ -175,7 +175,7 @@ Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_den
         divergence_multiplier_save_for_sph=new T_ARRAYS_SCALAR(divergence_multiplier);
         use_divergence_multiplier_save_for_sph=use_divergence_multiplier;
         use_non_zero_divergence_save_for_sph=use_non_zero_divergence;
-        elliptic_solver->psi_D_save_for_sph=new T_ARRAYS_BOOL(elliptic_solver->psi_D);
+        elliptic_solver->psi_D_save_for_sph=new ARRAY<bool,TV_INT>(elliptic_solver->psi_D);
         elliptic_solver->psi_N_save_for_sph=new T_FACE_ARRAYS_BOOL(elliptic_solver->psi_N);
         for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();

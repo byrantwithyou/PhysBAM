@@ -14,8 +14,8 @@ namespace PhysBAM{
 template<class T,class RW=T>
 class OPENGL_COMPONENT_LEVELSET_2D:public OPENGL_COMPONENT
 {
-    typedef VECTOR<T,2> TV;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const std::string filename_set_input="");
     virtual ~OPENGL_COMPONENT_LEVELSET_2D();

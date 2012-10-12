@@ -12,9 +12,9 @@ using namespace PhysBAM;
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_REFLECTION_ATTENUATION<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAYS_ND_BASE<T2,TV_INT>::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int side=0;side<T_GRID::number_of_faces_per_cell;side++) Fill_Single_Ghost_Region(grid,u_ghost,regions(side),side,dt,time,number_of_ghost_cells);
 }
@@ -22,7 +22,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
 // Function Fill_Single_Ghost_Region
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_REFLECTION_ATTENUATION<T_GRID,T2>::
-Fill_Single_Ghost_Region(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells) const
+Fill_Single_Ghost_Region(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const RANGE<TV_INT>& region,const int side,const T dt,const T time,const int number_of_ghost_cells) const
 {
     if(Constant_Extrapolation(side)){
         int axis=side/2,boundary=Boundary(side,region);

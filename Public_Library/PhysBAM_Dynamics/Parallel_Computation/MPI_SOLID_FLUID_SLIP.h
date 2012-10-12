@@ -35,8 +35,7 @@ class MPI_SOLID_FLUID_SLIP:public NONCOPYABLE
     typedef typename TV::SCALAR T;
     typedef typename GRID<TV>::VECTOR_INT TV_INT;
     typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,SIDED_FACE_INDEX<TV::dimension> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename MPI_GRID_POLICY<GRID<TV> >::MPI_GRID T_MPI_GRID;
     typedef typename MPI_GRID_POLICY<GRID<TV> >::PARALLEL_GRID T_PARALLEL_GRID;
@@ -83,10 +82,10 @@ public:
     void Parallel_Solve_Solid_Part(SOLID_SYSTEM_MPI_SLIP<TV>& solid_system,GENERALIZED_VELOCITY<TV>& x_array,GENERALIZED_VELOCITY<TV>& b_array,GENERALIZED_VELOCITY<TV>& p_array,GENERALIZED_VELOCITY<TV>& ap_array,
         GENERALIZED_VELOCITY<TV>& ar_array,GENERALIZED_VELOCITY<TV>& r_array,GENERALIZED_VELOCITY<TV>& z_array,GENERALIZED_VELOCITY<TV>& zaq_array,const int min_iterations,const int max_iterations,const T tolerance);
     void Exchange_Coupled_Deformable_Particle_List(ARRAY<int>* fluid_list,ARRAY<ARRAY<int> >* results);
-    void Find_Matrix_Indices(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_divergence_cells,T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int &cell_count);
-    //void Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_divergence_cells,const int region_index,const RANGE<TV_INT>& region,T_ARRAYS_INT& cell_index_to_matrix_index,
+    void Find_Matrix_Indices(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,T_ARRAYS_INT& cell_index_to_matrix_index,T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int &cell_count);
+    //void Find_Matrix_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int region_index,const RANGE<TV_INT>& region,T_ARRAYS_INT& cell_index_to_matrix_index,
     //    T_FACE_ARRAYS_INT& face_ghost_cell_index,ARRAY<int>& face_ghost_cell_index_map,T_FACE_ARRAYS_INT& face_lambdas,INTERVAL<int>& divergence_indices,int& cell_count);
-    void Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const T_ARRAYS_BOOL& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const T_FACE_ARRAYS_INT& face_ghost_cell_index,const T_FACE_ARRAYS_INT& face_lambdas);
+    void Find_Boundary_Indices_In_Region(const GRID<TV>& local_grid,const ARRAY<bool,TV_INT>& valid_divergence_cells,const int domain_side,const RANGE<TV_INT>& region,const T_ARRAYS_INT& cell_index_to_matrix_index,const T_FACE_ARRAYS_INT& face_ghost_cell_index,const T_FACE_ARRAYS_INT& face_lambdas);
 //#####################################################################
 };
 }

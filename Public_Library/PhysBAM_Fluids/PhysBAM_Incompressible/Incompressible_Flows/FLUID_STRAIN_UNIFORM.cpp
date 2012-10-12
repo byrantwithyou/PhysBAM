@@ -44,7 +44,7 @@ template<class T_GRID> FLUID_STRAIN_UNIFORM<T_GRID>::
 // Function Update_Strain_Equation_Helper_Cell_Centered
 //#####################################################################
 template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
-Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,T_ARRAYS_VECTOR& V,
+Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& V,
     const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells)
 {
     T_ARRAYS_SYMMETRIC_MATRIX e_ghost(grid.Domain_Indices(number_of_ghost_cells),false);e_boundary->Fill_Ghost_Cells(grid,e,e_ghost,dt,time,number_of_ghost_cells);
@@ -85,7 +85,7 @@ template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
 Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
-    T_ARRAYS_VECTOR V(grid.Domain_Indices(1));
+    ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,(T)1.5,face_velocities_ghost,V,phi_ghost,number_of_ghost_cells);
@@ -101,7 +101,7 @@ Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE
     const LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset,const int region,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
-    T_ARRAYS_VECTOR V(grid.Domain_Indices(1));
+    ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next())for(int axis=0;axis<T_GRID::dimension;axis++)
         V(iterator.Cell_Index())[axis]=(T).5*(face_velocities_ghost.Component(axis)(iterator.First_Face_Index(axis))+face_velocities_ghost.Component(axis)(iterator.Second_Face_Index(axis)));
     Update_Strain_Equation_Helper_Cell_Centered(dt,time,density,0,face_velocities_ghost,V,levelset.phis(region),number_of_ghost_cells);

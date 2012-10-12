@@ -99,7 +99,7 @@ Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRA
 // Function Get_Ghost_Density
 //#####################################################################
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
-Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_VECTOR& centered_velocity_ghost) const
+Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_cells,ARRAY<TV,TV_INT>& centered_velocity_ghost) const
 {
     euler->Fill_Ghost_Cells(dt,time,number_of_ghost_cells);
     for(CELL_ITERATOR iterator(euler->grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){
@@ -215,7 +215,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
     pressure_boundary->Fill_Ghost_Cells(euler->grid,p_ghost,p_ghost,dt,0,3);
 
 #if 1
-    T_ARRAYS_VECTOR v_cell(euler->grid.Domain_Indices(3));
+    ARRAY<TV,TV_INT> v_cell(euler->grid.Domain_Indices(3));
     for(CELL_ITERATOR iterator(euler->grid,3);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         v_cell(cell_index)=euler->Get_Velocity(U_ghost,cell_index);}
 
@@ -281,7 +281,7 @@ Compute_Density_Weighted_Face_Velocities(const T dt,const T time,const T_FACE_AR
     Compute_Density_Weighted_Face_Velocities(euler->grid,face_velocities,euler->U_ghost,euler->psi,psi_N);
 }
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
-Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_ARRAYS_BOOL& psi,const T_FACE_ARRAYS_BOOL& psi_N)
+Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T_FACE_ARRAYS_BOOL& psi_N)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -296,7 +296,7 @@ Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_S
 // Function Compute_Face_Pressure_From_Cell_Pressures
 //#####################################################################
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
-Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_ARRAYS_BOOL& psi,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
+Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell)
 {
     TV_INT first_cell_index,second_cell_index;int axis;
     for(FACE_ITERATOR iterator(face_grid);iterator.Valid();iterator.Next()){
@@ -313,7 +313,7 @@ Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS
 // Function Fill_Ghost_Pressures
 //#####################################################################
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
-Get_Ghost_Pressures(const T dt,const T time,const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,
+Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,
     const T_ARRAYS_SCALAR& pressure,T_ARRAYS_SCALAR& p_ghost)
 {
     assert(!is_pressure_scaled);
@@ -350,7 +350,7 @@ Get_Pressure_At_Faces(const T dt,const T time,const T_ARRAYS_SCALAR& p_ghost,T_F
 //#####################################################################
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
-    const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time)
+    const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time)
 {
     assert(!is_pressure_scaled);
     Apply_Pressure(p_ghost,p_face,face_velocities,elliptic_solver->psi_D,elliptic_solver->psi_N,dt,time,
@@ -361,7 +361,7 @@ Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face
 //#####################################################################
 template<class T_GRID> void EULER_PROJECTION_UNIFORM<T_GRID>::
 Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
-    const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time,
+    const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time,
     T_FACE_ARRAYS_DIMENSION_SCALAR *fluxes,EULER_UNIFORM<T_GRID>* euler)
 {
     T_ARRAYS_SCALAR p_hat(p_ghost);
@@ -423,7 +423,7 @@ Consistent_Boundary_Conditions() const
 {
     if(euler->mpi_grid){
         LOG::cout<<"checking for consistent mpi boundaries"<<std::endl;
-        T_ARRAYS_BOOL psi_D_ghost(elliptic_solver->psi_D);T_FACE_ARRAYS_SCALAR psi_N_ghost(euler->grid);
+        ARRAY<bool,TV_INT> psi_D_ghost(elliptic_solver->psi_D);T_FACE_ARRAYS_SCALAR psi_N_ghost(euler->grid);
         euler->mpi_grid->Exchange_Boundary_Cell_Data(psi_D_ghost,1);
         for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){int side=2*axis+axis_side;
             if(euler->mpi_grid->Neighbor(axis,axis_side)){TV_INT exterior_cell_offset=axis_side==0?-TV_INT::Axis_Vector(axis):TV_INT();

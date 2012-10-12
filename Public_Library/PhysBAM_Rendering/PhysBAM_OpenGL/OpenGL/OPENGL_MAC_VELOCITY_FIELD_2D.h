@@ -20,9 +20,9 @@ template<class T_input>
 class OPENGL_MAC_VELOCITY_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_input,2> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<2> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;
 
@@ -33,10 +33,10 @@ public:
     ARRAY<T,FACE_INDEX<2> > &face_velocities;
     ARRAY_VIEW<T,VECTOR<int,2> > &u,&v;
     ARRAY<TV> vector_field,vector_locations;
-    T_ARRAYS_BOOL *active_cells;
+    ARRAY<bool,TV_INT> *active_cells;
     T_FACE_ARRAYS_BOOL *active_faces;
 
-    OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid,ARRAY<T,FACE_INDEX<2> > &face_velocities_input,T_ARRAYS_BOOL *active_cells_input=0,T_FACE_ARRAYS_BOOL *active_faces_input=0);
+    OPENGL_MAC_VELOCITY_FIELD_2D(GRID<TV> &grid,ARRAY<T,FACE_INDEX<2> > &face_velocities_input,ARRAY<bool,TV_INT> *active_cells_input=0,T_FACE_ARRAYS_BOOL *active_faces_input=0);
     virtual ~OPENGL_MAC_VELOCITY_FIELD_2D();
 
     void Update();  // Call when grid/u/v change

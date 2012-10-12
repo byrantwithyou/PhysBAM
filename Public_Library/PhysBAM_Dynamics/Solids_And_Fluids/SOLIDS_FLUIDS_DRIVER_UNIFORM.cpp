@@ -765,7 +765,7 @@ Project_Fluid(const T dt_projection,const T time_projection,const int substep)
                 fluids_parameters.implicit_viscosity,0,fluids_parameters.use_levelset_viscosity,fluids_parameters.callbacks,fluids_parameters.print_viscosity_matrix);
         else{
             if(fluids_parameters.second_order_cut_cell_method) PHYSBAM_NOT_IMPLEMENTED(); // TAMAR: can you add the code for this when 2nd order works
-            T_ARRAYS_BOOL psi_D_old=incompressible->projection.elliptic_solver->psi_D;T_ARRAYS_SCALAR p_old=incompressible->projection.p;
+            ARRAY<bool,TV_INT> psi_D_old=incompressible->projection.elliptic_solver->psi_D;T_ARRAYS_SCALAR p_old=incompressible->projection.p;
             T_FACE_ARRAYS_SCALAR& face_velocities=example.fluid_collection.incompressible_fluid_collection.face_velocities;
             incompressible_multiphase->Set_Dirichlet_Boundary_Conditions(particle_levelset_evolution_multiple->phis,fluids_parameters.pseudo_dirichlet_regions);
             // TODO: check me
@@ -1110,7 +1110,7 @@ Advect_Fluid(const T dt,const int substep)
         if(example.Adjust_Phi_With_Sources(time+dt)) particle_levelset_evolution->Make_Signed_Distance();
         particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
         LOG::Time("getting sources");
-        T_ARRAYS_BOOL* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
+        ARRAY<bool,TV_INT>* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
         if(source_mask){LOG::Time("reseeding sources");particle_levelset_evolution->Reseed_Particles(time+dt,0,source_mask);delete source_mask;}
         if(fluids_parameters.sph_evolution){LOG::Time("adding SPH particles for sources");example.Add_SPH_Particles_For_Sources(dt,time+dt);}
         Write_Substep("after adding sources",0,1);

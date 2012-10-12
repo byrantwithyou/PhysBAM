@@ -79,7 +79,7 @@ namespace PhysBAM{
 template<class T_input>
 class STANDARD_TESTS:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
-    typedef T_input T;typedef VECTOR<T_input,3> TV;
+    typedef T_input T;typedef VECTOR<T_input,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     SOLIDS_STANDARD_TESTS<TV> tests;
 
@@ -1124,7 +1124,7 @@ void Build_Deforming_Sphere(KINEMATIC_COLLISION_BODY<GRID<TV> >* sphere,FRAME<TV
 void Deforming_Sphere()
 {
     last_frame=240;
-    deforming_sphere=new KINEMATIC_COLLISION_BODY<GRID<TV> >(solid_body_collection.rigid_body_collection,true,new GRID<TV>,new typename KINEMATIC_COLLISION_BODY<GRID<TV> >::T_ARRAYS_TV);
+    deforming_sphere=new KINEMATIC_COLLISION_BODY<GRID<TV> >(solid_body_collection.rigid_body_collection,true,new GRID<TV>,new ARRAY<TV,TV_INT>);
     Build_Deforming_Sphere(deforming_sphere,deforming_sphere->Frame(),0,true,true);
     solid_body_collection.rigid_body_collection.Add_Rigid_Body_And_Geometry(deforming_sphere);
     

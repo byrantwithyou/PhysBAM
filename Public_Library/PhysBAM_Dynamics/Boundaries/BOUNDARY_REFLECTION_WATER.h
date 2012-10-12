@@ -14,7 +14,7 @@ template<class T_GRID,class T2>
 class BOUNDARY_REFLECTION_WATER:public BOUNDARY_UNIFORM<T_GRID,T2>
 {
     typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
+    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::FACE_ARRAYS_SCALAR T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
     typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
@@ -47,16 +47,16 @@ public:
     {tolerance=tolerance_input;}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Fill_Ghost_Cells(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_REFLECTION_WATER<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    assert(grid.Is_MAC_Grid() && phi && V);T_ARRAYS_T2::Put(u,u_ghost);
+    assert(grid.Is_MAC_Grid() && phi && V);ARRAY<T2,TV_INT>::Put(u,u_ghost);
     RANGE<TV_INT> domain_indices=grid.Domain_Indices();
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){

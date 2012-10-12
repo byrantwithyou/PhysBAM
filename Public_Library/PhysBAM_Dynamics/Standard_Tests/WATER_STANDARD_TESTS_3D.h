@@ -41,7 +41,7 @@ template<class TV> class RIGID_BODY_COLLECTION;
 template<class T_GRID>
 class WATER_STANDARD_TESTS_3D
 {
-    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
+    typedef typename T_GRID::SCALAR T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     SOLIDS_FLUIDS_EXAMPLE<TV>& example;
     FLUIDS_PARAMETERS<T_GRID>& fluids_parameters;

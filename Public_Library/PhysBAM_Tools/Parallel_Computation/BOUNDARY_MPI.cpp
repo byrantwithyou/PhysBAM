@@ -50,7 +50,7 @@ Set_Fixed_Boundary(const bool use_fixed_boundary_input,const T2 fixed_boundary_v
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_MPI<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAYS_ND_BASE<T2,TV_INT>& u,ARRAYS_ND_BASE<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells_input)
 {
     boundary.Fill_Ghost_Cells(grid,u,u_ghost,dt,time,number_of_ghost_cells_input);
     mpi_grid->Exchange_Boundary_Cell_Data(u_ghost,number_of_ghost_cells_input);
@@ -68,7 +68,7 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS
 // Function Apply_Boundary_Condition
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_MPI<T_GRID,T2>::
-Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_T2& u,const T time)
+Apply_Boundary_Condition(const T_GRID& grid,ARRAYS_ND_BASE<T2,TV_INT>& u,const T time)
 {
     boundary.Apply_Boundary_Condition(grid,u,time);
 }

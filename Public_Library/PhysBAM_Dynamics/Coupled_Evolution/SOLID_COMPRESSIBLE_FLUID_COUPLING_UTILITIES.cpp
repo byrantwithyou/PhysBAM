@@ -374,7 +374,7 @@ Update_Np1_Collision_Data(const T dt)
     T_ARRAYS_CUT_CELLS::Put(cut_cells_np1,cut_cells_n);
     CUT_CELL_COMPUTATIONS::Compute_Cut_Geometries(euler.grid,1,*collision_bodies_affecting_fluid,cut_cells_np1);
 
-    T_ARRAYS_BOOL::Put(psi_np1,psi_n); psi_np1.Fill(true);
+    ARRAY<bool,TV_INT>::Put(psi_np1,psi_n); psi_np1.Fill(true);
     for(COLLISION_GEOMETRY_ID id(0);id<collision_bodies_affecting_fluid->collision_geometry_collection.bodies.m;id++)
         if(collision_bodies_affecting_fluid->collision_geometry_collection.Is_Active(id)){
             COLLISION_GEOMETRY<TV>& collision_body=*(collision_bodies_affecting_fluid->collision_geometry_collection.bodies(id));

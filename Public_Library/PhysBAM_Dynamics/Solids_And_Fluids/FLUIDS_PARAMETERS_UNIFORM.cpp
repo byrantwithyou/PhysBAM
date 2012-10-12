@@ -54,7 +54,7 @@ namespace PhysBAM{
 template<class T_GRID> FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 FLUIDS_PARAMETERS_UNIFORM(const int number_of_regions_input,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type)
     :FLUIDS_PARAMETERS<T_GRID>(type),mpi_grid(0),particle_levelset_evolution(0),incompressible(0),particle_levelset_evolution_multiple(0),incompressible_multiphase(0),sph_evolution(0),
-    maccormack_node_mask(*new T_ARRAYS_BOOL),maccormack_cell_mask(*new T_ARRAYS_BOOL),maccormack_face_mask(*new T_FACE_ARRAYS_BOOL),
+    maccormack_node_mask(*new ARRAY<bool,TV_INT>),maccormack_cell_mask(*new ARRAY<bool,TV_INT>),maccormack_face_mask(*new T_FACE_ARRAYS_BOOL),
     maccormack_semi_lagrangian(*new ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,T_ADVECTION_SEMI_LAGRANGIAN_SCALAR>(semi_lagrangian,&maccormack_node_mask,&maccormack_cell_mask,
         &maccormack_face_mask)),euler(0),euler_solid_fluid_coupling_utilities(0),compressible_incompressible_coupling_utilities(0),projection(0),use_reacting_flow(false),
     use_flame_speed_multiplier(false),use_dsd(false),use_psi_R(false),use_levelset_viscosity(false),print_viscosity_matrix(false),use_second_order_pressure(false),
@@ -343,7 +343,7 @@ Get_Neumann_And_Dirichlet_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>* elliptic_
 template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Set_Domain_Boundary_Conditions(LAPLACE_UNIFORM<T_GRID>& elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 {
-    T_ARRAYS_BOOL& psi_D=elliptic_solver.psi_D;T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver.psi_N;
+    ARRAY<bool,TV_INT>& psi_D=elliptic_solver.psi_D;T_FACE_ARRAYS_BOOL& psi_N=elliptic_solver.psi_N;
 
     for(int axis=0;axis<T_GRID::dimension;axis++) for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side;
@@ -431,7 +431,7 @@ template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
 Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time)
 {
     if(use_external_velocity){
-        T_ARRAYS_VECTOR V_blend(grid->Domain_Indices(1));T_ARRAYS_SCALAR blend(grid->Domain_Indices(1));callbacks->Get_External_Velocity(V_blend,blend,time);
+        ARRAY<TV,TV_INT> V_blend(grid->Domain_Indices(1));T_ARRAYS_SCALAR blend(grid->Domain_Indices(1));callbacks->Get_External_Velocity(V_blend,blend,time);
         for(FACE_ITERATOR iterator(*grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();T& face_velocity=face_velocities.Component(axis)(iterator.Face_Index());
             T b=(T).5*(blend(iterator.First_Cell_Index())+blend(iterator.Second_Cell_Index()));b=(T)1-pow(max((T)1-b,(T)0),dt);
             face_velocity=(1-b)*face_velocity+b*(T).5*(V_blend(iterator.First_Cell_Index())[axis]+V_blend(iterator.Second_Cell_Index())[axis]);}}

@@ -232,7 +232,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 // Function CFL
 //#####################################################################
 template<class T_GRID> typename T_GRID::VECTOR_T::SCALAR LEVELSET_MULTIPLE<T_GRID>::
-CFL(const T_ARRAYS_VECTOR& velocity) const
+CFL(const ARRAY<TV,TV_INT>& velocity) const
 {
     T minimum_cfl=FLT_MAX;
     for(int i=0;i<levelsets.m;i++) minimum_cfl=min(minimum_cfl,levelsets(i)->CFL(velocity));

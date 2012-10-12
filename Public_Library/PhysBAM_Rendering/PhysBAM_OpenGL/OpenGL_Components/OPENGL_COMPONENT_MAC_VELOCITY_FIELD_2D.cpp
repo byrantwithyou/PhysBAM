@@ -147,7 +147,7 @@ Reinitialize()
                 else return;
                 tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(filename_active_cells.c_str(),frame);
                 LOG::cout<<"Reading active cells from"<<tmp_filename<<std::endl;
-                if(FILE_UTILITIES::File_Exists(tmp_filename)){if(!opengl_adaptive_mac_velocity_fields(i)->active_cells) opengl_adaptive_mac_velocity_fields(i)->active_cells=new T_ARRAYS_BOOL();
+                if(FILE_UTILITIES::File_Exists(tmp_filename)){if(!opengl_adaptive_mac_velocity_fields(i)->active_cells) opengl_adaptive_mac_velocity_fields(i)->active_cells=new ARRAY<bool,TV_INT>();
                     FILE_UTILITIES::Read_From_File<bool>(tmp_filename,*opengl_adaptive_mac_velocity_fields(i)->active_cells);}
                 else return;
                 tmp_filename=STRING_UTILITIES::string_sprintf(directory_adaptive.c_str(),i)+FILE_UTILITIES::Get_Frame_Filename(filename_active_faces.c_str(),frame);
@@ -177,7 +177,7 @@ Update_Divergence()
         GRID<TV>& grid=opengl_mac_velocity_field->grid;
         ARRAY_VIEW<T,VECTOR<int,2> > &u=opengl_mac_velocity_field->u,&v=opengl_mac_velocity_field->v;
         static T_FACE_ARRAYS_BOOL psi_N;
-        static T_ARRAYS_BOOL psi_D;
+        static ARRAY<bool,TV_INT> psi_D;
         bool got_all_psi=true;
         if(!psi_N_psi_D_basedir.empty()){
             std::string psi_N_filename=STRING_UTILITIES::string_sprintf("%s/%d/psi_N",psi_N_psi_D_basedir.c_str(),frame);

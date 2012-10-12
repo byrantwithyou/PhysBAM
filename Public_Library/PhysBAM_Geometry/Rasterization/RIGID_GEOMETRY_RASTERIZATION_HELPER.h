@@ -72,7 +72,7 @@ template<class TV,class T_GRID> void Rasterize_Object_Generic(const COLLISION_GE
 //#####################################################################
 // NOTE: Since Compute_Occupied_Blocks is a virtual function we can't directly make it a template member
 template<class T,class TV,class T_GRID> void
-Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry,const T_GRID& grid,typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<bool>::TYPE& occupied,
+Compute_Occupied_Blocks_Generic(const COLLISION_GEOMETRY<TV>& collision_geometry,const T_GRID& grid,ARRAY<bool,VECTOR<int,TV::m> >& occupied,
     const bool with_body_motion,const T extra_thickness,const T body_thickness_factor)
 {
     const RIGID_COLLISION_GEOMETRY<TV>* rigid_collision_geometry;

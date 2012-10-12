@@ -20,14 +20,12 @@ template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T_GRID,class T2>
 class GRID_AND_ARRAY_CONTAINER:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename REBIND<T_ARRAYS_SCALAR,T2>::TYPE T_ARRAYS_T2;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
-    typedef typename REBIND<T_ARRAYS_SCALAR,TV>::TYPE T_ARRAYS_VECTOR;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
 public:
     T_GRID& grid;
-    T_ARRAYS_T2 array;
+    ARRAY<T2,TV_INT> array;
     ADVECTION<T_GRID,T>* advection;
     ADVECTION<T_GRID,T>* advection_maccormack;
     BOUNDARY_UNIFORM<T_GRID,T>* boundary;
@@ -36,7 +34,7 @@ private:
 protected:
     BOUNDARY_UNIFORM<T_GRID,T>& boundary_default; 
     const T_FACE_ARRAYS_SCALAR* face_velocities;
-    const T_ARRAYS_VECTOR* cell_velocities;
+    const ARRAY<TV,TV_INT>* cell_velocities;
 public:
 
     GRID_AND_ARRAY_CONTAINER(T_GRID& grid_input);
@@ -63,7 +61,7 @@ public:
     void Set_Velocity(const T_FACE_ARRAYS_SCALAR* face_velocities_input)
     {face_velocities=face_velocities_input;}
     
-    void Set_Velocity(const T_ARRAYS_VECTOR* cell_velocities_input)
+    void Set_Velocity(const ARRAY<TV,TV_INT>* cell_velocities_input)
     {cell_velocities=cell_velocities_input;}
 
     template<class T_ARRAYS_BOOL>

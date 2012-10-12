@@ -19,8 +19,8 @@ class FAST_LEVELSET:public LEVELSET_POLICY<T_GRID_input>::LEVELSET
     typedef T_GRID_input T_GRID;
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::AVERAGING T_AVERAGING;
 public:
     typedef T_LEVELSET BASE;
@@ -37,7 +37,7 @@ public:
 
 //#####################################################################
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
-    T CFL(const T_ARRAYS_VECTOR& velocity) const;
+    T CFL(const ARRAY<TV,TV_INT>& velocity) const;
 public:
     void Fast_Marching_Method(const int local_advection_spatial_order, const T time=0);
     void Fast_Marching_Method_Outside_Band(const int local_advection_spatial_order, const T time=0);

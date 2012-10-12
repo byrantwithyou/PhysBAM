@@ -15,7 +15,7 @@ template<class T_GRID>
 class FACE_LOOKUP_UNIFORM
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::INDEX T_INDEX;typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS;
+    typedef typename T_GRID::INDEX T_INDEX;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;
 public:
     typedef T ELEMENT;
         

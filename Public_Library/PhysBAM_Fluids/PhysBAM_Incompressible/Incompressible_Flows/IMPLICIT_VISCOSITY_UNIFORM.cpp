@@ -121,8 +121,8 @@ Setup_Viscosity(const T dt)
 template<class T_GRID> void IMPLICIT_VISCOSITY_UNIFORM<T_GRID>::
 Setup_Boundary_Conditions(const T_FACE_ARRAYS_SCALAR& face_velocities)
 {
-    const T_FACE_ARRAYS_BOOL& p_psi_N=elliptic_solver.psi_N;const T_ARRAYS_BOOL& p_psi_D=elliptic_solver.psi_D;
-    T_FACE_ARRAYS_BOOL& psi_N=heat_solver->psi_N;T_ARRAYS_BOOL& psi_D=heat_solver->psi_D;
+    const T_FACE_ARRAYS_BOOL& p_psi_N=elliptic_solver.psi_N;const ARRAY<bool,TV_INT>& p_psi_D=elliptic_solver.psi_D;
+    T_FACE_ARRAYS_BOOL& psi_N=heat_solver->psi_N;ARRAY<bool,TV_INT>& psi_D=heat_solver->psi_D;
     const T_FACE_ARRAYS_SCALAR& p_psi_R=elliptic_solver.psi_R;
     T_FACE_ARRAYS_SCALAR& psi_R=heat_solver->psi_R;
 

@@ -16,7 +16,7 @@ class DEEP_WATER_EVOLUTION_HEIGHTS:public DEEP_WATER_EVOLUTION<TV>
     typedef typename TV::SCALAR T;
     typedef VECTOR<T,TV::dimension+1> TV_FULL;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_T;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef typename GRID<TV>::NODE_ITERATOR NODE_ITERATOR;
     typedef DEEP_WATER_EVOLUTION<TV> BASE;
 public:

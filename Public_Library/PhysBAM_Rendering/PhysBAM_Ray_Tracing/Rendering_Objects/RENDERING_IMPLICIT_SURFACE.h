@@ -18,7 +18,7 @@ template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T>
 class RENDERING_IMPLICIT_SURFACE:public RENDERING_OBJECT<T>
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,TV::m> TV_INT;
 public:
     using RENDERING_OBJECT<T>::small_number;using RENDERING_OBJECT<T>::inverse_transform;using RENDERING_OBJECT<T>::Object_Space_Ray;
     using RENDERING_OBJECT<T>::Inside;using RENDERING_OBJECT<T>::Intersection;using RENDERING_OBJECT<T>::Object_Space_Point;
@@ -31,7 +31,7 @@ public:
     {}
 
     template<class T_GRID>
-    RENDERING_IMPLICIT_SURFACE(T_GRID& grid_input,typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR& phi_input)
+    RENDERING_IMPLICIT_SURFACE(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input)
     {
         implicit_surface=new typename LEVELSET_POLICY<T_GRID>::LEVELSET_IMPLICIT_OBJECT(grid_input,phi_input);
     }

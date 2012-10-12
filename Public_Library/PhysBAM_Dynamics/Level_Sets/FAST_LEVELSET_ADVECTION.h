@@ -20,8 +20,8 @@ class FAST_LEVELSET_ADVECTION:public LEVELSET_ADVECTION_UNIFORM<T_GRID>
     typedef LEVELSET_ADVECTION_UNIFORM<T_GRID> BASE;
     typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     
 public:
     using BASE::levelset;
@@ -53,7 +53,7 @@ public:
     void Use_Level_Set_Advection_Method()
     {local_semi_lagrangian_advection=false;local_advection_spatial_order=0;}
 
-    void Euler_Step(const T_ARRAYS_VECTOR& velocity,const T dt,const T time,const int number_of_ghost_cells);
+    void Euler_Step(const ARRAY<TV,TV_INT>& velocity,const T dt,const T time,const int number_of_ghost_cells);
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& velocity,const T dt,const T time,const int number_of_ghost_cells);
     void Reinitialize(const int time_steps=10,const T time=0)
     {PhysBAM::Reinitialize((FAST_LEVELSET<GRID<TV> >*)levelset,time_steps,time,((FAST_LEVELSET<GRID<TV> >*)levelset)->half_band_width,((FAST_LEVELSET<GRID<TV> >*)levelset)->grid.dX.Max()*(1+min(3,local_advection_spatial_order)),reinitialization_cfl,reinitialization_runge_kutta_order,reinitialization_spatial_order);}

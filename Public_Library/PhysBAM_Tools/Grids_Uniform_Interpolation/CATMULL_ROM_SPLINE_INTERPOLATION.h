@@ -17,7 +17,7 @@ class CATMULL_ROM_SPLINE_INTERPOLATION:public INTERPOLATION_UNIFORM<T_GRID,T2,T_
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T::template REBIND<bool>::TYPE TV_BOOL;
-    typedef typename T_GRID::ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;typedef typename T_GRID::CELL_ITERATOR T_CELL_ITERATOR;
+    typedef typename T_GRID::CELL_ITERATOR T_CELL_ITERATOR;
 public:
     typedef INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP> BASE;
     using BASE::Clamped_Index_End_Minus_One;
@@ -28,13 +28,13 @@ public:
         :tension((T).5)
     {}
 
-    T2 Clamped_To_Array(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X) const PHYSBAM_OVERRIDE
+    T2 Clamped_To_Array(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X) const PHYSBAM_OVERRIDE
     {return From_Base_Node(grid,u,X,Clamped_Index_End_Minus_One(grid,u,X));}
 
-    T2 Clamped_To_Array_Derivative(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_BOOL& derivatives) const
+    T2 Clamped_To_Array_Derivative(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_BOOL& derivatives) const
     {return From_Base_Node_Derivative(grid,u,X,Clamped_Index_End_Minus_One(grid,u,X),derivatives);}
 
-    T2 From_Base_Node(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
+    T2 From_Base_Node(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index) const PHYSBAM_OVERRIDE
     {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
     for(int axis=0;axis<T_GRID::dimension;axis++) Catmull_Rom_Basis(X_normalized[axis],basis[axis]);
     for(T_CELL_ITERATOR iterator(grid,RANGE<TV_INT>(index-TV_INT::All_Ones_Vector(),index+2*TV_INT::All_Ones_Vector()));iterator.Valid();iterator.Next()){
@@ -42,7 +42,7 @@ public:
         sum+=u(iterator.Cell_Index())*product;}
     return sum;}
 
-    T2 From_Base_Node_Derivative(const T_GRID& grid,const T_ARRAYS_T2& u,const TV& X,const TV_INT& index,const TV_BOOL& derivative) const
+    T2 From_Base_Node_Derivative(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,const TV& X,const TV_INT& index,const TV_BOOL& derivative) const
     {T basis[T_GRID::dimension][4];T2 sum=T2();TV X_normalized=(X-grid.X(index))*grid.one_over_dX;
     for(int axis=0;axis<T_GRID::dimension;axis++)
         if(derivative[axis]) Catmull_Rom_Basis_Derivative(X_normalized[axis],basis[axis]);

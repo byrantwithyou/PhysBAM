@@ -27,8 +27,8 @@ template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T_LAPLACE>
 class HEAT_LAPLACE:public T_LAPLACE
 {
-    typedef typename T_LAPLACE::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_LAPLACE::GRID_T T_GRID;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,int>::TYPE T_ARRAYS_INT;
+    typedef typename T_LAPLACE::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_LAPLACE::GRID_T T_GRID;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,int>::TYPE T_ARRAYS_INT;
 public:
     typedef T_LAPLACE BASE;
     using BASE::filled_region_touches_dirichlet;using BASE::Solve;using BASE::Find_Solution_Regions;using BASE::f;

@@ -19,11 +19,10 @@ class UNIFORM_INTERIOR_ITERATOR_CELL:public GRID<TV>::CELL_ITERATOR
 public:
     enum WORKAROUND {d=TV::dimension};
     typedef typename TV::SCALAR T;typedef VECTOR<int,d> TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
     typedef typename GRID<TV>::CELL_ITERATOR BASE;
     using BASE::Valid;using BASE::index;
 
-    const T_ARRAYS_BOOL& outside_fluid;
+    const ARRAY<bool,TV_INT>& outside_fluid;
 
     explicit UNIFORM_INTERIOR_ITERATOR_CELL(const UNIFORM_COLLISION_AWARE_ITERATOR_FACE_INFO<TV>& info,const int number_of_ghost_cells_input=0,
         const typename GRID<TV>::REGION& region_type_input=GRID<TV>::WHOLE_REGION,const int side_input=0);

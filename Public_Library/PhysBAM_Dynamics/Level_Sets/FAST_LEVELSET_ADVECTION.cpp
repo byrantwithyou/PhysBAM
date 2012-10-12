@@ -120,7 +120,7 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAY<VECTOR<T
 // Function Euler_Step
 //#####################################################################
 template<class T_GRID> void FAST_LEVELSET_ADVECTION<T_GRID>::
-Euler_Step(const T_ARRAYS_VECTOR& V,const T dt,const T time,const int number_of_ghost_cells)
+Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of_ghost_cells)
 {
     T_GRID& grid=((T_FAST_LEVELSET*)levelset)->grid;
     T_ARRAYS_SCALAR& phi=((T_FAST_LEVELSET*)levelset)->phi;

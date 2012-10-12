@@ -19,9 +19,7 @@ template<class TV,class T_GRID,class T_ARRAY> void Calculate_Approximate(const E
 }
 //#####################################################################
 
-template void Calculate_Approximate(const ELLIPSOID<float>&,const GRID<VECTOR<float,3> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<float,3> > >::ARRAYS_SCALAR&,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template void Calculate_Approximate(const ELLIPSOID<double>&,const GRID<VECTOR<double,3> >&,GRID_ARRAYS_POLICY<GRID<VECTOR<double,3> > >::ARRAYS_SCALAR&,bool);
 #endif
 }
 }

@@ -22,7 +22,7 @@ using namespace PhysBAM;
 // Function Update_Conservation_Law
 //#####################################################################
 template<class T_GRID,int d> void HYBRID_SL_ENO_CONSERVATION<T_GRID,d>::
-Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_ARRAYS_BOOL& psi,const T dt,
+Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T dt,
     VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>& eigensystems_explicit,const T_FACE_ARRAYS_BOOL& psi_N,
     const T_FACE_ARRAYS_SCALAR& face_velocities,const bool thinshell,const TV_BOOL& outflow_boundaries,VECTOR<EIGENSYSTEM<T,TV_DIMENSION>*,T_GRID::dimension>* eigensystems_auxiliary,
     T_FACE_ARRAYS_DIMENSION_SCALAR* fluxes_auxiliary)
@@ -30,8 +30,8 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
     const T cell_volume=grid.Cell_Size();
     const T one_over_cell_volume=(T)1/cell_volume;
 
-    T_ARRAYS_BOOL regular_cell(psi);
-    T_ARRAYS_BOOL cell_near_interface(psi),cell_near_interface_tmp(psi);
+    ARRAY<bool,TV_INT> regular_cell(psi);
+    ARRAY<bool,TV_INT> cell_near_interface(psi),cell_near_interface_tmp(psi);
     T_FACE_ARRAYS_DIMENSION_SCALAR& face_fluxes(conservation->fluxes);
     T_ARRAYS_DIMENSION_SCALAR rhs(U.Domain_Indices(),true);
 

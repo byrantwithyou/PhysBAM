@@ -19,8 +19,8 @@ template<class TV> class GRID;
 template<class TV>
 class LEVELSET_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<TV>
 {
-    typedef typename TV::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<GRID<TV> >::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<T,d-1> T_PRINCIPAL_CURVATURES;
@@ -30,7 +30,7 @@ public:
     using BASE::box;
 
     T_LEVELSET levelset;
-    T_ARRAYS_VECTOR* V;
+    ARRAY<TV,TV_INT>* V;
     INTERPOLATION_UNIFORM<GRID<TV>,TV>* velocity_interpolation;
 private:
     static LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,TV> default_velocity_interpolation;

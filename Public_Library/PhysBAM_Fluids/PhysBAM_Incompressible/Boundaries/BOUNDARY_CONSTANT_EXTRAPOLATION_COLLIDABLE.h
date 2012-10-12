@@ -15,7 +15,7 @@ template<class T_GRID,class T2>
 class BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE:public BOUNDARY_UNIFORM<T_GRID,T2>
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;
-    typedef typename T_GRID::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_T2;
+    typedef typename T_GRID::ARRAYS_SCALAR T_ARRAYS_SCALAR;
     typedef typename T_GRID::NODE_ITERATOR T_NODE_ITERATOR;typedef typename T_GRID::RIGID_BODY_LIST T_RIGID_BODY_LIST;
 public:
     T_RIGID_BODY_LIST& body_list;
@@ -25,18 +25,18 @@ public:
     {}
 
 //#####################################################################
-    void Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
-    void Apply_Boundary_Condition(const T_GRID& grid,T_ARRAYS_T2& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
-    void Collision_Aware_Extrapolate(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const TV_INT& source_index,const TV_INT& ghost_index,const TV& direction,const T ray_length);
+    void Fill_Ghost_Cells(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells=3) PHYSBAM_OVERRIDE;
+    void Apply_Boundary_Condition(const T_GRID& grid,ARRAY<T2,TV_INT>& u,const T time) PHYSBAM_OVERRIDE {} // do nothing
+    void Collision_Aware_Extrapolate(const T_GRID& grid,ARRAY<T2,TV_INT>& u_ghost,const TV_INT& source_index,const TV_INT& ghost_index,const TV& direction,const T ray_length);
 //#####################################################################
 };
 //#####################################################################
 // Function Fill_Ghost_Cells
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE<T_GRID,T2>::
-Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
+Fill_Ghost_Cells(const T_GRID& grid,const ARRAY<T2,TV_INT>& u,ARRAY<T2,TV_INT>& u_ghost,const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2::Put(u,u_ghost); // interior
+    ARRAY<T2,TV_INT>::Put(u,u_ghost); // interior
     ARRAY<RANGE<TV_INT> > regions;Find_Ghost_Regions(grid,regions,number_of_ghost_cells);
     for(int axis=0;axis<T_GRID::dimension;axis++)for(int axis_side=0;axis_side<2;axis_side++){
         int side=2*axis+axis_side,outward_sign=axis_side?-1:1;
@@ -51,7 +51,7 @@ Fill_Ghost_Cells(const T_GRID& grid,const T_ARRAYS_T2& u,T_ARRAYS_T2& u_ghost,co
 // Function Collision_Aware_Extrapolate
 //#####################################################################
 template<class T_GRID,class T2> void BOUNDARY_CONSTANT_EXTRAPOLATION_COLLIDABLE<T_GRID,T2>::
-Collision_Aware_Extrapolate(const T_GRID& grid,T_ARRAYS_T2& u_ghost,const TV_INT& source_index,const TV_INT& ghost_index,const TV& direction,const T ray_length)
+Collision_Aware_Extrapolate(const T_GRID& grid,ARRAY<T2,TV_INT>& u_ghost,const TV_INT& source_index,const TV_INT& ghost_index,const TV& direction,const T ray_length)
 {
     int body_id;
     RAY<TV> ray=RAY<TV>(grid.X(source_index),direction,true);ray.semi_infinite=false;ray.t_max=ray_length;

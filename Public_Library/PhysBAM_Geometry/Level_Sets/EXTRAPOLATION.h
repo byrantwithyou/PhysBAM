@@ -8,6 +8,7 @@
 #define __EXTRAPOLATION__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/constants.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{
@@ -18,8 +19,8 @@ template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 template<class T_GRID,class T2>
 class EXTRAPOLATION:public NONCOPYABLE
 {
-    typedef typename T_GRID::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE T_ARRAYS_BASE;typedef typename T_ARRAYS_BASE::template REBIND<bool>::TYPE T_ARRAYS_BOOL_BASE;
+    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<int,TV::m> TV_INT;
+    typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_GRID::INDEX T_INDEX;
 public:
     T band_width; // band for extrapolation near the interface
@@ -41,10 +42,10 @@ public:
     {boundary=&boundary_input;}
 
 protected:
-    static void Add_To_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,T_ARRAYS_BOOL_BASE& close,const T_INDEX& index)
+    static void Add_To_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,ARRAYS_ND_BASE<bool,TV_INT>& close,const T_INDEX& index)
     {close(index)=true;heap(heap_length++)=index;Up_Heap(phi,heap,heap_length-1);}
 
-    static T_INDEX Remove_Root_From_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,T_ARRAYS_BOOL_BASE& close)
+    static T_INDEX Remove_Root_From_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int& heap_length,ARRAYS_ND_BASE<bool,TV_INT>& close)
     {T_INDEX index=heap(0);close(index)=false;Down_Heap(phi,heap,heap_length);heap_length--;return index;}
 
     static void Up_Heap(const T_ARRAYS_BASE& phi,ARRAY<T_INDEX>& heap,int child)

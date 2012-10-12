@@ -50,7 +50,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 // Function CFL
 //#####################################################################
 template<class T_GRID> typename T_GRID::SCALAR FAST_LEVELSET<T_GRID>::
-CFL(const T_ARRAYS_VECTOR& V) const
+CFL(const ARRAY<TV,TV_INT>& V) const
 {
     T dt_convection=0;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell))<=half_band_width)

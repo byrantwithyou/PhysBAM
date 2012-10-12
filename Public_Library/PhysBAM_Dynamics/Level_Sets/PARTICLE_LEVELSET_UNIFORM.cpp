@@ -596,7 +596,7 @@ Delete_Marked_Particles(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLES& particles)
 // Function Reseed_Particles
 //#####################################################################
 template<class T_GRID> int PARTICLE_LEVELSET_UNIFORM<T_GRID>::
-Reseed_Particles(const T time,T_ARRAYS_BOOL* cell_centered_mask)
+Reseed_Particles(const T time,ARRAY<bool,TV_INT>* cell_centered_mask)
 {
     int new_particles=0;
     bool normals_defined=(levelset.normals!=0);levelset.Compute_Normals(); // make sure normals are accurate
@@ -672,7 +672,7 @@ Reseed_Delete_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const in
 //#####################################################################
 template<class T_GRID> int PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,
-    const T time,T_ARRAYS_BOOL* cell_centered_mask)
+    const T time,ARRAY<bool,TV_INT>* cell_centered_mask)
 {
     int number_added=0;
     RANGE<TV_INT> domain(levelset.grid.Domain_Indices());domain.max_corner+=TV_INT::All_Ones_Vector();
@@ -682,7 +682,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
 #ifdef USE_PTHREADS
     if(thread_queue){
         DOMAIN_ITERATOR_THREADED_ALPHA<PARTICLE_LEVELSET_UNIFORM<T_GRID>,TV> threaded_iterator(domain,thread_queue);
-        threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,int,T_ARRAYS_BOOL*,ARRAY<int,TV_INT>&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Reseed_Add_Particles_Threaded_Part_One,particles,other_particles,sign,cell_centered_mask,number_of_particles_to_add);
+        threaded_iterator.template Run<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES&,int,ARRAY<bool,TV_INT>*,ARRAY<int,TV_INT>&>(*this,&PARTICLE_LEVELSET_UNIFORM<T_GRID>::Reseed_Add_Particles_Threaded_Part_One,particles,other_particles,sign,cell_centered_mask,number_of_particles_to_add);
 
         ARRAY<pthread_mutex_t> mutexes(threaded_iterator.domains.m);
         for(int i=0;i<threaded_iterator.domains.m;i++)pthread_mutex_init(&mutexes(i),0);
@@ -716,7 +716,7 @@ Reseed_Add_Particles(T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PA
 // Function Reseed_Add_Particles
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
-Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,T_ARRAYS_BOOL* cell_centered_mask,ARRAY<int,TV_INT>& number_of_particles_to_add)
+Reseed_Add_Particles_Threaded_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& other_particles,const int sign,ARRAY<bool,TV_INT>* cell_centered_mask,ARRAY<int,TV_INT>& number_of_particles_to_add)
 {
     for(NODE_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT block_index=iterator.Node_Index();
         BLOCK_UNIFORM<T_GRID> block(levelset.grid,block_index);
@@ -1187,7 +1187,7 @@ Reincorporate_Removed_Particles(const BLOCK_UNIFORM<T_GRID>& block,PARTICLE_LEVE
             half_impulse = removed_particles.V(k)*mass_scaling*pow<TV::dimension>(r)*half_unit_sphere_size_over_cell_size;
             for(int i=0;i<T_GRID::dimension;i++){
                 TV_INT face_index(cell_index);
-                typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_BASE &face_velocity=V->Component(i);
+                ARRAYS_ND_BASE<T,TV_INT> &face_velocity=V->Component(i);
 #ifdef USE_PTHREADS
                 if(thread_queue) pthread_mutex_lock(&cell_lock); //TODO (mlentine) Remove this with thread_safe code
 #endif
@@ -1227,7 +1227,7 @@ Delete_Particles_Far_From_Interface(const int discrete_band)
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Far_From_Interface_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface)
 {
-    const T_ARRAYS_BOOL_DIMENSION& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
+    const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
     for(CELL_ITERATOR iterator(levelset.grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT neighbor=cell+TV_INT::Axis_Vector(axis);
             if(near_interface.Valid_Index(neighbor) && cell_neighbors_visible(cell)(axis) && LEVELSET_UTILITIES<T>::Interface(levelset.phi(cell),levelset.phi(neighbor))){
@@ -1239,7 +1239,7 @@ Delete_Particles_Far_From_Interface_Part_One(RANGE<TV_INT>& domain,T_ARRAYS_CHAR
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Delete_Particles_Far_From_Interface_Part_Two(RANGE<TV_INT>& domain,T_ARRAYS_CHAR& near_interface,const int distance)
 {
-    const T_ARRAYS_BOOL_DIMENSION& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
+    const ARRAY<VECTOR<bool,TV::m>,TV_INT>& cell_neighbors_visible=levelset.collision_body_list->cell_neighbors_visible;
     RANGE<TV_INT> ghost_domain(domain);if(ghost_domain.min_corner.x>0) ghost_domain.min_corner.x-=1;
     char new_mask=1<<(distance+1),old_mask=new_mask-1;
     for(CELL_ITERATOR iterator(levelset.grid,ghost_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
@@ -1313,19 +1313,35 @@ Exchange_Overlap_Particles()
         Exchange_Overlapping_Block_Particles(*mpi_grid,template_particles,positive_particles,(int)(cfl_number+(T)3.5),*this);}
 }
 //#####################################################################
-#define INSTANTIATION_HELPER(T_GRID) \
-    template class PARTICLE_LEVELSET_UNIFORM<T_GRID >;                  \
-    template void PARTICLE_LEVELSET_UNIFORM<T_GRID >::Euler_Step_Particles_Wrapper(const GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& V,PARTICLE_LEVELSET_UNIFORM<T_GRID >::T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt, \
-        const T time,const bool update_particle_cells_after_euler_step,const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries); \
-    template void PARTICLE_LEVELSET_UNIFORM<T_GRID >::Euler_Step_Particles_Wrapper(const GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS& V,PARTICLE_LEVELSET_UNIFORM<T_GRID >::T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt, \
-        const T time,const bool update_particle_cells_after_euler_step,const bool assume_particles_in_correct_blocks,const bool enforce_domain_boundaries);
-
-#define P(...) __VA_ARGS__
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<float,3> >));
+template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,1> > >;
+template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,2> > >;
+template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,3> > >;
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,1> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    ARRAY<float,FACE_INDEX<1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float,float,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,1> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> > >(
+    ARRAY<float,FACE_INDEX<1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,1> >*,VECTOR<int,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float,float,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,2> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    ARRAY<float,FACE_INDEX<2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float,float,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,2> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> > >(
+    ARRAY<float,FACE_INDEX<2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,2> >*,VECTOR<int,2> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float,float,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,3> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    ARRAY<float,FACE_INDEX<3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float,float,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<float,3> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> > >(
+    ARRAY<float,FACE_INDEX<3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<float,3> >*,VECTOR<int,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float,float,bool,bool,bool);
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,1> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,2> >));
-INSTANTIATION_HELPER(P(GRID<VECTOR<double,3> >));
+template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,1> > >;
+template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,2> > >;
+template class PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,3> > >;
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,1> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    ARRAY<double,FACE_INDEX<1> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,1> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> > >(
+    ARRAY<double,FACE_INDEX<1> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,1> >*,VECTOR<int,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,2> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    ARRAY<double,FACE_INDEX<2> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,2> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> > >(
+    ARRAY<double,FACE_INDEX<2> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,2> >*,VECTOR<int,2> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,3> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    ARRAY<double,FACE_INDEX<3> > const&,ARRAY<PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
+template void PARTICLE_LEVELSET_UNIFORM<GRID<VECTOR<double,3> > >::Euler_Step_Particles_Wrapper<ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> > >(
+    ARRAY<double,FACE_INDEX<3> > const&,ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<VECTOR<double,3> >*,VECTOR<int,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double,double,bool,bool,bool);
 #endif

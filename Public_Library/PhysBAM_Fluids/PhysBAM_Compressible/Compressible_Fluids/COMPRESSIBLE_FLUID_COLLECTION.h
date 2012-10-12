@@ -16,17 +16,16 @@ namespace PhysBAM{
 template<class T_GRID>
 class COMPRESSIBLE_FLUID_COLLECTION:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
     const T_GRID& grid;
 
     EOS<T>* eos;
-    T_ARRAYS_BOOL psi;
+    ARRAY<bool,TV_INT> psi;
     T_ARRAYS_DIMENSION_SCALAR U;
         
     COMPRESSIBLE_FLUID_COLLECTION(const T_GRID& grid_input);

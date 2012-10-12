@@ -17,10 +17,10 @@ template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template <class T_GRID,class ID>
 class OBJECTS_IN_CELL
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR::template REBIND<ID>::TYPE T_ARRAYS_ID;typedef typename T_GRID::INDEX T_INDEX;typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename T_GRID::INDEX T_INDEX;typedef typename T_GRID::BLOCK T_BLOCK;
 public:
-    T_ARRAYS_ID object_in_cell;
+    ARRAY<ID,TV_INT> object_in_cell;
     ARRAY<ARRAY<ID>,ID> object_list;
 private:
     mutable ARRAY<ID> merge;

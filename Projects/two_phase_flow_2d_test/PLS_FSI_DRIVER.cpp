@@ -538,7 +538,7 @@ Advect_Fluid(const T dt,const int substep)
     if(example.Adjust_Phi_With_Sources(time+dt)) particle_levelset_evolution->Make_Signed_Distance();
     particle_levelset_evolution->Fill_Levelset_Ghost_Cells(time+dt);
     LOG::Time("getting sources");
-    T_ARRAYS_BOOL* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
+    ARRAY<bool,TV_INT>* source_mask=0;example.Get_Source_Reseed_Mask(source_mask,time+dt);
     if(source_mask){LOG::Time("reseeding sources");particle_levelset_evolution->Reseed_Particles(time+dt,0,source_mask);delete source_mask;}
     Write_Substep("after adding sources",0,1);
 

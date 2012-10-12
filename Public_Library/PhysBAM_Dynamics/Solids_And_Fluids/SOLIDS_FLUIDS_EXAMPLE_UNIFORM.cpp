@@ -312,9 +312,9 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
 // Function Get_Source_Reseed_Mask
 //#####################################################################
 template<class T_GRID> template<class GEOMETRY> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
-Get_Source_Reseed_Mask(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,T_ARRAYS_BOOL*& cell_centered_mask,const bool reset_mask)
+Get_Source_Reseed_Mask(const GEOMETRY& source,const T_TRANSFORMATION_MATRIX& world_to_source,ARRAY<bool,TV_INT>*& cell_centered_mask,const bool reset_mask)
 {
-    if(reset_mask){if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new T_ARRAYS_BOOL(fluids_parameters.grid->Domain_Indices(1));}
+    if(reset_mask){if(cell_centered_mask) delete cell_centered_mask;cell_centered_mask=new ARRAY<bool,TV_INT>(fluids_parameters.grid->Domain_Indices(1));}
     T padding=3*fluids_parameters.grid->dX.Max();
     for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         if(!source.Outside(world_to_source.Homogeneous_Times(iterator.Location()),padding)) (*cell_centered_mask)(iterator.Cell_Index())=true;

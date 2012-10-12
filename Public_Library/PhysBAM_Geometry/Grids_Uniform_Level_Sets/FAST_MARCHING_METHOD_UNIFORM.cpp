@@ -35,7 +35,7 @@ template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
 {
     /*int heap_length=0;
-    T_ARRAYS_BOOL done(cell_grid.Domain_Indices(ghost_cells+1));
+    ARRAY<bool,TV_INT> done(cell_grid.Domain_Indices(ghost_cells+1));
     T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
     close_k.Fill(-1);
     ARRAY<TV_INT> heap(cell_grid.Domain_Indices().Thickened(ghost_cells).Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
@@ -73,8 +73,8 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
     int heap_length=0;
     T_ARRAYS_SCALAR phi_new(domain);
     for(CELL_ITERATOR iterator(cell_grid,domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_new(cell)=phi_ghost(cell);}
-    T_ARRAYS_BOOL done(domain.Thickened(1));
-    T_ARRAYS_INT close_k(domain.Thickened(1),false); // extra cell so that it is the same size as the done array for optimizations
+    ARRAY<bool,TV_INT> done(domain.Thickened(1));
+    ARRAY<int,TV_INT> close_k(domain.Thickened(1),false); // extra cell so that it is the same size as the done array for optimizations
     close_k.Fill(-1);
     ARRAY<TV_INT> heap(domain.Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
     Initialize_Interface(domain,phi_new,done,close_k,heap,heap_length,seed_indices,add_seed_indices_for_ghost_cells);
@@ -108,10 +108,10 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
 {
     int heap_length=0;
-    T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
+    ARRAY<int,TV_INT> close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
     close_k.Fill(-1);
     ARRAY<TV_INT> heap(cell_grid.Domain_Indices().Thickened(ghost_cells).Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
     Initialize_Interface(phi_ghost,done,close_k,heap,heap_length,add_seed_indices_for_ghost_cells);
@@ -142,7 +142,7 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,const T stop
 // Function Update_Or_Add_Neighbor
 //#####################################################################
 template<class T_GRID> inline void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Update_Or_Add_Neighbor(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor)
+Update_Or_Add_Neighbor(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor)
 {
     if(close_k(neighbor)>=0){
         Update_Close_Point(phi_ghost,done,neighbor);
@@ -158,7 +158,7 @@ Update_Or_Add_Neighbor(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_I
 //#####################################################################
 // pass heap_length by reference
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
 { 
     RANGE<TV_INT> interior_domain=domain.Thickened(-ghost_cells);
     if(seed_indices){
@@ -207,7 +207,7 @@ Initialize_Interface(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_B
 //#####################################################################
 // pass heap_length by reference
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
 { 
     if(seed_indices){
         for(int i=0;i<seed_indices->m;i++)Add_To_Initial(done,close_k,(*seed_indices)(i));
@@ -232,7 +232,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
                 if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(index1),phi_ghost(index2))){
                     Add_To_Initial(done,close_k,index1);Add_To_Initial(done,close_k,index2);}}}
 
-        DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue).template Run<T_ARRAYS_SCALAR&,T_ARRAYS_SCALAR&,T_ARRAYS_BOOL&>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Initialize_Interface_Threaded,phi_ghost,phi_new,done);
+        DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue).template Run<T_ARRAYS_SCALAR&,T_ARRAYS_SCALAR&,ARRAY<bool,TV_INT>&>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Initialize_Interface_Threaded,phi_ghost,phi_new,done);
 
         for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) phi_ghost(iterator.Cell_Index())=phi_new(iterator.Cell_Index());} // initialize done points
 
@@ -247,7 +247,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
 //#####################################################################
 // pass heap_length by reference
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_SCALAR& phi_new,T_ARRAYS_BOOL& done)
+Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_SCALAR& phi_new,ARRAY<bool,TV_INT>& done)
 { 
     T_LEVELSET levelset_ghost(cell_grid,phi_ghost);
 
@@ -340,7 +340,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
 //#####################################################################
 // pass heap_length by reference
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,ARRAY<TV_INT>& heap,int& heap_length,const bool add_seed_indices_for_ghost_cells)
+Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const bool add_seed_indices_for_ghost_cells)
 {
     T_LEVELSET levelset_ghost(cell_grid,phi_ghost);
 
@@ -363,7 +363,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_BOOL& done,T_ARRAYS_INT
 //##################################################################### 
 // needs done=0 around the outside of the domain
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Update_Close_Point(T_ARRAYS_SCALAR& phi_ghost,const T_ARRAYS_BOOL& done,const TV_INT& index)
+Update_Close_Point(T_ARRAYS_SCALAR& phi_ghost,const ARRAY<bool,TV_INT>& done,const TV_INT& index)
 {
     T value[3]={}; // the phi value to use in the given direction
     T dx[3]; // the edge length in the given direction
@@ -389,7 +389,7 @@ Update_Close_Point(T_ARRAYS_SCALAR& phi_ghost,const T_ARRAYS_BOOL& done,const TV
 // Function Add_To_Initial
 //##################################################################### 
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Add_To_Initial(T_ARRAYS_BOOL& done,T_ARRAYS_INT& close_k,const TV_INT& index)
+Add_To_Initial(ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,const TV_INT& index)
 {
     done(index)=true;close_k(index)=-1; // add to done, remove from close 
     // add neighbors to close if not done 

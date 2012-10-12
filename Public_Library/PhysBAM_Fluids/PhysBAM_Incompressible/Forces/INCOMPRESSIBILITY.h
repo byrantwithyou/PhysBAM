@@ -16,7 +16,7 @@ class INCOMPRESSIBILITY:public INCOMPRESSIBLE_FLUIDS_FORCES<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;
     typedef typename TV::SCALAR T;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     PROJECTION_UNIFORM<T_GRID>& projection;
 public:
 

@@ -20,7 +20,7 @@ Postprocess_Light_Field()
 {
     if(number_of_smoothing_steps) for(int light=0;light<precomputed_light.m;light++){
         LOG::cout<<"Smoothing light "<<light<<" "<<number_of_smoothing_steps<<" steps"<<std::endl;
-        SMOOTH::Smooth<GRID<TV> >(*precomputed_light(light),number_of_smoothing_steps,0);}
+        SMOOTH::Smooth<T,3>(*precomputed_light(light),number_of_smoothing_steps,0);}
 }
 //#####################################################################
 template class RENDERING_UNIFORM_VOXELS<float>;

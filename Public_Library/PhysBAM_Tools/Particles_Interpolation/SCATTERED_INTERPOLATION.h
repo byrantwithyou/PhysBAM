@@ -16,7 +16,7 @@ template<class T_GRID>
 class SCATTERED_INTERPOLATION
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
     T radius_of_influence;

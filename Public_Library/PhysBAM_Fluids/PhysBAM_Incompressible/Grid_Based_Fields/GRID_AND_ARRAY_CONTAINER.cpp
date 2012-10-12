@@ -39,7 +39,7 @@ template<class T_GRID,class T2> GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
 template<class T_GRID,class T2> void GRID_AND_ARRAY_CONTAINER<T_GRID,T2>::
 Euler_Step(const T dt,const T time,const int number_of_ghost_cells)
 {
-    T_ARRAYS_T2 array_ghost(grid.Cell_Indices(number_of_ghost_cells),false);boundary->Fill_Ghost_Cells(grid,array,array_ghost,dt,time,number_of_ghost_cells);
+    ARRAY<T2,TV_INT> array_ghost(grid.Cell_Indices(number_of_ghost_cells),false);boundary->Fill_Ghost_Cells(grid,array,array_ghost,dt,time,number_of_ghost_cells);
     if(cell_velocities) advection->Update_Advection_Equation_Cell(grid,array,array_ghost,*cell_velocities,*boundary,dt,time);
     else advection->Update_Advection_Equation_Cell(grid,array,array_ghost,*face_velocities,*boundary,dt,time);
 }

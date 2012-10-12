@@ -22,12 +22,11 @@ template<class T_GRID>
 class EULER_PROJECTION_UNIFORM:public EULER_PROJECTION<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::FACE_ARRAYS T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
-    typedef typename GRID_ARRAYS_POLICY<T_GRID>::ARRAYS_SCALAR T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV>::TYPE T_ARRAYS_VECTOR;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef typename T_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_ARRAYS_BOOL;
+    typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;
     typedef GRID<VECTOR<T,TV::dimension-1> > T_GRID_LOWER_DIM;typedef typename T_GRID_LOWER_DIM::CELL_ITERATOR CELL_ITERATOR_LOWER_DIM;
     typedef typename T_GRID_LOWER_DIM::VECTOR_INT TV_INT_LOWER_DIM;
     typedef typename GRID<VECTOR<T,1> >::CELL_ITERATOR CELL_ITERATOR_1D;
@@ -107,7 +106,7 @@ public:
     void Get_Pressure(T_ARRAYS_SCALAR& pressure) const;
     void Fill_Face_Weights_For_Projection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& beta_face);
     void Get_Ghost_Density(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_SCALAR& density_ghost) const;
-    void Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_cells,T_ARRAYS_VECTOR& centered_velocity_ghost) const;
+    void Get_Ghost_Centered_Velocity(const T dt,const T time,const int number_of_ghost_cells,ARRAY<TV,TV_INT>& centered_velocity_ghost) const;
     void Make_Boundary_Faces_Neumann(T_FACE_ARRAYS_BOOL& psi_N);
     void Project(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Get_Dirichlet_Boundary_Conditions(const T_ARRAYS_DIMENSION_SCALAR& U_dirichlet);
@@ -116,15 +115,15 @@ public:
     void Compute_Right_Hand_Side(const T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Compute_One_Over_rho_c_Squared();
     void Compute_Density_Weighted_Face_Velocities(const T dt,const T time,const T_FACE_ARRAYS_BOOL& psi_N);
-    static void Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_ARRAYS_BOOL& psi,const T_FACE_ARRAYS_BOOL& psi_N);
-    static void Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_ARRAYS_BOOL& psi,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell);
-    void Get_Ghost_Pressures(const T dt,const T time,const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,
+    static void Compute_Density_Weighted_Face_Velocities(const T_GRID& face_grid,T_FACE_ARRAYS_SCALAR& face_velocities,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,const T_FACE_ARRAYS_BOOL& psi_N);
+    static void Compute_Face_Pressure_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const ARRAY<bool,TV_INT>& psi,T_FACE_ARRAYS_SCALAR& p_face,const T_ARRAYS_SCALAR& p_cell);
+    void Get_Ghost_Pressures(const T dt,const T time,const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,
         const T_ARRAYS_SCALAR& pressure,T_ARRAYS_SCALAR& p_ghost);
     void Get_Pressure_At_Faces(const T dt,const T time,const T_ARRAYS_SCALAR& p_ghost,T_FACE_ARRAYS_SCALAR& p_face);
     void Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
-        const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time);
+        const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time);
     static void Apply_Pressure(const T_ARRAYS_SCALAR& p_ghost,const T_FACE_ARRAYS_SCALAR& p_face,const T_FACE_ARRAYS_SCALAR& face_velocities_star,
-            const T_ARRAYS_BOOL& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time,
+            const ARRAY<bool,TV_INT>& psi_D,const T_FACE_ARRAYS_BOOL& psi_N,const T dt,const T time,
             T_FACE_ARRAYS_DIMENSION_SCALAR *fluxes,EULER_UNIFORM<T_GRID>* euler);
     bool Consistent_Boundary_Conditions() const;
     void Log_Parameters() const;
