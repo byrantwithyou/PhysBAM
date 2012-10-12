@@ -18,8 +18,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_1D.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
@@ -43,7 +42,7 @@ class CONSERVATION
     typedef VECTOR<bool,2*T_GRID::dimension> TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<ARRAY<T,FACE_INDEX<TV::m> >,bool>::TYPE T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
     typedef GRID<VECTOR<T,TV::dimension-1> > T_GRID_LOWER_DIM;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;

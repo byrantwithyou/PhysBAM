@@ -6,7 +6,6 @@
 #define __INTERPOLATION_UNIFORM__
 
 #include <PhysBAM_Tools/Grids_Uniform/BLOCK_UNIFORM.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_UNIFORM_FORWARD.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>

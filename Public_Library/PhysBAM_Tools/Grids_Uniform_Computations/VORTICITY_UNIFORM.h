@@ -7,7 +7,8 @@
 #ifndef __VORTICITY_UNIFORM__
 #define __VORTICITY_UNIFORM__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
+#include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
+#include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
@@ -15,9 +16,7 @@ template<class TV>
 class VORTICITY_UNIFORM
 {
     typedef typename TV::SCALAR T;typedef typename REBIND<TV,int>::TYPE TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename TV::SPIN T_SPIN;typedef typename T_ARRAYS_SCALAR::template REBIND<T_SPIN>::TYPE T_ARRAYS_SPIN;
-    typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
+    typedef typename TV::SPIN T_SPIN;
 
 private:
     template<class T_FACE_LOOKUP_LOOKUP>
@@ -42,8 +41,8 @@ public:
         Cell_Centered_Face_Velocity_Difference(grid,1,0,lookup,index)-Cell_Centered_Face_Velocity_Difference(grid,0,1,lookup,index));}
 
     template<class T_FACE_LOOKUP_2>
-    static void Vorticity(const GRID<TV>& grid,const T_FACE_LOOKUP_2& face_velocities_lookup,T_ARRAYS_SPIN& vorticity,T_ARRAYS_SCALAR& vorticity_magnitude)
-    {for(CELL_ITERATOR iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
+    static void Vorticity(const GRID<TV>& grid,const T_FACE_LOOKUP_2& face_velocities_lookup,ARRAY<T_SPIN,TV_INT>& vorticity,ARRAY<T,TV_INT>& vorticity_magnitude)
+    {for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,2);iterator.Valid();iterator.Next()){TV_INT index=iterator.Cell_Index();
         const typename T_FACE_LOOKUP_2::LOOKUP& lookup=face_velocities_lookup.Starting_Point_Cell(iterator.Cell_Index());lookup.Set_Reference_Point(iterator.Location());
         vorticity(index)=Vorticity(grid,lookup,index);vorticity_magnitude(index)=vorticity(index).Magnitude();}}
 };

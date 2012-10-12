@@ -8,7 +8,6 @@
 #define __LAPLACE_UNIFORM_MPI__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/PCG_SPARSE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Parallel_Computation/LAPLACE_MPI.h>

@@ -7,7 +7,6 @@
 #ifndef __SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM__
 #define __SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM__
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/COUPLING_CONSTRAINT_ID.h>
 

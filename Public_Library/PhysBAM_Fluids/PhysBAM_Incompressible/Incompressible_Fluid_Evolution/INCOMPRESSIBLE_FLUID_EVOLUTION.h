@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Advection/ADVECTION_FORWARD.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/Find_Type.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 namespace PhysBAM{

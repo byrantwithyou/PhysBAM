@@ -21,7 +21,7 @@ class BOUNDARY_THREADED:public BOUNDARY_UNIFORM<T_GRID,T2>
     typedef typename T_GRID::SCALAR T;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;
     typedef VECTOR<T,T_GRID::dimension> TV;typedef VECTOR<int,T_GRID::dimension> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef typename REBIND<T_FACE_ARRAYS,T2>::TYPE T_FACE_ARRAYS_T2;
+    typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
 public:
     THREAD_QUEUE& thread_queue;
     BOUNDARY_UNIFORM<T_GRID,T2>& boundary;

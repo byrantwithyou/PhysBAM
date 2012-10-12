@@ -8,7 +8,6 @@
 #define __IMPLICIT_OBJECT_COMBINED__
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ORIENTED_BOX.h>

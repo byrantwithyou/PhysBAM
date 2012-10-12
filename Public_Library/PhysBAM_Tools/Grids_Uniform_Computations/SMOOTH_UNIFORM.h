@@ -8,7 +8,6 @@
 #define __SMOOTH_UNIFORM__
 
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 
 namespace PhysBAM{
 

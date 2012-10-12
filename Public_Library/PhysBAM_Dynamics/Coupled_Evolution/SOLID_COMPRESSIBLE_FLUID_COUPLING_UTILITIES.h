@@ -6,7 +6,6 @@
 //#####################################################################
 #ifndef __SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES__
 #define __SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES__
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POLYGON.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>

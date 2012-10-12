@@ -14,8 +14,9 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
 namespace PhysBAM{
@@ -25,7 +26,7 @@ class BOUNDARY_UNIFORM:public BOUNDARY<typename T_GRID::VECTOR_T,T2>
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,T2>::TYPE T_FACE_ARRAYS_T2;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
 public:
     typedef BOUNDARY<typename T_GRID::VECTOR_T,T2> BASE;

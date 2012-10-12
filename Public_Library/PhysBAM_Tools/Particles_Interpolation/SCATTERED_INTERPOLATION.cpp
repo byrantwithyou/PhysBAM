@@ -103,7 +103,7 @@ template<class T_GRID> void SCATTERED_INTERPOLATION<T_GRID>::
 Instantiate()
 {
     // This is a work around for Visual C++ compiler.
-    typename REBIND<T_ARRAYS_SCALAR,VECTOR<T,3> >::TYPE grid_data;
+    ARRAY<VECTOR<T,3>,TV_INT> grid_data;
     Transfer_To_Grid_Helper(ARRAY_VIEW<const TV>(0,0),ARRAY_VIEW<const VECTOR<T,3> >(0,0),T_GRID(),grid_data);
 }
 //#####################################################################

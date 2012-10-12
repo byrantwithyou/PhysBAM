@@ -6,7 +6,6 @@
 #define __VORTEX_PARTICLE_EVOLUTION_3D__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #include <PhysBAM_Tools/Particles_Interpolation/SCATTERED_INTERPOLATION.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>

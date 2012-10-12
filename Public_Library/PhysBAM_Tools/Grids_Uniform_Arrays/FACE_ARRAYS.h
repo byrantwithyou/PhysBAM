@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND_VIEW.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 namespace PhysBAM{
 
@@ -126,10 +125,10 @@ public:
     {return ((unsigned)index.axis<(unsigned)dimension) && Component(index.axis).Valid_Index(index.index);}
 
     T_ARRAY_VIEW& Component(const int axis)
-    {assert((unsigned)axis<dimension);return *(&data.x+axis);}
+    {assert((unsigned)axis<dimension);return data(axis);}
 
     const T_ARRAY_VIEW& Component(const int axis) const
-    {assert((unsigned)axis<dimension);return *(&data.x+axis);}
+    {assert((unsigned)axis<dimension);return data(axis);}
 
     TV Cell_Centered_Average(const TV_INT& cell_index) const
     {TV average;for(int i=0;i<dimension;i++) average(i)=(T).5*(data(i)(cell_index)+data(i)(cell_index+TV_INT::Axis_Vector(i)));return average;}

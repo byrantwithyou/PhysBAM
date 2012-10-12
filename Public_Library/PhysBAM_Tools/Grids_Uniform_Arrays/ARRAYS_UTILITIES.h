@@ -6,7 +6,6 @@
 #define __ARRAYS_UTILITIES__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
 namespace PhysBAM{
 
@@ -17,8 +16,8 @@ class ARRAYS_UTILITIES
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<T2>::TYPE T_ARRAYS_DIMENSION_T2;
     typedef typename T_ARRAYS_DIMENSION_T2::template REBIND<TV_T2>::TYPE T_ARRAYS_DIMENSION_VECTOR_T2;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename REBIND<T_FACE_ARRAYS_SCALAR,T2>::TYPE T_FACE_ARRAYS_T2;
-    typedef typename REBIND<ARRAY<T,TV_INT>,int>::TYPE T_ARRAYS_INT;
+    typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
+    typedef ARRAY<int,TV_INT> T_ARRAYS_INT;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
 public:
 

@@ -8,7 +8,6 @@
 #define __UNIFORM_INTERIOR_ITERATOR_CELL__
 
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 
 namespace PhysBAM{
 

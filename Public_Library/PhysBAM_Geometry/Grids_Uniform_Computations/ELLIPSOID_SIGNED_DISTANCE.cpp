@@ -3,7 +3,6 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Basic_Geometry/ELLIPSOID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/ELLIPSOID_SIGNED_DISTANCE.h>
 

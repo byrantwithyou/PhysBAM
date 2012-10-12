@@ -8,7 +8,6 @@
 #define __KANG_POISSON_VISCOSITY__
 
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID> class FLUIDS_PARAMETERS_UNIFORM;

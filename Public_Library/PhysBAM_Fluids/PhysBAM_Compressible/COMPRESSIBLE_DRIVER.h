@@ -4,7 +4,6 @@
 //#####################################################################
 #ifndef __COMPRESSIBLE_DRIVER__
 #define __COMPRESSIBLE_DRIVER__
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/DRIVER.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 namespace PhysBAM{

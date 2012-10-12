@@ -7,7 +7,6 @@
 #ifndef __PLS_FSI_EXAMPLE__
 #define __PLS_FSI_EXAMPLE__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/EXAMPLE.h>

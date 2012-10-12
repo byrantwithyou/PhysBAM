@@ -7,7 +7,6 @@
 #ifndef __SOLIDS_FLUIDS_EXAMPLE_UNIFORM__
 #define __SOLIDS_FLUIDS_EXAMPLE_UNIFORM__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_OBJECT_FORWARD.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Collisions/SOLIDS_COLLISIONS_FORWARD.h>
 #include <PhysBAM_Fluids/PhysBAM_Fluids/Fluids/FLUID_COLLECTION.h>

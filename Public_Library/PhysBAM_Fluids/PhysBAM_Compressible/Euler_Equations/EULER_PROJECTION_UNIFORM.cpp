@@ -219,7 +219,7 @@ Compute_Advected_Pressure(const T_ARRAYS_DIMENSION_SCALAR& U_ghost,const T_FACE_
     for(CELL_ITERATOR iterator(euler->grid,3);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         v_cell(cell_index)=euler->Get_Velocity(U_ghost,cell_index);}
 
-    FLOOD_FILL_1D find_connected_components;
+    FLOOD_FILL<1> find_connected_components;
     T_ARRAYS_SCALAR rhs(euler->grid.Domain_Indices());ARRAY<T,VECTOR<int,1> > p_1d,u,u_px;
     for(int axis=0;axis<T_GRID::dimension;axis++){
         GRID<VECTOR<T,1> > grid_1d=euler->grid.Get_1D_Grid(axis);

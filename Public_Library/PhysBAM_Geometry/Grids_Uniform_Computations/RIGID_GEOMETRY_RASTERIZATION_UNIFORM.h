@@ -6,7 +6,6 @@
 //##################################################################### 
 #ifndef __RIGID_GEOMETRY_RASTERIZATION_UNIFORM__
 #define __RIGID_GEOMETRY_RASTERIZATION_UNIFORM__
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 
 namespace PhysBAM{

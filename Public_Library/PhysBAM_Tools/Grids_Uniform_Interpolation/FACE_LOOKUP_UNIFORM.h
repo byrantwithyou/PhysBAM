@@ -8,7 +8,6 @@
 #define __FACE_LOOKUP_UNIFORM__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID>

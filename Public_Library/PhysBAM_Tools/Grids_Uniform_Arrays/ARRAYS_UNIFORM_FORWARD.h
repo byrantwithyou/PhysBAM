@@ -16,9 +16,7 @@ template<class T,class ID> class ARRAY;
 template<int d> class FACE_INDEX;
 template<int d> class SIDED_FACE_INDEX;
 
-class FLOOD_FILL_1D;
-class FLOOD_FILL_2D;
-class FLOOD_FILL_3D;
+template<int d> class FLOOD_FILL;
 
 template<class T_ARRAY,class T_NEW> struct REBIND;
 template<class T,class T_NEW,int d> struct REBIND<ARRAY<T,VECTOR<int,d> >,T_NEW>{typedef ARRAY<T_NEW,VECTOR<int,d> > TYPE;};

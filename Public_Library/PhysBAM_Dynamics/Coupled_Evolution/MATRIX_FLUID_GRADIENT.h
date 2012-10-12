@@ -8,7 +8,6 @@
 #define __MATRIX_FLUID_GRADIENT__
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/MATRIX_FLUID_GRADIENT_BASE.h>

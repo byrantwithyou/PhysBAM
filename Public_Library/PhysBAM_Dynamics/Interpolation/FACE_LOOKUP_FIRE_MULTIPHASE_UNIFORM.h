@@ -6,7 +6,6 @@
 #define __FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM__
 
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_POLICY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>
 #include <cassert>

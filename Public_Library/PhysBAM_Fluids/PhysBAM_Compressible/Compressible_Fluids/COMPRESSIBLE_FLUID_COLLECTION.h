@@ -8,7 +8,6 @@
 #define __COMPRESSIBLE_FLUID_COLLECTION__
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Equations_Of_State/EOS.h>
 namespace PhysBAM{

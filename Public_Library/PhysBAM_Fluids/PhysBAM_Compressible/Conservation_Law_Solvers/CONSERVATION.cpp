@@ -99,7 +99,7 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
     RANGE<TV_INT> U_ghost_domain_indices=U_ghost.Domain_Indices();
     int U_start,U_end,U_ghost_start,U_ghost_end;
     TV dx=grid.dX;
-    FLOOD_FILL_1D find_connected_components;
+    FLOOD_FILL<1> find_connected_components;
 
     for(int axis=0;axis<T_GRID::dimension;axis++){
         U_start=U_domain_indices.min_corner(axis);U_end=U_domain_indices.max_corner(axis);

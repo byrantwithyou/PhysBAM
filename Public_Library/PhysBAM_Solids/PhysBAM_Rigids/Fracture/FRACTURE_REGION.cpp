@@ -4,7 +4,7 @@
 //#####################################################################
 // Class FRACTURE_REGION
 //##################################################################### 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Tessellation/IMPLICIT_OBJECT_TESSELLATION.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Fracture/FRACTURE_REGION.h>
@@ -61,7 +61,7 @@ Intersect_With_Rigid_Body(const FRACTURE_REGION<T>& body,const bool use_particle
         if(fragment_implicit_object->levelset.phi(iterator.index)<=0) colors(iterator.index)=-1;
         else colors(iterator.index)=-2;}
     // Separate regions
-    FLOOD_FILL_3D flood_fill;ARRAY<bool,FACE_INDEX<3> > edge_is_blocked(fragment_implicit_object->levelset.grid);edge_is_blocked.Fill(false);
+    FLOOD_FILL<TV::m> flood_fill;ARRAY<bool,FACE_INDEX<TV::m> > edge_is_blocked(fragment_implicit_object->levelset.grid);edge_is_blocked.Fill(false);
     int num_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
     ARRAY<RANGE<TV_INT> > region_counts;
     region_counts.Resize(num_colors);

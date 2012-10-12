@@ -7,7 +7,6 @@
 #ifndef __GRID_BASED_COLLISION_GEOMETRY__
 #define __GRID_BASED_COLLISION_GEOMETRY__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Collisions/RIGID_COLLISION_GEOMETRY_1D.h>

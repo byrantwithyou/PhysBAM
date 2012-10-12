@@ -6,7 +6,6 @@
 //#####################################################################
 #ifndef __SOLID_FLUID_SYSTEM__
 #define __SOLID_FLUID_SYSTEM__
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Solids/PhysBAM_Rigids/Rigid_Bodies/RIGID_BODY_POLICY.h>

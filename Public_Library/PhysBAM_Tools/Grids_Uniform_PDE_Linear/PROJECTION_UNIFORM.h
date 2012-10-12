@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Grids_PDE_Linear/PROJECTION.h>
+#include <PhysBAM_Tools/Grids_Uniform/SIDED_FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h>
 namespace PhysBAM{
 

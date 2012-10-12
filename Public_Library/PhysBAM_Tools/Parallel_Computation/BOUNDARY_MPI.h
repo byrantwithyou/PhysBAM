@@ -9,6 +9,7 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Boundaries/BOUNDARY.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID_POLICY.h>
@@ -22,7 +23,7 @@ class BOUNDARY_MPI:public BOUNDARY_UNIFORM<T_GRID,T2>
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<int,TV::m> TV_INT;typedef VECTOR<bool,2> TV_BOOL2;typedef VECTOR<TV_BOOL2,T_GRID::dimension> TV_SIDES;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
-    typedef typename REBIND<T_FACE_ARRAYS,T2>::TYPE T_FACE_ARRAYS_T2;
+    typedef ARRAY<T2,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T2;
 public:
     T_MPI_GRID* mpi_grid;
     BOUNDARY_UNIFORM<T_GRID,T2>& boundary;

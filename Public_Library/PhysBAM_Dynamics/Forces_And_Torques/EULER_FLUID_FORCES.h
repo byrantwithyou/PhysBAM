@@ -7,7 +7,6 @@
 #ifndef __EULER_FLUID_FORCES__
 #define __EULER_FLUID_FORCES__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Solids/PhysBAM_Solids/Forces_And_Torques/SOLIDS_FORCES.h>
 #include <cfloat>
 namespace PhysBAM{

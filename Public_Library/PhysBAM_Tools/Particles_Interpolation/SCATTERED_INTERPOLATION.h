@@ -8,7 +8,6 @@
 #define __SCATTERED_INTERPOLATION__
 
 #include <PhysBAM_Tools/Arrays/ARRAY_VIEW.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 namespace PhysBAM{
 
@@ -16,7 +15,7 @@ template<class T_GRID>
 class SCATTERED_INTERPOLATION
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename REBIND<T_ARRAYS_SCALAR,ARRAY<int> >::TYPE T_ARRAYS_ARRAY_INT;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<ARRAY<int>,TV_INT> T_ARRAYS_ARRAY_INT;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
     T radius_of_influence;

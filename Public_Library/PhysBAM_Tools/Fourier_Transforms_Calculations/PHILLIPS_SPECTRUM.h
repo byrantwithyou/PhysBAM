@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Fourier_Transforms/FFT_POLICY.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Vectors/COMPLEX.h>
 namespace PhysBAM{

@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/OPERATION_HASH.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;

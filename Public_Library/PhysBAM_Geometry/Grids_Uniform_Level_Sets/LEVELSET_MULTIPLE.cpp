@@ -4,10 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_1D.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_2D.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
@@ -302,7 +299,7 @@ Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,con
         ARRAY<bool,FACE_INDEX<TV::m> > edge_is_blocked(grid,3);
         for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,3);iterator.Valid();iterator.Next()){
             if(!positive_regions(Inside_Region(iterator.Cell_Index()))) colors(iterator.Cell_Index())=-2;}
-        typename GRID_ARRAYS_POLICY<T_GRID>::FLOOD_FILL flood_fill;
+        FLOOD_FILL<TV::m> flood_fill;
         int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
         ARRAY<bool> color_touches_top_of_domain(number_of_colors);
         for(UNIFORM_GRID_ITERATOR_FACE<TV> iterator(grid,0,T_GRID::BOUNDARY_REGION,4);iterator.Valid();iterator.Next()){

@@ -5,7 +5,6 @@
 #ifndef __INCOMPRESSIBLE_DRIVER__
 #define __INCOMPRESSIBLE_DRIVER__
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Solids_Geometry_Evolution/KINEMATIC_EVOLUTION.h>
 namespace PhysBAM{

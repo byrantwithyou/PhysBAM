@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_PACKAGE.h>
 #ifdef USE_PTHREADS

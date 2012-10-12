@@ -5,7 +5,6 @@
 #ifndef __FACE_LOOKUP_COLLIDABLE_UNIFORM__
 #define __FACE_LOOKUP_COLLIDABLE_UNIFORM__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY_ID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_UNIFORM_FORWARD.h>

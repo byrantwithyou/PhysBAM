@@ -7,7 +7,6 @@
 #ifndef __IMPLICIT_VISCOSITY_UNIFORM__
 #define __IMPLICIT_VISCOSITY_UNIFORM__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_GRID_POLICY.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>

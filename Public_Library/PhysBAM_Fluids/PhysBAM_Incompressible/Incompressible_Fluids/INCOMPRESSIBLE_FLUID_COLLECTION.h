@@ -8,7 +8,6 @@
 #define __INCOMPRESSIBLE_FLUID_COLLECTION__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/DENSITY_CONTAINER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/TEMPERATURE_CONTAINER.h>

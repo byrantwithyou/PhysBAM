@@ -6,13 +6,14 @@
 //#####################################################################
 #ifndef __INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS__
 #define __INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS__
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/GRID_ARRAYS_POLICY_UNIFORM.h>
+#include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 namespace PhysBAM{
+template<class TV> class GRID;
 
 template<class TV>
 class INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;typedef GRID<TV> T_GRID;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<T,TV::dimension+2> TV_DIMENSION;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
@@ -24,9 +25,9 @@ public:
     {}
 
 //#####################################################################
-    virtual void Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const T_GRID& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,
+    virtual void Compute_Compressible_Incompressible_Face_Pressures_From_Cell_Pressures(const GRID<TV>& face_grid,const T_ARRAYS_DIMENSION_SCALAR& U,
         const ARRAY<bool,TV_INT>& euler_psi,const T_ARRAYS_SCALAR& p_cell,T_FACE_ARRAYS_SCALAR& p_face) const=0;
-    virtual void Fill_Incompressible_Beta_Face(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& beta_face) const=0;
+    virtual void Fill_Incompressible_Beta_Face(const GRID<TV>& grid,T_FACE_ARRAYS_SCALAR& beta_face) const=0;
 //#####################################################################
 };  
 }   

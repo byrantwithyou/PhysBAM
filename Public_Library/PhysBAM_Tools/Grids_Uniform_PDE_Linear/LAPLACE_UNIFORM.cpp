@@ -7,9 +7,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_1D.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_2D.h>
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/LAPLACE_UNIFORM.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
@@ -251,7 +249,7 @@ Build_Single_Solution_Region(ARRAY<bool,TV_INT>& solve)
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Find_Solution_Regions()
 {
-    typename GRID_ARRAYS_POLICY<T_GRID>::FLOOD_FILL flood_fill;
+    FLOOD_FILL<TV::m> flood_fill;
     // set domain boundary cells and cells with objects to uncolorable
     for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=-2;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
