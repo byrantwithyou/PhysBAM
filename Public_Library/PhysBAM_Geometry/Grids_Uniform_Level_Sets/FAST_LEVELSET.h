@@ -21,7 +21,7 @@ class FAST_LEVELSET:public LEVELSET_POLICY<T_GRID_input>::LEVELSET
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::AVERAGING T_AVERAGING;
+    typedef AVERAGING_UNIFORM<T_GRID> T_AVERAGING;
 public:
     typedef T_LEVELSET BASE;
     using BASE::grid;using BASE::boundary;using BASE::phi;using BASE::curvature_motion;using BASE::sigma;using BASE::max_time_step;

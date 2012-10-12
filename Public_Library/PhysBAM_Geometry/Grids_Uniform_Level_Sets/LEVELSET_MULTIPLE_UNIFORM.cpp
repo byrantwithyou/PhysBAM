@@ -51,7 +51,7 @@ Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,con
         T_ARRAYS_INT colors(grid.Domain_Indices(3));colors.Fill(-1);T_FACE_ARRAYS_BOOL edge_is_blocked(grid,3);
         for(CELL_ITERATOR iterator(grid,3);iterator.Valid();iterator.Next()){
             if(!positive_regions(Inside_Region(iterator.Cell_Index()))) colors(iterator.Cell_Index())=-2;}
-        T_FLOOD_FILL flood_fill;int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
+        typename GRID_ARRAYS_POLICY<T_GRID>::FLOOD_FILL flood_fill;int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
         ARRAY<bool> color_touches_top_of_domain(number_of_colors);
         for(FACE_ITERATOR iterator(grid,0,T_GRID::BOUNDARY_REGION,4);iterator.Valid();iterator.Next()){
             if(colors(iterator.First_Cell_Index())>0)color_touches_top_of_domain(colors(iterator.First_Cell_Index()))=true;}

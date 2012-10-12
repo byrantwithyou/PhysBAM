@@ -251,7 +251,7 @@ Build_Single_Solution_Region(ARRAY<bool,TV_INT>& solve)
 template<class T_GRID> void LAPLACE_UNIFORM<T_GRID>::
 Find_Solution_Regions()
 {
-    T_FLOOD_FILL flood_fill;
+    typename GRID_ARRAYS_POLICY<T_GRID>::FLOOD_FILL flood_fill;
     // set domain boundary cells and cells with objects to uncolorable
     for(CELL_ITERATOR iterator(grid,1,T_GRID::GHOST_REGION);iterator.Valid();iterator.Next()) filled_region_colors(iterator.Cell_Index())=-2;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
