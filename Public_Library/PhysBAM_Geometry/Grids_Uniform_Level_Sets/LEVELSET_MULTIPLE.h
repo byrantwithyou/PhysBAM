@@ -115,7 +115,6 @@ public:
     int Inside_Region_Face(const int axis,const TV_INT& face_index) const; // does not assume exactly one Phi<0
     void Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const;
     void Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_region,T& minimum_phi,T& second_minimum_phi) const;
-    void Use_Level_Set_Advection_Method();
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
     T CFL(const ARRAY<TV,TV_INT>& velocity) const;
     void Set_Collision_Body_List(T_GRID_BASED_COLLISION_GEOMETRY& collision_body_list_input);

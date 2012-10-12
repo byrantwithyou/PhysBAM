@@ -139,10 +139,14 @@ void FLOOD_FILL_3D::
 Explore_Path(ARRAYS_ND_BASE<TV_INT,VECTOR<int,3> >& parents,const ARRAYS_ND_BASE<bool,VECTOR<int,3> >& edge_is_blocked_x,const ARRAYS_ND_BASE<bool,VECTOR<int,3> >& edge_is_blocked_y,
     const ARRAYS_ND_BASE<bool,VECTOR<int,3> >& edge_is_blocked_z,const TV_INT& node)
 {
-    if(node.x>parents.domain.min_corner.x &&!edge_is_blocked_x(node.x,node.y,node.z)&&parents(node.x-1,node.y,node.z).x==INT_MAX){
-        TV_INT new_node(node.x-1,node.y,node.z);parents(new_node)=node;flood_fill_stack.Push(new_node);}
-    if(node.x<parents.domain.max_corner.x-1&&!edge_is_blocked_x(node.x+1,node.y,node.z)&&parents(node.x+1,node.y,node.z).x==INT_MAX){
-        TV_INT new_node(node.x+1,node.y,node.z);parents(new_node)=node;flood_fill_stack.Push(new_node);}
+    for(int d=0;d<TV::m;d++){
+        TV_INT node0(node),node1(node);
+        node0(d)--;
+        node1(d)++;
+    if(node(d)>parents.domain.min_corner(d) && !edge_is_blocked_x(node) && parents(node0)(d)==INT_MAX){
+        TV_INT new_node(node(d)-1,node.y,node.z);parents(new_node)=node;flood_fill_stack.Push(new_node);}
+    if(node(d)<parents.domain.max_corner(d)-1&&!edge_is_blocked_x(node(d)+1,node.y,node.z)&&parents(node(d)+1,node.y,node.z)(d)==INT_MAX){
+        TV_INT new_node(node(d)+1,node.y,node.z);parents(new_node)=node;flood_fill_stack.Push(new_node);}
     if(node.y>parents.domain.min_corner.y&&!edge_is_blocked_y(node.x,node.y,node.z)&&parents(node.x,node.y-1,node.z).x==INT_MAX){
         TV_INT new_node(node.x,node.y-1,node.z);parents(new_node)=node;flood_fill_stack.Push(new_node);}
     if(node.y<parents.domain.max_corner.y-1&&!edge_is_blocked_y(node.x,node.y+1,node.z)&&parents(node.x,node.y+1,node.z).x==INT_MAX){
@@ -151,4 +155,5 @@ Explore_Path(ARRAYS_ND_BASE<TV_INT,VECTOR<int,3> >& parents,const ARRAYS_ND_BASE
         TV_INT new_node(node.x,node.y,node.z-1);parents(new_node)=node;flood_fill_stack.Push(new_node);}
     if(node.z<parents.domain.max_corner.z-1&&!edge_is_blocked_z(node.x,node.y,node.z+1)&&parents(node.x,node.y,node.z+1).x==INT_MAX){
         TV_INT new_node(node.x,node.y,node.z+1);parents(new_node)=node;flood_fill_stack.Push(new_node);}
+    }
 }

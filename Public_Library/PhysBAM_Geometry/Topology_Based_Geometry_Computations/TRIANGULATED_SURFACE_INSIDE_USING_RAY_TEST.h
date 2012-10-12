@@ -41,7 +41,7 @@ Inside_Using_Ray_Test(const TRIANGULATED_SURFACE<T>& ts,RAY<VECTOR<T,3> >& ray,c
                 else if(region_id==2){if(TV::Dot_Product(triangle2.Normal(),triangle.X.y-triangle2.X.x) >= 0) convex=1;}
                 if(convex){if(triangle.Lazy_Inside_Plane(ray.endpoint) && triangle2.Lazy_Inside_Plane(ray.endpoint)) inside=true;} // inside both - can use location or point
                 else{if(triangle.Lazy_Inside_Plane(ray.endpoint) || triangle2.Lazy_Inside_Plane(ray.endpoint)) inside=true;}}} // inside either - can use location or point
-        else{if(triangle.Lazy_Inside_Plane(ray.endpoint)) inside=true;}} // region=3 - face - can use location or point
+        else{if(triangle.Lazy_Inside_Plane(ray.endpoint)) inside=true;}} // region=2 - face - can use location or point
     return inside;
 }
 }

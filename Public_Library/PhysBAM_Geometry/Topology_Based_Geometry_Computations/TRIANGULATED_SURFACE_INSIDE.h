@@ -57,7 +57,7 @@ bool Outside(const TRIANGULATED_SURFACE<T>& ts,const VECTOR<T,3>& location,const
                 else if(region_id==2){if(TV::Dot_Product(triangle2.Normal(),triangle.X.y-triangle2.X.x)>=0) convex=true;}
                 if(convex){if(triangle.Lazy_Outside_Plane(location) || triangle2.Lazy_Outside_Plane(location)) outside=true;} // outside either - can use location or point
                 else{if(triangle.Lazy_Outside_Plane(location) && triangle2.Lazy_Outside_Plane(location)) outside=true;}}} // outside both - can use location or point
-        else{if(triangle.Lazy_Outside_Plane(location)) outside=true;}} // region=3 - face - can use location or point
+        else{if(triangle.Lazy_Outside_Plane(location)) outside=true;}} // region=2 - face - can use location or point
     return outside;
 }
 template<class T>

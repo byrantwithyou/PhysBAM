@@ -128,7 +128,7 @@ template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV& location) const
 {
     T minimum_phi=Phi(0,location);
-    int minimum_region=1;
+    int minimum_region=0;
     for(int k=1;k<phis.m;k++){T candidate_phi=Phi(k,location);if(candidate_phi<minimum_phi){minimum_phi=candidate_phi;minimum_region=k;}}
     return minimum_region;
 }
@@ -139,7 +139,7 @@ template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV& location,T& phi) const
 {
     T minimum_phi=Phi(0,location);
-    int minimum_region=1;
+    int minimum_region=0;
     for(int k=1;k<phis.m;k++){T candidate_phi=Phi(k,location);if(candidate_phi<minimum_phi){minimum_phi=candidate_phi;minimum_region=k;}}
     phi=minimum_phi;
     return minimum_region;
@@ -167,14 +167,14 @@ Two_Minimum_Regions(const TV_INT& index,int& minimum_region,int& second_minimum_
     T phi1=phis(0)(index),phi2=phis(1)(index);
     if(phi1<phi2){
         minimum_phi=phi1;
-        minimum_region=1;
+        minimum_region=0;
         second_minimum_phi=phi2;
-        second_minimum_region=2;}
+        second_minimum_region=1;}
     else{
         minimum_phi=phi2;
-        minimum_region=2;
+        minimum_region=1;
         second_minimum_phi=phi1;
-        second_minimum_region=1;}
+        second_minimum_region=0;}
     for(int k=2;k<phis.m;k++){
         T candidate_phi=phis(k)(index);
         if(candidate_phi<minimum_phi){
@@ -195,14 +195,14 @@ Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_r
     T phi1=Phi(0,location),phi2=Phi(1,location);
     if(phi1<phi2){
         minimum_phi=phi1;
-        minimum_region=1;
+        minimum_region=0;
         second_minimum_phi=phi2;
-        second_minimum_region=2;}
+        second_minimum_region=1;}
     else{
         minimum_phi=phi2;
-        minimum_region=2;
+        minimum_region=1;
         second_minimum_phi=phi1;
-        second_minimum_region=1;}
+        second_minimum_region=0;}
     for(int k=2;k<phis.m;k++){
         T candidate_phi=Phi(k,location);
         if(candidate_phi<minimum_phi){
@@ -213,15 +213,6 @@ Two_Minimum_Regions(const TV& location,int& minimum_region,int& second_minimum_r
         else if(candidate_phi<second_minimum_phi){
             second_minimum_phi=candidate_phi;
             second_minimum_region=k;}}
-}
-//#####################################################################
-// Function Use_Level_Set_Advection_Method
-//#####################################################################
-template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
-Use_Level_Set_Advection_Method()
-{
-    PHYSBAM_FATAL_ERROR(); // TODO: The next line does not compile.
-//    for(int i=0;i<levelsets.m;i++) levelsets(i)->Use_Level_Set_Advection_Method();
 }
 //#####################################################################
 // Function CFL
@@ -285,8 +276,7 @@ Compute_Curvature(const T time)
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders)
 {
-    PHYSBAM_FATAL_ERROR();
-    // for(int i=0;i<levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i));
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i));
 }
 //#####################################################################
 // Function Project_Levelset
@@ -301,8 +291,8 @@ Project_Levelset(const int number_of_ghost_cells)
         for(int k=0;k<phis.m;k++) phis(k)(iterator.Cell_Index())-=correction;}
 }
 //#####################################################################
-// Function Project_Levelset
-//##################################################################### 
+// Function Get_Single_Levelset
+//#####################################################################
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
 Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,const bool flood_fill_for_bubbles)
 {

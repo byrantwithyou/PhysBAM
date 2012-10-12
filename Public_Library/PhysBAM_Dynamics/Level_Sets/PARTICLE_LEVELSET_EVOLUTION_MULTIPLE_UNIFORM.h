@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM__
 #define __PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM__
 
-#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE_UNIFORM.h>
+#include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_MULTIPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_MULTIPLE_UNIFORM.h>
 namespace PhysBAM{
@@ -32,7 +32,7 @@ public:
     ARRAY<T> initial_mass;
     ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis;
 
-    LEVELSET_ADVECTION_MULTIPLE_UNIFORM<T_GRID> levelset_advection_multiple;
+    LEVELSET_ADVECTION_MULTIPLE<T_GRID> levelset_advection_multiple;
 
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM();
