@@ -8,7 +8,7 @@
 #define __RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT__
 
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 namespace PhysBAM{
 

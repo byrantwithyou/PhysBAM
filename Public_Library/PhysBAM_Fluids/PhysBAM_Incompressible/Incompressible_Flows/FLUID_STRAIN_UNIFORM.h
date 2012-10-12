@@ -20,7 +20,7 @@
 namespace PhysBAM{
 
 template<class T> class EXTERNAL_STRAIN_ADJUSTMENT;
-template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
+template<class T_GRID> class LEVELSET_MULTIPLE;
 template<class T_GRID,class T2> class BOUNDARY_UNIFORM;
 
 template<class T_GRID>
@@ -68,7 +68,7 @@ public:
     void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
         const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells);
     void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
-        const LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset,const int region,const int number_of_ghost_cells);
+        const LEVELSET_MULTIPLE<T_GRID>& levelset,const int region,const int number_of_ghost_cells);
 private:
     void Update_Strain_Equation_Helper_Cell_Centered(const T dt,const T time,const T density,const T heaviside_bandwidth,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
         ARRAY<TV,TV_INT>& V,const T_ARRAYS_SCALAR& phi_ghost,const int number_of_ghost_cells);
@@ -97,7 +97,7 @@ public:
     void Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
         const ARRAY<T,VECTOR<int,1> >& phi_ghost,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
     void Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
-        const LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset,const int region,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
+        const LEVELSET_MULTIPLE<GRID<TV> >& levelset,const int region,const int number_of_ghost_cells){PHYSBAM_NOT_IMPLEMENTED();}
     void Extrapolate_Strain_Across_Interface(ARRAY<T,VECTOR<int,1> >& phi_ghost,const T band_width=3){PHYSBAM_NOT_IMPLEMENTED();}
     T CFL(const T density) const{PHYSBAM_NOT_IMPLEMENTED();}
 //#####################################################################

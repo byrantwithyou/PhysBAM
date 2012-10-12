@@ -52,7 +52,7 @@ Setup_Viscosity(const T dt)
 
     // set up internal levelset
     heat_poisson.Use_Internal_Level_Set(number_of_regions);
-    T_AVERAGING averaging;const T_LEVELSET_MULTIPLE& cell_centered_levelset_multiple=*projection_dynamics.poisson_collidable->levelset_multiple;
+    T_AVERAGING averaging;const LEVELSET_MULTIPLE<T_GRID>& cell_centered_levelset_multiple=*projection_dynamics.poisson_collidable->levelset_multiple;
     for(CELL_ITERATOR iterator(face_grid,2);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index(),p_face_index=cell_index;
         for(int i=0;i<number_of_regions;i++) heat_poisson.levelset_multiple->phis(i)(cell_index)=averaging.Cell_To_Face(projection.p_grid,axis,p_face_index,cell_centered_levelset_multiple.phis(i));}
     heat_poisson.levelset_multiple->Project_Levelset(2);
@@ -100,7 +100,7 @@ Calculate_Velocity_Jump()
         if(iterator.Axis()==axis)face_normal=(*levelset.normals)(p_face_index-axis_offset)[axis];
         else{face_normal=((*levelset.normals)(p_face_index-axis_offset-face_axis_offset)+(*levelset.normals)(p_face_index-face_axis_offset)+
             (*levelset.normals)(p_face_index)+(*levelset.normals)(p_face_index-axis_offset)).Normalized()[axis];}
-        heat_poisson.u_jump_face.Component(iterator.Axis())(face_index)=LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(product_region,fuel_region)*constants.z*flame_speed*face_normal;}
+        heat_poisson.u_jump_face.Component(iterator.Axis())(face_index)=LEVELSET_MULTIPLE<T_GRID>::Sign(product_region,fuel_region)*constants.z*flame_speed*face_normal;}
 }
 //#####################################################################
 // Debug_Write

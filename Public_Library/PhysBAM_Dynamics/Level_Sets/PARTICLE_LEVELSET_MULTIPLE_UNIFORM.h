@@ -7,7 +7,7 @@
 #ifndef __PARTICLE_LEVELSET_MULTIPLE_UNIFORM__
 #define __PARTICLE_LEVELSET_MULTIPLE_UNIFORM__
 
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
 namespace PhysBAM{
 
@@ -21,7 +21,7 @@ class PARTICLE_LEVELSET_MULTIPLE_UNIFORM:public NONCOPYABLE
 public:
     T min_collision_distance_factor,max_collision_distance_factor,max_minus_min_collision_distance_factor_over_max_short;
 
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID> levelset_multiple;
+    LEVELSET_MULTIPLE<T_GRID> levelset_multiple;
     ARRAY<PARTICLE_LEVELSET_UNIFORM<T_GRID>*> particle_levelsets;
     int number_of_ghost_cells;
 

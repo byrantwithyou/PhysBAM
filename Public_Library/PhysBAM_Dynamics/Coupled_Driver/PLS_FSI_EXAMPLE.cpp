@@ -250,7 +250,7 @@ Get_Object_Velocities(LAPLACE_UNIFORM<GRID<TV> >* elliptic_solver,ARRAY<T,FACE_I
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
-Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
+Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const
 {
     ARRAY<T,FACE_INDEX<TV::m> >::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
 }

@@ -984,7 +984,7 @@ Advect_Fluid(const T dt,const int substep)
 
     if(fluids_parameters.use_reacting_flow && incompressible_multiphase->projection.dsd){
         LOG::Time("advancing detonation shock dynamics");
-        LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
+        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         levelset_multiple.Compute_Normals();levelset_multiple.Compute_Curvature();
         incompressible_multiphase->projection.dsd->Advance_One_Time_Step(particle_levelset_evolution_multiple->V,dt,time,fluids_parameters.number_of_ghost_cells);}
     else if(incompressible && incompressible->projection.dsd){

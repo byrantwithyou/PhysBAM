@@ -7,7 +7,7 @@
 #ifndef __RENDERING_LEVELSET_MULTIPLE_OBJECT__
 #define __RENDERING_LEVELSET_MULTIPLE_OBJECT__
 
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_LEVELSET_MULTIPLE_REGION_OBJECT.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_OBJECT.h>
 

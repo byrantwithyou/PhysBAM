@@ -22,7 +22,7 @@
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 namespace PhysBAM{
 
-template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
+template<class T_GRID> class LEVELSET_MULTIPLE;
 
 template<class TV>
 class PLS_REFINEMENT_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >,public RIGID_GEOMETRY_EXAMPLE_VELOCITIES<TV>
@@ -101,7 +101,7 @@ public:
                 V[axis]=min((T)0,V[axis]);X=X_new-dt*V;}}
     }
     
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {}
     virtual void Write_Output_Files(const int frame);
     virtual void Read_Output_Files(const int frame);
     virtual void Set_Boundary_Conditions(const T time)=0;

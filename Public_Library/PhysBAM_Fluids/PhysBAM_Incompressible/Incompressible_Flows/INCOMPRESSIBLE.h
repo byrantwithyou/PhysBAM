@@ -31,7 +31,7 @@ class INCOMPRESSIBLE:public NONCOPYABLE
     typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
     typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE;typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::PROJECTION T_PROJECTION;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_MULTIPLE T_LEVELSET_MULTIPLE;typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
+    typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
     typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename FIRE_ADVECTION_POLICY<T_GRID>::ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE;
@@ -136,8 +136,8 @@ public:
 //#####################################################################
     void Use_Semi_Lagrangian_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list);
     void Use_Semi_Lagrangian_Collidable_Slip_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list);
-    void Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,const T_LEVELSET_MULTIPLE& levelset_multiple_n_plus_one);
-    void Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T_PROJECTION& projection,const T_LEVELSET_MULTIPLE& levelset_multiple_n_plus_one);
+    void Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one);
+    void Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one);
 //#####################################################################
 };
 }

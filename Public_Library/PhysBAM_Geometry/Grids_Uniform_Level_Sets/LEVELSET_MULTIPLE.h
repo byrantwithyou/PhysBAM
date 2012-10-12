@@ -28,6 +28,7 @@ class LEVELSET_MULTIPLE:public NONCOPYABLE
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_INTERPOLATION_VECTOR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
+    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
 public:
     typedef TV VECTOR_T;
 
@@ -122,6 +123,8 @@ public:
     void Compute_Normals(const T time=0);
     void Compute_Curvature(const T time=0);
     void Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders);
+    void Project_Levelset(const int number_of_ghost_cells=0);
+    void Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,const bool flood_fill_for_bubbles);
 //#####################################################################
 };   
 }

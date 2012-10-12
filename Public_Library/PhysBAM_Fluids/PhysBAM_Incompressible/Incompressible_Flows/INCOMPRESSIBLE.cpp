@@ -78,7 +78,7 @@ Use_Semi_Lagrangian_Collidable_Slip_Advection(T_GRID_BASED_COLLISION_GEOMETRY& b
 // Function Use_Semi_Lagrangian_Fire_Multiphase_Advection
 //#####################################################################
 template<class T_GRID> void INCOMPRESSIBLE<T_GRID>::
-Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,const T_LEVELSET_MULTIPLE& levelset_multiple_n_plus_one)
+Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one)
 {
     nested_semi_lagrangian_fire_multiphase=new T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE();
     semi_lagrangian_fire_multiphase=new T_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE(*nested_semi_lagrangian_fire_multiphase,projection,levelset_multiple_n_plus_one);
@@ -88,7 +88,7 @@ Use_Semi_Lagrangian_Fire_Multiphase_Advection(const T_PROJECTION& projection,con
 // Function Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection
 //#####################################################################
 template<class T_GRID> void INCOMPRESSIBLE<T_GRID>::
-Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T_PROJECTION& projection,const T_LEVELSET_MULTIPLE& levelset_multiple_n_plus_one)
+Use_Semi_Lagrangian_Fire_Multiphase_Collidable_Advection(T_GRID_BASED_COLLISION_GEOMETRY& body_list,const T_PROJECTION& projection,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one)
 {
     nested_nested_semi_lagrangian_fire_multiphase_collidable=new T_ADVECTION_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE(body_list,valid_mask);
     nested_semi_lagrangian_fire_multiphase_collidable=new T_NESTED_ADVECTION_WRAPPER_SEMI_LAGRANGIAN_FIRE_MULTIPHASE_COLLIDABLE(*nested_nested_semi_lagrangian_fire_multiphase_collidable,

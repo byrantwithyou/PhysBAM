@@ -39,7 +39,7 @@ public:
 
 //#####################################################################
     virtual PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID>& Particle_Levelset_Multiple();
-    virtual LEVELSET_MULTIPLE_UNIFORM<T_GRID>& Levelset_Multiple();
+    virtual LEVELSET_MULTIPLE<T_GRID>& Levelset_Multiple();
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i) PHYSBAM_OVERRIDE;
     virtual T_FAST_LEVELSET& Levelset(const int i) PHYSBAM_OVERRIDE;
     virtual FAST_LEVELSET_ADVECTION<T_GRID>& Levelset_Advection(const int i) PHYSBAM_OVERRIDE;

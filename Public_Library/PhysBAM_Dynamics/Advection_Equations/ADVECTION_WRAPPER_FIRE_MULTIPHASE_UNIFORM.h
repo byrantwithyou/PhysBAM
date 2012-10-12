@@ -18,13 +18,13 @@ class ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM:public ADVECTION<T_GRID,T2>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::PROJECTION T_PROJECTION;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_MULTIPLE T_LEVELSET_MULTIPLE;
+    typedef typename INCOMPRESSIBLE_POLICY<T_GRID>::PROJECTION T_PROJECTION;
 public:
     T_NESTED_ADVECTION& nested_advection;
     const T_PROJECTION& projection;
-    const T_LEVELSET_MULTIPLE& levelset_multiple_n_plus_one;
+    const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one;
 
-    ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM(T_NESTED_ADVECTION& nested_advection_input,const T_PROJECTION& projection_input,const T_LEVELSET_MULTIPLE& levelset_multiple_n_plus_one_input)
+    ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM(T_NESTED_ADVECTION& nested_advection_input,const T_PROJECTION& projection_input,const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_n_plus_one_input)
         :nested_advection(nested_advection_input),projection(projection_input),levelset_multiple_n_plus_one(levelset_multiple_n_plus_one_input)
     {}
 
@@ -42,7 +42,7 @@ public:
     void Update_Advection_Equation_Face_Lookup(const T_GRID& grid,T_FACE_ARRAYS_SCALAR& Z,const FACE_LOOKUP_UNIFORM<T_GRID>& Z_ghost,
         const FACE_LOOKUP_UNIFORM<T_GRID>& face_velocities,BOUNDARY_UNIFORM<T_GRID,T>& boundary,const T dt,const T time,
         const FACE_LOOKUP_UNIFORM<T_GRID>* Z_min_ghost,const FACE_LOOKUP_UNIFORM<T_GRID>* Z_max_ghost,T_FACE_ARRAYS_SCALAR* Z_min,T_FACE_ARRAYS_SCALAR* Z_max)
-    {const T_LEVELSET_MULTIPLE* levelset_multiple_n=projection.poisson_collidable->levelset_multiple; //assumes poisson's internal levelset is at time n
+    {const LEVELSET_MULTIPLE<T_GRID>* levelset_multiple_n=projection.poisson_collidable->levelset_multiple; //assumes poisson's internal levelset is at time n
     FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> Z_ghost_lookup(Z_ghost.V_face,projection,levelset_multiple_n);
     FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM<T_GRID> V_lookup(face_velocities.V_face,projection,&levelset_multiple_n_plus_one);
     if(Z_min_ghost && Z_max_ghost){

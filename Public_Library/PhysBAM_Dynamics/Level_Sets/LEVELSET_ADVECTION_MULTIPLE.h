@@ -19,15 +19,14 @@ namespace PhysBAM {
 template<class T_GRID>
 class LEVELSET_ADVECTION_MULTIPLE
 {
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_MULTIPLE T_LEVELSET_MULTIPLE;
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
-    T_LEVELSET_MULTIPLE* levelsets;
+    LEVELSET_MULTIPLE<T_GRID>* levelsets;
     ARRAY<FAST_LEVELSET_ADVECTION<GRID<TV> > > levelset_advections;
 
-    LEVELSET_ADVECTION_MULTIPLE(T_LEVELSET_MULTIPLE* _levelsets):levelsets(_levelsets)
+    LEVELSET_ADVECTION_MULTIPLE(LEVELSET_MULTIPLE<T_GRID>* _levelsets):levelsets(_levelsets)
     {
         for(int i=0;i<levelsets->levelsets.m;i++)
             levelset_advections.Append(FAST_LEVELSET_ADVECTION<GRID<TV> >(levelsets->levelsets(i)));

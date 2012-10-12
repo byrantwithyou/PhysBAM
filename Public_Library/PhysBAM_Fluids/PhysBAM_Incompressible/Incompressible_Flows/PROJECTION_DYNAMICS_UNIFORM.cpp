@@ -55,7 +55,7 @@ Initialize_Grid(const T_GRID& mac_grid)
 // Function Initialize_Dsd
 //#####################################################################
 template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Initialize_Dsd(const LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,const ARRAY<bool>& fuel_region)
+Initialize_Dsd(const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const ARRAY<bool>& fuel_region)
 {
     int region=0;if(!fuel_region.Find(true,region)) PHYSBAM_FATAL_ERROR();//TODO: multiple fuel regions
     delete dsd;dsd=new DETONATION_SHOCK_DYNAMICS<T_GRID>(p_grid,*levelset_multiple.levelsets(region));
@@ -128,13 +128,13 @@ Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,boo
             ARRAY<T_ARRAYS_SCALAR> phis_ghost;phis_ghost.Resize(poisson_collidable->levelset_multiple->levelsets.m);
             for(int i=0;i<poisson_collidable->levelset_multiple->levelsets.m;i++){phis_ghost(i).Resize(p_grid.Domain_Indices(ghost_cells),false);
                 poisson_collidable->levelset_multiple->levelsets(i)->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset_multiple->levelsets(i)->phi,phis_ghost(i),dt,time,ghost_cells);}
-            LEVELSET_MULTIPLE_UNIFORM<T_GRID> levelset_multiple(p_grid,phis_ghost);
+            LEVELSET_MULTIPLE<T_GRID> levelset_multiple(p_grid,phis_ghost);
             for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
                 int axis=iterator.Axis();TV_INT face_index=iterator.Face_Index(),first_cell=iterator.First_Cell_Index(),second_cell=iterator.Second_Cell_Index();
                 if(levelset_multiple.Interface(second_cell,first_cell) && !psi_N.Component(axis)(face_index) && !(psi_D(second_cell)&&psi_D(first_cell))){
                     int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(second_cell,first_cell,region_1,region_2,phi_1,phi_2);
                     face_velocities.Component(axis)(face_index)+=poisson->beta_face.Component(axis)(face_index)*one_over_dx[axis]*
-                        LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region_1,region_2)*poisson_collidable->u_jump_face.Component(axis)(face_index);}}}
+                        LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*poisson_collidable->u_jump_face.Component(axis)(face_index);}}}
         else{
             T_ARRAYS_SCALAR phi_ghost(p_grid.Domain_Indices(ghost_cells));poisson_collidable->levelset->boundary->Fill_Ghost_Cells(p_grid,poisson_collidable->levelset->phi,phi_ghost,dt,time,ghost_cells);
             for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){
@@ -212,7 +212,7 @@ Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_
 // Function Update_Phi_And_Move_Velocity_Discontinuity
 //#####################################################################
 template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,const T time,const bool update_phi_only)
+Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const T time,const bool update_phi_only)
 {
     assert(flame);
     int ghost_cells=3;

@@ -95,7 +95,7 @@ public:
     void Revalidate_Fluid_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities);
     void Post_Velocity_Advection_Callback(const T dt,const T time){}
     void Get_Object_Velocities(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time) PHYSBAM_OVERRIDE;
-    void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE;
+    void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE;
     void Initialize_Swept_Occupied_Blocks_For_Advection(const T dt,const T time,T maximum_fluid_velocity,const bool include_removed_particle_velocities);
     void Read_Output_Files_Fluids(const int frame) PHYSBAM_OVERRIDE;
     virtual void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE;

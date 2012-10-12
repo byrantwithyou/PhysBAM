@@ -97,7 +97,7 @@ public:
         for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
-    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE_UNIFORM<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET_MULTIPLE<GRID<TV> >& levelset_multiple,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
         for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }

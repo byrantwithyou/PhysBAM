@@ -102,7 +102,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
 
     if(!GFM && nonzero_surface_tension){
         T half_width=(T).5*number_of_interface_cells*grid.Minimum_Edge_Length();T dt_over_four=(T).25*dt;
-        LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
+        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
         levelset_multiple.Compute_Normals();levelset_multiple.Compute_Curvature();
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){int axis=iterator.Axis();TV_INT index=iterator.Face_Index();
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
@@ -166,12 +166,12 @@ Advance_One_Time_Step_Implicit_Part(T_FACE_ARRAYS_SCALAR& face_velocities,const 
     if((GFM&&nonzero_surface_tension)||projection.flame) projection.poisson_collidable->Set_Jump_Multiphase();
     
     if(GFM && nonzero_surface_tension){
-        LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
+        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             if(region_1!=region_2){
-                T sign=LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region_1,region_2);
+                T sign=LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2);
                 T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,-sign*(*levelset_multiple.levelsets(region_1)->curvature)(cell_1),
                                                        -phi_2,sign*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
                 projection.poisson_collidable->u_jump_face.Component(iterator.Axis())(iterator.Face_Index())+=dt*surface_tensions(region_1,region_2)*curvature;}}}
@@ -193,7 +193,7 @@ template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
 Calculate_Pressure_Jump(const T dt,const T time)
 {
     assert(projection.poisson_collidable->levelset_multiple);
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
+    LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
         int region1=levelset_multiple.Inside_Region(cell1),region2=levelset_multiple.Inside_Region(cell2);
@@ -202,7 +202,7 @@ Calculate_Pressure_Jump(const T dt,const T time)
         if(projection.densities(region1)<projection.densities(region2))exchange(region1,region2); //region1 is now the fuel region
         // [p]=dt*[1/density]*sqr(M) with M=-density_fuel*flame_speed, [1/density]=(1/density_fuel-1/density_products)
         // flame_speed_constant.z is (-density_fuel*[1/density])
-        projection.poisson_collidable->u_jump_face.Component(iterator.Axis())(iterator.Face_Index())+=LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region1,region2)*
+        projection.poisson_collidable->u_jump_face.Component(iterator.Axis())(iterator.Face_Index())+=LEVELSET_MULTIPLE<T_GRID>::Sign(region1,region2)*
             dt*constants.z*projection.densities(region1)*sqr(projection.Flame_Speed_Face_Multiphase(iterator.Axis(),iterator.Face_Index(),region1,region2));}
 }
 //#####################################################################
@@ -237,15 +237,15 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
     // surface tension
     T dt_surface_tension=0;
     if(nonzero_surface_tension){
-        LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
+        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;levelset_multiple.Compute_Curvature();
         int ghost_cells=1;
         levelset_multiple.Fill_Ghost_Cells(levelset_multiple.phis,0,ghost_cells);T kappa_cfl=0;
         for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
             TV_INT cell_1=iterator.First_Cell_Index(),cell_2=iterator.Second_Cell_Index();
             int region_1,region_2;T phi_1,phi_2;levelset_multiple.Minimum_Regions(cell_1,cell_2,region_1,region_2,phi_1,phi_2);
             if(region_1!=region_2 && surface_tensions(region_1,region_2)){
-                T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region_2,region_1)*(*levelset_multiple.levelsets(region_1)->curvature)(cell_1),
-                    -phi_2,LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region_1,region_2)*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
+                T curvature=LEVELSET_UTILITIES<T>::Average(phi_1,LEVELSET_MULTIPLE<T_GRID>::Sign(region_2,region_1)*(*levelset_multiple.levelsets(region_1)->curvature)(cell_1),
+                    -phi_2,LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*(*levelset_multiple.levelsets(region_2)->curvature)(cell_2));
                 kappa_cfl=max(kappa_cfl,abs(curvature*surface_tensions(region_1,region_2)/
                           LEVELSET_UTILITIES<T>::Heaviside((T).5*(phi_1-phi_2),projection.densities(region_1),projection.densities(region_2))));}}
         dt_surface_tension=sqrt(kappa_cfl)/grid.Minimum_Edge_Length();}
@@ -268,7 +268,7 @@ CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid,const bool viscous
 template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
 Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures)
 {
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID> levelset_multiple(grid,phis);
+    LEVELSET_MULTIPLE<T_GRID> levelset_multiple(grid,phis);
     if(dirichlet_regions.Number_True()>0){
         if(!pressures){for(CELL_ITERATOR iterator(projection.p_grid);iterator.Valid();iterator.Next()) if(dirichlet_regions(levelset_multiple.Inside_Region(iterator.Cell_Index()))){
             projection.elliptic_solver->psi_D(iterator.Cell_Index())=true;projection.p(iterator.Cell_Index())=0;}}
@@ -288,7 +288,7 @@ Add_Surface_Tension(T_LEVELSET& levelset,const T time)
 {
     LAPLACE_UNIFORM<T_GRID>& elliptic_solver=*projection.elliptic_solver;T_GRID& p_grid=elliptic_solver.grid;
     LAPLACE_COLLIDABLE<T_GRID>& collidable_solver=*projection.collidable_solver;
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
+    LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=*projection.poisson_collidable->levelset_multiple;
     T_ARRAYS_SCALAR& phi=levelset.phi; 
 
    if(collidable_solver.second_order_cut_cell_method) for(FACE_ITERATOR iterator(p_grid);iterator.Valid();iterator.Next()){

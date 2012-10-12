@@ -108,7 +108,7 @@ Find_Constant_beta(T_FACE_ARRAYS_SCALAR& beta_face,const T_ARRAYS_SCALAR& phi_gh
 template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 Find_Constant_beta_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 {
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
+    LEVELSET_MULTIPLE<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
 
     T half_width=(T).5*number_of_interface_cells*grid.dX.Max();
     if(GFM || smear_beta){
@@ -166,13 +166,13 @@ template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
 Add_Jump_To_b_Multiphase(ARRAY<T_ARRAYS_SCALAR>& phis_ghost)
 {
     TV one_over_dx2=Inverse(grid.dX*grid.dX);
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
+    LEVELSET_MULTIPLE<T_GRID> levelset(grid,phis_ghost);levelset.Recreate_Levelsets();
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index(),face_index=iterator.Face_Index();int axis=iterator.Axis();
         if(levelset.Interface(first_cell_index,second_cell_index) && !psi_N.Component(axis)(face_index) && !(psi_D(first_cell_index) && psi_D(second_cell_index))){
             int region_1,region_2;T phi_1,phi_2;levelset.Minimum_Regions(first_cell_index,second_cell_index,region_1,region_2,phi_1,phi_2);
             T jump=beta_face.Component(axis)(face_index)*one_over_dx2[axis]*u_jump_face.Component(axis)(face_index);
-            f(first_cell_index)-=LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region_1,region_2)*jump;f(second_cell_index)-=LEVELSET_MULTIPLE_UNIFORM<T_GRID>::Sign(region_2,region_1)*jump;}}
+            f(first_cell_index)-=LEVELSET_MULTIPLE<T_GRID>::Sign(region_1,region_2)*jump;f(second_cell_index)-=LEVELSET_MULTIPLE<T_GRID>::Sign(region_2,region_1)*jump;}}
 }
 //#####################################################################
 // Function Add_Derivative_Jump_To_b
@@ -268,7 +268,7 @@ Use_Internal_Level_Set(const int number_of_regions)
     levelset_multiple->Recreate_Levelsets();
 }
 template<class T_GRID> void POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-Update_Internal_Level_Set(LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple_input)
+Update_Internal_Level_Set(LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_input)
 {
     for(int k=0;k<levelset_multiple_input.phis.m;k++) levelset_multiple->phis(k)=levelset_multiple_input.phis(k);
 }

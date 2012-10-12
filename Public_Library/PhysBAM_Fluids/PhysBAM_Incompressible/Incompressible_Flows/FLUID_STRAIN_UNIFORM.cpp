@@ -98,7 +98,7 @@ Update_Strain_Equation(const T dt,const T time,const T density,T_FACE_ARRAYS_SCA
 //#####################################################################
 template<class T_GRID> void FLUID_STRAIN_UNIFORM<T_GRID>::
 Update_Strain_Equation_Multiphase(const T dt,const T time,const T density,T_FACE_ARRAYS_SCALAR& face_velocities,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,
-    const LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset,const int region,const int number_of_ghost_cells)
+    const LEVELSET_MULTIPLE<T_GRID>& levelset,const int region,const int number_of_ghost_cells)
 {
     if(!cfl_called) PHYSBAM_WARNING("Using strain without calling strain CFL");
     ARRAY<TV,TV_INT> V(grid.Domain_Indices(1));

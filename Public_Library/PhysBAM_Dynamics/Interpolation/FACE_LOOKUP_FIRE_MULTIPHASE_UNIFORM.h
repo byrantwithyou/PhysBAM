@@ -12,7 +12,7 @@
 #include <cassert>
 namespace PhysBAM{
 
-template<class T_GRID> class LEVELSET_MULTIPLE_UNIFORM;
+template<class T_GRID> class LEVELSET_MULTIPLE;
 
 template<class T_GRID>
 class FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM
@@ -26,10 +26,10 @@ public:
     const T_FACE_ARRAYS& V_face;
 protected:
     const T_PROJECTION& projection;
-    const LEVELSET_MULTIPLE_UNIFORM<T_GRID>* levelset_multiple;
+    const LEVELSET_MULTIPLE<T_GRID>* levelset_multiple;
 public:
 
-    FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM(const T_FACE_ARRAYS& V_face_input,const T_PROJECTION& projection_input,const LEVELSET_MULTIPLE_UNIFORM<T_GRID>* levelset_multiple_input=0)
+    FACE_LOOKUP_FIRE_MULTIPHASE_UNIFORM(const T_FACE_ARRAYS& V_face_input,const T_PROJECTION& projection_input,const LEVELSET_MULTIPLE<T_GRID>* levelset_multiple_input=0)
         :V_face(V_face_input),projection(projection_input),levelset_multiple(levelset_multiple_input)
     {}
 

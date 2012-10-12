@@ -396,7 +396,7 @@ Get_Object_Velocities(LAPLACE_UNIFORM<T_GRID>* elliptic_solver,T_FACE_ARRAYS_SCA
 // Function Get_Levelset_Velocity
 //#####################################################################
 template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
-Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const
+Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const
 {
     if(!fluids_parameters.use_reacting_flow) T_FACE_ARRAYS_SCALAR::Put(fluid_collection.incompressible_fluid_collection.face_velocities,V_levelset);
     else{
@@ -617,7 +617,7 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,2> > >::Set_Dirich
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,2> > >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,2> > >::Write_Output_Files(int) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<float,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Get_Levelset_Velocity(GRID<VECTOR<float,3> > const&,LEVELSET_MULTIPLE_UNIFORM<GRID<VECTOR<float,3> > >&,ARRAY<float,FACE_INDEX<3> >&,float) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Get_Levelset_Velocity(GRID<VECTOR<float,3> > const&,LEVELSET_MULTIPLE<GRID<VECTOR<float,3> > >&,ARRAY<float,FACE_INDEX<3> >&,float) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Get_Object_Velocities(LAPLACE_UNIFORM<GRID<VECTOR<float,3> > >*,ARRAY<float,FACE_INDEX<3> >&,float,float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Initialize_Compressible_Incompressible_Coupling();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Initialize_MPI();
@@ -645,7 +645,7 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,2> > >::Get_Source
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,2> > >::Get_Source_Velocities<RANGE<VECTOR<float,2> > >(RANGE<VECTOR<float,2> > const&,MATRIX<float,3,3> const&,VECTOR<float,2> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,3> > >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<float,3> >&,bool,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,1> > >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<float,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,float);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,1> > >::Get_Levelset_Velocity(GRID<VECTOR<float,1> > const&,LEVELSET_MULTIPLE_UNIFORM<GRID<VECTOR<float,1> > >&,ARRAY<float,FACE_INDEX<1> >&,float) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,1> > >::Get_Levelset_Velocity(GRID<VECTOR<float,1> > const&,LEVELSET_MULTIPLE<GRID<VECTOR<float,1> > >&,ARRAY<float,FACE_INDEX<1> >&,float) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,1> > >::Get_Object_Velocities(LAPLACE_UNIFORM<GRID<VECTOR<float,1> > >*,ARRAY<float,FACE_INDEX<1> >&,float,float);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,1> > >::Initialize_Compressible_Incompressible_Coupling();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<float,1> > >::Initialize_MPI();
@@ -697,7 +697,7 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,2> > >::Set_Diric
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,2> > >::Set_Ghost_Density_And_Temperature_Inside_Flame_Core();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,2> > >::Write_Output_Files(int) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<double,3> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Levelset_Velocity(GRID<VECTOR<double,3> > const&,LEVELSET_MULTIPLE_UNIFORM<GRID<VECTOR<double,3> > >&,ARRAY<double,FACE_INDEX<3> >&,double) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Levelset_Velocity(GRID<VECTOR<double,3> > const&,LEVELSET_MULTIPLE<GRID<VECTOR<double,3> > >&,ARRAY<double,FACE_INDEX<3> >&,double) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Get_Object_Velocities(LAPLACE_UNIFORM<GRID<VECTOR<double,3> > >*,ARRAY<double,FACE_INDEX<3> >&,double,double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Initialize_Compressible_Incompressible_Coupling();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Initialize_MPI();
@@ -725,7 +725,7 @@ template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,2> > >::Get_Sourc
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,2> > >::Get_Source_Velocities<RANGE<VECTOR<double,2> > >(RANGE<VECTOR<double,2> > const&,MATRIX<double,3,3> const&,VECTOR<double,2> const&);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,3> > >::Add_To_Fluid_Simulation(DEFORMABLE_OBJECT_FLUID_COLLISIONS<VECTOR<double,3> >&,bool,bool);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Delete_Particles_Inside_Objects(PARTICLE_LEVELSET_PARTICLES<VECTOR<double,1> >&,PARTICLE_LEVELSET_PARTICLE_TYPE,double);
-template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Get_Levelset_Velocity(GRID<VECTOR<double,1> > const&,LEVELSET_MULTIPLE_UNIFORM<GRID<VECTOR<double,1> > >&,ARRAY<double,FACE_INDEX<1> >&,double) const;
+template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Get_Levelset_Velocity(GRID<VECTOR<double,1> > const&,LEVELSET_MULTIPLE<GRID<VECTOR<double,1> > >&,ARRAY<double,FACE_INDEX<1> >&,double) const;
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Get_Object_Velocities(LAPLACE_UNIFORM<GRID<VECTOR<double,1> > >*,ARRAY<double,FACE_INDEX<1> >&,double,double);
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Initialize_Compressible_Incompressible_Coupling();
 template void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<double,1> > >::Initialize_MPI();

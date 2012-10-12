@@ -68,14 +68,14 @@ public:
 
 //#####################################################################
     virtual void Initialize_Grid(const T_GRID& mac_grid);
-    void Initialize_Dsd(const LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
+    void Initialize_Dsd(const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
     void Initialize_Dsd(const T_LEVELSET& levelset,const ARRAY<bool>& fuel_region);
     virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
     void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);
     void Set_Up_For_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
     void Restore_After_SPH(T_FACE_ARRAYS_SCALAR& face_velocities,const bool use_variable_density_solve=false,const bool use_one_way_coupling=false);
-    void Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple,const T time,const bool update_phi_only=false);
+    void Update_Phi_And_Move_Velocity_Discontinuity(T_FACE_ARRAYS_SCALAR& face_velocities,LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const T time,const bool update_phi_only=false);
     template<class FACE_LOOKUP> void Compute_Divergence(const FACE_LOOKUP &face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
     T Flame_Speed_Face_Multiphase(const int axis,const TV_INT& face_index,const int fuel_region,const int product_region) const;
     void Use_Flame_Speed_Multiplier(const bool use_flame_speed_multiplier_input=true);

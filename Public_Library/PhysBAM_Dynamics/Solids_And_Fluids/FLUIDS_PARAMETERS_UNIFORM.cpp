@@ -397,7 +397,7 @@ Get_Body_Force(T_FACE_ARRAYS_SCALAR& force,const T dt,const T time)
     else if(use_reacting_flow){
         T_ARRAYS_SCALAR temperature_ghost(grid->Domain_Indices(number_of_ghost_cells),false);
         temperature_container.boundary->Fill_Ghost_Cells_Cell(*grid,temperature_container.temperature,temperature_ghost,time,number_of_ghost_cells);
-        T_LEVELSET_MULTIPLE& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
+        LEVELSET_MULTIPLE<T_GRID>& levelset_multiple=particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple;
         ARRAY<T> one_over_densities(number_of_regions);for(int i=0;i<number_of_regions;i++) one_over_densities(i)=(T)1/densities(i);
         for(FACE_ITERATOR iterator(*grid,0,T_GRID::WHOLE_REGION,-1,1);iterator.Valid();iterator.Next()){ // y-direction forces only
             T temperature;

@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Grids_Uniform_PDE_Linear/POISSON_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_PDE_Linear/LAPLACE_COLLIDABLE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 namespace PhysBAM{
 
@@ -42,11 +42,11 @@ public:
     T_FACE_ARRAYS_SCALAR beta_interface_face; // 2nd order method
     T_FACE_ARRAYS_SCALAR u_jump_face;
     //T_LEVELSET* levelset; // used in second order accurate cut cell method
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID>* levelset_multiple;
+    LEVELSET_MULTIPLE<T_GRID>* levelset_multiple;
     //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
 private:
     ARRAY<T_ARRAYS_SCALAR> phis_default;
-    LEVELSET_MULTIPLE_UNIFORM<T_GRID> levelset_multiple_default;
+    LEVELSET_MULTIPLE<T_GRID> levelset_multiple_default;
 protected:
     T dt;
     bool dt_is_set;
@@ -74,7 +74,7 @@ public:
 
 //#####################################################################
     void Use_Internal_Level_Set(const int number_of_regions);
-    void Update_Internal_Level_Set(LEVELSET_MULTIPLE_UNIFORM<T_GRID>& levelset_multiple_input);
+    void Update_Internal_Level_Set(LEVELSET_MULTIPLE<T_GRID>& levelset_multiple_input);
     void Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input=true) PHYSBAM_OVERRIDE;
     void Initialize_Grid(const T_GRID& grid_input) PHYSBAM_OVERRIDE;
     void Compute_beta_And_Add_Jumps_To_b(const T dt,const T time) PHYSBAM_OVERRIDE;
