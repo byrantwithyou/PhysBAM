@@ -6,13 +6,19 @@ USE_FFMPEG=1
 USE_LIBJPEG=1
 USE_FLTK=0
 USE_OPENEXR=0
-compile_without_double_support=1
+compile_without_double_support=0
 compile_without_rle_support=1
 compile_without_dyadic_support=1
 USE_MPI=0
 USE_LAM=0
 lam_libpath=['/solver/adm/lam/lib']
 lam_include=['/solver/adm/lam/include']
+DEFAULT_ARCH='nocona'
+shared=1
+shared_objects=1
+single_so=0
+CXXFLAGS_EXTRA=['-fopenmp']
+LINKFLAGS_EXTRA=['-fopenmp']
 
 import os
 
