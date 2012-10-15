@@ -131,13 +131,11 @@ Scalar_Advance(const T dt,const T time)
 template<class TV> void INCOMPRESSIBLE_DRIVER<TV>::
 Convect(const T dt,const T time)
 {
-    static bool first=true;
     LOG::Time("Velocity Advection");
     example.boundary->Set_Fixed_Boundary(true,0);
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before convection",0,1);
     example.incompressible.Advance_One_Time_Step_Convection(dt,time,example.face_velocities,example.face_velocities,example.number_of_ghost_cells);
     example.boundary->Set_Fixed_Boundary(false);
-    first=false;
     PHYSBAM_DEBUG_WRITE_SUBSTEP("after convection",0,1);
 }
 //#####################################################################

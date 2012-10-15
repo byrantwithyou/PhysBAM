@@ -45,7 +45,7 @@ Write_Output(PARSE_ARGS& parse_args)
         TV X_o=iterator.Location()-((T)frame)*1/(T)frame_rate;
         TV X_o_fine=grid.Center(scale*iterator.Cell_Index()-(scale-1)*TV_INT::All_Ones_Vector())-((T)frame)*1/(T)frame_rate;
         T analytic=0;if(X_o.x>=0.25&&X_o.x<=0.75) analytic=.5*(sin(2*pi/(.5)*(X_o.x-0.25)-pi/2.)+1);
-        T analytic_fine=0;if(X_o_fine.x>=0.25&&X_o_fine.x<=0.75) analytic_fine=.5*(sin(2*pi/(.5)*(X_o_fine.x-0.25)-pi/2.)+1);
+//        T analytic_fine=0;if(X_o_fine.x>=0.25&&X_o_fine.x<=0.75) analytic_fine=.5*(sin(2*pi/(.5)*(X_o_fine.x-0.25)-pi/2.)+1);
         T coarse_error=analytic-(density_coarse(iterator.Cell_Index()));
         //T fine_error=analytic_fine-(density(scale*iterator.Cell_Index()-(scale-1)*TV_INT::All_Ones_Vector()));
         //PHYSBAM_ASSERT(scale*iterator.Cell_Index()-(scale-1)*TV_INT::All_Ones_Vector()==grid.Index(iterator.Location()));

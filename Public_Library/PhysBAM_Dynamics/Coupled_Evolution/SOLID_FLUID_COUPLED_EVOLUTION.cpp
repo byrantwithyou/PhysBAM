@@ -751,7 +751,6 @@ Compute_W(const T current_position_time)
         FACE_WEIGHT_ELEMENTS& deformable_face_weights=*dual_cell_weights(axis,face_index);
         FACE_WEIGHT_ELEMENTS& rigid_dual_cell_weights=*rigid_body_dual_cell_weights(axis,face_index);
 
-        bool only_kinematic=true;
         for(int s=0;s<dual_cell_structure_simplex_list.m;s++){
             const COLLISION_GEOMETRY_ID object_id=dual_cell_structure_simplex_list(s).x;
             const int object_simplex_index=dual_cell_structure_simplex_list(s).y;
@@ -769,7 +768,6 @@ Compute_W(const T current_position_time)
                     T sum_total_weight=total_weight.Sum();
                     overall_weight+=sum_total_weight;
                     if(sum_total_weight){
-                        if(fluids_parameters.fluid_affects_solid) only_kinematic=false;
                         for(int p=0;p<simplex_indices.m;p++){
                             int dynamic_particle_index=particles_to_dynamic_particles_map(simplex_indices(p)); // TODO: make this work for embedded particles
                             if(dynamic_particle_index>=0) deformable_face_weights.Append(PAIR<int,T>(dynamic_particle_index,total_weight(p)));}}}
@@ -779,7 +777,6 @@ Compute_W(const T current_position_time)
                     overall_weight+=total_weight;
                     if(total_weight){
                         const RIGID_GEOMETRY<TV>& rigid_geometry=rigid_collision_geometry->rigid_geometry;
-                        if(!dynamic_cast<const RIGID_BODY<TV>&>(rigid_geometry).Has_Infinite_Inertia() && fluids_parameters.fluid_affects_solid) only_kinematic=false;
                         rigid_dual_cell_weights.Append(PAIR<int,T>(rigid_geometry.particle_index,total_weight));}}
                 else PHYSBAM_FATAL_ERROR();}
             else{ // TODO: non-simplicial volumetric rigid body

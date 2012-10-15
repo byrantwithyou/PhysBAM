@@ -195,9 +195,6 @@ void Emit_Interface_Triangles(int* colors,int color_hint)
         if(edges[i].v0<12) adj[edges[i].v0][1]=i;
         if(edges[i].v1<12) adj[edges[i].v1][0]=i;}
 
-    int face_graph[64][2];
-    for(int i=0;i<64;i++) for(int k=0;k<2;k++) face_graph[i][k]=-1;
-
     int cur_edges[100][2],num_cur_edges=0;
     bool loops_only=true;
     for(int i=0;i<12;i++){

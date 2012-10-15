@@ -16,7 +16,9 @@ class BOUNDARY_UNIFORM_PERIODIC:public BOUNDARY_UNIFORM<T_GRID,T2>
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::VECTOR_T TV;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
+    typedef BOUNDARY_UNIFORM<T_GRID,T2> BASE;
 public:
+    using BASE::Find_Ghost_Regions;
 
     BOUNDARY_UNIFORM_PERIODIC()
     {}

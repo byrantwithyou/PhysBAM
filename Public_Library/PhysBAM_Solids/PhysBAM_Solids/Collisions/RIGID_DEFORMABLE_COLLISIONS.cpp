@@ -475,17 +475,14 @@ Process_Precomputed_Contact_With_Rigid_Bodies()
     for(int j=0;j<precompute_contact_projections.m;j++){if(precompute_contact_projections(j)->rigid_body.Has_Infinite_Inertia()) has_infinite=true;else has_finite=true;}
 
     if(has_finite)
-        for(int iteration=0;iteration<solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations;iteration++){
-            T epsilon_scale=1;
-            if(solids_parameters.rigid_body_collision_parameters.use_epsilon_scaling || solids_parameters.rigid_body_collision_parameters.use_epsilon_scaling_for_level)
-                epsilon_scale=(T)iteration/(solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations);
+        for(int iteration=0;iteration<solids_parameters.rigid_body_collision_parameters.contact_iterations*rigid_body_collisions.contact_level_iterations;iteration++)
             for(int j=0;j<precompute_contact_projections.m;j++){PRECOMPUTE_CONTACT_PROJECTION& precompute=*precompute_contact_projections(j);
                 if(precompute.rigid_body.Has_Infinite_Inertia()) continue;
                 TV impulse;
                 for(int i=0;i<precompute.particles.m;i++){const int p=precompute.particles(i);
                     TV relative_velocity=deformable_body_collection.particles.V(p)-precompute.rigid_body.Pointwise_Object_Velocity(deformable_body_collection.particles.X(p));
                     Apply_Rigid_Deformable_Collision_Impulse((RIGID_BODY<TV>&)precompute.rigid_body,p,deformable_body_collection.particles.X(p),precompute.N(i),relative_velocity,0,
-                        precompute.rigid_body.coefficient_of_friction,false,impulse,true);}}}
+                        precompute.rigid_body.coefficient_of_friction,false,impulse,true);}}
     if(has_infinite) Process_Precomputed_Contact_With_Kinematic_Rigid_Bodies();
 }
 //#####################################################################

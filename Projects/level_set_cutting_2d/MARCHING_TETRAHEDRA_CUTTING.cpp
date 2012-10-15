@@ -47,15 +47,15 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<2> >& table,const
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc1={{0,0,0,0},{{cc.elements[1][0],cc.elements[1][1]},
                                                         {cc.elements[0][0],cc.elements[0][1]}}};
     Fill_Helper(table,cc1,(a^(1-a/2))*9+(b^(1-b/2))*3+(c^(1-c/2)));
-#define F(i,j,m) (cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)):0)
+#define F(i,j,m) (unsigned short)(cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)):0)
     // flip
-    const int fl[6]={1,0,2,4,3,5};
+    const unsigned short fl[6]={1,0,2,4,3,5};
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc2={{0,0,0,0},{{F(0,0,fl),F(0,1,fl)},{F(1,0,fl),F(1,1,fl)}}};
     Fill_Helper(table,cc2,b*9+a*3+c);
 #undef F
-#define R(i,j,m) (cc.elements[i][j]?(m[A(i,j)]+(m[B(i,j)]<<4)+(m[C(i,j)]<<8)):0)
+#define R(i,j,m) (unsigned short)(cc.elements[i][j]?(m[A(i,j)]+(m[B(i,j)]<<4)+(m[C(i,j)]<<8)):0)
     // rotate
-    const int ro[6]={1,2,0,4,5,3};
+    const unsigned short ro[6]={1,2,0,4,5,3};
     MARCHING_TETRAHEDRA_CUTTING_CASE<2> cc0={{0,0,0,0},{{R(0,0,ro),R(0,1,ro)},{R(1,0,ro),R(1,1,ro)}}};
     Fill_Helper(table,cc0,c*9+a*3+b);
 #undef R
@@ -89,15 +89,15 @@ static void Fill_Helper(ARRAY<MARCHING_TETRAHEDRA_CUTTING_CASE<3> >& table,const
         {{cc.elements[1][0],cc.elements[1][1],cc.elements[1][2]},
          {cc.elements[0][0],cc.elements[0][1],cc.elements[0][2]}}};
     Fill_Helper(table,cc1,(a^(1-a/2))*27+(b^(1-b/2))*9+(c^(1-c/2))*3+(d^(1-d/2)));
-#define F(i,j,m) (cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)+(m[D(i,j)]<<12)):0)
+#define F(i,j,m) (unsigned short)(cc.elements[i][j]?(m[B(i,j)]+(m[A(i,j)]<<4)+(m[C(i,j)]<<8)+(m[D(i,j)]<<12)):0)
     // flip
-    const int fl[10]={1,0,2,3,6,5,4,9,8,7};
+    const unsigned char fl[10]={1,0,2,3,6,5,4,9,8,7};
     MARCHING_TETRAHEDRA_CUTTING_CASE<3> cc2={
         {fl[cc.comp[0]],fl[cc.comp[1]],fl[cc.comp[2]],fl[cc.comp[3]]},
         {{F(0,0,fl),F(0,1,fl),F(0,2,fl)},{F(1,0,fl),F(1,1,fl),F(1,2,fl)}}};
     Fill_Helper(table,cc2,b*27+a*9+c*3+d);
     // rotate
-    const int ro[10]={1,2,3,0,9,6,8,5,7,4};
+    const unsigned char ro[10]={1,2,3,0,9,6,8,5,7,4};
     MARCHING_TETRAHEDRA_CUTTING_CASE<3> cc0={
         {ro[cc.comp[0]],ro[cc.comp[1]],ro[cc.comp[2]],ro[cc.comp[3]]},
         {{F(0,0,ro),F(0,1,ro),F(0,2,ro)},{F(1,0,ro),F(1,1,ro),F(1,2,ro)}}};

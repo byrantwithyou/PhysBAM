@@ -207,7 +207,7 @@ else: # assume g++...
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
     elif env['TYPE']=='debug': env.Append(CXXFLAGS=' -g',LINKFLAGS=' -g')
-    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing')
+    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -Wno-unused-local-typedefs')
 #    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2')
     if env["warnings_are_errors"]: env.Append(CXXFLAGS=" -Werror")
 

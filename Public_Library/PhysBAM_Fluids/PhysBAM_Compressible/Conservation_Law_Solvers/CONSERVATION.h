@@ -41,13 +41,11 @@ class CONSERVATION
     typedef VECTOR<T,d> TV_DIMENSION;
     typedef VECTOR<bool,2*T_GRID::dimension> TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
-    typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_FACE_ARRAYS_DIMENSION_SCALAR;
-    typedef GRID<VECTOR<T,TV::dimension-1> > T_GRID_LOWER_DIM;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
-    typedef typename T_GRID_LOWER_DIM::CELL_ITERATOR CELL_ITERATOR_LOWER_DIM;
-    typedef typename T_GRID_LOWER_DIM::VECTOR_INT TV_INT_LOWER_DIM;
+    typedef ARRAY<TV_DIMENSION,TV_INT> T_ARRAYS_DIMENSION_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef ARRAY<bool,FACE_INDEX<TV::m> > T_FACE_ARRAYS_BOOL;
+    typedef ARRAY<TV_DIMENSION,FACE_INDEX<TV::m> > T_FACE_ARRAYS_DIMENSION_SCALAR;
+    typedef VECTOR<T,TV::m-1> TV_LOWER_DIM;
 public: 
     int order; // 1,2, or 3
     int field_by_field_alpha; // (1) field by field, (0) max over all the fields 

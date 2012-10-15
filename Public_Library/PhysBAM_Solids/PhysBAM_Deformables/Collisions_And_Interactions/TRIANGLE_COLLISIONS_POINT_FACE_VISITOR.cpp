@@ -47,9 +47,12 @@ Store(const int point_index,const int face_index)
     if(!box1.Intersection(box2,collision_thickness)) return;
     VECTOR<int,d+1> nodes=face_nodes.Insert(p,0);
     if(intersecting_point_face_pairs.Size() && intersecting_point_face_pairs.Contains(nodes)) return;
-    if (mpi_solids){
+    if(mpi_solids){
         VECTOR<PARTITION_ID,d+1> processors(mpi_solids->partition_id_from_particle_index.Subset(nodes));
-        int i; for(i=0;i<d;i++) if (processors(i)!=processors(d+1)) {pairs_external.Append(nodes);return;}
+        for(int i=0;i<d;i++)
+            if(processors(i)!=processors(d)){
+                pairs_external.Append(nodes);
+                return;}
         pairs_internal.Append(nodes);}
     else pairs_internal.Append(nodes);
 }

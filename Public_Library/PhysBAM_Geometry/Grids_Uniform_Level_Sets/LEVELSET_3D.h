@@ -23,7 +23,7 @@ public:
     typedef LEVELSET_UNIFORM<T_GRID> BASE;
     using BASE::grid;using BASE::phi;using BASE::normals;using BASE::curvature;using BASE::cell_range;
     using BASE::collision_body_list;using BASE::refine_fmm_initialization_with_iterative_solver;using BASE::fmm_initialization_iterations;using BASE::fmm_initialization_iterative_tolerance;
-    using BASE::fmm_initialization_iterative_drift_fraction;
+    using BASE::fmm_initialization_iterative_drift_fraction;using BASE::Hessian;
     using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;using BASE::max_time_step;
     using BASE::curvature_motion;using BASE::sigma;using BASE::interpolation;
     using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::secondary_interpolation;

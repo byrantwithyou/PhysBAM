@@ -16,6 +16,7 @@
 #include <PhysBAM_Tools/Math_Tools/maxmag.h>
 #include <PhysBAM_Tools/Math_Tools/min.h>
 #include <PhysBAM_Tools/Math_Tools/minmag.h>
+#include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Utilities/STATIC_ASSERT.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/ARITHMETIC_POLICY.h>

@@ -209,10 +209,6 @@ struct OBJECT
                 TV2 xp0=Project(x0);
                 TV2 xp1=Project(x1);
 
-                T sign[2];
-                if(!visible) {sign[0]=-1;sign[1]=1;}
-                else {sign[0]=1;sign[1]=-1;}
-
                 int color[2];
                 color[0]=c0;
                 color[1]=c1;

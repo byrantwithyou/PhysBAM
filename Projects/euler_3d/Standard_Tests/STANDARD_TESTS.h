@@ -1005,27 +1005,27 @@ void Add_Stack_Of_Squares()
     const char* boxfile=parameter?"box":"subdivided_box";
     T stack_mu=(T).5;
 
-    T box_scale_x=(T)1,box_scale_y=(T)1,box_scale_z=(T)1;
+    T box_scale_y=(T)1;
 
     T x_center=0,y_top=-1,z_center=0;
     T scale=.1;
     T epsilony=0;
 
-    T x_scale=box_scale_x*scale,y_scale=box_scale_y*scale,z_scale=box_scale_z*scale;
+    T y_scale=box_scale_y*scale;
     T x_pos=x_center,y_pos=y_top+y_scale,z_pos=z_center;
     RIGID_BODY<TV>& box1=solid_tests.Add_Rigid_Body(boxfile,scale,stack_mu);
     Set_Rigid_Body_Parameters(box1.particle_index,"box1",TV(x_pos,y_pos,z_pos),solid_mass*20,stack_mu);
 
     y_top=y_pos+y_scale+epsilony;
     
-    x_scale=box_scale_x*scale;y_scale=box_scale_y*scale;z_scale=box_scale_z*scale;
+    y_scale=box_scale_y*scale;
     x_pos=x_center,y_pos=y_top+y_scale,z_pos=z_center;
     RIGID_BODY<TV>& box4=solid_tests.Add_Rigid_Body(boxfile,scale,stack_mu);
     Set_Rigid_Body_Parameters(box4.particle_index,"box4",TV(x_pos,y_pos,z_pos),solid_mass*10,stack_mu);
     
     y_top=y_pos+y_scale+epsilony;
 
-    x_scale=box_scale_x*scale;y_scale=box_scale_y*scale;z_scale=box_scale_z*scale;
+    y_scale=box_scale_y*scale;
     x_pos=x_center,y_pos=y_top+y_scale,z_pos=z_center;
     RIGID_BODY<TV>& box5=solid_tests.Add_Rigid_Body(boxfile,scale,stack_mu);
     Set_Rigid_Body_Parameters(box5.particle_index,"box5",TV(x_pos,y_pos,z_pos),solid_mass*10,stack_mu);

@@ -58,7 +58,7 @@ Compute_Delta_Flux_For_Clamping_Variable(const T_GRID& grid,const int number_of_
 {
     TV one_over_dx=grid.one_over_dX;
     VECTOR<bool,T_GRID::dimension*2> clamp_flux;
-    for(CELL_ITERATOR iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,number_of_ghost_cells);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T outgoing_flux=0;overshoot_percentages(cell_index)=0;
         for(int i=0;i<T_GRID::dimension*2;i++) clamp_flux(i)=false;
         for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT first_face_index=iterator.First_Face_Index(axis),second_face_index=iterator.Second_Face_Index(axis);
@@ -111,8 +111,8 @@ Compute_Flux_Without_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR
         ARRAY<int,VECTOR<int,1> > filled_region_colors(U_start,U_end);filled_region_colors.Fill(-1);
         ARRAY<bool,VECTOR<int,1> > psi_axis_current_component(U_start,U_end);
         if(save_fluxes) flux_temp.Resize(U_start-1,U_end,true,false);
-        T_GRID_LOWER_DIM lower_dimension_grid=grid.Remove_Dimension(axis);
-        for(CELL_ITERATOR_LOWER_DIM iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){TV_INT_LOWER_DIM cell_index=iterator.Cell_Index();
+        GRID<TV_LOWER_DIM> lower_dimension_grid=grid.Remove_Dimension(axis);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV_LOWER_DIM> iterator(lower_dimension_grid);iterator.Valid();iterator.Next()){VECTOR<int,TV::m-1> cell_index=iterator.Cell_Index();
             VECTOR<int,3> slice_index;TV_INT cell_index_full_dimension=cell_index.Insert(0,axis);
             for(int axis_slice=0;axis_slice<T_GRID::dimension;axis_slice++){
                 slice_index[axis_slice]=cell_index_full_dimension[axis_slice];}
@@ -165,7 +165,7 @@ Compute_Flux_With_Clamping(const T_GRID& grid,const T_ARRAYS_DIMENSION_SCALAR& U
     ARRAYS_UTILITIES<T_GRID,TV_DIMENSION>::Compute_Divergence_At_Cells_From_Face_Data(grid,delta_rhs,delta_flux,0);
     rhs+=delta_rhs;
     T_ARRAYS_DIMENSION_SCALAR U_ghost_clamped(U_ghost,true);
-    for(CELL_ITERATOR iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next())
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next())
         U_ghost_clamped(iterator.Cell_Index())=(1-overshoot_percentages(iterator.Cell_Index()))*U_ghost(iterator.Cell_Index());
     // Compute the flux for the other variables
     if(fluxes_auxiliary){
@@ -207,7 +207,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
     Compute_Flux(grid,U,U_ghost,psi,dt,eigensystems,eigensystems_explicit,psi_N,face_velocities,outflow_boundaries,rhs,thinshell,eigensystems_auxiliary,fluxes_auxiliary);
 
     T_ARRAYS_SCALAR rho_dt(grid.Domain_Indices()), e_dt(grid.Domain_Indices());
-    for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell_index=iterator.Cell_Index();
         T clamp_rho_cell=clamp_rho*U_ghost(cell_index)(0);
         if(rhs(cell_index)(0)>0 && U_ghost(cell_index)(0)>=clamp_rho_cell) rho_dt(cell_index)=(U_ghost(cell_index)(0)-clamp_rho_cell)/rhs(cell_index)(0);
         else rho_dt(cell_index)=dt;
@@ -236,7 +236,7 @@ Update_Conservation_Law(T_GRID& grid,T_ARRAYS_DIMENSION_SCALAR& U,const T_ARRAYS
     LOG::cout<<"dt: "<<dt<<" Min dt: "<<min_dt<<std::endl;
 
     if((min_dt==dt)||(!adaptive_time_step)){
-        for(CELL_ITERATOR iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next()){
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,U_domain_indices.max_corner.x-grid.Domain_Indices().max_corner.x);iterator.Valid();iterator.Next()){
             TV_INT cell_index=iterator.Cell_Index();
             if(psi(cell_index)) U(cell_index)-=dt*rhs(cell_index);}}
 }

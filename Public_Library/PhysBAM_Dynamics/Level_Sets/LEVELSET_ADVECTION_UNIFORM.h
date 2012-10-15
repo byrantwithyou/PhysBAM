@@ -33,7 +33,7 @@ private:
     typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
 public:
     using BASE::advection;
-    using BASE::levelset;
+    using BASE::levelset;using BASE::HJ_WENO;using BASE::HJ_ENO;
     using BASE::reinitialization_cfl;using BASE::reinitialization_runge_kutta_order;using BASE::reinitialization_spatial_order;using BASE::Set_Custom_Advection;
 
     ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >* advection_maccormack;

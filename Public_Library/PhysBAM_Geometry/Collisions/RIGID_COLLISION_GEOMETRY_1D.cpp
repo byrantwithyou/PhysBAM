@@ -29,14 +29,17 @@ Earliest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_t
 { 
     weight.x=1;
     const T collision_thickness_over_two=(T).5*collision_thickness;
-    T min_time=FLT_MAX;bool collision=false;T current_hit_time;VECTOR<T,2> current_weight;
+    T min_time=FLT_MAX;bool collision=false;T current_hit_time=0;VECTOR<T,2> current_weight;
     TV normal;
     for(int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
         POINT_SIMPLEX_COLLISION_TYPE collision_type=
             POINT_SIMPLEX_1D<T>::Robust_Point_Face_Collision(initial_segment,final_segment,start_X,end_X,dt,collision_thickness_over_two,current_hit_time,normal,current_weight);
         if(collision_type!=POINT_SIMPLEX_NO_COLLISION && current_hit_time<min_time){
-            min_time=hit_time=current_hit_time;weight=current_weight.Remove_Index(0);segment_id=segment_number;collision=true;}}
+            min_time=hit_time=current_hit_time;
+            weight=current_weight.Remove_Index(0);
+            segment_id=segment_number;
+            collision=true;}}
     return collision;
 }
 //##################################################################### 

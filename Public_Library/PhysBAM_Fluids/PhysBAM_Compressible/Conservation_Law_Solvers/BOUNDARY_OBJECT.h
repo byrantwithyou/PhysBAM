@@ -19,7 +19,6 @@ class BOUNDARY_OBJECT
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef GRID<VECTOR<T,TV::dimension-1> > T_GRID_LOWER_DIM;typedef typename T_GRID_LOWER_DIM::VECTOR_INT TV_INT_LOWER_DIM;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     typedef typename T_ARRAYS_DIMENSION_SCALAR::ELEMENT T_ARRAYS_ELEMENT;
@@ -29,7 +28,7 @@ public:
 
 //#####################################################################
     void Get_State_At_Location(const GRID<VECTOR<T,1> >& grid_1d,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T location,const VECTOR<int,2>& region_boundaries,TV_DIMENSION& u_1d);
-    void Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT_LOWER_DIM& node_lower_dimension,const int axis,
+    void Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<int,TV::m-1>& node_lower_dimension,const int axis,
         const int ghost_cells,const bool use_exact_neumann_face_location,const VECTOR<int,2>& domain,const VECTOR<int,2>& region_boundaries,const VECTOR<bool,2>& psi_N,
         CONSERVATION_CALLBACKS<T>* callbacks);
     virtual void Apply_Neumann_Boundary_Condition(TV_DIMENSION& u_1d,const T neumann_face_velocity,const int axis)=0;
