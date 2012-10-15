@@ -64,7 +64,7 @@ public:
     void Set_Callbacks(CONSERVATION_CALLBACKS<T> *callbacks_input)
     {conservation->Set_Callbacks(callbacks_input);}
 
-    void Set_Custom_Object_Boundary(BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>& object_boundary_input)
+    void Set_Custom_Object_Boundary(BOUNDARY_OBJECT<TV,TV_DIMENSION>& object_boundary_input)
     {conservation->Set_Custom_Object_Boundary(object_boundary_input);}
 
     virtual void Log_Parameters() const

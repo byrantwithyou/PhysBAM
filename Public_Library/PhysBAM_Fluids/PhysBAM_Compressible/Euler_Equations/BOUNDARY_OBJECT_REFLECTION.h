@@ -12,7 +12,7 @@
 namespace PhysBAM{
 
 template<class T_GRID,class TV_DIMENSION>
-class BOUNDARY_OBJECT_REFLECTION:public BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>
+class BOUNDARY_OBJECT_REFLECTION:public BOUNDARY_OBJECT<typename T_GRID::VECTOR_T,TV_DIMENSION>
 {
     typedef typename T_GRID::SCALAR T;
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;

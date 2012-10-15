@@ -14,7 +14,7 @@ namespace PhysBAM{
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 
 template<class T_GRID>
-class BOUNDARY_OBJECT_EULER:public BOUNDARY_OBJECT<T_GRID,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
+class BOUNDARY_OBJECT_EULER:public BOUNDARY_OBJECT<typename T_GRID::VECTOR_T,VECTOR<typename T_GRID::SCALAR,T_GRID::dimension+2> >
 {
     typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;

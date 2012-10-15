@@ -14,10 +14,10 @@ namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 
-template<class T_GRID,class TV_DIMENSION>
+template<class TV,class TV_DIMENSION>
 class BOUNDARY_OBJECT
 {
-    typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;

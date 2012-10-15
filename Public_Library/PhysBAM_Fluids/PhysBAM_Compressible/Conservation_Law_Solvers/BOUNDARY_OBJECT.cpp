@@ -4,21 +4,21 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID,class TV_DIMENSION> BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>::
+template<class TV,class TV_DIMENSION> BOUNDARY_OBJECT<TV,TV_DIMENSION>::
 BOUNDARY_OBJECT()
 {
 }
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID,class TV_DIMENSION> BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>::
+template<class TV,class TV_DIMENSION> BOUNDARY_OBJECT<TV,TV_DIMENSION>::
 ~BOUNDARY_OBJECT()
 {
 }
 //#####################################################################
 // Function Get_State_At_Location
 //#####################################################################
-template<class T_GRID,class TV_DIMENSION> void BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>::
+template<class TV,class TV_DIMENSION> void BOUNDARY_OBJECT<TV,TV_DIMENSION>::
 Get_State_At_Location(const GRID<VECTOR<T,1> >& grid_1d,const ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T location,const VECTOR<int,2>& region_boundaries,TV_DIMENSION& u_1d)
 {
     T dx=grid_1d.dX.x,one_over_dx=grid_1d.one_over_dX.x;
@@ -40,7 +40,7 @@ Get_State_At_Location(const GRID<VECTOR<T,1> >& grid_1d,const ARRAY<TV_DIMENSION
 //#####################################################################
 // Function Fill_Ghost_Cells_Neumann
 //#####################################################################
-template<class T_GRID,class TV_DIMENSION> void BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>::
+template<class TV,class TV_DIMENSION> void BOUNDARY_OBJECT<TV,TV_DIMENSION>::
 Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VECTOR<int,1> >& U_1d,const T_FACE_ARRAYS_SCALAR& face_velocities,const VECTOR<int,TV::m-1>& node_lower_dimension,const int axis,
     const int ghost_cells,const bool use_exact_neumann_face_location,const VECTOR<int,2>& domain,const VECTOR<int,2>& region_boundaries,const VECTOR<bool,2>& psi_N,CONSERVATION_CALLBACKS<T>* callbacks)
 {
@@ -67,47 +67,47 @@ Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VE
             U_1d(i)=u_1d;}
 }
 
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,VECTOR<float,1> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,VECTOR<float,2> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,VECTOR<float,3> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,VECTOR<float,4> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,VECTOR<float,5> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,VECTOR<float,6> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,1> >,float>;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,VECTOR<float,1> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,VECTOR<float,2> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,VECTOR<float,3> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,VECTOR<float,4> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,VECTOR<float,5> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,VECTOR<float,6> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,2> >,float>;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,VECTOR<float,1> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,VECTOR<float,2> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,VECTOR<float,3> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,VECTOR<float,4> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,VECTOR<float,5> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,VECTOR<float,6> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<float,3> >,float>;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,1> >;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,2> >;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,3> >;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,4> >;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,5> >;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,VECTOR<float,6> >;
+template class BOUNDARY_OBJECT<VECTOR<float,1>,float>;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,VECTOR<float,1> >;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,VECTOR<float,2> >;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,VECTOR<float,3> >;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,VECTOR<float,4> >;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,VECTOR<float,5> >;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,VECTOR<float,6> >;
+template class BOUNDARY_OBJECT<VECTOR<float,2>,float>;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,1> >;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,2> >;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,3> >;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,4> >;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,5> >;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,VECTOR<float,6> >;
+template class BOUNDARY_OBJECT<VECTOR<float,3>,float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,VECTOR<double,1> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,VECTOR<double,2> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,VECTOR<double,3> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,VECTOR<double,4> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,VECTOR<double,5> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,VECTOR<double,6> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,1> >,double>;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,VECTOR<double,1> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,VECTOR<double,2> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,VECTOR<double,3> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,VECTOR<double,4> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,VECTOR<double,5> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,VECTOR<double,6> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,2> >,double>;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,VECTOR<double,1> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,VECTOR<double,2> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,VECTOR<double,3> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,VECTOR<double,4> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,VECTOR<double,5> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,VECTOR<double,6> >;
-template class BOUNDARY_OBJECT<GRID<VECTOR<double,3> >,double>;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,1> >;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,2> >;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,3> >;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,4> >;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,5> >;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,VECTOR<double,6> >;
+template class BOUNDARY_OBJECT<VECTOR<double,1>,double>;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,VECTOR<double,1> >;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,VECTOR<double,2> >;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,VECTOR<double,3> >;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,VECTOR<double,4> >;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,VECTOR<double,5> >;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,VECTOR<double,6> >;
+template class BOUNDARY_OBJECT<VECTOR<double,2>,double>;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,1> >;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,2> >;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,3> >;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,4> >;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,5> >;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,VECTOR<double,6> >;
+template class BOUNDARY_OBJECT<VECTOR<double,3>,double>;
 #endif

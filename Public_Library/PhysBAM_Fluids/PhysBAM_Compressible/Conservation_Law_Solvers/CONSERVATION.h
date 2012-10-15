@@ -53,7 +53,7 @@ public:
     int save_fluxes; // saves the fluxes
     ARRAY<TV_DIMENSION,VECTOR<int,1> > flux_temp; // temporary array used for saving 1d fluxes 
     CONSERVATION_CALLBACKS<T> *callbacks;
-    BOUNDARY_OBJECT<T_GRID,TV_DIMENSION> *object_boundary;
+    BOUNDARY_OBJECT<TV,TV_DIMENSION> *object_boundary;
     BOUNDARY_OBJECT_REFLECTION<T_GRID,TV_DIMENSION>& object_boundary_default;
     T_FACE_ARRAYS_DIMENSION_SCALAR fluxes;
     bool use_exact_neumann_face_location,scale_outgoing_fluxes_to_clamp_variable;
@@ -93,7 +93,7 @@ public:
     virtual void Set_Callbacks(CONSERVATION_CALLBACKS<T> *callbacks_input)
     {callbacks=callbacks_input;}
 
-    virtual void Set_Custom_Object_Boundary(BOUNDARY_OBJECT<T_GRID,TV_DIMENSION>& object_boundary_input)
+    virtual void Set_Custom_Object_Boundary(BOUNDARY_OBJECT<TV,TV_DIMENSION>& object_boundary_input)
     {object_boundary=&object_boundary_input;}
 
 //#####################################################################

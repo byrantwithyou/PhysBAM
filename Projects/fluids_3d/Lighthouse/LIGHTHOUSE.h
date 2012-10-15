@@ -147,8 +147,6 @@ void Parse_Late_Options() PHYSBAM_OVERRIDE {BASE::Parse_Late_Options();}
 T Get_Wave_Height(const TV& X,const TV_INT& cell_index,const T time=0)
 {
     T x=-(X.x+10*time-50+X.z/10)/50;
-    T distance=0;
-    if(x>1.5)distance=(T).25*(x-(T)1.5);
     return 50*((T)1./(2*(T)pi)*(epsilon*cos(2*(T)pi*x)+(T).5*sqr(epsilon)*cos(4*(T)pi*x)+(T)3/8*cube(epsilon)*cos(6*(T)pi*x)));
 }
 //#####################################################################

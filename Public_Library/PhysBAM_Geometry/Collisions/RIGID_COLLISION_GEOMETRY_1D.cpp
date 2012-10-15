@@ -51,7 +51,7 @@ Latest_Simplex_Crossover(const TV& start_X,const TV& end_X,const T dt,T& hit_tim
     weight.x=1;
     const T collision_thickness_over_two=(T).5*collision_thickness;
     returned_collision_type=POINT_SIMPLEX_NO_COLLISION;
-    T max_time=-FLT_MAX;bool collision=false;T current_hit_time;VECTOR<T,2> current_weight;
+    T max_time=-FLT_MAX;bool collision=false;T current_hit_time=0;VECTOR<T,2> current_weight;
     TV normal;
     for (int segment_number=0;segment_number<rigid_geometry.simplicial_object->mesh.elements.m;segment_number++){
         POINT_SIMPLEX_1D<T> initial_segment=World_Space_Simplex(segment_number),final_segment=World_Space_Simplex(segment_number,saved_states(0).x);
