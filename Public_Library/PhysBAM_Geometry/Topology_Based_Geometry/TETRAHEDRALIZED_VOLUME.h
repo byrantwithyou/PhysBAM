@@ -109,6 +109,7 @@ public:
     int Inside(const TV& location,const T thickness_over_two=0) const;
     int Find(const TV& location,const T thickness_over_two,ARRAY<int>& scratch) const;
     int Find(const TV& location,const T thickness_over_two=0) const;
+    bool Inside_Any_Simplex(const TV& location,int& tetrahedron_id,const T thickness_over_two) const;
     void Discard_Tetrahedrons_Outside_Implicit_Surface(IMPLICIT_OBJECT<TV>& implicit_surface);
     void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& implicit_surface);
     void Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& implicit_surface,const ARRAY<RANGE<TV> >& bounding_boxes);

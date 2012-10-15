@@ -94,6 +94,7 @@ public:
     static T Interpolation_Fraction(const TV& location,const TV& x1,const TV& x2);
     static VECTOR<T,2> Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2);
     static VECTOR<T,2> Clamped_Barycentric_Coordinates(const TV& location,const TV& x1,const TV& x2,const T tolerance=1e-7);
+    bool Inside(const TV& point,const T thickness_over_two=0) const;
 //#####################################################################
 };   
 }

@@ -12,10 +12,6 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_AREA_INSIDE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_AREA_PRUNE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_AREA_REFRESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_AREA_SPLIT.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -76,7 +72,9 @@ Initialize_Hierarchy(const bool update_boxes)
 template<class T> void TRIANGULATED_AREA<T>::
 Initialize_Square_Mesh_And_Particles(const GRID<TV>& grid,const bool reverse_triangles)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Square_Mesh_And_Particles(*this,grid,reverse_triangles);
+    int m=grid.counts.x,n=grid.counts.y,particle=0;
+    particles.Delete_All_Elements();mesh.Initialize_Square_Mesh(m,n,reverse_triangles);particles.Add_Elements(m*n);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j);
 }
 //#####################################################################
 // Funcion Initialize_Circle_Mesh_And_Particles
@@ -84,7 +82,11 @@ Initialize_Square_Mesh_And_Particles(const GRID<TV>& grid,const bool reverse_tri
 template<class T> void TRIANGULATED_AREA<T>::
 Initialize_Circle_Mesh_And_Particles(const T outer_radius,const T inner_radius,const int num_radial,const int num_tangential)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Circle_Mesh_And_Particles(*this,outer_radius,inner_radius,num_radial,num_tangential);
+    int particle=0;particles.Delete_All_Elements();
+    mesh.Initialize_Circle_Mesh(num_radial,num_tangential);particles.Add_Elements(num_radial*num_tangential);
+    for(int j=0;j<num_radial;j++) for(int i=0;i<num_tangential;i++){
+        T r=T(j)/T(num_tangential-1)*(outer_radius-inner_radius)+inner_radius,theta=T(i)/T(num_tangential)*(T)2*(T)pi; 
+        particles.X(particle++)=VECTOR<T,2>(r*cos(theta),r*sin(theta));}
 }
 //#####################################################################
 // Funcion Initialize_Herringbone_Mesh_And_Particles
@@ -92,7 +94,9 @@ Initialize_Circle_Mesh_And_Particles(const T outer_radius,const T inner_radius,c
 template<class T> void TRIANGULATED_AREA<T>::
 Initialize_Herring_Bone_Mesh_And_Particles(const GRID<TV>& grid)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Herring_Bone_Mesh_And_Particles(*this,grid);
+    int m=grid.counts.x,n=grid.counts.y,particle=0;
+    particles.Delete_All_Elements();mesh.Initialize_Herring_Bone_Mesh(m,n);particles.Add_Elements(m*n);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j);
 }
 //#####################################################################
 // Funcion Initialize_Equilateral_Mesh_And_Particles
@@ -100,7 +104,9 @@ Initialize_Herring_Bone_Mesh_And_Particles(const GRID<TV>& grid)
 template<class T> void TRIANGULATED_AREA<T>::
 Initialize_Equilateral_Mesh_And_Particles(const GRID<TV>& grid)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Equilateral_Mesh_And_Particles(*this,grid);
+    int m=grid.counts.x,n=grid.counts.y,particle=0;
+    particles.Delete_All_Elements();mesh.Initialize_Equilateral_Mesh(m,n);particles.Add_Elements(m*n);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=VECTOR<T,2>((j%2)?grid.Axis_X_minus_half(i,0):grid.Axis_X(i,0),grid.Axis_X(j,1));
 }
 //#####################################################################
 // Function Inside
@@ -109,7 +115,27 @@ Initialize_Equilateral_Mesh_And_Particles(const GRID<TV>& grid)
 template<class T> int TRIANGULATED_AREA<T>::
 Inside(const TV& location,const T thickness_over_two) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside(*this,location,thickness_over_two);
+    PHYSBAM_ASSERT(bounding_box && hierarchy);
+    if(bounding_box->Outside(location,thickness_over_two)) return -1;
+    if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return -1;
+    ARRAY<int> triangles_to_check;hierarchy->Intersection_List(location,triangles_to_check,thickness_over_two);
+    for(int l=0;l<triangles_to_check.m;l++){
+        int t=triangles_to_check(l);int i,j,k;mesh.elements(t).Get(i,j,k);
+        if(!TRIANGLE_2D<T>::Outside(location,particles.X(i),particles.X(j),particles.X(k),thickness_over_two)) return t;}
+    return -1;
+}
+//#####################################################################
+// Function Inside_Any_Simplex
+//#####################################################################
+template<class T> bool TRIANGULATED_AREA<T>::
+Inside_Any_Simplex(const VECTOR<T,2>& location,int& triangle_id,const T thickness_over_two) const
+{
+    assert(hierarchy);
+    ARRAY<int> nearby_triangles;hierarchy->Intersection_List(location,nearby_triangles,thickness_over_two);
+    for(int k=0;k<nearby_triangles.m;k++){
+        const TRIANGLE_2D<T>& triangle=Get_Element(nearby_triangles(k));
+        if(triangle.Inside(location,thickness_over_two)){triangle_id=nearby_triangles(k);return true;}}
+    return false;
 }
 //#####################################################################
 // Function Check_Signed_Area_And_Make_Consistent
@@ -136,7 +162,8 @@ Check_Signed_Areas_And_Make_Consistent(const bool verbose)
 template<class T> void TRIANGULATED_AREA<T>::
 Initialize_Segmented_Curve()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Segmented_Curve(*this);
+    delete segmented_curve;if(!mesh.boundary_mesh) mesh.Initialize_Boundary_Mesh();
+    segmented_curve=new SEGMENTED_CURVE_2D<T>(*mesh.boundary_mesh,particles);
 }
 //#####################################################################
 // Function Centroid
@@ -292,7 +319,30 @@ Area_Incident_On_A_Particle(const int particle_index)
 template<class T> int TRIANGULATED_AREA<T>::
 Split_Node(const int particle_index,const TV& normal)
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Split_Node(*this,particle_index,normal);
+    int incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    VECTOR<T,2> x0=particles.X(particle_index);ARRAY<int> tris_incident_on_old_particle,tris_incident_on_new_particle;
+    int t;for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
+        int this_incident_tri=(*mesh.incident_elements)(particle_index)(t);int i,j,k;mesh.elements(this_incident_tri).Get(i,j,k);
+        VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=(T)one_third*(x1+x2+x3);
+        if((centroid.x-x0.x)*normal.x+(centroid.y-x0.y)*normal.y < 0) tris_incident_on_new_particle.Append(this_incident_tri); 
+        else tris_incident_on_old_particle.Append(this_incident_tri);}
+    int new_particle=0;
+    if(tris_incident_on_old_particle.m != 0 && tris_incident_on_new_particle.m != 0){ 
+        // new particle - assumes we're storing position, and velocity - user must fix mass outside this function call
+        new_particle=particles.Add_Element();mesh.number_nodes=particles.Size();
+        particles.X(new_particle)=particles.X(particle_index);particles.V(new_particle)=particles.V(particle_index);
+        for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
+            int this_incident_tri=(*mesh.incident_elements)(particle_index)(t);int i,j,k;mesh.elements(this_incident_tri).Get(i,j,k);
+            VECTOR<T,2> x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),centroid=(T)one_third*(x1+x2+x3);
+            if((centroid.x-x0.x)*normal.x+(centroid.y-x0.y)*normal.y < 0){ // relabel with duplicate node
+                if(i == particle_index) i=new_particle;if(j == particle_index) j=new_particle;if(k == particle_index) k=new_particle;
+                mesh.elements(this_incident_tri).Set(i,j,k);}}        
+        if(incident_elements_defined){ //repair incident triangles if necessary
+            (*mesh.incident_elements)(particle_index).Clean_Memory();
+            (*mesh.incident_elements)(particle_index).Append_Elements(tris_incident_on_old_particle);
+            (*mesh.incident_elements).Append(tris_incident_on_new_particle);}}
+    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
+    return new_particle;
 }
 //#####################################################################
 // Function Split_Connected_Component
@@ -301,7 +351,27 @@ Split_Node(const int particle_index,const TV& normal)
 template<class T> int TRIANGULATED_AREA<T>::
 Split_Connected_Component(const int node)
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Split_Connected_Component(*this,node);
+    int incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    int adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
+    ARRAY<bool> marked((*mesh.incident_elements)(node).m);
+    mesh.Mark_Edge_Connected_Component_Incident_On_A_Node(node,marked);
+    int number_marked=0;int t;for(t=0;t<marked.m;t++) if(marked(t)) number_marked++;
+    int new_particle=0;
+    if(number_marked != marked.m){
+        // new particle -- assumes we're storing position, and velocity - user must fix mass outside this function call
+        new_particle=particles.Add_Element();mesh.number_nodes=particles.Size();
+        particles.X(new_particle)=particles.X(node);particles.V(new_particle)=particles.V(node);
+        ARRAY<int> empty;mesh.incident_elements->Append(empty);
+        ARRAY<int> indices_to_remove(number_marked);int counter=0;
+        for(t=0;t<(*mesh.incident_elements)(node).m;t++) if(marked(t)){
+            indices_to_remove(counter++)=t;
+            for(int i=0;i<3;i++) if(mesh.elements((*mesh.incident_elements)(node)(t))(i) == node){ 
+                mesh.elements((*mesh.incident_elements)(node)(t))(i)=new_particle;break;}
+            (*mesh.incident_elements)(new_particle).Append((*mesh.incident_elements)(node)(t));}
+        (*mesh.incident_elements)(node).Remove_Sorted_Indices(indices_to_remove);}
+    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;} 
+    if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
+    return new_particle;
 }
 //#####################################################################
 // Function Discard_Triangles_Outside_Implicit_Curve
@@ -310,7 +380,13 @@ Split_Connected_Component(const int node)
 template<class T> void TRIANGULATED_AREA<T>::
 Discard_Triangles_Outside_Implicit_Curve(IMPLICIT_OBJECT<TV>& implicit_curve)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Triangles_Outside_Implicit_Curve(*this,implicit_curve);
+    VECTOR<T,2> xi,xj,xk;int t=1;
+    while(t <= mesh.elements.m){
+        int i,j,k;mesh.elements(t).Get(i,j,k);
+        xi=particles.X(i);xj=particles.X(j);xk=particles.X(k);
+        T max_length=sqrt(max((xi-xj).Magnitude_Squared(),(xj-xk).Magnitude_Squared(),(xk-xi).Magnitude_Squared()));
+        T min_phi=min(implicit_curve(xi),implicit_curve(xj),implicit_curve(xk));
+        if(min_phi > max_length) mesh.elements.Remove_Index_Lazy(t);else t++;}
 }
 //#####################################################################
 // Function Initialize_Triangle_Area_Fractions_From_Voronoi_Regions
@@ -318,7 +394,14 @@ Discard_Triangles_Outside_Implicit_Curve(IMPLICIT_OBJECT<TV>& implicit_curve)
 template<class T> void TRIANGULATED_AREA<T>::
 Initialize_Triangle_Area_Fractions_From_Voronoi_Regions()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Triangle_Area_Fractions_From_Voronoi_Regions(*this);
+    if(!triangle_area_fractions) triangle_area_fractions=new ARRAY<VECTOR<T,2> >;
+    triangle_area_fractions->Resize(mesh.elements.m);
+    for(int t=0;t<mesh.elements.m;t++){
+        int i,j,k;mesh.elements(t).Get(i,j,k);
+        VECTOR<T,3> fractions=VECTOR<T,3>(1,1,1)-TRIANGLE_2D<T>::Circumcenter_Barycentric_Coordinates(particles.X(i),particles.X(j),particles.X(k));
+        fractions.x=max(T(0),fractions.x);fractions.y=max(T(0),fractions.y);fractions.z=max(T(0),fractions.z);
+        fractions/=(fractions.x+fractions.y+fractions.z);
+        (*triangle_area_fractions)(t).Set(fractions.x,fractions.y);}
 }
 //#####################################################################
 // Function Compute_Triangle_Areas
@@ -326,7 +409,11 @@ Initialize_Triangle_Area_Fractions_From_Voronoi_Regions()
 template<class T> void TRIANGULATED_AREA<T>::
 Compute_Triangle_Areas()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Compute_Triangle_Areas(*this);
+    if(!triangle_areas) triangle_areas=new ARRAY<T>;
+    triangle_areas->Resize(mesh.elements.m);
+    for(int t=0;t<mesh.elements.m;t++){
+        int i,j,k;mesh.elements(t).Get(i,j,k);
+        (*triangle_areas)(t)=TRIANGLE_2D<T>::Signed_Area(particles.X(i),particles.X(j),particles.X(k));}
 }
 //#####################################################################
 // Function Compute_Nodal_Areas
@@ -334,7 +421,18 @@ Compute_Triangle_Areas()
 template<class T> void TRIANGULATED_AREA<T>::
 Compute_Nodal_Areas(bool save_triangle_areas)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Compute_Nodal_Areas(*this,save_triangle_areas);
+    if(!nodal_areas) nodal_areas=new ARRAY<T>;
+    nodal_areas->Resize(particles.Size());
+    if(save_triangle_areas){
+        if(!triangle_areas) triangle_areas=new ARRAY<T>;
+        triangle_areas->Resize(mesh.elements.m);}
+    nodal_areas->Fill(0);
+    for(int t=0;t<mesh.elements.m;t++){
+        int i,j,k;mesh.elements(t).Get(i,j,k);
+        T area=TRIANGLE_2D<T>::Signed_Area(particles.X(i),particles.X(j),particles.X(k));
+        if(save_triangle_areas) (*triangle_areas)(t)=area;
+        if(!triangle_area_fractions){area*=(T)one_third;(*nodal_areas)(i)+=area;(*nodal_areas)(j)+=area;(*nodal_areas)(k)+=area;}
+        else{T wi,wj;(*triangle_area_fractions)(t).Get(wi,wj);(*nodal_areas)(i)+=wi*area;(*nodal_areas)(j)+=wj*area;(*nodal_areas)(k)+=(1-wi-wj)*area;}}
 }
 //#####################################################################
 // Function Triangle_In_Direction_Uninverted

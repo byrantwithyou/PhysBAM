@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Math_Tools/FACTORIAL.h>
 #include <PhysBAM_Tools/Matrices/FRAME.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_PARTITION.h>
@@ -20,10 +21,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/MESH_OBJECT_APPEND.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/MESH_OBJECT_PRUNE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/MESH_OBJECT_REFRESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/MESH_OBJECT_UNION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -95,7 +92,11 @@ Update_Number_Nodes()
 template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
 Update_Bounding_Box()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Update_Bounding_Box(*this);
+    if(!bounding_box) bounding_box=new RANGE<TV>();
+    const BOX_HIERARCHY<TV>* hierarchy=&*debug_cast<const typename MESH_TO_OBJECT<TV,T_MESH>::TYPE&>(*this).hierarchy;
+    if(!mesh.elements.m) *bounding_box=RANGE<TV>::Bounding_Box(particles.X);
+    else if(hierarchy) *bounding_box=hierarchy->box_hierarchy(hierarchy->root);
+    else *bounding_box=RANGE<TV>::Bounding_Box(particles.X.Subset(mesh.elements.Flattened()));
 }
 //#####################################################################
 // Function Initialize_Particle_Partition
@@ -103,7 +104,10 @@ Update_Bounding_Box()
 template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
 Initialize_Particle_Partition(const VECTOR<int,TV::m>& counts)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Particle_Partition(*this,counts); 
+    PHYSBAM_ASSERT(bounding_box);VECTOR<int,TV::m> counts_new;
+    for(int i=0;i<counts.m;i++) counts_new[i]=desired_particle_partition_counts[i]?desired_particle_partition_counts[i]:counts[i];
+    PHYSBAM_ASSERT(counts_new.All_Greater(VECTOR<int,TV::m>()));
+    delete particle_partition;particle_partition=new PARTICLE_PARTITION<TV>(*bounding_box,counts_new,particles);
 }
 //#####################################################################
 // Function Append_Particles_And_Create_Copy
@@ -111,7 +115,12 @@ Initialize_Particle_Partition(const VECTOR<int,TV::m>& counts)
 template<class TV,class T_MESH> STRUCTURE<TV>* MESH_OBJECT<TV,T_MESH>::
 Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int>* particle_indices) const // number_nodes must be set elsewhere
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Append_Particles_And_Create_Copy(*this,new_particles,particle_indices);
+    typename MESH_TO_OBJECT<TV,T_MESH>::TYPE* object=Create(new_particles);
+    int offset=new_particles.Size();
+    new_particles.Append(particles);
+    if(particle_indices) for(int p=0;p<particles.Size();p++) particle_indices->Append(p+offset);
+    object->mesh.Initialize_Mesh_With_Particle_Offset(mesh,offset);
+    return object;
 }
 //#####################################################################
 // Function Discard_Valence_Zero_Particles_And_Renumber
@@ -119,7 +128,26 @@ Append_Particles_And_Create_Copy(GEOMETRY_PARTICLES<TV>& new_particles,ARRAY<int
 template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
 Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Valence_Zero_Particles_And_Renumber(*this,condensation_mapping);
+    // mark which nodes are used
+    ARRAY<bool> node_is_used(mesh.number_nodes);
+    node_is_used.Subset(mesh.elements.Flattened()).Fill(true);
+    
+    // make condensation mapping
+    condensation_mapping.Resize(mesh.number_nodes,false,false);condensation_mapping.Fill(-1);
+    int counter=0;
+    for(int t=0;t<mesh.number_nodes;t++) if(node_is_used(t)) condensation_mapping(t)=counter++;
+    
+    // make new triangle mesh
+    mesh.number_nodes=counter;
+    for(int t=0;t<mesh.elements.m;t++)
+        mesh.elements(t)=condensation_mapping.Subset(mesh.elements(t));
+    
+    // do particles same way
+    for(int p=0;p<condensation_mapping.m;p++) if(condensation_mapping(p)<0) particles.Add_To_Deletion_List(p);
+    for(int p=condensation_mapping.m;p<particles.Size();p++) particles.Add_To_Deletion_List(p);
+    particles.Delete_Elements_On_Deletion_List(true);particles.Compact();
+
+    Refresh_Auxiliary_Structures();
 }
 //#####################################################################
 // Function Union_Mesh_Objects_Relatively
@@ -127,8 +155,6 @@ Discard_Valence_Zero_Particles_And_Renumber(ARRAY<int>& condensation_mapping)
 template<class TV,class T_MESH> typename MESH_OBJECT<TV,T_MESH>::T_DERIVED_OBJECT* MESH_OBJECT<TV,T_MESH>::
 Union_Mesh_Objects_Relatively(const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames)
 {
-
-
     T_DERIVED_OBJECT* object=Create();
     Union_Mesh_Objects_Relatively(object,object_list,relative_frames);
     return object;
@@ -139,7 +165,25 @@ Union_Mesh_Objects_Relatively(const ARRAY<T_DERIVED_OBJECT*>& object_list,const 
 template<class TV,class T_MESH> void MESH_OBJECT<TV,T_MESH>::
 Union_Mesh_Objects_Relatively(T_DERIVED_OBJECT *object,const ARRAY<T_DERIVED_OBJECT*>& object_list,const ARRAY<FRAME<TV> >& relative_frames)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Union_Mesh_Objects_Relatively(object,object_list,relative_frames);
+    GEOMETRY_PARTICLES<TV>& particles=object->particles;
+    particles.Clean_Memory();
+    object->mesh.elements.Remove_All();
+    // resize
+    {int total_particles=0,total_elements=0;
+    for(int i=0;i<object_list.m;i++){
+        total_particles+=object_list(i)->particles.Size();
+        total_elements+=object_list(i)->mesh.elements.m;}
+    particles.Preallocate(total_particles);object->mesh.elements.Preallocate(total_elements);}
+    // copy
+    for(int i=0;i<object_list.m;i++){
+        int particle_offset=particles.Size();
+        particles.Add_Arrays(object_list(i)->particles);
+        particles.Append(object_list(i)->particles);
+        for(int p=0;p<object_list(i)->particles.Size();p++){int p2=p+particle_offset;
+            particles.X(p2)=relative_frames(i)*particles.X(p2);
+            if(particles.store_velocity) particles.V(p2)=relative_frames(i).r.Rotate(particles.V(p2));}
+        object->mesh.elements.Append_Elements(object_list(i)->mesh.elements+particle_offset);}
+    object->Update_Number_Nodes();
 }
 //#####################################################################
 // Function Mark_Nodes_Referenced

@@ -15,14 +15,12 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/PARTICLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
+#include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_AREA.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/SEGMENTED_CURVE_INSIDE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TETRAHEDRALIZED_VOLUME_INSIDE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_AREA_INSIDE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_POINT_SIMPLICES_1D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_SEGMENTED_CURVE_2D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
@@ -261,10 +259,8 @@ Simplex_Closest_Non_Intersecting_Point(RAY<TV>& ray) const
 template<class TV> bool DEFORMABLE_OBJECT_FLUID_COLLISIONS<TV>::
 Inside_Any_Simplex(const TV& location,int& simplex_id) const
 {
-    if(volume_object){
-        return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside_Any_Simplex(*volume_object,location,simplex_id,collision_thickness);}
-    else{
-        return object.Inside_Any_Simplex(location,simplex_id,collision_thickness);}
+    if(volume_object) return volume_object->Inside_Any_Simplex(location,simplex_id,collision_thickness);
+    else return object.Inside_Any_Simplex(location,simplex_id,collision_thickness);
 }
 //##################################################################### 
 // Function Inside

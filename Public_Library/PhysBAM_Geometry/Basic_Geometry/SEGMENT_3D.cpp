@@ -242,6 +242,14 @@ Clamped_Barycentric_Coordinates(const VECTOR<T,3>& location,const VECTOR<T,3>& x
     return VECTOR<T,2>((T)1-a,a);
 }
 //#####################################################################
+// Function Inside
+//#####################################################################
+template<class T> bool SEGMENT_3D<T>::
+Inside(const TV& point,const T thickness_over_two) const
+{
+    return Distance_From_Point_To_Segment(point)<thickness_over_two;
+}
+//#####################################################################
 template class SEGMENT_3D<float>;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class SEGMENT_3D<double>;

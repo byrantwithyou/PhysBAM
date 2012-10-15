@@ -16,10 +16,6 @@
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TETRAHEDRALIZED_VOLUME_CENTROID.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TETRAHEDRALIZED_VOLUME_PRUNE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TETRAHEDRALIZED_VOLUME_REFRESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TETRAHEDRALIZED_VOLUME_SPLIT.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -46,7 +42,11 @@ TETRAHEDRALIZED_VOLUME(TETRAHEDRON_MESH& tetrahedron_mesh_input,GEOMETRY_PARTICL
 template<class T> TETRAHEDRALIZED_VOLUME<T>::
 ~TETRAHEDRALIZED_VOLUME()
 {
-    delete tetrahedron_list;delete triangulated_surface;delete hierarchy;delete tetrahedron_volumes;delete nodal_volumes;
+    delete tetrahedron_list;
+    delete triangulated_surface;
+    delete hierarchy;
+    delete tetrahedron_volumes;
+    delete nodal_volumes;
 }
 //#####################################################################
 // Function Clean_Memory
@@ -55,8 +55,16 @@ template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Clean_Memory()
 {
     MESH_OBJECT<TV,TETRAHEDRON_MESH>::Clean_Memory();
-    delete tetrahedron_list;tetrahedron_list=0;delete triangulated_surface;triangulated_surface=0;
-    delete hierarchy;hierarchy=0;delete tetrahedron_volumes;tetrahedron_volumes=0;delete nodal_volumes;nodal_volumes=0;
+    delete tetrahedron_list;
+    tetrahedron_list=0;
+    delete triangulated_surface;
+    triangulated_surface=0;
+    delete hierarchy;
+    hierarchy=0;
+    delete tetrahedron_volumes;
+    tetrahedron_volumes=0;
+    delete nodal_volumes;
+    nodal_volumes=0;
 }
 //#####################################################################
 // Function Refresh_Auxiliary_Structures_Helper
@@ -64,8 +72,10 @@ Clean_Memory()
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Refresh_Auxiliary_Structures_Helper()
 {
-    if(tetrahedron_list) Update_Tetrahedron_List();if(hierarchy) Initialize_Hierarchy();
-    if(triangulated_surface) Initialize_Triangulated_Surface();if(tetrahedron_volumes) Compute_Tetrahedron_Volumes();
+    if(tetrahedron_list) Update_Tetrahedron_List();
+    if(hierarchy) Initialize_Hierarchy();
+    if(triangulated_surface) Initialize_Triangulated_Surface();
+    if(tetrahedron_volumes) Compute_Tetrahedron_Volumes();
     if(nodal_volumes) Compute_Nodal_Volumes();
 }
 //#####################################################################
@@ -74,7 +84,11 @@ Refresh_Auxiliary_Structures_Helper()
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Update_Tetrahedron_List()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Update_Tetrahedron_List(*this);
+    if(!tetrahedron_list) tetrahedron_list=new ARRAY<TETRAHEDRON<T> >;
+    tetrahedron_list->Resize(mesh.elements.m,false,false);
+    for(int t=0;t<mesh.elements.m;t++){
+        (*tetrahedron_list)(t).X=particles.X.Subset(mesh.elements(t));
+        (*tetrahedron_list)(t).Create_Triangles();}
 }
 //#####################################################################
 // Function Initialize_Hierarchy
@@ -82,7 +96,10 @@ Update_Tetrahedron_List()
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Hierarchy(const bool update_boxes) // creates and updates the boxes as well
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Hierarchy(*this,update_boxes);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    delete hierarchy;
+    if(tetrahedron_list) hierarchy=new TETRAHEDRON_HIERARCHY<T>(mesh,particles,*tetrahedron_list,update_boxes);
+    else hierarchy=new TETRAHEDRON_HIERARCHY<T>(mesh,particles,update_boxes);
 }
 //#####################################################################
 // Function Initialize_Octahedron_Mesh_And_Particles
@@ -90,7 +107,12 @@ Initialize_Hierarchy(const bool update_boxes) // creates and updates the boxes a
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Octahedron_Mesh_And_Particles(*this,grid);
+    int i,j,k,m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z,particle=0;
+    particles.Delete_All_Elements();
+    mesh.Initialize_Octahedron_Mesh(m,n,mn);
+    particles.Add_Elements(m*n*mn+(m+1)*(n+1)*(mn+1));
+    for(k=0;k<mn;k++) for(j=0;j<n;j++) for(i=0;i<m;i++) particles.X(particle++)=grid.X(i,j,k);
+    for(k=-1;k<mn;k++) for(j=-1;j<n;j++) for(i=-1;i<m;i++) particles.X(particle++)=grid.X(i,j,k)+(T).5*grid.dX;
 }
 //#####################################################################
 // Function Initialize_Cube_Mesh_And_Particles
@@ -98,7 +120,11 @@ Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Cube_Mesh_And_Particles(*this,grid);
+    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z,particle=0;
+    particles.Delete_All_Elements();
+    mesh.Initialize_Cube_Mesh(m,n,mn);
+    particles.Add_Elements(m*n*mn);
+    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j,k);
 }
 //#####################################################################
 // Function Initialize_Prismatic_Cube_Mesh_And_Particles
@@ -106,7 +132,11 @@ Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Prismatic_Cube_Mesh_And_Particles(const GRID<TV>& grid)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Prismatic_Cube_Mesh_And_Particles(*this,grid);
+    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z,particle=0;
+    particles.Delete_All_Elements();
+    mesh.Initialize_Prismatic_Cube_Mesh(m,n,mn);
+    particles.Add_Elements(m*n*mn);
+    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j,k);
 }
 //#####################################################################
 // Function Check_Signed_Volumes_And_Make_Consistent
@@ -128,7 +158,10 @@ Check_Signed_Volumes_And_Make_Consistent(bool verbose)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Initialize_Triangulated_Surface()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Triangulated_Surface(*this);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    delete triangulated_surface;
+    if(!mesh.boundary_mesh) mesh.Initialize_Boundary_Mesh();
+    triangulated_surface=new TRIANGULATED_SURFACE<T>(*mesh.boundary_mesh,particles);
 }
 //#####################################################################
 // Funcion Minimum_Volume
@@ -421,7 +454,7 @@ Rescale(const T scaling_factor)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Rescale(const T scaling_x,const T scaling_y,const T scaling_z)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Rescale(*this,scaling_x,scaling_y,scaling_z);
+    for(int k=0;k<particles.Size();k++) particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
 }
 //#####################################################################
 // Function Signed_Volume
@@ -447,7 +480,15 @@ Volume(const int tetrahedron) const
 template<class T> VECTOR<T,3> TETRAHEDRALIZED_VOLUME<T>::
 Centroid_Of_Neighbors(const int node) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Centroid_Of_Neighbors(*this,node);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    bool neighbor_nodes_defined=mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) mesh.Initialize_Neighbor_Nodes();
+    TV target;
+    int number_of_neighbors=(*mesh.neighbor_nodes)(node).m;
+    for(int j=0;j<number_of_neighbors;j++) target+=particles.X((*mesh.neighbor_nodes)(node)(j));
+    if(number_of_neighbors != 0) target/=(T)number_of_neighbors;
+    else target=particles.X(node); // if no neighbors, return the current node location
+    if(!neighbor_nodes_defined){delete mesh.neighbor_nodes;mesh.neighbor_nodes=0;}
+    return target;
 }
 //#####################################################################
 // Function Completely_Inside_Box
@@ -466,7 +507,17 @@ Completely_Inside_Box(const int tetrahedron,const RANGE<TV>& box) const
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Discard_Spikes_From_Adjacent_Elements(ARRAY<int>* deletion_list)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Spikes_From_Adjacent_Elements(*this,deletion_list);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
+    if(deletion_list){
+        deletion_list->Resize(0);
+        for(int t=0;t<mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m == 1) deletion_list->Append(t);
+        mesh.Delete_Sorted_Elements(*deletion_list);}
+    else{
+        ARRAY<int> list;
+        for(int t=0;t<mesh.elements.m;t++) if((*mesh.adjacent_elements)(t).m == 1) list.Append(t);
+        mesh.Delete_Sorted_Elements(list);}
+    if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
 }
 //#####################################################################
 // Function Interior_Edges_With_Boundary_Nodes
@@ -475,7 +526,34 @@ Discard_Spikes_From_Adjacent_Elements(ARRAY<int>* deletion_list)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Interior_Edges_With_Boundary_Nodes(ARRAY<VECTOR<int,2> >* deletion_list)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Interior_Edges_With_Boundary_Nodes(*this,deletion_list);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    bool neighbor_nodes_defined=mesh.neighbor_nodes!=0;if(!neighbor_nodes_defined) mesh.Initialize_Neighbor_Nodes();
+    bool node_on_boundary_defined=mesh.node_on_boundary!=0;if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
+    bool boundary_nodes_defined=mesh.boundary_nodes!=0;if(!boundary_nodes_defined) mesh.Initialize_Boundary_Nodes();
+    bool boundary_mesh_defined=mesh.boundary_mesh!=0;if(!boundary_mesh_defined) mesh.Initialize_Boundary_Mesh();
+    bool boundary_mesh_segment_mesh_defined=mesh.boundary_mesh->segment_mesh!=0;
+    if(!boundary_mesh_segment_mesh_defined) mesh.boundary_mesh->Initialize_Segment_Mesh();
+    bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
+    bool boundary_mesh_segment_mesh_incident_elements_defined=mesh.boundary_mesh->segment_mesh->incident_elements!=0;
+    if(!boundary_mesh_segment_mesh_incident_elements_defined) mesh.boundary_mesh->segment_mesh->Initialize_Incident_Elements();
+
+    deletion_list->Resize(0);
+    for(int t=0;t<mesh.boundary_nodes->m;t++){
+        int node1=(*mesh.boundary_nodes)(t);
+        for(int i=0;i<(*mesh.neighbor_nodes)(node1).m;i++){
+            int node2=(*mesh.neighbor_nodes)(node1)(i);
+            if(node1 <node2 && (*mesh.node_on_boundary)(node2) && !mesh.boundary_mesh->segment_mesh->Segment(node1,node2))
+                deletion_list->Append(VECTOR<int,2>(node1,node2));}}
+
+    // delete node_on_boundary if defined in this function
+    if(!boundary_mesh_segment_mesh_incident_elements_defined){
+        delete mesh.boundary_mesh->segment_mesh->incident_elements;mesh.boundary_mesh->segment_mesh->incident_elements=0;}
+    if(!segment_mesh_defined){delete mesh.segment_mesh;mesh.segment_mesh=0;}
+    if(!boundary_mesh_segment_mesh_defined){delete mesh.boundary_mesh->segment_mesh;mesh.boundary_mesh->segment_mesh=0;}
+    if(!boundary_mesh_defined){delete mesh.boundary_mesh;mesh.boundary_mesh=0;}
+    if(!boundary_nodes_defined){delete mesh.boundary_nodes;mesh.boundary_nodes=0;}
+    if(!node_on_boundary_defined){delete mesh.node_on_boundary;mesh.node_on_boundary=0;}
+    if(!neighbor_nodes_defined){delete mesh.neighbor_nodes;mesh.neighbor_nodes=0;}
 }
 //#####################################################################
 // Function Discard_Spikes
@@ -484,7 +562,21 @@ Interior_Edges_With_Boundary_Nodes(ARRAY<VECTOR<int,2> >* deletion_list)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Discard_Spikes(ARRAY<int>* deletion_list)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Spikes(*this,deletion_list);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    bool node_on_boundary_defined=mesh.node_on_boundary!=0;if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
+    if(deletion_list){
+        deletion_list->Resize(0);
+        for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+            if((*mesh.node_on_boundary)(i) && (*mesh.node_on_boundary)(j) && (*mesh.node_on_boundary)(k) && (*mesh.node_on_boundary)(l))
+                deletion_list->Append(t);}
+        mesh.Delete_Sorted_Elements(*deletion_list);}
+    else{
+        ARRAY<int> list;
+        for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+            if((*mesh.node_on_boundary)(i) && (*mesh.node_on_boundary)(j) && (*mesh.node_on_boundary)(k) && (*mesh.node_on_boundary)(l))
+                list.Append(t);}
+        mesh.Delete_Sorted_Elements(list);}
+    if(!node_on_boundary_defined){delete mesh.node_on_boundary;mesh.node_on_boundary=0;}
 }
 //#####################################################################
 // Function Inverted_Tetrahedrons
@@ -517,6 +609,20 @@ Inside(const TV& location,const T thickness_over_two) const
     return -1;
 }
 //#####################################################################
+// Function Inside_Any_Simplex
+//#####################################################################
+template<class T> bool TETRAHEDRALIZED_VOLUME<T>::
+Inside_Any_Simplex(const TV& location,int& tetrahedron_id,const T thickness_over_two) const
+{
+    assert(hierarchy);assert(tetrahedron_list);
+    ARRAY<int> nearby_tetrahedrons;
+    hierarchy->Intersection_List(location,nearby_tetrahedrons,thickness_over_two);
+    for(int k=0;k<nearby_tetrahedrons.m;k++){
+        TETRAHEDRON<T>& tetrahedron=(*tetrahedron_list)(nearby_tetrahedrons(k));
+        if(tetrahedron.Inside(location,thickness_over_two)){tetrahedron_id=nearby_tetrahedrons(k);return true;}}
+    return false;
+}
+//#####################################################################
 // Function Inside
 //#####################################################################
 // note: return the first tetrahedron that it is inside of.  If none, then the first including boundary.  Otherwise returns 0
@@ -547,7 +653,12 @@ Find(const TV& location,const T thickness_over_two,ARRAY<int>& scratch) const
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Discard_Tetrahedrons_Outside_Implicit_Surface(IMPLICIT_OBJECT<TV>& implicit_surface)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Tetrahedrons_Outside_Implicit_Surface(*this,implicit_surface);
+    for(int t=mesh.elements.m-1;t>=0;t--){
+        int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+        TV xi=particles.X(i),xj=particles.X(j),xk=particles.X(k),xl=particles.X(l);
+        T max_length=TETRAHEDRON<T>::Maximum_Edge_Length(xi,xj,xk,xl);
+        T min_phi=min(implicit_surface(xi),implicit_surface(xj),implicit_surface(xk),implicit_surface(xl));
+        if(min_phi>max_length) mesh.elements.Remove_Index_Lazy(t);}
 }
 //#####################################################################
 // Function Discard_Tetrahedrons_Outside_Implicit_Surface_Agressive
@@ -556,7 +667,12 @@ Discard_Tetrahedrons_Outside_Implicit_Surface(IMPLICIT_OBJECT<TV>& implicit_surf
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& implicit_surface)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(*this,implicit_surface);
+    for(int t=mesh.elements.m-1;t>=0;t--){
+        int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+        TV xi=particles.X(i),xj=particles.X(j),xk=particles.X(k),xl=particles.X(l);
+        T max_length=TETRAHEDRON<T>::Maximum_Edge_Length(xi,xj,xk,xl);
+        T max_phi=max(implicit_surface(xi),implicit_surface(xj),implicit_surface(xk),implicit_surface(xl));
+        if(max_phi+max_length>0) mesh.elements.Remove_Index_Lazy(t);}
 }
 //#####################################################################
 // Function Discard_Tetrahedrons_Outside_Implicit_Surface_Agressive
@@ -566,7 +682,14 @@ Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& im
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(IMPLICIT_OBJECT<TV>& implicit_surface,const ARRAY<RANGE<TV> >& bounding_boxes)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Discard_Tetrahedrons_Outside_Implicit_Surface_Aggressive(*this,implicit_surface,bounding_boxes);
+    for(int b=0;b<bounding_boxes.Size();b++){const RANGE<TV>& box=bounding_boxes(b);
+        for(int t=mesh.elements.m-1;t>=0;t--){
+            int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+            TV xi=particles.X(i),xj=particles.X(j),xk=particles.X(k),xl=particles.X(l);
+            if(box.Lazy_Outside(xi)||box.Lazy_Outside(xj)||box.Lazy_Outside(xk)||box.Lazy_Outside(xl)) continue;
+            T max_length=TETRAHEDRON<T>::Maximum_Edge_Length(xi,xj,xk,xl);
+            T max_phi=max(implicit_surface(xi),implicit_surface(xj),implicit_surface(xk),implicit_surface(xl));
+            if(max_phi+max_length>0) mesh.elements.Remove_Index_Lazy(t);}}
 }
 //#####################################################################
 // Function Maximum_Magnitude_Phi_On_Boundary
@@ -602,7 +725,29 @@ Volume_Incident_On_A_Particle(const int particle_index)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Split_Along_Fracture_Plane(const PLANE<T>& plane,ARRAY<int>& particle_replicated)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Split_Along_Fracture_Plane(*this,plane,particle_replicated);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    if(particle_replicated.m != particles.Size()) particle_replicated.Resize(particles.Size());
+    bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    ARRAY<bool> positive_side(mesh.elements.m);int number_on_positive_side=0;
+    int t;for(t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+        TV x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),x4=particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
+        if(plane.Signed_Distance(centroid) >= 0){positive_side(t)=true;number_on_positive_side++;}}
+    int p;for(p=0;p<particles.Size();p++){
+        bool seen_positive_side=false,seen_negative_side=false;
+        for(t=0;t<(*mesh.incident_elements)(p).m;t++){
+            if(positive_side((*mesh.incident_elements)(p)(t))) seen_positive_side=true;else seen_negative_side=true;}
+        if(seen_positive_side && seen_negative_side) particle_replicated(p)=1;}
+    int number_of_new_particles=0;
+    for(p=0;p<particles.Size();p++) if(particle_replicated(p)){ // assumes we're storing mass (this is not set here!), position, & velocity
+        int new_index=particles.Add_Element();particle_replicated(p)=new_index;number_of_new_particles++;
+        particles.X(new_index)=particles.X(p);particles.V(new_index)=particles.V(p);}
+    // loop through tets and change indices in negative_side to new_indices (from particle_replicated)
+    for(t=0;t<mesh.elements.m;t++) if(!positive_side(t)){ int i,j,k,l;mesh.elements(t).Get(i,j,k,l); // replace indices with replicated_indices
+        if(particle_replicated(i)) i=particle_replicated(i);if(particle_replicated(j)) j=particle_replicated(j);
+        if(particle_replicated(k)) k=particle_replicated(k);if(particle_replicated(l)) l=particle_replicated(l);
+        mesh.elements(t).Set(i,j,k,l);}
+    mesh.number_nodes=particles.Size();
+    if(incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
 }
 //#####################################################################
 // Function Split_Node
@@ -611,7 +756,31 @@ Split_Along_Fracture_Plane(const PLANE<T>& plane,ARRAY<int>& particle_replicated
 template<class T> int TETRAHEDRALIZED_VOLUME<T>::
 Split_Node(const int particle_index,const TV& normal)
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Split_Node(*this,particle_index,normal);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    PLANE<T> plane(normal,particles.X(particle_index));ARRAY<int> tets_incident_on_old_particle,tets_incident_on_new_particle;
+    int t;for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
+        int this_incident_tet=(*mesh.incident_elements)(particle_index)(t);int i,j,k,l;mesh.elements(this_incident_tet).Get(i,j,k,l);
+        TV x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),x4=particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
+        if(plane.Signed_Distance(centroid) < 0) tets_incident_on_new_particle.Append(this_incident_tet);
+        else tets_incident_on_old_particle.Append(this_incident_tet);}
+    int new_particle=0;
+    if(tets_incident_on_old_particle.m != 0 && tets_incident_on_new_particle.m != 0){
+        // new particle - assumes we're storing position, and velocity - user must fix mass outside this function call
+        new_particle=particles.Add_Element();mesh.number_nodes=particles.Size();
+        particles.X(new_particle)=particles.X(particle_index);particles.V(new_particle)=particles.V(particle_index);
+        for(t=0;t<(*mesh.incident_elements)(particle_index).m;t++){
+            int this_incident_tet=(*mesh.incident_elements)(particle_index)(t);int i,j,k,l;mesh.elements(this_incident_tet).Get(i,j,k,l);
+            TV x1=particles.X(i),x2=particles.X(j),x3=particles.X(k),x4=particles.X(l),centroid=(T).25*(x1+x2+x3+x4);
+            if(plane.Signed_Distance(centroid) < 0){ // relabel with duplicate node
+                if(i == particle_index) i=new_particle;if(j == particle_index) j=new_particle;if(k == particle_index) k=new_particle;if(l == particle_index) l=new_particle;
+                mesh.elements(this_incident_tet).Set(i,j,k,l);}}
+        if(incident_elements_defined){ //repair incident tetrahedrons if necessary
+            (*mesh.incident_elements)(particle_index).Clean_Memory();
+            (*mesh.incident_elements)(particle_index).Append_Elements(tets_incident_on_old_particle);
+            (*mesh.incident_elements).Append(tets_incident_on_new_particle);}}
+    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
+    return new_particle;
 }
 //#####################################################################
 // Function Split_Connected_Component
@@ -620,7 +789,28 @@ Split_Node(const int particle_index,const TV& normal)
 template<class T> int TETRAHEDRALIZED_VOLUME<T>::
 Split_Connected_Component(const int node)
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Split_Connected_Component(*this,node);
+    if(mesh.number_nodes!=particles.Size()) PHYSBAM_FATAL_ERROR();
+    bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    bool adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
+    ARRAY<bool> marked((*mesh.incident_elements)(node).m);
+    mesh.Mark_Face_Connected_Component_Incident_On_A_Node(node,marked);
+    int number_marked=0;int t;for(t=0;t<marked.m;t++) if(marked(t)) number_marked++;
+    int new_particle=0;
+    if(number_marked != marked.m){
+        // new particle -- assumes we're storing position, and velocity - user must fix mass outside this function call
+        new_particle=particles.Add_Element();mesh.number_nodes=particles.Size();
+        particles.X(new_particle)=particles.X(node);particles.V(new_particle)=particles.V(node);
+        ARRAY<int> empty;mesh.incident_elements->Append(empty);
+        ARRAY<int> indices_to_remove(number_marked);int counter=0;
+        for(t=0;t<(*mesh.incident_elements)(node).m;t++) if(marked(t)){
+            indices_to_remove(counter++)=t;
+            for(int i=0;i<4;i++) if(mesh.elements((*mesh.incident_elements)(node)(t))(i) == node){
+                mesh.elements((*mesh.incident_elements)(node)(t))(i)=new_particle;break;}
+            (*mesh.incident_elements)(new_particle).Append((*mesh.incident_elements)(node)(t));}
+        (*mesh.incident_elements)(node).Remove_Sorted_Indices(indices_to_remove);}
+    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
+    if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
+    return new_particle;
 }
 //#####################################################################
 // Function Compute_Tetrahedron_Volumes
@@ -628,7 +818,10 @@ Split_Connected_Component(const int node)
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Compute_Tetrahedron_Volumes()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Compute_Tetrahedron_Volumes(*this);
+    if(!tetrahedron_volumes) tetrahedron_volumes=new ARRAY<T>;
+    tetrahedron_volumes->Resize(mesh.elements.m,false,false);
+    for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+        (*tetrahedron_volumes)(t)=TETRAHEDRON<T>::Signed_Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));}
 }
 //#####################################################################
 // Function Compute_Nodal_Volumes
@@ -636,8 +829,23 @@ Compute_Tetrahedron_Volumes()
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Compute_Nodal_Volumes(bool save_tetrahedron_volumes)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Compute_Nodal_Volumes(*this,save_tetrahedron_volumes);
+    if(!nodal_volumes) nodal_volumes=new ARRAY<T>;
+    *nodal_volumes=CONSTANT_ARRAY<T>(particles.Size(),0);
+    if(save_tetrahedron_volumes){
+        if(!tetrahedron_volumes) tetrahedron_volumes=new ARRAY<T>;
+        tetrahedron_volumes->Resize(mesh.elements.m);
+        for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+            (*tetrahedron_volumes)(t)=TETRAHEDRON<T>::Signed_Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));
+            T volume=(T).25*(*tetrahedron_volumes)(t);
+            (*nodal_volumes)(i)+=volume;(*nodal_volumes)(j)+=volume;(*nodal_volumes)(k)+=volume;(*nodal_volumes)(l)+=volume;}}
+    else
+        for(int t=0;t<mesh.elements.m;t++){int i,j,k,l;mesh.elements(t).Get(i,j,k,l);
+            T volume=(T).25*TETRAHEDRON<T>::Signed_Volume(particles.X(i),particles.X(j),particles.X(k),particles.X(l));
+            (*nodal_volumes)(i)+=volume;(*nodal_volumes)(j)+=volume;(*nodal_volumes)(k)+=volume;(*nodal_volumes)(l)+=volume;}
 }
+//#####################################################################
+// Function Print_Statistics
+//#####################################################################
 template<class T> void TETRAHEDRALIZED_VOLUME<T>::
 Print_Statistics(std::ostream& output)
 {

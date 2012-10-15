@@ -19,7 +19,6 @@
 #include <PhysBAM_Geometry/Spatial_Acceleration/SEGMENT_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/POINT_SIMPLICES_1D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/SEGMENTED_CURVE_REFRESH.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor
@@ -70,7 +69,10 @@ Refresh_Auxiliary_Structures_Helper()
 template<class TV> void SEGMENTED_CURVE<TV>::
 Update_Segment_List() // updates the segments assuming the particle positions are already updated
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Update_Segment_List(*this);
+    if(!segment_list) segment_list=new ARRAY<typename BASIC_GEOMETRY_POLICY<TV>::SEGMENT>(mesh.elements.m);
+    for(int s=0;s<mesh.elements.m;s++){
+        int i,j;mesh.elements(s).Get(i,j);
+        (*segment_list)(s)=typename BASIC_GEOMETRY_POLICY<TV>::SEGMENT(particles.X(i),particles.X(j));}
 }
 //#####################################################################
 // Function Initialize_Hierarchy
@@ -78,7 +80,9 @@ Update_Segment_List() // updates the segments assuming the particle positions ar
 template<class TV> void SEGMENTED_CURVE<TV>::  
 Initialize_Hierarchy(const bool update_boxes) // creates and updates the boxes as well
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Hierarchy(*this,update_boxes);
+    delete hierarchy;
+    if(segment_list) hierarchy=new SEGMENT_HIERARCHY<TV>(mesh,particles,*segment_list,update_boxes);
+    else hierarchy=new SEGMENT_HIERARCHY<TV>(mesh,particles,update_boxes);
 }
 //#####################################################################
 // Function Initialize_Straight_Mesh_And_Particles
@@ -86,7 +90,10 @@ Initialize_Hierarchy(const bool update_boxes) // creates and updates the boxes a
 template<class TV> void SEGMENTED_CURVE<TV>::  
 Initialize_Straight_Mesh_And_Particles(const GRID<VECTOR<T,1> >& grid)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Straight_Mesh_And_Particles(*this,grid);
+    Clean_Memory();
+    mesh.Initialize_Straight_Mesh(grid.counts.x);
+    particles.Preallocate(grid.counts.x);
+    for(int i=0;i<grid.counts.x;i++) particles.X(particles.Add_Element()).x=grid.X(VECTOR<int,1>(i)).x;
 }
 //#####################################################################
 // Function Initialize_Circle_Mesh_And_Particles
@@ -94,7 +101,12 @@ Initialize_Straight_Mesh_And_Particles(const GRID<VECTOR<T,1> >& grid)
 template<class TV> void SEGMENTED_CURVE<TV>::  
 Initialize_Circle_Mesh_And_Particles(const int m,const T radius)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Circle_Mesh_And_Particles(*this,m,radius);
+    Clean_Memory();
+    mesh.Initialize_Straight_Mesh(m,true);
+    particles.Add_Elements(m);
+    for(int p=0;p<m;p++){
+        COMPLEX<T> X=COMPLEX<T>::Polar(radius,(T)2*(T)pi/m*p);
+        particles.X(p)=TV(VECTOR<T,2>(X.re,X.im));}
 }
 template<> void SEGMENTED_CURVE<VECTOR<double,1> >::  
 Initialize_Circle_Mesh_And_Particles(const int m,const T radius)
@@ -155,7 +167,8 @@ Total_Length() const
 }
 template<class T> void Initialize_Boundary_Object_Helper(SEGMENTED_CURVE<VECTOR<T,1> >& sc)
 {
-    delete sc.point_simplices_1d;if(!sc.mesh.boundary_mesh) sc.mesh.Initialize_Boundary_Mesh();
+    delete sc.point_simplices_1d;
+    if(!sc.mesh.boundary_mesh) sc.mesh.Initialize_Boundary_Mesh();
     sc.point_simplices_1d=new POINT_SIMPLICES_1D<T>(*sc.mesh.boundary_mesh,sc.particles);
 }
 template<class T> void Initialize_Boundary_Object_Helper(SEGMENTED_CURVE<VECTOR<T,2> >& sc){PHYSBAM_NOT_IMPLEMENTED();}
@@ -168,6 +181,19 @@ Get_Boundary_Object()
 {
     Initialize_Boundary_Object_Helper(*this);
     return *point_simplices_1d;
+}
+//#####################################################################
+// Function Inside_Any_Simplex
+//#####################################################################
+template<class TV> bool SEGMENTED_CURVE<TV>::
+Inside_Any_Simplex(const TV& location,int& segment_id,const T thickness_over_two) const
+{
+    assert(hierarchy);assert(segment_list);
+    ARRAY<int> nearby_segments;hierarchy->Intersection_List(location,nearby_segments,thickness_over_two);
+    for(int k=0;k<nearby_segments.m;k++){
+        T_SEGMENT& segment=(*segment_list)(nearby_segments(k));
+        if(segment.Inside(location,thickness_over_two)){segment_id=nearby_segments(k);return true;}}
+    return false;
 }
 //#####################################################################
 template class SEGMENTED_CURVE<VECTOR<float,1> >;

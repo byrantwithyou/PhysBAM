@@ -22,15 +22,6 @@
 #include <PhysBAM_Geometry/Topology/SEGMENT_MESH.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGLE_SUBDIVISION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_CLEANSING.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_INSIDE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_INSIDE_USING_RAY_TEST.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_INTERSECTION.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_NORMAL.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_REFRESH.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_SUBDIVISION.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_SURFACE.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_UPDATE_VERTEX_NORMALS.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry_Intersections/RAY_TRIANGULATED_SURFACE_INTERSECTION.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -87,8 +78,8 @@ Refresh_Auxiliary_Structures_Helper()
 {
     if(triangle_list) Update_Triangle_List();
     if(hierarchy) Initialize_Hierarchy();
-    if(vertex_normals || face_vertex_normals) TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Update_Vertex_Normals(*this);
-    if(segment_lengths) TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Segment_Lengths(*this);
+    if(vertex_normals || face_vertex_normals) Update_Vertex_Normals();
+    if(segment_lengths) Initialize_Segment_Lengths();
 }
 //#####################################################################
 // Function Initialize_Hierarchy
@@ -96,7 +87,9 @@ Refresh_Auxiliary_Structures_Helper()
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Hierarchy(const bool update_boxes,const int triangles_per_group) // creates and updates the boxes as well
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Hierarchy(*this,update_boxes,triangles_per_group);
+    delete hierarchy;
+    if(triangle_list) hierarchy=new TRIANGLE_HIERARCHY<T>(mesh,particles,*triangle_list,update_boxes,triangles_per_group);
+    else hierarchy=new TRIANGLE_HIERARCHY<T>(mesh,particles,update_boxes,triangles_per_group);
 }
 //#####################################################################
 // Function Initialize_Particle_Hierarchy
@@ -104,7 +97,9 @@ Initialize_Hierarchy(const bool update_boxes,const int triangles_per_group) // c
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Particle_Hierarchy(const INDIRECT_ARRAY<ARRAY_VIEW<TV> >& particle_subset_input,const bool update_boxes,const int particles_per_group) // creates and updates the boxes as well
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Particle_Hierarchy(*this,particle_subset_input,update_boxes,particles_per_group);
+    typedef VECTOR<T,3> TV;
+    delete particle_hierarchy;
+    particle_hierarchy=new PARTICLE_HIERARCHY<TV,INDIRECT_ARRAY<ARRAY_VIEW<TV> > >(particle_subset_input,update_boxes,particles_per_group);
 }
 //#####################################################################
 // Function Rescale
@@ -112,7 +107,10 @@ Initialize_Particle_Hierarchy(const INDIRECT_ARRAY<ARRAY_VIEW<TV> >& particle_su
 template<class T> void TRIANGULATED_SURFACE<T>::
 Rescale(const T scaling_x,const T scaling_y,const T scaling_z)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Rescale(*this,scaling_x,scaling_y,scaling_z);
+    typedef VECTOR<T,3> TV;
+    if(scaling_x*scaling_y*scaling_z<=0) PHYSBAM_FATAL_ERROR();
+    for(int k=0;k<particles.Size();k++) particles.X(k)*=TV(scaling_x,scaling_y,scaling_z);
+    if(triangle_list) Update_Triangle_List();if(hierarchy) hierarchy->Update_Boxes();if(bounding_box) Update_Bounding_Box();
 }
 //#####################################################################
 // Function Update_Triangle_List
@@ -128,7 +126,10 @@ Update_Triangle_List()
 template<class T> void TRIANGULATED_SURFACE<T>::
 Update_Triangle_List(ARRAY_VIEW<const TV> X)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Update_Triangle_List(*this,X);
+    if(!triangle_list) triangle_list=new ARRAY<TRIANGLE_3D<T> >;
+    triangle_list->Resize(mesh.elements.m);
+    for(int t=0;t<mesh.elements.m;t++)
+        (*triangle_list)(t)=TRIANGLE_3D<T>(X.Subset(mesh.elements(t)));
 }
 //#####################################################################
 // Function Initialize_Torus_Mesh_And_Particles
@@ -136,7 +137,14 @@ Update_Triangle_List(ARRAY_VIEW<const TV> X)
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Torus_Mesh_And_Particles(const int m,const int n,const T major_radius,const T minor_radius)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Torus_Mesh_And_Particles(*this,m,n,major_radius,minor_radius);
+    typedef VECTOR<T,3> TV;
+    T di=T(2*pi)/m,dj=T(2*pi)/n;
+    for(int j=0;j<n;j++){
+        T phi=-dj*j,radius=major_radius+minor_radius*cos(phi),z=minor_radius*sin(phi);
+        for(int i=0;i<m;i++){
+            int p=particles.Add_Element();T theta=di*(i-(T).5*(j&1));
+            particles.X(p)=TV(radius*cos(theta),radius*sin(theta),z);}}
+    mesh.Initialize_Torus_Mesh(m,n);
 }
 //#####################################################################
 // Function Initialize_Cylinder_Mesh_And_Particles
@@ -144,7 +152,13 @@ Initialize_Torus_Mesh_And_Particles(const int m,const int n,const T major_radius
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Cylinder_Mesh_And_Particles(const int m,const int n,const T length,const T radius,const bool create_caps)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Cylinder_Mesh_And_Particles(*this,m,n,length,radius,create_caps);
+    typedef VECTOR<T,3> TV;
+    particles.Delete_All_Elements();T dtheta=(T)two_pi/n;T dlength=length/(m-1);
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++){
+        int p=particles.Add_Element();T theta=j*dtheta;
+        particles.X(p)=TV(dlength*i,radius*sin(theta),radius*cos(theta));}
+    if(create_caps){int p_1=particles.Add_Element();int p_2=particles.Add_Element();particles.X(p_1)=TV(0,0,0);particles.X(p_2)=TV(length,0,0);}
+    mesh.Initialize_Cylinder_Mesh(m,n,create_caps);
 }
 //#####################################################################
 // Function Initialize_Segment_Lengths
@@ -152,7 +166,11 @@ Initialize_Cylinder_Mesh_And_Particles(const int m,const int n,const T length,co
 template<class T> void TRIANGULATED_SURFACE<T>::
 Initialize_Segment_Lengths()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Initialize_Segment_Lengths(*this);
+    bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
+    delete segment_lengths;segment_lengths=new ARRAY<T>(mesh.segment_mesh->elements.m);
+    for(int t=0;t<mesh.segment_mesh->elements.m;t++) 
+        (*segment_lengths)(t)=(particles.X(mesh.segment_mesh->elements(t)(0))-particles.X(mesh.segment_mesh->elements(t)(1))).Magnitude();
+    if(!segment_mesh_defined){delete mesh.segment_mesh;mesh.segment_mesh=0;}
 }
 //#####################################################################
 // Function Update_Vertex_Normals
@@ -160,7 +178,36 @@ Initialize_Segment_Lengths()
 template<class T> void TRIANGULATED_SURFACE<T>::
 Update_Vertex_Normals()
 {  
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Update_Vertex_Normals(*this);
+    typedef VECTOR<T,3> TV;
+    bool incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    bool triangle_list_defined=triangle_list!=0;if(!triangle_list_defined) Update_Triangle_List();
+
+    if(avoid_normal_interpolation_across_sharp_edges){
+        delete vertex_normals;vertex_normals=0;
+        if(!face_vertex_normals) face_vertex_normals=new ARRAY<VECTOR<TV,3> >(mesh.elements.m);else face_vertex_normals->Resize(mesh.elements.m);
+        TV face_normal,normal,zero_vector(0,0,0);
+        for(int t=0;t<mesh.elements.m;t++){
+            face_normal=Face_Normal(t);
+            for(int i=0;i<3;i++){
+                normal=zero_vector;int node=mesh.elements(t)(i); 
+                for(int k=0;k<(*mesh.incident_elements)(node).m;k++){
+                    TRIANGLE_3D<T>& triangle=(*triangle_list)((*mesh.incident_elements)(node)(k));
+                    TV local_normal=triangle.Normal();
+                    if((face_normal-local_normal).Magnitude_Squared() < normal_variance_threshold) normal+=triangle.Area()*local_normal;}
+                if(normal != zero_vector) normal.Normalize();
+                (*face_vertex_normals)(t)(i)=normal;}}}
+    else{
+        delete face_vertex_normals;face_vertex_normals=0;
+        if(!vertex_normals) vertex_normals=new ARRAY<TV>(mesh.number_nodes);
+        else vertex_normals->Resize(mesh.number_nodes);
+        for(int k=0;k<vertex_normals->m;k++){
+            (*vertex_normals)(k)=TV(); // initialize to zero
+            for(int kk=0;kk<(*mesh.incident_elements)(k).m;kk++) 
+                (*vertex_normals)(k)+=(*triangle_list)((*mesh.incident_elements)(k)(kk)).Area()*(*triangle_list)((*mesh.incident_elements)(k)(kk)).Normal();
+            if((*vertex_normals)(k) != TV()) (*vertex_normals)(k).Normalize();}}
+
+    if(!triangle_list_defined){delete triangle_list;triangle_list=0;}
+    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
 }
 //#####################################################################
 // Function Normal
@@ -168,7 +215,17 @@ Update_Vertex_Normals()
 template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Normal(const TV& location,const int aggregate) const 
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Normal(*this,location,aggregate);
+    typedef VECTOR<T,3> TV;
+    assert(aggregate >= 1 && aggregate <= ts.mesh.elements.m);
+
+    if(use_vertex_normals){
+        TV normal1,normal2,normal3;
+        int node1,node2,node3;mesh.elements(aggregate).Get(node1,node2,node3);
+        if(avoid_normal_interpolation_across_sharp_edges) (*face_vertex_normals)(aggregate).Get(normal1,normal2,normal3);
+        else{normal1=(*vertex_normals)(node1);normal2=(*vertex_normals)(node2);normal3=(*vertex_normals)(node3);}
+        TV weights=TRIANGLE_3D<T>::Barycentric_Coordinates(location,particles.X(node1),particles.X(node2),particles.X(node3));
+        return (weights.x*normal1+weights.y*normal2+weights.z*normal3).Normalized();}
+    else return Face_Normal(aggregate);
 }
 //#####################################################################
 // Function Inside
@@ -176,7 +233,12 @@ Normal(const TV& location,const int aggregate) const
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Inside(const TV& location,const T thickness_over_two) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside(*this,location,thickness_over_two);
+    typedef VECTOR<T,3> TV;
+    PHYSBAM_ASSERT(bounding_box && hierarchy);
+    if(bounding_box->Outside(location,thickness_over_two)) return false;
+    if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return false;
+    RAY<TV> ray(location,TV(0,0,1),true);
+    return Inside_Using_Ray_Test(ray,thickness_over_two);
 }
 //#####################################################################
 // Function Inside_Relative_To_Triangle
@@ -187,7 +249,7 @@ Inside_Relative_To_Triangle(const TV& location,const int triangle_index_for_ray_
     PHYSBAM_ASSERT(triangle_list);
     RAY<TV> ray(SEGMENT_3D<T>(location,(*triangle_list)(triangle_index_for_ray_test).Center()));
     ray.t_max+=2*thickness_over_two;
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside_Using_Ray_Test(*this,ray,thickness_over_two); 
+    return Inside_Using_Ray_Test(ray,thickness_over_two); 
 }
 //#####################################################################
 // Function Inside_Using_Ray_Test
@@ -195,7 +257,32 @@ Inside_Relative_To_Triangle(const TV& location,const int triangle_index_for_ray_
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Inside_Using_Ray_Test(RAY<TV>& ray,const T thickness_over_two) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside_Using_Ray_Test(*this,ray,thickness_over_two); 
+    typedef VECTOR<T,3> TV;
+    PHYSBAM_ASSERT(mesh.adjacent_elements && triangle_list);
+    bool inside=false;
+    if(INTERSECTION::Intersects(ray,*this,thickness_over_two) && ray.t_max > 0){ // otherwise missed the object or on the boundary
+        TV point=ray.Point(ray.t_max); // point is inside if and only if location is inside
+        T thickness=2*thickness_over_two;
+        TRIANGLE_3D<T>& triangle=(*triangle_list)(ray.aggregate_id);
+        int region_id,region=triangle.Region(point,region_id,thickness);
+        if(region==0){ // vertex
+            if(Signed_Solid_Angle_Of_Triangle_Web(point,mesh.elements(ray.aggregate_id)(region_id)) > 0) inside=true;} 
+        else if(region==1) { // edge
+            int node1,node2,node3,neighbor=-1;mesh.elements(ray.aggregate_id).Get(node1,node2,node3);
+            if(region_id==0) neighbor=mesh.Adjacent_Triangle(ray.aggregate_id,node1,node2);
+            else if(region_id==1) neighbor=mesh.Adjacent_Triangle(ray.aggregate_id,node2,node3);
+            else neighbor=mesh.Adjacent_Triangle(ray.aggregate_id,node3,node1);
+            if(neighbor==-1){if(triangle.Lazy_Inside_Plane(ray.endpoint)) inside=true;}
+            else{
+                TRIANGLE_3D<T>& triangle2=(*triangle_list)(neighbor);
+                int convex=0;
+                if(region_id==0){if(TV::Dot_Product(triangle2.Normal(),triangle.X.z-triangle2.X.x) >= 0) convex=1;}
+                else if(region_id==1){if(TV::Dot_Product(triangle2.Normal(),triangle.X.x-triangle2.X.x) >= 0) convex=1;}
+                else if(region_id==2){if(TV::Dot_Product(triangle2.Normal(),triangle.X.y-triangle2.X.x) >= 0) convex=1;}
+                if(convex){if(triangle.Lazy_Inside_Plane(ray.endpoint) && triangle2.Lazy_Inside_Plane(ray.endpoint)) inside=true;} // inside both - can use location or point
+                else{if(triangle.Lazy_Inside_Plane(ray.endpoint) || triangle2.Lazy_Inside_Plane(ray.endpoint)) inside=true;}}} // inside either - can use location or point
+        else{if(triangle.Lazy_Inside_Plane(ray.endpoint)) inside=true;}} // region=2 - face - can use location or point
+    return inside;
 }
 //#####################################################################
 // Function Outside
@@ -203,7 +290,37 @@ Inside_Using_Ray_Test(RAY<TV>& ray,const T thickness_over_two) const
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Outside(const TV& location,const T thickness_over_two) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Outside(*this,location,thickness_over_two);
+    typedef VECTOR<T,3> TV;
+    PHYSBAM_ASSERT(bounding_box && hierarchy && mesh.adjacent_elements && triangle_list);
+    if(bounding_box->Outside(location,thickness_over_two)) return true;
+    if(hierarchy->box_hierarchy(hierarchy->root).Outside(location,thickness_over_two)) return true;
+       
+    bool outside=false;
+    RAY<TV> ray(location,TV(0,0,1));
+    if(!INTERSECTION::Intersects(ray,*this,thickness_over_two)) outside=true; // missed the object, outside
+    else if(ray.t_max > 0){ // not in boundary region
+        TV point=ray.Point(ray.t_max); // point is inside if and only if location is inside
+        T thickness=2*thickness_over_two;
+        TRIANGLE_3D<T>& triangle=(*triangle_list)(ray.aggregate_id);
+        int region_id,region=triangle.Region(point,region_id,thickness);
+        if(region==0){ // vertex
+            if(Signed_Solid_Angle_Of_Triangle_Web(point,mesh.elements(ray.aggregate_id)(region_id)) < 0) outside=true;} 
+        else if(region==1){ // edge
+            int node1,node2,node3,neighbor=-1;mesh.elements(ray.aggregate_id).Get(node1,node2,node3);
+            if(region_id==0) neighbor=mesh.Adjacent_Triangle(ray.aggregate_id,node1,node2);
+            else if(region_id==1) neighbor=mesh.Adjacent_Triangle(ray.aggregate_id,node2,node3);
+            else neighbor=mesh.Adjacent_Triangle(ray.aggregate_id,node3,node1);
+            if(neighbor==-1){if(triangle.Lazy_Outside_Plane(location)) outside=true;}
+            else{
+                TRIANGLE_3D<T>& triangle2=(*triangle_list)(neighbor);
+                bool convex=false;
+                if(region_id==0){if(TV::Dot_Product(triangle2.Normal(),triangle.X.z-triangle2.X.x)>=0) convex=true;}
+                else if(region_id==1){if(TV::Dot_Product(triangle2.Normal(),triangle.X.x-triangle2.X.x)>=0) convex=true;}
+                else if(region_id==2){if(TV::Dot_Product(triangle2.Normal(),triangle.X.y-triangle2.X.x)>=0) convex=true;}
+                if(convex){if(triangle.Lazy_Outside_Plane(location) || triangle2.Lazy_Outside_Plane(location)) outside=true;} // outside either - can use location or point
+                else{if(triangle.Lazy_Outside_Plane(location) && triangle2.Lazy_Outside_Plane(location)) outside=true;}}} // outside both - can use location or point
+        else{if(triangle.Lazy_Outside_Plane(location)) outside=true;}} // region=2 - face - can use location or point
+    return outside;
 }
 //#####################################################################
 // Function Boundary
@@ -219,7 +336,12 @@ Boundary(const TV& location,const T thickness_over_two) const
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Inside_Any_Triangle(const TV& location,int& triangle_id,const T thickness_over_two) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Inside_Any_Triangle(*this,location,triangle_id,thickness_over_two);
+    assert(hierarchy);assert(triangle_list);
+    ARRAY<int> nearby_triangles;hierarchy->Intersection_List(location,nearby_triangles,thickness_over_two);
+    for(int k=0;k<nearby_triangles.m;k++){
+        TRIANGLE_3D<T>& triangle=(*triangle_list)(nearby_triangles(k));
+        if(triangle.Point_Inside_Triangle(location,thickness_over_two)){triangle_id=nearby_triangles(k);return true;}}
+    return false;
 }
 //#####################################################################
 // Function Surface
@@ -227,7 +349,39 @@ Inside_Any_Triangle(const TV& location,int& triangle_id,const T thickness_over_t
 template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Surface(const TV& location,const T max_depth,const T thickness_over_2,int* closest_triangle,T* distance) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Surface(*this,location,max_depth,thickness_over_2,closest_triangle,distance);
+    typedef VECTOR<T,3> TV;
+    PHYSBAM_ASSERT(triangle_list);
+    TV point;
+    
+    if(max_depth){
+        PHYSBAM_ASSERT(hierarchy);
+        RANGE<TV> box(location.x-max_depth,location.x+max_depth,location.y-max_depth,location.y+max_depth,location.z-max_depth,location.z+max_depth);
+        ARRAY<int> nearby_triangles;hierarchy->Intersection_List(box,nearby_triangles);
+        if(!nearby_triangles.m){ // grab any point assuming far from the interface
+            RAY<TV> ray(location,particles.X(mesh.elements(0)(0))-location);if(closest_triangle) *closest_triangle=0;
+            if(INTERSECTION::Intersects(ray,*this,thickness_over_2)){if(distance) *distance=ray.t_max;return ray.Point(ray.t_max);}
+            else{if(distance) *distance=(particles.X(mesh.elements(0)(0))-location).Magnitude();return particles.X(mesh.elements(0)(0));}} 
+        else{
+            TV weights;
+            {TRIANGLE_3D<T>& triangle=(*triangle_list)(nearby_triangles(0));point=triangle.Closest_Point(location,weights);}
+            T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=nearby_triangles(0);
+            for(int k=1;k<nearby_triangles.m;k++){
+                TRIANGLE_3D<T>& triangle=(*triangle_list)(nearby_triangles(k));
+                TV new_point=triangle.Closest_Point(location,weights);
+                T new_distance=(location-new_point).Magnitude_Squared();
+                if(new_distance < distance_temp){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=nearby_triangles(k);}}
+            if(distance) *distance=sqrt(distance_temp);return point;}}
+
+    // slow method
+    TV weights;
+    {TRIANGLE_3D<T>& triangle=(*triangle_list)(0);point=triangle.Closest_Point(location,weights);}
+    T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=0;
+    for(int k=1;k<mesh.elements.m;k++){
+        TRIANGLE_3D<T>& triangle=(*triangle_list)(k);
+        TV new_point=triangle.Closest_Point(location,weights);
+        T new_distance=(location-new_point).Magnitude_Squared();
+        if(new_distance < distance_temp){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=k;}}
+    if(distance) *distance=sqrt(distance_temp);return point;
 }
 //#####################################################################
 // Function Oriented_Surface
@@ -235,7 +389,39 @@ Surface(const TV& location,const T max_depth,const T thickness_over_2,int* close
 template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Oriented_Surface(const TV& location,const TV& normal,const T max_depth,const T thickness_over_2,int* closest_triangle,T* distance) const
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Oriented_Surface(*this,location,normal,max_depth,thickness_over_2,closest_triangle,distance);
+    typedef VECTOR<T,3> TV;
+    PHYSBAM_ASSERT(triangle_list);
+    TV point;
+    
+    if(max_depth){
+        PHYSBAM_ASSERT(hierarchy);
+        RANGE<TV> box(location.x-max_depth,location.x+max_depth,location.y-max_depth,location.y+max_depth,location.z-max_depth,location.z+max_depth);
+        ARRAY<int> nearby_triangles;hierarchy->Intersection_List(box,nearby_triangles);
+        if(!nearby_triangles.m){ // grab any point ignoring normal assuming far from the interface
+            RAY<TV> ray(location,particles.X(mesh.elements(0)(0))-location);if(closest_triangle) *closest_triangle=0;
+            if(INTERSECTION::Intersects(ray,*this,thickness_over_2)){if(distance) *distance=ray.t_max;return ray.Point(ray.t_max);}
+            else{if(distance) *distance=(particles.X(mesh.elements(0)(0))-location).Magnitude();return particles.X(mesh.elements(0)(0));}} 
+        else{
+            TV weights;
+            {TRIANGLE_3D<T>& triangle=(*triangle_list)(nearby_triangles(0));point=triangle.Closest_Point(location,weights);}
+            T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=nearby_triangles(0);
+            for(int k=1;k<nearby_triangles.m;k++){
+                TRIANGLE_3D<T>& triangle=(*triangle_list)(nearby_triangles(k));
+                TV new_point=triangle.Closest_Point(location,weights);
+                T new_distance=(location-new_point).Magnitude_Squared();
+                if(new_distance<distance_temp && TV::Dot_Product(normal,triangle.Raw_Normal())>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=nearby_triangles(k);}}
+            if(distance) *distance=sqrt(distance_temp);return point;}}
+
+    // slow method
+    TV weights;
+    {TRIANGLE_3D<T>& triangle=(*triangle_list)(0);point=triangle.Closest_Point(location,weights);}
+    T distance_temp=(location-point).Magnitude_Squared();if(closest_triangle) *closest_triangle=0;
+    for(int k=1;k<mesh.elements.m;k++){
+        TRIANGLE_3D<T>& triangle=(*triangle_list)(k);
+        TV new_point=triangle.Closest_Point(location,weights);
+        T new_distance=(location-new_point).Magnitude_Squared();
+        if(new_distance<distance_temp&&TV::Dot_Product(normal,triangle.Raw_Normal())>0){distance_temp=new_distance;point=new_point;if(closest_triangle) *closest_triangle=k;}}
+    if(distance) *distance=sqrt(distance_temp);return point;
 }
 //#####################################################################
 // Function Signed_Solid_Angle_Of_Triangle_Web
@@ -263,7 +449,10 @@ Signed_Solid_Angle_Of_Triangle_Web(const TV& location,int web_root_node) const
 template<class T> bool TRIANGULATED_SURFACE<T>::
 Check_For_Self_Intersection(const T thickness_over_2,const bool update_bounding_boxes,ARRAY<VECTOR<int,2> >* intersecting_segment_triangle_pairs)
 {  
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Check_For_Self_Intersection(*this,thickness_over_2,update_bounding_boxes,intersecting_segment_triangle_pairs);
+    bool segment_mesh_defined=mesh.segment_mesh!=0;if(!segment_mesh_defined) mesh.Initialize_Segment_Mesh();
+    bool intersection=Segment_Triangle_Intersection(*mesh.segment_mesh,particles.X,thickness_over_2,update_bounding_boxes,intersecting_segment_triangle_pairs);
+    if(!segment_mesh_defined){delete mesh.segment_mesh;mesh.segment_mesh=0;}
+    return intersection;
 }
 //#####################################################################
 // Function Find_First_Segment_Triangle_Intersection
@@ -272,7 +461,18 @@ template<class T> bool TRIANGULATED_SURFACE<T>::
 Find_First_Segment_Triangle_Intersection(const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<const TV> X,const T thickness_over_2,const int max_coarsening_attempts,
     const bool update_bounding_boxes)
 {
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Find_First_Segment_Triangle_Intersection(*this,test_segment_mesh,X,thickness_over_2,max_coarsening_attempts,update_bounding_boxes);
+    if(Segment_Triangle_Intersection(test_segment_mesh,X,thickness_over_2,update_bounding_boxes)){
+        LOG::cout<<"SELF INTERSECTIONS !"<<std::endl;
+        return true;}
+    else{
+        for(int loops=0;loops<max_coarsening_attempts;loops++){
+            T distance=(1<<loops)*thickness_over_2;
+            if(Segment_Triangle_Intersection(test_segment_mesh,X,distance,false)){
+                LOG::cout<<"collision at a proximity < "<<distance<<std::endl;
+                return true;}
+            else LOG::cout<<"ok at a proximity = "<<distance<<std::endl;
+    }}
+    return false;
 }
 //#####################################################################
 // Function Segment_Triangle_Intersection
@@ -281,7 +481,15 @@ template<class T> bool TRIANGULATED_SURFACE<T>::
 Segment_Triangle_Intersection(const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<const TV> X,const T thickness_over_2,const bool update_bounding_boxes,
     ARRAY<VECTOR<int,2> >* intersecting_segment_triangle_pairs)
 {  
-    return TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Segment_Triangle_Intersection(*this,test_segment_mesh,X,thickness_over_2,update_bounding_boxes,intersecting_segment_triangle_pairs);
+    bool intersection=false;
+    ARRAY<ARRAY<int> > triangles_near_edges(test_segment_mesh.elements.m);Get_Triangles_Near_Edges(triangles_near_edges,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
+    for(int e=0;e<test_segment_mesh.elements.m;e++){
+        SEGMENT_3D<T> segment(X(test_segment_mesh.elements(e)(0)),X(test_segment_mesh.elements(e)(1)));
+        for(int k=0;k<triangles_near_edges(e).m;k++){int t=triangles_near_edges(e)(k);
+            TRIANGLE_3D<T> triangle(X(mesh.elements(t)(0)),X(mesh.elements(t)(1)),X(mesh.elements(t)(2)));
+            if(INTERSECTION::Intersects(segment,triangle,thickness_over_2)){intersection=true;
+                if(intersecting_segment_triangle_pairs) intersecting_segment_triangle_pairs->Append(VECTOR<int,2>(e,t));else return true;}}}
+    return intersection;
 }
 //#####################################################################
 // Function Get_Triangles_Near_Edges
@@ -290,7 +498,17 @@ template<class T> void TRIANGULATED_SURFACE<T>::
 Get_Triangles_Near_Edges(ARRAY<ARRAY<int> >& triangles_near_edges,const SEGMENT_MESH& test_segment_mesh,ARRAY_VIEW<const TV> X,const T thickness_over_2,
     const bool update_bounding_boxes)
 {  
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Get_Triangles_Near_Edges(*this,triangles_near_edges,test_segment_mesh,X,thickness_over_2,update_bounding_boxes);
+    bool hierarchy_defined=hierarchy!=0;if(!hierarchy_defined) Initialize_Hierarchy(false);
+    if(!hierarchy_defined || update_bounding_boxes) hierarchy->Update_Boxes(X);
+
+    for(int k=0;k<test_segment_mesh.elements.m;k++){
+        int node1,node2;test_segment_mesh.elements(k).Get(node1,node2);
+        RANGE<VECTOR<T,3> > box(X(node1));box.Enlarge_To_Include_Point(X(node2));
+        hierarchy->Intersection_List(box,triangles_near_edges(k),thickness_over_2);
+        for(int kk=0;kk<triangles_near_edges(k).m;kk++){int t=triangles_near_edges(k)(kk); // remove elements that contain a node of the edge being tested
+            for(int i=0;i<3;i++) if(mesh.elements(t)(i) == node1 || mesh.elements(t)(i) == node2){triangles_near_edges(k).Remove_Index_Lazy(kk);kk--;break;}}}
+    
+    if(!hierarchy_defined){delete hierarchy;hierarchy=0;}
 }
 //#####################################################################
 // Function Centroid_Of_Neighbors
@@ -323,7 +541,14 @@ Calculate_Signed_Distance(const TV& location,T thickness) const
 template<class T> void TRIANGULATED_SURFACE<T>::
 Linearly_Subdivide()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Linearly_Subdivide(*this);
+    TRIANGLE_SUBDIVISION subdivision(mesh);
+    TRIANGLE_MESH refined_mesh;
+    subdivision.Refine_Mesh(refined_mesh);
+    ARRAY<VECTOR<T,3> > X_save(particles.X),V_save(particles.V);
+    particles.Add_Elements(refined_mesh.number_nodes-particles.Size());
+    if(X_save.Size()) subdivision.Apply_Linear_Subdivision(X_save,particles.X);
+    if(V_save.Size()) subdivision.Apply_Linear_Subdivision(V_save,particles.V);
+    mesh.Initialize_Mesh(refined_mesh);
 }
 //#####################################################################
 // Function Loop_Subdivide
@@ -331,7 +556,14 @@ Linearly_Subdivide()
 template<class T> void TRIANGULATED_SURFACE<T>::
 Loop_Subdivide()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Loop_Subdivide(*this);
+    TRIANGLE_SUBDIVISION subdivision(mesh);
+    TRIANGLE_MESH refined_mesh;
+    subdivision.Refine_Mesh(refined_mesh);
+    ARRAY<VECTOR<T,3> > X_save(particles.X),V_save(particles.V);
+    particles.Add_Elements(refined_mesh.number_nodes-particles.Size());
+    if(X_save.Size()) subdivision.Apply_Loop_Subdivision(X_save,particles.X);
+    if(V_save.Size()) subdivision.Apply_Loop_Subdivision(V_save,particles.V);
+    mesh.Initialize_Mesh(refined_mesh);
 }
 //#####################################################################
 // Function Root_Three_Subdivide
@@ -339,7 +571,14 @@ Loop_Subdivide()
 template<class T> void TRIANGULATED_SURFACE<T>::
 Root_Three_Subdivide()
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Root_Three_Subdivide(*this);
+    TRIANGLE_SUBDIVISION subdivision(mesh);
+    TRIANGLE_MESH refined_mesh;
+    subdivision.Refine_Mesh_Dual(refined_mesh);
+    ARRAY<VECTOR<T,3> > X_save(particles.X),V_save(particles.V);
+    particles.Add_Elements(refined_mesh.number_nodes-particles.Size());
+    if(X_save.Size()) subdivision.Apply_Root_Three_Subdivision(X_save,particles.X);
+    if(V_save.Size()) subdivision.Apply_Root_Three_Subdivision(V_save,particles.V);
+    mesh.Initialize_Mesh(refined_mesh);
 }
 //#####################################################################
 // Funcion Total_Area
@@ -529,7 +768,77 @@ Make_Orientations_Consistent_With_Implicit_Surface(const IMPLICIT_OBJECT<TV>& im
 template<class T> void TRIANGULATED_SURFACE<T>::
 Close_Surface(const bool merge_coincident_vertices,const T merge_coincident_vertices_threshold,const bool fill_holes,const bool verbose)
 {
-    TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Close_Surface(*this,merge_coincident_vertices,merge_coincident_vertices_threshold,fill_holes,verbose);
+    typedef VECTOR<T,3> TV;
+    PHYSBAM_ASSERT(merge_coincident_vertices_threshold<1);
+    bool incident_elements_defined=(mesh.incident_elements!=0);if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
+    bool boundary_mesh_defined=(mesh.boundary_mesh!=0);if(!boundary_mesh_defined) mesh.Initialize_Boundary_Mesh();
+    bool node_on_boundary_defined=(mesh.node_on_boundary!=0);if(!node_on_boundary_defined) mesh.Initialize_Node_On_Boundary();
+
+    // for each node on boundary, get minimum length of boundary segments adjacent to it - also keep track of longest boundary segment
+    ARRAY<T> minimum_incident_boundary_segment_length(mesh.boundary_mesh->number_nodes,false);
+    minimum_incident_boundary_segment_length.Fill(FLT_MAX);
+    T maximum_boundary_segment_length=0;
+    for(int i=0;i<mesh.boundary_mesh->elements.m;i++){
+        int node1,node2;mesh.boundary_mesh->elements(i).Get(node1,node2);
+        T length=(particles.X(node1)-particles.X(node2)).Magnitude();
+        minimum_incident_boundary_segment_length(node1)=min(minimum_incident_boundary_segment_length(node1),length);
+        minimum_incident_boundary_segment_length(node2)=min(minimum_incident_boundary_segment_length(node2),length);
+        maximum_boundary_segment_length=max(maximum_boundary_segment_length,length);}
+
+    if(merge_coincident_vertices && maximum_boundary_segment_length>0){
+        if(verbose) LOG::cout<<"MERGING VERTICES (threshold="<<merge_coincident_vertices_threshold<<")"<<std::endl;
+        int number_merged=0;
+        PARTICLE_3D_SPATIAL_PARTITION<T> particle_spatial_partition(particles,2*maximum_boundary_segment_length);
+        particle_spatial_partition.Reinitialize();particle_spatial_partition.Reset_Pair_Finder();
+        int index1;ARRAY<int> nearby_particle_indices;nearby_particle_indices.Preallocate(100);
+        while(particle_spatial_partition.Get_Next_Particles_Potentially_Within_Interaction_Radius(index1,nearby_particle_indices)) if((*mesh.node_on_boundary)(index1)){
+            TV position1=particles.X(index1);
+            int closest_index2=0;T closest_distance_squared=FLT_MAX;
+            for(int k=0;k<nearby_particle_indices.m;k++){
+                int index2=nearby_particle_indices(k);if(!(*mesh.node_on_boundary)(index2)) continue;
+                T distance_squared=(particles.X(index2)-position1).Magnitude_Squared();
+                if(distance_squared < closest_distance_squared){closest_index2=index2;closest_distance_squared=distance_squared;}}
+            if(closest_index2){ // merge index1 to closest_index2
+                T real_threshold=merge_coincident_vertices_threshold*min(minimum_incident_boundary_segment_length(index1),minimum_incident_boundary_segment_length(closest_index2));
+                if(closest_distance_squared<=sqr(real_threshold)){
+                    number_merged++;
+                    if(verbose) LOG::cout<<index1<<"->"<<closest_index2<<" "<<std::flush;
+                    for(int j=0;j<(*mesh.incident_elements)(index1).m;j++){
+                        int t=(*mesh.incident_elements)(index1)(j);
+                        if(mesh.elements(t)(0)==index1)mesh.elements(t)(0)=closest_index2;
+                        else if(mesh.elements(t)(1)==index1)mesh.elements(t)(1)=closest_index2;
+                        else if(mesh.elements(t)(2)==index1)mesh.elements(t)(2)=closest_index2;}
+                    (*mesh.incident_elements)(closest_index2).Append_Elements((*mesh.incident_elements)(index1));}}} // dynamically update the incident triangles list
+        if(verbose) LOG::cout<<std::endl<<number_merged<<" vertices merged"<<std::endl<<std::endl;
+        Refresh_Auxiliary_Structures();}
+
+    if(fill_holes){
+        if(verbose) LOG::cout<<"HOLE FILLING"<<std::endl;
+        bool connected_segments_defined=(mesh.boundary_mesh->connected_segments!=0);if(!connected_segments_defined) mesh.boundary_mesh->Initialize_Connected_Segments();
+        ARRAY<ARRAY<VECTOR<int,2> > >& connected_segments=*mesh.boundary_mesh->connected_segments;
+        for(int i=0;i<connected_segments.m;i++){
+            TV centroid;
+            for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);centroid+=particles.X(node1)+particles.X(node2);}
+            centroid/=(T)(2*connected_segments(i).m); // assuming we count each node exactly twice, this gives us the average
+            int new_particle_index=particles.Add_Element();mesh.number_nodes++;particles.X(new_particle_index)=centroid;
+            if(particles.store_velocity){
+                TV velocity;
+                for(int j=0;j<connected_segments(i).m;j++){int node1,node2;connected_segments(i)(j).Get(node1,node2);velocity+=particles.V(node1)+particles.V(node2);}
+                particles.V(new_particle_index)=velocity/(T)(2*connected_segments(i).m);}
+            if(verbose){LOG::cout<<"Adding particle "<<new_particle_index<<": "<<particles.X(new_particle_index)<<std::endl;LOG::cout<<"Adding triangles: "<<std::flush;}
+            for(int j=0;j<connected_segments(i).m;j++){ // assumes segment orientation is consistent with triangle orientation!
+                int node1,node2;connected_segments(i)(j).Get(node1,node2);
+                if(verbose) LOG::cout<<"("<<node2<<","<<node1<<","<<new_particle_index<<") "<<std::flush;
+                mesh.elements.Append(VECTOR<int,3>(node2,node1,new_particle_index));}
+            if(verbose) LOG::cout<<std::endl<<std::endl;
+        }
+        if(!connected_segments_defined){delete mesh.boundary_mesh->connected_segments;mesh.boundary_mesh->connected_segments=0;}}
+
+    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;}
+    if(!boundary_mesh_defined){delete mesh.boundary_mesh;mesh.boundary_mesh=0;}
+    if(!node_on_boundary_defined){delete mesh.node_on_boundary;mesh.node_on_boundary=0;}
+
+    Discard_Valence_Zero_Particles_And_Renumber();  // refreshes auxiliary structures too 
 }
 //#####################################################################
 // Function Remove_Degenerate_Triangles

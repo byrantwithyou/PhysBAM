@@ -75,6 +75,7 @@ public:
     void Rescale(const TV& scaling);
     T Average_Edge_Length() const;
     T Total_Length() const;
+    bool Inside_Any_Simplex(const TV& location,int& segment_id,const T thickness_over_two) const;
 private:
     void Refresh_Auxiliary_Structures_Helper() PHYSBAM_OVERRIDE;
 //#####################################################################

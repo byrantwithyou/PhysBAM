@@ -26,7 +26,6 @@
 #include <PhysBAM_Geometry/Topology_Based_Geometry/FREE_PARTICLES.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TETRAHEDRALIZED_VOLUME.h>
-#include <PhysBAM_Geometry/Topology_Based_Geometry_Computations/TRIANGULATED_SURFACE_INSIDE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/BINDING_LIST.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/LINEAR_BINDING.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Bindings/SOFT_BINDINGS.h>
@@ -515,7 +514,7 @@ Embed_Surface_In_Tetrahedralized_Volume(BINDING_LIST<TV>& binding_list,SOFT_BIND
     ARRAY<int> todo;
     for(int i=0;i<volume.mesh.elements.m;i++){
         if(tet_color(i)) continue;
-        int color=TOPOLOGY_BASED_GEOMETRY_COMPUTATIONS::Outside(surface,volume.particles.X(volume.mesh.elements(i)(0)),thickness_over_two)?3:2;
+        int color=surface.Outside(volume.particles.X(volume.mesh.elements(i)(0)),thickness_over_two)?3:2;
         tet_color(i)=color;
         todo.Append(i);
         while(todo.m){

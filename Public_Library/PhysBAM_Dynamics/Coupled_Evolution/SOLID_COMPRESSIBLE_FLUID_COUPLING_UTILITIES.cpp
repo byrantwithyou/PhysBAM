@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POLYGON.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
-#include <PhysBAM_Geometry/Basic_Geometry_Computations/BOX_BOX_INTERSECTION_AREA.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Computations/BOX_POLYGON_INTERSECTION_AREA.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
@@ -582,7 +581,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                     if(!cut_cells){
                         if(swept_cells(donor_cell)) continue;// already handled in *forward* step above
                         if(near_interface(donor_cell) && (!visibility || visibility->Contains(donor_cell))){
-                            T weight=U_n(donor_cell)(variable_index) * INTERSECTION::Intersection_Area(intersecting_iter.Bounding_Box(),cell_preimage);
+                            T weight=U_n(donor_cell)(variable_index) * cell_preimage.Intersection_Area(intersecting_iter.Bounding_Box());
                             Add_Weight_To_Advection(weight, donor_cell, receiver_cell, weights, donors, receivers, sigma);}}
                     else{
                         if(cut_cells->dominant_element && cut_cells->visibility(cut_cells->dominant_element).Contains(receiver_cell)){
@@ -630,7 +629,7 @@ template<class TV> void Advect_Near_Interface_Data(const GRID<TV>& grid,const ty
                         CUT_CELLS<T,TV::dimension>* cut_cells=cut_cells_np1(receiver_cell);
                         if(!cut_cells){
                             if(near_interface(receiver_cell) && (!visibility || visibility->Contains(donor_cell))){
-                                T weight=INTERSECTION::Intersection_Area(intersecting_iter.Bounding_Box(),cell_postimage);
+                                T weight=cell_postimage.Intersection_Area(intersecting_iter.Bounding_Box());
                                 distributed_volume+=weight; forward_weights.Append(PAIR<TV_INT,T>(receiver_cell,weight));}}
                         else{
                             if(cut_cells->dominant_element && cut_cells->visibility(cut_cells->dominant_element).Contains(donor_cell)){

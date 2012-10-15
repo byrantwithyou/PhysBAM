@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_3D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/POLYGON.h>
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
-#include <PhysBAM_Geometry/Basic_Geometry_Computations/BOX_BOX_INTERSECTION_AREA.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Computations/BOX_POLYGON_INTERSECTION_AREA.h>
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
 namespace PhysBAM{
@@ -24,7 +23,7 @@ template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,1> >& box, con
 {
     RANGE<VECTOR<T,1> > polygon_as_range(polygon.X(0),polygon.X(1));
     if(polygon_as_range.min_corner.x >= polygon_as_range.max_corner.x) exchange(polygon_as_range.min_corner,polygon_as_range.max_corner);
-    return INTERSECTION::Intersection_Area(box,polygon_as_range);
+    return box.Intersection_Area(polygon_as_range);
 }
 
 template<class T> T Intersection_Area_Helper(const RANGE<VECTOR<T,2> >& box, const POLYGON<VECTOR<T,2> >& polygon)

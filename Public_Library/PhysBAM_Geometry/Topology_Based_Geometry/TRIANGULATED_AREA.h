@@ -76,6 +76,7 @@ public:
     void Initialize_Herring_Bone_Mesh_And_Particles(const GRID<TV>& grid);
     void Initialize_Equilateral_Mesh_And_Particles(const GRID<TV>& grid);
     int Inside(const TV& location,const T thickness_over_two=0) const;
+    bool Inside_Any_Simplex(const VECTOR<T,2>& location,int& triangle_id,const T thickness_over_two) const;
     void Check_Signed_Area_And_Make_Consistent(const int triangle,const bool verbose);
     void Check_Signed_Areas_And_Make_Consistent(const bool verbose=true);
     TV Centroid(const int triangle) const;
