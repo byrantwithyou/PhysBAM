@@ -140,27 +140,27 @@ public:
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& br,KRYLOV_VECTOR_BASE<T>& bz) const PHYSBAM_OVERRIDE {}
 //#####################################################################
     T Set_Matrix_Block_And_Rhs(const ARRAY_VIEW<TV>& particles,const ARRAY<int>& particle_indices,
-        const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const TV& n,ARRAY<TV>& positions_rhs_full,TV& rhs_n)
+        const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const TV& a,ARRAY<TV>& positions_rhs_full,TV& rhs_n)
     {
-        // NOTE: assumes n is normalized !!!
+        TV n=a;
+        const T norm_a=n.Normalize();
+        const T one_over_norm_a=(T)1/norm_a;
+        const int x_count=particle_indices.m;
 
         blocks.Add_End();
         BLOCK& block=blocks.Last();
         
-        const int x_full_count=particle_indices.m;
-        
         // compute average and initialize reduced index list
         TV average;
-        for(int i=0;i<particle_indices.m;i++){
+        for(int i=0;i<x_count;i++){
             const int index=particle_indices(i);
             const int reduced_index=reverse_index_map(index);
             if(reduced_index>=0) block.index.Append(reduced_index);
             average+=particles(index);}
-        average/=x_full_count;
-        
-        const int x_dofs=block.index.m;
+        average/=x_count;
         
         // normal differential
+        const int x_dofs=block.index.m;
         const SYMMETRIC_MATRIX<T,TV::m> nnt=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
         const SYMMETRIC_MATRIX<T,TV::m> dn=SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix()-nnt;
         
@@ -173,10 +173,10 @@ public:
             const TV& x=particles(index);
             const T x_dot_n=x.Dot(n);
             positions_rhs_full(index)+=n*(2*(x_dot_n-average_dot_n));
-            rhs_n+=(x-average)*2*x_dot_n;
+            rhs_n+=(x-average)*(2*x_dot_n);
             E+=sqr(x_dot_n);}
-        rhs_n=dn*rhs_n;
-        E-=sqr(average_dot_n)*x_full_count;
+        rhs_n=dn*rhs_n*one_over_norm_a;
+        E-=sqr(average_dot_n)*x_count;
         
         // set matrix block
         block.matrix_xx.Resize(x_dofs,x_dofs);
@@ -189,19 +189,20 @@ public:
             const int index=index_map(block.index(i));
             const TV& x=particles(index);
             block.matrix_xn(i)+=dn*(2*(x.Dot(n)-average_dot_n));
-            block.matrix_xn(i)+=MATRIX<T,TV::m>::Outer_Product(n,dn*(x-average))*2;}
+            block.matrix_xn(i)+=MATRIX<T,TV::m>::Outer_Product(n,dn*(x-average))*2;
+            block.matrix_xn(i)*=one_over_norm_a;}
         
         for(int i=0;i<particle_indices.m;i++){
             const int index=particle_indices(i);
             const TV& x=particles(index);
             const TV xma=x-average;
             SYMMETRIC_MATRIX<T,TV::m> tmp=
-                -MATRIX<T,TV::m>::Outer_Product(n,xma).Symmetric_Part()*2
+                MATRIX<T,TV::m>::Outer_Product(n,xma).Symmetric_Part()*(-2)
                 +(nnt*(T)3-SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix())*n.Dot(xma);
             block.matrix_nn+=tmp*(x.Dot(n));
             block.matrix_nn+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*x);}
-        block.matrix_nn-=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*average)*x_full_count;
-        block.matrix_nn*=2;
+        block.matrix_nn-=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*average)*x_count;
+        block.matrix_nn*=2*sqr(one_over_norm_a);
         
         return E;
     }
@@ -241,6 +242,7 @@ public:
                 E+=Set_Matrix_Block_And_Rhs(particles.X,particle_indices,index_map,reverse_index_map,
                     normals(normal_index),positions_rhs_full,rhs.n(normal_index));}}
         rhs.x=positions_rhs_full.Subset(index_map);
+        assert(normal_index==normals_count-1);
         sol.Resize(rhs);
         return E;
     }

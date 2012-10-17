@@ -13,6 +13,7 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
@@ -777,13 +778,46 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         if(position_dofs(i))
             reverse_index_map(i)=index_map.Append(i);}
 
+// #define TEST_DERIVATIVES
+#ifdef TEST_DERIVATIVES
+    LOG::cout<<"### Derivatives test ###"<<std::endl;
+
+    RANDOM_NUMBERS<T> rand;
+    for(int i=0;i<particles.number;i++) rand.Fill_Uniform(particles.X(i),0,1);
+    for(int i=0;i<normals_count;i++){rand.Fill_Uniform(normals(i),0,1);}
+    
+    MARCHING_CUBES_SYSTEM<TV> system1;
+    MARCHING_CUBES_VECTOR<TV> rhs1,sol1;
+    T E1=system1.Setup(rhs1,sol1,normals_count,position_dofs,index_map,reverse_index_map,
+        junction_cells,cell_to_element,surface,particles,normals);
+
+    MARCHING_CUBES_VECTOR<TV> perturb;
+    perturb.x.Resize(index_map.m);
+    perturb.n.Resize(normals_count);
+    T e=1e-6;
+    for(int i=0;i<index_map.m;i++){rand.Fill_Uniform(perturb.x(i),-e,e);particles.X(index_map(i))+=perturb.x(i);}
+    for(int i=0;i<normals_count;i++){rand.Fill_Uniform(perturb.n(i),-e,e);normals(i)+=perturb.n(i);}
+
+    MARCHING_CUBES_SYSTEM<TV> system2;
+    MARCHING_CUBES_VECTOR<TV> rhs2,sol2;
+    T E2=system2.Setup(rhs2,sol2,normals_count,position_dofs,index_map,reverse_index_map,
+        junction_cells,cell_to_element,surface,particles,normals);
+
+    LOG::cout<<"dE  "<<(E2-E1-(system1.Inner_Product(rhs1,perturb)+system2.Inner_Product(rhs2,perturb))*(T).5)/e<<std::endl;
+    system1.Multiply(perturb,sol1);
+    system2.Multiply(perturb,sol2);
+    sol1*=(T).5;sol2*=(T).5;
+    rhs2-=rhs1;rhs2-=sol1;rhs2-=sol2;
+    LOG::cout<<"ddE "<<system2.Convergence_Norm(rhs2)/e<<std::endl;
+
+    throw;
+#endif
+
     for(int step=0;step<newton_steps;step++){
         MARCHING_CUBES_SYSTEM<TV> system;
         MARCHING_CUBES_VECTOR<TV> rhs,sol;
-        T E=system.Setup(rhs,sol,normals_count,position_dofs,index_map,reverse_index_map,
+        system.Setup(rhs,sol,normals_count,position_dofs,index_map,reverse_index_map,
             junction_cells,cell_to_element,surface,particles,normals);
-
-        LOG::cout<<"############################################## "<<step<<" "<<E<<std::endl;
 
         ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
         CONJUGATE_RESIDUAL<T> cr;
@@ -796,8 +830,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                     particles.X(index_map(i))(j)-=sol.x(i)(j);
         for(int i=0;i<rhs.n.m;i++){
             normals(i)-=sol.n(i);
-            normals(i).Normalize();
-            LOG::cout<<normals(i)<<std::endl;}
+            normals(i).Normalize();}
     }
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
