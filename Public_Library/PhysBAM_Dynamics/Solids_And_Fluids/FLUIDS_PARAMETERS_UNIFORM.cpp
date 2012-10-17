@@ -102,7 +102,7 @@ Initialize_Fluid_Evolution(T_FACE_ARRAYS_SCALAR& incompressible_face_velocities)
         particle_levelset_evolution=particle_levelset_evolution_multiple;
         incompressible=incompressible_multiphase;}
     else if(number_of_regions==1){ // free surface_flow
-        particle_levelset_evolution=new T_PARTICLE_LEVELSET_EVOLUTION(*grid,number_of_ghost_cells);
+        particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*grid,number_of_ghost_cells);
         particle_levelset_evolution->particle_levelset.thread_queue=thread_queue;
         particle_levelset_evolution->particle_levelset.levelset.thread_queue=thread_queue;
         if(!projection){
@@ -655,7 +655,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
-                T_PARTICLE_LEVELSET& particle_levelset=particle_levelset_evolution->particle_levelset;
+                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->particle_levelset;
                 FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
@@ -672,7 +672,7 @@ Read_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direct
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg): This still does .%d.gz
-                    T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
+                    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
                         Read_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);
@@ -741,7 +741,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
         // particle levelset
         if(write_levelset){
             if(number_of_regions==1){
-                T_PARTICLE_LEVELSET& particle_levelset=particle_levelset_evolution->particle_levelset;
+                PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution->particle_levelset;
                 FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
                 if(write_particles && frame%restart_data_write_rate==0){
                     Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles",frame);
@@ -757,7 +757,7 @@ Write_Output_Files(const STREAM_TYPE stream_type,const std::string& output_direc
             else if(number_of_regions>=2){
                 for(int i=0;i<number_of_regions;i++){
                     std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f; // TODO(jontg) ...
-                    T_PARTICLE_LEVELSET& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
+                    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple->particle_levelset_multiple.particle_levelsets(i);
                     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/levelset_"+i_dot_f,particle_levelset.levelset);
                     if(write_particles && frame%restart_data_write_rate==0){
                         Write_Particles(stream_type,particle_levelset.template_particles,particle_levelset.positive_particles,output_directory,"positive_particles_"+ii,frame);

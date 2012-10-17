@@ -21,7 +21,6 @@ class PLS_FSI_DRIVER:public DRIVER<TV>,public NONCOPYABLE
     typedef DRIVER<TV> BASE;
     typedef GRID<TV> T_GRID;typedef VECTOR<T,T_GRID::dimension+2> TV_DIMENSION;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<TV_DIMENSION>::TYPE T_ARRAYS_DIMENSION_SCALAR;
     using BASE::time;
@@ -51,7 +50,7 @@ public:
     void Simulate_To_Frame(const int frame_input) PHYSBAM_OVERRIDE;
     void Delete_Particles_Inside_Objects(const T time);
     template<class T_PARTICLES> void Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time);
-    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T_FAST_LEVELSET& phi,const T band_width);
+    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<GRID<TV> >& phi,const T band_width);
     void Advance_Particles_With_PLS(T dt);
     void Extrapolate_Velocity_Across_Interface(T time,T dt);
 //#####################################################################

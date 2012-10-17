@@ -136,7 +136,7 @@ Project(const T dt,const T time)
             TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
         LOG::cout<<"something..."<<std::endl;  // TODO(jontg): If this log statement doesn't appear, the code crashes in release mode...
-        T_EXTRAPOLATION_SCALAR extrapolate(face_grid,phi_face,face_velocity,ghost_cells);extrapolate.Set_Band_Width(3);extrapolate.Set_Custom_Seed_Done(&fixed_face);
+        EXTRAPOLATION_UNIFORM<GRID<TV> > extrapolate(face_grid,phi_face,face_velocity,ghost_cells);extrapolate.Set_Band_Width(3);extrapolate.Set_Custom_Seed_Done(&fixed_face);
         extrapolate.Extrapolate();}
 }
 //#####################################################################

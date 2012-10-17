@@ -235,7 +235,7 @@ Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const bool update_particle_cells,const bool verbose)
 {
-    T_FAST_LEVELSET levelset_old(levelset.grid,phi_old);
+    FAST_LEVELSET<GRID<TV> > levelset_old(levelset.grid,phi_old);
     Update_Particles_To_Reflect_Mass_Conservation(levelset_old,negative_particles,PARTICLE_LEVELSET_NEGATIVE,update_particle_cells,verbose);
     Update_Particles_To_Reflect_Mass_Conservation(levelset_old,positive_particles,PARTICLE_LEVELSET_POSITIVE,update_particle_cells,verbose);
     Adjust_Particle_Radii();
@@ -244,7 +244,7 @@ Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const boo
 // Function Update_Particles_To_Reflect_Mass_Conservation
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
-Update_Particles_To_Reflect_Mass_Conservation(const T_FAST_LEVELSET& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
+Update_Particles_To_Reflect_Mass_Conservation(const FAST_LEVELSET<GRID<TV> >& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
     const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const bool update_particle_cells,const bool verbose)
 {
     const int maximum_iterations=5;

@@ -22,7 +22,7 @@ class DSD_FIRE_BALL_EXAMPLE:public SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<VECTOR<T_i
 public:
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;typedef GRID<TV> T_GRID;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID> BASE;
     using BASE::fluids_parameters;using BASE::fluid_collection;using BASE::solids_parameters;using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::write_output_files;
@@ -149,7 +149,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
     DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
     fluids_parameters.incompressible_multiphase->projection.dsd->Dn.array.Fill(Dn_initial);
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,0,3); // TODO: use real time/dt
-    T_FAST_LEVELSET& levelset=*fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(1);
+    FAST_LEVELSET<GRID<TV> >& levelset=*fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(1);
     levelset.Compute_Curvature();dsd.curvature_old.array=*levelset.curvature;
 }
 //#####################################################################

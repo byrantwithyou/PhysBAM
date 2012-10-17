@@ -54,7 +54,8 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
     if(pseudo_dirichlet_regions->Number_True()>0){
         T_FACE_ARRAYS_SCALAR face_velocities_liquid=face_velocities_to_advect;T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost_extrapolated=advection_face_velocities_ghost;
         T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost_extrapolated=face_velocities_to_advect_ghost;
-        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);T_FAST_LEVELSET levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
+        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);
+        FAST_LEVELSET<GRID<TV> > levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         projection.poisson_collidable->levelset_multiple->Get_Single_Levelset(*pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
         Extrapolate_Velocity_Across_Interface(advection_face_velocities_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
         Extrapolate_Velocity_Across_Interface(face_velocities_to_advect_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
@@ -86,7 +87,7 @@ Advance_One_Time_Step_Forces(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,co
             for(FACE_ITERATOR iterator(grid,0,T_GRID::WHOLE_REGION,-1,axis);iterator.Valid();iterator.Next())
                 phi_face(iterator.Face_Index())=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             int extrapolation_bandwidth=3;
-            T_EXTRAPOLATION_SCALAR extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width((T)extrapolation_bandwidth);
+            EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate(face_grid,phi_face,face_velocity,number_of_ghost_cells);extrapolate.Set_Band_Width((T)extrapolation_bandwidth);
             extrapolate.Extrapolate();}
         strains(i)->Update_Strain_Equation_Multiphase(dt,time,projection.densities(i),face_velocities,face_velocities_temp,*projection.poisson_collidable->levelset_multiple,i,number_of_ghost_cells);}
 

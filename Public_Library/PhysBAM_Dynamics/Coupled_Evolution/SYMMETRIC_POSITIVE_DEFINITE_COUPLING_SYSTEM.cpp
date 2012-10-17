@@ -227,7 +227,7 @@ Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_
 template<class TV> void SYMMETRIC_POSITIVE_DEFINITE_COUPLING_SYSTEM<TV>::
 Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,
     const bool disable_thinshell,const bool use_one_sided_face_velocty_interpolation,
-    T_FACE_ARRAYS_SCALAR& fluids_velocity,T mu,bool use_second_order_cut_cell,const T_LEVELSET* levelset_input)
+    T_FACE_ARRAYS_SCALAR& fluids_velocity,T mu,bool use_second_order_cut_cell,const FAST_LEVELSET<GRID<TV> >* levelset_input)
 {
     solve_id++;
     if(!solid_interpolation) solid_interpolation=new MATRIX_SOLID_INTERPOLATION<TV>(index_map.iterator_info);

@@ -30,8 +30,7 @@ class PARTICLE_LEVELSET_UNIFORM:public PARTICLE_LEVELSET<T_GRID>
     typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<TV>*>::TYPE T_ARRAYS_ARRAY_TV;
-    typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
+    typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<TV>*>::TYPE T_ARRAYS_ARRAY_TV;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_MAC_HELPER T_LINEAR_INTERPOLATION_MAC_HELPER;
     typedef typename INTERPOLATION_POLICY<T_GRID>::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
     typedef typename T_LINEAR_INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_LINEAR_INTERPOLATION_VECTOR;
@@ -74,7 +73,7 @@ public:
     void Adjust_Particle_Radii_Threaded(RANGE<TV_INT>& domain);
     void Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles=0);
     void Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const bool update_particle_cells=true,const bool verbose=false);
-    void Update_Particles_To_Reflect_Mass_Conservation(const T_FAST_LEVELSET& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
+    void Update_Particles_To_Reflect_Mass_Conservation(const FAST_LEVELSET<GRID<TV> >& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const bool update_particle_cells,const bool verbose);
     void Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const bool use_second_order_for_nonremoved_particles=false,
         const bool update_particle_cells_after_euler_step=true,const bool verbose=true,const bool analytic_test=false);

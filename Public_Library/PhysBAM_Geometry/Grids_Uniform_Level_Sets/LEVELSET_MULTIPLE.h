@@ -22,7 +22,6 @@ class LEVELSET_MULTIPLE:public NONCOPYABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR T_CELL_ITERATOR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_INTERPOLATION_VECTOR;
@@ -34,7 +33,7 @@ public:
     T_GRID& grid;
     ARRAY<T_ARRAYS_SCALAR>& phis;
     LEVELSET_CALLBACKS<T_GRID>* levelset_callbacks;
-    ARRAY<T_FAST_LEVELSET*> levelsets;
+    ARRAY<FAST_LEVELSET<GRID<TV> >*> levelsets;
     bool use_external_levelsets;
 
     LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input=false);

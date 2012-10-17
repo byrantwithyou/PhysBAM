@@ -33,7 +33,7 @@ public:
     template<class T_GRID>
     RENDERING_IMPLICIT_SURFACE(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input)
     {
-        implicit_surface=new typename LEVELSET_POLICY<T_GRID>::LEVELSET_IMPLICIT_OBJECT(grid_input,phi_input);
+        implicit_surface=new LEVELSET_IMPLICIT_OBJECT<TV>(grid_input,phi_input);
     }
 
     virtual ~RENDERING_IMPLICIT_SURFACE()

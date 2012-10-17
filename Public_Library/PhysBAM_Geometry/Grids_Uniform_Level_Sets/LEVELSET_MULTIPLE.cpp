@@ -37,7 +37,7 @@ Recreate_Levelsets()
     assert(!use_external_levelsets);
     for(int i=0;i<levelsets.m;i++) delete levelsets(i);
     levelsets.Resize(phis.m);
-    for(int i=0;i<levelsets.m;i++) levelsets(i)=new T_FAST_LEVELSET(grid,phis(i));
+    for(int i=0;i<levelsets.m;i++) levelsets(i)=new FAST_LEVELSET<GRID<TV> >(grid,phis(i));
 }
 //#####################################################################
 // Function Fill_Ghost_Cells

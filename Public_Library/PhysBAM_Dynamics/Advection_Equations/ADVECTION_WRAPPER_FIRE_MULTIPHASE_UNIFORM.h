@@ -13,6 +13,8 @@
 #include <PhysBAM_Dynamics/Interpolation/FIRE_INTERPOLATION_FORWARD.h>
 namespace PhysBAM{
 
+template<class T_GRID> class LEVELSET_MULTIPLE;
+
 template<class T_GRID,class T2,class T_NESTED_ADVECTION>
 class ADVECTION_WRAPPER_FIRE_MULTIPHASE_UNIFORM:public ADVECTION<T_GRID,T2>
 {

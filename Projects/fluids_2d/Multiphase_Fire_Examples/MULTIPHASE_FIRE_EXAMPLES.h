@@ -26,8 +26,6 @@ public:
     typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::EXTRAPOLATION_SCALAR T_EXTRAPOLATION_SCALAR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;
@@ -173,7 +171,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 {
-    T_ARRAYS_SCALAR phi;T_FAST_LEVELSET levelset(*fluids_parameters.grid,phi);
+    T_ARRAYS_SCALAR phi;FAST_LEVELSET<GRID<TV> > levelset(*fluids_parameters.grid,phi);
     T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
 
     if(test_number==1){

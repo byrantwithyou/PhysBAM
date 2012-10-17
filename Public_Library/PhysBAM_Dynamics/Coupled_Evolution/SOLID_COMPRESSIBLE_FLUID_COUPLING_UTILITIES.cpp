@@ -157,7 +157,7 @@ Extrapolate_State_Into_Solids(T_ARRAYS_SCALAR& phi_all_solids_negated,const int 
         mpi_boundary.Fill_Ghost_Cells(euler.grid,euler.U,U_extrapolated,(T)0,(T)0,number_of_ghost_cells);}
     else U_extrapolated=euler.U;
 
-    T_EXTRAPOLATION_SCALAR_DIMENSION extrapolate(euler.grid,phi_all_solids_negated,U_extrapolated,number_of_ghost_cells);extrapolate.Set_Band_Width((T)number_of_cells_to_extrapolate);
+    EXTRAPOLATION_UNIFORM<GRID<TV>,TV_DIMENSION> extrapolate(euler.grid,phi_all_solids_negated,U_extrapolated,number_of_ghost_cells);extrapolate.Set_Band_Width((T)number_of_cells_to_extrapolate);
     extrapolate.Extrapolate((T)0,false);
     T_ARRAYS_DIMENSION_SCALAR::Get(euler.U,U_extrapolated);
 

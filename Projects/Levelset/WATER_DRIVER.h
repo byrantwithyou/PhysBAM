@@ -17,7 +17,6 @@ class WATER_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef EXTRAPOLATION_UNIFORM<GRID<TV>,T> T_EXTRAPOLATION_SCALAR;
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     
 protected:

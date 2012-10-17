@@ -146,7 +146,7 @@ Initialize()
         example.Set_Boundary_Conditions(example.kang_poisson_viscosity->psi_D,example.kang_poisson_viscosity->psi_N,
             example.kang_poisson_viscosity->psi_D_value,example.kang_poisson_viscosity->psi_N_value);
 
-    example.fluids_parameters.particle_levelset_evolution=new typename LEVELSET_POLICY<GRID<TV> >::PARTICLE_LEVELSET_EVOLUTION(*example.fluids_parameters.grid,example.fluids_parameters.number_of_ghost_cells);
+    example.fluids_parameters.particle_levelset_evolution=new PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.number_of_ghost_cells);
     example.fluids_parameters.projection=new PROJECTION_DYNAMICS_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,example.fluids_parameters.particle_levelset_evolution->Levelset(0));
     example.fluids_parameters.incompressible=new INCOMPRESSIBLE_UNIFORM<GRID<TV> >(*example.fluids_parameters.grid,*example.fluids_parameters.projection);
     example.fluids_parameters.phi_boundary=&example.fluids_parameters.phi_boundary_water; // override default
@@ -675,7 +675,7 @@ Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PART
 // Function Extrapolate_Velocity_Across_Interface
 //#####################################################################
 template<class TV> void PLS_FSI_DRIVER<TV>::
-Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const T_FAST_LEVELSET& phi,const T band_width)
+Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<GRID<TV> >& phi,const T band_width)
 {
     T_GRID& grid=*example.fluids_parameters.grid;
     ARRAY<bool,FACE_INDEX<TV::m> > inside;

@@ -16,6 +16,8 @@
 
 namespace PhysBAM {
     
+template<class T_GRID> class LEVELSET_MULTIPLE;
+
 template<class T_GRID>
 class LEVELSET_ADVECTION_MULTIPLE
 {

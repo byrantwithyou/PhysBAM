@@ -21,8 +21,7 @@ template<class T_GRID>
 class PARTICLE_LEVELSET:public NONCOPYABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef VECTOR<int,TV::dimension> TV_INT;
-    typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;typedef typename T_GRID::BLOCK T_BLOCK;
+    typedef VECTOR<int,TV::dimension> TV_INT;typedef typename T_GRID::BLOCK T_BLOCK;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
@@ -50,7 +49,7 @@ public:
     T cfl_number;
     int number_of_ghost_cells;
 
-    T_FAST_LEVELSET levelset;
+    FAST_LEVELSET<GRID<TV> > levelset;
     T_ARRAYS_PARTICLE_LEVELSET_PARTICLES positive_particles,negative_particles;
     T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES removed_negative_particles,removed_positive_particles;
     T_ARRAYS_ARRAY_BOOL escaped_positive_particles,escaped_negative_particles;

@@ -40,9 +40,9 @@ Extrapolate_Compressible_State_Into_Incompressible_Region(const T dt,const T tim
         entropy(cell_index)=eos.S(density,e);
         velocity(iterator.Cell_Index())=vel;}
 
-    T_EXTRAPOLATION_SCALAR extrapolate_entropy(grid,phi_ghost_negated,entropy,ghost_cells);extrapolate_entropy.Set_Band_Width(bandwidth);extrapolate_entropy.Extrapolate(time,false);
-    T_EXTRAPOLATION_SCALAR extrapolate_pressure(grid,phi_ghost_negated,pressure,ghost_cells);extrapolate_pressure.Set_Band_Width(bandwidth);extrapolate_pressure.Extrapolate(time,false);
-    T_EXTRAPOLATION_VECTOR extrapolate_velocity(grid,phi_ghost_negated,velocity,ghost_cells);extrapolate_velocity.Set_Band_Width(bandwidth);extrapolate_velocity.Extrapolate(time,false);
+    EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate_entropy(grid,phi_ghost_negated,entropy,ghost_cells);extrapolate_entropy.Set_Band_Width(bandwidth);extrapolate_entropy.Extrapolate(time,false);
+    EXTRAPOLATION_UNIFORM<GRID<TV>,T>  extrapolate_pressure(grid,phi_ghost_negated,pressure,ghost_cells);extrapolate_pressure.Set_Band_Width(bandwidth);extrapolate_pressure.Extrapolate(time,false);
+    EXTRAPOLATION_UNIFORM<GRID<TV>,TV> extrapolate_velocity(grid,phi_ghost_negated,velocity,ghost_cells);extrapolate_velocity.Set_Band_Width(bandwidth);extrapolate_velocity.Extrapolate(time,false);
     // Find the tangential component and combine it with the normal component from the incompressible region
     TV one_over_two_dx=(T).5*grid.one_over_dX;
     for(CELL_ITERATOR iterator(grid,ghost_cells);iterator.Valid();iterator.Next()){

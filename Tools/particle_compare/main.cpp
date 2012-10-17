@@ -148,15 +148,14 @@ template<class TV> bool
 Compare_Levelsets(std::string& input_directory_1,std::string& input_directory_2,GRID<TV>& grid,int frame)
 {
     typedef typename TV::SCALAR T;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef VECTOR<int,TV::dimension> TV_INT;
 
     if(frame==-1){int last_frame=0;FILE_UTILITIES::Read_From_Text_File(input_directory_1+"/common/last_frame",last_frame);bool success=true;for(int i=0;i<last_frame;i++){success&=Compare_Levelsets(input_directory_1,input_directory_2,grid,i);if(!success){LOG::cout<<"Failed at Frame "<<i<<std::endl;break;}}return success;}
 
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     bool success=true;ARRAY<T,TV_INT> phi1,phi2;
-    T_FAST_LEVELSET l1(grid,phi1);FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/levelset",l1);
-    T_FAST_LEVELSET l2(grid,phi2);FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/levelset",l2);
+    FAST_LEVELSET<GRID<TV> > l1(grid,phi1);FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/levelset",l1);
+    FAST_LEVELSET<GRID<TV> > l2(grid,phi2);FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/levelset",l2);
     for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         if(l1.phi(iterator.Cell_Index())!=l2.phi(iterator.Cell_Index())){LOG::cout<<"WARNING: Phi don't match at index:["<<iterator.Cell_Index()<<std::endl;success=false;break;}}
     return success;

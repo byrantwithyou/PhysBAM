@@ -18,7 +18,6 @@ template<class T_GRID>
 class FAST_LEVELSET_ADVECTION:public LEVELSET_ADVECTION_UNIFORM<T_GRID>
 {
     typedef LEVELSET_ADVECTION_UNIFORM<T_GRID> BASE;
-    typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
@@ -31,7 +30,7 @@ public:
     int local_advection_spatial_order;
     bool local_semi_lagrangian_advection;
 
-    FAST_LEVELSET_ADVECTION(T_FAST_LEVELSET* fast_levelset)
+    FAST_LEVELSET_ADVECTION(FAST_LEVELSET<GRID<TV> >* fast_levelset)
         :BASE(fast_levelset)
     {
         Use_Level_Set_Advection_Method();

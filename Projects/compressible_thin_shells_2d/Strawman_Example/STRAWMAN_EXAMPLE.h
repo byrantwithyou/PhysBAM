@@ -40,7 +40,6 @@ class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<GRID<TV> >
     typedef ARRAY<T,TV_INT> T_ARRAY_SCALAR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
-    typedef typename LEVELSET_POLICY<T_GRID>::PARTICLE_LEVELSET T_PARTICLE_LEVELSET;
     typedef BOUNDARY_PHI_WATER<T_GRID> T_BOUNDARY_PHI_WATER;
 
 public:
@@ -397,7 +396,7 @@ void Write_Output_Files(const int frame) const PHYSBAM_OVERRIDE
     FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"/phi",phi);
 
     { // PLS
-        const T_PARTICLE_LEVELSET& particle_levelset=pls_evolution->particle_levelset;
+        const PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=pls_evolution->particle_levelset;
         FILE_UTILITIES::Write_To_File(stream_type,frame_folder+"levelset",particle_levelset.levelset);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"positive_particles"),particle_levelset.positive_particles);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s",frame_folder.c_str(),"negative_particles"),particle_levelset.negative_particles);

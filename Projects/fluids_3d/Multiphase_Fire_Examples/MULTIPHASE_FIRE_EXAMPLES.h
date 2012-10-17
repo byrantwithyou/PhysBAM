@@ -22,8 +22,6 @@ public:
     typedef typename GRID<TV>::FACE_ITERATOR FACE_ITERATOR;typedef typename GRID<TV>::CELL_ITERATOR CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::FAST_LEVELSET_T T_FAST_LEVELSET;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::EXTRAPOLATION_SCALAR T_EXTRAPOLATION_SCALAR;
 
     typedef MULTIPHASE_FIRE_EXAMPLES_UNIFORM<GRID<TV> > BASE;
     using BASE::fluids_parameters;using BASE::solids_parameters;using BASE::first_frame;using BASE::data_directory;

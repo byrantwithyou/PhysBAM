@@ -26,7 +26,7 @@ public:
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
-    typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;typedef typename LEVELSET_POLICY<T_GRID>::FAST_LEVELSET_T T_FAST_LEVELSET;
+    typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
 
     typedef SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID > BASE;
     using BASE::first_frame;using BASE::last_frame;using BASE::frame_rate;using BASE::restart;using BASE::restart_frame;using BASE::output_directory;using BASE::Adjust_Phi_With_Sources;
@@ -138,7 +138,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
     DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible->projection.dsd;
     fluids_parameters.incompressible->projection.dsd->Dn.array.Fill(Dn_initial);
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,0,3); // TODO: use real dt/time
-    T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset;
+    FAST_LEVELSET<GRID<TV> >& levelset=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset;
     levelset.Compute_Curvature();dsd.curvature_old.array=*levelset.curvature;
 }
 //#####################################################################
@@ -187,7 +187,7 @@ void Get_Analytic_Velocities(const T time) const PHYSBAM_OVERRIDE
     T_GRID& grid=*fluids_parameters.grid;
     DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible->projection.dsd;
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,time);
-    T_FAST_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset;
+    FAST_LEVELSET<GRID<TV> >& levelset=fluids_parameters.particle_levelset_evolution->particle_levelset.levelset;
     ARRAY<T,FACE_INDEX<TV::dimension> >& face_velocities=fluid_collection.incompressible_fluid_collection.face_velocities;
     for(FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         int axis=iterator.Axis();TV_INT face=iterator.Face_Index();

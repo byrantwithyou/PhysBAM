@@ -21,9 +21,7 @@ namespace PhysBAM{
 template<class T_GRID>
 class FLUID_COLLISION_BODY_INACCURATE_UNION:public COLLISION_GEOMETRY<typename T_GRID::VECTOR_T>
 {
-    typedef typename T_GRID::VECTOR_T TV;
-    typedef typename TV::SCALAR T;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET_IMPLICIT_OBJECT T_LEVELSET_IMPLICIT_OBJECT;typedef typename T_GRID::VECTOR_INT TV_INT;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_T;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_T;
     typedef typename T_FACE_ARRAYS_T::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -43,7 +41,7 @@ public:
     T contour_value;
     T_GRID& grid;
     T_ARRAYS_T phi;
-    T_LEVELSET_IMPLICIT_OBJECT levelset;
+    LEVELSET_IMPLICIT_OBJECT<TV> levelset;
 private:
     T_FACE_ARRAYS_T face_velocities;
     T_FACE_ARRAYS_BOOL face_velocities_set;

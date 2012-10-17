@@ -15,6 +15,7 @@
 namespace PhysBAM{
 
 template<class TV> class BOUNDARY_CONDITIONS_CALLBACKS;
+template<class T_GRID,class T> class EXTRAPOLATION_UNIFORM;
 
 template<class T_GRID>
 class INCOMPRESSIBLE_UNIFORM:public INCOMPRESSIBLE<T_GRID>
