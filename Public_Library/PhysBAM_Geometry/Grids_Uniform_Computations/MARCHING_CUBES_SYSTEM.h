@@ -13,6 +13,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_MXN.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 
 namespace PhysBAM{
 //#####################################################################
@@ -78,6 +79,7 @@ class MARCHING_CUBES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
     typedef VECTOR<int,TV::m> TV_INT;
     typedef MARCHING_CUBES_VECTOR<TV> VECTOR_T;
     typedef KRYLOV_SYSTEM_BASE<T> BASE;
+    typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
 
 public:
     struct BLOCK
@@ -198,6 +200,45 @@ public:
         block.matrix_nn-=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*average)*x_full_count;
         block.matrix_nn*=2;
         
+        return E;
+    }
+    
+    T Setup(MARCHING_CUBES_VECTOR<TV>& rhs,MARCHING_CUBES_VECTOR<TV>& sol,const int normals_count,const ARRAY<int>& position_dofs,
+        const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const ARRAY<TV_INT>& junction_cells,
+        const HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > >& cell_to_element,
+        const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const GEOMETRY_PARTICLES<TV>& particles,const ARRAY<TV>& normals)
+    {
+        T E=0;
+        ARRAY<TV> positions_rhs_full(particles.number);
+        rhs.n.Resize(normals_count);
+        project_flags=position_dofs.Subset(index_map);
+        int normal_index=-1;
+        for(int jc=0;jc<junction_cells.m;jc++){
+            const TV_INT& junction_cell_index=junction_cells(jc);
+            const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& junction_cell_elements=cell_to_element.Get(junction_cell_index);
+            for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(junction_cell_elements);it.Valid();it.Next()){
+                normal_index++;
+                HASHTABLE<int> particle_indices_ht;
+                const VECTOR<int,2>& color_pair=it.Key();
+                const T_SURFACE& color_pair_surface=*surface.Get(color_pair);
+                const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);
+                for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
+                    const TV_INT& cell_index=junction_cell_index+it2.index;
+                    if(cell_to_element.Contains(cell_index)){
+                        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get(cell_index);
+                        VECTOR<int,2> elements_range;
+                        if(cell_elements.Get(color_pair,elements_range))
+                            for(int i=elements_range.x;i<elements_range.y;i++){
+                                TV_INT element=color_pair_surface.mesh.elements(i);
+                                for(int j=0;j<TV::m;j++)
+                                    if(!particle_indices_ht.Contains(element(j)))
+                                        particle_indices_ht.Insert(element(j));}}}
+                ARRAY<int> particle_indices;
+                for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next())particle_indices.Append(it.Key());
+                E+=Set_Matrix_Block_And_Rhs(particles.X,particle_indices,index_map,reverse_index_map,
+                    normals(normal_index),positions_rhs_full,rhs.n(normal_index));}}
+        rhs.x=positions_rhs_full.Subset(index_map);
+        sol.Resize(rhs);
         return E;
     }
 };

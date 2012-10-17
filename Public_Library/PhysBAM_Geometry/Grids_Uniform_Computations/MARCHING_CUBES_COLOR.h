@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
+
 namespace PhysBAM{
 
 template<class T> class TRIANGLE_3D;

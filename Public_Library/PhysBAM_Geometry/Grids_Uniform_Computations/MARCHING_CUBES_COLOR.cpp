@@ -778,43 +778,13 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
             reverse_index_map(i)=index_map.Append(i);}
 
     for(int step=0;step<newton_steps;step++){
-        T E=0;
-        ARRAY<TV> positions_rhs_full(particles.number);
         MARCHING_CUBES_SYSTEM<TV> system;
         MARCHING_CUBES_VECTOR<TV> rhs,sol;
-        rhs.n.Resize(normals_count);
-        system.project_flags=position_dofs.Subset(index_map);
-        int normal_index=-1;
-        for(int jc=0;jc<junction_cells.m;jc++){
-            const TV_INT& junction_cell_index=junction_cells(jc);
-            HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& junction_cell_elements=cell_to_element.Get(junction_cell_index);
-            for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::ITERATOR it(junction_cell_elements);it.Valid();it.Next()){
-                normal_index++;
-                HASHTABLE<int> particle_indices_ht;
-                const VECTOR<int,2>& color_pair=it.Key();
-                const T_SURFACE& color_pair_surface=*surface.Get(color_pair);
-                const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);
-                for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
-                    const TV_INT& cell_index=junction_cell_index+it2.index;
-                    if(cell_to_element.Contains(cell_index)){
-                        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get(cell_index);
-                        VECTOR<int,2> elements_range;
-                        if(cell_elements.Get(color_pair,elements_range))
-                            for(int i=elements_range.x;i<elements_range.y;i++){
-                                TV_INT element=color_pair_surface.mesh.elements(i);
-                                for(int j=0;j<TV::m;j++)
-                                    if(!particle_indices_ht.Contains(element(j)))
-                                        particle_indices_ht.Insert(element(j));}}}
-                ARRAY<int> particle_indices;
-                for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next())particle_indices.Append(it.Key());
-                E+=system.Set_Matrix_Block_And_Rhs(particles.X,particle_indices,index_map,reverse_index_map,
-                    normals(normal_index),positions_rhs_full,rhs.n(normal_index));}}
-        
+        T E=system.Setup(rhs,sol,normals_count,position_dofs,index_map,reverse_index_map,
+            junction_cells,cell_to_element,surface,particles,normals);
+
         LOG::cout<<"############################################## "<<step<<" "<<E<<std::endl;
 
-        rhs.x=positions_rhs_full.Subset(index_map);
-        sol.Resize(rhs);
-        
         ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
         CONJUGATE_RESIDUAL<T> cr;
         cr.Ensure_Size(vectors,rhs,3);
