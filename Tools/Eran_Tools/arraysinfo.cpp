@@ -203,8 +203,8 @@ int main(int argc, char *argv[])
     parse_args.Add("-vec3d",&opt_vec3d,"vec3d");
     parse_args.Add("-vec3d",&opt_vec3d,"vec3d");
     parse_args.Add("-v",&verbose,"verbose");
-    parse_args.Add("-skip", &skip, "<bytes>", "skip header bytes");
-    parse_args.Add("-n", &num_arrays, "<num arrays>", "number of consecutive arrays in the file");
+    parse_args.Add("-skip", &skip, "bytes", "skip header bytes");
+    parse_args.Add("-n", &num_arrays, "num-arrays", "number of consecutive arrays in the file");
     parse_args.Extra(&filename,"filename","filename");
     parse_args.Parse();
 

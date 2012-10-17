@@ -411,7 +411,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
     parse_args.Add("-dump_matrix",&dump_matrix,"dump system matrix");
     parse_args.Add("-debug_particles",&debug_particles,"dump debug particles");
-    parse_args.Extra(&test_number,"<example number>","example number to run");
+    parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Parse();
 
     ANALYTIC_TEST<TV>* test=0;

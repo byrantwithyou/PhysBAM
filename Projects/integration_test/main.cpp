@@ -389,7 +389,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1,mu_i=1,mu_o=1;
     int test_number=1,resolution=4,cgf=2;
     bool use_preconditioner=false,use_test=false,opt_arg=false;
-    parse_args.Extra_Optional(&test_number,&opt_arg,"<example number>","example number to run");
+    parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-mu_i",&mu_i,"mu","viscosity inside");
     parse_args.Add("-mu_o",&mu_o,"mu","viscosity outside");

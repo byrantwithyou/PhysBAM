@@ -298,7 +298,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     T m=1,s=1,kg=1;
     int test_number=1,resolution=4,max_iter=1000000;
     bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,dump_geometry=false,opt_arg=false;
-    parse_args.Extra_Optional(&test_number,&opt_arg,"<example number>","example number to run");
+    parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-m",&m,"unit","meter scale");
     parse_args.Add("-s",&s,"unit","second scale");

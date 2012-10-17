@@ -83,9 +83,9 @@ Print_Usage(bool do_exit) const
         LOG::cerr<<" ["<<o.opt;
         if(o.store) LOG::cerr<<" <"<<(o.name.size()?o.name:"arg")<<">";
         LOG::cerr<<"]";}
-    LOG::cerr<<"\n"<<std::endl;
 
     for(int i=0;i<extras.m;i++) LOG::cerr<<(extras(i).required?" <":" [<")<<extras(i).name<<(extras(i).required?">":">]");
+    LOG::cerr<<"\n"<<std::endl;
 
     int width=0;
     for(int i=0;i<args.m;i++) width=max((int)args(i).size(),width);
@@ -104,7 +104,7 @@ Print_Usage(bool do_exit) const
     for(int i=0;i<extras.m;i++){
         LOG::cerr.flags(std::ios::left);
         LOG::cerr.width(width+2);
-        LOG::cerr<<"<"<<extras(i).name<<">"<<extras(i).desc;
+        LOG::cerr<<("<"+extras(i).name+">")<<extras(i).desc;
         if(!extras(i).required){
             LOG::cerr<<" (";
             extras(i).print_default_func(extras(i).store);

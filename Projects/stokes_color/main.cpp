@@ -437,7 +437,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-bc_n",&bc_n,"use Neumann boundary conditions");
     parse_args.Add("-bc_d",&bc_d,"use Dirichlet boundary conditions");
     parse_args.Add("-bc_s",&bc_s,"use slip boundary conditions");
-    parse_args.Extra(&test_number,"<example number>","example number to run");
+    parse_args.Extra(&test_number,"example number","example number to run");
     parse_args.Parse();
     PHYSBAM_ASSERT(bc_n+bc_d+bc_s<2);
     int bc_type=bc_n?NEUMANN:(bc_s?SLIP:DIRICHLET);

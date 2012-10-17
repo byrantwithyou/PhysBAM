@@ -94,7 +94,7 @@ template<class TV> void EXAMPLE<TV>::
 Register_Options()
 {
     if(!parse_args) return;
-    parse_args->Extra_Optional(&test_number,"<example number>","example number to run");
+    parse_args->Extra_Optional(&test_number,"example number","example number to run");
     parse_args->Add("-dt",&stored_dt,&user_dt,"size","fix the time step size to this value.");
     parse_args->Add("-framerate",&stored_frame_rate,&user_frame_rate,"rate","frame rate");
     parse_args->Add("-max_dt",&stored_max_dt,&user_max_dt,"size","fix the time step size to be no larger than this value.");
