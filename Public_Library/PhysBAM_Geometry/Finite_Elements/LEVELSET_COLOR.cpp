@@ -71,7 +71,7 @@ Get_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const
 {
     Get_Raw_Levelset_For_Color(color_phi,c,ghost);
     FAST_LEVELSET<GRID<TV> > fl(grid,color_phi,ghost);
-    Reinitialize(&fl,10*ghost,(T)0,(T)ghost,(T)0,(T).5,3,3);
+    Reinitialize(fl,10*ghost,(T)0,(T)ghost,(T)0,(T).5,3,3);
 }
 template class LEVELSET_COLOR<VECTOR<float,2> >;
 template class LEVELSET_COLOR<VECTOR<float,3> >;

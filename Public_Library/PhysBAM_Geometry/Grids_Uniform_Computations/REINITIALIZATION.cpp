@@ -51,14 +51,14 @@ Local_WENO_Reinitialize(const int m,const T dx,const ARRAY<T,VECTOR<int,1> >& ph
 // Functions Euler_Step_Of_Reinitialization
 //#####################################################################
 template<class T,class TV,class TV_INT> static void
-Euler_Step_Of_Reinitialization(FAST_LEVELSET<GRID<TV> >* levelset,const ARRAY<T,TV_INT>& signed_distance,const ARRAY<T,TV_INT>& sign_phi,T dt,T time,T half_band_width,int spatial_order)
+Euler_Step_Of_Reinitialization(FAST_LEVELSET<GRID<TV> >& levelset,const ARRAY<T,TV_INT>& signed_distance,const ARRAY<T,TV_INT>& sign_phi,T dt,T time,T half_band_width,int spatial_order)
 {
-    GRID<TV>& grid=levelset->grid;
-    ARRAY<T,TV_INT>& phi=levelset->phi;
+    GRID<TV>& grid=levelset.grid;
+    ARRAY<T,TV_INT>& phi=levelset.phi;
     
     int ghost_cells=3;
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));
-    levelset->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,ghost_cells);
+    levelset.boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,ghost_cells);
     ARRAY<T,TV_INT> rhs(grid.Domain_Indices());
 
     for(int d=0;d<TV::m;d++){
@@ -82,9 +82,9 @@ Euler_Step_Of_Reinitialization(FAST_LEVELSET<GRID<TV> >* levelset,const ARRAY<T,
     T min_DX=grid.dX.Min();
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(signed_distance(cell)) <= half_band_width){
         phi(cell)-=dt*sign_phi(cell)*(sqrt(rhs(cell))-1);
-        if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(cell),phi(cell))) phi(cell)=LEVELSET_UTILITIES<T>::Sign(phi_ghost(cell))*levelset->small_number*min_DX;}}
+        if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(cell),phi(cell))) phi(cell)=LEVELSET_UTILITIES<T>::Sign(phi_ghost(cell))*levelset.small_number*min_DX;}}
 
-    levelset->boundary->Apply_Boundary_Condition(grid,phi,time); // time not incremented - pseudo-time
+    levelset.boundary->Apply_Boundary_Condition(grid,phi,time); // time not incremented - pseudo-time
 }
 //#####################################################################
 // Functions Reinitialize
@@ -92,15 +92,15 @@ Euler_Step_Of_Reinitialization(FAST_LEVELSET<GRID<TV> >* levelset,const ARRAY<T,
 // extra_band=grid.dX.Max()*(1+min(3,local_advection_spatial_order))
 namespace PhysBAM{
 template<class T,class TV> void
-Reinitialize(FAST_LEVELSET<GRID<TV> >* levelset,int time_steps,T time,T half_band_width,T extra_band,T cfl,int temporal_order,int spatial_order)
+Reinitialize(FAST_LEVELSET<GRID<TV> >& levelset,int time_steps,T time,T half_band_width,T extra_band,T cfl,int temporal_order,int spatial_order)
 {
     typedef VECTOR<int,TV::m> TV_INT;
-    GRID<TV>& grid=levelset->grid;
-    ARRAY<T,TV_INT>& phi=levelset->phi;
+    GRID<TV>& grid=levelset.grid;
+    ARRAY<T,TV_INT>& phi=levelset.phi;
     
     T large_band=half_band_width+extra_band;
     ARRAY<T,TV_INT> signed_distance(grid.Domain_Indices());
-    levelset->Get_Signed_Distance_Using_FMM(signed_distance,time,large_band);
+    levelset.Get_Signed_Distance_Using_FMM(signed_distance,time,large_band);
 
     ARRAY<T,TV_INT> sign_phi(grid.Domain_Indices()); // smeared out sign function
     T epsilon=sqr(grid.dX.Max());
@@ -109,7 +109,7 @@ Reinitialize(FAST_LEVELSET<GRID<TV> >* levelset,int time_steps,T time,T half_ban
 
     T dt=cfl*grid.dX.Min();
     RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta(phi);
-    rungekutta.Set_Grid_And_Boundary_Condition(grid,*levelset->boundary);
+    rungekutta.Set_Grid_And_Boundary_Condition(grid,*levelset.boundary);
     rungekutta.Set_Order(temporal_order);
     rungekutta.Set_Time(time);
     rungekutta.Pseudo_Time();
@@ -125,10 +125,10 @@ Reinitialize(FAST_LEVELSET<GRID<TV> >* levelset,int time_steps,T time,T half_ban
         if(abs(signed_distance(cell)) > half_band_width) phi(cell)=signed_distance(cell); // outer band - use the FMM solution
         else if(abs(signed_distance(cell)-phi(cell)) > min_DX) phi(cell)=signed_distance(cell);}} // inner band - use FMM if errors look big
 }
-template void Reinitialize<float,VECTOR<float,1> >(FAST_LEVELSET<GRID<VECTOR<float,1> > >*,int,float,float,float,float,int,int);
-template void Reinitialize<float,VECTOR<float,2> >(FAST_LEVELSET<GRID<VECTOR<float,2> > >*,int,float,float,float,float,int,int);
-template void Reinitialize<float,VECTOR<float,3> >(FAST_LEVELSET<GRID<VECTOR<float,3> > >*,int,float,float,float,float,int,int);
-template void Reinitialize<double,VECTOR<double,1> >(FAST_LEVELSET<GRID<VECTOR<double,1> > >*,int,double,double,double,double,int,int);
-template void Reinitialize<double,VECTOR<double,2> >(FAST_LEVELSET<GRID<VECTOR<double,2> > >*,int,double,double,double,double,int,int);
-template void Reinitialize<double,VECTOR<double,3> >(FAST_LEVELSET<GRID<VECTOR<double,3> > >*,int,double,double,double,double,int,int);
+template void Reinitialize<float,VECTOR<float,1> >(FAST_LEVELSET<GRID<VECTOR<float,1> > >&,int,float,float,float,float,int,int);
+template void Reinitialize<float,VECTOR<float,2> >(FAST_LEVELSET<GRID<VECTOR<float,2> > >&,int,float,float,float,float,int,int);
+template void Reinitialize<float,VECTOR<float,3> >(FAST_LEVELSET<GRID<VECTOR<float,3> > >&,int,float,float,float,float,int,int);
+template void Reinitialize<double,VECTOR<double,1> >(FAST_LEVELSET<GRID<VECTOR<double,1> > >&,int,double,double,double,double,int,int);
+template void Reinitialize<double,VECTOR<double,2> >(FAST_LEVELSET<GRID<VECTOR<double,2> > >&,int,double,double,double,double,int,int);
+template void Reinitialize<double,VECTOR<double,3> >(FAST_LEVELSET<GRID<VECTOR<double,3> > >&,int,double,double,double,double,int,int);
 }
