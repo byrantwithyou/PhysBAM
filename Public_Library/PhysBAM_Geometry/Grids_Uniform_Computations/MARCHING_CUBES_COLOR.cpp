@@ -813,7 +813,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     throw;
 #endif
 
-    for(int step=0;step<newton_steps;step++){
+    for(int step=0;step<newton_steps+100;step++){
         MARCHING_CUBES_SYSTEM<TV> system;
         MARCHING_CUBES_VECTOR<TV> rhs,sol;
         system.Setup(rhs,sol,normals_count,position_dofs,index_map,reverse_index_map,
@@ -824,10 +824,12 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         cr.Ensure_Size(vectors,rhs,3);
         cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,10000);
         
-        for(int i=0;i<index_map.m;i++)
-            for(int j=0;j<TV::m;j++)
-                if(system.project_flags(i)&(1<<j))
-                    particles.X(index_map(i))(j)-=sol.x(i)(j);
+        if(step>=100)
+            for(int i=0;i<index_map.m;i++)
+                for(int j=0;j<TV::m;j++)
+                    if(system.project_flags(i)&(1<<j))
+                        particles.X(index_map(i))(j)-=sol.x(i)(j)*0.1;
+        
         for(int i=0;i<rhs.n.m;i++){
             normals(i)-=sol.n(i);
             normals(i).Normalize();}

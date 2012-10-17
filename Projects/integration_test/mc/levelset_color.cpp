@@ -114,7 +114,7 @@ int main(int argc, char* argv[])
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
-    for(int i=0;i<100;i++){
+    for(int i=0;i<50;i++){
         HASHTABLE<VECTOR<int,2>,SEGMENTED_CURVE_2D<T>*> surface;
         HASHTABLE<int,SEGMENTED_CURVE_2D<T>*> boundary;
         MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,phi_color,phi_value,i);
