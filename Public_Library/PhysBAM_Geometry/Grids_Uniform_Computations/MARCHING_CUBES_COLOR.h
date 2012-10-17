@@ -21,7 +21,8 @@ template<class TV>
 class MARCHING_CUBES_COLOR
 {
 public:
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
+    typedef typename TV::SCALAR T;
+    typedef VECTOR<int,TV::m> TV_INT;
     typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
     enum WORKAROUND {num_corners=1<<TV::m,num_edges=TV::m<<(TV::m-1),num_pts=num_corners+num_edges};
@@ -33,7 +34,7 @@ public:
     static void Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& boundary,
         const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
     static void Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
-        const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi);
+        const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int newton_steps=20);
 //#####################################################################
 };
 }

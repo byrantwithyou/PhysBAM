@@ -707,19 +707,11 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
     } while(!(pat&last_tri_bit));
 }
 //#####################################################################
-// Function Fill_Matrix_Block_And_Rhs
-//#####################################################################
-template<class TV> typename TV::SCALAR
-Fill_Matrix_Block_And_Rhs(typename MARCHING_CUBES_SYSTEM<TV>::BLOCK& block,INDIRECT_ARRAY<ARRAY<TV>,VECTOR<int,3>&> rhs)
-{
-    return 0;
-}
-//#####################################################################
 // Function Get_Elements
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
-    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi)
+    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int newton_steps)
 {
     HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > > cell_to_element;
 
@@ -785,11 +777,11 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         if(position_dofs(i))
             reverse_index_map(i)=index_map.Append(i);}
 
-    const int newton_steps=5;
     for(int step=0;step<newton_steps;step++){
+        T E=0;
         ARRAY<TV> positions_rhs_full(particles.number);
-        MARCHING_CUBES_VECTOR<TV> rhs,sol;
         MARCHING_CUBES_SYSTEM<TV> system;
+        MARCHING_CUBES_VECTOR<TV> rhs,sol;
         rhs.n.Resize(normals_count);
         system.project_flags=position_dofs.Subset(index_map);
         int normal_index=-1;
@@ -804,19 +796,22 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);
                 for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                     const TV_INT& cell_index=junction_cell_index+it2.index;
-                    const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get(cell_index);
-                    VECTOR<int,2> elements_range;
-                    if(cell_elements.Get(color_pair,elements_range))
-                        for(int i=elements_range.x;i<elements_range.y;i++){
-                            TV_INT element=color_pair_surface.mesh.elements(i);
-                            for(int j=0;j<TV::m;j++)
-                                if(!particle_indices_ht.Contains(element(j)))
-                                    particle_indices_ht.Insert(element(j));}}
+                    if(cell_to_element.Contains(cell_index)){
+                        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get(cell_index);
+                        VECTOR<int,2> elements_range;
+                        if(cell_elements.Get(color_pair,elements_range))
+                            for(int i=elements_range.x;i<elements_range.y;i++){
+                                TV_INT element=color_pair_surface.mesh.elements(i);
+                                for(int j=0;j<TV::m;j++)
+                                    if(!particle_indices_ht.Contains(element(j)))
+                                        particle_indices_ht.Insert(element(j));}}}
                 ARRAY<int> particle_indices;
                 for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next())particle_indices.Append(it.Key());
-                system.Set_Matrix_Block_And_Rhs(particles.X,particle_indices,index_map,reverse_index_map,
+                E+=system.Set_Matrix_Block_And_Rhs(particles.X,particle_indices,index_map,reverse_index_map,
                     normals(normal_index),positions_rhs_full,rhs.n(normal_index));}}
         
+        LOG::cout<<"############################################## "<<step<<" "<<E<<std::endl;
+
         rhs.x=positions_rhs_full.Subset(index_map);
         sol.Resize(rhs);
         
@@ -829,10 +824,10 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
             for(int j=0;j<TV::m;j++)
                 if(system.project_flags(i)&(1<<j))
                     particles.X(index_map(i))(j)-=sol.x(i)(j);
-
         for(int i=0;i<rhs.n.m;i++){
             normals(i)-=sol.n(i);
-            normals(i).Normalize();}
+            normals(i).Normalize();
+            LOG::cout<<normals(i)<<std::endl;}
     }
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;

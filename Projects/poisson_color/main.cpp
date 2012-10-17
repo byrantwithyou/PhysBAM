@@ -26,7 +26,7 @@
 using namespace PhysBAM;
 
 typedef float RW;
-std::string output_directory;
+std::string output_directory="ouput";
 
 template<class TV>
 GRID<TV>* Global_Grid(GRID<TV>* grid_in=0)

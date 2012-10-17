@@ -109,9 +109,9 @@ public:
                 const int index_i=block.index(i);
                 for(int j=0;j<block.index.m;j++){
                     const int index_j=block.index(j);
-                    x_result(index_i)+=block.matrix_xx(index_i,index_j)*x_input(index_j);}
-                x_result(index_i)+=block.matrix_xn(index_i)*n_input(b);
-                n_result(b)+=block.matrix_xn(index_i).Transpose_Times(x_input(index_i));}
+                    x_result(index_i)+=block.matrix_xx(i,j)*x_input(index_j);}
+                x_result(index_i)+=block.matrix_xn(i)*n_input(b);
+                n_result(b)+=block.matrix_xn(i).Transpose_Times(x_input(index_i));}
             n_result(b)+=block.matrix_nn*n_input(b);}
     }
 
@@ -134,18 +134,16 @@ public:
     void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE {Project(bv);}
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& br,KRYLOV_VECTOR_BASE<T>& bz) const PHYSBAM_OVERRIDE {}
 //#####################################################################
-    void Set_Matrix_Block_And_Rhs(const ARRAY_VIEW<TV>& particles,const ARRAY<int>& particle_indices,
+    T Set_Matrix_Block_And_Rhs(const ARRAY_VIEW<TV>& particles,const ARRAY<int>& particle_indices,
         const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const TV& n,ARRAY<TV>& positions_rhs_full,TV& rhs_n)
     {
         // NOTE: assumes n is normalized !!!
 
-        const int x_dofs=index_map.m;
-        const int x_full_count=particle_indices.m;
-
-        // create new block
         blocks.Add_End();
         BLOCK& block=blocks.Last();
-
+        
+        const int x_full_count=particle_indices.m;
+        
         // compute average and initialize reduced index list
         TV average;
         for(int i=0;i<particle_indices.m;i++){
@@ -153,13 +151,16 @@ public:
             const int reduced_index=reverse_index_map(index);
             if(reduced_index>=0) block.index.Append(reduced_index);
             average+=particles(index);}
-        assert(index_map.m==block_index.m);
         average/=x_full_count;
+        
+        const int x_dofs=block.index.m;
         
         // normal differential
         const SYMMETRIC_MATRIX<T,TV::m> nnt=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
         const SYMMETRIC_MATRIX<T,TV::m> dn=SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix()-nnt;
-
+        
+        T E=0;
+        
         // set RHS
         const T average_dot_n=average.Dot(n);
         for(int i=0;i<particle_indices.m;i++){
@@ -167,9 +168,11 @@ public:
             const TV& x=particles(index);
             const T x_dot_n=x.Dot(n);
             positions_rhs_full(index)+=n*(2*(x_dot_n-average_dot_n));
-            rhs_n+=(x-average)*2*x_dot_n;}
+            rhs_n+=(x-average)*2*x_dot_n;
+            E+=sqr(x_dot_n);}
         rhs_n=dn*rhs_n;
-
+        E-=sqr(average_dot_n)*x_full_count;
+        
         // set matrix block
         block.matrix_xx.Resize(x_dofs,x_dofs);
         block.matrix_xn.Resize(x_dofs);
@@ -178,11 +181,11 @@ public:
             for(int j=0;j<x_dofs;j++){
                 block.matrix_xx(i,j)=nnt;
                 block.matrix_xx(i,j)*=2*((i==j)-(T)1/particle_indices.m);}
-            const int index=index_map(i);
+            const int index=index_map(block.index(i));
             const TV& x=particles(index);
             block.matrix_xn(i)+=dn*(2*(x.Dot(n)-average_dot_n));
             block.matrix_xn(i)+=MATRIX<T,TV::m>::Outer_Product(n,dn*(x-average))*2;}
-
+        
         for(int i=0;i<particle_indices.m;i++){
             const int index=particle_indices(i);
             const TV& x=particles(index);
@@ -194,6 +197,8 @@ public:
             block.matrix_nn+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*x);}
         block.matrix_nn-=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*average)*x_full_count;
         block.matrix_nn*=2;
+        
+        return E;
     }
 };
 }

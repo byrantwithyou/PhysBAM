@@ -216,7 +216,7 @@ template<class T> VECTOR<T,3> TRIANGULATED_SURFACE<T>::
 Normal(const TV& location,const int aggregate) const 
 {
     typedef VECTOR<T,3> TV;
-    assert(aggregate >= 1 && aggregate <= ts.mesh.elements.m);
+    assert(aggregate >= 1);
 
     if(use_vertex_normals){
         TV normal1,normal2,normal3;
