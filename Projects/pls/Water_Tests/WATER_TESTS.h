@@ -11,7 +11,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
-#include <PhysBAM_Dynamics/PLS_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_EXAMPLE.h>
 
 namespace PhysBAM{
 

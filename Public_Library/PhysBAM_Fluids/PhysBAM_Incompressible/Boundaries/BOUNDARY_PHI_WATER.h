@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
-#include <PhysBAM_Dynamics/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_OPEN_CALLBACKS.h>
 namespace PhysBAM{
 
 template<class T_GRID>

@@ -4,10 +4,10 @@
 //#####################################################################
 // Class BOUNDARY_EXTRAPOLATE_CELL
 //#####################################################################
+#include <PhysBAM_Tools/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_EXTRAPOLATE_CELL.h>
-#include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER_POLY.h>
 using namespace PhysBAM;
 //#####################################################################
 // Function Fill_Ghost_Cells

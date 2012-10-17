@@ -10,10 +10,10 @@
 #include <PhysBAM_Tools/Vectors/VECTOR_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
-#include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <PhysBAM_Dynamics/PLS_DRIVER.h>
-#include <PhysBAM_Dynamics/PLS_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_DRIVER.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_EXAMPLE.h>
 using namespace PhysBAM;
 namespace{
 template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

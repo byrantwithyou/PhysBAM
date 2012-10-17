@@ -7,8 +7,8 @@
 #ifndef __REFINEMENT__
 #define __REFINEMENT__
 
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/SMOKE_STANDARD_TESTS_2D.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <PhysBAM_Dynamics/Standard_Tests/SMOKE_STANDARD_TESTS_2D.h>
 namespace PhysBAM{
 
 template<class T_input>

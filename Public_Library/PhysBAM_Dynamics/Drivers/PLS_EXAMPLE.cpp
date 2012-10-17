@@ -5,7 +5,7 @@
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
-#include <PhysBAM_Dynamics/PLS_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
 // PLS_EXAMPLE

@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
-#include <PhysBAM_Dynamics/PLS_REFINEMENT_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
 // PLS_REFINEMENT_EXAMPLE

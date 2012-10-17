@@ -26,5 +26,6 @@ public:
     VORTICITY_PARTICLES();
     virtual ~VORTICITY_PARTICLES();
 };
+const ATTRIBUTE_ID ATTRIBUTE_ID_VORTICITY(16);
 }
 #endif

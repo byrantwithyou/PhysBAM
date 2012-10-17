@@ -6,6 +6,7 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_THREADED.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include "WATER_DRIVER.h"
 #include "WATER_EXAMPLE.h"
 
@@ -136,7 +137,7 @@ Project(const T dt,const T time)
             TV_INT index=iterator.Face_Index();phi_face(index)=(T).5*(phi_ghost(iterator.First_Cell_Index())+phi_ghost(iterator.Second_Cell_Index()));
             if(phi_face(index)<=0) fixed_face(index)=true;if(phi_face(index) >= delta && !fixed_face(index)) face_velocity(index)=(T)0;}
         LOG::cout<<"something..."<<std::endl;  // TODO(jontg): If this log statement doesn't appear, the code crashes in release mode...
-        EXTRAPOLATION_UNIFORM<GRID<TV> > extrapolate(face_grid,phi_face,face_velocity,ghost_cells);extrapolate.Set_Band_Width(3);extrapolate.Set_Custom_Seed_Done(&fixed_face);
+        EXTRAPOLATION_UNIFORM<GRID<TV>,T> extrapolate(face_grid,phi_face,face_velocity,ghost_cells);extrapolate.Set_Band_Width(3);extrapolate.Set_Custom_Seed_Done(&fixed_face);
         extrapolate.Extrapolate();}
 }
 //#####################################################################

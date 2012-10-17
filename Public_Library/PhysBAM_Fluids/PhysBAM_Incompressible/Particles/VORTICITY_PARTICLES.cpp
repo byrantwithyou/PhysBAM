@@ -6,7 +6,6 @@
 //#####################################################################
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Particles/VORTICITY_PARTICLES.h>
-#include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 namespace PhysBAM{
 //#####################################################################
 // Constructor

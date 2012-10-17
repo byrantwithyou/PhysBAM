@@ -16,7 +16,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
-#include <PhysBAM_Dynamics/PLS_REFINEMENT_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_EXAMPLE.h>
 #include "REFINEMENT_THREADS.h"
 
 namespace PhysBAM{

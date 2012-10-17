@@ -9,11 +9,11 @@
 #include <PhysBAM_Geometry/Collisions/COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/COMPRESSIBLE_DRIVER.h>
-#include <PhysBAM_Fluids/PhysBAM_Compressible/COMPRESSIBLE_EXAMPLE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SOLID_COMPRESSIBLE_FLUID_COUPLING_UTILITIES.h>
+#include <PhysBAM_Dynamics/Drivers/COMPRESSIBLE_DRIVER.h>
+#include <PhysBAM_Dynamics/Drivers/COMPRESSIBLE_EXAMPLE.h>
 using namespace PhysBAM;
 //#####################################################################
 // Initialize

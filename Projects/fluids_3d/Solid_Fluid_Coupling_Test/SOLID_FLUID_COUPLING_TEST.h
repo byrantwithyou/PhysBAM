@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Tools/Math_Tools/choice.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
+#include <PhysBAM_Dynamics/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
 #include <Level_Sets/EXTRAPOLATION_3D.h>
 #include <Rigid_Bodies/RIGID_BODY_FLUID_FORCES_3D.h>
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_3D.h>

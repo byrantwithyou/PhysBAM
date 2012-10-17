@@ -7,11 +7,11 @@
 #ifndef __UNDERWATER_DOME__
 #define __UNDERWATER_DOME__
 
-#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
 #include <PhysBAM_Tools/Interpolation/INTERPOLATION_CURVE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/SIGNED_DISTANCE.h>
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
+#include <PhysBAM_Dynamics/Standard_Tests/THIN_SHELLS_FLUID_COUPLING_UTILITIES.h>
+#include <PhysBAM_Tools/Grids_Uniform_Arrays/FLOOD_FILL_3D.h>
 #include <Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_3D.h>
 namespace PhysBAM{
 

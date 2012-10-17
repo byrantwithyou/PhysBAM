@@ -11,9 +11,9 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
-#include <PhysBAM_Dynamics/Boundaries/BOUNDARY_PHI_WATER.h>
-#include <PhysBAM_Dynamics/PLS_REFINEMENT_DRIVER.h>
-#include <PhysBAM_Dynamics/PLS_REFINEMENT_EXAMPLE.h>
+#include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_DRIVER.h>
+#include <PhysBAM_Dynamics/Drivers/PLS_REFINEMENT_EXAMPLE.h>
 using namespace PhysBAM;
 namespace{
 template<class TV> void Write_Substep_Helper(void* writer,const std::string& title,int substep,int level)

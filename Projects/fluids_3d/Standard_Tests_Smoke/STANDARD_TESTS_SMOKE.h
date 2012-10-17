@@ -7,8 +7,8 @@
 #ifndef __STANDARD_TESTS_SMOKE__
 #define __STANDARD_TESTS_SMOKE__
 
-#include <PhysBAM_Fluids/PhysBAM_Incompressible/Standard_Tests/SMOKE_STANDARD_TESTS_3D.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/SOLIDS_FLUIDS_EXAMPLE_UNIFORM.h>
+#include <PhysBAM_Dynamics/Standard_Tests/SMOKE_STANDARD_TESTS_3D.h>
 namespace PhysBAM{
 
 template<class T_input>
