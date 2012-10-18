@@ -140,7 +140,7 @@ public:
     void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& br,KRYLOV_VECTOR_BASE<T>& bz) const PHYSBAM_OVERRIDE {}
 //#####################################################################
     T Set_Matrix_Block_And_Rhs(const ARRAY_VIEW<TV>& particles,const ARRAY<int>& particle_indices,
-        const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const TV& a,ARRAY<TV>& positions_rhs_full,TV& rhs_n)
+        const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const TV& a,ARRAY<TV>& positions_rhs_full,TV& rhs_n,const bool ignore_x,const bool dump_normal=false)
     {
         TV n=a;
         const T norm_a=n.Normalize();
@@ -158,7 +158,11 @@ public:
             if(reduced_index>=0) block.index.Append(reduced_index);
             average+=particles(index);}
         average/=x_count;
-        
+
+        if(dump_normal){
+            Add_Debug_Particle(average,VECTOR<T,3>(0,1,1));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,n);}
+
         // normal differential
         const int x_dofs=block.index.m;
         const SYMMETRIC_MATRIX<T,TV::m> nnt=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
@@ -172,10 +176,10 @@ public:
             const int index=particle_indices(i);
             const TV& x=particles(index);
             const T x_dot_n=x.Dot(n);
-            positions_rhs_full(index)+=n*(2*(x_dot_n-average_dot_n));
-            rhs_n+=(x-average)*(2*x_dot_n);
+            if(!ignore_x)positions_rhs_full(index)+=n*(2*(x_dot_n-average_dot_n));
+            if(ignore_x)rhs_n+=(x-average)*(2*x_dot_n);
             E+=sqr(x_dot_n);}
-        rhs_n=dn*rhs_n*one_over_norm_a;
+        if(ignore_x)rhs_n=dn*rhs_n*one_over_norm_a;
         E-=sqr(average_dot_n)*x_count;
         
         // set matrix block
@@ -184,13 +188,13 @@ public:
         
         for(int i=0;i<x_dofs;i++){
             for(int j=0;j<x_dofs;j++){
-                block.matrix_xx(i,j)=nnt;
-                block.matrix_xx(i,j)*=2*((i==j)-(T)1/particle_indices.m);}
+                if(!ignore_x)block.matrix_xx(i,j)=nnt;
+                if(!ignore_x)block.matrix_xx(i,j)*=2*((i==j)-(T)1/particle_indices.m);}
             const int index=index_map(block.index(i));
             const TV& x=particles(index);
-            block.matrix_xn(i)+=dn*(2*(x.Dot(n)-average_dot_n));
-            block.matrix_xn(i)+=MATRIX<T,TV::m>::Outer_Product(n,dn*(x-average))*2;
-            block.matrix_xn(i)*=one_over_norm_a;}
+            if(!ignore_x)block.matrix_xn(i)+=dn*(2*(x.Dot(n)-average_dot_n));
+            if(!ignore_x)block.matrix_xn(i)+=MATRIX<T,TV::m>::Outer_Product(n,dn*(x-average))*2;
+            if(!ignore_x)block.matrix_xn(i)*=one_over_norm_a;}
         
         for(int i=0;i<particle_indices.m;i++){
             const int index=particle_indices(i);
@@ -199,10 +203,10 @@ public:
             SYMMETRIC_MATRIX<T,TV::m> tmp=
                 MATRIX<T,TV::m>::Outer_Product(n,xma).Symmetric_Part()*(-2)
                 +(nnt*(T)3-SYMMETRIC_MATRIX<T,TV::m>::Identity_Matrix())*n.Dot(xma);
-            block.matrix_nn+=tmp*(x.Dot(n));
-            block.matrix_nn+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*x);}
-        block.matrix_nn-=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*average)*x_count;
-        block.matrix_nn*=2*sqr(one_over_norm_a);
+            if(ignore_x)block.matrix_nn+=tmp*(x.Dot(n));
+            if(ignore_x)block.matrix_nn+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*x);}
+        if(ignore_x)block.matrix_nn-=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(dn*average)*x_count;
+        if(ignore_x)block.matrix_nn*=2*sqr(one_over_norm_a);
         
         return E;
     }
@@ -210,7 +214,7 @@ public:
     T Setup(MARCHING_CUBES_VECTOR<TV>& rhs,MARCHING_CUBES_VECTOR<TV>& sol,const int normals_count,const ARRAY<int>& position_dofs,
         const ARRAY<int>& index_map,const ARRAY<int>& reverse_index_map,const ARRAY<TV_INT>& junction_cells,
         const HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > >& cell_to_element,
-        const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const GEOMETRY_PARTICLES<TV>& particles,const ARRAY<TV>& normals)
+        const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const GEOMETRY_PARTICLES<TV>& particles,const ARRAY<TV>& normals,const bool ignore_x,const bool dump_normal=false)
     {
         T E=0;
         ARRAY<TV> positions_rhs_full(particles.number);
@@ -225,7 +229,7 @@ public:
                 HASHTABLE<int> particle_indices_ht;
                 const VECTOR<int,2>& color_pair=it.Key();
                 const T_SURFACE& color_pair_surface=*surface.Get(color_pair);
-                const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);
+                const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*3);
                 for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                     const TV_INT& cell_index=junction_cell_index+it2.index;
                     if(cell_to_element.Contains(cell_index)){
@@ -240,7 +244,7 @@ public:
                 ARRAY<int> particle_indices;
                 for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next())particle_indices.Append(it.Key());
                 E+=Set_Matrix_Block_And_Rhs(particles.X,particle_indices,index_map,reverse_index_map,
-                    normals(normal_index),positions_rhs_full,rhs.n(normal_index));}}
+                    normals(normal_index),positions_rhs_full,rhs.n(normal_index),ignore_x,dump_normal);}}
         rhs.x=positions_rhs_full.Subset(index_map);
         assert(normal_index==normals_count-1);
         sol.Resize(rhs);
