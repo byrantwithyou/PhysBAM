@@ -12,7 +12,11 @@
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_SYSTEM_BASE.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Math_Tools/clamp.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_2X2.h>
+#include <PhysBAM_Tools/Matrices/DIAGONAL_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
+#include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Tools/Utilities/DEBUG_CAST.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
@@ -20,9 +24,9 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_SYSTEM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+
 using namespace PhysBAM;
 //#define ENABLE_TIMING
 namespace{
@@ -708,11 +712,79 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
     } while(!(pat&last_tri_bit));
 }
 //#####################################################################
+// Class LEAST_SQUARES_VECTOR
+//#####################################################################
+template<class TV>
+class LEAST_SQUARES_VECTOR:public KRYLOV_VECTOR_BASE<typename TV::SCALAR>
+{
+    typedef typename TV::SCALAR T;
+    typedef KRYLOV_VECTOR_BASE<T> BASE;
+
+public:
+    
+    TV x;
+    
+    LEAST_SQUARES_VECTOR(){}
+    virtual ~LEAST_SQUARES_VECTOR(){}
+
+    BASE& operator+=(const BASE& bv) PHYSBAM_OVERRIDE{x+=debug_cast<const LEAST_SQUARES_VECTOR&>(bv).x;return *this;}
+    BASE& operator-=(const BASE& bv) PHYSBAM_OVERRIDE{x-=debug_cast<const LEAST_SQUARES_VECTOR&>(bv).x;return *this;}
+    BASE& operator*=(const T a) PHYSBAM_OVERRIDE{x*=a; return *this;}
+    void Copy(const T c1,const BASE& bv1) PHYSBAM_OVERRIDE{x=debug_cast<const LEAST_SQUARES_VECTOR&>(bv1).x*c1;}
+    void Copy(const T c1,const BASE& bv1,const BASE& bv2) PHYSBAM_OVERRIDE
+    {x=debug_cast<const LEAST_SQUARES_VECTOR&>(bv1).x*c1+debug_cast<const LEAST_SQUARES_VECTOR&>(bv2).x;}
+    int Raw_Size() const PHYSBAM_OVERRIDE{return TV::m;}
+    T& Raw_Get(int i) PHYSBAM_OVERRIDE{return x(i);}
+    KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE
+    {LEAST_SQUARES_VECTOR* V=new LEAST_SQUARES_VECTOR;return V;}
+    void Resize(const KRYLOV_VECTOR_BASE<T>& bv) PHYSBAM_OVERRIDE{}
+};
+//#####################################################################
+// Class LEAST_SQUARES_SYSTEM
+//#####################################################################
+template<class TV>
+class LEAST_SQUARES_SYSTEM:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>
+{
+    typedef typename TV::SCALAR T;
+    typedef LEAST_SQUARES_VECTOR<TV> VECTOR_T;
+    typedef KRYLOV_SYSTEM_BASE<T> BASE;
+
+public:
+
+    SYMMETRIC_MATRIX<T,TV::m> matrix;
+    int project_flags;
+
+    LEAST_SQUARES_SYSTEM():BASE(false,false){}
+    virtual ~LEAST_SQUARES_SYSTEM(){}
+
+//#####################################################################
+    void Multiply(const KRYLOV_VECTOR_BASE<T>& bv_input,KRYLOV_VECTOR_BASE<T>& bv_result) const PHYSBAM_OVERRIDE{
+        const TV& x_input=debug_cast<const VECTOR_T&>(bv_input).x;
+        TV& x_result=debug_cast<VECTOR_T&>(bv_result).x;
+        x_result=matrix*x_input;}
+
+    double Inner_Product(const KRYLOV_VECTOR_BASE<T>& bv1,const KRYLOV_VECTOR_BASE<T>& bv2) const PHYSBAM_OVERRIDE{
+        const VECTOR_T& v1=debug_cast<const LEAST_SQUARES_VECTOR<TV>&>(bv1);
+        const VECTOR_T& v2=debug_cast<const LEAST_SQUARES_VECTOR<TV>&>(bv2);
+        return v1.x.Dot(v2.x);}
+
+    T Convergence_Norm(const KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE
+    {return debug_cast<const VECTOR_T&>(bv).x.Max_Abs();}
+
+    void Project(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE{
+        TV& x=debug_cast<VECTOR_T&>(bv).x;
+        for(int j=0;j<TV::m;j++) if(!(project_flags&(1<<j))) x(j)=0;}
+
+    void Set_Boundary_Conditions(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE {}
+    void Project_Nullspace(KRYLOV_VECTOR_BASE<T>& bv) const PHYSBAM_OVERRIDE {Project(bv);}
+    void Apply_Preconditioner(const KRYLOV_VECTOR_BASE<T>& br,KRYLOV_VECTOR_BASE<T>& bz) const PHYSBAM_OVERRIDE {}
+};
+//#####################################################################
 // Function Get_Elements
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
-    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int newton_steps)
+    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int iterations)
 {
     HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > > cell_to_element;
 
@@ -727,7 +799,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     ARRAY<bool,TV_INT> junction_cell(grid.Domain_Indices());
     ARRAY<TV_INT> junction_cells;
     
-    int normals_count=0;
+    int fit_count=0;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next()){
         VECTOR<int,num_corners> cell_color;
         VECTOR<T,num_corners> cell_phi;
@@ -745,20 +817,22 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         if(next_color>=3){
             junction_cell(it.index)=true;
             junction_cells.Append(it.index);
-            normals_count+=next_color;}
+            fit_count+=next_color;}
         Get_Interface_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
             face_vertices,cell_vertices,it.index,particles,cell_to_element);}
 
-    ARRAY<int> position_dofs(particles.number);
-    ARRAY<TV> normals(normals_count);
-    normals.Fill(TV::Axis_Vector(0));
+    ARRAY<int> particle_dofs(particles.number);
+    ARRAY<TV> normals(fit_count);
+    ARRAY<TV> midpoints(fit_count);
     
     for(typename HASHTABLE<TV_INT,int>::ITERATOR it(cell_vertices);it.Valid();it.Next()){
         Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,0,0));
-        position_dofs(it.Data())=(1<<TV::m)-1;}
+        particle_dofs(it.Data())=(1<<TV::m)-1;}
 
-    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_vertices);it.Valid();it.Next())
-        position_dofs(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);
+    for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_vertices);it.Valid();it.Next()){
+        // TODO: mark dofs properly for 3D
+        Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,1,0));
+        particle_dofs(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);}
 
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(edge_vertices);it.Valid();it.Next()){
         RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box());
@@ -769,74 +843,83 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 ok=false;
                 break;}}
         if(!ok){
-            position_dofs(it.Data())=1<<it.Key().axis;
+            particle_dofs(it.Data())=1<<it.Key().axis;
             Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,1,1));}}
 
-    ARRAY<int> index_map,reverse_index_map(position_dofs.m);
-    for(int i=0;i<position_dofs.m;i++){
+    ARRAY<int> index_map,reverse_index_map(particle_dofs.m);
+    for(int i=0;i<particle_dofs.m;i++){
         reverse_index_map(i)=-1;
-        if(position_dofs(i))
+        if(particle_dofs(i))
             reverse_index_map(i)=index_map.Append(i);}
 
-// #define TEST_DERIVATIVES
-#ifdef TEST_DERIVATIVES
-    LOG::cout<<"### Derivatives test ###"<<std::endl;
+    ARRAY<ARRAY<int> > particle_to_fit(index_map.m);
+    ARRAY<ARRAY<int> > fit_to_particle(fit_count);
 
-    RANDOM_NUMBERS<T> rand;
-    for(int i=0;i<particles.number;i++) rand.Fill_Uniform(particles.X(i),0,1);
-    for(int i=0;i<normals_count;i++){rand.Fill_Uniform(normals(i),0,1);}
+    int fit_index=-1;
+    for(int jc=0;jc<junction_cells.m;jc++){
+        const TV_INT& junction_cell_index=junction_cells(jc);
+        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& junction_cell_elements=cell_to_element.Get(junction_cell_index);
+        for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(junction_cell_elements);it.Valid();it.Next()){
+            fit_index++;
+            HASHTABLE<int> particle_indices_ht;
+            const VECTOR<int,2>& color_pair=it.Key();
+            const T_SURFACE& color_pair_surface=*surface.Get(color_pair);
+            const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*3);
+            for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
+                const TV_INT& cell_index=junction_cell_index+it2.index;
+                if(cell_to_element.Contains(cell_index)){
+                    const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get(cell_index);
+                    VECTOR<int,2> elements_range;
+                    if(cell_elements.Get(color_pair,elements_range))
+                        for(int i=elements_range.x;i<elements_range.y;i++){
+                            TV_INT element=color_pair_surface.mesh.elements(i);
+                            for(int j=0;j<TV::m;j++)
+                                if(!particle_indices_ht.Contains(element(j)))
+                                    particle_indices_ht.Insert(element(j));}}}
+            ARRAY<int> particle_indices;
+            for(typename HASHTABLE<int>::ITERATOR it(particle_indices_ht);it.Valid();it.Next()){
+                fit_to_particle(fit_index).Append(it.Key());
+                const int reduced_index=reverse_index_map(it.Key());
+                if(reduced_index>=0) particle_to_fit(reduced_index).Append(fit_index);}}}
+    assert(fit_index==fit_count-1);
+
+    LEAST_SQUARES_SYSTEM<TV> system;
+    LEAST_SQUARES_VECTOR<TV> rhs,sol;
     
-    MARCHING_CUBES_SYSTEM<TV> system1;
-    MARCHING_CUBES_VECTOR<TV> rhs1,sol1;
-    T E1=system1.Setup(rhs1,sol1,normals_count,position_dofs,index_map,reverse_index_map,
-        junction_cells,cell_to_element,surface,particles,normals);
-
-    MARCHING_CUBES_VECTOR<TV> perturb;
-    perturb.x.Resize(index_map.m);
-    perturb.n.Resize(normals_count);
-    T e=1e-6;
-    for(int i=0;i<index_map.m;i++){rand.Fill_Uniform(perturb.x(i),-e,e);particles.X(index_map(i))+=perturb.x(i);}
-    for(int i=0;i<normals_count;i++){rand.Fill_Uniform(perturb.n(i),-e,e);normals(i)+=perturb.n(i);}
-
-    MARCHING_CUBES_SYSTEM<TV> system2;
-    MARCHING_CUBES_VECTOR<TV> rhs2,sol2;
-    T E2=system2.Setup(rhs2,sol2,normals_count,position_dofs,index_map,reverse_index_map,
-        junction_cells,cell_to_element,surface,particles,normals);
-
-    LOG::cout<<"dE  "<<(E2-E1-(system1.Inner_Product(rhs1,perturb)+system2.Inner_Product(rhs2,perturb))*(T).5)/e<<std::endl;
-    system1.Multiply(perturb,sol1);
-    system2.Multiply(perturb,sol2);
-    sol1*=(T).5;sol2*=(T).5;
-    rhs2-=rhs1;rhs2-=sol1;rhs2-=sol2;
-    LOG::cout<<"ddE "<<system2.Convergence_Norm(rhs2)/e<<std::endl;
-
-    throw;
-#endif
-
-    for(int step=0;step<newton_steps;step++){
-        bool solve_for_normals=step<20||(step&1);
-        MARCHING_CUBES_SYSTEM<TV> system;
-        MARCHING_CUBES_VECTOR<TV> rhs,sol;
-        system.Setup(rhs,sol,normals_count,position_dofs,index_map,reverse_index_map,
-            junction_cells,cell_to_element,surface,particles,normals,solve_for_normals,step==newton_steps-1);
-
-        ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
-        CONJUGATE_RESIDUAL<T> cr;
-        cr.Ensure_Size(vectors,rhs,3);
-        cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,1);
-
-    if(step==newton_steps-1) break;
-
-    if(!solve_for_normals)
-    for(int i=0;i<index_map.m;i++)
-        for(int j=0;j<TV::m;j++)
-            if(system.project_flags(i)&(1<<j))
-                particles.X(index_map(i))(j)-=sol.x(i)(j);
-
-    if(solve_for_normals)
-    for(int i=0;i<rhs.n.m;i++){
-        normals(i)-=sol.n(i);
-        normals(i).Normalize();}}
+    ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
+    CONJUGATE_RESIDUAL<T> cr;
+    cr.Ensure_Size(vectors,rhs,3);
+    cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,TV::m);
+    
+    for(int i=0;i<iterations;i++){
+        if(i&1){ // update positions
+            for(int p=0;p<index_map.m;p++){
+                const ARRAY<int>& f_array=particle_to_fit(p);
+                const int p_index=index_map(p);
+                TV& p_position=particles.X(p_index);
+                system.matrix=SYMMETRIC_MATRIX<T,TV::m>();
+                rhs.x=TV();sol.x=TV();
+                system.project_flags=particle_dofs(p_index);
+                for(int j=0;j<f_array.m;j++){
+                    const int f_index=f_array(j);
+                    const TV& n=normals(f_index);
+                    system.matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
+                    rhs.x+=n.Dot(p_position-midpoints(f_index))*n;}
+                cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,100);
+                p_position-=sol.x;}}
+        else{ // update best fit manifolds
+            for(int f=0;f<fit_count;f++){
+                const ARRAY<int>& p_array=fit_to_particle(f);
+                midpoints(f)=particles.X.Subset(p_array).Average();
+                SYMMETRIC_MATRIX<T,TV::m> fit_matrix;
+                for(int j=0;j<p_array.m;j++) fit_matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(particles.X(p_array(j))-midpoints(f));
+                DIAGONAL_MATRIX<T,TV::m> eigenvalues;
+                MATRIX<T,TV::m> eigenvectors;
+                fit_matrix.Solve_Eigenproblem(eigenvalues,eigenvectors);
+                normals(f)=eigenvectors.Column(eigenvalues.To_Vector().Arg_Min());}}}
+    for(int f=0;f<fit_count;f++){
+        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(0,1,1));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normals(f));}
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;
