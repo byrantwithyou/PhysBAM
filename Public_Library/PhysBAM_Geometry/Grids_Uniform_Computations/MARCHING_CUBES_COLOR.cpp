@@ -864,7 +864,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
             HASHTABLE<int> particle_indices_ht;
             const VECTOR<int,2>& color_pair=it.Key();
             const T_SURFACE& color_pair_surface=*surface.Get(color_pair);
-            const RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*3);
+            RANGE<TV_INT> range(RANGE<TV_INT>::Centered_Box()*2);range.max_corner+=1;
             for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                 const TV_INT& cell_index=junction_cell_index+it2.index;
                 if(cell_to_element.Contains(cell_index)){
