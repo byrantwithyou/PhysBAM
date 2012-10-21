@@ -117,7 +117,6 @@ public:
     T Volume_Incident_On_A_Particle(const int particle_index);
     void Split_Along_Fracture_Plane(const PLANE<T>& plane,ARRAY<int>& particle_replicated);
     int Split_Node(const int particle_index,const TV& normal);
-    int Split_Connected_Component(const int node);
     void Compute_Tetrahedron_Volumes();
     void Compute_Nodal_Volumes(bool save_tetrahedron_volumes=false);
     void Print_Statistics(std::ostream& output);

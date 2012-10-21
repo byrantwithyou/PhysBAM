@@ -94,7 +94,6 @@ public:
     void Inverted_Triangles(ARRAY<int>& inverted_triangles) const;
     T Area_Incident_On_A_Particle(const int particle_index);
     int Split_Node(const int particle_index,const TV& normal);
-    int Split_Connected_Component(const int node);
     void Discard_Triangles_Outside_Implicit_Curve(IMPLICIT_OBJECT<TV>& implicit_curve);
     void Initialize_Triangle_Area_Fractions_From_Voronoi_Regions();
     void Compute_Triangle_Areas();

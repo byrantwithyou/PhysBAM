@@ -345,35 +345,6 @@ Split_Node(const int particle_index,const TV& normal)
     return new_particle;
 }
 //#####################################################################
-// Function Split_Connected_Component
-//#####################################################################
-// warning: will corrupt any aux structures aside from incident_elements & adjacent_elements
-template<class T> int TRIANGULATED_AREA<T>::
-Split_Connected_Component(const int node)
-{
-    int incident_elements_defined=mesh.incident_elements!=0;if(!incident_elements_defined) mesh.Initialize_Incident_Elements();
-    int adjacent_elements_defined=mesh.adjacent_elements!=0;if(!adjacent_elements_defined) mesh.Initialize_Adjacent_Elements();
-    ARRAY<bool> marked((*mesh.incident_elements)(node).m);
-    mesh.Mark_Edge_Connected_Component_Incident_On_A_Node(node,marked);
-    int number_marked=0;int t;for(t=0;t<marked.m;t++) if(marked(t)) number_marked++;
-    int new_particle=0;
-    if(number_marked != marked.m){
-        // new particle -- assumes we're storing position, and velocity - user must fix mass outside this function call
-        new_particle=particles.Add_Element();mesh.number_nodes=particles.Size();
-        particles.X(new_particle)=particles.X(node);particles.V(new_particle)=particles.V(node);
-        ARRAY<int> empty;mesh.incident_elements->Append(empty);
-        ARRAY<int> indices_to_remove(number_marked);int counter=0;
-        for(t=0;t<(*mesh.incident_elements)(node).m;t++) if(marked(t)){
-            indices_to_remove(counter++)=t;
-            for(int i=0;i<3;i++) if(mesh.elements((*mesh.incident_elements)(node)(t))(i) == node){ 
-                mesh.elements((*mesh.incident_elements)(node)(t))(i)=new_particle;break;}
-            (*mesh.incident_elements)(new_particle).Append((*mesh.incident_elements)(node)(t));}
-        (*mesh.incident_elements)(node).Remove_Sorted_Indices(indices_to_remove);}
-    if(!incident_elements_defined){delete mesh.incident_elements;mesh.incident_elements=0;} 
-    if(!adjacent_elements_defined){delete mesh.adjacent_elements;mesh.adjacent_elements=0;}
-    return new_particle;
-}
-//#####################################################################
 // Function Discard_Triangles_Outside_Implicit_Curve
 //#####################################################################
 // uses Whitney-like criterion to discard only those triangles that are for sure outside levelset (assuming accurate signed distance)
