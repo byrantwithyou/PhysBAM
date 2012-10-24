@@ -640,8 +640,105 @@ template<class T,class TV_INT,class TV,class T_SURFACE> void
 Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,8>& re_color,
     const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const int* color_list,HASHTABLE<FACE_INDEX<3>,int>& edge_vertices,
     HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,const TV_INT& cell_index,
-    GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > >& cell_to_element)
+    GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements)
 {
+    int cs=0;
+    for(int i=0;i<8;i++)
+        cs=cs*(i+1)+re_color(i);
+    if(!cs) return;
+
+    int tri=interface_case_table(cs);
+    if(interface_triangle_table(tri)&comparison_bit){
+        int pat=interface_triangle_table(tri);
+        if(pat&(0x3f<<18)){
+            int amb0=(pat>>24)&7,amb1=(pat>>27)&7,amb2=(pat>>18)&7,amb3=(pat>>21)&7;
+            if(color_list[amb0]<color_list[amb1]){
+                if(color_list[amb2]<color_list[amb3]) tri++;
+                else tri+=(pat>>12)&0x3f;}
+            else{
+                if(color_list[amb2]<color_list[amb3]) tri+=(pat>>6)&0x3f;
+                else tri+=pat&0x3f;}}
+        else{
+            int amb0=(pat>>24)&7,amb1=(pat>>27)&7;
+            if(color_list[amb1]<color_list[amb0]) tri+=(pat>>12)&0x3f;
+            else tri++;}}
+
+    TV corners[8]={TV(range.min_corner.x,range.min_corner.y,range.min_corner.z),TV(range.max_corner.x,range.min_corner.y,range.min_corner.z),
+                   TV(range.min_corner.x,range.max_corner.y,range.min_corner.z),TV(range.max_corner.x,range.max_corner.y,range.min_corner.z),
+                   TV(range.min_corner.x,range.min_corner.y,range.max_corner.z),TV(range.max_corner.x,range.min_corner.y,range.max_corner.z),
+                   TV(range.min_corner.x,range.max_corner.y,range.max_corner.z),TV(range.max_corner.x,range.max_corner.y,range.max_corner.z)};
+    TV pts[19];
+    T pts_phi[19];
+    for(int a=0,k=0;a<3;a++){
+        int mask=1<<a;
+        for(int v=0;v<8;v++)
+            if(!(v&mask)){
+                T theta=phi(v)/(phi(v)+phi(v|mask));
+                pts[k]=(1-theta)*corners[v]+theta*corners[v|mask];
+                pts_phi[k++]=(1-theta)*phi(v)+theta*phi(v|mask);}}
+
+    for(int i=0;i<7;i++){
+        int a=averaging_order[i][0],b=averaging_order[i][1];
+        T theta=pts_phi[a]/(pts_phi[a]+pts_phi[b]);
+        pts[12+i]=(1-theta)*pts[a]+theta*pts[b];
+        pts_phi[12+i]=(1-theta)*pts_phi[a]+theta*pts_phi[b];}
+
+    int pat;
+    int points[19]={-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1};
+    do{
+        pat=interface_triangle_table(tri++);
+        const TV_INT triangle(GET_V(pat,0),GET_V(pat,1),GET_V(pat,2));
+        int tmp;
+        for(int p=0;p<TV::m;p++){
+            const int e=triangle(p);
+            if(e<12){
+                const int axis=e>>2;
+                const int offset1=e&1;
+                const int offset2=(e>>1)&1;
+                FACE_INDEX<TV::m> fi(axis,cell_index+VECTOR<int,2>(offset1,offset2).Insert(0,axis));
+                if(!edge_vertices.Get(fi,tmp)){
+                    int index=particles.Add_Element();
+                    points[e]=index;
+                    edge_vertices.Set(fi,index);
+                    particles.X(index)=pts[e];}
+                else{
+                    assert(points[e]==tmp || points[e]==-1);
+                    points[e]=tmp;}}
+            else if(e<18){
+                const int axis=(e-12)>>1;
+                const int sign=(e-12)&1;
+                FACE_INDEX<TV::m> fi(axis,cell_index+TV_INT::Axis_Vector(axis)*sign);
+                if(!face_vertices.Get(fi,tmp)){
+                    int index=particles.Add_Element();
+                    points[e]=index;
+                    face_vertices.Set(fi,index);
+                    particles.X(index)=pts[e];}
+                else{
+                    assert(points[e]==tmp || points[e]==-1);
+                    points[e]=tmp;}}
+            else{
+                if(!cell_vertices.Get(cell_index,tmp)){
+                    int index=particles.Add_Element();
+                    points[e]=index;
+                    cell_vertices.Set(cell_index,index);
+                    particles.X(index)=pts[e];}
+                else{
+                    assert(points[e]==tmp || points[e]==-1);
+                    points[e]=tmp;}}}
+
+        TV_INT v(points[triangle(0)],points[triangle(2)],points[triangle(1)]);
+        VECTOR<int,2> c(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
+        if(c.x>c.y){
+            exchange(c.x,c.y);
+            exchange(v(1),v(2));}
+        
+        T_SURFACE* s=0;
+        if(!surface.Get(c,s)){
+            s=T_SURFACE::Create(particles);
+            surface.Set(c,s);}
+        s->mesh.elements.Append(v);
+        cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
+    }while(!(pat&last_tri_bit));
 }
 //#####################################################################
 // Function Get_Interface_Elements_For_Cell
@@ -650,7 +747,7 @@ template<class T,class TV_INT,class TV,class T_SURFACE> void
 Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,4>& re_color,
     const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const int* color_list,HASHTABLE<FACE_INDEX<2>,int>& edge_vertices,
     HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,const TV_INT& cell_index,
-    GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > >& cell_to_element)
+    GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements)
 {
     int cs=0;
     for(int i=0;i<4;i++)
@@ -666,7 +763,7 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
 
     const VECTOR<VECTOR<int,2>,4>& bits=GRID<TV>::Binary_Counts(TV_INT());
     TV corners[4]={TV(range.min_corner.x,range.min_corner.y),TV(range.max_corner.x,range.min_corner.y),
-        TV(range.min_corner.x,range.max_corner.y),TV(range.max_corner.x,range.max_corner.y)};
+                   TV(range.min_corner.x,range.max_corner.y),TV(range.max_corner.x,range.max_corner.y)};
     int pts[5]={-1,-1,-1,-1,-1};
     int num=0;
     for(int e=0;e<4;e++){
@@ -693,8 +790,6 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
             particles.X(index)=X/total;}}
 
     int pat;
-    assert(!cell_to_element.Contains(cell_index));
-     HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get_Or_Insert(cell_index);
     do{
         pat=interface_segment_table(seg++);
         VECTOR<int,2> c(color_list[GET_C(pat,0)],color_list[GET_C(pat,1)]);
@@ -814,12 +909,15 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 re_color(i)=next_color;
                 color_list[next_color]=cell_color(i);
                 color_map.Set(cell_color(i),next_color++);}
+        assert(!cell_to_element.Contains(it.index));
+        HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get_Or_Insert(it.index);
+        Get_Interface_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
+            face_vertices,cell_vertices,it.index,particles,cell_elements);
         if(next_color>=3){
             junction_cell(it.index)=true;
             junction_cells.Append(it.index);
-            fit_count+=next_color;}
-        Get_Interface_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
-            face_vertices,cell_vertices,it.index,particles,cell_to_element);}
+            for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(cell_elements);it.Valid();it.Next())
+                fit_count++;}}
 
     ARRAY<int> particle_dofs(particles.number);
     ARRAY<TV> normals(fit_count);
@@ -830,7 +928,6 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         particle_dofs(it.Data())=(1<<TV::m)-1;}
 
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_vertices);it.Valid();it.Next()){
-        // TODO: mark dofs properly for 3D
         Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,1,0));
         particle_dofs(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);}
 
@@ -839,7 +936,8 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         range.max_corner(it.Key().axis)=2;
         bool ok=true;
         for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
-            if(junction_cell(it2.index+it.Key().index)){
+            TV_INT index=it2.index+it.Key().index;
+            if(junction_cell.Valid_Index(index)&&junction_cell(index)){
                 ok=false;
                 break;}}
         if(!ok){
@@ -888,6 +986,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
     CONJUGATE_RESIDUAL<T> cr;
+    cr.print_diagnostics=false;
     cr.Ensure_Size(vectors,rhs,3);
     cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,TV::m);
     

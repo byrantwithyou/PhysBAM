@@ -50,37 +50,45 @@ T Compute(const ARRAY<TV>& x,const TV& n,TV& dE,SYMMETRIC_MATRIX<T,d>& ddE)
 
 int main(int argc, char* argv[])
 {
-    const int x_full=2;
-    RANDOM_NUMBERS<T> rand;
+    for(int e=0;e<12;e++){
+        const int axis=e>>2;
+        const int offset1=e&1;
+        const int offset2=(e>>1)&1;
+        LOG::cout<<e<<"\t"<<axis<<"\t"<<offset1<<"\t"<<offset2<<"\t";
+        LOG::cout<<VECTOR<int,2>(offset1,offset2).Insert(0,axis)<<std::endl;}
 
-    ARRAY<TV> x1(x_full);
-    TV n1;
-    TV dE1;
-    SYMMETRIC_MATRIX<T,d> ddE1;
 
-    x1(0)=TV(.2,.5);
-    x1(1)=TV(.7,.1);
-    n1=TV(1,1); n1.Normalize();
+    // const int x_full=2;
+    // RANDOM_NUMBERS<T> rand;
 
-    ARRAY<TV> x2(x1);
-    TV n2(n1);
-    TV dE2;
-    SYMMETRIC_MATRIX<T,d> ddE2;
+    // ARRAY<TV> x1(x_full);
+    // TV n1;
+    // TV dE1;
+    // SYMMETRIC_MATRIX<T,d> ddE1;
 
-    const T e=1e-6;
-    TV dn;
-    rand.Fill_Uniform(dn,-e,e);
-    n2+=dn;//n2.Normalize();
+    // x1(0)=TV(.2,.5);
+    // x1(1)=TV(.7,.1);
+    // n1=TV(1,1); n1.Normalize();
+
+    // ARRAY<TV> x2(x1);
+    // TV n2(n1);
+    // TV dE2;
+    // SYMMETRIC_MATRIX<T,d> ddE2;
+
+    // const T e=1e-6;
+    // TV dn;
+    // rand.Fill_Uniform(dn,-e,e);
+    // n2+=dn;//n2.Normalize();
     // dn=n2-n1;
 
-    T E1=Compute(x1,n1,dE1,ddE1);
-    T E2=Compute(x2,n2,dE2,ddE2);
+    // T E1=Compute(x1,n1,dE1,ddE1);
+    // T E2=Compute(x2,n2,dE2,ddE2);
 
-    LOG::cout<<"dE  "<<(E2-E1-(dE1.Dot(dn)+dE2.Dot(dn))*(T).5)/e<<std::endl;
-    LOG::cout<<"ddE "<<(dE2-dE1-(ddE1*dn+ddE2*dn)*(T).5).Max_Abs()/e<<std::endl;
+    // LOG::cout<<"dE  "<<(E2-E1-(dE1.Dot(dn)+dE2.Dot(dn))*(T).5)/e<<std::endl;
+    // LOG::cout<<"ddE "<<(dE2-dE1-(ddE1*dn+ddE2*dn)*(T).5).Max_Abs()/e<<std::endl;
 
-    LOG::cout<<E1<<" "<<dE1<<" "<<ddE1<<std::endl;
-    LOG::cout<<E2<<" "<<dE2<<" "<<ddE2<<std::endl;
+    // LOG::cout<<E1<<" "<<dE1<<" "<<ddE1<<std::endl;
+    // LOG::cout<<E2<<" "<<dE2<<" "<<ddE2<<std::endl;
 
     return 0;
 }
