@@ -9,7 +9,7 @@ env=env.Copy()
 ignore=["build","install","Documentation"]
 exclude=[]
 #directories=Find_Directories(lambda x: x not in ignore)
-directories=['PhysBAM_Dynamics', 'PhysBAM_Fluids', 'PhysBAM_Solids', 'PhysBAM_Geometry', 'PhysBAM_Tools']
+directories=['PhysBAM_Dynamics', 'PhysBAM_Fluids', 'PhysBAM_Solids', 'PhysBAM_Geometry', 'PhysBAM_Tools','PhysBAM_Rendering']
 
 if env['install_headers'] and env['INSTALL_PATH']:
     install_include=os.path.join(env['INSTALL_PATH'],'include','physbam','')
