@@ -102,6 +102,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     typedef typename TOPOLOGY_BASED_SIMPLEX_POLICY<TV,TV::m-1>::OBJECT T_SURFACE;
 
     int resolution=32;
+    int iterations=100;
     int test_number=0;
     bool opt_arg=false;
     bool dampen=false;
@@ -109,6 +110,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-resolution",&resolution,"res","resolution");
+    parse_args.Add("-iterations",&iterations,"iter","iterations");
     parse_args.Add("-dampen",&dampen,"dampen");
     parse_args.Add("-verbose",&verbose,"verbose");
     parse_args.Parse();
@@ -166,7 +168,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
 
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
-    for(int i=0;i<100;i++){
+    for(int i=0;i<iterations;i++){
         HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
         HASHTABLE<int,T_SURFACE*> boundary;
         MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,phi_color,phi_value,i,dampen,verbose);

@@ -423,6 +423,7 @@ Initialize_Components_And_Key_Bindings()
         OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>* component=new OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T>(filename);
         Add_Component(component,"Debug particles",'w',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE|BASIC_VISUALIZATION::OWNED);
         opengl_world.Append_Bind_Key('W',component->Toggle_Draw_Velocities_CB());
+        opengl_world.Append_Bind_Key('q',component->Show_Colored_Wireframe_CB());
         opengl_world.Append_Bind_Key('=',component->Increase_Vector_Size_CB());
         opengl_world.Append_Bind_Key('-',component->Decrease_Vector_Size_CB());
         if(slice_manager.slice) slice_manager.Add_Object(component);}

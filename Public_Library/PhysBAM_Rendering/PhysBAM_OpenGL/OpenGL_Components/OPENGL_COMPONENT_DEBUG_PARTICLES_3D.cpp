@@ -188,6 +188,14 @@ Reinitialize(bool force)
     frame_loaded=frame;
 }
 //#####################################################################
+// Function Show_Colored_Wireframe
+//#####################################################################
+template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T,RW>::
+Show_Colored_Wireframe()
+{
+    opengl_particles.wireframe_only=!opengl_particles.wireframe_only;
+}
+//#####################################################################
 // Function Toggle_Draw_Velocities
 //#####################################################################
 template<class T,class RW> void OPENGL_COMPONENT_DEBUG_PARTICLES_3D<T,RW>::

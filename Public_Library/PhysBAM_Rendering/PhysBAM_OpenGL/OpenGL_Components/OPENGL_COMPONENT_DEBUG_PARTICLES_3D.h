@@ -40,11 +40,13 @@ public:
     void Print_Selection_Info(std::ostream &output_stream, OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
     OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
+    void Show_Colored_Wireframe();
     void Toggle_Draw_Velocities();
     void Increase_Vector_Size();
     void Decrease_Vector_Size();
     void Command_Prompt();
     void Set_Slice(OPENGL_SLICE *slice_input);
+    DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Show_Colored_Wireframe,"Show colored wireframe");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Toggle_Draw_Velocities,"Toggle draw velocities");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Increase_Vector_Size,"Increase vector size");
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_DEBUG_PARTICLES_3D,Decrease_Vector_Size,"Decrease vector size");
