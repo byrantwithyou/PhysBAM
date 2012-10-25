@@ -11,7 +11,7 @@ using namespace PhysBAM;
 
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::string &values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    : OPENGL_COMPONENT("Face Scalar Field 3D"), opengl_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<3> >,color_map_input),
+    : OPENGL_COMPONENT("Face Scalar Field 3D"), opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
       values_filename(values_filename_input), x_face_values_filename(""), y_face_values_filename(""), z_face_values_filename(""), frame_loaded(-1), valid(false)
 {
     is_animation = FILE_UTILITIES::Is_Animated(values_filename);
@@ -21,7 +21,7 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::str
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::string &x_face_values_filename_input, const std::string &y_face_values_filename_input,
                                       const std::string &z_face_values_filename_input, OPENGL_COLOR_MAP<T2>* color_map_input)
-    : OPENGL_COMPONENT("Face Scalar Field 3D"), opengl_scalar_field(grid_input,*new ARRAY<T2,FACE_INDEX<3> >,color_map_input),
+    : OPENGL_COMPONENT("Face Scalar Field 3D"), opengl_scalar_field(grid_input,internal_scalar_field,color_map_input),
       values_filename(), x_face_values_filename(x_face_values_filename_input), y_face_values_filename(y_face_values_filename_input), z_face_values_filename(z_face_values_filename_input), 
       frame_loaded(-1), valid(false)
 {
@@ -32,9 +32,6 @@ OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D(const GRID<TV> &grid_input, const std::str
 template<class T,class T2,class RW> OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::
 ~OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D()
 {
-    delete &opengl_scalar_field.x_face_values;
-    delete &opengl_scalar_field.y_face_values;
-    delete &opengl_scalar_field.z_face_values;
 }
 
 template<class T,class T2,class RW> bool OPENGL_COMPONENT_FACE_SCALAR_FIELD_3D<T,T2,RW>::

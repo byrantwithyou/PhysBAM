@@ -17,7 +17,7 @@ template<class T,class RW> OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D<T,RW>::
 OPENGL_COMPONENT_MAC_VELOCITY_FIELD_3D(const GRID<TV> &grid, const std::string &velocity_filename)
     : OPENGL_COMPONENT("MAC Velocity Field"),
      opengl_mac_velocity_field(*new GRID<TV>(grid)),
-     opengl_vorticity_magnitude(opengl_mac_velocity_field.grid,*(new ARRAY<T,VECTOR<int,3> >),OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
+     opengl_vorticity_magnitude(opengl_mac_velocity_field.grid,opengl_vorticity_magnitude_array,OPENGL_COLOR_RAMP<T>::Matlab_Jet(0,1)),
      draw_vorticity(false),velocity_filename(velocity_filename),valid(false),min_vorticity(FLT_MAX),max_vorticity(FLT_MIN)
 {
     is_animation = FILE_UTILITIES::Is_Animated(velocity_filename);

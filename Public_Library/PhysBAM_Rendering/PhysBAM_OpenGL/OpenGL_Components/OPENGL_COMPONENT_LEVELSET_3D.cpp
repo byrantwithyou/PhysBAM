@@ -46,11 +46,17 @@ OPENGL_COMPONENT_LEVELSET_3D(const std::string& levelset_filename_input,
             opengl_levelset_multiviews(i)->Set_Surface_Material(color,color);
             opengl_levelset_multiviews(i)->Set_Two_Sided(false);}}
     opengl_levelset_multiview=opengl_levelset_multiviews(0);
+    delete color_map;
 
     if (triangulated_surface_filename.length()==0) triangulated_surface_filename="";
 
     is_animation=levelset_filename.find("%d")!=std::string::npos;
     Reinitialize();
+}
+template<class T,class RW> OPENGL_COMPONENT_LEVELSET_3D<T,RW>::
+~OPENGL_COMPONENT_LEVELSET_3D()
+{
+    opengl_levelset_multiviews.Delete_Pointers_And_Clean_Memory();
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_LEVELSET_3D<T,RW>::

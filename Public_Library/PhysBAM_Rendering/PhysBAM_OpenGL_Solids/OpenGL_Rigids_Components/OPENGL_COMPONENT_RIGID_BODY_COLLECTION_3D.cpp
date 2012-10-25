@@ -71,13 +71,6 @@ Initialize()
     draw_joint_frames=0;
     draw_forces_and_torques=false;
     has_init_destroy_information=true;
-
-    OPENGL_COLOR_RAMP<T>* color_ramp=new OPENGL_COLOR_RAMP<T>();
-    color_ramp->Add_Color((T)-log(1.001),OPENGL_COLOR::Blue());
-//    color_ramp->Add_Color((T)-log(1.000001),OPENGL_COLOR::Blue());
-    color_ramp->Add_Color((T)0,OPENGL_COLOR::Blue((T).5),OPENGL_COLOR::Gray((T).5),OPENGL_COLOR::Red((T).5));
-//    color_ramp->Add_Color(log((T)1.00001),OPENGL_COLOR::Red());
-    color_ramp->Add_Color(log((T)1.001),OPENGL_COLOR::Red());
 }
 //#####################################################################
 // Function Read_Articulated_Information

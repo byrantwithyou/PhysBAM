@@ -26,7 +26,7 @@ namespace{
 // Constructor
 //#####################################################################
 BASIC_VISUALIZATION::BASIC_VISUALIZATION() 
-    :opengl_axes(0),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
+    :opengl_axes(0),set_window_position(false),opengl_window_title("OpenGL Visualization"),add_axes(true),render_offscreen(false),
     opt_left_handed(false),opt_smooth(false),selection_enabled(true),current_selection(0)
 {
     the_visualization=this;

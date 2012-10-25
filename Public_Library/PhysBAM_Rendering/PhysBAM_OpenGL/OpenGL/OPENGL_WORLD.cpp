@@ -101,11 +101,14 @@ OPENGL_WORLD()
 OPENGL_WORLD::
 ~OPENGL_WORLD()
 {
-    for(int index=0;index<key_bindings_by_category.m;index++) for(int key=0;key<key_bindings_by_category(index).key_bindings.m;key++) delete key_bindings_by_category(index).key_bindings(key).y;
+    for(int index=0;index<key_bindings_by_category.m;index++)
+        for(int key=0;key<key_bindings_by_category(index).key_bindings.m;key++)
+            delete key_bindings_by_category(index).key_bindings(key).y;
     Clear_All_Lights();
     delete window;
     delete arcball;
     opengl_world=0;
+    delete idle_callback;
 }
 //#####################################################################
 // Singleton

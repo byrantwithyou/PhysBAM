@@ -27,7 +27,9 @@ OPENGL_MAC_VELOCITY_FIELD_3D(GRID<TV> &grid)
 template<class T> OPENGL_MAC_VELOCITY_FIELD_3D<T>::
 ~OPENGL_MAC_VELOCITY_FIELD_3D()
 {
-    delete &vector_field;delete &vector_locations;
+    delete &vector_field;
+    delete &vector_locations;
+    delete &face_velocities;
 }
 
 template<class T> void OPENGL_MAC_VELOCITY_FIELD_3D<T>::

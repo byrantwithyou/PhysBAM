@@ -60,6 +60,7 @@ private:
 
 public:
     OPENGL_MAC_VELOCITY_FIELD_3D<T> opengl_mac_velocity_field;
+    ARRAY<T,VECTOR<int,3> > opengl_vorticity_magnitude_array;
     OPENGL_SCALAR_FIELD_3D<T> opengl_vorticity_magnitude;
     bool draw_vorticity;
 

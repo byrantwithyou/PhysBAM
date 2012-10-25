@@ -96,6 +96,8 @@ private:
     bool has_valid_grid,has_valid_rle_grid,has_valid_octree_grid,has_valid_coarse_grid;
     bool node_based,coarse_node_based;
     OPENGL_SLICE_MANAGER slice_manager;
+    OPENGL_BOX_3D<T>* opengl_box;
+    OPENGL_UNIFORM_SLICE* slice;
 
     ARRAY<int> rigid_bodies_no_draw_list;
     ARRAY<int> deformable_no_draw_list;
@@ -109,7 +111,7 @@ private:
 template<class T,class RW> VISUALIZATION<T,RW>::
 VISUALIZATION()
     :ANIMATED_VISUALIZATION(),positive_particles_component(0),negative_particles_component(0),
-    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0),
+    removed_positive_particles_component(0),removed_negative_particles_component(0),grid_component(0),coarse_grid_component(0),opengl_box(0),slice(0),
     allow_caching(true),always_add_mac_velocities(false)
 {
 }
@@ -117,12 +119,8 @@ VISUALIZATION()
 template<class T,class RW> VISUALIZATION<T,RW>::
 ~VISUALIZATION()
 {
-    delete positive_particles_component;
-    delete negative_particles_component;
-    delete removed_positive_particles_component;
-    delete removed_negative_particles_component;
-    if(grid_component){delete &grid_component->object;delete grid_component;}
-    if(coarse_grid_component){delete &coarse_grid_component->object;delete coarse_grid_component;}
+    if(opengl_box) delete &opengl_box->box;
+    delete slice;
 }
 
 template<class T,class RW> void VISUALIZATION<T,RW>::
@@ -233,14 +231,14 @@ Initialize_Components_And_Key_Bindings()
 
     Read_Grid();
     if(has_valid_grid){
-        OPENGL_UNIFORM_SLICE* slice=new OPENGL_UNIFORM_SLICE(opengl_world);slice->Initialize(grid);
+        slice=new OPENGL_UNIFORM_SLICE(opengl_world);slice->Initialize(grid);
         slice_manager.slice=slice;
         std::cout<<"Using uniform grid slice"<<std::endl;}
 
     if(slice_manager.slice) slice_manager.Set_Slice_Has_Changed_Callback(Slice_Has_Changed_CB());
 
     if(has_valid_grid){
-        OPENGL_BOX_3D<T>* opengl_box=new OPENGL_BOX_3D<T>(*(new RANGE<TV>(grid.Domain())),OPENGL_COLOR::Gray(0.5));
+        opengl_box=new OPENGL_BOX_3D<T>(*(new RANGE<TV>(grid.Domain())),OPENGL_COLOR::Gray(0.5));
         OPENGL_COMPONENT_BASIC<OPENGL_BOX_3D<T> >* domain_box_component=new OPENGL_COMPONENT_BASIC<OPENGL_BOX_3D<T> >(*opengl_box);
         Add_Component(domain_box_component,"Domain box",'6',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
 
@@ -629,15 +627,18 @@ Initialize_Components_And_Key_Bindings()
 
     if(has_valid_grid){
         OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(*(new GRID<TV>(grid)),OPENGL_COLOR::Gray(0.5));
+        opengl_grid->owns_grid=true;
         grid_component=new OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >(*opengl_grid);
         opengl_world.Set_Key_Binding_Category("Grid");
-        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(grid_component,"Grid",'6',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('^',grid_component->object.Toggle_Draw_Ghost_Values_CB());
         slice_manager.Add_Object(grid_component);}
     if(has_valid_coarse_grid){
-        OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(*(new GRID<TV>(coarse_grid)),OPENGL_COLOR::Ground_Tan(.5));opengl_grid->scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
+        OPENGL_GRID_3D<T>* opengl_grid=new OPENGL_GRID_3D<T>(*(new GRID<TV>(coarse_grid)),OPENGL_COLOR::Ground_Tan(.5));
+        opengl_grid->owns_grid=true;
+        opengl_grid->scale=grid.Domain_Indices().max_corner(1)/coarse_grid.Domain_Indices().max_corner(1);
         coarse_grid_component=new OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >(*opengl_grid);
-        Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
+        Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('^',coarse_grid_component->object.Toggle_Draw_Ghost_Values_CB());
         slice_manager.Add_Object(coarse_grid_component);}
 
@@ -906,10 +907,12 @@ Slice_Has_Changed()
 // ==========================================================================
 
 ANIMATED_VISUALIZATION* visualization=0;
+PARSE_ARGS* parse_args=0;
 void cleanup_function(void)
 {
     delete visualization;
     TIMER::Destroy_Singleton();
+    delete parse_args;
 }
 
 int main(int argc,char* argv[])
@@ -917,10 +920,10 @@ int main(int argc,char* argv[])
     PROCESS_UTILITIES::Set_Floating_Point_Exception_Handling(true);
     PROCESS_UTILITIES::Set_Backtrace(true);
     bool type_double=false; // float by default
-    PARSE_ARGS parse_args(argc,argv);
-    parse_args.Add_Not("-float",&type_double,"Use floats");
-    parse_args.Add("-double",&type_double,"Use doubles");
-    parse_args.Parse(true);
+    parse_args=new PARSE_ARGS(argc,argv);
+    parse_args->Add_Not("-float",&type_double,"Use floats");
+    parse_args->Add("-double",&type_double,"Use doubles");
+    parse_args->Parse(true);
 
     if(!type_double) visualization=new VISUALIZATION<float>();
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
@@ -929,6 +932,6 @@ int main(int argc,char* argv[])
     else{std::cerr<<"Double support not enabled."<<std::endl;exit(1);}
 #endif
     atexit(cleanup_function);
-    visualization->Initialize_And_Run(parse_args);
+    visualization->Initialize_And_Run(*parse_args);
     return 0;
 }

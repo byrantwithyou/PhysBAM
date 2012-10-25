@@ -26,9 +26,15 @@ public:
         :slice(0),slice_has_changed_callback(0)
     {}
 
+    ~OPENGL_SLICE_MANAGER()
+    {
+        delete slice_has_changed_callback;
+    }
+
     void Set_Slice_Has_Changed_Callback(OPENGL_CALLBACK* slice_has_changed_callback_input)
     {
-        slice_has_changed_callback = slice_has_changed_callback_input;
+        delete slice_has_changed_callback;
+        slice_has_changed_callback=slice_has_changed_callback_input;
     }
     
     void Add_Object(OPENGL_OBJECT* object)

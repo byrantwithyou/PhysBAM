@@ -29,6 +29,7 @@ template<class T,class T2> OPENGL_FACE_SCALAR_FIELD_3D<T,T2>::
 ~OPENGL_FACE_SCALAR_FIELD_3D()
 {
     delete &opengl_points.points;
+    delete color_map;
 }
 //#####################################################################
 // Display

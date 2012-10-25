@@ -15,18 +15,22 @@
 namespace PhysBAM{
 
 template<class T>
-class OPENGL_GRID_3D : public OPENGL_OBJECT
+class OPENGL_GRID_3D:public OPENGL_OBJECT
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+
+    OPENGL_SELECTION *current_selection;
 public:
     GRID<TV> &grid;
     OPENGL_COLOR color;
     bool draw_ghost_values;
     bool hide_non_selected_grid;
+    bool owns_grid;
     int scale;
 
 //##################################################################### 
     OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input=OPENGL_COLOR::White());
+    virtual ~OPENGL_GRID_3D();
     void Display(const int in_color=1) const PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;
     void Print_Selection_Info(std::ostream& stream,OPENGL_SELECTION* selection) const PHYSBAM_OVERRIDE;
@@ -38,8 +42,6 @@ public:
 private:
     void Draw_Subgrid(const TV_INT &node_start,const TV_INT &node_end) const;
     void Draw_Nodes_For_Selection(const TV_INT &node_start,const TV_INT &node_end) const;
-
-    OPENGL_SELECTION *current_selection;
 //##################################################################### 
 };
 

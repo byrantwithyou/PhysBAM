@@ -25,6 +25,8 @@ public:
                                  bool write_generated_triangulated_surface = false,
                                  bool check_triangulated_surface_file_time = true);
 
+    virtual ~OPENGL_COMPONENT_LEVELSET_3D();
+
     void Set_Surface_Material(const OPENGL_MATERIAL &front_surface_mat,
                               const OPENGL_MATERIAL &back_surface_mat);
     void Set_Overlayed_Surface_Material(const OPENGL_MATERIAL &overlayed_surface_mat);

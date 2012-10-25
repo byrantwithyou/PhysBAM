@@ -8,12 +8,20 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_UNIFORM_SLICE.h>
 using namespace PhysBAM;
 //#####################################################################
-// OPENGL_GRID_3D
+// Constructor
 //#####################################################################
 template<class T> OPENGL_GRID_3D<T>::
 OPENGL_GRID_3D(GRID<TV> &grid_input,const OPENGL_COLOR &color_input) 
-    :grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),scale(1),current_selection(0)
+    :current_selection(0),grid(grid_input),color(color_input),draw_ghost_values(true),hide_non_selected_grid(false),owns_grid(false),scale(1)
 {
+}
+//#####################################################################
+// Destructor
+//#####################################################################
+template<class T> OPENGL_GRID_3D<T>::
+~OPENGL_GRID_3D()
+{
+    if(owns_grid) delete &grid;
 }
 //#####################################################################
 // Display
