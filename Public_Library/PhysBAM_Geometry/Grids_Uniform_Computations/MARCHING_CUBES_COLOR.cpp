@@ -1021,8 +1021,11 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
         if(verbose) LOG::cout<<".";}
     if(verbose) LOG::cout<<std::endl;
     for(int f=0;f<fit_count;f++){
-        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(0,1,1));
-        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normals(f));}
+        const TV& normal_vector=normals(f);
+        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normal_vector);
+        Add_Debug_Particle(midpoints(f),VECTOR<T,3>(1,0,1));
+        Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,-normal_vector);}
     for(int p=0;p<particle_dofs.m;p++){
         switch(particle_dofs(p)){
             case 0: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(.5,.5,.5)); break;

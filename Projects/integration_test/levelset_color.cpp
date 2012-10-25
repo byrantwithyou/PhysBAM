@@ -72,8 +72,7 @@ void Dump_Element(const VECTOR<int,2>& color_pair,SEGMENT_2D<T>& x)
 template<class T,class TV>
 void Dump_Element(const VECTOR<int,2>& color_pair,TRIANGLE_3D<T>& x)
 {
-    Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x],color_map[color_pair.x]);
-    Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y],color_map[color_pair.y]);
+    Add_Debug_Object(x.X,color_map[color_pair.x],color_map[color_pair.y]);
 }
 
 template<class T,class TV,class T_SURFACE,class T_FACE>
