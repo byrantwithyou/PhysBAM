@@ -35,7 +35,7 @@ public:
     static void Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,int> >& boundary,
         const VECTOR<int,num_corners>& colors,const VECTOR<T,num_corners>& phi);
     static void Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
-        const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int newton_steps=20);
+        const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int newton_steps=20,const bool dampen=false,const bool verbose=false);
 //#####################################################################
 };
 }

@@ -879,7 +879,7 @@ public:
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
-    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int iterations)
+    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int iterations,const bool dampen,const bool verbose)
 {
     HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > > cell_to_element;
 
@@ -924,11 +924,9 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     ARRAY<TV> midpoints(fit_count);
     
     for(typename HASHTABLE<TV_INT,int>::ITERATOR it(cell_vertices);it.Valid();it.Next()){
-        Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,0,0));
         particle_dofs(it.Data())=(1<<TV::m)-1;}
 
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(face_vertices);it.Valid();it.Next()){
-        Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,1,0));
         particle_dofs(it.Data())=(1<<TV::m)-1-(1<<it.Key().axis);}
 
     for(typename HASHTABLE<FACE_INDEX<TV::m>,int>::ITERATOR it(edge_vertices);it.Valid();it.Next()){
@@ -940,9 +938,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
             if(junction_cell.Valid_Index(index)&&junction_cell(index)){
                 ok=false;
                 break;}}
-        if(!ok){
-            particle_dofs(it.Data())=1<<it.Key().axis;
-            Add_Debug_Particle(particles.X(it.Data()),VECTOR<T,3>(1,1,1));}}
+        if(!ok) particle_dofs(it.Data())=1<<it.Key().axis;}
 
     ARRAY<int> index_map,reverse_index_map(particle_dofs.m);
     for(int i=0;i<particle_dofs.m;i++){
@@ -989,7 +985,8 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     cr.print_diagnostics=false;
     cr.Ensure_Size(vectors,rhs,3);
     cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,TV::m);
-    
+
+    if(verbose) LOG::cout<<"Adjusting surface mesh...";
     for(int i=0;i<iterations;i++){
         if(i&1){ // update positions
             for(int p=0;p<index_map.m;p++){
@@ -1002,10 +999,15 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 for(int j=0;j<f_array.m;j++){
                     const int f_index=f_array(j);
                     const TV& n=normals(f_index);
-                    system.matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
+                    if(!dampen) system.matrix+=SYMMETRIC_MATRIX<T,TV::m>::Outer_Product(n);
                     rhs.x+=n.Dot(p_position-midpoints(f_index))*n;}
-                cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,100);
-                p_position-=sol.x;}}
+                if(dampen){
+                    rhs.x/=f_array.m;
+                    system.Project(rhs);
+                    p_position-=rhs.x;}
+                else{
+                    cr.Solve(system,sol,rhs,vectors,(T)1e-7,0,TV::m);
+                    p_position-=sol.x;}}}
         else{ // update best fit manifolds
             for(int f=0;f<fit_count;f++){
                 const ARRAY<int>& p_array=fit_to_particle(f);
@@ -1015,10 +1017,19 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 DIAGONAL_MATRIX<T,TV::m> eigenvalues;
                 MATRIX<T,TV::m> eigenvectors;
                 fit_matrix.Solve_Eigenproblem(eigenvalues,eigenvectors);
-                normals(f)=eigenvectors.Column(eigenvalues.To_Vector().Arg_Min());}}}
+                normals(f)=eigenvectors.Column(eigenvalues.To_Vector().Arg_Min());}}
+        if(verbose) LOG::cout<<".";}
+    if(verbose) LOG::cout<<std::endl;
     for(int f=0;f<fit_count;f++){
         Add_Debug_Particle(midpoints(f),VECTOR<T,3>(0,1,1));
         Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_V,normals(f));}
+    for(int p=0;p<particle_dofs.m;p++){
+        switch(particle_dofs(p)){
+            case 0: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(.5,.5,.5)); break;
+            case 1: case 2: case 4: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,1,1)); break;
+            case 3: case 5: case 6: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,1,0)); break;
+            case 7: Add_Debug_Particle(particles.X(p),VECTOR<T,3>(1,0,0)); break;
+            default: PHYSBAM_FATAL_ERROR();}}
 }
 template class MARCHING_CUBES_COLOR<VECTOR<float,2> >;
 template class MARCHING_CUBES_COLOR<VECTOR<float,3> >;

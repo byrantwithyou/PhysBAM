@@ -62,6 +62,20 @@ void Flush_Frame(const char* title)
     Dump_Frame<T,TV>(ARRAY<T,FACE_INDEX<TV::m> >(*Global_Grid<TV>()),title);
 }
 
+template<class T,class TV>
+void Dump_Element(const VECTOR<int,2>& color_pair,SEGMENT_2D<T>& x)
+{
+    Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x]);
+    Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y]);
+}
+
+template<class T,class TV>
+void Dump_Element(const VECTOR<int,2>& color_pair,TRIANGLE_3D<T>& x)
+{
+    Add_Debug_Object(x.X+x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x],color_map[color_pair.x]);
+    Add_Debug_Object(x.X-x.Normal()*(T).005*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y],color_map[color_pair.y]);
+}
+
 template<class T,class TV,class T_SURFACE,class T_FACE>
 void Dump_Interface(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface)
 {
@@ -70,8 +84,7 @@ void Dump_Interface(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface)
         const T_SURFACE& surf=*it.Data();
         for(int i=0;i<surf.mesh.elements.m;i++){
             T_FACE x=surf.Get_Element(i);
-            Add_Debug_Object(x.X+x.Normal()*(T).03*Global_Grid<TV>()->dX.Min(),color_map[color_pair.x]);
-            Add_Debug_Object(x.X-x.Normal()*(T).03*Global_Grid<TV>()->dX.Min(),color_map[color_pair.y]);}}
+            Dump_Element<T,TV>(color_pair,x);}}
 }
 
 template<class T,class TV>
@@ -92,9 +105,13 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     int resolution=32;
     int test_number=0;
     bool opt_arg=false;
+    bool dampen=false;
+    bool verbose=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
     parse_args.Add("-o",&output_directory,"output","output directory");
     parse_args.Add("-resolution",&resolution,"res","resolution");
+    parse_args.Add("-dampen",&dampen,"dampen");
+    parse_args.Add("-verbose",&verbose,"verbose");
     parse_args.Parse();
 
     TV_INT counts=TV_INT()+resolution;
@@ -133,6 +150,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
                 void Initialize(){
                     for(int i=0;i<TV::m;i++)
                         n1(i)=i+M_PI/(i+M_PI);
+                    // n1.x=1;
                     n1.Normalize();
                     n2=n1.Orthogonal_Vector();}
                 T Phi_Value(const TV& X) const {TV x=X-0.5223;return n1.Dot(x)>0?n1.Dot(x):(min(abs(n1.Dot(x)),abs(n2.Dot(x))));}
@@ -152,7 +170,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     for(int i=0;i<100;i++){
         HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
         HASHTABLE<int,T_SURFACE*> boundary;
-        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,phi_color,phi_value,i);
+        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,phi_color,phi_value,i,dampen,verbose);
         Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
