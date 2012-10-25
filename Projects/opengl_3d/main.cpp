@@ -36,12 +36,9 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Dynamics/OpenGL_Dynamics_Components/OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Dynamics/OpenGL_Dynamics_Components/OPENGL_COMPONENT_MOTION_SEQUENCE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Deformable_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Deformable_Components/OPENGL_COMPONENT_SEGMENT_ADHESION.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_MUSCLE_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
@@ -82,10 +79,10 @@ private:
     DEFINE_CALLBACK_CREATOR(VISUALIZATION,Slice_Has_Changed);
 
     // Components
-    OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_PARTICLES<TV> >* positive_particles_component;
-    OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_PARTICLES<TV> >* negative_particles_component;
-    OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_positive_particles_component;
-    OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_negative_particles_component;
+    OPENGL_COMPONENT_PARTICLES_3D<T>* positive_particles_component;
+    OPENGL_COMPONENT_PARTICLES_3D<T>* negative_particles_component;
+    OPENGL_COMPONENT_PARTICLES_3D<T>* removed_positive_particles_component;
+    OPENGL_COMPONENT_PARTICLES_3D<T>* removed_negative_particles_component;
 
     // TODO: need better grid control 
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_3D<T> >* grid_component;
@@ -311,9 +308,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',rigid_bodies_component->Decrease_Vector_Size_CB());
         opengl_world.Append_Bind_Key('M',rigid_bodies_component->Toggle_Draw_Particles_CB());
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),rigid_bodies_component->Toggle_Forces_And_Torques_CB());
-        if(rigid_bodies_component->opengl_component_muscle_3d){
-            opengl_world.Append_Bind_Key('m',rigid_bodies_component->opengl_component_muscle_3d->Toggle_Linear_Muscles_CB());
-            opengl_world.Append_Bind_Key('n',rigid_bodies_component->opengl_component_muscle_3d->Toggle_Surface_Muscles_CB());}
         opengl_world.Append_Bind_Key('o',rigid_bodies_component->Toggle_One_Sided_CB());
         if(slice_manager.slice) slice_manager.Add_Object(rigid_bodies_component);}
 
@@ -654,7 +648,7 @@ Initialize_Components_And_Key_Bindings()
         if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
-        positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_PARTICLES<TV> >(filename,basedir+"/positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
+        positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         positive_particles_component->opengl_points->color=OPENGL_COLOR(1,0.5,0);
         positive_particles_component->opengl_points->point_size=2;
         Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
@@ -663,7 +657,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/negative_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_1",start_frame)){
-        negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_PARTICLES<TV> >(filename,basedir+"/negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
+        negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         negative_particles_component->opengl_points->color=OPENGL_COLOR(0,0.5,1);
         negative_particles_component->opengl_points->point_size=2;
         Add_Component(negative_particles_component,"Negative particles",'2',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
@@ -672,7 +666,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/removed_positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_1",start_frame)){
-        removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(filename,basedir+"/removed_positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
+        removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/removed_positive_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
         removed_positive_particles_component->opengl_points->point_size=2;
         Add_Component(removed_positive_particles_component,"Removed positive particles",'3',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
@@ -681,7 +675,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/removed_negative_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)||FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_1",start_frame)){
-        removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(filename,basedir+"/removed_negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
+        removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,basedir+"/removed_negative_particles_%d.%d",true,particles_stored_per_cell_uniform,particles_stored_per_cell_adaptive);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
         removed_negative_particles_component->opengl_points->point_size=2;
         Add_Component(removed_negative_particles_component,"Removed negative particles",'4',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::SELECTABLE);
@@ -690,7 +684,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/spray_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* spray_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(filename);
+        OPENGL_COMPONENT_PARTICLES_3D<T>* spray_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename);
         spray_particles_component->opengl_points->color=OPENGL_COLOR((T).7,(T).8,(T).9);
         spray_particles_component->opengl_points->point_size=1;
         Add_Component(spray_particles_component,"Spray particles",'5',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
@@ -699,7 +693,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/foam_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* foam_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(filename);
+        OPENGL_COMPONENT_PARTICLES_3D<T>* foam_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename);
         foam_particles_component->opengl_points->color=OPENGL_COLOR(1,0,0);
         foam_particles_component->opengl_points->point_size=1;
         Add_Component(foam_particles_component,"foam particles",'$',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
@@ -721,7 +715,7 @@ Initialize_Components_And_Key_Bindings()
 
     filename=basedir+"/%d/sph_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_3D<T,SPH_PARTICLES<TV> >* sph_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T,SPH_PARTICLES<TV> >(filename,"",false);
+        OPENGL_COMPONENT_PARTICLES_3D<T>* sph_particles_component=new OPENGL_COMPONENT_PARTICLES_3D<T>(filename,"",false);
         sph_particles_component->opengl_points->color=OPENGL_COLOR::Blue();
         sph_particles_component->opengl_points->point_size=1;
         Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
@@ -807,32 +801,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('_',strain_component->Decrease_Size_CB());
         slice_manager.Add_Object(strain_component);}}
 
-    opengl_world.Set_Key_Binding_Category("Motion");
-
-    filename=basedir+STRING_UTILITIES::string_sprintf("/%d/motion_sequence",start_frame);
-    if(FILE_UTILITIES::File_Exists(filename)){
-        OPENGL_COMPONENT_MOTION_SEQUENCE<T>* motion_sequence_component=new OPENGL_COMPONENT_MOTION_SEQUENCE<T>(filename,false,basedir+"/motion_sequence_segments.0",frame_rate,OPENGL_COLOR::Cyan());
-        Add_Component(motion_sequence_component,"Motion Sequence",'u',BASIC_VISUALIZATION::OWNED);
-        slice_manager.Add_Object(motion_sequence_component);}
-
-    filename=basedir+"/%d/motion_sequence1";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_MOTION_SEQUENCE<T>* motion_sequence_component1=new OPENGL_COMPONENT_MOTION_SEQUENCE<T>(filename,true,basedir+"/motion_sequence_segments1.0",frame_rate,OPENGL_COLOR::Cyan());
-        Add_Component(motion_sequence_component1,"Motion Sequence 1",'y',BASIC_VISUALIZATION::OWNED);
-        slice_manager.Add_Object(motion_sequence_component1);}
-
-    filename=basedir+"/%d/motion_sequence2";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_MOTION_SEQUENCE<T>* motion_sequence_component2=new OPENGL_COMPONENT_MOTION_SEQUENCE<T>(filename,true,basedir+"/motion_sequence_segments2.0",frame_rate,OPENGL_COLOR::Magenta());
-        Add_Component(motion_sequence_component2,"Motion Sequence 2",'n',BASIC_VISUALIZATION::OWNED);
-        slice_manager.Add_Object(motion_sequence_component2);}
-
-    filename=basedir+"/%d/optimization_controls";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS<T>* face_control_parameters_component=new OPENGL_COMPONENT_FACE_CONTROL_PARAMETERS<T>(basedir,filename);
-        Add_Component(face_control_parameters_component,"Face Optimization Controls",'Y',BASIC_VISUALIZATION::OWNED);
-        slice_manager.Add_Object(face_control_parameters_component);}
-
     filename=basedir+"/%d/surface.tri";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,T>* triangulated_surface_component=new OPENGL_COMPONENT_TRIANGULATED_SURFACE<T,T>(filename);
@@ -854,8 +822,6 @@ Initialize_Components_And_Key_Bindings()
     Selection_Priority(OPENGL_SELECTION::POINTS_3D)=100;
     Selection_Priority(OPENGL_SELECTION::COMPONENT_PARTICLES_3D)=100;
     Selection_Priority(OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D)=95;
-    Selection_Priority(OPENGL_SELECTION::MUSCLE_3D)=95;
-    Selection_Priority(OPENGL_SELECTION::MUSCLE_SURFACE_3D)=95;
     Selection_Priority(OPENGL_SELECTION::TRIANGULATED_SURFACE_VERTEX)=90;
     Selection_Priority(OPENGL_SELECTION::TRIANGULATED_SURFACE_SEGMENT)=89;
     Selection_Priority(OPENGL_SELECTION::TRIANGULATED_SURFACE_TRIANGLE)=88;

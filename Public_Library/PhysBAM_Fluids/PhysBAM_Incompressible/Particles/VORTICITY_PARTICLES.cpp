@@ -23,6 +23,12 @@ VORTICITY_PARTICLES()
 template<class TV> VORTICITY_PARTICLES<TV>::
 ~VORTICITY_PARTICLES()
 {}
+static int Initialize_Vorticity_Particles()
+{
+    Register_Attribute_Name(ATTRIBUTE_ID_VORTICITY,"vorticity");
+    return 0;
+}
+int initialize_vorticity_particles=Initialize_Vorticity_Particles();
 //#####################################################################
 template class VORTICITY_PARTICLES<VECTOR<float,1> >;
 template class VORTICITY_PARTICLES<VECTOR<float,2> >;

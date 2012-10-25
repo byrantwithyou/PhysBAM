@@ -27,7 +27,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_WORLD.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_LEVELSET_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_TETRAHEDRALIZED_VOLUME_BASED_VECTOR_FIELD.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_MUSCLE_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.h>
 #include <sstream>
 #include <string>
@@ -38,7 +37,7 @@ using namespace PhysBAM;
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(const std::string& basedir_input,bool use_display_lists)
     :OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D<T,RW>(basedir_input,use_display_lists,false),rigid_body_collection(*new RIGID_BODY_COLLECTION<TV>(0,0)),
-    articulated_rigid_body(0),opengl_component_muscle_3d(0),current_selection(0),need_destroy_rigid_body_collection(true)
+    articulated_rigid_body(0),current_selection(0),need_destroy_rigid_body_collection(true)
 {
     rigid_geometry_collection=&rigid_body_collection.rigid_geometry_collection;
     Initialize();
@@ -60,7 +59,6 @@ OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D(RIGID_BODY_COLLECTION<TV>& rigid_body_
 template<class T,class RW> OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D<T,RW>::
 ~OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D()
 {
-    delete opengl_component_muscle_3d;
     if(need_destroy_rigid_body_collection) delete &rigid_body_collection;
 }
 //#####################################################################
@@ -80,9 +78,6 @@ Initialize()
     color_ramp->Add_Color((T)0,OPENGL_COLOR::Blue((T).5),OPENGL_COLOR::Gray((T).5),OPENGL_COLOR::Red((T).5));
 //    color_ramp->Add_Color(log((T)1.00001),OPENGL_COLOR::Red());
     color_ramp->Add_Color(log((T)1.001),OPENGL_COLOR::Red());
-
-    delete opengl_component_muscle_3d;
-    opengl_component_muscle_3d=new OPENGL_COMPONENT_MUSCLE_3D<T>(color_ramp);
 }
 //#####################################################################
 // Function Read_Articulated_Information
@@ -134,9 +129,8 @@ Reinitialize(const bool force,const bool read_geometry)
         if(FILE_UTILITIES::File_Exists(arb_state_file)){
             if(!articulated_rigid_body) articulated_rigid_body=new ARTICULATED_RIGID_BODY<TV>(rigid_body_collection); // TODO: read in the actual particles
             articulated_rigid_body->Read(STREAM_TYPE(RW()),basedir,frame);
-            Initialize();
-            if(opengl_component_muscle_3d) opengl_component_muscle_3d->Initialize(articulated_rigid_body,basedir,frame);}
-        else{delete articulated_rigid_body;articulated_rigid_body=0;delete opengl_component_muscle_3d;opengl_component_muscle_3d=0;}
+            Initialize();}
+        else{delete articulated_rigid_body;articulated_rigid_body=0;}
 
         if(FILE_UTILITIES::File_Exists(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame))){
             Read_Articulated_Information(STRING_UTILITIES::string_sprintf("%s/%d/arb_info",basedir.c_str(),frame));}
@@ -269,8 +263,7 @@ Display(const int in_color) const
             if(mode==GL_SELECT){glPopName();glPopAttrib();}
             if(mode!=GL_SELECT && current_selection && current_selection->type==OPENGL_SELECTION::ARTICULATED_RIGID_BODIES_JOINT_3D){
                 int joint_id=((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)current_selection)->joint_id;
-                OPENGL_SELECTION::Draw_Highlighted_Vertex(articulation_points(joint_id));}}
-        if(opengl_component_muscle_3d) opengl_component_muscle_3d->Display(in_color);}
+                OPENGL_SELECTION::Draw_Highlighted_Vertex(articulation_points(joint_id));}}}
 
     RANGE<VECTOR<T,3> > axes_box(0,2,0,2,0,2);
     //RANGE<VECTOR<T,3> > axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
@@ -304,8 +297,7 @@ Get_Selection(GLuint *buffer,int buffer_size)
     if(buffer_size>=2){
         if(buffer[0]<=3) return BASE::Get_Selection(buffer,buffer_size);
         else if(buffer[0]==4){ // articulation joints
-            selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>(this,buffer[1]);}
-        else if(opengl_component_muscle_3d) selection=opengl_component_muscle_3d->Get_Muscle_Selection(buffer,buffer_size);}
+            selection=new OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>(this,buffer[1]);}}
     return selection;
 }
 //#####################################################################
@@ -390,8 +382,6 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         VECTOR<T,3> current_relative_angular_velocity=-RIGID_BODY<TV>::Relative_Angular_Velocity(*parent,*child); // child w.r.t. parent!
         output_stream<<"Relative velocity at joint = "<<current_relative_velocity<<std::endl;
         output_stream<<"Relative angular velocity = "<<current_relative_angular_velocity<<std::endl;}
-    else if(selection->type==OPENGL_SELECTION::MUSCLE_3D){
-        if(opengl_component_muscle_3d) opengl_component_muscle_3d->Print_Selection_Info(output_stream,selection);}
 }
 //#####################################################################
 // Function Toggle_Articulation_Points

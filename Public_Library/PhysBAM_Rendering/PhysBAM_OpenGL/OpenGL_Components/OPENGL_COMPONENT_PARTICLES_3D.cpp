@@ -15,9 +15,9 @@ using namespace PhysBAM;
 //#####################################################################
 // Function OPENGL_COMPONENT_PARTICLES_3D
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::string &filename_set_input, bool use_ids_input, bool particles_stored_per_cell_uniform_input, bool particles_stored_per_cell_adaptive_input)
-    :OPENGL_COMPONENT("Particles 3D"), particles(new T_PARTICLES),opengl_points(new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >))),
+    :OPENGL_COMPONENT("Particles 3D"), particles(new GEOMETRY_PARTICLES<TV>),opengl_points(new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >))),
     opengl_vector_field(*(new ARRAY<VECTOR<T,3> >),opengl_points->points,OPENGL_COLOR::Cyan()),
     filename(filename_input), filename_set(filename_set_input),frame_loaded(-1), set(0), set_loaded(-1),number_of_sets(0),use_sets(false),valid(false),
     draw_velocities(false),have_velocities(false),use_ids(use_ids_input),
@@ -38,7 +38,7 @@ OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::stri
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Particle_Multiple_Color_Map();
     opengl_points->color=color_map->Lookup(1);
     for(int i=1;i<number_of_sets;i++){
-        particles_multiple(i)=new T_PARTICLES;
+        particles_multiple(i)=new GEOMETRY_PARTICLES<TV>;
         opengl_points_multiple(i)=new OPENGL_POINTS_3D<T>(*(new ARRAY<VECTOR<T,3> >),color_map->Lookup(i));}
         
     is_animation=FILE_UTILITIES::Is_Animated(filename);
@@ -47,7 +47,7 @@ OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename_input, const std::stri
 //#####################################################################
 // Function ~OPENGL_COMPONENT_PARTICLES_3D
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 ~OPENGL_COMPONENT_PARTICLES_3D()
 {
     for(int i=0;i<number_of_sets;i++){delete particles_multiple(i);delete &opengl_points_multiple(i)->points;delete opengl_points_multiple(i);}
@@ -57,7 +57,7 @@ template<class T,class T_PARTICLES,class RW> OPENGL_COMPONENT_PARTICLES_3D<T,T_P
 //#####################################################################
 // Function Valid_Frame
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> bool OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> bool OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Valid_Frame(int frame_input) const
 {
     return FILE_UTILITIES::Frame_File_Exists(filename,frame_input);
@@ -65,7 +65,7 @@ Valid_Frame(int frame_input) const
 //#####################################################################
 // Function Set_Frame
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Set_Frame(int frame_input)
 {
     OPENGL_COMPONENT::Set_Frame(frame_input);
@@ -74,7 +74,7 @@ Set_Frame(int frame_input)
 //#####################################################################
 // Function Set_Draw
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Set_Draw(bool draw_input)
 {
     OPENGL_COMPONENT::Set_Draw(draw_input);
@@ -83,7 +83,7 @@ Set_Draw(bool draw_input)
 //#####################################################################
 // Function Display
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Display(const int in_color) const
 {
     if(!valid || !draw) return;
@@ -110,7 +110,7 @@ Display(const int in_color) const
 //#####################################################################
 // Function Bounding_Box
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Bounding_Box() const
 {
     if(valid && draw) return opengl_points->Bounding_Box();
@@ -119,7 +119,7 @@ Bounding_Box() const
 //#####################################################################
 // Function Get_Selection
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Selection(GLuint* buffer,int buffer_size)
 {
     if(buffer_size==1){}
@@ -141,7 +141,7 @@ Get_Selection(GLuint* buffer,int buffer_size)
 //#####################################################################
 // Function Get_Selection_By_Id
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> OPENGL_SELECTION *OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Selection_By_Id(int id)
 {
     OPENGL_SELECTION_COMPONENT_PARTICLES_3D<T> *selection = 0;
@@ -159,7 +159,7 @@ Get_Selection_By_Id(int id)
 //#####################################################################
 // Function Highlight_Selection
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Highlight_Selection(OPENGL_SELECTION* selection)
 {
     if(selection->type != OPENGL_SELECTION::COMPONENT_PARTICLES_3D) return;
@@ -172,7 +172,7 @@ Highlight_Selection(OPENGL_SELECTION* selection)
 //#####################################################################
 // Function Clear_Highlight
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Clear_Highlight()
 {
     if(use_ids && Get_Particles_Id_Array()) Clear_Id_Selection();
@@ -181,7 +181,7 @@ Clear_Highlight()
 //#####################################################################
 // Function Print_Selection_Info
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) const
 {
     if(selection && selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_3D && selection->object == this){
@@ -205,7 +205,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* selection) co
 //#####################################################################
 // Create_Or_Destroy_Selection_After_Frame_Change
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> OPENGL_SELECTION* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection)
 {
     // TODO: reimplement transfering particles between objects.
@@ -221,7 +221,7 @@ Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,b
 //#####################################################################
 // Function Selection_Bounding_Box
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Selection_Bounding_Box(OPENGL_SELECTION* selection) const
 {
     int current_index = Get_Current_Index_Of_Selection(selection);
@@ -231,7 +231,7 @@ Selection_Bounding_Box(OPENGL_SELECTION* selection) const
 //#####################################################################
 // Function Get_Current_Index_Of_Selection
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> int OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> int OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const
 {
     PHYSBAM_ASSERT(selection->type == OPENGL_SELECTION::COMPONENT_PARTICLES_3D && selection->object == this);
@@ -247,7 +247,7 @@ Get_Current_Index_Of_Selection(OPENGL_SELECTION* selection) const
 //#####################################################################
 // Function Reinitialize
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Reinitialize(bool force)
 {
     if(!draw || !(force || !valid || (is_animation && frame_loaded != frame) || (!is_animation && frame_loaded < 0))) return;
@@ -261,7 +261,7 @@ Reinitialize(bool force)
         try{
             std::istream* input_file=FILE_UTILITIES::Safe_Open_Input(frame_filename);
             if(particles_stored_per_cell_uniform){
-                ARRAY<T_PARTICLES*,VECTOR<int,3> > particles_per_cell;
+                ARRAY<GEOMETRY_PARTICLES<TV>*,VECTOR<int,3> > particles_per_cell;
                 Read_Binary<RW>(*input_file,particles_per_cell);
                 ARRAY<PARTICLES<VECTOR<T,3> >*> initialization_array(particles_per_cell.array.Size());
                 for(int j=0;j<particles_per_cell.array.Size();j++){
@@ -272,7 +272,7 @@ Reinitialize(bool force)
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
             else if(particles_stored_per_cell_adaptive){
                 PHYSBAM_FATAL_ERROR();
-                ARRAY<T_PARTICLES*> particles_per_cell;
+                ARRAY<GEOMETRY_PARTICLES<TV>*> particles_per_cell;
                 Read_Binary<RW>(*input_file,particles_per_cell);
                 //particles_multiple(i)->Initialize(particles_per_cell);
                 particles_per_cell.Delete_Pointers_And_Clean_Memory();}
@@ -293,7 +293,7 @@ Reinitialize(bool force)
 //#####################################################################
 // Function Toggle_Draw_Point_Numbers
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Toggle_Draw_Point_Numbers()
 {
     opengl_points->draw_point_numbers=!opengl_points->draw_point_numbers;
@@ -301,7 +301,7 @@ Toggle_Draw_Point_Numbers()
 //#####################################################################
 // Function Toggle_Draw_Velocities
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Toggle_Draw_Velocities()
 {
     draw_velocities=!draw_velocities;
@@ -310,7 +310,7 @@ Toggle_Draw_Velocities()
 //#####################################################################
 // Function Command_Prompt_Response
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Command_Prompt_Response()
 {
     if(!OPENGL_WORLD::Singleton()->prompt_response.empty()){
@@ -331,7 +331,7 @@ Command_Prompt_Response()
 //#####################################################################
 // Function Command_Prompt
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Command_Prompt()
 {
     OPENGL_WORLD::Singleton()->Prompt_User("Command: ",Command_Prompt_Response_CB(),"");
@@ -339,7 +339,7 @@ Command_Prompt()
 //#####################################################################
 // Function Next_Set
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Next_Set()
 {
     set=min(set+1,number_of_sets-1);
@@ -350,7 +350,7 @@ Next_Set()
 //#####################################################################
 // Function Previous_Set
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Previous_Set()
 {
     set=max(set-1,0);
@@ -361,7 +361,7 @@ Previous_Set()
 //#####################################################################
 // Function Toggle_Draw_Multiple_Particle_Sets
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Toggle_Draw_Multiple_Particle_Sets()
 {
     draw_multiple_particle_sets=!draw_multiple_particle_sets;
@@ -369,7 +369,7 @@ Toggle_Draw_Multiple_Particle_Sets()
 //#####################################################################
 // Function Select_Particle_By_Id
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Select_Particle_By_Id(int id)
 {
     selected_ids.Append(id);
@@ -378,7 +378,7 @@ Select_Particle_By_Id(int id)
 //#####################################################################
 // Function Select_Particles_By_Ids
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Select_Particles_By_Ids(const ARRAY<int> &ids)
 {
     for(int i=0;i<ids.m;i++)selected_ids.Append(ids(i));
@@ -387,7 +387,7 @@ Select_Particles_By_Ids(const ARRAY<int> &ids)
 //#####################################################################
 // Function Clear_Id_Selection
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Clear_Id_Selection()
 {
     selected_ids.Remove_All();
@@ -396,7 +396,7 @@ Clear_Id_Selection()
 //#####################################################################
 // Function Apply_Id_Selection
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Apply_Id_Selection()
 {
     opengl_points->Clear_Selection();
@@ -409,7 +409,7 @@ Apply_Id_Selection()
 //#####################################################################
 // Function Get_Particles_Id_Array
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> ARRAY_VIEW<int>* OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> ARRAY_VIEW<int>* OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Get_Particles_Id_Array(int set_number) const
 {
     if(set_number<0) set_number=set;
@@ -420,7 +420,7 @@ Get_Particles_Id_Array(int set_number) const
 //#####################################################################
 // Function Set_Vector_Size
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Set_Vector_Size(double size)
 {
     opengl_vector_field.size=size;
@@ -428,7 +428,7 @@ Set_Vector_Size(double size)
 //#####################################################################
 // Function Increase_Vector_Size
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Increase_Vector_Size()
 {
     opengl_vector_field.Scale_Vector_Size(1.1);
@@ -436,7 +436,7 @@ Increase_Vector_Size()
 //#####################################################################
 // Function Decrease_Vector_Size
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Decrease_Vector_Size()
 {
     opengl_vector_field.Scale_Vector_Size(1/1.1);
@@ -444,7 +444,7 @@ Decrease_Vector_Size()
 //#####################################################################
 // Function Toggle_Arrowhead
 //#####################################################################
-template<class T,class T_PARTICLES,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,T_PARTICLES,RW>::
+template<class T,class RW> void OPENGL_COMPONENT_PARTICLES_3D<T,RW>::
 Toggle_Arrowhead()
 {
     opengl_vector_field.Toggle_Arrowhead_Mode();
@@ -459,3 +459,7 @@ Bounding_Box() const
     return object->Selection_Bounding_Box((OPENGL_SELECTION*)this);
 }
 //#####################################################################
+template class OPENGL_COMPONENT_PARTICLES_3D<float,float>;
+#ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
+template class OPENGL_COMPONENT_PARTICLES_3D<double,double>;
+#endif

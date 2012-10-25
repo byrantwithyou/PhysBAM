@@ -17,9 +17,10 @@
 
 namespace PhysBAM{
 
-template<class T,class T_PARTICLES,class RW=T>
+template<class T,class RW=T>
 class OPENGL_COMPONENT_PARTICLES_3D : public OPENGL_COMPONENT
 {
+    typedef VECTOR<T,3> TV;
 public:
     OPENGL_COMPONENT_PARTICLES_3D(const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_input = false, bool particles_stored_per_cell_adaptive_input=false);
     virtual ~OPENGL_COMPONENT_PARTICLES_3D();
@@ -75,8 +76,8 @@ protected:
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_3D, Command_Prompt_Response, "");
 
 public:
-    T_PARTICLES* particles;
-    ARRAY<T_PARTICLES*> particles_multiple;
+    GEOMETRY_PARTICLES<TV>* particles;
+    ARRAY<GEOMETRY_PARTICLES<TV>*> particles_multiple;
     OPENGL_POINTS_3D<T,ARRAY<VECTOR<T,3> > >* opengl_points;
     ARRAY<OPENGL_POINTS_3D<T>*> opengl_points_multiple;
     OPENGL_VECTOR_FIELD_3D<T> opengl_vector_field;
@@ -101,6 +102,7 @@ protected:
 template<class T>
 class OPENGL_SELECTION_COMPONENT_PARTICLES_3D : public OPENGL_SELECTION
 {
+    typedef VECTOR<T,3> TV;
 public:
     int index;  // index into particles array
     bool has_id;

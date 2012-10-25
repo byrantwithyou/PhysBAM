@@ -2,7 +2,7 @@
 // Copyright 2007, Andrew Selle.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class OPENGL_COMPONENT_MOTION_SEQUENCE
+// Class OPENGL_COMPONENT_SEGMENT_ADHESION
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE_ITERATOR.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>

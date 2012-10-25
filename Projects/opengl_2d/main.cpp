@@ -79,10 +79,10 @@ private:
     // Components
     OPENGL_COMPONENT_SCALAR_FIELD_2D<T> *sph_cell_weight_component;
     OPENGL_COMPONENT_SCALAR_FIELD_2D<T>* pressure_component,* coarse_pressure_component;
-    OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_PARTICLES<TV> >* positive_particles_component;
-    OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_PARTICLES<TV> >* negative_particles_component;
-    OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_positive_particles_component;
-    OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >* removed_negative_particles_component;
+    OPENGL_COMPONENT_PARTICLES_2D<T>* positive_particles_component;
+    OPENGL_COMPONENT_PARTICLES_2D<T>* negative_particles_component;
+    OPENGL_COMPONENT_PARTICLES_2D<T>* removed_positive_particles_component;
+    OPENGL_COMPONENT_PARTICLES_2D<T>* removed_negative_particles_component;
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_2D<T> >* grid_component,*coarse_grid_component;
     OPENGL_COMPONENT_REFINEMENT_GRID_2D<T>* sub_grids_component;
     // Options
@@ -346,7 +346,7 @@ Initialize_Components_And_Key_Bindings()
     if(has_valid_grid) particles_stored_per_cell_uniform=true;
     filename=basedir+"/%d/positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/positive_particles_1",start_frame)){
-        positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_PARTICLES<TV> >(filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
+        positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,basedir+"/%d/positive_particles_%d",true,particles_stored_per_cell_uniform);
         positive_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!positive_particles_component->Uses_Sets()) positive_particles_component->opengl_points->color=OPENGL_COLOR(1,.5,0);
         Add_Component(positive_particles_component,"Positive particles",'1',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
@@ -357,7 +357,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('M',positive_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/negative_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/negative_particles_1",start_frame)){
-        negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_PARTICLES<TV> >(filename,
+        negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,
             basedir+"/%d/negative_particles_%d",true,particles_stored_per_cell_uniform);
         negative_particles_component->particles->template Add_Array<int>(ATTRIBUTE_ID_ID);
         if(!negative_particles_component->Uses_Sets()) negative_particles_component->opengl_points->color=OPENGL_COLOR(0,.5,1);
@@ -369,7 +369,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('M',negative_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/removed_positive_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_positive_particles_1",start_frame)){
-        removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(filename,basedir+"/%d/removed_positive_particles_%d",
+        removed_positive_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,basedir+"/%d/removed_positive_particles_%d",
             true,particles_stored_per_cell_uniform);
         removed_positive_particles_component->opengl_points->color=OPENGL_COLOR::Green();
         Add_Component(removed_positive_particles_component,"Removed positive particles",'3',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
@@ -380,7 +380,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('M',removed_positive_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/removed_negative_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame) || FILE_UTILITIES::Frame_File_Exists(basedir+"/%d/removed_negative_particles_1",start_frame)){
-        removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV> >(filename,
+        removed_negative_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,
             basedir+"/%d/removed_negative_particles_%d",true,particles_stored_per_cell_uniform);
         removed_negative_particles_component->opengl_points->color=OPENGL_COLOR::Cyan();
         Add_Component(removed_negative_particles_component,"Removed negative particles",'4',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);
@@ -391,17 +391,17 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('M',removed_negative_particles_component->Toggle_Draw_Multiple_Particle_Sets_CB());}
     filename=basedir+"/%d/particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_2D<T,SPH_PARTICLES<TV> >* particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,SPH_PARTICLES<TV> >(filename,"",true,false);
+        OPENGL_COMPONENT_PARTICLES_2D<T>* particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,"",true,false);
         particles_component->opengl_points->color=OPENGL_COLOR(1,1,1);
         Add_Component(particles_component,"Particles",'P',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);}
     filename=basedir+"/%d/vorticity_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_2D<T,VORTICITY_PARTICLES<TV> >* vorticity_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,VORTICITY_PARTICLES<TV> >(filename,"",false);
+        OPENGL_COMPONENT_PARTICLES_2D<T>* vorticity_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,"",false);
         vorticity_particles_component->opengl_points->color=OPENGL_COLOR::Yellow();
         Add_Component(vorticity_particles_component,"Vorticity particles",'O',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE|BASIC_VISUALIZATION::START_HIDDEN);}
     filename=basedir+"/%d/sph_particles";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_2D<T,SPH_PARTICLES<TV> >* sph_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T,SPH_PARTICLES<TV> >(filename,"",false);
+        OPENGL_COMPONENT_PARTICLES_2D<T>* sph_particles_component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,"",false);
         sph_particles_component->opengl_points->color=OPENGL_COLOR::Blue();
         Add_Component(sph_particles_component,"SPH particles",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::SELECTABLE);}
 
@@ -745,11 +745,11 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key('-',component->Decrease_Vector_Size_CB());}
     filename=basedir+"/%d/residual_energy";
     if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_2D<T,GEOMETRY_PARTICLES<TV> >* component=new OPENGL_COMPONENT_PARTICLES_2D<T,GEOMETRY_PARTICLES<TV> >(filename,"",false,false);
+        OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,"",false,false);
         Add_Component(component,"Residual Energy",'k',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);}
     filename=basedir+"/%d/collision_iterators";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_PARTICLES_2D<T,GEOMETRY_PARTICLES<TV> >* component=new OPENGL_COMPONENT_PARTICLES_2D<T,GEOMETRY_PARTICLES<TV> >(filename,"",false,false);
+        OPENGL_COMPONENT_PARTICLES_2D<T>* component=new OPENGL_COMPONENT_PARTICLES_2D<T>(filename,"",false,false);
         Add_Component(component,"Collision Iterators",'I',BASIC_VISUALIZATION::START_HIDDEN|BASIC_VISUALIZATION::OWNED);}
     filename=basedir+"/%d/coarse_psi_D";
     if(has_valid_coarse_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){

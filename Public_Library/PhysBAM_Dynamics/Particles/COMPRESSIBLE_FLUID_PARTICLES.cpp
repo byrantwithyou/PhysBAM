@@ -29,7 +29,6 @@ template<class TV> COMPRESSIBLE_FLUID_PARTICLES<TV>::
 {}
 static int Initialize_Compressible_Particles()
 {
-    Register_Attribute_Name(ATTRIBUTE_ID_VORTICITY,"vorticity");
     Register_Attribute_Name(ATTRIBUTE_ID_E,"E");
     Register_Attribute_Name(ATTRIBUTE_ID_RHO,"rho");
     Register_Attribute_Name(ATTRIBUTE_ID_PHI,"phi");

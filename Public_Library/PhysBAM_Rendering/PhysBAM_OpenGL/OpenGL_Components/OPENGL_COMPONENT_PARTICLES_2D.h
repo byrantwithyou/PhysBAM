@@ -17,9 +17,10 @@
 namespace PhysBAM
 {
 
-template<class T,class T_PARTICLES,class RW=T>
+template<class T,class RW=T>
 class OPENGL_COMPONENT_PARTICLES_2D : public OPENGL_COMPONENT
 {
+    typedef VECTOR<T,2> TV;
 public:
     OPENGL_COMPONENT_PARTICLES_2D(const std::string &filename, const std::string &filename_set_input="", bool use_ids_input = true, bool particles_stored_per_cell_uniform_input = false);
     virtual ~OPENGL_COMPONENT_PARTICLES_2D();
@@ -41,7 +42,7 @@ public:
     OPENGL_SELECTION* Create_Or_Destroy_Selection_After_Frame_Change(OPENGL_SELECTION* old_selection,bool& delete_selection) PHYSBAM_OVERRIDE;
     virtual RANGE<VECTOR<float,3> > Selection_Bounding_Box(OPENGL_SELECTION *selection) const PHYSBAM_OVERRIDE;
     int Get_Current_Index_Of_Selection(OPENGL_SELECTION *selection) const;
-    T_PARTICLES* Get_Particle_Set_Of_Selection(OPENGL_SELECTION *selection) const;
+    GEOMETRY_PARTICLES<TV>* Get_Particle_Set_Of_Selection(OPENGL_SELECTION *selection) const;
     bool Uses_Sets() const { return use_sets; }
     void Select_Particle_By_Id(int id,int particle_set);
     void Select_Particles_By_Ids(const ARRAY<int> &ids);
@@ -71,11 +72,11 @@ private:
     DEFINE_COMPONENT_CALLBACK(OPENGL_COMPONENT_PARTICLES_2D, Command_Prompt_Response, "");
 
 public:
-    T_PARTICLES* particles;
-    ARRAY<T_PARTICLES*> particles_multiple;
+    GEOMETRY_PARTICLES<TV>* particles;
+    ARRAY<GEOMETRY_PARTICLES<TV>*> particles_multiple;
     OPENGL_POINTS_2D<T>* opengl_points;
     ARRAY<OPENGL_POINTS_2D<T>*> opengl_points_multiple;
-    OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T,2> > > opengl_vector_field;
+    OPENGL_VECTOR_FIELD_2D<ARRAY<TV> > opengl_vector_field;
 
 private:
     std::string filename;
@@ -96,12 +97,13 @@ private:
 template<class T>
 class OPENGL_SELECTION_COMPONENT_PARTICLES_2D : public OPENGL_SELECTION
 {
+    typedef VECTOR<T,2> TV;
 public:
     int index;  // index into particles array
     bool has_id;
     int id;
     int particle_set;
-    VECTOR<T,2> location;
+    TV location;
 
     OPENGL_SELECTION_COMPONENT_PARTICLES_2D(OPENGL_OBJECT *object) : OPENGL_SELECTION(OPENGL_SELECTION::COMPONENT_PARTICLES_2D, object) {}
     virtual RANGE<VECTOR<float,3> > Bounding_Box() const PHYSBAM_OVERRIDE;

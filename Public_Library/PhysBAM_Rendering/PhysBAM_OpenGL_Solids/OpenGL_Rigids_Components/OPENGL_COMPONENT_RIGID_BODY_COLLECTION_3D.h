@@ -21,7 +21,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_RIGID_GEOMETRY_COLLECTION_3D.h>
 namespace PhysBAM{
 
-template<class T> class OPENGL_COMPONENT_MUSCLE_3D;
 template<class TV> class ARTICULATED_RIGID_BODY;
 template<class TV> class RIGID_BODY_COLLECTION;
 
@@ -49,7 +48,6 @@ protected:
 public:
     RIGID_BODY_COLLECTION<TV> &rigid_body_collection;
     ARTICULATED_RIGID_BODY<TV>* articulated_rigid_body;
-    OPENGL_COMPONENT_MUSCLE_3D<T>* opengl_component_muscle_3d;
 private:
     ARRAY<ARRAY<OPENGL_COMPONENT*>,int> extra_components;
     ARRAY<VECTOR<T,3> > articulation_points;
