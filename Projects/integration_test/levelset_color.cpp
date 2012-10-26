@@ -76,10 +76,21 @@ void Dump_Element(const VECTOR<int,2>& color_pair,TRIANGLE_3D<T>& x)
 }
 
 template<class T,class TV,class T_SURFACE,class T_FACE>
-void Dump_Interface(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface)
+void Dump_Interface(const HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface)
 {
-    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(surface);it.Valid();it.Next()){
+    for(typename HASHTABLE<VECTOR<int,2>,T_SURFACE*>::CONST_ITERATOR it(interface);it.Valid();it.Next()){
         const VECTOR<int,2>& color_pair=it.Key();
+        const T_SURFACE& surf=*it.Data();
+        for(int i=0;i<surf.mesh.elements.m;i++){
+            T_FACE x=surf.Get_Element(i);
+            Dump_Element<T,TV>(color_pair,x);}}
+}
+
+template<class T,class TV,class T_SURFACE,class T_FACE>
+void Dump_Boundary(const HASHTABLE<int,T_SURFACE*>& boundary)
+{
+    for(typename HASHTABLE<int,T_SURFACE*>::CONST_ITERATOR it(boundary);it.Valid();it.Next()){
+        VECTOR<int,2> color_pair(it.Key(),it.Key());
         const T_SURFACE& surf=*it.Data();
         for(int i=0;i<surf.mesh.elements.m;i++){
             T_FACE x=surf.Get_Element(i);
@@ -173,6 +184,7 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
         HASHTABLE<int,T_SURFACE*> boundary;
         MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,phi_color,phi_value,i,dampen,verbose);
         Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
+        Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
         char buffer[100];
         sprintf(buffer, "newton step %i",i);
         Flush_Frame<T,TV>(buffer);}
