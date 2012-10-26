@@ -27,11 +27,11 @@ public:
     using BASE::cfl_number;using BASE::reseeding_frequency;using BASE::time;using BASE::use_fmm;using BASE::use_reinitialization;using BASE::V;using BASE::grid;
 
     ARRAY<T_ARRAYS_SCALAR> phis;
-    PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID> particle_levelset_multiple;
+    PARTICLE_LEVELSET_MULTIPLE_UNIFORM<T_GRID>& particle_levelset_multiple;
     ARRAY<T> initial_mass;
     ARRAY<RUNGEKUTTA<T_ARRAYS_SCALAR>*> rungekutta_phis;
 
-    LEVELSET_ADVECTION_MULTIPLE<T_GRID> levelset_advection_multiple;
+    LEVELSET_ADVECTION_MULTIPLE<T_GRID>& levelset_advection_multiple;
 
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM(const T_GRID& grid_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM();

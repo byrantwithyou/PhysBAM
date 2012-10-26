@@ -24,7 +24,6 @@ public:
     int current_frame;
     T time;
     int output_number;
-    int ghost;
 
     PLS_FC_EXAMPLE<TV>& example;
 

@@ -22,9 +22,6 @@ class PARTICLE_LEVELSET:public NONCOPYABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef VECTOR<int,TV::dimension> TV_INT;typedef typename T_GRID::BLOCK T_BLOCK;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<ARRAY<bool> >::TYPE T_ARRAYS_ARRAY_BOOL;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
-    typedef typename T_ARRAYS_SCALAR::template REBIND<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
 public:
     int number_particles_per_cell;
     bool only_use_negative_particles;
@@ -50,12 +47,12 @@ public:
     int number_of_ghost_cells;
 
     FAST_LEVELSET<GRID<TV> > levelset;
-    T_ARRAYS_PARTICLE_LEVELSET_PARTICLES positive_particles,negative_particles;
-    T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES removed_negative_particles,removed_positive_particles;
-    T_ARRAYS_ARRAY_BOOL escaped_positive_particles,escaped_negative_particles;
+    ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> positive_particles,negative_particles;
+    ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> removed_negative_particles,removed_positive_particles;
+    ARRAY<ARRAY<bool>,TV_INT> escaped_positive_particles,escaped_negative_particles;
     ARRAY<ARRAY<PAIR<PARTICLE_LEVELSET_PARTICLES<TV>*,int> >,TV_INT> deletion_list;
 
-    PARTICLE_LEVELSET(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input);
+    PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input);
     virtual ~PARTICLE_LEVELSET();
 
     void Set_Band_Width(const T number_of_cells=6)
@@ -68,12 +65,20 @@ public:
     else particle_pool.Set_Number_Particles_Per_Cell((int)((T)1.5*number));}
 
     void Use_Removed_Negative_Particles(const bool use_removed_negative_particles_input=true)
-    {use_removed_negative_particles=use_removed_negative_particles_input;
-    if(use_removed_negative_particles) removed_negative_particles.Resize(levelset.grid.Block_Indices(number_of_ghost_cells));else removed_negative_particles.Clean_Memory();}
+    {
+        if(use_removed_negative_particles!=use_removed_negative_particles_input){
+            use_removed_negative_particles=use_removed_negative_particles_input;
+            removed_negative_particles.Delete_Pointers_And_Clean_Memory();
+            if(use_removed_negative_particles) removed_negative_particles.Resize(levelset.grid.Block_Indices(number_of_ghost_cells));}
+    }
     
     void Use_Removed_Positive_Particles(const bool use_removed_positive_particles_input=true)
-    {use_removed_positive_particles=use_removed_positive_particles_input;
-    if(use_removed_positive_particles) removed_positive_particles.Resize(levelset.grid.Block_Indices(number_of_ghost_cells));else removed_positive_particles.Clean_Memory();}
+    {
+        if(use_removed_positive_particles!=use_removed_positive_particles_input){
+            use_removed_positive_particles=use_removed_positive_particles_input;
+            removed_positive_particles.Delete_Pointers_And_Clean_Memory();
+            if(use_removed_positive_particles) removed_positive_particles.Resize(levelset.grid.Block_Indices(number_of_ghost_cells));}
+    }
 
     void Set_Minimum_Particle_Radius(const T radius)
     {minimum_particle_radius=radius;}

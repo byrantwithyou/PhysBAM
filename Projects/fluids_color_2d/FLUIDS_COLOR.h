@@ -18,7 +18,6 @@
 
 namespace PhysBAM{
 
-
 template<class TV>
 class ANALYTIC_IMPLICIT_SURFACE_LEVELSET
 {
@@ -66,10 +65,10 @@ class FLUIDS_COLOR:public PLS_FC_EXAMPLE<TV>
 
 public:
     using BASE::grid;using BASE::output_directory;using BASE::domain_boundary;using BASE::face_velocities;
-    using BASE::particle_levelset_evolution;using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
+    using BASE::write_substeps_level;using BASE::restart;using BASE::last_frame;
     using BASE::dt;using BASE::levelset_color;using BASE::mu;using BASE::rho;using BASE::dump_matrix;using BASE::number_of_colors;
     using BASE::use_advection;using BASE::use_reduced_advection;using BASE::omit_solve;using BASE::use_discontinuous_velocity;
-    using BASE::time_steps_per_frame;using BASE::use_p_null_mode;
+    using BASE::time_steps_per_frame;using BASE::use_p_null_mode;using BASE::Fill_Levelsets_From_Levelset_Color;
 
     enum WORKAROUND{SLIP=-3,DIRICHLET=-2,NEUMANN=-1}; // From CELL_DOMAIN_INTERFACE_COLOR
 
@@ -103,11 +102,11 @@ public:
 
     FLUIDS_COLOR(const STREAM_TYPE stream_type,PARSE_ARGS& parse_args)
         :PLS_FC_EXAMPLE<TV>(stream_type),test_number(0),resolution(32),stored_last_frame(0),user_last_frame(false),mu0(1),mu1(2),
-        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),no_advection(false),refine(1)
+        rho0(1),rho1(2),m(1),s(1),kg(1),bc_n(false),bc_d(false),bc_s(false),test_analytic_diff(false),no_advection(false),refine(1)
     {
         last_frame=16;
         int number_of_threads=1;
-        parse_args.Extra(&test_number,"<example number>","example number to run");
+        parse_args.Extra(&test_number,"example number","example number to run");
         parse_args.Add("-restart",&restart,"frame","restart frame");
         parse_args.Add("-resolution",&resolution,"resolution","grid resolution");
         parse_args.Add("-substep",&write_substeps_level,"level","output-substep level");
@@ -304,6 +303,12 @@ public:
         if(analytic_velocity.m) number_of_colors=analytic_velocity.m;
     }
 
+    ~FLUIDS_COLOR()
+    {
+        delete analytic_levelset;
+        analytic_velocity.Delete_Pointers_And_Clean_Memory();
+    }
+
     void Write_Output_Files(const int frame)
     {BASE::Write_Output_Files(frame);}
 
@@ -325,6 +330,7 @@ public:
             T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
             levelset_color.phi(it.index)=abs(p);
             levelset_color.color(it.index)=c==-4?bc_type:c;}
+        Fill_Levelsets_From_Levelset_Color();
     }
 
     void Analytic_Test()

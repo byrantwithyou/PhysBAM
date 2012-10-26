@@ -60,7 +60,7 @@ Get_Raw_Levelset_For_Color(ARRAY<T,TV_INT>& color_phi,int c,int ghost) const
     for(RANGE_ITERATOR<TV::m> it(phi.domain);it.Valid();it.Next()){
         int k=color(it.index);
         T p=phi(it.index);
-        if(k!=c) p=-p;
+        if(k==c) p=-p;
         color_phi(it.index)=p;}
 }
 //#####################################################################

@@ -4,10 +4,12 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/FLUID_GRAVITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/INCOMPRESSIBILITY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -19,8 +21,9 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
     number_of_ghost_cells(3),dt(1),time_steps_per_frame(1),use_preconditioner(true),max_iter(100000),
     dump_matrix(false),wrap(true),use_advection(true),use_reduced_advection(false),omit_solve(false),
     number_of_colors(1),use_discontinuous_velocity(false),use_p_null_mode(false),grid(TV_INT(),RANGE<TV>::Unit_Box(),true),
-    particle_levelset_evolution(grid,number_of_ghost_cells),boundary(0),
-    levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(grid),debug_particles(*new DEBUG_PARTICLES<TV>)
+    particle_levelset_evolution_multiple(*new PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >(grid,number_of_ghost_cells)),
+    advection_scalar(*new ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>),boundary(0),
+    levelset_color(grid,*new ARRAY<T,TV_INT>,*new ARRAY<int,TV_INT>),collision_bodies_affecting_fluid(*new GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >(grid)),debug_particles(*new DEBUG_PARTICLES<TV>)
 {
     for(int i=0;i<TV::dimension;i++){domain_boundary(i)(0)=true;domain_boundary(i)(1)=true;}
     domain_boundary(1)(1)=false;
@@ -33,8 +36,12 @@ PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input)
 template<class TV> PLS_FC_EXAMPLE<TV>::
 ~PLS_FC_EXAMPLE()
 {
+    delete &debug_particles;
+    delete &collision_bodies_affecting_fluid;
     delete &levelset_color.color;
     delete &levelset_color.phi;
+    delete &advection_scalar;
+    delete &particle_levelset_evolution_multiple;
 }
 //#####################################################################
 // Function Merge_Velocities
@@ -60,15 +67,16 @@ Write_Output_Files(const int frame)
 
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/mac_velocities",V);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/common/grid",grid);
-//    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_N",projection.elliptic_solver->psi_N);
-//    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/psi_D",projection.elliptic_solver->psi_D);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.particle_levelset;
-    FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
-    FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    FILE_UTILITIES::Write_To_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    // particle levelset
+    for(int i=0;i<number_of_colors;i++){
+        std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f;
+        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
+        FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
+        FILE_UTILITIES::Write_To_Text_File(STRING_UTILITIES::string_sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
     debug_particles.Write_Debug_Particles(stream_type,output_directory,frame);
 }
 //#####################################################################
@@ -78,13 +86,15 @@ template<class TV> void PLS_FC_EXAMPLE<TV>::
 Read_Output_Files(const int frame)
 {
     std::string f=STRING_UTILITIES::string_sprintf("%d",frame);
-    PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.particle_levelset;
-    FILE_UTILITIES::Read_From_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"positive_particles"),particle_levelset.positive_particles);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"negative_particles"),particle_levelset.negative_particles);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_positive_particles"),particle_levelset.removed_positive_particles);
-    FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/%s",output_directory.c_str(),frame,"removed_negative_particles"),particle_levelset.removed_negative_particles);
-    FILE_UTILITIES::Read_From_Text_File(output_directory+"/"+f+"/last_unique_particle_id",particle_levelset.last_unique_particle_id);
+    for(int i=0;i<number_of_colors;i++){
+        std::string ii=STRING_UTILITIES::string_sprintf("%d",i),i_dot_f=ii+"."+f;
+        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
+        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/levelset_%d",output_directory.c_str(),frame,i),particle_levelset.levelset);
+        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.positive_particles);
+        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.negative_particles);
+        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_positive_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_positive_particles);
+        FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%d/removed_negative_particles_%d",output_directory.c_str(),frame,i),particle_levelset.removed_negative_particles);
+        FILE_UTILITIES::Read_From_Text_File(STRING_UTILITIES::string_sprintf("%s/%d/last_unique_particle_id_%d",output_directory.c_str(),frame,i),particle_levelset.last_unique_particle_id);}
     std::string filename;
 //    filename=output_directory+"/"+f+"/pressure";
 //    if(FILE_UTILITIES::File_Exists(filename)){LOG::cout<<"Reading pressure "<<filename<<std::endl;FILE_UTILITIES::Read_From_File(stream_type,filename,incompressible.projection.p);}
@@ -99,23 +109,80 @@ Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles
 {
     if(particle_type==PARTICLE_LEVELSET_POSITIVE || particle_type==PARTICLE_LEVELSET_REMOVED_POSITIVE) return;
 
-    TV& X=particles.X(index);TV X_new=X+dt*V;
-    T max_collision_distance=particle_levelset_evolution.particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
-    T min_collision_distance=particle_levelset_evolution.particle_levelset.min_collision_distance_factor*max_collision_distance;
-    TV min_corner=grid.domain.Minimum_Corner(),max_corner=grid.domain.Maximum_Corner();
-    for(int axis=0;axis<GRID<TV>::dimension;axis++){
-        if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
-            T collision_distance=X[axis]-min_corner[axis];
-            if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
-            collision_distance=max(min_collision_distance,collision_distance);
-            X_new[axis]+=max((T)0,min_corner[axis]-X_new[axis]+collision_distance);
-            V[axis]=max((T)0,V[axis]);X=X_new-dt*V;}
-        if(domain_boundary[axis][1] && X_new[axis]>max_corner[axis]-max_collision_distance){
-            T collision_distance=max_corner[axis]-X[axis];
-            if(collision_distance>max_collision_distance) collision_distance=max_corner[axis]-X_new[axis];
-            collision_distance=max(min_collision_distance,collision_distance);
-            X_new[axis]-=max((T)0,X_new[axis]-max_corner[axis]+collision_distance);
-            V[axis]=min((T)0,V[axis]);X=X_new-dt*V;}}
+    for(int i=0;i<number_of_colors;i++){
+        PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=*particle_levelset_evolution_multiple.particle_levelset_multiple.particle_levelsets(i);
+        TV& X=particles.X(index);TV X_new=X+dt*V;
+        T max_collision_distance=particle_levelset.Particle_Collision_Distance(particles.quantized_collision_distance(index));
+        T min_collision_distance=particle_levelset.min_collision_distance_factor*max_collision_distance;
+        TV min_corner=grid.domain.Minimum_Corner(),max_corner=grid.domain.Maximum_Corner();
+        for(int axis=0;axis<GRID<TV>::dimension;axis++){
+            if(domain_boundary[axis][0] && X_new[axis]<min_corner[axis]+max_collision_distance){
+                T collision_distance=X[axis]-min_corner[axis];
+                if(collision_distance>max_collision_distance)collision_distance=X_new[axis]-min_corner[axis];
+                collision_distance=max(min_collision_distance,collision_distance);
+                X_new[axis]+=max((T)0,min_corner[axis]-X_new[axis]+collision_distance);
+                V[axis]=max((T)0,V[axis]);X=X_new-dt*V;}
+            if(domain_boundary[axis][1] && X_new[axis]>max_corner[axis]-max_collision_distance){
+                T collision_distance=max_corner[axis]-X[axis];
+                if(collision_distance>max_collision_distance) collision_distance=max_corner[axis]-X_new[axis];
+                collision_distance=max(min_collision_distance,collision_distance);
+                X_new[axis]-=max((T)0,X_new[axis]-max_corner[axis]+collision_distance);
+                V[axis]=min((T)0,V[axis]);X=X_new-dt*V;}}}
+}
+//#####################################################################
+// Function Color_At_Cell
+//#####################################################################
+template<class TV> int PLS_FC_EXAMPLE<TV>::
+Color_At_Cell(const TV_INT& index) const
+{
+    for(int i=0;i<bc_phis.m;i++)
+        if(bc_phis(i)(index)<=0)
+            return ~i;
+    return particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Inside_Region(index);
+}
+//#####################################################################
+// Function Color_At_Cell
+//#####################################################################
+template<class TV> int PLS_FC_EXAMPLE<TV>::
+Color_At_Cell(const TV_INT& index,T& phi) const
+{
+    for(int i=0;i<bc_phis.m;i++)
+        if(bc_phis(i)(index)<=0){
+            phi=-bc_phis(i)(index);
+            return ~i;}
+    int c=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Inside_Region(index,phi);
+    phi=-phi;
+    return c;
+}
+//#####################################################################
+// Function Rebuild_Levelset_Color
+//#####################################################################
+template<class TV> void PLS_FC_EXAMPLE<TV>::
+Rebuild_Levelset_Color()
+{
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next())
+        levelset_color.color(it.index)=Color_At_Cell(it.index,levelset_color.phi(it.index));
+}
+//#####################################################################
+// Function Fill_Levelsets_From_Levelset_Color
+//#####################################################################
+template<class TV> void PLS_FC_EXAMPLE<TV>::
+Fill_Levelsets_From_Levelset_Color()
+{
+    ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+        int c=levelset_color.color(it.index);
+        T p=levelset_color.phi(it.index);
+        for(int i=0;i<bc_phis.m;i++)
+            bc_phis(i)(it.index)=(c==~i)?-p:p;
+        for(int i=0;i<phis.m;i++)
+            phis(i)(it.index)=(c==i)?-p:p;}
+
+    for(int i=0;i<bc_phis.m;i++){
+        FAST_LEVELSET<GRID<TV> > fl(grid,bc_phis(i),number_of_ghost_cells);
+        Reinitialize(fl,number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);}
+    for(int i=0;i<phis.m;i++)
+        Reinitialize(*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(i),number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);
 }
 //#####################################################################
 template class PLS_FC_EXAMPLE<VECTOR<float,2> >;

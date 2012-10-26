@@ -31,6 +31,11 @@ public:
         Set_Collision_Distance_Factors(); // TODO: use this from a normal particle levelset
     }
 
+    ~PARTICLE_LEVELSET_MULTIPLE_UNIFORM()
+    {
+        particle_levelsets.Delete_Pointers_And_Clean_Memory();
+    }
+
     void Initialize_Particle_Levelsets_And_Grid_Values(T_GRID& grid,ARRAY<T_ARRAYS_SCALAR>& phis,const int number_of_regions)
     {if(particle_levelsets.m!=number_of_regions){
         for(int i=0;i<particle_levelsets.m;i++)delete particle_levelsets(i);

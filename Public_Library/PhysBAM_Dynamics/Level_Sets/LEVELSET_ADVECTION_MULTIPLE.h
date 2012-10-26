@@ -25,15 +25,16 @@ class LEVELSET_ADVECTION_MULTIPLE
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
-    LEVELSET_MULTIPLE<T_GRID>* levelsets;
+    LEVELSET_MULTIPLE<T_GRID>& levelsets;
     ARRAY<FAST_LEVELSET_ADVECTION<GRID<TV> > > levelset_advections;
 
-    LEVELSET_ADVECTION_MULTIPLE(LEVELSET_MULTIPLE<T_GRID>* _levelsets):levelsets(_levelsets)
-    {
-        for(int i=0;i<levelsets->levelsets.m;i++)
-            levelset_advections.Append(FAST_LEVELSET_ADVECTION<GRID<TV> >(levelsets->levelsets(i)));
-    }
-    
+    LEVELSET_ADVECTION_MULTIPLE(LEVELSET_MULTIPLE<T_GRID>& _levelsets)
+        :levelsets(_levelsets)
+    {}
+
+    void Initialize()
+    {for(int i=0;i<levelsets.levelsets.m;i++) levelset_advections.Append(FAST_LEVELSET_ADVECTION<GRID<TV> >(levelsets.levelsets(i)));}
+
     void Set_Custom_Advection(ADVECTION<T,T,T_GRID>& advection_input)
     {for(int i=0;i<levelset_advections.m;i++)levelset_advections(i).Set_Custom_Advection(advection_input);}
     

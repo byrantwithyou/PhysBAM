@@ -19,9 +19,11 @@ using namespace PhysBAM;
 // Constructor
 //##################################################################### 
 template<class T_GRID> PARTICLE_LEVELSET<T_GRID>::
-PARTICLE_LEVELSET(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
-    :only_use_negative_particles(false),last_unique_particle_id(0),particle_pool(template_particles),reincorporate_removed_particles_everywhere(false),
-    save_removed_particle_times(false),delete_positive_particles_crossing_bodies(true),number_of_ghost_cells(number_of_ghost_cells_input),levelset(grid_input,phi_input,number_of_ghost_cells_input),deletion_list(levelset.grid.Domain_Indices())
+PARTICLE_LEVELSET(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
+    :only_use_negative_particles(false),use_removed_negative_particles(false),use_removed_positive_particles(false),last_unique_particle_id(0),
+    particle_pool(template_particles),reincorporate_removed_particles_everywhere(false),save_removed_particle_times(false),
+    delete_positive_particles_crossing_bodies(true),number_of_ghost_cells(number_of_ghost_cells_input),levelset(grid_input,phi_input,number_of_ghost_cells_input),
+    deletion_list(levelset.grid.Domain_Indices())
 {   
     Set_Outside_Particle_Distance();
     Set_Maximum_Iterations_For_Attraction();
@@ -32,7 +34,8 @@ PARTICLE_LEVELSET(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number
 
     Set_Minimum_Particle_Radius((T).1*levelset.grid.Minimum_Edge_Length());Set_Maximum_Particle_Radius((T).5*levelset.grid.Minimum_Edge_Length());
     Set_Band_Width();
-    Use_Removed_Positive_Particles(false);Use_Removed_Negative_Particles(false);
+    Use_Removed_Positive_Particles(false);
+    Use_Removed_Negative_Particles(false);
     Set_Number_Particles_Per_Cell(pow<T_GRID::dimension>(4));
 }   
 //#####################################################################

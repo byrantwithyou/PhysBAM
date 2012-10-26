@@ -12,16 +12,15 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/LEVELSET_COLOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
-#include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID> class LEVELSET_MULTIPLE;
+template<class T_GRID> class PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM;
+template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class DEBUG_PARTICLES;
 
 template<class TV>
@@ -30,11 +29,8 @@ class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
     typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
-    typedef BOUNDARY_PHI_WATER<GRID<TV> > T_BOUNDARY_PHI_WATER;
-    typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    enum WORKAROUND1{d=TV::m};
-
 public:
+    enum WORKAROUND1{num_bc=3};
     STREAM_TYPE stream_type;
     T initial_time;
     int last_frame;
@@ -60,16 +56,18 @@ public:
     bool use_p_null_mode;
 
     GRID<TV> grid;
-    PARTICLE_LEVELSET_EVOLUTION_UNIFORM<GRID<TV> > particle_levelset_evolution;
+    PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
+    VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
+    VECTOR<FAST_LEVELSET<GRID<TV> >*,num_bc> bc_levelsets;
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
-    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T> advection_scalar;
+    ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>& advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary,*phi_boundary;
     BOUNDARY_EXTRAPOLATE_CELL<TV,T> cell_extrapolate;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;
     LEVELSET_COLOR<TV> levelset_color;
-    T_GRID_BASED_COLLISION_GEOMETRY collision_bodies_affecting_fluid;
+    GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_bodies_affecting_fluid;
     DEBUG_PARTICLES<TV>& debug_particles;
 
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
@@ -91,6 +89,10 @@ public:
     virtual TV Jump_Interface_Condition(const TV& X,int color0,int color1,T time)=0;
     virtual TV Volume_Force(const TV& X,int color,T time)=0;
     virtual TV Velocity_Jump(const TV& X,int color0,int color1,T time)=0;
+    int Color_At_Cell(const TV_INT& index) const;
+    int Color_At_Cell(const TV_INT& index,T& phi) const;
+    void Rebuild_Levelset_Color();
+    void Fill_Levelsets_From_Levelset_Color();
 //#####################################################################
 };
 }

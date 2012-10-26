@@ -104,8 +104,8 @@ template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV_INT& index) const // assumes exactly one Phi<0 on a node
 {
     for(int k=0;k<phis.m-1;k++) if(Phi(k,index)<=0) return k;
-    assert(Phi(phis.m,index)<=0);
-    return phis.m;
+    assert(Phi(phis.m-1,index)<=0);
+    return phis.m-1;
 }
 //#####################################################################
 // Function Inside_Region
@@ -114,9 +114,9 @@ template<class T_GRID> int LEVELSET_MULTIPLE<T_GRID>::
 Inside_Region(const TV_INT& index,T& phi) const // assumes exactly one Phi<0 on a node
 {
     for(int k=0;k<phis.m-1;k++){phi=Phi(k,index);if(phi<=0) return k;}
-    phi=Phi(phis.m,index);
+    phi=Phi(phis.m-1,index);
     assert(phi<=0);
-    return phis.m;
+    return phis.m-1;
 }
 //#####################################################################
 // Function Inside_Region
