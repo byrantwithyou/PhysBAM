@@ -27,9 +27,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_AREA.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_TWO_PHASE_VELOCITY_MAGNITUDE_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_REFINEMENT_GRID_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Deformable_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_2D.h>
 //#include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODIES_2D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D.h>
@@ -84,7 +81,6 @@ private:
     OPENGL_COMPONENT_PARTICLES_2D<T>* removed_positive_particles_component;
     OPENGL_COMPONENT_PARTICLES_2D<T>* removed_negative_particles_component;
     OPENGL_COMPONENT_BASIC<OPENGL_GRID_2D<T> >* grid_component,*coarse_grid_component;
-    OPENGL_COMPONENT_REFINEMENT_GRID_2D<T>* sub_grids_component;
     // Options
     std::string basedir;
 
@@ -186,12 +182,6 @@ Read_Grid()
         FILE_UTILITIES::Read_From_File<RW>(filename,grid);
         has_valid_grid=true;}
 
-    if(has_valid_grid && FILE_UTILITIES::File_Exists(sub_filename)){
-        LOG::cout<<"Reading sub grids '"<<sub_filename<<"'"<<std::endl<<std::flush;
-        sub_filename=STRING_UTILITIES::string_sprintf("%s/%%d/sub_grids",basedir.c_str());
-        sub_grids_component=new OPENGL_COMPONENT_REFINEMENT_GRID_2D<T>(grid,sub_filename);
-        has_valid_sub_grids=true;}
-
     if(has_valid_grid){
         node_based=!grid.Is_MAC_Grid();
         mac_grid=grid.Get_MAC_Grid();regular_grid=grid.Get_Regular_Grid();}
@@ -251,16 +241,6 @@ Initialize_Components_And_Key_Bindings()
         internal_energy_component->Toggle_Draw();
         opengl_world.Set_Key_Binding_Category("Density");
         Add_Component(internal_energy_component,"Internal_Energy",'E',BASIC_VISUALIZATION::OWNED);}
-    filename=basedir+"/%d/sub_density";filename2=basedir+"/%d/sub_grids";
-    if(has_valid_grid && has_valid_sub_grids && FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && FILE_UTILITIES::Frame_File_Exists(filename2,start_frame)){
-        OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D<T>* sub_density_component=new OPENGL_COMPONENT_REFINEMENT_SCALAR_FIELD_2D<T>(grid,filename2,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,1,OPENGL_COLOR::Gray(0,0),OPENGL_COLOR::Gray(1,1)));
-        sub_density_component->Set_Uniform_Contour_Values(0,2,.1);
-        sub_density_component->Update();
-        opengl_world.Set_Key_Binding_Category("Sub Density");
-        Add_Component(sub_density_component,"Sub Density",'d',BASIC_VISUALIZATION::OWNED);
-        opengl_world.Append_Bind_Key('D',sub_density_component->Toggle_Color_Map_CB());
-        opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F8),sub_density_component->Toggle_Draw_Mode_CB());
-        opengl_world.Append_Bind_Key('`',sub_density_component->Toggle_Smooth_CB());}
 
     // Temperature
     filename=basedir+"/%d/temperature";
@@ -517,23 +497,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(']',coarse_mac_velocity_component->Lengthen_Streamlines_CB());
         opengl_world.Append_Bind_Key('[',coarse_mac_velocity_component->Shorten_Streamlines_CB());}
 
-    // Sub velocities
-    opengl_world.Set_Key_Binding_Category("Sub Velocities");
-    filename=basedir+"/%d/sub_mac_velocities";filename2=basedir+"/%d/sub_grids";
-    OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D<T>* sub_mac_velocities_component=0;
-    if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame) && FILE_UTILITIES::Frame_File_Exists(filename2,start_frame)){
-        sub_mac_velocities_component=new OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D<T>(mac_grid,filename,filename2);
-        sub_mac_velocities_component->Set_Size(.01);
-        sub_mac_velocities_component->Set_Vector_Color(OPENGL_COLOR::Blue());
-        sub_mac_velocities_component->Set_Velocity_Mode(OPENGL_MAC_VELOCITY_FIELD_2D<T>::FACE_CENTERED);
-        Add_Component(sub_mac_velocities_component,"sub MAC velocities",'\0',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}
-    if(sub_mac_velocities_component){
-        opengl_world.Append_Bind_Key('x',sub_mac_velocities_component->Toggle_Draw_CB());
-        opengl_world.Append_Bind_Key('V',sub_mac_velocities_component->Toggle_Velocity_Mode_And_Draw_CB());
-        opengl_world.Append_Bind_Key('=',sub_mac_velocities_component->Increase_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('-',sub_mac_velocities_component->Decrease_Vector_Size_CB());
-        opengl_world.Append_Bind_Key('h',sub_mac_velocities_component->Toggle_Arrowhead_CB());}
-
     filename=basedir+"/%d/beta_face";
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>* beta_face_component=new OPENGL_COMPONENT_FACE_SCALAR_FIELD_2D<T,T>(mac_grid,filename,OPENGL_COLOR_RAMP<T>::Two_Color_Ramp(0,.002,OPENGL_COLOR::Gray(1),OPENGL_COLOR::Gray(0)));
@@ -674,8 +637,6 @@ Initialize_Components_And_Key_Bindings()
         Add_Component(coarse_grid_component,"Coarse Grid",'y',BASIC_VISUALIZATION::SELECTABLE);
         opengl_world.Append_Bind_Key('^',coarse_grid_component->object.Toggle_Draw_Ghost_Values_CB());}
     opengl_world.Set_Key_Binding_Category("Sub Grids");
-    if(has_valid_sub_grids && sub_grids_component)
-        Add_Component(sub_grids_component,"Sub Grids",'y',BASIC_VISUALIZATION::SELECTABLE);
 
     // deformable and rigid bodies
     OPENGL_COMPONENT_RIGID_BODY_COLLECTION_2D<T>* rigid_bodies_component=0;

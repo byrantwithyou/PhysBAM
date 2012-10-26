@@ -38,7 +38,6 @@
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL_Components/OPENGL_COMPONENT_TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Fluids/OpenGL_Incompressible_Components/OPENGL_COMPONENT_VORTICITY_PARTICLES_3D.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Deformable_Components/OPENGL_COMPONENT_DEFORMABLE_BODY_COLLECTION_3D.h>
-#include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Deformable_Components/OPENGL_COMPONENT_SEGMENT_ADHESION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL_Solids/OpenGL_Rigids_Components/OPENGL_COMPONENT_RIGID_BODY_COLLECTION_3D.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
@@ -308,12 +307,6 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F5),rigid_bodies_component->Toggle_Forces_And_Torques_CB());
         opengl_world.Append_Bind_Key('o',rigid_bodies_component->Toggle_One_Sided_CB());
         if(slice_manager.slice) slice_manager.Add_Object(rigid_bodies_component);}
-
-    filename=basedir+"/%d/adhesion";
-    if(FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
-        OPENGL_COMPONENT_SEGMENT_ADHESION<T,T>* segment_adhesion_component=new OPENGL_COMPONENT_SEGMENT_ADHESION<T,T>(filename,*deformable_objects_component);
-        Add_Component(segment_adhesion_component,"Segment_Adhesion",'.',BASIC_VISUALIZATION::OWNED|BASIC_VISUALIZATION::START_HIDDEN);}}
-
 
     std::string soft_constraints_deformable_object_filename=basedir+"/soft_constraints_deformable_object_particles";
     if(FILE_UTILITIES::File_Exists(soft_constraints_deformable_object_filename) // TODO(jontg): Not sure what to do here...
@@ -785,7 +778,7 @@ Initialize_Components_And_Key_Bindings()
         opengl_world.Append_Bind_Key(OPENGL_KEY(OPENGL_KEY::F2),psi_colors_component->Toggle_Draw_CB());
         slice_manager.Add_Object(psi_colors_component);}
 
-{filename=basedir+"/%d/strain";
+    filename=basedir+"/%d/strain";
     OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>* strain_component=0; // TODO: make this not a hack for multiphase
     if(has_valid_grid && FILE_UTILITIES::Frame_File_Exists(filename,start_frame)){
         strain_component=new OPENGL_COMPONENT_SYMMETRIC_MATRIX_FIELD_3D<T>(grid,filename);
@@ -834,7 +827,7 @@ Initialize_Components_And_Key_Bindings()
     Selection_Priority(OPENGL_SELECTION::SEGMENTED_CURVE_SEGMENT_3D)=78;
     Selection_Priority(OPENGL_SELECTION::GRID_NODE_3D)=70;
     Selection_Priority(OPENGL_SELECTION::GRID_CELL_3D)=60;
-}
+    }
 
 template<class T,class RW> void VISUALIZATION<T,RW>::
 Update_OpenGL_Strings()
