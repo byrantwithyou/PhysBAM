@@ -634,13 +634,14 @@ Get_Elements_For_Cell(ARRAY<TRIPLE<T_FACE,int,int> >& surface,ARRAY<PAIR<T_FACE,
 }
 int vertex_lookup_2d[4][2]={{0,1},{2,3},{0,2},{1,3}};
 //#####################################################################
-// Function Get_Interface_Elements_For_Cell
+// Function Get_Hashed_Elements_For_Cell
 //#####################################################################
 template<class T,class TV_INT,class TV,class T_SURFACE> void
-Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,8>& re_color,
+Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,8>& re_color,
     const VECTOR<int,8>& colors,const VECTOR<T,8>& phi,const int* color_list,HASHTABLE<FACE_INDEX<3>,int>& edge_vertices,
-    HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,const TV_INT& cell_index,
-    GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements)
+    HASHTABLE<FACE_INDEX<3>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,HASHTABLE<TV_INT,int>& node_vertices,
+    const TV_INT& cell_index,GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& interface_cell_elements,
+    HASHTABLE<int,VECTOR<int,2> >& boundary_cell_elements)
 {
     int cs=0;
     for(int i=0;i<8;i++)
@@ -737,17 +738,18 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
             s=T_SURFACE::Create(particles);
             surface.Set(c,s);}
         s->mesh.elements.Append(v);
-        cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
+        interface_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
     }while(!(pat&last_tri_bit));
 }
 //#####################################################################
-// Function Get_Interface_Elements_For_Cell
+// Function Get_Hashed_Elements_For_Cell
 //#####################################################################
 template<class T,class TV_INT,class TV,class T_SURFACE> void
-Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,4>& re_color,
+Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,const VECTOR<int,4>& re_color,
     const VECTOR<int,4>& colors,const VECTOR<T,4>& phi,const int* color_list,HASHTABLE<FACE_INDEX<2>,int>& edge_vertices,
-    HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,const TV_INT& cell_index,
-    GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements)
+    HASHTABLE<FACE_INDEX<2>,int>& face_vertices,HASHTABLE<TV_INT,int>& cell_vertices,HASHTABLE<TV_INT,int>& node_vertices,
+    const TV_INT& cell_index,GEOMETRY_PARTICLES<TV>& particles,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& interface_cell_elements,
+    HASHTABLE<int,VECTOR<int,2> >& boundary_cell_elements)
 {
     int cs=0;
     for(int i=0;i<4;i++)
@@ -803,7 +805,7 @@ Get_Interface_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T
             s=T_SURFACE::Create(particles);
             surface.Set(c,s);}
         s->mesh.elements.Append(v);
-        cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
+        interface_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(s->mesh.elements.m-1,s->mesh.elements.m)).y=s->mesh.elements.m;
     } while(!(pat&last_tri_bit));
 }
 //#####################################################################
@@ -881,7 +883,10 @@ template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,HASHTABLE<int,T_SURFACE*>& boundary,
     const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int iterations,const bool dampen,const bool verbose)
 {
-    HASHTABLE<TV_INT,HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > > cell_to_element;
+    typedef HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > INTERFACE_HASH;
+    typedef HASHTABLE<int,VECTOR<int,2> > BOUNDARY_HASH;
+
+    HASHTABLE<TV_INT,PAIR<INTERFACE_HASH,BOUNDARY_HASH> > cell_to_element;
 
     const int num_corners=1<<TV::m;
     const VECTOR<VECTOR<int,TV::m>,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
@@ -889,6 +894,7 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     HASHTABLE<FACE_INDEX<TV::m>,int> edge_vertices;
     HASHTABLE<FACE_INDEX<TV::m>,int> face_vertices;
     HASHTABLE<TV_INT,int> cell_vertices;
+    HASHTABLE<TV_INT,int> node_vertices;
 
     GEOMETRY_PARTICLES<TV>& particles=*new GEOMETRY_PARTICLES<TV>;
     ARRAY<bool,TV_INT> junction_cell(grid.Domain_Indices());
@@ -910,13 +916,15 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
                 color_list[next_color]=cell_color(i);
                 color_map.Set(cell_color(i),next_color++);}
         assert(!cell_to_element.Contains(it.index));
-        HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get_Or_Insert(it.index);
-        Get_Interface_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
-            face_vertices,cell_vertices,it.index,particles,cell_elements);
+        PAIR<INTERFACE_HASH,BOUNDARY_HASH>& cell_elements=cell_to_element.Get_Or_Insert(it.index);
+        INTERFACE_HASH& interface_cell_elements=cell_elements.x;
+        BOUNDARY_HASH& boundary_cell_elements=cell_elements.y;
+        Get_Hashed_Elements_For_Cell(grid.Cell_Domain(it.index),surface,re_color,cell_color,cell_phi,color_list,edge_vertices,
+            face_vertices,cell_vertices,node_vertices,it.index,particles,interface_cell_elements,boundary_cell_elements);
         if(next_color>=3){
             junction_cell(it.index)=true;
             junction_cells.Append(it.index);
-            for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(cell_elements);it.Valid();it.Next())
+            for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(interface_cell_elements);it.Valid();it.Next())
                 fit_count++;}}
 
     ARRAY<int> particle_dofs(particles.number);
@@ -952,8 +960,8 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
     int fit_index=-1;
     for(int jc=0;jc<junction_cells.m;jc++){
         const TV_INT& junction_cell_index=junction_cells(jc);
-        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& junction_cell_elements=cell_to_element.Get(junction_cell_index);
-        for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(junction_cell_elements);it.Valid();it.Next()){
+        const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& junction_interface_cell_elements=cell_to_element.Get(junction_cell_index).x;
+        for(typename HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >::CONST_ITERATOR it(junction_interface_cell_elements);it.Valid();it.Next()){
             fit_index++;
             HASHTABLE<int> particle_indices_ht;
             const VECTOR<int,2>& color_pair=it.Key();
@@ -962,9 +970,9 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& surface,H
             for(RANGE_ITERATOR<TV::m> it2(range);it2.Valid();it2.Next()){
                 const TV_INT& cell_index=junction_cell_index+it2.index;
                 if(cell_to_element.Contains(cell_index)){
-                    const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& cell_elements=cell_to_element.Get(cell_index);
+                    const HASHTABLE<VECTOR<int,2>,VECTOR<int,2> >& interface_cell_elements=cell_to_element.Get(cell_index).x;
                     VECTOR<int,2> elements_range;
-                    if(cell_elements.Get(color_pair,elements_range))
+                    if(interface_cell_elements.Get(color_pair,elements_range))
                         for(int i=elements_range.x;i<elements_range.y;i++){
                             TV_INT element=color_pair_surface.mesh.elements(i);
                             for(int j=0;j<TV::m;j++)
