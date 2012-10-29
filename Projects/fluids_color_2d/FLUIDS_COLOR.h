@@ -7,6 +7,7 @@
 
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_FACE.h>
+#include <PhysBAM_Tools/Log/DEBUG_SUBSTEPS.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
 #include <PhysBAM_Geometry/Basic_Geometry/CYLINDER.h>
@@ -333,6 +334,26 @@ public:
         Fill_Levelsets_From_Levelset_Color();
     }
 
+    void Level_Set_Error(T time)
+    {
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+            int c=levelset_color.color(it.index);
+            T p=levelset_color.phi(it.index);
+            Add_Debug_Particle(it.Location(),VECTOR<T,3>(c<0,c>=0,p<0));
+            Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(p));}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("level set",0,1);
+        for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+            int c=-4;
+            T p=analytic_levelset->phi(it.Location()/m,time,c)*m;
+            if(levelset_color.color(it.index)!=(c==-4?bc_type:c)){
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(1,0,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index))+abs(p));}
+            else{
+                Add_Debug_Particle(it.Location(),VECTOR<T,3>(0,1,0));
+                Debug_Particle_Set_Attribute<TV>(ATTRIBUTE_ID_DISPLAY_SIZE,abs(levelset_color.phi(it.index)-p));}}
+        PHYSBAM_DEBUG_WRITE_SUBSTEP("level set error",0,1);
+    }
+
     void Analytic_Test()
     {
         mu.Append(mu0);
@@ -607,10 +628,12 @@ public:
     {
         if(analytic_velocity.m && analytic_levelset)
             Set_Level_Set(time);
+        if(time==0) Level_Set_Error(0);
     }
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
+        Level_Set_Error(time);
         if(analytic_velocity.m){
             T max_error=0,a=0,b=0;
             for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
