@@ -163,36 +163,43 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 1:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 2:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 3:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 4:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 5:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 6:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV()+(T).5,rho0));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 7:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -204,6 +211,7 @@ public:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(2*(T)pi)*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_PERIODIC;
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),TV((T).2,(T).5)));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 9:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -214,17 +222,20 @@ public:
                     analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0,rho0*sqr(m)/kg));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1,rho1*sqr(m)/kg));
+                    use_p_null_mode=true;
                 }
                 break;
             case 10:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*(T)pi*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_VORTEX((T).2);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV()+1));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 11:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
                 analytic_levelset=new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3);
                 analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).6,(T).8),rho0*sqr(m)/kg));
+                if(bc_type!=NEUMANN) use_p_null_mode=true;
                 break;
             case 12:
                 grid.Initialize(TV_INT()+resolution,RANGE<TV>::Unit_Box()*m,true);
@@ -232,6 +243,7 @@ public:
                     T x0=(T).2,x1=(T).8,g=9.8,a=rho0*sqr(m)*g/(2*mu0*s);
                     analytic_levelset=new ANALYTIC_LEVELSET_BANDED(x0,x1,DIRICHLET,DIRICHLET);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X(a,-a*(x0+x1),a*x0*x1,mu0*s/kg));
+                    use_p_null_mode=true;
                 }
                 break;
             case 13:
@@ -242,6 +254,7 @@ public:
                     analytic_levelset=(new ANALYTIC_LEVELSET_BANDED(x0,x2,DIRICHLET,DIRICHLET))->Add(x1);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du0,rho0*sqr(m)/kg));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_AFFINE(TV(x1,0),TV(0,v1),du1,rho1*sqr(m)/kg));
+                    use_p_null_mode=true;
                 }
                 break;
             case 14:
@@ -252,6 +265,7 @@ public:
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV(0,v0)));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_CONST(TV(0,v2)));
                     use_discontinuous_velocity=true;
+                    use_p_null_mode=true;
                 }
                 break;
             case 15:
@@ -262,7 +276,7 @@ public:
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu0*s/kg));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1),rho1*sqr(m)/kg));
                     use_discontinuous_velocity=true;
-                    if(bc_type!=NEUMANN) use_p_null_mode=true;
+                    use_p_null_mode=true;
                 }
                 break;
             case 16:
