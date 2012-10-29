@@ -32,7 +32,7 @@ template<class T_GRID> FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     /*int heap_length=0;
     ARRAY<bool,TV_INT> done(cell_grid.Domain_Indices(ghost_cells+1));
@@ -62,13 +62,13 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const 
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
                 if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector))
                     Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}}*/
-    DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue,1,ghost_cells,2,1).template Run<T_ARRAYS_SCALAR&,T,const ARRAY<TV_INT>*,bool>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Fast_Marching_Method_Threaded,phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
+    DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue,1,ghost_cells,2,1).template Run<T_ARRAYS_SCALAR&,T,const ARRAY<TV_INT>*,bool,int>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Fast_Marching_Method_Threaded,phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     int heap_length=0;
     T_ARRAYS_SCALAR phi_new(domain);
@@ -87,6 +87,8 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
             return;}
         done(index)=true;close_k(index)=-1; // add to done, remove from close
         FAST_MARCHING<T>::Down_Heap(phi_new,close_k,heap,heap_length);heap_length--; // remove point from heap
+
+        if((process_sign==1 && phi_new(index)<0) || (process_sign==-1 && phi_new(index)>0)) continue;
 
         if(levelset.collision_body_list)
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
@@ -108,7 +110,7 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     int heap_length=0;
     ARRAY<int,TV_INT> close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
@@ -124,6 +126,8 @@ Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,const T
             return;}
         done(index)=true;close_k(index)=-1; // add to done, remove from close
         FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
+
+        if((process_sign==1 && phi_ghost(index)<0) || (process_sign==-1 && phi_ghost(index)>0)) continue;
 
         if(levelset.collision_body_list)
             for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);

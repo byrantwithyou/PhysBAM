@@ -127,28 +127,28 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
-    Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
+    Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
-    Get_Signed_Distance_Using_FMM(phi,seed_indices,time,stopping_distance,add_seed_indices_for_ghost_cells);
+    Get_Signed_Distance_Using_FMM(phi,seed_indices,time,stopping_distance,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
+    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
 }
@@ -156,12 +156,12 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,cons
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells)
+Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,seed_indices,stopping_distance,add_seed_indices_for_ghost_cells);
+    fmm.Fast_Marching_Method(phi_ghost,seed_indices,stopping_distance,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
 }
@@ -169,13 +169,13 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,VECTOR
 // Function Fast_Marching_Method_Outside_Band
 //#####################################################################
 template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance)
+Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance,int process_sign)
 {
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     int ghost_cells=number_of_ghost_cells;
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance);
+    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,0,false,process_sign);
     for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++) if(abs(phi_ghost(i,j,ij))>half_band_width) phi(i,j,ij)=phi_ghost(i,j,ij);
     boundary->Apply_Boundary_Condition(grid,phi,time);
 }

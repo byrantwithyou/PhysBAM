@@ -47,10 +47,10 @@ public:
     void Compute_Curvature(const T time=0);
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
 public:
-    void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,1> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false);
+    void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,1> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,1> >& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,1> >* seed_indices=0,
-        const bool add_seed_indices_for_ghost_cells=false);
-    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0);
+        const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
+    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0,int process_sign=0);
 //#####################################################################
 };
 }

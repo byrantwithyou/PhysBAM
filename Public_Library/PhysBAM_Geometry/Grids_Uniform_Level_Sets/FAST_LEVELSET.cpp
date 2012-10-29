@@ -63,16 +63,16 @@ CFL(const ARRAY<TV,TV_INT>& V) const
 // Functions Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void FAST_LEVELSET<T_GRID>::
-Fast_Marching_Method(const int local_advection_spatial_order, const T time)
+Fast_Marching_Method(const int local_advection_spatial_order, const T time,int process_sign)
 {
-    T_LEVELSET::Fast_Marching_Method(time,half_band_width+grid.dX.Max()*(1+min(3,local_advection_spatial_order)));
+    T_LEVELSET::Fast_Marching_Method(time,half_band_width+grid.dX.Max()*(1+min(3,local_advection_spatial_order)),0,false,process_sign);
     boundary->Apply_Boundary_Condition(grid,phi,time); // time not incremented - pseudo-time
 }
 //#####################################################################
 // Functions Fast_Marching_Method_Outside_Band
 //#####################################################################
 template<class T_GRID> void FAST_LEVELSET<T_GRID>::
-Fast_Marching_Method_Outside_Band(const int local_advection_spatial_order, const T time)
+Fast_Marching_Method_Outside_Band(const int local_advection_spatial_order, const T time,int process_sign)
 {
     T_LEVELSET::Fast_Marching_Method_Outside_Band(half_band_width,time,half_band_width+grid.dX.Max()*(1+min(3,local_advection_spatial_order)));
     boundary->Apply_Boundary_Condition(grid,phi,time); // time not incremented - pseudo-time

@@ -69,21 +69,21 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T> void LEVELSET_1D<T>::
-Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<VECTOR<int,1> >* seed_indices,const bool add_seed_indices_for_ghost_cells)
+Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<VECTOR<int,1> >* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
-    Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
+    Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
 template<class T> void LEVELSET_1D<T>::
 Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,1> >& signed_distance,const T time,const T stopping_distance,const ARRAY<VECTOR<int,1> >* seed_indices,
-        const bool add_seed_indices_for_ghost_cells)
+        const bool add_seed_indices_for_ghost_cells,int process_sign)
 {       
     const int ghost_cells=2*number_of_ghost_cells+1;
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells);
+    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,VECTOR<int,1> >::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
 }
@@ -91,13 +91,13 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,1> >& signed_distance,const T t
 // Function Fast_Marching_Method_Outside_Band
 //#####################################################################
 template<class T> void LEVELSET_1D<T>::
-Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance)
+Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance,int process_sign)
 {              
     int m=grid.counts.x;
     int ghost_cells=number_of_ghost_cells;
     ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance);
+    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,0,false,process_sign);
     for(int i=0;i<m;i++) if(abs(phi_ghost(i)) > half_band_width) phi(i)=phi_ghost(i);
     boundary->Apply_Boundary_Condition(grid,phi,time);
 }

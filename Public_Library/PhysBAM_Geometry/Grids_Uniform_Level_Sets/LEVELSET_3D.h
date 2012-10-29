@@ -43,12 +43,12 @@ public:
     T Compute_Curvature(const VECTOR<T,3>& location) const;
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
 public:
-    void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,3> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false);
-    void Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false);
+    void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,3> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
+    void Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,3> >& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,3> >* seed_indices=0,
-        const bool add_seed_indices_for_ghost_cells=false);
-    void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,3> >& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false);
-    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0);
+        const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
+    void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,3> >& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
+    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0,int process_sign=0);
     T Approximate_Surface_Area(const T interface_thickness=3,const T time=0) const;
     void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool include_ghost_values=false) const;
     void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,TRIANGULATED_SURFACE<T>& triangulated_surface) const;

@@ -119,7 +119,7 @@ public:
     bool Is_Projected_At_Nodes();
     void Compute_Normals(const T time=0);
     void Compute_Curvature(const T time=0);
-    void Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders);
+    void Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders,int process_sign=0);
     void Project_Levelset(const int number_of_ghost_cells=0);
     void Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,const bool flood_fill_for_bubbles);
 //#####################################################################

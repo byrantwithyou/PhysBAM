@@ -39,8 +39,8 @@ public:
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
     T CFL(const ARRAY<TV,TV_INT>& velocity) const;
 public:
-    void Fast_Marching_Method(const int local_advection_spatial_order, const T time=0);
-    void Fast_Marching_Method_Outside_Band(const int local_advection_spatial_order, const T time=0);
+    void Fast_Marching_Method(const int local_advection_spatial_order, const T time=0,int process_sign=0);
+    void Fast_Marching_Method_Outside_Band(const int local_advection_spatial_order, const T time=0,int process_sign=0);
 //#####################################################################
 };
 }

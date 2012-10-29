@@ -271,9 +271,9 @@ Compute_Curvature(const T time)
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
-Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders)
+Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders,int process_sign)
 {
-    for(int i=0;i<levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i));
+    for(int i=0;i<levelsets.m;i++) levelsets(i)->Fast_Marching_Method(local_advection_spatial_orders(i),process_sign);
 }
 //#####################################################################
 // Function Project_Levelset
