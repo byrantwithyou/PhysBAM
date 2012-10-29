@@ -49,9 +49,9 @@ template<class TV> PLS_FC_EXAMPLE<TV>::
 template<class TV> void PLS_FC_EXAMPLE<TV>::
 Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color) const
 {
-    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         int c=color(it.Full_Index());
-        if(c<0) continue;
+        if(c<0) c=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Inside_Region(it.index);
         V(it.Full_Index())=u(c)(it.Full_Index());}
 }
 //#####################################################################
