@@ -28,6 +28,7 @@ Initialize(const BASIS_STENCIL_UNIFORM<TV,d>& s,CELL_MANAGER_COLOR<TV>& cm_input
     flat_diff.Sort();
 
     data.Resize(cdi->colors);
+    rhs_data.Resize(cdi->colors);
 }
 //#####################################################################
 // Function Mark_Active_Cells

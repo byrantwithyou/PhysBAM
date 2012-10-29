@@ -254,7 +254,7 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
             error_u_l2+=sqr(error_u(it.index));}}
     error_u_l2=sqrt(error_u_l2/cnt_u);
 
-    LOG::cout<<ips.grid.counts<<" U error:   linf "<<error_u_linf<<"   l2 "<<error_u_l2<<std::endl<<std::endl;
+    LOG::cout<<"error "<<error_u_linf<<" "<<error_u_l2<<std::endl<<std::endl;
 
     if(debug_particles){
         Dump_System<T,TV>(ips,at);
@@ -743,6 +743,15 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                         default: PHYSBAM_FATAL_ERROR();}
                 }
                 virtual T j_surface(const TV& X,int color0,int color1)
+                {
+                    TV x=Transform(X);
+                    if(color0==-2){return -grad_u(X,color1).Dot((x-centers(color1)).Normalized());}
+                    if(color0==0 && color1==1) return normals(2).Dot(grad_u(X,1)-grad_u(X,0));
+                    if(color0==1 && color1==2) return normals(0).Dot(grad_u(X,2)-grad_u(X,1));
+                    if(color0==0 && color1==2) return normals(1).Dot(grad_u(X,0)-grad_u(X,2));
+                    PHYSBAM_FATAL_ERROR();
+                }
+                virtual T d_surface(const TV& X,int color0,int color1)
                 {
                     TV x=Transform(X);
                     if(color0==-2){return -grad_u(X,color1).Dot((x-centers(color1)).Normalized());}
