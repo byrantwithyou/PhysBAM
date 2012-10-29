@@ -262,6 +262,7 @@ public:
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_QUADRATIC_X((T).5,(T).2,(T).3,mu0*s/kg));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_ROTATION(TV((T).1,(T).1),rho1*sqr(m)/kg));
                     use_discontinuous_velocity=true;
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
             case 16:
@@ -270,6 +271,7 @@ public:
                     TV vel((T).2,(T).5);
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_VORTEX((T).2),vel);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),vel));
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
             case 17:
@@ -278,6 +280,7 @@ public:
                     TV vel((T).2,(T).5);
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),vel);
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_CONST(TV()+1),vel));
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
             case 18:
@@ -285,6 +288,7 @@ public:
                 {
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_CIRCLE(TV()+(T).5,(T).3),TV(.1,.2));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_ROTATION(TV()+1,rho0*sqr(m)/kg),TV(0.5,-0.4)));
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
             case 19:
@@ -292,6 +296,7 @@ public:
                 {
                     analytic_levelset=new ANALYTIC_LEVELSET_TRANSLATE(new ANALYTIC_LEVELSET_ROTATE(new ANALYTIC_LEVELSET_SCALE(new ANALYTIC_LEVELSET_VORTEX((T).2),-2),4),TV(9,.4));
                     analytic_velocity.Append(new ANALYTIC_VELOCITY_TRANSLATE(new ANALYTIC_VELOCITY_VORTEX(mu0*s/kg,rho0*sqr(m)/kg),TV(.5,-.2)));
+                    if(bc_type!=NEUMANN) use_p_null_mode=true;
                 }
                 break;
             default: PHYSBAM_FATAL_ERROR("Missing test number");}
