@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Log/DEBUG_PRINT.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
-#include <PhysBAM_Tools/Math_Tools/Hash.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #ifdef USE_MPI
 #include <PhysBAM_Tools/Arrays/ARRAY.h>

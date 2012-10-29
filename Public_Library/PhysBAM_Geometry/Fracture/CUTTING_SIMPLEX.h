@@ -19,7 +19,8 @@
 namespace PhysBAM{
 
 template<class T,int d> struct CUTTING_SIMPLEX;
-template<class T,int d> int Hash_Reduce(const CUTTING_SIMPLEX<T,d>& s);
+template<class T,int d> struct HASH_REDUCE<CUTTING_SIMPLEX<T,d> >
+{static int H(const CUTTING_SIMPLEX<T,d>& s);};
 
 template<class T,int d>
 struct CUTTING_SIMPLEX
@@ -44,7 +45,8 @@ struct CUTTING_SIMPLEX
     template<class RW> void Write(std::ostream& output) const
     {Write_Binary<RW>(output,type,parent,element_owner,nodes,weights,abs_tol,element_original_coordinates,simplex_original_coordinates,node_in_embedded_simplex);}
 
-    template<class TT,int dd> friend int Hash_Reduce(const CUTTING_SIMPLEX<TT,dd> s);
+    friend struct HASH_REDUCE<CUTTING_SIMPLEX<T,d> >;
+
     CUTTING_SIMPLEX();
     CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,SIMPLEX_TYPE type);
     CUTTING_SIMPLEX(const VECTOR<int,d>& nodes,const SIMPLEX_TYPE type,const VECTOR<VECTOR<T,d>,d>& weights,const int parent,const int element_owner);

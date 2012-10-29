@@ -9,7 +9,6 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
-#include <PhysBAM_Tools/Math_Tools/Hash.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
 #include <limits.h>
 #define SUPPORT_FORMATTED_STENCIL_OUTPUT
@@ -171,9 +170,7 @@ public:
         index.x=(index.x+shift.x+n-1)%n+1;
         index.y=(index.y+shift.y+n-1)%n+1;}}
 
-
-    friend HASH Hash_Reduce(const STENCIL& key){return HASH(key.entries);}
-
+    friend struct HASH_REDUCE<STENCIL>;
 //#####################################################################
 };
 template<class T,int d,int d2> inline T 
@@ -269,6 +266,6 @@ for(int z=box.max_corner.z;z>=box.min_corner.z;z--){
         box.min_corner.y,box.max_corner.y
 );}}
 #endif
-
+template<class T,int d> class HASH_REDUCE<STENCIL<T,d> >{static int H(const STENCIL<T,d>& key){return int_hash(key.entries);}};
 }
 #endif

@@ -582,6 +582,19 @@ inline std::ostream& operator<<(std::ostream& output,const ARRAY_BASE<T,T_ARRAY,
 //#####################################################################
 template<class T_ARRAY1,class T_ARRAY2> struct CAN_ASSIGN<T_ARRAY1,T_ARRAY2,typename ENABLE_IF<IS_ARRAY<T_ARRAY1>::value && IS_ARRAY<T_ARRAY2>::value && IS_SAME<typename T_ARRAY1::ELEMENT,typename T_ARRAY2::ELEMENT>::value && !IS_SAME<T_ARRAY1,T_ARRAY2>::value>::TYPE>
 {static const bool value=true;};
+
+template<class T,class T_ARRAY,class ID>
+static int Hash_Reduce_Array_Helper(const ARRAY_BASE<T,T_ARRAY,ID>& array)
+{
+    ID i(0);
+    int hash=Value(array.Size())%2==0?missing_element_hash:HASH_REDUCE<T>::H(array(i++));
+    for(;i<array.Size()-1;i+=2)
+        hash=int_hash(hash,HASH_REDUCE<T>::H(array(i)),HASH_REDUCE<T>::H(array(i+1)));
+    return Value(array.Size())==1?int_hash(hash):hash;
+};
+
+template<class T_ARRAY> struct HASH_REDUCE<T_ARRAY,typename ENABLE_IF<(IS_ARRAY<T_ARRAY>::value && !FIXED_SIZE_VECTOR<T_ARRAY>::value)>::TYPE>
+{static int H(const T_ARRAY& key){return Hash_Reduce_Array_Helper(key);}};
 }
 //#####################################################################
 #include <PhysBAM_Tools/Arrays/ARRAY_DIFFERENCE.h>

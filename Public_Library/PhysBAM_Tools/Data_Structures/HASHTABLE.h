@@ -10,7 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Arrays/PROJECTED_ARRAY.h>
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
-#include <PhysBAM_Tools/Math_Tools/Hash.h>
+#include <PhysBAM_Tools/Data_Structures/HASH_REDUCE.h>
 #include <PhysBAM_Tools/Math_Tools/integer_log.h>
 #include <PhysBAM_Tools/Utilities/EXCEPTIONS.h>
 namespace PhysBAM{

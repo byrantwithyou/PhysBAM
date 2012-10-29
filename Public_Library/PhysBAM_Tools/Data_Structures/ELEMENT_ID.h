@@ -8,6 +8,7 @@
 #define __ELEMENT_ID__
 
 #include <PhysBAM_Tools/Data_Structures/DATA_STRUCTURES_FORWARD.h>
+#include <PhysBAM_Tools/Data_Structures/HASH_REDUCE.h>
 #include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 #include <PhysBAM_Tools/Utilities/TYPE_UTILITIES.h>
 namespace PhysBAM{
@@ -114,6 +115,7 @@ Value(ID i)
     {                                                \
         ID(){}                                       \
         explicit ID(T n):ELEMENT_ID<ID,T,flags>(n){} \
+        typedef int ELEMENT_ID_TAG;                  \
     };
 
 PHYSBAM_DECLARE_ELEMENT_ID(INITIAL_SIZE,int,ELEMENT_ID_HELPER::equality);
@@ -124,5 +126,7 @@ template<class ID,class T,int flags> inline std::ostream& operator<<(std::ostrea
 
 template<class ID,class T,int flags> inline std::istream& operator>>(std::istream& input,ELEMENT_ID<ID,T,flags>& id)
 {T i;input>>i;id=ID(i);return input;}
+template<class ID_TYPE> struct HASH_REDUCE<ID_TYPE,typename FIRST<void,typename ID_TYPE::ELEMENT_ID_TAG>::TYPE>
+{static int H(ID_TYPE id){return id.Value();}};
 }
 #endif

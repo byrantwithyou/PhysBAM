@@ -427,5 +427,17 @@ template<class T,int d> struct QUOTIENT<VECTOR<T,d>,T>{typedef VECTOR<T,d> TYPE;
 template<class T,int d> struct QUOTIENT<T,VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
 template<class T,int d> struct NEGATION<VECTOR<T,d> >{typedef VECTOR<T,d> TYPE;};
 //#####################################################################
+template<class T> struct HASH_REDUCE<VECTOR<T,0> >
+{static int H(const VECTOR<T,0>& key){return missing_element_hash;}};
+template<class T> struct HASH_REDUCE<VECTOR<T,1> >
+{static int H(const VECTOR<T,1>& key){return int_hash(HASH_REDUCE<T>::H(key.x));}};
+template<class T> struct HASH_REDUCE<VECTOR<T,2> >
+{static int H(const VECTOR<T,2>& key){return int_hash(HASH_REDUCE<T>::H(key.x),HASH_REDUCE<T>::H(key.y));}};
+template<class T> struct HASH_REDUCE<VECTOR<T,3> >
+{static int H(const VECTOR<T,3>& key){return int_hash(HASH_REDUCE<T>::H(key.x),HASH_REDUCE<T>::H(key.y),HASH_REDUCE<T>::H(key.z));}};
+template<class T> struct HASH_REDUCE<VECTOR<T,4> >
+{static int H(const VECTOR<T,4>& key){return int_hash(int_hash(HASH_REDUCE<T>::H(key[0]),HASH_REDUCE<T>::H(key[1])),HASH_REDUCE<T>::H(key[2]),HASH_REDUCE<T>::H(key[3]));}};
+template<class T,int d> struct HASH_REDUCE<VECTOR<T,d> >
+{static int H(const VECTOR<T,d>& key){return Hash_Reduce_Array_Helper(key);}};
 }
 #endif

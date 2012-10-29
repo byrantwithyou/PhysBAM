@@ -49,5 +49,7 @@ public:
 template<int d>
 inline std::ostream& operator<<(std::ostream& output,const FACE_INDEX<d>& fi)
 {output<<"("<<fi.axis<<" "<<fi.index<<")";return output;}
+template<int d> struct HASH_REDUCE<FACE_INDEX<d> >
+{static int H(const FACE_INDEX<d>& key){return int_hash(key.axis,HASH_REDUCE<VECTOR<int,d> >::H(key.index));}};
 }
 #endif

@@ -382,6 +382,8 @@ inline std::ostream& operator<<(std::ostream& output,const RANGE<TV>& box)
 template<class TV>
 inline std::istream& operator>>(std::istream& input,RANGE<TV>& box)
 {FILE_UTILITIES::Ignore(input,'(');input>>box.min_corner>>box.max_corner;FILE_UTILITIES::Ignore(input,')');return input;}
+template<class TV> struct HASH_REDUCE<RANGE<TV> >
+{static int H(const RANGE<TV>& key){return int_hash(HASH_REDUCE<TV>::H(key.min_corner),HASH_REDUCE<TV>::H(key.max_corner));}};
 }
 #include <PhysBAM_Tools/Math_Tools/RANGE_ITERATOR.h>
 #endif

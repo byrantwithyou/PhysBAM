@@ -6,6 +6,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Data_Structures/DYNAMIC_LIST.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
+#include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

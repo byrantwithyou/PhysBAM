@@ -131,5 +131,11 @@ public:
 
 //#####################################################################
 };
+template<> struct HASH_REDUCE<const char*>
+{static int H(const char* key){return HASH_REDUCE<ARRAY_VIEW<const char> >::H(ARRAY_VIEW<const char>((int)strlen(key),key));}};
+template<> struct HASH_REDUCE<char*>
+{static int H(const char* key){return HASH_REDUCE<const char*>::H(key);}};
+template<> struct HASH_REDUCE<std::string>
+{static int H(const std::string& key){return HASH_REDUCE<ARRAY_VIEW<const char> >::H(ARRAY_VIEW<const char>((int)key.length(),key.c_str()));}};
 }
 #endif

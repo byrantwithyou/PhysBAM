@@ -7,6 +7,7 @@
 #ifndef __PAIR__
 #define __PAIR__
 
+#include <PhysBAM_Tools/Data_Structures/HASH_REDUCE.h>
 #include <PhysBAM_Tools/Math_Tools/choice.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <iostream>
@@ -73,5 +74,7 @@ inline std::istream& operator>>(std::istream& input,PAIR<T1,T2>& p)
 template<class T1,class T2>
 inline std::ostream& operator<<(std::ostream& output,const PAIR<T1,T2>& p)
 {output<<"("<<p.x<<" "<<p.y<<")";return output;}
+template<class T1,class T2> struct HASH_REDUCE<PAIR<T1,T2> >
+{static int H(const PAIR<T1,T2>& key){return int_hash(HASH_REDUCE<T1>::H(key.x),HASH_REDUCE<T2>::H(key.y));}};
 }
 #endif

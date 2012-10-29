@@ -61,5 +61,7 @@ public:
 template<int d>
 inline std::ostream& operator<<(std::ostream& output,const SIDED_FACE_INDEX<d>& fi)
 {output<<"("<<fi.side<<" "<<fi.axis<<" "<<fi.index<<")";return output;}
+template<int d> struct HASH_REDUCE<SIDED_FACE_INDEX<d> >
+{static int H(const SIDED_FACE_INDEX<d>& key){return int_hash(key.side,key.axis,HASH_REDUCE<VECTOR<int,d> >::H(key.index));}};
 }
 #endif

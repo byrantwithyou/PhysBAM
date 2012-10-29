@@ -7,6 +7,7 @@
 #ifndef __TRIPLE__
 #define __TRIPLE__
 
+#include <PhysBAM_Tools/Data_Structures/HASH_REDUCE.h>
 #include <PhysBAM_Tools/Read_Write/READ_WRITE_FUNCTIONS.h>
 namespace PhysBAM{
 template<class T1,class T2,class T3>
@@ -46,5 +47,7 @@ inline TRIPLE<T1,T2,T3> Tuple(const T1& x,const T2& y,const T3& z)
 template<class T1,class T2,class T3>
 inline std::ostream& operator<<(std::ostream& output,const TRIPLE<T1,T2,T3>& object)
 {output<<"("<<object.x<<" "<<object.y<<" "<<object.z<<")";return output;}
+template<class T1,class T2,class T3> struct HASH_REDUCE<TRIPLE<T1,T2,T3> >
+{static int H(const TRIPLE<T1,T2,T3>& key){return int_hash(HASH_REDUCE<T1>::H(key.x),HASH_REDUCE<T2>::H(key.y),HASH_REDUCE<T3>::H(key.z));}};
 }
 #endif

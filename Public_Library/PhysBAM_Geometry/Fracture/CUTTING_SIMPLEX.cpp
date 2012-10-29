@@ -5,12 +5,14 @@
 #include <PhysBAM_Geometry/Fracture/CUTTING_SIMPLEX.h>
 using namespace PhysBAM;
 //#####################################################################
-// Function Hash_Reduce
+// Function H
 //#####################################################################
-template<class T,int d> int
-Hash_Reduce(const CUTTING_SIMPLEX<T,d>& s)
+template<class T,int d> int HASH_REDUCE<CUTTING_SIMPLEX<T,d> >::
+H(const CUTTING_SIMPLEX<T,d>& s)
 {
-    return HASH(HASH(s.nodes,s.type,s.weights,s.parent,s.element_owner),HASH(s.element_original_coordinates,s.simplex_original_coordinates)).value;
+    int a=int_hash(HASH_REDUCE<VECTOR<int,d> >::H(s.nodes),s.type,HASH_REDUCE<VECTOR<VECTOR<T,d>,d> >::H(s.weights));
+    int b=int_hash(s.parent,s.element_owner,HASH_REDUCE<VECTOR<VECTOR<T,d>,d+1> >::H(s.element_original_coordinates));
+    return int_hash(a,b,HASH_REDUCE<VECTOR<VECTOR<T,d>,d> >::H(s.simplex_original_coordinates));
 }
 //#####################################################################
 // Constructor
