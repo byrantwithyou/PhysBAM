@@ -11,6 +11,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_MXN.h>
 #include <PhysBAM_Geometry/Finite_Elements/BOUNDARY_CONDITIONS_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TOPOLOGY_BASED_SIMPLEX_POLICY.h>
 
 namespace PhysBAM{
@@ -32,6 +33,9 @@ struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
     virtual int phi_color(const TV& X)=0;
     virtual T u(const TV& X,int color)=0;
     virtual T f_volume(const TV& X,int color)=0;
+
+    virtual T u_jump(const TV& X,int color0,int color1)
+    {return u(X,color1)-u(X,color0);}
 
     T u(const TV& X){return u(X,phi_color(X));}
 };
@@ -92,7 +96,7 @@ public:
 
 //#####################################################################
     void Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* abc,bool double_fine=false);
-    void Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<T,TV_INT> >& f_volume,const ARRAY<ARRAY<T,TV_INT> >& u);
+    void Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc);
     void Resize_Vector(KRYLOV_VECTOR_BASE<T>& x) const;
     void Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const;
     double Inner_Product(const KRYLOV_VECTOR_BASE<T>& x,const KRYLOV_VECTOR_BASE<T>& y) const;

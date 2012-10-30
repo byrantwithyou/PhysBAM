@@ -18,6 +18,7 @@
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
@@ -131,36 +132,30 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
 // Function Set_RHS
 //#####################################################################
 template<class TV> void INTERFACE_POISSON_SYSTEM_COLOR<TV>::
-Set_RHS(VECTOR_T& rhs,const ARRAY<ARRAY<T,TV_INT> >& f_volume,const ARRAY<ARRAY<T,TV_INT> >& u)
+Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
 {
-    ARRAY<ARRAY<T> > F_volume,U;
-    
-    F_volume.Resize(cdi->colors);
-    U.Resize(cdi->colors);
-    for(int c=0;c<cdi->colors;c++){
-        F_volume(c).Resize(cm_u->dofs(c));
-        U(c).Resize(cm_u->dofs(c));}
-
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
-        for(int c=0;c<cdi->colors;c++){
-            int k=cm_u->Get_Index(it.index,c);
-            if(k>=0)
-                for(int i=0;i<TV::m;i++){
-                    F_volume(c)(k)=f_volume(c)(it.index);
-                    U(c)(k)=u(c)(it.index);}}
+    ARRAY<ARRAY<T> > F_volume;
 
     Resize_Vector(rhs); // assumes rhs was 0
     rhs.q=rhs_constraint;
+    
+    F_volume.Resize(cdi->colors);
+    for(int c=0;c<cdi->colors;c++)
+        F_volume(c).Resize(cm_u->dofs(c));
+
+    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+        for(int c=0;c<cdi->colors;c++){
+            int k=cm_u->Get_Index(it.index,c);
+            if(k>=0) F_volume(c)(k)=vfsc->F(it.Location(),c);}
+
+    for(int c=0;c<cdi->colors;c++)
+        matrix_rhs_uu(c).Transpose_Times_Add(F_volume(c),rhs.u(c));
 
     for(int c=0;c<cdi->colors;c++)
         for(int j=0;j<cdi->flat_size;j++){
             int k=cm_u->Get_Index(j,c);
             if(k>=0) rhs.u(c)(k)+=rhs_surface(c)(j);}
     
-    for(int c=0;c<cdi->colors;c++){
-        matrix_rhs_uu(c).Transpose_Times_Add(F_volume(c),rhs.u(c));
-        matrix_qu(c).Times_Add(U(c),rhs.q);}
-
     matrix_rhs_uu.Clean_Memory();
     rhs_surface.Clean_Memory();
 }

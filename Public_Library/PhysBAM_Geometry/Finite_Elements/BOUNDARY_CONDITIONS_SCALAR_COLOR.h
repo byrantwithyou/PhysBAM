@@ -17,11 +17,16 @@ struct BOUNDARY_CONDITIONS_SCALAR_COLOR: public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;
 
-    BOUNDARY_CONDITIONS_SCALAR_COLOR() {}
+    bool use_discontinuous_scalar_field;
 
-    virtual T j_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-    virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-    virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
+    BOUNDARY_CONDITIONS_SCALAR_COLOR()
+        :use_discontinuous_scalar_field(false) 
+    {}
+
+    virtual T u_jump(const TV& X,int color0,int color1)=0;
+    virtual T j_surface(const TV& X,int color0,int color1)=0;
+    virtual T n_surface(const TV& X,int color0,int color1)=0;
+    virtual T d_surface(const TV& X,int color0,int color1)=0;
 };
 }
 #endif

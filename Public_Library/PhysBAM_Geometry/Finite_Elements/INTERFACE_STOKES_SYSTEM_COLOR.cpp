@@ -173,7 +173,6 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
         for(int i=0;i<TV::m;i++)
             helper_inertial_rhs(i).Build_Matrix(matrix_inertial_rhs(i));
     // FILL IN THE NULL MODES
-
     for(int i=0;i<TV::m;i++) inactive_u(i).Resize(cdi->colors);
     inactive_p.Resize(cdi->colors);
 

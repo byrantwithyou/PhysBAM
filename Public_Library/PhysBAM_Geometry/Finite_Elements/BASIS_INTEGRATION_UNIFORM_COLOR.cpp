@@ -385,7 +385,7 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                         PHYSBAM_ASSERT(found);
                         const int constraint_offset=constraint_offsets(color_pair_index);
                         const T integral=Precomputed_Integral(precomputed_surface_integrals(k),op.polynomial);
-                        assert(V.z!=BC::SLIP && "Do you really want slip constraints for a scalar variable?");
+                        PHYSBAM_ASSERT(V.z!=BC::SLIP && "Slip constraint is not allowed for scalar varialbes!");
 
                         cdi.nc_present|=(V.y==BC::NEUMANN);
                         cdi.dc_present|=(V.y==BC::DIRICHLET);
@@ -400,7 +400,11 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
                             T value=-integral*sbs->bc->j_surface(X,V.y,V.z);
                             value*=(T)0.5;
                             (*sbs->rhs)(V.y)(flat_index)+=value;
-                            (*sbs->rhs)(V.z)(flat_index)+=value;}
+                            (*sbs->rhs)(V.z)(flat_index)+=value;
+                            
+                            if(sbs->bc->use_discontinuous_scalar_field){
+                                T value=-integral*sbs->bc->u_jump(X,V.y,V.z);
+                                sbs->Add_Constraint_Rhs_Entry(cdi.constraint_base_scalar+constraint_offset,V.z,value);}}
                         else if(V.y==BC::NEUMANN){
                             T value=-integral*sbs->bc->n_surface(X,V.y,V.z);
                             (*sbs->rhs)(V.z)(flat_index)+=value;}
