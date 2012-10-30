@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Krylov_Solvers/KRYLOV_VECTOR_BASE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+
 namespace PhysBAM{
 
 template<class TV>
@@ -22,6 +23,9 @@ public:
     ARRAY<T> q;
 
     int colors;
+
+    mutable int threads;
+    mutable ARRAY<T> result_per_thread;
 
     INTERFACE_POISSON_SYSTEM_VECTOR_COLOR();
     ~INTERFACE_POISSON_SYSTEM_VECTOR_COLOR();
@@ -38,6 +42,7 @@ public:
     KRYLOV_VECTOR_BASE<T>* Clone_Default() const PHYSBAM_OVERRIDE;
     void Resize(const KRYLOV_VECTOR_BASE<T>& v) PHYSBAM_OVERRIDE;
 
+    void Zero_Out();
     T Dot(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v) const;
     T Magnitude_Squared() const;
     T Magnitude() const;

@@ -63,6 +63,7 @@ public:
     void Times(const ARRAY<T>& x,ARRAY<T>& result) const;
     void Transpose_Times(const ARRAY<T>& x,ARRAY<T>& result) const;
     void Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const;
+    void Times_Add_Row(const ARRAY<T>& x,ARRAY<T>& result,const int row) const;
     void Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const;
     void Transpose_Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const;
     void Transpose_Times_Subtract(const ARRAY<T>& x,ARRAY<T>& result) const;

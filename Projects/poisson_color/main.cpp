@@ -23,6 +23,7 @@
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <iostream>
+#include <omp.h>
 
 using namespace PhysBAM;
 
@@ -202,6 +203,8 @@ void Analytic_Test(GRID<TV>& grid,ANALYTIC_TEST<TV>& at,int max_iter,bool use_pr
     KRYLOV_SOLVER<T>* solver=&mr;
     ARRAY<KRYLOV_VECTOR_BASE<T>*> vectors;
 
+    LOG::SCOPE("System solve");
+
     solver->Solve(ips,sol,rhs,vectors,1e-10,0,max_iter);
     
     ips.Multiply(sol,*vectors(0));
@@ -288,6 +291,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     Get_Debug_Particles<TV>().debug_particles.template Add_Array<T>(ATTRIBUTE_ID_DISPLAY_SIZE);
 
     T m=1,s=1,kg=1;
+    int threads=1;
     int test_number=1,resolution=4,max_iter=1000000;
     bool use_preconditioner=false,use_test=false,null=false,dump_matrix=false,debug_particles=false,double_fine=false,dump_geometry=false,opt_arg=false;
     parse_args.Extra_Optional(&test_number,&opt_arg,"example number","example number to run");
@@ -297,6 +301,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-kg",&kg,"unit","kilogram scale");
     parse_args.Add("-test",&test_number,&use_test,"number","test number");
     parse_args.Add("-resolution",&resolution,"res","resolution");
+    parse_args.Add("-threads",&threads,"threads","number of threads");
     parse_args.Add("-use_preconditioner",&use_preconditioner,"Use Jacobi preconditioner");
     parse_args.Add("-max_iter",&max_iter,"iter","max number of interations");
     parse_args.Add("-null",&null,"find extra null modes of the matrix");
@@ -305,6 +310,14 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-double_fine",&double_fine,"set level set exactly on double fine grid");
     parse_args.Add("-dump_geometry",&dump_geometry,"dump grid info and interface");
     parse_args.Parse();
+
+    omp_set_num_threads(threads);
+#pragma omp parallel
+#pragma omp master
+    {
+        PHYSBAM_ASSERT(threads==omp_get_num_threads());
+        LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
+    }
 
     if(!use_test && !opt_arg){
         LOG::cerr<<"Test number is required."<<std::endl;
@@ -599,103 +612,14 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                 virtual int phi_color(const TV& X){TV x=X-0.5*m;return (x.Magnitude()-r)<0?((x.Dot(n)<0)?1:0):constraint;}
                 virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*a(color);}
                 virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*a(color);}
-                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared();if(color0==0) return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;else return T();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_ASSERT(constraint==-2); T x2=(X-0.5*m).Magnitude_Squared();return exp(-x2/m2)*2*mu(color1)*a(color1)*sqrt(x2)/m2;}
+                virtual T j_surface(const TV& X,int color0,int color1){return T();}
+                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_ASSERT(constraint==-2); return u(X,color1);}
                 virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
             test=new ANALYTIC_TEST_10;
             break;}
-        case 11:{ // Four colors, periodic. Three equal bubbles.
+        case 11:{ // Four colors (dirichlet outside). Three equal bubbles.
             struct ANALYTIC_TEST_11:public ANALYTIC_TEST<TV>
-            {
-                T r;
-                TV n; // rotate angle with respect to e_y
-                TV a; // shift
-                VECTOR<TV,3> centers;
-                VECTOR<TV,3> normals;
-                VECTOR<VECTOR<int,3>,3> sectors;
-                ROTATION<TV> rotation;
-                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize()
-                {
-                    wrap=true;mu.Append(1);mu.Append(2);mu.Append(3);mu.Append(4);
-                    r=(T)1/(2*M_PI-1);
-                    n=TV::Axis_Vector(1);a=TV()-1./90;
-                    centers(0)=TV::Axis_Vector(1);
-                    centers(1).x=(T)sqrt(3)/2;centers(1).y=-(T)1/2;
-                    centers(2).x=-(T)sqrt(3)/2;centers(2).y=-(T)1/2;
-                    for(int i=0;i<3;i++){
-                        normals(i).x=-centers(i).y;
-                        normals(i).y=centers(i).x;
-                        centers(i)*=r;
-                        for(int j=0;j<3;j++) sectors(i)(j)=(i+j)%3;}
-                    const int rot_dim=(TV::m==3)?3:1;
-                    VECTOR<T,rot_dim> rotation_vector;
-                    for(int i=0;i<rot_dim;i++) rotation_vector(i)=i+M_PI/10;
-                    rotation=ROTATION<TV>::From_Rotation_Vector(rotation_vector);
-                    this->use_discontinuous_scalar_field=true;
-                }
-                virtual TV Transform(const TV& X){return rotation.Rotate(X-0.5+a);}
-                virtual T phi_value(const TV& X)
-                {
-                    TV x=Transform(X);
-                    int i;
-                    for(i=0;i<2;i++) if(x.Dot(normals(sectors(i)(1)))>=0 && x.Dot(normals(sectors(i)(2)))<0) break;
-                    T d=(x-centers(i)).Magnitude();
-                    if(d>r && x.Magnitude()>r/100) return d-r;
-                    else return min(abs(d-r),abs(x.Dot(normals(sectors(i)(1)))),abs(x.Dot(normals(sectors(i)(2)))));
-                }
-                virtual int phi_color(const TV& X){
-                    TV x=Transform(X);
-                    int i;
-                    for(i=0;i<2;i++) if(x.Dot(normals(sectors(i)(1)))>=0 && x.Dot(normals(sectors(i)(2)))<0) break;
-                    T d=(x-centers(i)).Magnitude();
-                    if(d>r && x.Magnitude()>r/100) return 0;
-                    else return i+1;
-                }
-                virtual T u(const TV& X,int color)
-                {
-                    switch(color){
-                        case 0: return T();
-                        case 1: return sin(X.x);
-                        case 2: return cos(X.y);
-                        case 3: return X.Magnitude_Squared();
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual TV grad_u(const TV& X,int color)
-                {
-                    switch(color){
-                        case 0: return TV();
-                        case 1: return TV::Axis_Vector(0)*cos(X.x)*mu(color);
-                        case 2: return -TV::Axis_Vector(1)*sin(X.y)*mu(color);
-                        case 3: return (TV()+2)*X*mu(color);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T f_volume(const TV& X,int color)
-                {
-                    switch(color){
-                        case 0: return T();
-                        case 1: return sin(X.x)*mu(color);
-                        case 2: return cos(X.y)*mu(color);
-                        case 3: return -2*TV::m*mu(color);
-                        default: PHYSBAM_FATAL_ERROR();}
-                }
-                virtual T j_surface(const TV& X,int color0,int color1)
-                {
-                    TV x=Transform(X);
-                    if(color0==0){return -grad_u(X,color1).Dot((x-centers(color1-1)).Normalized());}
-                    if(color0==1 && color1==2) return normals(2).Dot(grad_u(X,2)-grad_u(X,1));
-                    if(color0==2 && color1==3) return normals(0).Dot(grad_u(X,3)-grad_u(X,2));
-                    if(color0==1 && color1==3) return normals(1).Dot(grad_u(X,1)-grad_u(X,3));
-                    PHYSBAM_FATAL_ERROR();
-                }
-                virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-                virtual T d_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
-            };
-            test=new ANALYTIC_TEST_11;
-            break;}
-        case 12:{ // Four colors, periodic. Three equal bubbles.
-            struct ANALYTIC_TEST_12:public ANALYTIC_TEST<TV>
             {
                 T r;
                 TV n; // rotate angle with respect to e_y
@@ -770,14 +694,10 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
                     if(color0==0 && color1==2) return normals(1).Dot(grad_u(X,0)-grad_u(X,2));
                     PHYSBAM_FATAL_ERROR();
                 }
-                virtual T d_surface(const TV& X,int color0,int color1)
-                {
-                    TV x=Transform(X);
-                    return -grad_u(X,color1).Dot((x-centers(color1)).Normalized());
-                }
+                virtual T d_surface(const TV& X,int color0,int color1){return u(X,color1);}
                 virtual T n_surface(const TV& X,int color0,int color1){PHYSBAM_FATAL_ERROR();}
             };
-            test=new ANALYTIC_TEST_12;
+            test=new ANALYTIC_TEST_11;
             break;}
         default:{
         LOG::cerr<<"Unknown test number."<<std::endl; exit(-1); break;}}

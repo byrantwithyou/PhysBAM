@@ -121,6 +121,18 @@ Times_Add(const ARRAY<T>& x,ARRAY<T>& result) const
         result(i)+=sum;}
 }
 //#####################################################################
+// Function Times_Add
+//#####################################################################
+template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::
+Times_Add_Row(const ARRAY<T>& x,ARRAY<T>& result,const int row) const
+{
+    int index=offsets(row);
+    int end=offsets(row+1);
+    T sum=(T)0;
+    for(;index<end;index++) sum+=A(index).a*x(A(index).j);
+    result(row)+=sum;
+}
+//#####################################################################
 // Function Times_Subtract
 //#####################################################################
 template<class T> void SPARSE_MATRIX_FLAT_MXN<T>::

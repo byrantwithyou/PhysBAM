@@ -67,6 +67,7 @@ public:
     
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_uu;
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_qu;
+    ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_qu_t;
 
     ARRAY<SPARSE_MATRIX_FLAT_MXN<T> > matrix_rhs_uu;
     ARRAY<ARRAY<T> > rhs_surface;

@@ -112,6 +112,11 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
     helper_qu.Build_Matrix(matrix_qu,rhs_constraint);
     helper_rhs_uu.Build_Matrix(matrix_rhs_uu);
 
+    matrix_qu_t.Resize(cdi->colors);
+#pragma omp parallel for
+    for(int c=0;c<cdi->colors;c++)
+        matrix_qu(c).Transpose(matrix_qu_t(c));
+
     // FILL IN THE NULL MODES
 
     inactive_u.Resize(cdi->colors);
@@ -209,12 +214,17 @@ Multiply(const KRYLOV_VECTOR_BASE<T>& x,KRYLOV_VECTOR_BASE<T>& result) const
 {
     const VECTOR_T& xc=debug_cast<const VECTOR_T&>(x);
     VECTOR_T& rc=debug_cast<VECTOR_T&>(result);
-    for(int c=0;c<cdi->colors;c++){
-        matrix_uu(c).Times(xc.u(c),rc.u(c));
-        matrix_qu(c).Transpose_Times_Add(xc.q,rc.u(c));}
+    rc.Zero_Out();
+    for(int c=0;c<cdi->colors;c++)
+#pragma omp parallel for
+        for(int i=0;i<cm_u->dofs(c);i++){
+            matrix_uu(c).Times_Add_Row(xc.u(c),rc.u(c),i);
+            matrix_qu_t(c).Times_Add_Row(xc.q,rc.u(c),i);}
     rc.q.Fill(0);
     for(int c=0;c<cdi->colors;c++)
-        matrix_qu(c).Times_Add(xc.u(c),rc.q);
+#pragma omp parallel for
+        for(int i=0;i<cdi->constraint_base_scalar;i++)
+            matrix_qu(c).Times_Add_Row(xc.u(c),rc.q,i);
 }
 //#####################################################################
 // Function Inner_Product
@@ -245,8 +255,10 @@ Project(KRYLOV_VECTOR_BASE<T>& x) const
     for(int c=0;c<cdi->colors;c++){
         ARRAY<T>& u=v.u(c);
         const ARRAY<int>& inactive=inactive_u(c);
+#pragma omp parallel for
         for(int k=0;k<inactive.m;k++)
             u(inactive(k))=0;}
+#pragma omp parallel for
     for(int k=0;k<inactive_q.m;k++)
         v.q(inactive_q(k))=0;
 }

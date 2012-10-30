@@ -6,6 +6,8 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
+#include <omp.h>
+
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -13,6 +15,10 @@ using namespace PhysBAM;
 template<class TV> INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 INTERFACE_POISSON_SYSTEM_VECTOR_COLOR()
 {
+#pragma omp parallel
+#pragma omp master
+    threads=omp_get_num_threads();
+    result_per_thread.Resize(threads);
 }
 //#####################################################################
 // Destructor
@@ -27,8 +33,13 @@ template<class TV> INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 template<class TV> INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 operator=(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v)
 {
-    u=v.u;
-    q=v.q;
+    for(int c=0;c<colors;c++)
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)=v.u(c)(i);
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)=v.q(i);
     return *this;
 }
 //#####################################################################
@@ -38,8 +49,13 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_POISSON_SY
 operator+=(const BASE& bv)
 {
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv);
-    u+=v.u;
-    q+=v.q;
+    for(int c=0;c<colors;c++)
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)+=v.u(c)(i);
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)+=v.q(i);
     return *this;
 }
 //#####################################################################
@@ -49,8 +65,13 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_POISSON_SY
 operator-=(const BASE& bv)
 {
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv);
-    u-=v.u;
-    q-=v.q;
+    for(int c=0;c<colors;c++)
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)-=v.u(c)(i);
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)-=v.q(i);
     return *this;
 }
 //#####################################################################
@@ -60,8 +81,12 @@ template<class TV> KRYLOV_VECTOR_BASE<typename TV::SCALAR>& INTERFACE_POISSON_SY
 operator*=(const T a)
 {
     for(int c=0;c<colors;c++)
-        u(c)*=a;
-    q*=a;
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)*=a;
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)*=a;
     return *this;
 }
 //#####################################################################
@@ -72,8 +97,12 @@ Copy(const T c1,const BASE& bv1)
 {
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv1);
     for(int c=0;c<colors;c++)
-        u(c).Copy(c1,v1.u(c));
-    q.Copy(c1,v1.q);
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)=c1*v1.u(c)(i);
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)=c1*v1.q(i);
 }
 //#####################################################################
 // Function Copy
@@ -84,8 +113,12 @@ Copy(const T c1,const BASE& bv1,const BASE& bv2)
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v1=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv1);
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR& v2=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR&>(bv2);
     for(int c=0;c<colors;c++)
-        u(c).Copy(c1,v1.u(c),v2.u(c));
-    q.Copy(c1,v1.q,v2.q);
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)=c1*v1.u(c)(i)+v2.u(c)(i);
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)=c1*v1.q(i)+v2.q(i);
 }
 //#####################################################################
 // Function Print
@@ -134,6 +167,7 @@ Clone_Default() const
     INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>* v=new INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>;
     v->colors=colors;
     v->u.Resize(colors);
+#pragma omp parallel for
     for(int c=0;c<colors;c++)
         v->u(c).Resize(u(c).m);
     v->q.Resize(q.m);
@@ -148,9 +182,21 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
     const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& cs=debug_cast<const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>&>(v);
     colors=cs.colors;
     u.Resize(colors);
+#pragma omp parallel for
     for(int c=0;c<colors;c++)
         u(c).Resize(cs.u(c).m);
     q.Resize(cs.q.m);
+}
+template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
+Zero_Out()
+{
+    for(int c=0;c<colors;c++)
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++)
+            u(c)(i)=0;
+#pragma omp parallel for
+        for(int i=0;i<q.m;i++)
+            q(i)=0;
 }
 //#####################################################################
 // Function Dot
@@ -158,11 +204,20 @@ Resize(const KRYLOV_VECTOR_BASE<T>& v)
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Dot(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v) const
 {
-    T dot=0;
+    result_per_thread.Fill(0);
     for(int c=0;c<colors;c++)
-        dot+=u(c).Dot(v.u(c));
-    dot+=q.Dot(v.q);
-    return dot;
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++){
+            const int tid=omp_get_thread_num();
+            result_per_thread(tid)+=u(c)(i)*v.u(c)(i);}
+#pragma omp parallel for
+    for(int i=0;i<q.m;i++){
+        const int tid=omp_get_thread_num();
+        result_per_thread(tid)+=q(i)*v.q(i);}
+    T result=0;
+    for(int tid=0;tid<threads;tid++)
+        result+=result_per_thread(tid);
+    return result;
 }
 //#####################################################################
 // Function Magnitude_Squared
@@ -186,10 +241,23 @@ Magnitude() const
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Max_Abs() const
 {
-    T max_abs=0;
+    result_per_thread.Fill(0);
     for(int c=0;c<colors;c++)
-        max_abs=max(u(c).Max_Abs(),max_abs);
-    max_abs=max(q.Max_Abs(),max_abs);
+#pragma omp parallel for
+        for(int i=0;i<u(c).m;i++){
+            const int tid=omp_get_thread_num();
+            T& result=result_per_thread(tid);
+            T current=fabs(u(c)(i));
+            if(current>result) result=current;}
+#pragma omp parallel for
+    for(int i=0;i<q.m;i++){
+        const int tid=omp_get_thread_num();
+        T& result=result_per_thread(tid);
+        T current=fabs(q(i));
+        if(current>result) result=current;}
+    T max_abs=0;
+    for(int tid=0;tid<threads;tid++)
+        max_abs=max(max_abs,result_per_thread(tid));
     return max_abs;
 }
 //#####################################################################
@@ -207,8 +275,10 @@ template<class TV> void INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Scale(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v,const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& s)
 {
     for(int c=0;c<colors;c++)
+#pragma omp parallel for
         for(int k=0;k<u(c).m;k++)
             u(c)(k)=v.u(c)(k)*s.u(c)(k);
+#pragma omp parallel for
     for(int k=0;k<q.m;k++)
         q(k)=v.q(k)*s.q(k);
 }
