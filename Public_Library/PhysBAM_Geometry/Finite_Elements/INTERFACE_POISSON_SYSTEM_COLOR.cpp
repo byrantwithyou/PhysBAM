@@ -139,11 +139,13 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
     Resize_Vector(rhs); // assumes rhs was 0
     rhs.q=rhs_constraint;
     
+    LOG::cout<<rhs.q<<std::endl;
+
     F_volume.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++)
         F_volume(c).Resize(cm_u->dofs(c));
 
-    for(UNIFORM_GRID_ITERATOR_NODE<TV> it(grid);it.Valid();it.Next())
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
         for(int c=0;c<cdi->colors;c++){
             int k=cm_u->Get_Index(it.index,c);
             if(k>=0) F_volume(c)(k)=vfsc->F(it.Location(),c);}
@@ -155,7 +157,7 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
         for(int j=0;j<cdi->flat_size;j++){
             int k=cm_u->Get_Index(j,c);
             if(k>=0) rhs.u(c)(k)+=rhs_surface(c)(j);}
-    
+
     matrix_rhs_uu.Clean_Memory();
     rhs_surface.Clean_Memory();
 }

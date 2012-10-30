@@ -64,7 +64,9 @@ Build_Matrix(ARRAY<SPARSE_MATRIX_FLAT_MXN<T> >& matrix,ARRAY<T>& constraint_rhs)
         constraint_rhs.Resize(m);
 
         MATRIX_MXN<T>& d=data(c);
+        const ARRAY<T>& rd=rhs_data(c);
         for(int row=0;row<d.m;row++){
+            constraint_rhs(row)+=rd(row);
             ARRAY<SPARSE_MATRIX_ENTRY<T> > entries;
             for(int j=0;j<d.n;j++){
                 T value=d(row,j);

@@ -363,7 +363,9 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             {
                 T r;
                 using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;}
+                virtual void Initialize(){
+                    wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;
+                    this->use_discontinuous_scalar_field=true;}
                 virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
                 virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
                 virtual T u(const TV& X,int color){return (X-0.5*m).Magnitude_Squared()*color;}
