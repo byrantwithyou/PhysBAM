@@ -139,8 +139,6 @@ Set_RHS(VECTOR_T& rhs,VOLUME_FORCE_SCALAR_COLOR<TV>* vfsc)
     Resize_Vector(rhs); // assumes rhs was 0
     rhs.q=rhs_constraint;
     
-    LOG::cout<<rhs.q<<std::endl;
-
     F_volume.Resize(cdi->colors);
     for(int c=0;c<cdi->colors;c++)
         F_volume(c).Resize(cm_u->dofs(c));

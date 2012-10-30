@@ -376,20 +376,24 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
             };
             test=new ANALYTIC_TEST_3;
             break;}
-        // case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
-            // struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
-            // {
-                // T r,m2,m4;
-                // using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
-                // virtual void Initialize(){wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);}
-                // virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
-                // virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
-                // virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*color;}
-                // virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*color;}
-                // virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*sqrt(x2)*2*mu(1)/m2;}
-            // };
-            // test=new ANALYTIC_TEST_4;
-            // break;}
+        case 4:{ // Two colors, periodic. u=exp(-x^2) for r<R, zero elsewhere.
+            struct ANALYTIC_TEST_4:public ANALYTIC_TEST<TV>
+            {
+                T r,m2,m4;
+                using ANALYTIC_TEST<TV>::kg;using ANALYTIC_TEST<TV>::m;using ANALYTIC_TEST<TV>::s;using ANALYTIC_TEST<TV>::wrap;using ANALYTIC_TEST<TV>::mu;
+                virtual void Initialize(){
+                    wrap=true;mu.Append(1);mu.Append(2);r=m/M_PI;m2=sqr(m);m4=sqr(m2);
+                    this->use_discontinuous_scalar_field=true;}
+                virtual T phi_value(const TV& X){return abs((X-0.5*m).Magnitude()-r);}
+                virtual int phi_color(const TV& X){return ((X-0.5*m).Magnitude()-r)<0;}
+                virtual T u(const TV& X,int color){return exp(-(X-0.5*m).Magnitude_Squared()/m2)*color;}
+                virtual T f_volume(const TV& X,int color){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*(2*TV::m/m2-x2*4/m4)*mu(color)*color;}
+                virtual T j_surface(const TV& X,int color0,int color1){T x2=(X-0.5*m).Magnitude_Squared(); return exp(-x2/m2)*sqrt(x2)*2*mu(1)/m2;}
+                virtual T n_surface(const TV& X,int color0,int color1){return T();}
+                virtual T d_surface(const TV& X,int color0,int color1){return T();}
+            };
+            test=new ANALYTIC_TEST_4;
+            break;}
         // case 5:{ // Three colors, periodic. Stripes in x 0:[0,a], 1:[a,b], 2:[b,c], 0:[c,1].
             // struct ANALYTIC_TEST_5:public ANALYTIC_TEST<TV>
             // {
