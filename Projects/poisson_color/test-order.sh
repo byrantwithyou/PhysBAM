@@ -3,7 +3,7 @@ for t in {1..11}; do
     (
         T="o-$t"
         L=""
-        for r in 16 20 24 28 32 36 40 44 48 52 56 60 64 68 72 76 80 84 88 92 96 100; do
+        for r in {40..160}; do
             (
                 echo -n $r
                 nice ./poisson_color -resolution $r $t -use_preconditioner | grep error | tail -n 1

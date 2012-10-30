@@ -5,7 +5,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
-#include <PhysBAM_Geometry/Finite_Elements/CELL_MANAGER.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -81,6 +80,14 @@ Update_Total_Constraint_Count()
     total_number_of_surface_constraints=0;
     for(int orientation=0;orientation<TV::m;orientation++)
         total_number_of_surface_constraints+=*constraint_base(orientation);
+}
+//#####################################################################
+// Function Construct_Surface_Meshes
+//#####################################################################
+template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
+Construct_Surface_Meshes(const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color)
+{
+    MARCHING_CUBES_COLOR<TV>::Get_Elements(phi_grid,interface,boundary,cell_to_element,phi_color,phi_value,phi_grid.counts.Max(),true);
 }
 //#####################################################################
 // Function Interpolate_Level_Set_To_Double_Fine_Grid

@@ -8,16 +8,17 @@
 #define __CELL_DOMAIN_INTERFACE_COLOR__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
+#include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Data_Structures/TRIPLE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Basic_Geometry/BASIC_SIMPLEX_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/LINE_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/PLANE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/SEGMENT_2D.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TRIANGLE_3D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
 
 namespace PhysBAM{
 
@@ -36,7 +37,10 @@ class CELL_DOMAIN_INTERFACE_COLOR:public NONCOPYABLE
 
 public:
 
-    typedef typename BASIC_SIMPLEX_POLICY<TV,TV::m>::SIMPLEX_FACE T_FACE;
+    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_INTERFACE HASH_INTERFACE;
+    typedef typename MARCHING_CUBES_COLOR<TV>::HASH_BOUNDARY HASH_BOUNDARY;
+    typedef typename MARCHING_CUBES_COLOR<TV>::T_SURFACE T_SURFACE;
+    typedef typename MARCHING_CUBES_COLOR<TV>::T_FACE T_FACE;
     typedef TRIPLE<T_FACE,int,int> SURFACE_ELEMENT;
     typedef PAIR<T_FACE,int> SIDES_ELEMENT;
 
@@ -70,6 +74,10 @@ public:
     ARRAY<int> flat_base_scalar;
 
     ARRAY<SURFACE_ELEMENT> surface_mesh;
+
+    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element;
+    HASHTABLE<VECTOR<int,2>,T_SURFACE*> interface;
+    HASHTABLE<int,T_SURFACE*> boundary;
     
     CELL_DOMAIN_INTERFACE_COLOR(const GRID<TV>& grid_input,int padding_input,int colors_input,bool wrap_input);
 
@@ -95,6 +103,7 @@ public:
     void Set_Flat_Base_And_Resize_Scalar(int extra_constraints_scalar,const TV_INT& index);
     void Update_Constraint_Count();
     void Update_Total_Constraint_Count();
+    void Construct_Surface_Meshes(const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color);
 
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const RANGE<TV>& range_input,
         const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,

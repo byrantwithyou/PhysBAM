@@ -78,6 +78,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>* ab
 
     cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
     cm_u=new CELL_MANAGER_COLOR<TV>(*cdi);
+    cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
 
     // STENCILS INTEGRATION 
     

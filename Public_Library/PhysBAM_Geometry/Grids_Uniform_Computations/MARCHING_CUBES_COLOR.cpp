@@ -1047,13 +1047,9 @@ public:
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
-    const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,const int iterations,const bool dampen,const bool verbose)
+    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element,const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,
+    const int iterations,const bool dampen,const bool verbose)
 {
-    typedef HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > INTERFACE_HASH;
-    typedef HASHTABLE<int,VECTOR<int,2> > BOUNDARY_HASH;
-
-    HASHTABLE<TV_INT,PAIR<INTERFACE_HASH,BOUNDARY_HASH> > cell_to_element;
-
     const int num_corners=1<<TV::m;
     const VECTOR<VECTOR<int,TV::m>,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
 
@@ -1082,9 +1078,9 @@ Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface
                 color_list[next_color]=cell_color(i);
                 color_map.Set(cell_color(i),next_color++);}
         assert(!cell_to_element.Contains(it.index));
-        PAIR<INTERFACE_HASH,BOUNDARY_HASH>& cell_elements=cell_to_element.Get_Or_Insert(it.index);
-        INTERFACE_HASH& interface_cell_elements=cell_elements.x;
-        BOUNDARY_HASH& boundary_cell_elements=cell_elements.y;
+        PAIR<HASH_INTERFACE,HASH_BOUNDARY>& cell_elements=cell_to_element.Get_Or_Insert(it.index);
+        HASH_INTERFACE& interface_cell_elements=cell_elements.x;
+        HASH_BOUNDARY& boundary_cell_elements=cell_elements.y;
         Get_Hashed_Elements_For_Cell(grid.Cell_Domain(it.index),interface,boundary,re_color,cell_color,cell_phi,color_list,edge_vertices,
             face_vertices,cell_vertices,node_vertices,it.index,particles,interface_cell_elements,boundary_cell_elements);
         if(next_color>=3){
