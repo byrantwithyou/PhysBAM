@@ -641,8 +641,7 @@ public:
     void Begin_Time_Step(const T time) PHYSBAM_OVERRIDE
     {
         if(analytic_velocity.m && analytic_levelset)
-            Set_Level_Set(time);
-        if(time==0) Level_Set_Error(0);
+            Set_Level_Set(time+dt);
     }
 
     void End_Time_Step(const T time) PHYSBAM_OVERRIDE
