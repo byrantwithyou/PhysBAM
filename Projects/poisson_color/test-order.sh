@@ -1,9 +1,9 @@
 #!/bin/bash
-for t in {1..13}; do
+for t in {1..12}; do
     (
         T="o-$t"
         L=""
-        for r in 8 16 24 32 40 48 56 64 72 80; do
+        for r in {16..128}; do
             (
                 echo -n $r
                 nice ./poisson_color -resolution $r $t | grep error | tail -n 1
