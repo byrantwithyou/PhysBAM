@@ -51,7 +51,9 @@ Merge_Velocities(ARRAY<T,FACE_INDEX<TV::dimension> >& V,const ARRAY<ARRAY<T,FACE
 {
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         int c=color(it.Full_Index());
-        if(c<0) c=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.Inside_Region(it.index);
+        if(c<0){
+            c=0;
+            if(abs(u(c)(it.Full_Index()))>1e10) continue;}
         V(it.Full_Index())=u(c)(it.Full_Index());}
 }
 //#####################################################################
@@ -160,7 +162,7 @@ Color_At_Cell(const TV_INT& index,T& phi) const
 template<class TV> void PLS_FC_EXAMPLE<TV>::
 Rebuild_Levelset_Color()
 {
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next())
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next())
         levelset_color.color(it.index)=Color_At_Cell(it.index,levelset_color.phi(it.index));
 }
 //#####################################################################
@@ -170,7 +172,7 @@ template<class TV> void PLS_FC_EXAMPLE<TV>::
 Fill_Levelsets_From_Levelset_Color()
 {
     ARRAY<ARRAY<T,TV_INT> >& phis=particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.phis;
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,1);it.Valid();it.Next()){
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,number_of_ghost_cells);it.Valid();it.Next()){
         int c=levelset_color.color(it.index);
         T p=levelset_color.phi(it.index);
         for(int i=0;i<bc_phis.m;i++)

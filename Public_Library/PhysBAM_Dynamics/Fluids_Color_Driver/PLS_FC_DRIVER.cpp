@@ -268,6 +268,16 @@ No_Advection_And_BDF(T dt,bool first_step,int c)
     else example.prev_face_velocities(c)=example.face_velocities(c);
 }
 //#####################################################################
+// Function Assert_Advection_CFL
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<int,FACE_INDEX<TV::m> >& color,int c,T dt) const
+{
+    for(UNIFORM_GRID_ITERATOR_FACE<TV> it(example.grid);it.Valid();it.Next())
+        if(color(it.Full_Index())>=0){
+            PHYSBAM_ASSERT(u(it.Full_Index())*dt<example.grid.dX(it.Axis())*example.number_of_ghost_cells);}
+}
+//#####################################################################
 // Function Advection_And_BDF
 //#####################################################################
 template<class TV> void PLS_FC_DRIVER<TV>::
@@ -276,9 +286,9 @@ Reduced_Advection_And_BDF(T dt,bool first_step,int c)
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T,AVERAGING_UNIFORM<GRID<TV> >,QUADRATIC_INTERPOLATION_UNIFORM<GRID<TV>,T> > quadratic_advection;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary;
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
-    for(int i=0;i<TV::m;i++) assert(example.face_velocities(c).Component(i).array.Max_Abs()*dt<example.grid.dX(i)*example.number_of_ghost_cells);
+    PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.face_velocities(c),example.face_color,c,dt));
     if(!first_step){
-        for(int i=0;i<TV::m;i++) assert(example.prev_face_velocities(c).Component(i).array.Max_Abs()*dt<example.grid.dX(i)*example.number_of_ghost_cells);
+        PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.prev_face_velocities(c),example.prev_face_color,c,dt));
         ARRAY<T,FACE_INDEX<TV::dimension> > temp(example.grid,example.number_of_ghost_cells);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp,lookup_prev_face_velocities,lookup_prev_face_velocities,boundary,2*dt,time+dt);
         quadratic_advection.Update_Advection_Equation_Face_Lookup(example.grid,example.prev_face_velocities(c),lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);
@@ -299,9 +309,9 @@ RK2_Advection_And_BDF(T dt,bool first_step,int c)
         temp3(example.grid,example.number_of_ghost_cells),temp4(example.grid,example.number_of_ghost_cells),temp5(example.grid,example.number_of_ghost_cells);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_temp(temp),lookup_temp2(temp2),lookup_temp3(temp3),lookup_temp4(temp4),lookup_temp5(temp5);
     FACE_LOOKUP_UNIFORM<GRID<TV> > lookup_face_velocities(example.face_velocities(c)),lookup_prev_face_velocities(example.prev_face_velocities(c));
-    for(int i=0;i<TV::m;i++) assert(example.face_velocities(c).Component(i).array.Max_Abs()*dt<example.grid.dX(i)*example.number_of_ghost_cells);
+    PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.face_velocities(c),example.face_color,c,dt));
     if(!first_step){
-        for(int i=0;i<TV::m;i++) assert(example.prev_face_velocities(c).Component(i).array.Max_Abs()*dt<example.grid.dX(i)*example.number_of_ghost_cells);
+        PHYSBAM_DEBUG_ONLY(Assert_Advection_CFL(example.prev_face_velocities(c),example.prev_face_color,c,dt));
         temp.Copy((T)1.5,example.face_velocities(c),-(T).5,example.prev_face_velocities(c));
         linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp2,lookup_temp,lookup_face_velocities,boundary,dt/2,time+dt);
         linear_advection.Update_Advection_Equation_Face_Lookup(example.grid,temp3,lookup_face_velocities,lookup_face_velocities,boundary,dt,time+dt);

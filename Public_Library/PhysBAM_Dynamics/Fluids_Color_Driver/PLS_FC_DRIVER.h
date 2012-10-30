@@ -45,6 +45,7 @@ public:
     void No_Advection_And_BDF(T dt,bool first_step,int c);
     void Reduced_Advection_And_BDF(T dt,bool first_step,int c);
     void RK2_Advection_And_BDF(T dt,bool first_step,int c);
+    void Assert_Advection_CFL(const ARRAY<T,FACE_INDEX<TV::m> >& u,const ARRAY<int,FACE_INDEX<TV::m> >& color,int c,T dt) const;
 //#####################################################################
 };
 }
