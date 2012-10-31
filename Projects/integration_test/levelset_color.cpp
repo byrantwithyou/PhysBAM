@@ -22,6 +22,9 @@
 using namespace PhysBAM;
 
 typedef float RW;
+typedef HASHTABLE<VECTOR<int,2>,VECTOR<int,2> > HASH_INTERFACE;
+typedef HASHTABLE<int,VECTOR<int,2> > HASH_BOUNDARY;
+
 std::string output_directory="levelset";
 
 template<class TV>
@@ -180,9 +183,10 @@ void Build_Surface(int argc,char* argv[],PARSE_ARGS& parse_args)
     MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
     for(int i=0;i<iterations;i++){
+        HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element;
         HASHTABLE<VECTOR<int,2>,T_SURFACE*> surface;
         HASHTABLE<int,T_SURFACE*> boundary;
-        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,phi_color,phi_value,i,dampen,verbose);
+        MARCHING_CUBES_COLOR<TV>::Get_Elements(grid,surface,boundary,cell_to_element,phi_color,phi_value,i,dampen,verbose);
         Dump_Interface<T,TV,T_SURFACE,T_FACE>(surface);
         Dump_Boundary<T,TV,T_SURFACE,T_FACE>(boundary);
         char buffer[100];
