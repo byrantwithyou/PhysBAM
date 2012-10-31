@@ -954,7 +954,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
                 assert(points_m==tmp || points_m==-1);
                 points_m=tmp;}
 
-            {VECTOR<int,2> v(points[1-s],points_m);
+            {VECTOR<int,2> v(points_m,points[1-s]);
             int c=colors[offset+1-s];
             
             T_SURFACE* surf=0;
@@ -964,7 +964,7 @@ Get_Hashed_Elements_For_Cell(const RANGE<TV>& range,HASHTABLE<VECTOR<int,2>,T_SU
             surf->mesh.elements.Append(v);
             boundary_cell_elements.Get_Or_Insert(c,VECTOR<int,2>(surf->mesh.elements.m-1,surf->mesh.elements.m)).y=surf->mesh.elements.m;}
 
-            {VECTOR<int,2> v(points_m,points[s]);
+            {VECTOR<int,2> v(points[s],points_m);
             int c=colors[offset+s];
             
             T_SURFACE* surf=0;
