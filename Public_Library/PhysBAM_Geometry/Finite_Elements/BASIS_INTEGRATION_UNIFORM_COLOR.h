@@ -10,6 +10,7 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Math_Tools/RANGE.h>
 #include <PhysBAM_Tools/Vectors/STATIC_TENSOR.h>
+#include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_SURFACE_BLOCK_SCALAR_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_COLOR.h>
@@ -29,7 +30,10 @@ public:
     typedef SYSTEM_SURFACE_BLOCK_SCALAR_COLOR<TV,static_degree> SURFACE_BLOCK_SCALAR;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SURFACE_ELEMENT SURFACE_ELEMENT;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::SIDES_ELEMENT SIDES_ELEMENT;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::HASH_INTERFACE HASH_INTERFACE;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::HASH_BOUNDARY HASH_BOUNDARY;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::BOUNDARY_CONDITIONS BC;
+    typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_SURFACE T_SURFACE;
     typedef typename CELL_DOMAIN_INTERFACE_COLOR<TV>::T_FACE T_FACE;
     typedef typename VOLUME_BLOCK::OPEN_ENTRY OPEN_ENTRY;
     typedef typename TV::SCALAR T;

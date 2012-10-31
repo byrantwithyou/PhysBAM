@@ -10,6 +10,9 @@
 #include <PhysBAM_Geometry/Finite_Elements/BASIS_INTEGRATION_UNIFORM_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/CELL_DOMAIN_INTERFACE_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES_COLOR.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
+#include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
@@ -80,7 +83,6 @@ template<class TV,int static_degree> void BASIS_INTEGRATION_UNIFORM_COLOR<TV,sta
 Compute_Entries(bool double_fine)
 {
     const VECTOR<TV_INT,(1<<TV::m)>& bits=GRID<TV>::Binary_Counts(TV_INT());
-    MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
 
     VECTOR<ARRAY<SURFACE_ELEMENT>,(1<<TV::m)> surface;
     VECTOR<ARRAY<SIDES_ELEMENT>,(1<<TV::m)> sides;
@@ -101,6 +103,7 @@ Compute_Entries(bool double_fine)
             if(!material_cell) continue;
             if(cell_corners==0){Add_Uncut_Cell(it.index,base_color);continue;}}
 
+        TV cell_center(grid.Center(it.index));
         VECTOR<bool,(1<<TV::m)> material_subcell;
         for(int s=0;s<(1<<TV::m);s++){
             sides(s).Remove_All();
@@ -115,7 +118,26 @@ Compute_Entries(bool double_fine)
                 assert(color<cdi.colors);
                 subcell_phi_colors(b)=color;
                 material_subcell(s)|=color>=0;}
-            if(material_subcell(s)) MARCHING_CUBES_COLOR<TV>::Get_Elements_For_Cell(surface(s),sides(s),subcell_phi_colors,subcell_phi_values);}
+            if(material_subcell(s)){
+                const PAIR<HASH_INTERFACE,HASH_BOUNDARY>& elements=cdi.cell_to_element.Get(subcell_base);
+                const HASH_INTERFACE& surface_elements=elements.x;
+                const HASH_BOUNDARY& sides_elements=elements.y;
+                for(typename HASH_INTERFACE::CONST_ITERATOR it(surface_elements);it.Valid();it.Next()){
+                    const VECTOR<int,2>& color_pair=it.Key();
+                    const VECTOR<int,2>& interval=it.Data();
+                    const T_SURFACE& surf=*cdi.interface.Get(color_pair);
+                    for(int i=interval.x;i<interval.y;i++){
+                        T_FACE x=surf.Get_Element(i);
+                        for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
+                        surface(s).Append(SURFACE_ELEMENT(x,color_pair.x,color_pair.y));}}
+                for(typename HASH_BOUNDARY::CONST_ITERATOR it(sides_elements);it.Valid();it.Next()){
+                    const int color=it.Key();
+                    const VECTOR<int,2>& interval=it.Data();
+                    const T_SURFACE& surf=*cdi.boundary.Get(color);
+                    for(int i=interval.x;i<interval.y;i++){
+                        T_FACE x=surf.Get_Element(i);
+                        for(int j=0;j<TV::m;j++) x.X(j)-=cell_center;
+                        sides(s).Append(SIDES_ELEMENT(x,color));}}}}
 
         HASHTABLE<VECTOR<int,2>,int> ht_color_pairs;
         ARRAY<VECTOR<int,2> > color_pairs;
@@ -257,15 +279,10 @@ Add_Cut_Fine_Cell(const TV_INT& cell,int subcell,const TV& subcell_offset,ARRAY<
     TV cell_center(grid.Center(cell));
     
     for(int i=0;i<surface.m;i++){
-        for(int j=0;j<TV::m;j++) surface(i).x.X(j)=(surface(i).x.X(j)-subcell_offset)*((T).5*grid.dX);
         SURFACE_ELEMENT element(surface(i));
         for(int j=0;j<TV::m;j++) element.x.X(j)+=cell_center;
         cdi.surface_mesh.Append(element);}
 
-    for(int i=0;i<sides.m;i++)
-        for(int j=0;j<TV::m;j++)
-            sides(i).x.X(j)=(sides(i).x.X(j)-subcell_offset)*((T).5*grid.dX);
-            
     ARRAY<STATIC_TENSOR<T,TV::m,static_degree+1> > precomputed_volume_integrals(cdi.colors);
     RANGE<TV_INT> range(TV_INT(),TV_INT()+static_degree+1);
     ARRAY<T> integrals(cdi.colors);

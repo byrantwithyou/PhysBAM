@@ -88,6 +88,7 @@ Set_Matrix(const ARRAY<T>& mu,bool wrap,BOUNDARY_CONDITIONS_COLOR<TV>* abc,ARRAY
         for(int i=0;i<TV::m;i++) padding=max(u_stencil(i)->Padding(),padding);}
 
     cdi=new CELL_DOMAIN_INTERFACE_COLOR<TV>(grid,padding,mu.m,wrap); 
+    cdi->Construct_Surface_Meshes(phi_grid,phi_value,phi_color);
 
     cm_p=new CELL_MANAGER_COLOR<TV>(*cdi);
     for(int i=0;i<TV::m;i++) cm_u(i)=new CELL_MANAGER_COLOR<TV>(*cdi);

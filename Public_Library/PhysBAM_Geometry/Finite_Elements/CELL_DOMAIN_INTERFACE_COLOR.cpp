@@ -85,9 +85,10 @@ Update_Total_Constraint_Count()
 // Function Construct_Surface_Meshes
 //#####################################################################
 template<class TV> void CELL_DOMAIN_INTERFACE_COLOR<TV>::
-Construct_Surface_Meshes(const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color)
+Construct_Surface_Meshes(const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi_value,const ARRAY<int,TV_INT>& phi_color)
 {
-    MARCHING_CUBES_COLOR<TV>::Get_Elements(phi_grid,interface,boundary,cell_to_element,phi_color,phi_value,phi_grid.counts.Max(),true);
+    MARCHING_CUBES_COLOR<TV>::Initialize_Case_Table();
+    MARCHING_CUBES_COLOR<TV>::Get_Elements(phi_grid,interface,boundary,cell_to_element,phi_color,phi_value,0/*phi_grid.counts.Max()*/,true);
 }
 //#####################################################################
 // Function Interpolate_Level_Set_To_Double_Fine_Grid

@@ -1047,7 +1047,7 @@ public:
 //#####################################################################
 template<class TV> void MARCHING_CUBES_COLOR<TV>::
 Get_Elements(const GRID<TV>& grid,HASHTABLE<VECTOR<int,2>,T_SURFACE*>& interface,HASHTABLE<int,T_SURFACE*>& boundary,
-    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> > cell_to_element,const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,
+    HASHTABLE<TV_INT,PAIR<HASH_INTERFACE,HASH_BOUNDARY> >& cell_to_element,const ARRAY<int,TV_INT>& color,const ARRAY<T,TV_INT>& phi,
     const int iterations,const bool dampen,const bool verbose)
 {
     const int num_corners=1<<TV::m;

@@ -103,7 +103,7 @@ public:
     void Set_Flat_Base_And_Resize_Scalar(int extra_constraints_scalar,const TV_INT& index);
     void Update_Constraint_Count();
     void Update_Total_Constraint_Count();
-    void Construct_Surface_Meshes(const GRID<TV>& phi_grid,ARRAY<T,TV_INT>& phi_value,ARRAY<int,TV_INT>& phi_color);
+    void Construct_Surface_Meshes(const GRID<TV>& phi_grid,const ARRAY<T,TV_INT>& phi_value,const ARRAY<int,TV_INT>& phi_color);
 
     static void Interpolate_Level_Set_To_Double_Fine_Grid(const RANGE<TV>& range_input,
         const ARRAY<T,TV_INT>& phi_value_input,const ARRAY<int,TV_INT>& phi_color_input,
