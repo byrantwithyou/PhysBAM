@@ -25,7 +25,6 @@
 #include "Standard_Tests/STANDARD_TESTS.h"
 #include "Tank/TANK_EXAMPLE.h"
 //#include "TP/TP_EXAMPLE.h"
-//#include "Visible_Human/VISIBLE_HUMAN_EXAMPLE.h"
 
 using namespace PhysBAM;
 

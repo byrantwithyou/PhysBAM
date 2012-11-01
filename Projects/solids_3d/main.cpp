@@ -22,7 +22,6 @@
 #include "Incompressible/INCOMPRESSIBLE_TESTS.h"
 #include "Mass_Weighted_Self_Collisions/MASS_WEIGHTED_SELF_COLLISIONS.h"
 #include "Rigid_Particle/RIGID_PARTICLE_EXAMPLE.h"
-#include "Rigid_Particle_Mesh/RIGID_PARTICLE_MESH_EXAMPLE.h"
 #include "Rigid_Particle_Spheres/RIGID_PARTICLE_SPHERES_EXAMPLE.h"
 #include "Simple_Hard_Binding/SIMPLE_HARD_BINDING_EXAMPLE.h"
 #include "Standard_Tests/STANDARD_TESTS.h"
@@ -37,7 +36,7 @@ int main(int argc,char* argv[])
     RW rw=RW();STREAM_TYPE stream_type(rw); // gcc 3.3.2 workaround
 
     bool opt_incomp=false,opt_hair_sim_tests=false,opt_hair_strand_tests=false,opt_mass_weighted_self_collisions=false;
-    bool opt_embedded_collisions=false,opt_rigid_particles=false,opt_rigid_particle_mesh=false;
+    bool opt_embedded_collisions=false,opt_rigid_particles=false;
     bool opt_rigid_particle_spheres=false,opt_simple_hard_binding=false,opt_binding_plasticity=false,opt_binding_springs=false;
     bool opt_cloth_spheres=false,opt_embedding_test=false,opt_hair_tests=false,opt_fragment_tests=false,opt_armadillo_test=false;
     bool opt_body_test=false;
@@ -49,7 +48,6 @@ int main(int argc,char* argv[])
     parse_args.Add("-mass_weighted_self_collisions",&opt_mass_weighted_self_collisions,"Use mass_weighted_self_collisions test");
     parse_args.Add("-embedded_collisions",&opt_embedded_collisions,"Use embedded_collisions test");
     parse_args.Add("-rigid_particles",&opt_rigid_particles,"Use rigid_particles test");
-    parse_args.Add("-rigid_particle_mesh",&opt_rigid_particle_mesh,"Use rigid_particle_mesh test");
     parse_args.Add("-rigid_particle_spheres",&opt_rigid_particle_spheres,"Use rigid_particle_spheres test");
     parse_args.Add("-simple_hard_binding",&opt_simple_hard_binding,"Use simple_hard_binding test");
     parse_args.Add("-binding_plasticity",&opt_binding_plasticity,"Use binding_plasticity test");
@@ -69,7 +67,6 @@ int main(int argc,char* argv[])
     else if(opt_mass_weighted_self_collisions) example=new MASS_WEIGHTED_SELF_COLLISIONS<T>(stream_type);
     else if(opt_embedded_collisions) example=new EMBEDDED_COLLISIONS_EXAMPLE<T>(stream_type);
     else if(opt_rigid_particles) example=new RIGID_PARTICLE_EXAMPLE<T>(stream_type);
-    else if(opt_rigid_particle_mesh) example=new RIGID_PARTICLE_MESH_EXAMPLE<T>(stream_type);
     else if(opt_rigid_particle_spheres) example=new RIGID_PARTICLE_SPHERES_EXAMPLE<T>(stream_type);
     else if(opt_simple_hard_binding) example=new SIMPLE_HARD_BINDING_EXAMPLE<T>(stream_type);
     else if(opt_binding_plasticity) example=new BINDING_PLASTICITY_EXAMPLE<T>(stream_type);

@@ -401,30 +401,11 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
     for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) 
         fluid_collection.incompressible_fluid_collection.face_velocities.Component(iterator.Axis())(iterator.Face_Index())=water_tests.Initial_Velocity(iterator.Location())[iterator.Axis()];
 }
-#if 0
-//#####################################################################
-// Function Get_Object_Velocities
-//#####################################################################
-void Get_Object_Velocities(PROJECTION_UNIFORM<GRID<TV> >& projection,const bool set_densities_for_coupling,const T dt,const T time) PHYSBAM_OVERRIDE
-{
-    RIGID_BODY<TV>& rigid_body=solids_parameters.rigid_body_parameters.list(int(1));
-    for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
-        TV_INT cell_index=iterator.Cell_Index();
-        if(rigid_body.Implicit_Geometry_Extended_Value(cell_index)<(T)0){
-            
-        }
-    }
-    tests.Get_Object_Velocities(projection,set_densities_for_coupling,dt,time);
-}
-#endif
 //#####################################################################
 // Function Get_Source_Velocities
 //#####################################################################
 void Get_Source_Velocities(T_FACE_ARRAYS_SCALAR& face_velocities,T_FACE_ARRAYS_BOOL& psi_N,const T time) PHYSBAM_OVERRIDE
 {
-#if 0
-    if(water_tests.test_number==1) BASE::Get_Source_Velocities(water_tests.source,water_tests.world_to_source,water_tests.source_velocity);
-#endif
     for(int i=0;i<fountain_source.m;i++) BASE::Get_Source_Velocities(fountain_source(i),world_to_source,fountain_source_velocity(i));
     //if(test_number==4) for(int i=0;i<fountain_source.m;i++){
     //    for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()) if(fountain_source(i).Lazy_Inside(world_to_source.Homogeneous_Times(iterator.Location()))){
