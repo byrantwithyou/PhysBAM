@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 using namespace PhysBAM;
 //#####################################################################
@@ -37,7 +37,7 @@ Recreate_Levelsets()
     assert(!use_external_levelsets);
     for(int i=0;i<levelsets.m;i++) delete levelsets(i);
     levelsets.Resize(phis.m);
-    for(int i=0;i<levelsets.m;i++) levelsets(i)=new FAST_LEVELSET<TV>(grid,phis(i));
+    for(int i=0;i<levelsets.m;i++) levelsets(i)=new LEVELSET<TV>(grid,phis(i));
 }
 //#####################################################################
 // Function Fill_Ghost_Cells

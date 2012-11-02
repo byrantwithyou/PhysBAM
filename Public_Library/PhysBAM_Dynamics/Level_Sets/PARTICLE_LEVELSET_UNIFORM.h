@@ -13,7 +13,7 @@
 #include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
 #endif
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 namespace PhysBAM{
 
@@ -73,7 +73,7 @@ public:
     void Adjust_Particle_Radii_Threaded(RANGE<TV_INT>& domain);
     void Modify_Levelset_Using_Escaped_Particles(T_FACE_ARRAYS_SCALAR* V,ARRAY<T_ARRAYS_PARTICLE_LEVELSET_PARTICLES*>* other_positive_particles=0);
     void Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const bool update_particle_cells=true,const bool verbose=false);
-    void Update_Particles_To_Reflect_Mass_Conservation(const FAST_LEVELSET<TV>& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
+    void Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
         const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const bool update_particle_cells,const bool verbose);
     void Euler_Step_Particles(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const bool use_second_order_for_nonremoved_particles=false,
         const bool update_particle_cells_after_euler_step=true,const bool verbose=true,const bool analytic_test=false);

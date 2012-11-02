@@ -33,6 +33,7 @@ LEVELSET_BASE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_o
     curvature_interpolation=&interpolation_default;
     normal_interpolation=&normal_interpolation_default;
     secondary_interpolation=0;
+    Set_Band_Width();
 }
 //#####################################################################
 // Destructor
@@ -215,19 +216,6 @@ Hessian(const TV& X) const
             H(i,j)=(Phi(F)-Phi(E)-Phi(D)+Phi(A))*(T).25*grid.one_over_dX(i)*grid.one_over_dX(j);}}
 
     return H;
-}
-//#####################################################################
-// Function Fast_Marching_Method_Outside_Band
-//#####################################################################
-template<class TV> void LEVELSET_BASE<TV>::
-Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance,int process_sign)
-{
-    int ghost_cells=number_of_ghost_cells;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(reinterpret_cast<LEVELSET<TV>&>(*this),ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,0,false,process_sign);
-    for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) if(abs(phi_ghost(it.index))>half_band_width) phi(it.index)=phi_ghost(it.index);
-    boundary->Apply_Boundary_Condition(grid,phi,time);
 }
 //#####################################################################
 // Function Compute_Cell_Minimum_And_Maximum

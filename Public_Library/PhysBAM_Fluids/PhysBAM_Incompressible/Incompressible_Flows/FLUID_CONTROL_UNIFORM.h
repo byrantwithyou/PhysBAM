@@ -27,7 +27,7 @@ class FLUID_CONTROL_UNIFORM:public NONCOPYABLE
 public:
     const FLUID_CONTROL_CALLBACKS<T_GRID>* callbacks;
     MPI_UNIFORM_GRID<T_GRID>* mpi_grid;
-    FAST_LEVELSET<TV>& levelset;
+    LEVELSET<TV>& levelset;
     T_FACE_ARRAYS_SCALAR& face_velocities;
     T_FACE_ARRAYS_BOOL& psi_N;
     PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection;
@@ -47,7 +47,7 @@ public:
     
     bool left_wall,right_wall,bottom_wall,top_wall,front_wall,back_wall;
 
-    FLUID_CONTROL_UNIFORM(FAST_LEVELSET<TV>& levelset_input,T_FACE_ARRAYS_SCALAR& face_velocities_input,T_FACE_ARRAYS_BOOL& psi_N_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,
+    FLUID_CONTROL_UNIFORM(LEVELSET<TV>& levelset_input,T_FACE_ARRAYS_SCALAR& face_velocities_input,T_FACE_ARRAYS_BOOL& psi_N_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input,
                           bool left_wall_input,bool right_wall_input,bool bottom_wall_input,bool top_wall_input,bool front_wall_input,bool back_wall_input)
         :mpi_grid(0),levelset(levelset_input),face_velocities(face_velocities_input),psi_N(psi_N_input),projection(projection_input),
          alpha(625),beta(25),shape_smoothing_steps(0),velocity_smoothing_steps(0),potential_smoothing_steps(0),pcg_iterations(20),pcg_iterations_mpi(80),

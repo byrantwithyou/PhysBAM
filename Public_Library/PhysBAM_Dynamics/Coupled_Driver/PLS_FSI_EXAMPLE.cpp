@@ -20,7 +20,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -205,7 +205,7 @@ Adjust_Phi_With_Source(const GEOMETRY& source,const int region,const T_TRANSFORM
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Fluid_Scalars()
 {
-    FAST_LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
+    LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
     FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable)
         levelset_advection.nested_semi_lagrangian_collidable->Average_To_Invalidated_Cells(*fluids_parameters.grid,fluids_parameters.collidable_phi_replacement_value,levelset.phi);
@@ -216,7 +216,7 @@ Revalidate_Fluid_Scalars()
 template<class TV> void PLS_FSI_EXAMPLE<TV>::
 Revalidate_Phi_After_Modify_Levelset()
 {
-    FAST_LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
+    LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
     FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(0);
     if(levelset_advection.nested_semi_lagrangian_collidable){
         levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_current=levelset_advection.nested_semi_lagrangian_collidable->cell_valid_points_next;

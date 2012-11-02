@@ -766,7 +766,7 @@ Adjust_Phi_With_Objects(const T time)
 template<class T> void SURFACE_TENSION<T>::
 Sync_Particle_To_Level_Set(int p)
 {
-    const FAST_LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
+    const LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(0);
     TV& X=front_tracked_structure->particles.X(p);
     X-=levelset.Extended_Phi(X)*levelset.Extended_Normal(X);
 }

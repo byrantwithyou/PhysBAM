@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 using namespace PhysBAM;
@@ -154,8 +154,8 @@ Compare_Levelsets(std::string& input_directory_1,std::string& input_directory_2,
 
     std::string f=STRING_UTILITIES::string_sprintf("%d/",frame);
     bool success=true;ARRAY<T,TV_INT> phi1,phi2;
-    FAST_LEVELSET<TV> l1(grid,phi1);FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/levelset",l1);
-    FAST_LEVELSET<TV> l2(grid,phi2);FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/levelset",l2);
+    LEVELSET<TV> l1(grid,phi1);FILE_UTILITIES::Read_From_File<T>(input_directory_1+"/"+f+"/levelset",l1);
+    LEVELSET<TV> l2(grid,phi2);FILE_UTILITIES::Read_From_File<T>(input_directory_2+"/"+f+"/levelset",l2);
     for(typename GRID<TV>::CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){
         if(l1.phi(iterator.Cell_Index())!=l2.phi(iterator.Cell_Index())){LOG::cout<<"WARNING: Phi don't match at index:["<<iterator.Cell_Index()<<std::endl;success=false;break;}}
     return success;

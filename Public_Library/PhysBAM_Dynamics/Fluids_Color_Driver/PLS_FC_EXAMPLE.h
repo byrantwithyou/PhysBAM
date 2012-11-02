@@ -57,7 +57,7 @@ public:
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
     VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
-    VECTOR<FAST_LEVELSET<TV>*,num_bc> bc_levelsets;
+    VECTOR<LEVELSET<TV>*,num_bc> bc_levelsets;
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>& advection_scalar;

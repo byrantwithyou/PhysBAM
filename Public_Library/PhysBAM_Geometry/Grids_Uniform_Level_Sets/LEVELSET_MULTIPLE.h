@@ -9,7 +9,7 @@
 
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
 
@@ -31,7 +31,7 @@ public:
     T_GRID& grid;
     ARRAY<T_ARRAYS_SCALAR>& phis;
     LEVELSET_CALLBACKS<T_GRID>* levelset_callbacks;
-    ARRAY<FAST_LEVELSET<TV>*> levelsets;
+    ARRAY<LEVELSET<TV>*> levelsets;
     bool use_external_levelsets;
 
     LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input=false);

@@ -18,7 +18,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/DEFORMABLE_OBJECT_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -675,7 +675,7 @@ Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PART
 // Function Extrapolate_Velocity_Across_Interface
 //#####################################################################
 template<class TV> void PLS_FSI_DRIVER<TV>::
-Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<TV>& phi,const T band_width)
+Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const LEVELSET<TV>& phi,const T band_width)
 {
     T_GRID& grid=*example.fluids_parameters.grid;
     ARRAY<bool,FACE_INDEX<TV::m> > inside;

@@ -20,7 +20,7 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Collisions_And_Interactions/TRIANGLE_COLLISION_PARAMETERS.h>
 #include <PhysBAM_Solids/PhysBAM_Deformables/Deformable_Objects/DEFORMABLE_BODY_COLLECTION.h>
@@ -336,7 +336,7 @@ template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Revalidate_Fluid_Scalars()
 {
     for(int i=0;i<fluids_parameters.number_of_regions;i++){
-        FAST_LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
+        LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
         FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
         int sign=1;if(fluids_parameters.number_of_regions>=2&&fluids_parameters.dirichlet_regions(i))sign=-1;
         if(levelset_advection.nested_semi_lagrangian_collidable)
@@ -357,7 +357,7 @@ template<class T_GRID> void SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>::
 Revalidate_Phi_After_Modify_Levelset()
 {
     for(int i=0;i<fluids_parameters.number_of_regions;i++){
-        FAST_LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
+        LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(i);
         FAST_LEVELSET_ADVECTION<GRID<TV> >& levelset_advection=fluids_parameters.particle_levelset_evolution->Levelset_Advection(i);
         int sign=1;if(fluids_parameters.number_of_regions>=2&&fluids_parameters.dirichlet_regions(i))sign=-1;
         if(levelset_advection.nested_semi_lagrangian_collidable){
@@ -419,7 +419,7 @@ Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset_mul
                     projection.Flame_Speed_Face_Multiphase(axis,face,fuel_region,product_region)*
                     (levelset_multiple.Phi(fuel_region,cell2)-levelset_multiple.Phi(fuel_region,cell1))*grid.one_over_dX[axis];}}}
     if(fluids_parameters.pseudo_dirichlet_regions.Number_True()>0){
-        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);FAST_LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
+        T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.Get_Single_Levelset(fluids_parameters.pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
         fluids_parameters.incompressible->Extrapolate_Velocity_Across_Interface(V_levelset,phi_for_pseudo_dirichlet_regions);}
 }

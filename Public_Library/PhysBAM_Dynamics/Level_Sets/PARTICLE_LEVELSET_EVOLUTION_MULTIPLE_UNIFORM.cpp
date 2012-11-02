@@ -6,7 +6,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_MULTIPLE.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM.h>
@@ -302,7 +302,7 @@ Particle_Levelset(const int i)
 {
     return *particle_levelset_multiple.particle_levelsets(i);
 }
-template<class T_GRID> FAST_LEVELSET<typename T_GRID::VECTOR_T>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
+template<class T_GRID> LEVELSET<typename T_GRID::VECTOR_T>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Levelset(const int i)
 {
     return *particle_levelset_multiple.levelset_multiple.levelsets(i);

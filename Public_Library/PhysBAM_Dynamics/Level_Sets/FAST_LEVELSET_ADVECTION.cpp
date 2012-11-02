@@ -122,23 +122,22 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAY<VECTOR<T
 template<class T_GRID> void FAST_LEVELSET_ADVECTION<T_GRID>::
 Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of_ghost_cells)
 {
-    FAST_LEVELSET<TV>* fl=(FAST_LEVELSET<TV>*)levelset;
-    T_GRID& grid=fl->grid;
-    T_ARRAYS_SCALAR& phi=fl->phi;
-    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));fl->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
+    T_GRID& grid=levelset->grid;
+    T_ARRAYS_SCALAR& phi=levelset->phi;
+    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));levelset->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
 
     if(local_semi_lagrangian_advection){
         LINEAR_INTERPOLATION_UNIFORM<T_GRID,T> interpolation;
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi_ghost(cell)) <= fl->half_band_width)
+        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi_ghost(cell)) <= levelset->half_band_width)
             phi(cell)=interpolation.Clamped_To_Array(grid,phi_ghost,iterator.Location()-dt*V(cell));}}
     else if(local_advection_spatial_order){
         T_ARRAYS_SCALAR rhs(grid.Domain_Indices());
-        Euler_Step_High_Order_Helper(grid,V,phi,phi_ghost,rhs,local_advection_spatial_order,fl->half_band_width);
-        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell)) <= fl->half_band_width) phi(cell)-=dt*rhs(cell);}}
+        Euler_Step_High_Order_Helper(grid,V,phi,phi_ghost,rhs,local_advection_spatial_order,levelset->half_band_width);
+        for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();if(abs(phi(cell)) <= levelset->half_band_width) phi(cell)-=dt*rhs(cell);}}
     else // use the advection routine in the level set base class
-        advection->Update_Advection_Equation_Node(grid,phi,phi_ghost,V,*fl->boundary,dt,time);
+        advection->Update_Advection_Equation_Node(grid,phi,phi_ghost,V,*levelset->boundary,dt,time);
 
-    fl->boundary->Apply_Boundary_Condition(grid,phi,time+dt);
+    levelset->boundary->Apply_Boundary_Condition(grid,phi,time+dt);
 }
 //#####################################################################
 // Function Euler_Step
@@ -146,14 +145,13 @@ Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of
 template<class T_GRID> void FAST_LEVELSET_ADVECTION<T_GRID>::
 Euler_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const int number_of_ghost_cells)
 {
-    FAST_LEVELSET<TV>* fl=(FAST_LEVELSET<TV>*)levelset;
-    T_GRID& grid=fl->grid;
-    T_ARRAYS_SCALAR& phi=fl->phi;
+    T_GRID& grid=levelset->grid;
+    T_ARRAYS_SCALAR& phi=levelset->phi;
     
     assert(grid.Is_MAC_Grid() && advection); // for now use advection in base class
-    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));fl->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
-    advection->Update_Advection_Equation_Cell(grid,phi,phi_ghost,V,*fl->boundary,dt,time);
-    fl->boundary->Apply_Boundary_Condition(grid,phi,time+dt);
+    T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));levelset->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
+    advection->Update_Advection_Equation_Cell(grid,phi,phi_ghost,V,*levelset->boundary,dt,time);
+    levelset->boundary->Apply_Boundary_Condition(grid,phi,time+dt);
 }
 //#####################################################################
 template class FAST_LEVELSET_ADVECTION<GRID<VECTOR<float,1> > >;

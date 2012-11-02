@@ -58,6 +58,7 @@ public:
     int fmm_initialization_iterations;
     T fmm_initialization_iterative_tolerance;
     T fmm_initialization_iterative_drift_fraction;
+    T half_band_width;
 
     BOUNDARY_UNIFORM<GRID<TV>,T>* boundary;
     LEVELSET_CALLBACKS<GRID<TV> >* levelset_callbacks;
@@ -104,6 +105,9 @@ protected:
     void Initialize_Levelset_Grid_Values(const GRID<TV>& grid_input)
     {}
 public:
+
+    void Set_Band_Width(const T number_of_cells=6)
+    {half_band_width=number_of_cells*grid.dX.Max()/2;}
 
     void Initialize_Valid_Masks(const GRID<TV>& grid_input)
     {
@@ -235,7 +239,6 @@ public:
     TV Normal(const TV& location) const;
     TV Extended_Normal(const TV& location) const;
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
-    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0,int process_sign=0);
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
 //#####################################################################
 };

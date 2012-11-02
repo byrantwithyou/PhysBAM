@@ -46,7 +46,7 @@ public:
     T cfl_number;
     int number_of_ghost_cells;
 
-    FAST_LEVELSET<TV> levelset;
+    LEVELSET<TV> levelset;
     ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> positive_particles,negative_particles;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> removed_negative_particles,removed_positive_particles;
     ARRAY<ARRAY<bool>,TV_INT> escaped_positive_particles,escaped_negative_particles;

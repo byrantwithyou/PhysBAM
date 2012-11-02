@@ -44,7 +44,7 @@ public:
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i)
     {assert(i==0);return particle_levelset;}
 
-    virtual FAST_LEVELSET<TV>& Levelset(const int i)
+    virtual LEVELSET<TV>& Levelset(const int i)
     {assert(i==0);return particle_levelset.levelset;}
     
     virtual FAST_LEVELSET_ADVECTION<GRID<TV> >& Levelset_Advection(const int i)
@@ -68,7 +68,8 @@ public:
     if(levelset_advection.semi_lagrangian_collidable) particle_levelset.levelset.Initialize_Valid_Masks(grid);}
 
     virtual void Make_Signed_Distance()
-    {if(use_fmm) particle_levelset.levelset.Fast_Marching_Method(levelset_advection.local_advection_spatial_order);else if(use_reinitialization) levelset_advection.Reinitialize();}
+    {if(use_fmm){particle_levelset.levelset.Fast_Marching_Method(time,particle_levelset.levelset.half_band_width+grid.dX.Max()*(1+min(3,levelset_advection.local_advection_spatial_order)));particle_levelset.levelset.boundary->Apply_Boundary_Condition(grid,phi,time);}
+    else if(use_reinitialization) levelset_advection.Reinitialize();}
 
     virtual void Set_Number_Particles_Per_Cell(const int number_particles_per_cell)
     {particle_levelset.Set_Number_Particles_Per_Cell(number_particles_per_cell);}

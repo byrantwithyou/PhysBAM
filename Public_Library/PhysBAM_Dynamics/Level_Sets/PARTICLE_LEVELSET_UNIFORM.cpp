@@ -12,7 +12,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_FACE_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_UNIFORM.h>
@@ -235,7 +235,7 @@ Modify_Levelset_Using_Escaped_Particles_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
 Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const bool update_particle_cells,const bool verbose)
 {
-    FAST_LEVELSET<TV> levelset_old(levelset.grid,phi_old);
+    LEVELSET<TV> levelset_old(levelset.grid,phi_old);
     Update_Particles_To_Reflect_Mass_Conservation(levelset_old,negative_particles,PARTICLE_LEVELSET_NEGATIVE,update_particle_cells,verbose);
     Update_Particles_To_Reflect_Mass_Conservation(levelset_old,positive_particles,PARTICLE_LEVELSET_POSITIVE,update_particle_cells,verbose);
     Adjust_Particle_Radii();
@@ -244,7 +244,7 @@ Update_Particles_To_Reflect_Mass_Conservation(T_ARRAYS_SCALAR& phi_old,const boo
 // Function Update_Particles_To_Reflect_Mass_Conservation
 //#####################################################################
 template<class T_GRID> void PARTICLE_LEVELSET_UNIFORM<T_GRID>::
-Update_Particles_To_Reflect_Mass_Conservation(const FAST_LEVELSET<TV>& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
+Update_Particles_To_Reflect_Mass_Conservation(const LEVELSET<TV>& levelset_old,T_ARRAYS_PARTICLE_LEVELSET_PARTICLES& particles,
     const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const bool update_particle_cells,const bool verbose)
 {
     const int maximum_iterations=5;

@@ -14,7 +14,7 @@
 #include <PhysBAM_Tools/Math_Tools/minmag.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>
@@ -55,7 +55,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
         T_FACE_ARRAYS_SCALAR face_velocities_liquid=face_velocities_to_advect;T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost_extrapolated=advection_face_velocities_ghost;
         T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost_extrapolated=face_velocities_to_advect_ghost;
         T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);
-        FAST_LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
+        LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         projection.poisson_collidable->levelset_multiple->Get_Single_Levelset(*pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
         Extrapolate_Velocity_Across_Interface(advection_face_velocities_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
         Extrapolate_Velocity_Across_Interface(face_velocities_to_advect_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);

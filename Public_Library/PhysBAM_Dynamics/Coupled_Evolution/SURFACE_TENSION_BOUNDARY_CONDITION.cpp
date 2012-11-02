@@ -3,14 +3,14 @@
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_CELL.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/SURFACE_TENSION_BOUNDARY_CONDITION.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class TV> SURFACE_TENSION_BOUNDARY_CONDITION<TV>::
-SURFACE_TENSION_BOUNDARY_CONDITION(const FAST_LEVELSET<TV>& levelset_input,T surface_tension_coefficient_input)
+SURFACE_TENSION_BOUNDARY_CONDITION(const LEVELSET<TV>& levelset_input,T surface_tension_coefficient_input)
     :levelset(levelset_input),surface_tension_coefficient(surface_tension_coefficient_input)
 {
 }

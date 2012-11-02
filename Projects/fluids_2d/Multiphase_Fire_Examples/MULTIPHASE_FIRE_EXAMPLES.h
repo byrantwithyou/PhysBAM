@@ -171,7 +171,7 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
 //#####################################################################
 void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 {
-    T_ARRAYS_SCALAR phi;FAST_LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
+    T_ARRAYS_SCALAR phi;LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
     T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
 
     if(test_number==1){
