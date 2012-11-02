@@ -40,20 +40,6 @@ Principal_Curvatures(const TV& X) const
     return VECTOR<T,1>(curvature);
 }
 //#####################################################################
-// Function Approximate_Length
-//#####################################################################
-// calculates the approximate perimeter using delta functions
-template<class T> T LEVELSET<VECTOR<T,2> >::
-Approximate_Length(const T interface_thickness,const T time) const
-{
-    int ghost_cells=number_of_ghost_cells;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    T interface_half_width=interface_thickness*grid.dX.Max()/2,one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),length=0;
-    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++)
-        length+=(LEVELSET_UTILITIES<T>::Delta(phi_ghost(i,j),interface_half_width)*sqrt(sqr((phi_ghost(i+1,j)-phi_ghost(i-1,j))*one_over_two_dx)+sqr((phi_ghost(i,j+1)-phi_ghost(i,j-1))*one_over_two_dy)));
-    return length*grid.dX.x*grid.dX.y;
-}
-//#####################################################################
 template class LEVELSET<VECTOR<float,2> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
 template class LEVELSET<VECTOR<double,2> >;

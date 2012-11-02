@@ -35,7 +35,6 @@ public:
 //#####################################################################
     VECTOR<T,2> Principal_Curvatures(const VECTOR<T,3>& X) const;
 public:
-    T Approximate_Surface_Area(const T interface_thickness=3,const T time=0) const;
     void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool include_ghost_values=false) const;
     void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const GRID<TV>& tet_grid,TRIANGULATED_SURFACE<T>& triangulated_surface) const;
 private:

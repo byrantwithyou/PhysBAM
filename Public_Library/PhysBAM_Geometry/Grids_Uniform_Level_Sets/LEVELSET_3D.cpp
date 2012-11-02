@@ -53,21 +53,6 @@ Principal_Curvatures(const TV& X) const
     return VECTOR<T,2>(quadratic.root1,quadratic.root2);
 }
 //#####################################################################
-// Function Approximate_Surface_Area
-//#####################################################################
-// calculates the approximate perimeter using delta functions
-template<class T> T LEVELSET<VECTOR<T,3> >::
-Approximate_Surface_Area(const T interface_thickness,const T time) const
-{
-    int ghost_cells=number_of_ghost_cells;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    T interface_half_width=interface_thickness*grid.dX.Max()/2,one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),one_over_two_dz=1/(2*grid.dX.z),surface_area=0;
-    for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++)
-        surface_area+=(LEVELSET_UTILITIES<T>::Delta(phi_ghost(i,j,ij),interface_half_width)*sqrt(sqr((phi_ghost(i+1,j,ij)-phi_ghost(i-1,j,ij))*one_over_two_dx)+
-                                sqr((phi_ghost(i,j+1,ij)-phi_ghost(i,j-1,ij))*one_over_two_dy)+sqr((phi_ghost(i,j,ij+1)-phi_ghost(i,j,ij-1))*one_over_two_dz)));
-    return surface_area*grid.dX.x*grid.dX.y*grid.dX.z;
-}
-//#####################################################################
 // Function Calculate_Triangulated_Surface_From_Marching_Tetrahedra
 //#####################################################################
 // uses levelset grid for tet marching - faster than version below because we don't need to interpolate phi

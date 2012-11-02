@@ -242,6 +242,8 @@ public:
     TV Normal(const TV& location) const;
     TV Extended_Normal(const TV& location) const;
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
+    SYMMETRIC_MATRIX<T,TV::m> Hessian(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const;
+    TV Gradient(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const;
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
     T Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const;
     void Compute_Curvature(const T time=0);
@@ -249,6 +251,7 @@ public:
     void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,
         const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
+    T Approximate_Surface_Size(const T interface_thickness=3,const T time=0) const;
 //#####################################################################
 };
 }

@@ -239,17 +239,13 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
         (*cell_range)(it.index)=interval;}
 }
 //#####################################################################
-// Function Compute_Curvature
+// Function Hessian
 //#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
-Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET_BASE<TV>::
+Hessian(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
     TV_INT stride=phi_input.Strides();
     int s_index=phi_input.Standard_Index(index);
-    TV dphi;
-    for(int a=0;a<TV::m;a++)
-        dphi(a)=(T).5*(phi_input.array(s_index+stride(a))-phi_input.array(s_index-stride(a)))*grid.one_over_dX(a);
-
     SYMMETRIC_MATRIX<T,TV::m> ddphi;
     for(int a=0;a<TV::m;a++)
         for(int b=0;b<a;b++)
@@ -258,6 +254,29 @@ Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 
     for(int a=0;a<TV::m;a++)
         ddphi(a,a)=(phi_input.array(s_index+stride(a))-2*phi_input.array(s_index)+phi_input.array(s_index-stride(a)))*sqr(grid.one_over_dX(a));
+    return ddphi;
+}
+//#####################################################################
+// Function Gradient
+//#####################################################################
+template<class TV> TV LEVELSET_BASE<TV>::
+Gradient(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
+{
+    TV_INT stride=phi_input.Strides();
+    int s_index=phi_input.Standard_Index(index);
+    TV dphi;
+    for(int a=0;a<TV::m;a++)
+        dphi(a)=(T).5*(phi_input.array(s_index+stride(a))-phi_input.array(s_index-stride(a)))*grid.one_over_dX(a);
+    return dphi;
+}
+//#####################################################################
+// Function Compute_Curvature
+//#####################################################################
+template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
+{
+    TV dphi=Gradient(phi_input,index);
+    SYMMETRIC_MATRIX<T,TV::m> ddphi=Hessian(phi_input,index);
 
     T norm_squared=dphi.Magnitude_Squared(),norm=sqrt(norm_squared);
     if(norm<small_number) return LEVELSET_UTILITIES<T>::Sign(phi_input(index))/grid.min_dX;
@@ -318,6 +337,20 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,cons
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
+}
+//#####################################################################
+// Function Approximate_Surface_Size
+//#####################################################################
+// calculates the approximate perimeter using delta functions
+template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+Approximate_Surface_Size(const T interface_thickness,const T time) const
+{
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(number_of_ghost_cells));
+    boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,number_of_ghost_cells);
+    T interface_half_width=interface_thickness*grid.dX.Max()/2,surface_size=0;
+    for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next())
+        surface_size+=LEVELSET_UTILITIES<T>::Delta(phi_ghost(it.index),interface_half_width)*Gradient(phi,it.index).Magnitude();
+    return surface_size*grid.dX.Size();
 }
 template class LEVELSET_BASE<VECTOR<float,1> >;
 template class LEVELSET_BASE<VECTOR<float,2> >;

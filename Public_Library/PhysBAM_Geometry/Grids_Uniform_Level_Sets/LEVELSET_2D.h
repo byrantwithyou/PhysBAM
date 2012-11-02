@@ -31,7 +31,6 @@ public:
 
 //#####################################################################
     VECTOR<T,1> Principal_Curvatures(const VECTOR<T,2>& X) const;
-    T Approximate_Length(const T interface_thickness=3,const T time=0) const;
 //#####################################################################
 };
 }
