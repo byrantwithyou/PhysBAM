@@ -7,6 +7,7 @@
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_NXN.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
+#include <PhysBAM_Tools/Vectors/VECTOR.h>
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

@@ -6,7 +6,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_STOKES_SYSTEM_VECTOR_COLOR.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

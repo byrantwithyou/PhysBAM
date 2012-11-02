@@ -6,7 +6,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Geometry/Finite_Elements/INTERFACE_POISSON_SYSTEM_VECTOR_COLOR.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 
 using namespace PhysBAM;
 //#####################################################################
@@ -15,10 +17,12 @@ using namespace PhysBAM;
 template<class TV> INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 INTERFACE_POISSON_SYSTEM_VECTOR_COLOR()
 {
+#ifdef USE_OPENMP
 #pragma omp parallel
 #pragma omp master
     threads=omp_get_num_threads();
     result_per_thread.Resize(threads);
+#endif
 }
 //#####################################################################
 // Destructor
@@ -204,6 +208,8 @@ Zero_Out()
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Dot(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v) const
 {
+    T result=0;
+#ifdef USE_OPENMP
     result_per_thread.Fill(0);
     for(int c=0;c<colors;c++)
 #pragma omp parallel for
@@ -214,9 +220,15 @@ Dot(const INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>& v) const
     for(int i=0;i<q.m;i++){
         const int tid=omp_get_thread_num();
         result_per_thread(tid)+=q(i)*v.q(i);}
-    T result=0;
     for(int tid=0;tid<threads;tid++)
         result+=result_per_thread(tid);
+#else
+    for(int c=0;c<colors;c++)
+        for(int i=0;i<u(c).m;i++)
+            result+=u(c)(i)*v.u(c)(i);
+    for(int i=0;i<q.m;i++)
+        result+=q(i)*v.q(i);
+#endif
     return result;
 }
 //#####################################################################
@@ -241,6 +253,7 @@ Magnitude() const
 template<class TV> typename TV::SCALAR INTERFACE_POISSON_SYSTEM_VECTOR_COLOR<TV>::
 Max_Abs() const
 {
+#ifdef USE_OPENMP
     result_per_thread.Fill(0);
     for(int c=0;c<colors;c++)
 #pragma omp parallel for
@@ -258,6 +271,11 @@ Max_Abs() const
     T max_abs=0;
     for(int tid=0;tid<threads;tid++)
         max_abs=max(max_abs,result_per_thread(tid));
+#else
+    T max_abs=q.Max_Abs();
+    for(int c=0;c<colors;c++)
+        max_abs=max(max_abs,u(c).Max_Abs());
+#endif
     return max_abs;
 }
 //#####################################################################

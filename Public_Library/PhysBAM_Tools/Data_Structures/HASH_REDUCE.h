@@ -12,10 +12,9 @@
 #include <string>
 namespace PhysBAM{
 
-namespace{
-const int missing_element_hash=32138912;
+static const int missing_element_hash=32138912;
 
-unsigned int int_hash(unsigned int key) 
+inline unsigned int int_hash(unsigned int key) 
 {
     STATIC_ASSERT(sizeof(int)==4);
     key += ~(key << 15);
@@ -27,7 +26,7 @@ unsigned int int_hash(unsigned int key)
     return key;
 }
 
-unsigned int int_hash(unsigned int a,unsigned int b,unsigned int c)
+inline unsigned int int_hash(unsigned int a,unsigned int b,unsigned int c)
 {
     STATIC_ASSERT(sizeof(int)==4);
     a-=b;a-=c;a^=(c>>13);
@@ -42,9 +41,8 @@ unsigned int int_hash(unsigned int a,unsigned int b,unsigned int c)
     return c;
 }
 
-unsigned int int_hash(unsigned int a,unsigned int b)
+inline unsigned int int_hash(unsigned int a,unsigned int b)
 {return int_hash(missing_element_hash,a,b);}
-}
 
 template<class T,class ENABLE=void> struct HASH_REDUCE;
 

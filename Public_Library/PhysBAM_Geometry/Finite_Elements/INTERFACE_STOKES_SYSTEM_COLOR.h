@@ -19,7 +19,7 @@ namespace PhysBAM{
 template<class TV> class GRID;
 template<class TV> class CELL_MANAGER_COLOR;
 template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
-template<class TV> class VOLUME_FORCE_COLOR;
+template<class TV> struct VOLUME_FORCE_COLOR;
 
 template<class TV>
 class INTERFACE_STOKES_SYSTEM_COLOR:public KRYLOV_SYSTEM_BASE<typename TV::SCALAR>

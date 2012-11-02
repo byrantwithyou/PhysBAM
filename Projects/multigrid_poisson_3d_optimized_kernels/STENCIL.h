@@ -266,6 +266,6 @@ for(int z=box.max_corner.z;z>=box.min_corner.z;z--){
         box.min_corner.y,box.max_corner.y
 );}}
 #endif
-template<class T,int d> class HASH_REDUCE<STENCIL<T,d> >{static int H(const STENCIL<T,d>& key){return int_hash(key.entries);}};
+template<class T,int d> struct HASH_REDUCE<STENCIL<T,d> >{static int H(const STENCIL<T,d>& key){return int_hash(key.entries);}};
 }
 #endif

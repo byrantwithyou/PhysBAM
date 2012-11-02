@@ -103,6 +103,7 @@ void Dump_Boundary(const HASHTABLE<int,T_SURFACE*>& boundary)
 template<class T,class TV>
 struct ANALYTIC_LS
 {
+    virtual ~ANALYTIC_LS() {}
     virtual void Initialize()=0;
     virtual T Phi_Value(const TV& X)const=0;
     virtual int Phi_Color(const TV& X)const=0;

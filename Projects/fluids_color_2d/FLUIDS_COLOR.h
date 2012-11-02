@@ -15,7 +15,9 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 
 namespace PhysBAM{
 
@@ -88,6 +90,7 @@ public:
 
     struct ANALYTIC_VELOCITY
     {
+        virtual ~ANALYTIC_VELOCITY(){}
         virtual TV u(const TV& X,T t) const=0;
         virtual MATRIX<T,2> du(const TV& X,T t) const=0;
         virtual T p(const TV& X,T t) const=0;
@@ -97,6 +100,7 @@ public:
 
     struct ANALYTIC_LEVELSET
     {
+        virtual ~ANALYTIC_LEVELSET(){}
         virtual T phi(const TV& X,T t,int& c) const=0;
         virtual TV N(const TV& X,T t,int c) const=0;
     }* analytic_levelset;
@@ -134,6 +138,7 @@ public:
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Parse();
 
+#ifdef USE_OPENMP
         omp_set_num_threads(number_of_threads);
 #pragma omp parallel
 #pragma omp single
@@ -141,6 +146,7 @@ public:
             if(omp_get_num_threads()!=number_of_threads) PHYSBAM_FATAL_ERROR();
             LOG::cout<<"Running on "<<number_of_threads<<" threads"<<std::endl;
         }
+#endif
         
         resolution*=refine;
         dt/=refine;

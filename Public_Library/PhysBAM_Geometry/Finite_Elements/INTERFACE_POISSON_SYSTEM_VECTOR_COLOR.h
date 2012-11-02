@@ -24,8 +24,10 @@ public:
 
     int colors;
 
+#ifdef USE_OPENMP
     mutable int threads;
     mutable ARRAY<T> result_per_thread;
+#endif
 
     INTERFACE_POISSON_SYSTEM_VECTOR_COLOR();
     ~INTERFACE_POISSON_SYSTEM_VECTOR_COLOR();

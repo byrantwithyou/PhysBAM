@@ -69,7 +69,8 @@ external_libraries={
     'lam':        {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
     'openmpi':    {'flags':['USE_MPI'],'libs':['mpi_cxx','open-rte','mpi','open-pal','util','dl','nsl'],'linkflags':' -pthread','filter':''},
     'mpich':      {'flags':['USE_MPI'],'libs':['lammpio','lammpi++','mpi','lam','util','dl'],'linkflags':' -pthread','filter':''},
-    'pthreads':    {'flags':['USE_PTHREADS'],'libs':[],'linkflags':' -pthread','filter':''},
+    'pthreads':    {'default':0,'flags':['USE_PTHREADS'],'libs':[],'linkflags':' -pthread','filter':''},
+    'openmp':    {'default':0,'flags':['USE_OPENMP'],'libs':[],'linkflags':' -fopenmp','filter':''},
     'renderman':  {'default':0,'flags':['USE_RENDERMAN'],'cpppath':[],'libs':[],'filter':'renderman'}}
 for name,lib in external_libraries.items():
     defaults={'default':0,'cvs':0,'flags':'','linkflags':'','cpppath':[],'libpath':[],'filter':''}
@@ -90,6 +91,8 @@ else:
     env=Environment(variables=variables)
 env.Replace(ENV=os.environ) # do this here to allow SConstruct.options to change environment
 Help(variables.GenerateHelpText(env))
+if env["USE_OPENMP"]:
+    CXXFLAGS_EXTRA.Append('-fopenmp');
 
 ### improve performance
 if 'Decider' in dir(env): # if Decider exists, use it to avoid deprecation warnings
@@ -207,7 +210,7 @@ else: # assume g++...
         env.Append(CXXFLAGS=optimization_flags)
         if env['TYPE']=='profile': env.Append(CXXFLAGS=' -pg',LINKFLAGS=' -pg')
     elif env['TYPE']=='debug': env.Append(CXXFLAGS=' -g',LINKFLAGS=' -g')
-    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -Wno-unused-local-typedefs')
+    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2 -fno-strict-aliasing -Wno-unused-local-typedefs -Wno-unknown-pragmas')
 #    env.Append(CXXFLAGS=' -Wall -Winit-self -Woverloaded-virtual -Wstrict-aliasing=2')
     if env["warnings_are_errors"]: env.Append(CXXFLAGS=" -Werror")
 

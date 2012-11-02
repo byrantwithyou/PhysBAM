@@ -14,7 +14,9 @@
 #include <PhysBAM_Geometry/Geometry_Particles/DEBUG_PARTICLES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Forces/VORTICITY_CONFINEMENT.h>
 #include <PhysBAM_Dynamics/Fluids_Color_Driver/PLS_FC_EXAMPLE.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 
 namespace PhysBAM{
 
@@ -95,6 +97,7 @@ public:
         parse_args.Add("-threads",&number_of_threads,"threads","Number of threads");
         parse_args.Parse();
 
+#ifdef USE_OPENMP
         omp_set_num_threads(number_of_threads);
 #pragma omp parallel
 #pragma omp single
@@ -102,6 +105,7 @@ public:
             if(omp_get_num_threads()!=number_of_threads) PHYSBAM_FATAL_ERROR();
             LOG::cout<<"Running on "<<number_of_threads<<" threads"<<std::endl;
         }
+#endif
         
         resolution*=refine;
         dt/=refine;

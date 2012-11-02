@@ -24,7 +24,9 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 using namespace PhysBAM;
 //#####################################################################
 // Constructor

@@ -23,7 +23,9 @@
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
 #include <iostream>
+#ifdef USE_OPENMP
 #include <omp.h>
+#endif
 
 using namespace PhysBAM;
 
@@ -311,6 +313,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
     parse_args.Add("-dump_geometry",&dump_geometry,"dump grid info and interface");
     parse_args.Parse();
 
+#ifdef USE_OPENMP
     omp_set_num_threads(threads);
 #pragma omp parallel
 #pragma omp master
@@ -318,6 +321,7 @@ void Integration_Test(int argc,char* argv[],PARSE_ARGS& parse_args)
         PHYSBAM_ASSERT(threads==omp_get_num_threads());
         LOG::cout<<"Running on "<<threads<<" threads"<<std::endl;
     }
+#endif
 
     if(!use_test && !opt_arg){
         LOG::cerr<<"Test number is required."<<std::endl;
