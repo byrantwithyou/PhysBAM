@@ -10,17 +10,16 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_BASE.h>
 namespace PhysBAM{
 template<class T> class TRIANGULATED_SURFACE;
 
-template<class T_GRID_input>
-class LEVELSET_3D:public LEVELSET_UNIFORM<T_GRID_input>
+template<class T>
+class LEVELSET<VECTOR<T,3> >:public LEVELSET_BASE<VECTOR<T,3> >
 {
-    typedef typename T_GRID_input::SCALAR T;typedef typename T_GRID_input::CELL_ITERATOR CELL_ITERATOR;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef T_GRID_input T_GRID;    
-    typedef LEVELSET_UNIFORM<T_GRID> BASE;
+    typedef LEVELSET_BASE<TV> BASE;
     using BASE::grid;using BASE::phi;using BASE::normals;using BASE::curvature;using BASE::cell_range;
     using BASE::collision_body_list;using BASE::refine_fmm_initialization_with_iterative_solver;using BASE::fmm_initialization_iterations;using BASE::fmm_initialization_iterative_tolerance;
     using BASE::fmm_initialization_iterative_drift_fraction;using BASE::Hessian;
@@ -30,8 +29,8 @@ public:
     using BASE::collision_aware_interpolation_minus;using BASE::thread_queue;
     using BASE::number_of_ghost_cells;using BASE::Phi;using BASE::Extended_Phi;
 
-    LEVELSET_3D(T_GRID& grid_input,ARRAY<T,VECTOR<int,3> >& phi_input,const int number_of_ghost_cells_input=3);
-    ~LEVELSET_3D();
+    LEVELSET(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,3> >& phi_input,const int number_of_ghost_cells_input=3);
+    ~LEVELSET();
 
     T Compute_Curvature(const VECTOR<int,3>& index) const
     {return Compute_Curvature(phi,index);}
@@ -41,17 +40,15 @@ public:
     void Compute_Curvature(const T time=0);
     T Compute_Curvature(const ARRAY<T,VECTOR<int,3> >& phi_input,const VECTOR<int,3>& index) const;
     T Compute_Curvature(const VECTOR<T,3>& location) const;
-    void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
 public:
     void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,3> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,3> >& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,3> >* seed_indices=0,
         const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,3> >& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time=0,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
-    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0,int process_sign=0);
     T Approximate_Surface_Area(const T interface_thickness=3,const T time=0) const;
     void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool include_ghost_values=false) const;
-    void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,TRIANGULATED_SURFACE<T>& triangulated_surface) const;
+    void Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const GRID<TV>& tet_grid,TRIANGULATED_SURFACE<T>& triangulated_surface) const;
 private:
     int If_Zero_Crossing_Add_Particle_By_Index(TRIANGULATED_SURFACE<T>& triangulated_surface,const VECTOR<int,3>& index1,const VECTOR<int,3>& index2) const; 
     int If_Zero_Crossing_Add_Particle(TRIANGULATED_SURFACE<T>& triangulated_surface,const VECTOR<T,3>& x1,const VECTOR<T,3>& x2) const; 

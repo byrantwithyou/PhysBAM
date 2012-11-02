@@ -16,7 +16,6 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/maxabs.h>
 #include <PhysBAM_Geometry/Grids_PDE_Linear/LAPLACE_COLLIDABLE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T> class PCG_SPARSE;
@@ -29,7 +28,7 @@ class LAPLACE_COLLIDABLE_UNIFORM:public LAPLACE_UNIFORM<T_GRID>,public LAPLACE_C
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
+    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
 public:
@@ -43,22 +42,22 @@ public:
     using COLLIDABLE_BASE::second_order_cut_cell_method;using COLLIDABLE_BASE::second_order_cut_cell_threshold;
     using COLLIDABLE_BASE::levelset;using COLLIDABLE_BASE::u_interface;using BASE::filled_region_colors;
 
-    //T_LEVELSET* levelset; // used in second order accurate cut cell method
+    //LEVELSET<TV>* levelset; // used in second order accurate cut cell method
     //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
 protected:
     T_ARRAYS_SCALAR phi_default;
-    T_LEVELSET* levelset_default;
+    LEVELSET<TV>* levelset_default;
 public:
 
     LAPLACE_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue=0);
-    LAPLACE_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,T_LEVELSET& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+    LAPLACE_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
         const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue=0);
     virtual ~LAPLACE_COLLIDABLE_UNIFORM();
 
     void Use_Internal_Level_Set()
     {levelset=levelset_default;phi_default.Resize(grid.Domain_Indices(1));}
 
-    void Use_External_Level_Set(T_LEVELSET& cell_centered_levelset)
+    void Use_External_Level_Set(LEVELSET<TV>& cell_centered_levelset)
     {levelset=&cell_centered_levelset;phi_default.Clean_Memory();}
 
 //#####################################################################

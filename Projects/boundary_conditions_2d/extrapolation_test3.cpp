@@ -28,7 +28,7 @@ int main(int argc,char* argv[])
     ARRAY<T,FACE_INDEX<TV::m> > x(grid.Domain_Indices(ghost));
     ARRAY<bool,FACE_INDEX<TV::m> > inside(grid.Domain_Indices());
     ARRAY<T,TV_INT> p(grid.Domain_Indices());
-    LEVELSET_3D<GRID<TV> > phi(grid,p);
+    LEVELSET<TV> phi(grid,p);
 
     for(UNIFORM_GRID_ITERATOR_FACE<TV> it(grid);it.Valid();it.Next()){
         TV X(it.Location());

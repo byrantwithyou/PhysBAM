@@ -21,11 +21,11 @@ namespace PhysBAM{
 template<class T> class HAMILTONIAN_2D;
 
 template<class T_input>
-class HAMILTON_JACOBI_2D:public HAMILTON_JACOBI,public LEVELSET_2D<GRID<VECTOR<T_input,2> > >,public LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T_input,2> > >
+class HAMILTON_JACOBI_2D:public HAMILTON_JACOBI,public LEVELSET<VECTOR<T_input,2> >,public LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T_input,2> > >
 {
     typedef T_input T;typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef LEVELSET_2D<GRID<TV> > BASE;
+    typedef LEVELSET<TV> BASE;
     using BASE::grid;using BASE::phi;using BASE::boundary;using BASE::max_time_step;
     using BASE::curvature;using BASE::curvature_motion;using BASE::sigma;using BASE::Compute_Curvature;
     using LEVELSET_ADVECTION_UNIFORM<GRID<TV> >::HJ_WENO;using LEVELSET_ADVECTION_UNIFORM<GRID<TV> >::HJ_ENO;
@@ -33,7 +33,7 @@ public:
     HAMILTONIAN_2D<T>& hamiltonian;
 
     HAMILTON_JACOBI_2D(HAMILTONIAN_2D<T>& hamiltonian_input,GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input) 
-        :LEVELSET_2D<GRID<TV> >(grid_input,phi_input),LEVELSET_ADVECTION_UNIFORM<GRID<TV> >((LEVELSET_2D<GRID<TV> >*)this),hamiltonian(hamiltonian_input)
+        :LEVELSET<TV>(grid_input,phi_input),LEVELSET_ADVECTION_UNIFORM<GRID<TV> >((LEVELSET<TV>*)this),hamiltonian(hamiltonian_input)
     {}
     
 //#####################################################################

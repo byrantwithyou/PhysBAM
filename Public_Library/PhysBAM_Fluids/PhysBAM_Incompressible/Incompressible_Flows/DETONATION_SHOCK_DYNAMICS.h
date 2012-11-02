@@ -13,7 +13,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Grid_Based_Fields/GRID_AND_ARRAY_CONTAINER.h>
 namespace PhysBAM{
 
@@ -22,13 +21,13 @@ class DETONATION_SHOCK_DYNAMICS
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename TV::template REBIND<bool>::TYPE TV_BOOL;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_ARRAYS_SCALAR::template REBIND<VECTOR<T,3> >::TYPE T_ARRAYS_RGB;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
 public:
     T_GRID& grid;
-    const T_LEVELSET& levelset;
+    const LEVELSET<TV>& levelset;
     GRID_AND_ARRAY_CONTAINER<T_GRID,T> Dn,Dn_dot,curvature,curvature_old;
     int order;
 
@@ -46,7 +45,7 @@ public:
     BOUNDARY_UNIFORM<T_GRID,T> *boundary,boundary_default;
     BOUNDARY_UNIFORM<GRID<TV>,TV> *boundary_vector,boundary_vector_default;
 
-    DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const T_LEVELSET& levelset_input,const int order_input=3);
+    DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const LEVELSET<TV>& levelset_input,const int order_input=3);
     virtual ~DETONATION_SHOCK_DYNAMICS();
 
     void Set_Custom_Boundary(BOUNDARY_UNIFORM<T_GRID,T>* boundary_input,BOUNDARY_UNIFORM<GRID<TV>,TV>* boundary_vector_input)

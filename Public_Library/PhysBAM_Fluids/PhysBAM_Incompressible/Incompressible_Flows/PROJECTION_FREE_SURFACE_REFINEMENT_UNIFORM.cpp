@@ -19,7 +19,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID> PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM<T_GRID>::
-PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input,const int scale,const T alpha_in,const bool use_surface_solve,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
+PROJECTION_FREE_SURFACE_REFINEMENT_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input,const int scale,const T alpha_in,const bool use_surface_solve,const bool flame_input,const bool multiphase,const bool use_variable_beta,const bool use_poisson)
     :PROJECTION_REFINEMENT_UNIFORM<T_GRID>(mac_grid,scale,alpha_in,flame_input,multiphase,use_variable_beta,use_poisson),boundary(0),phi_boundary(0),levelset_projection(fine_grid),levelset(levelset_input),coarse_levelset(coarse_grid,coarse_phi),surface_solve(use_surface_solve),buffer(1)
 {
 }
@@ -39,7 +39,7 @@ Initialize_Grid(const T_GRID& mac_grid)
     BASE::Initialize_Grid(mac_grid);
     local_phi.Resize(local_grid.Domain_Indices(1));
     coarse_phi.Resize(coarse_grid.Domain_Indices(1));
-    fast_local_projection.collidable_solver->Use_External_Level_Set(*new T_LEVELSET(local_grid,local_phi));    
+    fast_local_projection.collidable_solver->Use_External_Level_Set(*new LEVELSET<TV>(local_grid,local_phi));    
     levelset_projection.elliptic_solver->Set_Relative_Tolerance((T)1e-7);
     levelset_projection.elliptic_solver->pcg.Set_Maximum_Iterations(400);
     levelset_projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;

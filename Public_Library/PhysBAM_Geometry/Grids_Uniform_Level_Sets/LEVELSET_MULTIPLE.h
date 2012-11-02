@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/INTERPOLATION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_LEVELSET.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
 
@@ -26,14 +25,13 @@ class LEVELSET_MULTIPLE:public NONCOPYABLE
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
     typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR::template REBIND<TV>::TYPE T_INTERPOLATION_VECTOR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
 public:
     typedef TV VECTOR_T;
 
     T_GRID& grid;
     ARRAY<T_ARRAYS_SCALAR>& phis;
     LEVELSET_CALLBACKS<T_GRID>* levelset_callbacks;
-    ARRAY<FAST_LEVELSET<GRID<TV> >*> levelsets;
+    ARRAY<FAST_LEVELSET<TV>*> levelsets;
     bool use_external_levelsets;
 
     LEVELSET_MULTIPLE(T_GRID& grid_input,ARRAY<T_ARRAYS_SCALAR>& phis_input,const bool use_external_levelsets_input=false);
@@ -121,7 +119,7 @@ public:
     void Compute_Curvature(const T time=0);
     void Fast_Marching_Method(const ARRAY<int>& local_advection_spatial_orders,int process_sign=0);
     void Project_Levelset(const int number_of_ghost_cells=0);
-    void Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,const bool flood_fill_for_bubbles);
+    void Get_Single_Levelset(const ARRAY<bool>& positive_regions,LEVELSET<TV>& levelset,const bool flood_fill_for_bubbles);
 //#####################################################################
 };   
 }

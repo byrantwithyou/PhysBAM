@@ -15,7 +15,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID> DETONATION_SHOCK_DYNAMICS<T_GRID>::
-DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const T_LEVELSET& levelset_input,const int order_input)
+DETONATION_SHOCK_DYNAMICS(T_GRID& grid_input,const LEVELSET<TV>& levelset_input,const int order_input)
     :grid(grid_input),levelset(levelset_input),Dn(grid),Dn_dot(grid),curvature(grid),curvature_old(grid),order(order_input),boundary(&boundary_default),
     boundary_vector(&boundary_vector_default)
 {

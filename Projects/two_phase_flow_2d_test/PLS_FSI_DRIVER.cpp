@@ -48,7 +48,6 @@
 #include "PLS_FSI_EXAMPLE.h"
 #include <PhysBAM_Solids/PhysBAM_Solids/Solids_Evolution/FRACTURE_EVOLUTION.h>
 
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include "Chorin_Project.h"
 #include <Jeffrey_Utilities/Functional/ARRAY_WRAPPER_FUNCTION.h>
 #include <Jeffrey_Utilities/Functional/BOUND_FAST_MEM_FN.h>
@@ -314,7 +313,6 @@ First_Order_Time_Step(int substep,T dt)
         const T sigma = fluids_parameters.surface_tension;
         const T rho_negative = fluids_parameters.density;
         const T rho_positive = fluids_parameters.outside_density;
-        typedef typename LEVELSET_POLICY< GRID<TV> >::LEVELSET LEVEL_SET_TYPE;
         Chorin_Project(
             1, // n_thread
             min_x, max_x, dt,
@@ -329,8 +327,8 @@ First_Order_Time_Step(int substep,T dt)
             ),
             Make_Constant_Function(
                 BOUND_FAST_MEM_FN<
-                    T (LEVEL_SET_TYPE::*)(const TV&) const,
-                    &LEVEL_SET_TYPE::Compute_Curvature
+                    T (LEVELSET<TV>::*)(const TV&) const,
+                    &LEVELSET<TV>::Compute_Curvature
                 >(fluids_parameters.particle_levelset_evolution->particle_levelset.levelset)
             ),
             Make_Array_Wrapper_Function(fluid_collection.incompressible_fluid_collection.face_velocities)

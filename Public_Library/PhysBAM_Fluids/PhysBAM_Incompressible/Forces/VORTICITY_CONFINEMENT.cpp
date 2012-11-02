@@ -65,7 +65,7 @@ Compute_Vorticity_Confinement_Force_Helper(const T_GRID& grid,const T_FACE_ARRAY
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_ARRAYS_TV::template REBIND<T>::TYPE T_ARRAYS_SCALAR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_ARRAYS_TV::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;
-    typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_FACE;
     T_ARRAYS_SPIN vorticity(grid.Cell_Indices(2),false);
     T_ARRAYS_SCALAR vorticity_magnitude(grid.Cell_Indices(2));
     if(collision_body_list){
@@ -74,7 +74,7 @@ Compute_Vorticity_Confinement_Force_Helper(const T_GRID& grid,const T_FACE_ARRAY
         VORTICITY_UNIFORM<TV>::Vorticity(grid,face_velocities_lookup,vorticity,vorticity_magnitude);}
     else VORTICITY_UNIFORM<TV>::Vorticity(grid,T_FACE_LOOKUP(face_velocities_ghost),vorticity,vorticity_magnitude);
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){ // do collision awareness when these are averaged to faces
-        TV vortex_normal_vector=T_LEVELSET::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());
+        TV vortex_normal_vector=LEVELSET<TV>::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());
         F(iterator.Cell_Index())=TV::Cross_Product(vortex_normal_vector,vorticity(iterator.Cell_Index()));}
 }
 template<class T,class T_FACE_ARRAYS,class T_ARRAYS_TV> static void

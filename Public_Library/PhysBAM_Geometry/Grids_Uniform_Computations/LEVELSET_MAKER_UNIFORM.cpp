@@ -218,7 +218,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) 
             phi(i,j,k)=clamp(phi(i,j,k),-10*grid.min_dX,10*grid.min_dX); // clamp away from FLT_MAX to avoid floating point exceptions
         if(verbose) LOG::Time(STRING_UTILITIES::string_sprintf("Fast Marching (one sided band width=%f)",fmm_one_sided_band_width));
-        GRID<TV> grid_copy=grid;LEVELSET_3D<GRID<TV> > levelset(grid_copy,phi);
+        GRID<TV> grid_copy=grid;LEVELSET<TV> levelset(grid_copy,phi);
         if(compute_unsigned_distance_function) levelset.Fast_Marching_Method(0,fmm_stopping_distance,&initialized_indices);
         else if(compute_signed_distance_function) levelset.Fast_Marching_Method(0,fmm_stopping_distance,phi_offset?&initialized_indices:0);}
 
@@ -238,11 +238,11 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
     if(phi_offset){
         phi-=phi_offset;
         if(use_fmm && compute_signed_distance_function)
-            LEVELSET_3D<GRID<TV> >(grid,phi).Fast_Marching_Method(0,fmm_stopping_distance);}
+            LEVELSET<TV>(grid,phi).Fast_Marching_Method(0,fmm_stopping_distance);}
 
     // TODO: put this back if you need it
     /*if(write_debug_data){
-        GRID<TV> grid_copy=grid;LEVELSET_3D<GRID<TV> > levelset(grid_copy,phi);
+        GRID<TV> grid_copy=grid;LEVELSET<TV> levelset(grid_copy,phi);
         FILE_UTILITIES::Write_To_File<T>("levelset.debug",levelset);
         if(compute_velocity)FILE_UTILITIES::Write_To_File<T>("velocity.debug",velocity);}*/
 

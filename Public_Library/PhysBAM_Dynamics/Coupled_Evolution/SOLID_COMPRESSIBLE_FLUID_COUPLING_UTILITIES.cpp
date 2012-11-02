@@ -20,7 +20,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/POISSON_COLLIDABLE_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_LAPLACE.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/EULER_UNIFORM.h>
@@ -206,7 +205,7 @@ Compute_Phi_Solids(const int number_of_ghost_cells)
         for(UNIFORM_COLLISION_AWARE_ITERATOR_FACE_COUPLED<TV> iterator(iterator_info);iterator.Valid();iterator.Next()){
             seed_indices.Append(iterator.First_Cell_Index());seed_indices.Append(iterator.Second_Cell_Index());}
 
-        typename LEVELSET_POLICY<GRID<TV> >::LEVELSET levelset(euler.grid,phi_all_solids_negated); // TODO(jontg): Make this a permanent member variable?
+        LEVELSET<TV> levelset(euler.grid,phi_all_solids_negated); // TODO(jontg): Make this a permanent member variable?
         FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(levelset,number_of_cells_to_extrapolate);
         fmm.Fast_Marching_Method(phi_all_solids_negated,euler.grid.dX.Max()*(T)number_of_cells_to_extrapolate,&seed_indices,true);}
 }

@@ -2,7 +2,7 @@
 #define __BOUNDARY_CONDITIONS__
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 
 using namespace PhysBAM;
 
@@ -19,7 +19,7 @@ struct BOUNDARY_CONDITIONS
     ARRAY<T,TV_INT> phi_array;
     bool check_leaks;
     bool use_analytic_solution;
-    typename LEVELSET_POLICY<GRID<TV> >::LEVELSET* phi;
+    LEVELSET<TV>* phi;
 
     BOUNDARY_CONDITIONS(GRID<TV>& grid_input);
     virtual ~BOUNDARY_CONDITIONS();

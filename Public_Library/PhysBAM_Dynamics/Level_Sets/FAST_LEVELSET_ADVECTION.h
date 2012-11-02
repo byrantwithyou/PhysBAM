@@ -30,7 +30,7 @@ public:
     int local_advection_spatial_order;
     bool local_semi_lagrangian_advection;
 
-    FAST_LEVELSET_ADVECTION(FAST_LEVELSET<GRID<TV> >* fast_levelset)
+    FAST_LEVELSET_ADVECTION(FAST_LEVELSET<TV>* fast_levelset)
         :BASE(fast_levelset)
     {
         Use_Level_Set_Advection_Method();
@@ -55,7 +55,7 @@ public:
     void Euler_Step(const ARRAY<TV,TV_INT>& velocity,const T dt,const T time,const int number_of_ghost_cells);
     void Euler_Step(const T_FACE_ARRAYS_SCALAR& velocity,const T dt,const T time,const int number_of_ghost_cells);
     void Reinitialize(const int time_steps=10,const T time=0)
-    {PhysBAM::Reinitialize(*(FAST_LEVELSET<GRID<TV> >*)levelset,time_steps,time,((FAST_LEVELSET<GRID<TV> >*)levelset)->half_band_width,((FAST_LEVELSET<GRID<TV> >*)levelset)->grid.dX.Max()*(1+min(3,local_advection_spatial_order)),reinitialization_cfl,reinitialization_runge_kutta_order,reinitialization_spatial_order,0);}
+    {PhysBAM::Reinitialize(*(FAST_LEVELSET<TV>*)levelset,time_steps,time,((FAST_LEVELSET<TV>*)levelset)->half_band_width,((FAST_LEVELSET<TV>*)levelset)->grid.dX.Max()*(1+min(3,local_advection_spatial_order)),reinitialization_cfl,reinitialization_runge_kutta_order,reinitialization_spatial_order,0);}
 };
 
 }

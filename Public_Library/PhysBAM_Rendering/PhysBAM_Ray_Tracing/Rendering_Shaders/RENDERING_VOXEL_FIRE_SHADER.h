@@ -32,7 +32,7 @@ public:
     BLACKBODY<T> blackbody;
     MATRIX<T,3> world_xyz_to_display_xyz;
     bool use_lms_scaling;
-    LEVELSET_3D<GRID<TV> >* blue_core_levelset;
+    LEVELSET<TV>* blue_core_levelset;
     RENDER_WORLD<T>& world;
     
     RENDERING_VOXEL_FIRE_SHADER(const VECTOR<T,3>& absorption_input,const VECTOR<T,3>& scattering_input,
@@ -40,7 +40,7 @@ public:
         const T temperature_scale_input,const T temperature_offset_input,const bool clamp_low_temperature_input,
         const T temperature_lowest_input,const T white_point_temperature,
         const T density_scale_input,const T density_offset_input,const bool clamp_low_density_input,
-        const T density_lowest_input,const bool use_lms_scaling,LEVELSET_3D<GRID<TV> >* blue_core_levelset_input,RENDER_WORLD<T>& world_input) 
+        const T density_lowest_input,const bool use_lms_scaling,LEVELSET<TV>* blue_core_levelset_input,RENDER_WORLD<T>& world_input) 
         :VOLUMETRIC_SHADER<T>(world_input),absorption(absorption_input),scattering(scattering_input),
          inscattering_amplification_factor(inscattering_amplification_factor_input),isotropic_scattering(false),phase_function_g((T)0.67),
          emission_amplification(emission_amplification),

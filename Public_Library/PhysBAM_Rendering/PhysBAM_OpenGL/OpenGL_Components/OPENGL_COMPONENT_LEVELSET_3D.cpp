@@ -113,7 +113,7 @@ Print_Selection_Info(std::ostream& output_stream,OPENGL_SELECTION* current_selec
             VECTOR<int,3> index=((OPENGL_SELECTION_GRID_CELL_3D<T>*)current_selection)->index;
             opengl_levelset_multiviews(0)->Levelset()->grid.Clamp(index,ghost_cells);
             for(int i=0;i<opengl_levelset_multiviews.m;i++){
-                const LEVELSET_3D<GRID<TV> >& levelset=*opengl_levelset_multiviews(i)->Levelset();
+                const LEVELSET<TV>& levelset=*opengl_levelset_multiviews(i)->Levelset();
                 output_stream<<component_name<<": phi["<<i<<"]="<<levelset.phi(index)
                              <<" curvature["<<i<<"]="<<levelset.Compute_Curvature(levelset.grid.Center(index))<<std::endl;}}
         if(current_selection && current_selection->type==OPENGL_SELECTION::GRID_NODE_3D && !is_MAC){

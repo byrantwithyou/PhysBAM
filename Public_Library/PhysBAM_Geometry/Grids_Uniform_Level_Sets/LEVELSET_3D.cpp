@@ -9,6 +9,7 @@
 #include <PhysBAM_Tools/Log/DEBUG_UTILITIES.h>
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Math_Tools/cube.h>
+#include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_3X3.h>
@@ -23,20 +24,20 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T_GRID> LEVELSET_3D<T_GRID>::
-LEVELSET_3D(T_GRID& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
-    :LEVELSET_UNIFORM<T_GRID>(grid_input,phi_input,number_of_ghost_cells_input)
+template<class T> LEVELSET<VECTOR<T,3> >::
+LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
+    :LEVELSET_BASE<TV>(grid_input,phi_input,number_of_ghost_cells_input)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T_GRID> LEVELSET_3D<T_GRID>::
-~LEVELSET_3D()
+template<class T> LEVELSET<VECTOR<T,3> >::
+~LEVELSET()
 {}
 //#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
-template<class T_GRID> VECTOR<typename T_GRID::SCALAR,2> LEVELSET_3D<T_GRID>::
+template<class T> VECTOR<T,2> LEVELSET<VECTOR<T,3> >::
 Principal_Curvatures(const TV& X) const
 {
     TV grad_phi=TV((Phi(TV(X.x+grid.dX.x,X.y,X.z))-Phi(TV(X.x-grid.dX.x,X.y,X.z)))/(2*grid.dX.x),
@@ -55,21 +56,21 @@ Principal_Curvatures(const TV& X) const
 // Function Compute_Curvature
 //#####################################################################
 // kappa = - DIV(normal), negative for negative phi inside, positive for positive phi inside, sqrt(phix^2+phiy^2+phiy^2)=1 for distance functions
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
+template<class T> void LEVELSET<VECTOR<T,3> >::
 Compute_Curvature(const T time)
 {
     int ghost_cells=3;
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
 
     if(!curvature) curvature=new ARRAY<T,TV_INT>(grid.Domain_Indices(ghost_cells-1));
-    for(CELL_ITERATOR iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next())
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next())
         (*curvature)(iterator.Cell_Index())=Compute_Curvature(phi_ghost,iterator.Cell_Index());
 }
 //#####################################################################
 // Function Compute_Curvature
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR LEVELSET_3D<T_GRID>::
-Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const VECTOR<int,3>& index) const
+template<class T> T LEVELSET<VECTOR<T,3> >::
+Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
     T one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),one_over_two_dz=1/(2*grid.dX.z);
     T one_over_dx_squared=1/sqr(grid.dX.x),one_over_dy_squared=1/sqr(grid.dX.y),one_over_dz_squared=1/sqr(grid.dX.z);
@@ -96,7 +97,7 @@ Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const VECTOR<int,3>& index) c
 //#####################################################################
 // Function Compute_Curvature
 //#####################################################################
-template<class T_GRID> typename T_GRID::SCALAR LEVELSET_3D<T_GRID>::
+template<class T> T LEVELSET<VECTOR<T,3> >::
 Compute_Curvature(const TV& location) const
 {
     // TODO: optimize
@@ -104,50 +105,33 @@ Compute_Curvature(const TV& location) const
     for(int i=-1;i<=1;i++) for(int j=-1;j<=1;j++) for(int k=-1;k<=1;k++){
         TV phi_location=grid.dX.x*TV((T)i,0,0)+grid.dX.y*TV(0,(T)j,0)+grid.dX.z*TV(0,0,(T)k)+location;
         phi_stencil(i,j,k)=Phi(phi_location);}
-    return Compute_Curvature(phi_stencil,VECTOR<int,3>(0,0,0));
-}
-//#####################################################################
-// Function Compute_Cell_Minimum_And_Maximum
-//#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
-{
-    if(!recompute_if_exists && cell_range) return;
-    if(!cell_range) cell_range=new ARRAY<RANGE<VECTOR<T,1> >,VECTOR<int,3> >(phi.domain.min_corner.x,phi.domain.max_corner.x-1,phi.domain.min_corner.y,phi.domain.max_corner.y-1,phi.domain.min_corner.z,phi.domain.max_corner.z-1);
-    TV_INT i;
-    for(i.x=phi.domain.min_corner.x;i.x<phi.domain.max_corner.x-1;i.x++) for(i.y=phi.domain.min_corner.y;i.y<phi.domain.max_corner.y-1;i.y++) for(i.z=phi.domain.min_corner.z;i.z<phi.domain.max_corner.z-1;i.z++){
-        int index=phi.Standard_Index(i);
-        int z=phi.counts.z,yz=index+phi.counts.y*z;
-        T phi1=phi.array(index),phi2=phi.array(yz),phi3=phi.array(index+z),phi4=phi.array(index+1),
-           phi5=phi.array(yz+z),phi6=phi.array(yz+1),phi7=phi.array(index+z+1),
-           phi8=phi.array(yz+z+1);
-        (*cell_range)(i)=RANGE<VECTOR<T,1> >(min(phi1,phi2,phi3,phi4,phi5,phi6,phi7,phi8),max(phi1,phi2,phi3,phi4,phi5,phi6,phi7,phi8));}
+    return Compute_Curvature(phi_stencil,TV_INT(0,0,0));
 }
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
+template<class T> void LEVELSET<VECTOR<T,3> >::
+Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Fast_Marching_Method(ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
+template<class T> void LEVELSET<VECTOR<T,3> >::
+Fast_Marching_Method(ARRAY<bool,TV_INT>& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     Get_Signed_Distance_Using_FMM(phi,seed_indices,time,stopping_distance,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<VECTOR<int,3> >* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
+template<class T> void LEVELSET<VECTOR<T,3> >::
+Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
+    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells,thread_queue);
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
@@ -155,35 +139,21 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,cons
 //#####################################################################
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,VECTOR<int,3> >& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
+template<class T> void LEVELSET<VECTOR<T,3> >::
+Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,TV_INT>& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
+    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells,thread_queue);
     fmm.Fast_Marching_Method(phi_ghost,seed_indices,stopping_distance,add_seed_indices_for_ghost_cells,process_sign);
     ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
 }
 //#####################################################################
-// Function Fast_Marching_Method_Outside_Band
-//#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance,int process_sign)
-{
-    int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
-    int ghost_cells=number_of_ghost_cells;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<T_GRID > fmm(*this,ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,0,false,process_sign);
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++) if(abs(phi_ghost(i,j,ij))>half_band_width) phi(i,j,ij)=phi_ghost(i,j,ij);
-    boundary->Apply_Boundary_Condition(grid,phi,time);
-}
-//#####################################################################
 // Function Approximate_Surface_Area
 //#####################################################################
 // calculates the approximate perimeter using delta functions
-template<class T_GRID> typename T_GRID::SCALAR LEVELSET_3D<T_GRID>::
+template<class T> T LEVELSET<VECTOR<T,3> >::
 Approximate_Surface_Area(const T interface_thickness,const T time) const
 {
     int ghost_cells=number_of_ghost_cells;
@@ -198,26 +168,26 @@ Approximate_Surface_Area(const T interface_thickness,const T time) const
 // Function Calculate_Triangulated_Surface_From_Marching_Tetrahedra
 //#####################################################################
 // uses levelset grid for tet marching - faster than version below because we don't need to interpolate phi
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
+template<class T> void LEVELSET<VECTOR<T,3> >::
 Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>& triangulated_surface,const bool include_ghost_values) const
 {
     triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.Clean_Memory();
     int m_start=1,m_end=grid.counts.x,n_start=1,n_end=grid.counts.y,mn_start=1,mn_end=grid.counts.z;
     if(include_ghost_values){m_start=phi.domain.min_corner.x;m_end=phi.domain.max_corner.x;n_start=phi.domain.min_corner.y;n_end=phi.domain.max_corner.y;mn_start=phi.domain.min_corner.z;mn_end=phi.domain.max_corner.z;}
-    ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(m_start,m_end,n_start,n_end,mn_start,mn_end);edge.Fill(VECTOR<int,6>()-1);
+    ARRAY<VECTOR<int,6>,TV_INT> edge(m_start,m_end,n_start,n_end,mn_start,mn_end);edge.Fill(VECTOR<int,6>()-1);
     // create particles
     for(int i=m_start;i<m_end;i++) for(int j=n_start;j<n_end;j++) for(int k=mn_start;k<mn_end;k++){TV_INT index(i,j,k);
-        if(i<m_end-1) edge(index)(0)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j,k));
-        if(j<n_end-1) edge(index)(1)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j+1,k));
-        if(k<mn_end-1)edge(index)(2)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j,k+1));
+        if(i<m_end-1) edge(index)(0)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,TV_INT(i+1,j,k));
+        if(j<n_end-1) edge(index)(1)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,TV_INT(i,j+1,k));
+        if(k<mn_end-1)edge(index)(2)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,TV_INT(i,j,k+1));
         if((i+j+k)%2 == 0){
-            if(j<n_end-1 && k<mn_end-1)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i,j+1,k),VECTOR<int,3>(i,j,k+1));
-            if(i<m_end-1 && k<mn_end-1)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i+1,j,k),VECTOR<int,3>(i,j,k+1));
-            if(i<m_end-1 && j<n_end-1) edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,VECTOR<int,3>(i,j+1,k),VECTOR<int,3>(i+1,j,k));}
+            if(j<n_end-1 && k<mn_end-1)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,TV_INT(i,j+1,k),TV_INT(i,j,k+1));
+            if(i<m_end-1 && k<mn_end-1)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,TV_INT(i+1,j,k),TV_INT(i,j,k+1));
+            if(i<m_end-1 && j<n_end-1) edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,TV_INT(i,j+1,k),TV_INT(i+1,j,k));}
         else{
-            if(j<n_end-1 && k<mn_end-1)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i,j+1,k+1));
-            if(i<m_end-1 && k<mn_end-1)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j,k+1));
-            if(i<m_end-1 && j<n_end-1) edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,VECTOR<int,3>(i+1,j+1,k));}}
+            if(j<n_end-1 && k<mn_end-1)edge(index)(3)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,TV_INT(i,j+1,k+1));
+            if(i<m_end-1 && k<mn_end-1)edge(index)(4)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,TV_INT(i+1,j,k+1));
+            if(i<m_end-1 && j<n_end-1) edge(index)(5)=If_Zero_Crossing_Add_Particle_By_Index(triangulated_surface,index,TV_INT(i+1,j+1,k));}}
     // calculate triangles
     for(int i=m_start;i<m_end-1;i++) for(int j=n_start;j<n_end-1;j++) for(int k=mn_start;k<mn_end-1;k++)
         if((i+j+k)%2 == 0){
@@ -238,8 +208,8 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(TRIANGULATED_SURFACE<T>&
 //#####################################################################
 // Function If_Zero_Crossing_Add_Particle
 //#####################################################################
-template<class T_GRID> int LEVELSET_3D<T_GRID>::
-If_Zero_Crossing_Add_Particle_By_Index(TRIANGULATED_SURFACE<T>& triangulated_surface,const VECTOR<int,3>& index1,const VECTOR<int,3>& index2) const
+template<class T> int LEVELSET<VECTOR<T,3> >::
+If_Zero_Crossing_Add_Particle_By_Index(TRIANGULATED_SURFACE<T>& triangulated_surface,const TV_INT& index1,const TV_INT& index2) const
 {
     int index=-1;T phi1=phi(index1),phi2=phi(index2);
     if(LEVELSET_UTILITIES<T>::Interface(phi1,phi2)){
@@ -250,13 +220,13 @@ If_Zero_Crossing_Add_Particle_By_Index(TRIANGULATED_SURFACE<T>& triangulated_sur
 //#####################################################################
 // Function Calculate_Triangulated_Surface_From_Marching_Tetrahedra
 //#####################################################################
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
-Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,TRIANGULATED_SURFACE<T>& triangulated_surface) const
+template<class T> void LEVELSET<VECTOR<T,3> >::
+Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const GRID<TV>& tet_grid,TRIANGULATED_SURFACE<T>& triangulated_surface) const
 {
     assert(tet_grid.domain.min_corner.x >= grid.domain.min_corner.x && tet_grid.domain.max_corner.x < grid.domain.max_corner.x && tet_grid.domain.min_corner.y >= grid.domain.min_corner.y && tet_grid.domain.max_corner.y < grid.domain.max_corner.y && tet_grid.domain.min_corner.z >= grid.domain.min_corner.z &&
                tet_grid.domain.max_corner.z < grid.domain.max_corner.z);
     triangulated_surface.Clean_Memory();triangulated_surface.mesh.Clean_Memory();triangulated_surface.particles.Clean_Memory();
-    ARRAY<VECTOR<int,6>,VECTOR<int,3> > edge(0,tet_grid.counts.x,0,tet_grid.counts.y,0,tet_grid.counts.z);
+    ARRAY<VECTOR<int,6>,TV_INT> edge(0,tet_grid.counts.x,0,tet_grid.counts.y,0,tet_grid.counts.z);
     // create particles
     int i;for(i=0;i<tet_grid.counts.x;i++) for(int j=0;j<tet_grid.counts.y;j++) for(int k=0;k<tet_grid.counts.z;k++){
         edge(i,j,k)(0)=If_Zero_Crossing_Add_Particle(triangulated_surface,tet_grid.X(i,j,k),tet_grid.X(i+1,j,k));
@@ -290,7 +260,7 @@ Calculate_Triangulated_Surface_From_Marching_Tetrahedra(const T_GRID& tet_grid,T
 //#####################################################################
 // Function If_Zero_Crossing_Add_Particle
 //#####################################################################
-template<class T_GRID> int LEVELSET_3D<T_GRID>::
+template<class T> int LEVELSET<VECTOR<T,3> >::
 If_Zero_Crossing_Add_Particle(TRIANGULATED_SURFACE<T>& triangulated_surface,const TV& x1,const TV& x2) const
 {
     int index=-1;T phi1=Phi(x1),phi2=Phi(x2);
@@ -304,34 +274,34 @@ If_Zero_Crossing_Add_Particle(TRIANGULATED_SURFACE<T>& triangulated_surface,cons
 //#####################################################################
 // looking down at the node with phi1, e1-e2-e3 is conunter clockwise
 // edges 1,2,3 come out of phi1 - edge4 is opposite edge3 - edge2 is opposite edge6 - edge1 is opposite edge5
-template<class T_GRID> void LEVELSET_3D<T_GRID>::
+template<class T> void LEVELSET<VECTOR<T,3> >::
 Append_Triangles(TRIANGULATED_SURFACE<T>& triangulated_surface,const int e1,const int e2,const int e3,const int e4,const int e5,const int e6,const T phi1) const
 {
     int number_positive=(e1>=0)+(e2>=0)+(e3>=0)+(e4>=0)+(e5>=0)+(e6>=0);if(number_positive==0) return;assert(number_positive==3 || number_positive==4);
     if(e1>=0 && e2>=0 && e5>=0 && e6>=0){ // 2 triangles
-        if(phi1>0){triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e6,e2));triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e2,e6,e5));}
-        else{triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e2,e6));triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e2,e5,e6));}}
+        if(phi1>0){triangulated_surface.mesh.elements.Append(TV_INT(e1,e6,e2));triangulated_surface.mesh.elements.Append(TV_INT(e2,e6,e5));}
+        else{triangulated_surface.mesh.elements.Append(TV_INT(e1,e2,e6));triangulated_surface.mesh.elements.Append(TV_INT(e2,e5,e6));}}
     else if(e2>=0 && e3>=0 && e4>=0 && e6>=0){
-        if(phi1>0){triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e2,e4,e3));triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e3,e4,e6));}
-        else{triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e2,e3,e4));triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e4,e3,e6));}}
+        if(phi1>0){triangulated_surface.mesh.elements.Append(TV_INT(e2,e4,e3));triangulated_surface.mesh.elements.Append(TV_INT(e3,e4,e6));}
+        else{triangulated_surface.mesh.elements.Append(TV_INT(e2,e3,e4));triangulated_surface.mesh.elements.Append(TV_INT(e4,e3,e6));}}
     else if(e1>=0 && e3>=0 && e4>=0 && e5>=0){
-        if(phi1>0){triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e3,e5));triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e5,e4));}
-        else {triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e5,e3));triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e4,e5));}}
+        if(phi1>0){triangulated_surface.mesh.elements.Append(TV_INT(e1,e3,e5));triangulated_surface.mesh.elements.Append(TV_INT(e1,e5,e4));}
+        else {triangulated_surface.mesh.elements.Append(TV_INT(e1,e5,e3));triangulated_surface.mesh.elements.Append(TV_INT(e1,e4,e5));}}
     else if(e1>=0 && e2>=0 && e3>=0){ // 1 triangle
-        if(phi1>0) triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e3,e2));
-        else triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e2,e3));}
+        if(phi1>0) triangulated_surface.mesh.elements.Append(TV_INT(e1,e3,e2));
+        else triangulated_surface.mesh.elements.Append(TV_INT(e1,e2,e3));}
     else if(e1>=0 && e4>=0 && e6>=0){
-        if(phi1>0) triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e6,e4));
-        else triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e1,e4,e6));}
+        if(phi1>0) triangulated_surface.mesh.elements.Append(TV_INT(e1,e6,e4));
+        else triangulated_surface.mesh.elements.Append(TV_INT(e1,e4,e6));}
     else if(e3>=0 && e5>=0 && e6>=0){
-        if(phi1>0) triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e3,e5,e6));
-        else triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e3,e6,e5));}
+        if(phi1>0) triangulated_surface.mesh.elements.Append(TV_INT(e3,e5,e6));
+        else triangulated_surface.mesh.elements.Append(TV_INT(e3,e6,e5));}
     else if(e4>=0 && e2>=0 && e5>=0){
-        if(phi1>0) triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e4,e5,e2));
-        else triangulated_surface.mesh.elements.Append(VECTOR<int,3>(e4,e2,e5));}
+        if(phi1>0) triangulated_surface.mesh.elements.Append(TV_INT(e4,e5,e2));
+        else triangulated_surface.mesh.elements.Append(TV_INT(e4,e2,e5));}
 }
 //#####################################################################
-template class LEVELSET_3D<GRID<VECTOR<float,3> > >;
+template class LEVELSET<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class LEVELSET_3D<GRID<VECTOR<double,3> > >;
+template class LEVELSET<VECTOR<double,3> >;
 #endif

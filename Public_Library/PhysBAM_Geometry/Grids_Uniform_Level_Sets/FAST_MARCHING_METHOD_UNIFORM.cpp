@@ -16,7 +16,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class T_GRID> FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-FAST_MARCHING_METHOD_UNIFORM(const T_LEVELSET& levelset,const int ghost_cells_input,THREAD_QUEUE* thread_queue_input)
+FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells_input,THREAD_QUEUE* thread_queue_input)
     :levelset(levelset),ghost_cells(ghost_cells_input),thread_queue(thread_queue_input)
 {
     cell_grid=levelset.grid.Is_MAC_Grid()?levelset.grid:levelset.grid.Get_MAC_Grid_At_Regular_Positions();
@@ -253,7 +253,7 @@ Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<i
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_SCALAR& phi_new,ARRAY<bool,TV_INT>& done)
 { 
-    T_LEVELSET levelset_ghost(cell_grid,phi_ghost);
+    LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
 
     T sqr_epsilon_cell_size=sqr(levelset.small_number*cell_grid.Cell_Size()),sqr_epsilon_face_size[3];
     if(T_GRID::dimension==2){sqr_epsilon_face_size[2]=sqr_epsilon_cell_size;}
@@ -346,7 +346,7 @@ Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Initialize_Interface(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const bool add_seed_indices_for_ghost_cells)
 {
-    T_LEVELSET levelset_ghost(cell_grid,phi_ghost);
+    LEVELSET<TV> levelset_ghost(cell_grid,phi_ghost);
 
     for(CELL_ITERATOR iterator(cell_grid,ghost_cells);iterator.Valid();iterator.Next()) if(done(iterator.Cell_Index())) Add_To_Initial(done,close_k,iterator.Cell_Index());
     if(add_seed_indices_for_ghost_cells){RANGE<TV_INT> ghost_domain=cell_grid.Domain_Indices().Thickened(ghost_cells);

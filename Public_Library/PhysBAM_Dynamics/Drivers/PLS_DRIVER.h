@@ -6,7 +6,6 @@
 #define __PLS_DRIVER__
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 
@@ -17,7 +16,6 @@ class PLS_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     typedef typename ADVECTION_POLICY<GRID<TV> >::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;

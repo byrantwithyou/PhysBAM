@@ -19,7 +19,7 @@ template<class T_GRID>
 class PROJECTION_COLLIDABLE_UNIFORM:public PROJECTION_UNIFORM<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -32,7 +32,7 @@ public:
     POISSON_COLLIDABLE_UNIFORM<T_GRID>* poisson_collidable;
 
     PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,const bool multiphase,const bool use_poisson,const bool use_variable_beta,THREAD_QUEUE* thread_queue=0);
-    PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input);
+    PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input);
     virtual ~PROJECTION_COLLIDABLE_UNIFORM();
 
 //#####################################################################

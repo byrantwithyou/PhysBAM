@@ -21,7 +21,7 @@ class POISSON_COLLIDABLE_UNIFORM:public POISSON_UNIFORM<T_GRID>,public LAPLACE_C
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
     typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
 
 public:
@@ -41,7 +41,7 @@ public:
     T_ARRAYS_SCALAR u_jump,beta_un_jump; // [u] and [beta un] on the grid
     T_FACE_ARRAYS_SCALAR beta_interface_face; // 2nd order method
     T_FACE_ARRAYS_SCALAR u_jump_face;
-    //T_LEVELSET* levelset; // used in second order accurate cut cell method
+    //LEVELSET<TV>* levelset; // used in second order accurate cut cell method
     LEVELSET_MULTIPLE<T_GRID>* levelset_multiple;
     //T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
 private:
@@ -53,7 +53,7 @@ protected:
 public:
 
     POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input);
-    POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,T_LEVELSET& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+    POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
         const bool enforce_compatibility_input);
     virtual ~POISSON_COLLIDABLE_UNIFORM();
 

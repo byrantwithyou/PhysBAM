@@ -9,19 +9,17 @@
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class T_GRID>
 class FAST_MARCHING_METHOD_UNIFORM:public NONCOPYABLE
 {
-    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
-    const T_LEVELSET& levelset;
+    const LEVELSET<TV>& levelset;
 private:
     T_GRID cell_grid;
     TV_INT dimension_start,dimension_end;
@@ -29,7 +27,7 @@ private:
 public:
     THREAD_QUEUE* thread_queue;
 
-    FAST_MARCHING_METHOD_UNIFORM(const T_LEVELSET& levelset,const int ghost_cells,THREAD_QUEUE* thread_queue_input=0);
+    FAST_MARCHING_METHOD_UNIFORM(const LEVELSET<TV>& levelset,const int ghost_cells,THREAD_QUEUE* thread_queue_input=0);
     ~FAST_MARCHING_METHOD_UNIFORM();
 
     bool Neighbor_Visible(const int neighbor_number,const TV_INT& current_index) // neighbor_number between 1 and 3 -- right, top, back

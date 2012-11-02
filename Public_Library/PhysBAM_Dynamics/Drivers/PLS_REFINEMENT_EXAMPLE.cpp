@@ -56,7 +56,7 @@ Write_Output_Files(const int frame)
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_psi_N",projection.elliptic_solver->psi_N);
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_psi_D",projection.elliptic_solver->psi_D);}
     PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.particle_levelset;
-    T_LEVELSET coarse_levelset(coarse_mac_grid,coarse_phi);
+    LEVELSET<TV> coarse_levelset(coarse_mac_grid,coarse_phi);
     FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/levelset",particle_levelset.levelset);
     if(write_debug_data){
         FILE_UTILITIES::Write_To_File(stream_type,output_directory+"/"+f+"/coarse_levelset",coarse_levelset);
@@ -75,7 +75,7 @@ Read_Output_Files(const int frame)
     PARTICLE_LEVELSET_UNIFORM<GRID<TV> >& particle_levelset=particle_levelset_evolution.particle_levelset;
     if(split){
         ARRAY<T,TV_INT> phi_global(fine_mpi_grid->global_grid.Domain_Indices());
-        T_LEVELSET levelset_global(fine_mpi_grid->global_grid,phi_global);        
+        LEVELSET<TV> levelset_global(fine_mpi_grid->global_grid,phi_global);        
         FILE_UTILITIES::Read_From_File(stream_type,my_output_directory+"/"+f+"/levelset",levelset_global);
         for(typename GRID<TV>::CELL_ITERATOR iterator(fine_mac_grid);iterator.Valid();iterator.Next()){
             particle_levelset.levelset.phi(iterator.Cell_Index())=phi_global(fine_mpi_grid->global_grid.Clamped_Index(iterator.Location()));}}

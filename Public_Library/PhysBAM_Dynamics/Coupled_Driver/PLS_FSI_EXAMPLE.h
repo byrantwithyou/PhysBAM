@@ -34,7 +34,7 @@ template<class TV>
 class PLS_FSI_EXAMPLE:public EXAMPLE<TV>,public EXAMPLE_FORCES_AND_VELOCITIES<TV>,public SOLIDS_EVOLUTION_CALLBACKS<TV>,public SOLIDS_FLUIDS_CALLBACKS<TV>,
                       public LEVELSET_CALLBACKS<GRID<TV> >,public FLUIDS_PARAMETERS_CALLBACKS<GRID<TV> >,public NONCOPYABLE
 {
-    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename INTERPOLATION_POLICY<GRID<TV> >::FACE_LOOKUP T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<GRID<TV> > T_FACE_LOOKUP_COLLIDABLE;
@@ -69,7 +69,7 @@ public:
     PLS_FSI_EXAMPLE(const STREAM_TYPE stream_type,const int number_of_regions);
     virtual ~PLS_FSI_EXAMPLE();
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::m> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {V_levelset=fluid_collection.incompressible_fluid_collection.face_velocities;}
 
     void Get_Body_Force(ARRAY<T,FACE_INDEX<TV::m> >& force,const T dt,const T time) PHYSBAM_OVERRIDE

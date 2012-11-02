@@ -226,7 +226,9 @@ Advance_One_Time_Step(bool first_step)
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     example.Begin_Time_Step(time);
     T dt=example.dt;
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before levelset evolution",0,1);
 //    Update_Pls(dt);
+    Update_Level_Set(dt,first_step);
 
     PHYSBAM_DEBUG_WRITE_SUBSTEP("before advection",0,1);
     Advection_And_BDF(dt,first_step);
@@ -236,6 +238,18 @@ Advance_One_Time_Step(bool first_step)
     time+=dt;
     Extrapolate_Velocity(example.face_velocities,example.face_color);
     example.End_Time_Step(time);
+}
+//#####################################################################
+// Function Update_Level_Set
+//#####################################################################
+template<class TV> void PLS_FC_DRIVER<TV>::
+Update_Level_Set(T dt,bool first_step)
+{
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before phi advection",0,1);
+    example.particle_levelset_evolution_multiple.Advance_Levelset(dt);
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("before reinitialization",0,1);
+    example.particle_levelset_evolution_multiple.Make_Signed_Distance();
+    PHYSBAM_DEBUG_WRITE_SUBSTEP("after level set update",0,1);
 }
 //#####################################################################
 // Function Advection_And_BDF

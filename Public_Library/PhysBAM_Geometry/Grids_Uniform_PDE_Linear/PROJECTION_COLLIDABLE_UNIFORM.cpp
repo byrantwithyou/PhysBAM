@@ -27,7 +27,7 @@ PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,const bool multiphase,const
 // Constructor
 //#####################################################################
 template<class T_GRID> PROJECTION_COLLIDABLE_UNIFORM<T_GRID>::
-PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input)
+PROJECTION_COLLIDABLE_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input)
     :laplace_collidable(0),poisson_collidable(0)
 {
     poisson=poisson_collidable=new POISSON_COLLIDABLE_UNIFORM<T_GRID>(p_grid,p,levelset_input,true,false,true);elliptic_solver=poisson;collidable_solver=poisson_collidable;

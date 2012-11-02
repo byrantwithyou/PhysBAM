@@ -11,7 +11,6 @@
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID> class LAPLACE_UNIFORM;
@@ -26,7 +25,6 @@ class IMPLICIT_VISCOSITY_UNIFORM:public NONCOPYABLE
     typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef AVERAGING_UNIFORM<T_GRID> T_AVERAGING;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef typename MPI_GRID_POLICY<T_GRID>::MPI_GRID T_MPI_GRID;
 
 protected:

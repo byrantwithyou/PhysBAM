@@ -7,29 +7,22 @@
 #ifndef __FAST_LEVELSET__
 #define __FAST_LEVELSET__
 
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
-template<class T_GRID_input>
-class FAST_LEVELSET:public LEVELSET_POLICY<T_GRID_input>::LEVELSET
+template<class TV>
+class FAST_LEVELSET:public LEVELSET<TV>
 {
-    typedef T_GRID_input T_GRID;
-    typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;
-    typedef typename T_GRID::VECTOR_INT TV_INT;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;
-    typedef AVERAGING_UNIFORM<T_GRID> T_AVERAGING;
+    typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef AVERAGING_UNIFORM<GRID<TV> > T_AVERAGING;
 public:
-    typedef T_LEVELSET BASE;
+    typedef LEVELSET<TV> BASE;
     using BASE::grid;using BASE::boundary;using BASE::phi;using BASE::curvature_motion;using BASE::sigma;using BASE::max_time_step;
     using BASE::small_number;using BASE::Set_Face_Velocities_Valid_Mask;
 
     T half_band_width;
 
-    FAST_LEVELSET(T_GRID& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells=3);
+    FAST_LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells=3);
     ~FAST_LEVELSET();
 
     void Set_Band_Width(const T number_of_cells=6)

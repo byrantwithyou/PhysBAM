@@ -41,7 +41,6 @@ struct ANALYTIC_TEST: public BOUNDARY_CONDITIONS_SCALAR_COLOR<TV>
 };
 
 template<class TV> class GRID;
-template<class T_GRID> class LEVELSET_UNIFORM;
 template<class TV> class CELL_MANAGER_COLOR;
 template<class TV> class CELL_DOMAIN_INTERFACE_COLOR;
 

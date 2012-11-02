@@ -11,7 +11,7 @@ using namespace std;
 // Function OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D
 //#####################################################################
 template<class T> OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
-OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(GRID<TV>& grid,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus,LEVELSET_2D<GRID<TV> >& levelset)
+OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(GRID<TV>& grid,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus,LEVELSET<TV>& levelset)
     :height_scale(0),grid(grid),V_minus(V_minus),V_plus(V_plus),levelset(levelset),minus(*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >)),
       plus(*(new ARRAY<VECTOR<T,3> >),*(new ARRAY<VECTOR<T,3> >))
 {

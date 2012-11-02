@@ -45,7 +45,7 @@ delete opengl_triangulated_surface;opengl_triangulated_surface=0;
 // Function Set_Levelset
 //#####################################################################
 template<class T,class RW> void OPENGL_LEVELSET_MULTIVIEW<T,RW>::
-Set_Levelset(LEVELSET_3D<GRID<TV> >& levelset_input)
+Set_Levelset(LEVELSET<TV>& levelset_input)
 {
 Reset();
 levelset=&levelset_input;
@@ -63,7 +63,7 @@ levelset_filename=levelset_filename_input;
 //#####################################################################
 // Function Levelset
 //#####################################################################
-template<class T,class RW> const LEVELSET_3D<GRID<VECTOR<T,3> > >* OPENGL_LEVELSET_MULTIVIEW<T,RW>::
+template<class T,class RW> const LEVELSET<VECTOR<T,3> >* OPENGL_LEVELSET_MULTIVIEW<T,RW>::
 Levelset() const
 {
 return levelset;
@@ -114,7 +114,7 @@ Initialize_Levelset()
 {
 if(!levelset){
     if(levelset_filename.length() > 0){
-        levelset=new LEVELSET_3D<GRID<TV> >(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,3> >));
+        levelset=new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,3> >));
         FILE_UTILITIES::Read_From_File<RW>(levelset_filename,*levelset);
             i_own_levelset=true;}}
 }

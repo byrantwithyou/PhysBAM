@@ -27,7 +27,7 @@ POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,con
 // Constructor
 //#####################################################################
 template<class T_GRID> POISSON_COLLIDABLE_UNIFORM<T_GRID>::
-POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,T_LEVELSET& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+POISSON_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
     const bool enforce_compatibility_input)
     :BASE(grid_input,u_input,initialize_grid,multiphase_input,enforce_compatibility_input),levelset_multiple(0),
     levelset_multiple_default(grid,phis_default,false),dt(0),dt_is_set(false)

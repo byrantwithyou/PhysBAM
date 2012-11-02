@@ -302,7 +302,7 @@ Particle_Levelset(const int i)
 {
     return *particle_levelset_multiple.particle_levelsets(i);
 }
-template<class T_GRID> FAST_LEVELSET<T_GRID>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
+template<class T_GRID> FAST_LEVELSET<typename T_GRID::VECTOR_T>& PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<T_GRID>::
 Levelset(const int i)
 {
     return *particle_levelset_multiple.levelset_multiple.levelsets(i);

@@ -10,7 +10,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_UNIFORM_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
 #include <PhysBAM_Geometry/Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 
@@ -23,7 +22,6 @@ public:
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef typename T_GRID::VECTOR_INT TV_INT;
 private:
     typedef LEVELSET_ADVECTION<T_GRID> BASE;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename ADVECTION_COLLIDABLE_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL T_ADVECTION_SEMI_LAGRANGIAN_COLLIDABLE_CELL;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
@@ -38,7 +36,7 @@ public:
 
     ADVECTION_MACCORMACK_UNIFORM<T_GRID,T,ADVECTION<T_GRID,T> >* advection_maccormack;
 
-    LEVELSET_ADVECTION_UNIFORM(T_LEVELSET* _levelset)
+    LEVELSET_ADVECTION_UNIFORM(LEVELSET<TV>* _levelset)
         :BASE(_levelset),advection_maccormack(0)
     {}
 

@@ -11,10 +11,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/GRID_BASED_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
 namespace PhysBAM{
@@ -26,7 +23,6 @@ class GRID_BASED_COLLISION_GEOMETRY_UNIFORM:public GRID_BASED_COLLISION_GEOMETRY
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename T_FACE_ARRAYS_BOOL::template REBIND<VECTOR<bool,T_GRID::dimension> >::TYPE T_FACE_ARRAYS_BOOL_DIMENSION;

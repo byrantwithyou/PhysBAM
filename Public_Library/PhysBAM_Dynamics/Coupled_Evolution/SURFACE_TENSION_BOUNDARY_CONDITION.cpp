@@ -10,7 +10,7 @@ using namespace PhysBAM;
 // Constructor
 //#####################################################################
 template<class TV> SURFACE_TENSION_BOUNDARY_CONDITION<TV>::
-SURFACE_TENSION_BOUNDARY_CONDITION(const FAST_LEVELSET<GRID<TV> >& levelset_input,T surface_tension_coefficient_input)
+SURFACE_TENSION_BOUNDARY_CONDITION(const FAST_LEVELSET<TV>& levelset_input,T surface_tension_coefficient_input)
     :levelset(levelset_input),surface_tension_coefficient(surface_tension_coefficient_input)
 {
 }

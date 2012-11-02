@@ -67,7 +67,7 @@ template<class T,class RW> void Process(int argc,char* argv[])
     std::string f=STRING_UTILITIES::string_sprintf(".%d",frame);
 
     ARRAY<T,VECTOR<int,3> > temperature,density,phi;
-    GRID<TV> grid;LEVELSET_3D<GRID<TV> > levelset(grid,phi);
+    GRID<TV> grid;LEVELSET<TV> levelset(grid,phi);
     FILE_UTILITIES::Read_From_File<RW>("levelset"+f,levelset);
     FILE_UTILITIES::Read_From_File<RW>("temperature"+f,temperature);
     FILE_UTILITIES::Read_From_File<RW>("density"+f,density);

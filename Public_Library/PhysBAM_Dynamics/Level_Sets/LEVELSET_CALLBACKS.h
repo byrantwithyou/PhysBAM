@@ -15,12 +15,12 @@ namespace PhysBAM{
 
 template<class T_GRID> struct GRID_ARRAYS_POLICY;
 template<class T_GRID> struct LEVELSET_MULTIPLE;
+template<class TV> struct LEVELSET;
 
 template<class T_GRID>
 class LEVELSET_CALLBACKS
 {    
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 public:
 
@@ -31,7 +31,7 @@ public:
     {}
 
 //#####################################################################
-    virtual void Get_Levelset_Velocity(const T_GRID& grid,T_LEVELSET& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
+    virtual void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET_MULTIPLE<T_GRID>& levelset,T_FACE_ARRAYS_SCALAR& face_velocity,const T time=0) const {PHYSBAM_FUNCTION_IS_NOT_DEFINED();}
     virtual void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,
         const T dt,const T time){PHYSBAM_WARN_IF_NOT_OVERRIDDEN();}

@@ -59,7 +59,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
         Add_Debug_Particle(grid.X(it.index),color);}*/
     PHYSBAM_DEBUG_WRITE_SUBSTEP("Compute Level Set",0,1);
 
-    LEVELSET_2D<GRID<TV> > levelset(grid,phi);
+    LEVELSET<TV> levelset(grid,phi);
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(levelset,ghost_cells);
     fmm.Fast_Marching_Method(phi,done);
 }

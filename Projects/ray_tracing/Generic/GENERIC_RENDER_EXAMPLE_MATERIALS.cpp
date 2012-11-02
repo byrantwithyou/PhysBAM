@@ -392,7 +392,7 @@ Volume_Material(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameter
         T density_lowest=parameters.Get_Parameter("Density_Lowest",(T)0);
         std::string levelset_object_name=parameters.Get_Parameter("Blue_Core_Levelset",std::string("<unknown>"));
         RENDERING_OBJECT<T>* levelset_object=0;
-        LEVELSET_3D<GRID<TV> >* blue_core_levelset;
+        LEVELSET<TV>* blue_core_levelset;
         if(!objects.Get(levelset_object_name,levelset_object)){
             fprintf(stderr,"Invalid blue core levelset object named '%s' specified\n",levelset_object_name.c_str());
             blue_core_levelset=0;}

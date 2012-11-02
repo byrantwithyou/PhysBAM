@@ -20,7 +20,7 @@ class RENDERING_BUMP_MAP_IMAGE_SHADER:public RENDERING_BUMP_MAP_SHADER<T>
 public:
     GRID<TV2> grid;
     ARRAY<T,VECTOR<int,2> > phi;
-    LEVELSET_2D<GRID<TV2> > levelset;
+    LEVELSET<TV2> levelset;
     T s0,s_min,s_max,s_scaling_factor,t0,t_min,t_max,t_scaling_factor;
     
     RENDERING_BUMP_MAP_IMAGE_SHADER(const MATERIAL_SHADER<T>* shader,RENDER_WORLD<T>& world,const T s0_input=0,const T s1_input=1,const T t0_input=0,const T t1_input=1) 

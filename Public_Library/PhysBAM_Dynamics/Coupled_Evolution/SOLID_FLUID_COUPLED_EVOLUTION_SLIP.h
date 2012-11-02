@@ -37,7 +37,6 @@ class SOLID_FLUID_COUPLED_EVOLUTION_SLIP:public NEWMARK_EVOLUTION<TV_input>,publ
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<int>::TYPE T_ARRAYS_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<int>::TYPE T_FACE_ARRAYS_INT;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
 

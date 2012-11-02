@@ -462,7 +462,7 @@ Apply_Second_Order_Cut_Cell_Method(const T_ARRAYS_INT& cell_index_to_divergence_
     ARRAY<bool,TV_INT>& psi_D=poisson->psi_D;
     // TODO: this will not work for multiphase, obviously
     assert(fluids_parameters.number_of_regions==1); // this should not be called for gas or multiphase
-    T_LEVELSET* levelset=&fluids_parameters.particle_levelset_evolution->Levelset(0);
+    LEVELSET<TV>* levelset=&fluids_parameters.particle_levelset_evolution->Levelset(0);
     for(FACE_ITERATOR iterator(poisson->grid);iterator.Valid();iterator.Next()){
         TV_INT face_index=iterator.Face_Index();int axis=iterator.Axis();
         TV_INT first_cell_index=iterator.First_Cell_Index(),second_cell_index=iterator.Second_Cell_Index();

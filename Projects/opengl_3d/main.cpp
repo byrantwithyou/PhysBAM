@@ -175,7 +175,7 @@ Read_Grid()
     if(FILE_UTILITIES::File_Exists(coarse_filename)){
         std::cout<<"Reading coarse_grid from '"<<coarse_filename<<"'..."<<std::endl;
         ARRAY<T,VECTOR<int,3> > phi;
-        LEVELSET_3D<GRID<TV> > levelset(coarse_grid,phi);
+        LEVELSET<TV> levelset(coarse_grid,phi);
         FILE_UTILITIES::Read_From_File<RW>(coarse_filename,levelset);
         has_valid_coarse_grid=true;}
     else if(FILE_UTILITIES::File_Exists(basedir+"/common/coarse_grid")){
@@ -187,7 +187,7 @@ Read_Grid()
     if(FILE_UTILITIES::File_Exists(filename)){
         std::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl;
         ARRAY<T,VECTOR<int,3> > phi;
-        LEVELSET_3D<GRID<TV> > levelset(grid,phi);
+        LEVELSET<TV> levelset(grid,phi);
         FILE_UTILITIES::Read_From_File<RW>(filename,levelset);
         has_valid_grid=true;}
     else if(FILE_UTILITIES::File_Exists(basedir+"/common/grid")){

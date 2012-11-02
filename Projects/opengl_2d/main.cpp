@@ -173,7 +173,7 @@ Read_Grid()
     if(FILE_UTILITIES::File_Exists(filename)){
         LOG::cout<<"Reading grid from '"<<filename<<"'..."<<std::endl<<std::flush;
         ARRAY<T,VECTOR<int,2> > phi;
-        LEVELSET_2D<GRID<TV> > levelset(grid,phi);
+        LEVELSET<TV> levelset(grid,phi);
         FILE_UTILITIES::Read_From_File<RW>(filename,levelset);
         has_valid_grid=true;}
     else if(FILE_UTILITIES::File_Exists(basedir+"/common/grid")){

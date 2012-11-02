@@ -12,7 +12,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 using namespace PhysBAM;
 //#####################################################################

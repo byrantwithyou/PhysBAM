@@ -21,7 +21,7 @@ class INCOMPRESSIBLE_MULTIPHASE_UNIFORM:public INCOMPRESSIBLE_UNIFORM<T_GRID>
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;typedef typename T_GRID::VECTOR_INT T_VECTOR_INT;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
+    typedef typename INTERPOLATION_POLICY<T_GRID>::INTERPOLATION_SCALAR T_INTERPOLATION_SCALAR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename T_ARRAYS_SCALAR::template REBIND<typename TV::SPIN>::TYPE T_ARRAYS_SPIN;
 public:
@@ -34,7 +34,7 @@ public:
     using BASE::maximum_implicit_viscosity_iterations;using BASE::Extrapolate_Velocity_Across_Interface;
 
     T_FACE_ARRAYS_SCALAR viscous_force;
-    T_LEVELSET* levelset_for_dirichlet_regions;
+    LEVELSET<TV>* levelset_for_dirichlet_regions;
     ARRAY<FLUID_STRAIN_UNIFORM<T_GRID>*> strains;
 
     INCOMPRESSIBLE_MULTIPHASE_UNIFORM(const T_GRID& grid_input,PROJECTION_DYNAMICS_UNIFORM<T_GRID>& projection_input);
@@ -61,7 +61,7 @@ public:
     void Calculate_Pressure_Jump(const T dt,const T time);
     T CFL(T_FACE_ARRAYS_SCALAR& face_velocities,const bool inviscid=false,const bool viscous_only=false) const;
     void Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>& dirichlet_regions,const ARRAY<T>* pressures=0);
-    void Add_Surface_Tension(T_LEVELSET& levelset,const T time);
+    void Add_Surface_Tension(LEVELSET<TV>& levelset,const T time);
     void Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<TV,TV_INT>& F) PHYSBAM_OVERRIDE;
 protected:
     void Discretize_Explicit_Viscous_Terms(const T dt){PHYSBAM_NOT_IMPLEMENTED();}

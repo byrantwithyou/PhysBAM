@@ -11,7 +11,7 @@
 #include <PhysBAM_Tools/Data_Structures/PAIR.h>
 #include <PhysBAM_Tools/Particles/POINTS_POOL.h>
 #include <PhysBAM_Tools/Random_Numbers/RANDOM_NUMBERS.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_PARTICLES.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 #include <climits>
@@ -46,7 +46,7 @@ public:
     T cfl_number;
     int number_of_ghost_cells;
 
-    FAST_LEVELSET<GRID<TV> > levelset;
+    FAST_LEVELSET<TV> levelset;
     ARRAY<PARTICLE_LEVELSET_PARTICLES<TV>*,TV_INT> positive_particles,negative_particles;
     ARRAY<PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*,TV_INT> removed_negative_particles,removed_positive_particles;
     ARRAY<ARRAY<bool>,TV_INT> escaped_positive_particles,escaped_negative_particles;

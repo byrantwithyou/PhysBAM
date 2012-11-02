@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/LEVELSET_COLOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
@@ -28,7 +28,6 @@ class PLS_FC_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
 public:
     enum WORKAROUND1{num_bc=3};
     STREAM_TYPE stream_type;
@@ -58,7 +57,7 @@ public:
     GRID<TV> grid;
     PARTICLE_LEVELSET_EVOLUTION_MULTIPLE_UNIFORM<GRID<TV> >& particle_levelset_evolution_multiple;
     VECTOR<ARRAY<T,TV_INT>,num_bc> bc_phis; // 0=Neumann, 1=Dirichlet, 2=Slip
-    VECTOR<FAST_LEVELSET<GRID<TV> >*,num_bc> bc_levelsets;
+    VECTOR<FAST_LEVELSET<TV>*,num_bc> bc_levelsets;
     ARRAY<int,FACE_INDEX<TV::dimension> > face_color,prev_face_color;
     ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > > face_velocities,prev_face_velocities;
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM<GRID<TV>,T>& advection_scalar;
@@ -73,7 +72,7 @@ public:
     PLS_FC_EXAMPLE(const STREAM_TYPE stream_type_input);
     virtual ~PLS_FC_EXAMPLE();
     
-    void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {Merge_Velocities(V_levelset,face_velocities,face_color);}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE;

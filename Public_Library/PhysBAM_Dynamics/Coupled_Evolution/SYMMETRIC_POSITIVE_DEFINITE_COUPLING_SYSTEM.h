@@ -80,7 +80,7 @@ protected:
     mutable ARRAY<T,COUPLING_CONSTRAINT_ID> temporary_lambdas;
     mutable ARRAY<T> temporary_viscous_velocities;
     VECTOR_T tolerances;
-    const FAST_LEVELSET<GRID<TV> >* levelset;
+    const FAST_LEVELSET<TV>* levelset;
     ARRAY<T,COUPLING_CONSTRAINT_ID> lambda_diagonal_preconditioner;
 
 public:
@@ -166,7 +166,7 @@ public:
     void Apply_One_Sided_Interpolation_At_Coupling_Faces(const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,
         const bool use_one_sided_face_velocty_interpolation,T_FACE_ARRAYS_SCALAR& fluids_velocity);
     void Compute(int ghost_cells,const T dt_input,const T current_velocity_time,const T_FACE_ARRAYS_BOOL& psi_N_domain_boundary,const bool disable_thinshell,
-        const bool use_one_sided_face_velocty_interpolation,T_FACE_ARRAYS_SCALAR& fluids_velocity,T mu,bool use_second_order_cut_cell,const FAST_LEVELSET<GRID<TV> >* levelset);
+        const bool use_one_sided_face_velocty_interpolation,T_FACE_ARRAYS_SCALAR& fluids_velocity,T mu,bool use_second_order_cut_cell,const FAST_LEVELSET<TV>* levelset);
     void Set_Up_RHS(VECTOR_T& V,VECTOR_T& F,const GENERALIZED_VELOCITY<TV>& solids_velocity_star,const ARRAY<T,FACE_INDEX<TV::dimension> >& fluids_velocity_star,
         const ARRAY<T,TV_INT>& p_advected_over_rho_c_squared_dt,const ARRAY<T,TV_INT>& p_advected,const ARRAY<T,TV_INT>& fluid_pressures);
     virtual void Multiply(const KRYLOV_VECTOR_BASE<T>& bV,KRYLOV_VECTOR_BASE<T>& bF) const PHYSBAM_OVERRIDE;

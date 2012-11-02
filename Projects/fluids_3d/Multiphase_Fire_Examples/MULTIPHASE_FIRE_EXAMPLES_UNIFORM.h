@@ -190,10 +190,10 @@ void Get_Flame_Speed_Multiplier(const T dt,const T time) PHYSBAM_OVERRIDE
         T reaction_bandwidth_times_edge_length=reaction_bandwidth*fluids_parameters.grid->Minimum_Edge_Length();
 
         T_ARRAYS_SCALAR& phi1=phis(1);
-        //FAST_LEVELSET<GRID<TV> > levelset1(fluids_parameters.grid,phi1);
+        //FAST_LEVELSET<TV> levelset1(fluids_parameters.grid,phi1);
         //levelset1.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.Minimum_Edge_Length());levelset1.Fast_Marching_Method();
         T_ARRAYS_SCALAR& phi2=phis(2);
-        //FAST_LEVELSET<GRID<TV> > levelset2(fluids_parameters.grid,phi2);
+        //FAST_LEVELSET<TV> levelset2(fluids_parameters.grid,phi2);
         //levelset2.Set_Band_Width(2*reaction_bandwidth_times_edge_length+fluids_parameters.grid.Minimum_Edge_Length());levelset2.Fast_Marching_Method();
         for(FACE_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){
             VECTOR<int,3> cell1=iterator.First_Cell_Index(),cell2=iterator.Second_Cell_Index();
@@ -219,7 +219,7 @@ void Set_Ghost_Density_And_Temperature_Inside_Flame_Core() PHYSBAM_OVERRIDE
 {
     if(test_number==3) return;
 
-    T_ARRAYS_SCALAR phi;FAST_LEVELSET<GRID<TV> > levelset(*fluids_parameters.grid,phi);
+    T_ARRAYS_SCALAR phi;FAST_LEVELSET<TV> levelset(*fluids_parameters.grid,phi);
     T_FACE_ARRAYS_SCALAR& flame_speed_multiplier=fluids_parameters.incompressible->projection.flame_speed_multiplier;
     TEMPERATURE_CONTAINER<T_GRID>& temperature=fluids_parameters.temperature_container;
     DENSITY_CONTAINER<T_GRID>& density=fluids_parameters.density_container;

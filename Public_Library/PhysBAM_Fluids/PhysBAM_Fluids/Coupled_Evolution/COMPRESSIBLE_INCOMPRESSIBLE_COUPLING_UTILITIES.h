@@ -7,7 +7,6 @@
 #ifndef __COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES__
 #define __COMPRESSIBLE_INCOMPRESSIBLE_COUPLING_UTILITIES__
 #include <PhysBAM_Tools/Utilities/PHYSBAM_OVERRIDE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Compressible/Euler_Equations/INCOMPRESSIBLE_COMPRESSIBLE_COUPLING_CALLBACKS.h>
 namespace PhysBAM{
 template<class T> class EOS;

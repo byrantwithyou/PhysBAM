@@ -8,20 +8,19 @@
 #define __LAPLACE_COLLIDABLE__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class T_GRID>
 class LAPLACE_COLLIDABLE
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
 
 public:
     bool second_order_cut_cell_method;
     T second_order_cut_cell_threshold;
-    T_LEVELSET* levelset; // used in second order accurate cut cell method
+    LEVELSET<TV>* levelset; // used in second order accurate cut cell method
     T_FACE_ARRAYS_SCALAR u_interface; // interface boundary condition - 2nd order method
 
 protected:
@@ -32,7 +31,7 @@ public:
     virtual ~LAPLACE_COLLIDABLE()
     {}
 
-    virtual void Use_External_Level_Set(T_LEVELSET& cell_centered_levelset)
+    virtual void Use_External_Level_Set(LEVELSET<TV>& cell_centered_levelset)
     {levelset=&cell_centered_levelset;}
 
     virtual void Set_Up_Second_Order_Cut_Cell_Method(const bool use_second_order_cut_cell_method_input=true)

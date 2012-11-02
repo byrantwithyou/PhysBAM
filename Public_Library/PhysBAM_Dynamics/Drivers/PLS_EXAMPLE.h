@@ -12,7 +12,6 @@
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Boundaries/BOUNDARY_PHI_WATER.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_CALLBACKS.h>
@@ -26,7 +25,6 @@ class PLS_EXAMPLE:public LEVELSET_CALLBACKS<GRID<TV> >
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     typedef BOUNDARY_PHI_WATER<GRID<TV> > T_BOUNDARY_PHI_WATER;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<GRID<TV> >::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     enum workaround1{d=TV::m};
@@ -65,7 +63,7 @@ public:
     T Time_At_Frame(const int frame) const
     {return initial_time+(frame-first_frame)/frame_rate;}
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {V_levelset=face_velocities;}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE

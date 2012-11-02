@@ -50,7 +50,7 @@ public:
     void Simulate_To_Frame(const int frame_input) PHYSBAM_OVERRIDE;
     void Delete_Particles_Inside_Objects(const T time);
     template<class T_PARTICLES> void Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T time);
-    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<GRID<TV> >& phi,const T band_width);
+    void Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<TV>& phi,const T band_width);
     void Advance_Particles_With_PLS(T dt);
     void Extrapolate_Velocity_Across_Interface(T time,T dt);
 //#####################################################################

@@ -29,7 +29,7 @@ class SOLIDS_FLUIDS_EXAMPLE_UNIFORM:public SOLIDS_FLUIDS_EXAMPLE<typename T_GRID
     typedef typename T_GRID::VECTOR_INT T_VECTOR_INT;typedef typename T_GRID::NODE_ITERATOR NODE_ITERATOR;
     typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename T_ARRAYS_SCALAR::template REBIND<char>::TYPE T_ARRAYS_CHAR;typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;
-    typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
     typedef typename MATRIX_POLICY<TV>::TRANSFORMATION_MATRIX T_TRANSFORMATION_MATRIX;
     typedef typename TV::SPIN T_ANGULAR_VELOCITY;typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
     typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE;
@@ -52,7 +52,7 @@ public:
     SOLIDS_FLUIDS_EXAMPLE_UNIFORM(const STREAM_TYPE stream_type,const int number_of_regions,const typename FLUIDS_PARAMETERS<T_GRID>::TYPE type);
     virtual ~SOLIDS_FLUIDS_EXAMPLE_UNIFORM();
 
-    void Get_Levelset_Velocity(const T_GRID& grid,T_LEVELSET& levelset,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE
+    void Get_Levelset_Velocity(const T_GRID& grid,LEVELSET<TV>& levelset,T_FACE_ARRAYS_SCALAR& V_levelset,const T time) const PHYSBAM_OVERRIDE
     {if(fluids_parameters.analytic_test) Get_Analytic_Velocities(time);V_levelset=fluid_collection.incompressible_fluid_collection.face_velocities;}
 
     void Adjust_Particle_For_Domain_Boundaries(PARTICLE_LEVELSET_PARTICLES<TV>& particles,const int index,TV& V,const PARTICLE_LEVELSET_PARTICLE_TYPE particle_type,const T dt,const T time) PHYSBAM_OVERRIDE

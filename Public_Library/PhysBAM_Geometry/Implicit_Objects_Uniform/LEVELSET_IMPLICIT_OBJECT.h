@@ -10,7 +10,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
@@ -21,7 +20,6 @@ class LEVELSET_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     enum WORKAROUND {d=TV::m};
     typedef VECTOR<T,d-1> T_PRINCIPAL_CURVATURES;
 public:
@@ -29,7 +27,7 @@ public:
     typedef IMPLICIT_OBJECT<TV> BASE;
     using BASE::box;
 
-    T_LEVELSET levelset;
+    LEVELSET<TV> levelset;
     ARRAY<TV,TV_INT>* V;
     INTERPOLATION_UNIFORM<GRID<TV>,TV>* velocity_interpolation;
 private:

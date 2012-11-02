@@ -23,11 +23,11 @@ public:
     GRID<TV>& grid;
     ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus;
     ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus;
-    LEVELSET_2D<GRID<TV> >& levelset;
+    LEVELSET<TV>& levelset;
     OPENGL_VECTOR_FIELD_3D<T> minus;
     OPENGL_VECTOR_FIELD_3D<T> plus;
 
-    OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(GRID<TV>& grid,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus,LEVELSET_2D<GRID<TV> >& levelset);
+    OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D(GRID<TV>& grid,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_minus,ARRAY<VECTOR<T,2> ,VECTOR<int,2> >& V_plus,LEVELSET<TV>& levelset);
     virtual ~OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D();
 
 //#####################################################################

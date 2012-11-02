@@ -25,7 +25,7 @@ template<class T,class T2> class OPENGL_SCALAR_FIELD_3D;
 template<class T,class RW=T>
 class OPENGL_LEVELSET_MULTIVIEW:public OPENGL_OBJECT
 {
-    typedef VECTOR<T,3> TV;typedef LEVELSET_3D<GRID<TV> > T_LEVELSET;
+    typedef VECTOR<T,3> TV;
 public:
     enum COLOR_MODE {COLOR_SOLID,COLOR_GRADIENT}; // currently only used for slice mode
     COLOR_MODE color_mode;
@@ -42,7 +42,7 @@ private:
     bool generate_triangulated_surface;
     bool write_generated_triangulated_surface;
     bool use_marching_tetrahedra;
-    T_LEVELSET* levelset;
+    LEVELSET<TV>* levelset;
     LEVELSET_IMPLICIT_OBJECT<TV>* levelset_implicit_surface;
     TRIANGULATED_SURFACE<T>* triangulated_surface;
     bool i_own_levelset; 
@@ -70,7 +70,7 @@ public:
 
 //#####################################################################
     // First call one of these
-    void Set_Levelset(T_LEVELSET &levelset);
+    void Set_Levelset(LEVELSET<TV> &levelset);
     void Read_Levelset(const std::string& levelset_filename);
     // Then (optionally) call one of these
     const TRIANGULATED_SURFACE<T>* Get_Triangulated_Surface() const;
@@ -95,7 +95,7 @@ public:
     void Turn_Smooth_Shading_On() PHYSBAM_OVERRIDE;
     void Turn_Smooth_Shading_Off() PHYSBAM_OVERRIDE;
     void Slice_Has_Changed() PHYSBAM_OVERRIDE;
-    const T_LEVELSET *Levelset() const;
+    const LEVELSET<TV> *Levelset() const;
     void Update();
 private:
     void Initialize_Levelset();

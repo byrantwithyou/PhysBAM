@@ -4,6 +4,7 @@
 //#####################################################################
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Dynamics/Level_Sets/HAMILTON_JACOBI_2D.h>
 #include <PhysBAM_Dynamics/Level_Sets/HAMILTONIAN_2D.h>
 using namespace PhysBAM;

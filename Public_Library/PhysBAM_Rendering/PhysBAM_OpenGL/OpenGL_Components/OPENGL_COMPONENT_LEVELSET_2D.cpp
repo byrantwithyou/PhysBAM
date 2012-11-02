@@ -27,7 +27,7 @@ OPENGL_COMPONENT_LEVELSET_2D(const std::string& levelset_filename_input,const st
     opengl_levelsets.Resize(number_of_sets);
     OPENGL_INDEXED_COLOR_MAP* color_map=OPENGL_INDEXED_COLOR_MAP::Levelset_Multiple_Color_Map();
     for(int j=0;j<opengl_levelsets.m;j++)
-        opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(*(new LEVELSET_2D<GRID<TV> >(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
+        opengl_levelsets(j)=new OPENGL_LEVELSET_2D<T>(*(new LEVELSET<TV>(*(new GRID<TV>),*(new ARRAY<T,VECTOR<int,2> >))),color_map->Lookup(j),OPENGL_COLOR::Transparent());
     opengl_levelset=opengl_levelsets(0);
 
     is_animation=FILE_UTILITIES::Is_Animated(levelset_filename);

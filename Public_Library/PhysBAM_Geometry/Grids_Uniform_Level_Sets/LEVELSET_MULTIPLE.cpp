@@ -37,7 +37,7 @@ Recreate_Levelsets()
     assert(!use_external_levelsets);
     for(int i=0;i<levelsets.m;i++) delete levelsets(i);
     levelsets.Resize(phis.m);
-    for(int i=0;i<levelsets.m;i++) levelsets(i)=new FAST_LEVELSET<GRID<TV> >(grid,phis(i));
+    for(int i=0;i<levelsets.m;i++) levelsets(i)=new FAST_LEVELSET<TV>(grid,phis(i));
 }
 //#####################################################################
 // Function Fill_Ghost_Cells
@@ -291,7 +291,7 @@ Project_Levelset(const int number_of_ghost_cells)
 // Function Get_Single_Levelset
 //#####################################################################
 template<class T_GRID> void LEVELSET_MULTIPLE<T_GRID>::
-Get_Single_Levelset(const ARRAY<bool>& positive_regions,T_LEVELSET& levelset,const bool flood_fill_for_bubbles)
+Get_Single_Levelset(const ARRAY<bool>& positive_regions,LEVELSET<TV>& levelset,const bool flood_fill_for_bubbles)
 {
     ARRAY<T,TV_INT>& phi_ghost=levelset.phi;phi_ghost.Resize(grid.Domain_Indices(3));
     if(flood_fill_for_bubbles){

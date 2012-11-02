@@ -30,7 +30,7 @@ PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,const bool flame_input,const 
 // Constructor
 //#####################################################################
 template<class T_GRID> PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input)
+PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input)
     :PROJECTION_COLLIDABLE_UNIFORM<T_GRID>(mac_grid,levelset_input),PROJECTION_DYNAMICS<T>(false),use_flame_speed_multiplier(0),dsd(0),collidable_solver_save_for_sph(0)
 {
 }
@@ -67,7 +67,7 @@ Initialize_Dsd(const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const ARRAY<bo
 // Function Initialize_Dsd
 //#####################################################################
 template<class T_GRID> void PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-Initialize_Dsd(const T_LEVELSET& levelset,const ARRAY<bool>& fuel_region)
+Initialize_Dsd(const LEVELSET<TV>& levelset,const ARRAY<bool>& fuel_region)
 {
     int region=0;if(!fuel_region.Find(true,region)) PHYSBAM_FATAL_ERROR();//TODO: multiple fuel regions
     delete dsd;dsd=new DETONATION_SHOCK_DYNAMICS<T_GRID>(p_grid,levelset);
@@ -235,7 +235,7 @@ Flame_Speed_Face_Multiphase(const int axis,const TV_INT& face_index,const int fu
     TV_INT offset=TV_INT::Axis_Vector(axis);const TRIPLE<T,T,T>& constants=flame_speed_constants(fuel_region,product_region);
     const T normal_flame_speed=constants.x;const T curvature_flame_speed=constants.y;
     if(!curvature_flame_speed) return multiplier*normal_flame_speed;
-    const T_LEVELSET* levelset=poisson_collidable->levelset_multiple->levelsets(fuel_region);
+    const LEVELSET<TV>* levelset=poisson_collidable->levelset_multiple->levelsets(fuel_region);
     T face_curvature=(T).5*((*levelset->curvature)(face_index)+(*levelset->curvature)(face_index-offset));
     return multiplier*(normal_flame_speed+curvature_flame_speed*face_curvature);
 }
@@ -258,7 +258,7 @@ Face_Jump_Multiphase(const int axis,const TV_INT& face_index,const int current_r
     const TRIPLE<T,T,T>& constants=flame_speed_constants(current_region,face_region);
     if(constants.z==0) return 0; // getting the diagonal if the two regions are the same. i.e. .z will be zero and the jump will return as nothing
     TV_INT offset=TV_INT::Axis_Vector(axis);
-    const T_LEVELSET* levelset=poisson_collidable->levelset_multiple->levelsets(current_region);
+    const LEVELSET<TV>* levelset=poisson_collidable->levelset_multiple->levelsets(current_region);
     T face_normal=(levelset->phi(face_index)-levelset->phi(face_index-offset))*p_grid.one_over_dX[axis];
     return constants.z*Flame_Speed_Face_Multiphase(axis,face_index,current_region,face_region)*face_normal;
 }

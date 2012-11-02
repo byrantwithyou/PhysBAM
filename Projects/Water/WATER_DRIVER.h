@@ -8,7 +8,6 @@
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Solids_Geometry_Evolution/KINEMATIC_EVOLUTION.h>
 namespace PhysBAM{
 
@@ -20,7 +19,6 @@ class WATER_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     typedef typename ADVECTION_POLICY<GRID<TV> >::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;

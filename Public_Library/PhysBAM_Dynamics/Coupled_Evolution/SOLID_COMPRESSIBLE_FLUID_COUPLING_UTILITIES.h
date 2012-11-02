@@ -11,7 +11,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Advection_Collidable/ADVECTION_COLLIDABLE_UNIFORM_FORWARD.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/CUT_CELL.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 namespace PhysBAM{
 template<class TV> class GRID;
 template<class T,int d> class VECTOR;

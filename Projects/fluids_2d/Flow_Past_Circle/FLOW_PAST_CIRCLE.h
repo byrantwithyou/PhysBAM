@@ -30,7 +30,7 @@ public:
     T rho,rho_bottom,rho_top,buoyancy_constant;
     RANGE<TV> source_domain;
     ARRAY<T,TV_INT> phi_object;
-    LEVELSET_2D<GRID<TV> > levelset_object;
+    LEVELSET<TV> levelset_object;
     SPHERE<TV> circle;
     GEOMETRY_PARTICLES<TV> debug_particles;
     ARRAY<TV> sample_points;

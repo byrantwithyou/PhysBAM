@@ -181,7 +181,7 @@ Fill_Levelsets_From_Levelset_Color()
             phis(i)(it.index)=(c==i)?-p:p;}
 
     for(int i=0;i<bc_phis.m;i++){
-        FAST_LEVELSET<GRID<TV> > fl(grid,bc_phis(i),number_of_ghost_cells);
+        FAST_LEVELSET<TV> fl(grid,bc_phis(i),number_of_ghost_cells);
         Reinitialize(fl,number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);}
     for(int i=0;i<phis.m;i++)
         Reinitialize(*particle_levelset_evolution_multiple.particle_levelset_multiple.levelset_multiple.levelsets(i),number_of_ghost_cells*2,(T)0,number_of_ghost_cells*grid.dX.Max(),(T)0,(T).9,3,5,1);

@@ -6,18 +6,17 @@
 //#####################################################################
 #ifndef __SURFACE_TENSION_BOUNDARY_CONDITION__
 #define __SURFACE_TENSION_BOUNDARY_CONDITION__
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Dynamics/Coupled_Evolution/IMPLICIT_BOUNDARY_CONDITION.h>
 namespace PhysBAM{
 template<class TV>
 class SURFACE_TENSION_BOUNDARY_CONDITION:public IMPLICIT_BOUNDARY_CONDITION<TV>
 {
     typedef VECTOR<int,TV::dimension> TV_INT;typedef typename TV::SCALAR T;
-    const FAST_LEVELSET<GRID<TV> >& levelset;
+    const FAST_LEVELSET<TV>& levelset;
 public:
     T surface_tension_coefficient;
 
-    SURFACE_TENSION_BOUNDARY_CONDITION(const FAST_LEVELSET<GRID<TV> >& levelset,T surface_tension_boundary_condition_input);
+    SURFACE_TENSION_BOUNDARY_CONDITION(const FAST_LEVELSET<TV>& levelset,T surface_tension_boundary_condition_input);
     virtual ~SURFACE_TENSION_BOUNDARY_CONDITION();
 
     void Update_Boundary_Conditions(const GRID<TV>& grid,ARRAY<bool,TV_INT>& psi_D,ARRAY<bool,FACE_INDEX<TV::dimension> >& psi_N,ARRAY<T,TV_INT>& p,

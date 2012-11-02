@@ -149,7 +149,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
     DETONATION_SHOCK_DYNAMICS<T_GRID>& dsd=*fluids_parameters.incompressible_multiphase->projection.dsd;
     fluids_parameters.incompressible_multiphase->projection.dsd->Dn.array.Fill(Dn_initial);
     dsd.Dn.boundary->Fill_Ghost_Cells(dsd.Dn.grid,dsd.Dn.array,dsd.Dn.array,0,0,3); // TODO: use real time/dt
-    FAST_LEVELSET<GRID<TV> >& levelset=*fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(1);
+    FAST_LEVELSET<TV>& levelset=*fluids_parameters.particle_levelset_evolution_multiple->particle_levelset_multiple.levelset_multiple.levelsets(1);
     levelset.Compute_Curvature();dsd.curvature_old.array=*levelset.curvature;
 }
 //#####################################################################

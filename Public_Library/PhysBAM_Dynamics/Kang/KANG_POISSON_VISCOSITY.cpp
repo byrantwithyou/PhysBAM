@@ -46,12 +46,11 @@ template<class TV> KANG_POISSON_VISCOSITY<TV>::
 template<class TV> typename TV::SCALAR KANG_POISSON_VISCOSITY<TV>::
 Pressure_Jump(const TV_INT& cell,T dt) const
 {
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET LEVELSET;
-    const LEVELSET& phi=fluids_parameters.particle_levelset_evolution->Levelset(0);
+    const LEVELSET<TV>& phi=fluids_parameters.particle_levelset_evolution->Levelset(0);
     T kappa=phi.Compute_Curvature(cell);
     T pj_st=dt*fluids_parameters.surface_tension*kappa;
     TV du_n;
-    TV N=LEVELSET::Normal_At_Node(*fluids_parameters.grid,old_phi,cell);
+    TV N=LEVELSET<TV>::Normal_At_Node(*fluids_parameters.grid,old_phi,cell);
 
     for(int d=0;d<TV::m;d++){
         TV_INT cellp=cell,celln=cell;
@@ -79,9 +78,8 @@ Viscosity_Jump(const FACE_INDEX<TV::m>& face) const
 template<class TV> MATRIX<typename TV::SCALAR,TV::m> KANG_POISSON_VISCOSITY<TV>::
 Viscosity_Jump(const TV_INT& cell) const
 {
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET LEVELSET;
     MATRIX<T,TV::m> du;
-    TV N=LEVELSET::Normal_At_Node(*fluids_parameters.grid,old_phi,cell);
+    TV N=LEVELSET<TV>::Normal_At_Node(*fluids_parameters.grid,old_phi,cell);
 
     for(int d=0;d<TV::m;d++){
         TV_INT cellp=cell,celln=cell;

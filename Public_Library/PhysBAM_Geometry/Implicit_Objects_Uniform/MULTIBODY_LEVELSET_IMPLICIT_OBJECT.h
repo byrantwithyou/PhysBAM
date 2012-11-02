@@ -14,7 +14,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 namespace PhysBAM{
 
@@ -25,7 +24,6 @@ class MULTIBODY_LEVELSET_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<TV>
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
     typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     typedef typename BASIC_GEOMETRY_POLICY<TV>::ORIENTED_BOX T_ORIENTED_BOX;
 public:
     typedef IMPLICIT_OBJECT<TV> BASE;

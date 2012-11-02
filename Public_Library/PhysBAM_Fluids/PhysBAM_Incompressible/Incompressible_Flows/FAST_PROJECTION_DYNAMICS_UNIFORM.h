@@ -16,7 +16,7 @@ template<class T_GRID>
 class FAST_PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_DYNAMICS_UNIFORM<T_GRID>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::FACE_ARRAYS_SLIP T_FACE_ARRAYS_SLIP_SCALAR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -30,7 +30,7 @@ public:
     ARRAY<TV_INT,int> matrix_index_to_cell_index;
 
     FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false);
-    FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,T_LEVELSET& levelset_input);
+    FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,LEVELSET<TV>& levelset_input);
     virtual ~FAST_PROJECTION_DYNAMICS_UNIFORM();
 
 //#####################################################################

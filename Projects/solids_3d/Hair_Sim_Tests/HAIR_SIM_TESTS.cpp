@@ -427,7 +427,7 @@ Initialize_Bodies()
         GRID<TV>& grid_1=*new GRID<TV>;
         ARRAY<T,VECTOR<int,3> >& phi_1=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity_1=*new ARRAY<TV,VECTOR<int,3> >;
-        LEVELSET_3D<GRID<TV> > levelset_1(grid_1,phi_1);
+        LEVELSET<TV> levelset_1(grid_1,phi_1);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset_1);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_1);
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
@@ -436,7 +436,7 @@ Initialize_Bodies()
         GRID<TV> &grid_2=*new GRID<TV>;
         ARRAY<T,VECTOR<int,3> > &phi_2=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity_2=*new ARRAY<TV,VECTOR<int,3> >;
-        LEVELSET_3D<GRID<TV> > levelset_2(grid_2,phi_2);
+        LEVELSET<TV> levelset_2(grid_2,phi_2);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),++current_levelset),levelset_2);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity_2);
         LOG::cout<<"READING LEVELSET NUMBER: "<<current_levelset<<std::endl;
@@ -606,7 +606,7 @@ Update_Keyframed_Parameters_For_Time_Update_Helper(const T time,T_IMPLICIT_COMBI
         GRID<TV>& grid=*new GRID<TV>;
         ARRAY<T,VECTOR<int,3> >& phi=*new ARRAY<T,VECTOR<int,3> >;
         ARRAY<TV,VECTOR<int,3> >& velocity=*new ARRAY<TV,VECTOR<int,3> >;
-        LEVELSET_3D<GRID<TV> > levelset(grid,phi);
+        LEVELSET<TV> levelset(grid,phi);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/out.%d.phi",data_directory.c_str(),sim_folder.c_str(),current_levelset),levelset);
         FILE_UTILITIES::Read_From_File(stream_type,STRING_UTILITIES::string_sprintf("%s/%s/motion/velocities.%d",data_directory.c_str(),sim_folder.c_str(),current_levelset),velocity);
         LOG::cout<<"PRE object1="<<combined.implicit_object1<<" object2="<<combined.implicit_object2<<std::endl;
@@ -896,7 +896,7 @@ Write_Interpolated_Level_Set(const int frame,T_IMPLICIT_COMBINED& combined) cons
         GRID<TV> grid(levelset->levelset.grid.counts.x,levelset->levelset.grid.counts.y,levelset->levelset.grid.counts.z,combined.box);
         ARRAY<T,VECTOR<int,3> > phi(grid.Domain_Indices());
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++) phi(i,j,ij)=combined(grid.X(i,j,ij));
-        LEVELSET_3D<GRID<TV> > interpolated_levelset(grid,phi);
+        LEVELSET<TV> interpolated_levelset(grid,phi);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/grid.%d",output_directory.c_str(),frame),grid);
         FILE_UTILITIES::Write_To_File(stream_type,STRING_UTILITIES::string_sprintf("%s/levelset.%d",output_directory.c_str(),frame),interpolated_levelset);}
     else{

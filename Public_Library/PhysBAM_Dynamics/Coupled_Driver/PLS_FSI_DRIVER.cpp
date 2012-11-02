@@ -675,7 +675,7 @@ Delete_Particles_Inside_Objects(ARRAY<T_PARTICLES*,TV_INT>& particles,const PART
 // Function Extrapolate_Velocity_Across_Interface
 //#####################################################################
 template<class TV> void PLS_FSI_DRIVER<TV>::
-Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<GRID<TV> >& phi,const T band_width)
+Extrapolate_Velocity_Across_Interface(ARRAY<T,FACE_INDEX<TV::m> >& face_velocities,const FAST_LEVELSET<TV>& phi,const T band_width)
 {
     T_GRID& grid=*example.fluids_parameters.grid;
     ARRAY<bool,FACE_INDEX<TV::m> > inside;

@@ -8,7 +8,6 @@
 #define __LEVELSET_POLICY__
 namespace PhysBAM{
 
-template<class T_GRID> struct LEVELSET_POLICY;
 template<class T_GRID> class FAST_LEVELSET;
 template<class T,int d> class VECTOR;
 

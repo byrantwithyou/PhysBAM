@@ -504,7 +504,7 @@ Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time)
 // Function Adjust_Strain_For_Object
 //#####################################################################
 template<class T_GRID> void FLUIDS_PARAMETERS_UNIFORM<T_GRID>::
-Adjust_Strain_For_Object(T_LEVELSET& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time)
+Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time)
 {
     assert(!smoke && !fire);
     if(adhesion_coefficient==1 && !adhesion_normal_strain) return;

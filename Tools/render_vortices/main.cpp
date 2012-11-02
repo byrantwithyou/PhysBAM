@@ -24,7 +24,7 @@ void Run(const STREAM_TYPE& stream_type,const std::string& file)
 
     ARRAY<T,TV_INT> phi_array(grid.Domain_Indices(ghost));
 
-    LEVELSET_2D<GRID<VECTOR<T,2> > > phi(grid,phi_array);
+    LEVELSET<TV> phi(grid,phi_array);
 
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,ghost);it.Valid();it.Next()){
         T val=-FLT_MAX;

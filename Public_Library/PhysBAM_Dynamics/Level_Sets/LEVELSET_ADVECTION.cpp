@@ -12,7 +12,7 @@
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION.h>
 using namespace PhysBAM;
 template<class T_GRID> LEVELSET_ADVECTION<T_GRID>::
-LEVELSET_ADVECTION(T_LEVELSET* _levelset)
+LEVELSET_ADVECTION(LEVELSET<TV>* _levelset)
     :levelset(_levelset),advection(0),nested_semi_lagrangian_collidable(0),semi_lagrangian_collidable(0)
 {
     Set_Reinitialization_Runge_Kutta_Order();

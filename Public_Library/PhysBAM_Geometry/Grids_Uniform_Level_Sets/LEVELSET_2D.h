@@ -10,26 +10,24 @@
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Matrices/SYMMETRIC_MATRIX_2X2.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_UNIFORM.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_BASE.h>
 namespace PhysBAM{
 
-template<class T_GRID_input>
-class LEVELSET_2D:public LEVELSET_UNIFORM<T_GRID_input>
+template<class T>
+class LEVELSET<VECTOR<T,2> >:public LEVELSET_BASE<VECTOR<T,2> >
 {
-    typedef typename T_GRID_input::SCALAR T;typedef typename T_GRID_input::CELL_ITERATOR CELL_ITERATOR;
     typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
-    typedef T_GRID_input T_GRID;    
-    typedef LEVELSET_UNIFORM<T_GRID> BASE;
+    typedef LEVELSET_BASE<TV> BASE;
     using BASE::grid;using BASE::phi;using BASE::normals;using BASE::curvature;using BASE::cell_range;
     using BASE::collision_body_list;using BASE::refine_fmm_initialization_with_iterative_solver;using BASE::fmm_initialization_iterations;using BASE::fmm_initialization_iterative_tolerance;
-    using BASE::fmm_initialization_iterative_drift_fraction;using BASE::Hessian;
+    using BASE::fmm_initialization_iterative_drift_fraction;using BASE::Hessian;using BASE::thread_queue;
     using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;using BASE::max_time_step;
     using BASE::curvature_motion;using BASE::sigma;using BASE::interpolation;using BASE::Phi;using BASE::Extended_Phi;
     using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::collision_aware_interpolation_minus;using BASE::number_of_ghost_cells;
 
-    LEVELSET_2D(T_GRID& grid_input,ARRAY<T,VECTOR<int,2> >& phi_input,const int number_of_ghost_cells_input=3);
-    ~LEVELSET_2D();
+    LEVELSET(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,2> >& phi_input,const int number_of_ghost_cells_input=3);
+    ~LEVELSET();
 
     T Compute_Curvature(const VECTOR<int,2>& index) const
     {return Compute_Curvature(phi,index);}
@@ -40,11 +38,9 @@ public:
     void Compute_Curvature(const T time=0);
     T Compute_Curvature(const ARRAY<T,VECTOR<int,2> >& phi_input,const VECTOR<int,2>& index) const;
     T Compute_Curvature(const VECTOR<T,2>& location) const;
-    void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
 public:
     void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,2> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,2> >& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,2> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
-    void Fast_Marching_Method_Outside_Band(const T half_band_width,const T time=0,const T stopping_distance=0,int process_sign=0);
 public:
     T Approximate_Length(const T interface_thickness=3,const T time=0) const;
 //#####################################################################

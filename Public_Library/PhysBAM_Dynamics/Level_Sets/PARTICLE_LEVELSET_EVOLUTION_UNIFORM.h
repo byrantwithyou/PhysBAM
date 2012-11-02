@@ -44,7 +44,7 @@ public:
     virtual PARTICLE_LEVELSET_UNIFORM<T_GRID>& Particle_Levelset(const int i)
     {assert(i==0);return particle_levelset;}
 
-    virtual FAST_LEVELSET<GRID<TV> >& Levelset(const int i)
+    virtual FAST_LEVELSET<TV>& Levelset(const int i)
     {assert(i==0);return particle_levelset.levelset;}
     
     virtual FAST_LEVELSET_ADVECTION<GRID<TV> >& Levelset_Advection(const int i)

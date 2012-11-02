@@ -18,14 +18,14 @@ class DUALCONTOUR_3D:public NONCOPYABLE
 {
     typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    LEVELSET_3D<GRID<TV> >& levelset;
+    LEVELSET<TV>& levelset;
     ARRAY<VECTOR<int,4> > topology;
     ARRAY<int,TV_INT> vertices;
     ARRAY<TV> geometry;
     ARRAY<TV> normals;
     GRID<TV> grid; 
 
-    DUALCONTOUR_3D(LEVELSET_3D<GRID<TV> >& levelset_input)
+    DUALCONTOUR_3D(LEVELSET<TV>& levelset_input)
         :levelset(levelset_input)
     {
         if(levelset_input.grid.MAC_offset==(T).5) grid=levelset_input.grid.Get_Regular_Grid_At_MAC_Positions();else grid=levelset_input.grid;
@@ -34,7 +34,7 @@ public:
     void Dualcontour()
     {Generate_Topology();Generate_Vertices();Ensure_Vertices_In_Correct_Cells();}
     
-    static TRIANGULATED_SURFACE<T>* Create_Triangulated_Surface_From_Levelset(LEVELSET_3D<GRID<TV> >& levelset)
+    static TRIANGULATED_SURFACE<T>* Create_Triangulated_Surface_From_Levelset(LEVELSET<TV>& levelset)
     {DUALCONTOUR_3D<T> dualcontour(levelset);dualcontour.Dualcontour();return dualcontour.Get_Triangulated_Surface();} 
 
 //#####################################################################

@@ -38,7 +38,7 @@ Initialize_Phi(int ghost)
     phi_array.Resize(grid.Domain_Indices(ghost));
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid,ghost);it.Valid();it.Next())
         phi_array(it.index)=Theta(it.Location());
-    if(!phi) phi=new typename LEVELSET_POLICY<GRID<TV> >::LEVELSET(grid,phi_array);
+    if(!phi) phi=new LEVELSET<TV>(grid,phi_array);
 }
 
 template<class TV> void BOUNDARY_CONDITIONS<TV>::

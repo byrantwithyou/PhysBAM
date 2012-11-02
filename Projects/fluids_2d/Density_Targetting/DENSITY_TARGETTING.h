@@ -446,7 +446,7 @@ void Add_SPH_Particles_For_Sources(const ARRAY<ORIENTED_BOX<TV> > &sources,const
 //#####################################################################
 // Function Create_Levelset_From_Particles
 //#####################################################################
-void Create_Levelset_For_SPH(LEVELSET_2D<GRID<TV> > &levelset) const
+void Create_Levelset_For_SPH(LEVELSET<TV> &levelset) const
 {
     GRID<TV>& grid=*fluids_parameters.grid;
     for(CELL_ITERATOR iterator(grid);iterator.Valid();iterator.Next()) levelset.phi(iterator.Cell_Index())=fluids_parameters.sph_evolution->cell_weight(iterator.Cell_Index())>0?1:-1;

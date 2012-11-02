@@ -14,6 +14,7 @@
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Dynamics/Level_Sets/HAMILTON_JACOBI.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_UNIFORM.h>
 namespace PhysBAM{
@@ -21,11 +22,11 @@ namespace PhysBAM{
 template<class T> class HAMILTONIAN_3D;
 
 template<class T_input>
-class HAMILTON_JACOBI_3D:public HAMILTON_JACOBI,public LEVELSET_3D<GRID<VECTOR<T_input,3> > >,LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T_input,3> > >
+class HAMILTON_JACOBI_3D:public HAMILTON_JACOBI,public LEVELSET<VECTOR<T_input,3> >,LEVELSET_ADVECTION_UNIFORM<GRID<VECTOR<T_input,3> > >
 {
     typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
-    typedef LEVELSET_3D<GRID<TV> > BASE;
+    typedef LEVELSET<TV> BASE;
     using BASE::grid;using BASE::phi;using BASE::boundary;using BASE::max_time_step;
     using BASE::curvature;using BASE::curvature_motion;using BASE::sigma;using BASE::Compute_Curvature;
     using LEVELSET_ADVECTION_UNIFORM<GRID<TV> >::HJ_WENO;using LEVELSET_ADVECTION_UNIFORM<GRID<TV> >::HJ_ENO;
@@ -33,7 +34,7 @@ public:
     HAMILTONIAN_3D<T>& hamiltonian;
 
     HAMILTON_JACOBI_3D(HAMILTONIAN_3D<T>& hamiltonian_input,GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input) 
-        :LEVELSET_3D<GRID<TV> >(grid_input,phi_input),LEVELSET_ADVECTION_UNIFORM<GRID<TV> >((LEVELSET_3D<GRID<TV> >*)this),hamiltonian(hamiltonian_input)
+        :LEVELSET<TV>(grid_input,phi_input),LEVELSET_ADVECTION_UNIFORM<GRID<TV> >((LEVELSET<TV>*)this),hamiltonian(hamiltonian_input)
     {}
     
 //#####################################################################

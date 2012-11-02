@@ -12,9 +12,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/LAPLACE_COLLIDABLE_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 namespace PhysBAM{
@@ -23,16 +21,16 @@ namespace PhysBAM{
 //#####################################################################
 template<class T_GRID> LAPLACE_COLLIDABLE_UNIFORM<T_GRID>::
 LAPLACE_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,const bool initialize_grid,const bool multiphase_input,const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
-    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new T_LEVELSET(grid,phi_default))
+    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new LEVELSET<TV>(grid,phi_default))
 {
 }
 //#####################################################################
 // Constructor
 //#####################################################################
 template<class T_GRID> LAPLACE_COLLIDABLE_UNIFORM<T_GRID>::
-LAPLACE_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,T_LEVELSET& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
+LAPLACE_COLLIDABLE_UNIFORM(const T_GRID& grid_input,T_ARRAYS_SCALAR& u_input,LEVELSET<TV>& cell_centered_levelset,const bool initialize_grid,const bool multiphase_input,
     const bool enforce_compatibility_input,THREAD_QUEUE* thread_queue)
-    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new T_LEVELSET(grid,phi_default))
+    :BASE(grid_input,u_input,initialize_grid,enforce_compatibility_input,thread_queue),levelset_default(new LEVELSET<TV>(grid,phi_default))
 {
     levelset=&cell_centered_levelset;
 }

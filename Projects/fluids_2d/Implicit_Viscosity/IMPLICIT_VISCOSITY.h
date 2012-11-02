@@ -70,7 +70,7 @@ void Write_Matlab_Data_File(const int stepnumber)
     ARRAY<T,VECTOR<int,2> > output(1,m,1,n);
     char file_name[256];
 
-    ARRAY<T,VECTOR<int,2> > phi_temp(phi);LEVELSET_2D<T> levelset_temp(grid,phi_temp);levelset_temp.Reinitialize();//Fast_Marching_Method();
+    ARRAY<T,VECTOR<int,2> > phi_temp(phi);LEVELSET<TV> levelset_temp(grid,phi_temp);levelset_temp.Reinitialize();//Fast_Marching_Method();
     levelset_temp.Compute_Curvature();
     for(i=0;i<m;i++) for(j=0;j<n;j++) if(fabs(phi_temp(i,j)) > 5*grid.dx) (*levelset_temp.curvature)(i,j)=0; 
     

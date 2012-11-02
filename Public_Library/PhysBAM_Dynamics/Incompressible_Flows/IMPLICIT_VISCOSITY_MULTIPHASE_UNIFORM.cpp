@@ -89,7 +89,7 @@ Calculate_Velocity_Jump()
         int fuel_region=region_1,product_region=region_2;
         if(densities(region_1)<densities(region_2)){fuel_region=region_2;product_region=region_1;}
         const TRIPLE<T,T,T>& constants=flame_speed_constants(fuel_region,product_region);if(constants.z==0)continue;
-        const T_LEVELSET& levelset=*projection_dynamics.poisson_collidable->levelset_multiple->levelsets(fuel_region);
+        const LEVELSET<TV>& levelset=*projection_dynamics.poisson_collidable->levelset_multiple->levelsets(fuel_region);
         T flame_speed=constants.x;
         if(constants.y){T face_curvature;TV_INT p_face_index=face_index;
             if(iterator.Axis()==axis)face_curvature=(*levelset.curvature)(p_face_index-axis_offset);

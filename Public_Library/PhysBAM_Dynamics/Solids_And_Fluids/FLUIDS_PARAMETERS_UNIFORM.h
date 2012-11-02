@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <PhysBAM_Geometry/Grids_PDE_Linear/LAPLACE_COLLIDABLE_POLICY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>
@@ -38,7 +38,6 @@ class FLUIDS_PARAMETERS_UNIFORM:public FLUIDS_PARAMETERS<T_GRID>
     typedef typename REBIND<T_ARRAYS_SCALAR,PARTICLE_LEVELSET_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_PARTICLES;
     typedef typename REBIND<T_ARRAYS_SCALAR,PARTICLE_LEVELSET_REMOVED_PARTICLES<TV>*>::TYPE T_ARRAYS_PARTICLE_LEVELSET_REMOVED_PARTICLES;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename REBIND<T_FACE_ARRAYS_SCALAR,bool>::TYPE T_FACE_ARRAYS_BOOL;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef typename ADVECTION_POLICY<T_GRID>::ADVECTION_SEMI_LAGRANGIAN_SCALAR T_ADVECTION_SEMI_LAGRANGIAN_SCALAR;
     typedef typename REBIND<T_ADVECTION_SEMI_LAGRANGIAN_SCALAR,SYMMETRIC_MATRIX<T,TV::m> >::TYPE T_ADVECTION_SEMI_LAGRANGIAN_SYMMETRIC_MATRIX;
     typedef FACE_LOOKUP_COLLIDABLE_UNIFORM<T_GRID> T_FACE_LOOKUP_COLLIDABLE;typedef typename INTERPOLATION_POLICY<T_GRID>::FACE_LOOKUP T_FACE_LOOKUP;
@@ -146,7 +145,7 @@ public:
     void Blend_In_External_Velocity(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const T time);
     void Move_Grid(T_FACE_ARRAYS_SCALAR& face_velocities,const TV_INT& shift_domain,const T time);
-    void Adjust_Strain_For_Object(T_LEVELSET& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time);
+    void Adjust_Strain_For_Object(LEVELSET<TV>& levelset_object,T_ARRAYS_SYMMETRIC_MATRIX& e_ghost,const T time);
     void Combustion(const T dt,const T time);
     void Evolve_Soot(const T dt,const T time);
     void Sync_Parameters(FLUIDS_PARAMETERS_UNIFORM<T_GRID>& single_parameters,THREADED_UNIFORM_GRID<T_GRID>& threaded_grid);

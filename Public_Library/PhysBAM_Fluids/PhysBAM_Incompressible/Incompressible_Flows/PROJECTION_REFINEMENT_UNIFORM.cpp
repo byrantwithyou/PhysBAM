@@ -29,7 +29,7 @@ PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,const int scale,const T alp
 // Constructor
 //#####################################################################
 template<class T_GRID> PROJECTION_REFINEMENT_UNIFORM<T_GRID>::
-PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input,const int scale,const T alpha_in)
+PROJECTION_REFINEMENT_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input,const int scale,const T alpha_in)
     :PROJECTION_DYNAMICS_UNIFORM<T_GRID>(mac_grid,levelset_input),thread_queue(0),coarse_mpi_grid(0),fine_mpi_grid(0),fast_local_projection(scale),
      beta_face(poisson->beta_face),alpha(alpha_in),coarse_scale(scale)
 {

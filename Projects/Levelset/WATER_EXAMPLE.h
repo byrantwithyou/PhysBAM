@@ -14,7 +14,6 @@
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_PDE_Linear/PROJECTION_COLLIDABLE_UNIFORM.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 namespace PhysBAM{
@@ -24,7 +23,6 @@ class WATER_EXAMPLE
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
     enum workaround1{d=TV::m};
 
 public:
@@ -48,7 +46,7 @@ public:
     ADVECTION_SEMI_LAGRANGIAN_UNIFORM_BETA<GRID<TV>,T, AVERAGING_UNIFORM<GRID<TV>, FACE_LOOKUP_UNIFORM<GRID<TV> > >,LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,T,FACE_LOOKUP_UNIFORM<GRID<TV> > > > advection_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> boundary_scalar;
     BOUNDARY_UNIFORM<GRID<TV>,T> *boundary;
-    T_LEVELSET levelset;
+    LEVELSET<TV> levelset;
     VECTOR<VECTOR<bool,2>,TV::dimension> domain_boundary;    
     RANGE<TV> source;
     pthread_mutex_t lock;

@@ -7,7 +7,6 @@
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
 #include <PhysBAM_Tools/Grids_Uniform_Advection/ADVECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 
@@ -18,7 +17,6 @@ class PLS_FC_DRIVER
 {
     typedef typename TV::SCALAR T;
     typedef typename TV::template REBIND<int>::TYPE TV_INT;
-    typedef typename LEVELSET_POLICY<GRID<TV> >::LEVELSET T_LEVELSET;
 public:
 
     int current_frame;
@@ -38,6 +36,7 @@ public:
     void Simulate_To_Frame(const int frame_input);
     void Write_Output_Files(const int frame);
     void Write_Substep(const std::string& title,const int substep,const int level=0);
+    void Update_Level_Set(T dt,bool first_step);
     void Advection_And_BDF(T dt,bool first_step);
     void Apply_Pressure_And_Viscosity(T dt,bool first_step);
     void Extrapolate_Velocity(ARRAY<ARRAY<T,FACE_INDEX<TV::dimension> > >& u,const ARRAY<int,FACE_INDEX<TV::dimension> >& color);

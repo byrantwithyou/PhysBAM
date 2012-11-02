@@ -135,7 +135,7 @@ Initialize()
     example.incompressible.projection.elliptic_solver->pcg.evolution_solver_type=krylov_solver_cg;
     example.incompressible.projection.elliptic_solver->pcg.cg_restart_iterations=40;
     example.incompressible.projection.elliptic_solver->pcg.Show_Results();
-    example.incompressible.projection.collidable_solver->Use_External_Level_Set(*new T_LEVELSET(example.coarse_mac_grid,example.coarse_phi));
+    example.incompressible.projection.collidable_solver->Use_External_Level_Set(*new LEVELSET<TV>(example.coarse_mac_grid,example.coarse_phi));
 
     {
         example.particle_levelset_evolution.Initialize_Domain(example.fine_mac_grid);

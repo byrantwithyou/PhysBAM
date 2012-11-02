@@ -19,7 +19,7 @@ class SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT:public IMPLICIT_OBJECT<VECTOR<T_inpu
 public:
     GRID<VECTOR<T,2> > slice_grid;
     ARRAY<T,VECTOR<int,2> > slice_phi;
-    LEVELSET_2D<GRID<VECTOR<T,2> > > slice_levelset;
+    LEVELSET<VECTOR<T,2> > slice_levelset;
     T width,height,tolerance;
 
     SURFACE_OF_REVOLUTION_IMPLICIT_OBJECT(std::string& filename,const T width_input,const T height_input,const T tolerance_input=1e-6)

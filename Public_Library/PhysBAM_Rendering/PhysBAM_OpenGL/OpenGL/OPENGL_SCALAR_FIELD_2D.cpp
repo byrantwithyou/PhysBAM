@@ -321,7 +321,7 @@ Update_Contour_Curves()
 template<> void OPENGL_SCALAR_FIELD_2D<float,float>::
 Update_Contour_Curves()
 {
-    LEVELSET_2D<GRID<TV> > scalar_field_as_levelset(grid,values);
+    LEVELSET<TV> scalar_field_as_levelset(grid,values);
     OPENGL_COLOR_MAP<float>* color_map=color_maps(current_color_map);
     for(int i=0;i<contour_curves.m;i++) delete contour_curves(i);
     if(!values.counts.Contains(0)){
@@ -335,7 +335,7 @@ Update_Contour_Curves()
 template<> void OPENGL_SCALAR_FIELD_2D<double,double>::
 Update_Contour_Curves()
 {
-    LEVELSET_2D<GRID<TV> > scalar_field_as_levelset(grid,values);
+    LEVELSET<TV> scalar_field_as_levelset(grid,values);
     OPENGL_COLOR_MAP<double>* color_map=color_maps(current_color_map);
     for(int i=0;i<contour_curves.m;i++) delete contour_curves(i);
     if(!values.counts.Contains(0)){

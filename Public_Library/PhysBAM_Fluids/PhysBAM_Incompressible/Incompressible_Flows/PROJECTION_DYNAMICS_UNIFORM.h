@@ -21,7 +21,7 @@ template<class T_GRID>
 class PROJECTION_DYNAMICS_UNIFORM:public PROJECTION_COLLIDABLE_UNIFORM<T_GRID>,public PROJECTION_DYNAMICS<typename T_GRID::SCALAR>
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename T_GRID::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
+    typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;typedef ARRAYS_ND_BASE<T,TV_INT> T_ARRAYS_BASE;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename INTERPOLATION_COLLIDABLE_POLICY<T_GRID>::FACE_ARRAYS_SLIP T_FACE_ARRAYS_SLIP_SCALAR;
     typedef typename T_GRID::FACE_ITERATOR FACE_ITERATOR;typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;
     typedef typename T_FACE_ARRAYS_SCALAR::template REBIND<bool>::TYPE T_FACE_ARRAYS_BOOL;
@@ -48,7 +48,7 @@ protected:
 public:
 
     PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,const bool flame_input=false,const bool multiphase=false,const bool use_variable_beta=false,const bool use_poisson=false,THREAD_QUEUE* thread_queue=0);
-    PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,T_LEVELSET& levelset_input);
+    PROJECTION_DYNAMICS_UNIFORM(const T_GRID& mac_grid,LEVELSET<TV>& levelset_input);
     virtual ~PROJECTION_DYNAMICS_UNIFORM();
 
     T Face_Velocity_With_Ghost_Value_Multiphase(const T_ARRAYS_BASE& face_velocities_ghost,const int axis,const TV_INT& face_index,const int current_region) const
@@ -69,7 +69,7 @@ public:
 //#####################################################################
     virtual void Initialize_Grid(const T_GRID& mac_grid);
     void Initialize_Dsd(const LEVELSET_MULTIPLE<T_GRID>& levelset_multiple,const ARRAY<bool>& is_fuel_region);
-    void Initialize_Dsd(const T_LEVELSET& levelset,const ARRAY<bool>& fuel_region);
+    void Initialize_Dsd(const LEVELSET<TV>& levelset,const ARRAY<bool>& fuel_region);
     virtual void Make_Divergence_Free(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time);
     void Compute_Divergence(const T_FACE_LOOKUP_FIRE_MULTIPHASE& face_lookup,LAPLACE_UNIFORM<T_GRID>* solver);
     void Apply_Pressure(T_FACE_ARRAYS_SCALAR& face_velocities,const T dt,const T time,bool scale_by_dt=false);

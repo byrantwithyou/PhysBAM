@@ -13,20 +13,20 @@ using namespace PhysBAM;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class T> LEVELSET_1D<T>::
-LEVELSET_1D(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,1> >& phi_input,const int number_of_ghost_cells_input)
-    :LEVELSET_UNIFORM<GRID<TV> >(grid_input,phi_input,number_of_ghost_cells_input)
+template<class T> LEVELSET<VECTOR<T,1> >::
+LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input)
+    :LEVELSET_BASE<TV>(grid_input,phi_input,number_of_ghost_cells_input)
 {}
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class T> LEVELSET_1D<T>::
-~LEVELSET_1D()
+template<class T> LEVELSET<VECTOR<T,1> >::
+~LEVELSET()
 {}
 //#####################################################################
 // Function Principal_Curvatures
 //#####################################################################
-template<class T> VECTOR<T,0> LEVELSET_1D<T>::
+template<class T> VECTOR<T,0> LEVELSET<VECTOR<T,1> >::
 Principal_Curvatures(const VECTOR<T,1>& X) const
 {
     return VECTOR<T,0>(); // not much curvature in 1D
@@ -35,74 +35,48 @@ Principal_Curvatures(const VECTOR<T,1>& X) const
 // Function Compute_Normals
 //#####################################################################
 // note that abs(phix)=1 if it's a distance function
-template<class T> void LEVELSET_1D<T>::
+template<class T> void LEVELSET<VECTOR<T,1> >::
 Compute_Normals(const T time)
 {
     T one_over_two_dx=1/(2*grid.dX.x);
     int ghost_cells=3;
-    ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
         
-    if(!normals) normals=new ARRAY<VECTOR<T,1> ,VECTOR<int,1> >(grid.Domain_Indices(ghost_cells-1));
+    if(!normals) normals=new ARRAY<VECTOR<T,1> ,TV_INT>(grid.Domain_Indices(ghost_cells-1));
     for(int i=normals->domain.min_corner.x;i<normals->domain.max_corner.x;i++)(*normals)(i)=VECTOR<T,1>((phi_ghost(i+1)-phi_ghost(i-1))*one_over_two_dx).Normalized();
 }
 //#####################################################################
 // Function Compute_Curvature
 //#####################################################################
-template<class T> void LEVELSET_1D<T>::
+template<class T> void LEVELSET<VECTOR<T,1> >::
 Compute_Curvature(const T time)
 {      
-    if(!curvature) curvature=new ARRAY<T,VECTOR<int,1> >(grid.counts.x,2);
-}
-//#####################################################################
-// Function Compute_Cell_Minimum_And_Maximum
-//#####################################################################
-template<class T> void LEVELSET_1D<T>::
-Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
-{
-    if(!recompute_if_exists && cell_range) return;
-    if(!cell_range) cell_range=new ARRAY<RANGE<VECTOR<T,1> >,VECTOR<int,1> >(phi.domain.min_corner.x,phi.domain.max_corner.x-1);
-    for(int i=phi.domain.min_corner.x;i<phi.domain.max_corner.x-1;i++){
-        T phi1=phi(i),phi2=phi(i+1);
-        (*cell_range)(i)=RANGE<VECTOR<T,1> >(min(phi1,phi2),max(phi1,phi2));}
+    if(!curvature) curvature=new ARRAY<T,TV_INT>(grid.counts.x,2);
 }
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class T> void LEVELSET_1D<T>::
-Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<VECTOR<int,1> >* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
+template<class T> void LEVELSET<VECTOR<T,1> >::
+Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
-template<class T> void LEVELSET_1D<T>::
-Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,1> >& signed_distance,const T time,const T stopping_distance,const ARRAY<VECTOR<int,1> >* seed_indices,
+template<class T> void LEVELSET<VECTOR<T,1> >::
+Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,
         const bool add_seed_indices_for_ghost_cells,int process_sign)
 {       
     const int ghost_cells=2*number_of_ghost_cells+1;
-    ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells);
     fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
-    ARRAY<T,VECTOR<int,1> >::Get(signed_distance,phi_ghost);
+    ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
     boundary->Apply_Boundary_Condition(grid,signed_distance,time);
 }
 //#####################################################################
-// Function Fast_Marching_Method_Outside_Band
-//#####################################################################
-template<class T> void LEVELSET_1D<T>::
-Fast_Marching_Method_Outside_Band(const T half_band_width,const T time,const T stopping_distance,int process_sign)
-{              
-    int m=grid.counts.x;
-    int ghost_cells=number_of_ghost_cells;
-    ARRAY<T,VECTOR<int,1> > phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,0,false,process_sign);
-    for(int i=0;i<m;i++) if(abs(phi_ghost(i)) > half_band_width) phi(i)=phi_ghost(i);
-    boundary->Apply_Boundary_Condition(grid,phi,time);
-}
-//#####################################################################
-template class LEVELSET_1D<float>;
+template class LEVELSET<VECTOR<float,1> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class LEVELSET_1D<double>;
+template class LEVELSET<VECTOR<double,1> >;
 #endif

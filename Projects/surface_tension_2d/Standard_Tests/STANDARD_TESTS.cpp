@@ -465,7 +465,7 @@ Adjust_Phi_With_Objects(const T time)
 template<class T> void STANDARD_TESTS<T>::
 Sync_Particle_To_Level_Set(int p)
 {
-    const T_LEVELSET& levelset=fluids_parameters.particle_levelset_evolution->Levelset(1);
+    const LEVELSET<TV>& levelset=fluids_parameters.particle_levelset_evolution->Levelset(1);
     TV& X=front_tracked_structure->particles.X(p);
     X-=levelset.Extended_Phi(X)*levelset.Extended_Normal(X);
 }

@@ -166,11 +166,11 @@ Initialize_Bodies()
     if(test_number==16){
         GRID<VECTOR<T,3> > armadillo_temp_grid;
         ARRAY<T,VECTOR<int,3> > armadillo_temp_phi;
-        LEVELSET_3D<GRID<VECTOR<T,3> > > armadillo_temp(armadillo_temp_grid,armadillo_temp_phi);
+        LEVELSET<VECTOR<T,3> > armadillo_temp(armadillo_temp_grid,armadillo_temp_phi);
         FILE_UTILITIES::Read_From_File<float>(example.data_directory+"/Rigid_Bodies/armadillo_high_res.phi",armadillo_temp);
-        armadillo=new T_LEVELSET(*(new T_GRID(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(0))));
+        armadillo=new LEVELSET<TV>(*(new T_GRID(*fluids_parameters.grid)),*(new T_ARRAYS_SCALAR(fluids_parameters.grid->Domain_Indices(0))));
         for(CELL_ITERATOR iterator(*fluids_parameters.grid,1);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();
-            VECTOR<T,3> vec=VECTOR<T,3>(iterator.Location());exchange(vec.x,vec.z);
+            VECTOR<T,3> vec(iterator.Location());exchange(vec.x,vec.z);
             if(T_GRID::dimension==3){armadillo->phi(cell)=armadillo_temp.Extended_Phi((vec-VECTOR<T,3>((T).5,(T).35,(T).5+(T).07*vec.y))*(T)145)/(T)145;}
             else{
                 armadillo->phi(cell)=1;

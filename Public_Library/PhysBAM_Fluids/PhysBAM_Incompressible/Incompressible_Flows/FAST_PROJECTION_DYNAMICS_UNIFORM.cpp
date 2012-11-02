@@ -17,7 +17,7 @@ FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,const bool flame_input,const bo
 // Constructor
 //#####################################################################
 template<class T_GRID> FAST_PROJECTION_DYNAMICS_UNIFORM<T_GRID>::
-FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,T_LEVELSET& levelset_input)
+FAST_PROJECTION_DYNAMICS_UNIFORM(const int scale,LEVELSET<TV>& levelset_input)
     :PROJECTION_DYNAMICS_UNIFORM<T_GRID>(GRID<TV>(TV_INT::All_Ones_Vector()*scale,RANGE<TV>(TV(),TV::All_Ones_Vector()),true),levelset_input)
 {
 }

@@ -55,7 +55,7 @@ Advance_One_Time_Step_Convection(const T dt,const T time,T_FACE_ARRAYS_SCALAR& a
         T_FACE_ARRAYS_SCALAR face_velocities_liquid=face_velocities_to_advect;T_FACE_ARRAYS_SCALAR advection_face_velocities_ghost_extrapolated=advection_face_velocities_ghost;
         T_FACE_ARRAYS_SCALAR face_velocities_to_advect_ghost_extrapolated=face_velocities_to_advect_ghost;
         T_ARRAYS_SCALAR phi_for_pseudo_dirichlet_regions;T_GRID grid_temp(grid);
-        FAST_LEVELSET<GRID<TV> > levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
+        FAST_LEVELSET<TV> levelset_for_pseudo_dirichlet_regions(grid_temp,phi_for_pseudo_dirichlet_regions);
         projection.poisson_collidable->levelset_multiple->Get_Single_Levelset(*pseudo_dirichlet_regions,levelset_for_pseudo_dirichlet_regions,false);
         Extrapolate_Velocity_Across_Interface(advection_face_velocities_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
         Extrapolate_Velocity_Across_Interface(face_velocities_to_advect_ghost_extrapolated,phi_for_pseudo_dirichlet_regions);
@@ -285,7 +285,7 @@ Set_Dirichlet_Boundary_Conditions(ARRAY<T_ARRAYS_SCALAR>& phis,const ARRAY<bool>
 // Function Add_Surface_Tension
 //#####################################################################
 template<class T_GRID> void INCOMPRESSIBLE_MULTIPHASE_UNIFORM<T_GRID>::
-Add_Surface_Tension(T_LEVELSET& levelset,const T time)
+Add_Surface_Tension(LEVELSET<TV>& levelset,const T time)
 {
     LAPLACE_UNIFORM<T_GRID>& elliptic_solver=*projection.elliptic_solver;T_GRID& p_grid=elliptic_solver.grid;
     LAPLACE_COLLIDABLE<T_GRID>& collidable_solver=*projection.collidable_solver;
@@ -328,7 +328,7 @@ Compute_Vorticity_Confinement_Force(const T_GRID& grid,const T_FACE_ARRAYS_SCALA
         VORTICITY_UNIFORM<TV>::Vorticity(grid,face_velocities_lookup,vorticity,vorticity_magnitude);}
     else VORTICITY_UNIFORM<TV>::Vorticity(grid,FACE_LOOKUP_UNIFORM<T_GRID>(face_velocities_ghost),vorticity,vorticity_magnitude);
     for(CELL_ITERATOR iterator(grid,1);iterator.Valid();iterator.Next()){
-        TV vortex_normal_vector=T_LEVELSET::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());
+        TV vortex_normal_vector=LEVELSET<TV>::Normal_At_Node(grid,vorticity_magnitude,iterator.Cell_Index());
         F(iterator.Cell_Index())=TV::Cross_Product(vortex_normal_vector,vorticity(iterator.Cell_Index()));}
 }
 //#####################################################################

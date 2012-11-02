@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Level_Sets/FAST_LEVELSET_ADVECTION.h>
 using namespace PhysBAM;
@@ -122,7 +122,7 @@ Euler_Step_High_Order_Helper(const GRID<VECTOR<T,3> >& grid,const ARRAY<VECTOR<T
 template<class T_GRID> void FAST_LEVELSET_ADVECTION<T_GRID>::
 Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of_ghost_cells)
 {
-    FAST_LEVELSET<GRID<TV> >* fl=(FAST_LEVELSET<GRID<TV> >*)levelset;
+    FAST_LEVELSET<TV>* fl=(FAST_LEVELSET<TV>*)levelset;
     T_GRID& grid=fl->grid;
     T_ARRAYS_SCALAR& phi=fl->phi;
     T_ARRAYS_SCALAR phi_ghost(grid.Domain_Indices(number_of_ghost_cells));fl->boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,number_of_ghost_cells);
@@ -146,7 +146,7 @@ Euler_Step(const ARRAY<TV,TV_INT>& V,const T dt,const T time,const int number_of
 template<class T_GRID> void FAST_LEVELSET_ADVECTION<T_GRID>::
 Euler_Step(const T_FACE_ARRAYS_SCALAR& V,const T dt,const T time,const int number_of_ghost_cells)
 {
-    FAST_LEVELSET<GRID<TV> >* fl=(FAST_LEVELSET<GRID<TV> >*)levelset;
+    FAST_LEVELSET<TV>* fl=(FAST_LEVELSET<TV>*)levelset;
     T_GRID& grid=fl->grid;
     T_ARRAYS_SCALAR& phi=fl->phi;
     

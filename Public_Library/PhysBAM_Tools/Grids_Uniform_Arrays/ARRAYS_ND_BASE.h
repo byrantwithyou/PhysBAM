@@ -260,6 +260,9 @@ public:
     int Standard_Index(const TV_INT& index) const
     {assert(Valid_Index(index));return Compute_Index(index-domain.min_corner);}
 
+    TV_INT Strides() const
+    {TV_INT strides;strides(TV_INT::m-1)=1;for(int i=TV_INT::m-1;i>0;i--) strides(i-1)=strides(i)*counts(i);return strides;}
+
     TV_INT Clamp(const TV_INT& i) const
     {return domain.Clamp(i);}
 

@@ -15,7 +15,6 @@
 #define __WATER_STANDARD_TESTS_MULTIPHASE__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_POLICY_UNIFORM.h>
 namespace PhysBAM{
 
 template<class T_GRID> class SOLIDS_FLUIDS_EXAMPLE_UNIFORM;
@@ -27,7 +26,7 @@ template<class T_GRID,class T_WATER_STANDARD_TESTS>
 class WATER_STANDARD_TESTS_MULTIPHASE:public T_WATER_STANDARD_TESTS
 {
     typedef typename T_GRID::VECTOR_T TV;typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;
-    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
+    typedef typename T_GRID::CELL_ITERATOR CELL_ITERATOR;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
 public:
     typedef T_WATER_STANDARD_TESTS BASE;
     using BASE::world_to_source;using BASE::rigid_body_collection;using BASE::sources;using BASE::fluids_parameters;using BASE::grid;using BASE::example;using BASE::Initial_Phi;using BASE::sphere;
@@ -40,7 +39,7 @@ public:
     bool use_open_wall;
     int air_region;
 
-    T_LEVELSET* armadillo;
+    LEVELSET<TV>* armadillo;
     
     WATER_STANDARD_TESTS_MULTIPHASE(SOLIDS_FLUIDS_EXAMPLE_UNIFORM<T_GRID>& example,FLUIDS_PARAMETERS_UNIFORM<T_GRID>& fluids_parameters_input,FLUID_COLLECTION<TV>& fluid_collection_input,
         RIGID_BODY_COLLECTION<TV>& rigid_body_collection_input);

@@ -39,7 +39,6 @@ class STRAWMAN_EXAMPLE : public EXAMPLE<TV>,LEVELSET_CALLBACKS<GRID<TV> >
     typedef GRID<TV> T_GRID;
     typedef ARRAY<T,TV_INT> T_ARRAY_SCALAR;
     typedef typename COLLISION_GEOMETRY_COLLECTION_POLICY<T_GRID>::GRID_BASED_COLLISION_GEOMETRY T_GRID_BASED_COLLISION_GEOMETRY;
-    typedef typename LEVELSET_POLICY<T_GRID>::LEVELSET T_LEVELSET;
     typedef BOUNDARY_PHI_WATER<T_GRID> T_BOUNDARY_PHI_WATER;
 
 public:
@@ -92,7 +91,7 @@ public:
     inline T solid_position(const T& time) const
     {return initial_distance+solid_velocity*time;}
 
-    void Get_Levelset_Velocity(const GRID<TV>& grid,T_LEVELSET& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
+    void Get_Levelset_Velocity(const GRID<TV>& grid,LEVELSET<TV>& levelset,ARRAY<T,FACE_INDEX<TV::dimension> >& V_levelset,const T time) const PHYSBAM_OVERRIDE {
         for(typename T_GRID::FACE_ITERATOR iterator(grid);iterator.Valid();iterator.Next())
             V_levelset(iterator.Full_Index())=fluid_velocity_field(iterator.Location(),time)(iterator.Axis());
     }
