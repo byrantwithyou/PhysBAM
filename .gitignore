@@ -56,3 +56,10 @@ Projects/pls/pls_debug
 Projects/refinement/refinement_debug
 Projects/refinement_pls/refinement_pls_debug
 Projects/scalable_rigids/scalable_rigids_debug
+Projects/fluids_color_3d/fluids_color_3d
+Projects/fluids_color_3d/fluids_color_3d_debug
+Projects/integration_test/levelset_color
+Projects/integration_test/levelset_color_debug
+Projects/integration_test/test
+Projects/integration_test/test_debug
+Projects/level_set_cutting_2d/fracture3a_debug
