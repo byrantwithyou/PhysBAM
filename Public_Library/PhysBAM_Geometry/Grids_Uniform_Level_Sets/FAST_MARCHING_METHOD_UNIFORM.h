@@ -36,7 +36,6 @@ public:
 //#####################################################################
     void Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
-    void Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& seed_indices,const T stopping_distance=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Initialize_Interface_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,T_ARRAYS_SCALAR& phi_new,ARRAY<bool,TV_INT>& done);
 private:
     void Update_Or_Add_Neighbor(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,ARRAY<int,TV_INT>& close_k,ARRAY<TV_INT>& heap,int& heap_length,const TV_INT& neighbor);

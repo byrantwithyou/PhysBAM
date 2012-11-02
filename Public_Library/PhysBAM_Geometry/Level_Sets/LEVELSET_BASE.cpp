@@ -298,6 +298,27 @@ Compute_Curvature(const TV& location) const
 
     return LINEAR_INTERPOLATION<T,T>::Linear(k,w);
 }
+//#####################################################################
+// Function Fast_Marching_Method
+//#####################################################################
+template<class TV> void LEVELSET_BASE<TV>::
+Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
+{
+    Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
+}
+//#####################################################################
+// Function Get_Signed_Distance_Using_FMM
+//#####################################################################
+template<class TV> void LEVELSET_BASE<TV>::
+Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
+{
+    const int ghost_cells=2*number_of_ghost_cells+1;
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(static_cast<LEVELSET<TV>&>(*this),ghost_cells,thread_queue);
+    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
+    ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
+    boundary->Apply_Boundary_Condition(grid,signed_distance,time);
+}
 template class LEVELSET_BASE<VECTOR<float,1> >;
 template class LEVELSET_BASE<VECTOR<float,2> >;
 template class LEVELSET_BASE<VECTOR<float,3> >;

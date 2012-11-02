@@ -53,48 +53,6 @@ Principal_Curvatures(const TV& X) const
     return VECTOR<T,2>(quadratic.root1,quadratic.root2);
 }
 //#####################################################################
-// Function Fast_Marching_Method
-//#####################################################################
-template<class T> void LEVELSET<VECTOR<T,3> >::
-Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
-{
-    Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
-}
-//#####################################################################
-// Function Fast_Marching_Method
-//#####################################################################
-template<class T> void LEVELSET<VECTOR<T,3> >::
-Fast_Marching_Method(ARRAY<bool,TV_INT>& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
-{
-    Get_Signed_Distance_Using_FMM(phi,seed_indices,time,stopping_distance,add_seed_indices_for_ghost_cells,process_sign);
-}
-//#####################################################################
-// Function Get_Signed_Distance_Using_FMM
-//#####################################################################
-template<class T> void LEVELSET<VECTOR<T,3> >::
-Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
-{
-    const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
-    ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
-    boundary->Apply_Boundary_Condition(grid,signed_distance,time);
-}
-//#####################################################################
-// Function Get_Signed_Distance_Using_FMM
-//#####################################################################
-template<class T> void LEVELSET<VECTOR<T,3> >::
-Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,ARRAY<bool,TV_INT>& seed_indices,const T time,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
-{
-    const int ghost_cells=max(2*number_of_ghost_cells+1,1-phi.Domain_Indices().Minimum_Corner()(0));
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-    FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(*this,ghost_cells,thread_queue);
-    fmm.Fast_Marching_Method(phi_ghost,seed_indices,stopping_distance,add_seed_indices_for_ghost_cells,process_sign);
-    ARRAY<T,TV_INT>::Get(signed_distance,phi_ghost);
-    boundary->Apply_Boundary_Condition(grid,signed_distance,time);
-}
-//#####################################################################
 // Function Approximate_Surface_Area
 //#####################################################################
 // calculates the approximate perimeter using delta functions

@@ -34,34 +34,6 @@ template<class T_GRID> FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
 Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
-    /*int heap_length=0;
-    ARRAY<bool,TV_INT> done(cell_grid.Domain_Indices(ghost_cells+1));
-    T_ARRAYS_INT close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
-    close_k.Fill(-1);
-    ARRAY<TV_INT> heap(cell_grid.Domain_Indices().Thickened(ghost_cells).Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
-    Initialize_Interface(phi_ghost,done,close_k,heap,heap_length,seed_indices,add_seed_indices_for_ghost_cells);
-
-    while(heap_length != 0){
-        TV_INT index=heap(0); // smallest point is on top of heap
-        if(stopping_distance && abs(phi_ghost(index)) > stopping_distance){ // exit early
-            for(CELL_ITERATOR iterator(cell_grid);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
-                phi_ghost(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_ghost(iterator.Cell_Index()))*stopping_distance;}
-            return;}
-        done(index)=true;close_k(index)=-1; // add to done, remove from close
-        FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
-
-        if(levelset.collision_body_list)
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-                if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && Neighbor_Visible(axis,index))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}
-        else
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-                if(index[axis] != dimension_start[axis] && !done(index-axis_vector))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}}*/
     DOMAIN_ITERATOR_THREADED_ALPHA<FAST_MARCHING_METHOD_UNIFORM<T_GRID>,TV>(cell_grid.Domain_Indices(ghost_cells),thread_queue,1,ghost_cells,2,1).template Run<T_ARRAYS_SCALAR&,T,const ARRAY<TV_INT>*,bool,int>(*this,&FAST_MARCHING_METHOD_UNIFORM<T_GRID>::Fast_Marching_Method_Threaded,phi_ghost,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
 }
 //#####################################################################
@@ -105,42 +77,6 @@ Fast_Marching_Method_Threaded(RANGE<TV_INT>& domain,T_ARRAYS_SCALAR& phi_ghost,c
 
     RANGE<TV_INT> interior_domain=domain.Thickened(-ghost_cells);
     for(CELL_ITERATOR iterator(cell_grid,interior_domain);iterator.Valid();iterator.Next()){TV_INT cell=iterator.Cell_Index();phi_ghost(cell)=phi_new(cell);}
-}
-//#####################################################################
-// Function Fast_Marching_Method
-//#####################################################################
-template<class T_GRID> void FAST_MARCHING_METHOD_UNIFORM<T_GRID>::
-Fast_Marching_Method(T_ARRAYS_SCALAR& phi_ghost,ARRAY<bool,TV_INT>& done,const T stopping_distance,const bool add_seed_indices_for_ghost_cells,int process_sign)
-{
-    int heap_length=0;
-    ARRAY<int,TV_INT> close_k(cell_grid.Domain_Indices(ghost_cells+1),false); // extra cell so that it is the same size as the done array for optimizations
-    close_k.Fill(-1);
-    ARRAY<TV_INT> heap(cell_grid.Domain_Indices().Thickened(ghost_cells).Size(),false); // a generic version of heap((m+6)*(n+6)*(mn+6),false);
-    Initialize_Interface(phi_ghost,done,close_k,heap,heap_length,add_seed_indices_for_ghost_cells);
-
-    while(heap_length != 0){
-        TV_INT index=heap(0); // smallest point is on top of heap
-        if(stopping_distance && abs(phi_ghost(index)) > stopping_distance){ // exit early
-            for(CELL_ITERATOR iterator(cell_grid);iterator.Valid();iterator.Next()) if(!done(iterator.Cell_Index())){
-                phi_ghost(iterator.Cell_Index())=LEVELSET_UTILITIES<T>::Sign(phi_ghost(iterator.Cell_Index()))*stopping_distance;}
-            return;}
-        done(index)=true;close_k(index)=-1; // add to done, remove from close
-        FAST_MARCHING<T>::Down_Heap(phi_ghost,close_k,heap,heap_length);heap_length--; // remove point from heap
-
-        if((process_sign==1 && phi_ghost(index)<0) || (process_sign==-1 && phi_ghost(index)>0)) continue;
-
-        if(levelset.collision_body_list)
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-                if(index[axis] != dimension_start[axis] && !done(index-axis_vector) && Neighbor_Visible(axis,index-axis_vector))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector) && Neighbor_Visible(axis,index))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}
-        else
-            for(int axis=0;axis<T_GRID::dimension;axis++){TV_INT axis_vector=TV_INT::Axis_Vector(axis);
-                if(index[axis] != dimension_start[axis] && !done(index-axis_vector))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index-axis_vector);
-                if(index[axis] != dimension_end[axis]-1 && !done(index+axis_vector))
-                    Update_Or_Add_Neighbor(phi_ghost,done,close_k,heap,heap_length,index+axis_vector);}}
 }
 //#####################################################################
 // Function Update_Or_Add_Neighbor

@@ -84,7 +84,7 @@ public:
 protected:
 
     LEVELSET_BASE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input);
-    virtual ~LEVELSET_BASE();
+    ~LEVELSET_BASE();
 
 public:
     void Set_Small_Number(const T small_number_input=1e-8)
@@ -246,6 +246,9 @@ public:
     T Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const;
     void Compute_Curvature(const T time=0);
     T Compute_Curvature(const TV& location) const;
+    void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
+    void Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,
+        const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
 //#####################################################################
 };
 }

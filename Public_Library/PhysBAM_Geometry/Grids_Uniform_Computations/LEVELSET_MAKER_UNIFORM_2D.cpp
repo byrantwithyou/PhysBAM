@@ -21,6 +21,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
     phi.Fill(FLT_MAX);
     T dx=grid.dX.Max();
 
+    ARRAY<TV_INT> seed_indices;
     ARRAY<bool,TV_INT> done(grid.Domain_Indices(ghost_cells+1));
     for(int i=0;i<curve.mesh.elements.m;i++){
         SEGMENT_2D<T> segment(curve.particles.X(curve.mesh.elements(i).x),curve.particles.X(curve.mesh.elements(i).y));
@@ -37,7 +38,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
                     new_sign=curve.Inside(grid.X(it.index));
                 if(abs(dist)<abs(phi(it.index))) phi(it.index)=dist;
                 phi(it.index)=abs(phi(it.index))*(new_sign?-1:1);
-                done(it.index)=true;}}}
+                seed_indices.Append(it.index);}}}
 
     ARRAY<TV_INT> todo,next_todo;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> it(grid);it.Valid();it.Next())
@@ -61,7 +62,7 @@ Compute_Level_Set(SEGMENTED_CURVE_2D<T>& curve,GRID<TV>& grid,int ghost_cells,AR
 
     LEVELSET<TV> levelset(grid,phi);
     FAST_MARCHING_METHOD_UNIFORM<GRID<TV> > fmm(levelset,ghost_cells);
-    fmm.Fast_Marching_Method(phi,done);
+    fmm.Fast_Marching_Method(phi,0,&seed_indices);
 }
 //#####################################################################
 // Function Compute_Level_Set_Helper

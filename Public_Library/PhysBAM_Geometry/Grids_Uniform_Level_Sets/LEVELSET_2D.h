@@ -31,10 +31,6 @@ public:
 
 //#####################################################################
     VECTOR<T,1> Principal_Curvatures(const VECTOR<T,2>& X) const;
-public:
-    void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,2> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
-    void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,2> >& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,2> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
-public:
     T Approximate_Length(const T interface_thickness=3,const T time=0) const;
 //#####################################################################
 };
