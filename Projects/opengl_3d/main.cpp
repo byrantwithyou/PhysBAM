@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Particles/VORTICITY_PARTICLES.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/ANIMATED_VISUALIZATION.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_BOOL_COLOR_MAP.h>

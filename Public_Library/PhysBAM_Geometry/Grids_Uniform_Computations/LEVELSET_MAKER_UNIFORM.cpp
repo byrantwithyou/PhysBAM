@@ -12,7 +12,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/SEGMENT_3D_TRIANGLE_3D_INTERSECTION.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/LEVELSET_MAKER_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Spatial_Acceleration/TRIANGLE_HIERARCHY.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 using namespace PhysBAM;

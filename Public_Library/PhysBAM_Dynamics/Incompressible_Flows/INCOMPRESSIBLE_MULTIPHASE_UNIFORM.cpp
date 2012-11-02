@@ -14,7 +14,7 @@
 #include <PhysBAM_Tools/Math_Tools/minmag.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/EXTRAPOLATION_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/IMPLICIT_VISCOSITY_MULTIPHASE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Incompressible_Flows/INCOMPRESSIBLE_MULTIPHASE_UNIFORM.h>

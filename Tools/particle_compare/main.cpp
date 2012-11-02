@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_POLICY.h>
 #include <PhysBAM_Dynamics/Particles/PARTICLE_LEVELSET_REMOVED_PARTICLES.h>
 using namespace PhysBAM;

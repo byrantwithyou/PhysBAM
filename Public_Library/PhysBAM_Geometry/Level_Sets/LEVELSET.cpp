@@ -7,19 +7,20 @@
 #include <PhysBAM_Tools/Grids_Uniform/UNIFORM_GRID_ITERATOR_NODE.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
+#include <PhysBAM_Tools/Polynomials/QUADRATIC.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/LINEAR_INTERPOLATION_COLLIDABLE_CELL_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/FAST_MARCHING_METHOD_UNIFORM.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET_BASE.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 using namespace PhysBAM;
-template<class TV> typename LEVELSET_BASE<TV>::T_LINEAR_INTERPOLATION_SCALAR LEVELSET_BASE<TV>::interpolation_default;
-template<class TV> typename LEVELSET_BASE<TV>::T_LINEAR_INTERPOLATION_VECTOR LEVELSET_BASE<TV>::normal_interpolation_default;
+template<class TV> typename LEVELSET<TV>::T_LINEAR_INTERPOLATION_SCALAR LEVELSET<TV>::interpolation_default;
+template<class TV> typename LEVELSET<TV>::T_LINEAR_INTERPOLATION_VECTOR LEVELSET<TV>::normal_interpolation_default;
 //#####################################################################
 // Constructor
 //#####################################################################
-template<class TV> LEVELSET_BASE<TV>::
-LEVELSET_BASE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
+template<class TV> LEVELSET<TV>::
+LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input)
     :levelset_callbacks(0),collision_body_list(0),face_velocities_valid_mask_current(0),clamp_phi_with_collision_bodies(true),boundary_default(*new BOUNDARY_UNIFORM<GRID<TV>,T>),
     collision_aware_interpolation_plus(0),collision_aware_interpolation_minus(0),collision_unaware_interpolation(0),collidable_phi_replacement_value((T)1e-5),grid(grid_input),
     phi(phi_input),normals(0),curvature(0),cell_range(0),thread_queue(0),number_of_ghost_cells(number_of_ghost_cells_input)
@@ -38,8 +39,8 @@ LEVELSET_BASE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_o
 //#####################################################################
 // Destructor
 //#####################################################################
-template<class TV> LEVELSET_BASE<TV>::
-~LEVELSET_BASE()
+template<class TV> LEVELSET<TV>::
+~LEVELSET()
 {
     assert(!collision_unaware_interpolation);
     delete collision_aware_interpolation_plus;
@@ -52,7 +53,7 @@ template<class TV> LEVELSET_BASE<TV>::
 //#####################################################################
 // Function Set_Collision_Body_List
 //#####################################################################
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Set_Collision_Body_List(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collision_body_list_input,const bool set_secondary_interpolation)
 {
     collision_body_list=&collision_body_list_input;
@@ -64,7 +65,7 @@ Set_Collision_Body_List(GRID_BASED_COLLISION_GEOMETRY_UNIFORM<GRID<TV> >& collis
 //#####################################################################
 // Function Collision_Aware_Phi
 //#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+template<class TV> typename TV::SCALAR LEVELSET<TV>::
 Collision_Aware_Phi(const TV& location) const
 {
     assert(collision_body_list);
@@ -73,7 +74,7 @@ Collision_Aware_Phi(const TV& location) const
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+template<class TV> typename TV::SCALAR LEVELSET<TV>::
 CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 {
     T dt_convection=0;
@@ -89,7 +90,7 @@ CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const
 //#####################################################################
 // Function CFL
 //#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+template<class TV> typename TV::SCALAR LEVELSET<TV>::
 CFL(const ARRAY<TV,TV_INT>& velocity) const
 {
     T dt_convection=0;
@@ -102,7 +103,7 @@ CFL(const ARRAY<TV,TV_INT>& velocity) const
 //#####################################################################
 // Function Iterative_Find_Interface
 //#####################################################################
-template<class TV> TV LEVELSET_BASE<TV>::
+template<class TV> TV LEVELSET<TV>::
 Iterative_Find_Interface(TV left,TV right,const int iterations) const
 {
     T phi_left=Phi(left),phi_right=Phi(right);
@@ -123,7 +124,7 @@ Iterative_Find_Interface(TV left,TV right,const int iterations) const
 //#####################################################################
 // Function Compute_Gradient
 //#####################################################################
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time) const
 {
     TV one_over_two_dx=(T).5*grid.one_over_dX;
@@ -136,25 +137,32 @@ Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time) const
             gradient(cell_index)(axis)=(phi_ghost(cell_index+axis_vector)-phi_ghost(cell_index-axis_vector))*one_over_two_dx(axis);}}
 }
 //#####################################################################
+// Function Gradient
 //#####################################################################
-// Function Normal
-//#####################################################################
-template<class TV> TV LEVELSET_BASE<TV>::
-Normal(const TV& location) const
+template<class TV> TV LEVELSET<TV>::
+Gradient(const TV& location) const
 {
-    if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,location).Normalized();
-    TV N;
+    TV G;
     for(int d=0;d<TV::m;d++){
         TV a(location),b(location);
         a(d)-=grid.dX(d);
         b(d)+=grid.dX(d);
-        N(d)=(T).5*(Phi(b)-Phi(a))*grid.one_over_dX(d);}
-    return N.Normalized();
+        G(d)=(T).5*(Phi(b)-Phi(a))*grid.one_over_dX(d);}
+    return G;
+}
+//#####################################################################
+// Function Normal
+//#####################################################################
+template<class TV> TV LEVELSET<TV>::
+Normal(const TV& location) const
+{
+    if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,location).Normalized();
+    return Gradient(location).Normalized();
 }
 //#####################################################################
 // Function Extended_Normal
 //#####################################################################
-template<class TV> TV LEVELSET_BASE<TV>::
+template<class TV> TV LEVELSET<TV>::
 Extended_Normal(const TV& location) const
 {
     if(normals) return normal_interpolation->Clamped_To_Array(grid,*normals,grid.Clamp(location)).Normalized();
@@ -170,7 +178,7 @@ Extended_Normal(const TV& location) const
 // Function Compute_Normals
 //#####################################################################
 // note that sqrt(phix^2+phiy^2+phiz^2)=1 if it's a distance function
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Compute_Normals(const T time)
 {
     int ghost_cells=3;
@@ -193,7 +201,7 @@ Compute_Normals(const T time)
 //#####################################################################
 // Function Hessian
 //#####################################################################
-template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET_BASE<TV>::
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET<TV>::
 Hessian(const TV& X) const
 {
     SYMMETRIC_MATRIX<T,TV::m> H;
@@ -220,7 +228,7 @@ Hessian(const TV& X) const
 //#####################################################################
 // Function Compute_Cell_Minimum_And_Maximum
 //#####################################################################
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 {
     if(!recompute_if_exists && cell_range) return;
@@ -241,7 +249,7 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
 //#####################################################################
 // Function Hessian
 //#####################################################################
-template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET_BASE<TV>::
+template<class TV> SYMMETRIC_MATRIX<typename TV::SCALAR,TV::m> LEVELSET<TV>::
 Hessian(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
     TV_INT stride=phi_input.Strides();
@@ -259,7 +267,7 @@ Hessian(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 //#####################################################################
 // Function Gradient
 //#####################################################################
-template<class TV> TV LEVELSET_BASE<TV>::
+template<class TV> TV LEVELSET<TV>::
 Gradient(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
     TV_INT stride=phi_input.Strides();
@@ -272,7 +280,7 @@ Gradient(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 //#####################################################################
 // Function Compute_Curvature
 //#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+template<class TV> typename TV::SCALAR LEVELSET<TV>::
 Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 {
     TV dphi=Gradient(phi_input,index);
@@ -287,7 +295,7 @@ Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
 // Function Compute_Curvature
 //#####################################################################
 // kappa = - DIV(normal), negative for negative phi inside, positive for positive phi inside, sqrt(phix^2+phiy^2+phiy^2)=1 for distance functions
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Compute_Curvature(const T time)
 {
     int ghost_cells=3;
@@ -300,7 +308,7 @@ Compute_Curvature(const T time)
 //#####################################################################
 // Function Compute_Curvature
 //#####################################################################
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+template<class TV> typename TV::SCALAR LEVELSET<TV>::
 Compute_Curvature(const TV& location) const
 {
     TV l2=(location-(T).5*grid.dX-grid.domain.min_corner)*grid.one_over_dX;
@@ -320,7 +328,7 @@ Compute_Curvature(const TV& location) const
 //#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     Get_Signed_Distance_Using_FMM(phi,time,stopping_distance,seed_indices,add_seed_indices_for_ghost_cells,process_sign);
@@ -328,7 +336,7 @@ Fast_Marching_Method(const T time,const T stopping_distance,const ARRAY<TV_INT>*
 //#####################################################################
 // Function Get_Signed_Distance_Using_FMM
 //#####################################################################
-template<class TV> void LEVELSET_BASE<TV>::
+template<class TV> void LEVELSET<TV>::
 Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,const T stopping_distance,const ARRAY<TV_INT>* seed_indices,const bool add_seed_indices_for_ghost_cells,int process_sign)
 {
     const int ghost_cells=2*number_of_ghost_cells+1;
@@ -342,7 +350,7 @@ Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time,cons
 // Function Approximate_Surface_Size
 //#####################################################################
 // calculates the approximate perimeter using delta functions
-template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+template<class TV> typename TV::SCALAR LEVELSET<TV>::
 Approximate_Surface_Size(const T interface_thickness,const T time) const
 {
     ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(number_of_ghost_cells));
@@ -352,11 +360,40 @@ Approximate_Surface_Size(const T interface_thickness,const T time) const
         surface_size+=LEVELSET_UTILITIES<T>::Delta(phi_ghost(it.index),interface_half_width)*Gradient(phi,it.index).Magnitude();
     return surface_size*grid.dX.Size();
 }
-template class LEVELSET_BASE<VECTOR<float,1> >;
-template class LEVELSET_BASE<VECTOR<float,2> >;
-template class LEVELSET_BASE<VECTOR<float,3> >;
+template<class T> inline VECTOR<T,0> Principal_Curvatures_Helper(const VECTOR<T,1>& N,T norm,const SYMMETRIC_MATRIX<T,1>& H)
+{
+    return VECTOR<T,0>();
+}
+template<class T> inline VECTOR<T,1> Principal_Curvatures_Helper(const VECTOR<T,2>& N,T norm,const SYMMETRIC_MATRIX<T,2>& H)
+{
+    VECTOR<T,2> tangent=N.Perpendicular();
+    return VECTOR<T,1>(tangent.Dot(H*tangent)/norm);
+}
+template<class T> inline VECTOR<T,2> Principal_Curvatures_Helper(const VECTOR<T,3>& N,T norm,const SYMMETRIC_MATRIX<T,3>& H)
+{
+    SYMMETRIC_MATRIX<T,3> P=(T)1-SYMMETRIC_MATRIX<T,3>::Outer_Product(N),M=SYMMETRIC_MATRIX<T,3>::Conjugate(P,H)/norm;
+    T trace=M.Trace();
+    QUADRATIC<T> quadratic(-1,trace,sqr(M(1,1))-M(0,1)*M(1,2)+sqr(M(2,1))-M(0,1)*M(2,3)+sqr(M(2,2))-M(1,2)*M(2,3));
+    quadratic.Compute_Roots();
+    if(quadratic.roots == 0) (T).5*VECTOR<T,2>(trace,trace);
+    else if(quadratic.roots == 1) return VECTOR<T,2>(quadratic.root1,quadratic.root1);
+    return VECTOR<T,2>(quadratic.root1,quadratic.root2);
+}
+//#####################################################################
+// Function Principal_Curvatures
+//#####################################################################
+template<class TV> VECTOR<typename TV::SCALAR,TV::m-1> LEVELSET<TV>::
+Principal_Curvatures(const TV& X) const
+{
+    TV N=Gradient(X);
+    T grad_phi_magnitude=N.Normalize();
+    return Principal_Curvatures_Helper(N,grad_phi_magnitude,Hessian(X));
+}
+template class LEVELSET<VECTOR<float,1> >;
+template class LEVELSET<VECTOR<float,2> >;
+template class LEVELSET<VECTOR<float,3> >;
 #ifndef COMPILE_WITHOUT_DOUBLE_SUPPORT
-template class LEVELSET_BASE<VECTOR<double,1> >;
-template class LEVELSET_BASE<VECTOR<double,2> >;
-template class LEVELSET_BASE<VECTOR<double,3> >;
+template class LEVELSET<VECTOR<double,1> >;
+template class LEVELSET<VECTOR<double,2> >;
+template class LEVELSET<VECTOR<double,3> >;
 #endif

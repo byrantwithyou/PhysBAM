@@ -8,7 +8,7 @@
 #define __DUALCONTOUR_2D__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class T> class SEGMENTED_CURVE_2D;

@@ -4,8 +4,8 @@
 #include <PhysBAM_Tools/Log/LOG.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <fstream>
 #include <iostream>
 

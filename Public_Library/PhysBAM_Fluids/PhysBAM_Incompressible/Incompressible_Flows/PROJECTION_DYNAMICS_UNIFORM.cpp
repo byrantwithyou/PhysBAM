@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/FACE_LOOKUP_UNIFORM.h>
 #include <PhysBAM_Tools/Parallel_Computation/BOUNDARY_MPI.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/DETONATION_SHOCK_DYNAMICS.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/PROJECTION_DYNAMICS_UNIFORM.h>

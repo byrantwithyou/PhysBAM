@@ -9,7 +9,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/AVERAGING_UNIFORM.h>
 #include <PhysBAM_Tools/Grids_Uniform_Interpolation/LINEAR_INTERPOLATION_UNIFORM.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Level_Sets/FAST_LEVELSET_ADVECTION.h>
 using namespace PhysBAM;

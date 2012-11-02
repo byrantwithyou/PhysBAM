@@ -7,10 +7,8 @@
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
 #include <PhysBAM_Geometry/Geometry_Particles/GEOMETRY_PARTICLES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION_HIGHER_ORDER.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <cmath>
 #include <cstdio>
 #include "HEADER.h"

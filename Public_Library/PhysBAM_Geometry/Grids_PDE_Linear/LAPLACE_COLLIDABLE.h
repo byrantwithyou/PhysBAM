@@ -8,7 +8,7 @@
 #define __LAPLACE_COLLIDABLE__
 
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/FACE_ARRAYS.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class T_GRID>

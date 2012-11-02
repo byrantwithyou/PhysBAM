@@ -7,7 +7,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Boundaries/BOUNDARY_UNIFORM.h>
 #include <PhysBAM_Tools/Ordinary_Differential_Equations/RUNGEKUTTA.h>
 #include <PhysBAM_Tools/Vectors/VECTOR_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 using namespace PhysBAM;
 //#####################################################################

@@ -2,9 +2,9 @@
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Tools/Parsing/PARSE_ARGS.h>
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 #include <fstream>
 #include <iostream>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
 
 using namespace PhysBAM;
 

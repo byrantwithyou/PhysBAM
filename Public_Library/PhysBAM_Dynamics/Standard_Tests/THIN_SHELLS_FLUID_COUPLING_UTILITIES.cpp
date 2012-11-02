@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_4X4.h>
 #include <PhysBAM_Tools/Parallel_Computation/MPI_UNIFORM_GRID.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Solids_Geometry/DEFORMABLE_GEOMETRY_COLLECTION.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>

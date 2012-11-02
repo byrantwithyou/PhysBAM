@@ -17,7 +17,7 @@
 #include <PhysBAM_Geometry/Basic_Geometry/SPHERE.h>
 #include <PhysBAM_Geometry/Basic_Geometry/TORUS.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Implicit_Objects/ANALYTIC_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT_TRANSFORMED.h>
@@ -25,6 +25,7 @@
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/IMPLICIT_OBJECT_COMBINED_EULERIAN.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/MULTIBODY_LEVELSET_IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Solids_Geometry/RIGID_GEOMETRY.h>
 #include <PhysBAM_Geometry/Tessellation/BOUNDED_HORIZONTAL_PLANE_TESSELLATION.h>
 #include <PhysBAM_Geometry/Tessellation/BOWL_TESSELLATION.h>
@@ -50,7 +51,7 @@ namespace {
 template<class T> TRIANGULATED_SURFACE<T>* Generate_Triangles_Helper(const LEVELSET_IMPLICIT_OBJECT<VECTOR<T,3> >* implicit)
 { // TODO(jontg): There should be a better implementation for this...
     TRIANGULATED_SURFACE<T>* surface=TRIANGULATED_SURFACE<T>::Create();
-    implicit->levelset.Calculate_Triangulated_Surface_From_Marching_Tetrahedra(*surface);
+    MARCHING_CUBES<VECTOR<T,3> >::Create_Surface(*surface,implicit->levelset.grid,implicit->levelset.phi);
     return surface;
 }
 

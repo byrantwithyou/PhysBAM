@@ -11,9 +11,9 @@
 #include <PhysBAM_Geometry/Basic_Geometry/RAY.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/GRID_BASED_COLLISION_GEOMETRY.h>
 #include <PhysBAM_Geometry/Collisions_And_Grids/OBJECTS_IN_CELL.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
 #include <PhysBAM_Geometry/Level_Sets/IMPLICIT_OBJECT_ON_A_RAY.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template <class T_GRID>

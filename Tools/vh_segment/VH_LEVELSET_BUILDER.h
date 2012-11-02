@@ -8,8 +8,8 @@
 #include <PhysBAM_Tools/Data_Structures/HASHTABLE.h>
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <string>
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 
 class Fl_Hold_Browser;
 

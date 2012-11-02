@@ -7,7 +7,7 @@
 #ifndef __OPENGL_LEVELSET_1D__
 #define __OPENGL_LEVELSET_1D__
 
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_SCALAR_FIELD_1D.h>
 namespace PhysBAM{

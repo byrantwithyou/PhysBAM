@@ -21,7 +21,7 @@
 #include <PhysBAM_Geometry/Finite_Elements/SYSTEM_VOLUME_BLOCK_HELPER_COLOR.h>
 #include <PhysBAM_Geometry/Finite_Elements/VOLUME_FORCE_COLOR.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/SEGMENTED_CURVE_2D.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #ifdef USE_OPENMP

@@ -8,7 +8,7 @@
 #include <PhysBAM_Tools/Math_Tools/pow.h>
 #include <PhysBAM_Tools/Utilities/PROCESS_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_UNIFORM.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 using namespace PhysBAM;
 //#####################################################################

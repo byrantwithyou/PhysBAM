@@ -8,9 +8,7 @@
 #include <PhysBAM_Tools/Math_Tools/max.h>
 #include <PhysBAM_Tools/Math_Tools/sqr.h>
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h> // TODO(jontg): There doesn't appear to be any good reason for these dependencies to exist...
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Level_Sets/LEVELSET_UTILITIES.h>
 #include <PhysBAM_Dynamics/Heat_Flows/HEAT_UNIFORM.h>
 using namespace PhysBAM;

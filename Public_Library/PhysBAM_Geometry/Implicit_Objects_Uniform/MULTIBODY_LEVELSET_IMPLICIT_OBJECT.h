@@ -11,10 +11,8 @@
 #include <PhysBAM_Tools/Matrices/MATRIX_3X3.h>
 #include <PhysBAM_Tools/Matrices/MATRIX_POLICY.h>
 #include <PhysBAM_Geometry/Basic_Geometry/BASIC_GEOMETRY_POLICY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Implicit_Objects/IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class TV> class GRID;

@@ -2,10 +2,10 @@
 // Copyright 2002-2006, Doug Enright, Ronald Fedkiw, Frederic Gibou, Geoffrey Irving, Frank Losasso, Neil Molino, Avi Robinson-Mosher, Tamar Shinar, Jerry Talton.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-// Class LEVELSET_BASE
+// Class LEVELSET
 //#####################################################################
-#ifndef __LEVELSET_BASE__
-#define __LEVELSET_BASE__
+#ifndef __LEVELSET__
+#define __LEVELSET__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
 #include <PhysBAM_Tools/Grids_Uniform/FACE_INDEX.h>
@@ -20,7 +20,7 @@
 #include <PhysBAM_Tools/Vectors/SCALAR_POLICY.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Collisions/GRID_BASED_COLLISION_GEOMETRY_COLLECTION_POLICY_UNIFORM.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Interpolation_Collidable/INTERPOLATION_COLLIDABLE_POLICY_UNIFORM.h>
-#include <PhysBAM_Geometry/Level_Sets/LEVELSET_BASE.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <cassert>
 #include <cfloat>
 namespace PhysBAM{
@@ -36,7 +36,7 @@ template<class T_GRID> class GRID_BASED_COLLISION_GEOMETRY_UNIFORM;
 template<class TV> class LEVELSET;
 
 template<class TV>
-class LEVELSET_BASE:public NONCOPYABLE
+class LEVELSET:public NONCOPYABLE
 {
     typedef typename TV::SCALAR T;typedef VECTOR<int,TV::m> TV_INT;typedef ARRAY<T,TV_INT> T_ARRAYS_SCALAR;
     typedef typename INTERPOLATION_POLICY<GRID<TV> >::LINEAR_INTERPOLATION_SCALAR T_LINEAR_INTERPOLATION_SCALAR;
@@ -53,7 +53,6 @@ public:
     T max_time_step;
     bool curvature_motion;
     T sigma;
-public:
     bool refine_fmm_initialization_with_iterative_solver;
     int fmm_initialization_iterations;
     T fmm_initialization_iterative_tolerance;
@@ -71,7 +70,6 @@ public:
     T_INTERPOLATION_SCALAR *collision_aware_interpolation_plus,*collision_aware_interpolation_minus,*collision_unaware_interpolation;
     static T_LINEAR_INTERPOLATION_VECTOR normal_interpolation_default;
     T collidable_phi_replacement_value;
-public:
     ARRAY<bool,TV_INT> valid_mask_current;
     ARRAY<bool,TV_INT> valid_mask_next;
     GRID<TV>& grid;
@@ -81,12 +79,10 @@ public:
     ARRAY<INTERVAL<T>,TV_INT> *cell_range;
     THREAD_QUEUE *thread_queue;
     int number_of_ghost_cells;
-protected:
 
-    LEVELSET_BASE(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input);
-    ~LEVELSET_BASE();
+    LEVELSET(GRID<TV>& grid_input,T_ARRAYS_SCALAR& phi_input,const int number_of_ghost_cells_input=3);
+    ~LEVELSET();
 
-public:
     void Set_Small_Number(const T small_number_input=1e-8)
     {small_number=small_number_input;}
 
@@ -239,6 +235,7 @@ public:
     TV Iterative_Find_Interface(TV left,TV right,const int iterations=3) const;
     void Compute_Gradient(ARRAY<TV,TV_INT>& gradient,const T time=0) const;
     void Compute_Normals(const T time=0);
+    TV Gradient(const TV& location) const;
     TV Normal(const TV& location) const;
     TV Extended_Normal(const TV& location) const;
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
@@ -252,6 +249,7 @@ public:
     void Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,
         const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     T Approximate_Surface_Size(const T interface_thickness=3,const T time=0) const;
+    VECTOR<T,TV::m-1> Principal_Curvatures(const TV& X) const;
 //#####################################################################
 };
 }

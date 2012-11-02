@@ -2,8 +2,8 @@
 // Copyright 2007-2012.
 // This file is part of PhysBAM whose distribution is governed by the license contained in the accompanying file PHYSBAM_COPYRIGHT.txt.
 //#####################################################################
-#include "MATRIX_TESTS.h"
 #include "MATRIX_TEST_GENERATOR.h"
+#include "MATRIX_TESTS.h"
 using namespace PhysBAM;
 //#####################################################################
 // Function Run_Test

@@ -5,7 +5,7 @@
 #ifndef __RENDERING_VOXEL_FIRE_SHADER__
 #define __RENDERING_VOXEL_FIRE_SHADER__
 #include <PhysBAM_Geometry/Basic_Geometry_Intersections/RAY_BOX_INTERSECTION.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/BLACKBODY.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering/RENDERING_RAY_DEBUG.h>
 #include <PhysBAM_Rendering/PhysBAM_Ray_Tracing/Rendering_Objects/RENDERING_VOXELS.h>

@@ -17,7 +17,7 @@
 #include <PhysBAM_Tools/Matrices/SPARSE_MATRIX_FLAT_NXN.h>
 #include <PhysBAM_Tools/Matrices/SYSTEM_MATRIX_HELPER.h>
 #include <PhysBAM_Tools/Read_Write/OCTAVE_OUTPUT.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_UNIFORM.h>
 #include <PhysBAM_Dynamics/Kang/KANG_POISSON_VISCOSITY.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET_EVOLUTION_UNIFORM.h>

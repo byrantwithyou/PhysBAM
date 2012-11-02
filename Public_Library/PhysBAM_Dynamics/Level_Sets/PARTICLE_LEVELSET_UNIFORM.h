@@ -13,7 +13,7 @@
 #include <PhysBAM_Tools/Parallel_Computation/PTHREAD.h>
 #endif
 #include <PhysBAM_Tools/Parallel_Computation/THREAD_QUEUE.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Dynamics/Level_Sets/PARTICLE_LEVELSET.h>
 namespace PhysBAM{
 

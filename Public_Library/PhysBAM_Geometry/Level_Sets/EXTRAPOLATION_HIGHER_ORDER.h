@@ -12,6 +12,7 @@
 #include <PhysBAM_Tools/Math_Tools/INTERVAL.h>
 #include <PhysBAM_Tools/Utilities/NONCOPYABLE.h>
 #include <PhysBAM_Tools/Vectors/VECTOR.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 // TODO: Limit to near interface

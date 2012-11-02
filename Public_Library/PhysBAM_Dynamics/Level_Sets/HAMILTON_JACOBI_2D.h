@@ -13,7 +13,7 @@
 #define __HAMILTON_JACOBI_2D__
 
 #include <PhysBAM_Tools/Grids_Uniform/GRID.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Dynamics/Level_Sets/HAMILTON_JACOBI.h>
 #include <PhysBAM_Dynamics/Level_Sets/LEVELSET_ADVECTION_UNIFORM.h>
 namespace PhysBAM{

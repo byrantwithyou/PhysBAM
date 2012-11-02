@@ -12,7 +12,7 @@
 #include <PhysBAM_Tools/Grids_Uniform_Arrays/ARRAYS_ND.h>
 #include <PhysBAM_Tools/Parallel_Computation/THREADED_UNIFORM_GRID.h>
 #include <PhysBAM_Geometry/Grids_PDE_Linear/LAPLACE_COLLIDABLE_POLICY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Fluids/PhysBAM_Incompressible/Incompressible_Flows/INCOMPRESSIBLE_FORWARD.h>
 #include <PhysBAM_Dynamics/Particles/DYNAMICS_PARTICLES_FORWARD.h>
 #include <PhysBAM_Dynamics/Solids_And_Fluids/FLUIDS_PARAMETERS.h>

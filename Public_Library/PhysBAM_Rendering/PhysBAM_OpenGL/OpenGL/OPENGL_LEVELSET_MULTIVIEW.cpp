@@ -4,8 +4,9 @@
 //#####################################################################
 #include <PhysBAM_Tools/Read_Write/FILE_UTILITIES.h>
 #include <PhysBAM_Geometry/Grids_Uniform_Computations/DUALCONTOUR_3D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Grids_Uniform_Computations/MARCHING_CUBES.h>
 #include <PhysBAM_Geometry/Implicit_Objects_Uniform/LEVELSET_IMPLICIT_OBJECT.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 #include <PhysBAM_Geometry/Topology_Based_Geometry/TRIANGULATED_SURFACE.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_COLOR_RAMP.h>
 #include <PhysBAM_Rendering/PhysBAM_OpenGL/OpenGL/OPENGL_LEVELSET_MULTIVIEW.h>
@@ -132,8 +133,10 @@ Initialize_Triangulated_Surface()
                     triangulated_surface=DUALCONTOUR_3D<T>::Create_Triangulated_Surface_From_Levelset(*levelset);
                 else{
                     triangulated_surface=TRIANGULATED_SURFACE<T>::Create();
-                    levelset->Calculate_Triangulated_Surface_From_Marching_Tetrahedra(*triangulated_surface,true);levelset->Compute_Normals();
-                    triangulated_surface->Use_Vertex_Normals();triangulated_surface->vertex_normals=new ARRAY<TV>(triangulated_surface->particles.Size());
+                    MARCHING_CUBES<TV>::Create_Surface(*triangulated_surface,levelset->grid,levelset->phi);
+                    levelset->Compute_Normals();
+                    triangulated_surface->Use_Vertex_Normals();
+                    triangulated_surface->vertex_normals=new ARRAY<TV>(triangulated_surface->particles.Size());
                     for(int p=0;p<triangulated_surface->particles.Size();p++)
                         (*triangulated_surface->vertex_normals)(p)=levelset->Normal(triangulated_surface->particles.X(p));}
                 if(write_generated_triangulated_surface && triangulated_surface_filename.length() > 0){

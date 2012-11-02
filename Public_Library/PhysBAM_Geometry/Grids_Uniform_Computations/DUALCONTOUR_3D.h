@@ -8,7 +8,7 @@
 #define __DUALCONTOUR_3D__
 
 #include <PhysBAM_Tools/Arrays/ARRAY.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class T> class TRIANGULATED_SURFACE;

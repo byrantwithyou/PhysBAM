@@ -6,8 +6,8 @@
 #include <PhysBAM_Tools/Images/IMAGE.h>
 #include <PhysBAM_Tools/Parsing/PARAMETER_LIST.h>
 #include <PhysBAM_Tools/Parsing/STRING_UTILITIES.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include "VH_LEVELSET_BUILDER.h"
+#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 
 using namespace PhysBAM;
 

@@ -13,10 +13,8 @@
 #define __EXTRAPOLATION_UNIFORM__
 
 #include <PhysBAM_Tools/Arrays/ARRAYS_FORWARD.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_1D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_2D.h>
-#include <PhysBAM_Geometry/Grids_Uniform_Level_Sets/LEVELSET_3D.h>
 #include <PhysBAM_Geometry/Level_Sets/EXTRAPOLATION.h>
+#include <PhysBAM_Geometry/Level_Sets/LEVELSET.h>
 namespace PhysBAM{
 
 template<class T_GRID,class T2>
