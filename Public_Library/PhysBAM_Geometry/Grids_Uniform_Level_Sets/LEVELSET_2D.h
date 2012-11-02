@@ -22,22 +22,15 @@ public:
     using BASE::grid;using BASE::phi;using BASE::normals;using BASE::curvature;using BASE::cell_range;
     using BASE::collision_body_list;using BASE::refine_fmm_initialization_with_iterative_solver;using BASE::fmm_initialization_iterations;using BASE::fmm_initialization_iterative_tolerance;
     using BASE::fmm_initialization_iterative_drift_fraction;using BASE::Hessian;using BASE::thread_queue;
-    using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;using BASE::max_time_step;
+    using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;using BASE::max_time_step;using BASE::Compute_Curvature;
     using BASE::curvature_motion;using BASE::sigma;using BASE::interpolation;using BASE::Phi;using BASE::Extended_Phi;
     using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::collision_aware_interpolation_minus;using BASE::number_of_ghost_cells;
 
     LEVELSET(GRID<TV>& grid_input,ARRAY<T,VECTOR<int,2> >& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET();
 
-    T Compute_Curvature(const VECTOR<int,2>& index) const
-    {return Compute_Curvature(phi,index);}
-
 //#####################################################################
     VECTOR<T,1> Principal_Curvatures(const VECTOR<T,2>& X) const;
-    void Compute_Normals(const T time=0);
-    void Compute_Curvature(const T time=0);
-    T Compute_Curvature(const ARRAY<T,VECTOR<int,2> >& phi_input,const VECTOR<int,2>& index) const;
-    T Compute_Curvature(const VECTOR<T,2>& location) const;
 public:
     void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,2> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,VECTOR<int,2> >& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<VECTOR<int,2> >* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);

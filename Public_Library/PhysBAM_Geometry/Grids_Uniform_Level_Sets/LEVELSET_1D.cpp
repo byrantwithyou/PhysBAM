@@ -32,28 +32,6 @@ Principal_Curvatures(const VECTOR<T,1>& X) const
     return VECTOR<T,0>(); // not much curvature in 1D
 }
 //#####################################################################
-// Function Compute_Normals
-//#####################################################################
-// note that abs(phix)=1 if it's a distance function
-template<class T> void LEVELSET<VECTOR<T,1> >::
-Compute_Normals(const T time)
-{
-    T one_over_two_dx=1/(2*grid.dX.x);
-    int ghost_cells=3;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells),false);boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-        
-    if(!normals) normals=new ARRAY<VECTOR<T,1> ,TV_INT>(grid.Domain_Indices(ghost_cells-1));
-    for(int i=normals->domain.min_corner.x;i<normals->domain.max_corner.x;i++)(*normals)(i)=VECTOR<T,1>((phi_ghost(i+1)-phi_ghost(i-1))*one_over_two_dx).Normalized();
-}
-//#####################################################################
-// Function Compute_Curvature
-//#####################################################################
-template<class T> void LEVELSET<VECTOR<T,1> >::
-Compute_Curvature(const T time)
-{      
-    if(!curvature) curvature=new ARRAY<T,TV_INT>(grid.counts.x,2);
-}
-//#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T> void LEVELSET<VECTOR<T,1> >::

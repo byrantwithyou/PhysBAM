@@ -25,25 +25,14 @@ public:
     using BASE::refine_fmm_initialization_with_iterative_solver;using BASE::fmm_initialization_iterations;using BASE::fmm_initialization_iterative_tolerance;
     using BASE::fmm_initialization_iterative_drift_fraction;using BASE::thread_queue;
     using BASE::levelset_callbacks;using BASE::small_number;using BASE::boundary;
-    using BASE::max_time_step;using BASE::number_of_ghost_cells;
+    using BASE::max_time_step;using BASE::number_of_ghost_cells;using BASE::Compute_Curvature;
     using BASE::interpolation;using BASE::curvature_interpolation;using BASE::normal_interpolation;using BASE::Phi;using BASE::Extended_Phi;
 
     LEVELSET(GRID<TV>& grid_input,ARRAY<T,TV_INT>& phi_input,const int number_of_ghost_cells_input=3);
     ~LEVELSET();
 
-    T Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
-    {return 0;}
-
-    T Compute_Curvature(const TV_INT& index) const
-    {return Compute_Curvature(phi,index);}
-
-    T Compute_Curvature(const TV& location) const
-    {return 0;}
-
 //#####################################################################
     VECTOR<T,0> Principal_Curvatures(const TV& X) const;
-    void Compute_Normals(const T time=0);
-    void Compute_Curvature(const T time=0);
 public:
     void Fast_Marching_Method(const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,const bool add_seed_indices_for_ghost_cells=false,int process_sign=0);
     void Get_Signed_Distance_Using_FMM(ARRAY<T,TV_INT>& signed_distance,const T time=0,const T stopping_distance=0,const ARRAY<TV_INT>* seed_indices=0,

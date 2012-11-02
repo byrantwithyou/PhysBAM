@@ -53,61 +53,6 @@ Principal_Curvatures(const TV& X) const
     return VECTOR<T,2>(quadratic.root1,quadratic.root2);
 }
 //#####################################################################
-// Function Compute_Curvature
-//#####################################################################
-// kappa = - DIV(normal), negative for negative phi inside, positive for positive phi inside, sqrt(phix^2+phiy^2+phiy^2)=1 for distance functions
-template<class T> void LEVELSET<VECTOR<T,3> >::
-Compute_Curvature(const T time)
-{
-    int ghost_cells=3;
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
-
-    if(!curvature) curvature=new ARRAY<T,TV_INT>(grid.Domain_Indices(ghost_cells-1));
-    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next())
-        (*curvature)(iterator.Cell_Index())=Compute_Curvature(phi_ghost,iterator.Cell_Index());
-}
-//#####################################################################
-// Function Compute_Curvature
-//#####################################################################
-template<class T> T LEVELSET<VECTOR<T,3> >::
-Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
-{
-    T one_over_two_dx=1/(2*grid.dX.x),one_over_two_dy=1/(2*grid.dX.y),one_over_two_dz=1/(2*grid.dX.z);
-    T one_over_dx_squared=1/sqr(grid.dX.x),one_over_dy_squared=1/sqr(grid.dX.y),one_over_dz_squared=1/sqr(grid.dX.z);
-    T one_over_four_dx_dy=1/(4*grid.dX.x*grid.dX.y),one_over_four_dx_dz=1/(4*grid.dX.x*grid.dX.z),one_over_four_dy_dz=1/(4*grid.dX.y*grid.dX.z);
-    T max_curvature=1/grid.min_dX; // max resolution
-    int z=phi_input.counts.z,yz=phi_input.counts.y*z;
-
-    int s_index=phi_input.Standard_Index(index);
-    T phix=(phi_input.array(s_index+yz)-phi_input.array(s_index-yz))*one_over_two_dx;
-    T phixx=(phi_input.array(s_index+yz)-2*phi_input.array(s_index)+phi_input.array(s_index-yz))*one_over_dx_squared;
-    T phiy=(phi_input.array(s_index+z)-phi_input.array(s_index-z))*one_over_two_dy;
-    T phiyy=(phi_input.array(s_index+z)-2*phi_input.array(s_index)+phi_input.array(s_index-z))*one_over_dy_squared;
-    T phiz=(phi_input.array(s_index+1)-phi_input.array(s_index-1))*one_over_two_dz;
-    T phizz=(phi_input.array(s_index+1)-2*phi_input.array(s_index)+phi_input.array(s_index-1))*one_over_dz_squared;
-    T phixy=(phi_input.array(s_index+yz+z)-phi_input.array(s_index+yz-z)-phi_input.array(s_index-yz+z)+phi_input.array(s_index-yz-z))*one_over_four_dx_dy;
-    T phixz=(phi_input.array(s_index+yz+1)-phi_input.array(s_index+yz-1)-phi_input.array(s_index-yz+1)+phi_input.array(s_index-yz-1))*one_over_four_dx_dz;
-    T phiyz=(phi_input.array(s_index+z+1)-phi_input.array(s_index+z-1)-phi_input.array(s_index-z+1)+phi_input.array(s_index-z-1))*one_over_four_dy_dz;
-    T denominator=sqrt(sqr(phix)+sqr(phiy)+sqr(phiz)),curvature;
-    if(denominator >= small_number)
-        curvature=-(sqr(phix)*phiyy-2*phix*phiy*phixy+sqr(phiy)*phixx+sqr(phix)*phizz-2*phix*phiz*phixz+sqr(phiz)*phixx+sqr(phiy)*phizz-2*phiy*phiz*phiyz+sqr(phiz)*phiyy)/cube(denominator);
-    else curvature=LEVELSET_UTILITIES<T>::Sign(phi_input(index))*max_curvature;
-    return minmag(curvature,LEVELSET_UTILITIES<T>::Sign(curvature)*max_curvature);
-}
-//#####################################################################
-// Function Compute_Curvature
-//#####################################################################
-template<class T> T LEVELSET<VECTOR<T,3> >::
-Compute_Curvature(const TV& location) const
-{
-    // TODO: optimize
-    ARRAY<T,TV_INT> phi_stencil(-1,2,-1,2,-1,2);
-    for(int i=-1;i<=1;i++) for(int j=-1;j<=1;j++) for(int k=-1;k<=1;k++){
-        TV phi_location=grid.dX.x*TV((T)i,0,0)+grid.dX.y*TV(0,(T)j,0)+grid.dX.z*TV(0,0,(T)k)+location;
-        phi_stencil(i,j,k)=Phi(phi_location);}
-    return Compute_Curvature(phi_stencil,TV_INT(0,0,0));
-}
-//#####################################################################
 // Function Fast_Marching_Method
 //#####################################################################
 template<class T> void LEVELSET<VECTOR<T,3> >::

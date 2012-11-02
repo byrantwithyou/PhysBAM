@@ -229,6 +229,9 @@ public:
     static TV Normal_At_Node(const GRID<TV>& grid,const ARRAY<T,TV_INT>& phi,const TV_INT& index)
     {TV N;for(int d=0;d<TV::m;d++){TV_INT a(index),b(index);a(d)--;b(d)++;N(d)=(phi(b)-phi(a))*grid.one_over_dX(d);}return N.Normalized();}
 
+    T Compute_Curvature(const TV_INT& index) const
+    {return Compute_Curvature(phi,index);}
+
 //#####################################################################
     T Collision_Aware_Phi(const TV& location) const;
     T CFL(const T_FACE_ARRAYS_SCALAR& face_velocities) const;
@@ -240,6 +243,9 @@ public:
     TV Extended_Normal(const TV& location) const;
     SYMMETRIC_MATRIX<T,TV::m> Hessian(const TV& X) const;
     void Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists=true);
+    T Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const;
+    void Compute_Curvature(const T time=0);
+    T Compute_Curvature(const TV& location) const;
 //#####################################################################
 };
 }

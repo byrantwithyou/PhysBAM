@@ -238,6 +238,66 @@ Compute_Cell_Minimum_And_Maximum(const bool recompute_if_exists)
             interval.Enlarge_To_Include_Point(phi.array(ind));}
         (*cell_range)(it.index)=interval;}
 }
+//#####################################################################
+// Function Compute_Curvature
+//#####################################################################
+template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+Compute_Curvature(const ARRAY<T,TV_INT>& phi_input,const TV_INT& index) const
+{
+    TV_INT stride=phi_input.Strides();
+    int s_index=phi_input.Standard_Index(index);
+    TV dphi;
+    for(int a=0;a<TV::m;a++)
+        dphi(a)=(T).5*(phi_input.array(s_index+stride(a))-phi_input.array(s_index-stride(a)))*grid.one_over_dX(a);
+
+    SYMMETRIC_MATRIX<T,TV::m> ddphi;
+    for(int a=0;a<TV::m;a++)
+        for(int b=0;b<a;b++)
+            ddphi(a,b)=(T).25*(phi_input.array(s_index+stride(a)+stride(b))-phi_input.array(s_index+stride(a)-stride(b))
+                -phi_input.array(s_index-stride(a)+stride(b))+phi_input.array(s_index-stride(a)-stride(b)))*grid.one_over_dX(a)*grid.one_over_dX(b);
+
+    for(int a=0;a<TV::m;a++)
+        ddphi(a,a)=(phi_input.array(s_index+stride(a))-2*phi_input.array(s_index)+phi_input.array(s_index-stride(a)))*sqr(grid.one_over_dX(a));
+
+    T norm_squared=dphi.Magnitude_Squared(),norm=sqrt(norm_squared);
+    if(norm<small_number) return LEVELSET_UTILITIES<T>::Sign(phi_input(index))/grid.min_dX;
+    T curvature=(dphi.Dot(ddphi*dphi)-norm_squared*ddphi.Trace())/(norm*norm_squared);
+    return minmag(curvature,LEVELSET_UTILITIES<T>::Sign(curvature)/grid.min_dX);
+}
+//#####################################################################
+// Function Compute_Curvature
+//#####################################################################
+// kappa = - DIV(normal), negative for negative phi inside, positive for positive phi inside, sqrt(phix^2+phiy^2+phiy^2)=1 for distance functions
+template<class TV> void LEVELSET_BASE<TV>::
+Compute_Curvature(const T time)
+{
+    int ghost_cells=3;
+    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,0,time,ghost_cells);
+
+    if(!curvature) curvature=new ARRAY<T,TV_INT>(grid.Domain_Indices(ghost_cells-1));
+    for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid,ghost_cells-1);iterator.Valid();iterator.Next())
+        (*curvature)(iterator.Cell_Index())=Compute_Curvature(phi_ghost,iterator.Cell_Index());
+}
+//#####################################################################
+// Function Compute_Curvature
+//#####################################################################
+template<class TV> typename TV::SCALAR LEVELSET_BASE<TV>::
+Compute_Curvature(const TV& location) const
+{
+    TV l2=(location-(T).5*grid.dX-grid.domain.min_corner)*grid.one_over_dX;
+    TV_INT cell(floor(l2));
+    TV w(l2-TV(cell));
+
+    T k[1<<TV::m];
+    for(int i=0;i<(1<<TV::m);i++){
+        TV_INT index(cell);
+        for(int d=0;d<TV::m;d++)
+            if(i&(1<<d))
+                index(d)++;
+        k[i]=Compute_Curvature(phi,index);}
+
+    return LINEAR_INTERPOLATION<T,T>::Linear(k,w);
+}
 template class LEVELSET_BASE<VECTOR<float,1> >;
 template class LEVELSET_BASE<VECTOR<float,2> >;
 template class LEVELSET_BASE<VECTOR<float,3> >;
