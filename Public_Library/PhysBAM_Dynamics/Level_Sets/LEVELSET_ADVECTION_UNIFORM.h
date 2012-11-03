@@ -43,8 +43,6 @@ public:
     void Use_Maccormack_Advection(const ARRAY<bool,TV_INT>& cell_mask);
     T Approximate_Negative_Material(const T interface_thickness=3,const T time=0) const;
     T Approximate_Positive_Material(const T interface_thickness=3,const T time=0) const;
-    void Euler_Step_Of_Reinitialization(const ARRAY<T,TV_INT>& sign_phi,const T dt,const T time);
-    void Reinitialize(const int time_steps,const T time);
     void Euler_Step(const ARRAY<T,FACE_INDEX<TV::m> >& face_velocity,const T dt,const T time,const int number_of_ghost_cells);
 };
 }

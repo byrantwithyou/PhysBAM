@@ -53,64 +53,6 @@ Approximate_Positive_Material(const T interface_thickness,const T time) const
     return volume*grid.Cell_Size();
 }
 //#####################################################################
-// Function Euler_Step_Of_Reinitialization
-//#####################################################################
-template<class T_GRID> void LEVELSET_ADVECTION_UNIFORM<T_GRID>::
-Euler_Step_Of_Reinitialization(const ARRAY<T,TV_INT>& sign_phi,const T dt,const T time)
-{
-    GRID<TV>& grid=levelset->grid;
-    BOUNDARY_UNIFORM<GRID<TV>,T>* boundary=levelset->boundary;
-    T_ARRAYS_SCALAR& phi=levelset->phi;
-    
-    int ghost_cells=3;
-    RANGE<TV_INT> domain(grid.Domain_Indices());
-    ARRAY<T,TV_INT> phi_ghost(grid.Domain_Indices(ghost_cells));
-    boundary->Fill_Ghost_Cells(grid,phi,phi_ghost,dt,time,ghost_cells);
-    ARRAY<T,TV_INT> rhs(domain);
-
-    for(int d=0;d<TV::m;d++){
-        ARRAY<T,VECTOR<int,1> > phi_1d(-ghost_cells,grid.counts(d)+ghost_cells),phi_minus(0,grid.counts(d)),phi_plus(0,grid.counts(d));
-        RANGE<VECTOR<int,TV::m-1> > domain_plane(VECTOR<int,TV::m-1>(),domain.max_corner.Remove_Index(d));
-        for(RANGE_ITERATOR<TV::m-1> it(domain_plane);it.Valid();it.Next()){
-            TV_INT i=it.index.Insert(0,d);
-            for(i(d)=-ghost_cells;i(d)<grid.counts(d)+ghost_cells;i(d)++) phi_1d(i(d))=phi_ghost(i);
-            if(reinitialization_spatial_order==5) HJ_WENO(grid.counts(d),grid.dX(d),phi_1d,phi_minus,phi_plus);
-            else HJ_ENO(reinitialization_spatial_order,grid.counts(d),grid.dX(d),phi_1d,phi_minus,phi_plus);
-            for(i(d)=0;i(d)<grid.counts(d);i(d)++)
-                if(LEVELSET_UTILITIES<T>::Sign(phi(i))<0) rhs(i)=sqr(max(-phi_minus(i(d)),phi_plus(i(d)),(T)0));
-                else rhs(i)=sqr(max(phi_minus(i(d)),-phi_plus(i(d)),(T)0));}}
-
-    for(RANGE_ITERATOR<TV::m> it(domain);it.Valid();it.Next()){
-        phi(it.index)-=dt*sign_phi(it.index)*(sqrt(rhs(it.index))-1);
-        if(LEVELSET_UTILITIES<T>::Interface(phi_ghost(it.index),phi(it.index))) phi(it.index)=LEVELSET_UTILITIES<T>::Sign(phi_ghost(it.index))*levelset->small_number*grid.min_dX;}
-
-    boundary->Apply_Boundary_Condition(grid,phi,time); // time not incremented, pseudo-time
-}
-//#####################################################################
-// Functions Reinitialize
-//#####################################################################
-template<class T_GRID> void LEVELSET_ADVECTION_UNIFORM<T_GRID>::
-Reinitialize(const int time_steps,const T time)
-{
-    GRID<TV>& grid=levelset->grid;
-    T_ARRAYS_SCALAR& phi=levelset->phi;
-
-    ARRAY<T,TV_INT> sign_phi(grid.Domain_Indices()); // smeared out sign function
-    T epsilon=sqr(grid.dX.Max());
-    TV_INT i;
-    for(RANGE_ITERATOR<TV::m> it(grid.Domain_Indices());it.Valid();it.Next()) sign_phi(it.index)=phi(it.index)/sqrt(sqr(phi(it.index))+epsilon);
-
-    T dt=reinitialization_cfl*grid.min_dX;
-    RUNGEKUTTA<ARRAY<T,TV_INT> > rungekutta(phi);
-    rungekutta.Set_Grid_And_Boundary_Condition(grid,*levelset->boundary);
-    rungekutta.Set_Order(reinitialization_runge_kutta_order);
-    rungekutta.Set_Time(time);
-    rungekutta.Pseudo_Time();
-    for(int k=0;k<time_steps;k++){
-        rungekutta.Start(dt);
-        for(int kk=0;kk<rungekutta.order;kk++){Euler_Step_Of_Reinitialization(sign_phi,dt,time);rungekutta.Main();}}
-}
-//#####################################################################
 // Function Euler_Step
 //#####################################################################
 template<class T_GRID> void LEVELSET_ADVECTION_UNIFORM<T_GRID>::
