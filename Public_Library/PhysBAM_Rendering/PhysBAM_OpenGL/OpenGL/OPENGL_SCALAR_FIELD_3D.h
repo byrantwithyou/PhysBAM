@@ -20,7 +20,7 @@ template<class T,class T_ARRAY> class OPENGL_POINTS_3D;
 template<class T,class T2=T>
 class OPENGL_SCALAR_FIELD_3D : public OPENGL_OBJECT
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     GRID<TV> grid;
     ARRAY<T2,VECTOR<int,3> > &values;

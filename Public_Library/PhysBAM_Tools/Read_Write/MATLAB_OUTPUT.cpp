@@ -71,7 +71,7 @@ template<class T> void MATLAB_OUTPUT::
 Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,2> >& grid,const int stepnumber)
 {
     int m=grid.Counts().x,n=grid.Counts().y;
-    ARRAY<T,VECTOR<int,2> > x(0,m,0,n),y(0,m,0,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++){x(i,j)=grid.X(i,j).x;y(i,j)=grid.X(i,j).y;}
+    ARRAY<T,VECTOR<int,2> > x(0,m,0,n),y(0,m,0,n);for(int i=0;i<m;i++) for(int j=0;j<n;j++){x(i,j)=grid.X(VECTOR<int,2>(i,j)).x;y(i,j)=grid.X(VECTOR<int,2>(i,j)).y;}
     Write_Header_File(file_name,x,y,stepnumber);
 }
 //#####################################################################
@@ -97,8 +97,8 @@ Write_Header_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,co
 {
     int m=grid.Counts().x,n=grid.Counts().y,mn=grid.Counts().z;
     ARRAY<T,VECTOR<int,3> > x(0,m,0,n,0,mn),y(0,m,0,n,0,mn),z(0,m,0,n,0,mn);
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(i,j,ij).x;y(i,j,ij)=grid.X(i,j,ij).y;z(i,j,ij)=grid.X(i,j,ij).z;}
-    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(i,j,ij).x;y(i,j,ij)=grid.X(i,j,ij).y;z(i,j,ij)=grid.X(i,j,ij).z;}
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).x;y(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).y;z(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).z;}
+    for(int i=0;i<m;i++) for(int j=0;j<n;j++) for(int ij=0;ij<mn;ij++){x(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).x;y(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).y;z(i,j,ij)=grid.X(VECTOR<int,3>(i,j,ij)).z;}
     Write_Header_File(file_name,x,y,z,stepnumber);
 }
 //#####################################################################

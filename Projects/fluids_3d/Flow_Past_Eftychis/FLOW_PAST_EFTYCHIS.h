@@ -171,7 +171,7 @@ void Adjust_Density_And_Temperature_With_Sources(const T time)
                     fluids_parameters.density_container.density(i,j,fluids_parameters.grid->counts.z-1)=(T)1;}}
     else if(test_number==2 || test_number==3){
         for(int i=0;i<fluids_parameters.grid->counts.x;i++) for(int j=0;j<fluids_parameters.grid->counts.y;j++) for(int ij=0;ij<fluids_parameters.grid->counts.z;ij++){
-            if(source_sphere.Lazy_Inside(fluids_parameters.grid->X(i,j,ij))){
+            if(source_sphere.Lazy_Inside(fluids_parameters.grid->X(TV_INT(i,j,ij)))){
                 fluids_parameters.density_container.density(i,j,ij)=(T)1;}}}
 }
 //#####################################################################

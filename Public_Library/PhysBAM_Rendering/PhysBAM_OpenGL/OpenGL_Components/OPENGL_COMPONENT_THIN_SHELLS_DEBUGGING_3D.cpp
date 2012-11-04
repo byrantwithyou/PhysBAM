@@ -73,22 +73,22 @@ Display(const int in_color) const
                 glLineWidth(1);
                 vertices.Resize(0);
                 for(int i=face_corners_visible_from_face_center_u.domain.min_corner.x;i<face_corners_visible_from_face_center_u.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_u.domain.min_corner.y;j<face_corners_visible_from_face_center_u.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_u.domain.min_corner.z;k<face_corners_visible_from_face_center_u.domain.max_corner.z;k++){
-                    if(!face_corners_visible_from_face_center_u(i,j,k)(0).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j,k),vertices);}
-                    if(!face_corners_visible_from_face_center_u(i,j,k)(1).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j+1,k),vertices);}
-                    if(!face_corners_visible_from_face_center_u(i,j,k)(2).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j,k+1),vertices);}
-                    if(!face_corners_visible_from_face_center_u(i,j,k)(3).x){OpenGL_Line(u_grid.X(i,j,k),grid.X(i,j+1,k+1),vertices);}
+                    if(!face_corners_visible_from_face_center_u(i,j,k)(0).x){OpenGL_Line(u_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_u(i,j,k)(1).x){OpenGL_Line(u_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j+1,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_u(i,j,k)(2).x){OpenGL_Line(u_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k+1)),vertices);}
+                    if(!face_corners_visible_from_face_center_u(i,j,k)(3).x){OpenGL_Line(u_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j+1,k+1)),vertices);}
                 }
                 for(int i=face_corners_visible_from_face_center_v.domain.min_corner.x;i<face_corners_visible_from_face_center_v.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_v.domain.min_corner.y;j<face_corners_visible_from_face_center_v.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_v.domain.min_corner.z;k<face_corners_visible_from_face_center_v.domain.max_corner.z;k++){
-                    if(!face_corners_visible_from_face_center_v(i,j,k)(0).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i,j,k),vertices);}
-                    if(!face_corners_visible_from_face_center_v(i,j,k)(1).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i+1,j,k),vertices);}
-                    if(!face_corners_visible_from_face_center_v(i,j,k)(2).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i,j,k+1),vertices);}
-                    if(!face_corners_visible_from_face_center_v(i,j,k)(3).x){OpenGL_Line(v_grid.X(i,j,k),grid.X(i+1,j,k+1),vertices);}
+                    if(!face_corners_visible_from_face_center_v(i,j,k)(0).x){OpenGL_Line(v_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_v(i,j,k)(1).x){OpenGL_Line(v_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i+1,j,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_v(i,j,k)(2).x){OpenGL_Line(v_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k+1)),vertices);}
+                    if(!face_corners_visible_from_face_center_v(i,j,k)(3).x){OpenGL_Line(v_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i+1,j,k+1)),vertices);}
                 }
                 for(int i=face_corners_visible_from_face_center_w.domain.min_corner.x;i<face_corners_visible_from_face_center_w.domain.max_corner.x;i++) for(int j=face_corners_visible_from_face_center_w.domain.min_corner.y;j<face_corners_visible_from_face_center_w.domain.max_corner.y;j++) for(int k=face_corners_visible_from_face_center_w.domain.min_corner.z;k<face_corners_visible_from_face_center_w.domain.max_corner.z;k++){
-                    if(!face_corners_visible_from_face_center_w(i,j,k)(0).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i,j,k),vertices);}
-                    if(!face_corners_visible_from_face_center_w(i,j,k)(1).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i+1,j,k),vertices);}
-                    if(!face_corners_visible_from_face_center_w(i,j,k)(2).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i,j+1,k),vertices);}
-                    if(!face_corners_visible_from_face_center_w(i,j,k)(3).x){OpenGL_Line(w_grid.X(i,j,k),grid.X(i+1,j+1,k),vertices);}
+                    if(!face_corners_visible_from_face_center_w(i,j,k)(0).x){OpenGL_Line(w_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_w(i,j,k)(1).x){OpenGL_Line(w_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i+1,j,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_w(i,j,k)(2).x){OpenGL_Line(w_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j+1,k)),vertices);}
+                    if(!face_corners_visible_from_face_center_w(i,j,k)(3).x){OpenGL_Line(w_grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i+1,j+1,k)),vertices);}
                 }
                 OpenGL_Draw_Arrays(GL_LINES,3,vertices);
             }
@@ -98,9 +98,9 @@ Display(const int in_color) const
                 glLineWidth(5);
                 vertices.Resize(0);
                 for(int i=node_neighbors_visible.domain.min_corner.x;i<node_neighbors_visible.domain.max_corner.x;i++) for(int j=node_neighbors_visible.domain.min_corner.y;j<node_neighbors_visible.domain.max_corner.y;j++) for(int k=node_neighbors_visible.domain.min_corner.z;k<node_neighbors_visible.domain.max_corner.z;k++){
-                    if(!node_neighbors_visible(i,j,k)(0)){OpenGL_Line(grid.X(i,j,k),grid.X(i+1,j,k),vertices);}
-                    if(!node_neighbors_visible(i,j,k)(1)){OpenGL_Line(grid.X(i,j,k),grid.X(i,j+1,k),vertices);}
-                    if(!node_neighbors_visible(i,j,k)(2)){OpenGL_Line(grid.X(i,j,k),grid.X(i,j,k+1),vertices); }
+                    if(!node_neighbors_visible(i,j,k)(0)){OpenGL_Line(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i+1,j,k)),vertices);}
+                    if(!node_neighbors_visible(i,j,k)(1)){OpenGL_Line(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j+1,k)),vertices);}
+                    if(!node_neighbors_visible(i,j,k)(2)){OpenGL_Line(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k+1)),vertices); }
                 }
                 OpenGL_Draw_Arrays(GL_LINES,3,vertices);
             }

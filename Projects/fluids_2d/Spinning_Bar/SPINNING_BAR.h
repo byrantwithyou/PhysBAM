@@ -107,7 +107,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     RANGE<TV> box((T).25,(T).75,(T).4,(T).6);
 
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++)
-        phi(i,j)=box.Signed_Distance(grid.X(i,j));
+        phi(i,j)=box.Signed_Distance(grid.X(TV_INT(i,j)));
 }
 //#####################################################################
 // Function Initialize_Velocities
@@ -129,7 +129,7 @@ void Get_External_Velocity(ARRAY<TV,VECTOR<int,2> >& V_blend,ARRAY<T,VECTOR<int,
 {
     //TV center=grid.Domain().Center();
     //for(int i=0;i<grid.m;i++)for(int j=0;j<grid.n;j++)
-    //    V(i,j)=angular_velocity*(grid.X(i,j)-center).Rotate_Counterclockwise_90();
+    //    V(i,j)=angular_velocity*(grid.X(TV_INT(i,j))-center).Rotate_Counterclockwise_90();
 } 
 //#####################################################################
 };      

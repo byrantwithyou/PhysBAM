@@ -20,7 +20,7 @@ namespace PhysBAM
 template<class T,class RW=T>
 class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_3D : public OPENGL_COMPONENT
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     GRID<TV> grid,mac_grid,u_grid,v_grid,w_grid;
     ARRAY<VECTOR<bool,3>,VECTOR<int,3> > node_neighbors_visible;

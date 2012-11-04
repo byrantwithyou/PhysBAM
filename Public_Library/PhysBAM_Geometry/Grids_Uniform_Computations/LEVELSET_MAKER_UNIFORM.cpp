@@ -85,7 +85,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         if(!grid_domain.Lazy_Intersection(triangle_bounding_box)) continue;
         TV_INT min_index=grid.Clamped_Index(triangle_bounding_box.Minimum_Corner()),max_index=grid.Clamped_Index_End_Minus_One(triangle_bounding_box.Maximum_Corner())+2;
         for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++){
-            TV grid_position=grid.X(i,j,k),weights,closest_point=triangle.Closest_Point(grid_position,weights);
+            TV grid_position=grid.X(TV_INT(i,j,k)),weights,closest_point=triangle.Closest_Point(grid_position,weights);
             T distance_squared=(grid_position-closest_point).Magnitude_Squared();
             if(phi(i,j,k)==FLT_MAX || distance_squared<sqr(phi(i,j,k))){
                 if(store_initialized_indices && phi(i,j,k)==FLT_MAX) initialized_indices.Append(TV_INT(i,j,k));
@@ -96,11 +96,11 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
                     (*velocity)(i,j,k)=weights.x*triangulated_surface.particles.V(node1)+weights.y*triangulated_surface.particles.V(node2)+weights.z*triangulated_surface.particles.V(node3);}}}
         if(need_flood_fill){
             for(int i=min_index.x+1;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++)
-                if(!edge_is_blocked.Component(0)(i,j,k)) edge_is_blocked.Component(0)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(i,j,k),grid.X(i-1,j,k)),enlarged_triangle,surface_thickness_over_two);
+                if(!edge_is_blocked.Component(0)(i,j,k)) edge_is_blocked.Component(0)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i-1,j,k))),enlarged_triangle,surface_thickness_over_two);
             for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y+1;j<max_index.y;j++) for(int k=min_index.z;k<max_index.z;k++)
-                if(!edge_is_blocked.Component(1)(i,j,k)) edge_is_blocked.Component(1)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(i,j,k),grid.X(i,j-1,k)),enlarged_triangle,surface_thickness_over_two);
+                if(!edge_is_blocked.Component(1)(i,j,k)) edge_is_blocked.Component(1)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j-1,k))),enlarged_triangle,surface_thickness_over_two);
             for(int i=min_index.x;i<max_index.x;i++) for(int j=min_index.y;j<max_index.y;j++) for(int k=min_index.z+1;k<max_index.z;k++)
-                if(!edge_is_blocked.Component(2)(i,j,k)) edge_is_blocked.Component(2)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(i,j,k),grid.X(i,j,k-1)),enlarged_triangle,surface_thickness_over_two);}}
+                if(!edge_is_blocked.Component(2)(i,j,k)) edge_is_blocked.Component(2)(i,j,k)=INTERSECTION::Intersects(SEGMENT_3D<T>(grid.X(TV_INT(i,j,k)),grid.X(TV_INT(i,j,k-1))),enlarged_triangle,surface_thickness_over_two);}}
 
     if((compute_signed_distance_function || compute_unsigned_distance_function) && use_fmm && fmm_stopping_distance)
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) phi(i,j,k)=min(phi(i,j,k),fmm_stopping_distance);
@@ -120,7 +120,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         if(verbose) LOG::Time("Computing sign using orthogonal vote");
         ARRAY<bool,TV_INT> is_inside(grid.Domain_Indices());
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-            if(closest_triangle_index(i,j,k)) is_inside(i,j,k)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(i,j,k),closest_triangle_index(i,j,k),surface_thickness_over_two);}
+            if(closest_triangle_index(i,j,k)) is_inside(i,j,k)=triangulated_surface.Inside_Relative_To_Triangle(grid.X(TV_INT(i,j,k)),closest_triangle_index(i,j,k),surface_thickness_over_two);}
         ARRAY<char,TV_INT> vote(grid.Domain_Indices());
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.x,edge_is_blocked.Component(0),is_inside,TV_INT(1,j,k),1,vote);
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++) Process_Segment(grid.counts.y,edge_is_blocked.Component(1),is_inside,TV_INT(i,1,k),2,vote);
@@ -149,7 +149,7 @@ Compute_Level_Set(TRIANGULATED_SURFACE<T>& triangulated_surface,GRID<TV>& grid,A
         int number_of_colors=flood_fill.Flood_Fill(colors,edge_is_blocked);
         if(verbose) LOG::cout<<"(got "<<number_of_colors<<" colors)... "<<std::endl;
         if(number_of_colors==1 && !phi_offset){ // there is only one color. check if the whole domain is inside or outside then return
-            if(triangulated_surface.Inside(grid.X(1,1,1))) phi.Fill(-FLT_MAX);
+            if(triangulated_surface.Inside(grid.X(TV_INT(1,1,1)))) phi.Fill(-FLT_MAX);
             else phi.Fill(FLT_MAX);
             return false;}
         // TODO: put this back if you need it

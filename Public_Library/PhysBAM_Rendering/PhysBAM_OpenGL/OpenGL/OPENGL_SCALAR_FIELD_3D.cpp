@@ -184,7 +184,7 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int i=grid.counts.x-1;i>=0;i--) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(i,j,k);
+                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
@@ -194,7 +194,7 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(i,j,k);
+                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
@@ -205,7 +205,7 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=grid.counts.y-1;j>=0;j--) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(i,j,k);
+                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
@@ -215,7 +215,7 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int j=0;j<grid.counts.y;j++) for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(i,j,k);
+                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
@@ -226,7 +226,7 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=grid.counts.z-1;k>=0;k--) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(i,j,k);
+                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
@@ -236,7 +236,7 @@ Display_3D() const
             ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
             for(int k=0;k<grid.counts.z;k++) for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
                 for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-                VECTOR<T,3> pos=grid.X(i,j,k);
+                VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
                 OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
@@ -269,7 +269,7 @@ Display_3D_Slice() const
         int i=slice->index;
         for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
             for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-            VECTOR<T,3> pos=grid.X(i,j,k);
+            VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
             OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y-0.5*grid.dX.y,pos.z+0.5*grid.dX.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x,pos.y+0.5*grid.dX.y,pos.z-0.5*grid.dX.z),vertices);
@@ -280,7 +280,7 @@ Display_3D_Slice() const
         int j=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int k=0;k<grid.counts.z;k++){
             for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-            VECTOR<T,3> pos=grid.X(i,j,k);
+            VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
             OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y,pos.z-0.5*grid.dX.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y,pos.z+0.5*grid.dX.z),vertices);
@@ -291,7 +291,7 @@ Display_3D_Slice() const
         int k=slice->index;
         for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
             for(int t=0;t<4;t++) OpenGL_Color(Do_Color(i,j,k).rgba,colors);
-            VECTOR<T,3> pos=grid.X(i,j,k);
+            VECTOR<T,3> pos=grid.X(TV_INT(i,j,k));
             OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y,pos.z),vertices);
             OpenGL_Vertex(VECTOR<T,3>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y,pos.z),vertices);
@@ -437,17 +437,17 @@ void Update_Slice_Helper(OPENGL_SCALAR_FIELD_3D<T,T2>* self,int tex_width,int te
             T2 value=T2();
             TV location;
             switch (slice->axis){
-                case 0: location=TV(self->grid.X(slice->index,0,0).x,
+                case 0: location=TV(self->grid.X(VECTOR<int,3>(slice->index,0,0)).x,
                     self->grid.domain.min_corner.y+j*(self->grid.domain.max_corner.y-self->grid.domain.min_corner.y)/tex_height,
                     self->grid.domain.max_corner.z-i*(self->grid.domain.max_corner.z-self->grid.domain.min_corner.z)/tex_width);
                     break;
                 case 1: location=TV(self->grid.domain.min_corner.x+i*(self->grid.domain.max_corner.x-self->grid.domain.min_corner.x)/tex_width,
-                    self->grid.X(0,slice->index,0).y,
+                    self->grid.X(VECTOR<int,3>(0,slice->index,0)).y,
                     self->grid.domain.max_corner.z-j*(self->grid.domain.max_corner.z-self->grid.domain.min_corner.z)/tex_height);
                     break;
                 case 2: location=TV(self->grid.domain.min_corner.x+i*(self->grid.domain.max_corner.x-self->grid.domain.min_corner.x)/tex_width,
                     self->grid.domain.min_corner.y+j*(self->grid.domain.max_corner.y-self->grid.domain.min_corner.y)/tex_height,
-                    self->grid.X(0,0,slice->index).z);
+                    self->grid.X(VECTOR<int,3>(0,0,slice->index)).z);
                     break;}
             value=interpolation.Clamped_To_Array(self->grid,self->values,location);
             int idx=j*tex_width+i;
@@ -527,7 +527,7 @@ Update_Points()
     opengl_points->points.Resize(values.counts.Product());
     int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++){
-        opengl_points->points(index)=grid.X(i,j,k);
+        opengl_points->points(index)=grid.X(TV_INT(i,j,k));
         opengl_points->Set_Point_Color(index,color_maps(current_color_map)->Lookup(values(i,j,k)));
         index++;}
 }
@@ -543,7 +543,7 @@ Update_Points()
     opengl_points->points.Resize(values.counts.Product());
     int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
-        if(values(i,j,k)) opengl_points->points(index++)=grid.X(i,j,k);
+        if(values(i,j,k)) opengl_points->points(index++)=grid.X(TV_INT(i,j,k));
     opengl_points->points.Resize(index);
 }
 
@@ -555,7 +555,7 @@ Update_Points()
     opengl_points->points.Resize(values.counts.Product());
     int index=0;
     for(int i=values.domain.min_corner.x;i<values.domain.max_corner.x;i++) for(int j=values.domain.min_corner.y;j<values.domain.max_corner.y;j++) for(int k=values.domain.min_corner.z;k<values.domain.max_corner.z;k++)
-        if(values(i,j,k)) opengl_points->points(index++)=grid.X(i,j,k);
+        if(values(i,j,k)) opengl_points->points(index++)=grid.X(TV_INT(i,j,k));
     opengl_points->points.Resize(index);
 }
 

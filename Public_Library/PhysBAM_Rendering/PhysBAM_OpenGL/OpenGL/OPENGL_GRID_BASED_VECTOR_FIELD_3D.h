@@ -18,7 +18,7 @@ template<class TV> class RANGE;
 template<class T_input>
 class OPENGL_GRID_BASED_VECTOR_FIELD_3D:public OPENGL_VECTOR_FIELD_3D<T_input>
 {
-    typedef T_input T;typedef VECTOR<T,3> TV;
+    typedef T_input T;typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using OPENGL_VECTOR_FIELD_3D<T>::slice;
     using OPENGL_VECTOR_FIELD_3D<T>::vector_field;using OPENGL_VECTOR_FIELD_3D<T>::vector_locations;

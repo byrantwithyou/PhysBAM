@@ -22,7 +22,7 @@ Display(const int in_color) const
         glDisable(GL_LIGHTING);OPENGL_COLOR::White().Send_To_GL_Pipeline();
         ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;
         for(int i=0;i<levelset.grid.counts.x;i++) for(int j=0;j<levelset.grid.counts.y;j++) if(!active_cells || (*active_cells)(i,j)){
-            OpenGL_Line(grid.X(i,j),grid.X(i,j)+T(0.01)*(*levelset.normals)(i,j),vertices);}
+            OpenGL_Line(grid.X(TV_INT(i,j)),grid.X(TV_INT(i,j))+T(0.01)*(*levelset.normals)(i,j),vertices);}
         OpenGL_Draw_Arrays(GL_LINES,2,vertices);
         glPopAttrib();}
     if(draw_area&&opengl_triangulated_area){glDepthMask(GL_FALSE);opengl_triangulated_area->Display(in_color);glDepthMask(GL_TRUE);}

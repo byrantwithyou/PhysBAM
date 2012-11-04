@@ -15,7 +15,7 @@ namespace PhysBAM{
 template<class T>
 class VORTEX_PARTICLE_EVOLUTION_3D:public NONCOPYABLE
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
     typedef ARRAY<T,FACE_INDEX<TV::m> > T_FACE_ARRAYS_SCALAR;typedef typename GRID<TV>::FACE_ITERATOR T_FACE_ITERATOR;
     typedef typename MPI_GRID_POLICY<GRID<TV> >::MPI_GRID T_MPI_GRID;
 public:

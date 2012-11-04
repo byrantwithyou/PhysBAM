@@ -122,11 +122,11 @@ Get_Triangulated_Area(const int sign)
     GRID<TV> mac_grid=grid.Get_MAC_Grid();
     for(int i=1;i<grid.counts.x-1;i++) for(int j=1;j<grid.counts.y-1;j++) if(levelset.phi(i,j)*sign>=0){
         int v0=particles.Add_Element(),v1=particles.Add_Element(),v2=particles.Add_Element(),v3=particles.Add_Element(),v4=particles.Add_Element();
-        particles.X(v0)=grid.X(i,j);
-        particles.X(v1)=vertices(i-1,j-1)>=0?geometry(vertices(i-1,j-1)):mac_grid.X(i-1,j-1);
-        particles.X(v2)=vertices(i,j-1)>=0?geometry(vertices(i,j-1)):mac_grid.X(i,j-1);
-        particles.X(v3)=vertices(i,j)>=0?geometry(vertices(i,j)):mac_grid.X(i,j);
-        particles.X(v4)=vertices(i-1,j)>=0?geometry(vertices(i-1,j)):mac_grid.X(i-1,j);
+        particles.X(v0)=grid.X(TV_INT(i,j));
+        particles.X(v1)=vertices(i-1,j-1)>=0?geometry(vertices(i-1,j-1)):mac_grid.X(TV_INT(i-1,j-1));
+        particles.X(v2)=vertices(i,j-1)>=0?geometry(vertices(i,j-1)):mac_grid.X(TV_INT(i,j-1));
+        particles.X(v3)=vertices(i,j)>=0?geometry(vertices(i,j)):mac_grid.X(TV_INT(i,j));
+        particles.X(v4)=vertices(i-1,j)>=0?geometry(vertices(i-1,j)):mac_grid.X(TV_INT(i-1,j));
         mesh.elements(current_triangle++).Set(v2,v1,v0);
         mesh.elements(current_triangle++).Set(v3,v2,v0);
         mesh.elements(current_triangle++).Set(v4,v3,v0);

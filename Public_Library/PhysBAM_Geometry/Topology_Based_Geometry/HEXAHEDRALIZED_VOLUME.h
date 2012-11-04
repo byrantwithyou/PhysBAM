@@ -22,7 +22,7 @@ template<class T_input>
 class HEXAHEDRALIZED_VOLUME:public MESH_OBJECT<VECTOR<T_input,3>,HEXAHEDRON_MESH>
 {
     typedef T_input T;
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     typedef MESH_OBJECT<TV,HEXAHEDRON_MESH> BASE;
     using BASE::mesh;using BASE::particles;

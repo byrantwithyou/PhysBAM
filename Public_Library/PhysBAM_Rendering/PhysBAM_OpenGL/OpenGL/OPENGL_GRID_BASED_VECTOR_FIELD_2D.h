@@ -17,7 +17,7 @@ template<class T_input>
 class OPENGL_GRID_BASED_VECTOR_FIELD_2D:public OPENGL_VECTOR_FIELD_2D<ARRAY<VECTOR<T_input,2> > >
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     using OPENGL_VECTOR_FIELD_2D<ARRAY<TV> >::size;
 

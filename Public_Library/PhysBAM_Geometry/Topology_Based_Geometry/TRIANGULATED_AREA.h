@@ -19,7 +19,7 @@ template<class T_input>
 class TRIANGULATED_AREA:public MESH_OBJECT<VECTOR<T_input,2>,TRIANGLE_MESH>
 {
     typedef T_input T;
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
     typedef TRIANGLE_HIERARCHY_2D<T>* T_HIERARCHY;
 public:
     typedef MESH_OBJECT<TV,TRIANGLE_MESH> BASE;

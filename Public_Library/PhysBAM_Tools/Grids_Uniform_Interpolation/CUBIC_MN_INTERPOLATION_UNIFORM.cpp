@@ -23,7 +23,7 @@ namespace{
 template<class T_GRID,class T2,class T_FACE_LOOKUP,class T> T2
 From_Base_Node(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOOKUP>& cub,const GRID<VECTOR<T,1> >& grid,const ARRAYS_ND_BASE<T2,VECTOR<int,1> >& u,const VECTOR<T,1>& X,const VECTOR<int,1>& index)
 {
-    return cub.cubic_mn_interpolation.Cubic_MN(u(index.x),u(index.x+1),u(index.x+2),u(index.x+3),(X.x-grid.X(index.x+1).x)*grid.one_over_dX.x);
+    return cub.cubic_mn_interpolation.Cubic_MN(u(index.x),u(index.x+1),u(index.x+2),u(index.x+3),(X.x-grid.X(index+1).x)*grid.one_over_dX.x);
 }
 //#####################################################################
 // Function From_Base_Node_Weights
@@ -33,7 +33,7 @@ From_Base_Node_Weights(const CUBIC_MN_INTERPOLATION_UNIFORM<T_GRID,T2,T_FACE_LOO
 {
     typedef VECTOR<int,1> TV_INT;
     ARRAY<T> local_weights;
-    local_weights=cub.cubic_mn_interpolation.Cubic_MN_Weights((X.x-grid.X(index.x+1).x)*grid.one_over_dX.x);
+    local_weights=cub.cubic_mn_interpolation.Cubic_MN_Weights((X.x-grid.X(index+1).x)*grid.one_over_dX.x);
     ARRAY<PAIR<TV_INT,T> > weights;
     for(int i=0;i<4;i++) weights.Append(PAIR<TV_INT,T>(TV_INT(index.x+i),local_weights(i+1)));
     return weights;

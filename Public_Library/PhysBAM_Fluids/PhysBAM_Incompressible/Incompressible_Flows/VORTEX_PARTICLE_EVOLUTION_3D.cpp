@@ -70,7 +70,7 @@ Compute_Body_Force(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,ARRAY<VECTO
             VECTOR<int,3> index=grid.Clamped_Index(missing_vorticity_particles.X(p));
             VECTOR<int,3> lower=clamp_min(index-box_radius,VECTOR<int,3>(0,0,0)),upper=clamp_max(index+box_radius,grid.counts);
             for(int i=lower.x;i<upper.x;i++) for(int j=lower.y;j<upper.y;j++) for(int ij=lower.z;ij<upper.z;ij++){
-                VECTOR<T,3> X_minus_Xp=grid.X(i,j,ij)-missing_vorticity_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
+                VECTOR<T,3> X_minus_Xp=grid.X(TV_INT(i,j,ij))-missing_vorticity_particles.X(p);T distance_squared=X_minus_Xp.Magnitude_Squared();
                 if(distance_squared>small_number&&distance_squared<=sqr(radius)) {
 //                    force(i,j,ij)-=(T)(force_scaling*Gaussian_Kernel(distance_squared)/sqrt(distance_squared))*VECTOR<T,3>::Cross_Product(X_minus_Xp,missing_vorticity_particles.vorticity(p));}}}
                     T distance=sqrt(distance_squared);
@@ -132,7 +132,7 @@ Euler_Step(const T_FACE_ARRAYS_SCALAR& face_velocities_ghost,const T dt,const T 
     ARRAY<MATRIX<T,3> ,VECTOR<int,3> > VX(grid.Domain_Indices(1),false);LINEAR_INTERPOLATION_UNIFORM<GRID<TV>,MATRIX<T,3> > VX_interpolation;
     T one_over_four_dx=1/(4*grid.dX.x),one_over_four_dy=1/(4*grid.dX.y),one_over_four_dz=1/(4*grid.dX.z);
     for(int i=0;i<grid.counts.x+1;i++) for(int j=0;j<grid.counts.y+1;j++) for(int ij=0;ij<grid.counts.z+1;ij++)
-        VX(i,j,ij)=MATRIX<T,3>(one_over_four_dx*(two_times_V_ghost(i+1,j,ij)-two_times_V_ghost(i-1,j,ij)),
+        VX(TV_INT(i,j,ij))=MATRIX<T,3>(one_over_four_dx*(two_times_V_ghost(i+1,j,ij)-two_times_V_ghost(i-1,j,ij)),
                                  one_over_four_dy*(two_times_V_ghost(i,j+1,ij)-two_times_V_ghost(i,j-1,ij)),
                                  one_over_four_dz*(two_times_V_ghost(i,j,ij+1)-two_times_V_ghost(i,j,ij-1)));
 

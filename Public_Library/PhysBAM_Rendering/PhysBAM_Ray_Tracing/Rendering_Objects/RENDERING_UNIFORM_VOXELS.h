@@ -16,7 +16,7 @@ namespace PhysBAM{
 template<class T>
 class RENDERING_UNIFORM_VOXELS:public RENDERING_VOXELS<T>
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 public:
     using RENDERING_VOXELS<T>::box;using RENDERING_VOXELS<T>::small_number;using RENDERING_VOXELS<T>::precompute_single_scattering;
 
@@ -76,7 +76,7 @@ public:
     {locations.Resize(coarse_grid.counts.Product());map_from_accessor_index_to_my_index.Resize(locations.m);int index=0;
     for(int i=0;i<coarse_grid.counts.x;i++)for(int j=0;j<coarse_grid.counts.y;j++)for(int ij=0;ij<coarse_grid.counts.z;ij++){
         map_from_accessor_index_to_my_index(index)=VECTOR<int,3>(i,j,ij);
-        locations(index)=coarse_grid.X(i,j,ij);index++;}}
+        locations(index)=coarse_grid.X(TV_INT(i,j,ij));index++;}}
 
     bool Use_Precomputed_Light_Data(const VECTOR<T,3>& location,const int light_index) const PHYSBAM_OVERRIDE
     {if(!precompute_single_scattering)return false;

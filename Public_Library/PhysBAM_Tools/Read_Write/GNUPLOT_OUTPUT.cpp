@@ -28,7 +28,7 @@ Write_Output_File(const std::string& file_name,const GRID<VECTOR<T,1> >& grid,co
 {
     int m=output.domain.max_corner.x;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str());
-    for(int i=0;i<m;i++){VECTOR<T,1> position=grid.X(i);Matlab_Output<<position.x<<"\t"<<output(i)<<std::endl;}
+    for(int i=0;i<m;i++){VECTOR<T,1> position=grid.X(VECTOR<int,1>(i));Matlab_Output<<position.x<<"\t"<<output(i)<<std::endl;}
     Matlab_Output.close();
 }
 //#####################################################################
@@ -40,7 +40,7 @@ Write_Output_File(const std::string& file_name,const GRID<VECTOR<T,2> >& grid,co
     int m=output.domain.max_corner.x,n=output.domain.max_corner.y;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str());
     for(int i=0;i<m;i++){for(int j=0;j<n;j++){
-            VECTOR<T,2> position=grid.X(i,j);Matlab_Output<<position.x<<"\t"<<position.y<<"\t"<<output(i,j)<<std::endl;}
+            VECTOR<T,2> position=grid.X(VECTOR<int,2>(i,j));Matlab_Output<<position.x<<"\t"<<position.y<<"\t"<<output(i,j)<<std::endl;}
         Matlab_Output<<std::endl;}
     Matlab_Output.close();
 }
@@ -53,7 +53,7 @@ Write_Output_File(const std::string& file_name,const GRID<VECTOR<T,3> >& grid,co
     int m=output.domain.max_corner.x,n=output.domain.max_corner.y,mn=output.domain.max_corner.z;
     std::ofstream Matlab_Output;Matlab_Output.open(STRING_UTILITIES::string_sprintf("%s.%d",file_name.c_str(),stepnumber).c_str());
     for(int i=0;i<m;i++){for(int j=0;j<n;j++){for(int ij=0;ij<mn;ij++){
-            VECTOR<T,3> position=grid.X(i,j,ij);Matlab_Output<<position.x<<"\t"<<position.y<<"\t"<<position.z<<"\t"<<output(i,j,ij)<<std::endl;}
+            VECTOR<T,3> position=grid.X(VECTOR<int,3>(i,j,ij));Matlab_Output<<position.x<<"\t"<<position.y<<"\t"<<position.z<<"\t"<<output(i,j,ij)<<std::endl;}
             Matlab_Output<<std::endl;}
         Matlab_Output<<std::endl;}
     Matlab_Output.close();

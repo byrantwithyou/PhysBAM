@@ -168,7 +168,7 @@ Display_2D() const
     ARRAY<typename OPENGL_POLICY<T>::T_GL> vertices;ARRAY<GLfloat> colors;
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) {
         for(int t=0;t<4;t++) OpenGL_Color(color_map->Lookup(Pre_Map_Value(values(i,j))).rgba,colors);
-        VECTOR<T,2> pos=grid.X(i,j);
+        VECTOR<T,2> pos=grid.X(TV_INT(i,j));
         OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y-0.5*grid.dX.y),vertices);
         OpenGL_Vertex(VECTOR<T,2>(pos.x-0.5*grid.dX.x,pos.y+0.5*grid.dX.y),vertices);
         OpenGL_Vertex(VECTOR<T,2>(pos.x+0.5*grid.dX.x,pos.y-0.5*grid.dX.y),vertices);
@@ -304,7 +304,7 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     int index=0;
     OPENGL_COLOR_MAP<T2>* color_map=color_maps(current_color_map);
     for(int i=start_index.x,i_active_cells=0;i<end_index.x;i++,i_active_cells++) for(int j=start_index.y,j_active_cells=0;j<end_index.y;j++,j_active_cells++) if(!active_cells || (*active_cells)(i_active_cells,j_active_cells)){
-        opengl_points->points(index)=grid.X(i,j);
+        opengl_points->points(index)=grid.X(TV_INT(i,j));
         opengl_points->Set_Point_Color(index,color_map->Lookup(Pre_Map_Value(values(i,j))));
         index++;}
     opengl_points->points.Resize(index);
@@ -358,7 +358,7 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     opengl_points->points.Resize((end_index.x-start_index.x)*(end_index.y-start_index.y));
     int index=0;
     for(int i=start_index.x;i<end_index.x;i++) for(int j=start_index.y;j<end_index.y;j++)
-        if(values(i,j)) opengl_points->points(index++)=grid.X(i,j);
+        if(values(i,j)) opengl_points->points(index++)=grid.X(TV_INT(i,j));
     opengl_points->points.Resize(index);
 }
 
@@ -371,7 +371,7 @@ Update_Points(const VECTOR<int,2>& start_index,const VECTOR<int,2>& end_index)
     opengl_points->points.Resize((end_index.x-start_index.x)*(end_index.y-start_index.y));
     int index=0;
     for(int i=start_index.x;i<end_index.x;i++) for(int j=start_index.y;j<end_index.y;j++)
-        if(values(i,j)) opengl_points->points(index++)=grid.X(i,j);
+        if(values(i,j)) opengl_points->points(index++)=grid.X(TV_INT(i,j));
     opengl_points->points.Resize(index);
 }
 

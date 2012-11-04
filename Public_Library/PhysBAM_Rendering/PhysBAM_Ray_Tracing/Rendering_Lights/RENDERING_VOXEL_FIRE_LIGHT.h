@@ -21,7 +21,7 @@ namespace PhysBAM{
 template<class T>
 class RENDERING_VOXEL_FIRE_LIGHT:public RENDERING_LIGHT<T>
 {
-    typedef VECTOR<T,3> TV;
+    typedef VECTOR<T,3> TV;typedef VECTOR<int,3> TV_INT;
 private:
     using RENDERING_LIGHT<T>::world;using RENDERING_LIGHT<T>::supports_global_photon_mapping;using RENDERING_LIGHT<T>::supports_caustic_photon_mapping;
     using RENDERING_LIGHT<T>::supports_volume_photon_mapping;using RENDERING_LIGHT<T>::global_photon_random;using RENDERING_LIGHT<T>::caustic_photon_random;
@@ -49,9 +49,9 @@ public:
         total_average_power=0;total_power=VECTOR<T,3>(0,0,0);
         for(int i=0;i<fire_voxels.grid.counts.x;i++)for(int j=0;j<fire_voxels.grid.counts.y;j++)for(int ij=0;ij<fire_voxels.grid.counts.z;ij++){
             T cell_power;VECTOR<T,3> cell_power_spectrum;
-            if(fire_shader.empty_implicit_surface && fire_shader.empty_implicit_surface->Lazy_Inside(fire_voxels.grid.X(i,j,ij))){cell_power=0;cell_power_spectrum=VECTOR<T,3>(0,0,0);}
+            if(fire_shader.empty_implicit_surface && fire_shader.empty_implicit_surface->Lazy_Inside(fire_voxels.grid.X(TV_INT(i,j,ij)))){cell_power=0;cell_power_spectrum=VECTOR<T,3>(0,0,0);}
             else{
-                VECTOR<T,3> xyz=fire_shader.world_xyz_to_display_xyz*fire_shader.blackbody.Calculate_XYZ(fire_voxels.Source_Term(2,fire_voxels.grid.X(i,j,ij)));
+                VECTOR<T,3> xyz=fire_shader.world_xyz_to_display_xyz*fire_shader.blackbody.Calculate_XYZ(fire_voxels.Source_Term(2,fire_voxels.grid.X(TV_INT(i,j,ij))));
                 cell_power_spectrum=fire_shader.blackbody.cie.XYZ_To_RGB(xyz)*fire_shader.emission_amplification;
                 T luminance=xyz.y*fire_shader.emission_amplification;
                 cell_power=T(4*T(pi)*cell_volume)*luminance;
@@ -96,7 +96,7 @@ public:
     PAIR<int,T> sample_y=y_cdf(i).Sample(xi_y);int j=sample_y.x;
     PAIR<int,T> sample_z=z_cdf(i,j).Sample(xi_z);int ij=sample_z.x;
     probability_of_location=pdf(i,j,ij)/total_average_power;
-    return VECTOR<T,3>(sample_x.y,sample_y.y,sample_z.y)-VECTOR<T,3>((T).5,(T).5,(T).5)+fire_voxels.grid.X(i,j,ij);}
+    return VECTOR<T,3>(sample_x.y,sample_y.y,sample_z.y)-VECTOR<T,3>((T).5,(T).5,(T).5)+fire_voxels.grid.X(TV_INT(i,j,ij));}
 
     VECTOR<T,3> Emitted_Light(const RENDERING_RAY<T>& ray) const PHYSBAM_OVERRIDE
     {return VECTOR<T,3>(0,0,0);}

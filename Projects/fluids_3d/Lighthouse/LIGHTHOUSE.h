@@ -184,7 +184,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
         phi(iterator.Cell_Index())=X.y-depth-Get_Wave_Attenuation(X)*Get_Wave_Height(X,iterator.Cell_Index());}
     
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int ij=0;ij<grid.counts.z;ij++){
-        TV X=grid.X(i,j,ij);
+        TV X=grid.X(TV_INT(i,j,ij));
         fluids_parameters.particle_levelset_evolution->phi(i,j,ij)=max(fluids_parameters.particle_levelset_evolution->phi(i,j,ij),-rigid_body_collection.Rigid_Body(lighthouse).Implicit_Geometry_Extended_Value(X),-rigid_body_collection.Rigid_Body(cove).Implicit_Geometry_Extended_Value(X));}
 }
 //#####################################################################

@@ -111,8 +111,8 @@ Initialize_Octahedron_Mesh_And_Particles(const GRID<TV>& grid)
     particles.Delete_All_Elements();
     mesh.Initialize_Octahedron_Mesh(m,n,mn);
     particles.Add_Elements(m*n*mn+(m+1)*(n+1)*(mn+1));
-    for(k=0;k<mn;k++) for(j=0;j<n;j++) for(i=0;i<m;i++) particles.X(particle++)=grid.X(i,j,k);
-    for(k=-1;k<mn;k++) for(j=-1;j<n;j++) for(i=-1;i<m;i++) particles.X(particle++)=grid.X(i,j,k)+(T).5*grid.dX;
+    for(k=0;k<mn;k++) for(j=0;j<n;j++) for(i=0;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j,k));
+    for(k=-1;k<mn;k++) for(j=-1;j<n;j++) for(i=-1;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j,k))+(T).5*grid.dX;
 }
 //#####################################################################
 // Function Initialize_Cube_Mesh_And_Particles
@@ -124,7 +124,7 @@ Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid)
     particles.Delete_All_Elements();
     mesh.Initialize_Cube_Mesh(m,n,mn);
     particles.Add_Elements(m*n*mn);
-    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j,k);
+    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j,k));
 }
 //#####################################################################
 // Function Initialize_Prismatic_Cube_Mesh_And_Particles
@@ -136,7 +136,7 @@ Initialize_Prismatic_Cube_Mesh_And_Particles(const GRID<TV>& grid)
     particles.Delete_All_Elements();
     mesh.Initialize_Prismatic_Cube_Mesh(m,n,mn);
     particles.Add_Elements(m*n*mn);
-    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j,k);
+    for(int k=0;k<mn;k++) for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j,k));
 }
 //#####################################################################
 // Function Check_Signed_Volumes_And_Make_Consistent

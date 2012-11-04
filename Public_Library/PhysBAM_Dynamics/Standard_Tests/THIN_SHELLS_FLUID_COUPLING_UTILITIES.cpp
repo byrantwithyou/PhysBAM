@@ -73,13 +73,13 @@ Add_Grid_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_
     ARRAY<int,VECTOR<int,2> > base_index(grid.Domain_Indices());
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         int index=base_index(i,j)=particles.Add_Element();
-        particles.X(index)=grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);}
+        particles.X(index)=grid.X(VECTOR<int,2>(i,j));particles.V(index)=VECTOR<T,2>(0,0);}
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++){
         if(i<grid.counts.x){
             int last_index=base_index(i,j);
             for(int k=0;k<edge_subdivision-1;k++){
                 int index=particles.Add_Element();
-                particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(grid.dX.x,0)+grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);
+                particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(grid.dX.x,0)+grid.X(VECTOR<int,2>(i,j));particles.V(index)=VECTOR<T,2>(0,0);
                 mesh.elements(segment_index++).Set(last_index,index);
                 last_index=index;}
             mesh.elements(segment_index++).Set(last_index,base_index(i+1,j));}
@@ -87,7 +87,7 @@ Add_Grid_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,2> >& deformable_
             int last_index=base_index(i,j);
             for(int k=0;k<edge_subdivision-1;k++){
                 int index=particles.Add_Element();
-                particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(0,grid.dX.y)+grid.X(i,j);particles.V(index)=VECTOR<T,2>(0,0);
+                particles.X(index)=((T)k/edge_subdivision)*VECTOR<T,2>(0,grid.dX.y)+grid.X(VECTOR<int,2>(i,j));particles.V(index)=VECTOR<T,2>(0,0);
                 mesh.elements(segment_index++).Set(last_index,index);
                 last_index=index;}
             mesh.elements(segment_index++).Set(last_index,base_index(i,j+1));}}
@@ -108,7 +108,7 @@ Add_Deformable_Object(DEFORMABLE_BODY_COLLECTION<VECTOR<T,3> >& deformable_body_
     mesh.Initialize_Herring_Bone_Mesh(cloth_grid.counts.x,cloth_grid.counts.y);
     particles.Add_Elements(mesh.number_nodes);
     for(int i=0;i<cloth_grid.counts.x;i++) for(int j=0;j<cloth_grid.counts.y;j++){
-        int node=i+cloth_grid.counts.x*(j-1);particles.X(node)=transform.Homogeneous_Times(VECTOR<T,3>(cloth_grid.X(i,j)));particles.V(node)=VECTOR<T,3>();}
+        int node=i+cloth_grid.counts.x*(j-1);particles.X(node)=transform.Homogeneous_Times(VECTOR<T,3>(cloth_grid.X(VECTOR<int,2>(i,j))));particles.V(node)=VECTOR<T,3>();}
 
     if(constraint_mode==1){
         deformable_body_collection_enslaved_nodes.Append(1+cloth_grid.counts.x*(cloth_grid.counts.y-1));

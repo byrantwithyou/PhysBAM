@@ -32,7 +32,7 @@ template<class T> void Calculate(TRIANGULATED_SURFACE<T>& surface,const GRID<VEC
     T epsilon=(T)1e-8*grid.min_dX;
     int total_cells=grid.counts.x*grid.counts.y*grid.counts.z,cells_done=0,progress=-1;
     for(int i=0;i<grid.counts.x;i++) for(int j=0;j<grid.counts.y;j++) for(int k=0;k<grid.counts.z;k++){
-        phi(i,j,k)=surface.Calculate_Signed_Distance(grid.X(i,j,k),epsilon);
+        phi(i,j,k)=surface.Calculate_Signed_Distance(grid.X(VECTOR<int,3>(i,j,k)),epsilon);
         if(print_progress){
             cells_done++;int new_progress=(int)((T)100*cells_done/total_cells);
             if(new_progress > progress){

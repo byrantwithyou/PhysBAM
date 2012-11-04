@@ -110,7 +110,7 @@ Initialize_Cube_Mesh_And_Particles(const GRID<TV>& grid)
     int m=grid.counts.x,n=grid.counts.y,mn=grid.counts.z;
     mesh.Initialize_Cube_Mesh(m,n,mn);
     particles.Preallocate(m*n*mn);
-    for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++)for(int i=0;i<m;i++) particles.X(particles.Add_Element())=grid.X(i,j,ij);
+    for(int ij=0;ij<mn;ij++)for(int j=0;j<n;j++)for(int i=0;i<m;i++) particles.X(particles.Add_Element())=grid.X(TV_INT(i,j,ij));
 }
 //#####################################################################
 // Funcion Total_Volume

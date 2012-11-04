@@ -74,7 +74,7 @@ Initialize_Square_Mesh_And_Particles(const GRID<TV>& grid,const bool reverse_tri
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     particles.Delete_All_Elements();mesh.Initialize_Square_Mesh(m,n,reverse_triangles);particles.Add_Elements(m*n);
-    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j));
 }
 //#####################################################################
 // Funcion Initialize_Circle_Mesh_And_Particles
@@ -96,7 +96,7 @@ Initialize_Herring_Bone_Mesh_And_Particles(const GRID<TV>& grid)
 {
     int m=grid.counts.x,n=grid.counts.y,particle=0;
     particles.Delete_All_Elements();mesh.Initialize_Herring_Bone_Mesh(m,n);particles.Add_Elements(m*n);
-    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(i,j);
+    for(int j=0;j<n;j++) for(int i=0;i<m;i++) particles.X(particle++)=grid.X(TV_INT(i,j));
 }
 //#####################################################################
 // Funcion Initialize_Equilateral_Mesh_And_Particles

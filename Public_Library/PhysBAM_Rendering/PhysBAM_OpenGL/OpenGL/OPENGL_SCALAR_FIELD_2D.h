@@ -22,7 +22,7 @@ template<class T> class OPENGL_SEGMENTED_CURVE_2D;
 template<class T,class T2=T>
 class OPENGL_SCALAR_FIELD_2D : public OPENGL_OBJECT
 {
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     GRID<TV>& grid;
     ARRAY<T2,VECTOR<int,2> > &values;

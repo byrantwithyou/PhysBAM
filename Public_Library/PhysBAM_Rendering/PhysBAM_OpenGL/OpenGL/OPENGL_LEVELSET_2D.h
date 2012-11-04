@@ -18,7 +18,7 @@ namespace PhysBAM{
 template<class T>
 class OPENGL_LEVELSET_2D:public OPENGL_SCALAR_FIELD_2D<T,T>
 {
-    typedef VECTOR<T,2> TV;
+    typedef VECTOR<T,2> TV;typedef VECTOR<int,2> TV_INT;
 public:
     using OPENGL_SCALAR_FIELD_2D<T,T>::grid;
     using OPENGL_SCALAR_FIELD_2D<T,T>::Send_Transform_To_GL_Pipeline;

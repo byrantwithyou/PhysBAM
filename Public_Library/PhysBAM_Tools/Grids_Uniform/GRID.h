@@ -156,15 +156,6 @@ public:
     TV X(const TV_INT& index) const
     {return domain.min_corner+(TV(index)+MAC_offset)*dX;}
 
-    TV X(const int i,const int j,const int ij) const
-    {STATIC_ASSERT(dimension==3);return X(TV_INT(i,j,ij));}
-
-    TV X(const int i,const int j) const
-    {STATIC_ASSERT(dimension==2);return X(TV_INT(i,j));}
-
-    TV X(const int i) const
-    {STATIC_ASSERT(dimension==1);return X(TV_INT(i));}
-
     TV Node(const TV_INT& index) const
     {return domain.min_corner+TV(index)*dX;}
 
@@ -391,9 +382,9 @@ public:
     {cells[0]=TV_INT(node.x-1);cells[1]=TV_INT(node.x);}
 
     void Nodes_In_Cell_From_Minimum_Corner_Node(const VECTOR<int,3>& minimum_corner_node,VECTOR<int,3> nodes[8]) const
-    {int i=minimum_corner_node.x,j=minimum_corner_node.y,ij=minimum_corner_node.z;
-    nodes[0]=minimum_corner_node;nodes[1]=VECTOR<int,3>(i+1,j,ij);nodes[2]=VECTOR<int,3>(i,j+1,ij);nodes[3]=VECTOR<int,3>(i+1,j+1,ij);
-    nodes[4]=VECTOR<int,3>(i,j,ij+1);nodes[5]=VECTOR<int,3>(i+1,j,ij+1);nodes[6]=VECTOR<int,3>(i,j+1,ij+1);nodes[7]=VECTOR<int,3>(i+1,j+1,ij+1);}
+    {int i=minimum_corner_node.x,j=minimum_corner_node.y,k=minimum_corner_node.z;
+    nodes[0]=minimum_corner_node;nodes[1]=VECTOR<int,3>(i+1,j,k);nodes[2]=VECTOR<int,3>(i,j+1,k);nodes[3]=VECTOR<int,3>(i+1,j+1,k);
+    nodes[4]=VECTOR<int,3>(i,j,k+1);nodes[5]=VECTOR<int,3>(i+1,j,k+1);nodes[6]=VECTOR<int,3>(i,j+1,k+1);nodes[7]=VECTOR<int,3>(i+1,j+1,k+1);}
 
     void Nodes_In_Cell_From_Minimum_Corner_Node(const VECTOR<int,2>& minimum_corner_node,VECTOR<int,2> nodes[4]) const
     {nodes[0]=minimum_corner_node;nodes[1]=VECTOR<int,2>(minimum_corner_node.x+1,minimum_corner_node.y);nodes[2]=VECTOR<int,2>(minimum_corner_node.x,minimum_corner_node.y+1);
@@ -432,8 +423,8 @@ public:
     {for(int a=0;a<TV::m;a++){INDEX_FACE fi(a,index);n(a*2)=fi;fi.index(a)++;n(a*2+1)=fi;}}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<T2,VECTOR<int,3> >& array,const int ghost_cells) const
-    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(-1-s,j,ij)=array(counts.x+s,j,ij)=constant;
-    for(int i=0;i<counts.x;i++) for(int ij=-ghost_cells;ij<counts.z+ghost_cells;ij++) for(int s=0;s<ghost_cells;s++) array(i,-1-s,ij)=array(i,counts.y+s,ij)=constant;
+    {for(int j=-ghost_cells;j<counts.y+ghost_cells;j++) for(int k=-ghost_cells;k<counts.z+ghost_cells;k++) for(int s=0;s<ghost_cells;s++) array(-1-s,j,k)=array(counts.x+s,j,k)=constant;
+    for(int i=0;i<counts.x;i++) for(int k=-ghost_cells;k<counts.z+ghost_cells;k++) for(int s=0;s<ghost_cells;s++) array(i,-1-s,k)=array(i,counts.y+s,k)=constant;
     for(int i=0;i<counts.x;i++) for(int j=0;j<counts.y;j++) for(int s=0;s<ghost_cells;s++) array(i,j,-1-s)=array(i,j,counts.z+s)=constant;}
 
     template<class T2> void Put_Ghost(const T2& constant,ARRAYS_ND_BASE<T2,VECTOR<int,2> >& array,const int ghost_cells) const

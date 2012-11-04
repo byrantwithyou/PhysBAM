@@ -292,7 +292,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
         state_right=TV_DIMENSION((T)1,(T)2,(T).4);}
     else if(test_number==8){
         T_GRID& grid=*fluids_parameters.grid;
-        T center_cell_location=grid.X((int)((grid.numbers_of_cells.x+1)*.5)).x;
+        T center_cell_location=grid.X(TV_INT((int)((grid.numbers_of_cells.x+1)*.5))).x;
         T dx=grid.DX().x;
         middle_state_start_point=center_cell_location - dx*.5;
         right_state_start_point=center_cell_location + dx*.5;
