@@ -771,7 +771,8 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else grid=*fluids_parameters.grid;
             
             // TODO Rewrite to not depend on the grid dimensions; may differ in MPI
-            RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y,grid.domain.min_corner.z,grid.domain.max_corner.z);
+            RANGE<TV> world(TV(grid.domain.min_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,grid.domain.min_corner.z),
+                TV(grid.domain.max_corner.x,(T)1.5*grid.domain.max_corner.y,grid.domain.max_corner.z));
 
             RANDOM_NUMBERS<T> random;
 
@@ -915,7 +916,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             else grid=*fluids_parameters.grid;
             
             // TODO Rewrite to not depend on the grid dimensions; may differ in MPI
-            RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.min_corner.y+(T).04,grid.domain.min_corner.z,grid.domain.max_corner.z);
+            RANGE<TV> world(grid.domain.min_corner,grid.domain.max_corner+TV(0,(T).04,0));
 
             // slide all the rigid body walls down
             for(int i=0;i<rigid_body_collection.rigid_body_particle.Size();i++) rigid_body_collection.rigid_body_particle.frame(i).t.y-=(T).75;

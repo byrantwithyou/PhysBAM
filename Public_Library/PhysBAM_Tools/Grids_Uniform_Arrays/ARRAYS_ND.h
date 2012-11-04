@@ -115,16 +115,16 @@ public:
 
     void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,int mn_start_new,int mn_end_new,const bool initialize_new_elements=true,
         const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==3);RANGE<TV_INT> box(m_start_new,m_end_new,n_start_new,n_end_new,mn_start_new,mn_end_new);
+    {STATIC_ASSERT(d==3);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new,mn_start_new),TV_INT(m_end_new,n_end_new,mn_end_new));
     Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
 
     void Resize(int m_start_new,int m_end_new,int n_start_new,int n_end_new,const bool initialize_new_elements=true,
         const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==2);RANGE<TV_INT> box(m_start_new,m_end_new,n_start_new,n_end_new);Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
+    {STATIC_ASSERT(d==2);RANGE<TV_INT> box(TV_INT(m_start_new,n_start_new),TV_INT(m_end_new,n_end_new));Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
 
     void Resize(int m_start_new,int m_end_new,const bool initialize_new_elements=true,
         const bool copy_existing_elements=true,const T& initialization_value=T())
-    {STATIC_ASSERT(d==1);RANGE<TV_INT> box(m_start_new,m_end_new);Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
+    {STATIC_ASSERT(d==1);RANGE<TV_INT> box((TV_INT(m_start_new)),TV_INT(m_end_new));Resize(box,initialize_new_elements,copy_existing_elements,initialization_value);}
 
 private:
     void Resize_Helper(const RANGE<VECTOR<int,3> >& box,ARRAY_VIEW<T> array_new,const TV_INT& counts_new)

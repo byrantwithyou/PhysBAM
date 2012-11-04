@@ -103,8 +103,8 @@ Reinitialize(bool force)
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_PSEUDO_DIRICHLET_2D<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return RANGE<VECTOR<float,3> >(mac_grid.domain.min_corner.x,mac_grid.domain.min_corner.y,0,mac_grid.domain.max_corner.x,mac_grid.domain.max_corner.y,0);
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    if(valid && draw) return RANGE<VECTOR<float,3> >(VECTOR<float,3>(mac_grid.domain.min_corner.x,0,mac_grid.domain.max_corner.y),VECTOR<float,3>(mac_grid.domain.min_corner.y,mac_grid.domain.max_corner.x,0));
+    return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 //#####################################################################
 // Function Set_Vector_Size

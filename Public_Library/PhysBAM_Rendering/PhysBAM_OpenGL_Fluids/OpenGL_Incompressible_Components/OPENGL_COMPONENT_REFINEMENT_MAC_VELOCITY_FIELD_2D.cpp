@@ -102,8 +102,8 @@ Display(const int in_color) const
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return RANGE<VECTOR<float,3> >(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.max_corner.y,0,0);
-    else return RANGE<VECTOR<float,3> >::Centered_Box();
+    if (valid && draw) return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
+    return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 
 template<class T,class RW> void OPENGL_COMPONENT_REFINEMENT_MAC_VELOCITY_FIELD_2D<T,RW>::

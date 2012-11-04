@@ -312,14 +312,14 @@ template<class T_GRID> void MPI_GRID<T_GRID>::
 Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,1> > >& regions,const RANGE<VECTOR<int,1> >& sentinels,const bool skip_common_boundary,const RANGE<VECTOR<int,1> >& band,const bool include_corners,
     const bool include_ghost_regions,const GRID<VECTOR<T,1> >& local_grid) const
 {
-    RANGE<VECTOR<int,1> > box=RANGE<VECTOR<int,1> >(1,local_grid.numbers_of_cells.x)+sentinels;
+    RANGE<VECTOR<int,1> > box=RANGE<VECTOR<int,1> >(VECTOR<int,1>(1),local_grid.numbers_of_cells)+sentinels;
     RANGE<VECTOR<int,1> > band_x=band;
     if(skip_common_boundary && band.max_corner.x>0){
         if(band.min_corner.x<0) PHYSBAM_NOT_IMPLEMENTED();
         if(sentinels.max_corner.x) band_x+=VECTOR<int,1>(1);}
     regions.Clean_Memory();
-    regions.Append(RANGE<VECTOR<int,1> >(box.min_corner.x,box.min_corner.x)+band_x);
-    regions.Append(RANGE<VECTOR<int,1> >(box.max_corner.x,box.max_corner.x)-band_x);
+    regions.Append(RANGE<VECTOR<int,1> >(box.min_corner,box.min_corner)+band_x);
+    regions.Append(RANGE<VECTOR<int,1> >(box.max_corner,box.max_corner)-band_x);
 }
 //#####################################################################
 // Function Find_Boundary_Regions
@@ -328,33 +328,33 @@ template<class T_GRID> void MPI_GRID<T_GRID>::
 Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,2> > >& regions,const RANGE<VECTOR<int,2> >& sentinels,const bool skip_common_boundary,const RANGE<VECTOR<int,1> >& band,const bool include_corners,
     const bool include_ghost_regions,const GRID<VECTOR<T,2> >& local_grid) const
 {
-    RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(1,local_grid.numbers_of_cells.x,1,local_grid.numbers_of_cells.y)+sentinels;
+    RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(VECTOR<int,2>(1,1),local_grid.numbers_of_cells)+sentinels;
     if(include_corners && include_ghost_regions){
         int band_size=band.Size();
         if(side_neighbor_ranks(0)<0) box.min_corner.x-=band_size;
         if(side_neighbor_ranks(1)<0) box.max_corner.x+=band_size;
         if(side_neighbor_ranks(2)<0) box.min_corner.y-=band_size;
         if(side_neighbor_ranks(3)<0) box.max_corner.y+=band_size;}
-    RANGE<VECTOR<int,2> > band_x(band.min_corner.x,band.max_corner.x,0,0),band_y(0,0,band.min_corner.x,band.max_corner.x);
+    RANGE<VECTOR<int,2> > band_x(VECTOR<int,2>(band.min_corner.x,0),VECTOR<int,2>(band.max_corner.x,0)),band_y(VECTOR<int,2>(0,band.min_corner.x),VECTOR<int,2>(0,band.max_corner.x));
     if(skip_common_boundary && band.max_corner.x>0){
         if(band.min_corner.x<0) PHYSBAM_NOT_IMPLEMENTED();
         if(sentinels.max_corner.x) band_x+=VECTOR<int,2>(1,0);
         if(sentinels.max_corner.y) band_y+=VECTOR<int,2>(0,1);}
     regions.Clean_Memory();
     if(!include_corners){ // add in side order
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.max_corner.y)+band_x);
-        regions.Append(RANGE<VECTOR<int,2> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y)-band_x);
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y)+band_y);
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y)-band_y);}
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.min_corner.y),VECTOR<int,2>(box.min_corner.x,box.max_corner.y))+band_x);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.max_corner.x,box.min_corner.y),VECTOR<int,2>(box.max_corner.x,box.max_corner.y))-band_x);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.min_corner.y),VECTOR<int,2>(box.max_corner.x,box.min_corner.y))+band_y);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.max_corner.y),VECTOR<int,2>(box.max_corner.x,box.max_corner.y))-band_y);}
     else{ // add in one ring neighbors order
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.min_corner.y)+band_x+band_y);
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y)+band_y);
-        regions.Append(RANGE<VECTOR<int,2> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y)-band_x+band_y);
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.max_corner.y)+band_x);
-        regions.Append(RANGE<VECTOR<int,2> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y)-band_x);
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.min_corner.x,box.max_corner.y,box.max_corner.y)+band_x-band_y);
-        regions.Append(RANGE<VECTOR<int,2> >(box.min_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y)-band_y);
-        regions.Append(RANGE<VECTOR<int,2> >(box.max_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y)-band_x-band_y);}
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.min_corner.y),VECTOR<int,2>(box.min_corner.x,box.min_corner.y))+band_x+band_y);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.min_corner.y),VECTOR<int,2>(box.max_corner.x,box.min_corner.y))+band_y);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.max_corner.x,box.min_corner.y),VECTOR<int,2>(box.max_corner.x,box.min_corner.y))-band_x+band_y);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.min_corner.y),VECTOR<int,2>(box.min_corner.x,box.max_corner.y))+band_x);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.max_corner.x,box.min_corner.y),VECTOR<int,2>(box.max_corner.x,box.max_corner.y))-band_x);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.max_corner.y),VECTOR<int,2>(box.min_corner.x,box.max_corner.y))+band_x-band_y);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.min_corner.x,box.max_corner.y),VECTOR<int,2>(box.max_corner.x,box.max_corner.y))-band_y);
+        regions.Append(RANGE<VECTOR<int,2> >(VECTOR<int,2>(box.max_corner.x,box.max_corner.y),VECTOR<int,2>(box.max_corner.x,box.max_corner.y))-band_x-band_y);}
 }
 //#####################################################################
 // Function Find_Boundary_Regions
@@ -363,7 +363,7 @@ template<class T_GRID> void MPI_GRID<T_GRID>::
 Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<int,3> >& sentinels,const bool skip_common_boundary,const RANGE<VECTOR<int,1> >& band,const bool include_corners,
     const bool include_ghost_regions,const GRID<VECTOR<T,3> >& local_grid) const
 {
-    RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(1,local_grid.numbers_of_cells.x,1,local_grid.numbers_of_cells.y,1,local_grid.numbers_of_cells.z)+sentinels;
+    RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(VECTOR<int,3>(1,1,1),local_grid.numbers_of_cells)+sentinels;
     if(include_corners && include_ghost_regions){
         int band_size=band.Size();
         if(side_neighbor_ranks(0)<0) box.min_corner.x-=band_size;
@@ -372,7 +372,7 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<
         if(side_neighbor_ranks(3)<0) box.max_corner.y+=band_size;
         if(side_neighbor_ranks(4)<0) box.min_corner.z-=band_size;
         if(side_neighbor_ranks(5)<0) box.max_corner.z+=band_size;}
-    RANGE<VECTOR<int,3> > band_x(band.min_corner.x,band.max_corner.x,0,0,0,0),band_y(0,0,band.min_corner.x,band.max_corner.x,0,0),band_z(0,0,0,0,band.min_corner.x,band.max_corner.x);
+    RANGE<VECTOR<int,3> > band_x(VECTOR<int,3>(band.min_corner.x,0,0),VECTOR<int,3>(band.max_corner.x,0,0)),band_y(VECTOR<int,3>(0,band.min_corner.x,0),VECTOR<int,3>(0,band.max_corner.x,0)),band_z(VECTOR<int,3>(0,0,band.min_corner.x),VECTOR<int,3>(0,0,band.max_corner.x));
     if(skip_common_boundary && band.max_corner.x>0){
         if(band.min_corner.x<0) PHYSBAM_NOT_IMPLEMENTED();
         if(sentinels.max_corner.x) band_x+=VECTOR<int,3>(1,0,0);
@@ -380,39 +380,39 @@ Find_Boundary_Regions(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<
         if(sentinels.max_corner.z) band_z+=VECTOR<int,3>(0,0,1);}
     regions.Clean_Memory();
     if(!include_corners){ // add in side order
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)+band_x);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)-band_x);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.max_corner.z)+band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)-band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)-band_z);}
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z))+band_x);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_x);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z))+band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z))+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_z);}
     else{ // add in one ring neighbors order
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.min_corner.z)+band_x+band_y+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.min_corner.z)+band_y+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.min_corner.z)-band_x+band_y+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)+band_x+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)+band_z); 
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)-band_x+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)+band_x-band_y+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)-band_y+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.min_corner.z)-band_x-band_y+band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.max_corner.z)+band_x+band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.max_corner.z)+band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.min_corner.z,box.max_corner.z)-band_x+band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)+band_x);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)-band_x);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)+band_x-band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)-band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.min_corner.z,box.max_corner.z)-band_x-band_y);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.min_corner.y,box.max_corner.z,box.max_corner.z)+band_x+band_y-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.max_corner.z,box.max_corner.z)+band_y-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.min_corner.y,box.max_corner.z,box.max_corner.z)-band_x+band_y-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.min_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)+band_x-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)-band_z); 
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.min_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)-band_x-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.min_corner.x,box.max_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)+band_x-band_y-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.min_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)-band_y-band_z);
-        regions.Append(RANGE<VECTOR<int,3> >(box.max_corner.x,box.max_corner.x,box.max_corner.y,box.max_corner.y,box.max_corner.z,box.max_corner.z)-band_x-band_y-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z))+band_x+band_y+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z))+band_y+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z))-band_x+band_y+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z))+band_x+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z))+band_z); 
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z))-band_x+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z))+band_x-band_y+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z))-band_y+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z))-band_x-band_y+band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z))+band_x+band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z))+band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z))-band_x+band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z))+band_x);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_x);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z))+band_x-band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.min_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_x-band_y);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z))+band_x+band_y-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z))+band_y-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z))-band_x+band_y-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z))+band_x-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_z); 
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.min_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_x-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z),VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z))+band_x-band_y-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.min_corner.x,box.max_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_y-band_z);
+        regions.Append(RANGE<VECTOR<int,3> >(VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z),VECTOR<int,3>(box.max_corner.x,box.max_corner.y,box.max_corner.z))-band_x-band_y-band_z);
     }
 }
 //#####################################################################
@@ -430,7 +430,7 @@ Find_Boundary_Regions(ARRAY<RANGE<TV_INT> >& regions,const RANGE<TV_INT>& sentin
 template<class T> RANGE<VECTOR<int,1> >
 Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,1> >& process_ranks,const GRID<VECTOR<T,1> >& other_grid,const VECTOR<int,1>& coordinates,const RANGE<VECTOR<int,1> >& sentinels,const int band)
 {
-    RANGE<VECTOR<int,1> > box=RANGE<VECTOR<int,1> >(0,other_grid.numbers_of_cells.x)+sentinels;
+    RANGE<VECTOR<int,1> > box=RANGE<VECTOR<int,1> >(VECTOR<int,1>(),other_grid.numbers_of_cells)+sentinels;
     if(process_ranks(GRID<VECTOR<T,1> >::Node_Neighbor(coordinates,0))<0) box.min_corner.x-=band;
     if(process_ranks(GRID<VECTOR<T,1> >::Node_Neighbor(coordinates,1))<0) box.max_corner.x+=band;
     return box;
@@ -441,7 +441,7 @@ Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,1> >& process_ranks,const GRID
 template<class T> RANGE<VECTOR<int,2> >
 Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,2> >& process_ranks,const GRID<VECTOR<T,2> >& other_grid,const VECTOR<int,2>& coordinates,const RANGE<VECTOR<int,2> >& sentinels,const int band)
 {
-    RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(0,other_grid.numbers_of_cells.x,0,other_grid.numbers_of_cells.y)+sentinels;
+    RANGE<VECTOR<int,2> > box=RANGE<VECTOR<int,2> >(VECTOR<int,2>(),other_grid.numbers_of_cells)+sentinels;
     if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,0))<0) box.min_corner.x-=band;
     if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,1))<0) box.max_corner.x+=band;
     if(process_ranks(GRID<VECTOR<T,2> >::Node_Neighbor(coordinates,2))<0) box.min_corner.y-=band;
@@ -454,7 +454,7 @@ Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,2> >& process_ranks,const GRID
 template<class T> RANGE<VECTOR<int,3> >
 Find_Region_Box_Helper(const ARRAY<int,VECTOR<int,3> >& process_ranks,const GRID<VECTOR<T,3> >& other_grid,const VECTOR<int,3>& coordinates,const RANGE<VECTOR<int,3> >& sentinels,const int band)
 {
-    RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(0,other_grid.numbers_of_cells.x,0,other_grid.numbers_of_cells.y,0,other_grid.numbers_of_cells.z)+sentinels;
+    RANGE<VECTOR<int,3> > box=RANGE<VECTOR<int,3> >(VECTOR<int,3>(),other_grid.numbers_of_cells)+sentinels;
     if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,0))<0) box.min_corner.x-=band;
     if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,1))<0) box.max_corner.x+=band;
     if(process_ranks(GRID<VECTOR<T,3> >::Node_Neighbor(coordinates,2))<0) box.min_corner.y-=band;

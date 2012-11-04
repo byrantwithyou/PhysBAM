@@ -27,10 +27,6 @@ public:
     RENDERING_BOX()
     {}
 
-    RENDERING_BOX(const T xmin,const T xmax,const T ymin,const T ymax,const T zmin,const T zmax)
-        :box(xmin,xmax,ymin,ymax,zmin,zmax)
-    {}
-
     RENDERING_BOX(const RANGE<TV>& box)
         :box(box)
     {}

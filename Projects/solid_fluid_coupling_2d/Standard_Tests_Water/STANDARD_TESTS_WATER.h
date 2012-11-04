@@ -192,7 +192,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
             solids_parameters.rigid_body_collision_parameters.use_push_out=true;
             fluids_parameters.density=(T)1000;
             solids_parameters.rigid_body_collision_parameters.enforce_rigid_rigid_contact_in_cg=true;
-            fountain_source.Append(RANGE<TV>((T).45,(T).55,(T).3,(T).35));
+            fountain_source.Append(RANGE<TV>(TV((T).45,(T).3),TV((T).55,(T).35)));
             //fountain_source.Append(RANGE<TV>((T).45,(T).55,(T).25,(T).3));
             //fountain_source.Append(RANGE<TV>((T).975,(T)1,(T).1,(T).4)); // TODO: make total input/output sourcing add up to zero
             //fountain_source.Append(RANGE<TV>((T)0,(T).025,(T).1,(T).4));
@@ -374,8 +374,9 @@ T Initial_Phi(const TV& X) const
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==8)
-        if(time<light_sphere_drop_time)
-        {RANGE<TV> source_box((T).45,(T).55,(T)1.15,(T)1.25);Adjust_Phi_With_Source(source_box,MATRIX<T,3>::Identity_Matrix());return true;}
+        if(time<light_sphere_drop_time){
+            RANGE<TV> source_box(TV((T).45,(T)1.15),TV((T).55,(T)1.25));
+            Adjust_Phi_With_Source(source_box,MATRIX<T,3>::Identity_Matrix());return true;}
     
     ARRAY<T,VECTOR<int,2> >& phi=fluids_parameters.particle_levelset_evolution->phi;
     if(test_number==12)
@@ -512,7 +513,7 @@ void Initialize_Bodies() PHYSBAM_OVERRIDE
             const GRID<TV>& grid=*fluids_parameters.grid;
             
             //RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y+(grid.domain.max_corner.y-grid.domain.min_corner.y)*(T).75,(T)1.5*grid.domain.max_corner.y);
-            RANGE<TV> world(grid.domain.min_corner.x,grid.domain.max_corner.x,(T).75,(T)1.5);
+            RANGE<TV> world(TV(grid.domain.min_corner.x,(T).75),TV(grid.domain.max_corner.x,(T)1.5));
 
             first_coupled_rigid_body=rigid_body_collection.rigid_body_particle.Size()+1;
             RANDOM_NUMBERS<T> random;

@@ -58,10 +58,9 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         plane->texture_vector2=parameters.Get_Parameter("Texture_Vector2",TV(0,0,1));}
     else if(type=="Box"){
         LOG::cout<<"Box"<<std::endl;
-        T xmin=parameters.Get_Parameter("Xmin",(T)-1);T xmax=parameters.Get_Parameter("Xmax",(T)1);
-        T ymin=parameters.Get_Parameter("Ymin",(T)-1);T ymax=parameters.Get_Parameter("Ymax",(T)1);
-        T zmin=parameters.Get_Parameter("Zmin",(T)-1);T zmax=parameters.Get_Parameter("Zmax",(T)1);
-        object=new RENDERING_BOX<T>(xmin,xmax,ymin,ymax,zmin,zmax);}
+        TV min(parameters.Get_Parameter("Xmin",(T)-1),parameters.Get_Parameter("Ymin",(T)-1),parameters.Get_Parameter("Zmin",(T)-1));
+        TV max(parameters.Get_Parameter("Xmax",(T)1),parameters.Get_Parameter("Ymax",(T)1),parameters.Get_Parameter("Zmax",(T)1));
+        object=new RENDERING_BOX<T>(RANGE<TV>(min,max));}
      else if(type=="Cylinder"){
         TV X1=parameters.Get_Parameter("X1",TV(0,-1,0));
         TV X2=parameters.Get_Parameter("X2",TV(0,1,0));
@@ -83,10 +82,9 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
         bool just_frame=parameters.Get_Parameter("Just_Frame", false);
         RANGE<TV>* box=0;
         if (control=="Null"||control=="Free"){
-            T xmin=parameters.Get_Parameter("Xmin",(T)-1);T xmax=parameters.Get_Parameter("Xmax",(T)1);
-            T ymin=parameters.Get_Parameter("Ymin",(T)-1);T ymax=parameters.Get_Parameter("Ymax",(T)1);
-            T zmin=parameters.Get_Parameter("Zmin",(T)-1);T zmax=parameters.Get_Parameter("Zmax",(T)1);
-            box=new RANGE<TV>(xmin,xmax,ymin,ymax,zmin,zmax);}
+            TV min(parameters.Get_Parameter("Xmin",(T)-1),parameters.Get_Parameter("Ymin",(T)-1),parameters.Get_Parameter("Zmin",(T)-1));
+            TV max(parameters.Get_Parameter("Xmax",(T)1),parameters.Get_Parameter("Ymax",(T)1),parameters.Get_Parameter("Zmax",(T)1));
+            box=new RANGE<TV>(min,max);}
         else if(control=="Object"){ // any object has a bounding box so just use it...
             std::string object_name=parameters.Get_Parameter("Object",std::string("Null"));
             RENDERING_OBJECT<T>* object=0;
@@ -103,56 +101,56 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                 outer_box.min_corner.x=box->min_corner.x-thickness;outer_box.max_corner.x=box->min_corner.x+thickness;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z-thickness;outer_box.max_corner.z=box->min_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->min_corner.x-thickness;outer_box.max_corner.x=box->min_corner.x+thickness;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->max_corner.z-thickness;outer_box.max_corner.z=box->max_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->min_corner.x-thickness;outer_box.max_corner.x=box->min_corner.x+thickness;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->min_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->min_corner.x-thickness;outer_box.max_corner.x=box->min_corner.x+thickness;
                 outer_box.min_corner.y=box->max_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 if(!just_frame){
                   outer_box.min_corner.x=box->min_corner.x-thickness;outer_box.max_corner.x=box->min_corner.x+thickness;
                   outer_box.min_corner.y=box->min_corner.y+thickness-perturb_value;outer_box.max_corner.y=box->max_corner.y-thickness+perturb_value;
                   outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                  object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                  object_group.Append(new RENDERING_BOX<T>(outer_box));
                 }
             }
             if(xmax_wall){
                 outer_box.min_corner.x=box->max_corner.x-thickness;outer_box.max_corner.x=box->max_corner.x+thickness;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z-thickness;outer_box.max_corner.z=box->min_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->max_corner.x-thickness;outer_box.max_corner.x=box->max_corner.x+thickness;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->max_corner.z-thickness;outer_box.max_corner.z=box->max_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->max_corner.x-thickness;outer_box.max_corner.x=box->max_corner.x+thickness;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->min_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->max_corner.x-thickness;outer_box.max_corner.x=box->max_corner.x+thickness;
                 outer_box.min_corner.y=box->max_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 if(!just_frame){
                   outer_box.min_corner.x=box->max_corner.x-thickness;outer_box.max_corner.x=box->max_corner.x+thickness;
                   outer_box.min_corner.y=box->min_corner.y+thickness-perturb_value;outer_box.max_corner.y=box->max_corner.y-thickness+perturb_value;
                   outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                  object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                  object_group.Append(new RENDERING_BOX<T>(outer_box));
                 }
             }
             if(ymin_wall){
@@ -160,7 +158,7 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                   outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                   outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->min_corner.y+thickness;
                   outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                  object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                  object_group.Append(new RENDERING_BOX<T>(outer_box));
                 }
             }
             if(ymax_wall){
@@ -168,43 +166,43 @@ Object(RENDER_WORLD<T>& world,const int frame,PARAMETER_LIST& parameters)
                   outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                   outer_box.min_corner.y=box->max_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                   outer_box.min_corner.z=box->min_corner.z+thickness-perturb_value;outer_box.max_corner.z=box->max_corner.z-thickness+perturb_value;
-                  object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                  object_group.Append(new RENDERING_BOX<T>(outer_box));
                 }
             }
             if(zmin_wall){
                 outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                 outer_box.min_corner.y=box->max_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z-thickness;outer_box.max_corner.z=box->min_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->min_corner.y+thickness;
                 outer_box.min_corner.z=box->min_corner.z-thickness;outer_box.max_corner.z=box->min_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 if(!just_frame){
                   outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                   outer_box.min_corner.y=box->min_corner.y+thickness-perturb_value;outer_box.max_corner.y=box->max_corner.y-thickness+perturb_value;
                   outer_box.min_corner.z=box->min_corner.z-thickness;outer_box.max_corner.z=box->min_corner.z+thickness;
-                  object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                  object_group.Append(new RENDERING_BOX<T>(outer_box));
                 }
             }
             if(zmax_wall){
                 outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                 outer_box.min_corner.y=box->max_corner.y-thickness;outer_box.max_corner.y=box->max_corner.y+thickness;
                 outer_box.min_corner.z=box->max_corner.z-thickness;outer_box.max_corner.z=box->max_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                 outer_box.min_corner.y=box->min_corner.y-thickness;outer_box.max_corner.y=box->min_corner.y+thickness;
                 outer_box.min_corner.z=box->max_corner.z-thickness;outer_box.max_corner.z=box->max_corner.z+thickness;
-                object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                object_group.Append(new RENDERING_BOX<T>(outer_box));
 
                 if(!just_frame){
                   outer_box.min_corner.x=box->min_corner.x+thickness-perturb_value;outer_box.max_corner.x=box->max_corner.x-thickness+perturb_value;
                   outer_box.min_corner.y=box->min_corner.y+thickness-perturb_value;outer_box.max_corner.y=box->max_corner.y-thickness+perturb_value;
                   outer_box.min_corner.z=box->max_corner.z-thickness;outer_box.max_corner.z=box->max_corner.z+thickness;
-                  object_group.Append(new RENDERING_BOX<T>(outer_box.min_corner.x,outer_box.max_corner.x,outer_box.min_corner.y,outer_box.max_corner.y,outer_box.min_corner.z,outer_box.max_corner.z));
+                  object_group.Append(new RENDERING_BOX<T>(outer_box));
                 }
             }
         }

@@ -44,24 +44,6 @@ public:
         :min_corner(TV::Constant_Vector(std::numeric_limits<T>::max())),max_corner(-TV::Constant_Vector(std::numeric_limits<T>::max()))
     {}
 
-    RANGE(const T xmin,const T xmax)
-        :min_corner(xmin),max_corner(xmax)
-    {
-        STATIC_ASSERT(d==1);
-    }
-
-    RANGE(const T xmin,const T xmax,const T ymin,const T ymax)
-        :min_corner(xmin,ymin),max_corner(xmax,ymax)
-    {
-        STATIC_ASSERT(d==2);
-    }
-
-    RANGE(const T xmin,const T xmax,const T ymin,const T ymax,const T zmin,const T zmax)
-        :min_corner(xmin,ymin,zmin),max_corner(xmax,ymax,zmax)
-    {
-        STATIC_ASSERT(d==3);
-    }
-
     RANGE(const TV& minimum_corner,const TV& maximum_corner)
         :min_corner(minimum_corner),max_corner(maximum_corner)
     {}

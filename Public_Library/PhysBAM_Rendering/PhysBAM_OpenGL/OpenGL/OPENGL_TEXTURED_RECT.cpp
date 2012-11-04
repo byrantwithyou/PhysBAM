@@ -70,5 +70,5 @@ OPENGL_TEXTURED_RECT::Display(const int in_color) const
 RANGE<VECTOR<float,3> >
 OPENGL_TEXTURED_RECT::Bounding_Box() const
 {
-    return World_Space_Box(RANGE<VECTOR<float,3> >(-0.5*width,0.5*width,-0.5*height,0.5*height,0,0));
+    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(-0.5*width,-0.5*height,0),VECTOR<float,3>(0.5*width,0.5*height,0)));
 }

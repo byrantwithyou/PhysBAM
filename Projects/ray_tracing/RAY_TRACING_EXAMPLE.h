@@ -29,9 +29,9 @@ public:
 
     RAY_TRACING_EXAMPLE()
         :frame(1),output_filename("rgb"),keep_old_files(false),
-         pixels_between_output_directory_existence_checks(0),
-         use_spatial_partition(true),
-         gamma_correction((T)2.2),clipping_region(-10000,-10000,10000,10000)
+        pixels_between_output_directory_existence_checks(0),
+        use_spatial_partition(true),
+        gamma_correction((T)2.2),clipping_region(RANGE<VECTOR<int,2> >::Centered_Box()*10000)
     {}
 
     virtual ~RAY_TRACING_EXAMPLE()

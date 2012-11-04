@@ -998,13 +998,13 @@ void Update_Scatter_Plot()
 //#####################################################################
 void Dump_Scatter_Plot(int frame)
 {
-    RANGE<TV> box(-image_size,image_size,-image_size,image_size);
+    RANGE<TV> box(RANGE<TV>::Centered_Box()*image_size);
     char buff[1000];
     sprintf(buff, "svd-plot-%04d.eps", frame);
     EPS_FILE<T> eps(buff,box);
     eps.cur_format.point_radius=4*sigma_range/image_size;
     eps.fixed_bounding_box=true;
-    eps.bounding_box=RANGE<TV>(-sigma_range,sigma_range,-sigma_range,sigma_range);
+    eps.bounding_box=RANGE<TV>(RANGE<TV>::Centered_Box()*sigma_range);
     for(int i=0;i<contrail.m;i++){
         eps.cur_format.line_color=contrail_colors(i);
         for(int j=1;j<contrail(i).m;j++)

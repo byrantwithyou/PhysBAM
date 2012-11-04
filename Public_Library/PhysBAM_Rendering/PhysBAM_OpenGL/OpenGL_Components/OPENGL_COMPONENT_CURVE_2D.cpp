@@ -222,7 +222,7 @@ Bounding_Box() const
     if(valid&&draw){
         T xmin=x.Min(),xmax=x.Max();
         T umin=u.Min(),umax=u.Max();
-        return World_Space_Box(RANGE<VECTOR<float,3> >(xmin,xmax,umin,umax,0,0));}
+        return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(xmin,umin,0),VECTOR<float,3>(xmax,umax,0)));}
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 //#####################################################################

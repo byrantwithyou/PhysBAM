@@ -344,15 +344,15 @@ void Parse_Options()
     if(total_loops!=0) solids_parameters.triangle_collision_parameters.total_collision_loops=total_loops;
 
     if(no_altitude_springs){
-        if(test_number!=5 && !RANGE<VECTOR<int,1> >(10,14).Lazy_Inside(VECTOR<int,1>(test_number)) && test_number!=19 && test_number!=22){
+        if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=19 && test_number!=22){
             LOG::cerr<<"-noalt not supported for example "<<test_number<<std::endl;exit(1);}
         output_directory+="_noalt";}
     if(stiffness_multiplier!=1){
-        if(test_number!=5 && !RANGE<VECTOR<int,1> >(10,14).Lazy_Inside(VECTOR<int,1>(test_number)) && test_number!=22 && test_number !=30 && test_number!=1){
+        if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number !=30 && test_number!=1){
             LOG::cerr<<"-stiffen not supported for example "<<test_number<<std::endl;exit(1);}
         output_directory+=STRING_UTILITIES::string_sprintf("_stiffen%g",stiffness_multiplier);}
     if(damping_multiplier!=1){
-        if(test_number!=5 && !RANGE<VECTOR<int,1> >(10,14).Lazy_Inside(VECTOR<int,1>(test_number)) && test_number!=22 && test_number!=1){
+        if(test_number!=5 && !INTERVAL<T>(10,14).Lazy_Inside(test_number) && test_number!=22 && test_number!=1){
             LOG::cerr<<"-dampen not supported for example "<<test_number<<std::endl;exit(1);}
         output_directory+=STRING_UTILITIES::string_sprintf("_dampen%g",damping_multiplier);}
 
@@ -1066,7 +1066,7 @@ void Get_Initial_Data()
             RANDOM_NUMBERS<T> random;random.Set_Seed(65539);
             T thickness=(T).015,max_angle=(T)pi/3,base_height=12;
             VECTOR<int,3> counts(5,5,4);
-            RANGE<TV> panel_box(0,aspect_ratio*side_length,0,0,0,side_length);panel_box=panel_box.Thickened(thickness)-panel_box.Center();
+            RANGE<TV> panel_box(TV(),TV(aspect_ratio*side_length,0,side_length));panel_box=panel_box.Thickened(thickness)-panel_box.Center();
             GRID<TV> grid(counts,RANGE<TV>());
             ARRAY<FRAME<TV> ,VECTOR<int,3> > frames(grid.Domain_Indices());
             for(T cell_size=1;;cell_size+=(T).01){

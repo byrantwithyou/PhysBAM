@@ -135,7 +135,7 @@ Initialize(const int test_number_input,const int resolution)
     if(test_number==3){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(2);source_velocity.Resize(2);world_to_source.Resize(2);
-        sources(0)=sources(1)=RANGE<TV>((T).10787,(T).2714532,-(T).10787,(T).10787);
+        sources(0)=sources(1)=RANGE<TV>(TV((T).10787,-(T).10787),TV((T).2714532,(T).10787));
         ARRAY<MATRIX<T,3> > source_to_world(2);
         MATRIX<T,3> rotation=MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
@@ -144,12 +144,12 @@ Initialize(const int test_number_input,const int resolution)
         for(int i=0;i<2;i++){source_velocity(i)=source_to_world(i).Extract_Rotation()*TV((T).5,0);world_to_source(i)=source_to_world(i).Inverse();}}
     if(test_number==5){
         world_to_source.Append(MATRIX<T,3>::Rotation_Matrix_Z_Axis((T)pi/(T)4)*MATRIX<T,3>::Translation_Matrix(TV((T)-.03,(T)-.23)));
-        sources.Append(RANGE<TV>(-(T).010,(T).010,-(T).010,(T).010));
+        sources.Append(RANGE<TV>(TV(-(T).010,-(T).010),TV((T).010,(T).010)));
         source_velocity.Append((T).3*TV(-1,-1).Normalized());}
     if(test_number==8){
         TV domain_center=grid.domain.Center();domain_center.y=(T)1;
         sources.Resize(1);source_velocity.Resize(1);world_to_source.Resize(1);
-        sources(0)=RANGE<TV>(0,(T).1,0,(T).2);
+        sources(0)=RANGE<TV>(TV(),TV((T).1,(T).2));
         ARRAY<MATRIX<T,3> > source_to_world(1);
         MATRIX<T,3> translation=MATRIX<T,3>::Translation_Matrix(domain_center);
         source_to_world(0)=translation;world_to_source(0)=source_to_world(0).Inverse();
@@ -416,7 +416,7 @@ Initial_Phi_Object(const TV& X) const
 {
     if(test_number==4||test_number==20) return rigid_body_collection.Rigid_Body(sphere).Implicit_Geometry_Extended_Value(X);
     else if(test_number==5){
-        static RANGE<TV> glass((T).005,(T).095,(T)-.1,1);
+        static RANGE<TV> glass(TV((T).005,(T)-.1),TV((T).095,1));
         return -glass.Signed_Distance(X);}
     else if(test_number==6){
         static LINE_2D<T> line((TV((T)-.2,1)).Normalized(),TV());

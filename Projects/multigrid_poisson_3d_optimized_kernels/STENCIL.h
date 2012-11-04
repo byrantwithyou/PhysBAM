@@ -254,7 +254,7 @@ template<class T> void
 Print_Stencil(std::ostream& output,const STENCIL<T,3>& stencil)
 {if(!stencil.Size()){output<<"<empty stencil>"<<std::endl;return;}
 HASHTABLE<int,STENCIL<T,2> > slices;
-RANGE<VECTOR<int,3> > box(INT_MAX,INT_MIN,INT_MAX,INT_MIN,INT_MAX,INT_MIN);
+RANGE<VECTOR<int,3> > box;
 for(STENCIL_ITERATOR<const T,3> iterator(stencil);iterator.Valid();iterator.Next()){
     const VECTOR<int,3>& index=iterator.Key();
     box.Enlarge_To_Include_Point(index);

@@ -49,24 +49,24 @@ Fill_Ghost_Cells_Face(const T_GRID& grid,const T_FACE_ARRAYS_T2& u,T_FACE_ARRAYS
 //#####################################################################
 static inline void Find_Ghost_Regions_Helper(ARRAY<RANGE<VECTOR<int,1> > >& regions,const RANGE<VECTOR<int,1> >& domain,const RANGE<VECTOR<int,1> >& ghost)
 {
-    regions(0)=RANGE<VECTOR<int,1> >(ghost.min_corner.x,domain.min_corner.x); // left
-    regions(1)=RANGE<VECTOR<int,1> >(domain.max_corner.x,ghost.max_corner.x); // right
+    regions(0)=RANGE<VECTOR<int,1> >(VECTOR<int,1>(ghost.min_corner.x),VECTOR<int,1>(domain.min_corner.x)); // left
+    regions(1)=RANGE<VECTOR<int,1> >(VECTOR<int,1>(domain.max_corner.x),VECTOR<int,1>(ghost.max_corner.x)); // right
 }
 static inline void Find_Ghost_Regions_Helper(ARRAY<RANGE<VECTOR<int,2> > >& regions,const RANGE<VECTOR<int,2> >& domain,const RANGE<VECTOR<int,2> >& ghost)
 {
-    regions(0)=RANGE<VECTOR<int,2> >(ghost.min_corner.x,domain.min_corner.x,domain.min_corner.y,domain.max_corner.y); // left
-    regions(1)=RANGE<VECTOR<int,2> >(domain.max_corner.x,ghost.max_corner.x,domain.min_corner.y,domain.max_corner.y); // right
-    regions(2)=RANGE<VECTOR<int,2> >(ghost.min_corner.x,ghost.max_corner.x,ghost.min_corner.y,domain.min_corner.y); // bottom
-    regions(3)=RANGE<VECTOR<int,2> >(ghost.min_corner.x,ghost.max_corner.x,domain.max_corner.y,ghost.max_corner.y); // top
+    regions(0)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(ghost.min_corner.x,domain.min_corner.y),VECTOR<int,2>(domain.min_corner.x,domain.max_corner.y)); // left
+    regions(1)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(domain.max_corner.x,domain.min_corner.y),VECTOR<int,2>(ghost.max_corner.x,domain.max_corner.y)); // right
+    regions(2)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(ghost.min_corner.x,ghost.min_corner.y),VECTOR<int,2>(ghost.max_corner.x,domain.min_corner.y)); // bottom
+    regions(3)=RANGE<VECTOR<int,2> >(VECTOR<int,2>(ghost.min_corner.x,domain.max_corner.y),VECTOR<int,2>(ghost.max_corner.x,ghost.max_corner.y)); // top
 }
 static inline void Find_Ghost_Regions_Helper(ARRAY<RANGE<VECTOR<int,3> > >& regions,const RANGE<VECTOR<int,3> >& domain,const RANGE<VECTOR<int,3> >& ghost)
 {
-    regions(0)=RANGE<VECTOR<int,3> >(ghost.min_corner.x,domain.min_corner.x,domain.min_corner.y,domain.max_corner.y,domain.min_corner.z,domain.max_corner.z); // left
-    regions(1)=RANGE<VECTOR<int,3> >(domain.max_corner.x,ghost.max_corner.x,domain.min_corner.y,domain.max_corner.y,domain.min_corner.z,domain.max_corner.z); // right
-    regions(2)=RANGE<VECTOR<int,3> >(ghost.min_corner.x,ghost.max_corner.x,ghost.min_corner.y,domain.min_corner.y,domain.min_corner.z,domain.max_corner.z); // bottom
-    regions(3)=RANGE<VECTOR<int,3> >(ghost.min_corner.x,ghost.max_corner.x,domain.max_corner.y,ghost.max_corner.y,domain.min_corner.z,domain.max_corner.z); // top
-    regions(4)=RANGE<VECTOR<int,3> >(ghost.min_corner.x,ghost.max_corner.x,ghost.min_corner.y,ghost.max_corner.y,ghost.min_corner.z,domain.min_corner.z); // front
-    regions(5)=RANGE<VECTOR<int,3> >(ghost.min_corner.x,ghost.max_corner.x,ghost.min_corner.y,ghost.max_corner.y,domain.max_corner.z,ghost.max_corner.z); // back
+    regions(0)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,domain.min_corner.y,domain.min_corner.z),VECTOR<int,3>(domain.min_corner.x,domain.max_corner.y,domain.max_corner.z)); // left
+    regions(1)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(domain.max_corner.x,domain.min_corner.y,domain.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,domain.max_corner.y,domain.max_corner.z)); // right
+    regions(2)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,ghost.min_corner.y,domain.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,domain.min_corner.y,domain.max_corner.z)); // bottom
+    regions(3)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,domain.max_corner.y,domain.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,ghost.max_corner.y,domain.max_corner.z)); // top
+    regions(4)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,ghost.min_corner.y,ghost.min_corner.z),VECTOR<int,3>(ghost.max_corner.x,ghost.max_corner.y,domain.min_corner.z)); // front
+    regions(5)=RANGE<VECTOR<int,3> >(VECTOR<int,3>(ghost.min_corner.x,ghost.min_corner.y,domain.max_corner.z),VECTOR<int,3>(ghost.max_corner.x,ghost.max_corner.y,ghost.max_corner.z)); // back
 }
 template<class T_GRID,class T2> void BOUNDARY_UNIFORM<T_GRID,T2>::
 Find_Ghost_Regions(const T_GRID& grid,ARRAY<RANGE<TV_INT> >& regions,const int ghost_cells) const

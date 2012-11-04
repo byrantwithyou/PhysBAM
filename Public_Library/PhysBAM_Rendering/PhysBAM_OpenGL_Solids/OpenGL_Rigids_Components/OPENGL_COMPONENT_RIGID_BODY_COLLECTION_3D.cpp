@@ -258,8 +258,8 @@ Display(const int in_color) const
                 int joint_id=((OPENGL_SELECTION_ARTICULATED_RIGID_BODIES_JOINT_3D<T>*)current_selection)->joint_id;
                 OPENGL_SELECTION::Draw_Highlighted_Vertex(articulation_points(joint_id));}}}
 
-    RANGE<VECTOR<T,3> > axes_box(0,2,0,2,0,2);
-    //RANGE<VECTOR<T,3> > axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
+    RANGE<TV> axes_box(RANGE<TV>::Unit_Box()*2);
+    //RANGE<TV> axes_box(0,velocity_field.size,0,velocity_field.size,0,velocity_field.size);
     if(draw_joint_frames==1) for(int i=0;i<joint_frames.m;i++)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
     else if(draw_joint_frames==2) for(int i=1;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
     else if(draw_joint_frames==3) for(int i=0;i<joint_frames.m;i+=2)(OPENGL_AXES<T>(joint_frames(i),axes_box)).Display();
@@ -369,10 +369,10 @@ Print_Selection_Info(std::ostream &output_stream,OPENGL_SELECTION *selection) co
         output_stream<<"Joint rotation vector: "<<joint_frame.r.Rotation_Vector()<<std::endl;
         T twist,phi,theta;joint_frame.r.Euler_Angles(twist,phi,theta);
         output_stream<<"Joint Euler angles: twist="<<twist<<", phi="<<phi<<", theta="<<theta<<std::endl;
-        VECTOR<T,3> ap1=parent->World_Space_Point(joint.F_pj().t),ap2=child->World_Space_Point(joint.F_cj().t),location=(T).5*(ap1+ap2);
+        TV ap1=parent->World_Space_Point(joint.F_pj().t),ap2=child->World_Space_Point(joint.F_cj().t),location=(T).5*(ap1+ap2);
 
-        VECTOR<T,3> current_relative_velocity=-RIGID_BODY<TV>::Relative_Velocity(*parent,*child,location); // child w.r.t. parent!
-        VECTOR<T,3> current_relative_angular_velocity=-RIGID_BODY<TV>::Relative_Angular_Velocity(*parent,*child); // child w.r.t. parent!
+        TV current_relative_velocity=-RIGID_BODY<TV>::Relative_Velocity(*parent,*child,location); // child w.r.t. parent!
+        TV current_relative_angular_velocity=-RIGID_BODY<TV>::Relative_Angular_Velocity(*parent,*child); // child w.r.t. parent!
         output_stream<<"Relative velocity at joint = "<<current_relative_velocity<<std::endl;
         output_stream<<"Relative angular velocity = "<<current_relative_angular_velocity<<std::endl;}
 }

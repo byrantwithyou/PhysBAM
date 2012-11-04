@@ -187,7 +187,7 @@ template<class T,class T2> RANGE<VECTOR<float,3> > OPENGL_SCALAR_FIELD_2D<T,T2>:
 Bounding_Box() const
 {
     // May not be the exact bounds, but close enough...
-    return World_Space_Box(RANGE<VECTOR<float,3> >(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.max_corner.y,0,0));
+    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0))));
 }
 
 template<class T,class T2> void OPENGL_SCALAR_FIELD_2D<T,T2>::

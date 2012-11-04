@@ -36,7 +36,8 @@ Display_Helper(const int cell,const int height,const int in_color) const
 template<class T> RANGE<VECTOR<float,3> > OPENGL_BOX_HIERARCHY_3D<T>::
 Bounding_Box() const
 {
-    if(hierarchy) return RANGE<VECTOR<float,3> >(hierarchy->box_hierarchy(hierarchy->root));else return RANGE<VECTOR<float,3> >(0,0,0,0,0,0);
+    if(hierarchy) return RANGE<VECTOR<float,3> >(hierarchy->box_hierarchy(hierarchy->root));
+    return RANGE<VECTOR<float,3> >(VECTOR<float,3>(),VECTOR<float,3>());
 }
 //#####################################################################
 // Function Decrement_Height

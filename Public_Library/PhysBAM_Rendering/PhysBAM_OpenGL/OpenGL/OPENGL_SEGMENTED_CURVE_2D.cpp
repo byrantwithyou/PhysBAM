@@ -109,7 +109,7 @@ Bounding_Box() const
     for(int i=0;i<curve.particles.Size();i++){
         xmin=min(xmin,(float)curve.particles.X(i).x);xmax=max(xmax,(float)curve.particles.X(i).x);
         ymin=min(ymin,(float)curve.particles.X(i).y);ymax=max(ymax,(float)curve.particles.X(i).y);}
-    return World_Space_Box(RANGE<VECTOR<float,3> >(xmin,xmax,ymin,ymax,0,0));
+    return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(xmin,ymin,0),VECTOR<float,3>(xmax,ymax,0)));
 }
 //#####################################################################
 // Function Get_Selection

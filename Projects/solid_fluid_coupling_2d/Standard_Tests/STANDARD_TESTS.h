@@ -599,7 +599,7 @@ void Initialize_Velocities() PHYSBAM_OVERRIDE
 void Adjust_Density_And_Temperature_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number>=9) return;
-    BASE::Adjust_Density_And_Temperature_With_Sources(RANGE<TV>((T).45,(T).55,(T)0,(T).1),MATRIX<T,3>::Identity_Matrix(),1,fluids_parameters.temperature_products);
+    BASE::Adjust_Density_And_Temperature_With_Sources(RANGE<TV>(TV((T).45,(T)0),TV((T).55,(T).1)),MATRIX<T,3>::Identity_Matrix(),1,fluids_parameters.temperature_products);
 }
 //#####################################################################
 // Function Set_Dirichlet_Boundary_Conditions

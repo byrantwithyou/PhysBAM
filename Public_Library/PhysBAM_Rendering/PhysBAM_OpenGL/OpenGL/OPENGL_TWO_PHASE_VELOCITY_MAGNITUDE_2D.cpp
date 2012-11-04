@@ -74,7 +74,7 @@ Update()
 template<class T> RANGE<VECTOR<float,3> > OPENGL_TWO_PHASE_VELOCITY_MAGNITUDE_2D<T>::
 Bounding_Box() const
 {
-    return RANGE<VECTOR<float,3> >(grid.domain.min_corner.x,grid.domain.max_corner.x,grid.domain.min_corner.y,grid.domain.max_corner.y,0,0);
+    return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.Append(0)),VECTOR<float,3>(grid.domain.max_corner.Append(0)));
 }
 //#####################################################################
 // Function Scale_Vector_Size

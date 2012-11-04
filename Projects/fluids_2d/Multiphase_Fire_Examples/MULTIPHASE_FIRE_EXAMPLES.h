@@ -196,7 +196,7 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
     if(test_number==1){
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next())
-            phis(1)(iterator.Cell_Index())=min(iterator.Location().y-(T).2,RANGE<TV>(0,(T).2,0,(T).5).Signed_Distance(iterator.Location()));
+            phis(1)(iterator.Cell_Index())=min(iterator.Location().y-(T).2,RANGE<TV>(TV(),TV((T).2,(T).5)).Signed_Distance(iterator.Location()));
         //phis(1)(iterator.Cell_Index())=iterator.Location().y-(T).2;
         phis(2).Copy(-1,phis(1));}
     if(test_number==2){
@@ -218,8 +218,8 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
 bool Adjust_Phi_With_Sources(const T time) PHYSBAM_OVERRIDE
 {
     if(test_number==2){
-        Adjust_Phi_With_Source(RANGE<TV>(0,(T).1,(T).1,(T).3),1,MATRIX<T,3>::Identity_Matrix());
-        Adjust_Phi_With_Source(RANGE<TV>((T).9,1,(T).1,(T).3),2,MATRIX<T,3>::Identity_Matrix());
+        Adjust_Phi_With_Source(RANGE<TV>(TV(0,(T).1),TV((T).1,(T).3)),1,MATRIX<T,3>::Identity_Matrix());
+        Adjust_Phi_With_Source(RANGE<TV>(TV((T).9,(T).1),TV(1,(T).3)),2,MATRIX<T,3>::Identity_Matrix());
         ARRAY<ARRAY<T,VECTOR<int,2> > >& phis=fluids_parameters.particle_levelset_evolution_multiple->phis;
         T reaction_seed_bandwidth=(T).5*reaction_bandwidth*fluids_parameters.grid->Minimum_Edge_Length();
         for(CELL_ITERATOR iterator(*fluids_parameters.grid);iterator.Valid();iterator.Next()){

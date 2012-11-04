@@ -135,7 +135,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
     fluids_parameters.sph_evolution->target_particles_per_unit_volume=20000;
     if(test_number==1){
         int particles_added=0;
-        RANGE<TV> seed_box((T)0.7,1,0,1);
+        RANGE<TV> seed_box(TV((T)0.7,0),TV(1,1));
         number_of_particles=(int)(seed_box.Size()*(T)fluids_parameters.sph_evolution->target_particles_per_unit_volume);
         while(particles_added<number_of_particles){
             TV X=random.Get_Uniform_Vector(grid.Xmin(),grid.Xmax());
@@ -159,7 +159,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
     else if(test_number==3){
         int particles_added=0;
         SPHERE<TV> seed_sphere(TV((T).5,(T).75),(T).2);
-        RANGE<TV> seed_box((T)0,(T)1,(T)0,(T).5);
+        RANGE<TV> seed_box(TV(),TV(1,(T).5));
         // assume they don't overlap to compute total area
         number_of_particles=(int)((seed_box.Size()+seed_sphere.Size())*(T)fluids_parameters.sph_evolution->target_particles_per_unit_volume);
         while(particles_added<number_of_particles){
@@ -171,7 +171,7 @@ void Initialize_SPH_Particles() PHYSBAM_OVERRIDE
                 sph_particles.X(id)=X;}}}
     else if(test_number==5);
     else if(test_number==6){
-        RANGE<TV> initial_seed_box((T)0,(T)1,(T)0,(T).25);
+        RANGE<TV> initial_seed_box(TV(),TV(1,(T).25));
         number_of_particles=(int)(initial_seed_box.Size()*(T)fluids_parameters.sph_evolution->target_particles_per_unit_volume);
         int particles_added=0;
         while(particles_added<number_of_particles){
@@ -243,7 +243,7 @@ void Add_SPH_Particles_For_Sources(const T dt,const T time)
 {
     SPH_PARTICLES<TV>& sph_particles=fluids_parameters.sph_evolution->sph_particles;
     if(test_number==5){
-        RANGE<TV> source_box((T).2,(T).3,(T).8,(T).9);
+        RANGE<TV> source_box(TV((T).2,(T).8),TV((T).3,(T).9));
         int particles_per_second=2000;
         int particles_to_add=max(1,(int)((T)particles_per_second*dt));
         for(int i=0;i<particles_to_add;i++) sph_particles.X(sph_particles.Add_Element())=random.Get_Uniform_Vector(source_box);}

@@ -49,7 +49,7 @@ public:
         fluids_parameters.use_vorticity_confinement=false;
         fluids_parameters.use_levelset_viscosity=true;
         write_output_files=true;fluids_parameters.write_debug_data=true;
-        source_domain=RANGE<TV>((T).45,(T).55,(T)0,(T).1);
+        source_domain=RANGE<TV>(TV((T).45,(T)0),TV((T).55,(T).1));
 //        fluids_parameters.use_maccormack_semi_lagrangian_advection=true;
 
         sample_points.Append(TV(1.25,2.5));

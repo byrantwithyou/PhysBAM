@@ -36,16 +36,16 @@ public:
         :MATERIAL_SHADER<T>(world),color1(color1_input),color2(color2_input),octaves(octaves),lacunarity(lacunarity),gain(gain),low(low),high(high),vain_value(vain_value),vain_width(vain_width),
         clamp_width(clamp_width)
     {
-        RANGE<VECTOR<T,1> > dark(vain_value-vain_width,vain_value+vain_width);
+        INTERVAL<T> dark(vain_value-vain_width,vain_value+vain_width);
         T clamp_value=vain_value+clamp_width;
         curve.Add_Control_Point(0,clamp_value);
-        curve.Add_Control_Point(dark.min_corner.x-clamp_width,clamp_value);
-        curve.Add_Control_Point(dark.min_corner.x,dark.max_corner.x);
-        curve.Add_Control_Point(dark.Size()/4+dark.min_corner.x,(T).3);
-        curve.Add_Control_Point(dark.Size()/2+dark.min_corner.x,(T).2);
-        curve.Add_Control_Point(3*dark.Size()/4+dark.min_corner.x,(T).3);
-        curve.Add_Control_Point(dark.max_corner.x,dark.max_corner.x);
-        curve.Add_Control_Point(dark.max_corner.x+clamp_width,clamp_value);
+        curve.Add_Control_Point(dark.min_corner-clamp_width,clamp_value);
+        curve.Add_Control_Point(dark.min_corner,dark.max_corner);
+        curve.Add_Control_Point(dark.Size()/4+dark.min_corner,(T).3);
+        curve.Add_Control_Point(dark.Size()/2+dark.min_corner,(T).2);
+        curve.Add_Control_Point(3*dark.Size()/4+dark.min_corner,(T).3);
+        curve.Add_Control_Point(dark.max_corner,dark.max_corner);
+        curve.Add_Control_Point(dark.max_corner+clamp_width,clamp_value);
     }
 
     VECTOR<T,3> Shade_Surface_Using_Direct_Illumination(const RENDERING_RAY<T>& ray,const RENDERING_OBJECT<T>& exiting_object,const RENDERING_OBJECT<T>& entering_object,

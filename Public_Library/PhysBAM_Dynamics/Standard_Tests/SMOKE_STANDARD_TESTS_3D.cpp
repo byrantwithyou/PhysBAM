@@ -56,7 +56,7 @@ Initialize(const int test_number_input,const int resolution)
     
     // set up the source domain
     if(test_number==1||test_number==2||test_number==3||test_number==4){
-        source=RANGE<TV>((T).35,(T).65,(T).35,(T).65,(T)0,(T).1);
+        source=RANGE<TV>(TV((T).35,(T).35,(T)0),TV((T).65,(T).65,(T).1));
         //source=RANGE<TV>((T).45,(T).55,(T)0,(T).1,(T).45,(T).55);
         world_to_source=MATRIX<T,4>::Identity_Matrix();
         source_velocity=TV((T)0,(T)0,(T)2);}

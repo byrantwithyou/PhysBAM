@@ -355,7 +355,7 @@ Surface(const TV& location,const T max_depth,const T thickness_over_2,int* close
     
     if(max_depth){
         PHYSBAM_ASSERT(hierarchy);
-        RANGE<TV> box(location.x-max_depth,location.x+max_depth,location.y-max_depth,location.y+max_depth,location.z-max_depth,location.z+max_depth);
+        RANGE<TV> box(location-max_depth,location+max_depth);
         ARRAY<int> nearby_triangles;hierarchy->Intersection_List(box,nearby_triangles);
         if(!nearby_triangles.m){ // grab any point assuming far from the interface
             RAY<TV> ray(location,particles.X(mesh.elements(0)(0))-location);if(closest_triangle) *closest_triangle=0;
@@ -395,7 +395,7 @@ Oriented_Surface(const TV& location,const TV& normal,const T max_depth,const T t
     
     if(max_depth){
         PHYSBAM_ASSERT(hierarchy);
-        RANGE<TV> box(location.x-max_depth,location.x+max_depth,location.y-max_depth,location.y+max_depth,location.z-max_depth,location.z+max_depth);
+        RANGE<TV> box(location-max_depth,location+max_depth);
         ARRAY<int> nearby_triangles;hierarchy->Intersection_List(box,nearby_triangles);
         if(!nearby_triangles.m){ // grab any point ignoring normal assuming far from the interface
             RAY<TV> ray(location,particles.X(mesh.elements(0)(0))-location);if(closest_triangle) *closest_triangle=0;

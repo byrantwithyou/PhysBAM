@@ -77,7 +77,7 @@ public:
     {return *frame*object_space_point;}
 
     RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<float,1> >& object_space_box) const
-    {return World_Space_Box(RANGE<VECTOR<float,3> >(object_space_box.min_corner.x,object_space_box.max_corner.x,0,0,0,0));}
+    {return World_Space_Box(RANGE<VECTOR<float,3> >(VECTOR<float,3>(object_space_box.min_corner.x,0,0),VECTOR<float,3>(object_space_box.max_corner.x,0,0)));}
 
     RANGE<VECTOR<float,3> > World_Space_Box(const RANGE<VECTOR<float,2> >& object_space_box) const
     {return World_Space_Box(Convert_2d_To_3d(object_space_box));}

@@ -88,7 +88,7 @@ void Parse_Options() PHYSBAM_OVERRIDE
 
     //grid
     int cells=resolution;
-    fluids_parameters.grid->Initialize(TV_INT(4,1,1)*cells,RANGE<VECTOR<T,3> >((T)-2.,(T)2.,(T)-.5,(T).5,(T)-.5,(T).5));
+    fluids_parameters.grid->Initialize(TV_INT(4,1,1)*cells,RANGE<TV>(TV((T)-2,(T)-.5,(T)-.5),TV((T)2.,(T).5,(T).5)));
     *fluids_parameters.grid=fluids_parameters.grid->Get_MAC_Grid_At_Regular_Positions();
     fluids_parameters.domain_walls[0][0]=false;fluids_parameters.domain_walls[0][1]=false;fluids_parameters.domain_walls[1][0]=true;
     fluids_parameters.domain_walls[1][1]=true;fluids_parameters.domain_walls[2][0]=true;fluids_parameters.domain_walls[2][1]=true;
@@ -150,8 +150,8 @@ void Initialize_Phi() PHYSBAM_OVERRIDE
     ARRAY<bool,VECTOR<int,3> > psi_cut_out(grid.Domain_Indices(),true);
     TV drop_center((T)-1,(T)0,(T)0);T drop_radius=(T).2;
     for(UNIFORM_GRID_ITERATOR_CELL<TV> iterator(grid);iterator.Valid();iterator.Next()){
-        VECTOR<int,3> cell_index=iterator.Cell_Index();VECTOR<T,3> X=iterator.Location();
-        phi(cell_index)=VECTOR<T,3>(X-drop_center).Magnitude()-drop_radius;
+        VECTOR<int,3> cell_index=iterator.Cell_Index();TV X=iterator.Location();
+        phi(cell_index)=TV(X-drop_center).Magnitude()-drop_radius;
         if(phi(cell_index)>0) psi_cut_out(cell_index)=true;}
     fluids_parameters.euler->Set_Up_Cut_Out_Grid(psi_cut_out);
 }

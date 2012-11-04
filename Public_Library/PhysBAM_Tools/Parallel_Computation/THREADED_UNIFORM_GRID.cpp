@@ -224,14 +224,14 @@ Exchange_Boundary_Cell_Data(ARRAYS_ND_BASE<T2,VECTOR<int,TV::dimension> >& data,
     RANGE<TV_INT> sentinels=RANGE<TV_INT>::Zero_Box();
     const ARRAY<int>& neighbor_ranks=include_corners?all_neighbor_ranks:side_neighbor_ranks;
     // send
-    ARRAY<RANGE<TV_INT> > send_regions;Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(0,bandwidth-1),include_corners,true,local_grid);
+    ARRAY<RANGE<TV_INT> > send_regions;Find_Boundary_Regions(send_regions,sentinels,false,RANGE<VECTOR<int,1> >(VECTOR<int,1>(0),VECTOR<int,1>(bandwidth-1)),include_corners,true,local_grid);
     for(int n=0;n<send_regions.m;n++)if(neighbor_ranks(n)!=-1){
         THREAD_PACKAGE pack=Package_Cell_Data(data,send_regions(n));pack.recv_tid=neighbor_ranks(n);
         pthread_mutex_lock(lock);
         buffers.Append(pack);
         pthread_mutex_unlock(lock);}
     // receive
-    ARRAY<RANGE<TV_INT> > recv_regions;Find_Boundary_Regions(recv_regions,sentinels,false,RANGE<VECTOR<int,1> >(-bandwidth,-1),include_corners,true,local_grid);
+    ARRAY<RANGE<TV_INT> > recv_regions;Find_Boundary_Regions(recv_regions,sentinels,false,RANGE<VECTOR<int,1> >(VECTOR<int,1>(-bandwidth),VECTOR<int,1>(-1)),include_corners,true,local_grid);
     pthread_barrier_wait(barr);
     for(int n=0;n<recv_regions.m;n++)if(neighbor_ranks(n)!=-1){int index=-1;
         for(int i=0;i<buffers.m;i++) if(buffers(i).send_tid==neighbor_ranks(n) && buffers(i).recv_tid==rank) index=i;
@@ -249,7 +249,7 @@ template<class T_GRID> template<class T2> void THREADED_UNIFORM_GRID<T_GRID>::
 Exchange_Boundary_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const int bandwidth) const
 {   
 #ifdef USE_PTHREADS
-    RANGE<VECTOR<int,1> > boundary_band(0,bandwidth-1),ghost_band(-bandwidth,-1);
+    RANGE<VECTOR<int,1> > boundary_band(VECTOR<int,1>(0),VECTOR<int,1>(bandwidth-1)),ghost_band(VECTOR<int,1>(-bandwidth),VECTOR<int,1>(-1));
     // send
     ARRAY<ARRAY<RANGE<TV_INT> > > send_regions(T_GRID::dimension);
     for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(send_regions(axis),Face_Sentinels(axis),true,boundary_band,true);
@@ -285,7 +285,7 @@ Average_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data) const
 {
 #ifdef USE_PTHREADS
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
-    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
+    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(VECTOR<int,1>(),VECTOR<int,1>()),false);
     // send and receive into temporary buffers
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
         int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();
@@ -317,7 +317,7 @@ Assert_Common_Face_Data(ARRAY<T2,FACE_INDEX<TV::dimension> >& data,const T toler
 {
 #ifdef USE_PTHREADS
     ARRAY<ARRAY<RANGE<TV_INT> > > regions(T_GRID::dimension);
-    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(0,0),false);
+    for(int axis=0;axis<T_GRID::dimension;axis++)Find_Boundary_Regions(regions(axis),Face_Sentinels(axis),false,RANGE<VECTOR<int,1> >(VECTOR<int,1>(),VECTOR<int,1>()),false);
     // send and receive into temporary buffers
     for(int n=0;n<regions(0).m;n++)if(side_neighbor_ranks(n)!=-1){int axis=n/2;
         int size=0;for(FACE_ITERATOR iterator(local_grid,regions(axis)(n),axis);iterator.Valid();iterator.Next()) size+=data.data(axis).Pack_Size();

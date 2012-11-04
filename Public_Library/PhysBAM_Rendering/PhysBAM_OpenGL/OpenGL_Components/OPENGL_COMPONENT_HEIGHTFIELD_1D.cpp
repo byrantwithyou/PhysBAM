@@ -200,7 +200,7 @@ Bounding_Box() const
             max_x=max(max_x,x->Max());
         }
 
-        return RANGE<VECTOR<float,3> >(min_x, max_x, min_height, max_height, 0, 0);
+        return RANGE<VECTOR<float,3> >(VECTOR<float,3>(min_x,min_height,0),VECTOR<float,3>(max_x,max_height,0));
     }
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }

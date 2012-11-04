@@ -65,7 +65,7 @@ Initialize(const int test_number_input,const int resolution,const T angle_fracti
 
     // set up the source domain
     if(test_number==1 || test_number==2 || test_number==3){
-        source=RANGE<TV>((T).45,(T).55,(T)0,(T).1);
+        source=RANGE<TV>(TV((T).45,(T)0),TV((T).55,(T).1));
         world_to_source=MATRIX<T,3>::Identity_Matrix();
         source_velocity=VECTOR<T,2>((T)0,(T)0.5);}
 

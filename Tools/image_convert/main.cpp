@@ -23,7 +23,7 @@ Bloom(ARRAY<VECTOR<T,3>,VECTOR<int,2> >& image,const T bloom_radius,const T bloo
     PROGRESS_INDICATOR progress(image.counts.x*image.counts.y);
     for(int i=0;i<image.counts.x;i++) for(int j=0;j<image.counts.y;j++){
         T weight_sum=0;
-        RANGE<VECTOR<int,2> > bloom_box(clamp_min(i-bloom_width,1),clamp_max(i+bloom_width,image.counts.x),clamp_min(j-bloom_width,1),clamp_max(j+bloom_width,image.counts.y));
+        RANGE<VECTOR<int,2> > bloom_box(VECTOR<int,2>(clamp_min(i-bloom_width,1),clamp_min(j-bloom_width,1)),VECTOR<int,2>(clamp_max(i+bloom_width,image.counts.x),clamp_max(j+bloom_width,image.counts.y)));
         //std::cout<<"pixel "<<i<<","<<j<<" box="<<bloom_box<<std::endl;
         for(int ii=bloom_box.min_corner.x;ii<=bloom_box.max_corner.x;ii++) for(int jj=bloom_box.min_corner.y;jj<=bloom_box.max_corner.y;jj++) if(ii!=i || jj!=j){
             int dx=ii-i,dy=jj-j;

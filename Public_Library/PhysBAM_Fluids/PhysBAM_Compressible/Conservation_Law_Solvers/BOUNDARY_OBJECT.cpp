@@ -45,12 +45,12 @@ Fill_Ghost_Cells_Neumann(const GRID<VECTOR<T,1> >& grid_1d,ARRAY<TV_DIMENSION,VE
     const int ghost_cells,const bool use_exact_neumann_face_location,const VECTOR<int,2>& domain,const VECTOR<int,2>& region_boundaries,const VECTOR<bool,2>& psi_N,CONSERVATION_CALLBACKS<T>* callbacks)
 {
     TV_DIMENSION u_1d;
-    ARRAY<RANGE<VECTOR<int,1> > > regions;regions.Resize(2);
-    regions(0)=RANGE<VECTOR<int,1> >(region_boundaries.x-ghost_cells,region_boundaries.x-1);
-    regions(1)=RANGE<VECTOR<int,1> >(region_boundaries.y+1,region_boundaries.y+ghost_cells);
+    ARRAY<INTERVAL<T> > regions;regions.Resize(2);
+    regions(0)=INTERVAL<T>(region_boundaries.x-ghost_cells,region_boundaries.x-1);
+    regions(1)=INTERVAL<T>(region_boundaries.y+1,region_boundaries.y+ghost_cells);
     for(int side=0;side<2;side++) if(psi_N(side))
-        for(int i=regions(side).Minimum_Corner()[0];i<regions(side).Maximum_Corner()[0];i++) if(i>=domain.x && i<domain.y){
-            int reflection_face=side&1?regions(side).Minimum_Corner()[0]:regions(side).Maximum_Corner()[0]+1;
+        for(int i=regions(side).min_corner;i<regions(side).max_corner;i++) if(i>=domain.x && i<domain.y){
+            int reflection_face=side&1?regions(side).min_corner:regions(side).max_corner+1;
             if(use_exact_neumann_face_location){
                 T location=grid_1d.Center(VECTOR<int,1>(i)).x;
                 T boundary_face_location;callbacks->Get_Neumann_Face_Location(grid_1d,reflection_face,boundary_face_location);

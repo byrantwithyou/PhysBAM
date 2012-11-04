@@ -166,7 +166,7 @@ Toggle_Draw_Phi_Valid_Mask()
 template<class T,class RW> RANGE<VECTOR<float,3> > OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<T,RW>::
 Bounding_Box() const
 {
-    if (valid && draw) return RANGE<VECTOR<float,3> >(grid.domain.min_corner.x,grid.domain.min_corner.y,0,grid.domain.max_corner.x,grid.domain.max_corner.y,0);
+    if(valid && draw) return RANGE<VECTOR<float,3> >(VECTOR<float,3>(grid.domain.min_corner.x,0,grid.domain.max_corner.y),VECTOR<float,3>(grid.domain.min_corner.y,grid.domain.max_corner.x,0));
     else return RANGE<VECTOR<float,3> >::Centered_Box();
 }
 template class OPENGL_COMPONENT_THIN_SHELLS_DEBUGGING_2D<float,float>;
